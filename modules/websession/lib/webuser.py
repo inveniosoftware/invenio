@@ -65,13 +65,14 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_URL, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+     CFG_CERN_SITE, \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
 from invenio import session
 from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
-from invenio.access_control_admin import acc_find_user_role_actions, acc_get_role_id, acc_get_role_id
+from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
 from invenio.access_control_config import SUPERADMINROLE
@@ -181,7 +182,7 @@ def getApacheUser(req):
     sm.maintain_session(req, s, remember_me)
     return apache_user
 
-def getUid (req):
+def getUid(req):
     """Return user ID taking it from the cookie of the request.
        Includes control mechanism for the guest users, inserting in
        the database table when need be, raising the cookie back to the
@@ -218,6 +219,10 @@ def getUid (req):
                 return 0
             else:
                 return -1
+    else:
+        if not hasattr(req, '_user_info') and 'user_info' in s.param_list():
+            req._user_info = s.param_get('user_info')
+            req._user_info = collect_user_info(req, refresh=True)
 
     remember_me = s.getRememberMe()
     sm.maintain_session(req, s, remember_me)
@@ -252,12 +257,14 @@ def setApacheUser(req, apache_user):
         s = sm.get_session(req)
     s.setApacheUser(apache_user)
     sm.maintain_session(req, s)
+    user_info = collect_user_info(req, login_time=True)
+    session_param_set(req, 'user_info', user_info)
+    req._user_info = user_info
     return apache_user
 
 def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
     """
-    from invenio.search_engine import get_permitted_restricted_collections
     if hasattr(req, '_user_info'):
         del req._user_info
     sm = session.MPSessionManager(pSession, pSessionMapping())
@@ -269,13 +276,27 @@ def setUid(req, uid, remember_me=False):
     s.setUid(uid)
     s.setRememberMe(remember_me)
     sm.maintain_session(req, s, remember_me)
-    if CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL > 0:
-        if uid > 0:
-            collections = get_permitted_restricted_collections(collect_user_info(req))
-            session_param_set(req, 'permitted_restricted_collections', collections)
-        else:
-            session_param_set(req, 'permitted_restricted_collections', [])
+    if uid > 0:
+        user_info = collect_user_info(req, login_time=True)
+        session_param_set(req, 'user_info', user_info)
+        req._user_info = user_info
+    else:
+        session_param_del(req, 'user_info')
     return uid
+
+def session_param_del(req, key):
+    """
+    Remove a given key from the session.
+    """
+    sm = session.MPSessionManager(pSession, pSessionMapping())
+    try:
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        s = sm.get_session(req)
+    s.param_del(key)
+    remember_me = s.getRememberMe()
+    sm.maintain_session(req, s, remember_me)
 
 def session_param_set(req, key, value):
     """
@@ -365,7 +386,7 @@ def isGuestUser(uid):
     """
     out = 1
     try:
-        res = run_sql("select email from user where id=%s", (uid,))
+        res = run_sql("SELECT email FROM user WHERE id=%s LIMIT 1", (uid,), 1)
         if res:
             if res[0][0]:
                 out = 0
@@ -376,41 +397,30 @@ def isGuestUser(uid):
 def isUserSubmitter(user_info):
     """Return True if the user is a submitter for something; False otherwise."""
     u_email = get_email(user_info['uid'])
-    res = run_sql("select email from sbmSUBMISSIONS where email=%s", (u_email,))
+    res = run_sql("SELECT email FROM sbmSUBMISSIONS WHERE email=%s LIMIT 1", (u_email,), 1)
     return len(res) > 0
 
 def isUserReferee(user_info):
     """Return True if the user is a referee for something; False otherwise."""
-    return True
-    ## FIXME: This function is useful for the user experience, but is so
-    ## slooooooooooow on real system that for the time being it's disabled.
-    from invenio.access_control_engine import acc_authorize_action
-    res = run_sql("select sdocname from sbmDOCTYPE")
-    for row in res:
-        doctype = row[0]
-        categ = "*"
-        (auth_code, auth_message) = acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
-        if auth_code == 0:
-            return 1
-        res2 = run_sql("select sname from sbmCATEGORIES where doctype=%s", (doctype,))
-        for row2 in res2:
-            categ = row2[0]
-            (auth_code, auth_message) = acc_authorize_action(user_info, "referee", doctype=doctype, categ=categ)
-            if auth_code == 0:
-                return 1
-    return 0
+    if CFG_CERN_SITE:
+        return True
+    else:
+        for (role_id, role_name, role_description) in acc_get_action_roles(acc_get_action_id('referee')):
+            if acc_is_user_in_role(user_info, role_id):
+                return True
+    return False
 
 def isUserAdmin(user_info):
     """Return True if the user has some admin rights; False otherwise."""
-    return acc_find_user_role_actions(user_info)
+    return acc_find_possible_activities(user_info) != {}
 
 def isUserSuperAdmin(user_info):
     """Return True if the user is superadmin; False otherwise."""
     if run_sql("""SELECT r.id
         FROM accROLE r LEFT JOIN user_accROLE ur
         ON r.id = ur.id_accROLE
-        WHERE r.name = '%s' AND
-        ur.id_user = '%s' AND ur.expiration>=NOW()""" % (SUPERADMINROLE, user_info['uid'])):
+        WHERE r.name = %s AND
+        ur.id_user = %s AND ur.expiration>=NOW() LIMIT 1""", (SUPERADMINROLE, user_info['uid']), 1):
         return True
     return acc_firerole_check_user(user_info, load_role_definition(acc_get_role_id(SUPERADMINROLE)))
 
@@ -834,14 +844,22 @@ def create_userinfobox_body(req, uid, language="en"):
     else:
         url_referer = CFG_SITE_URL
 
+    user_info = collect_user_info(req)
+
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,
                                             url_referer=url_referer,
                                             guest = isGuestUser(uid),
                                             username = get_nickname_or_email(uid),
-                                            submitter = True, # FIXME isUserSubmitter(uid),
-                                            referee = True, # FIXME isUserReferee(req),
-                                            admin = True # FIXME isUserAdmin(req),
+                                            submitter = user_info['precached_viewsubmissions'],
+                                            referee = user_info['precached_useapprove'],
+                                            admin = user_info['precached_useadmin'],
+                                            usebaskets = user_info['precached_usebaskets'],
+                                            usemessages = user_info['precached_usemessages'],
+                                            usealerts = user_info['precached_usealerts'],
+                                            usegroups = user_info['precached_usegroups'],
+                                            useloans = user_info['precached_useloans'],
+                                            usestats = user_info['precached_usestats']
                                             )
     except OperationalError:
         return ""
@@ -966,7 +984,7 @@ def get_preferred_user_language(req):
 
     return new_lang
 
-def collect_user_info(req):
+def collect_user_info(req, login_time=False, refresh=False):
     """Given the mod_python request object rec or a uid it returns a dictionary
     containing at least the keys uid, nickname, email, groups, plus any external keys in
     the user preferences (collected at login time and built by the different
@@ -978,6 +996,7 @@ def collect_user_info(req):
     is saved into req._user_info (for caching purpouses)
     setApacheUser & setUid will properly reset it.
     """
+    from invenio.search_engine import get_permitted_restricted_collections
     user_info = {
         'remote_ip' : '',
         'remote_host' : '',
@@ -991,10 +1010,18 @@ def collect_user_info(req):
         'email' : '',
         'group' : [],
         'guest' : '1',
-        'last_login' : datetime.datetime(1970, 1, 1)
+        'precached_permitted_restricted_collections' : [],
+        'precached_usebaskets' : False,
+        'precached_useloans' : False,
+        'precached_usegroups' : False,
+        'precached_usealerts' : False,
+        'precached_usemessages' : False,
+        'precached_viewsubmissions' : False,
+        'precached_useapprove' : False,
+        'precached_useadmin' : False,
+        'precached_usestats' : False,
     }
 
-    has_req = False
     try:
         if req is None:
             uid = -1
@@ -1013,10 +1040,12 @@ def collect_user_info(req):
             user_info.update(req)
             return user_info
         else:
-            if hasattr(req, '_user_info'):
-                return req._user_info
-            has_req = True
             uid = getUid(req)
+            if hasattr(req, '_user_info') and not login_time:
+                user_info = req._user_info
+                if not refresh:
+                    return req._user_info
+            req._user_info = user_info
             try:
                 user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
             except gaierror:
@@ -1039,11 +1068,10 @@ def collect_user_info(req):
         user_info['guest'] = str(isGuestUser(uid))
         if user_info['guest'] == '0':
             user_info['group'] = [group[1] for group in get_groups(uid)]
-            user_info['last_login'] = get_last_login(uid)
             prefs = get_user_preferences(uid)
             login_method = prefs['login_method']
             login_object = CFG_EXTERNAL_AUTHENTICATION[login_method][0]
-            if login_object and ((datetime.datetime.now() - user_info['last_login']).days > 0):
+            if login_object and ((datetime.datetime.now() - get_last_login(uid)).days > 0):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
                 try:
@@ -1072,14 +1100,25 @@ def collect_user_info(req):
                     prefs = get_user_preferences(uid)
 
                 run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid, ))
-                user_info['last_login'] = get_last_login(uid)
             if prefs:
                 for key, value in prefs.iteritems():
                     user_info[key.lower()] = value
+            if login_time:
+                ## Heavy computational information
+                from invenio.access_control_engine import acc_authorize_action
+                if CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL > 0:
+                    user_info['precached_permitted_restricted_collections'] = get_permitted_restricted_collections(user_info)
+                user_info['precached_usebaskets'] = acc_authorize_action(user_info, 'usebaskets')[0] == 0
+                user_info['precached_useloans'] = acc_authorize_action(user_info, 'useloans')[0] == 0
+                user_info['precached_usegroups'] = acc_authorize_action(user_info, 'usegroups')[0] == 0
+                user_info['precached_usealerts'] = acc_authorize_action(user_info, 'usealerts')[0] == 0
+                user_info['precached_usemessages'] = acc_authorize_action(user_info, 'usemessages')[0] == 0
+                user_info['precached_usestats'] = acc_authorize_action(user_info, 'runwebstatadmin')[0] == 0
+                user_info['precached_viewsubmissions'] = isUserSubmitter(user_info)
+                user_info['precached_useapprove'] = isUserReferee(user_info)
+                user_info['precached_useadmin'] = isUserAdmin(user_info)
     except Exception, e:
         register_exception()
-    if has_req:
-        req._user_info = user_info
     return user_info
 
 ## --- follow some functions for Apache user/group authentication

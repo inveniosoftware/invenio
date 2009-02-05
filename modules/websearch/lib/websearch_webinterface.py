@@ -482,7 +482,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 ## Let's update the current collections list with all
                 ## the restricted collections the user has rights to view.
                 try:
-                    restricted_collections = session_param_get(req, 'permitted_restricted_collections')
+                    restricted_collections = user_info['precached_permitted_restricted_collections']
                     argd_collections = Set(argd['c'])
                     argd_collections.update(restricted_collections)
                     argd['c'] = list(argd_collections)

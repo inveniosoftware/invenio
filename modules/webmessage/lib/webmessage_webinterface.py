@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_URL, CFG_ACCESS_CONTROL_LEVEL_SITE
-from invenio.webuser import getUid, isGuestUser, page_not_authorized
+from invenio.webuser import getUid, isGuestUser, page_not_authorized, collect_user_info
 from invenio.webmessage import perform_request_display, \
                                perform_request_display_msg, \
                                perform_request_write, \
@@ -76,6 +76,10 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usemessages']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use messages."))
 
         (body, errors, warnings) = perform_request_display(uid=uid,
                                                            ln=argd['ln'])
@@ -123,6 +127,10 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usemessages']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use messages."))
 
         # Request the composing page
         (body, errors, warnings) = perform_request_write(
@@ -199,6 +207,11 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usemessages']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use messages."))
+
         if argd['send_button']:
             (body, errors, warnings, title, navtrail) = perform_request_send(
                             uid=uid,
@@ -272,6 +285,11 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usemessages']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use messages."))
+
         # Generate content
         (body, errors, warnings) = perform_request_delete_msg(uid,
                                                               argd['msgid'],
@@ -314,6 +332,11 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usemessages']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use messages."))
+
         # Generate content
         (body, errors, warnings) = perform_request_delete_all(uid,
                                                               argd['confirmed'],
@@ -355,6 +378,12 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_usemessages']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use messages."))
+
         # Generate content
         (body, errors, warnings) = perform_request_display_msg(uid,
                                                                argd['msgid'],

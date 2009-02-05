@@ -106,7 +106,15 @@ if CFG_CERN_SITE:
 # roles
 #           name          description          definition
 DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
-             (WEBACCESSADMINROLE, 'WebAccess administrator', 'deny any'))
+             (WEBACCESSADMINROLE, 'WebAccess administrator', 'deny any'),
+             ('anyuser', 'Any user', 'allow any'),
+             ('basketusers', 'Users who can use baskets', 'allow any'),
+             ('loanusers', 'Users who can use loans', 'allow any'),
+             ('groupusers', 'Users who can use groups', 'allow any'),
+             ('alertusers', 'Users who can use alerts', 'allow any'),
+             ('messageusers', 'Users who can use messages', 'allow any'),
+             ('holdingsusers', 'Users who can view holdings', 'allow any'),
+             ('statisticsusers', 'Users who can view statistics', 'allow any'))
 
 # Demo site roles
 DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
@@ -114,7 +122,8 @@ DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('thesescurator', 'Theses collection curator', 'deny any'),
                   ('bookcurator', 'Book collection curator', 'deny any'),
                   ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'),
-                  ('curator', 'Curator', 'deny any'))
+                  ('curator', 'Curator', 'deny any'),
+                  ('basketusers', 'User who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('dorian.gray@cds.cern.ch', 'bookcurator'),
@@ -163,12 +172,25 @@ DEF_ACTIONS = (
                ('attachcommentfile', 'attach files to comments', 'collection', 'no'),
                ('cfgbibexport', 'configure BibExport', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
-               ('fulltext', 'administrate Fulltext', '', 'no')
+               ('fulltext', 'administrate Fulltext', '', 'no'),
+               ('usebaskets', 'use baskets', '', 'no'),
+               ('useloans', 'use loans', '', 'no'),
+               ('usegroups', 'use groups', '', 'no'),
+               ('usealerts', 'use alerts', '', 'no'),
+               ('usemessages', 'use messages', '', 'no'),
+               ('viewholdings', 'view holdings', 'collection', 'yes'),
+               ('viewstatistics', 'view statistics', 'collection', 'yes')
               )
 
 # Default authorizations
 #              role          action       arglistid  optional  arguments
-DEF_AUTHS = ()
+DEF_AUTHS = (('basketusers', 'usebaskets', -1, 0, {}),
+             ('loanusers', 'useloans', -1, 0, {}),
+             ('groupusers', 'usegroups', -1, 0, {}),
+             ('alertusers', 'usealerts', -1, 0, {}),
+             ('messageusers', 'usemessages', -1, 0, {}),
+             ('holdingsusers', 'viewholdings', -1, 1, {}),
+             ('statisticsusers', 'viewstatistics', -1, 1, {}))
 
 # Demo site authorizations
 #              role          action       arglistid  optional  arguments
@@ -185,8 +207,9 @@ DEF_DEMO_AUTHS = (
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)
+# Activities (i.e. actions) for which it exist an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit' : (_("Run BibEdit"), "%s/record/edit/" % CFG_SITE_URL),
+    'runbibedit' : (_("Run BibEdit"), "%s/record/edit/?ln=%%s" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibharvest' : (_("Configure BibHarvest"), "%s/admin/bibharvest/bibharvestadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/bibharvest/oaiarchiveadmin.py?ln=%%s" % CFG_SITE_URL),

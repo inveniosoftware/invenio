@@ -63,6 +63,7 @@ from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
 from invenio.webuser import collect_user_info
 from invenio.webcomment import check_user_can_attach_file_to_comments
+from invenio.access_control_engine import acc_authorize_action
 try:
     from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
     fckeditor_available = True
@@ -147,6 +148,10 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         rights = get_max_user_rights_on_basket(argd['uid'], argd['bskid'])
 
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         if user_info['email'] == 'guest' and not user_info['apache_user']:
             # Ask to login
             target = '/youraccount/login' + \
@@ -224,6 +229,8 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         if user_info['email'] == 'guest' and not user_info['apache_user']:
             # 1. User is guest: must login prior to upload
             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
+        if not user_info['precached_usebaskets']:
+            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to use WebBasket')
         elif not check_user_can_comment(uid, argd['bskid']):
             # 2. User cannot edit comment of this basket
             data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files')
@@ -290,6 +297,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         (body, errors, warnings) = perform_request_display(uid,
                                                            argd['category'],
                                                            argd['topic'],
@@ -308,7 +321,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                               ln=argd['ln'])
 
         # register event in webstat
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -359,6 +371,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         (body, errors, warnings) = perform_request_display_item(
                                             uid=uid,
                                             bskid=argd['bskid'],
@@ -382,7 +399,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        user_info = collect_user_info(req)
+
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -433,6 +450,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         (body, errors, warnings) = perform_request_write_comment(
                                         uid=uid,
                                         bskid=argd['bskid'],
@@ -454,7 +476,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -507,6 +528,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         (errors_saving, infos) = perform_request_save_comment(
                                         uid=uid,
                                         bskid=argd['bskid'],
@@ -538,7 +564,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -596,6 +621,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
+
         url = CFG_SITE_URL + '/yourbaskets/display_item?recid=%i&bskid=%i' % \
                             (argd['recid'], argd['bskid'])
         url += '&category=%s&topic=%i&group=%i&ln=%s' % \
@@ -663,6 +695,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         if not argd['referer']:
             argd['referer'] = get_referer(req)
         (body, errors, warnings) = perform_request_add(
@@ -686,7 +723,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         # register event in webstat
         basket_str = ["%s (%s)" % (get_basket_name(bskid), bskid) for bskid in argd['bskids']]
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -735,6 +771,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         (body, errors, warnings)=perform_request_delete(
                                         uid=uid,
                                         bskid=argd['bskid'],
@@ -763,7 +804,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
             # register event in webstat
             basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-            user_info = collect_user_info(req)
             if user_info['email']:
                 user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
             else:
@@ -813,6 +853,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         url = CFG_SITE_URL
         url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' % \
                (argd['category'], argd['topic'], argd['group'], argd['ln'])
@@ -851,7 +896,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -907,6 +951,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         if argd['cancel']:
             url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
             url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'],
@@ -974,7 +1023,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -1021,7 +1069,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
         _ = gettext_set_language(argd['ln'])
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         if argd['new_basket_name'] and \
                 (argd['new_topic_name'] or argd['create_in_topic'] != -1):
             topic = perform_request_create_basket(
@@ -1033,7 +1086,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
             # register event in webstat
             basket_str = "%s ()" % argd['new_basket_name']
-            user_info = collect_user_info(req)
             if user_info['email']:
                 user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
             else:
@@ -1084,6 +1136,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/display_public",
                                        navmenuid = 'yourbaskets')
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         if argd['bskid'] == 0:
             # No given basket => display list of public baskets
             (body, errors, warnings) = perform_request_list_public_baskets(
@@ -1118,7 +1175,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         # register event in webstat
         basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -1155,6 +1211,13 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/list_public_baskets",
                                        navmenuid = 'yourbaskets')
+
+        user_info = collect_user_info(req)
+        ## This is to public to require user to be logged in to visit them...
+        #if not user_info['precached_usebaskets']:
+            #return page_not_authorized(req, "../", \
+                                       #text = _("You are not authorized to use baskets."))
+
         (body, errors, warnings) = perform_request_list_public_baskets(
                                         argd['inf_limit'],
                                         argd['order'],
@@ -1192,6 +1255,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
+
         perform_request_unsubscribe(uid, argd['bskid'])
         url = CFG_SITE_URL + '/yourbaskets/display?category=%s&ln=%s'
         url %= (CFG_WEBBASKET_CATEGORIES['EXTERNAL'], argd['ln'])
@@ -1216,6 +1285,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
+
+        _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usebaskets']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use baskets."))
 
         errors = perform_request_subscribe(uid, argd['bskid'])
         if len(errors):

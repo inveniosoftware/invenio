@@ -28,7 +28,7 @@ from invenio.access_control_admin import acc_add_role, acc_delete_role, \
     acc_get_role_definition
 from invenio.access_control_firerole import compile_role_definition, \
     serialize, deserialize
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
@@ -84,13 +84,29 @@ class WebAccessFireRoleTest(unittest.TestCase):
         acc_delete_role(self.role_id)
 
     def test_webaccess_firerole_serialization(self):
-        """firerole - role definition correctly serialized"""
+        """webaccess - firerole role definition correctly serialized"""
         def_ser = compile_role_definition(self.role_definition)
         tmp_def_ser = acc_get_role_definition(self.role_id)
         self.assertEqual(def_ser, deserialize(tmp_def_ser))
 
+class WebAccessUseBasketsTest(unittest.TestCase):
+    """
+    Check WebAccess behaviour WRT enabling/disabling web modules such
+    as baskets.
+    """
+
+    def test_precached_area_authorization(self):
+        """webaccess - login-time precached authorizations for usebaskets"""
+        error_messages = test_web_page_content(CFG_SITE_SECURE_URL + '/youraccount/display?ln=en', username='jekyll', password='j123ekyll', expected_text='Your Baskets')
+        error_messages.extend(test_web_page_content(CFG_SITE_SECURE_URL + '/youraccount/display?ln=en', username='hyde', password='h123yde', unexpected_text='Your Baskets'))
+
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+
 TEST_SUITE = make_test_suite(WebAccessWebPagesAvailabilityTest,
-                             WebAccessFireRoleTest)
+                             WebAccessFireRoleTest,
+                             WebAccessUseBasketsTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

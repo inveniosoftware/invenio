@@ -18,11 +18,7 @@
 __revision__ = "$Id$"
 
 import urllib
-import time
 import cgi
-import gettext
-import string
-import locale
 
 from invenio.config import \
      CFG_CERN_SITE, \
@@ -31,7 +27,6 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
-     CFG_VERSION, \
      CFG_SITE_URL, \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
      CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
@@ -430,15 +425,18 @@ class Template:
 
         out += """
         <dt><a href="../youralerts/display?ln=%(ln)s">%(your_searches)s</a></dt>
-        <dd>%(search_explain)s</dd>
-
-        <dt><a href="../yourbaskets/display?ln=%(ln)s">%(your_baskets)s</a></dt>
-        <dd>%(basket_explain)s""" % {
+        <dd>%(search_explain)s</dd>""" % {
           'ln' : ln,
           'your_searches' : _("Your Searches"),
           'search_explain' : _("View all the searches you performed during the last 30 days."),
-          'your_baskets' : _("Your Baskets"),
-          'basket_explain' : _("With baskets you can define specific collections of items, store interesting records you want to access later or share with others."),
+
+        }
+        out += """
+        <dt><a href="../yourbaskets/display?ln=%(ln)s">%(your_baskets)s</a></dt>
+        <dd>%(basket_explain)s""" % {
+        'ln' : ln,
+        'your_baskets' : _("Your Baskets"),
+        'basket_explain' : _("With baskets you can define specific collections of items, store interesting records you want to access later or share with others."),
         }
         if guest and CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
             out += self.tmpl_warning_guest_user(ln = ln, type = "baskets")
@@ -540,7 +538,7 @@ class Template:
                           </table>""" % (url, title, body)
         return out
 
-    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, administrative):
+    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, submissions, approvals, administrative):
         """
         Displays the your account page
 
@@ -560,6 +558,10 @@ class Template:
 
           - 'groups' *string* - The body of the groups block
 
+          - 'submissions' *string* - The body of the submission block
+
+          - 'approvals' *string* - The body of the approvals block
+
           - 'administrative' *string* - The body of the administrative block
         """
 
@@ -572,26 +574,41 @@ class Template:
             out += self.tmpl_general_warnings(warning_list)
 
         out += self.tmpl_account_template(_("Your Account"), accBody, ln, '/youraccount/edit?ln=%s' % ln)
-        out += self.tmpl_account_template(_("Your Messages"), messages, ln, '/yourmessages/display?ln=%s' % ln)
+        if messages:
+            out += self.tmpl_account_template(_("Your Messages"), messages, ln, '/yourmessages/display?ln=%s' % ln)
 
-        out += self.tmpl_account_template(_("Your Loans"), loans, ln, '/yourloans/display?ln=%s' % ln)
+        if loans:
+            out += self.tmpl_account_template(_("Your Loans"), loans, ln, '/yourloans/display?ln=%s' % ln)
 
-        out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
-        out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
-        out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)
-        groups_description = _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of.")
-        groups_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourgroups/display?ln=' + ln + '">',
+        if baskets:
+            out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
+
+        if alerts:
+            out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
+
+        if searches:
+            out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)
+
+        if groups:
+            groups_description = _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of.")
+            groups_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourgroups/display?ln=' + ln + '">',
                                'x_url_close': '</a>'}
-        out += self.tmpl_account_template(_("Your Groups"), groups_description, ln, '/yourgroups/display?ln=%s' % ln)
-        submission_description = _("You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status.")
-        submission_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yoursubmissions.py?ln=' + ln + '">',
+            out += self.tmpl_account_template(_("Your Groups"), groups_description, ln, '/yourgroups/display?ln=%s' % ln)
+
+        if submissions:
+            submission_description = _("You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status.")
+            submission_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yoursubmissions.py?ln=' + ln + '">',
                                    'x_url_close': '</a>'}
-        out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln, '/yoursubmissions.py?ln=%s' % ln)
-        approval_description =  _("You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed.")
-        approval_description %=  {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourapprovals.py?ln=' + ln + '">',
+            out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln, '/yoursubmissions.py?ln=%s' % ln)
+
+        if approvals:
+            approval_description =  _("You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed.")
+            approval_description %=  {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourapprovals.py?ln=' + ln + '">',
                                   'x_url_close': '</a>'}
-        out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln, '/yourapprovals.py?ln=%s' % ln)
-        out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln, '/admin')
+            out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln, '/yourapprovals.py?ln=%s' % ln)
+
+        if administrative:
+            out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln, '/admin')
         return out
 
     def tmpl_account_emailMessage(self, ln, msg):
@@ -1018,40 +1035,42 @@ class Template:
             return "<p>" + _("You are not authorized to access administrative functions.") + "</p>"
 
         # displaying form
-        out += "<p>" + _("You are enabled to the following roles: %(x_role)s.") % {'x_role': ('<em>' + string.join(roles, ", ") + "</em> ")} + '</p>'
+        out += "<p>" + _("You are enabled to the following roles: %(x_role)s.") % {'x_role': ('<em>' + ", ".join(roles) + "</em>")} + '</p>'
 
         if activities:
-            out += _("Here are some interesting web admin links for you:")
-
             # print proposed links:
-            activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
+            activities.sort(lambda x, y: cmp(x.lower(), y.lower()))
+            tmp_out = ''
             for action in activities:
                 if action == "runbibedit":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/edit/">%s</a>""" % (CFG_SITE_URL, _("Run BibEdit"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/edit/">%s</a>""" % (CFG_SITE_URL, _("Run BibEdit"))
                 if action == "cfgbibformat":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
                 if action == "cfgbibharvest":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibHarvest"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibHarvest"))
                 if action == "cfgoairepository":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oaiarchiveadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln,  _("Configure OAI Repository"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oaiarchiveadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln,  _("Configure OAI Repository"))
                 if action == "cfgbibindex":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibIndex"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibIndex"))
                 if action == "cfgbibrank":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibRank"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibRank"))
                 if action == "cfgwebaccess":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebAccess"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebAccess"))
                 if action == "cfgwebcomment":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebComment"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebComment"))
                 if action == "cfgwebsearch":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSearch"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSearch"))
                 if action == "cfgwebsubmit":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
-        out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
-            {'x_url_open': '<a href="' + CFG_SITE_URL + '/help/admin?ln=' + ln + '">',
-             'x_url_close': '</a>'}
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
+            if tmp_out:
+                out += _("Here are some interesting web admin links for you:") + tmp_out
+
+                out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
+                {'x_url_open': '<a href="' + CFG_SITE_URL + '/help/admin?ln=' + ln + '">',
+                    'x_url_close': '</a>'}
         return out
 
-    def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin):
+    def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
         """
         Displays the user block
 
@@ -1070,6 +1089,18 @@ class Template:
           - 'referee' *boolean* - If the user is referee
 
           - 'admin' *boolean* - If the user is admin
+
+          - 'usebaskets' *boolean* - If baskets are enabled for the user
+
+          - 'usemessages' *boolean* - If messages are enabled for the user
+
+          - 'usealerts' *boolean* - If alerts are enabled for the user
+
+          - 'usegroups' *boolean* - If groups are enabled for the user
+
+          - 'useloans' *boolean* - If loans are enabled for the user
+
+          - 'usestats' *boolean* - If stats are enabled for the user
         """
 
         # load the right message language
@@ -1079,48 +1110,68 @@ class Template:
         if guest:
             out += """%(guest_msg)s ::
                    <a class="userinfo" href="%(sitesecureurl)s/youraccount/login?ln=%(ln)s%(referer)s">%(login)s</a>""" % {
-                     'siteurl' : CFG_SITE_URL,
                      'sitesecureurl': CFG_SITE_SECURE_URL,
                      'ln' : ln,
                      'guest_msg' : _("guest"),
-                     'session' : _("session"),
-                     'alerts' : _("alerts"),
-                     'baskets' : _("baskets"),
-                     'login' : _("login"),
                      'referer' : url_referer and ('&amp;referer=%s' % urllib.quote(url_referer)) or '',
+                     'login' : _('login')
                    }
         else:
             out += """%(username)s ::
-               <a class="userinfo" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
-                   <a class="userinfo" href="%(siteurl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
-
-                   <a class="userinfo" href="%(siteurl)s/yourloans/display?ln=%(ln)s">%(loans)s</a> ::
-
-                   <a class="userinfo" href="%(siteurl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
-                   <a class="userinfo" href="%(siteurl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
-                   <a class="userinfo" href="%(siteurl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> ::
-                   <a class="userinfo" href="%(siteurl)s/stats/?ln=%(ln)s">%(stats)s</a> :: """ % {
-                     'username' : username,
-                     'siteurl' : CFG_SITE_URL,
+               <a class="userinfo" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a> :: """ % {
+                    'sitesecureurl' : CFG_SITE_SECURE_URL,
+                    'ln' : ln,
+                    'account' : _("account"),
+                    'username' : username
+               }
+            if usemessages:
+                out += """<a class="userinfo" href="%(sitesecureurl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> :: """ % {
+                    'sitesecureurl' : CFG_SITE_SECURE_URL,
+                    'ln' : ln,
+                    'messages' : _('messages')
+                }
+            if useloans:
+                out += """<a class="userinfo" href="%(sitesecureurl)s/yourloans/display?ln=%(ln)s">%(loans)s</a> ::
+                """ % {
                      'sitesecureurl' : CFG_SITE_SECURE_URL,
                      'ln' : ln,
-                     'account' : _("account"),
-                     'alerts' : _("alerts"),
-                     'messages': _("messages"),
-                     'loans': _("loans"),
-                     'baskets' : _("baskets"),
-                     'groups' : _("groups"),
-                     'stats' : _("statistics"),
+                     'loans': _("loans")
+                }
+            if usebaskets:
+                out += """<a class="userinfo" href="%(sitesecureurl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> :: """ % {
+                        'sitesecureurl' : CFG_SITE_SECURE_URL,
+                        'ln' : ln,
+                        'baskets' : _("baskets")
+                }
+            if usealerts:
+                out += """<a class="userinfo" href="%(sitesecureurl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
+                """ % {
+                        'sitesecureurl' : CFG_SITE_SECURE_URL,
+                        'ln' : ln,
+                        'alerts' : _("alerts"),
+                }
+            if usegroups:
+                out += """<a class="userinfo" href="%(sitesecureurl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> ::
+                """ % {
+                        'sitesecureurl' : CFG_SITE_SECURE_URL,
+                        'ln' : ln,
+                        'groups' : _("groups"),
+                    }
+            if usestats:
+                out += """<a class="userinfo" href="%(siteurl)s/stats/?ln=%(ln)s">%(stats)s</a> :: """ % {
+                        'siteurl' : CFG_SITE_URL,
+                        'ln' : ln,
+                        'stats' : _("statistics"),
                    }
             if submitter:
-                out += """<a class="userinfo" href="%(siteurl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
-                         'siteurl' : CFG_SITE_URL,
+                out += """<a class="userinfo" href="%(sitesecureurl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
+                         'sitesecureurl' : CFG_SITE_SECURE_URL,
                          'ln' : ln,
                          'submission' : _("submissions"),
                        }
             if referee:
-                out += """<a class="userinfo" href="%(siteurl)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a> :: """ % {
-                         'siteurl' : CFG_SITE_URL,
+                out += """<a class="userinfo" href="%(sitesecureurl)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a> :: """ % {
+                         'sitesecureurl' : CFG_SITE_SECURE_URL,
                          'ln' : ln,
                          'approvals' : _("approvals"),
                        }

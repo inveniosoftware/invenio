@@ -35,8 +35,6 @@ __revision__ = "$Id$"
 
 import cPickle
 from UserDict import UserDict
-import traceback
-
 from invenio.dbquery import run_sql, blob_to_string, \
      OperationalError, IntegrityError
 from invenio.session import Session
@@ -123,6 +121,10 @@ class pSession(Session):
 
     def param_set(self, key, value):
         self.__params[key] = value
+        self.__dirty = 1
+
+    def param_del(self, key):
+        del self.__params[key]
         self.__dirty = 1
 
     def param_get(self, key):

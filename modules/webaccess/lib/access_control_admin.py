@@ -31,7 +31,7 @@ from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
 from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
 from invenio.access_control_firerole import compile_role_definition, \
-    acc_firerole_check_user, serialize, deserialize
+    acc_firerole_check_user, serialize, deserialize, load_role_definition
 from sets import Set
 
 
@@ -644,7 +644,6 @@ def acc_add_authorization(name_role='', name_action='', optional=0, **keyval):
 
     return inserted
 
-
 def acc_add_role_action_arguments(id_role=0, id_action=0, arglistid=-1,
         optional=0, verbose=0, id_arguments=[]):
     """ function inserts entries in accROLE_accACTION_accARGUMENT if all
@@ -1222,7 +1221,10 @@ def acc_get_role_actions(id_role):
 
 
 def acc_get_role_users(id_role):
-    """get all users that have direct access to a role. """
+    """get all users that have direct access to a role.
+    Note this function will not consider implicit user linked by the
+    FireRole definition.
+    """
 
     return run_sql("""SELECT DISTINCT(u.id), u.email, u.settings
         FROM user_accROLE ur, user u
@@ -1254,7 +1256,7 @@ def acc_get_user_email(id_user=0):
 
     try:
         return run_sql("""SELECT email FROM user WHERE id = %s """,
-        (id_user, ))[0][0]
+        (id_user, ))[0][0].lower().strip()
     except IndexError:
         return ''
 
@@ -1264,57 +1266,56 @@ def acc_get_user_id(email=''):
 
     try:
         return run_sql("""SELECT id FROM user WHERE email = %s """,
-        (email, ))[0][0]
+        (email.lower().strip(), ))[0][0]
     except IndexError:
         return 0
 
+def acc_is_user_in_role(user_info, id_role):
+    """Return True if the user belong implicitly or explicitly to the role."""
 
-def acc_get_user_roles(id_user=0):
-    """get all roles a user is directly connected to."""
+    if run_sql("""SELECT ur.id_accROLE
+            FROM user_accROLE ur
+            WHERE ur.id_user = %s AND ur.expiration >= NOW() AND
+            ur.id_accROLE = %s""", (user_info['uid'], id_role)):
+        return True
 
-    res = run_sql("""SELECT ur.id_accROLE
+    return acc_firerole_check_user(user_info, load_role_definition(id_role))
+
+def acc_get_user_roles_from_user_info(user_info):
+    """get all roles a user is connected to."""
+    from invenio.webuser import collect_user_info
+    if type(user_info) is int:
+        user_info = collect_user_info(user_info)
+
+    explicit_roles = run_sql("""SELECT ur.id_accROLE
+        FROM user_accROLE ur
+        WHERE ur.id_user = %s AND ur.expiration >= NOW()
+        ORDER BY ur.id_accROLE""", (user_info['uid'], ))
+
+    explicit_roles = [role[0] for role in explicit_roles]
+
+    potential_implicit_roles = run_sql("""SELECT id FROM accROLE
+        WHERE firerole_def_ser <> %s""", (CFG_ACC_EMPTY_ROLE_DEFINITION_SER, ))
+
+    potential_implicit_roles = [role[0] for role in potential_implicit_roles]
+
+    implicit_roles = []
+    for role in potential_implicit_roles:
+        if role not in explicit_roles:
+            if acc_firerole_check_user(user_info, load_role_definition(role)):
+                implicit_roles.append(role)
+
+    return explicit_roles + implicit_roles
+
+def acc_get_user_roles(id_user):
+    """get all roles a user is explicitly connected to."""
+
+    explicit_roles = run_sql("""SELECT ur.id_accROLE
         FROM user_accROLE ur
         WHERE ur.id_user = %s AND ur.expiration >= NOW()
         ORDER BY ur.id_accROLE""", (id_user, ))
 
-    return res
-
-
-def acc_find_user_info_ids(id_user=0):
-    """find all authorization entries for all the roles a user
-       is connected to."""
-
-    res1 = run_sql("""SELECT ur.id_user, raa.*
-        FROM user_accROLE ur LEFT JOIN accROLE_accACTION_accARGUMENT raa
-        ON ur.id_accROLE = raa.id_accROLE
-        WHERE ur.id_user = %s AND ur.expiration >= NOW()""", (id_user, ))
-
-    res2 = []
-    for res in res1:
-        res2.append(res)
-    res2.sort()
-
-    return res2
-
-def acc_find_user_info_names(id_user=0):
-    """Find all the info about a user #FIXME"""
-    query = """ SELECT ur.id_user, r.name, ac.name, raa.argumentlistid,
-        ar.keyword, ar.value FROM accROLE_accACTION_accARGUMENT raa,
-        user_accROLE ur, accROLE r, accACTION ac, accARGUMENT ar
-        WHERE ur.id_user = %s and ur.expiration >= NOW() and
-        ur.id_accROLE = raa.id_accROLE and
-        raa.id_accROLE = r.id and
-        raa.id_accACTION = ac.id and
-        raa.id_accARGUMENT = ar.id """
-
-    res1 =  run_sql(query, (id_user, ))
-
-    res2 = []
-    for res in res1:
-        res2.append(res)
-    res2.sort()
-
-    return res2
+    return [id_role[0] for id_role in explicit_roles]
 
 def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
     """Return a dictionary with all the possible activities for which the user
@@ -1341,14 +1342,14 @@ def acc_find_user_role_actions(user_info):
     """find name of all roles and actions connected to user_info (or uid), id
        given."""
 
-    if type(user_info) in [type(1), type(1L)]:
+    if type(user_info) in (int, long):
         uid = user_info
     else:
         uid = user_info['uid']
 
     # Let's check if user is superadmin
     id_superadmin = acc_get_role_id(SUPERADMINROLE)
-    if (id_superadmin, ) in acc_get_user_roles(uid):
+    if id_superadmin in acc_get_user_roles_from_user_info(user_info):
         return [(SUPERADMINROLE, action[1]) for action in acc_get_all_actions()]
 
     query = """SELECT DISTINCT r.name, a.name
@@ -1431,16 +1432,19 @@ def acc_find_possible_actions_argument_listid(id_role, id_action, arglistid):
 
 def acc_find_possible_roles(name_action, arguments):
     """Find all the possible roles that are enabled to action_name with
-    given arguments. roles is a list of role_id"""
+    given arguments. roles is a list of role_id
+
+    FIXME: this function is still broken...
+    """
 
     id_superadmin = acc_get_role_id(SUPERADMINROLE)
 
     query1 = """select a.id, a.allowedkeywords, a.optional
                 from accACTION a
-                where a.name = '%s'""" % (name_action)
+                where a.name = %s"""
 
     try:
-        id_action, aallowedkeywords, optional = run_sql_cached(query1, affected_tables=['accACTION'])[0]
+        id_action, aallowedkeywords, optional = run_sql_cached(query1, (name_action,),  affected_tables=['accACTION'])[0]
     except IndexError:
         return []
 
@@ -1464,7 +1468,6 @@ def acc_find_possible_roles(name_action, arguments):
         if str_roles: str_roles += ','
         str_roles += '%s' % (role, )
 
-
     # create dictionary with default values and replace entries from input arguments
     defdict = {}
 
@@ -1474,8 +1477,10 @@ def acc_find_possible_roles(name_action, arguments):
 
     # create or-string from arguments
     str_args = ''
+    params = []
     for key in defkeys:
-        if str_args: str_args += ' OR '
+        if str_args:
+            str_args += ' AND '
         str_args += """(arg.keyword = '%s' AND arg.value = '%s')""" % (key, defdict[key])
 
     if defkeys:
@@ -1502,7 +1507,8 @@ def acc_find_possible_roles(name_action, arguments):
     cur_role = cur_action = cur_arglistid = 0
 
     booldict = {}
-    for key in defkeys: booldict[key] = 0
+    for key in defkeys:
+        booldict[key] = 0
 
     res4 = list(res4)
     res4.sort()
@@ -1544,6 +1550,28 @@ def acc_find_possible_roles(name_action, arguments):
     else:
         return results[1:]
 
+def acc_find_possible_actions_user_from_user_info(user_info, id_action):
+    """user based function to find all action combination for a given
+    user and action. find all the roles and utilize findPossibleActions
+    for all these.
+
+    user_info - user information dictionary, used to find roles
+
+    id_action - action id.
+    """
+
+    res = []
+
+    for id_role in acc_get_user_roles_from_user_info(user_info):
+        hlp = acc_find_possible_actions(id_role, id_action)
+        if hlp and not res:
+            res.append(['role'] + hlp[0])
+
+        for row in hlp[1:]:
+            res.append([id_role] + row)
+
+    return res
+
 def acc_find_possible_actions_user(id_user, id_action):
     """user based function to find all action combination for a given
     user and action. find all the roles and utilize findPossibleActions
@@ -1551,11 +1579,15 @@ def acc_find_possible_actions_user(id_user, id_action):
 
       id_user - user id, used to find roles
 
-    id_action - action id. """
+    id_action - action id.
+
+    Note this function considers only explicit links between users and roles,
+    and not FireRole definitions.
+    """
 
     res = []
 
-    for (id_role, ) in acc_get_user_roles(id_user):
+    for id_role in acc_get_user_roles(id_user):
         hlp = acc_find_possible_actions(id_role, id_action)
         if hlp and not res:
             res.append(['role'] + hlp[0])
@@ -1848,8 +1880,9 @@ def acc_add_default_settings(superusers=(),
 
     # add roles
     insroles = []
-    def_roles = list(DEF_ROLES) + list(additional_def_roles)
-    for (name, description, firerole_def_src) in def_roles:
+    def_roles = dict([(role[0], role[1:]) for role in DEF_ROLES])
+    def_roles.update(dict([(role[0], role[1:]) for role in additional_def_roles]))
+    for name, (description, firerole_def_src) in def_roles.iteritems():
         # try to add, don't care if description is different
         role_id = acc_add_role(name_role=name,
                          description=description, firerole_def_ser=serialize(

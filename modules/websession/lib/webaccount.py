@@ -17,9 +17,6 @@
 
 __revision__ = "$Id$"
 
-import sys
-import string
-import cgi
 import re
 import MySQLdb
 import urllib
@@ -28,19 +25,16 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_CERN_SITE, \
      CFG_SITE_LANG, \
-     CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      CFG_DATABASE_HOST, \
-     CFG_DATABASE_NAME, \
-     CFG_SITE_URL
+     CFG_DATABASE_NAME
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
-from invenio.webpage import page
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
-        set_user_preferences, collect_user_info
+        collect_user_info
 from invenio.access_control_admin import acc_find_user_role_actions
 from invenio.messages import gettext_set_language
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
@@ -53,12 +47,13 @@ def perform_info(req, ln):
     out = ""
     uid = getUid(req)
 
+    user_info = collect_user_info(req)
     return websession_templates.tmpl_account_info(
             ln = ln,
             uid = uid,
             guest = isGuestUser(uid),
             CFG_CERN_SITE = CFG_CERN_SITE,
-           );
+           )
 
 def perform_display_external_user_settings(settings, ln):
     """show external user settings which is a dictionary."""
@@ -91,7 +86,7 @@ def perform_youradminactivities(user_info, ln):
             your_admin_activities.append(action)
 
     if SUPERADMINROLE in your_roles:
-        for action in ["runbibedit", "cfgbibformat", "cfgbibharvest", "cfgoairepository", "cfgbibrank", "cfgbibindex", "cfgwebaccess", "cfgwebcomment", "cfgwebsearch", "cfgwebsubmit"]:
+        for action in ("runbibedit", "cfgbibformat", "cfgbibharvest", "cfgoairepository", "cfgbibrank", "cfgbibindex", "cfgwebaccess", "cfgwebcomment", "cfgwebsearch", "cfgwebsubmit"):
             if action not in your_admin_activities:
                 your_admin_activities.append(action)
 
@@ -103,7 +98,7 @@ def perform_youradminactivities(user_info, ln):
              activities = your_admin_activities,
            )
 
-def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
+def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, ln):
     """Display a dynamic page that shows the user's account."""
 
     # load the right message language
@@ -151,9 +146,11 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
              alerts = aler,
              searches = sear,
              messages = msgs,
-             loans = None,
+             loans = loan,
              groups = grps,
-             administrative = perform_youradminactivities(user_info, ln)
+             submissions = sbms,
+             approvals = appr,
+             administrative = admn
            )
 
 def superuser_account_warnings():

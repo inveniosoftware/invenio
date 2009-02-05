@@ -2133,7 +2133,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
 
                 # sort the roles in connected and not connected roles
                 for (id, name, description, dummy, dummy) in all_roles:
-                    if (id, ) in role_ids: con_roles.append([-id, name, description])
+                    if id in role_ids: con_roles.append([-id, name, description])
                     else: not_roles.append([id, name, description])
 
                 # create roleselect
@@ -2267,7 +2267,7 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
                 all_roles = acca.acc_get_all_roles()
                 roles = []
                 for (id, name, desc, dummy, dummy) in all_roles:
-                    if (id, ) in role_ids: roles.append([id, name, desc])
+                    if id in role_ids: roles.append([id, name, desc])
 
                 output += createroleselect(id_role=id_role,
                                         action="deleteuserrole",
@@ -2369,7 +2369,7 @@ def userdetails(id_user=0):
 
     # find connected roles
     for (id, name, desc, dummy, dummy) in acca.acc_get_all_roles():
-        if (id, ) in userroles:
+        if id in userroles:
             conn_roles.append([id, name, desc])
             conn_roles[-1].append('<a href="showroledetails?id_role=%s">show details</a>' % (id, ))
 

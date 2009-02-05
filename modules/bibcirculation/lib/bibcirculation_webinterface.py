@@ -95,8 +95,10 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
 
-
-
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use loans."))
 
         body = perform_borrower_loans(uid=uid,
                                       barcode=argd['barcode'],
@@ -134,6 +136,11 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                     "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use loans."))
 
         body = perform_loanshistoricaloverview(uid=uid,
                                                ln=argd['ln'])

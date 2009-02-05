@@ -23,12 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-try:
-    from mod_python import apache
-except ImportError:
-    pass
 from datetime import timedelta
-import os
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -40,8 +35,7 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
      CFG_CERN_SITE, \
-     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
-     CFG_WEBDIR
+     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
@@ -217,13 +211,18 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         navmenuid='youraccount')
 
         username = webuser.get_nickname_or_email(uid)
-        bask = webbasket.account_list_baskets(uid, ln=args['ln'])
-        aler = webalert.account_list_alerts(uid, ln=args['ln'])
+        user_info = webuser.collect_user_info(req)
+        bask = user_info['precached_usebaskets'] and webbasket.account_list_baskets(uid, ln=args['ln']) or ''
+        aler = user_info['precached_usealerts'] and webalert.account_list_alerts(uid, ln=args['ln']) or ''
         sear = webalert.account_list_searches(uid, ln=args['ln'])
-        msgs = account_new_mail(uid, ln=args['ln'])
-        grps = webgroup.account_group(uid, ln=args['ln'])
+        msgs = user_info['precached_usemessages'] and account_new_mail(uid, ln=args['ln']) or ''
+        grps = user_info['precached_usegroups'] and webgroup.account_group(uid, ln=args['ln']) or ''
+        appr = user_info['precached_useapprove']
+        sbms = user_info['precached_viewsubmissions']
+        loan = ''
+        admn = webaccount.perform_youradminactivities(user_info, args['ln'])
         return page(title=_("Your Account"),
-                    body=webaccount.perform_display_account(req,username,bask,aler,sear,msgs,grps,args['ln']),
+                    body=webaccount.perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, sbms, appr, admn, args['ln']),
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
@@ -252,8 +251,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         body = ''
         if args['verbose'] == 9:
             user_info = webuser.collect_user_info(req)
-            for key, value in user_info.items():
-                body += "<b>%s</b>:%s<br />" % (key, value)
+            keys = user_info.keys()
+            keys.sort()
+            for key in keys:
+                body += "<b>%s</b>:%s<br />" % (key, user_info[key])
 
         return page(title= _("Your Settings"),
                     body=body+webaccount.perform_set(webuser.get_email(uid),
@@ -841,6 +842,11 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
             return webuser.page_not_authorized(req, "../yourgroups/display",
                                                navmenuid='yourgroups')
 
+        user_info = webuser.collect_user_info(req)
+        if not user_info['precached_usegroups']:
+            return webuser.page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use groups."))
+
         (body, errors, warnings) = webgroup.perform_request_groups_display(uid=uid,
                                                                           ln=argd['ln'])
 
@@ -880,6 +886,10 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/create",
                                                navmenuid='yourgroups')
+        user_info = webuser.collect_user_info(req)
+        if not user_info['precached_usegroups']:
+            return webuser.page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
             url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
@@ -936,6 +946,10 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/join",
                                                navmenuid='yourgroups')
+        user_info = webuser.collect_user_info(req)
+        if not user_info['precached_usegroups']:
+            return webuser.page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
             url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
@@ -995,6 +1009,10 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/leave",
                                                navmenuid='yourgroups')
+        user_info = webuser.collect_user_info(req)
+        if not user_info['precached_usegroups']:
+            return webuser.page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
             url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
@@ -1049,6 +1067,10 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/display",
                                                navmenuid='yourgroups')
+        user_info = webuser.collect_user_info(req)
+        if not user_info['precached_usegroups']:
+            return webuser.page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
             url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
@@ -1117,6 +1139,10 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         if uid == -1 or webuser.isGuestUser(uid) or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../yourgroups/display",
                                                navmenuid='yourgroups')
+        user_info = webuser.collect_user_info(req)
+        if not user_info['precached_usegroups']:
+            return webuser.page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use groups."))
 
         if argd['cancel']:
             url = CFG_SITE_URL + '/yourgroups/display?ln=%s'

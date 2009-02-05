@@ -1049,7 +1049,7 @@ II. Example - connecting role and user</a>
     exist in the user describing dictionary are checked. All the rules
     with non existant fields are skipped.
 
-    The user describing dictionary is built at runtime with all the informations
+    The user describing dictionary (user_info) is built at runtime with all the informations
     that can be gathered about the current user (and its session).
     Currently valid fields are: <em>uid, email, nickname, apache_user, remote_ip,
     remote_host, groups, apache_groups</em> and all the external settings provided
@@ -1122,4 +1122,9 @@ II. Example - connecting role and user</a>
     in the 24bit mask network of 127.0.0.0. All the the other users don't belong
     to the role which is being defined.
 
+    If you want to discover which keys are available on your system to build a FireRole
+    rule, just login with your account in your installation and visit <a href="<CFG_SITE_SECURE_URL>/youraccount/edit?verbose=9">your account page</a>,
+    by activating verbose=9 variable. Under the tile you will se the available keys and
+    values that you can use to build a FireRole rule. All but fields prefixed with
+    <strong>precached_</strong> are usuable.
    </pre>

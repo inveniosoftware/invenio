@@ -53,8 +53,8 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
      CFG_SITE_URL
-from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
-from invenio.bibrecord import create_record, create_records, record_get_field_value, record_get_field_values
+from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError
+from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -68,8 +68,6 @@ from invenio.access_control_config import VIEWRESTRCOLL, \
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.intbitset import intbitset as HitSet
-from invenio.webinterface_handler import wash_urlargd
-from invenio.urlutils import make_canonical_urlargd
 from invenio.dbquery import DatabaseError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
@@ -79,12 +77,12 @@ webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
-calculate_co_cited_with_list, get_self_cited_in, get_self_cited_by, get_records_with_num_cites
+    calculate_co_cited_with_list, get_records_with_num_cites
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Error
 from invenio.webuser import getUid, collect_user_info
-from invenio.webpage import page, pageheaderonly, pagefooteronly, create_error_box
+from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
 InvenioWebSearchQueryParserException, SpiresToInvenioSyntaxConverter

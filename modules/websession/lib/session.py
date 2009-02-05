@@ -47,12 +47,7 @@ DEFAULT_SESSION_COOKIE_DOMAIN = None
 DEFAULT_SESSION_COOKIE_PATH = "/"
 
 import re
-from time import time, gmtime, localtime, strftime, clock
-try:
-    from mod_python import apache
-except ImportError:
-    pass
-
+from time import time, gmtime, strftime, clock
 
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
 

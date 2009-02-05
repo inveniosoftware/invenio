@@ -62,7 +62,10 @@ try:
 except ImportError, e:
     fckeditor_available = False
 import os
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 from invenio.bibdocfile import stream_file
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):

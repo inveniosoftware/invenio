@@ -74,6 +74,8 @@ def compile_role_definition(firerole_def_src):
                     if field in alias_item:
                         field = alias_item[0]
                         break
+                if field.startswith('precached_'):
+                    raise InvenioWebAccessFireroleError, "Error while compiling rule %s (line %s): %s is a reserved key and can not be used in FireRole rules!" % (row, line, field)
                 expressions = g.group('expression')+g.group('more_expressions')
                 expressions_list = []
                 for expr in _expressions_re.finditer(expressions):

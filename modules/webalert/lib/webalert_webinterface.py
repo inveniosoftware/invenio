@@ -76,13 +76,17 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
+
         if argd['p'] == 'y':
             _title = _("Popular Searches")
         else:
             _title = _("Your Searches")
 
         # register event in webstat
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -134,6 +138,10 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right language
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
 
         try:
             html = webalert.perform_input_alert("add", argd['idq'], argd['name'], argd['freq'],
@@ -163,7 +171,6 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # register event in webstat
         alert_str = "%s (%d)" % (argd['name'], argd['idq'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -216,6 +223,10 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right language
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
 
         try:
             html = webalert.perform_input_alert("update", argd['idq'], argd['name'], argd['freq'],
@@ -245,7 +256,6 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # register event in webstat
         alert_str = "%s (%d)" % (argd['name'], argd['idq'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -291,9 +301,12 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right language
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
 
         # register event in webstat
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -344,6 +357,10 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right language
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
 
         try:
             html = webalert.perform_add_alert(argd['name'], argd['freq'], argd['notif'],
@@ -366,7 +383,6 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # register event in webstat
         alert_str = "%s (%d)" % (argd['name'], argd['idq'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -418,6 +434,10 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right language
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
 
         try:
             html = webalert.perform_update_alert(argd['name'], argd['freq'], argd['notif'],
@@ -440,7 +460,6 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # register event in webstat
         alert_str = "%s (%d)" % (argd['name'], argd['idq'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:
@@ -489,6 +508,10 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right language
         _ = gettext_set_language(argd['ln'])
+        user_info = collect_user_info(req)
+        if not user_info['precached_usealerts']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use alerts."))
 
         try:
             html = webalert.perform_remove_alert(argd['name'], argd['idq'],
@@ -512,7 +535,6 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # register event in webstat
         alert_str = "%s (%d)" % (argd['name'], argd['idq'])
-        user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
         else:

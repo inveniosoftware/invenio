@@ -18,29 +18,24 @@
 __revision__ = "$Id$"
 
 ## import interesting modules:
-import os
-import sys
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_SITE_SECURE_URL, \
-     CFG_VERSION
+     CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql, Error
+from invenio.access_control_config import SUPERADMINROLE
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import *
+from invenio.access_control_admin import acc_find_possible_roles, acc_get_role_id
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, list_registered_users, page_not_authorized
+from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.messages import gettext_set_language, wash_language
-from invenio.websubmit_config import *
-from invenio.search_engine import search_pattern
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
-    global uid
+def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedId="", deletedAction="", deletedDoctype=""):
     ln = wash_language(ln)
 
     # load the right message language
@@ -57,13 +52,18 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
     except Error, e:
         return errorMsg(str(e), req, ln = ln)
 
+    user_info = collect_user_info(req)
+    if not user_info['precached_useapprove']:
+        return page_not_authorized(req, "../", \
+                                    text = _("You are not authorized to use approval system."))
+
     res = run_sql("SELECT sdocname,ldocname FROM sbmDOCTYPE ORDER BY ldocname")
     referees = []
     for row in res:
         doctype = row[0]
         docname = row[1]
         reftext = ""
-        if isReferee(req, doctype, "*"):
+        if isRefereed(doctype) and isReferee(req, doctype):
             referees.append ({'doctype': doctype,
                               'docname': docname,
                               'categories': None})
@@ -73,7 +73,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
             for row2 in res2:
                 category = row2[0]
                 categname = row2[1]
-                if isReferee(req, doctype, category):
+                if isRefereed(doctype, category) and isReferee(req, doctype, category):
                     categories.append({
                                         'id' : category,
                                         'name' : categname,
@@ -99,12 +99,23 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
                 req=req,
                 navmenuid='yourapprovals')
 
-def isReferee(req, doctype="", categ=""):
+def isReferee(req, doctype="", categ="*"):
     (auth_code, auth_message) = acc_authorize_action(req, "referee", verbose=0, doctype=doctype, categ=categ)
     if auth_code == 0:
         return 1
     else:
         return 0
+
+def isRefereed(doctype, categ="*"):
+    """Check if the given doctype, categ is refereed by at least a role. different than SUPERADMINROLE"""
+    roles = acc_find_possible_roles('referee', {'doctype': doctype, 'categ': categ})
+    try:
+        roles.remove(acc_get_role_id(SUPERADMINROLE))
+    except ValueError:
+        pass
+    if roles:
+        return True
+    return False
 
 def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
     return page(title="error",
