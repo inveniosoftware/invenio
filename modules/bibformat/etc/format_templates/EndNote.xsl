@@ -37,7 +37,6 @@ exclude-result-prefixes="marc fn">
 <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
 <xsl:template match="/">
 	<xsl:if test="collection">
-		<records>
 			<xsl:for-each select="collection">
 				<xsl:for-each select="record">
                                         <record>
@@ -45,12 +44,11 @@ exclude-result-prefixes="marc fn">
                                         </record>
 				</xsl:for-each>
 			</xsl:for-each>
-		</records>
 	</xsl:if>
 	<xsl:if test="record">
-                <records><record>
+                <record>
 			<xsl:apply-templates/>
-		</record></records>
+		</record>
 	</xsl:if>
  </xsl:template>
 

@@ -9,7 +9,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,12 +20,12 @@ etcdir = $(sysconfdir)/bibformat/output_formats
 etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo \
 	   XD.bfo HS.bfo \
 	   XE.bfo XN.bfo XR.bfo XW.bfo \
-	   XOAIDC.bfo \
+	   XOAIDC.bfo XO.bfo \
 	   HDREF.bfo HDFILE.bfo HDACT.bfo
 
 tmpdir = $(prefix)/var/tmp
 
-tmp_DATA = TEST1.bfo TEST2.bfo TEST3.bfo 
+tmp_DATA = TEST1.bfo TEST2.bfo TEST3.bfo
 
 EXTRA_DIST = $(etc_DATA) $(tmp_DATA)
 
