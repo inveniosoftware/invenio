@@ -145,7 +145,7 @@ def get_keywords_from_text(text_lines, taxonomy=None, output_mode="text",
 
     author_keywords = None
     if with_author_keywords:
-        author_keywords = get_author_keywords(fulltext)
+        author_keywords = get_author_keywords(_SKWS, _CKWS, fulltext)
 
     if match_mode == "partial":
         fulltext = _get_partial_text(fulltext)
@@ -159,8 +159,7 @@ def get_keywords_from_text(text_lines, taxonomy=None, output_mode="text",
         author_keywords, output_mode, output_limit, spires)
 
 def _get_keywords_output(single_keywords, composite_keywords,
-                        author_keywords=None, style="text",
-                        output_limit=0, spires=False):
+    author_keywords=None, style="text", output_limit=0, spires=False):
     """Returns a formatted string representing the keywords according
     to the style chosen."""
 
@@ -179,6 +178,31 @@ def _get_keywords_output(single_keywords, composite_keywords,
         return _output_marc(single_keywords, composite_keywords, spires)
     elif style == "html":
         return _output_html(single_keywords, composite_keywords, spires)
+
+def _get_author_keywords_output(author_keywords):
+    """Formats the output for the author keywords."""
+    out = []
+
+    for keyword_string, matching_keywords in author_keywords.iteritems():
+        single_keywords = matching_keywords[0]
+        composite_keywords = matching_keywords[1]
+
+        kw_out  = []
+
+        if single_keywords:
+            for kw in single_keywords.keys():
+                kw_out.append(kw)
+
+        if composite_keywords > 0:
+            for kw in composite_keywords:
+                kw_out.append(kw[0])
+
+        if kw_out:
+            keyword_string += ', '.join(kw_out)
+
+        out.append(kw_out)
+
+    return out
 
 def _get_partial_text(fulltext):
     """Returns a shortened version of the fulltext used with the partial
@@ -318,8 +342,18 @@ def _output_text(single_keywords=None, composite_keywords=None,
 
     if author_keywords is not None:
         output.append("\nAuthor keywords:")
-        for keyword in author_keywords:
-            output.append(keyword)
+        for keyword, matches in author_keywords.iteritems():
+            skws = matches[0]
+            ckws = matches[1]
+            matches_str = []
+            for ckw in ckws:
+                matches_str.append(_CKWS[ckw[0]].concept)
+            for skw in skws.keys():
+                matches_str.append(_SKWS[skw].concept)
+            if matches:
+                output.append(keyword + ' -> ' + ', '.join(matches_str))
+            else:
+                output.append(keyword)
 
     if composite_keywords is not None:
         output.append("\nComposite keywords:")

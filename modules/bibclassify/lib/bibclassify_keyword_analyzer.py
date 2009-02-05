@@ -48,7 +48,7 @@ except ImportError:
 _MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)
     for _separator in CFG_BIBCLASSIFY_VALID_SEPARATORS])
 
-def get_single_keywords(skw_db, fulltext):
+def get_single_keywords(skw_db, fulltext, verbose=True):
     """Returns a dictionary of single keywords bound with the positions
     of the matches in the fulltext.
     Format of the output dictionary is (subject: positions)."""
@@ -84,13 +84,14 @@ def get_single_keywords(skw_db, fulltext):
     for span, subject in records:
         single_keywords.setdefault(subject, []).append(span)
 
-    write_message("INFO: Matching single keywords... %d keywords found in "
-        "%.1f sec." % (len(single_keywords), time.clock() - timer_start),
-        stream=sys.stderr, verbose=3)
+    if verbose:
+        write_message("INFO: Matching single keywords... %d keywords found "
+            "in %.1f sec." % (len(single_keywords), time.clock() - timer_start),
+            stream=sys.stderr, verbose=3)
 
     return single_keywords
 
-def get_composite_keywords(ckw_db, fulltext, skw_spans):
+def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
     """Returns a list of composite keywords bound with the number of
     occurrences found in the text string.
     Format of the output list is (subject, count, component counts)."""
@@ -173,13 +174,14 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
         except KeyError:
             pass
 
-    write_message("INFO: Matching composite keywords... %d keywords found in "
-        "%.1f sec." % (len(ckw_list), time.clock() - timer_start),
-        stream=sys.stderr, verbose=3)
+    if verbose:
+        write_message("INFO: Matching composite keywords... %d keywords found "
+            "in %.1f sec." % (len(ckw_list), time.clock() - timer_start),
+            stream=sys.stderr, verbose=3)
 
     return ckw_list
 
-def get_author_keywords(fulltext):
+def get_author_keywords(skw_db, ckw_db, fulltext):
     """Finds out human defined keyowrds in a text string. Searches for
     the string "Keywords:" and its declinations and matches the
     following words."""
@@ -189,7 +191,7 @@ def get_author_keywords(fulltext):
     if len(split_string) == 1:
         write_message("INFO: Matching author keywords... No keywords found.",
         stream=sys.stderr, verbose=3)
-        return []
+        return None
 
     kw_string = split_string[1]
 
@@ -204,7 +206,16 @@ def get_author_keywords(fulltext):
         "%.1f sec." % (len(author_keywords), time.clock() - timer_start),
         stream=sys.stderr, verbose=3)
 
-    return author_keywords
+    out = {}
+    for kw in author_keywords:
+        kw = kw.lower()
+        matching_skw = get_single_keywords(skw_db, ' %s ' % kw, verbose=False)
+        matching_ckw = get_composite_keywords(ckw_db, ' %s ' % kw,
+            matching_skw, verbose=False)
+
+        out[kw] = (matching_skw, matching_ckw)
+
+    return out
 
 def _get_ckw_span(fulltext, spans):
     """Returns the span of the composite keyword if it is valid. Returns
