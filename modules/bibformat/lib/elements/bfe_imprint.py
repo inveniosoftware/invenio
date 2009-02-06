@@ -22,7 +22,8 @@ __revision__ = "$Id$"
 
 import time
 
-def format(bfo, place_label, publisher_label, date_label, separator=', ', date_format=""):
+def format(bfo, place_label, publisher_label, date_label,
+           separator=', ', date_format=""):
     """
     Print imprint (Order: Name of publisher, place of publication and date of publication).
     Parameter <code>date_format</code> allows to specify the string representation of the output.
@@ -52,10 +53,10 @@ def format(bfo, place_label, publisher_label, date_label, separator=', ', date_f
         out += place_label + ' ' + place + separator
 
     if len(date) > 0:
-        if format != '':
+        if date_format != '':
             try:
                 date_time = time.strptime(date, "%Y-%m-%d")
-                out += date_label + " " + date_time.strftime(date_format)
+                out += date_label + " " + time.strftime(date_format, date_time)
             except ValueError:
                 out += date_label + ' ' + date
         else:
