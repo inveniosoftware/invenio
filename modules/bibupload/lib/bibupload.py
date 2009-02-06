@@ -1848,6 +1848,7 @@ def task_run_core():
 
     if task_get_option('file_path') is not None:
         write_message("start preocessing", verbose=3)
+        task_update_status("Reading XML input")
         recs = xml_marc_to_records(open_marc_file(task_get_option('file_path')))
         stat['nb_records_to_upload'] = len(recs)
         write_message("   -Open XML marc: DONE", verbose=2)
@@ -1887,10 +1888,10 @@ def task_run_core():
                             write_message("Record could not have been parsed",
                                           stream=sys.stderr)
 
-                            task_update_progress("Done %d out of %d." % \
-                                                     (stat['nb_records_inserted'] + \
-                                                      stat['nb_records_updated'],
-                                                      stat['nb_records_to_upload']))
+                task_update_progress("Done %d out of %d." % \
+                    (stat['nb_records_inserted'] + \
+                    stat['nb_records_updated'],
+                    stat['nb_records_to_upload']))
         else:
             write_message("   Error bibupload failed: No record found",
                         verbose=1, stream=sys.stderr)
