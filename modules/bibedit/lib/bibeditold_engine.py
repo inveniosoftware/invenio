@@ -423,7 +423,10 @@ def perform_request_history(ln, recid, revid, revid_cmp, action, uid,
 
     revids = get_record_revision_ids(recid)
     if not revid:
-        revid = revids[0]
+        try:
+            revid = revids[0]
+        except IndexError:
+            return ('No history exists for this record.', errors, warnings)
     body = bibedit_templates.history_container('header')
     revdates = [split_revid(some_revid, 'dategui')[1] for some_revid
                 in revids]
