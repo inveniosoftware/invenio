@@ -23,14 +23,11 @@ __revision__ = "$Id$"
 
 #import cgi
 from invenio import bibformat_utils
-from urllib import quote
-from invenio.config import CFG_SITE_URL
-import re
 
 def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
            extension_en="[...] ",extension_fr="[...] ", contextual="no",
            highlight='no', print_lang='en,fr', escape="3",
-           separator_en="<br/>", separator_fr="<br/>"):
+           separator_en="<br/>", separator_fr="<br/>", latex_to_html='no'):
     """ Prints the abstract of a record in HTML. By default prints English and French versions.
 
     Printed languages can be chosen with the 'print_lang' parameter.
@@ -49,6 +46,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
     @param escape escaping method
     @param separator_en a separator between each english abstract
     @param separator_fr a separator between each french abstract
+    @param latex_to_html if 'yes', interpret as LaTeX abstract
     """
     out = ''
 
@@ -158,8 +156,10 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
     if highlight == 'yes':
         out = bibformat_utils.highlight(out, bfo.search_pattern)
 
-    return out
+    if latex_to_html == 'yes':
+        out = bibformat_utils.latex_to_html(out)
 
+    return out
 
 def escape_values(bfo):
     """

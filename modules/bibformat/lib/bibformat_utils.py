@@ -37,8 +37,9 @@ import zlib
 from invenio.config import \
      CFG_OAI_ID_FIELD
 from invenio.dbquery import run_sql
+from invenio.urlutils import string_to_numeric_char_reference
 
-def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
+def highlight(text, keywords=None, prefix_tag='<strong>', suffix_tag="</strong>"):
     """
     Returns text with all words highlighted with given tags (this
     function places 'prefix_tag' and 'suffix_tag' before and after
@@ -51,7 +52,7 @@ def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
     @return highlighted text
     """
 
-    if keywords == []:
+    if not keywords:
         return text
 
     #FIXME decide if non english accentuated char should be desaccentuaded
@@ -432,7 +433,7 @@ def get_all_fieldvalues(recID, tags_in):
     """
     out = []
     if type(tags_in) is not list:
-        tags_in = [tags_in,]
+        tags_in = [tags_in, ]
 
     dict_of_tags_out = {}
     if not tags_in:
@@ -476,3 +477,79 @@ def get_all_fieldvalues(recID, tags_in):
             out.append(value)
 
     return out
+
+
+re_bold_latex = re.compile('\$?\\\\textbf\{(?P<content>.*?)\}\$?')
+re_emph_latex = re.compile('\$?\\\\emph\{(?P<content>.*?)\}\$?')
+re_generic_start_latex = re.compile('\$?\\\\begin\{(?P<content>.*?)\}\$?')
+re_generic_end_latex = re.compile('\$?\\\\end\{(?P<content>.*?)\}\$?')
+re_verbatim_env_latex = re.compile('\\\\begin\{verbatim.*?\}(?P<content>.*?)\\\\end\{verbatim.*?\}')
+
+def latex_to_html(text):
+    """
+    Do some basic interpretation of LaTeX input. Gives some nice
+    results when used in combination with JSMath.
+    """
+    # Process verbatim environment first
+    def make_verbatim(match_obj):
+        """Replace all possible special chars by HTML character
+        entities, so that they are not interpreted by further commands"""
+        return '<br/><pre class="tex2math_ignore">' + \
+               string_to_numeric_char_reference(match_obj.group('content')) + \
+               '</pre><br/>'
+
+    text = re_verbatim_env_latex.sub(make_verbatim, text)
+
+    # Remove trailing "line breaks"
+    text = text.strip('\\\\')
+
+    # Process special characters
+    text = text.replace("\\%", "%")
+    text = text.replace("\\#", "#")
+    text = text.replace("\\$", "$")
+    text = text.replace("\\&", "&amp;")
+    text = text.replace("\\{", "{")
+    text = text.replace("\\}", "}")
+    text = text.replace("\\_", "_")
+    text = text.replace("\\^{} ", "^")
+    text = text.replace("\\~{} ", "~")
+    text = text.replace("\\textregistered", "&#0174;")
+    text = text.replace("\\copyright", "&#0169;")
+    text = text.replace("\\texttrademark", "&#0153; ")
+
+    # Remove commented lines and join lines
+    text = '\\\\'.join([line for line in text.split('\\\\') \
+                        if not line.lstrip().startswith('%')])
+
+    # Line breaks
+    text = text.replace('\\\\', '<br/>')
+
+    # Non-breakable spaces
+    text = text.replace('~', '&nbsp;')
+
+    # Styled text
+    def make_bold(match_obj):
+        "Make the found pattern bold"
+        # FIXME: check if it is valid to have this inside a formula
+        return '<b>' + match_obj.group('content') + '</b>'
+    text = re_bold_latex.sub(make_bold, text)
+
+    def make_emph(match_obj):
+        "Make the found pattern emphasized"
+        # FIXME: for the moment, remove as it could cause problem in
+        # the case it is used in a formula. To be check if it is valid.
+        return ' ' + match_obj.group('content') + ''
+    text = re_emph_latex.sub(make_emph, text)
+
+    # Lists
+    text = text.replace('\\begin{enumerate}', '<ol>')
+    text = text.replace('\\end{enumerate}', '</ol>')
+    text = text.replace('\\begin{itemize}', '<ul>')
+    text = text.replace('\\end{itemize}', '</ul>')
+    text = text.replace('\\item', '<li>')
+
+    # Remove remaining non-processed tags
+    text = re_generic_start_latex.sub('', text)
+    text = re_generic_end_latex.sub('', text)
+
+    return text
