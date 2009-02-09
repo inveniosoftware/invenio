@@ -23,34 +23,13 @@ __revision__ = "$Id$"
 from invenio.dbquery import run_sql
 
 def get_name_tags_all():
-    """This function returns a dictionary of all MARC tag's textual names.
-
-    If for any field, a name is specified for only one subfieldcode, the
-    subfieldcode will be replaced with a wildcard.
-
-    """
+    """This function returns a dictionary of all MARC tag's textual names."""
     result = run_sql("SELECT name, value FROM tag")
-
-    # Count how many subfields are specified for each field.
-    subfieldcount = {}
-    for el in result:
-        if len(el[1]) == 6 and el[1][5] != '%':
-            field_code = el[1][0:5]
-            if (subfieldcount.has_key(field_code)):
-                subfieldcount[field_code] += 1
-            else:
-                subfieldcount[field_code] = 1
 
     # Collect names in a dictionary with field codes as keys.
     nametags = {}
     for el in result:
-        code = el[1]
-        if len(el[1]) == 6 and el[1][5] != '%':
-            field_code = el[1][0:5]
-            # If only one subfield is specified, replace with wildcard.
-            if subfieldcount[field_code] == 1:
-                code = field_code + '%'
-        nametags[code] = el[0]
+        nametags[el[1]] = el[0]
 
     return nametags
 

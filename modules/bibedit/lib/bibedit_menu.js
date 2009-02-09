@@ -26,15 +26,11 @@
  * Global variables
  */
 
-// Last Y-scroll value
-var gYscroll = 0;
 // Interval (in ms) between menu repositioning.
 var gCHECK_SCROLL_INTERVAL = 250;
 
 // Display status messages for how long (in ms).
 var gSTATUS_RESET_TIMEOUT = 1000;
-// Status timer ID (times how long to display status messages)
-var gStatusResetTimerID;
 
 // Color of new field form.
 var gNEW_ADD_FIELD_FORM_COLOR = 'lightblue';
@@ -86,19 +82,21 @@ function positionMenu(){
    */
   var newYscroll = $(document).scrollTop();
   // Only care if there has been some major scrolling.
-  if (Math.abs(newYscroll - gYscroll) > 10){
+  if (Math.abs(newYscroll - positionMenu.yScroll) > 10){
     // If scroll distance is less then 200px, position menu in sufficient
     // distance from header.
     if (newYscroll < 200)
       $('#bibEditMenu').animate({
 	'top': 220 - newYscroll}, 'fast');
     // If scroll distance has crossed 200px, fix menu 50px from top.
-    else if (gYscroll < 200 && newYscroll > 200)
+    else if (positionMenu.yScroll < 200 && newYscroll > 200)
       $('#bibEditMenu').animate({
 	'top': 50}, 'fast');
-    gYscroll = newYscroll;
+    positionMenu.yScroll = newYscroll;
   }
 }
+// Last Y-scroll value
+positionMenu.yScroll = 0;
 
 function deactivateMenu(){
   /*
@@ -134,8 +132,8 @@ function updateStatus(statusType, reporttext){
     case 'report':
       image = img('/img/circle_green.png');
       text = reporttext;
-      clearTimeout(gStatusResetTimerID);
-      gStatusResetTimerID = setTimeout('updateStatus("ready")',
+      clearTimeout(updateStatus.statusResetTimerID);
+      updateStatus.statusResetTimerID = setTimeout('updateStatus("ready")',
 				  gSTATUS_RESET_TIMEOUT);
       break;
     default:
@@ -168,6 +166,7 @@ function onGetRecordSuccess(json){
   /*
    * Handle successfull 'getRecord' request.
    */
+  gPageDirty = false;
   if (json['resultCode'] != 0){
     // Not that successfull requests...
     deactivateMenu();
@@ -310,7 +309,7 @@ function onAddFieldClick(){
    */
   // Create form and scroll close to the top of the table.
   $(document).scrollTop(0);
-  var fieldTmpNo = gAddFieldFreeTmpNo++;
+  var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
   $('#bibEditColFieldTag').css('width', '80px');
   $('#bibEditTable tbody').eq(3).after(createAddFieldRowGroup(fieldTmpNo));
 
@@ -356,6 +355,8 @@ function onAddFieldClick(){
   $(rowGroup).effect('highlight', {color: gNEW_ADD_FIELD_FORM_COLOR},
 		     gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION);
 }
+// Incrementing temporary field numbers.
+onAddFieldClick.addFieldFreeTmpNo = 100000;
 
 function onAddFieldControlfieldClick(){
   /*
@@ -487,6 +488,7 @@ function onAddFieldSave(event){
     var newRowGroup = createField(tag, field);
   }
 
+  gPageDirty = true;
   // Create AJAX request.
   var data = {
     recID: gRecID,
@@ -576,6 +578,7 @@ function onDeleteSelectedClick(){
     return;
   }
 
+  gPageDirty = true;
   // Create AJAX request.
   var data = {
     recID: gRecID,
@@ -591,9 +594,9 @@ function onDeleteSelectedClick(){
   fields that had subfields deleted. */
   var fieldNumbersToDelete, subfieldIndexesToDelete, field, subfields,
     subfieldIndex;
-  for (tag in toDelete){
+  for (var tag in toDelete){
     fieldNumbersToDelete = toDelete[tag];
-    for (fieldNumber in fieldNumbersToDelete){
+    for (var fieldNumber in fieldNumbersToDelete){
       var fieldID = tag + '_' + fieldNumber;
       subfieldIndexesToDelete = fieldNumbersToDelete[fieldNumber];
       if (subfieldIndexesToDelete.length == 0){

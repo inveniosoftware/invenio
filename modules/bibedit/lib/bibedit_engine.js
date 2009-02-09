@@ -30,14 +30,11 @@ var gRecID = null;
 var gRecord = null;
 // Tag format.
 var gTagFormat;
+// Is the page dirty?
+var gPageDirty = false;
 
 // Highest available field number
 var gNewFieldNumber;
-// Incrementing temporary field numbers.
-var gAddFieldFreeTmpNo = 100000;
-
-// Incrementing transaction ID.
-var gTransactionID = 0;
 
 // The current hash (fragment part of the URL).
 var gHash;
@@ -57,17 +54,16 @@ var gNEW_FIELDS_COLOR = 'lightgreen';
 // Duration (in ms) for the color fading of newly added fields.
 var gNEW_FIELDS_COLOR_FADE_DURATION = 2000;
 
-// MARC validation REs
-var gReControlTag = /00[1-9A-Za-z]{1}/;
-var gReTag = /(0([1-9A-Z][0-9A-Z])|0([1-9a-z][0-9a-z]))|(([1-9A-Z][0-9A-Z]{2})|([1-9a-z][0-9a-z]{2}))/;
-var gReIndicator = /[\da-z]{1}/;
-var gReSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
-
 
 $(function(){
   /*
    * Initialization
    */
+  window.onbeforeunload = function(){
+    if (gPageDirty){
+      return "Your changes have not been submitted.";
+    }
+  };
   // Initialize Jeditable.
   initJeditable();
   // Initialize menu.
@@ -194,7 +190,7 @@ function changeAndSerializeHash(updateData){
    */
   clearTimeout(gHashCheckTimerID);
   gHashParsed = {};
-  for (key in updateData){
+  for (var key in updateData){
     gHashParsed[key.toString()] = updateData[key].toString();
   }
   gHash = '#';
@@ -265,7 +261,7 @@ function createReq(data, onSuccess){
   /*
    * Create AJAX request.
    */
-  data.ID = gTransactionID++;
+  data.ID = createReq.transactionID++;
   $.ajax({
     data: {
       jsondata: JSON.stringify(data)
@@ -273,6 +269,8 @@ function createReq(data, onSuccess){
     success: onSuccess
   });
 }
+// Incrementing transaction ID.
+createReq.transactionID = 0;
 
 function onReqError(XHR, textStatus, errorThrown){
   /*
@@ -292,6 +290,7 @@ function cleanUpDisplay(){
   $('.headline').text('BibEdit');
   gRecID = null;
   gRecord = null;
+  gPageDirty = false;
 }
 
 function notImplemented(event){
@@ -336,6 +335,7 @@ function onMoveSubfieldClick(arrow){
    * Handle subfield moving arrows.
    */
   updateStatus('updating');
+  gPageDirty = true;
   var tmpArray = arrow.id.split('_');
   var btnType = tmpArray[0], tag = tmpArray[1], fieldNumber = tmpArray[2],
     subfieldIndex = tmpArray[3];
@@ -408,6 +408,7 @@ function onContentChange(value){
    * Handle 'Save' button in editable content fields.
    */
   updateStatus('updating');
+  gPageDirty = true;
   var tmpArray = this.id.split('_');
   var tag = tmpArray[1], fieldNumber = tmpArray[2], subfieldIndex = tmpArray[3];
   var field = getFieldFromTag(tag, fieldNumber);
@@ -534,6 +535,7 @@ function onAddSubfieldsSave(event){
   }
 
   if (!subfields.length == 0){
+    gPageDirty = true;
     // Create AJAX request
     var data = {
       recID: gRecID,
@@ -591,7 +593,7 @@ function getTagsSorted(){
    * Return field tags in sorted order.
    */
   var tags = [];
-  for (tag in gRecord){
+  for (var tag in gRecord){
     tags.push(tag);
   }
   return tags.sort();
@@ -663,7 +665,7 @@ function resetNewFieldNumber(){
    */
   var existingNumbers = [];
   var fields, field;
-  for (tag in gRecord){
+  for (var tag in gRecord){
     fields = gRecord[tag];
     for (var i=0, n=fields.length; i<n; i++){
       existingNumbers.push(fields[i][4]);
@@ -681,8 +683,13 @@ function validMARC(datatype, value){
    * Datatype can be 'ControlTag', 'Tag', 'Indicator' or 'SubfieldCode'.
    * Returns a boolean.
    */
-  return eval('gRe' + datatype + '.test(value)');
+  return eval('validMARC.re' + datatype + '.test(value)');
 }
+// MARC validation REs
+validMARC.reControlTag = /00[1-9A-Za-z]{1}/;
+validMARC.reTag = /(0([1-9A-Z][0-9A-Z])|0([1-9a-z][0-9a-z]))|(([1-9A-Z][0-9A-Z]{2})|([1-9a-z][0-9a-z]{2}))/;
+validMARC.reIndicator = /[\da-z]{1}/;
+validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
 
 function getFieldTag(MARC){
   /*
@@ -716,7 +723,7 @@ function getFieldTag(MARC){
 	  i--;
 	  term = MARC.substr(0, i) + '%';
 	}
-	while (i >= 2)
+	while (i >= 3)
       }
     }
   }
@@ -728,23 +735,11 @@ function getSubfieldTag(MARC){
    * Get the tag name of a subfield in format as specified by gTagFormat.
    */
   if (gTagFormat == 'human'){
-    var subfieldName, term = MARC, i = 6;
-    do{
-      // Look for direct hit, then try finding wildcard hit by shortening
-      // expression gradually. Ignores wildcards which gives values like '27x'.
-      subfieldName = gTagNames[term];
-      if (subfieldName != undefined){
-	if (subfieldName != MARC.substr(0, i) + 'x')
-	  return subfieldName;
-	break;
-      }
-      i--;
-      term = MARC.substr(0, i) + '%';
-    }
-    while (i >= 2)
+    var subfieldName = gTagNames[MARC];
+      if (subfieldName != undefined)
+	return subfieldName;
   }
-  var r = '$$' + MARC.charAt(5);
-  return r;
+  return '$$' + MARC.charAt(5);
 }
 
 function fieldIsProtected(MARC){
@@ -773,9 +768,9 @@ function containsProtectedField(fieldData){
    *     - Subfield index
    */
   var fieldNumbers, subfieldIndexes, MARC;
-  for (tag in fieldData){
+  for (var tag in fieldData){
     fieldNumbers = fieldData[tag];
-    for (fieldNumber in fieldNumbers){
+    for (var fieldNumber in fieldNumbers){
       subfieldIndexes = fieldNumbers[fieldNumber];
       if (subfieldIndexes.length == 0){
 	MARC = getMARC(tag, fieldNumber);

@@ -1424,6 +1424,7 @@ input.hyperlinkformSubmitButton {
 }
 /* end of WebSubmit module */
 /* BibEdit module */
+/* BibEdit - old interface */
 .bibEditTable{
    background: #ececec;
    border: 0px;
@@ -1461,9 +1462,7 @@ input.hyperlinkformSubmitButton {
 .bibEditHistForms{
    margin: 5px 0px 5px 10px;
 }
-
-/* end of BibEdit module*/
-/* BibEdit module new */
+/* BibEdit - new interface */
 .bibEditHidden {
   visibility: hidden;
 }
@@ -1596,66 +1595,7 @@ input.hyperlinkformSubmitButton {
 #bibEditMessage {
   background: rgb(250, 209, 99);
 }
-/* Some demo dialog CSS from jQuery */
-.flora .ui-dialog,
-.flora.ui-dialog {
-  background-color: #DCE5F6;
-}
-.ui-dialog-overlay {
-  background: black;
-  opacity: 0.5;
-}
-.flora .ui-dialog .ui-dialog-titlebar,
-.flora.ui-dialog .ui-dialog-titlebar {
-	border-bottom: 1px solid #d8d2aa;
-	background: #3366CC;
-	padding: 0px;
-	height: 28px;
-}
-.flora .ui-dialog .ui-dialog-titlebar-close,
-.flora.ui-dialog .ui-dialog-titlebar-close {
-	width: 16px;
-	height: 16px;
-	background: url(dialog-titlebar-close.png) no-repeat;
-	position:absolute;
-	top: 6px;
-	right: 7px;
-	cursor: default;
-}
-.flora .ui-dialog .ui-dialog-titlebar-close span,
-.flora.ui-dialog .ui-dialog-titlebar-close span {
-	display: none;
-}
-.flora .ui-dialog .ui-dialog-titlebar-close-hover,
-.flora.ui-dialog .ui-dialog-titlebar-close-hover {
-	background: url(dialog-titlebar-close-hover.png) no-repeat;
-}
-.flora .ui-dialog .ui-dialog-title,
-.flora.ui-dialog .ui-dialog-title {
-	margin-left: 5px;
-	color: white;
-	font-weight: bold;
-	position: relative;
-	top: 7px;
-	left: 4px;
-}
-.flora .ui-dialog .ui-dialog-content,
-.flora.ui-dialog .ui-dialog-content {
-	margin: 1.2em;
-}
-.flora .ui-dialog .ui-dialog-buttonpane,
-.flora.ui-dialog .ui-dialog-buttonpane {
-	position: absolute;
-	bottom: 8px;
-	right: 12px;
-	width: 100%;
-	text-align: right;
-}
-.flora .ui-dialog .ui-dialog-buttonpane button,
-.flora.ui-dialog .ui-dialog-buttonpane button {
-	margin: 6px;
-}
-/* end of BibEdit module*/
+/* end of BibEdit module */
 /* WebAlert module */
 .alrtTable{
     border: 1px solid black;
