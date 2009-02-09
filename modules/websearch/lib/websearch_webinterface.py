@@ -696,7 +696,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             return answer, []
 
 
-        elif component == 'record' and path[0] == 'edit':
+        elif component == 'record' and path and path[0] == 'edit':
             return WebInterfaceEditPages(), path[1:]
 
         elif component == 'record' or component == 'record-restricted':
