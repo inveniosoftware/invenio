@@ -222,7 +222,8 @@ class HTMLWasher(HTMLParser):
         self.result += '&' + name + ';'
 
 def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
-                         enabled=True, file_upload_url=None, toolbar_set="Basic"):
+                         enabled=True, file_upload_url=None, toolbar_set="Basic",
+                         custom_configurations_path='/fckeditor/invenio-fckeditor-config.js'):
     """
     Returns a wysiwyg editor (FCKeditor) to embed in html pages.
 
@@ -274,6 +275,13 @@ file_upload_url - *str* the URL used to upload new files via the
                   config file in
                   /opt/cds-invenio/var/www/fckeditor/invenio-fckconfig.js
 
+custom_configurations_path - *str* value for the FCKeditor config
+                             variable 'CustomConfigurationsPath',
+                             which allows to specify the path of a
+                             file that contains a custom configuration
+                             for the editor. The path is relative to
+                             /opt/cds-invenio/var/www/
+
     Returns:
 
         the HTML markup of the editor
@@ -300,8 +308,7 @@ file_upload_url - *str* the URL used to upload new files via the
     if enabled and fckeditor_available:
         oFCKeditor = fckeditor.FCKeditor(name)
         oFCKeditor.BasePath = '/fckeditor/'
-        # TODO: check if path would not better be a parameter of the function
-        oFCKeditor.Config["CustomConfigurationsPath"] = "/fckeditor/invenio-fckeditor-config.js"
+        oFCKeditor.Config["CustomConfigurationsPath"] = custom_configurations_path
 
         # Though not recommended, it is much better that users gets a
         # <br/> when pressing carriage return than a <p> element. Then
