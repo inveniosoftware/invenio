@@ -741,7 +741,7 @@ class Template:
         view_button = _("View revision")
         compare_button = _("Compare revisions")
         revert_button = _("Revert to revision")
-        back_button = _("Back to bibedit")
+        back_button = _("Back to BibEdit")
         input_edit_submit = self.input('submit', edit_button, class_css='formbutton', style='width: 200px;')
         input_view_submit = self.input('submit', view_button, class_css='formbutton', style='width: 200px; margin-top: 20px;')
         input_compare_submit = self.input('submit', compare_button, class_css='formbutton', style='width: 200px; margin-top: 20px;')
@@ -764,8 +764,6 @@ class Template:
 
         default_actionurl = bibediturl + '/history'
 
-#        edit_form = self.history_form(bibediturl + '/index', input_edit_submit,
-#            hidden_fields=(input_ln, input_recid, input_format_tag))
         edit_form = self.history_form(CFG_SITE_URL + '/record/' + str(recid) +
             '/edit/', input_edit_submit)
         view_form = self.history_form(default_actionurl, input_view_submit,
@@ -777,9 +775,7 @@ class Template:
         revert_form = self.history_form(default_actionurl, input_revert_submit,
             ('revid',), (optlist_revert,), (input_ln, input_recid,
                                             input_format_tag, input_revert))
-#        back_form = self.history_form(bibediturl + '/index', input_back_submit,
-#            hidden_fields=(input_ln,))
-        back_form = self.history_form(CFG_SITE_URL + '/edit/', input_back_submit)
+        back_form = self.history_form(CFG_SITE_URL + '/record/edit/', input_back_submit)
 
 
         return '''
