@@ -160,3 +160,14 @@ def ParamFromFile(afile):
     except IOError:
         pass
     return parameter
+
+def write_file(filename, filedata):
+    """Open FILENAME and write FILEDATA to it."""
+    filename1 =filename.strip()
+    try:
+        of=open(filename1,'w')
+    except IOError:
+        raise InvenioWebSubmitFunctionError('Cannot open ' + filename1 + ' to write')
+    of.write(filedata)
+    of.close()
+    return ""
