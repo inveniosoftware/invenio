@@ -125,7 +125,7 @@ def send_email(fromaddr,
             server.quit()
             sent = True
         except (smtplib.SMTPException, socket.error):
-            register_exception(alert_admin=True)
+            register_exception()
             if (debug_level > 1):
                 log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime, sys.exc_info()[0], fromaddr, toaddr, body)
             sleep(attempt_sleeptime)
