@@ -54,7 +54,7 @@ You can see the details of the record at the following address:
 
 Please register your decision by following the instructions at the
 following address:
- <%(site-url)s/submit/sub?%(report-number-fieldname)s=%(report-number)s@APP%(doctype)s&combo%(doctype)s=%(category)s>
+ <%(site-url)s/submit/sub?%(report-number-fieldname)s=%(report-number)s@%(approval-action)s%(doctype)s&combo%(doctype)s=%(category)s>
 
 Below, you may find some additional information about the approval request:
 
@@ -323,9 +323,10 @@ def Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=None):
                           print_record(int(sysno), 'tm', "245__a").split("\n")])
     ##
     #######
+    ## the normal approval action
+    approve_act = 'APP'
     ## Get notes about the approval request:
     approval_notes = get_approval_request_notes(doctype, rn)
-
     ## Get the referee email address:
     if CFG_CERN_SITE:
         ## The referees system in CERN now works with listbox membership.
@@ -334,11 +335,29 @@ def Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=None):
         ## Make sure that your list exists!
         ## FIXME - to be replaced by a mailing alias in webaccess in the
         ## future.
-        referee_listname = "service-cds-referee-%s" % doctype.lower()
-        if category != "":
-            referee_listname += "-%s" % category.lower()
-        referee_listname += "@cern.ch"
-        mailto_addresses = referee_listname
+        if doctype == 'ATN':  ## Special case of 'RPR' action for doctype ATN
+            action = ParamFromFile("%s/%s" % (curdir,'act')).strip()
+            if action == 'RPR':
+                notetype = ParamFromFile("%s/%s" % (curdir,'ATN_NOTETYPE')).strip()
+                if notetype not in ('SLIDE','PROC'):
+                    raise InvenioWebSubmitFunctionError('ERROR function Mail_Approval_Request_to_Referee:: do not recognize notetype ' + notetype)
+                if notetype == 'PROC':
+                    approve_act = 'APR'  # RPR PROC requires APR action to approve
+                    referee_listname = "service-cds-referee-atn-proc@cern.ch"
+                elif notetype == 'SLIDE':  ## SLIDES approval
+                    approve_act = 'APS'  # RPR SLIDE requires APS action to approve
+                    referee_listname = "atlas-speakers-comm@cern.ch"
+                else:
+                    raise InvenioWebSubmitFunctionError('ERROR function Mail_Approval_Request_to_Referee:: do not understand notetype: ' +notetype)
+            else:
+                referee_listname = "service-cds-referee-%s" % doctype.lower()
+                if category != "":
+                    referee_listname += "-%s" % category.lower()
+            mailto_addresses = referee_listname + "@cern.ch"
+            if category == 'CDSTEST':
+                referee_listname = "service-cds-referee-%s" % doctype.lower()
+                referee_listname += "-%s" % category.lower()
+                mailto_addresses = referee_listname + "@cern.ch"
     else:
         referee_address = ""
         ## Try to retrieve the referee's email from the referee's database:
@@ -368,6 +387,7 @@ def Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=None):
                   'authors'                 : rec_authors,
                   'site-url'                : CFG_SITE_URL,
                   'record-id'               : sysno,
+                  'approval-action'         : approve_act,
                   'doctype'                 : doctype,
                   'notes'                   : approval_notes,
                   'category'                : category,

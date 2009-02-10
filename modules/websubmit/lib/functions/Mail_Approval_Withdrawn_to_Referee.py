@@ -34,6 +34,7 @@ from invenio.config import CFG_CERN_SITE, \
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.websubmit_functions.Shared_Functions import ParamFromFile
 from invenio.errorlib import register_exception
+from invenio.websubmit_dblayer import get_approval_request_notes
 from invenio.mailutils import send_email
 
 
@@ -277,11 +278,35 @@ def Mail_Approval_Withdrawn_to_Referee(parameters, \
         ## Make sure that your list exists!
         ## FIXME - to be replaced by a mailing alias in webaccess in the
         ## future.
-        referee_listname = "service-cds-referee-%s" % doctype.lower()
-        if category != "":
-            referee_listname += "-%s" % category.lower()
+        ## see if was a PROC request or not
+        notes = get_approval_request_notes(doctype,rn)
+        was_proc = 'n'
+        was_slide = 'n'
+        if notes:
+            note_lines = notes.split('\n')
+            for note_line in note_lines:
+                if note_line.find('Requested Note Classification:') == 0:
+                    note_type = note_line.split()[-1]
+                    if note_type == 'PROC':
+                        was_proc = 'y'
+                    elif note_type == 'SLIDE':
+                        was_slide = 'y'
+                    break  # there may be more than one - just take the first
+        if was_proc == 'y':
+            referee_listname = "service-cds-referee-%s" % doctype.lower()
+            referee_listname += "-%s" %  'proc'
+        elif was_slide == 'y':
+            referee_listname = "atlas-speakers-comm"
+        else:
+            referee_listname = "service-cds-referee-%s" % doctype.lower()
+            if category != "":
+                referee_listname += "-%s" % category.lower()
         referee_listname += "@cern.ch"
         mailto_addresses = referee_listname
+        if category == 'CDSTEST':    ## our special testing category
+            referee_listname = "service-cds-referee-%s" % doctype.lower()
+            referee_listname += "-%s" % category.lower()
+            mailto_addresses = referee_listname + "@cern.ch"
     else:
         referee_address = ""
         ## Try to retrieve the referee's email from the referee's database:
