@@ -31,7 +31,7 @@ Contents
         install most of the below-mentioned prerequisites and
         recommendations by running:
 
-          $ sudo apt-get install libapache2-mod-python2.3 \
+          $ sudo apt-get install libapache2-mod-python2.3 python2.3-dev \
               apache2-mpm-prefork mysql-server-4.1 mysql-client-4.1 \
               python2.3-mysqldb python2.3-4suite python-simplejson \
               python2.3-xml python2.3-libxml2 python2.3-libxslt1 \
