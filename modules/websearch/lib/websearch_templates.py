@@ -1348,12 +1348,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        # This function used to return _("The contents of this collection is restricted.")
-        # But it seems more user friendly not to display anything
-        # in the search interface pages for restricted collections.
-        # Users will be asked to authenticate themselves after they
-        # click on Search anyway.  So let's simply return empty string here.
-        return ""
+        return _("This collection is restricted.  If you are authorized to access it, please click on the Search button.")
 
     def tmpl_box_no_records(self, ln):
         """
