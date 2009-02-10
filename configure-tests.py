@@ -260,11 +260,31 @@ try:
         ** You must either remove your old Stemmer or else **
         ** upgrade to Snowball Stemmer
         **   <http://snowball.tartarus.org/wrappers/PyStemmer-1.0.1.tar.gz>
-        ** before continuing.  Please see INSTALL file for **
-        ** more details.                                   **
+        ** before continuing.  Please see the INSTALL file **
+        ** for more details.                               **
         *****************************************************
         """ % (msg)
         sys.exit(1)
 except ImportError:
     pass # no prob, Stemmer is optional
 
+## 5) check for Python.h (needed for intbitset):
+try:
+    from distutils.sysconfig import get_python_inc
+    path_to_python_h = get_python_inc() + os.sep + 'Python.h'
+    if not os.path.exists(path_to_python_h):
+        raise StandardError, "Cannot find %s" % path_to_python_h
+except StandardError, msg:
+    print """
+    *****************************************************
+    ** ERROR: PYTHON HEADER FILE ERROR %s
+    *****************************************************
+    ** You do not seem to have Python developer files  **
+    ** installed (such as Python.h).  Some operating   **
+    ** systems provide these in a separate Python      **
+    ** package called python-dev or python-devel.      **
+    ** You must install such a package before          **
+    ** continuing the installation process.            **
+    *****************************************************
+    """ % (msg)
+    sys.exit(1)
