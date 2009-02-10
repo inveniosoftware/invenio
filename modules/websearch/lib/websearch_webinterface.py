@@ -58,12 +58,14 @@ from invenio.config import \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBDIR, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
-     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
+     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, http_check_credentials, logoutUser, isUserSuperAdmin
+    collect_user_info, http_check_credentials, logoutUser, isUserSuperAdmin, \
+    session_param_get
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
@@ -475,6 +477,17 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
+
+            if CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL == 2:
+                ## Let's update the current collections list with all
+                ## the restricted collections the user has rights to view.
+                try:
+                    restricted_collections = session_param_get(req, 'permitted_restricted_collections')
+                    argd_collections = Set(argd['c'])
+                    argd_collections.update(restricted_collections)
+                    argd['c'] = list(argd_collections)
+                except KeyError:
+                    pass
 
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS

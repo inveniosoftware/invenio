@@ -64,7 +64,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_TMPDIR, \
      CFG_SITE_URL, \
-     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
+     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
 from invenio import session
 from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
@@ -256,6 +257,7 @@ def setApacheUser(req, apache_user):
 def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
     """
+    from invenio.search_engine import get_permitted_restricted_collections
     if hasattr(req, '_user_info'):
         del req._user_info
     sm = session.MPSessionManager(pSession, pSessionMapping())
@@ -267,6 +269,12 @@ def setUid(req, uid, remember_me=False):
     s.setUid(uid)
     s.setRememberMe(remember_me)
     sm.maintain_session(req, s, remember_me)
+    if CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL > 0:
+        if uid > 0:
+            collections = get_permitted_restricted_collections(collect_user_info(req))
+            session_param_set(req, 'permitted_restricted_collections', collections)
+        else:
+            session_param_set(req, 'permitted_restricted_collections', [])
     return uid
 
 def session_param_set(req, key, value):
@@ -735,8 +743,8 @@ def nicknameUnique(p_nickname):
     return -1
 
 def update_Uid(req, p_email, remember_me=False):
-    """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system
-    with a given email and password
+    """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system with a given email and password.
+    As a side effect it will discover all the restricted collection to which the user has right to
     """
     query_ID = int(run_sql("select id from user where email=%s",
                            (p_email,))[0][0])

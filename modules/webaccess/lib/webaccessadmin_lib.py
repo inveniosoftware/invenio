@@ -826,10 +826,10 @@ def perform_becomeuser(req, userID='', callback='yes', confirm=0):
 
     subtitle = """<a name="5"></a>5. Became user.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#5">?</a>]</small>""" % CFG_SITE_URL
 
-    res = run_sql("SELECT id FROM user WHERE id=%s", (userID, ))
+    res = run_sql("SELECT email FROM user WHERE id=%s", (userID, ))
     output = ""
     if res:
-        setUid(req, res[0][0])
+        update_Uid(req, res[0][0])
         redirect_to_url(req, CFG_SITE_URL)
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'

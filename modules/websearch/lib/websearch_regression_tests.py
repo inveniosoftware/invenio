@@ -39,7 +39,7 @@ from invenio.testutils import make_test_suite, \
 from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
-    collection_restricted_p
+    collection_restricted_p, get_permitted_restricted_collections
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -901,6 +901,12 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         """websearch - collection_restricted_p"""
         self.failUnless(collection_restricted_p('Theses'), True)
         self.failIf(collection_restricted_p('Books & Reports'))
+
+    def test_get_permitted_restricted_collections(self):
+        """websearch - get_permitted_restricted_collections"""
+        from invenio.webuser import get_uid_from_email, collect_user_info
+        self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses'])
+        self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('hyde@cds.cern.ch'))), [])
 
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""

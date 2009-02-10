@@ -188,6 +188,16 @@ try:
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
 
+def get_permitted_restricted_collections(user_info):
+    """Return a list of collection that are restricted but for which the user
+    is authorized."""
+    restricted_collection_cache.recreate_cache_if_needed()
+    ret = []
+    for collection in restricted_collection_cache.cache:
+        if acc_authorize_action(user_info, 'viewrestrcoll', collection=collection)[0] == 0:
+            ret.append(collection)
+    return ret
+
 def check_user_can_view_record(user_info, recid):
     """Check if the user is authorized to view the given recid. The function
     grants access in two cases: either user has author rights on ths record,
