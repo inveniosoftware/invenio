@@ -52,9 +52,9 @@ class WebAlertHTMLToTextTest(unittest.TestCase):
     def test_your_alerts_pages_availability(self):
         """webalert - HTML to text conversion"""
 
-        self.assertEqual("High energy cosmic rays striking atoms at the top of the atmosphere give the rise to showers of particles striking the Earth's surface\nDes rayons cosmiques de haute energie heurtent des atomes dans la haute atmosphere et donnent ainsi naissance a des gerbes de particules projetees sur la surface terrestre\n10 May 1999 \nPicture number: CERN-DI-9905005", get_as_text(5))
+        self.assertEqual("High energy cosmic rays striking atoms at the top of the atmosphere give the rise to showers of particles striking the Earth's surface \nDes rayons cosmiques de haute energie heurtent des atomes dans la haute atmosphere et donnent ainsi naissance a des gerbes de particules projetees sur la surface terrestre \n10 May 1999 \nPicture number: CERN-DI-9905005", get_as_text(5))
 
-        self.assertEqual("Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes / Wang, B ; Lin, C Y ; Abdalla, E [hep-th/0003295]\nComplex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed. [...] \nPublished in Phys. Lett., B :481 2000 79-88", get_as_text(74))
+        self.assertEqual("Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes / Wang, B ; Lin, C Y ; Abdalla, E [hep-th/0003295] \nComplex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed. [...] \nPublished in Phys. Lett., B :481 2000 79-88", get_as_text(74))
 
 
 TEST_SUITE = make_test_suite(WebAlertWebPagesAvailabilityTest,

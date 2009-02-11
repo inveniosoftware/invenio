@@ -31,7 +31,7 @@ from invenio.bibformat import format_record
 from invenio.bibindex_engine import re_html
 from invenio.messages import gettext_set_language
 
-whitespaces_pattern = re.compile(r'\s+')
+whitespaces_pattern = re.compile(r'[ \t]+')
 
 def wrap(text):
     """Limits the number of characters per line in given text.
@@ -119,13 +119,13 @@ class RecordHTMLParser(HTMLParser):
         if data.lower() in  ['detailed record', 'similar record', 'cited by']:
             pass
         elif self.silent == False:
-            cleaned_data = data.strip()
-            cleaned_data = whitespaces_pattern.sub(' ', cleaned_data)
-            if len(cleaned_data) != 0:
-                self.result += ((data.startswith(' ') and not self.new_line) and ' ' or '') + \
-                               cleaned_data + \
-                               (data.endswith(' ') and ' ' or '')
-                self.new_line = False
+            if self.new_line:
+                # Remove unnecessary trailing whitespace at the
+                # beginning of a line
+                data = data.lstrip()
+            # Merge all consecutive whitespaces into a single one
+            self.result += data
+            self.new_line = False
 
     def handle_comment(self, data):
         if 'START_NOT_FOR_TEXT' == data.upper().strip():
@@ -143,6 +143,15 @@ class RecordHTMLParser(HTMLParser):
     def handle_entityref(self, name):
         """Process a general entity reference of the form "&name;".
         Transform to text whenever possible."""
+        if name == 'nbsp':
+            # Keep them for the moment. Will be processed at the end.
+            # It is needed to consider them separately, as all
+            # consecutive whitespaces will be merged into a single one
+            # at the end. It should not be the case of non breakable
+            # space.  Note that because of this trick, input
+            # &amp;nbsp; will be considered as a &nbsp;
+            self.result += '&nbsp;'
+            return
         char_code = htmlentitydefs.name2codepoint.get(name, None)
         if char_code is not None:
             try:
@@ -164,8 +173,13 @@ def get_as_text(record_id, ln=CFG_SITE_LANG):
     except:
         out = re_html.sub(' ', rec_in_hb)
 
-    out = out.strip('\n').strip() # Remove trailing whitespace and
-                                  # linefeeds
+    # Remove trailing whitespace and linefeeds
+    out = out.strip('\n').strip()
+    # Merge consecutive whitespaces. Must be done here, once all HTML
+    # tags have been removed
+    out = whitespaces_pattern.sub(' ', out)
+    # Now consider non-breakable spaces
+    out = out.replace('&nbsp;', ' ')
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Detailed record"), "", out)
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Similar records"), "", out)
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Cited by"), "", out)
