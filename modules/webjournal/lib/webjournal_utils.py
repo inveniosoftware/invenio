@@ -236,6 +236,69 @@ def get_categories_from_rule_list(rule_list):
 
     return categories
 
+def get_journal_articles(journal_name, issue, category):
+    """
+    Returns the recids in given category and journal, for given issue
+    number. The returned recids are grouped according to their 773__c
+    field.
+    Example of returned value:
+                {'1': [2390, 2386, 2385],
+                 '3': [2388],
+                 '2': [2389],
+                 '4': [2387]}
+    Parameters:
+
+      journal_name  - *str* the name of the journal (as used in URLs)
+             issue  - *str* the issue. Eg: "08/2007"
+          category  - *str* the name of the category
+    """
+    # Retrieve the list of rules that map Category -> Search Pattern.
+    # Keep only the rule matching our category
+    config_strings = get_xml_from_config(["rule"], journal_name)
+    category_to_search_pattern_rules = config_strings["rule"]
+    try:
+        matching_rule = [rule.split(',', 1) for rule in \
+                         category_to_search_pattern_rules \
+                         if rule.split(',')[0] == category]
+    except:
+        return []
+
+    recids = list(search_pattern(p='773__n:%s and %s' %
+                                 (issue,
+                                  matching_rule[0][1])))
+    if issue[0] == '0':
+        # search for 09/ and 9/
+        additional_recids = list(search_pattern(p='773__n:%s and %s' %
+                                                (issue[1:],
+                                                 matching_rule[0][1])))
+        recids.extend(additional_recids)
+
+    return get_order_dict_from_recid_list(recids, issue)
+
+def get_journal_categories(journal_name, issue):
+    """
+    List the categories for the given journal and issue
+
+       Parameters:
+
+      journal_name  - *str* the name of the journal (as used in URLs)
+             issue  - *str* the issue. Eg: "08/2007"
+    """
+    categories = {}
+
+    config_strings = get_xml_from_config(["rule"], journal_name)
+    all_categories = [rule.split(',')[0] for rule in \
+                      config_strings["rule"]]
+
+    for category in all_categories:
+        recids = get_journal_articles(journal_name,
+                                      issue,
+                                      category)
+        if len(recids.keys()) > 0:
+            categories[category] = None
+
+    return categories.keys()
+
 def get_category_from_rule_string(rule_string):
     """
     TODO: Remove?
