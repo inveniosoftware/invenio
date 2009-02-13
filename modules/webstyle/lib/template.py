@@ -17,16 +17,16 @@
 
 """CDS Invenio templating framework."""
 
-__revision__ = "$Id$"
-
-import os, sys, inspect, getopt
+from __future__ import nested_scopes
+import os, sys, inspect, getopt, new, cgi
 
 try:
     # This tool can be run before Invenio is installed:
     # invenio files might then not exist.
     from invenio.config import \
          CFG_WEBSTYLE_TEMPLATE_SKIN, \
-         CFG_PREFIX
+         CFG_PREFIX, \
+         CFG_WEBSTYLE_INSPECT_TEMPLATES
     CFG_WEBSTYLE_PYLIBDIR = CFG_PREFIX + os.sep + 'lib' + os.sep + 'python'
 except ImportError:
     CFG_WEBSTYLE_PYLIBDIR = None
@@ -59,6 +59,38 @@ CFG_WEBSTYLE_DEPRECATED_FUNCTIONS = {'webstyle': \
 # Eg. {'webstyle': {'get_page':{'header': "replaced by 'title'"}}}
 CFG_WEBSTYLE_DEPRECATED_PARAMETERS = {}
 
+## Thanks to Python CookBook for this!
+def enhance_method(module, klass, method_name, replacement):
+    old_method = getattr(klass, method_name)
+    try:
+        if type(old_method) is not new.instancemethod or old_method.__name__ == 'new_method':
+            ## not a method or Already wrapped
+            return
+    except AttributeError:
+        raise '%s %s %s %s' % (module, klass, method_name, old_method)
+    def new_method(*args, **kwds):
+        return replacement(module, old_method, method_name, *args, **kwds)
+    setattr(klass, method_name, new.instancemethod(new_method, None, klass))
+
+def method_wrapper(module, old_method, method_name, self, *args, **kwds):
+    def shortener(text):
+        if len(text) > 205:
+            return text[:100] + ' ... ' + text[-100:]
+        else:
+            return text
+    ret = old_method(self, *args, **kwds)
+    if ret and type(ret) is str:
+        params = ', '.join([shortener(repr(arg)) for arg in args] + ['%s=%s' % (item[0], shortener(repr(item[1]))) for item in kwds.items()])
+        signature = '%s_templates/%s(%s)' % (module, method_name, params)
+        signature_q = '%s_templates/%s' % (module, method_name)
+        return '<span title="%(signature)s" style="border: thin solid red;"><!-- BEGIN TEMPLATE %(signature_q)s BEGIN TEMPLATE --><span style="color: red; font-size: xx-small; font-style: normal; font-family: monospace; float: both">*</span>%(result)s<!-- END TEMPLATE %(signature_q)s END TEMPLATE --></span>' % {
+            'signature_q' : cgi.escape(signature_q),
+            'signature' : cgi.escape(signature, True),
+            'result' : ret
+            }
+    else:
+        return ret
+
 def load(module=''):
     """ Load and returns a template class, given a module name (like
         'websearch', 'webbasket',...).  The module corresponding to
@@ -78,6 +110,11 @@ def load(module=''):
         except ImportError:
             mymodule = __import__("invenio.%s_templates" % (module), local, local,
                                   ["invenio.templates.%s" % (module)])
+    if CFG_WEBSTYLE_INSPECT_TEMPLATES:
+        for method_name in dir(mymodule.Template):
+            if method_name.startswith('tmpl_'):
+                enhance_method(module, mymodule.Template, method_name, method_wrapper)
+
     return mymodule.Template()
 
 # Functions to check that customized templates functions conform to

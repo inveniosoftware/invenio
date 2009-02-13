@@ -222,7 +222,7 @@ End of the side comment.)
     its HTML snippets.  The important thing is to preserve the imports
     (<code>from invenio.config import CFG_SITE_LANG</code>) as in the original
     <code>webstyle_templates.py</code> file and to preserve the
-    leading whitespace Pythonic indentation.
+    leading whitespace Pythonic indentation.</li>
 
 <li>You do not have to learn "yet another templating language", you
     can use the full power of Python. The <code>tmpl_foo()</code>
@@ -242,6 +242,22 @@ End of the side comment.)
     webstyle_templates_ithaca.py (and possibly
     websearch_templates_ithaca.py) files to achieve most important
     customizations.</li>
+
+<li>If you would like to discover which method of which template
+    generate which region on the web page, you can switch on
+    the <tt>CFG_WEBSTYLE_INSPECT_TEMPLATES</tt> configuration variable
+    in your <tt>invenio-local.conf</tt> file and rerun <code>sudo -u
+    apache /opt/cds-invenio/bin/inveniocfg
+    --update-config-py</code>. Then, after optionally running
+    <code>bibreformat -a</code> and <code>webcoll -f</code> (if you
+    want to debug search pages) and after having restarted your Apache
+    server (in every case), you will find in your browser that a
+    place-mark has been put next to every region of every page, and
+    that you can hover your mouse pointer over any region of the page
+    in order to discover which module/method/parameters have been used
+    to generate it.  This is useful for debugging Python templates
+    and/or for understanding which part of code generates which HTML
+    snippet in the output.</li>
 
 <li>We expect to provide possibly more than one skin with the default
     distribution, so if you have modified CDS Invenio look and feel in

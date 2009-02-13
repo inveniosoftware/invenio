@@ -34,7 +34,8 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
-     CFG_VERSION
+     CFG_VERSION, \
+     CFG_WEBSTYLE_INSPECT_TEMPLATES
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
@@ -263,6 +264,27 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        if CFG_WEBSTYLE_INSPECT_TEMPLATES:
+            inspect_templates_message = """
+<table width="100%%" cellspacing=0 cellpadding=2 border=0>
+<tr bgcolor="#aa0000">
+<td width="100%%">
+<font color="#ffffff">
+<strong>
+<small>
+CFG_WEBSTYLE_INSPECT_TEMPLATES debugging mode is enabled.  Please
+hover your mouse pointer over any region on the page to see which
+template function generated it.
+</small>
+</strong>
+</font>
+</td>
+</tr>
+</table>
+"""
+        else:
+            inspect_templates_message = ""
+
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -281,6 +303,7 @@ class Template:
 </head>
 <body>
 <div class="pageheader">
+%(inspect_templates_message)s
 <!-- replaced page header -->
 <div style="background-image: url(%(cssurl)s/img/header_background.gif);">
 <table class="headerbox">
@@ -377,7 +400,8 @@ class Template:
           'msg_personalize' : _("Personalize"),
           'msg_help' : _("Help"),
           'languagebox' : self.tmpl_language_selection_box(req, ln),
-          'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL)
+          'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
+          'inspect_templates_message' : inspect_templates_message
         }
         return out
 
