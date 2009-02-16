@@ -17,55 +17,70 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Tool for caching important infos, which are slow to rebuild, but that rarely
-   change"""
+"""
+Tool for caching important infos, which are slow to rebuild, but that
+rarely change.
+"""
 
 from invenio.dbquery import run_sql, get_table_update_time
 import time
 
-class CacherError(Exception):
-    """Error raised by data cacher"""
+class InvenioDataCacherError(Exception):
+    """Error raised by data cacher."""
     pass
 
 class DataCacher:
-    """ DataCacher is an abstract cacher system, for caching informations
-    that are slow to retrieve but that don't change too much during time."""
-    def __init__(self, cache_filler, timestamp_getter):
-        """ @param cache_filler a function that receives the cache dictionary.
-            @param timestamp_getter a function that returns a timestamp for
-            checking if something has changed after cache creation.
+    """
+    DataCacher is an abstract cacher system, for caching informations
+    that are slow to retrieve but that don't change too much during
+    time.
+
+    The .timestamp and .cache objects are exposed to clients.  Most
+    use cases use a dict internal structure for .cache, but some use
+    lists.
+    """
+    def __init__(self, cache_filler, timestamp_verifier):
+        """ @param cache_filler a function that fills the cache dictionary.
+            @param timestamp_verifier a function that returns a timestamp for
+                   checking if something has changed after cache creation.
         """
-        self.timestamp = 0
-        self.cache = {}
+        self.timestamp = 0 # WARNING: may be exposed to clients
+        self.cache = {} # WARNING: may be exposed to clients; lazy
+                        # clients may even alter this object on the fly
         if not callable(cache_filler):
-            raise CacherError, "cache_filler is not callable"
+            raise InvenioDataCacherError, "cache_filler is not callable"
         self.cache_filler = cache_filler
-        if not callable(timestamp_getter):
-            raise CacherError, "timestamp_getter is not callable"
-        self.timestamp_getter = timestamp_getter
+        if not callable(timestamp_verifier):
+            raise InvenioDataCacherError, "timestamp_verifier is not callable"
+        self.timestamp_verifier = timestamp_verifier
         self.is_ok_p = True
         self.create_cache()
 
     def clear(self):
-        """ Clear the cache rebuilding it"""
+        """Clear the cache rebuilding it."""
         self.create_cache()
 
     def create_cache(self):
-        """Create cache. Called on startup and used later during the search
-        time."""
-        # populate field I18 name cache:
+        """
+        Create and populate cache by calling cache filler.  Called on
+        startup and used later during runtime as needed by clients.
+        """
         self.cache = self.cache_filler()
         self.timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-    def get_cache(self):
-        """ Obtain an uptodate cache."""
-        if self.timestamp_getter() > self.timestamp:
+    def recreate_cache_if_needed(self):
+        """
+        Recreate cache if needed, by verifying the cache timestamp
+        against the timestamp verifier function.
+        """
+        if self.timestamp_verifier() > self.timestamp:
             self.create_cache()
-        return self.cache
 
 class SQLDataCacher(DataCacher):
-    """ SqlDataCacher is a cacher system, for caching single queries and
-    their results."""
+    """
+    SQLDataCacher is a cacher system, for caching single queries and
+    their results.
+    """
     def __init__(self, query, param=None, affected_tables=()):
         """ @param query the query to cache
             @param param its optional parameters as a tuple
@@ -74,15 +89,18 @@ class SQLDataCacher(DataCacher):
         self.query = query
         self.affected_tables = affected_tables
         assert(affected_tables)
+
         def cache_filler():
             """Standard SQL filler, with results from sql query."""
             return run_sql(self.query, param)
 
-        def timestamp_getter():
-            """Standard timestamp getter from affected tables by query."""
+        def timestamp_verifier():
+            """The standard timestamp verifier is looking at affected
+            tables time stamp."""
             return max([get_table_update_time(table)
                 for table in self.affected_tables])
-        DataCacher.__init__(self, cache_filler, timestamp_getter)
+
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 
 

@@ -101,12 +101,8 @@ except:
     pass
 
 ## global vars:
-search_cache = {} # will cache results of previous searches
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
 cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
-collection_reclist_cache_timestamp = 0
-field_i18nname_cache_timestamp = 0
-collection_i18nname_cache_timestamp = 0
 
 ## precompile some often-used regexp for speed reasons:
 re_word = re.compile('[\s]')
@@ -178,20 +174,19 @@ class RestrictedCollectionDataCacher(DataCacher):
                 ret.append(coll[0])
             return ret
 
-        def timestamp_getter():
+        def timestamp_verifier():
             return max(get_table_update_time('accROLE_accACTION_accARGUMENT'), get_table_update_time('accARGUMENT'))
 
-        DataCacher.__init__(self, cache_filler, timestamp_getter)
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 def collection_restricted_p(collection):
-    cache = restricted_collection_cache.get_cache()
-    return collection in cache
+    restricted_collection_cache.recreate_cache_if_needed()
+    return collection in restricted_collection_cache.cache
 
 try:
     restricted_collection_cache.is_ok_p
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
-
 
 def check_user_can_view_record(user_info, recid):
     """Check if the user is authorized to view the given recid. The function
@@ -222,6 +217,11 @@ def check_user_can_view_record(user_info, recid):
         return (0, '')
 
 class IndexStemmingDataCacher(DataCacher):
+    """
+    Provides cache for stemming information for word/phrase indexes.
+    This class is not to be used directly; use function
+    get_index_stemming_language() instead.
+    """
     def __init__(self):
         def cache_filler():
             try:
@@ -231,21 +231,148 @@ class IndexStemmingDataCacher(DataCacher):
                 return {}
             return dict(res)
 
-        def timestamp_getter():
+        def timestamp_verifier():
             return get_table_update_time('idxINDEX')
 
-        DataCacher.__init__(self, cache_filler, timestamp_getter)
-
-def get_index_stemming_language(index_id):
-    cache = index_stemming_cache.get_cache()
-    return cache[index_id]
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 try:
     index_stemming_cache.is_ok_p
 except Exception:
     index_stemming_cache = IndexStemmingDataCacher()
 
+def get_index_stemming_language(index_id):
+    """Return stemming langugage for given index."""
+    index_stemming_cache.recreate_cache_if_needed()
+    return index_stemming_cache.cache[index_id]
+
+class CollectionRecListDataCacher(DataCacher):
+    """
+    Provides cache for collection reclist hitsets.  This class is not
+    to be used directly; use function get_collection_reclist() instead.
+    """
+    def __init__(self):
+        def cache_filler():
+            ret = {}
+            try:
+                res = run_sql("SELECT name,reclist FROM collection")
+            except Exception:
+                # database problems, return empty cache
+                return {}
+            for name, reclist in res:
+                ret[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
+            return ret
+
+        def timestamp_verifier():
+            return get_table_update_time('collection')
+
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+try:
+    if not collection_reclist_cache.is_ok_p:
+        raise Exception
+except Exception:
+    collection_reclist_cache = CollectionRecListDataCacher()
+
+def get_collection_reclist(coll):
+    """Return hitset of recIDs that belong to the collection 'coll'."""
+    collection_reclist_cache.recreate_cache_if_needed()
+    if not collection_reclist_cache.cache[coll]:
+        # not yet it the cache, so calculate it and fill the cache:
+        set = HitSet()
+        query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
+        res = run_sql(query, (coll, ), 1)
+        if res:
+            try:
+                set = HitSet(res[0][1])
+            except:
+                pass
+        collection_reclist_cache.cache[coll] = set
+    # finally, return reclist:
+    return collection_reclist_cache.cache[coll]
+
+class SearchResultsCache(DataCacher):
+    """
+    Provides temporary lazy cache for Search Results.
+    Useful when users click on `next page'.
+    """
+    def __init__(self):
+        def cache_filler():
+            return {}
+        def timestamp_verifier():
+            return '1970-01-01 00:00:00' # lazy cache is always okay;
+                                         # its filling is governed by
+                                         # CFG_WEBSEARCH_SEARCH_CACHE_SIZE
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+try:
+    if not search_results_cache.is_ok_p:
+        raise Exception
+except Exception:
+    search_results_cache = SearchResultsCache()
+
+class CollectionI18nNameDataCacher(DataCacher):
+    """
+    Provides cache for I18N collection names.  This class is not to be
+    used directly; use function get_coll_i18nname() instead.
+    """
+    def __init__(self):
+        def cache_filler():
+            ret = {}
+            try:
+                res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
+            except Exception:
+                # database problems
+                return {}
+            for c, ln, i18nname in res:
+                if i18nname:
+                    if not ret.has_key(c):
+                        ret[c] = {}
+                    ret[c][ln] = i18nname
+            return ret
+
+        def timestamp_verifier():
+            return get_table_update_time('collectionname')
+
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
+
+try:
+    if not collection_i18nname_cache.is_ok_p:
+        raise Exception
+except Exception:
+    collection_i18nname_cache = CollectionI18nNameDataCacher()
+
+def get_coll_i18nname(c, ln=CFG_SITE_LANG, verify_cache_timestamp=True):
+    """
+    Return nicely formatted collection name (of the name type `ln'
+    (=long name)) for collection C in language LN.
+
+    This function uses collection_i18nname_cache, but it verifies
+    whether the cache is up-to-date first by default.  This
+    verification step is performed by checking the DB table update
+    time.  So, if you call this function 1000 times, it can get very
+    slow because it will do 1000 table update time verifications, even
+    though collection names change not that often.
+
+    Hence the parameter VERIFY_CACHE_TIMESTAMP which, when set to
+    False, will assume the cache is already up-to-date.  This is
+    useful namely in the generation of collection lists for the search
+    results page.
+    """
+    if verify_cache_timestamp:
+        collection_i18nname_cache.recreate_cache_if_needed()
+    out = c
+    try:
+        out = collection_i18nname_cache.cache[c][ln]
+    except KeyError:
+        pass # translation in LN does not exist
+    return out
+
 class FieldI18nNameDataCacher(DataCacher):
+    """
+    Provides cache for I18N field names.  This class is not to be used
+    directly; use function get_field_i18nname() instead.
+    """
     def __init__(self):
         def cache_filler():
             ret = {}
@@ -261,118 +388,48 @@ class FieldI18nNameDataCacher(DataCacher):
                     ret[f][ln] = i18nname
             return ret
 
-        def timestamp_getter():
+        def timestamp_verifier():
             return get_table_update_time('fieldname')
 
-        DataCacher.__init__(self, cache_filler, timestamp_getter)
-
-    def get_field_i18nname(self, f, ln=CFG_SITE_LANG):
-        out = f
-        try:
-            out = self.get_cache()[f][ln]
-        except KeyError:
-            pass # translation in LN does not exist
-        return out
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 try:
-    if not field_i18n_name_cache.is_ok_p:
+    if not field_i18nname_cache.is_ok_p:
         raise Exception
 except Exception:
-    field_i18n_name_cache = FieldI18nNameDataCacher()
+    field_i18nname_cache = FieldI18nNameDataCacher()
 
+def get_field_i18nname(f, ln=CFG_SITE_LANG, verify_cache_timestamp=True):
+    """
+    Return nicely formatted field name (of type 'ln', 'long name') for
+    field F in language LN.
 
-class CollectionRecListDataCacher(DataCacher):
-    def __init__(self):
-        def cache_filler():
-            ret = {}
-            try:
-                res = run_sql("SELECT name,reclist FROM collection")
-            except Exception:
-                # database problems, return empty cache
-                return {}
-            for name, reclist in res:
-                ret[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
-            return ret
-
-        def timestamp_getter():
-            return get_table_update_time('collection')
-
-        DataCacher.__init__(self, cache_filler, timestamp_getter)
-
-    def get_collection_reclist(self, coll):
-        cache = self.get_cache()
-        if not cache[coll]:
-            # not yet it the cache, so calculate it and fill the cache:
-            set = HitSet()
-            query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
-            res = run_sql(query, (coll, ), 1)
-            if res:
-                try:
-                    set = HitSet(res[0][1])
-                except:
-                    pass
-            self.cache[coll] = set
-            cache[coll] = set
-        # finally, return reclist:
-        return cache[coll]
-
-try:
-    if not collection_reclist_cache.is_ok_p:
-        raise Exception
-except Exception:
-    collection_reclist_cache = CollectionRecListDataCacher()
-
-
-class CollectionI18nDataCacher(DataCacher):
-    def __init__(self):
-        def cache_filler():
-            ret = {}
-            try:
-                res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
-            except Exception:
-                # database problems,
-                return {}
-            for c, ln, i18nname in res:
-                if i18nname:
-                    if not ret.has_key(c):
-                        ret[c] = {}
-                    ret[c][ln] = i18nname
-            return ret
-
-        def timestamp_getter():
-            return get_table_update_time('collectionname')
-
-        DataCacher.__init__(self, cache_filler, timestamp_getter)
-
-    def get_coll_i18nname(self, c, ln=CFG_SITE_LANG):
-        """Return nicely formatted collection name (of name type 'ln',
-        'long name') for collection C in language LN."""
-        cache = self.get_cache()
-        out = c
-        try:
-            out = cache[c][ln]
-        except KeyError:
-            pass # translation in LN does not exist
-        return out
-
-try:
-    if not collection_i18n_name_cache.is_ok_p:
-        raise Exception
-except Exception:
-    collection_i18n_name_cache = CollectionI18nDataCacher()
-
+    If VERIFY_CACHE_TIMESTAMP is set to True, then verify DB timestamp
+    and field I18N name cache timestamp and refresh cache from the DB
+    if needed.  Otherwise don't bother checking DB timestamp and
+    return the cached value.  (This is useful when get_field_i18nname
+    is called inside a loop.)
+    """
+    if verify_cache_timestamp:
+        field_i18nname_cache.recreate_cache_if_needed()
+    out = f
+    try:
+        out = field_i18nname_cache.cache[f][ln]
+    except KeyError:
+        pass # translation in LN does not exist
+    return out
 
 def get_alphabetically_ordered_collection_list(level=0, ln=CFG_SITE_LANG):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
        Suitable for create_search_box()."""
     out = []
-    query = "SELECT id,name FROM collection ORDER BY name ASC"
-    res = run_sql(query)
+    res = run_sql_cached("SELECT id,name FROM collection ORDER BY name ASC",
+                         affected_tables=['collection',])
     for c_id, c_name in res:
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
-        c_printable_fullname = get_coll_i18nname(c_name, ln)
+        c_printable_fullname = get_coll_i18nname(c_name, ln, False)
         c_printable = wash_index_term(c_printable_fullname, 30, False)
         if c_printable != c_printable_fullname:
             c_printable = c_printable + "..."
@@ -386,13 +443,12 @@ def get_nicely_ordered_collection_list(collid=1, level=0, ln=CFG_SITE_LANG):
        (collection name, printable collection name).
        Suitable for create_search_box()."""
     colls_nicely_ordered = []
-    query = "SELECT c.name,cc.id_son FROM collection_collection AS cc, collection AS c "\
-            " WHERE c.id=cc.id_son AND cc.id_dad=%s ORDER BY score DESC"
-    res = run_sql(query, (collid, ))
+    res = run_sql("""SELECT c.name,cc.id_son FROM collection_collection AS cc, collection AS c
+                     WHERE c.id=cc.id_son AND cc.id_dad=%s ORDER BY score DESC""", (collid, ))
     for c, cid in res:
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
-        c_printable_fullname = get_coll_i18nname(c, ln)
+        c_printable_fullname = get_coll_i18nname(c, ln, False)
         c_printable = wash_index_term(c_printable_fullname, 30, False)
         if c_printable != c_printable_fullname:
             c_printable = c_printable + "..."
@@ -613,7 +669,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
             description = "%s %s." % (cc, _("Search Results"))
 
         if not keywords:
-            keywords = "%s, WebSearch, %s" % (get_coll_i18nname(CFG_SITE_NAME, ln), get_coll_i18nname(cc, ln))
+            keywords = "%s, WebSearch, %s" % (get_coll_i18nname(CFG_SITE_NAME, ln, False), get_coll_i18nname(cc, ln, False))
 
         ## generate RSS URL:
         argd = {}
@@ -749,7 +805,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
     _ = gettext_set_language(ln)
 
     # some computations
-    cc_intl = get_coll_i18nname(cc, ln)
+    cc_intl = get_coll_i18nname(cc, ln, False)
     cc_colID = get_colID(cc)
 
     colls_nicely_ordered = []
@@ -819,7 +875,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
     # show collections in the search box? (not if there is only one
     # collection defined, and not if we are in light search)
     show_colls = True
-    if len(collection_reclist_cache.keys()) == 1 or \
+    if len(collection_reclist_cache.cache.keys()) == 1 or \
            as == -1:
         show_colls = False
 
@@ -873,10 +929,10 @@ def create_navtrail_links(cc=CFG_SITE_NAME, as=0, ln=CFG_SITE_LANG, self_p=1, ta
     dads = []
     for dad in get_coll_ancestors(cc):
         if dad != CFG_SITE_NAME: # exclude Home collection
-            dads.append ((dad, get_coll_i18nname (dad, ln)))
+            dads.append ((dad, get_coll_i18nname(dad, ln, False)))
 
     if self_p and cc != CFG_SITE_NAME:
-        dads.append((cc, get_coll_i18nname(cc, ln)))
+        dads.append((cc, get_coll_i18nname(cc, ln, False)))
 
     return websearch_templates.tmpl_navtrail_links(
         as=as, ln=ln, dads=dads)
@@ -894,12 +950,12 @@ def get_searchwithin_fields(ln='en', colID=None):
                              affected_tables=['field',])
     fields = [{
                 'value' : '',
-                'text' : get_field_i18nname("any field", ln)
+                'text' : get_field_i18nname("any field", ln, False)
               }]
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
             fields.append({ 'value' : field_code,
-                            'text' : get_field_i18nname(field_name, ln)
+                            'text' : get_field_i18nname(field_name, ln, False)
                           })
     return fields
 
@@ -931,7 +987,7 @@ def get_sortby_fields(ln='en', colID=None):
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
             fields.append({ 'value' : field_code,
-                            'text' : get_field_i18nname(field_name, ln)
+                            'text' : get_field_i18nname(field_name, ln, False)
                           })
     return fields
 
@@ -1016,13 +1072,13 @@ def wash_colls(cc, c, split_colls=0):
     # check what type is 'cc':
     if type(cc) is list:
         for ci in cc:
-            if collection_reclist_cache.has_key(ci):
+            if collection_reclist_cache.cache.has_key(ci):
                 # yes this collection is real, so use it:
                 cc = ci
                 break
     else:
         # check once if cc is real:
-        if not collection_reclist_cache.has_key(cc):
+        if not collection_reclist_cache.cache.has_key(cc):
             if cc:
                 raise InvenioWebSearchUnknownCollectionError(cc)
             else:
@@ -1037,7 +1093,7 @@ def wash_colls(cc, c, split_colls=0):
     # remove all 'unreal' collections:
     colls_real = []
     for coll in colls:
-        if collection_reclist_cache.has_key(coll):
+        if collection_reclist_cache.cache.has_key(coll):
             colls_real.append(coll)
         else:
             if coll:
@@ -1298,40 +1354,6 @@ def get_colID(c):
         colID = res[0][0]
     return colID
 
-def get_coll_i18nname(c, ln=CFG_SITE_LANG):
-    """Return nicely formatted collection name (of name type 'ln',
-    'long name') for collection C in language LN."""
-    global collection_i18nname_cache
-    global collection_i18nname_cache_timestamp
-    # firstly, check whether the collectionname table was modified:
-    if get_table_update_time('collectionname') > collection_i18nname_cache_timestamp:
-        # yes it was, cache clear-up needed:
-        collection_i18nname_cache = create_collection_i18nname_cache()
-    # secondly, read i18n name from either the cache or return common name:
-    out = c
-    try:
-        out = collection_i18nname_cache[c][ln]
-    except KeyError:
-        pass # translation in LN does not exist
-    return out
-
-def get_field_i18nname(f, ln=CFG_SITE_LANG):
-    """Return nicely formatted field name (of type 'ln', 'long name')
-       for field F in language LN."""
-    global field_i18nname_cache
-    global field_i18nname_cache_timestamp
-    # firstly, check whether the fieldname table was modified:
-    if get_table_update_time('fieldname') > field_i18nname_cache_timestamp:
-        # yes it was, cache clear-up needed:
-        field_i18nname_cache = create_field_i18nname_cache()
-    # secondly, read i18n name from either the cache or return common name:
-    out = f
-    try:
-        out = field_i18nname_cache[f][ln]
-    except KeyError:
-        pass # translation in LN does not exist
-    return out
-
 def get_coll_ancestors(coll):
     "Returns a list of ancestors for collection 'coll'."
     coll_ancestors = []
@@ -1385,127 +1407,6 @@ def get_coll_real_descendants(coll):
         else: # this is 'composed' collection, so recurse:
             coll_sons.extend(get_coll_real_descendants(name))
     return coll_sons
-
-def get_collection_reclist(coll):
-    """Return hitset of recIDs that belong to the collection 'coll'.
-       But firstly check the last updated date of the collection table.
-       If it's newer than the cache timestamp, then empty the cache,
-       since new records could have been added."""
-    global collection_reclist_cache
-    global collection_reclist_cache_timestamp
-    # firstly, check whether the collection table was modified:
-    if get_table_update_time('collection') > collection_reclist_cache_timestamp:
-        # yes it was, cache clear-up needed:
-        collection_reclist_cache = create_collection_reclist_cache()
-    # secondly, read reclist from either the cache or the database:
-    try:
-        if not collection_reclist_cache[coll]:
-            # not yet it the cache, so calculate it and fill the cache:
-            query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
-            res = run_sql(query, (coll, ), 1)
-            if res:
-                try:
-                    set = HitSet(res[0][1])
-                except:
-                    set = HitSet()
-            collection_reclist_cache[coll] = set
-        # finally, return reclist:
-        return collection_reclist_cache[coll]
-    except KeyError:
-        return HitSet()
-
-def create_collection_reclist_cache():
-    """Creates list of records belonging to collections.  Called on startup
-    and used later for intersecting search results with collection universe."""
-    global collection_reclist_cache_timestamp
-    # populate collection reclist cache:
-    collrecs = {}
-    try:
-        res = run_sql("SELECT name,reclist FROM collection")
-    except Error:
-        # database problems, set timestamp to zero and return empty cache
-        collection_reclist_cache_timestamp = 0
-        return collrecs
-    for name, reclist in res:
-        collrecs[name] = None # this will be filled later during runtime by calling get_collection_reclist(coll)
-    # update timestamp:
-    try:
-        collection_reclist_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    except NameError:
-        collection_reclist_cache_timestamp = 0
-    return collrecs
-
-try:
-    collection_reclist_cache.has_key(CFG_SITE_NAME)
-except:
-    try:
-        collection_reclist_cache = create_collection_reclist_cache()
-    except:
-        collection_reclist_cache = {}
-
-def create_collection_i18nname_cache():
-    """Create cache of I18N collection names of type 'ln' (=long name).
-    Called on startup and used later during the search time."""
-    global collection_i18nname_cache_timestamp
-    # populate collection I18N name cache:
-    names = {}
-    try:
-        res = run_sql("SELECT c.name,cn.ln,cn.value FROM collectionname AS cn, collection AS c WHERE cn.id_collection=c.id AND cn.type='ln'") # ln=long name
-    except Error:
-        # database problems, set timestamp to zero and return empty cache
-        collection_i18nname_cache_timestamp = 0
-        return names
-    for c, ln, i18nname in res:
-        if i18nname:
-            if not names.has_key(c):
-                names[c] = {}
-            names[c][ln] = i18nname
-    # update timestamp:
-    try:
-        collection_i18nname_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    except NameError:
-        collection_i18nname_cache_timestamp = 0
-    return names
-
-try:
-    collection_i18nname_cache.has_key(CFG_SITE_NAME)
-except:
-    try:
-        collection_i18nname_cache = create_collection_i18nname_cache()
-    except:
-        collection_i18nname_cache = {}
-
-def create_field_i18nname_cache():
-    """Create cache of I18N field names of type 'ln' (=long name).
-    Called on startup and used later during the search time."""
-    global field_i18nname_cache_timestamp
-    # populate field I18 name cache:
-    names = {}
-    try:
-        res = run_sql("SELECT f.name,fn.ln,fn.value FROM fieldname AS fn, field AS f WHERE fn.id_field=f.id AND fn.type='ln'") # ln=long name
-    except Error:
-        # database problems, set timestamp to zero and return empty cache
-        field_i18nname_cache_timestamp = 0
-        return names
-    for f, ln, i18nname in res:
-        if i18nname:
-            if not names.has_key(f):
-                names[f] = {}
-            names[f][ln] = i18nname
-    # update timestamp:
-    try:
-        field_i18nname_cache_timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    except NameError:
-        field_i18nname_cache_timestamp = 0
-    return names
-
-try:
-    field_i18nname_cache.has_key(CFG_SITE_NAME)
-except:
-    try:
-        field_i18nname_cache = create_field_i18nname_cache()
-    except:
-        field_i18nname_cache = {}
 
 def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     """Browse either biliographic phrases or words indexes, and display it."""
@@ -1570,7 +1471,7 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
             f=f,
-            fn=get_field_i18nname(get_field_name(f) or f, ln),
+            fn=get_field_i18nname(get_field_name(f) or f, ln, False),
             ln=ln,
             browsed_phrases_in_colls=browsed_phrases_in_colls,
             colls=colls,
@@ -1671,7 +1572,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 else: # it is WRD query
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
-                    print_warning(req, "trying (%s,%s,%s)" % (cgi.escape(bsu_pn), cgi.escape(bsu_f), cgi.escape(bsu_m)))
+                    print_warning(req, "Trying (%s,%s,%s)" % (cgi.escape(bsu_pn), cgi.escape(bsu_f), cgi.escape(bsu_m)))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
                 if len(basic_search_unit_hitset) > 0:
                     # we retain the new unit instead
@@ -2080,7 +1981,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             if of.startswith("h"):
                 url = websearch_templates.build_search_url(req.argd, cc=CFG_SITE_NAME, c=[])
                 print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
-                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln) for coll in colls], ', ') + '</em>',
+                              {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln, False) for coll in colls], ', ') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
                                'x_nb_hits': len(results_in_Home),
                                'x_url_close': '</a>'})
@@ -2203,7 +2104,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
             return _("No word index is available for %s.") % \
-                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln)) + '</em>')
+                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + '</em>')
     else:
         nearest_terms = []
         if index_id:
@@ -2212,7 +2113,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
             nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
             return _("No phrase index is available for %s.") % \
-                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln)) + '</em>')
+                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + '</em>')
 
     terminfo = []
     for term in nearest_terms:
@@ -2249,7 +2150,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         if f:
             intro = _("Search term %(x_term)s inside index %(x_index)s did not match any record. Nearest terms in any collection are:") % \
                      {'x_term': "<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
-                      'x_index': "<em>" + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln)) + "</em>"}
+                      'x_index': "<em>" + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln, False)) + "</em>"}
         else:
             intro = _("Search term %s did not match any record. Nearest terms in any collection are:") % \
                      ("<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")
@@ -2519,7 +2420,7 @@ def get_all_collections_of_a_record(recID):
     """Return all the collection names a record belongs to.
     Note this function is O(n_collections)."""
     ret = []
-    for name in collection_reclist_cache.keys():
+    for name in collection_reclist_cache.cache.keys():
         if recID in get_collection_reclist(name):
             ret.append(name)
     return ret
@@ -2529,7 +2430,8 @@ def get_tag_name(tag_value, prolog="", epilog=""):
        Return empty string in case of failure.
        Example: input='100__%', output=first author'."""
     out = ""
-    res = run_sql("SELECT name FROM tag WHERE value=%s", (tag_value,))
+    res = run_sql_cached("SELECT name FROM tag WHERE value=%s", (tag_value,),
+                         affected_tables=['tag',])
     if res:
         out = prolog + res[0][0] + epilog
     return out
@@ -2538,7 +2440,8 @@ def get_fieldcodes():
     """Returns a list of field codes that may have been passed as 'search options' in URL.
        Example: output=['subject','division']."""
     out = []
-    res = run_sql_cached("SELECT DISTINCT(code) FROM field")
+    res = run_sql_cached("SELECT DISTINCT(code) FROM field",
+                         affected_tables=['field',])
     for row in res:
         out.append(row[0])
     return out
@@ -2546,7 +2449,8 @@ def get_fieldcodes():
 def get_field_name(code):
     """Return the corresponding field_name given the field code.
     e.g. reportnumber -> report number."""
-    res = run_sql("SELECT name FROM field WHERE code=%s", (code, ))
+    res = run_sql_cached("SELECT name FROM field WHERE code=%s", (code, ),
+                         affected_tables=['field',])
     if res:
         return res[0][0]
     else:
@@ -2737,7 +2641,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb
              ln = ln,
              collection = collection,
              as = as,
-             collection_name = get_coll_i18nname(collection, ln),
+             collection_name = get_coll_i18nname(collection, ln, False),
              collection_id = get_colID(collection),
              middle_only = middle_only,
              rg = rg,
@@ -2784,7 +2688,7 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
         new_colls.append({
                           'id': get_colID(coll),
                           'code': coll,
-                          'name': get_coll_i18nname(coll, ln),
+                          'name': get_coll_i18nname(coll, ln, False),
                          })
 
     return websearch_templates.tmpl_print_results_overview(
@@ -3463,7 +3367,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                         out += "<strong>%s</strong>" % title
                 else:
                     # just print record ID:
-                    out += "<strong>%s %d</strong>" % (get_field_i18nname("record ID", ln), recID)
+                    out += "<strong>%s %d</strong>" % (get_field_i18nname("record ID", ln, False), recID)
             out += "</a>"
             # secondly, authors:
             authors = get_fieldvalues(recID, "100__a") + get_fieldvalues(recID, "700__a")
@@ -3810,10 +3714,19 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
           ec - list of external search engines to search as well
                (e.g. "SPIRES HEP").
     """
+
     selected_external_collections_infos = None
 
     # wash output format:
     of = wash_output_format(of)
+
+    # for every search engine request asking for an HTML output, we
+    # first regenerate cache of collection and field I18N names if
+    # needed; so that later we won't bother checking timestamps for
+    # I18N names at all:
+    if of.startswith("h"):
+        collection_i18nname_cache.recreate_cache_if_needed()
+        field_i18nname_cache.recreate_cache_if_needed()
 
     # wash all arguments requiring special care
     try:
@@ -4040,6 +3953,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                     print_records_epilogue(req, of)
     else:
         ## 3 - common search needed
+        query_in_cache = False
+        query_representation_in_cache = repr((p,f,colls_to_search))
         page_start(req, of, cc, as, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
@@ -4101,14 +4016,21 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 return page_end(req, of, ln)
         else:
             ## 3B - simple search
-            try:
-                results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
-            except:
-                register_exception(req=req, alert_admin=True)
-                if of.startswith("h"):
-                    req.write(create_error_box(req, verbose=verbose, ln=ln))
-                    perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
-                return page_end(req, of, ln)
+            if search_results_cache.cache.has_key(query_representation_in_cache):
+                # query is not in the cache already, so reuse it:
+                query_in_cache = True
+                results_in_any_collection = search_results_cache.cache[query_representation_in_cache]
+                if verbose and of.startswith("h"):
+                    print_warning(req, "Search stage 0: query found in cache, reusing cached results.")
+            else:
+                try:
+                    results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
+                except:
+                    register_exception(req=req, alert_admin=True)
+                    if of.startswith("h"):
+                        req.write(create_error_box(req, verbose=verbose, ln=ln))
+                        perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                    return page_end(req, of, ln)
 
         if len(results_in_any_collection) == 0:
             if of.startswith("h"):
@@ -4119,14 +4041,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 print_records_epilogue(req, of)
             return page_end(req, of, ln)
 
-#             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
-#             if search_cache.has_key(search_cache_key): # is the result in search cache?
-#                 results_final = search_cache[search_cache_key]
-#             else:
-#                 results_final = search_pattern(req, p, f, colls_to_search)
-#                 search_cache[search_cache_key] = results_final
-#             if len(search_cache) > CFG_WEBSEARCH_SEARCH_CACHE_SIZE: # is the cache full? (sanity cleaning)
-#                 search_cache.clear()
+        # store this search query results into search results cache if needed:
+        if CFG_WEBSEARCH_SEARCH_CACHE_SIZE and not query_in_cache:
+            if len(search_results_cache.cache) > CFG_WEBSEARCH_SEARCH_CACHE_SIZE:
+                search_results_cache.clear()
+            search_results_cache.cache[query_representation_in_cache] = results_in_any_collection
+            if verbose and of.startswith("h"):
+                print_warning(req, "Search stage 3: storing query results in cache.")
 
         # search stage 4: intersection with collection universe:
         try:
@@ -4315,7 +4236,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 id_query = log_query(req.get_remote_host(), req.args, uid)
                 if of.startswith("h") and id_query:
                     if not of in ['hcs']:
-                        # display aalert/RSS teaser for non-summary formats:
+                        # display alert/RSS teaser for non-summary formats:
                         req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, ln=ln))
             except:
                 # do not log query if req is None (used by CLI interface)
@@ -4331,71 +4252,59 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
 
 def perform_request_cache(req, action="show"):
     """Manipulates the search engine cache."""
-    global search_cache
-    global collection_reclist_cache
-    global collection_reclist_cache_timestamp
-    global field_i18nname_cache
-    global field_i18nname_cache_timestamp
-    global collection_i18nname_cache
-    global collection_i18nname_cache_timestamp
     req.content_type = "text/html"
     req.send_http_header()
+    req.write("<html>")
     out = ""
     out += "<h1>Search Cache</h1>"
     # clear cache if requested:
     if action == "clear":
-        search_cache = {}
-        collection_reclist_cache = create_collection_reclist_cache()
+        search_results_cache.clear()
+    req.write(out)
     # show collection reclist cache:
-    out += "<h3>Collection reclist cache</h3>"
+    out = "<h3>Collection reclist cache</h3>"
     out += "- collection table last updated: %s" % get_table_update_time('collection')
-    out += "<br />- reclist cache timestamp: %s" % collection_reclist_cache_timestamp
+    out += "<br />- reclist cache timestamp: %s" % collection_reclist_cache.timestamp
     out += "<br />- reclist cache contents:"
     out += "<blockquote>"
-    for coll in collection_reclist_cache.keys():
-        if collection_reclist_cache[coll]:
-            out += "%s (%d)<br />" % (coll, len(get_collection_reclist(coll)))
+    for coll in collection_reclist_cache.cache.keys():
+        if collection_reclist_cache.cache[coll]:
+            out += "%s (%d)<br />" % (coll, len(collection_reclist_cache.cache[coll]))
     out += "</blockquote>"
-    # show search cache:
-    out += "<h3>Search Cache</h3>"
-    out += "<blockquote>"
-    if len(search_cache):
-        out += """<table border="=">"""
-        out += "<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % \
-               ("Pattern", "Field", "Collection", "Number of Hits")
-        for search_cache_key in search_cache.keys():
-            p, f, c = string.split(search_cache_key, "@", 2)
-            # find out about length of cached data:
-            l = 0
-            for coll in search_cache[search_cache_key]:
-                l += len(search_cache[search_cache_key][coll])
-            out += "<tr><td>%s</td><td>%s</td><td>%s</td><td>%d</td></tr>" % (p, f, c, l)
-        out += "</table>"
-    else:
-        out += "<p>Search cache is empty."
-    out += "</blockquote>"
-    out += """<p><a href="%s/search/cache?action=clear">clear cache</a>""" % CFG_SITE_URL
+    req.write(out)
+    # show search results cache:
+    out = "<h3>Search Cache</h3>"
+    out += "- search cache usage: %d queries cached (max. ~%d)" % \
+           (len(search_results_cache.cache), CFG_WEBSEARCH_SEARCH_CACHE_SIZE)
+    if len(search_results_cache.cache):
+        out += "<br />- search cache contents:"
+        out += "<blockquote>"
+        for query, hitset in search_results_cache.cache.items():
+            out += "<br />%s ... %s" % (query, hitset)
+        out += """<p><a href="%s/search/cache?action=clear">clear search results cache</a>""" % CFG_SITE_URL
+        out += "</blockquote>"
+    req.write(out)
     # show field i18nname cache:
-    out += "<h3>Field I18N names cache</h3>"
+    out = "<h3>Field I18N names cache</h3>"
     out += "- fieldname table last updated: %s" % get_table_update_time('fieldname')
-    out += "<br />- i18nname cache timestamp: %s" % field_i18nname_cache_timestamp
+    out += "<br />- i18nname cache timestamp: %s" % field_i18nname_cache.timestamp
     out += "<br />- i18nname cache contents:"
     out += "<blockquote>"
-    for field in field_i18nname_cache.keys():
-        for ln in field_i18nname_cache[field].keys():
-            out += "%s, %s = %s<br />" % (field, ln, field_i18nname_cache[field][ln])
+    for field in field_i18nname_cache.cache.keys():
+        for ln in field_i18nname_cache.cache[field].keys():
+            out += "%s, %s = %s<br />" % (field, ln, field_i18nname_cache.cache[field][ln])
     out += "</blockquote>"
+    req.write(out)
     # show collection i18nname cache:
-    out += "<h3>Collection I18N names cache</h3>"
+    out = "<h3>Collection I18N names cache</h3>"
     out += "- collectionname table last updated: %s" % get_table_update_time('collectionname')
-    out += "<br />- i18nname cache timestamp: %s" % collection_i18nname_cache_timestamp
+    out += "<br />- i18nname cache timestamp: %s" % collection_i18nname_cache.timestamp
     out += "<br />- i18nname cache contents:"
     out += "<blockquote>"
-    for coll in collection_i18nname_cache.keys():
-        for ln in collection_i18nname_cache[coll].keys():
-            out += "%s, %s = %s<br />" % (coll, ln, collection_i18nname_cache[coll][ln])
+    for coll in collection_i18nname_cache.cache.keys():
+        for ln in collection_i18nname_cache.cache[coll].keys():
+            out += "%s, %s = %s<br />" % (coll, ln, collection_i18nname_cache.cache[coll][ln])
     out += "</blockquote>"
-    req.write("<html>")
     req.write(out)
     req.write("</html>")
     return "\n"
@@ -4557,7 +4466,6 @@ def profile(p="", f="", c=CFG_SITE_NAME):
 #print type(wash_url_argument("-1",'int'))
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 #print call_bibformat(68, "HB_FLY")
-#print create_collection_i18nname_cache()
 #print get_fieldvalues(10, "980__a")
 #print get_fieldvalues_alephseq_like(10,"001___")
 #print get_fieldvalues_alephseq_like(10,"980__a")

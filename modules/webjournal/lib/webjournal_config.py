@@ -27,16 +27,6 @@ from invenio.htmlutils import escape_html
 import invenio.template
 webjournal_templates = invenio.template.load('webjournal')
 
-
-#from invenio.data_cacher import SQLDataCacher
-#
-#CFG_JOURNAL_CONFIG_CACHE = {}
-#
-#def initialize_config_cache():
-#    """
-#    """
-#    journal_id_names = SQLDataCacher("SELECT * FROM jrnJOURNAL", affected_tables=(jrnJOURNAL))
-
 class InvenioWebJournalNoIndexTemplateError(Exception):
     """Exception if no index template is specified in the config."""
     def __init__(self, ln, journal_name):

@@ -55,10 +55,10 @@ class CitationDictsDataCacher(DataCacher):
                     alldicts['citationdict_keys_intbitset'] = intbitset(object_value_dict.keys())
             return alldicts
 
-        def timestamp_getter():
+        def timestamp_verifier():
             return get_table_update_time('rnkCITATIONDATA')
 
-        DataCacher.__init__(self, cache_filler, timestamp_getter)
+        DataCacher.__init__(self, cache_filler, timestamp_verifier)
 
 try:
     cache_citation_dicts.is_ok_p
@@ -69,8 +69,8 @@ def get_citation_dict(dictname):
     """Return cached value of a citation dictionary. DICTNAME can be
        citationdict, reversedict, selfcitdict, selfcitedbydict.
     """
-    cache = cache_citation_dicts.get_cache()
-    return cache.get(dictname, {})
+    cache_citation_dicts.recreate_cache_if_needed()
+    return cache_citation_dicts.cache.get(dictname, {})
 
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""

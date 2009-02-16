@@ -503,8 +503,8 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 # then if the user is not authorized for that
                 # collection.
                 recids = intbitset(xrange(argd['recid'], argd['recidb']))
-                restricted_colls = restricted_collection_cache.get_cache()
-                for collname in restricted_colls:
+                restricted_collection_cache.recreate_cache_if_needed()
+                for collname in restricted_collection_cache.cache:
                     (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collname)
                     if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                         coll_recids = get_collection(collname).reclist
@@ -866,7 +866,7 @@ def display_collection(req, c, as, verbose, ln):
         title = get_coll_i18nname(c, ln)
         # if there is only one collection defined, do not print its
         # title on the page as it would be displayed repetitively.
-        if len(search_engine.collection_reclist_cache.keys()) == 1:
+        if len(search_engine.collection_reclist_cache.cache.keys()) == 1:
             title = ""
 
         rssurl = CFG_SITE_URL + '/rss'
