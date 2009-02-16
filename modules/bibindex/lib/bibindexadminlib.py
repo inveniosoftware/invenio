@@ -1498,6 +1498,8 @@ def delete_idx(idxID):
         res = run_sql("DELETE FROM idxINDEX_field WHERE id_idxINDEX=%s", (idxID, ))
         res = run_sql("DROP TABLE idxWORD%02dF" % idxID)
         res = run_sql("DROP TABLE idxWORD%02dR" % idxID)
+        res = run_sql("DROP TABLE idxPAIR%02dF" % idxID)
+        res = run_sql("DROP TABLE idxPAIR%02dR" % idxID)
         res = run_sql("DROP TABLE idxPHRASE%02dF" % idxID)
         res = run_sql("DROP TABLE idxPHRASE%02dR" % idxID)
         return (1, "")
@@ -1552,6 +1554,21 @@ def add_idx(idxNAME):
                             ) ENGINE=MyISAM""" % idxID)
 
         res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dR (
+                            id_bibrec mediumint(9) unsigned NOT NULL,
+                            termlist longblob,
+                            type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                            PRIMARY KEY (id_bibrec,type)
+                            ) ENGINE=MyISAM""" % idxID)
+
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxPAIR%02dF (
+                            id mediumint(9) unsigned NOT NULL auto_increment,
+                            term varchar(100) default NULL,
+                            hitlist longblob,
+                            PRIMARY KEY  (id),
+                            UNIQUE KEY term (term)
+                            ) ENGINE=MyISAM""" % idxID)
+
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxPAIR%02dR (
                             id_bibrec mediumint(9) unsigned NOT NULL,
                             termlist longblob,
                             type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',

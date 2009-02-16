@@ -332,13 +332,17 @@ def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
         "%sidxWORD%02dR TO idxWORD%02dR," % (reindex_prefix, index_id, index_id) +
         "idxWORD%02dF TO old_idxWORD%02dF," % (index_id, index_id) +
         "%sidxWORD%02dF TO idxWORD%02dF," % (reindex_prefix, index_id, index_id) +
+        "idxPAIR%02dR TO old_idxPAIR%02dR," % (index_id, index_id) +
+        "%sidxPAIR%02dR TO idxPAIR%02dR," % (reindex_prefix, index_id, index_id) +
+        "idxPAIR%02dF TO old_idxPAIR%02dF," % (index_id, index_id) +
+        "%sidxPAIR%02dF TO idxPAIR%02dF," % (reindex_prefix, index_id, index_id) +
         "idxPHRASE%02dR TO old_idxPHRASE%02dR," % (index_id, index_id) +
         "%sidxPHRASE%02dR TO idxPHRASE%02dR," % (reindex_prefix, index_id, index_id) +
         "idxPHRASE%02dF TO old_idxPHRASE%02dF," % (index_id, index_id) +
         "%sidxPHRASE%02dF TO idxPHRASE%02dF;" % (reindex_prefix, index_id, index_id)
     )
     write_message("Dropping old index tables for id %s" % index_id)
-    run_sql("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id)
+    run_sql("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPAIR%02dR, old_idxPAIR%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id, index_id, index_id)
     )
 
 def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
@@ -353,6 +357,21 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
     res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxWORD%02dR (
+                        id_bibrec mediumint(9) unsigned NOT NULL,
+                        termlist longblob,
+                        type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                        PRIMARY KEY (id_bibrec,type)
+                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+
+    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPAIR%02dF (
+                        id mediumint(9) unsigned NOT NULL auto_increment,
+                        term varchar(100) default NULL,
+                        hitlist longblob,
+                        PRIMARY KEY  (id),
+                        UNIQUE KEY term (term)
+                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+
+    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPAIR%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL,
                         termlist longblob,
                         type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
@@ -1399,12 +1418,12 @@ def task_run_core():
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
-        _last_word_table = None
-        return True
 
-    if task_get_option("cmd") == "check":
-        wordTables = get_word_tables(task_get_option("windex"))
-        for index_id, index_name, index_tags in wordTables:
+            wordTable = WordTable(index_id, index_tags, 'idxPAIR%02dF', get_pairs_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+            _last_word_table = wordTable
+            wordTable.report_on_table_consistency()
+            task_sleep_now_if_required(can_stop_too=True)
+
             if index_name == 'author':
                 fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
             elif index_name == 'exactauthor':
@@ -1480,6 +1499,61 @@ def task_run_core():
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception(alert_admin=True)
+            task_update_status("ERROR")
+            if _last_word_table:
+                _last_word_table.put_into_db()
+            sys.exit(1)
+
+        wordTable.report_on_table_consistency()
+        task_sleep_now_if_required(can_stop_too=True)
+
+        # Let's work on pairs now
+        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxPAIR%02dF', get_pairs_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+        _last_word_table = wordTable
+        wordTable.report_on_table_consistency()
+        try:
+            if task_get_option("cmd") == "del":
+                if task_get_option("id"):
+                    wordTable.del_recIDs(task_get_option("id"))
+                    task_sleep_now_if_required(can_stop_too=True)
+                elif task_get_option("collection"):
+                    l_of_colls = task_get_option("collection").split(",")
+                    recIDs = perform_request_search(c=l_of_colls)
+                    recIDs_range = []
+                    for recID in recIDs:
+                        recIDs_range.append([recID,recID])
+                    wordTable.del_recIDs(recIDs_range)
+                    task_sleep_now_if_required(can_stop_too=True)
+                else:
+                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
+                                sys.stderr)
+                    raise StandardError
+            elif task_get_option("cmd") == "add":
+                if task_get_option("id"):
+                    wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
+                    task_sleep_now_if_required(can_stop_too=True)
+                elif task_get_option("collection"):
+                    l_of_colls = task_get_option("collection").split(",")
+                    recIDs = perform_request_search(c=l_of_colls)
+                    recIDs_range = []
+                    for recID in recIDs:
+                        recIDs_range.append([recID,recID])
+                    wordTable.add_recIDs(recIDs_range, task_get_option("flush"))
+                    task_sleep_now_if_required(can_stop_too=True)
+                else:
+                    wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
+                    # let us update last_updated timestamp info, if run via automatic mode:
+                    task_sleep_now_if_required(can_stop_too=True)
+            elif task_get_option("cmd") == "repair":
+                wordTable.repair(task_get_option("flush"))
+                task_sleep_now_if_required(can_stop_too=True)
+            else:
+                write_message("Invalid command found processing %s" % \
+                    wordTable.tablename, sys.stderr)
+                raise StandardError
+        except StandardError, e:
+            write_message("Exception caught: %s" % e, sys.stderr)
+            register_exception()
             task_update_status("ERROR")
             if _last_word_table:
                 _last_word_table.put_into_db()
