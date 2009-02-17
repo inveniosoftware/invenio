@@ -26,7 +26,6 @@ __revision__ = "$Id$"
 CFG_TESTUTILS_VERBOSE = 1
 
 import os
-import string
 import sys
 import time
 import unittest
@@ -153,6 +152,7 @@ def test_web_page_content(url,
                           username="guest",
                           password="",
                           expected_text="</html>",
+                          unexpected_text="",
                           expected_link_target=None,
                           expected_link_label=None,
                           require_validate_p=CFG_TESTS_REQUIRE_HTML_VALIDATION):
@@ -198,8 +198,7 @@ def test_web_page_content(url,
             browser.submit()
             username_account_page_body = browser.response().read()
             try:
-                string.index(username_account_page_body,
-                             "You are logged in as %s." % username)
+                username_account_page_body.index("You are logged in as %s." % username)
             except ValueError:
                 raise InvenioTestUtilsBrowserException, \
                       'ERROR: Cannot login as %s.' % username
@@ -217,11 +216,30 @@ def test_web_page_content(url,
         # then test
         for cur_expected_text in expected_texts:
             try:
-                string.index(url_body, cur_expected_text)
+                url_body.index(cur_expected_text)
             except ValueError:
                 raise InvenioTestUtilsBrowserException, \
                       'ERROR: Page %s (login %s) does not contain %s.' % \
                       (url, username, cur_expected_text)
+
+        # now test for UNEXPECTED_TEXT:
+        # first normalize unexpected_text
+        if isinstance(unexpected_text, str):
+            if unexpected_text:
+                unexpected_texts = [unexpected_text]
+            else:
+                unexpected_texts = []
+        else:
+            unexpected_texts = unexpected_text
+        # then test
+        for cur_unexpected_text in unexpected_texts:
+            try:
+                url_body.index(cur_unexpected_text)
+                raise InvenioTestUtilsBrowserException, \
+                      'ERROR: Page %s (login %s) contains %s.' % \
+                      (url, username, cur_unexpected_text)
+            except ValueError:
+                pass
 
         # now test for EXPECTED_LINK_TARGET and EXPECTED_LINK_LABEL:
         if expected_link_target or expected_link_label:
@@ -275,7 +293,7 @@ def test_web_page_content(url,
         print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \
               (time.strftime("%Y-%m-%d %H:%M:%S -->", time.localtime()),
                url, username, expected_text,
-               string.join(error_messages, ","))
+               ",".join(error_messages))
 
     return error_messages
 
@@ -286,7 +304,7 @@ def merge_error_messages(error_messages):
     """
     out = ""
     if error_messages:
-        out = "\n*** " + string.join(error_messages, "\n*** ")
+        out = "\n*** " + "\n*** ".join(error_messages)
     return out
 
 def build_and_run_unit_test_suite():
