@@ -42,7 +42,7 @@
 
 __revision__ = "$Id$"
 
-import os.path, sys, getopt, shutil, tempfile
+import os.path, sys, getopt, shutil, tempfile, re
 from invenio.config import \
      CFG_TMPDIR, \
      CFG_PATH_DISTILLER, \
@@ -56,6 +56,9 @@ CFG_ALLOWED_FILE_EXTENSIONS = ["pdf", "gif", "jpg", \
 
 
 ## ***** Functions related to the icon creation process: *****
+
+# Accepted format for the ImageMagick 'scale' parameter:
+re_imagemagic_scale_parameter_format = re.compile(r'x?\d+(x\d*)?(^|!|>|<|@|%)?$')
 
 def create_working_directory():
     """Create a "working directory" in which the files related to the icon-
@@ -293,7 +296,7 @@ def build_icon(path_workingdir,
                       "%(source-file-path)s %(icon-file-path)s 2>/dev/null" \
                       % { 'convert'          : CFG_PATH_CONVERT,
                           'scale'            : \
-                                             escape_shell_arg(str(icon_scale)),
+                                             escape_shell_arg(icon_scale),
                           'delay'            : delay_info,
                           'source-file-path' : \
                                       escape_shell_arg("%s/%s" \
@@ -342,8 +345,9 @@ def create_icon(options):
               the icon type is gif.
               This allows the user to specify the delay between "pages"
               of a multi-page (animated) icon.
-           + icon-scale: (integer) - the scaling information to be used for the
-              creation of the new icon.
+           + icon-scale: ('geometry') - the scaling information to be used for the
+              creation of the new icon. Type 'geometry' as defined in ImageMagick.
+              (eg. 320 or 320x240 or 100> or 5%)
            + icon-file-format: (string) - the file format of the icon that is
               to be created. Legal values are:
               * pdf
@@ -454,9 +458,9 @@ def create_icon(options):
         options["multipage-icon-delay"] = 100
 
     ## Wash the icon scaling information:
-    if type(options["icon-scale"]) is not int or options["icon-scale"] <= 0:
+    if not re_imagemagic_scale_parameter_format.match(options["icon-scale"]):
         ## Ivalid value - set it to default:
-        options["icon-scale"] = 180
+        options["icon-scale"] = "180"
 
     ## OK. Begin the icon creation process:
     ##
@@ -571,8 +575,11 @@ def get_cli_options():
          -v, --verbose=              -> Set verbosity level (0=min, 1=default,
                                         9=max).
          -s, --icon-scale            -> Scaling information for the icon that
-                                        is to be created. Must be an integer.
-                                        Defaults to 180.
+                                        is to be created. Must be of
+                                        type 'geometry', as understood
+                                        by ImageMagick (Eg. 320 or
+                                        320x240 or 100>). Defaults to
+                                        180.
          -m, --multipage-icon        -> A flag to indicate that the icon should
                                         consist of multiple pages. Will only be
                                         respected if the requested icon type is
@@ -699,14 +706,10 @@ def get_cli_options():
                     options['multipage-icon-delay'] = frame_delay
         elif opt[0] in ("-s", "--icon-scale"):
             ## The scaling information for the icon:
-            try:
-                icon_scale = int(opt[1])
-            except ValueError:
-                ## Invalid icon scale supplied. Usage message.
-                usage()
+            if re_imagemagic_scale_parameter_format.match(opt[1]):
+                options['icon-scale'] = opt[1]
             else:
-                if icon_scale > 0:
-                    options['icon-scale'] = icon_scale
+                usage()
     ##
     ## Done. Return the dictionary of options:
     return options
