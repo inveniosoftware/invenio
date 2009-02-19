@@ -101,6 +101,13 @@ class BibRankCitationRankingTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 
+    def test_detailed_record_citations_tab(self):
+        """bibrank - detailed record, citations tab"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/record/79/citations',
+                                               expected_text=["Cited by: 1 records",
+                                                              "Co-cited with: 2 records"]))
+
 class BibRankExtCitesTest(unittest.TestCase):
     """Check BibRank citation ranking tools with respect to the external cites."""
 
