@@ -340,6 +340,18 @@ def _output_text(single_keywords=None, composite_keywords=None,
     """Outputs the results obtained in text format."""
     output = []
 
+    # Search and output core keywords.
+    core_keywords = [_SKWS[skw[0]].concept
+                     for skw in single_keywords
+                     if _SKWS[skw[0]].core]
+    core_keywords += [_CKWS[ckw[0]].concept
+                      for ckw in composite_keywords
+                      if _CKWS[ckw[0]].core]
+    if core_keywords:
+        output.append("\nCore keywords:")
+        for core_keyword in core_keywords:
+            output.append(core_keyword)
+
     if author_keywords is not None:
         output.append("\nAuthor keywords:")
         for keyword, matches in author_keywords.iteritems():

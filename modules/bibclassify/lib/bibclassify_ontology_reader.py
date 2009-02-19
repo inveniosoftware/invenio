@@ -159,7 +159,7 @@ def _download_remote_ontology(onto_url, time_difference=None):
         download = remote_modif_time > local_modif_time + time_difference
         if download:
             write_message("INFO: The remote ontology '%s' is more recent "
-                "than the local ontology.", onto_url, stream=sys.stderr,
+                "than the local ontology." % onto_url, stream=sys.stderr,
                 verbose=3)
 
     if download:
@@ -188,6 +188,8 @@ class SingleKeyword:
             self.regex = _get_searchable_regex(basic=[subject])
             self.nostandalone = False
             self.spires = subject
+            self.fieldcodes = None
+            self.core = None
         else:
             basic_labels = []
             for label in store.objects(subject, namespace["prefLabel"]):
@@ -206,14 +208,24 @@ class SingleKeyword:
 
             self.regex = _get_searchable_regex(basic_labels, hidden_labels)
 
-            note = str(store.value(subject, namespace["note"], any=True))
-            if note is not None:
-                self.nostandalone = (note.lower() in
-                    ("nostandalone", "nonstandalone"))
+            self.core = False
+            self.nostandalone = False
+            for note in map(lambda s: str(s).lower().strip(),
+                store.objects(subject, namespace["note"])):
+                if note == 'core':
+                    self.core = True
+                if note in ("nostandalone", "nonstandalone"):
+                    self.nostandalone = True
 
             spires = store.value(subject, namespace["spiresLabel"], any=True)
             if spires is not None:
                 self.spires = str(spires)
+
+            self.fieldcodes = []
+            for code in store.objects(subject, namespace["field"]):
+                self.fieldcodes.append(str(code))
+
+            core = None
 
     def __repr__(self):
         return "".join(["<SingleKeyword: ", self.concept, ">"])
@@ -243,6 +255,12 @@ class CompositeKeyword:
         component_positions.sort()
         for position in component_positions:
             self.compositeof.append(position[1])
+
+        self.core = False
+        for note in map(lambda s: str(s).lower().strip(),
+            store.objects(subject, namespace["note"])):
+            if note == 'core':
+                self.core = True
 
         spires = store.value(subject, namespace["spiresLabel"], any=True)
         if spires is not None:
@@ -498,6 +516,9 @@ def _download_ontology(url, local_file):
         file_desc = open(local_file, 'w')
         file_desc.write(url_desc.read())
         file_desc.close()
+    except IOError, e:
+        print e
+        return False
     except:
         write_message("WARNING: Unable to download the ontology. '%s'" %
             sys.exc_info()[0], stream=sys.stderr, verbose=2)
