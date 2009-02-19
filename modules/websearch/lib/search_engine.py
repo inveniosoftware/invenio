@@ -4192,6 +4192,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             # print records:
             if of in ['hcs']:
                 # feed the current search to be summarized:
+                from invenio.search_engine_summarizer import summarize_records
                 summarize_records(results_final_for_all_selected_colls, 'hcs', ln, p, f, req)
             else:
                 if len(colls_to_search)>1:
