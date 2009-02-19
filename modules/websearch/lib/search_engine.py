@@ -77,7 +77,7 @@ webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
-    calculate_co_cited_with_list, get_records_with_num_cites
+    calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Error
