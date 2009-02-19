@@ -1332,8 +1332,16 @@ class WebSearchSummarizerTest(unittest.TestCase):
         self.assertEqual((('REPORT', 1), ('THESIS', 1)),
                          get_most_popular_field_values((41,), ('690C_a', '980__a'), count_repetitive_values=False))
 
+    def test_ellis_citation_summary(self):
+        """websearch - query ellis, citation summary output format"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=hcs',
+                                               expected_text="Less known papers (1-9)",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=ellis%20cited%3A1-%3E9&rm=citation",
+                                               expected_link_label='1'))
+
 class WebSearchRecordCollectionGuessTest(unittest.TestCase):
-    """Collection Guessing tests."""
+    """Primary collection guessing tests."""
 
     def test_guess_primary_collection_of_a_record(self):
         """websearch - guess_primary_collection_of_a_record"""
@@ -1345,8 +1353,6 @@ class WebSearchRecordCollectionGuessTest(unittest.TestCase):
         self.assertEqual(guess_collection_of_a_record(96, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Articles')
         self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
         self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical%%20Physics%%20%%28TH%%29?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
-
-
 
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
