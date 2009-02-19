@@ -61,8 +61,9 @@ def perform_request_init():
     # Add scripts (the ordering is NOT irrelevant).
     scripts = ['jquery.min.js', 'effects.core.min.js',
                'effects.highlight.min.js', 'jquery.autogrow.js',
-               'jquery.jeditable.mini.js', 'json2.js',
-               'bibedit_display.js', 'bibedit_engine.js', 'bibedit_menu.js']
+               'jquery.jeditable.mini.js', 'jquery.hotkeys.min.js', 'json2.js',
+               'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
+               'bibedit_menu.js']
 
     for script in scripts:
         body += '    <script type="text/javascript" src="%s/js/%s">' \
@@ -199,20 +200,33 @@ def perform_request_update_record(requestType, recid, uid, data):
             int(data['subfieldIndex']), int(data['newSubfieldIndex']))
         result['resultText'] = 'Subfield moved'
 
-    elif requestType == 'deleteSelected':
+    elif requestType == 'deleteFields':
         to_delete = data['toDelete']
+        deleted_fields = 0
+        deleted_subfields = 0
         for tag in to_delete:
             for field_number in to_delete[tag]:
                 if not to_delete[tag][field_number]:
                     # No subfields specified - delete entire field.
                     record_delete_field_from(record, tag, int(field_number))
+                    deleted_fields += 1
                 else:
                     for subfield_index in to_delete[tag][field_number][::-1]:
                         # Delete subfields in reverse order (to keep the
                         # indexing correct).
                         record_delete_subfield_from(record, tag,
                             int(field_number), int(subfield_index))
-        result['resultText'] = 'Selection deleted'
+                        deleted_subfields += 1
+        if deleted_fields == 1 and deleted_subfields == 0:
+            result['resultText'] = 'Field deleted'
+        elif deleted_fields and deleted_subfields == 0:
+            result['resultText'] = 'Fields deleted'
+        elif deleted_subfields == 1 and deleted_fields == 0:
+            result['resultText'] = 'Subfield deleted'
+        elif deleted_subfields and deleted_fields == 0:
+            result['resultText'] = 'Subfields deleted'
+        else:
+            result['resultText'] = 'Selection deleted'
 
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
 

@@ -1477,13 +1477,13 @@ input.hyperlinkformSubmitButton {
   margin-bottom: 20px;
   font-size: 0.8em;
 }
-.bibEditMenuSection {
+#bibEditMenu .bibEditMenuSection {
   margin-bottom: 10px;
 }
-.bibEditMenuSectionHeader {
+#bibEditMenu .bibEditMenuSectionHeader {
   font-weight: bold;
 }
-.bibEditMenuSection table {
+#bibEditMenu .bibEditMenuSection table {
   width: 100%;
 }
 #bibEditMenu a, #bibEditMenu button, #bibEditMenu input {
@@ -1534,25 +1534,33 @@ input.hyperlinkformSubmitButton {
   min-width: 16px;
   max-width: 16px;
 }
+#bibEditTable td:focus {
+  background: yellow;
+}
 #bibEditTable .bibEditFieldColored {
   background-color: rgb(235, 235, 235);
   border: 1px solid #A1A1A1;
+}
+#bibEditTable .bibEditSelected {
+  background: lightblue;
 }
 #bibEditTable td {
   padding: 1px 1px;
   font-size: 0.8em;
 }
-.bibEditCellField, .bibEditCellFieldTag, .bibEditCellSubfield,
-.bibEditCellSubfieldTag {
+#bibEditTable .bibEditCellField,
+#bibEditTable .bibEditCellFieldTag,
+#bibEditTable .bibEditCellSubfield,
+#bibEditTable .bibEditCellSubfieldTag {
   vertical-align: top;
 }
-.bibEditCellFieldTag {
+#bibEditTable .bibEditCellFieldTag {
   font-weight: bold;
 }
-.bibEditCellContentProtected {
+#bibEditTable .bibEditCellContentProtected {
   font-weight: bold;
 }
-.bibEditCellAddSubfields {
+#bibEditTable .bibEditCellAddSubfields {
   vertical-align: bottom;
 }
 #bibEditTable img {

@@ -128,7 +128,8 @@ install-jquery-plugins: uninstall-jquery-plugins
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
 	rm jquery.autogrow-1.2.2.zip && \
-	wget http://json.org/json2.js)
+	wget http://json.org/json2.js && \
+	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
 	@echo "***********************************************************"
@@ -140,7 +141,8 @@ uninstall-jquery-plugins:
 	rm -f effects.highlight.min.js && \
 	rm -f jquery.jeditable.mini.js && \
 	rm -f jquery.autogrow.js && \
-	rm -f json2.js)
+	rm -f json2.js && \
+	rm -f jquery.hotkeys.min.js)
 	@echo "***********************************************************"
 	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"

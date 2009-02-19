@@ -21,6 +21,7 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import CFG_SITE_URL
 
 class Template:
 
@@ -106,8 +107,7 @@ class Template:
                                     disabled='disabled'),
             'imgDeleteSelected': img('/img/delete.png'),
             'btnDeleteSelected': button('button', 'Delete selected',
-                id='btnDeleteSelected', disabled='disabled')
-            }
+                id='btnDeleteSelected', disabled='disabled')}
 
         statusarea = '<table>\n' \
             '          <tr>\n' \
@@ -117,6 +117,12 @@ class Template:
             'imgIndicator': img('/img/indicator.gif'),
             'lblChecking': 'Checking status' + '...'
             }
+
+        lnkhelp = img('/img/help.gif', '', style='vertical-align: bottom') + \
+            link('Help', href='#', onclick='window.open(' \
+            '\'%s/help/admin/bibedit-admin-guide#2\', \'\', \'width=640,' \
+            'height=600,left=150,top=150,resizable=yes,scrollbars=yes\');' \
+            'return false;' % CFG_SITE_URL)
 
         return '    <div id="bibEditMenu">\n' \
             '      <div class="bibEditMenuSection">\n' \
@@ -128,10 +134,14 @@ class Template:
             '      <div id="bibEditMenuSection">\n' \
             '        %(statusarea)s\n' \
             '      </div>\n' \
+            '      <div id="bibEditMenuSection" align="right">\n' \
+            '        %(lnkhelp)s\n' \
+            '      </div>\n' \
             '    </div>\n' % {
                 'recordmenu': recordmenu,
                 'fieldmenu': fieldmenu,
-                'statusarea': statusarea
+                'statusarea': statusarea,
+                'lnkhelp': lnkhelp
                 }
 
 def img(src, _class='', **kargs):

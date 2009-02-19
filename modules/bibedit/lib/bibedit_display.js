@@ -21,6 +21,11 @@
  * This is the BibEdit Javascript for generation of webpage elements and HTML.
  */
 
+/*
+ * Global variables
+ */
+
+
 function displayRecord(){
   /*
    * Create the main content table.
@@ -77,20 +82,20 @@ function createControlField(tag, field){
    * Create control field row.
    */
   var fieldID = tag + '_' + field[4];
-  var cellContentClass = ' class="bibEditCellContentProtected"',
+  var cellContentClass = 'class="bibEditCellContentProtected" ',
     evtContentClick = '';
 
   if (!fieldIsProtected(tag)){
     cellContentClass = '';
-    evtContentClick = 'ondblclick="onContentClick(this)" ';
+    evtContentClick = ' ondblclick="onContentClick(this)"';
   }
 
   return '' +
     '<tbody id="rowGroup_' + fieldID + '">' +
       '<tr id="row_' + fieldID + '" >' +
         '<td class="bibEditCellField">' +
-	  input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField', '',
-			 'onclick', 'onFieldBoxClick(this)') +
+	  input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField',
+	    {onclick: 'onFieldBoxClick(this)', tabindex: -1}) +
 	'</td>' +
         '<td id="fieldTag_' + fieldID + '" class="bibEditCellFieldTag">' +
 	  getFieldTag(tag) +
@@ -98,9 +103,9 @@ function createControlField(tag, field){
         '<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
-	'<td ' + evtContentClick + 'id="content_' + fieldID + '" colspan="2"' +
-	  cellContentClass + '>' +
-	  escapeHTML(field[3]) +
+	'<td id="content_' + fieldID + '" ' + cellContentClass +
+	  'colspan="2" tabindex="0"' + evtContentClick + '>' +
+	    escapeHTML(field[3]) +
 	'</td>' +
       '</tr>' +
     '</tbody>';
@@ -136,29 +141,29 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var subfieldID = fieldID + '_' + subfieldIndex;
   var boxField = '', cellFieldTagAttrs = 'class="bibEditCellField"',
     fieldTagToPrint = '', btnMoveSubfieldUp = '', btnMoveSubfieldDown = '',
-    cellContentClass = ' class="bibEditCellContentProtected"',
+    cellContentClass = 'class="bibEditCellContentProtected"',
     evtContentClick = '';
   if (!protectedField){
     // Enable features for unprotected fields.
-    btnMoveSubfieldUp = img('/img/arrow_up2.png', 'Move subfield up',
-      'btnMoveSubfieldUp_' + subfieldID, 'bibEditBtnMoveSubfieldUp', 'onclick',
-      'onMoveSubfieldClick(this)');
-    btnMoveSubfieldDown = img('/img/arrow_down2.png', 'Move subfield down',
-      'btnMoveSubfieldDown_' + subfieldID, 'bibEditBtnMoveSubfieldDown',
-      'onclick', 'onMoveSubfieldClick(this)');
+    btnMoveSubfieldUp = img('/img/arrow_up2.png', 'btnMoveSubfieldUp_' +
+      subfieldID, 'bibEditBtnMoveSubfieldUp',
+      {title: 'Move subfield up', onclick: 'onMoveSubfieldClick(this)'});
+    btnMoveSubfieldDown = img('/img/arrow_down2.png', 'btnMoveSubfieldDown_' +
+      subfieldID, 'bibEditBtnMoveSubfieldDown',
+      {title: 'Move subfield down', onclick: 'onMoveSubfieldClick(this)'});
     if (!protectedSubfield){
       cellContentClass = '';
-      evtContentClick = 'ondblclick="onContentClick(this)" ';
+      evtContentClick = ' ondblclick="onContentClick(this)" ';
     }
   }
   var boxSubfield = input('checkbox', 'boxSubfield_' + subfieldID,
-    'bibEditBoxSubfield', '', 'onclick', 'onSubfieldBoxClick(this)');
+    'bibEditBoxSubfield', {onclick: 'onSubfieldBoxClick(this)', tabindex: -1});
   var subfieldTagToPrint = getSubfieldTag(MARC);
   var btnAddSubfield = '';
   // If first subfield, add tag and selection box, remove up arrow.
   if (subfieldIndex == 0){
-    boxField = input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField', '',
-		     'onclick', 'onFieldBoxClick(this)');
+    boxField = input('checkbox', 'boxField_' + fieldID, 'bibEditBoxField',
+      {onclick: 'onFieldBoxClick(this)', tabindex: -1});
     cellFieldTagAttrs = 'id="fieldTag_' + fieldID +
       '" class="bibEditCellFieldTag"';
     fieldTagToPrint = getFieldTag(MARC);
@@ -168,8 +173,8 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   if (subfieldIndex == subfieldsLength - 1){
     btnMoveSubfieldDown = '';
     if (!protectedField)
-      btnAddSubfield = img('/img/add.png', 'Add subfield', 'btnAddSubfield_' +
-			   fieldID, '', 'onclick', 'onAddSubfieldsClick(this)');
+      btnAddSubfield = img('/img/add.png', 'btnAddSubfield_' + fieldID, '',
+      {title: 'Add subfield', onclick: 'onAddSubfieldsClick(this)'});
   }
   return '' +
     '<tr id="row_' + subfieldID + '">' +
@@ -183,9 +188,9 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
 	'" class="bibEditCellSubfieldTag">' +
 	subfieldTagToPrint +
       '</td>' +
-      '<td ' + evtContentClick + 'id="content_' + subfieldID + '"' +
-	cellContentClass + '>' +
-	subfieldValue +
+      '<td id="content_' + subfieldID + '" ' + cellContentClass + '"' +
+	  'tabindex="0"' + evtContentClick + '>' +
+	    subfieldValue +
       '</td>' +
       '<td class="bibEditCellAddSubfields">' + btnAddSubfield + '</td>' +
     '</tr>';
@@ -208,23 +213,24 @@ function createAddFieldRowGroup(fieldTmpNo){
 				 fieldTmpNo) +
         '</td>' +
 	'<td>' +
-	  img('/img/add.png', 'Add subfield', 'btnAddFieldAddSubfield_' +
-	      fieldTmpNo) +
+	  img('/img/add.png', 'btnAddFieldAddSubfield_' + fieldTmpNo, '', {
+	    title: 'Add subfield'}) +
 	'</td>' +
       '</tr>' +
     createAddFieldRow(fieldTmpNo, 0) +
       '<tr>' +
 	'<td>' +
-	  input('hidden', 'hdnAddFieldFreeSubfieldTmpNo_' + fieldTmpNo, '', 1) +
+	  input('hidden', 'hdnAddFieldFreeSubfieldTmpNo_' + fieldTmpNo, '',
+	    {value: 1}) +
 	'</td>' +
 	'<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
 	'<td>' +
-	  button('btnAddFieldSave_' + fieldTmpNo, 'bibEditBtnBold', 'Save') +
-	  button('btnAddFieldCancel_' + fieldTmpNo, '', 'Cancel') +
-	  button('btnAddFieldClear_' + fieldTmpNo, 'bibEditBtnClear', 'Clear') +
+	  button('Save', 'btnAddFieldSave_' + fieldTmpNo, 'bibEditBtnBold') +
+	  button('Cancel', 'btnAddFieldCancel_' + fieldTmpNo, '') +
+	  button('Clear', 'btnAddFieldClear_' + fieldTmpNo, 'bibEditBtnClear') +
 	'</td>' +
 	'<td></td>' +
       '</tr>' +
@@ -238,16 +244,16 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
   var txtAddFieldSubfieldCode = '', txtAddFieldInd1 = '', txtAddFieldInd2 = '',
     btnAddFieldRemove = '';
   if (subfieldTmpNo == 0){
-    txtAddFieldSubfieldCode = inputText('txtAddFieldTag_' + fieldTmpNo,
-				'bibEditTxtTag', '', 3);
-    txtAddFieldInd1 = inputText('txtAddFieldInd1_' + fieldTmpNo,
-				'bibEditTxtInd', '', 1);
-    txtAddFieldInd2 = inputText('txtAddFieldInd2_' + fieldTmpNo,
-				'bibEditTxtInd', '', 1);
+    txtAddFieldSubfieldCode = input('text', 'txtAddFieldTag_' + fieldTmpNo,
+				    'bibEditTxtTag', {maxlength: 3});
+    txtAddFieldInd1 = input('text', 'txtAddFieldInd1_' + fieldTmpNo,
+			    'bibEditTxtInd', {maxlength: 1});
+    txtAddFieldInd2 = input('text', 'txtAddFieldInd2_' + fieldTmpNo,
+			    'bibEditTxtInd', {maxlength: 1});
   }
   else
-    btnAddFieldRemove = img('/img/delete.png', 'Remove subfield',
-      'btnAddFieldRemove_' + fieldTmpNo + '_' + subfieldTmpNo);
+    btnAddFieldRemove = img('/img/delete.png', 'btnAddFieldRemove_' +
+      fieldTmpNo + '_' + subfieldTmpNo, '', {title: 'Remove subfield'});
   return '' +
     '<tr id="rowAddField_' + fieldTmpNo + '_' + subfieldTmpNo + '">' +
       '<td></td>' +
@@ -257,11 +263,11 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
       '<td></td>' +
       '<td></td>' +
       '<td class="bibEditCellAddSubfieldCode">' +
-	inputText('txtAddFieldSubfieldCode_' + fieldTmpNo + '_' +
-		  subfieldTmpNo, 'bibEditTxtSubfieldCode', 1, 1) +
+	input('text', 'txtAddFieldSubfieldCode_' + fieldTmpNo + '_' +
+	  subfieldTmpNo, 'bibEditTxtSubfieldCode', {maxlength: 1}) +
       '</td>' +
       '<td>' +
-	inputText('txtAddFieldValue_' + fieldTmpNo + '_' +
+	input('text', 'txtAddFieldValue_' + fieldTmpNo + '_' +
 		  subfieldTmpNo, 'bibEditTxtValue') +
       '</td>' +
       '<td>' + btnAddFieldRemove + '</td>' +
@@ -276,16 +282,16 @@ function createAddSubfieldsForm(fieldID){
     createAddSubfieldsRow(fieldID, 0) +
     '<tr id="rowAddSubfieldsControls_' + fieldID + '">' +
       '<td>' +
-	input('hidden', 'hdnAddSubfieldsFreeTmpNo_' + fieldID, '', 1) +
+	input('hidden', 'hdnAddSubfieldsFreeTmpNo_' + fieldID, '', {value: 1}) +
       '</td>' +
       '<td></td>' +
       '<td></td>' +
       '<td></td>' +
       '<td></td>' +
       '<td>' +
-	button('btnAddSubfieldsSave_' + fieldID, 'bibEditBtnBold', 'Save') +
-        button('btnAddSubfieldsCancel_' + fieldID, '', 'Cancel') +
-        button('btnAddSubfieldsClear_' + fieldID, 'bibEditBtnClear', 'Clear') +
+	button('Save', 'btnAddSubfieldsSave_' + fieldID, 'bibEditBtnBold') +
+	button('Cancel', 'btnAddSubfieldsCancel_' + fieldID, '') +
+	button('Clear', 'btnAddSubfieldsClear_' + fieldID, 'bibEditBtnClear') +
       '</td>' +
       '<td></td>' +
     '</tr>';
@@ -297,7 +303,7 @@ function createAddSubfieldsRow(fieldID, subfieldTmpNo){
    */
   var subfieldID = fieldID + '_' + subfieldTmpNo;
   var btnRemove = (subfieldTmpNo == 0) ? '' : img('/img/delete.png',
-    'Remove subfield', 'btnAddSubfieldsRemove_' + subfieldID);
+    'btnAddSubfieldsRemove_' + subfieldID, '', {title: 'Remove subfield'});
   return '' +
     '<tr id="rowAddSubfields_' + subfieldID + '">' +
       '<td></td>' +
@@ -305,11 +311,11 @@ function createAddSubfieldsRow(fieldID, subfieldTmpNo){
       '<td></td>' +
       '<td></td>' +
       '<td class="bibEditCellAddSubfieldCode">' +
-	inputText('txtAddSubfieldsCode_' + subfieldID,
-		  'bibEditTxtSubfieldCode', 1, 1) +
+	input('text', 'txtAddSubfieldsCode_' + subfieldID,
+	      'bibEditTxtSubfieldCode', {maxlength: 1}) +
       '</td>' +
       '<td>' +
-	inputText('txtAddSubfieldsValue_' + subfieldID, 'bibEditTxtValue') +
+	input('text', 'txtAddSubfieldsValue_' + subfieldID, 'bibEditTxtValue') +
       '</td>' +
       '<td>' + btnRemove + '</td>' +
     '</tr>';
@@ -389,58 +395,46 @@ function displayAlert(alertType, msgType, ready, arg){
   return answer;
 }
 
-function button(id, _class, value, event, handler){
+function button(value, id, _class, attrs){
   /*
    * Create a button tag with specified attributes.
    */
+  value = (value != undefined) ? value : '';
   id = id ? 'id="' + id + '" ' : '';
   _class = _class ? 'class="' + _class + '" ' : '';
-  value = (value != undefined) ? value : '';
-  event = event ? event + '="' + handler + '" ' : '';
-  return '<button ' + id + _class + event + '>' + value + '</button>';
+  var strAttrs = '';
+  for (var attr in attrs){
+    strAttrs += attr + '="' + attrs[attr] + '" ';
+  }
+  return '<button ' + id + _class + strAttrs + '>' + value + '</button>';
 }
 
-function img(src, title, id, _class, event, handler){
+function img(src, id, _class, attrs){
   /*
    * Create an image tag with specified attributes.
    */
   src = 'src="' + src + '" ';
-  title = title ? 'title="' + title + '" ' : '';
   id = id ? 'id="' + id + '" ' : '';
   _class =  _class ? 'class="' + _class + '" ' : '';
-  event =  event ? event + '="' + handler + '" ' : '';
-  return '<img ' + src + title + id + _class + event + '/>';
+  var strAttrs = '';
+  for (var attr in attrs){
+    strAttrs += attr + '="' + attrs[attr] + '" ';
+  }
+  return '<img ' + src + id + _class + strAttrs + '/>';
 }
 
-function input(type, id, _class, value, event, handler, size, maxlength){
+function input(type, id, _class, attrs){
   /*
    * Create an input tag with specified attributes.
    */
   type = 'type="' + type + '" ';
   id = id ? 'id="' + id + '" ' : '';
   _class = _class ? 'class="' + _class + '" ' : '';
-  value = (value != undefined) ? 'value="' + value + '" ' : '';
-  event = event ? event + '="' + handler + '" ' : '';
-  size = size ? 'size="' + size + '" ' : '';
-  maxlength = maxlength ? 'maxlength="' + maxlength + '" ' : '';
-  return '<input ' + type + id + _class + value + event + size +
-    maxlength + '/>';
-}
-
-function inputText(id, _class, size, maxlength, value, event, handler){
-  /*
-   * Create a text input tag with specified attributes.
-   */
-  var type = 'type="text" ';
-  id = id ? 'id="' + id + '" ' : '';
-  _class = _class ? 'class="' + _class + '" ' : '';
-  size = size ? 'size="' + size + '" ' : '';
-  maxlength = maxlength ? 'maxlength="' + maxlength + '" ' : '';
-  // name = name ? 'name="' + name + '" ' : '';
-  value = value ? 'value="' + value + '" ' : '';
-  event = event ? event + '="' + handler + '" ' : '';
-  return '<input ' + type + id + _class + size + maxlength + value +
-    event +  '/>';
+  var strAttrs = '';
+  for (var attr in attrs){
+    strAttrs += attr + '="' + attrs[attr] + '" ';
+  }
+  return '<input ' + type + id + _class + strAttrs + '/>';
 }
 
 function escapeHTML(value){

@@ -40,6 +40,7 @@ jsdir=$(localstatedir)/www/js
 
 js_DATA = bibedit_display.js \
           bibedit_engine.js \
+          bibedit_keys.js \
           bibedit_menu.js
 
 EXTRA_DIST = $(pylib_DATA) \
