@@ -197,8 +197,10 @@ def get_files(bfo):
                     if '/setlink?' in url: # Setlink (i.e. hosted on doc.cern.ch)
                         descr = _("Fulltext") # Surely a fulltext
                     else:
-                        #FIXME remove eventual ?parameters
-                        descr = filename or host # Let's take the name from the url
+                        # we have some generic external URL that is
+                        # not of the setlink type; so let us display
+                        # the URL in full:
+                        descr = url
                 if CFG_CERN_SITE and 'cern.ch' in host:
                     if not use_bibdocs_p or not ('/setlink?' in url or 'cms' in host or 'documents.cern.ch' in url or 'doc.cern.ch' in url or 'preprints.cern.ch' in url):
                         parsed_urls['cern_urls'].append((url, descr)) # Obsolete cern.ch url (we're migrating)
