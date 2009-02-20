@@ -462,7 +462,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             'doctype': (str, ''),
             'act': (str, ''),
             'startPg': (str, "1"),
-            'indir': (str, ''),
             'access': (str, ''),
             'mainmenu': (str, ''),
             'fromdir': (str, ''),
@@ -479,7 +478,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         args["doctype"] = args["doctype"].strip()
         args["act"] = args["act"].strip()
 
-        def _index(req, c, ln, doctype, act, startPg, indir, access,
+        def _index(req, c, ln, doctype, act, startPg, access,
                    mainmenu, fromdir, file, nextPg, nbPg, curpage, step,
                    mode):
 
@@ -493,13 +492,9 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             elif act=="":
                 return action(req,c,ln,doctype)
             elif int(step)==0:
-                return interface(req,c,ln, doctype, act, startPg, indir,
-                                 access, mainmenu, fromdir, file, nextPg,
-                                 nbPg, curpage)
+                return interface(req, c, ln, doctype, act, startPg, access, mainmenu, fromdir, file, nextPg, nbPg, curpage)
             else:
-                return endaction(req,c,ln, doctype, act, startPg, indir,
-                                 access,mainmenu, fromdir, file, nextPg,
-                                 nbPg, curpage, step, mode)
+                return endaction(req, c, ln, doctype, act, startPg, access,mainmenu, fromdir, file, nextPg, nbPg, curpage, step, mode)
 
         return _index(req, **args)
 

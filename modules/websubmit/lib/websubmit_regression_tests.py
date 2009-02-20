@@ -97,8 +97,40 @@ class WebSubmitTestLegacyURLs(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/help/submit/access.en.html',
                                               expected_text="Submit Guide"))
 
+class WebSubmitXSSVulnerabilityTest(unittest.TestCase):
+    """Test possible XSS vulnerabilities of the submission engine."""
+
+    def test_xss_in_submission_doctype(self):
+        """websubmit - no XSS vulnerability in doctype parameter"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/submit?doctype=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                                               expected_text='Unable to find document type: &lt;SCRIPT&gt;alert("XSS")', username="jekyll",
+                          password="j123ekyll"))
+
+    def test_xss_in_submission_act(self):
+        """websubmit - no XSS vulnerability in act parameter"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/submit?doctype=DEMOTHE&access=1_1&act=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                                               expected_text='Unable to find the submission directory for the ation: &lt;SCRIPT&gt;alert("XSS")', username="jekyll",
+                          password="j123ekyll"))
+
+    def test_xss_in_submission_page(self):
+        """websubmit - no XSS vulnerability in access parameter"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL +
+                          '/submit?doctype=DEMOTHE&access=/../../../etc/passwd&act=SBI&startPg=1&ln=en&ln=en',                                               expected_text='Invalid parameters', username="jekyll",
+                          password="j123ekyll"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL +
+                          '/submit?doctype=DEMOTHE&access=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&act=SBI',                                               expected_text='Invalid parameters', username="jekyll",
+                          password="j123ekyll"))
+
+
+
+
 TEST_SUITE = make_test_suite(WebSubmitWebPagesAvailabilityTest,
-                             WebSubmitTestLegacyURLs)
+                             WebSubmitTestLegacyURLs,
+                             WebSubmitXSSVulnerabilityTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

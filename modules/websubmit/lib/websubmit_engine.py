@@ -93,7 +93,6 @@ def interface(req,
               doctype="",
               act="",
               startPg=1,
-              indir="",
               access="",
               mainmenu="",
               fromdir="",
@@ -178,7 +177,7 @@ def interface(req,
     noPage = []
     # Preliminary tasks
     # check that the user is logged in
-    if uid_email == "" or uid_email == "guest":
+    if not uid_email or uid_email == "guest":
         return warningMsg(websubmit_templates.tmpl_warning_message(
                            ln = ln,
                            msg = _("Sorry, you must log in to perform this action.")
@@ -189,6 +188,12 @@ def interface(req,
         ## We don't have all the necessary information to go ahead
         ## with this submission:
         return warningMsg(_("Not enough information to go ahead with the submission."), req, c, ln)
+
+    try:
+        assert(re.match('\d+_\d+', access))
+    except AssertionError:
+        register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: doctype="%s", access="%s"' % (doctype, access))
+        return warningMsg(_("Invalid parameters"), req, c, ln)
 
     ## Before continuing to display the submission form interface,
     ## verify that this submission has not already been completed:
@@ -211,14 +216,13 @@ def interface(req,
     ## Concatenate action ID and doctype ID to make the submission ID:
     subname = "%s%s" % (act, doctype)
 
-    if not indir:
-        ## Get the submission storage directory from the DB:
-        submission_dir = get_storage_directory_of_action(act)
-        if submission_dir:
-            indir = submission_dir
-        else:
-            ## Unable to determine the submission-directory:
-            return warningMsg(_("Unable to find the submission directory."), req, c, ln)
+    ## Get the submission storage directory from the DB:
+    submission_dir = get_storage_directory_of_action(act)
+    if submission_dir:
+        indir = submission_dir
+    else:
+        ## Unable to determine the submission-directory:
+        return warningMsg(_("Unable to find the submission directory for the ation: %s") % escape(str(act)), req, c, ln)
 
     ## get the document type's long-name:
     doctype_lname = get_longname_of_doctype(doctype)
@@ -605,7 +609,6 @@ def interface(req,
           nbPg = nbPg,
           doctype = doctype,
           act = act,
-          indir = indir,
           fields = full_fields,
           javascript = websubmit_templates.tmpl_page_interface_js(
                          ln = ln,
@@ -632,7 +635,7 @@ def interface(req,
     p_navtrail = """<a href="/submit?ln=%(ln)s" class="navtrail">%(submit)s</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" class="navtrail">%(docname)s</a>&nbsp;""" % {
                    'submit'  : _("Submit"),
                    'doctype' : quote_plus(doctype),
-                   'docname' : escape(docname),
+                   'docname' : escape(str(docname)),
                    'ln' : ln
                  }
     return page(title= actname,
@@ -652,7 +655,6 @@ def endaction(req,
               doctype="",
               act="",
               startPg=1,
-              indir="",
               access="",
               mainmenu="",
               fromdir="",
@@ -747,6 +749,12 @@ def endaction(req,
         ## with this submission:
         return warningMsg(_("Not enough information to go ahead with the submission."), req, c, ln)
 
+    try:
+        assert(re.match('\d+_\d+', access))
+    except AssertionError:
+        register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative:  doctype="%s", access="%s"' % (doctype, access))
+        return warningMsg(_("Invalid parameters"), req, c, ln)
+
     ## Before continuing to process the submitted data, verify that
     ## this submission has not already been completed:
     if submission_is_finished(doctype, act, access, uid_email):
@@ -763,15 +771,14 @@ def endaction(req,
         return warningMsg(wrnmsg, req)
 
     ## retrieve the action and doctype data
-    if not indir:
-        ## Get the submission storage directory from the DB:
-        submission_dir = get_storage_directory_of_action(act)
-        if submission_dir:
-            indir = submission_dir
-        else:
-            ## Unable to determine the submission-directory:
-            return warningMsg(_("Unable to find the submission directory."), \
-                            req, c, ln)
+    ## Get the submission storage directory from the DB:
+    submission_dir = get_storage_directory_of_action(act)
+    if submission_dir:
+        indir = submission_dir
+    else:
+        ## Unable to determine the submission-directory:
+        return warningMsg(_("Unable to find the submission directory."), \
+                        req, c, ln)
 
     # The following words are reserved and should not be used as field names
     reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \
@@ -1016,7 +1023,6 @@ def endaction(req,
           act = act,
           docname = docname,
           actname = actname,
-          indir = indir,
           mainmenu = mainmenu,
           finished = finished,
           function_content = function_content,
@@ -1030,7 +1036,7 @@ def endaction(req,
     p_navtrail = '<a href="/submit?ln='+ln+'" class="navtrail">' + _("Submit") +\
                  """</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" class="navtrail">%(docname)s</a>""" % {
                    'doctype' : quote_plus(doctype),
-                   'docname' : escape(docname),
+                   'docname' : escape(str(docname)),
                    'ln' : ln,
                  }
     return page(title= actname,
@@ -1265,7 +1271,7 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     doctype_details = get_doctype_details(doctype)
     if doctype_details is None:
         ## Doctype doesn't exist - raise error:
-        return errorMsg (_("Unable to find document type.") + str(doctype), req)
+        return warningMsg(_("Unable to find document type: %s") % escape(str(doctype)), req, c, ln)
     else:
         docFullDesc  = doctype_details[0]
         docShortDesc = doctype_details[1]

@@ -406,7 +406,7 @@ class Template:
 
         return """<center><font color="red">%s</font></center>""" % msg
 
-    def tmpl_page_interface(self, ln, docname, actname, curpage, nbpages, file, nextPg, access, nbPg, doctype, act, indir, fields, javascript, mainmenu):
+    def tmpl_page_interface(self, ln, docname, actname, curpage, nbpages, file, nextPg, access, nbPg, doctype, act, fields, javascript, mainmenu):
         """
         Produces a page with the specified fields (in the submit chain)
 
@@ -431,8 +431,6 @@ class Template:
           - 'access' *string* - The submission number
 
           - 'nbPg' *string* - ??
-
-          - 'indir' *string* - the directory of submitting
 
           - 'fields' *array* - the fields to display in the page, with each record having the structure:
 
@@ -492,7 +490,7 @@ class Template:
         out += """        <td class="submitEmptyPage">&nbsp;&nbsp;
                         </td></tr></table>
                     </td>
-                    <td class="submitHeader" align="right">&nbsp;<a href="" onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>
+                    <td class="submitHeader" align="right">&nbsp;<a href="" onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>
                   </tr>
                   <tr><td colspan="5" class="submitHeader">
                     <table border="0" cellspacing="0" cellpadding="15" width="100%%" class="submitBody"><tr><td>
@@ -504,21 +502,19 @@ class Template:
                      <input type="hidden" name="nbPg" value="%(nbPg)s" />
                      <input type="hidden" name="doctype" value="%(doctype)s" />
                      <input type="hidden" name="act" value="%(act)s" />
-                     <input type="hidden" name="indir" value="%(indir)s" />
                      <input type="hidden" name="mode" value="U" />
                      <input type="hidden" name="step" value="0" />
                      <input type="hidden" name="ln" value="%(ln)s" />
                 """ % {
                  'summary' : _("SUMMARY"),
-                 'doctype' : doctype,
-                 'act' : act,
-                 'access' : access,
-                 'indir' : indir,
-                 'file' : file,
-                 'nextPg' : nextPg,
-                 'curpage' : curpage,
-                 'nbPg' : nbPg,
-                 'ln' : ln,
+                 'doctype' : cgi.escape(doctype),
+                 'act' : cgi.escape(act),
+                 'access' : cgi.escape(access),
+                 'file' : cgi.escape(file),
+                 'nextPg' : cgi.escape(nextPg),
+                 'curpage' : cgi.escape(curpage),
+                 'nbPg' : cgi.escape(nbPg),
+                 'ln' : cgi.escape(ln),
                }
 
         for field in fields:
@@ -554,7 +550,7 @@ class Template:
         # Display the submission number
         out += """ <td class="submitHeader" align="center"><small>%(submission)s: %(access)s</small></td>\n""" % {
                 'submission' : _("Submission number") + '(1)',
-                'access' : access,
+                'access' : cgi.escape(access),
               }
         # Display the "next page" navigation arrow
         if int(curpage) != int(nbpages):
@@ -584,7 +580,7 @@ class Template:
                """ % {
                  'surequit' : _("Are you sure you want to quit this submission?"),
                  'back' : _("Back to main menu"),
-                 'mainmenu' : mainmenu,
+                 'mainmenu' : cgi.escape(mainmenu),
                  'images' : CFG_SITE_URL + '/img',
                  'take_note' : '(1) ' + _("This is your submission access number. It can be used to continue with an interrupted submission in case of problems."),
                  'explain_summary' : '(2) ' + _("Mandatory fields appear in red in the SUMMARY window."),
@@ -848,7 +844,7 @@ class Template:
         out += """</script>"""
         return out
 
-    def tmpl_page_endaction(self, ln, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, indir, mainmenu, finished, function_content, next_action):
+    def tmpl_page_endaction(self, ln, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, mainmenu, finished, function_content, next_action):
         """
         Produces the pages after all the fields have been submitted.
 
@@ -875,8 +871,6 @@ class Template:
           - 'nbPg' *string* - total number of pages
 
           - 'nbpages' *string* - number of pages (?)
-
-          - 'indir' *string* - the directory of submitting
 
           - 'file' *string* - ??
 
@@ -920,19 +914,19 @@ class Template:
                  <table cellspacing="0" cellpadding="0" border="0" width="100%%">
                  <tr><td class="submitEmptyPage">&nbsp;&nbsp;</td>
               """ % {
-                'file' : file,
-                'nextPg' : nextPg,
-                'startPg' : startPg,
-                'access' : access,
-                'curpage' : curpage,
-                'nbPg' : nbPg,
-                'doctype' : doctype,
-                'act' : act,
-                'docname' : docname,
-                'actname' : actname,
-                'indir' : indir,
-                'mainmenu' : mainmenu,
-                'ln' : ln,
+                'file' : cgi.escape(file),
+                'nextPg' : cgi.escape(nextPg),
+                'startPg' : cgi.escape(startPg),
+                'access' : cgi.escape(access),
+                'curpage' : cgi.escape(curpage),
+                'nbPg' : cgi.escape(nbPg),
+                'doctype' : cgi.escape(doctype),
+                'act' : cgi.escape(act),
+                'docname' : cgi.escape(docname),
+                'actname' : cgi.escape(actname),
+                'indir' : cgi.escape(indir),
+                'mainmenu' : cgi.escape(mainmenu),
+                'ln' : cgi.escape(ln),
               }
 
         if finished == 1:
@@ -952,11 +946,11 @@ class Template:
                       <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
                         'end_action' : _("end of action"),
                         'summary' : _("SUMMARY"),
-                        'doctype' : doctype,
-                        'act' : act,
-                        'access' : access,
-                        'indir' : indir,
-                        'ln' : ln,
+                        'doctype' : cgi.escape(doctype),
+                        'act' : cgi.escape(act),
+                        'access' : cgi.escape(access),
+                        'indir' : cgi.escape(indir),
+                        'ln' : cgi.escape(ln),
                       }
         out += """</tr>
                   <tr>
@@ -976,7 +970,7 @@ class Template:
             out += """<small>%(submission)s</small>&sup2;:
                       <small>%(access)s</small>""" % {
                         'submission' : _("Submission no"),
-                        'access' : access,
+                        'access' : cgi.escape(access),
                       }
         else:
             out += "&nbsp;\n"
@@ -996,7 +990,7 @@ class Template:
                            'surequit' : _("Are you sure you want to quit this submission?"),
                            'back' : _("Back to main menu"),
                            'images' : CFG_SITE_URL + '/img',
-                           'mainmenu' : mainmenu
+                           'mainmenu' : cgi.escape(mainmenu)
                            }
         else:
             out += """ <a href="%(mainmenu)s">
@@ -1004,7 +998,7 @@ class Template:
                        <br /><br />""" % {
                      'back' : _("Back to main menu"),
                      'images' : CFG_SITE_URL + '/img',
-                     'mainmenu' : mainmenu,
+                     'mainmenu' : cgi.escape(mainmenu),
                    }
 
         return out
