@@ -563,7 +563,7 @@ function onDeleteSelectedClick(){
     else{
       if (!toDelete[tag][fieldNumber])
 	toDelete[tag][fieldNumber] = [subfieldIndex];
-      else if (toDelete[tag][fieldNumber] == [])
+      else if (toDelete[tag][fieldNumber].length == 0)
 	// Entire field scheduled for the deletion.
 	return;
       else
