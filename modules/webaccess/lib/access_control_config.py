@@ -120,13 +120,13 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
 DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"\nallow apache_group "theses"'),
                   ('thesescurator', 'Theses collection curator', 'deny any'),
-                  ('bookcurator', 'Book collection curator', 'deny any'),
+                  ('referee_DEMOBOO_*', 'Book collection curator', 'deny any'),
                   ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'),
                   ('curator', 'Curator', 'deny any'),
                   ('basketusers', 'User who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
-                       ('dorian.gray@cds.cern.ch', 'bookcurator'),
+                       ('dorian.gray@cds.cern.ch', 'referee_DEMOBOO_*'),
                        ('balthasar.montague@cds.cern.ch', 'curator'),
                        ('romeo.montague@cds.cern.ch', 'restrictedpicturesviewer'),
                        ('romeo.montague@cds.cern.ch', 'thesescurator'),
@@ -199,12 +199,12 @@ DEF_DEMO_AUTHS = (
              ('photocurator', 'runwebcoll', -1, 0, {'collection': 'Pictures'}),
              ('restrictedpicturesviewer', 'viewrestrdoc', -1, 0, {'status': 'restricted_picture'}),
              ('thesesviewer', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
-             ('bookcurator', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
+             ('referee_DEMOBOO_*', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
              ('curator', 'runbibedit', -1, 1, {}),
              ('thesescurator', 'runbibedit', -1, 0, {'collection': 'Theses'}),
              ('thesescurator', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
              ('photocurator', 'runbibedit', -1, 0, {'collection': 'Pictures'}),
-             ('bookcurator', 'runbibedit', -1, 0, {'collection': 'Books'})
+             ('referee_DEMOBOO_*', 'runbibedit', -1, 0, {'collection': 'Books'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)

@@ -190,7 +190,7 @@ def interface(req,
         return warningMsg(_("Not enough information to go ahead with the submission."), req, c, ln)
 
     try:
-        assert(re.match('\d+_\d+', access))
+        assert(not access or re.match('\d+_\d+', access))
     except AssertionError:
         register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: doctype="%s", access="%s"' % (doctype, access))
         return warningMsg(_("Invalid parameters"), req, c, ln)
@@ -357,7 +357,7 @@ def interface(req,
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
-        elif hasattr(formfields,"filename") and formfields.filename is not None:
+        elif hasattr(formfields,"filename") and formfields.filename:
             dir_to_open = os.path.join(curdir, 'files', key)
             try:
                 assert(dir_to_open == os.path.abspath(dir_to_open))
@@ -635,7 +635,7 @@ def interface(req,
     p_navtrail = """<a href="/submit?ln=%(ln)s" class="navtrail">%(submit)s</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" class="navtrail">%(docname)s</a>&nbsp;""" % {
                    'submit'  : _("Submit"),
                    'doctype' : quote_plus(doctype),
-                   'docname' : escape(str(docname)),
+                   'docname' : docname,
                    'ln' : ln
                  }
     return page(title= actname,
@@ -750,7 +750,7 @@ def endaction(req,
         return warningMsg(_("Not enough information to go ahead with the submission."), req, c, ln)
 
     try:
-        assert(re.match('\d+_\d+', access))
+        assert(not access or re.match('\d+_\d+', access))
     except AssertionError:
         register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative:  doctype="%s", access="%s"' % (doctype, access))
         return warningMsg(_("Invalid parameters"), req, c, ln)
@@ -864,7 +864,7 @@ def endaction(req,
             fp.write(specialchars(value))
             fp.close()
         # the field is a file
-        elif hasattr(formfields, "filename") and formfields.filename is not None:
+        elif hasattr(formfields, "filename") and formfields.filename:
             dir_to_open = os.path.join(curdir, 'files', key)
             try:
                 assert(dir_to_open == os.path.abspath(dir_to_open))
@@ -1036,7 +1036,7 @@ def endaction(req,
     p_navtrail = '<a href="/submit?ln='+ln+'" class="navtrail">' + _("Submit") +\
                  """</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" class="navtrail">%(docname)s</a>""" % {
                    'doctype' : quote_plus(doctype),
-                   'docname' : escape(str(docname)),
+                   'docname' : docname,
                    'ln' : ln,
                  }
     return page(title= actname,

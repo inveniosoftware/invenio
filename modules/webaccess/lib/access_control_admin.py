@@ -1463,10 +1463,7 @@ def acc_find_possible_roles(name_action, arguments):
         return [id_superadmin]
 
     # create role string (add default value? roles='(raa.id_accROLE='def' or ')
-    str_roles = ''
-    for (role, ) in roles:
-        if str_roles: str_roles += ','
-        str_roles += '%s' % (role, )
+    str_roles = ','.join([role[0] for role in roles])
 
     # create dictionary with default values and replace entries from input arguments
     defdict = {}
@@ -1480,7 +1477,7 @@ def acc_find_possible_roles(name_action, arguments):
     params = []
     for key in defkeys:
         if str_args:
-            str_args += ' AND '
+            str_args += ' OR '
         str_args += """(arg.keyword = '%s' AND arg.value = '%s')""" % (key, defdict[key])
 
     if defkeys:
