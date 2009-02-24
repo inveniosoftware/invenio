@@ -626,10 +626,10 @@ class BibRecordDeleteFieldFromTest(unittest.TestCase):
         bibrecord.record_delete_field_from(self.rec, "100", 4)
         self.assertEqual(self.rec['100'], [([('a', 'Doe1, John')], ' ', ' ', '', 3)])
         bibrecord.record_delete_field_from(self.rec, "100", 3)
-        self.assertFalse(self.rec.has_key('100'))
+        self.failIf(self.rec.has_key('100'))
         bibrecord.record_delete_field_from(self.rec, "001", 1)
         bibrecord.record_delete_field_from(self.rec, "245", 6)
-        self.assertFalse(self.rec.has_key('001'))
+        self.failIf(self.rec.has_key('001'))
         self.assertEqual(self.rec['245'], [([('a', 'On the foo and bar1')], ' ', '1', '', 5)])
 
         # Some crash tests
