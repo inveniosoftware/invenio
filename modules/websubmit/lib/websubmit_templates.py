@@ -896,7 +896,6 @@ class Template:
           <input type="hidden" name="nbPg" value="%(nbPg)s" />
           <input type="hidden" name="doctype" value="%(doctype)s" />
           <input type="hidden" name="act" value="%(act)s" />
-          <input type="hidden" name="indir" value="%(indir)s" />
           <input type="hidden" name="fromdir" value="" />
           <input type="hidden" name="mainmenu" value="%(mainmenu)s" />
 
@@ -924,7 +923,6 @@ class Template:
                 'act' : cgi.escape(act),
                 'docname' : cgi.escape(docname),
                 'actname' : cgi.escape(actname),
-                'indir' : cgi.escape(indir),
                 'mainmenu' : cgi.escape(mainmenu),
                 'ln' : cgi.escape(ln),
               }
@@ -943,13 +941,12 @@ class Template:
                 out += """<td class="submitPage"><small>&nbsp;
                             <a href='' onclick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;document.forms[0].submit();return false;">%s</a>&nbsp;</small></td>""" % (i,i)
             out += """<td class="submitCurrentPage">%(end_action)s</td><td class="submitEmptyPage">&nbsp;&nbsp;</td></tr></table></td>
-                      <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
+                      <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
                         'end_action' : _("end of action"),
                         'summary' : _("SUMMARY"),
                         'doctype' : cgi.escape(doctype),
                         'act' : cgi.escape(act),
                         'access' : cgi.escape(access),
-                        'indir' : cgi.escape(indir),
                         'ln' : cgi.escape(ln),
                       }
         out += """</tr>
