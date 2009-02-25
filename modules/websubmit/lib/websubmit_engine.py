@@ -96,7 +96,6 @@ def interface(req,
               access="",
               mainmenu="",
               fromdir="",
-              file="",
               nextPg="",
               nbPg="",
               curpage=1):
@@ -146,7 +145,6 @@ def interface(req,
         home stem) for the submission's home-page. (E.g. If this submission
         is "PICT", the "mainmenu" file would contain "/submit?doctype=PICT".
        @param fromdir: (integer)
-       @param file: (string)
        @param nextPg: (string)
        @param nbPg: (string)
        @param curpage: (integer) - the current submission page number. Defaults
@@ -603,7 +601,6 @@ def interface(req,
           actname = actname,
           curpage = curpage,
           nbpages = nbpages,
-          file = file,
           nextPg = nextPg,
           access = access,
           nbPg = nbPg,
@@ -658,7 +655,6 @@ def endaction(req,
               access="",
               mainmenu="",
               fromdir="",
-              file="",
               nextPg="",
               nbPg="",
               curpage=1,
@@ -709,7 +705,6 @@ def endaction(req,
         home stem) for the submission's home-page. (E.g. If this submission
         is "PICT", the "mainmenu" file would contain "/submit?doctype=PICT".
        @param fromdir:
-       @param file:
        @param nextPg:
        @param nbPg:
        @param curpage: (integer) - the current submission page number. Defaults
@@ -1012,7 +1007,6 @@ def endaction(req,
     t = websubmit_templates.tmpl_page_endaction(
           ln = ln,
           # these fields are necessary for the navigation
-          file = file,
           nextPg = nextPg,
           startPg = startPg,
           access = access,

@@ -406,7 +406,7 @@ class Template:
 
         return """<center><font color="red">%s</font></center>""" % msg
 
-    def tmpl_page_interface(self, ln, docname, actname, curpage, nbpages, file, nextPg, access, nbPg, doctype, act, fields, javascript, mainmenu):
+    def tmpl_page_interface(self, ln, docname, actname, curpage, nbpages, nextPg, access, nbPg, doctype, act, fields, javascript, mainmenu):
         """
         Produces a page with the specified fields (in the submit chain)
 
@@ -495,7 +495,6 @@ class Template:
                   <tr><td colspan="5" class="submitHeader">
                     <table border="0" cellspacing="0" cellpadding="15" width="100%%" class="submitBody"><tr><td>
                      <br />
-                     <input type="hidden" name="file" value="%(file)s" />
                      <input type="hidden" name="nextPg" value="%(nextPg)s" />
                      <input type="hidden" name="access" value="%(access)s" />
                      <input type="hidden" name="curpage" value="%(curpage)s" />
@@ -510,7 +509,6 @@ class Template:
                  'doctype' : cgi.escape(doctype),
                  'act' : cgi.escape(act),
                  'access' : cgi.escape(access),
-                 'file' : cgi.escape(file),
                  'nextPg' : cgi.escape(nextPg),
                  'curpage' : cgi.escape(curpage),
                  'nbPg' : cgi.escape(nbPg),
@@ -844,7 +842,7 @@ class Template:
         out += """</script>"""
         return out
 
-    def tmpl_page_endaction(self, ln, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, mainmenu, finished, function_content, next_action):
+    def tmpl_page_endaction(self, ln, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, mainmenu, finished, function_content, next_action):
         """
         Produces the pages after all the fields have been submitted.
 
@@ -872,7 +870,6 @@ class Template:
 
           - 'nbpages' *string* - number of pages (?)
 
-          - 'file' *string* - ??
 
           - 'mainmenu' *string* - the url of the main menu
 
@@ -888,7 +885,6 @@ class Template:
 
         out = """
           <form ENCTYPE="multipart/form-data" action="/submit" method="post">
-          <input type="hidden" name="file" value="%(file)s" />
           <input type="hidden" name="nextPg" value="%(nextPg)s" />
           <input type="hidden" name="startPg" value="%(startPg)s" />
           <input type="hidden" name="access" value="%(access)s" />
@@ -913,7 +909,6 @@ class Template:
                  <table cellspacing="0" cellpadding="0" border="0" width="100%%">
                  <tr><td class="submitEmptyPage">&nbsp;&nbsp;</td>
               """ % {
-                'file' : cgi.escape(file),
                 'nextPg' : cgi.escape(nextPg),
                 'startPg' : cgi.escape(startPg),
                 'access' : cgi.escape(access),
