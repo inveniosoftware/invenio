@@ -82,7 +82,8 @@ if parser == -1 and \
 
 def create_records(xmltext,
                    verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
-                   correct=CFG_BIBRECORD_DEFAULT_CORRECT):
+                   correct=CFG_BIBRECORD_DEFAULT_CORRECT,
+                   force_parser=None):
     """
     Create list of record from XMLTEXT.  Return a list of objects
     initiated by create_record() function; please see that function's
@@ -98,8 +99,8 @@ def create_records(xmltext,
         p = re.compile(pat, re.DOTALL) # DOTALL - to ignore whitespaces
         alist = p.findall(xmltext)
 
-        listofrec = map((lambda x:create_record(x, verbose, correct)),
-                        alist)
+        listofrec = map((lambda x:create_record(x, verbose, correct,
+            force_parser)), alist)
         return listofrec
     return []
 
@@ -109,7 +110,8 @@ def create_records(xmltext,
 
 def create_record(xmltext,
                   verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
-                  correct=CFG_BIBRECORD_DEFAULT_CORRECT):
+                  correct=CFG_BIBRECORD_DEFAULT_CORRECT,
+                  force_parser=None):
     """
     Create a record object from XMLTEXT and return it.
 
@@ -151,8 +153,12 @@ def create_record(xmltext,
     """
     global parser, err
 
+    if not force_parser:
+        # If the parser is not specified, use the best parser available.
+        force_parser = parser
+
     try:
-        if parser == 2:
+        if force_parser == 2:
             ## the following is because of DTD validation
             if correct:
                 ## Note that with pyRXP < 1.13 a memory leak
@@ -166,9 +172,9 @@ def create_record(xmltext,
                 t += "</collection>"
                 xmltext = t
             (rec, er) = create_record_RXP(xmltext, verbose, correct)
-        elif parser == 1:
+        elif force_parser == 1:
             (rec, er) = create_record_4suite(xmltext, verbose, correct)
-        elif parser == 0:
+        elif force_parser == 0:
             (rec, er) = create_record_minidom(xmltext, verbose, correct)
         else:
             (rec, er) = (None, "ERROR: No usable XML parsers found.")
@@ -944,6 +950,15 @@ def create_record_minidom(xmltext,
     dom = parseString(xmltext)
     root = dom.childNodes[0]
 
+    if root.tagName == 'collection':
+        record_nodes = [child
+                       for child in root.childNodes
+                       if child.nodeName == 'record']
+        if record_nodes:
+            root = record_nodes[0]
+        else:
+            return ({}, "No records were found")
+
     for controlfield in get_childs_by_tag_name(root, "controlfield"):
         s = controlfield.getAttribute("tag")
 
@@ -1016,6 +1031,15 @@ def create_record_4suite(xmltext,
     dom = NonvalidatingReader.parseString(xmltext, "urn:dummy")
 
     root = dom.childNodes[0]
+
+    if root.tagName == 'collection':
+        record_nodes = [child
+                       for child in root.childNodes
+                       if child.nodeName == 'record']
+        if record_nodes:
+            root = record_nodes[0]
+        else:
+            return ({}, "No records were found")
 
     ord = 1
     for controlfield in get_childs_by_tag_name(root, "controlfield"):

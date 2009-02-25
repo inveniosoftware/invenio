@@ -100,6 +100,22 @@ class BibRecordSuccessTest(unittest.TestCase):
             ret.append(rec)
         self.assertEqual(fields, cr)
 
+    def test_create_record_with_collection_tag(self):
+        """ bibrecord - create_record() for single record in collection"""
+        xmltext = """
+        <collection>
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        </record>
+        </collection>
+        """
+        record = bibrecord.create_record(xmltext)
+        record1 = bibrecord.create_records(xmltext)[0]
+        self.assertEqual(record1, record)
+
 class BibRecordBadInputTreatmentTest(unittest.TestCase):
     """ bibrecord - testing for bad input treatment """
     def test_wrong_attribute(self):
