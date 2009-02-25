@@ -324,7 +324,13 @@ def cli_cmd_update_web_tests(conf):
                                          conf.get("Invenio", 'CFG_SITE_URL'),
                                          match.group(2))
                 else:
-                    out += line
+                    match = re.search(r'^(.*<td>)/opt/cds-invenio(.*)$', line)
+                    if match:
+                        out += "%s%s%s\n" % (match.group(1),
+                                            conf.get("Invenio", 'CFG_PREFIX'),
+                                            match.group(2))
+                    else:
+                        out += line
             fdesc = open(testfile, 'w')
             fdesc.write(out)
             fdesc.close()
