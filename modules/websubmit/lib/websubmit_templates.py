@@ -916,8 +916,8 @@ class Template:
                 'nbPg' : cgi.escape(nbPg),
                 'doctype' : cgi.escape(doctype),
                 'act' : cgi.escape(act),
-                'docname' : cgi.escape(docname),
-                'actname' : cgi.escape(actname),
+                'docname' : docname,
+                'actname' : actname,
                 'mainmenu' : cgi.escape(mainmenu),
                 'ln' : cgi.escape(ln),
               }
