@@ -41,7 +41,9 @@ def Update_Approval_DB(parameters, curdir, form, user_info=None):
     except KeyError:
         decision_filename = ""
 
-    access = "%s%s" % (time.time(),os.getpid())
+    pid = os.getpid()
+    now = time.time()
+    access = "%i_%s" % (now,pid)
     if act != "APP":
         # retrieve category
         if re.search("<FILE:",categformat):
