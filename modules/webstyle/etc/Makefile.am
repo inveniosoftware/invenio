@@ -19,7 +19,8 @@ jsmathwebdir=$(localstatedir)/www/jsMath/easy
 jsmathweb_DATA=invenio-jsmath.js
 
 fckeditorwebdir=$(localstatedir)/www/fckeditor
-fckeditorweb_DATA=invenio-fckeditor-config.js
+fckeditorweb_DATA=invenio-fckeditor-config.js journal-editor-config.js \
+                  journal-editor-styles.xml journal-editor-templates.xml
 
 EXTRA_DIST = $(jsmathweb_DATA)$(fckeditorweb_DATA)
 

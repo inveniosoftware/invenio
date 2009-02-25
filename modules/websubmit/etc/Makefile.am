@@ -9,7 +9,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,7 +20,8 @@ submission_templates_DATA = DEMOPIC.tpl DEMOPICcreate.tpl DEMOPICmodify.tpl \
            DEMOTHE.tpl DEMOTHEcreate.tpl DEMOTHEmodify.tpl \
            DEMOART.tpl DEMOARTcreate.tpl DEMOARTmodify.tpl \
            DEMOPOE.tpl DEMOPOEcreate.tpl DEMOPOEmodify.tpl \
-           DEMOBOO.tpl DEMOBOOcreate.tpl DEMOBOOmodify.tpl
+           DEMOBOO.tpl DEMOBOOcreate.tpl DEMOBOOmodify.tpl \
+           DEMOJRN.tpl DEMOJRNcreate.tpl DEMOJRNmodify.tpl
 
 stamper_templatesdir = $(sysconfdir)/websubmit/file_stamper_templates
 stamper_templates_DATA = demo-stamp-left.tex demo-stamp-left-logo.png

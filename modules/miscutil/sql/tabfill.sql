@@ -407,6 +407,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Upload_Files','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('User_is_Record_Owner_or_Curator','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Files_to_Storage','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Make_Dummy_MARC_XML_Record','');
+INSERT INTO sbmALLFUNCDESCR VALUES ('Move_FCKeditor_Files_to_Storage','Transfer files attached to the record with the FCKeditor');
 
 INSERT INTO sbmCHECKS VALUES ('AUCheck','function AUCheck(txt) {\r\n	var res=1;\r\n	tmp=txt.indexOf(\"\\015\");\r\n	while (tmp != -1) {\r\n		left=txt.substring(0,tmp);\r\n		right=txt.substring(tmp+2,txt.length);\r\n		txt=left + \"\\012\" + right;\r\n		tmp=txt.indexOf(\"\\015\");\r\n	}\r\n	tmp=txt.indexOf(\"\\012\");\r\n	if (tmp==-1){\r\n		line=txt;\r\n		txt=\'\';}\r\n	else{\r\n		line=txt.substring(0,tmp);\r\n		txt=txt.substring(tmp+1,txt.length);}\r\n	while (line != \"\"){\r\n		coma=line.indexOf(\",\");\r\n		left=line.substring(0,coma);\r\n		right=line.substring(coma+1,line.length);\r\n		coma2=right.indexOf(\",\");\r\n		space=right.indexOf(\" \");\r\n		if ((coma==-1)||(left==\"\")||(right==\"\")||(space!=0)||(coma2!=-1)){\r\n			res=0;\r\n			error_log=line;\r\n		}\r\n		tmp=txt.indexOf(\"\\012\");\r\n		if (tmp==-1){\r\n			line=txt;\r\n			txt=\'\';}\r\n		else{\r\n			line=txt.substring(0,tmp-1);\r\n			txt=txt.substring(tmp+1,txt.length);}\r\n	}\r\n	if (res == 0){\r\n		alert(\"This author name cannot be managed \\: \\012\\012\" + error_log + \" \\012\\012It is not in the required format!\\012Put one author per line and a comma (,) between the name and the firstname initial letters. \\012The name is going first, followed by the firstname initial letters.\\012Do not forget the whitespace after the comma!!!\\012\\012Example \\: Put\\012\\012Le Meur, J Y \\012Baron, T \\012\\012for\\012\\012Le Meur Jean-Yves & Baron Thomas.\");\r\n		return 0;\r\n	}	\r\n	return 1;	\r\n}','1998-08-18','0000-00-00','','');
 INSERT INTO sbmCHECKS VALUES ('DatCheckNew','function DatCheckNew(txt) {\r\n	var res=1;\r\n	if (txt.length != 10){res=0;}\r\n	if (txt.indexOf(\"/\") != 2){res=0;}\r\n	if (txt.lastIndexOf(\"/\") != 5){res=0;}\r\n	tmp=parseInt(txt.substring(0,2),10);\r\n	if ((tmp > 31)||(tmp < 1)||(isNaN(tmp))){res=0;}\r\n	tmp=parseInt(txt.substring(3,5),10);\r\n	if ((tmp > 12)||(tmp < 1)||(isNaN(tmp))){res=0;}\r\n	tmp=parseInt(txt.substring(6,10),10);\r\n	if ((tmp < 1)||(isNaN(tmp))){res=0;}\r\n	if (txt.length  == 0){res=1;}\r\n	if (res == 0){\r\n		alert(\"Please enter a correct Date \\012Format: dd/mm/yyyy\");\r\n		return 0;\r\n	}\r\n	return 1;	\r\n}','0000-00-00','0000-00-00','','');
@@ -513,6 +514,7 @@ INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_templ
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_template_vars');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','new_file_name');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','stamp');
+INSERT INTO sbmFUNDESC VALUES ('Move_FCKeditor_Files_to_Storage','input_fields');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
