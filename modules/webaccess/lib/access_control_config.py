@@ -170,6 +170,7 @@ DEF_ACTIONS = (
                ('viewcomment', 'view comments', 'collection', 'no'),
                ('sendcomment', 'send comments', 'collection', 'no'),
                ('attachcommentfile', 'attach files to comments', 'collection', 'no'),
+               ('attachsubmissionfile', 'upload files to drop box during submission', '', 'no'),
                ('cfgbibexport', 'configure BibExport', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
                ('fulltext', 'administrate Fulltext', '', 'no'),

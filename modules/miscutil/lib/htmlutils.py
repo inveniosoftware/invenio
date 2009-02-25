@@ -310,12 +310,6 @@ custom_configurations_path - *str* value for the FCKeditor config
         oFCKeditor.BasePath = '/fckeditor/'
         oFCKeditor.Config["CustomConfigurationsPath"] = custom_configurations_path
 
-        # Though not recommended, it is much better that users gets a
-        # <br/> when pressing carriage return than a <p> element. Then
-        # when a user replies to a webcomment without the FCKeditor,
-        # line breaks are nicely displayed.
-        oFCKeditor.Config["EnterMode"] = 'br'
-
         if file_upload_url is not None:
             oFCKeditor.Config["LinkUploadURL"] = file_upload_url
             oFCKeditor.Config["ImageUploadURL"] = file_upload_url + '%3Ftype%3DImage'
@@ -340,10 +334,6 @@ custom_configurations_path - *str* value for the FCKeditor config
         #toolbar_set_js_repr = repr(toolbar_set) + ';'
         #oFCKeditor.Config["ToolbarSets"] = {}
         #oFCKeditor.Config['ToolbarSets["Default"]'] = toolbar_set_js_repr
-
-        # Set the CSS used by Invenio, so that it is also applied
-        # inside the editor
-        oFCKeditor.Config["EditorAreaCSS"] = CFG_SITE_URL + '/img/cds.css'
 
         oFCKeditor.Value = content
         oFCKeditor.Height = height

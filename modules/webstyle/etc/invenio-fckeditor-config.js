@@ -21,3 +21,13 @@ FCKConfig.ToolbarSets["WebComment"] = [
 ['Link','Unlink'],
 ['Image','Table','Rule','Smiley','SpecialChar']
 ] ;
+
+
+FCKConfig.EditorAreaCSS = '/img/cds.css'
+
+/* Though not recommended, it is much better that users gets a
+   <br/> when pressing carriage return than a <p> element. Then
+   when a user replies to a webcomment without the FCKeditor,
+   line breaks are nicely displayed.
+*/
+FCKConfig.EnterMode = 'br'
