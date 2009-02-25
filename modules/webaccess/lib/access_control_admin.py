@@ -33,7 +33,13 @@ from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
 from sets import Set
+from invenio.intbitset import intbitset
 
+id_tmp = run_sql('SELECT id FROM accROLE WHERE name=%s', (SUPERADMINROLE, ))
+if id_tmp:
+    CFG_SUPERADMINROLE_ID = int(id_tmp[0][0])
+else:
+    CFG_SUPERADMINROLE_ID = 0
 
 # ACTIONS
 
@@ -1276,7 +1282,7 @@ def acc_is_user_in_role(user_info, id_role):
     if run_sql("""SELECT ur.id_accROLE
             FROM user_accROLE ur
             WHERE ur.id_user = %s AND ur.expiration >= NOW() AND
-            ur.id_accROLE = %s""", (user_info['uid'], id_role)):
+            ur.id_accROLE = %s LIMIT 1""", (user_info['uid'], id_role), 1):
         return True
 
     return acc_firerole_check_user(user_info, load_role_definition(id_role))
@@ -1433,119 +1439,26 @@ def acc_find_possible_actions_argument_listid(id_role, id_action, arglistid):
 def acc_find_possible_roles(name_action, arguments):
     """Find all the possible roles that are enabled to action_name with
     given arguments. roles is a list of role_id
-
-    FIXME: this function is still broken...
     """
-
-    id_superadmin = acc_get_role_id(SUPERADMINROLE)
-
-    query1 = """select a.id, a.allowedkeywords, a.optional
-                from accACTION a
-                where a.name = %s"""
-
-    try:
-        id_action, aallowedkeywords, optional = run_sql_cached(query1, (name_action,),  affected_tables=['accACTION'])[0]
-    except IndexError:
-        return []
-
-    defkeys = [key for key in aallowedkeywords.split(',') if key]
-    # There's a trick to remove empty key
-
-    for key in arguments.keys():
-        if key not in defkeys:
-            raise StandardError, "Incorrect arguments"
-
-    roles = run_sql_cached("""SELECT id_accROLE FROM
-            accROLE_accACTION_accARGUMENT
-            WHERE id_accACTION = %s""", (id_action, ), affected_tables=['accROLE_accACTION_accARGUMENT'])
-
-    if not roles:
-        return [id_superadmin]
-
-    # create role string (add default value? roles='(raa.id_accROLE='def' or ')
-    str_roles = ','.join([role[0] for role in roles])
-
-    # create dictionary with default values and replace entries from input arguments
-    defdict = {}
-
-    ## FIXME: this function should correctly analyse optional arguments.
-    for key in defkeys:
-        defdict[key] = arguments.get(key)
-
-    # create or-string from arguments
-    str_args = ''
-    params = []
-    for key in defkeys:
-        if str_args:
-            str_args += ' OR '
-        str_args += """(arg.keyword = '%s' AND arg.value = '%s')""" % (key, defdict[key])
-
-    if defkeys:
-        query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
-                raa.id_accARGUMENT, arg.keyword, arg.value
-                FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
-                WHERE raa.id_accACTION = '%s' AND
-                raa.id_accROLE IN (%s) AND
-                (%s) AND
-                raa.id_accARGUMENT = arg.id """ % (id_action, str_roles, str_args)
-    else:
-        query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
-                raa.id_accARGUMENT, arg.keyword, arg.value
-                FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
-                WHERE raa.id_accACTION = '%s' AND
-                raa.id_accROLE IN (%s) AND
-                raa.id_accARGUMENT = arg.id """ % (id_action, str_roles)
-
-
-    res4 = run_sql_cached(query4, affected_tables=['accROLE_accACTION_accARGUMENT', 'accARGUMENT', 'accROLE'])
-
-    # CHECK WITH MORE THAN 1 ARGUMENT
-
-    cur_role = cur_action = cur_arglistid = 0
-
-    booldict = {}
-    for key in defkeys:
-        booldict[key] = 0
-
-    res4 = list(res4)
-    res4.sort()
-
-    # run through the results
-
-    results = []
-
-    go_to_next_role = False
-    for (role, action, arglistid, arg, keyword, val) in res4 + [(-1, -1, -1, -1, -1, -1)]:
-        # not the same role or argumentlist (authorization group), i.e. check if thing are satisfied
-        # if cur_arglistid != arglistid or cur_role != role or cur_action != action:
-        if go_to_next_role:
-            if (cur_role == role):
-                cur_arglistid, cur_role, cur_action = arglistid, role, action
-                continue
-            else:
-                go_to_next_role = False
-        if (cur_arglistid, cur_role, cur_action) != (arglistid, role, action):
-            # test if all keywords are satisfied
-            for value in booldict.values():
-                if not value:
-                    go_to_next_role = True
-                    continue
-            else:
-                results.append(cur_role)
-
-            # assign the values for the current tuple from the query
-            cur_arglistid, cur_role, cur_action = arglistid, role, action
-
-            for key in booldict.keys():
-                booldict[key] = 0
-
-        # set keyword qualified for the action, (whatever result of the test)
-        booldict[keyword] = 1
-
-    if id_superadmin not in results[1:]:
-        return results[1:] + [id_superadmin]
-    else:
-        return results[1:]
+    id_action = acc_get_action_id(name_action)
+    roles = intbitset(run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0", (id_action, )))
+    roles.add(CFG_SUPERADMINROLE_ID)
+    other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ))
+    other_roles_to_check_dict = {}
+    for id_accROLE, keyword, value, argumentlistid in other_roles_to_check:
+        if id_accROLE not in roles:
+            try:
+                other_roles_to_check_dict[(id_accROLE, argumentlistid)][keyword] = value
+            except KeyError:
+                other_roles_to_check_dict[(id_accROLE, argumentlistid)] = {keyword : value}
+    for ((id_accROLE, argumentlistid), stored_arguments) in other_roles_to_check_dict.iteritems():
+        for key, value in stored_arguments.iteritems():
+            if arguments.get(key, '*') != value != '*':
+                break
+        else:
+            roles.add(id_accROLE)
+    roles.add(CFG_SUPERADMINROLE_ID)
+    return roles
 
 def acc_find_possible_actions_user_from_user_info(user_info, id_action):
     """user based function to find all action combination for a given
