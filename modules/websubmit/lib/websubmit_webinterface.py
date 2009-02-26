@@ -638,7 +638,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
-                    'referer' : CFG_SITE_URL + req.unparsed_uri, 'ln' : args['ln']})))
+                    'referer' : CFG_SITE_URL + req.unparsed_uri, 'ln' : args['ln']}, {})))
 
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
                 return page_not_authorized(req, "../submit",
