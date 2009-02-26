@@ -1436,13 +1436,14 @@ def acc_find_possible_actions_argument_listid(id_role, id_action, arglistid):
     # return this list
     return res2
 
-def acc_find_possible_roles(name_action, arguments):
+def acc_find_possible_roles(name_action, always_add_superadmin=True, **arguments):
     """Find all the possible roles that are enabled to action_name with
     given arguments. roles is a list of role_id
     """
     id_action = acc_get_action_id(name_action)
     roles = intbitset(run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0", (id_action, )))
-    roles.add(CFG_SUPERADMINROLE_ID)
+    if always_add_superadmin:
+        roles.add(CFG_SUPERADMINROLE_ID)
     other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ))
     other_roles_to_check_dict = {}
     for id_accROLE, keyword, value, argumentlistid in other_roles_to_check:
@@ -1453,11 +1454,10 @@ def acc_find_possible_roles(name_action, arguments):
                 other_roles_to_check_dict[(id_accROLE, argumentlistid)] = {keyword : value}
     for ((id_accROLE, argumentlistid), stored_arguments) in other_roles_to_check_dict.iteritems():
         for key, value in stored_arguments.iteritems():
-            if arguments.get(key, '*') != value != '*':
+            if '*' != arguments.get(key, '*') != value:
                 break
         else:
             roles.add(id_accROLE)
-    roles.add(CFG_SUPERADMINROLE_ID)
     return roles
 
 def acc_find_possible_actions_user_from_user_info(user_info, id_action):

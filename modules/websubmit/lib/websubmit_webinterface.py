@@ -49,7 +49,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
-from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info, isUserSuperAdmin
+from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info, isUserSuperAdmin, isGuestUser
 from invenio.websubmit_config import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
@@ -375,7 +375,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                          user_files_absolute_path = user_files_absolute_path)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = acc_authorize_action(user_info,'attachsubmissionfile')
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'attachsubmissionfile')
         if user_info['email'] == 'guest' and not user_info['apache_user']:
             # User is guest: must login prior to upload
             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
@@ -640,6 +640,12 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                    mode):
 
             uid = getUid(req)
+            if isGuestUser(uid):
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : CFG_SITE_URL + req.unparsed_uri, 'ln' : args['ln']})))
+
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
                 return page_not_authorized(req, "../submit",
                                            navmenuid='submit')

@@ -1062,16 +1062,15 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
         uid = getUid(req)
     except Error, e:
         return errorMsg(e, req, c, ln)
-    # start display:
-    req.content_type = "text/html"
-    req.send_http_header()
 
     # load the right message language
     _ = gettext_set_language(ln)
 
+    user_info = collect_user_info(req)
+
     finaltext = websubmit_templates.tmpl_submit_home_page(
                     ln = ln,
-                    catalogues = makeCataloguesTable(ln)
+                    catalogues = makeCataloguesTable(user_info, ln)
                 )
 
     return page(title=_("Submit"),
@@ -1085,10 +1084,12 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
                navmenuid='submit'
                )
 
-def makeCataloguesTable(ln=CFG_SITE_LANG):
+def makeCataloguesTable(user_info, ln=CFG_SITE_LANG):
     """Build the 'catalogues' (submission-collections) tree for
        the WebSubmit home-page. This tree contains the links to
        the various document types in WebSubmit.
+       @param user_info: (dict) - the user information in order to decide
+        whether to display a submission.
        @param ln: (string) - the language of the interface.
         (defaults to 'CFG_SITE_LANG').
        @return: (string) - the submission-collections tree.
@@ -1103,7 +1104,7 @@ def makeCataloguesTable(ln=CFG_SITE_LANG):
         ## There are submission-collections attatched to the top level.
         ## retrieve their details for displaying:
         for child_collctn in top_level_collctns:
-            catalogues.append(getCatalogueBranch(child_collctn[0], 1))
+            catalogues.append(getCatalogueBranch(child_collctn[0], 1, user_info))
 
         text = websubmit_templates.tmpl_submit_home_catalogs(
                  ln=ln,
@@ -1113,7 +1114,7 @@ def makeCataloguesTable(ln=CFG_SITE_LANG):
         text = websubmit_templates.tmpl_submit_home_catalog_no_content(ln=ln)
     return text
 
-def getCatalogueBranch(id_father, level):
+def getCatalogueBranch(id_father, level, user_info):
     """Build up a given branch of the submission-collection
        tree. I.e. given a parent submission-collection ID,
        build up the tree below it. This tree will include
@@ -1124,6 +1125,8 @@ def getCatalogueBranch(id_father, level):
         from which to begin building the branch.
        @param level: (integer) - the level of the current submission-
         collection branch.
+       @param user_info: (dict) - the user information in order to decide
+        whether to display a submission.
        @return: (dictionary) - the branch and its sub-branches.
     """
     elem = {} ## The dictionary to contain this branch of the tree.
@@ -1146,14 +1149,15 @@ def getCatalogueBranch(id_father, level):
     doctype_children = \
        get_doctype_children_of_submission_collection(id_father)
     for child_doctype in doctype_children:
-        elem['docs'].append(getDoctypeBranch(child_doctype[0]))
+        if acc_authorize_action(user_info, 'submit', authorized_if_no_roles=True, doctype=child_doctype[0])[0] == 0:
+            elem['docs'].append(getDoctypeBranch(child_doctype[0]))
 
     ## Now, get the collection-children of this submission-collection:
     elem['sons'] = []
     collctn_children = \
          get_collection_children_of_submission_collection(id_father)
     for child_collctn in collctn_children:
-        elem['sons'].append(getCatalogueBranch(child_collctn[0], level + 1))
+        elem['sons'].append(getCatalogueBranch(child_collctn[0], level + 1), user_info)
 
     ## Now return this branch of the built-up 'collection-tree':
     return elem

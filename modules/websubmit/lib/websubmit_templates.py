@@ -80,11 +80,7 @@ class Template:
                     <table width="100%%">
                     <tr>
                         <td width="50%%" class="narrowsearchboxbody">
-                          <form method="get" action="/submit">
-                            <input type="hidden" name="doctype" />
-                            <input type="hidden" name="ln" value="%(ln)s" />
-                              %(catalogues)s
-                          </form>
+                            %(catalogues)s
                         </td>
                     </tr>
                     </table>
@@ -188,10 +184,10 @@ class Template:
             out = "<li><font size=\"+1\"><strong>%s</strong></font>\n" % catalog['name']
         else:
             if catalog['level'] == 2:
-                out = "<li>%s\n" % catalog['name']
+                out = "<li>%s\n" % cgi.escape(catalog['name'])
             else:
                 if catalog['level'] > 2:
-                    out = "<li>%s\n" % catalog['name']
+                    out = "<li>%s\n" % cgi.escape(catalog['name'])
 
         if len(catalog['docs']) or len(catalog['sons']):
             out += "<ul>\n"
@@ -227,7 +223,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        return """<li><a href="" onclick="document.forms[0].doctype.value='%(id)s';document.forms[0].submit();return false;">%(name)s</a></li>""" % doc
+        return """<li>%s</li>""" % create_html_link('%s/submit' % CFG_SITE_URL, {'doctype' : doc['id'], 'ln' : ln}, doc['name'])
 
     def tmpl_action_page(self, ln, uid, guest, pid, now, doctype,
                          description, docfulldesc, snameCateg,

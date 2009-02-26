@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql_cached
-from invenio.access_control_admin import acc_find_possible_roles, acc_is_user_in_role
+from invenio.access_control_admin import acc_find_possible_roles, acc_is_user_in_role, CFG_SUPERADMINROLE_ID
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 from invenio.webuser import collect_user_info
 from invenio.access_control_firerole import acc_firerole_suggest_apache_p, deserialize
@@ -40,7 +40,7 @@ def make_list_apache_firerole(name_action, arguments):
     action with these arguments, and whose FireRole definition expect
     an Apache Password membership.
     """
-    roles = acc_find_possible_roles(name_action, arguments)
+    roles = acc_find_possible_roles(name_action, **arguments)
 
     ret = []
 
@@ -87,15 +87,32 @@ def make_apache_message(name_action, arguments, referer=None):
     else:
         return ""
 
-def acc_authorize_action(req, name_action, **arguments):
+def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **arguments):
     """
     Given the request object (or the user_info dictionary, or the uid), checks
     if the user is allowed to run name_action with the given parameters.
+    If authorized_if_no_roles is True and no role exists (different
+    than superadmin) that are authorized to execute the given action, the
+    authorization will be granted.
     Returns (0, msg) when the authorization is granted, (1, msg) when it's not.
     """
     user_info = collect_user_info(req)
-    roles = acc_find_possible_roles(name_action, arguments)
+    roles = acc_find_possible_roles(name_action, always_add_superadmin=False, **arguments)
     for id_role in roles:
         if acc_is_user_in_role(user_info, id_role):
+            ## User belong to at least one authorized role.
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+    if acc_is_user_in_role(user_info, CFG_SUPERADMINROLE_ID):
+        ## User is SUPERADMIN
+        return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+    if not roles:
+        ## No role is authorized for the given action/arguments
+        if authorized_if_no_roles:
+            ## User is authorized because no authorization exists for the given
+            ## action/arguments
+            return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+        else:
+            ## User is not authorized.
+            return (20, CFG_WEBACCESS_WARNING_MSGS[20] % name_action)
+    ## User is not authorized
     return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (CFG_CALLED_FROM_APACHE and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info['uri'])))

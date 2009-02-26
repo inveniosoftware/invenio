@@ -100,7 +100,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, order="", doctype="", deletedI
                 navmenuid='yourapprovals')
 
 def isReferee(req, doctype="", categ="*"):
-    (auth_code, auth_message) = acc_authorize_action(req, "referee", verbose=0, doctype=doctype, categ=categ)
+    (auth_code, auth_message) = acc_authorize_action(req, "referee", doctype=doctype, categ=categ)
     if auth_code == 0:
         return 1
     else:
@@ -108,11 +108,7 @@ def isReferee(req, doctype="", categ="*"):
 
 def isRefereed(doctype, categ="*"):
     """Check if the given doctype, categ is refereed by at least a role. different than SUPERADMINROLE"""
-    roles = acc_find_possible_roles('referee', {'doctype': doctype, 'categ': categ})
-    try:
-        roles.remove(acc_get_role_id(SUPERADMINROLE))
-    except ValueError:
-        pass
+    roles = acc_find_possible_roles('referee', always_add_superadmin=False, doctype=doctype, categ=categ)
     if roles:
         return True
     return False
