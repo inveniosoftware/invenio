@@ -3362,12 +3362,12 @@ def cleanstring(txt='', comma=0):
 
 def cleanstring_argumentvalue(txt=''):
     """clean the value of an argument before submitting it.
-    allowed characters: a-z A-Z 0-9 _ and space
+    allowed characters: a-z A-Z 0-9 _ * and space
 
     txt - string to be cleaned """
 
     # remove not allowed characters
-    txt = re.sub(r'[^a-zA-Z0-9_ .]', '', txt)
+    txt = re.sub(r'[^a-zA-Z0-9_ *.]', '', txt)
     # trim leading and ending spaces
     txt = re.sub(r'^ *| *$', '', txt)
 
