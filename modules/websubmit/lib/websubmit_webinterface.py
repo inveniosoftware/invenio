@@ -19,18 +19,14 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
 
-import string
 import os
 import time
-import types
-import re
 try:
     from mod_python import apache
 except ImportError:
     pass
 
-import sys
-from urllib import quote, unquote, urlencode
+from urllib import unquote, urlencode
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -38,18 +34,16 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_VERSION, \
-     CFG_SITE_URL, \
      CFG_PREFIX
-from invenio.dbquery import run_sql, Error
+from invenio.dbquery import run_sql
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
-from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info, isUserSuperAdmin, isGuestUser
+from invenio.webuser import getUid, page_not_authorized, collect_user_info, isGuestUser
 from invenio.websubmit_config import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url

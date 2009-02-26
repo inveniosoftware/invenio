@@ -241,99 +241,24 @@ def acc_is_role(name_action, **arguments):
     arguments - arguments for authorization"""
 
     # first check if an action exists with this name
-    query1 = """select a.id, a.allowedkeywords, a.optional
-                from accACTION a
-                where a.name = %s"""
-
-    try:
-        id_action, aallowedkeywords, dummy = run_sql(query1,
-            (name_action,))[0]
-    except (ProgrammingError, IndexError):
-        return 0
-
-    defkeys = aallowedkeywords.split(',')
-    for key in arguments.keys():
-        if key not in defkeys:
-            return 0
-
-    # then check if a role giving this authorization exists
-    # create dictionary with default values and replace entries from input
-    # arguments
-    defdict = {}
-
-    for key in defkeys:
+    id_action = acc_get_action_id(name_action)
+    arole = run_sql("SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT WHERE id_accACTION=%s AND argumentlistid <= 0 LIMIT 1", (id_action, ), 1)
+    if arole:
+        return True
+    other_roles_to_check = run_sql("SELECT id_accROLE, keyword, value, argumentlistid FROM  accROLE_accACTION_accARGUMENT JOIN accARGUMENT ON id_accARGUMENT=id WHERE id_accACTION=%s AND argumentlistid > 0", (id_action, ))
+    other_roles_to_check_dict = {}
+    for id_accROLE, keyword, value, argumentlistid in other_roles_to_check:
         try:
-            defdict[key] = arguments[key]
+            other_roles_to_check_dict[(id_accROLE, argumentlistid)][keyword] = value
         except KeyError:
-            return 0 # all keywords must be present
-        # except KeyError: defdict[key] = 'x' # default value,
-                                              # this is not in use...
-
-    # create or-string from arguments
-    str_args = ''
-    for key in defkeys:
-        if str_args:
-            str_args += ' OR '
-        str_args += """(arg.keyword = '%s' AND arg.value = '%s')""" % \
-            (key, defdict[key])
-
-    query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION,
-                                raa.argumentlistid, raa.id_accARGUMENT,
-                                arg.keyword, arg.value
-            FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
-            WHERE raa.id_accACTION = %s AND
-            (%s) AND
-            raa.id_accARGUMENT = arg.id """ % (id_action, str_args)
-
-    try:
-        res4 = run_sql(query4)
-    except ProgrammingError:
-        return 0
-
-    if not res4:
-        return 0 # no entries at all
-
-    res5 = []
-    for res in res4:
-        res5.append(res)
-    res5.sort()
-
-    if len(defdict) == 1:
-        return 1
-
-    cur_role = cur_action = cur_arglistid = 0
-
-    booldict = {}
-    for key in defkeys:
-        booldict[key] = 0
-
-    # run through the results
-    for (role, action, arglistid, dummy, keyword, dummy) in res5 + \
-            [(-1, -1, -1, -1, -1, -1)]:
-        # not the same role or argumentlist (authorization group),
-        # i.e. check if thing are satisfied
-        # if cur_arglistid != arglistid or cur_role != role or
-        # cur_action != action:
-        if (cur_arglistid, cur_role, cur_action) != (arglistid, role, action):
-
-            # test if all keywords are satisfied
-            for value in booldict.values():
-                if not value:
-                    break
-            else:
-                return 1 # USER AUTHENTICATED TO PERFORM ACTION
-
-            # assign the values for the current tuple from the query
-            cur_arglistid, cur_role, cur_action = arglistid, role, action
-
-            for key in booldict.keys():
-                booldict[key] = 0
-
-        # set keyword qualified for the action, (whatever result of the test)
-        booldict[keyword] = 1
-
-    # matching failed
-    return 0
+            other_roles_to_check_dict[(id_accROLE, argumentlistid)] = {keyword : value}
+    for ((id_accROLE, argumentlistid), stored_arguments) in other_roles_to_check_dict.iteritems():
+        for key, value in stored_arguments.iteritems():
+            if (value != arguments.get(key, '*') != '*') and value != '*':
+                break
+        else:
+            return True
+    return False
 
 def acc_delete_role(id_role=0, name_role=0):
     """ delete role entry in table accROLE and all references from
@@ -1454,7 +1379,7 @@ def acc_find_possible_roles(name_action, always_add_superadmin=True, **arguments
                 other_roles_to_check_dict[(id_accROLE, argumentlistid)] = {keyword : value}
     for ((id_accROLE, argumentlistid), stored_arguments) in other_roles_to_check_dict.iteritems():
         for key, value in stored_arguments.iteritems():
-            if '*' != arguments.get(key, '*') != value:
+            if (value != arguments.get(key, '*') != '*') and value != '*':
                 break
         else:
             roles.add(id_accROLE)

@@ -46,7 +46,7 @@ class BibFormatAdminWebPagesAvailabilityTest(unittest.TestCase):
             error_messages.extend(test_web_page_content(url,
                                                         username='guest',
                                                         expected_text=
-                                                        'not authorized to perform'))
+                                                        'Authorization failure'))
             # then try as admin:
             error_messages.extend(test_web_page_content(url,
                                                         username='admin'))
