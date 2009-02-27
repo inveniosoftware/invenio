@@ -908,6 +908,42 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))), ['Theses'])
         self.assertEqual(get_permitted_restricted_collections(collect_user_info(get_uid_from_email('hyde@cds.cern.ch'))), [])
 
+class WebSearchRestrictedPicturesTest(unittest.TestCase):
+    """
+    Check whether restricted pictures on the demo site can be accessed
+    well by people who have rights to access them.
+    """
+
+    def test_restricted_pictures_guest(self):
+        """websearch - restricted pictures not available to guest"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/record/1/files/0106015_01.jpg',
+                                               expected_text=['This file is restricted',
+                                                              'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_pictures_romeo(self):
+        """websearch - restricted pictures available to Romeo"""
+        error_messages = test_web_page_content(CFG_SITE_URL + '/record/1/files/0106015_01.jpg',
+                                               username='romeo',
+                                               password='r123omeo',
+                                               expected_text=[],
+                                               unexpected_text=['This file is restricted',
+                                                                'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
+    def test_restricted_pictures_hyde(self):
+        """websearch - restricted pictures not available to Mr. Hyde"""
+
+        error_messages = test_web_page_content(CFG_SITE_URL + '/record/1/files/0106015_01.jpg',
+                                               username='hyde',
+                                               password='h123yde',
+                                               expected_text=['This file is restricted',
+                                                              'You are not authorized'])
+        if error_messages:
+            self.fail(merge_error_messages(error_messages))
+
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""
 
@@ -1367,6 +1403,7 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSearchEnginePythonAPITest,
                              WebSearchSearchEngineWebAPITest,
                              WebSearchRestrictedCollectionTest,
+                             WebSearchRestrictedPicturesTest,
                              WebSearchRSSFeedServiceTest,
                              WebSearchXSSVulnerabilityTest,
                              WebSearchResultsOverview,
