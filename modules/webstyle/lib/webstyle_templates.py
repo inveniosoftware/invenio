@@ -568,7 +568,7 @@ template function generated it.
         traceback_s = ''
         if verbose >= 1:
             if sys.exc_info()[0]:
-                sys_error_s = _("System Error") + ': %s %s\n' % \
+                sys_error_s = '\n' + _("System Error") + ': %s %s\n' % \
                               (sys.exc_info()[0], sys.exc_info()[1])
             if errors:
                 errs = ''
@@ -583,10 +583,9 @@ template function generated it.
             else:
                 error_s = _("Error") + ': ' + info_not_available
         if verbose >= 9:
-            traceback_s = _("Traceback") + ': \n%s' % \
+            traceback_s = '\n' + _("Traceback") + ': \n%s' % \
                           string.join(traceback.format_tb(sys.exc_info()[2]),
                                       "\n")
-
         out = """
               <table class="errorbox">
                 <thead>
@@ -614,14 +613,14 @@ URI: http://%(host)s%(page)s
                       <form action="%(siteurl)s/error/send" method="post">
                         %(send_error_label)s
                         <input class="adminbutton" type="submit" value="%(send_label)s" />
-                        <input type="hidden" name="header" value="%(esc_title)s %(esc_sys1)s %(esc_sys2)s" />
+                        <input type="hidden" name="header" value="%(title)s %(sys1)s %(sys2)s" />
                         <input type="hidden" name="url" value="URI: http://%(host)s%(page)s" />
                         <input type="hidden" name="time" value="Time: %(time)s" />
                         <input type="hidden" name="browser" value="%(browser)s" />
                         <input type="hidden" name="client" value="Client: %(client)s" />
-                        <input type="hidden" name="error" value="%(esc_error)s" />
+                        <input type="hidden" name="error" value="%(error)s" />
                         <input type="hidden" name="sys_error" value="%(sys_error)s" />
-                        <input type="hidden" name="traceback" value="%(esc_traceback)s" />
+                        <input type="hidden" name="traceback" value="%(traceback)s" />
                         <input type="hidden" name="referer" value="%(referer)s" />
                       </form>
                     </td>
@@ -629,31 +628,26 @@ URI: http://%(host)s%(page)s
                 </tbody>
               </table>
               """ % {
-                'title'     : title,
-                'esc_title' : title.replace('"', '&quot;'),
+                'title'     : cgi.escape(title).replace('"', '&quot;'),
                 'time_label': _("Time"),
                 'client_label': _("Client"),
                 'send_error_label': \
-                       _("Please send an error report to the Administrator."),
+                       _("Please send an error report to the administrator."),
                 'send_label': _("Send error report"),
-                'sys1'      : sys.exc_info()[0] or '',
-                'sys2'      : sys.exc_info()[1] or '',
-                'esc_sys1'  : str((sys.exc_info()[0] or '')).replace('"', '&quot;"'),
-                'esc_sys2'  : str((sys.exc_info()[1] or '')).replace('"', '&quot;"'),
+                'sys1'  : cgi.escape(str((sys.exc_info()[0] or ''))).replace('"', '&quot;'),
+                'sys2'  : cgi.escape(str((sys.exc_info()[1] or ''))).replace('"', '&quot;'),
                 'contact'   : \
                    _("Please contact %s quoting the following information:") % \
                      ('<a href="mailto:' + urllib.quote(CFG_SITE_SUPPORT_EMAIL) +'">' + \
                        CFG_SITE_SUPPORT_EMAIL + '</a>'),
-                'host'      : host_s,
-                'page'      : page_s,
+                'host'      : cgi.escape(host_s),
+                'page'      : cgi.escape(page_s),
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
-                'browser'   : browser_s,
-                'client'    : client_s,
-                'esc_error' : error_s,
-                'error'     : error_s.replace('"', '&quot;"'),
-                'traceback' : traceback_s,
-                'esc_traceback' : traceback_s.replace('"', '&quot;"'),
-                'sys_error' : sys_error_s,
+                'browser'   : cgi.escape(browser_s).replace('"', '&quot;'),
+                'client'    : cgi.escape(client_s).replace('"', '&quot;'),
+                'error'     : cgi.escape(error_s).replace('"', '&quot;'),
+                'traceback' : cgi.escape(traceback_s).replace('"', '&quot;'),
+                'sys_error' : cgi.escape(sys_error_s).replace('"', '&quot;'),
                 'siteurl'    : CFG_SITE_URL,
                 'referer'   : page_s!=info_not_available and \
                                  ("http://" + host_s + page_s) or \

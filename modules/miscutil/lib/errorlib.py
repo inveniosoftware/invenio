@@ -115,8 +115,13 @@ def register_emergency(msg, send_sms_function=send_sms):
 
 def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_admin=False):
     """
-    log error exception to invenio.err and warning exception to invenio.log
-    errors will be logged with client information (if req is given)
+    Log error exception to invenio.err and warning exception to invenio.log.
+    Errors will be logged together with client information (if req is
+    given).
+
+    Note:   For sanity reasons, dynamic params such as PREFIX, SUFFIX and
+            local stack variables are checked for length, and only first 500
+            chars of their values are printed.
 
     @param force_stack: when True stack is always printed, while when False,
     stack is printed only whenever the Exception type is not containing the
@@ -136,6 +141,17 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
 
     @return 1 if successfully wrote to stream, 0 if not
     """
+
+    def _truncate_dynamic_string(val, maxlength=500):
+        """
+        Return at most MAXLENGTH characters of VAL.  Useful for
+        sanitizing dynamic variable values in the output.
+        """
+        out = str(val)
+        if len(out) > maxlength:
+            out = out[:maxlength] + ' [...]'
+        return out
+
     try:
         ## Let's extract exception information
         exc_info =  sys.exc_info()
@@ -160,12 +176,12 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             except Exception, e:
                 client_data = "Error in retrieving contextual information: %s" % e
 
-            ## Let's extract the traceback
+            ## Let's extract the traceback:
             if not exc_name.startswith('Invenio') or force_stack:
                 ## We put a large traceback only if requested
                 ## or the Exception is not an Invenio one.
                 tracestack = traceback.extract_stack()[-5:-2]
-                tracestack_data = "Forced traceback (most recent call last)"
+                tracestack_data = "Forced traceback (most recent call last):"
                 for trace_tuple in tracestack:
                     tracestack_data += """
   File "%(file)s", line %(line)s, in %(function)s
@@ -178,13 +194,25 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             else:
                 tracestack_data = ""
 
+            ## Let's get the exception (and the traceback):
             exception_data = StringIO()
-            ## Let's print the exception (and the traceback)
             traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, exception_data)
             exception_data = exception_data.getvalue()
             if exception_data.endswith('\n'):
                 exception_data = exception_data[:-1]
 
+            ## Let's get the values of local variables on the stack:
+            localvars_data = "\nLocal variables:\n"
+            localvars = sys.exc_info()[2].tb_frame.f_locals.keys()
+            localvars.sort()
+            for localvar in localvars:
+                localvars_data += "  %s = %s\n" % \
+                                  (localvar,
+                                   _truncate_dynamic_string(repr(sys.exc_info()[2].tb_frame.f_locals[localvar])))
+            if localvars_data.endswith('\n'):
+                localvars_data = localvars_data[:-1]
+
+            ## Okay, start printing:
             log_stream = StringIO()
             email_stream = StringIO()
 
@@ -192,8 +220,9 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
 
             ## If a prefix was requested let's print it
             if prefix:
-                print >> log_stream, prefix
-                print >> email_stream, prefix
+                prefix = _truncate_dynamic_string(prefix)
+                print >> log_stream, prefix + '\n'
+                print >> email_stream, prefix + '\n'
 
             print >> email_stream, "The following problem occurred on <%s> (CDS Invenio %s)" % (CFG_SITE_URL, CFG_VERSION)
             print >> email_stream, "\n>>> Registered exception\n"
@@ -215,8 +244,12 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             print >> log_stream, exception_data
             print >> email_stream, exception_data
 
+            print >> log_stream, localvars_data
+            print >> email_stream, localvars_data
+
             ## If a suffix was requested let's print it
             if suffix:
+                suffix = _truncate_dynamic_string(suffix)
                 print >> log_stream, suffix
                 print >> email_stream, suffix
 
