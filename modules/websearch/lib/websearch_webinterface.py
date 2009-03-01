@@ -22,6 +22,7 @@ __revision__ = "$Id$"
 import cgi
 import os
 import datetime
+import time
 from urllib import quote
 try:
     from mod_python import apache
@@ -74,7 +75,7 @@ from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, \
     check_user_can_view_record, collection_restricted_p, restricted_collection_cache, \
-    get_fieldvalues
+    get_fieldvalues, get_most_popular_field_values
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -184,8 +185,9 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Serve the page in the given language."""
-        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG), 'verbose': (int, 0) })
         ln = argd['ln']
+        verbose = argd['verbose']
         req.argd = argd #needed since perform_req_search
 
         # start page
@@ -202,40 +204,45 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             return websearch_templates.tmpl_author_information(req, {}, self.authorname,
                                                                0, {},
                                                                {}, {}, {}, {}, ln)
-
+        #let's see what takes time..
+        time1 = time.time()
+        genstart = time1
         citelist = get_author_cited_by(self.authorname)
+        time2 = time.time()
+        if verbose == 9:
+            req.write("<br/>citelist generation took: "+str(time2-time1)+"<br/>")
+
         #search the publications by this author
         pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
-        #get most frequent first authors of these pubs
-        authors = [authorfreq[0] for authorfreq in search_engine.get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG), count_repetitive_values=False)]
+        #get most frequent authors of these pubs
+        popular_author_tuples = search_engine.get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
+        authors= []
+        for (auth, frequency) in popular_author_tuples:
+            if len(authors) < MAX_COLLAB_LIST:
+                authors.append(auth)
+
+        time1 = time.time()
+        if verbose == 9:
+            req.write("<br/>popularized authors: "+str(time1-time2)+"<br/>")
+
         #and publication venues
-        venuedict =  search_engine.get_values_for_code_dict(pubs, VENUE_TAG)
+        venuetuples =  search_engine.get_most_popular_field_values(pubs, (VENUE_TAG))
+        time2 = time.time()
+        if verbose == 9:
+            req.write("<br/>venues: "+str(time2-time1)+"<br/>")
+
+
         #and keywords
-        kwdict = search_engine.get_values_for_code_dict(pubs, KEYWORD_TAG)
+        kwtuples = search_engine.get_most_popular_field_values(pubs, (KEYWORD_TAG))
+        time1 = time.time()
+        if verbose == 9:
+            req.write("<br/>keywords: "+str(time1-time2)+"<br/>")
 
         #construct a simple list of tuples that contains keywords that appear more than once
         #moreover, limit the length of the list to MAX_KEYWORD_LIST
-        kwtuples = []
-        for k in kwdict.keys():
-            if kwdict[k] > 1:
-                mytuple = (kwdict[k], k)
-                kwtuples.append(mytuple)
-        #sort ..
-        kwtuples.sort()
-        kwtuples.reverse()
         kwtuples = kwtuples[0:MAX_KEYWORD_LIST]
+        vtuples = venuetuples[0:MAX_VENUE_LIST]
 
-        #same for venues
-        vtuples = []
-
-        for k in venuedict.keys():
-            if venuedict[k] > 1:
-                mytuple = (venuedict[k], k)
-                vtuples.append(mytuple)
-        #sort ..
-        vtuples.sort()
-        vtuples.reverse()
-        vtuples = vtuples[0:MAX_VENUE_LIST]
 
         #remove the author in question from authors: they are associates
         if (authors.count(self.authorname) > 0):
@@ -243,9 +250,18 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         authors = authors[0:MAX_COLLAB_LIST] #cut extra
 
+        time2 = time.time()
+        if verbose == 9:
+            req.write("<br/>misc: "+str(time2-time1)+"<br/>")
+
         #a dict. keys: affiliations, values: lists of publications
         author_aff_pubs = self.get_institute_pub_dict(pubs)
         authoraffs = author_aff_pubs.keys()
+
+        time1 = time.time()
+        if verbose == 9:
+            req.write("<br/>affiliations: "+str(time1-time2)+"<br/>")
+
 
         #find out how many times these records have been downloaded
         recsloads = {}
@@ -257,18 +273,29 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         #get cited by..
         citedbylist = get_cited_by_list(pubs)
+
+        time1 = time.time()
+        if verbose == 9:
+            req.write("<br/>citedby: "+str(time1-time2)+"<br/>")
+
         #finally all stuff there, call the template
         websearch_templates.tmpl_author_information(req, pubs, self.authorname,
                                                     totaldownloads, author_aff_pubs,
                                                     citedbylist, kwtuples, authors, vtuples, ln)
-
+        time1 = time.time()
         #cited-by summary
         out = summarize_records(intbitset(pubs), 'hcs', ln, self.authorname, 'author', req)
+
+        time2 = time.time()
+        if verbose == 9:
+            req.write("<br/>summarizer: "+str(time2-time1)+"<br/>")
+
         req.write(out)
 
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
         req.write(simauthbox)
-
+        if verbose == 9:
+            req.write("<br/>all: "+str(time.time()-genstart)+"<br/>")
         return search_engine.page_end(req, 'hb', ln)
 
     def get_institute_pub_dict(self, recids):

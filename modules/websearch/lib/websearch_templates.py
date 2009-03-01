@@ -3392,7 +3392,7 @@ class Template:
         keywstr = ""
         collabstr = ""
         if (kwtuples):
-            for (freq, kw) in kwtuples:
+            for (kw, freq) in kwtuples:
                 if keywstr:
                     keywstr += '<br>'
                 #create a link in author=x, keyword=y
@@ -3419,7 +3419,7 @@ class Template:
             #get the second member: that's the journal name
             pubinfo = ""
             for t in vtuples:
-                (times, journal) = t
+                (journal, times) = t
                 pubinfo += journal+" ("+str(times)+") "
             banner = self.tmpl_print_searchresultbox(_("Publishes in"), pubinfo)
             req.write(banner)

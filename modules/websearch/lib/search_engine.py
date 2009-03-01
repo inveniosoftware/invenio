@@ -2477,12 +2477,34 @@ def get_field_tags(field):
         out.append(val[0])
     return out
 
-def get_fieldvalues(recID, tag):
-    """Return list of field values for field TAG inside record RECID."""
+
+def get_fieldvalues(recID_or_ids, tag):
+    """Return  list of field values for field TAG for a record or records in recIDs"""
     out = []
+    #check if recID_or_ids is a list
+    recID = 0
+    recIDs = []
+    intrecIDs = [] #a list where we have verified that all members are numeric
+    if type(recID_or_ids) is list:
+        for myrecid in recID_or_ids:
+            try:
+                intrecid = int(myrecid)
+                intrecIDs.append(intrecid)
+            except ValueError:
+                return []
+    else:
+        #get the integer value and make a list
+        try:
+            intrecid = int(recID_or_ids)
+            intrecIDs.append(intrecid)
+        except ValueError:
+            return []
+
+    if len(intrecIDs) == 0:
+        return []
     if tag == "001___":
         # we have asked for recID that is not stored in bibXXx tables
-        out.append(str(recID))
+        out = intrecIDs
     else:
         # we are going to look inside bibXXx tables
         digits = tag[0:2]
@@ -2495,10 +2517,13 @@ def get_fieldvalues(recID, tag):
             return []
         bx = "bib%sx" % digits
         bibx = "bibrec_bib%sx" % digits
-        query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
-                " WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag LIKE %%s " \
-                " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx)
-        res = run_sql(query, (recID, tag))
+        querywhere = "bibx.id_bibrec in ("
+        querywhere += ",".join([str(i) for i in intrecIDs])
+        querywhere += ")"
+        query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE %s" \
+                " AND bx.id=bibx.id_bibxxx AND bx.tag LIKE %%s " \
+                " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, querywhere)
+        res = run_sql(query, (tag, ))
         for row in res:
             out.append(row[0])
     return out
@@ -4360,32 +4385,6 @@ def perform_request_log(req, date=""):
     return "\n"
 
 
-def get_values_for_code_dict(recids, tag):
-    """ gets values of tag for records, puts them in dictionary that contains their frequency"""
-    valuefreqdict = {}
-    for recid in recids:
-        vals = get_fieldvalues(recid, tag)
-        for v in vals:
-            if valuefreqdict.has_key(v):
-                valuefreqdict[v] = valuefreqdict[v]+1
-            else:
-                valuefreqdict[v] = 1
-    return valuefreqdict
-
-def get_most_popular_values_for_code(recids, tag):
-    """returns a sorted tuple list of the popular values for a given tag"""
-    valuefreqdict = get_values_for_code_dict(recids, tag)
-    tmppairs = []
-    for k,v in valuefreqdict.items():
-        tmppairs.append((v,k))
-    tmppairs.sort()
-    tmppairs.reverse()
-    #take only the keys and return them
-    sortedvalues = []
-    for (v,k) in tmppairs:
-        sortedvalues.append(k)
-    return sortedvalues
-
 def get_most_popular_field_values(recids, tags, exclude_values=None, count_repetitive_values=True):
     """
     Analyze RECIDS and look for TAGS and return most popular values
@@ -4417,27 +4416,38 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
 
     valuefreqdict = {}
     # sanity check:
+    if not exclude_values:
+        exclude_values = []
     if isinstance(tags, str):
         tags = (tags,)
-    # find values and their frequencies:
-    for recid in recids:
-        vals_in_rec = []
+    if count_repetitive_values:
+        #use the new faster method
         for tag in tags:
-            for val in get_fieldvalues(recid, tag):
-                vals_in_rec.append(val)
-        if not count_repetitive_values:
+            myvals = get_fieldvalues(recids, tag)
+            for val in myvals:
+                if val not in exclude_values:
+                    if valuefreqdict.has_key(val):
+                        valuefreqdict[val] += 1
+                    else:
+                        valuefreqdict[val] = 1
+    else:
+        # find values and their frequencies record-by-record:
+        for recid in recids:
+            vals_in_rec = []
+            for tag in tags:
+                for val in get_fieldvalues(recid, tag):
+                    vals_in_rec.append(val)
             # do not count repetitive values
             dtmp = {}
             for val in vals_in_rec:
                 dtmp[val] = 1
             vals_in_rec = dtmp.keys()
-        for val in vals_in_rec:
-            if (not exclude_values) or \
-               (exclude_values and val not in exclude_values):
-                if valuefreqdict.has_key(val):
-                    valuefreqdict[val] += 1
-                else:
-                    valuefreqdict[val] = 1
+            for val in vals_in_rec:
+                if val not in exclude_values:
+                    if valuefreqdict.has_key(val):
+                        valuefreqdict[val] += 1
+                    else:
+                        valuefreqdict[val] = 1
     # sort by descending frequency of values:
     out = ()
     vals = valuefreqdict.keys()
