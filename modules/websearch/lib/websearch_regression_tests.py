@@ -39,7 +39,8 @@ from invenio.testutils import make_test_suite, \
 from invenio.urlutils import same_urls_p
 from invenio.search_engine import perform_request_search, \
     guess_primary_collection_of_a_record, guess_collection_of_a_record, \
-    collection_restricted_p, get_permitted_restricted_collections
+    collection_restricted_p, get_permitted_restricted_collections, \
+    get_fieldvalues
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -1390,6 +1391,42 @@ class WebSearchRecordCollectionGuessTest(unittest.TestCase):
         self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
         self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical%%20Physics%%20%%28TH%%29?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
 
+class WebSearchGetFieldValuesTest(unittest.TestCase):
+    """Testing get_fieldvalues() function."""
+
+    def test_get_fieldvalues_001(self):
+        """websearch - get_fieldvalues() for bibxxx-agnostic tags"""
+        self.assertEqual(get_fieldvalues(10, '001___'), ['10'])
+
+    def test_get_fieldvalues_980(self):
+        """websearch - get_fieldvalues() for bibxxx-powered tags"""
+        self.assertEqual(get_fieldvalues(18, '700__a'), ['Enqvist, K', 'Nanopoulos, D V'])
+        self.assertEqual(get_fieldvalues(18, '909C1u'), ['CERN'])
+
+    def test_get_fieldvalues_wildcard(self):
+        """websearch - get_fieldvalues() for tag wildcards"""
+        self.assertEqual(get_fieldvalues(18, '%'), [])
+        self.assertEqual(get_fieldvalues(18, '7%'), [])
+        self.assertEqual(get_fieldvalues(18, '700%'), ['Enqvist, K', 'Nanopoulos, D V'])
+        self.assertEqual(get_fieldvalues(18, '909C0%'), ['1985', '13','TH'])
+
+    def test_get_fieldvalues_recIDs(self):
+        """websearch - get_fieldvalues() for list of recIDs"""
+        self.assertEqual(get_fieldvalues([], '001___'), [])
+        self.assertEqual(get_fieldvalues([], '700__a'), [])
+        self.assertEqual(get_fieldvalues([10, 13], '001___'), ['10', '13'])
+        self.assertEqual(get_fieldvalues([18, 13], '700__a'),
+                         ['Dawson, S', 'Ellis, R K', 'Enqvist, K', 'Nanopoulos, D V'])
+
+    def test_get_fieldvalues_repetitive(self):
+        """websearch - get_fieldvalues() for repetitive values"""
+        self.assertEqual(get_fieldvalues([17, 18], '909C1u'),
+                         ['CERN', 'CERN'])
+        self.assertEqual(get_fieldvalues([17, 18], '909C1u', repetitive_values=True),
+                         ['CERN', 'CERN'])
+        self.assertEqual(get_fieldvalues([17, 18], '909C1u', repetitive_values=False),
+                         ['CERN'])
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1417,8 +1454,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchJournalQueryTest,
                              WebSearchStemmedIndexQueryTest,
                              WebSearchSummarizerTest,
-                             WebSearchRecordCollectionGuessTest)
+                             WebSearchRecordCollectionGuessTest,
+                             WebSearchGetFieldValuesTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-
