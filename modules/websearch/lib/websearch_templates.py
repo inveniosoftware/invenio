@@ -3388,9 +3388,8 @@ class Template:
         line2 = authoraff
         req.write(self.tmpl_print_searchresultbox(line1, line2))
 
-        #keywords, collaborations
+        # print frequent keywords:
         keywstr = ""
-        collabstr = ""
         if (kwtuples):
             for (kw, freq) in kwtuples:
                 if keywstr:
@@ -3403,6 +3402,9 @@ class Template:
                 keywstr = keywstr+" "+searchstr
             banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent keywords:") + "</strong>", keywstr)
             req.write(banner)
+
+        # print frequent co-authors:
+        collabstr = ""
         if (authors):
             for c in authors:
                 c = c.strip()
@@ -3415,22 +3417,26 @@ class Template:
             banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent co-authors:") + "</strong>", collabstr)
             req.write(banner)
 
+        # print frequently publishes in journals:
         if (vtuples):
-            #get the second member: that's the journal name
             pubinfo = ""
             for t in vtuples:
-                (journal, times) = t
-                pubinfo += journal+" ("+str(times)+") "
-            banner = self.tmpl_print_searchresultbox(_("Publishes in"), pubinfo)
+                (journal, num) = t
+                pubinfo += create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
+                                                                  'journal:"' + journal + '"'),
+                                                   {}, journal + " ("+str(num)+")<br/>")
+            banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequently publishes in:") + "<strong>", pubinfo)
             req.write(banner)
 
-        #print papers:
+        # print papers:
         searchstr = create_html_link(self.build_search_url(p=authorname,
                                      f='author'),
                                      {}, "All papers ("+str(len(pubs))+")",)
         line1 = "<strong>" + _("Papers:") + "</strong>"
-        line2 = searchstr+" ("+_("downloaded")+" "
-        line2 += str(num_downloads)+" "+_("times")+")"
+        line2 = searchstr
+        if num_downloads:
+            line2 + " ("+_("downloaded")+" "
+            line2 += str(num_downloads)+" "+_("times")+")"
         from invenio.search_engine import perform_request_search
         if CFG_INSPIRE_SITE:
             CFG_COLLS = ['Book',
