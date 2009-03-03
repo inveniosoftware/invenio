@@ -67,9 +67,6 @@ def index(req, ln=CFG_SITE_LANG, recid=None, format_tag='marc',
     else:
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit',
             collection=guess_primary_collection_of_a_record(recid))
-        if auth_code != 0:
-            (auth_code, auth_message) = acc_authorize_action(req,
-                                                             'runbibedit')
         if auth_code == 0:
             (body, errors, warnings) = perform_request_index(ln, recid,
                 cancel, delete, confirm_delete, uid, format_tag,
@@ -110,8 +107,6 @@ def edit(req, recid=None, tag=None, num_field='0', num_subfield=0,
     if (recid and tag and (record_exists(recid)>0)):
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit',
             collection=guess_primary_collection_of_a_record(recid))
-        if auth_code != 0:
-            (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
         if auth_code == 0:
             (body, errors, warnings) = perform_request_edit(ln, recid, uid,
                 tag, num_field, num_subfield, format_tag, act_subfield,
@@ -148,8 +143,6 @@ def submit(req, recid='', ln=CFG_SITE_LANG):
     if (recid and (record_exists(recid)>0)):
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit',
             collection=guess_primary_collection_of_a_record(recid))
-        if auth_code != 0:
-            (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
         if auth_code == 0:
             (body, errors, warnings) = perform_request_submit(ln, recid)
         else:
@@ -180,9 +173,6 @@ def history(req, ln=CFG_SITE_LANG, recid=None, revid=None, revid_cmp=None,
     if (recid and (record_exists(recid)>0)):
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit',
             collection=guess_primary_collection_of_a_record(recid))
-        if auth_code != 0:
-            (auth_code, auth_message) = acc_authorize_action(req,
-                                                             'runbibedit')
         if auth_code == 0:
             (body, errors, warnings) = perform_request_history(ln, recid,
                 revid, revid_cmp, action, uid, format_tag)

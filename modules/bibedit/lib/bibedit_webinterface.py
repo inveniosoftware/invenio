@@ -107,9 +107,6 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
                 collection=guess_primary_collection_of_a_record(recid))
             if auth_code != 0:
-                auth_code, auth_message = acc_authorize_action(req,
-                                                               'runbibedit')
-            if auth_code != 0:
                 result.update({
                         'resultCode': 1,
                         'resultText':
