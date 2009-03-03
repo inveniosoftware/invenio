@@ -14,7 +14,7 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, writeto the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
@@ -35,6 +35,7 @@ from invenio.bibformat_utils import parse_tag
 from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
+from invenio.errorlib import register_exception
 
 try:
     Set = set
@@ -67,7 +68,8 @@ def get_citation_weight(rank_method_code, config):
 
     if task_get_option("quick") == "no":
         last_update_time = "0000-00-00 00:00:00"
-    #if task_get_option('verbose') >= 3:
+        write_message("running thorough indexing since quick option not used", verbose=3)
+
     last_modified_records = get_last_modified_rec(last_update_time)
     #id option forces re-indexing a certain range even if there are no new recs
     if last_modified_records or task_get_option("id"):
@@ -102,14 +104,13 @@ def get_citation_weight(rank_method_code, config):
         #citations and references in the updated_recid's (but nothing else)!
         if task_get_task_param('verbose') >= 9:
             write_message("Entering get_citation_informations")
-        citation_informations = get_citation_informations(updated_recid_list, 
+        citation_informations = get_citation_informations(updated_recid_list,
                                                           config)
         #write_message("citation_informations: "+str(citation_informations))
-        #create_analysis_tables() #temporary.. 
+        #create_analysis_tables() #temporary..
                                   #test how much faster in-mem indexing is
-        if task_get_task_param('verbose') >= 9:
-            write_message("Entering ref_analyzer")
-        #call the analyser that uses the citation_informations to really 
+        write_message("Entering ref_analyzer", verbose=9)
+        #call the analyser that uses the citation_informations to really
         #search x-cites-y in the coll..
         dic = ref_analyzer(citation_informations,
                            citation_weight_dic_intermediate,
@@ -172,7 +173,7 @@ def create_record_tuple(ilist):
 
 def last_updated_result(rank_method_code):
     """ return the last value of dictionary in rnkMETHODDATA table if it exists and
-        initialize the value of last updated records by zero, 
+        initialize the value of last updated records by zero,
         otherwise an initial dictionary with zero as value for all recids
     """
     result = [{}, {}, {}]
@@ -206,56 +207,57 @@ def get_citation_informations(recid_list, config):
        returns a 4 list of dictionaries that contains the citation information
        of cds records
        examples: [ {} {} {} {} ]
-                 [ {5: 'SUT-DP-92-70-5'}, 
-                   { 93: ['astro-ph/9812088']}, 
+                 [ {5: 'SUT-DP-92-70-5'},
+                   { 93: ['astro-ph/9812088']},
                    { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
         NB: stuff here is for analysing new or changed records.
         see "ref_analyzer" for more.
     """
     begin_time = os.times()[4]
     d_reports_numbers = {} #dict of recid -> institute-given-report-code
-    d_references_report_numbers = {} #dict of recid -> ['astro-ph/xyz'] 
+    d_references_report_numbers = {} #dict of recid -> ['astro-ph/xyz']
     d_references_s = {} #dict of recid -> list_of_the_entries_of_this_recs_bibliography
     d_records_s = {} #dict of recid -> this_records_publication_info
     citation_informations = []
 
-    if task_get_task_param('verbose') >= 9:
-        write_message("config function "+config.get("rank_method", "function")    )
+    write_message("config function "+config.get("rank_method", "function"), verbose=9)
     function = ""
     try:
         function = config.get("rank_method", "function")
     except:
-        print "critical error. cfg section [rank_method] has no attribute called function"
-        raise "config error"
+        register_exception(prefix="cfg section [rank_method] has no attribute called function", alert_admin=True)
+        #we cannot continue
+        return [ {}, {}, {}, {} ]
     record_pri_number_tag = ""
     try:
-        record_pri_number_tag = config.get(function,
-                                       "primary_report_number")
+        record_pri_number_tag = config.get(function, "primary_report_number")
     except:
-        print "critical error. primary_report_number not in cfg section "+function
-        raise "config error"
-
+        register_exception(prefix="cfg section "+function+" has no attribute primary_report_number", alert_admin=True)
+        return [ {}, {}, {}, {} ]
     record_add_number_tag = ""
     try:
         record_add_number_tag = config.get(config.get("rank_method", "function"),
                                        "additional_report_number")
     except:
-        print "critical error. additional_report_number not in cfg section "+function
-        raise "config error"
+        register_exception(prefix="config error. cfg section "+function+" has no attribute additional_report_number", alert_admin=True)
+        return [ {}, {}, {}, {} ]
+
     reference_number_tag = ""
     try:
         reference_number_tag = config.get(config.get("rank_method", "function"),
                                       "reference_via_report_number")
     except:
-        print "critical error. reference_via_report_number not in cfg section "+function
-        raise "config error"
+        register_exception(prefix="config error. cfg section "+function+" has no attribute reference_via_report_number", alert_admin=True)
+        return [ {}, {}, {}, {} ]
+
     reference_tag = ""
     try:
         reference_tag = config.get(config.get("rank_method", "function"),
                                "reference_via_pubinfo")
     except:
-        print "critical error. reference_via_pubinfo not in cfg section "+function
-        raise "config error"
+        register_exception(prefix="config error. cfg section "+function+" has no attribute reference_via_pubinfo", alert_admin=True)
+        return [ {}, {}, {}, {} ]
+
     p_record_pri_number_tag = tagify(parse_tag(record_pri_number_tag))
     #037a: contains (often) the "hep-ph/0501084" tag of THIS record
     p_record_add_number_tag = tagify(parse_tag(record_add_number_tag))
@@ -289,85 +291,96 @@ def get_citation_informations(recid_list, config):
         write_message("p_record_pri_number_tag "+str(p_record_pri_number_tag))
         write_message("p_reference_tag "+str(p_reference_tag))
         write_message("publication_journal_tag "+str(publication_journal_tag))
-
-    write_message("publication_format_string is "+publication_format_string, verbose=9)
+        write_message("publication_format_string is "+publication_format_string)
     done = 0 #for status reporting
     numrecs = len(recid_list)
-    for recid in recid_list:
-        if (done % 10 == 0):
-            task_sleep_now_if_required()
-            #in fact we can sleep any time here
 
-        if (done % 1000 == 0):
-            mesg = "get cit.inf done "+str(done)+" of "+str(numrecs)
-            write_message(mesg)
-            task_update_progress(mesg)
-        done = done+1
+    # perform quick check to see if there are some records with
+    # reference tags, because otherwise get.cit.inf would be slow even
+    # if there is nothing to index:
+    if run_sql("SELECT value FROM bib%sx WHERE tag=%%s LIMIT 1" % p_reference_tag[0:2],
+               (p_reference_tag,)) or \
+       run_sql("SELECT value FROM bib%sx WHERE tag=%%s LIMIT 1" % p_reference_number_tag[0:2],
+               (p_reference_number_tag,)):
+        for recid in recid_list:
+            if (done % 10 == 0):
+                task_sleep_now_if_required()
+                #in fact we can sleep any time here
 
-        pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
-        add_report_numbers = get_fieldvalues(recid, p_record_add_number_tag)
-        reference_report_numbers = get_fieldvalues(recid, p_reference_number_tag)
-        references_s = get_fieldvalues(recid, p_reference_tag)
+            if (done % 1000 == 0):
+                mesg = "get cit.inf done "+str(done)+" of "+str(numrecs)
+                write_message(mesg)
+                task_update_progress(mesg)
+            done = done+1
 
-        l_report_numbers = pri_report_numbers
-        l_report_numbers.extend(add_report_numbers)
-        d_reports_numbers[recid] = l_report_numbers
+            pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
+            add_report_numbers = get_fieldvalues(recid, p_record_add_number_tag)
+            reference_report_numbers = get_fieldvalues(recid, p_reference_number_tag)
+            references_s = get_fieldvalues(recid, p_reference_tag)
 
-        if reference_report_numbers:
-            d_references_report_numbers[recid] = reference_report_numbers
+            l_report_numbers = pri_report_numbers
+            l_report_numbers.extend(add_report_numbers)
+            d_reports_numbers[recid] = l_report_numbers
 
-        references_s = get_fieldvalues(recid, p_reference_tag)
-        if task_get_task_param('verbose') >= 9:
-            write_message(str(recid)+"'s "+str(p_reference_tag)+" values "+str(references_s))
-        if references_s:
-            d_references_s[recid] = references_s
+            if reference_report_numbers:
+                d_references_report_numbers[recid] = reference_report_numbers
 
-        #get a combination of
-        #journal vol (year) pages
-        if publication_pages_tag and publication_journal_tag and \
-             publication_volume_tag and publication_year_tag and publication_format_string:
-            tagsvalues = {} #we store the tags and their values here
+            references_s = get_fieldvalues(recid, p_reference_tag)
+            write_message(str(recid)+"'s "+str(p_reference_tag)+" values "+str(references_s), verbose=9)
+            if references_s:
+                d_references_s[recid] = references_s
+
+            #get a combination of
+            #journal vol (year) pages
+            if publication_pages_tag and publication_journal_tag and \
+                 publication_volume_tag and publication_year_tag and publication_format_string:
+                tagsvalues = {} #we store the tags and their values here
                                 #like c->444 y->1999 p->"journal of foo",v->20
-            tagsvalues["p"] = ""
-            tagsvalues["y"] = ""
-            tagsvalues["c"] = ""
-            tagsvalues["v"] = ""
-            tmp = get_fieldvalues(recid, publication_journal_tag)
-            if tmp:
-                tagsvalues["p"] = tmp[0]
-            tmp = get_fieldvalues(recid, publication_volume_tag)
-            if tmp:
-                tagsvalues["v"] = tmp[0]
-            tmp = get_fieldvalues(recid, publication_year_tag)
-            if tmp:
-                tagsvalues["y"] = tmp[0]
-            tmp = get_fieldvalues(recid, publication_pages_tag)
-            if tmp:
-                #if the page numbers have "x-y" take just x
-                pages = tmp[0]
-                hpos = pages.find("-")
-                if hpos > 0:
-                    pages = pages[:hpos]
-                tagsvalues["c"] = pages
-            #format the publ infostring according to the format
-            publ = ""
-            ok = 1
-            for i in range (0, len(publication_format_string)):
-                current = publication_format_string[i]
-                #these are supported
-                if current == "p" or current == "c" or current=="v" \
-                                  or current=="y":
-                    if tagsvalues[current]:
-                        #add the value in the string
-                        publ += tagsvalues[current]
+                tagsvalues["p"] = ""
+                tagsvalues["y"] = ""
+                tagsvalues["c"] = ""
+                tagsvalues["v"] = ""
+                tmp = get_fieldvalues(recid, publication_journal_tag)
+                if tmp:
+                    tagsvalues["p"] = tmp[0]
+                tmp = get_fieldvalues(recid, publication_volume_tag)
+                if tmp:
+                    tagsvalues["v"] = tmp[0]
+                tmp = get_fieldvalues(recid, publication_year_tag)
+                if tmp:
+                    tagsvalues["y"] = tmp[0]
+                tmp = get_fieldvalues(recid, publication_pages_tag)
+                if tmp:
+                    #if the page numbers have "x-y" take just x
+                    pages = tmp[0]
+                    hpos = pages.find("-")
+                    if hpos > 0:
+                        pages = pages[:hpos]
+                    tagsvalues["c"] = pages
+                #format the publ infostring according to the format
+                publ = ""
+                ok = 1
+                for i in range (0, len(publication_format_string)):
+                    current = publication_format_string[i]
+                    #these are supported
+                    if current == "p" or current == "c" or current == "v" \
+                                      or current == "y":
+                        if tagsvalues[current]:
+                            #add the value in the string
+                            publ += tagsvalues[current]
+                        else:
+                            ok = 0
+                            break #it was needed and not found
                     else:
-                        ok = 0
-                        break #it was needed and not found
-                else:
-                    publ += current #just add the character in the format string
-            if ok:
-                write_message("d_records_s (publication info) for "+str(recid)+" is "+publ, verbose=9)
-                d_records_s[recid] = publ
+                        publ += current #just add the character in the format string
+                if ok:
+                    write_message("d_records_s (publication info) for "+str(recid)+" is "+publ, verbose=9)
+                    d_records_s[recid] = publ
+    else:
+        mesg = "Warning: there are no records with tag values for "
+        mesg += p_reference_number_tag+" or "+p_reference_tag+". Nothing to do."
+        write_message(mesg)
+
     mesg = "get cit.inf done fully"
     write_message(mesg)
     task_update_progress(mesg)
@@ -391,10 +404,10 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
     tags = ['first_author', 'additional_author', 'alternative_author_name']
     for t in tags:
         try:
-            x = config.get(config.get("rank_method", "function"), t)
+            dummy = config.get(config.get("rank_method", "function"), t)
         except:
-            print "critical error. attribute "+t+" missing in config"
-            raise "cfg error"
+            register_exception(prefix="attribute "+t+" missing in config", alert_admin=True)
+            return initial_selfcitdict
 
     r_mainauthortag = config.get(config.get("rank_method", "function"), "first_author")
     r_coauthortag = config.get(config.get("rank_method", "function"), "additional_author")
@@ -468,8 +481,8 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
             x = config.get(config.get("rank_method", "function"), t)
             tagvals[t] = x
         except:
-            print "critical error. attribute "+t+" missing in config"
-            raise "cfg error"
+            register_exception(prefix="attribute "+t+" missing in config", alert_admin=True)
+            return initial_author_dict
 
     #parse the tags
     mainauthortag = tagify(parse_tag(tagvals['first_author']))
@@ -565,21 +578,22 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     try:
         function = config.get("rank_method", "function")
     except:
-        print "critical error. cfg section [rank_method] has no attr function"
-        raise "config error"
+        register_exception(prefix="cfg section [rank_method] has no attr function", alert_admin=True)
+        return {}
 
     pubrefntag = ""
     try:
         pubrefntag  = config.get(function, "reference_via_report_number")
     except:
-        print "critical error. cfg section "+function+" has no attr reference_via_report_number"
-        raise "cfg error"
+        register_exception(prefix="cfg section "+function+" has no attr reference_via_report_number", alert_admin=True)
+        return {}
+
     pubreftag = ""
     try:
         pubreftag = config.get(function, "reference_via_pubinfo")
     except:
-        print "critical error. cfg section "+function+" has no attr reference_via_pubinfo"
-        raise "cfg error"
+        register_exception(prefix="cfg section "+function+" has no attr reference_via_pubinfo", alert_admin=True)
+        return {}
 
     #pubrefntag is often 999C5r, pubreftag 999C5s
     if task_get_task_param('verbose') >= 9:
@@ -875,15 +889,16 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = selfcitedbydic[t]
-        write_message("selfcitedbydic (x is cited by y and one  \
-                       of the authors of x same as y's): "+str(tmpdict))
+        mesg = "selfcitedbydic (x is cited by y and one of the authors of x same as y's):"
+        mesg += str(tmpdict)
+        write_message(mesg)
         write_message("size: "+str(len(selfcitedbydic.keys())))
         tmp = selfdic.keys()[0:100]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = selfdic[t]
-        write_message("selfdic (x cites y and one of the authors \
-                       of x same as y's): "+str(tmpdict))
+        mesg = "selfdic (x cites y and one of the authors of x same as y's): "+str(tmpdict)
+        write_message(mesg)
         write_message("size: "+str(len(selfdic.keys())))
         tmp = authorcitdic.keys()[0:10]
         tmpdict = {}
@@ -929,9 +944,7 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
                 run_sql("UPDATE rnkAUTHORDATA SET hitlist  = %s where aterm=%s",
                         (lserarr,a))
         except:
-            print "Critical error: could not read/write rnkAUTHORDATA "
-            print "aterm="+a+" hitlist="+str(lserarr)+"\n"
-            traceback.print_tb(sys.exc_info()[2])
+            register_exception(prefix="could not read/write rnkAUTHORDATA aterm="+a+" hitlist="+str(lserarr), alert_admin=True)
 
 def insert_into_cit_db(dic, name):
     """an aux thing to avoid repeating code"""
@@ -951,9 +964,10 @@ def insert_into_cit_db(dic, name):
                      (name,s))
         run_sql("UPDATE rnkCITATIONDATA SET last_updated = %s where object_name = %s",
                (ndate,name))
+        #finally, update the rnkmethod table.
+        run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (ndate, 'citation'))
     except:
-        print "Critical error: could not write "+name+" into db"
-        traceback.print_tb(sys.exc_info()[2])
+        register_exception(prefix="could not write "+name+" into db", alert_admin=True)
 
 
 def get_cit_dict(name):
@@ -968,7 +982,7 @@ def get_cit_dict(name):
         else:
             return {}
     except:
-        print "Critical error: could not read "+name+" from db"
+        register_exception(prefix="could not read "+name+" from db", alert_admin=True)
         traceback.print_tb(sys.exc_info()[2])
     return dict
 
@@ -981,8 +995,7 @@ def get_initial_author_dict():
             adict[a] = deserialize_via_marshal(h)
         return adict
     except:
-        print "Critical error: could not read rnkAUTHORDATA"
-        traceback.print_tb(sys.exc_info()[2])
+        register_exception(prefix="could not read rnkAUTHORDATA", alert_admin=True)
         return {}
 
 
