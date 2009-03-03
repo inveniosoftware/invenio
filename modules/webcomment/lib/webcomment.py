@@ -1112,22 +1112,7 @@ def check_user_can_view_comments(user_info, recid):
     ## But first can we find an authorization for this case action,
     ## for this collection?
     record_primary_collection = guess_primary_collection_of_a_record(recid)
-    if not acc_is_role('viewcomment', collection=record_primary_collection):
-        # No such action. Try without parameter
-        if not acc_is_role('viewcomment', collection="*"):
-            # No default (without parameter) role defined. By default,
-            # grant access
-            return (0, '')
-        else:
-            # A default role is defined. Check it
-            return acc_authorize_action(user_info,
-                                        'viewcomment',
-                                        collection="*")
-    else:
-        ## An authorization was found. check it
-        return acc_authorize_action(user_info,
-                                    'viewcomment',
-                                    collection=record_primary_collection)
+    return acc_authorize_action(user_info, 'viewcomment', authorized_if_no_roles=True, collection=record_primary_collection)
 
 def check_user_can_send_comments(user_info, recid):
     """Check if the user is authorized to comment the given
@@ -1138,22 +1123,7 @@ def check_user_can_send_comments(user_info, recid):
     """
     ## First can we find an authorization for this case, action + collection
     record_primary_collection = guess_primary_collection_of_a_record(recid)
-    if not acc_is_role('sendcomment', collection=record_primary_collection):
-        # No such action. Try without parameter
-        if not acc_is_role('sendcomment', collection="*"):
-            # No default (without parameter) role defined. By default,
-            # grant access
-            return (0, '')
-        else:
-            # A default role is defined. Check it
-            return acc_authorize_action(user_info,
-                                        'sendcomment',
-                                        collection="*")
-    else:
-        ## An authorization was found. Check it
-        return acc_authorize_action(user_info,
-                                    'sendcomment',
-                                    collection=record_primary_collection)
+    return acc_authorize_action(user_info, 'sendcomment', authorized_if_no_roles=True, collection=record_primary_collection)
 
 def check_user_can_attach_file_to_comments(user_info, recid):
     """Check if the user is authorized to attach a file to comments
@@ -1165,19 +1135,4 @@ def check_user_can_attach_file_to_comments(user_info, recid):
     ## First can we find an authorization for this case action, for
     ## this collection?
     record_primary_collection = guess_primary_collection_of_a_record(recid)
-    if not acc_is_role('attachcommentfile', collection=record_primary_collection):
-        # No such action. Try without parameter
-        if not acc_is_role('attachcommentfile', collection="*"):
-            # No default (without parameter) role defined. By default,
-            # do not grant access
-            return (1, CFG_WEBACCESS_WARNING_MSGS[1])
-        else:
-            # A default role is defined. Check it
-            return acc_authorize_action(user_info,
-                                        'attachcommentfile',
-                                        collection="*")
-    else:
-        ## An authorization was found. check it
-        return acc_authorize_action(user_info,
-                                    'attachcommentfile',
-                                    collection=record_primary_collection)
+    return acc_authorize_action(user_info, 'attachcommentfile', authorized_if_no_roles=True, collection=record_primary_collection)
