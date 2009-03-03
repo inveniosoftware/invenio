@@ -821,7 +821,7 @@ translated_welcome =  &#95;("Welcome")
     title = bfo.field('245__a', escape="1")
     abstract = bfo.field('520__a', escape="2")
 </pre>
-     <a name="listofescapingmodes" />
+     <a name="listofescapingmodes"></a>
      The <code>escape</code> parameter can be one of the following values:
           <ul><li>0 - no escaping</li>
               <li>1 - escape all HTML characters (escaped chars are shown as escaped)</li>
@@ -844,6 +844,13 @@ translated_welcome =  &#95;("Welcome")
      using any other Python function/library you want to use (such as <code>cgi.escape()</code>).
      </p>
 
+     <p>As a BibFormat element developer you can also override the
+     default <code>escape</code> parameter of your format elements:
+     that is especially useful if you want to provide a way for format
+     templates editors to call your element with a custom escaping
+     mode that should not escape the whole output of your
+     element. The <code>bfe_abstract.py</code> element is an example
+     of code that overrides the <code>escape</code> parameter.</p>
 
     <h3><a name="attrsFormatElement">4.7 Edit the Attributes of a Format Element</a></h3>
     <p>A format element has mainly four kinds of attributes: <ul>

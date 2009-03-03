@@ -561,11 +561,16 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
 
         # Look for parameters defined in format element
         # Fill them with specified default values and values
-        # given as parameters
+        # given as parameters.
+        # Also remember if the element overrides the 'escape'
+        # parameter
+        format_element_overrides_escape = False
         for param in format_element['attrs']['params']:
             name = param['name']
             default = param['default']
             params[name] = parameters.get(name, default)
+            if name == 'escape':
+                format_element_overrides_escape = True
 
         # Add BibFormatObject
         params['bfo'] = bfo
@@ -600,8 +605,11 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         # (1) By default, everything is escaped in mode 1
         # (2) If evaluated element has 'escape_values()' function, use
         #     its returned value as escape mode, and override (1)
-        # (3) If template has a defined parameter (in allowed values),
-        #     use it, and override (1) and (2)
+        # (3) If template has a defined parameter 'escape' (in allowed
+        #     values), use it, and override (1) and (2). If this
+        #     'escape' parameter is overriden by the format element
+        #     (defined in the 'format' function of the element), leave
+        #     the escaping job to this element
 
         # (1)
         escape_mode = 1
@@ -627,9 +635,9 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
         if escape in ['0', '1', '2', '3', '4', '5', '6']:
             escape_mode = int(escape)
 
-        #If escape is equal to 1, then escape all
+        # If escape is equal to 1, then escape all
         # HTML reserved chars.
-        if escape_mode > 0:
+        if escape_mode > 0 and not format_element_overrides_escape:
             output_text = escape_field(output_text, mode=escape_mode)
 
         # Add prefix and suffix if they have been given as parameters and if
