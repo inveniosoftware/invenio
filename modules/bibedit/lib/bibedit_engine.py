@@ -28,7 +28,8 @@ from invenio.bibedit_utils import get_file_path, get_record, \
 from invenio.bibrecord import record_add_field, record_add_subfield_into, \
     record_modify_controlfield, record_modify_subfield, record_move_subfield, \
     record_delete_subfield_from, record_delete_field_from
-from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_SITE_URL
+from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
+    CFG_SITE_URL
 from invenio.search_engine import record_exists
 from invenio.webuser import session_param_get, session_param_set
 
@@ -50,9 +51,14 @@ def perform_request_init():
     protected_fields = ['001']
     protected_fields.extend(CFG_BIBEDIT_PROTECTED_FIELDS.split(','))
     history_url = '"' + CFG_SITE_URL + '/admin/bibedit/bibeditadmin.py/history"'
+    cern_site = 'false'
+    if CFG_CERN_SITE:
+        cern_site = 'true'
     data = {'gTagNames': tag_names,
             'gProtectedFields': protected_fields,
-            'gHistoryURL': history_url}
+            'gSiteURL': '"' + CFG_SITE_URL + '"',
+            'gHistoryURL': history_url,
+            'gCERNSite': cern_site}
     body += '<script type="text/javascript">\n'
     for key in data:
         body += '    var %s = %s;\n' % (key, data[key])

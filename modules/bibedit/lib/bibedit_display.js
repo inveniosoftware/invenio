@@ -82,13 +82,9 @@ function createControlField(tag, field){
    * Create control field row.
    */
   var fieldID = tag + '_' + field[4];
-  var cellContentClass = 'class="bibEditCellContentProtected" ',
-    evtContentClick = '';
-
-  if (!fieldIsProtected(tag)){
+  var cellContentClass = 'class="bibEditCellContentProtected" ';
+  if (!fieldIsProtected(tag))
     cellContentClass = '';
-    evtContentClick = ' ondblclick="onContentClick(this)"';
-  }
 
   return '' +
     '<tbody id="rowGroup_' + fieldID + '">' +
@@ -104,8 +100,7 @@ function createControlField(tag, field){
 	'<td></td>' +
 	'<td></td>' +
 	'<td id="content_' + fieldID + '" ' + cellContentClass +
-	  'colspan="2" tabindex="0"' + evtContentClick + '>' +
-	    escapeHTML(field[3]) +
+	  'colspan="2" tabindex="0">' + escapeHTML(field[3]) +
 	'</td>' +
       '</tr>' +
     '</tbody>';
@@ -141,8 +136,7 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var subfieldID = fieldID + '_' + subfieldIndex;
   var boxField = '', cellFieldTagAttrs = 'class="bibEditCellField"',
     fieldTagToPrint = '', btnMoveSubfieldUp = '', btnMoveSubfieldDown = '',
-    cellContentClass = 'class="bibEditCellContentProtected"',
-    evtContentClick = '';
+    cellContentClass = 'class="bibEditCellContentProtected"';
   if (!protectedField){
     // Enable features for unprotected fields.
     btnMoveSubfieldUp = img('/img/arrow_up2.png', 'btnMoveSubfieldUp_' +
@@ -151,10 +145,8 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     btnMoveSubfieldDown = img('/img/arrow_down2.png', 'btnMoveSubfieldDown_' +
       subfieldID, 'bibEditBtnMoveSubfieldDown',
       {title: 'Move subfield down', onclick: 'onMoveSubfieldClick(this)'});
-    if (!protectedSubfield){
+    if (!protectedSubfield)
       cellContentClass = '';
-      evtContentClick = ' ondblclick="onContentClick(this)" ';
-    }
   }
   var boxSubfield = input('checkbox', 'boxSubfield_' + subfieldID,
     'bibEditBoxSubfield', {onclick: 'onSubfieldBoxClick(this)', tabindex: -1});
@@ -189,8 +181,8 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
 	subfieldTagToPrint +
       '</td>' +
       '<td id="content_' + subfieldID + '" ' + cellContentClass + '"' +
-	  'tabindex="0"' + evtContentClick + '>' +
-	    subfieldValue +
+	'tabindex="0">' +
+	subfieldValue +
       '</td>' +
       '<td class="bibEditCellAddSubfields">' + btnAddSubfield + '</td>' +
     '</tr>';
@@ -219,10 +211,7 @@ function createAddFieldRowGroup(fieldTmpNo){
       '</tr>' +
     createAddFieldRow(fieldTmpNo, 0) +
       '<tr>' +
-	'<td>' +
-	  input('hidden', 'hdnAddFieldFreeSubfieldTmpNo_' + fieldTmpNo, '',
-	    {value: 1}) +
-	'</td>' +
+	'<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
@@ -281,9 +270,7 @@ function createAddSubfieldsForm(fieldID){
   return '' +
     createAddSubfieldsRow(fieldID, 0) +
     '<tr id="rowAddSubfieldsControls_' + fieldID + '">' +
-      '<td>' +
-	input('hidden', 'hdnAddSubfieldsFreeTmpNo_' + fieldID, '', {value: 1}) +
-      '</td>' +
+      '<td></td>' +
       '<td></td>' +
       '<td></td>' +
       '<td></td>' +

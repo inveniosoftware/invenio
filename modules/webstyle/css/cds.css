@@ -1463,9 +1463,6 @@ input.hyperlinkformSubmitButton {
    margin: 5px 0px 5px 10px;
 }
 /* BibEdit - new interface */
-.bibEditHidden {
-  visibility: hidden;
-}
 .bibEditBtnBold {
   font-weight: bold
 }

@@ -54,23 +54,55 @@ var gNEW_FIELDS_COLOR = 'lightgreen';
 // Duration (in ms) for the color fading of newly added fields.
 var gNEW_FIELDS_COLOR_FADE_DURATION = 2000;
 
+window.onload = function(){
+  if (typeof(jQuery) == 'undefined'){
+    alert('ERROR: jQuery not found!\n\n' +
+	  'BibEdit requires jQuery, which does not appear to be installed on ' +
+	  'this server. Please alert your site administrator.\n\n' +
+	  'Instructions on how to install jQuery and other required plug-ins ' +
+	  'can be found in CDS-Invenio\'s INSTALL file.');
+    var imgError = document.createElement('img');
+    imgError.setAttribute('src', '/img/circle_red.png');
+    var txtError = document.createTextNode('jQuery missing');
+    var cellIndicator = document.getElementById('cellIndicator');
+    cellIndicator.replaceChild(imgError, cellIndicator.firstChild);
+    var cellStatus = document.getElementById('cellStatus');
+    cellStatus.replaceChild(txtError, cellStatus.firstChild);
+  }
+};
 
 $(function(){
   /*
-   * Initialization
+   * Initialization of all components when documents is ready.
    */
-  window.onbeforeunload = function(){
-    if (gPageDirty){
-      return "Your changes have not been submitted.";
-    }
-  };
-  initJeditable();
   initMenu();
+  initJeditable();
   initAJAX();
+  initMisc();
   initStateFromHash();
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
   initHotkeys();
 });
+
+function initMisc(){
+  /*
+   * Miscellaneous initialization operations.
+   */
+  // CERN allows for capital MARC indicators.
+  if (gCERNSite)
+    validMARC.reIndicator = /[\dA-Za-z]{1}/;
+
+  // Show confirmation dialog when leaving page if content has changed.
+  window.onbeforeunload = function(){
+    if (gPageDirty)
+      return "Your changes have not been submitted.";
+  };
+
+  // Add global event handlers.
+  $(document).bind('dblclick', function(event){
+    onDoubleClick(event);
+  });
+}
 
 function initAJAX(){
   /*
@@ -80,7 +112,8 @@ function initAJAX(){
     { cache: false,
       dataType: 'json',
       error: onReqError,
-      type: 'POST'
+      type: 'POST',
+      url: '/record/edit/'
     }
   );
 }
@@ -264,7 +297,14 @@ function createReq(data, onSuccess){
     data: {
       jsondata: JSON.stringify(data)
     },
-    success: onSuccess
+    success: function(json){
+      if (json['resultText'] == 'Error: Not logged in'){
+	// User's session has timed out.
+	gPageDirty = false;
+	window.location = gSiteURL + '/record/' + gRecID + '/edit/';
+      }
+      onSuccess(json);
+    }
   });
 }
 // Incrementing transaction ID.
@@ -381,41 +421,46 @@ function onMoveSubfieldClick(arrow){
     $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
 }
 
-function onContentClick(cell){
+function onDoubleClick(event){
   /*
-   * Handle click on editable content fields.
+   * Handle double click on editable content fields.
    */
-  $(cell).removeAttr('ondblclick').addClass('edit_area').editable(
-    onContentChange,
-    {
-      type: 'autogrow',
-      event: 'dblclick',
-      data: function(){
-	// Get the real content from the record structure (in stead of from the
-	// view, where HTML entities are escaped).
-	var tmpArray = this.id.split('_');
-	var tag = tmpArray[1], fieldNumber = tmpArray[2],
-	  subfieldIndex = tmpArray[3];
-	var field = getFieldFromTag(tag, fieldNumber);
-	if (subfieldIndex == undefined)
-	  // Controlfield
-	  return field[3];
-	else
-	  return field[0][subfieldIndex][1];
-      },
-      submit: 'Save',
-      cancel: 'Cancel',
-      tooltip: 'Click to edit...',
-      onblur: 'ignore',
-      autogrow: {
-	lineHeight: 16,
-	minHeight: 32
-      },
-      callback: function(){
-	$(this).closest('tbody').next().find('[id^=content]').eq(0).focus();
+  if (event.target.nodeName == 'TD'){
+    var targetID = event.target.id;
+    var type = targetID.slice(0, targetID.indexOf('_'));
+    if (type == 'content'){
+      if (!$(event.target).hasClass('edit_area')){
+	// Add event handler for content editing.
+	$(event.target).addClass('edit_area').editable(onContentChange, {
+	  type: 'autogrow',
+	  event: 'dblclick',
+	  data: function(){
+	    // Get the real content from the record structure (in stead of
+	    // from the view, where HTML entities are escaped).
+	    var tmpArray = this.id.split('_');
+	    var tag = tmpArray[1], fieldNumber = tmpArray[2],
+	      subfieldIndex = tmpArray[3];
+	    var field = getFieldFromTag(tag, fieldNumber);
+	    if (subfieldIndex == undefined)
+	      // Controlfield
+	      return field[3];
+	    else
+	      return field[0][subfieldIndex][1];
+	  },
+	  submit: 'Save',
+	  cancel: 'Cancel',
+	  placeholder: '',
+	  width: '100%',
+	  onblur: 'ignore',
+	  autogrow: {
+	    lineHeight: 16,
+	    minHeight: 32
+	  }
+	}).dblclick();
       }
+      event.preventDefault();
     }
-  ).dblclick();
+  }
 }
 
 function onContentChange(value){
@@ -462,9 +507,11 @@ function onAddSubfieldsClick(img){
    * Handle 'Add subfield' buttons.
    */
   var fieldID = img.id.slice(img.id.indexOf('_')+1);
+  var jQRowGroupID = '#rowGroup_' + fieldID;
   if ($('#rowAddSubfieldsControls_' + fieldID).length == 0){
     // The 'Add subfields' form does not exist for this field.
-    $('#rowGroup_' + fieldID).append(createAddSubfieldsForm(fieldID));
+    $(jQRowGroupID).append(createAddSubfieldsForm(fieldID));
+    $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
     $('#txtAddSubfieldsCode_' + fieldID + '_' + 0).bind('keyup',
       onAddSubfieldsChange);
     $('#btnAddSubfieldsSave_' + fieldID).bind('click', onAddSubfieldsSave);
@@ -472,7 +519,7 @@ function onAddSubfieldsClick(img){
 	$('#rowAddSubfields_' + fieldID + '_' + 0).nextAll().andSelf().remove();
     });
     $('#btnAddSubfieldsClear_' + fieldID).bind('click', function(){
-      $('#rowGroup_' + fieldID + ' input[type=text]').val('').removeClass(
+      $(jQRowGroupID + ' input[type=text]').val('').removeClass(
 	'bibEditInputError');
       $('#txtAddSubfieldsCode_' + fieldID + '_' + 0).focus();
     });
@@ -480,9 +527,8 @@ function onAddSubfieldsClick(img){
   }
   else{
     // The 'Add subfields' form exist for this field. Just add another row.
-    var hdnFreeTmpNo = $('#hdnAddSubfieldsFreeTmpNo_' + fieldID);
-    var subfieldTmpNo = parseInt($(hdnFreeTmpNo).val());
-    $(hdnFreeTmpNo).val(subfieldTmpNo+1);
+    var subfieldTmpNo = $(jQRowGroupID).data('freeSubfieldTmpNo');
+    $(jQRowGroupID).data('freeSubfieldTmpNo', subfieldTmpNo+1);
     var subfieldTmpID = fieldID + '_' + subfieldTmpNo;
     $('#rowAddSubfieldsControls_' + fieldID).before(
       createAddSubfieldsRow(fieldID, subfieldTmpNo));

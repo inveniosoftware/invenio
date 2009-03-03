@@ -118,9 +118,9 @@ function initHotkeys(){
   $(document).bind('keydown', 'ctrl+shift+x', function(event){
     onTriggerFormControl('Clear', event);
   });
-  // Add subfield.
+  // Add subfield in form.
   $(document).bind('keydown', {combi: 'ctrl+shift+e'}, onKeyCtrlShiftE);
-  // Remove subfield.
+  // Remove subfield from form.
   $(document).bind('keydown', {combi: 'ctrl+shift+d'}, onKeyCtrlShiftD);
 }
 
@@ -254,7 +254,7 @@ function onTriggerFormControl(command, event){
 
 function onKeyCtrlShiftE(event){
   /*
-   * Handle key 'Ctrl+Shift+e' (add subfield).
+   * Handle key 'Ctrl+Shift+e' (add subfield to form).
    */
   var nodeName = event.target.nodeName;
   if (nodeName == 'TD' || nodeName == 'INPUT' || nodeName == 'BUTTON' ||
@@ -263,8 +263,9 @@ function onKeyCtrlShiftE(event){
     if (rowGroup){
       var btnAddSubfield;
       if (rowGroup.id.indexOf('rowGroupAddField')+1)
-	btnAddSubfield = $('#btnAddFieldAddSubfield_' + rowGroup.id.slice(
-			   rowGroup.id.indexOf('_')+1));
+	var fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
+	if (!$('#chkAddFieldControlfield_' + fieldID).attr('checked'))
+	  btnAddSubfield = $('#btnAddFieldAddSubfield_' + fieldID);
       else if (rowGroup.id.indexOf('rowGroup')+1)
 	btnAddSubfield = $('#btnAddSubfield_' + rowGroup.id.slice(
 			   rowGroup.id.indexOf('_')+1));
@@ -278,7 +279,7 @@ function onKeyCtrlShiftE(event){
 
 function onKeyCtrlShiftD(event){
   /*
-   * Handle key 'Ctrl+Shift+d' (remove subfield).
+   * Handle key 'Ctrl+Shift+d' (remove subfield from form).
    */
   var nodeName = event.target.nodeName;
   if (nodeName == 'TD' || nodeName == 'INPUT' || nodeName == 'BUTTON' ||
@@ -288,7 +289,7 @@ function onKeyCtrlShiftD(event){
       var fieldID, tmpNo, btnRemoveSubfield;
       if (rowGroup.id.indexOf('rowGroupAddField')+1){
 	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
-	tmpNo = parseInt($('#hdnAddFieldFreeSubfieldTmpNo_' + fieldID).val())-1;
+	tmpNo = $('#rowGroupAddField_' + fieldID).data('freeSubfieldTmpNo')-1;
 	btnRemoveSubfield = $('#btnAddFieldRemove_' + fieldID + '_' + tmpNo);
 	while (!btnRemoveSubfield.length && tmpNo >= 1){
 	  tmpNo--;
@@ -297,10 +298,10 @@ function onKeyCtrlShiftD(event){
       }
       else if (rowGroup.id.indexOf('rowGroup')+1){
       	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
-	tmpNo = parseInt($('#hdnAddSubfieldsFreeTmpNo_' + fieldID).val())-1;
+	tmpNo = $('#rowGroup_' + fieldID).data('freeSubfieldTmpNo')-1;
 	btnRemoveSubfield = $('#btnAddSubfieldsRemove_' + fieldID + '_' +
 			      tmpNo);
-	while (!btnRemoveSubfield.length && tmpNo >= 1){
+	while (!btnRemoveSubfield.length && tmpNo > 1){
 	  tmpNo--;
 	  btnRemoveSubfield = $('#btnAddSubfieldsRemove_' + fieldID + '_' +
 				tmpNo);

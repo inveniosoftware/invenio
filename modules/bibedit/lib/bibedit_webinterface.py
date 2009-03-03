@@ -58,12 +58,12 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         if form.has_key('jsondata'):
             jsondata = form['jsondata']
 
+        user_info = collect_user_info(req)
         if not jsondata:
             # Handle intial request.
-            # Do not display the introductory recID selection box to guest
-            # users (as it used to be with v0.99.0):
-            user_info = collect_user_info(req)
             if user_info['email'] == 'guest':
+                # Do not display the introductory recID selection box to guest
+                # users (as it used to be with v0.99.0):
                 auth_code, auth_message = acc_authorize_action(req,
                                                                'runbibedit')
                 referer = '/edit/'
@@ -95,11 +95,20 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                             lastupdated = __lastupdated__,
                             req         = req)
 
+        # Handle AJAX requests..
+        result = {}
+        if user_info['email'] == 'guest':
+            # Session has most likely timed out.
+            result.update({
+                    'resultCode': 1,
+                    'resultText':
+                        'Error: Not logged in'
+                    })
+
         else:
-            # Handle AJAX requests..
-            result = {}
             data = json.loads(str(jsondata))
-            # Deunicode all strings (CDS Invenio doesn't have unicode support).
+            # Deunicode all strings (CDS Invenio doesn't have unicode
+            # support).
             data = json_unicode_to_utf8(data)
 
             # Authentication.

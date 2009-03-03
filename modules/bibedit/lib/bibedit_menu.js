@@ -148,11 +148,20 @@ function onGetRecordClick(){
   /*
    * Handle 'Get' button (get record).
    */
-  var recID = $('#txtSelectRecord').val();
-  if (gRecID == recID && gState == 'Edit')
-    // We are already editing this record.
-    return;
+  var userInput = $('#txtSelectRecord').val();
+  var recID = parseInt(userInput);
+  if (isNaN(recID)){
+    deactivateMenu();
+    changeAndSerializeHash({state: 'edit', recid: userInput});
+    gState = 'RecordError';
+    $('.headline').text('BibEdit: Record #' + userInput);
+    displayMessage('Error: Non-existent record');
+  }
   else{
+    $('#txtSelectRecord').val(recID);
+    if (gRecID == recID && gState == 'Edit')
+      // We are already editing this record.
+      return;
     updateStatus('updating');
     cleanUpDisplay();
     gRecID = recID;
@@ -312,17 +321,18 @@ function onAddFieldClick(){
   // Create form and scroll close to the top of the table.
   $(document).scrollTop(0);
   var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
+  var jQRowGroupID = '#rowGroupAddField_' + fieldTmpNo;
   $('#bibEditColFieldTag').css('width', '90px');
   $('#bibEditTable tbody').eq(3).after(createAddFieldRowGroup(fieldTmpNo));
+  $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
 
   // Bind event handlers.
   $('#chkAddFieldControlfield_' + fieldTmpNo).bind('click',
     onAddFieldControlfieldClick);
   $('#btnAddFieldAddSubfield_' + fieldTmpNo).bind('click', function(){
-    var hdnFreeSubfieldTmpNo = $('#hdnAddFieldFreeSubfieldTmpNo_' + fieldTmpNo);
-    var subfieldTmpNo = parseInt($(hdnFreeSubfieldTmpNo).val());
-    $(hdnFreeSubfieldTmpNo).val(subfieldTmpNo+1);
-    var addFieldRows = $('#rowGroupAddField_' + fieldTmpNo + ' tr');
+    var subfieldTmpNo = $(jQRowGroupID).data('freeSubfieldTmpNo');
+    $(jQRowGroupID).data('freeSubfieldTmpNo', subfieldTmpNo+1);
+    var addFieldRows = $(jQRowGroupID + ' tr');
     $(addFieldRows).eq(addFieldRows.length-1).before(createAddFieldRow(
       fieldTmpNo, subfieldTmpNo));
     $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_' + subfieldTmpNo).bind(
@@ -339,13 +349,13 @@ function onAddFieldClick(){
 							  onAddFieldChange);
   $('#btnAddFieldSave_' + fieldTmpNo).bind('click', onAddFieldSave);
   $('#btnAddFieldCancel_' + fieldTmpNo).bind('click', function(){
-    $('#rowGroupAddField_' + fieldTmpNo).remove();
+    $(jQRowGroupID).remove();
     if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
       $('#bibEditColFieldTag').css('width', '48px');
     reColorFields();
   });
   $('#btnAddFieldClear_' + fieldTmpNo).bind('click', function(){
-    $('#rowGroupAddField_' + fieldTmpNo + ' input[type="text"]').val(''
+    $(jQRowGroupID + ' input[type="text"]').val(''
       ).removeClass('bibEditInputError');
     $('#txtAddFieldTag_' + fieldTmpNo).focus();
   });
@@ -353,9 +363,8 @@ function onAddFieldClick(){
   reColorFields();
   $('#txtAddFieldTag_' + fieldTmpNo).focus();
   // Color the new form for a short period.
-  var rowGroup = $('#rowGroupAddField_' + fieldTmpNo);
-  $(rowGroup).effect('highlight', {color: gNEW_ADD_FIELD_FORM_COLOR},
-		     gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION);
+  $(jQRowGroupID).effect('highlight', {color: gNEW_ADD_FIELD_FORM_COLOR},
+    gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION);
 }
 // Incrementing temporary field numbers.
 onAddFieldClick.addFieldFreeTmpNo = 100000;
@@ -374,15 +383,11 @@ function onAddFieldControlfieldClick(){
   var addFieldTextInput = $('#rowGroupAddField_' + fieldTmpNo +
 			    ' input[type=text]');
   $(addFieldTextInput).val('').removeClass('bibEditInputError');
-  $('#hdnAddFieldFreeSubfieldTmpNo_' + fieldTmpNo).val(1);
 
   // Toggle hidden fields.
-  var elems = $('#txtAddFieldInd1_' + fieldTmpNo + ', #txtAddFieldInd2_' + fieldTmpNo +
-    ', #txtAddFieldSubfieldCode_' + fieldTmpNo + '_0,' +
-    '#btnAddFieldAddSubfield_' + fieldTmpNo);
-  $(elems).each(function(){
-    $(this).toggleClass('bibEditHidden');
-  });
+  var elems = $('#txtAddFieldInd1_' + fieldTmpNo + ', #txtAddFieldInd2_' +
+    fieldTmpNo + ', #txtAddFieldSubfieldCode_' + fieldTmpNo + '_0,' +
+    '#btnAddFieldAddSubfield_' + fieldTmpNo).toggle();
 
   $('#txtAddFieldTag_' + fieldTmpNo).focus();
 }
@@ -507,7 +512,6 @@ function onAddFieldSave(event){
   });
 
   // Continue local updating.
-  var record = gRecord;
   var fields = gRecord[tag];
   // New field?
   if (!fields)
