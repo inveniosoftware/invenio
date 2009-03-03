@@ -15,6 +15,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibcheck bibcirculation bibclassify bibconvert bibedit bibexport bibharvest bibmatch bibsched bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webmessage webstat webcomment webjournal
+webappdir = $(localstatedir)/www/admin/bibcheck
 
-CLEANFILES = *~
+webapp_DATA = bibcheckadmin.py
+
+EXTRA_DIST =  $(webapp_DATA)
+
+CLEANFILES = *~ *.tmp
