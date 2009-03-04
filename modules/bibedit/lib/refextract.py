@@ -97,7 +97,7 @@ except ImportError:
 
 # make refextract runnable without having to have done the full Invenio installation:
 try:
-    from invenio.search_engine import encode_for_xml
+    from invenio.textutils import encode_for_xml
 except ImportError:
     import string
     def encode_for_xml(s):

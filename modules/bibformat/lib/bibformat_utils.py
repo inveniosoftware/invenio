@@ -38,6 +38,7 @@ from invenio.config import \
      CFG_OAI_ID_FIELD
 from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
+from invenio.textutils import encode_for_xml
 
 def highlight(text, keywords=None, prefix_tag='<strong>', suffix_tag="</strong>"):
     """
@@ -335,12 +336,6 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
         out += "  </record>\n"
 
     return out
-
-def encode_for_xml(s):
-    "Encode special chars in string so that it would be XML-compliant."
-    s = s.replace('&', '&amp;')
-    s = s.replace('<', '&lt;')
-    return s
 
 def parse_tag(tag):
     """

@@ -43,6 +43,7 @@ from invenio.bibrecord_config import CFG_MARC21_DTD, \
                                      CFG_BIBRECORD_DEFAULT_CORRECT, \
                                      CFG_BIBRECORD_PARSERS_AVAILABLE
 from invenio.config import CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
+from invenio.textutils import encode_for_xml
 # find out about the best usable parser:
 err = []
 parser = -1
@@ -1183,12 +1184,6 @@ def get_string_value_RXP(node):
         return ''.join([ n for n in node[2] if type(n).__name__ == 'str'])
     else:
         return ""
-
-def encode_for_xml(s):
-    "Encode special chars in string so that it would be XML-compliant."
-    s = s.replace('&', '&amp;')
-    s = s.replace('<', '&lt;')
-    return s
 
 def print_errors(alist):
     """ creates a unique string with the strings in list, using '\n' as a separator """

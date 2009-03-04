@@ -38,7 +38,7 @@ from invenio.search_engine import perform_request_search
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
-from invenio.bibrecord import encode_for_xml
+from invenio.textutils import encode_for_xml
 
 def _xml_mksubfield(key, subfield, fft):
     return fft.get(key, None) and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(fft[key])) or ''

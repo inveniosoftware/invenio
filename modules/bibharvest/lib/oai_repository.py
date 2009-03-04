@@ -44,6 +44,7 @@ from invenio.dbquery import run_sql
 from invenio.search_engine import record_exists, perform_request_search
 from invenio.bibformat_dblayer import get_preformatted_record
 from invenio.bibformat import format_record
+from invenio.textutils import encode_for_xml
 
 ## verbs = {
 ##     "Identify"            : [""],
@@ -76,16 +77,6 @@ params = {
     "set" :[""],
     "identifier": [""]
 }
-
-def encode_for_xml(strxml):
-    "Encode special chars in string for XML-compliancy."
-
-    if strxml is None:
-        return strxml
-    else:
-        strxml = strxml.replace('&', '&amp;')
-        strxml = strxml.replace('<', '&lt;')
-        return strxml
 
 def escape_space(strxml):
     "Encode special chars in string for URL-compliancy."

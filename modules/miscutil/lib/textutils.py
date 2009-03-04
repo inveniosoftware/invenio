@@ -273,3 +273,12 @@ def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
         except (UnicodeEncodeError, UnicodeDecodeError):
             pass
     return (text, 'utf8')
+
+def encode_for_xml(text):
+    """Encodes special characters in a text so that it would be
+    XML-compliant.
+    @param text text to encode
+    @return an encoded text"""
+    text = text.replace('&', '&amp;')
+    text = text.replace('<', '&lt;')
+    return text

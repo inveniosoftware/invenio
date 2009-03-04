@@ -71,6 +71,7 @@ from invenio.intbitset import intbitset as HitSet
 from invenio.dbquery import DatabaseError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
+from invenio.textutils import encode_for_xml
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -3466,12 +3467,6 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         out += "  </record>\n"
 
     return out
-
-def encode_for_xml(s):
-    "Encode special chars in string so that it would be XML-compliant."
-    s = string.replace(s, '&', '&amp;')
-    s = string.replace(s, '<', '&lt;')
-    return s
 
 def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, user_info=None, verbose=0):
     """
