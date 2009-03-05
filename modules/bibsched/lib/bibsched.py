@@ -145,6 +145,11 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
                              runtime<%%s""" % status_query, (task, date))
             write_message('Archived %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
 
+def bibsched_get_status(task_id):
+    """Retrieve the task status."""
+    res = run_sql("SELECT status FROM schTASK WHERE id=%s LIMIT 1", (task_id, ), 1)
+    if res:
+        return res[0][0]
 
 def bibsched_set_status(task_id, status, when_status_is=None):
     """Update the status of task_id."""
@@ -187,7 +192,7 @@ class Manager:
         self.footer_waiting_item = "[R Run] [D Delete] [N Priority]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
         self.footer_stopped_item = "[I Initialise] [D Delete] [K Acknowledge]"
-        self.footer_sleeping_item   = "[W Wake Up]"
+        self.footer_sleeping_item   = "[W Wake Up] [T Stop] [K Kill]"
         self.item_status = ""
         self.selected_line = 2
         self.rows = []
@@ -498,7 +503,7 @@ class Manager:
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        if status in ('RUNNING', 'CONTINUING', 'ABOUT TO STOP', 'ABOUT TO SLEEP'):
+        if status in ('RUNNING', 'CONTINUING', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'SLEEPING'):
             if self._display_YN_box("Are you sure you want to kill the %s process %s?" % (process, task_id)):
                 bibsched_send_signal(process, task_id, signal.SIGKILL)
                 bibsched_set_status(task_id, 'KILLED')
@@ -510,8 +515,14 @@ class Manager:
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        if status in ('RUNNING', 'CONTINUING'):
-            bibsched_set_status(task_id, 'ABOUT TO STOP', status)
+        if status in ('RUNNING', 'CONTINUING', 'ABOUT TO SLEEP', 'SLEEPING'):
+            if status == 'SLEEPING':
+                bibsched_send_signal(process, task_id, signal.SIGCONT)
+                while bibsched_get_status(task_id) == 'SLEEPING':
+                    time.sleep(1)
+                bibsched_set_status(task_id, 'ABOUT TO STOP', 'CONTINUING')
+            else:
+                bibsched_set_status(task_id, 'ABOUT TO STOP', status)
             self.display_in_footer("STOP signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot stop non-running processes")
