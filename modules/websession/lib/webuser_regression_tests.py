@@ -193,7 +193,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
         # Going to edit page and setting records per group to 20
         browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
         browser.select_form(name="edit_websearch_settings")
-        browser['group_records'] = ["20"]
+        browser['group_records'] = ["25"]
         browser.submit()
 
         expected_response = "User settings saved correctly"
@@ -208,7 +208,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
         browser.open(CFG_SITE_SECURE_URL)
         browser.select_form(nr=0)
         browser.submit()
-        expected_response = "1 - 20"
+        expected_response = "1 - 25"
         records_found_body = browser.response().read()
         try:
             records_found_body.index(expected_response)
