@@ -21,6 +21,7 @@ __revision__ = "$Id$"
 
 import os
 import time
+import cgi
 try:
     from mod_python import apache
 except ImportError:
@@ -544,15 +545,26 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../sub/",
                                        navmenuid='submit')
 
+        ln = args['ln']
+        _ = gettext_set_language(ln)
         #DEMOBOO_RN=DEMO-BOOK-2008-001&ln=en&password=1223993532.26572%40APPDEMOBOO
         params = dict(form)
-        del params['password']
         password = args['password']
-        if "@" in password:
-            params['access'], params['sub'] = password.split('@', 1)
+        if password:
+            del params['password']
+            if "@" in password:
+                params['access'], params['sub'] = password.split('@', 1)
+            else:
+                params['sub'] = password
         else:
-            params['sub'] = password
-        url = "%s/submit/direct?%s" % (CFG_SITE_URL, urlencode(params))
+            args = str(req.args).split('@')
+            if len(args) > 1:
+                params = {'sub' : args[-1]}
+                args = '@'.join(args[:-1])
+                params.update(cgi.parse_qs(args))
+            else:
+                return warningMsg(_("Sorry, invalid URL..."), req, ln=ln)
+        url = "%s/submit/direct?%s" % (CFG_SITE_URL, urlencode(params, doseq=True))
         redirect_to_url(req, url)
 
 
