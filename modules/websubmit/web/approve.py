@@ -72,9 +72,10 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
             rn = res[0][1]
         res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype=%s",(doctype,))
         edsrn = res[0][0]
-        url = "%s/submit/sub?%s" % (CFG_SITE_URL, urllib.urlencode({
+        url = "%s/submit/direct?%s" % (CFG_SITE_URL, urllib.urlencode({
             edsrn: rn,
-            'password': '%s@APP%s' % (access, doctype),
+            'access' : access,
+            'sub' : 'APP%s' % doctype,
             'ln' : ln
         }))
         redirect_to_url(req, url)

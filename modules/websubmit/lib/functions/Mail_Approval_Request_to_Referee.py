@@ -54,7 +54,7 @@ You can see the details of the record at the following address:
 
 Please register your decision by following the instructions at the
 following address:
- <%(site-url)s/submit/sub?%(report-number-fieldname)s=%(report-number)s@%(approval-action)s%(doctype)s&combo%(doctype)s=%(category)s>
+ <%(site-url)s/submit/direct?%(report-number-fieldname)s=%(report-number)s&sub=%(approval-action)s%(doctype)s&combo%(doctype)s=%(category)s>
 
 Below, you may find some additional information about the approval request:
 

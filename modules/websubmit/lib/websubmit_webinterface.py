@@ -539,11 +539,16 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         redirect_to_url(req, url)
 
     def sub(self, req, form):
+        """DEPRECATED: /submit/sub is deprecated now, so raise email to the admin (but allow submission to continue anyway)"""
         args = wash_urlargd(form, {'password': (str, '')})
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../sub/",
                                        navmenuid='submit')
+        try:
+            raise DeprecationWarning, 'submit/sub handler has been used. Please use submit/direct. e.g. "submit/sub?RN=123@SBIFOO" -> "submit/direct?RN=123&sub=SBIFOO"'
+        except DeprecationWarning:
+            register_exception(req=req, alert_admin=True)
 
         ln = args['ln']
         _ = gettext_set_language(ln)

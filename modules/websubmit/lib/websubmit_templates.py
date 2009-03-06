@@ -1438,7 +1438,7 @@ class Template:
                          'last' : _("Last access"),
                        }
             if submission['pending']:
-                idtext = """<a href="submit/sub?access=%(id)s@%(action)s%(doctype)s%(ln_link)s">%(id)s</a>
+                idtext = """<a href="submit/direct?access=%(id)s&sub=%(action)s%(doctype)s%(ln_link)s">%(id)s</a>
                             &nbsp;<a onclick='if (confirm("%(sure)s")){document.forms[0].deletedId.value="%(id)s";document.forms[0].deletedDoctype.value="%(doctype)s";document.forms[0].deletedAction.value="%(action)s";document.forms[0].submit();return true;}else{return false;}' href=''><img src="%(images)s/smallbin.gif" border="0" alt='%(delete)s' /></a>
                          """ % {
                            'images' : CFG_SITE_URL + '/img',
