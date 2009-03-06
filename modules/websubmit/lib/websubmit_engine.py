@@ -193,6 +193,14 @@ def interface(req,
         register_exception(req=req, prefix='doctype="%s", access="%s"' % (doctype, access))
         return warningMsg(_("Invalid parameters"), req, c, ln)
 
+    if doctype and act:
+        ## Let's clean the input
+        details = get_details_of_submission(doctype, act)
+        if not details:
+            return warningMsg(_("Invalid doctype and act parameters"), req, c, ln)
+        doctype = details[0]
+        act = details[1]
+
     ## Before continuing to display the submission form interface,
     ## verify that this submission has not already been completed:
     if submission_is_finished(doctype, act, access, uid_email):
@@ -220,7 +228,7 @@ def interface(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warningMsg(_("Unable to find the submission directory for the ation: %s") % escape(str(act)), req, c, ln)
+        return warningMsg(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, c, ln)
 
     ## get the document type's long-name:
     doctype_lname = get_longname_of_doctype(doctype)
@@ -744,6 +752,14 @@ def endaction(req,
         ## with this submission:
         return warningMsg(_("Not enough information to go ahead with the submission."), req, c, ln)
 
+    if doctype and act:
+        ## Let's clean the input
+        details = get_details_of_submission(doctype, act)
+        if not details:
+            return warningMsg(_("Invalid doctype and act parameters"), req, c, ln)
+        doctype = details[0]
+        act = details[1]
+
     try:
         assert(not access or re.match('\d+_\d+', access))
     except AssertionError:
@@ -772,8 +788,7 @@ def endaction(req,
         indir = submission_dir
     else:
         ## Unable to determine the submission-directory:
-        return warningMsg(_("Unable to find the submission directory."), \
-                        req, c, ln)
+        return warningMsg(_("Unable to find the submission directory for the action: %s") % escape(str(act)), req, c, ln)
 
     # The following words are reserved and should not be used as field names
     reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \

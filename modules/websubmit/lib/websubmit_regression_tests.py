@@ -111,7 +111,7 @@ class WebSubmitXSSVulnerabilityTest(unittest.TestCase):
         """websubmit - no XSS vulnerability in act parameter"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/submit?doctype=DEMOTHE&access=1_1&act=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
-                                               expected_text='Unable to find the submission directory for the ation: &lt;SCRIPT&gt;alert("XSS")', username="jekyll",
+                                               expected_text='Invalid doctype and act parameters', username="jekyll",
                           password="j123ekyll"))
 
     def test_xss_in_submission_page(self):
