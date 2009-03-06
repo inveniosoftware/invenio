@@ -504,14 +504,17 @@ class BibRecDocs:
             # bibdoc doesn't already exists!
             bibdoc = self.add_bibdoc(doctype, docname, False)
             bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format)
+            self.build_bibdoc_list()
         else:
             try:
                 bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format)
+                self.build_bibdoc_list()
             except InvenioWebSubmitFileError, e:
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
                     bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format)
+                    self.build_bibdoc_list()
                 else:
                     raise e
         return bibdoc
@@ -527,6 +530,7 @@ class BibRecDocs:
             format = decompose_file(fullpath)[2]
         bibdoc = self.get_bibdoc(docname=docname)
         bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, hide_previous_versions=hide_previous_versions)
+        self.build_bibdoc_list()
         return bibdoc
 
     def add_new_format(self, fullpath, docname=None, description=None, comment=None, format=None):
@@ -540,6 +544,7 @@ class BibRecDocs:
             format = decompose_file(fullpath)[2]
         bibdoc = self.get_bibdoc(docname=docname)
         bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format)
+        self.build_bibdoc_list()
         return bibdoc
 
     def list_latest_files(self, doctype=''):
