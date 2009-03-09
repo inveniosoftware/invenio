@@ -334,10 +334,10 @@ def _task_build_params(
                 "verbose=",
                 "user=",
                 "sleep=",
-                "time=",
+                "runtime=",
                 "priority=",
-                "task-specific-name=",
-                "runtime-limit=",
+                "name=",
+                "limit=",
                 "profile="
             ] + long_params)
     except getopt.GetoptError, err:
@@ -361,9 +361,9 @@ def _task_build_params(
                 _task_params["runtime"] = get_datetime(opt[1])
             elif opt[0] in ("-P", "--priority"):
                 _task_params["priority"] = int(opt[1])
-            elif opt[0] in ("-N", "--task-specific-name"):
+            elif opt[0] in ("-N", "--name"):
                 _task_params["task_specific_name"] = opt[1]
-            elif opt[0] in ("-L", "--runtime-limit"):
+            elif opt[0] in ("-L", "--limit"):
                 _task_params["runtime_limit"] = parse_runtime_limit(opt[1])
             elif opt[0] in ("--profile", ):
                 _task_params["profile"] += opt[1].split(',')
@@ -561,7 +561,7 @@ def task_sleep_now_if_required(can_stop_too=False):
         write_message("stopped")
         task_update_status("STOPPED")
         sys.exit(0)
-    runtime_limit = task_get_option("runtime_limit")
+    runtime_limit = task_get_option("limit")
     if runtime_limit is not None:
         if not (runtime_limit[0] <= time.time() <= runtime_limit[1]):
             if can_stop_too:
@@ -802,14 +802,14 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -u, --user=USER\tUser name to submit the"
         " task as, password needed.\n")
     sys.stderr.write("  -t, --runtime=TIME\tTime to execute the"
-        " task (now), e.g. +15s, 5m, 3h, 2002-10-27 13:57:26\n")
+        " task (now), e.g. +15s, 5m, 3h, 2002-10-27 13:57:26.\n")
     sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
-        " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
-    sys.stderr.write("  -L  --runtime-limit=LIMIT\tTime limit when it is"
-        " allowed to execute the task, e.g. Sunday 01:00-05:00\n"
-        "\t\t\t\twith the syntax [Wee[kday]] [hh[:mm][-hh[:mm]]]\n")
-    sys.stderr.write("  -P, --priority=PRIORITY\tPriority level (an integer, 0 is default)\n")
-    sys.stderr.write("  -N, --task-specific-name=TASK_SPECIFIC_NAME\tAdvanced option\n")
+        " which to repeat task (no), e.g.: 30m, 2h, 1d.\n")
+    sys.stderr.write("  -L  --limit=LIMIT\tTime limit when it is"
+        " allowed to execute the task, e.g. Sunday 01:00-05:00.\n"
+        "\t\t\tThe time limit syntax is [Wee[kday]] [hh[:mm][-hh[:mm]]].\n")
+    sys.stderr.write("  -P, --priority=PRI\tTask priority (0=default, 1=higher, etc).\n")
+    sys.stderr.write("  -N, --name=NAME\tTask specific name (advanced option).\n")
     sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help\t\tPrint this help.\n")
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")
