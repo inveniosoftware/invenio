@@ -113,7 +113,7 @@ def register_emergency(msg, send_sms_function=send_sms):
     for phone_number in CFG_SITE_EMERGENCY_PHONE_NUMBERS:
         send_sms_function(phone_number, msg)
 
-def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_admin=False):
+def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_admin=False, subject=''):
     """
     Log error exception to invenio.err and warning exception to invenio.log.
     Errors will be logged together with client information (if req is
@@ -139,6 +139,8 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
 
     @param alert_admin wethever to send the exception to the administrator via email
 
+    @param subject overrides the email subject
+
     @return 1 if successfully wrote to stream, 0 if not
     """
 
@@ -152,12 +154,21 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             out = out[:maxlength] + ' [...]'
         return out
 
+    def _get_filename_and_line(exc_info):
+        """
+        Return the filename and the line where the exception happened.
+        """
+        tb = exc_info[2]
+        exception_info = traceback.extract_tb(tb, 1)[0]
+        filename = os.path.basename(exception_info[0])
+        line_no = exception_info[1]
+        return filename, line_no
+
     try:
         ## Let's extract exception information
         exc_info =  sys.exc_info()
         if exc_info[0]:
             ## We found an exception.
-
 
             ## We want to extract the name of the Exception
             exc_name = exc_info[0].__name__
@@ -272,7 +283,11 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 if alert_admin or not written_to_log:
                     ## If requested or if it's impossible to write in the log
                     from invenio.mailutils import send_email
-                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject='Registered exception at %s' % CFG_SITE_URL, content=email_text)
+                    if not subject:
+                        filename, line_no = _get_filename_and_line(exc_info)
+                        subject = 'Exception (%s:%s)' % (filename, line_no)
+                    subject = '%s at %s' % (subject, CFG_SITE_URL)
+                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject=subject, content=email_text)
             return 1
         else:
             return 0

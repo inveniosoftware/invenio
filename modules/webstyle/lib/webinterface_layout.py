@@ -65,108 +65,108 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
 try:
     from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceSearchInterfacePages = WebInterfaceDumbPages
 
 try:
     from invenio.websearch_webinterface import WebInterfaceAuthorPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceAuthorPages = WebInterfaceDumbPages
 
 try:
     from invenio.websearch_webinterface import WebInterfaceRSSFeedServicePages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceRSSFeedServicePages = WebInterfaceDumbPages
 
 try:
     from invenio.websearch_webinterface import WebInterfaceUnAPIPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceUnAPIPages = WebInterfaceDumbPages
 
 try:
     from invenio.websubmit_webinterface import websubmit_legacy_getfile
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     websubmit_legacy_getfile = WebInterfaceDumbPages
 
 try:
     from invenio.websubmit_webinterface import WebInterfaceSubmitPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceSubmitPages = WebInterfaceDumbPages
 
 try:
     from invenio.websession_webinterface import WebInterfaceYourAccountPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAccountPages = WebInterfaceDumbPages
 
 try:
     from invenio.websession_webinterface import WebInterfaceYourGroupsPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourGroupsPages = WebInterfaceDumbPages
 
 try:
     from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourAlertsPages = WebInterfaceDumbPages
 
 try:
     from invenio.webbasket_webinterface import WebInterfaceYourBasketsPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourBasketsPages = WebInterfaceDumbPages
 
 try:
     from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceCommentsPages = WebInterfaceDumbPages
 
 try:
     from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourMessagesPages = WebInterfaceDumbPages
 
 try:
     from invenio.errorlib_webinterface import WebInterfaceErrorPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceErrorPages = WebInterfaceDumbPages
 
 try:
     from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceOAIProviderPages = WebInterfaceDumbPages
 
 try:
     from invenio.webstat_webinterface import WebInterfaceStatsPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceStatsPages = WebInterfaceDumbPages
 try:
     from invenio.bibcirculation_webinterface import WebInterfaceYourLoansPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceYourLoansPages = WebInterfaceDumbPages
 
 try:
     from invenio.webjournal_webinterface import WebInterfaceJournalPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceJournalPages = WebInterfaceDumbPages
 
 try:
     from invenio.webdoc_webinterface import WebInterfaceDocumentationPages
 except:
-    register_exception(alert_admin=True)
+    register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceDocumentationPages = WebInterfaceDumbPages
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
