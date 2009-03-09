@@ -28,27 +28,146 @@ __revision__ = \
     "$Id$"
 
 from invenio.webinterface_handler import create_handler
+from invenio.errorlib import register_exception
+from invenio.webinterface_handler import WebInterfaceDirectory
 
-from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages, \
-     WebInterfaceAuthorPages, WebInterfaceRSSFeedServicePages, \
-     WebInterfaceUnAPIPages
-from invenio.websubmit_webinterface import websubmit_legacy_getfile, \
-     WebInterfaceSubmitPages
-from invenio.websession_webinterface import WebInterfaceYourAccountPages, \
-     WebInterfaceYourGroupsPages
-from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
-from invenio.webbasket_webinterface import WebInterfaceYourBasketsPages
-from invenio.webcomment_webinterface import WebInterfaceCommentsPages
-from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
-from invenio.errorlib_webinterface import WebInterfaceErrorPages
-from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
-from invenio.webstat_webinterface import WebInterfaceStatsPages
-from invenio.bibcirculation_webinterface import WebInterfaceYourLoansPages
+class WebInterfaceDumbPages(WebInterfaceDirectory):
+    """This class implements a dumb interface to use as a fallback in case of
+    errors importing particular module pages."""
+    _exports = ['']
+    def __call__(self, req, form):
+        try:
+            from invenio.webpage import page
+        except ImportError:
+            page = lambda *args: args[1]
+        from mod_python import apache
+        req.status = apache.HTTP_INTERNAL_SERVER_ERROR
+        msg = "<p>This functionality is facing a temporary failure.</p>"
+        msg += "<p>The administrator has been informed about the problem.</p>"
+        try:
+            from invenio.config import CFG_SITE_ADMIN_EMAIL
+            msg += """<p>You can contact <code>%s</code>
+                         in case of questions.</p>""" % \
+                      CFG_SITE_ADMIN_EMAIL
+        except ImportError:
+            pass
+        msg += """<p>We hope to restore the service soon.</p>
+                  <p>Sorry for the inconvenience.</p>"""
+        try:
+            return page('Service failure', msg)
+        except:
+            return msg
 
+    def _lookup(self, component, path):
+        return WebInterfaceDumbPages(), path
+    index = __call__
 
-from invenio.webjournal_webinterface import WebInterfaceJournalPages
+try:
+    from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceSearchInterfacePages = WebInterfaceDumbPages
 
-from invenio.webdoc_webinterface import WebInterfaceDocumentationPages
+try:
+    from invenio.websearch_webinterface import WebInterfaceAuthorPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceAuthorPages = WebInterfaceDumbPages
+
+try:
+    from invenio.websearch_webinterface import WebInterfaceRSSFeedServicePages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceRSSFeedServicePages = WebInterfaceDumbPages
+
+try:
+    from invenio.websearch_webinterface import WebInterfaceUnAPIPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceUnAPIPages = WebInterfaceDumbPages
+
+try:
+    from invenio.websubmit_webinterface import websubmit_legacy_getfile
+except:
+    register_exception(alert_admin=True)
+    websubmit_legacy_getfile = WebInterfaceDumbPages
+
+try:
+    from invenio.websubmit_webinterface import WebInterfaceSubmitPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceSubmitPages = WebInterfaceDumbPages
+
+try:
+    from invenio.websession_webinterface import WebInterfaceYourAccountPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceYourAccountPages = WebInterfaceDumbPages
+
+try:
+    from invenio.websession_webinterface import WebInterfaceYourGroupsPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceYourGroupsPages = WebInterfaceDumbPages
+
+try:
+    from invenio.webalert_webinterface import WebInterfaceYourAlertsPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceYourAlertsPages = WebInterfaceDumbPages
+
+try:
+    from invenio.webbasket_webinterface import WebInterfaceYourBasketsPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceYourBasketsPages = WebInterfaceDumbPages
+
+try:
+    from invenio.webcomment_webinterface import WebInterfaceCommentsPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceCommentsPages = WebInterfaceDumbPages
+
+try:
+    from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceYourMessagesPages = WebInterfaceDumbPages
+
+try:
+    from invenio.errorlib_webinterface import WebInterfaceErrorPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceErrorPages = WebInterfaceDumbPages
+
+try:
+    from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceOAIProviderPages = WebInterfaceDumbPages
+
+try:
+    from invenio.webstat_webinterface import WebInterfaceStatsPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceStatsPages = WebInterfaceDumbPages
+try:
+    from invenio.bibcirculation_webinterface import WebInterfaceYourLoansPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceYourLoansPages = WebInterfaceDumbPages
+
+try:
+    from invenio.webjournal_webinterface import WebInterfaceJournalPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceJournalPages = WebInterfaceDumbPages
+
+try:
+    from invenio.webdoc_webinterface import WebInterfaceDocumentationPages
+except:
+    register_exception(alert_admin=True)
+    WebInterfaceDocumentationPages = WebInterfaceDumbPages
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
@@ -76,38 +195,22 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
 
     def __init__(self):
         self.getfile = websubmit_legacy_getfile
-        return
 
     author = WebInterfaceAuthorPages()
-
     submit = WebInterfaceSubmitPages()
-
     youraccount = WebInterfaceYourAccountPages()
-
     youralerts = WebInterfaceYourAlertsPages()
-
     yourbaskets = WebInterfaceYourBasketsPages()
-
     yourmessages = WebInterfaceYourMessagesPages()
-
     yourloans = WebInterfaceYourLoansPages()
-
     yourgroups = WebInterfaceYourGroupsPages()
-
     comments = WebInterfaceCommentsPages()
-
     error = WebInterfaceErrorPages()
-
     oai2d = WebInterfaceOAIProviderPages()
-
     rss = WebInterfaceRSSFeedServicePages()
-
     stats = WebInterfaceStatsPages()
-
     journal = WebInterfaceJournalPages()
-
     help = WebInterfaceDocumentationPages()
-
     unapi = WebInterfaceUnAPIPages()
 
 # This creates the 'handler' function, which will be invoked directly
