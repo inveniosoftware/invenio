@@ -99,13 +99,13 @@ class Template:
             '            <td>%(btnDeleteSelected)s</td>\n' \
             '          </tr>\n' \
             '        </table>' % {
-            'imgAddField': img('/img/add.png'),
+            'imgAddField': img('/img/table_row_insert.png'),
             'btnAddField': button('button', 'Add', id='btnAddField',
                                   disabled='disabled'),
-            'imgSortFields': img('/img/sort_asc.png'),
+            'imgSortFields': img('/img/table_sort.png'),
             'btnSortFields': button('button', 'Sort', id='btnSortFields',
                                     disabled='disabled'),
-            'imgDeleteSelected': img('/img/delete.png'),
+            'imgDeleteSelected': img('/img/table_row_delete.png'),
             'btnDeleteSelected': button('button', 'Delete selected',
                 id='btnDeleteSelected', disabled='disabled')}
 
@@ -118,7 +118,7 @@ class Template:
             'lblChecking': 'Checking status' + '...'
             }
 
-        lnkhelp = img('/img/help.gif', '', style='vertical-align: bottom') + \
+        lnkhelp = img('/img/help.png', '', style='vertical-align: bottom') + \
             link('Help', href='#', onclick='window.open(' \
             '\'%s/help/admin/bibedit-admin-guide#2\', \'\', \'width=640,' \
             'height=600,left=150,top=150,resizable=yes,scrollbars=yes\');' \
