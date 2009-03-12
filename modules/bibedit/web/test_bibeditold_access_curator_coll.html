@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://localhost/" />
-<title>test_bibedit_access_none</title>
+<title>test_bibeditold_access_curator_coll</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">test_bibedit_access_none</td></tr>
+<tr><td rowspan="1" colspan="3">test_bibeditold_access_curator_coll</td></tr>
 </thead><tbody>
 <tr>
 	<td>open</td>
@@ -24,12 +24,12 @@
 <tr>
 	<td>type</td>
 	<td>p_un</td>
-	<td>benvolio</td>
+	<td>romeo</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>p_pw</td>
-	<td>b123envolio</td>
+	<td>r123omeo</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
@@ -44,7 +44,27 @@
 <tr>
 	<td>type</td>
 	<td>recid</td>
-	<td>3</td>
+	<td>35</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Edit']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Record #35</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Cancel</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>recid</td>
+	<td>4</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>

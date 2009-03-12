@@ -4,12 +4,12 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://localhost/" />
-<title>test_bibedit_basic_record_locking</title>
+<title>test_bibedit_access_curator_all</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">test_bibedit_basic_record_locking</td></tr>
+<tr><td rowspan="1" colspan="3">test_bibedit_access_curator_all</td></tr>
 </thead><tbody>
 <tr>
 	<td>open</td>
@@ -44,7 +44,7 @@
 <tr>
 	<td>type</td>
 	<td>txtSelectRecord</td>
-	<td>40</td>
+	<td>36</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -64,92 +64,27 @@
 <tr>
 	<td>verifyText</td>
 	<td>content_001_1</td>
-	<td>40</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=logout</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=login</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>p_un</td>
-	<td>romeo</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>p_pw</td>
-	<td>r123omeo</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>action</td>
-	<td></td>
-</tr>
-<tr>
-	<td>open</td>
-	<td>http://localhost/record/edit/?ln=en</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>txtSelectRecord</td>
-	<td>40</td>
+	<td>36</td>
 </tr>
 <tr>
 	<td>click</td>
-	<td>btnGetRecord</td>
+	<td>btnCancel</td>
 	<td></td>
 </tr>
 <tr>
 	<td>waitForText</td>
 	<td>cellStatus</td>
-	<td>Error: Locked record - by user</td>
+	<td>Cancelled</td>
 </tr>
 <tr>
-	<td>verifyText</td>
-	<td>bibEditMessage</td>
-	<td>This record is currently being edited by another user. Please try again later.</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=logout</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=login</td>
-	<td></td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>p_un</td>
-	<td>balthasar</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>p_pw</td>
-	<td>b123althasar</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>action</td>
-	<td></td>
-</tr>
-<tr>
-	<td>open</td>
-	<td>http://localhost/record/edit/?ln=en</td>
-	<td></td>
+	<td>waitForText</td>
+	<td>cellStatus</td>
+	<td>Ready</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>txtSelectRecord</td>
-	<td>40</td>
+	<td>12</td>
 </tr>
 <tr>
 	<td>click</td>
@@ -169,7 +104,7 @@
 <tr>
 	<td>verifyText</td>
 	<td>content_001_1</td>
-	<td>40</td>
+	<td>12</td>
 </tr>
 <tr>
 	<td>click</td>

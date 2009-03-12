@@ -181,7 +181,7 @@ function onGetRecordSuccess(json){
     deactivateMenu();
     displayMessage(json['resultText']);
     gState = 'RecordError';
-    updateStatus('ready');
+    updateStatus('report', json['resultText']);
   }
   else{
     // Display record.

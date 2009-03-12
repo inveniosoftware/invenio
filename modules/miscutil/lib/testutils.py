@@ -373,7 +373,7 @@ def build_and_run_web_test_suite():
     fdesc.write('<tr><td>Web test suite for the whole Invenio.</td></tr>\n')
     for candidate in sorted(os.listdir(webtestdir)):
         base, ext = os.path.splitext(candidate)
-        if ext != '.html' or base.endswith('_all'):
+        if ext != '.html' or base == 'test_all':
             continue
         fdesc.write('<tr><td><a target="testFrame" href="%s">%s</a></td></tr>\n' % (candidate, base))
     fdesc.write('</table>\n')
