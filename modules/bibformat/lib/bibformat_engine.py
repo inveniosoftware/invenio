@@ -832,8 +832,8 @@ def get_format_template(filename, with_attributes=False):
         # Remove name and description
         if filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
             code_and_description = pattern_format_template_name.sub("",
-                                                                    format_content)
-            code = pattern_format_template_desc.sub("", code_and_description)
+                                                                    format_content, 1)
+            code = pattern_format_template_desc.sub("", code_and_description, 1)
         else:
             code = format_content
 

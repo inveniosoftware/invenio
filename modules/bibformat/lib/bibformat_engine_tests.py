@@ -55,7 +55,7 @@ class FormatTemplateTest(unittest.TestCase):
         #Test correct parsing and structure
         template_1 = bibformat_engine.get_format_template("Test1.bft", with_attributes=True)
         self.assert_(template_1 is not None)
-        self.assertEqual(template_1['code'],  "test")
+        self.assertEqual(template_1['code'],  "test\n<name>this value should stay as it is</name>\n<description>this one too</description>\n")
         self.assertEqual(template_1['attrs']['name'], "name_test")
         self.assertEqual(template_1['attrs']['description'], "desc_test")
 
@@ -83,7 +83,7 @@ class FormatTemplateTest(unittest.TestCase):
         self.assert_("Test_no_template.test" not in templates.keys())
 
         #Test correct pasrsing and structure
-        self.assertEqual(templates['Test1.bft']['code'],  "test")
+        self.assertEqual(templates['Test1.bft']['code'],  "test\n<name>this value should stay as it is</name>\n<description>this one too</description>\n")
         self.assertEqual(templates['Test1.bft']['attrs']['name'], "name_test")
         self.assertEqual(templates['Test1.bft']['attrs']['description'], "desc_test")
 
