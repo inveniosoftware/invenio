@@ -20,8 +20,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.1.20090303, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20090303)
+AC_INIT(cds-invenio, 0.99.1.20090310, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20090310)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -570,6 +570,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/elmsubmit/lib/Makefile \
 	  modules/miscutil/Makefile \
 	  modules/miscutil/bin/Makefile \
+	  modules/miscutil/bin/dbdump \
 	  modules/miscutil/bin/dbexec \
 	  modules/miscutil/bin/inveniocfg \
 	  modules/miscutil/demo/Makefile \

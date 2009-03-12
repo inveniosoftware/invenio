@@ -50,6 +50,7 @@ modules/bibsched/bin/bibtaskex
 modules/bibupload/bin/bibupload
 modules/elmsubmit/bin/elmsubmit
 modules/elmsubmit/etc/elmsubmit.cfg
+modules/miscutil/bin/dbdump
 modules/miscutil/bin/dbexec
 modules/miscutil/bin/inveniocfg
 modules/miscutil/lib/build

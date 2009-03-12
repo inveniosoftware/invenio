@@ -21,11 +21,14 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import CFG_LOGDIR
+
 # Which tasks are recognized as valid?
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
                            "oaiharvest", "oaiarchive", "inveniogc",
-                           "webstatadmin", "bibclassify", "bibexport")
+                           "webstatadmin", "bibclassify", "bibexport",
+                           "dbdump")
 
 # Task that should not be reinstatiated
 CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
@@ -93,5 +96,9 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
     },
     'bibexport' : {
         'wjob' : None,
+    },
+    'dbdump' : {
+        'output': CFG_LOGDIR,
+        'number': 5,
     },
 }

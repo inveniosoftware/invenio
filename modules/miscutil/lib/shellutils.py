@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import os
 import tempfile
 
-def run_shell_command(cmd):
+def run_shell_command(cmd, filename_out=None, filename_err=None):
     """
     Run operating system command CMD (assumed to be properly escaped
     already!) in a sub-shell and return tuple (exit status code, out
@@ -34,26 +34,49 @@ def run_shell_command(cmd):
 
     Note: uses temporary files to store out/err output, not pipes due
     to potential pipe race condition on some systems.
+
+    If either FILENAME_OUT or FILENAME_ERR are defined, then do not
+    create temporary files, store stdout or stderr output directly in
+    these files instead, and do not delete them.  This is useful for
+    commands that produce big files, for which it is not practical to
+    open temporary files and pass them onto clients in a text buffer.
+    Note that it is the client's responsibility to name these files in
+    proper fashion (e.g. to be unique) and to close these files after
+    use.
     """
     cmd_out = ''
     cmd_err = ''
-    cmd_out_fd, file_cmd_out = tempfile.mkstemp("invenio-shellutils-cmd-out")
-    cmd_err_fd, file_cmd_err = tempfile.mkstemp("invenio-shellutils-cmd-err")
+    # create files:
+    if filename_out:
+        cmd_out_fd = os.open(filename_out, os.O_CREAT, 0644)
+        file_cmd_out = filename_out
+    else:
+        cmd_out_fd, file_cmd_out = tempfile.mkstemp("invenio-shellutils-cmd-out")
+    if filename_err:
+        cmd_err_fd = os.open(filename_err, os.O_CREAT, 0644)
+        file_cmd_err = filename_err
+    else:
+        cmd_err_fd, file_cmd_err = tempfile.mkstemp("invenio-shellutils-cmd-err")
+    # run command:
     cmd_exit_code = os.system("%s > %s 2> %s" % (cmd,
                                                  file_cmd_out,
                                                  file_cmd_err))
-    if os.path.exists(file_cmd_out):
-        cmd_out_fo = open(file_cmd_out)
-        cmd_out = cmd_out_fo.read()
-        cmd_out_fo.close()
-        os.remove(file_cmd_out)
-    if os.path.exists(file_cmd_err):
-        cmd_err_fo = open(file_cmd_err)
-        cmd_err = cmd_err_fo.read()
-        cmd_err_fo.close()
-        os.remove(file_cmd_err)
+    # delete temporary files: (if applicable)
+    if not filename_out:
+        if os.path.exists(file_cmd_out):
+            cmd_out_fo = open(file_cmd_out)
+            cmd_out = cmd_out_fo.read()
+            cmd_out_fo.close()
+            os.remove(file_cmd_out)
+    if not filename_err:
+        if os.path.exists(file_cmd_err):
+            cmd_err_fo = open(file_cmd_err)
+            cmd_err = cmd_err_fo.read()
+            cmd_err_fo.close()
+            os.remove(file_cmd_err)
     os.close(cmd_out_fd)
     os.close(cmd_err_fd)
+    # return results:
     return cmd_exit_code, cmd_out, cmd_err
 
 def escape_shell_arg(shell_arg):

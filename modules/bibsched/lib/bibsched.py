@@ -776,8 +776,8 @@ class BibSched:
         return proc1 != proc2 # and not proc1.startswith('bibupload') and not proc2.startswith('bibupload')
 
     def get_tasks_to_sleep_and_stop(self, proc, task_set):
-        """Among the task_set, return the lists of task to stop and the lists
-        of task to sleep.
+        """Among the task_set, return the list of tasks to stop and the list
+        of tasks to sleep.
         """
         min_prio = None
         min_task_id = None
@@ -907,8 +907,9 @@ class BibSched:
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s' % (task_id, proc, os.path.join(CFG_LOGDIR, 'bibsched.log'))
-                    if proc == 'bibupload':
-                        ## bibupload mode: serial monotask.
+                    if proc == 'bibupload' or proc == 'dbdump':
+                        ## okay, we have a synchronous monotask to run:
+                        ## (won't be interrupted by any other task that may pop in)
                         COMMAND = "(%s %s > /dev/null 2> /dev/null %s)" % (program, str(task_id), exit_str)
                     else:
                         COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" % (program, str(task_id), exit_str)

@@ -23,6 +23,7 @@ pylib_DATA = __init__.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
              data_cacher.py \
+             dbdump.py \
              dbquery.py \
              dbquery_tests.py \
              mailutils.py \

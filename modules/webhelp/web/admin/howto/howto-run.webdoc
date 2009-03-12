@@ -21,12 +21,12 @@
 
 <h2>Overview</h2>
 
-<p>This HOWTO guide intends to give you ideas on how to run your
-CDS Invenio installation and how to take care of its normal operation day
-by day.
+<p>This HOWTO guide intends to give you ideas on how to run your CDS
+Invenio installation and how to take care of its normal day-to-day
+operation.
 </p>
 
-<h2>BibSched Periodical Tasks</h2>
+<h2>Setting up periodical daemon tasks</h2>
 
 <p>Many tasks that manipulate the bibliographic record database can be
 set to run in a periodical mode.  For example, we want to have the
@@ -57,14 +57,14 @@ daemon, do:
 </p>
 
 <p>To setup indexing, ranking, formatting, and collection cache updating
-daemons to run periodically with a sleeping period of, say, 1 hour:
+daemons to run periodically with a sleeping period of, say, 5 minutes:
 
 <blockquote>
 <pre>
-$ bibindex -f50000 -s1h
-$ bibreformat -oHB -s1h
-$ webcoll -v0 -s1h
-$ bibrank -f50000 -s1h
+$ bibindex -f50000 -s5m
+$ bibreformat -oHB -s5m
+$ webcoll -v0 -s5m
+$ bibrank -f50000 -s5m
 </pre>
 </blockquote>
 </p>
@@ -74,24 +74,29 @@ BibSched queue so that newly submitted documents will be processed
 automatically.
 </p>
 
-<p>You may also want to set up periodical recalculating of word
-similarity ranking weights every, say, thirty days:
+<p>You may also want to set up some periodical housekeeping tasks:
 
 <blockquote>
 <pre>
-$ bibrank -f50000 -R -wwrd -s30d
+$ bibrank -f50000 -R -wwrd -s14d -LSunday
+$ inveniogc -a -s7d -L 'Sunday 01:00-05:00'
+$ dbdump -s20h -L '22:00-06:00' -o/opt2/mysql-backups -n10
 </pre>
 </blockquote>
 </p>
 
-Please consult the section below entitled "Recalculate ranking
-weights" for more details.
+Please consult the sections below for more details about these
+housekeeping tasks.
 </p>
 
-<p>Note that the BibSched daemon automatic mode stops as soon as some
-of the tasks ends with an error.  It it therefore a good idea to
-inspect BibSched queue from time to time, say several times per day.
-This can be done by running the BibSched command-line monitor:
+<h2>Monitoring periodical daemon tasks</h2>
+
+<p>Note that the BibSched automated daemon stops as soon as some of
+its tasks end with an error.  You will be informed by email about this
+incident.  Nevertheless, it is a good idea to inspect the BibSched
+queue from time to time anyway, say several times per day, to see what
+is going on.  This can be done by running the BibSched command-line
+monitor:
 
 <blockquote>
 <pre>
@@ -100,25 +105,44 @@ $ bibsched
 </blockquote>
 </p>
 
-<p>The monitor will permit you to stop/start the daemon mode, to
-delete the tasks already submitted, to run some of the tasks manually,
-etc.  Note also that BibSched daemon writes log and error files on its
-operation and on the operation of its tasks.  The log and error files
-can be found at <code>/opt/cds-invenio/var/log</code>.
-</p>
+<p>The monitor will permit you to stop/start the automated mode, to
+delete the tasks that were wrongly submitted, to run some of the tasks
+manually, etc.  Note also that the BibSched daemon writes its log and
+error files about its own operation, as well as on the operation of
+its tasks, to the <code>/opt/cds-invenio/var/log</code> directory.</p>
 
-<p>You may want to clean up the old BibSched tasks with the DONE
-status, let us say once per month, to make the task table slim and the
-bibsched daemon both faster and less memory hungry:
+<h2>Running alert engine</h2>
+
+<p>CDS Invenio users may set up an automatic notification email alerts
+so that they are automatically alerted about documents of their
+interest by email, either daily, weekly, or monthly.  It is the job of
+the alert engine to do this.  The alert engine has to be run every
+day:
 
 <blockquote>
 <pre>
-$ echo "DELETE FROM schTASK WHERE status='DONE' AND runtime&lt;DATE_SUB(NOW(), INTERVAL 7 DAY);" | dbexec
+$ alertengine
 </pre>
 </blockquote>
 </p>
 
-<h2>Recalculate ranking weights</h2>
+<p>You may want to set up an external cron job to call
+<code>alertengine</code> each day, for example:
+
+<blockquote>
+<pre>
+$ crontab -l
+&#35; invenio: periodically restart Apache:
+59 23 * * * /usr/sbin/apachectl restart
+&#35; invenio: run alert engine:
+30 14 * * * /usr/bin/sudo -u apache /opt/cds-invenio/bin/alertengine
+</pre>
+</blockquote>
+</p>
+
+<h2>Housekeeping task details</h2>
+
+<h4>Housekeeping: recalculating ranking weights</h4>
 
 <p>When you are adding new records to the system, the word frequency
 ranking weights for old records aren't recalculated by default in
@@ -129,7 +153,7 @@ while during a relatively quiet site operation day, by doing:
 
 <blockquote>
 <pre>
-$ bibrank -R -wwrd -s14d -L Sunday
+$ bibrank -R -w wrd -s 14d -L Sunday
 </pre>
 </blockquote>
 
@@ -139,47 +163,85 @@ additions to the record database, say when the size grows by 2-3
 percent.
 </p>
 
-<h2>Guest Users Cleanup</h2>
+<h4>Housekeeping: cleaning up the garbage</h4>
 
-<p>Guest users create a lot of entries in CDS Invenio tables that are
-related to their web sessions, their search history, personal baskets,
-etc.  This data has to be garbage-collected periodically.  You can run this,
-say every Sunday between 01:00 and 05:00, via:
+<p>The tool <code>inveniogc</code> provides a garbage collector for
+the database, temporary files, and the like.</p>
+
+<p>If you choose to differentiate between guest users
+(see <code>CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS</code>
+in <code>invenio.conf</code>), then guest users can create a lot of
+entries in CDS Invenio tables that are related to their web sessions,
+their search history, personal baskets, etc.  This data has to be
+garbage-collected periodically.  You can run this, say every Sunday
+between 01:00 and 05:00, via:
 
 <blockquote>
 <pre>
-$ inveniogc -s7d -L 'Sunday 01:00-05:00'
+$ inveniogc -s 7d -L 'Sunday 01:00-05:00'
 </pre>
 </blockquote>
 </p>
 
-<h2>Cleaning Up the Filesystem</h2>
-
-<p>Different temporary log and err files  are created in <code>/opt/cds-invenio/var/log</code>
-and <code>/opt/cds-invenio/var/tmp</code> directory that is good to clean up from time to time.  The previous command could be used to clean those files, too, via:
+<p>Different temporary log and err files are created
+in <code>/opt/cds-invenio/var/log</code>
+and <code>/opt/cds-invenio/var/tmp</code> directory that is good to
+clean up from time to time.  The previous command could be used to
+clean those files, too, via:
 
 <blockquote>
 <pre>
-$ inveniogc -s7d -d -L 'Sunday 01:00-05:00'
+$ inveniogc -s 7d -d -L 'Sunday 01:00-05:00'
 </pre>
 </blockquote>
 </p>
 
-<h2>Alert Engine</h2>
+<p>The <code>inveniogc</code> tool can run other cleaning actions;
+please refer to its help (<code>inveniogc --help</code>) for more
+details.</p>
 
-<p>CDS Invenio users may set up an automatic notification email alerts
-that would send them documents corresponding to the user profile by
-email either daily, weekly, or monthly.  It is the job of the alert
-engine to do this.  The alert engine has to be run every day:
+<p>Note that in the above section "Setting up periodical daemon
+tasks", we have set up <code>inveniogc</code> with
+argument <code>-a</code> in that example, meaning that it would run
+all possible cleaning actions.  Please modify this if it is not what
+you want.</p>
+
+<h4>Housekeeping: backing up the database</h4>
+
+<p>You can launch a bibsched task called <code>dbdump</code> in order
+to take regular snapshot of your database content into SQL dump files.
+For example, to back up the database content
+into <code>/opt2/mysql-backups</code> directory every night, keeping
+at most 10 latest copies of the backup file, you would launch:</p>
 
 <blockquote>
 <pre>
-$ alertengine
+$ dbdump -s 20h -L '22:00-06:00' -o /opt2/mysql-backups -n 10
 </pre>
 </blockquote>
-</p>
 
-<p>You may want to set up an external cron job to call
-<code>alertengine</code> each day.
-</p>
+<p>This will create files named
+like <code>cdsinvenio-dbdump-2009-03-10_22:10:28.sql</code> in this
+folder.</p>
 
+<p>Note that you may use Invenio-independent MySQL backuping tools
+like <code>mysqldump</code>, but these might generally lock all tables
+during backup for consistency, hence it could happen that your site
+might not be accessible during backuping time due to the user session
+table being locked as well.  The <code>dbdump</code> tool does not
+lock all tables, therefore the site remains accessible to users while
+the dump files are being created.  Note that the dump files are kept
+consistent with respect to the data, since <code>dbdump</code> runs
+via <code>bibsched</code>, hence not allowing any other important
+bibliographic task to run during the backup.</p>
+
+<p>To load a dump file produced by <code>dbdump</code> into a running
+Invenio instance later, you can use:</p>
+
+<blockquote>
+<pre>
+$ bibsched stop
+$ cat /opt2/mysql-backups/cdsinvenio-dbdump-2009-03-10_22\:10\:28.sql | dbexec
+$ bibsched start
+</pre>
+</blockquote>

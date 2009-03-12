@@ -799,15 +799,17 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         sys.stderr.write("Command options:\n")
         sys.stderr.write(help_specific_usage)
     sys.stderr.write("Scheduling options:\n")
-    sys.stderr.write("  -u, --user=USER\tUser name to submit the"
-        " task as, password needed.\n")
-    sys.stderr.write("  -t, --runtime=TIME\tTime to execute the"
-        " task (now), e.g. +15s, 5m, 3h, 2002-10-27 13:57:26.\n")
+    sys.stderr.write("  -u, --user=USER\tUser name under which to submit this"
+        " task.\n")
+    sys.stderr.write("  -t, --runtime=TIME\tTime to execute the task. [default=now]\n"
+        "\t\t\tExamples: +15s, 5m, 3h, 2002-10-27 13:57:26.\n")
     sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
-        " which to repeat task (no), e.g.: 30m, 2h, 1d.\n")
+        " which to repeat the task.\n"
+        "\t\t\tExamples: 30m, 2h, 1d. [default=no]\n")
     sys.stderr.write("  -L  --limit=LIMIT\tTime limit when it is"
-        " allowed to execute the task, e.g. Sunday 01:00-05:00.\n"
-        "\t\t\tThe time limit syntax is [Wee[kday]] [hh[:mm][-hh[:mm]]].\n")
+        " allowed to execute the task.\n"
+        "\t\t\tExamples: 22:00-03:00, Sunday 01:00-05:00.\n"
+        "\t\t\tSyntax: [Wee[kday]] [hh[:mm][-hh[:mm]]].\n")
     sys.stderr.write("  -P, --priority=PRI\tTask priority (0=default, 1=higher, etc).\n")
     sys.stderr.write("  -N, --name=NAME\tTask specific name (advanced option).\n")
     sys.stderr.write("General options:\n")

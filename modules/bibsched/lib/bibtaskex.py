@@ -72,14 +72,13 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
         time.sleep(1)
     task_update_progress("Done %d out of %d." % (n, n))
-    write_message("Task #%d finished." % task_get_task_param('task_id'))
     return 1
 
 def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='runbibtaskex',
             authorization_msg="BibTaskEx Task Submission",
-            help_specific_usage="""  -n,  --number            Print Fibonacci numbers for up to NUM. [default=30]\n""",
+            help_specific_usage="""  -n,  --number         Print Fibonacci numbers for up to NUM. [default=30]\n""",
             version=__revision__,
             specific_params=("n:",
                 ["number="]),

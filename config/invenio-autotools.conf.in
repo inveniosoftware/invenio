@@ -37,6 +37,7 @@ CFG_CACHEDIR = @localstatedir@/cache
 CFG_WEBDIR = @localstatedir@/www
 
 ## path to interesting programs:
+CFG_PATH_MYSQL = @MYSQL@
 CFG_PATH_PHP = @PHP@
 CFG_PATH_ACROREAD = @ACROREAD@
 CFG_PATH_GZIP = @GZIP@
