@@ -94,7 +94,7 @@ def bibconvert_function_libxslt(ctx, value, func):
     try:
         if isinstance(value, str):
             string_value = value
-        elif isinstance(value, int):
+        elif isinstance(value, (int, long)):
             string_value = str(value)
         else:
             string_value = libxml2.xmlNode(_obj=value[0]).children.content

@@ -2490,7 +2490,7 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True):
     only.
     """
     out = []
-    if isinstance(recIDs, int):
+    if isinstance(recIDs, (int, long)):
         recIDs =[recIDs,]
     if len(recIDs) == 0:
         return []

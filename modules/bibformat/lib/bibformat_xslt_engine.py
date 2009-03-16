@@ -97,7 +97,7 @@ def get_creation_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
     try:
         if isinstance(recID, str):
             recID_int = int(recID)
-        elif isinstance(recID, int):
+        elif isinstance(recID, (int, long)):
             recID_int = recID
         else:
             recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
@@ -167,7 +167,7 @@ def get_modification_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
     try:
         if isinstance(recID, str):
             recID_int = int(recID)
-        elif isinstance(recID, int):
+        elif isinstance(recID, (int, long)):
             recID_int = recID
         else:
             recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
@@ -242,7 +242,7 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
     try:
         if isinstance(recID, str):
             recID_int = int(recID)
-        elif isinstance(recID, int):
+        elif isinstance(recID, (int, long)):
             recID_int = recID
         else:
             recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
