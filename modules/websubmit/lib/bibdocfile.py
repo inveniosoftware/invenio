@@ -1676,7 +1676,7 @@ class BibDocFile:
                  name = self.name,
                  format = self.format,
                  size = self.size,
-                 description = self.description
+                 description = self.description or ''
                )
 
     def is_restricted(self, req):
