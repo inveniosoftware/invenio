@@ -1221,7 +1221,7 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, format, size):
+    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, format, size, description):
         """
         Displays a file in the file list.
 
@@ -1238,6 +1238,9 @@ class Template:
           - 'format' *string* - The display format
 
           - 'size' *string* - The size of the file
+
+          - 'description' *string* - The description that might have been associated
+          to the particular file
         """
 
         # load the right message language
@@ -1251,16 +1254,19 @@ class Template:
                     </td>
                     <td valign="top">
                       <font size="-2" color="green">[%(size)s&nbsp;B]</font>
-                    </td></tr>""" % {
+                    </td>
+                    <td valign="top"><em>%(description)s</em></td>
+                    </tr>""" % {
                       'siteurl' : CFG_SITE_URL,
                       'recid' : recid,
                       'quoted_name' : urllib.quote(name),
-                      'name' : name,
+                      'name' : cgi.escape(name),
                       'version' : version,
-                      'name' : name,
+                      'name' : cgi.escape(name),
                       'quoted_format' : urllib.quote(format),
-                      'format' : format,
-                      'size' : size
+                      'format' : cgi.escape(format),
+                      'size' : size,
+                      'description' : cgi.escape(description),
                     }
 
     def tmpl_submit_summary (self, ln, values):
