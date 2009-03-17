@@ -1262,8 +1262,15 @@ def elaborate_fft_tags(record, rec_id, mode):
                         if icon != KEEP_OLD_VALUE:
                             _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
-                    write_message("('%s', '%s', '%s') not added because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
-                    raise StandardError
+                    if doctype in ('PURGE', 'DELETE', 'EXPUNGE', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE', 'REVERT'):
+                        write_message("('%s', '%s', '%s') not performed because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
+                        raise StandardError
+                    else:
+                        bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
+                        for (url, format, description, comment) in urls:
+                            assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
+                        if icon and not icon == KEEP_OLD_VALUE:
+                            assert(_add_new_icon(bibdoc, icon, restriction))
             elif mode == 'append':
                 try:
                     found_bibdoc = False

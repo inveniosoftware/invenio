@@ -279,7 +279,7 @@ semantic of the metadata upload:
 <td>   append  </td><td>     append new tag instances for the given tag XXX, regardless of existing tag instances</td><td>          append new files, if filename (i.e. new format) not already present </td>
 </tr>
 <tr>
-<td>   correct  </td><td>    correct tag instances for the given tag XXX; delete existing ones and replace with given ones    </td><td>     correct files with the given filename; add new revision or delete file</td>
+<td>   correct  </td><td>    correct tag instances for the given tag XXX; delete existing ones and replace with given ones    </td><td>     correct files with the given filename; add new revision or delete file; if the docname does not exist the file is added</td>
 </tr>
 <tr>
 <td>   replace   </td><td>   replace all tags, whatever XXX are</td><td> replace all files, whatever filenames are </td>
