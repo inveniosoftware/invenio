@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
+## $Id: bibcirculation_config.py,v 1.2 2008/08/12 16:07:40 joaquim Exp $
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -18,10 +20,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-bibcirculation config file, here you can manage
+bibcirculation config file
 """
 
-__revision__ = "$Id$"
+__revision__ = "$Id: bibcirculation_config.py,v 1.2 2008/08/12 16:07:40 joaquim Exp $"
+
 
 # templates used to notify borrowers
 CFG_BIBCIRCULATION_TEMPLATES = {
@@ -30,4 +33,8 @@ CFG_BIBCIRCULATION_TEMPLATES = {
     'NOTIFICATION': 'Notification letter template (write some text)',
     'EMPTY': 'Please choose one template'
 }
+
+ACCESS_KEY = '1T6P3M3TDMW9HWJ212R2'
+
+USER_ON_CERN_LDAP = 'true'
 

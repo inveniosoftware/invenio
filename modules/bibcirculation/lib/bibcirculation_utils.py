@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
+## $Id: bibcirculation_utils.py,v 1.1 2008/08/25 12:44:35 joaquim Exp $
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -17,103 +19,116 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__revision__ = "$Id$"
+"""BibCirculation Utils: Auxiliary methods of BibCirculation """
 
-"""
-This file use screen scraping techique to get informations from ALEPH.
-Using sysno, this file can find information about a book.
-"""
-
-# NON INVENIO IMPORTS
-import urllib
-import re
-import time
+__revision__ = "$Id: bibcirculation_utils.py,v 1.1 2008/08/25 12:44:35 joaquim Exp $"
 
 from invenio.search_engine import get_fieldvalues
-from invenio.search_engine import perform_request_search
-from invenio.dbquery import run_sql
+import invenio.bibcirculation_dblayer as db
+from invenio.urlutils import create_html_link
+from invenio.config import CFG_SITE_URL
+from invenio.bibcirculation_config import ACCESS_KEY
 
-# GLOBAL VARS
-_LP_ = re.compile('<!--Loan status-->\n<td class=td1 nowrap>(.*?)</td>\n<!--Due date-->', re.DOTALL)
-_LIB_ = re.compile('<!--Sub-library-->\n<td class=td1 nowrap>(.*?)</td>\n<!--Collection-->', re.DOTALL)
-_LOC_ = re.compile('<!--Location-->\n<td class=td1 nowrap>(.*?)</td>\n<!--Pages-->', re.DOTALL)
-_BAR_ = re.compile('<!--Barcode-->\n<td class=td1>(.*?)</td>', re.DOTALL)
-
-def get_book_info(sysno):
+def hold_request_mail(recid, borrower_id):
     """
-    Returns holding informations.
-
-    @param sysno ALEPH system number
+    Create the mail who will be sent for each hold requests.
     """
 
-    # GET SESSION VALUE
-    session_value = urllib.urlopen('http://cdslib.cern.ch:4505/cgi-bin/session')
-    session = session_value.read()
+    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
+    more_holdings_infos = db.get_holdings_details(recid)
+    borrower_infos = db.get_borrower_details(borrower_id)
 
-    # GET INFO FROM ALEPH USING SESSION & SYSNO
-    aleph_info = urllib.urlopen("http://guest:aguest@cdslib.cern.ch:4505/ALEPH/"\
-                                    +session+\
-                                    "-00024/item-global?P01=CER01&P02="\
-                                    +sysno+\
-                                    "&P03=&P04=&P05=")
-    info = aleph_info.read()
-    nb_copies = re.findall('<!--Barcode-->', info)
-    result = []
+    title_link = create_html_link(CFG_SITE_URL +
+                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          {'recid': recid},
+                                          (book_title))
+    out = """
+    Hello,
 
-    for i in range(len(nb_copies)):
+        This is an automatic email for confirming the hold request for a
+    book on behalf of:
 
-        lp = re.findall(_LP_, info)[i]
-        #lib = re.findall(_LIB_, info)[i]
-        loc = re.findall(_LOC_, info)[i]
-        bar = re.findall(_BAR_, info)[i]
+        %s (email: %s)
 
-        # tuple with (loan period, library, location, barcode)
-        tup = (bar, loc, lp)
-
-        result.append(tup)
-
-    return result
+        title: %s
+        author: %s
+        location: %s
+        library: %s
+        publisher: %s
+        year: %s
+        isbn: %s
 
 
-def holdings_info():
+        Best regards
+        --
+        CERN Document Server <http://cdsweb.cern.ch>
+        Need human intervention?  Contact <cds.support@cern.ch>
 
-    # list of all recids in the collection 'Books'
-    books_recids = perform_request_search(cc='Books')
+    """ % (borrower_infos[0][1], borrower_infos[0][2],
+           title_link, book_author, more_holdings_infos[0][1],
+           more_holdings_infos[0][2],
+           book_editor, book_year, book_isbn)
 
-    for recid in books_recids:
+    return out
 
-        t0 = time.time()
 
-        # for each recid get the sysno number
-        sysno = get_fieldvalues(recid, '970__a')
-        sysno = sysno[:9]
+def get_book_cover(isbn):
+    """
+    Retrieve book cover using Amazon web services.
+    """
 
-        # get list with tuples
-        #
-        # e.g.  get_book_info('002651748')
-        #
-        # [('CM-B00036572', '004.438.Python LUT', 'Four week loan'),
-        # ('CM-B00036976', '004.438.Python LUT', 'Four week loan'),
-        # ('CM-B00037141', '004.438.Python LUT', 'Four week loan')]
+    from xml.dom import minidom
+    import urllib
 
-        book_info = get_book_info(sysno)
+    cover_xml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml' \
+                               '?Service=AWSECommerceService&AWSAccessKeyId=' + ACCESS_KEY + \
+                               '&Operation=ItemSearch&Condition=All&' \
+                               'ResponseGroup=Images&SearchIndex=Books&' \
+                               'Keywords=' + isbn)
 
-        for (bar, loc, lp) in book_info:
+    xml_img = minidom.parse(cover_xml)
 
-            # insert into crcITEM book's values
-            run_sql("""insert into crcITEM (barcode, id_bibrec,
-                                            id_crcLIBRARY, location,
-                                            loan_period, status,
-                                            creation_date, modification_date,
-                                            number_of_requests)
-                                            values (%s, %s, '1', %s, %s, 'available', NOW(), NOW(), '0');
-                    """, (bar, recid, loc, lp))
+    try:
+        retrieve_book_cover = xml_img.getElementsByTagName('MediumImage')
+        book_cover = retrieve_book_cover.item(0).firstChild.firstChild.data
+    except AttributeError:
+        book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-        t1 = time.time()
-        t = t0 - t1
+    return book_cover
 
-        output = "recid: " + recid + " >>>  Done. in " + t + " seconds."
+def book_information_from_MARC(recid):
+    """
+    Retrieve book information from MARC
+    """
 
-    return output
+    book_title = ' '.join(get_fieldvalues(recid, "245__a") + \
+                          get_fieldvalues(recid, "245__b") + \
+                          get_fieldvalues(recid, "245__n") + \
+                          get_fieldvalues(recid, "245__p"))
 
+    book_year = ' '.join(get_fieldvalues(recid, "260__c"))
+
+    book_author = '  '.join(get_fieldvalues(recid, "270__p") + \
+                            get_fieldvalues(recid, "100__a") +
+                            get_fieldvalues(recid, "100__u"))
+
+    book_isbn = ' '.join(get_fieldvalues(recid, "020__a"))
+
+    book_editor = ' , '.join(get_fieldvalues(recid, "260__b") + \
+                             get_fieldvalues(recid, "260__a"))
+
+
+    return (book_title, book_year, book_author, book_isbn, book_editor)
+
+
+def book_title_from_MARC(recid):
+    """
+    Retrieve book's title from MARC
+    """
+    book_title = ' '.join(get_fieldvalues(recid, "245__a") + \
+                          get_fieldvalues(recid, "245__b") + \
+                          get_fieldvalues(recid, "245__n") + \
+                          get_fieldvalues(recid, "245__p"))
+
+    return book_title
 

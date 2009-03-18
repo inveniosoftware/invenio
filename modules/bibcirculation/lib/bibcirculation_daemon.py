@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
+## $Id: bibcirculation_daemon.py,v 1.2 2008/08/12 17:05:41 joaquim Exp $
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -21,7 +23,7 @@
 BibCirculation daemon.
 """
 
-__revision__ = "$Id$"
+__revision__ = "$Id: bibcirculation_daemon.py,v 1.2 2008/08/12 17:05:41 joaquim Exp $"
 
 import sys
 from invenio.dbquery import run_sql
@@ -43,7 +45,7 @@ def get_expired_loan():
                      """)
     return res
 
-def update_expired_loan(id):
+def update_expired_loan(loan_id):
     """
     Update status, number of overdue letter and date of overdue letter
     @param id: id of crcLOAN
@@ -54,7 +56,7 @@ def update_expired_loan(id):
                       status = 'expired',
                       overdue_letter_date = NOW()
                where id = %s
-               """, (id, ))
+               """, (loan_id, ))
 
 
 def send_overdue_letter(borrower_id, subject):
@@ -104,8 +106,8 @@ def main():
     task_init(authorization_action='runbibcirculation',
               authorization_msg="BibCirculation Task Submission",
               description="""Examples:
-        %s -u admin
-""" % (sys.argv[0],),
+              %s -u admin
+              """ % (sys.argv[0],),
               version=__revision__,
               task_run_fnc = task_run_core)
 
