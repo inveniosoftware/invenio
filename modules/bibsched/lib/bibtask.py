@@ -84,7 +84,7 @@ def fix_argv_paths(paths, argv=None):
     for path in paths:
         for count in xrange(len(argv)):
             if path == argv[count]:
-                argv[count] = os.path.realpath(path)
+                argv[count] = os.path.abspath(path)
     return argv
 
 def task_low_level_submission(name, user, *argv):

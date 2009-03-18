@@ -1760,7 +1760,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         else:
             task_set_option('mode', 'insert')
         fix_argv_paths([args[0]])
-        task_set_option('file_path', os.path.realpath(args[0]))
+        task_set_option('file_path', os.path.abspath(args[0]))
 
     # Replace mode option
     elif key in ("-r", "--replace"):
@@ -1770,36 +1770,36 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         else:
             task_set_option('mode', 'replace')
         fix_argv_paths([args[0]])
-        task_set_option('file_path', os.path.realpath(args[0]))
+        task_set_option('file_path', os.path.abspath(args[0]))
     # Holding pen mode option
     elif key in ("-o", "--holdingpen"):
         write_message("Holding pen mode", verbose=3)
         task_set_option('mode', 'holdingpen')
         fix_argv_paths([args[0]])
-        task_set_option('file_path', os.path.realpath(args[0]))
+        task_set_option('file_path', os.path.abspath(args[0]))
     # Correct mode option
     elif key in ("-c", "--correct"):
         task_set_option('mode', 'correct')
         fix_argv_paths([args[0]])
-        task_set_option('file_path', os.path.realpath(args[0]))
+        task_set_option('file_path', os.path.abspath(args[0]))
 
     # Append mode option
     elif key in ("-a", "--append"):
         task_set_option('mode', 'append')
         fix_argv_paths([args[0]])
-        task_set_option('file_path', os.path.realpath(args[0]))
+        task_set_option('file_path', os.path.abspath(args[0]))
 
     # Reference mode option
     elif key in ("-z", "--reference"):
         task_set_option('mode', 'reference')
         fix_argv_paths([args[0]])
-        task_set_option('file_path', os.path.realpath(args[0]))
+        task_set_option('file_path', os.path.abspath(args[0]))
 
     # Format mode option
     elif key in ("-f", "--format"):
         task_set_option('mode', 'format')
         fix_argv_paths([args[0]])
-        task_set_option('file_path', os.path.realpath(args[0]))
+        task_set_option('file_path', os.path.abspath(args[0]))
 
     # Stage
     elif key in ("-S", "--stage"):

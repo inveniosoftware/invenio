@@ -2269,7 +2269,7 @@ def clean_url(url):
     protocol = urllib2.urlparse.urlsplit(url)[0]
     if protocol in ('', 'file'):
         path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
-        return os.path.realpath(path)
+        return os.path.abspath(path)
     else:
         return url
 
@@ -2279,7 +2279,7 @@ def check_valid_url(url):
         protocol = urllib2.urlparse.urlsplit(url)[0]
         if protocol in ('', 'file'):
             path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
-            if os.path.realpath(path) != path:
+            if os.path.abspath(path) != path:
                 raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
             for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR, CFG_WEBSUBMIT_STORAGEDIR]:
                 if path.startswith(allowed_path):
@@ -2324,7 +2324,7 @@ def download_url(url, format, user=None, password=None, sleep=2):
         try:
             if protocol in ('', 'file'):
                 path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
-                if os.path.realpath(path) != path:
+                if os.path.abspath(path) != path:
                     raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
                 for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR, CFG_WEBSUBMIT_STORAGEDIR]:
                     if path.startswith(allowed_path):
