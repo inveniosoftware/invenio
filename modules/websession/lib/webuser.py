@@ -75,7 +75,7 @@ from invenio.session import SessionError
 from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
-from invenio.access_control_config import SUPERADMINROLE
+from invenio.access_control_config import SUPERADMINROLE, CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language, wash_languages, wash_language
 from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
@@ -1023,6 +1023,7 @@ def collect_user_info(req, login_time=False, refresh=False):
     }
 
     try:
+        is_req = False
         if req is None:
             uid = -1
         elif type(req) in (type(1), type(1L)):
@@ -1040,6 +1041,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             user_info.update(req)
             return user_info
         else:
+            is_req = True
             uid = getUid(req)
             if hasattr(req, '_user_info') and not login_time:
                 user_info = req._user_info
@@ -1071,35 +1073,42 @@ def collect_user_info(req, login_time=False, refresh=False):
             prefs = get_user_preferences(uid)
             login_method = prefs['login_method']
             login_object = CFG_EXTERNAL_AUTHENTICATION[login_method][0]
-            if login_object and ((datetime.datetime.now() - get_last_login(uid)).days > 0):
+            if login_object and ((datetime.datetime.now() - get_last_login(uid)).seconds > 3600):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
-                try:
-                    groups = login_object.fetch_user_groups_membership(user_info['email'], req=req)
-                    # groups is a dictionary {group_name : group_description,}
-                    new_groups = {}
-                    for key, value in groups.items():
-                        new_groups[key + " [" + str(login_method) + "]"] = value
-                    groups = new_groups
-                except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
-                    pass
-                else: # Groups synchronization
-                    from invenio.webgroup import synchronize_external_groups
-                    synchronize_external_groups(uid, groups, login_method)
-                    user_info['group'] = [group[1] for group in get_groups(uid)]
+                if not CFG_EXTERNAL_AUTH_USING_SSO or (
+                    is_req and
+                    req.subprocess_env.has_key('HTTPS') and
+                    req.subprocess_env['HTTPS'] == 'on'):
+                    ## If we're using SSO we must be sure to be in HTTPS
+                    ## otherwise we can't really read anything, hence
+                    ## it's better skeep the synchronization
+                    try:
+                        groups = login_object.fetch_user_groups_membership(user_info['email'], req=req)
+                        # groups is a dictionary {group_name : group_description,}
+                        new_groups = {}
+                        for key, value in groups.items():
+                            new_groups[key + " [" + str(login_method) + "]"] = value
+                        groups = new_groups
+                    except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
+                        pass
+                    else: # Groups synchronization
+                        from invenio.webgroup import synchronize_external_groups
+                        synchronize_external_groups(uid, groups, login_method)
+                        user_info['group'] = [group[1] for group in get_groups(uid)]
 
-                try:
-                    # Importing external settings
-                    new_prefs = login_object.fetch_user_preferences(user_info['email'], req=req)
-                    for key, value in new_prefs.items():
-                        prefs['EXTERNAL_' + key] = value
-                except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
-                    pass
-                else:
-                    set_user_preferences(uid, prefs)
-                    prefs = get_user_preferences(uid)
+                    try:
+                        # Importing external settings
+                        new_prefs = login_object.fetch_user_preferences(user_info['email'], req=req)
+                        for key, value in new_prefs.items():
+                            prefs['EXTERNAL_' + key] = value
+                    except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
+                        pass
+                    else:
+                        set_user_preferences(uid, prefs)
+                        prefs = get_user_preferences(uid)
 
-                run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid, ))
+                    run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid, ))
             if prefs:
                 for key, value in prefs.iteritems():
                     user_info[key.lower()] = value
