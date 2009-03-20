@@ -30,7 +30,7 @@ from invenio.bibrecord import record_add_field, record_add_subfield_into, \
     record_delete_subfield_from, record_delete_field_from
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL
-from invenio.search_engine import record_exists
+from invenio.search_engine import record_exists, search_pattern
 from invenio.webuser import session_param_get, session_param_set
 
 import invenio.template
@@ -80,6 +80,29 @@ def perform_request_init():
     body += '    <div id="bibEditContent"></div>\n'
 
     return body, errors, warnings
+
+def perform_request_search(req, data):
+    """Handle search requests."""
+    max_results = 99 # Keep only this number of results.
+
+    result = {
+        'resultCode': 0,
+        'resultText': ''
+        }
+    searchType = data['searchType']
+    searchPattern = data['searchPattern']
+    if searchType == 'anywhere':
+        pattern = searchPattern
+    else:
+        pattern = searchType + ':' + searchPattern
+    result_set = list(search_pattern(p=pattern))
+    if not result_set:
+        result['resultCode'] = 1
+    else:
+        result['resultSet'] = result_set[0:max_results]
+    result['resultText'] = 'Found ' + str(len(result_set)) + ' records'
+
+    return result
 
 def perform_request_user(req, requestType, recid,  data):
     """Handle user related requests."""

@@ -338,6 +338,10 @@ function displayMessage(msgType){
       break;
     case 'Error: Permission denied':
       msg = 'Could not access record. Permission denied.';
+      break;
+    case 'Found 0 records':
+      msg = 'No records found matching this criteria.';
+      break;
     default:
       msg = msgType;
   }

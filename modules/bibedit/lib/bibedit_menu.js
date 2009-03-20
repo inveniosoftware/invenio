@@ -43,12 +43,12 @@ function initMenu(){
    * Initialize menu.
    */
   // Make sure the menu is in it's initial state.
-  deactivateMenu();
-  $('#txtSelectRecord').val('');
+  deactivateRecordMenu();
+  $('#txtSearchPattern').val('');
   // Submit get request on enter.
-  $('#txtSelectRecord').bind('keypress', function(event){
+  $('#txtSearchPattern, #sctSearchType').bind('keypress', function(event){
     if (event.keyCode == 13){
-      $('#btnGetRecord').click();
+      $('#btnSearch').click();
       event.preventDefault();
     }
   });
@@ -56,12 +56,12 @@ function initMenu(){
   $('#cellIndicator').html(img('/img/circle_green'));
   $('#cellStatus').text('Ready');
   // Bind button event handlers.
-  $('#btnGetRecord').bind('click', onGetRecordClick);
+  $('#btnSearch').bind('click', onSearchClick);
   $('#btnSubmit').bind('click', onSubmitClick);
   $('#btnCancel').bind('click', onCancelClick);
   $('#btnDeleteRecord').bind('click', onDeleteRecordClick);
-  $('#lnkMARCTags').bind('click', onMARCTagsClick);
-  $('#lnkHumanTags').bind('click', onHumanTagsClick);
+  $('#btnMARCTags').bind('click', onMARCTagsClick);
+  $('#btnHumanTags').bind('click', onHumanTagsClick);
   $('#btnAddField').bind('click', onAddFieldClick);
   $('#btnSortFields').bind('click', function(){
     updateStatus('updating');
@@ -70,8 +70,10 @@ function initMenu(){
     updateStatus('ready');
   });
   $('#btnDeleteSelected').bind('click', onDeleteFields);
+  $('#bibEditMenu .bibEditImgExpandMenuSection').bind('click',
+    expandMenuSection);
   // Focus on record selection box.
-  $('#txtSelectRecord').focus();
+  $('#txtSearchPattern').focus();
   // Initialize menu positioning (poll for scrolling).
   setInterval(positionMenu, gCHECK_SCROLL_INTERVAL);
 }
@@ -98,20 +100,82 @@ function positionMenu(){
 // Last Y-scroll value
 positionMenu.yScroll = 0;
 
-function deactivateMenu(){
+function expandMenuSection(){
   /*
-   * Deactivate menu.
+   * Expand a section of the menu.
    */
-  $('#lnkMARCTags').removeAttr('href');
-  $('#lnkMARCTags').unbind('click');
-  $('#lnkHumanTags').removeAttr('href');
-  $('#lnkHumanTags').unbind('click');
+  var currentMenuHeight = $('#bibEditMenu').height();
+  var parent = $(this).parent();
+  parent.closest('.bibEditMenuSection').find('.bibEditMenuMore').show();
+
+  // Expand content spaceholder accordingly.
+  var deltaMenuHeight = $('#bibEditMenu').height() - currentMenuHeight;
+  var currentSpacerHeight = parseInt($('#bibEditContent').css(
+			      'min-height').slice(0, -2));
+  $('#bibEditContent').css('min-height',
+    (currentSpacerHeight + deltaMenuHeight) + 'px');
+
+  $(this).replaceWith(img('/img/bullet_toggle_minus.png', '',
+			  'bibEditImgCompressMenuSection'));
+  parent.find('.bibEditImgCompressMenuSection').bind('click',
+						     compressMenuSection);
+}
+
+function compressMenuSection(){
+  /*
+   * Compress a section of the menu.
+   */
+  var currentMenuHeight = $('#bibEditMenu').height();
+  var parent = $(this).parent();
+  parent.closest('.bibEditMenuSection').find('.bibEditMenuMore').hide();
+
+  // Reduce content spaceholder accordingly.
+  var deltaMenuHeight = $('#bibEditMenu').height() - currentMenuHeight;
+  var currentSpacerHeight = parseInt($('#bibEditContent').css(
+			      'min-height').slice(0, -2));
+  $('#bibEditContent').css('min-height',
+    (currentSpacerHeight + deltaMenuHeight) + 'px');
+
+  $(this).replaceWith(img('/img/bullet_toggle_plus.png', '',
+			  'bibEditImgExpandMenuSection'));
+  parent.find('.bibEditImgExpandMenuSection').bind('click', expandMenuSection);
+}
+
+function activateRecordMenu(){
+  /*
+   * Activate record controls in menu.
+   */
+  $('#btnSubmit').removeAttr('disabled');
+  $('#btnCancel').removeAttr('disabled');
+  $('#btnDeleteRecord').removeAttr('disabled');
+  $('#btnAddField').removeAttr('disabled');
+  $('#btnSortFields').removeAttr('disabled');
+  $('#btnDeleteSelected').removeAttr('disabled');
+}
+
+function deactivateRecordMenu(){
+  /*
+   * Deactivate record controls in menu.
+   */
   $('#btnSubmit').attr('disabled', 'disabled');
   $('#btnCancel').attr('disabled', 'disabled');
+  $('#btnDeleteRecord').attr('disabled', 'disabled');
+  $('#btnMARCTags').attr('disabled', 'disabled');
+  $('#btnHumanTags').attr('disabled', 'disabled');
   $('#btnAddField').attr('disabled', 'disabled');
   $('#btnSortFields').attr('disabled', 'disabled');
   $('#btnDeleteSelected').attr('disabled', 'disabled');
-  $('#btnDeleteRecord').attr('disabled', 'disabled');
+}
+
+function disableRecordBrowser(){
+  /*
+   * Disable and hide the record browser in the menu.
+   */
+  if ($('#rowRecordBrowser').css('display') != 'none'){
+    $('#btnNext').unbind('click').attr('disabled', 'disabled');
+    $('#btnPrev').unbind('click').attr('disabled', 'disabled');
+    $('#rowRecordBrowser').hide();
+  }
 }
 
 function updateStatus(statusType, reporttext){
@@ -144,41 +208,92 @@ function updateStatus(statusType, reporttext){
   $('#cellStatus').html(text);
 }
 
-function onGetRecordClick(){
+function onSearchClick(event){
   /*
-   * Handle 'Get' button (get record).
+   * Handle 'Search' button (search for records).
    */
-  var userInput = $('#txtSelectRecord').val();
-  var recID = parseInt(userInput);
-  if (isNaN(recID)){
-    deactivateMenu();
-    changeAndSerializeHash({state: 'edit', recid: userInput});
-    gState = 'RecordError';
-    $('.headline').text('BibEdit: Record #' + userInput);
-    displayMessage('Error: Non-existent record');
+  var searchPattern = $('#txtSearchPattern').val();
+  var searchType = $('#sctSearchType').val();
+  if (searchType == 'recID'){
+    // Record ID - do some basic validation.
+    var recID = parseInt(searchPattern);
+    if (isNaN(recID)){
+      deactivateRecordMenu();
+      changeAndSerializeHash({state: 'edit', recid: searchPattern});
+      gState = 'RecordError';
+      $('.headline').text('BibEdit: Record #' + searchPattern);
+      displayMessage('Error: Non-existent record');
+    }
+    else{
+      $('#txtSearchPattern').val(recID);
+      if (gRecID == recID && gState == 'Edit')
+	// We are already editing this record.
+	return;
+      getRecord(recID, false);
+    }
   }
-  else{
-    $('#txtSelectRecord').val(recID);
-    if (gRecID == recID && gState == 'Edit')
-      // We are already editing this record.
-      return;
+  else if (searchPattern.replace(/\s*/g, '')){
+    // Custom search.
     updateStatus('updating');
     cleanUpDisplay();
-    gRecID = recID;
-    $('.headline').text('BibEdit: Record #' + gRecID);
-    changeAndSerializeHash({state: 'edit', recid: recID});
-    createReq({recID: gRecID, requestType: 'getRecord'}, onGetRecordSuccess);
+    disableRecordBrowser();
+    createReq({requestType: 'searchForRecord', searchType: searchType,
+      searchPattern: searchPattern}, onSearchForRecordSuccess);
   }
+}
+
+function onSearchForRecordSuccess(json){
+  /*
+   * Handle successfull 'searchForRecord' requests (custom search).
+   */
+  if (json['resultCode'] != 0){
+    // Search yielded no results.
+    deactivateRecordMenu();
+    displayMessage(json['resultText']);
+    gState = 'RecordError';
+    $('.headline').text('BibEdit');
+    changeAndSerializeHash({state: 'edit'});
+    updateStatus('report', json['resultText']);
+  }
+  else{
+    var resultSet = json['resultSet'];
+    gResultSet = resultSet;
+    if (resultSet.length > 1){
+      var recordCount = gResultSet.length;
+      $('#cellRecordNo').text(1 + ' / ' + recordCount);
+      $('#btnNext').bind('click', onNextRecordClick).removeAttr('disabled');
+      $('#rowRecordBrowser').show();
+    }
+    getRecord(resultSet[0], true);
+  }
+}
+
+function getRecord(recID, navigatingRecordSet){
+  /*
+   * Prepare the page and send request to get a given record.
+   */
+  updateStatus('updating');
+  cleanUpDisplay();
+  if (!navigatingRecordSet){
+    // Clear record set. Disable record browser.
+    gResultSet = null;
+    disableRecordBrowser();
+  }
+  gRecID = recID;
+  $('.headline').text('BibEdit: Record #' + recID);
+  changeAndSerializeHash({state: 'edit', recid: recID});
+  createReq({recID: recID, requestType: 'getRecord', searchType:
+	     'recID'}, onGetRecordSuccess);
 }
 
 function onGetRecordSuccess(json){
   /*
-   * Handle successfull 'getRecord' request.
+   * Handle successfull 'searchForRecord' requests (recID).
    */
   gPageDirty = false;
   if (json['resultCode'] != 0){
     // Not that successfull requests...
-    deactivateMenu();
+    deactivateRecordMenu();
     displayMessage(json['resultText']);
     gState = 'RecordError';
     updateStatus('report', json['resultText']);
@@ -189,24 +304,20 @@ function onGetRecordSuccess(json){
     gTagFormat = json['tagFormat'];
     $('.headline').html(
       'BibEdit: Record #' + gRecID +
-	'<a href="' + gHistoryURL + '?recid=' + gRecID +
-	'" style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
-	'(view history)' +
-	'</a>');
+      '<a href="' + gHistoryURL + '?recid=' + gRecID +
+      '" style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
+      '(view history)' +
+	'</a>').css('white-space', 'nowrap');
     resetNewFieldNumber();
     displayRecord();
-    // Activate all disabled buttons.
-    $('button[disabled]').removeAttr('disabled');
-    if (gTagFormat == 'MARC'){
-      $('#lnkHumanTags').bind('click', onHumanTagsClick);
-      $('#lnkHumanTags').attr('href', 'human');
-    }
-    else{
-      $('#lnkMARCTags').bind('click', onMARCTagsClick);
-      $('#lnkMARCTags').attr('href', 'marc');
-    }
+    // Activate menu record controls.
+    activateRecordMenu();
+    if (gTagFormat == 'MARC')
+      $('#btnHumanTags').bind('click', onHumanTagsClick).removeAttr('disabled');
+    else
+      $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
     // Unfocus record selection field (to facilitate hotkeys).
-    $('#txtSelectRecord').blur();
+    $('#txtSearchPattern').blur();
     updateStatus('report', json['resultText']);
   }
 }
@@ -218,8 +329,9 @@ function onSubmitClick(){
   var recID = gRecID;
   updateStatus('updating');
   cleanUpDisplay();
-  $('#txtSelectRecord').val('');
-  $('#txtSelectRecord').focus();
+  disableRecordBrowser();
+  $('#txtSearchPattern').val('');
+  $('#txtSearchPattern').focus();
   changeAndSerializeHash({state: 'submit',
 			  recid: recID});
   createReq({recID: recID, requestType: 'submit'}, function(json){
@@ -235,13 +347,44 @@ function onCancelClick(){
   var recID = gRecID;
   updateStatus('updating');
   cleanUpDisplay();
-  $('#txtSelectRecord').val('');
-  $('#txtSelectRecord').focus();
+  disableRecordBrowser();
+  $('#txtSearchPattern').val('');
+  $('#txtSearchPattern').focus();
   changeAndSerializeHash({state: 'cancel',
 			  recid: recID});
   createReq({recID: recID, requestType: 'cancel'}, function(json){
     updateStatus('report', json['resultText']);
   });
+}
+
+function onNextRecordClick(){
+  /*
+   * Handle click on the 'Next' button in the record browser.
+   */
+  var recordCount = gResultSet.length;
+  var prevIndex = $.inArray(gRecID, gResultSet);
+  var currentIndex = prevIndex + 1;
+  if (currentIndex == recordCount-1)
+    $(this).unbind('click').attr('disabled', 'disabled');
+  if (prevIndex == 0)
+    $('#btnPrev').bind('click', onPrevRecordClick).removeAttr('disabled');
+  $('#cellRecordNo').text((currentIndex+1) + ' / ' + recordCount);
+  getRecord(gResultSet[currentIndex], true);
+}
+
+function onPrevRecordClick(){
+  /*
+   * Handle click on the 'Previous' button in the record browser.
+   */
+  var recordCount = gResultSet.length;
+  var prevIndex = $.inArray(gRecID, gResultSet);
+  var currentIndex = prevIndex - 1;
+  if (currentIndex == 0)
+    $(this).unbind('click').attr('disabled', 'disabled');
+  if (prevIndex == recordCount-1)
+    $('#btnNext').bind('click', onNextRecordClick).removeAttr('disabled');
+  $('#cellRecordNo').text((currentIndex+1) + ' / ' + recordCount);
+  getRecord(gResultSet[currentIndex], true);
 }
 
 function onDeleteRecordClick(){
@@ -251,8 +394,9 @@ function onDeleteRecordClick(){
   var recID = gRecID;
   updateStatus('updating');
   cleanUpDisplay();
-  $('#txtSelectRecord').val('');
-  $('#txtSelectRecord').focus();
+  disableRecordBrowser();
+  $('#txtSearchPattern').val('');
+  $('#txtSearchPattern').focus();
   changeAndSerializeHash({state: 'deleteRecord',
 			  recid: recID});
   createReq({recID: recID, requestType: 'deleteRecord'}, function(json){
@@ -265,13 +409,11 @@ function onMARCTagsClick(event){
   /*
    * Handle 'MARC' link (MARC tags).
    */
-  $('#lnkMARCTags').unbind('click');
-  $('#lnkMARCTags').removeAttr('href');
+  $(this).unbind('click').attr('disabled', 'disabled');
   createReq({recID: gRecID, requestType: 'changeTagFormat', tagFormat: 'MARC'});
   gTagFormat = 'MARC';
   updateTags();
-  $('#lnkHumanTags').bind('click', onHumanTagsClick);
-  $('#lnkHumanTags').attr('href', 'human');
+  $('#btnHumanTags').bind('click', onHumanTagsClick).removeAttr('disabled');
   event.preventDefault();
 }
 
@@ -279,14 +421,12 @@ function onHumanTagsClick(event){
   /*
    * Handle 'Human' link (Human tags).
    */
-  $('#lnkHumanTags').unbind('click');
-  $('#lnkHumanTags').removeAttr('href');
+  $(this).unbind('click').attr('disabled', 'disabled');
   createReq({recID: gRecID, requestType: 'changeTagFormat',
 	     tagFormat: 'human'});
   gTagFormat = 'human';
   updateTags();
-  $('#lnkMARCTags').bind('click', onMARCTagsClick);
-  $('#lnkMARCTags').attr('href', 'marc');
+  $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
   event.preventDefault();
 }
 

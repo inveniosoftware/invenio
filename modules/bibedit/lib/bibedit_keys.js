@@ -35,7 +35,7 @@ function initHotkeys(){
   // Focus on record selection field.
   $(document).bind('keydown', {combi: 'g', disableInInput: true},
     function(event){
-      $('#txtSelectRecord').focus();
+      $('#txtSearchPattern').focus();
       event.preventDefault();
   });
   // Submit record.
@@ -60,9 +60,9 @@ function initHotkeys(){
   $(document).bind('keydown', {combi: 'shift+t', disableInInput: true},
     function(event){
       if (gTagFormat == 'MARC')
-	$('#lnkHumanTags').trigger('click');
+	$('#btnHumanTags').trigger('click');
       else if (gTagFormat == 'human')
-	$('#lnkMARCTags').trigger('click');
+	$('#btnMARCTags').trigger('click');
       event.preventDefault();
   });
   // Add new field.

@@ -1,5 +1,5 @@
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -32,60 +32,90 @@ class Template:
         pass
 
     def menu(self, recid=None):
-        """ Create the menu."""
+        """Create the menu."""
         if recid == None:
             recid = ''
 
-        recordmenu = '<div class="bibEditMenuSectionHeader">Record</div>\n' \
+        imgExpandMenuSection = img('/img/bullet_toggle_plus.png',
+                            'bibEditImgExpandMenuSection')
+
+        recordmenu = '<div class="bibEditMenuSectionHeader">\n' \
+            '          %(imgExpandMenuSection)sRecord\n' \
+            '        </div>\n' \
             '        <table>\n' \
-            '          <col width="20px">\n' \
-            '          <col width="48px">\n' \
-            '          <col width="68px">\n' \
+            '          <col width="28px">\n' \
+            '          <col width="40px">\n' \
+            '          <col width="40px">\n' \
+            '          <col width="28px">\n' \
             '          <tr>\n' \
             '            <td colspan="2">\n' \
             '              <form onsubmit="return false;">\n' \
-            '                %(txtSelectRecord)s\n' \
+            '                %(txtSearchPattern)s\n' \
             '              </form>\n' \
-            '            </td>\n' \
-            '            <td>%(btnGetRecord)s</td>\n' \
-            '          </tr>\n' \
-            '          <tr>\n' \
-            '            <td colspan="2" align="right">%(btnSubmit)s</td>\n' \
-            '            <td>%(btnCancel)s</td>\n' \
-            '          </tr>\n' \
-            '          <tr>\n' \
-            '            <td align="bottom">%(imgDeleteRecord)s</td>\n' \
-            '            <td colspan="2" align="bottom">\n' \
-            '              %(btnDeleteRecord)s\n' \
+            '            <td colspan="2">\n' \
+            '              %(sctSearchType)s\n' \
             '            </td>\n' \
             '          </tr>\n' \
             '          <tr>\n' \
-            '            <td colspan="3" style="font-size: 0.8em;">\n' \
-            '              %(lblShow)s:\n' \
-            '            </td>\n' \
+            '            <td colspan="4">%(btnSearch)s</td>\n' \
+            '          </tr>\n' \
+            '          <tr id="rowRecordBrowser" style="display: none">\n' \
+            '            <td>%(btnPrev)s</td>\n' \
+            '            <td id="cellRecordNo" colspan="2"\n' \
+            '              style="text-align: center">1/1</td>\n' \
+            '            <td>%(btnNext)s</td>\n' \
             '          </tr>\n' \
             '          <tr>\n' \
-            '            <td colspan="2" align="right">%(btnTagMARC)s</td>\n' \
-            '            <td>%(btnTagNames)s</td>\n' \
+            '            <td colspan="2">%(btnSubmit)s</td>\n' \
+            '            <td colspan="2">%(btnCancel)s</td>\n' \
+            '          </tr>\n' \
+            '          <tr class="bibEditMenuMore">\n' \
+            '            <td colspan="4">%(btnDeleteRecord)s</td>\n' \
+            '            </td>\n' \
             '          </tr>\n' \
             '        </table>' % {
-            'txtSelectRecord': inp('text', value=recid, id='txtSelectRecord',
-                                   maxlength=8),
-            'btnGetRecord': button('button', 'Get', id='btnGetRecord'),
+            'imgExpandMenuSection': imgExpandMenuSection,
+            'txtSearchPattern': inp('text', value=recid, id='txtSearchPattern'),
+            'sctSearchType': '<select id="sctSearchType">\n' \
+            '                <option value="recID">Rec ID</option>\n' \
+            '                <option value="reportnumber">Rep No</option>\n' \
+            '                <option value="anywhere">Anywhere</option>\n' \
+            '              </select>',
+            'btnSearch': button('button', 'Search', 'bibEditBtnBold',
+                                         id='btnSearch'),
+            'btnPrev': button('button', '&lt;', id='btnPrev', disabled='disabled'),
+            'btnNext': button('button', '&gt;', id='btnNext', disabled='disabled'),
             'btnSubmit': button('button', 'Submit', 'bibEditBtnBold',
                                 id='btnSubmit', disabled='disabled'),
             'btnCancel': button('button', 'Cancel', id='btnCancel',
                                 disabled='disabled'),
             'imgDeleteRecord': img('/img/trash.png'),
             'btnDeleteRecord': button('button', 'Delete record',
-                id='btnDeleteRecord', disabled='disabled'),
-            'lblShow': 'Display',
-            'btnTagMARC': link('MARC', id='lnkMARCTags'),
-            'btnTagNames': link('Human', id='lnkHumanTags')
+                id='btnDeleteRecord', disabled='disabled')
             }
 
-        fieldmenu = '<div class="bibEditMenuSectionHeader">Fields</div>\n' \
+        viewmenu = '<div class="bibEditMenuSectionHeader">\n' \
+            '          %(imgExpandMenuSection)sView\n' \
+            '        </div>\n' \
             '        <table>\n' \
+            '          <col width="68px">\n' \
+            '          <col width="68px">\n' \
+            '          <tr class="bibEditMenuMore">\n' \
+            '            <td>%(btnTagMARC)s</td>\n' \
+            '            <td>%(btnTagNames)s</td>\n' \
+            '          </tr>\n' \
+            '        </table>' % {
+            'imgExpandMenuSection': imgExpandMenuSection,
+            'btnTagMARC': button('button', 'MARC', id='btnMARCTags',
+                                 disabled='disabled'),
+            'btnTagNames': button('button', 'Human', id='btnHumanTags',
+                                  disabled='disabled')
+            }
+
+        fieldmenu = '<div class="bibEditMenuSectionHeader">\n' \
+            '          %(imgExpandMenuSection)sFields\n' \
+            '        </div>\n' \
+            '        <table class="bibEditMenuMore">\n' \
             '          <tr>\n' \
             '            <td>%(imgAddField)s</td>\n' \
             '            <td>%(btnAddField)s</td>\n' \
@@ -99,6 +129,7 @@ class Template:
             '            <td>%(btnDeleteSelected)s</td>\n' \
             '          </tr>\n' \
             '        </table>' % {
+            'imgExpandMenuSection': imgExpandMenuSection,
             'imgAddField': img('/img/table_row_insert.png'),
             'btnAddField': button('button', 'Add', id='btnAddField',
                                   disabled='disabled'),
@@ -129,6 +160,9 @@ class Template:
             '        %(recordmenu)s\n' \
             '      </div>\n' \
             '      <div class="bibEditMenuSection">\n' \
+            '        %(viewmenu)s\n' \
+            '      </div>\n' \
+            '      <div class="bibEditMenuSection">\n' \
             '        %(fieldmenu)s\n' \
             '      </div>\n' \
             '      <div id="bibEditMenuSection">\n' \
@@ -139,6 +173,7 @@ class Template:
             '      </div>\n' \
             '    </div>\n' % {
                 'recordmenu': recordmenu,
+                'viewmenu': viewmenu,
                 'fieldmenu': fieldmenu,
                 'statusarea': statusarea,
                 'lnkhelp': lnkhelp

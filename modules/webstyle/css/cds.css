@@ -1483,18 +1483,30 @@ input.hyperlinkformSubmitButton {
 #bibEditMenu .bibEditMenuSection table {
   width: 100%;
 }
-#bibEditMenu a, #bibEditMenu button, #bibEditMenu input {
+#bibEditMenu form {
+  margin: 0px;
+}
+#bibEditMenu .bibEditMenuMore {
+  display: none;
+}
+#bibEditMenu .bibEditImgExpandMenuSection,
+#bibEditMenu .bibEditImgCompressMenuSection {
+  margin: 0px;
+  text-align: left;
+  vertical-align: bottom;
+}
+#bibEditMenu a, #bibEditMenu button, #bibEditMenu input, #bibEditMenu select {
   font-size: 0.8em;
 }
 #bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
-#bibEditMenu input {
+#bibEditMenu input, #bibEditMenu select {
   margin: 1px;
 }
-#bibEditMenu button, #bibEditMenu input {
+#bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
   width: 100%;
 }
 #bibEditContent {
-  min-height: 250px;
+  min-height: 200px;
   margin-left: 150px;
 }
 #bibEditTable {

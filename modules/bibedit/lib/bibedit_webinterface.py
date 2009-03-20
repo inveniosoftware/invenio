@@ -29,7 +29,8 @@ except ImportError:
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_init, \
-    perform_request_record, perform_request_update_record, perform_request_user
+    perform_request_record, perform_request_search, \
+    perform_request_update_record, perform_request_user
 from invenio.bibedit_utils import json_unicode_to_utf8
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.search_engine import guess_primary_collection_of_a_record
@@ -112,9 +113,16 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             data = json_unicode_to_utf8(data)
 
             # Authentication.
-            recid = data['recID']
-            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
-                collection=guess_primary_collection_of_a_record(recid))
+            try:
+                recid = data['recID']
+            except KeyError:
+                # Not all requests have a record ID attached (like search).
+                auth_code, auth_message = acc_authorize_action(req,
+                                                               'runbibedit')
+            else:
+                auth_code, auth_message = acc_authorize_action(req,
+                    'runbibedit',
+                    collection=guess_primary_collection_of_a_record(recid))
             if auth_code != 0:
                 result.update({
                         'resultCode': 1,
@@ -125,11 +133,16 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             else:
                 uid = getUid(req)
                 requestType = data['requestType']
-                if requestType in ('changeTagFormat'):
+
+                if requestType in ('searchForRecord'):
+                    # Search request.
+                    result.update(perform_request_search(req, data))
+
+                elif requestType in ('changeTagFormat'):
                     # User related requests.
                     result.update(perform_request_user(req, requestType, recid,
                                                        data))
-                if requestType in ('getRecord', 'submit', 'deleteRecord',
+                elif requestType in ('getRecord', 'submit', 'deleteRecord',
                                    'cancel'):
                     # 'Major' record related requests
                     result.update(perform_request_record(req, requestType,

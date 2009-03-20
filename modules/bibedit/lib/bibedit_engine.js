@@ -28,6 +28,7 @@
 // Record data
 var gRecID = null;
 var gRecord = null;
+var gResultSet = null;
 // Tag format.
 var gTagFormat;
 // Is the page dirty?
@@ -240,8 +241,10 @@ function onStateChangeToStartPage(){
    * Handle change to internal state 'StartPage'.
    */
   cleanUpDisplay();
-  $('#txtSelectRecord').val('');
-  $('#txtSelectRecord').focus();
+  disableRecordBrowser();
+  $('#txtSearchPattern').val('');
+  $('#sctSearchType').val('recID');
+  $('#txtSearchPattern').focus();
   updateStatus('ready');
 }
 
@@ -250,21 +253,13 @@ function onStateChangeToEdit(recID){
    * Handle change to internal state 'Edit'.
    */
   cleanUpDisplay();
+  disableRecordBrowser();
   gRecID = recID;
   $('.headline').text('BibEdit: Record #' + gRecID);
-  $('#txtSelectRecord').val(gRecID);
-  createReq({recID: gRecID, requestType: 'getRecord'}, onGetRecordSuccess);
-}
-
-function onStateChangeToSubmit(){
-  /*
-   * Handle change to internal state 'Submit'.
-   */
-  cleanUpDisplay();
-  $('#txtSelectRecord').val('');
-  $('#txtSelectRecord').focus();
-  displayMessage('Confirm: Submitted');
-  updateStatus('ready');
+  $('#txtSearchPattern').val(gRecID);
+  $('#sctSearchType').val('recID');
+  createReq({recID: gRecID, requestType: 'getRecord',
+	     searchType: 'recID'}, onGetRecordSuccess);
 }
 
 function onStateChangeToCancel(){
@@ -272,8 +267,10 @@ function onStateChangeToCancel(){
    * Handle change to internal state 'Cancel'.
    */
   cleanUpDisplay();
-  $('#txtSelectRecord').val('');
-  $('#txtSelectRecord').focus();
+  disableRecordBrowser();
+  $('#txtSearchPattern').val('');
+  $('#sctSearchType').val('recID');
+  $('#txtSearchPattern').focus();
   updateStatus('ready');
 }
 
@@ -282,8 +279,9 @@ function onStateChangeToDeleteRecord(){
    * Handle change to internal state 'DeleteRecord'.
    */
   cleanUpDisplay();
-  $('#txtSelectRecord').val('');
-  $('#txtSelectRecord').focus();
+  disableRecordBrowser();
+  $('#txtSearchPattern').val('');
+  $('#txtSearchPattern').focus();
   displayMessage('Confirm: Deleted');
   updateStatus('ready');
 }
@@ -323,7 +321,7 @@ function cleanUpDisplay(){
   /*
    * Clears the display and the client side record data.
    */
-  deactivateMenu();
+  deactivateRecordMenu();
   $('#bibEditContent').empty();
   $('.headline').text('BibEdit');
   gRecID = null;
