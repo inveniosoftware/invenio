@@ -518,8 +518,14 @@ class Manager:
         if status in ('RUNNING', 'CONTINUING', 'ABOUT TO SLEEP', 'SLEEPING'):
             if status == 'SLEEPING':
                 bibsched_send_signal(process, task_id, signal.SIGCONT)
+                count = 5
                 while bibsched_get_status(task_id) == 'SLEEPING':
-                    time.sleep(1)
+                    if count <= 0:
+                        bibsched_set_status(task_id, 'ERROR', 'SLEEPING')
+                        self.display_in_footer("It seems impossible to wakeup this task.")
+                        return
+                    time.sleep(CFG_BIBSCHED_REFRESHTIME)
+                    count -= 1
                 bibsched_set_status(task_id, 'ABOUT TO STOP', 'CONTINUING')
             else:
                 bibsched_set_status(task_id, 'ABOUT TO STOP', status)
@@ -764,7 +770,6 @@ class Manager:
 class BibSched:
     def __init__(self):
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
-        self.scheduled = None
         self.task_status = {}
         self.next_bibupload = ()
         self.waitings = ()
@@ -848,20 +853,9 @@ class BibSched:
                 return True
         elif task_id in self.task_status['WAITING'] or task_id in self.task_status['SLEEPING']:
             #Log("Trying to run %s" % task_id)
-            if self.scheduled is not None and task_id != self.scheduled:
-                ## Another task is scheduled for running.
-                #Log("Cannot run %s because %s is already scheduled" % (task_id, self.scheduled))
-                return False
 
-            nothing_was_scheduled = self.scheduled is None
             if priority < -10:
                 return False
-
-            self.scheduled = task_id
-            if nothing_was_scheduled:
-                Log("Task #%d (%s) scheduled for running" % (task_id, proc))
-            #Log('Scheduled task %s' % self.scheduled)
-            ## Schedule the task for running.
 
             lower, higher = self.split_running_tasks_by_priority(task_id, priority)
             #Log('lower: %s' % lower)
@@ -894,7 +888,6 @@ class BibSched:
 
             procname = proc.split(':')[0]
             if not tasks_to_stop and not tasks_to_sleep:
-                self.scheduled = None
                 if status in ("SLEEPING", "ABOUT TO SLEEP"):
                     bibsched_set_status(task_id, "CONTINUING", status)
                     if not bibsched_send_signal(proc, task_id, signal.SIGCONT):
@@ -916,10 +909,14 @@ class BibSched:
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
+                    count = 5
                     while run_sql("SELECT status FROM schTASK WHERE id=%s AND status='SCHEDULED'", (task_id, )):
                         ## Polling to wait for the task to really start,
                         ## in order to avoid race conditions.
+                        if count <= 0:
+                            raise StandardError, "Process %s (task_id: %s) was launched but seems not to be able to reach RUNNING status." % (proc, task_id)
                         time.sleep(CFG_BIBSCHED_REFRESHTIME)
+                        count -= 1
                     return True
                 else:
                     raise StandardError, "%s is not in the allowed modules" % procname
@@ -1257,13 +1254,13 @@ def stop(verbose=True):
     for task_id, proc, status in res:
         if status == 'SLEEPING':
             bibsched_send_signal(proc, task_id, signal.SIGCONT)
-            time.sleep(1)
+            time.sleep(CFG_BIBSCHED_REFRESHTIME)
         bibsched_set_status(task_id, 'ABOUT TO STOP')
     while run_sql("SELECT id FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%_DELETED' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')"):
         if verbose:
             sys.stdout.write('.')
             sys.stdout.flush()
-            time.sleep(1)
+            time.sleep(CFG_BIBSCHED_REFRESHTIME)
 
     if verbose:
         print "\nStopped"
