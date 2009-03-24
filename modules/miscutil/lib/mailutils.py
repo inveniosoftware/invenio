@@ -260,7 +260,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         if html_header is None:
             html_content = email_html_header(ln) + html_content
         else:
-            html_content = html_header + content
+            html_content = html_header + html_content
         if html_footer is None:
             html_content += email_html_footer(ln)
         else:
