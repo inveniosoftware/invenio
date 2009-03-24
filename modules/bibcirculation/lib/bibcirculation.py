@@ -36,7 +36,8 @@ import datetime
 from invenio.webuser import collect_user_info
 from invenio.mailutils import send_email
 from invenio.bibcirculation_utils import hold_request_mail, \
-     book_title_from_MARC
+     book_title_from_MARC, \
+     make_copy_available
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 
 def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
@@ -57,7 +58,7 @@ def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
 
 
 def perform_borrower_loans(uid, barcode, borrower_id,
-                           id_request, ln=CFG_SITE_LANG):
+                           request_id, ln=CFG_SITE_LANG):
     """
     @param uid: user id
     @param barcode: book's barcode
@@ -85,8 +86,9 @@ def perform_borrower_loans(uid, barcode, borrower_id,
             db.update_due_date(barcode, new_due_date)
             infos.append("Your loan has been renewed with sucess.")
 
-    if id_request:
-        db.cancel_request(id_request, 'cancelled')
+    if request_id:
+        db.cancel_request(request_id, 'cancelled')
+        make_copy_available(request_id)
 
     elif borrower_id:
         list_of_recids = db.get_borrower_recids(borrower_id)

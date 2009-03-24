@@ -29,12 +29,12 @@ import time
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
-from invenio.search_engine import get_fieldvalues
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import USER_ON_CERN_LDAP
 from invenio.bibcirculation_utils import get_book_cover, \
       book_information_from_MARC, \
-      book_title_from_MARC
+      book_title_from_MARC, \
+      renew_loan_for_X_days
 
 _MENU_ = """
 
@@ -521,11 +521,11 @@ class Template:
                           _("Request date"),
                           _("Status"))
 
-            for(id_request, recid, request_date, status) in requests:
+            for(request_id, recid, request_date, status) in requests:
 
                 cancel_request_link = create_html_link(CFG_SITE_URL +
                                                        '/yourloans/display',
-                                                       {'id_request': id_request},
+                                                       {'request_id': request_id},
                                                        (_("Cancel")))
                 out += """
                 <tr>
@@ -800,7 +800,7 @@ class Template:
         """
         out += _MENU_
 
-        if len(result)==0:
+        if len(result) == 0:
             out += """
             <div class="bibcircbottom">
             <br /> <br \>            <br /> <br \>
@@ -924,7 +924,7 @@ class Template:
         out += _MENU_
 
 
-        if len(result)==0:
+        if len(result) == 0:
             out += """
             <div class="bibcircbottom">
             <br /> <br \>            <br /> <br \>
@@ -1115,25 +1115,25 @@ class Template:
         </table>
         <table class="bibcirctable">
           <tr valign='top'>
-           <td width="400">
+           <td width="350">
            <table>
             <tr>
-             <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+             <td width="80">%s</td> <td class="bibcirccontent">%s</td>
             </tr>
             <tr>
-            <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+            <td width="80">%s</td> <td class="bibcirccontent">%s</td>
             </tr>
             <tr>
-            <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+            <td width="80">%s</td> <td class="bibcirccontent">%s</td>
             </tr>
             <tr>
-            <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+            <td width="80">%s</td> <td class="bibcirccontent">%s</td>
             </tr>
             <tr>
-            <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+            <td width="80">%s</td> <td class="bibcirccontent">%s</td>
             </tr>
             <tr>
-            <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+            <td width="80">%s</td> <td class="bibcirccontent">%s</td>
             </tr>
             </table>
             </td>
@@ -1142,6 +1142,7 @@ class Template:
 
         <input type=hidden name=recid value=%s>
         <input type=hidden name=barcode value=%s>
+
         """ % (_("Loan informations"),
                _("Borrower"), borrower_name,
                _("Item"), book_title,
@@ -1566,12 +1567,12 @@ class Template:
 
         return out
 
-    def tmpl_loan_on_desk_step2(self,  user_info, ln=CFG_SITE_LANG):
+    def tmpl_loan_on_desk_step2(self, user_info, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
 
-        infos = user_info.split(',')
+        (ccid, name, email, phone, address, mailbox) = user_info.split(',')
 
         _ = gettext_set_language(ln)
 
@@ -1639,26 +1640,27 @@ class Template:
                 <br />
                 <br />
                 </div>
-                """ % (CFG_SITE_URL, _("ID"), infos[0],
-                       _("Name"), infos[1],
-                       _("Email"), infos[2],
-                       _("Phone"), infos[3],
-                       _("Address"), infos[4],
-                       _("Mailbox"), infos[5],
+                """ % (CFG_SITE_URL, _("ID"), ccid,
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
+                       _("Mailbox"), mailbox,
                        _("Back"), _("Continue"))
 
         return out
 
-    def tmpl_loan_on_desk_step3(self, ccid, name, email, phone, address,
-                                mailbox, ln=CFG_SITE_LANG):
+    def tmpl_loan_on_desk_step3(self, user_info, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
 
+        (ccid, name, email, phone, address, mailbox) = user_info
+
         _ = gettext_set_language(ln)
 
-        out = """
-        """
+        out = """  """
+
         out += _MENU_
 
         out += """
@@ -1675,32 +1677,26 @@ class Template:
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                      <input type=hidden name="ccid" value=%s>
                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                      <input type=hidden name="name" value="%s">
                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                      <input type=hidden name="email" value=%s>
                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                      <input type=hidden name="phone" value=%s>
                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                      <input type=hidden name="address" value="%s">
                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                      <input type=hidden name="mailbox" value=%s>
                 </tr>
                 </table>
                 <br />
@@ -1722,6 +1718,8 @@ class Template:
                        <input type="submit" name="confirm_button"
                        value=%s class="formbutton">
 
+                      <input type=hidden name="user_info" value="%s">
+
                   </td>
                  </tr>
                 </table>
@@ -1730,27 +1728,23 @@ class Template:
                 <br />
                 </div>
                 """ % (CFG_SITE_URL, _("User information"),
-                       _("ID"), ccid, ccid,
-                       _("Name"), name, name,
-                       _("Email"), email, email,
-                       _("Phone"), phone, phone,
-                       _("Address"), address, address,
-                       _("Mailbox"), mailbox, mailbox,
-                       _("Barcode(s)"), _("Back"), _("Continue"))
+                       _("ID"), ccid,
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
+                       _("Mailbox"), mailbox,
+                       _("Barcode(s)"), _("Back"),
+                       _("Continue"), user_info)
 
         return out
 
-    def tmpl_loan_on_desk_step4(self, ccid, name, email, phone, address,
-                                mailbox, list_of_books, infos,
+    def tmpl_loan_on_desk_step4(self, user_info, list_of_books, infos,
                                 ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
-
-        loaned_on = datetime.date.today()
-        more30days = datetime.timedelta(days=30)
-        tmp_date = loaned_on + more30days
-        due_date = tmp_date.strftime("%Y-%m-%d")
+        (ccid, name, email, phone, address, mailbox) = user_info
 
         _ = gettext_set_language(ln)
 
@@ -1777,28 +1771,23 @@ class Template:
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                    <input type=hidden name="name" value="%s">
-                </tr>
+                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                    <input type=hidden name="email" value=%s>
-                </tr>
+                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                    <input type=hidden name="phone" value=%s>
-                </tr>
+                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                    <input type=hidden name="address" value=%s>
-                </tr>
+                 </tr>
                 <tr>
                     <td width="70">%s</td>
                     <td class="bibcirccontent">%s</td>
-                    <input type=hidden name="mailbox" value=%s>
-                </tr>
+                 </tr>
                 </table>
                 <br />
                 <table class="bibcirctable">
@@ -1818,15 +1807,19 @@ class Template:
                 </tr>
                 """  % (CFG_SITE_URL, list_of_books, _("User information"),
                         _("CCID"), ccid,
-                        _("Name"), name, name,
-                       _("Email"), email, email,
-                        _("Phone"), phone, phone,
-                       _("Address"), address, address,
-                        _("Mailbox"), mailbox, mailbox,
+                        _("Name"), name,
+                        _("Email"), email,
+                        _("Phone"), phone,
+                        _("Address"), address,
+                        _("Mailbox"), mailbox,
                         _("List of borrowed books"),
                         _("Item"), _("Barcode"), _("Due date"))
 
-        for i in range(len(list_of_books)):
+        iterator = 1
+
+        for (recid, barcode) in list_of_books:
+
+            due_date = renew_loan_for_X_days(barcode)
 
             out +="""
                  <tr>
@@ -1846,10 +1839,11 @@ class Template:
                        </script>
                     </td>
                 </tr>
-                """ % (book_title_from_MARC(list_of_books[i][0]), list_of_books[i][1],
-                       _("due_date_" + str(i)), due_date,
-                       _("jsCal_" + str(i)), _("due_date_" + str(i)), _("jsCal_" + str(i)))
+                """ % (book_title_from_MARC(recid), barcode,
+                       _("due_date_" + str(iterator)), due_date,
+                       _("jsCal_" + str(iterator)), _("due_date_" + str(iterator)), _("jsCal_" + str(iterator)))
 
+            iterator += 1
 
         out += """
                 </table>
@@ -1877,6 +1871,7 @@ class Template:
                        <input type="submit" name="confirm_button"
                        value=%s class="formbutton">
 
+                       <input type=hidden name="user_info" value="%s">
                   </td>
                  </tr>
                 </table>
@@ -1884,7 +1879,8 @@ class Template:
                 <br />
                 <br />
                 </div>
-                """ % (_("Write note"), _("Back"), _("Continue"))
+                """ % (_("Write note"), _("Back"),
+                       _("Continue"), user_info)
 
         return out
 
@@ -1950,14 +1946,17 @@ class Template:
 
         return out
 
-    def tmpl_register_new_loan_done(self, loan_information, ln=CFG_SITE_LANG):
+    def tmpl_register_new_loan(self, loan_information, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
+
+        (name, address, mailbox, email) = loan_information
+
         _ = gettext_set_language(ln)
 
-        out = """
-              """
+        out = """  """
+
         out += _MENU_
 
         out += """
@@ -1978,6 +1977,9 @@ class Template:
         <tr>
           <td width="70">%s</td> <td class="bibcirccontent">%s</td>
         </tr>
+        <tr>
+          <td width="70">%s</td> <td class="bibcirccontent">%s</td>
+        </tr>
         </table>
         <br />
         <br />
@@ -1989,9 +1991,10 @@ class Template:
         <br />
         </div>
         """ % (_("A new loan has been registered for:"),
-               _("Name"), loan_information[0],
-               _("Address"), loan_information[1],
-               _("Email"), loan_information[2],
+               _("Name"), name,
+               _("Address"), address,
+               _("Mailbox"), mailbox,
+               _("Email"), email,
                CFG_SITE_URL,
                _("Print loan information"))
 
@@ -2138,7 +2141,7 @@ class Template:
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">
                    <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/all_requests?request_id=%s'"
-                   value='%s'>
+                   value='%s' class="formbutton">
                  </td>
             </tr>
             """ % (borrower_link,
@@ -2215,16 +2218,16 @@ class Template:
                _("Option(s)"))
 
 
-        for (borid, name, recid, status, date_from, date_to, id_request, request_date) in result:
+        for (borrower_id, name, recid, status, date_from, date_to, request_id, request_date) in result:
 
             borrower_link = create_html_link(CFG_SITE_URL +
                                              '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
-                                             {'borrower_id': borid, 'ln': ln},
+                                             {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
             cancel_request_link = create_html_link(CFG_SITE_URL +
                                                    '/admin/bibcirculation/bibcirculationadmin.py/get_item_requests_details',
-                                                   {'id_request': id_request},
+                                                   {'request_id': request_id},
                                                    (_("Cancel")))
 
             out += """
@@ -2239,7 +2242,7 @@ class Template:
                    value='%s'>
                  </td>
             </tr>
-            """ % (borrower_link, status, date_from, date_to, request_date, CFG_SITE_URL, id_request, _("Cancel hold request"))
+            """ % (borrower_link, status, date_from, date_to, request_date, CFG_SITE_URL, request_id, _("Cancel hold request"))
 
         out += """
         </table>
@@ -2259,8 +2262,8 @@ class Template:
 
         return out
 
-    def tmpl_item_details(self, recid, details, requests, loans, req_hist_overview,
-                          loans_hist_overview, nb_copies, ln=CFG_SITE_LANG):
+    def tmpl_get_item_details(self, recid, copies, requests, loans, req_hist_overview,
+                              loans_hist_overview, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
@@ -2271,19 +2274,13 @@ class Template:
 
         out += _MENU_
 
-        nb_req = len(requests)
-        nb_loans = len(loans)
-
-        nb_req_hist = len(req_hist_overview)
-        nb_loans_hist = len(loans_hist_overview)
-
         req_hist_link = create_html_link(CFG_SITE_URL +
-                                        '/admin/bibcirculation/bibcirculationadmin.py/item_req_historical_overview',
+                                        '/admin/bibcirculation/bibcirculationadmin.py/get_item_req_historical_overview',
                                         {'recid': recid, 'ln': ln},
                                         (_("More details")))
 
         loans_hist_link = create_html_link(CFG_SITE_URL +
-                                        '/admin/bibcirculation/bibcirculationadmin.py/item_loans_historical_overview',
+                                        '/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_historical_overview',
                                         {'recid': recid, 'ln': ln},
                                         (_("More details")))
 
@@ -2382,7 +2379,7 @@ class Template:
                                 _("Description"))
 
 
-        for (barcode, loan_period, library_name, library_id, location, nb_requests, status, collection, description) in details:
+        for (barcode, loan_period, library_name, library_id, location, nb_requests, status, collection, description) in copies:
 
             library_link = create_html_link(CFG_SITE_URL +
                                             '/admin/bibcirculation/bibcirculationadmin.py/get_library_details',
@@ -2464,11 +2461,11 @@ class Template:
 
             """ % (CFG_SITE_URL, recid, _("Add new copy"),
                    _("Hold requests and loans overview on"), time.ctime(),
-                   _("Hold requests"), nb_req, req_link,
-                   _("Loans"), nb_loans, loans_link,
+                   _("Hold requests"), len(requests), req_link,
+                   _("Loans"), len(loans), loans_link,
                    _("Historical overview"),
-                   _("Hold requests"), nb_req_hist, req_hist_link,
-                   _("Loans"), nb_loans_hist, loans_hist_link)
+                   _("Hold requests"), len(req_hist_overview), req_hist_link,
+                   _("Loans"), len(loans_hist_overview), loans_hist_link)
 
 
 
@@ -2509,11 +2506,14 @@ class Template:
                      <td class="bibcirctableheader" align="center">%s</td>
                      <td class="bibcirctableheader" align="center">%s</td>
                      <td class="bibcirctableheader" align="center">%s</td>
+                     <td class="bibcirctableheader" align="center">%s</td>
+                     <td class="bibcirctableheader" align="center">%s</td>
                      </tr>
-                     """ % (_("Item"), _("Barcode"), _("From"),
+                     """ % (_("Item"), _("Barcode"), _("Library"),
+                            _("Location"), _("From"),
                             _("To"), _("Request date"))
 
-        for (recid, barcode, req_from, req_to, req_date) in req_hist_overview:
+        for (recid, barcode, library_name, location, req_from, req_to, req_date) in req_hist_overview:
 
             title_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
@@ -2527,8 +2527,10 @@ class Template:
                        <td class="bibcirccontent" align="center">%s</td>
                        <td class="bibcirccontent" align="center">%s</td>
                        <td class="bibcirccontent" align="center">%s</td>
+                       <td class="bibcirccontent" align="center">%s</td>
+                       <td class="bibcirccontent" align="center">%s</td>
                        </tr>
-                 """ % (title_link, barcode, req_from, req_to, req_date)
+                 """ % (title_link, barcode, library_name, location, req_from, req_to, req_date)
 
         out += """
            </table>
@@ -2569,16 +2571,20 @@ class Template:
                      <td class="bibcirctableheader" align="center">%s</td>
                      <td class="bibcirctableheader" align="center">%s</td>
                      <td class="bibcirctableheader" align="center">%s</td>
+                     <td class="bibcirctableheader" align="center">%s</td>
+                     <td class="bibcirctableheader" align="center">%s</td>
                      </tr>
                      """ % (_("Item"),
                             _("Barcode"),
+                            _("Library"),
+                            _("Location"),
                             _("Loaned on"),
                             _("Due date"),
                             _("Returned on"),
-                            _("No of renewals"),
-                            _("No of overdue letters"))
+                            _("Renewals"),
+                            _("Overdue letters"))
 
-        for (recid, barcode, loaned_on, due_date, returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
+        for (recid, barcode, library_name, location, loaned_on, due_date, returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
 
             title_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
@@ -2594,8 +2600,11 @@ class Template:
                        <td class="bibcirccontent" align="center">%s</td>
                        <td class="bibcirccontent" align="center">%s</td>
                        <td class="bibcirccontent" align="center">%s</td>
+                       <td class="bibcirccontent" align="center">%s</td>
+                       <td class="bibcirccontent" align="center">%s</td>
                        </tr>
                  """ % (title_link, barcode,
+                        library_name, location,
                         loaned_on, due_date,
                         returned_on, nb_renew,
                         nb_overdueletters)
@@ -2619,7 +2628,7 @@ class Template:
         return out
 
 
-    def tmpl_item_req_historical_overview(self, req_hist_overview,
+    def tmpl_get_item_req_historical_overview(self, req_hist_overview,
                                           ln=CFG_SITE_LANG):
         """
         """
@@ -2641,18 +2650,22 @@ class Template:
                <td width="20" class="bibcirctableheader" align="center">%s</td>
                <td width="20" class="bibcirctableheader" align="center">%s</td>
                <td width="20" class="bibcirctableheader" align="center">%s</td>
+               <td width="20" class="bibcirctableheader" align="center">%s</td>
+               <td width="20" class="bibcirctableheader" align="center">%s</td>
               </tr>
                      """ % (_("Borrower"),
                             _("Barcode"),
-                            _("Period of interest - From"),
-                            _("Period of interest - To"),
+                            _("Library"),
+                            _("Location"),
+                            _("From"),
+                            _("To"),
                             _("Request date"))
 
-        for (name, uid, barcode, req_from, req_to, req_date) in req_hist_overview:
+        for (name, borrower_id, barcode, library_name, location, req_from, req_to, req_date) in req_hist_overview:
 
             borrower_link = create_html_link(CFG_SITE_URL +
                                              '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
-                                             {'borrower_id': uid, 'ln': ln},
+                                             {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
             out += """
@@ -2664,10 +2677,12 @@ class Template:
                    <td width="20" class="bibcirccontent" align="center">%s</td>
                    <td width="20" class="bibcirccontent" align="center">%s</td>
                    <td width="20" class="bibcirccontent" align="center">%s</td>
+                   <td width="20" class="bibcirccontent" align="center">%s</td>
+                   <td width="20" class="bibcirccontent" align="center">%s</td>
                   </tr>
 
-                 """ % (borrower_link, barcode,
-                        req_from, req_to, req_date)
+                 """ % (borrower_link, barcode, library_name,
+                        location, req_from, req_to, req_date)
 
         out += """
            </table>
@@ -2688,7 +2703,7 @@ class Template:
         return out
 
 
-    def tmpl_item_loans_historical_overview(self, loans_hist_overview,
+    def tmpl_get_item_loans_historical_overview(self, loans_hist_overview,
                                             ln=CFG_SITE_LANG):
         """
         """
@@ -2710,20 +2725,24 @@ class Template:
                      <td class="bibcirctableheader" align="center">%s</td>
                      <td class="bibcirctableheader" align="center">%s</td>
                      <td class="bibcirctableheader" align="center">%s</td>
+                     <td class="bibcirctableheader" align="center">%s</td>
+                     <td class="bibcirctableheader" align="center">%s</td>
                      </tr>
                      """ % (_("Borrower"),
                             _("Barcode"),
+                            _("Library"),
+                            _("Location"),
                             _("Loaned on"),
                             _("Due date"),
                             _("Returned on"),
-                            _("No of renewals"),
-                            _("No of overdue letters"))
+                            _("Renewals"),
+                            _("Overdue letters"))
 
-        for (name, uid, barcode, loaned_on, due_date, returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
+        for (name, borrower_id, barcode, library_name, location, loaned_on, due_date, returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
 
             borrower_link = create_html_link(CFG_SITE_URL +
                                              '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
-                                             {'borrower_id': uid, 'ln': ln},
+                                             {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
             out += """ <tr  onMouseOver="this.className='highlight'"
@@ -2735,8 +2754,11 @@ class Template:
                        <td class="bibcirccontent" align="center">%s</td>
                        <td class="bibcirccontent" align="center">%s</td>
                        <td class="bibcirccontent" align="center">%s</td>
+                       <td class="bibcirccontent" align="center">%s</td>
+                       <td class="bibcirccontent" align="center">%s</td>
                        </tr>
-                 """ % (borrower_link, barcode, loaned_on,
+                 """ % (borrower_link, barcode, library_name,
+                        location, loaned_on,
                         due_date, returned_on, nb_renew,
                         nb_overdueletters)
 
@@ -2773,25 +2795,24 @@ class Template:
         <div class="bibcircbottom">
         <br \>
         """
+        (library_id, name, address, email, phone, notes) = library_details
 
-        for (library_id, name, address, email, phone, notes) in library_details:
+        no_notes_link = create_html_link(CFG_SITE_URL +
+                                         '/admin/bibcirculation/bibcirculationadmin.py/get_library_notes',
+                                         {'library_id': library_id},
+                                         (_("No notes")))
 
-            no_notes_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_library_notes',
-                                             {'library_id': library_id},
-                                             (_("No notes")))
+        see_notes_link = create_html_link(CFG_SITE_URL +
+                                          '/admin/bibcirculation/bibcirculationadmin.py/get_library_notes',
+                                          {'library_id': library_id},
+                                          (_("Notes about this library")))
 
-            see_notes_link = create_html_link(CFG_SITE_URL +
-                                              '/admin/bibcirculation/bibcirculationadmin.py/get_library_notes',
-                                              {'library_id': library_id},
-                                              (_("Notes about this library")))
+        if notes == "":
+            notes_link = no_notes_link
+        else:
+            notes_link = see_notes_link
 
-            if notes == "":
-                notes_link = no_notes_link
-            else:
-                notes_link = see_notes_link
-
-            out += """
+        out += """
             <table class="bibcirctable">
                  <tr>
                       <td width="80" class="bibcirctableheader">%s</td>
@@ -2867,52 +2888,51 @@ class Template:
         _ = gettext_set_language(ln)
 
 
-        out = """
-        """
+        out = """ """
 
         out += _MENU_
 
-        for (borrower_id, name, email, phone, address, mailbox) in borrower:
+        (borrower_id, name, email, phone, address, mailbox) = borrower
 
-            req_link = create_html_link(CFG_SITE_URL +
-                                        '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details',
-                                        {'borrower_id': borrower_id},
-                                        (_("More details")))
+        req_link = create_html_link(CFG_SITE_URL +
+                                    '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details',
+                                    {'borrower_id': borrower_id},
+                                    (_("More details")))
 
-            no_notes_link = create_html_link(CFG_SITE_URL +
-                                        '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes',
-                                        {'borrower_id': borrower_id},
-                                          (_("No notes")))
+        no_notes_link = create_html_link(CFG_SITE_URL +
+                                         '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes',
+                                         {'borrower_id': borrower_id},
+                                         (_("No notes")))
 
-            see_notes_link = create_html_link(CFG_SITE_URL +
+        see_notes_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes',
                                           {'borrower_id': borrower_id},
                                           (_("Notes about this borrower")))
 
 
-            loans_link = create_html_link(CFG_SITE_URL +
-                                        '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
-                                        {'borrower_id': borrower_id},
-                                        (_("More details")))
+        loans_link = create_html_link(CFG_SITE_URL +
+                                      '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
+                                      {'borrower_id': borrower_id},
+                                      (_("More details")))
 
 
-            req_hist_link = create_html_link(CFG_SITE_URL +
-                                        '/admin/bibcirculation/bibcirculationadmin.py/bor_requests_historical_overview',
-                                        {'borrower_id': borrower_id},
-                                        (_("More details")))
+        req_hist_link = create_html_link(CFG_SITE_URL +
+                                         '/admin/bibcirculation/bibcirculationadmin.py/bor_requests_historical_overview',
+                                         {'borrower_id': borrower_id},
+                                         (_("More details")))
 
-            loans_hist_link = create_html_link(CFG_SITE_URL +
-                                        '/admin/bibcirculation/bibcirculationadmin.py/bor_loans_historical_overview',
-                                        {'borrower_id': borrower_id},
-                                        (_("More details")))
+        loans_hist_link = create_html_link(CFG_SITE_URL +
+                                           '/admin/bibcirculation/bibcirculationadmin.py/bor_loans_historical_overview',
+                                           {'borrower_id': borrower_id},
+                                           (_("More details")))
 
-            if notes == "":
-                check_notes = no_notes_link
-            else:
-                check_notes = see_notes_link
+        if notes == "":
+            check_notes = no_notes_link
+        else:
+            check_notes = see_notes_link
 
 
-            out += """
+        out += """
             <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_notification" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
@@ -2954,16 +2974,16 @@ class Template:
                       <td class="bibcirccontent">%s</td>
                  </tr>
 
-            """% (CFG_SITE_URL,
-                  borrower_id,
-                  _("Personal details"),
-                  _("Name"), name,
-                  _("Email"), email,
-                  _("Notify this borrower"),
-                  _("Phone"), phone,
-                  _("Address"), address,
-                  _("Mailbox"), mailbox,
-                  _("Notes"), check_notes)
+            """ % (CFG_SITE_URL,
+                   borrower_id,
+                   _("Personal details"),
+                   _("Name"), name,
+                   _("Email"), email,
+                   _("Notify this borrower"),
+                   _("Phone"), phone,
+                   _("Address"), address,
+                   _("Mailbox"), mailbox,
+                   _("Notes"), check_notes)
 
         nb_requests = len(requests)
         nb_loans = len(loans)
@@ -3032,7 +3052,7 @@ class Template:
         </table>
         <br \>
         </div>
-        """ % (CFG_SITE_URL, borrower[0][0], _("Update"),
+        """ % (CFG_SITE_URL, borrower_id, _("Update"),
                _("Requests and Loans overview on"), time.ctime(),
                _("Requests"), nb_requests, req_link,
                _("Loans"), nb_loans, loans_link,
@@ -3148,6 +3168,7 @@ class Template:
                        <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
+                       <td class="bibcirctableheader" align="center">%s</td>
                </tr>
 
          """% (CFG_SITE_URL,
@@ -3159,11 +3180,12 @@ class Template:
                _("Renewals"),
                _("Overdue letters"),
                _("Type"),
-                _("Loan notes"),
+               _("Loan notes"),
+               _("Loans status"),
                _("Loan options"))
 
 
-        for (recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, type, notes, loan_id) in borrower_loans:
+        for (recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, type, notes, loan_id, status) in borrower_loans:
 
             title_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
@@ -3196,6 +3218,7 @@ class Template:
                  <td class="bibcirccontent" align="center">%s - %s</td>
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">%s</td>
+                 <td class="bibcirccontent" align="center">%s</td>
 
                  <td align="center">
                  <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details?borrower_id=%s&barcode=%s&loan_id=%s&recid=%s'"
@@ -3210,7 +3233,7 @@ class Template:
             """ % (title_link, barcode, loaned_on,
                    due_date, nb_renewall,
                    nb_overdue, date_overdue, type,
-                   check_notes,
+                   check_notes, status,
                    CFG_SITE_URL, borrower_id, barcode,
                    loan_id, recid, _("renew"),
                    CFG_SITE_URL, barcode, _("return"),
@@ -3248,7 +3271,7 @@ class Template:
 
         return out
 
-    def tmpl_all_loans(self, result, loans_per_page, jloan, ln=CFG_SITE_LANG):
+    def tmpl_all_loans(self, result, show, loans_per_page, jloan, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
@@ -3259,10 +3282,10 @@ class Template:
         last = int(jloan) + int(loans_per_page)
         end = len(result) - (len(result) % int(loans_per_page))
 
-        # raise repr(jloan)<option value ="on_loan">loans 'ON LOAN?!?!'</option>
 
-        out = """
-        """
+
+        out = """  """
+
         out += _MENU_
 
         out += """
@@ -3274,19 +3297,30 @@ class Template:
             <td class="bibcirctableheader" width="90">
             Show list of
             </td>
-            <td width="200">
+            <td width="150">
                        <select name="show"  style='border: 1px solid #cfcfcf'>
-                          <option value ="all">all loans</option>
-                          <option value ="expired">expired loans</option>
+            """ % (CFG_SITE_URL)
 
-                    </select>
+        if show == 'expired':
+            out += """
+                   <option value="all">all loans</option>
+                   <option value="expired" selected>expired loans</option>
+                   """
+        else:
+            out += """
+                   <option value="all" selected>all loans</option>
+                   <option value="expired">expired loans</option>
+                   """
+
+        out += """
+            </select>
             </td>
             <td class="bibcirctableheader" width="100">
             loans per page
             </td>
-            <td width="100">
+            <td width="70">
                     <select name="loans_per_page" style='border: 1px solid #cfcfcf'>
-            """  % (CFG_SITE_URL)
+            """
 
         if loans_per_page == '50':
             out += """
@@ -3323,7 +3357,7 @@ class Template:
                     </select>
             </td>
             <td>
-            <input type="submit" name="ok_button" value="OK" class="formbutton">
+            <input type="submit" name="ok_button" value="%s" class="formbutton">
             </td>
             </tr>
             </table>
@@ -3331,12 +3365,36 @@ class Template:
             <hr>
             <br />
             </form>
-        """
 
-        out += """
-        <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+        """ % (_("Ok"))
 
-        <br \>
+        if len(result) == 0:
+            out += """
+              <br />
+              <table class="bibcirctable">
+                <tr>
+                    <td class="bibcirccontent">%s</td>
+                </tr>
+                </table>
+                <br />
+                <table class="bibcirctable">
+                <tr>
+                  <td>
+                       <input type=button value='%s'
+                        onClick="history.go(-1)" class="formbutton">
+                  </td>
+                 </tr>
+                </table>
+                <br />
+                <br />
+                </div>
+                """ % (_("No result for your search."),
+                       _("Back"))
+
+        else:
+            out += """
+            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+            <br \>
              <table class="bibcirctable">
                     <tr>
                        <td class="bibcirctableheader">%s</td>
@@ -3350,160 +3408,178 @@ class Template:
                        <td class="bibcirctableheader" align="center">%s</td>
                     </tr>
 
-         """% (CFG_SITE_URL,
-               _("Borrower"),
-               _("Item"),
-               _("Barcode"),
-               _("Loaned on"),
-               _("Due date"),
-               _("Renewals"),
-               _("Overdue letters"),
-               _("Status"),
-               _("Loan Notes"))
+                    """% (CFG_SITE_URL,
+                          _("Borrower"),
+                          _("Item"),
+                          _("Barcode"),
+                          _("Loaned on"),
+                          _("Due date"),
+                          _("Renewals"),
+                          _("Overdue letters"),
+                          _("Status"),
+                          _("Loan Notes"))
 
+            for (borrower_id, borrower_name, recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, status, notes, loan_id) in result[initial:last]:
 
+                borrower_link = create_html_link(CFG_SITE_URL +
+                                                 '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                                 {'borrower_id': borrower_id, 'ln': ln},
+                                                 (borrower_name))
 
+                see_notes_link = create_html_link(CFG_SITE_URL +
+                                                  '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                                  {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                                  (_("see notes")))
 
-        for (borid, borname, recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, status, notes, loan_id) in result[initial:last]:
+                no_notes_link = create_html_link(CFG_SITE_URL +
+                                                 '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                                 {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                                 (_("no notes")))
 
-            borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
-                                             {'borrower_id': borid, 'ln': ln},
-                                             (borname))
+                next_link = create_html_link(CFG_SITE_URL +
+                                             '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                             {'loans_per_page': loans_per_page, 'jloan': last, 'ln': ln},
+                                             (_("next page >>>")))
 
-            see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                          {'loan_id': loan_id, 'recid': recid, 'borrower_id': borid, 'ln': ln},
-                                          (_("see notes")))
+                previous_link = create_html_link(CFG_SITE_URL +
+                                                 '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                                 {'loans_per_page': loans_per_page, 'jloan': initial - int(loans_per_page), 'ln': ln},
+                                                 (_("<<< previous page")))
 
-            no_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                          {'loan_id': loan_id, 'recid': recid, 'borrower_id': borid, 'ln': ln},
-                                          (_("no notes")))
+                begin_link = create_html_link(CFG_SITE_URL +
+                                              '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                              {'loans_per_page': loans_per_page, 'jloan': 0, 'ln': ln},
+                                              (_("|<< first page")))
 
-            next_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                         {'loans_per_page': loans_per_page, 'jloan': last, 'ln': ln},
-                                          (_("next page >>>")))
+                end_link = create_html_link(CFG_SITE_URL +
+                                            '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                            {'loans_per_page': loans_per_page, 'jloan': end, 'ln': ln},
+                                            (_("last page >>|")))
 
-            previous_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                          {'loans_per_page': loans_per_page, 'jloan': initial - int(loans_per_page), 'ln': ln},
-                                          (_("<<< previous page")))
+                if notes == "":
+                    check_notes = no_notes_link
+                else:
+                    check_notes = see_notes_link
 
-            begin_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                          {'loans_per_page': loans_per_page, 'jloan': 0, 'ln': ln},
-                                          (_("|<< first page")))
+                title_link = create_html_link(CFG_SITE_URL +
+                                              '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                              {'recid': recid, 'ln': ln},
+                                              (book_title_from_MARC(recid)))
 
-            end_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                          {'loans_per_page': loans_per_page, 'jloan': end, 'ln': ln},
-                                          (_("last page >>|")))
+                out += """
+                    <tr onMouseOver="this.className='highlight'" onMouseOut="this.className='normal'">
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent" align="center">%s</td>
+                    <td class="bibcirccontent" align="center">%s</td>
+                    <td class="bibcirccontent" align="center">%s</td>
+                    <td class="bibcirccontent" align="center">%s</td>
+                    <td class="bibcirccontent" align="center">%s - %s</td>
+                    <td class="bibcirccontent" align="center">%s</td>
+                    <td class="bibcirccontent" align="center">%s</td>
+                    </tr>
 
-            if notes == "":
-                check_notes = no_notes_link
+                    """ % (borrower_link, title_link, barcode,
+                           loaned_on, due_date,
+                           nb_renewall, nb_overdue, date_overdue,
+                           status, check_notes)
+
+            if int(loans_per_page) <= len(result):
+
+                if int(jloan) == 0:
+                    out += """
+                    </table>
+                    <br \>
+                    <table class="bibcirctable">
+                    <tr>
+                    <td align='center'>%s - %s - %s - %s</td>
+                    </tr>
+                    </table>
+                    <br \>
+                    <table class="bibcirctable">
+                    <tr>
+                    <td><input type=button value='%s'
+                    onClick="history.go(-1)" class="formbutton"></td>
+                    </tr>
+                    </table>
+                    <br \>
+                    <br \>
+                    <br \>
+                    </div>
+                    </form>
+                    """ % ('|<< first page', '<<< previous page',
+                           next_link, end_link,
+                           _("Back"))
+
+                elif int(jloan) == end:
+                    out += """
+                    </table>
+                    <br \>
+                    <table class="bibcirctable">
+                    <tr>
+                    <td align='center'>%s - %s - %s - %s</td>
+                    </tr>
+                    </table>
+                    <br \>
+                    <table class="bibcirctable">
+                    <tr>
+                    <td><input type=button value='%s'
+                    onClick="history.go(-1)" class="formbutton"></td>
+                    </tr>
+                    </table>
+                    <br \>
+                    <br \>
+                    <br \>
+                    </div>
+                    </form>
+                    """ % (begin_link, previous_link,
+                           'next page >>>', 'last page >>|',
+                           _("Back"))
+
+                else:
+                    out += """
+                    </table>
+                    <br \>
+                    <table class="bibcirctable">
+                    <tr>
+                    <td align='center'>%s - %s - %s - %s</td>
+                    </tr>
+                    </table>
+                    <br \>
+                    <table class="bibcirctable">
+                    <tr>
+                    <td><input type=button value='%s'
+                    onClick="history.go(-1)" class="formbutton"></td>
+                    </tr>
+                    </table>
+                    <br \>
+                    <br \>
+                    <br \>
+                    </div>
+                    </form>
+                    """ % (begin_link, previous_link,
+                           next_link, end_link,
+                           _("Back"))
             else:
-                check_notes = see_notes_link
+                out += """
+                    </table>
+                    <br \>
+                    <br \>
+                    <br \>
+                    <table class="bibcirctable">
+                    <tr>
+                    <td><input type=button value='%s'
+                    onClick="history.go(-1)" class="formbutton"></td>
+                    </tr>
+                    </table>
+                    <br \>
+                    <br \>
+                    <br \>
+                    </div>
+                    </form>
+                    """ % (_("Back"))
 
-            title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
-                                          {'recid': recid, 'ln': ln},
-                                          (book_title_from_MARC(recid)))
 
-            out += """
-            <tr onMouseOver="this.className='highlight'" onMouseOut="this.className='normal'">
-                 <td class="bibcirccontent">%s</td>
-                 <td class="bibcirccontent">%s</td>
-                 <td class="bibcirccontent" align="center">%s</td>
-                 <td class="bibcirccontent" align="center">%s</td>
-                 <td class="bibcirccontent" align="center">%s</td>
-                 <td class="bibcirccontent" align="center">%s</td>
-                 <td class="bibcirccontent" align="center">%s - %s</td>
-                 <td class="bibcirccontent" align="center">%s</td>
-                 <td class="bibcirccontent" align="center">%s</td>
-
-             </tr>
-
-            """ % (borrower_link, title_link, barcode,
-                   loaned_on, due_date,
-                   nb_renewall, nb_overdue, date_overdue,
-                   status, check_notes)
-
-        if int(jloan) == 0:
-            out += """
-            </table>
-            <br \>
-            <table class="bibcirctable">
-            <tr>
-            <td align='center'>%s - %s - %s - %s</td>
-            </tr>
-            </table>
-            <br \>
-            <table class="bibcirctable">
-            <tr>
-            <td><input type=button value='%s'
-                 onClick="history.go(-1)" class="formbutton"></td>
-            </tr>
-            </table>
-            <br \>
-            <br \>
-            <br \>
-            </div>
-            </form>
-            """ % ('|<< first page', '<<< previous page',
-                   next_link, end_link,
-                   _("Back"))
-
-        elif int(jloan) == end:
-            out += """
-            </table>
-            <br \>
-            <table class="bibcirctable">
-            <tr>
-            <td align='center'>%s - %s - %s - %s</td>
-            </tr>
-            </table>
-            <br \>
-            <table class="bibcirctable">
-             <tr>
-             <td><input type=button value='%s'
-                  onClick="history.go(-1)" class="formbutton"></td>
-             </tr>
-             </table>
-             <br \>
-             <br \>
-             <br \>
-             </div>
-             </form>
-             """ % (begin_link, previous_link,
-                    'next page >>>', 'last page >>|',
-                    _("Back"))
-
-        else:
-            out += """
-            </table>
-            <br \>
-            <table class="bibcirctable">
-            <tr>
-            <td align='center'>%s - %s - %s - %s</td>
-            </tr>
-            </table>
-            <br \>
-            <table class="bibcirctable">
-            <tr>
-            <td><input type=button value='%s'
-                 onClick="history.go(-1)" class="formbutton"></td>
-            </tr>
-            </table>
-            <br \>
-            <br \>
-            <br \>
-            </div>
-            </form>
-            """ % (begin_link, previous_link,
-                   next_link, end_link,
-                   _("Back"))
 
         return out
 
@@ -3675,7 +3751,7 @@ class Template:
 
             no_notes_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_notes',
-                                          {'loan_id': loan_id, 'recid': recid, 'ln': ln},
+                                          {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
                                           (_("No notes")))
 
             see_notes_link = create_html_link(CFG_SITE_URL +
@@ -3758,9 +3834,9 @@ class Template:
 
         out += _MENU_
 
-        for (borrower_id, name, email, phone, address, mailbox) in borrower:
+        (borrower_id, name, email, phone, address, mailbox) = borrower
 
-            out += """
+        out += """
             <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_new_loan" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
@@ -3910,9 +3986,10 @@ class Template:
             """ % (_("Confirm"), borrower_id)
         else:
             out += """
-                <tr><td></td></tr>
-                <tr><td></td></tr>
-                <tr><td></td></tr>
+            </table>
+            <br />
+            <br />
+            <table class="bibcirctable">
                 <tr>
                   <td>
                        <input type='submit' name='add_notes' value='%s' class='formbutton'>
@@ -3939,8 +4016,8 @@ class Template:
              <br \>
              </form>
              </div>
-        """ % (borrower_id,
-               CFG_SITE_URL,
+        """ % (CFG_SITE_URL,
+               borrower_id,
                _("Back"))
 
         return out
@@ -4041,7 +4118,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes" method="get" >
+            <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_notes" method="get" >
             <br \>
             <br \>
             <table class="bibcirctable">
@@ -4066,7 +4143,7 @@ class Template:
                   </tr>
                    <tr>
                   <td>
-                      <input type='submit' name='confirm_note' value='Confirm' class='formbutton'>
+                      <input type='submit' name='confirm_note' value='%s' class='formbutton'>
                       <input type=hidden name=loan_id value=%s>
                       <input type=hidden name=recid value=%s>
                       <input type=hidden name=borrower_id value=%s>
@@ -4505,7 +4582,7 @@ class Template:
                         </td>
                   </tr>
                   <tr align="center">
-                        <td><input type="text" size="45" name="str" style='border: 1px solid #cfcfcf'></td>
+                        <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
                   </tr>
              </table>
         <br \>
@@ -4597,6 +4674,8 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        (borrower_id, name, email, phone, address, mailbox) = result
+
         out = """ """
 
         out += _MENU_
@@ -4657,11 +4736,11 @@ class Template:
                 </form>
                 </div>
                 """ % (CFG_SITE_URL, _("Borrower information"),
-                       _("Name"), result[0][1],
-                       _("Email"), result[0][2],
-                       _("Phone"), result[0][3],
-                       _("Address"), result[0][4],
-                       _("Mailbox"), result[0][5],
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
+                       _("Mailbox"), mailbox,
                        _("Back"), _("Continue"))
 
 
@@ -4670,6 +4749,8 @@ class Template:
     def tmpl_update_borrower_info_step4(self, tup_infos, ln=CFG_SITE_LANG):
 
         _ = gettext_set_language(ln)
+
+        (name, email, phone, address, mailbox) = tup_infos
 
         out = """ """
 
@@ -4717,11 +4798,11 @@ class Template:
                 </form>
                 </div>
                 """ % (CFG_SITE_URL, _("Borrower information"),
-                       _("Name"), tup_infos[0],
-                       _("Email"), tup_infos[1],
-                       _("Phone"), tup_infos[2],
-                       _("Address"), tup_infos[3],
-                       _("Mailbox"), tup_infos[4],
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
+                       _("Mailbox"), mailbox,
                        _("Back"), _("Confirm"),
                        tup_infos)
 
@@ -4835,6 +4916,8 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        (name, email, phone, address, notes) = tup_infos
+
         out = """ """
 
         out += _MENU_
@@ -4881,11 +4964,11 @@ class Template:
                 </form>
                 </div>
                 """ % (CFG_SITE_URL, _("New library information"),
-                       _("Name"), tup_infos[0],
-                       _("Email"), tup_infos[1],
-                       _("Phone"), tup_infos[2],
-                       _("Address"), tup_infos[3],
-                       _("Notes"), tup_infos[4],
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
+                       _("Notes"), notes,
                        _("Back"), _("Confirm"),
                        tup_infos)
 
@@ -4953,7 +5036,7 @@ class Template:
                      </td>
                   </tr>
                   <tr align="center">
-                        <td><input type="text" size="45" name="str" style='border: 1px solid #cfcfcf'></td>
+                        <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
                   </tr>
              </table>
         <br \>
@@ -5043,10 +5126,11 @@ class Template:
         return out
 
 
-    def tmpl_update_library_info_step3(self, result, library_id,
-                                       ln=CFG_SITE_LANG):
+    def tmpl_update_library_info_step3(self, library_info, ln=CFG_SITE_LANG):
 
         _ = gettext_set_language(ln)
+
+        (library_id, name, address, email, phone, notes) = library_info
 
         out = """ """
 
@@ -5107,16 +5191,18 @@ class Template:
                 </form>
                 </div>
                 """ % (CFG_SITE_URL, library_id, _("Library information"),
-                       _("Name"), result[0][1],
-                       _("Email"), result[0][3],
-                       _("Phone"), result[0][4],
-                       _("Address"), result[0][2],
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
                        _("Back"), _("Continue"))
 
 
         return out
 
-    def tmpl_update_library_info_step4(self, tup_infos, library_id, ln=CFG_SITE_LANG):
+    def tmpl_update_library_info_step4(self, tup_infos, ln=CFG_SITE_LANG):
+
+        (library_id, name, email, phone, address) = tup_infos
 
         _ = gettext_set_language(ln)
 
@@ -5159,7 +5245,6 @@ class Template:
                        value=%s class="formbutton">
 
                        <input type=hidden name=tup_infos value="%s">
-                       <input type=hidden name=library_id value=%s>
                   </td>
                  </tr>
                 </table>
@@ -5168,12 +5253,12 @@ class Template:
                 </form>
                 </div>
                 """ % (CFG_SITE_URL, _("Library information"),
-                       _("Name"), tup_infos[0],
-                       _("Email"), tup_infos[1],
-                       _("Phone"), tup_infos[2],
-                       _("Address"), tup_infos[3],
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
                        _("Back"), _("Continue"),
-                       tup_infos, library_id)
+                       tup_infos)
 
         return out
 
@@ -5342,20 +5427,13 @@ class Template:
 
         out += _MENU_
 
-        item_name = ' '.join(get_fieldvalues(recid, "245__a") + \
-                             get_fieldvalues(recid, "245__b"))
-        year = ' '.join(get_fieldvalues(recid, "260__c"))
-        author = '  '.join(get_fieldvalues(recid, "270__p") + \
-                           get_fieldvalues(recid, "100__a") +
-                           get_fieldvalues(recid, "100__u"))
-        isbn = ' '.join(get_fieldvalues(recid, "020__a"))
-        editor = ' , '.join(get_fieldvalues(recid, "260__b") + \
-                            get_fieldvalues(recid, "260__a"))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
-        if isbn:
-            book_cover = get_book_cover(isbn)
+        if book_isbn:
+            book_cover = get_book_cover(book_isbn)
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
+
 
         out += """
            <form name="add_new_copy_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step4" method="get" >
@@ -5366,17 +5444,13 @@ class Template:
                                <td class="bibcirctableheader" width="10">%s</td>
                           </tr>
                 </table>
-
                 <table class="bibcirctable">
+                 <tr valign='top'>
+                    <td width="400">
+                    <table>
                      <tr>
                         <td width="100">%s</td>
                         <td class="bibcirccontent">%s</td>
-                     </tr>
-                     <tr>
-                        <td width="100"></td>
-                        <td class="bibcirccontent">
-                          <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
-                        </td>
                      </tr>
                      <tr>
                         <td width="100">%s</td>
@@ -5394,22 +5468,34 @@ class Template:
                         <td width="100">%s</td>
                         <td class="bibcirccontent">%s</td>
                      </tr>
+                     </table>
+                     </td>
+                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                     </tr>
               </table>
+
            <br \>
            <table class="bibcirctable">
                 <tr>
                      <td class="bibcirctableheader">%s</td>
                 </tr>
            </table>
+
            """  % (CFG_SITE_URL,
                    _("Item details"),
-                  _("Name"), item_name,
-                  str(book_cover),
-                  _("Author(s)"), author,
-                  _("Year"), year,
-                  _("Editor"), editor,
-                  _("ISBN"), isbn,
-                  _("Copies of %s" % item_name))
+                   _("Name"),
+                   book_title,
+                   _("Author(s)"),
+                   book_author,
+                   _("Year"),
+                   book_year,
+                   _("Editor"),
+                   book_editor,
+                   _("ISBN"),
+                   book_isbn,
+                   str(book_cover),
+                   _("Copies of %s" % book_title))
+
 
         out += """<table class="bibcirctable">
                     <tr>
@@ -5769,23 +5855,15 @@ class Template:
         """
         out += _MENU_
 
-        item_name = ' '.join(get_fieldvalues(recid, "245__a") + \
-                             get_fieldvalues(recid, "245__b"))
-        year = ' '.join(get_fieldvalues(recid, "260__c"))
-        author = '  '.join(get_fieldvalues(recid, "270__p") + \
-                           get_fieldvalues(recid, "100__a") +
-                           get_fieldvalues(recid, "100__u"))
-        isbn = ' '.join(get_fieldvalues(recid, "020__a"))
-        editor = ' , '.join(get_fieldvalues(recid, "260__b") + \
-                            get_fieldvalues(recid, "260__a"))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
-        if isbn:
-            book_cover = get_book_cover(isbn)
+        if book_isbn:
+            book_cover = get_book_cover(book_isbn)
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-
         out += """
+           <form name="update_item_info_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step4" method="get" >
            <div class="bibcircbottom">
                 <br \>
                      <table class="bibcirctable">
@@ -5793,41 +5871,52 @@ class Template:
                                <td class="bibcirctableheader" width="10">%s</td>
                           </tr>
                 </table>
-
                 <table class="bibcirctable">
+                 <tr valign='top'>
+                    <td width="400">
+                    <table>
                      <tr>
-                        <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+                        <td width="100">%s</td>
+                        <td class="bibcirccontent">%s</td>
                      </tr>
                      <tr>
-                        <td width="100"></td> <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                        <td width="100">%s</td>
+                        <td class="bibcirccontent">%s</td>
                      </tr>
                      <tr>
-                        <td width="100">%s</td> <td class="bibcirccontent">%s</td>
-                     </tr>
-                     <tr>
-                        <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+                        <td width="100">%s</td>
+                        <td class="bibcirccontent">%s</td>
                          </tr>
                      <tr>
-                        <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+                        <td width="100">%s</td>
+                        <td class="bibcirccontent">%s</td>
                      </tr>
                      <tr>
-                        <td width="100">%s</td> <td class="bibcirccontent">%s</td>
+                        <td width="100">%s</td>
+                        <td class="bibcirccontent">%s</td>
+                     </tr>
+                     </table>
+                     </td>
+                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
                      </tr>
               </table>
+
            <br \>
-           <table class="bibcirctable">
-                <tr>
-                     <td class="bibcirctableheader">%s</td>
-                </tr>
-           </table>
-           """  % (_("Item details"),
-                  _("Name"), item_name,
-                  str(book_cover),
-                  _("Author(s)"), author,
-                  _("Year"), year,
-                  _("Editor"), editor,
-                  _("ISBN"), isbn,
-                  _("Copies of %s" % item_name))
+
+           """  % (CFG_SITE_URL,
+                   _("Item details"),
+                   _("Name"),
+                   book_title,
+                   _("Author(s)"),
+                   book_author,
+                   _("Year"),
+                   book_year,
+                   _("Editor"),
+                   book_editor,
+                   _("ISBN"),
+                   book_isbn,
+                   str(book_cover))
+
 
         out += """<table class="bibcirctable">
                     <tr>
@@ -5870,7 +5959,7 @@ class Template:
                      <td class="bibcirccontent" align="center">%s</td>
                      <td class="bibcirccontent" align="center">
                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step4?barcode=%s'"
-                     value=%s>
+                     value=%s class="formbutton">
                      </td>
                      <td class="bibcirccontent" width="350"></td>
                  </tr>
@@ -5907,23 +5996,15 @@ class Template:
         """
         out += _MENU_
 
-        item_name = ' '.join(get_fieldvalues(recid, "245__a") + \
-                             get_fieldvalues(recid, "245__b"))
-        year = ' '.join(get_fieldvalues(recid, "260__c"))
-        author = '  '.join(get_fieldvalues(recid, "270__p") + \
-                           get_fieldvalues(recid, "100__a") +
-                           get_fieldvalues(recid, "100__u"))
-        isbn = ' '.join(get_fieldvalues(recid, "020__a"))
-        editor = ' , '.join(get_fieldvalues(recid, "260__b") + \
-                            get_fieldvalues(recid, "260__a"))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
-        if isbn:
-            book_cover = get_book_cover(isbn)
+        if book_isbn:
+            book_cover = get_book_cover(book_isbn)
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
         out += """
-           <form name="update_item_info_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step5" method="get" >
+           <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step5" method="get" >
            <div class="bibcircbottom">
                 <br \>
                      <table class="bibcirctable">
@@ -5965,16 +6046,16 @@ class Template:
 
            """  % (CFG_SITE_URL,
                    _("Item details"),
-                  _("Name"),
-                  item_name,
-                  _("Author(s)"),
-                  author,
-                  _("Year"),
-                  year,
-                  _("Editor"),
-                  editor,
-                  _("ISBN"),
-                  isbn,
+                   _("Name"),
+                   book_title,
+                   _("Author(s)"),
+                   book_author,
+                   _("Year"),
+                   book_year,
+                   _("Editor"),
+                   book_editor,
+                   _("ISBN"),
+                   book_isbn,
                    str(book_cover))
 
         out += """
@@ -6234,7 +6315,7 @@ class Template:
              </td>
            </tr>
            <tr align="center">
-             <td><input type="text" size="45" name="str" style='border: 1px solid #cfcfcf'></td>
+             <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
            </tr>
           </table>
           <br \>

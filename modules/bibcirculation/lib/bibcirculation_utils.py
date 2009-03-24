@@ -28,6 +28,10 @@ import invenio.bibcirculation_dblayer as db
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL
 from invenio.bibcirculation_config import ACCESS_KEY
+from invenio.dateutils import get_datetext
+from invenio.messages import gettext_set_language
+
+import datetime, time
 
 def hold_request_mail(recid, borrower_id):
     """
@@ -39,9 +43,9 @@ def hold_request_mail(recid, borrower_id):
     borrower_infos = db.get_borrower_details(borrower_id)
 
     title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
-                                          {'recid': recid},
-                                          (book_title))
+                                  '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                  {'recid': recid},
+                                  (book_title))
     out = """
     Hello,
 
@@ -101,6 +105,7 @@ def book_information_from_MARC(recid):
     Retrieve book information from MARC
     """
 
+
     book_title = ' '.join(get_fieldvalues(recid, "245__a") + \
                           get_fieldvalues(recid, "245__b") + \
                           get_fieldvalues(recid, "245__n") + \
@@ -132,3 +137,226 @@ def book_title_from_MARC(recid):
 
     return book_title
 
+def update_status_if_expired(loan_id):
+    """
+    Update the loan's status if status is 'expired'.
+    """
+
+    loan_status = db.get_loan_status(loan_id)
+
+    if loan_status == 'expired':
+        db.update_loan_status('on loan', loan_id)
+
+    return
+
+def generate_new_due_date(days):
+    """
+    Generate a new due date (today + X days = new due date).
+    """
+
+    today = datetime.date.today()
+    more_X_days = datetime.timedelta(days=days)
+    tmp_date = today + more_X_days
+    new_due_date = tmp_date.strftime('%Y-%m-%d')
+
+    return new_due_date
+
+def renew_loan_for_X_days(barcode):
+    """
+    Renew a loan based on his loan period
+    """
+
+    loan_period = db.get_loan_period(barcode)
+
+    if loan_period == '4 weeks':
+        new_due_date = generate_new_due_date(30)
+    else:
+        new_due_date = generate_new_due_date(7)
+
+    return new_due_date
+
+def make_copy_available(request_id):
+    """
+    Change the status of a copy for 'available' when
+    an hold request was cancelled.
+    """
+
+    barcode_requested = db.get_requested_barcode(request_id)
+    db.update_item_status('available', barcode_requested)
+
+    return
+
+def print_new_loan_information(req, ln):
+    """
+    Create a printable format with the information of the last
+    loan who has been registered on the table crcLOAN.
+    """
+    _ = gettext_set_language(ln)
+
+    # get the last loan from crcLOAN
+    (recid, borrower_id, due_date) = db.get_last_loan()
+
+    # get book's information
+    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
+
+    # get borrower's data/information (name, address, email)
+    (borrower_name, borrower_address, borrower_email) = db.get_borrower_data(borrower_id)
+
+    # Generate printable format
+    req.content_type = "text/html"
+    req.send_http_header()
+
+    out = """<table style='width:95%; margin:auto; max-width: 600px;'>"""
+    out += """
+           <tr>
+                     <td><img src="%s/img/CERN_CDS_logo.png"></td>
+                   </tr>
+                  </table><br />""" % (CFG_SITE_URL)
+
+    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
+
+    out += """ <tr><td align="center"><h2><strong>%s</strong></h2></td></tr>""" % (_("Loan information"))
+
+    out += """ <tr><td align="center"><strong>%s</strong></td></tr>""" % (_("This book is sent to you ..."))
+
+    out += """</table><br />"""
+    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
+    out += """<tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                  <tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                  <tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                  <tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                   <tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                  """ % (_("Title"), book_title,
+                         _("Author"), book_author,
+                         _("Editor"), book_editor,
+                         _("ISBN"), book_isbn,
+                         _("Year"), book_year)
+
+    out += """</table><br />"""
+
+    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
+    out += """<tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                  <tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                  <tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr>
+                  <tr>
+                        <td width="70"><strong>%s</strong></td><td style='color: black;'>%s</td>
+                  </tr> """ % (_("Id"), borrower_id,
+                               _("Name"), borrower_name,
+                               _("Address"), borrower_address,
+                               _("Email"), borrower_email)
+    out += """</table> <br />"""
+
+    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 400px;'>"""
+
+    out += """ <tr><td align="center"><h2><strong>%s: %s</strong></h2></td></tr>""" % (_("Due date"), due_date)
+
+    out += """</table>"""
+
+    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 800px;'>
+                  <tr><td><input type="button" onClick='window.print()'
+                  value='Print' style='color: #fff; background: #36c; font-weight: bold;'></td></tr>
+                  </table>"""
+
+    req.write("<html>")
+    req.write(out)
+    req.write("</html>")
+
+    return "\n"
+
+
+def print_pending_hold_requests_information(req, ln):
+    """
+    Create a printable format with all the information about all
+    pending hold requests.
+    """
+
+    _ = gettext_set_language(ln)
+
+    requests = db.get_pdf_request_data('pending')
+
+    req.content_type = "text/html"
+    req.send_http_header()
+
+    out = """<table style='width:100%; margin:auto; max-width: 1024px;'>"""
+    out += """
+                   <tr>
+                     <td><img src="%s/img/CERN_CDS_logo.png"></td>
+                   </tr>
+                  </table><br />""" % (CFG_SITE_URL)
+    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 1024px;'>"""
+
+    out += """ <tr><td align="center"><h2><strong>%s</strong></h2></td></tr>""" % (_("List of pending hold requests"))
+
+    out += """ <tr><td align="center"><strong>%s</strong></td></tr>""" % (time.ctime())
+
+    out += """</table><br/>"""
+
+    out += """<table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 1024px;'>"""
+
+    out += """<tr>
+                       <td><strong>%s</strong></td>
+                       <td><strong>%s</strong></td>
+                       <td><strong>%s</strong></td>
+                       <td><strong>%s</strong></td>
+                       <td><strong>%s</strong></td>
+                       <td><strong>%s</strong></td>
+                       <td><strong>%s</strong></td>
+                  </tr>
+                       """ % (_("Borrower"),
+                              _("Item"),
+                              _("Library"),
+                              _("Location"),
+                              _("From"),
+                              _("To"),
+                              _("Request date"))
+
+    for (recid, borrower_name, library_name, location, date_from, date_to, request_date) in requests:
+
+        out += """<tr style='color: black;'>
+                         <td class="bibcirccontent">%s</td>
+                         <td class="bibcirccontent">%s</td>
+                         <td class="bibcirccontent">%s</td>
+                         <td class="bibcirccontent">%s</td>
+                         <td class="bibcirccontent">%s</td>
+                         <td class="bibcirccontent">%s</td>
+                         <td class="bibcirccontent">%s</td>
+                      </tr>
+                         """ % (borrower_name, book_title_from_MARC(recid), library_name,
+                                location, date_from, date_to, request_date)
+
+    out += """</table>
+              <br />
+              <br />
+                  <table style='color: #79d; font-size: 82%; width:95%; margin:auto; max-width: 1024px;'>
+                  <tr>
+                    <td>
+                      <input type=button value='Back' onClick="history.go(-1)"
+                      style='color: #fff; background: #36c; font-weight: bold;'>
+
+                      <input type="button" onClick='window.print()'
+                      value='Print' style='color: #fff; background: #36c; font-weight: bold;'>
+                    </td>
+                  </tr>
+                  </table>"""
+
+    req.write("<html>")
+    req.write(out)
+    req.write("</html>")
+
+    return "\n"
