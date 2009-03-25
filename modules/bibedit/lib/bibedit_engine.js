@@ -78,7 +78,7 @@ $(function(){
    */
   initMenu();
   initJeditable();
-  initAJAX();
+  initAjax();
   initMisc();
   initStateFromHash();
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
@@ -105,9 +105,9 @@ function initMisc(){
   });
 }
 
-function initAJAX(){
+function initAjax(){
   /*
-   * Initialize AJAX.
+   * Initialize Ajax.
    */
   $.ajaxSetup(
     { cache: false,
@@ -152,19 +152,12 @@ function initStateFromHash(){
     return;
 
   gHash = window.location.hash;
-  gHashParsed = deserializeHash(gHash);
+  gHashParsed = (gHash) ? deserializeHash(gHash) : {state: 'edit'};
   gPrevState = gState;
   // Capitalize first letter for later use in eval.
   var state = gHashParsed.state ? gHashParsed.state.charAt(0).toUpperCase() +
     gHashParsed.state.slice(1) : null;
-  var recID = parseInt(gHashParsed.recid);
-
-  if (gHashParsed.recid && (isNaN(recID) || recID < 1 ||
-			    recID > Math.pow(10, 8))){
-    // Not a sane record ID.
-    displayMessage('Error: Non-existent record');
-    return;
-  }
+  var recID = gHashParsed.recid;
 
   // Find out which internal state the new hash leaves us with
   if (state && recID){
@@ -252,14 +245,20 @@ function onStateChangeToEdit(recID){
   /*
    * Handle change to internal state 'Edit'.
    */
-  cleanUpDisplay();
-  disableRecordBrowser();
-  gRecID = recID;
-  $('.headline').text('BibEdit: Record #' + gRecID);
-  $('#txtSearchPattern').val(gRecID);
+  $('#txtSearchPattern').val(recID);
   $('#sctSearchType').val('recID');
-  createReq({recID: gRecID, requestType: 'getRecord',
-	     searchType: 'recID'}, onGetRecordSuccess);
+  onSearchClick();
+}
+
+function onStateChangeToSubmit(){
+  /*
+   * Handle change to internal state 'Submit'.
+   */
+  cleanUpDisplay();
+  $('#txtSearchPattern').val('');
+  $('#txtSearchPattern').focus();
+  displayMessage('Confirm: Submitted');
+  updateStatus('ready');
 }
 
 function onStateChangeToCancel(){
@@ -288,7 +287,7 @@ function onStateChangeToDeleteRecord(){
 
 function createReq(data, onSuccess){
   /*
-   * Create AJAX request.
+   * Create Ajax request.
    */
   data.ID = createReq.transactionID++;
   $.ajax({
@@ -310,7 +309,7 @@ createReq.transactionID = 0;
 
 function onReqError(XHR, textStatus, errorThrown){
   /*
-   * Handle AJAX request errors.
+   * Handle Ajax request errors.
    */
   alert('Request completed with status ' + textStatus
 	+ '\nResult: ' + XHR.responseText
@@ -396,7 +395,7 @@ function onMoveSubfieldClick(arrow){
     newSubfieldIndex = parseInt(subfieldIndex) - 1;
   else
     newSubfieldIndex = parseInt(subfieldIndex) + 1;
-  // Create AJAX request.
+  // Create Ajax request.
   var data = {
     recID: gRecID,
     requestType: 'moveSubfield',
@@ -482,7 +481,7 @@ function onContentChange(value){
     field[0][subfieldIndex][1] = value;
     var subfieldCode = field[0][subfieldIndex][0];
   }
-  // Create AJAX request.
+  // Create Ajax request.
   var data = {
     recID: gRecID,
     requestType: 'modifyContent',
@@ -596,7 +595,7 @@ function onAddSubfieldsSave(event){
 
   if (!subfields.length == 0){
     gPageDirty = true;
-    // Create AJAX request
+    // Create Ajax request
     var data = {
       recID: gRecID,
       requestType: 'addSubfields',
@@ -700,7 +699,7 @@ function onDeleteFields(event){
   }
 
   gPageDirty = true;
-  // Create AJAX request.
+  // Create Ajax request.
   var data = {
     recID: gRecID,
     requestType: 'deleteFields',

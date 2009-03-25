@@ -25,7 +25,7 @@ __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 try:
     import simplejson as json
 except ImportError:
-    pass # okay, no AJAX app will be possible, but continue anyway
+    pass # okay, no Ajax app will be possible, but continue anyway
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_init, \
@@ -96,7 +96,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                             lastupdated = __lastupdated__,
                             req         = req)
 
-        # Handle AJAX requests..
+        # Handle Ajax requests..
         result = {}
         if user_info['email'] == 'guest':
             # Session has most likely timed out.

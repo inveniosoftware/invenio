@@ -636,7 +636,7 @@ function onAddFieldSave(event){
   }
 
   gPageDirty = true;
-  // Create AJAX request.
+  // Create Ajax request.
   var data = {
     recID: gRecID,
     requestType: 'addField',

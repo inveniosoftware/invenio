@@ -262,14 +262,15 @@ function onKeyCtrlShiftE(event){
     var rowGroup = $(event.target).closest('tbody')[0];
     if (rowGroup){
       var btnAddSubfield;
-      if (rowGroup.id.indexOf('rowGroupAddField')+1)
+      if (rowGroup.id.indexOf('rowGroupAddField')+1){
 	var fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
 	if (!$('#chkAddFieldControlfield_' + fieldID).attr('checked'))
 	  btnAddSubfield = $('#btnAddFieldAddSubfield_' + fieldID);
+      }
       else if (rowGroup.id.indexOf('rowGroup')+1)
 	btnAddSubfield = $('#btnAddSubfield_' + rowGroup.id.slice(
 			   rowGroup.id.indexOf('_')+1));
-      if (btnAddSubfield.length){
+      if (btnAddSubfield){
 	$(btnAddSubfield).trigger('click');
 	event.preventDefault();
       }
