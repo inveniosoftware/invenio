@@ -1910,7 +1910,7 @@ class Template:
                                   ln = ln,
                                   fieldname = 'f1',
                                   selected = f1,
-                                  values = self._add_mark_to_field(value = f1, fields = fieldslist, ln = ln)
+                                  values = self._add_mark_to_field(value=f1, fields=fieldslist, ln=ln)
                                 ),
               'andornot1' : self.tmpl_andornot_box(
                                   name = 'op1',
@@ -1923,7 +1923,7 @@ class Template:
                                   ln = ln,
                                   fieldname = 'f2',
                                   selected = f2,
-                                  values = self._add_mark_to_field(value = f2, fields = fieldslist, ln = ln)
+                                  values = self._add_mark_to_field(value=f2, fields=fieldslist, ln=ln)
                                 ),
               'andornot2' : self.tmpl_andornot_box(
                                   name = 'op2',
@@ -1936,7 +1936,7 @@ class Template:
                                   ln = ln,
                                   fieldname = 'f3',
                                   selected = f3,
-                                  values = self._add_mark_to_field(value = f3, fields = fieldslist, ln = ln)
+                                  values = self._add_mark_to_field(value=f3, fields=fieldslist, ln=ln)
                                 ),
               'search' : _("Search"),
               'browse' : _("Browse"),
@@ -2152,8 +2152,9 @@ class Template:
             for i in [10, 25, 50, 100, 250, 500]:
                 if i <= CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS:
                     rgs.append({ 'value' : i, 'text' : "%d %s" % (i, _("results"))})
-
-            # sort by:
+            # enrich sort fields list if we are sorting by some MARC tag:
+            sort_fields = self._add_mark_to_field(value=sf, fields=sort_fields, ln=ln)
+            # create sort by HTML box:
             out += """<table class="searchbox">
                  <thead>
                   <tr>
@@ -2204,7 +2205,7 @@ class Template:
                                   ln = ln,
                                   fieldname = 'of',
                                   selected = of,
-                                  values = self._add_mark_to_field(value = of, fields = formats, chars = 3, ln = ln)
+                                  values = self._add_mark_to_field(value=of, fields=formats, chars=3, ln=ln)
                                 ),
                 }
 
@@ -2223,7 +2224,7 @@ class Template:
                  'value' : cgi.escape(str(value), 1),
                }
 
-    def _add_mark_to_field(self, value, fields, ln, chars = 1):
+    def _add_mark_to_field(self, value, fields, ln, chars=1):
         """Adds the current value as a MARC tag in the fields array
         Useful for advanced search"""
 
