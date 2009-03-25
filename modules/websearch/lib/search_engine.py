@@ -2492,6 +2492,8 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True):
     out = []
     if isinstance(recIDs, (int, long)):
         recIDs =[recIDs,]
+    if not isinstance(recIDs, (list, tuple)):
+        return []
     if len(recIDs) == 0:
         return []
     if tag == "001___":
