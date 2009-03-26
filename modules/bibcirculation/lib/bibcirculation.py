@@ -117,7 +117,7 @@ def perform_get_holdings_information(recid, ln=CFG_SITE_LANG):
         status = "On loan"
         title = ''.join(get_fieldvalues(recid, "245__a"))
         due_date = db.get_due_date_loan(recid)
-        infos.append('Sorry. Actually, all copies of "' + title + '" are on loan. One copy should be available on ' + due_date + '.')
+        infos.append('Sorry. Actually, all copies of "' + repr(title) + '" are on loan. One copy should be available on ' + repr(due_date) + '.')
         nb_requests = db.get_number_requests(recid)
 
     body = bibcirculation_templates.tmpl_holdings_information(recid=recid,
