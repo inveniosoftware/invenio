@@ -48,7 +48,7 @@ class AccessControlFireRoleTest(unittest.TestCase):
 
     def test_compile_role_definition_deny_any(self):
         """firerole - compiling deny any role definitions"""
-        self.failUnless(serialize(compile_role_definition("deny any")))
+        self.failIf(serialize(compile_role_definition("deny any")))
 
     def test_compile_role_definition_literal_field(self):
         """firerole - compiling literal field role definitions"""

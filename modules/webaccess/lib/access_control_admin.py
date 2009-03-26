@@ -1214,29 +1214,21 @@ def acc_is_user_in_role(user_info, id_role):
 
 def acc_get_user_roles_from_user_info(user_info):
     """get all roles a user is connected to."""
-    from invenio.webuser import collect_user_info
-    if type(user_info) is int:
-        user_info = collect_user_info(user_info)
 
-    explicit_roles = run_sql("""SELECT ur.id_accROLE
+    roles = intbitset(run_sql("""SELECT ur.id_accROLE
         FROM user_accROLE ur
         WHERE ur.id_user = %s AND ur.expiration >= NOW()
-        ORDER BY ur.id_accROLE""", (user_info['uid'], ))
+        ORDER BY ur.id_accROLE""", (user_info['uid'], )))
 
-    explicit_roles = [role[0] for role in explicit_roles]
+    potential_implicit_roles = run_sql("""SELECT id, firerole_def_ser FROM accROLE
+        WHERE firerole_def_ser IS NOT NULL""")
 
-    potential_implicit_roles = run_sql("""SELECT id FROM accROLE
-        WHERE firerole_def_ser <> %s""", (CFG_ACC_EMPTY_ROLE_DEFINITION_SER, ))
+    for role_id, firerole_def_ser in potential_implicit_roles:
+        if role_id not in roles:
+            if acc_firerole_check_user(user_info, deserialize(firerole_def_ser)):
+                roles.add(role_id)
 
-    potential_implicit_roles = [role[0] for role in potential_implicit_roles]
-
-    implicit_roles = []
-    for role in potential_implicit_roles:
-        if role not in explicit_roles:
-            if acc_firerole_check_user(user_info, load_role_definition(role)):
-                implicit_roles.append(role)
-
-    return explicit_roles + implicit_roles
+    return roles
 
 def acc_get_user_roles(id_user):
     """get all roles a user is explicitly connected to."""
@@ -1270,13 +1262,9 @@ def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
     return ret
 
 def acc_find_user_role_actions(user_info):
-    """find name of all roles and actions connected to user_info (or uid), id
-       given."""
+    """find name of all roles and actions connected to user_info."""
 
-    if type(user_info) in (int, long):
-        uid = user_info
-    else:
-        uid = user_info['uid']
+    uid = user_info['uid']
 
     # Let's check if user is superadmin
     id_superadmin = acc_get_role_id(SUPERADMINROLE)

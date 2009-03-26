@@ -72,7 +72,7 @@ FireRole definitions.
         The first rule which matches return.
         """
 
-    def <strong>serialize</strong>(FireRole_def_src):
+    def <strong>serialize</strong>(FireRole_def_obj):
         """ Serialize and compress a definition."""
 
     def <strong>deserialize</strong>(FireRole_def_ser):

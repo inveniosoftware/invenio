@@ -128,7 +128,7 @@ def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, s
                   )
 
     #Display warnings if user is superuser
-    roles = acc_find_user_role_actions(uid)
+    roles = acc_find_user_role_actions(user_info)
     warnings = "0"
     for role in roles:
         if "superadmin" in role:

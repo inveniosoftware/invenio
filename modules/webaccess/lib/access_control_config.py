@@ -59,33 +59,35 @@ MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
 
-""" Serialized compiled default role definition"""
-CFG_ACC_EMPTY_ROLE_DEFINITION_SER=compress(cPickle.dumps((False, False, ()), -1))
-
 """ Source of the default role definition"""
-CFG_ACC_EMPTY_ROLE_DEFINITION_SRC='deny any'
+CFG_ACC_EMPTY_ROLE_DEFINITION_SRC = 'deny all'
 
+""" Compiled default role definition"""
+CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ = (False, False, ())
+
+""" Serialized compiled default role definition"""
+CFG_ACC_EMPTY_ROLE_DEFINITION_SER = None
 
 # List of tags containing (multiple) emails of users who should authorize
 # to access the corresponding record regardless of collection restrictions.
 if CFG_CERN_SITE:
-    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS=['859__f', '270__m']
+    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['859__f', '270__m']
 else:
-    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS=['8560_f']
+    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['8560_f']
 
 # Use external source for access control?
 # Atleast one must be added
 # Adviced not to change the name, since it is used to identify the account
 # Format is:   System name: (System class, Default True/Flase), atleast one
 # must be default
-CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, True)}
+CFG_EXTERNAL_AUTHENTICATION = {"Local" : (None, True)}
 
 # Variables to set to the SSO Authentication name if using SSO
 CFG_EXTERNAL_AUTH_USING_SSO = False
 CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
 
 if CFG_CERN_SITE:
-    if False: #FIXME set this to True when we deploy SSO at CERN
+    if True:
         import external_authentication_sso as ea_sso
         CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
         # Link to reach in order to logout from SSO
@@ -95,10 +97,6 @@ if CFG_CERN_SITE:
         import external_authentication_cern as ea_cern
         CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, False), \
         "CERN": (ea_cern.ExternalAuthCern(), True)}
-
-
-
-
 
 # default data for the add_default_settings function
 # Note: by default the definition is set to deny any. This won't be a problem

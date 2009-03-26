@@ -28,7 +28,7 @@ webaccess to connect user to roles using every infos about users.
 from invenio.access_control_config import InvenioWebAccessFireroleError
 from invenio.dbquery import run_sql, blob_to_string
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
-        CFG_ACC_EMPTY_ROLE_DEFINITION_SER
+        CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
 import re
 import cPickle
 from zlib import compress, decompress
@@ -129,16 +129,14 @@ def load_role_definition(role_id):
     res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1)
     if res:
         try:
-            return cPickle.loads(decompress(blob_to_string(res[0][0])))
+            return deserialize(res[0][0])
         except Exception:
+            ## Something bad might have happened? (Update of Python?)
             repair_role_definitions()
             res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1)
             if res:
-                return cPickle.loads(decompress(blob_to_string(res[0][0])))
-            else:
-                return (False, ())
-    else:
-        return (False, ())
+                return deserialize(res[0][0])
+    return CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
 
 def acc_firerole_suggest_apache_p(firerole_def_obj):
     """Return True if the given firerole definition suggest the authentication
@@ -207,10 +205,12 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
         raise InvenioWebAccessFireroleError, msg
     return default_allow_p # By default we allow ;-) it'an OpenSource project
 
-def serialize(firerole_def_ser):
+def serialize(firerole_def_obj):
     """ Serialize and compress a definition."""
-    if firerole_def_ser:
-        return compress(cPickle.dumps(firerole_def_ser, -1))
+    if firerole_def_obj == CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ:
+        return CFG_ACC_EMPTY_ROLE_DEFINITION_SER
+    elif firerole_def_obj:
+        return compress(cPickle.dumps(firerole_def_obj, -1))
     else:
         return CFG_ACC_EMPTY_ROLE_DEFINITION_SER
 
@@ -219,7 +219,7 @@ def deserialize(firerole_def_ser):
     if firerole_def_ser:
         return cPickle.loads(decompress(blob_to_string(firerole_def_ser)))
     else:
-        return cPickle.loads(decompress(CFG_ACC_EMPTY_ROLE_DEFINITION_SER))
+        return CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
 
 # IMPLEMENTATION
 

@@ -1016,7 +1016,7 @@ II. Example - connecting role and user</a>
 
     Any row has this syntax:
 
-        <strong>ALLOW/DENY ANY</strong>
+        <strong>ALLOW/DENY ANY/ALL</strong>
 
         or
 
@@ -1043,7 +1043,7 @@ II. Example - connecting role and user</a>
     rule matches the rule is skipped, otherwise if all the value of the rules
     don't match the whole rule matches.
 
-    A <strong>DENY ANY</strong> rule is implicitly added at the end of every definition.
+    A <strong>DENY ALL</strong> rule is implicitly added at the end of every definition.
 
     Any field is valid, but only rules concerning fields which currently
     exist in the user describing dictionary are checked. All the rules
