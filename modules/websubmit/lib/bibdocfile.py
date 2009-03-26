@@ -79,6 +79,7 @@ websearch_templates = invenio.template.load('websearch')
 
 CFG_BIBDOCFILE_MD5_THRESHOLD = 256 * 1024
 CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
+CFG_BIBDOCFILE_BLOCK_SIZE = 1024 * 8
 CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION = False
 CFG_BIBDOCFILE_AVAILABLE_FLAGS = ('PDF/A', 'STAMPED', 'PDFOPT', 'HIDDEN', 'CONVERTED', 'PERFORM_HIDE_PREVIOUS', 'OCRED')
 
@@ -318,7 +319,7 @@ class BibRecDocs:
                     out += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(value))
                 out += '\t</datafield>\n'
 
-        for afile in self.list_latest_files():
+        for afile in self.list_latest_files(list_hidden=False):
             out += '\t<datafield tag="856" ind1="4" ind2=" ">\n'
             url = afile.get_url()
             description = afile.get_description()
@@ -606,13 +607,13 @@ class BibRecDocs:
         self.build_bibdoc_list()
         return bibdoc
 
-    def list_latest_files(self, doctype=''):
+    def list_latest_files(self, doctype='', list_hidden=True):
         """Returns a list which is made up by all the latest docfile of every
         bibdoc (of a particular doctype).
         """
         docfiles = []
         for bibdoc in self.list_bibdocs(doctype):
-            docfiles += bibdoc.list_latest_files()
+            docfiles += bibdoc.list_latest_files(list_hidden=list_hidden)
         return docfiles
 
     def display(self, docname="", version="", doctype="", ln=CFG_SITE_LANG, verbose=0, display_hidden=True):
@@ -784,7 +785,7 @@ class BibRecDocs:
         This algorithm verify if it is necessary to fix.
         Return True if format is correct. False if a fix is needed."""
         bibdoc = self.get_bibdoc(docname)
-        correct_docname = decompose_file(docname)[1]
+        correct_docname = decompose_file(docname + '.pdf')[1]
         if docname != correct_docname:
             return False
         for filename in os.listdir(bibdoc.basedir):
@@ -836,7 +837,7 @@ class BibRecDocs:
             if self.check_format(docname):
                 return True
         bibdoc = self.get_bibdoc(docname)
-        correct_docname = decompose_file(docname)[1]
+        correct_docname = decompose_file(docname + '.pdf')[1]
         need_merge = False
         if correct_docname != docname:
             need_merge = self.has_docname_p(correct_docname)
@@ -1332,7 +1333,7 @@ class BibDoc:
             version = int(version)
             docfiles = self.list_version_files(version, list_hidden=display_hidden)
         else:
-            docfiles = self.list_latest_files()
+            docfiles = self.list_latest_files(list_hidden=display_hidden)
         existing_icon = self.get_icon()
         if existing_icon is not None:
             existing_icon = existing_icon.list_all_files()[0]
@@ -1725,14 +1726,14 @@ class BibDoc:
         else:
             return [afile for afile in self.docfiles if not afile.hidden_p()]
 
-    def list_latest_files(self):
+    def list_latest_files(self, list_hidden=True):
         """Returns all the docfiles within the last version."""
-        return self.list_version_files(self.get_latest_version())
+        return self.list_version_files(self.get_latest_version(), list_hidden=list_hidden)
 
     def list_version_files(self, version, list_hidden=True):
         """Return all the docfiles of a particular version."""
         version = int(version)
-        return [docfile for docfile in self.docfiles if docfile.get_version() == version and (list_hidden or not docfile.hidden_p)]
+        return [docfile for docfile in self.docfiles if docfile.get_version() == version and (list_hidden or not docfile.hidden_p())]
 
     def get_latest_version(self):
         """ Returns the latest existing version number for the given bibdoc.
@@ -2208,7 +2209,6 @@ def _make_base_dir(docid):
     group = "g" + str(int(int(docid) / CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT))
     return os.path.join(CFG_WEBSUBMIT_FILEDIR, group, str(docid))
 
-
 class Md5Folder:
     """Manage all the Md5 checksum about a folder"""
     def __init__(self, folder):
@@ -2362,6 +2362,32 @@ def bibdocfile_url_p(url):
     splitted_url = url.split('/files/')
     return len(splitted_url) == 2 and splitted_url[0] != '' and splitted_url[1] != ''
 
+def get_docid_from_bibdocfile_fullpath(fullpath):
+    """Given a bibdocfile fullpath (e.g. "CFG_WEBSUBMIT_FILEDIR/g0/123/bar.pdf;1")
+    returns the docid (e.g. 123)."""
+    if not fullpath.startswith(os.path.join(CFG_WEBSUBMIT_FILEDIR, 'g')):
+        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+    dirname, base, extension, version = decompose_file_with_version(fullpath)
+    try:
+        return int(dirname.split('/')[-1])
+    except:
+        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+
+def decompose_bibdocfile_fullpath(fullpath):
+    """Given a bibdocfile fullpath (e.g. "CFG_WEBSUBMIT_FILEDIR/g0/123/bar.pdf;1")
+    returns a quadruple (recid, docname, format, version)."""
+    if not fullpath.startswith(os.path.join(CFG_WEBSUBMIT_FILEDIR, 'g')):
+        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+    dirname, base, extension, version = decompose_file_with_version(fullpath)
+    try:
+        docid = int(dirname.split('/')[-1])
+        bibdoc = BibDoc(docid)
+        recid = bibdoc.get_recid()
+        docname = bibdoc.get_docname()
+        return recid, docname, extension, version
+    except:
+        raise InvenioWebSubmitFileError, "Fullpath %s doesn't correspond to a valid bibdocfile fullpath" % fullpath
+
 def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
     if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
@@ -2488,18 +2514,9 @@ def safe_mkstemp(suffix):
         tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
     return (tmpfd, tmppath)
 
-def download_url(url, format=None, user=None, password=None, sleep=2):
+def download_url(url, format=None, sleep=2):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
-    class my_fancy_url_opener(urllib.FancyURLopener):
-        def __init__(self, user, password):
-            urllib.FancyURLopener.__init__(self)
-            self.fancy_user = user
-            self.fancy_password = password
-
-        def prompt_user_passwd(self, host, realm):
-            return (self.fancy_user, self.fancy_password)
-
     if format is None:
         format = decompose_file(url)[2]
     else:
@@ -2521,15 +2538,18 @@ def download_url(url, format=None, user=None, password=None, sleep=2):
                             raise StandardError, "%s seems to be empty" % url
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
-                if user is not None:
-                    urlopener = my_fancy_url_opener(user, password)
-                    urlopener.retrieve(url, tmppath)
-                else:
-                    urllib.urlretrieve(url, tmppath)
-                #cmd_exit_code, cmd_out, cmd_err = run_shell_command(CFG_PATH_WGET + ' %s -O %s -t 2 -T 40',
-                                                                    #(url, tmppath))
-                #if cmd_exit_code:
-                    #raise StandardError, "It's impossible to download %s: %s" % (url, cmd_err)
+                try:
+                    from_file = urllib2.urlopen(url)
+                    to_file = open(tmppath, 'w')
+                    while True:
+                        block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
+                        if not block:
+                            break
+                        to_file.write(block)
+                    to_file.close()
+                    from_file.close()
+                except Exception, e:
+                    raise StandardError, "Error when downloading %s into %s: %s" % (url, tmppath, e)
                 if os.path.getsize(tmppath) > 0:
                     return tmppath
                 else:

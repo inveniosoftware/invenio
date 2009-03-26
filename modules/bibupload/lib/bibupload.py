@@ -1141,7 +1141,8 @@ def elaborate_fft_tags(record, rec_id, mode):
             # Let's discover the desired docname to be created/altered
             name = field_get_subfield_values(fft, 'n')
             if name:
-                name = file_strip_ext(name[0])
+                ## Let's remove undesired extensions
+                name = file_strip_ext(name[0] + '.pdf')
             else:
                 if url:
                     name = get_docname_from_url(url)
@@ -1152,7 +1153,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             # Let's discover the desired new docname in case we want to change it
             newname = field_get_subfield_values(fft, 'm')
             if newname:
-                newname = file_strip_ext(newname[0])
+                newname = file_strip_ext(newname[0] + '.pdf')
             else:
                 newname = name
 

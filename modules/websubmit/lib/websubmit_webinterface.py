@@ -89,7 +89,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             user_info = collect_user_info(req)
 
             verbose = args['verbose']
-            if verbose >= 1 and isUserSuperAdmin(user_info):
+            if verbose >= 1 and not isUserSuperAdmin(user_info):
                 # Only SuperUser can see all the details!
                 verbose = 0
 
@@ -131,6 +131,9 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     _("The system has encountered an error in retrieving the list of files for this document."),
                     _("The error has been logged and will be taken in consideration as soon as possible."))
                 return warningMsg(msg, req, CFG_SITE_NAME, ln)
+
+            if bibarchive.deleted_p():
+                return print_warning(req, _("Requested record does not seem to exist."))
 
             docname = ''
             format = ''

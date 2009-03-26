@@ -24,18 +24,24 @@ BibDocAdmin CLI administration tool
 __revision__ = "$Id$"
 
 import sys
+import re
 import os
 import time
 import fnmatch
-from optparse import OptionParser, OptionGroup
+import datetime
+from logging import getLogger, debug, DEBUG
+from optparse import OptionParser, OptionGroup, OptionValueError
 from tempfile import mkstemp
 
-from invenio.config import CFG_TMPDIR
+from invenio.errorlib import register_exception
+from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_WEBSUBMIT_FILEDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
-    get_format_from_url, KEEP_OLD_VALUE
+    guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
+    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, \
+    CFG_BIBDOCFILE_AVAILABLE_FLAGS
 from invenio.intbitset import intbitset
-from invenio.search_engine import perform_request_search, search_unit
+from invenio.search_engine import perform_request_search
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
@@ -43,36 +49,40 @@ from invenio.textutils import encode_for_xml
 from invenio.websubmit_file_converter import can_perform_ocr
 
 def _xml_mksubfield(key, subfield, fft):
-    return fft.get(key, None) and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(fft[key])) or ''
+    return fft.get(key, None) is not None and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(str(fft[key]))) or ''
 
 def _xml_mksubfields(key, subfield, fft):
     ret = ""
     for value in fft.get(key, []):
-        ret += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(value))
+        ret += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(string(value)))
     return ret
 
 def _xml_fft_creator(fft):
     """Transform an fft dictionary (made by keys url, docname, format,
     new_docname, icon, comment, description, restriction, doctype, into an xml
     string."""
+    debug('Input FFT structure: %s' % fft)
     out = '\t<datafield tag ="FFT" ind1=" " ind2=" ">\n'
     out += _xml_mksubfield('url', 'a', fft)
     out += _xml_mksubfield('docname', 'n', fft)
     out += _xml_mksubfield('format', 'f', fft)
-    out += _xml_mksubfield('newdocname', 'm', fft)
+    out += _xml_mksubfield('new_docname', 'm', fft)
     out += _xml_mksubfield('doctype', 't', fft)
     out += _xml_mksubfield('description', 'd', fft)
     out += _xml_mksubfield('comment', 'z', fft)
     out += _xml_mksubfield('restriction', 'r', fft)
     out += _xml_mksubfield('icon', 'x', fft)
     out += _xml_mksubfields('options', 'o', fft)
+    out += _xml_mksubfield('version', 'v', fft)
     out += '\t</datafield>\n'
+    debug('FFT created: %s' % out)
     return out
 
 def ffts_to_xml(ffts_dict):
     """Transform a dictionary: recid -> ffts where ffts is a list of fft dictionary
     into xml.
     """
+    debug('Input FFTs dictionary: %s' % ffts_dict)
     out = ''
     recids = ffts_dict.keys()
     recids.sort()
@@ -84,51 +94,295 @@ def ffts_to_xml(ffts_dict):
             for fft in ffts:
                 out += _xml_fft_creator(fft)
             out += '</record>\n'
+    debug('MARC to Upload: %s' % out)
     return out
 
-_actions = [('get-info', 'print all the informations about the record/bibdoc/file structure'),
-            #'get-stats',
-            ('get-disk-usage', 'print statistics about usage disk usage'),
-            ('get-docnames', 'print the document docnames'),
-            #'get-docids',
-            #'get-recids',
-            #'get-doctypes',
-            #'get-revisions',
-            #'get-last-revisions',
-            #'get-formats',
-            #'get-comments',
-            #'get-descriptions',
-            #'get-restrictions',
-            #'get-icons',
-            ('get-history', 'print the document history'),
-            ('delete', 'delete the specified docname'),
-            ('undelete', 'undelete the specified docname'),
-            ('list-available-flags', 'list the available flags that can be used when revising/appending a file'),
-            #'purge',
-            #'expunge',
-            ('check-md5', 'check md5 checksum validity of files'),
-            ('check-format', 'check if any format-related inconsistences exists'),
-            ('check-duplicate-docnames', 'check for duplicate docnames associated with the same record'),
-            ('update-md5', 'update md5 checksum of files'),
-            ('fix-all', 'fix inconsistences in filesystem vs database vs MARC'),
-            ('fix-marc', 'synchronize MARC after filesystem/database'),
-            ('fix-format', 'fix format related inconsistences'),
-            ('fix-duplicate-docnames', 'fix duplicate docnames associated with the same record'),
-            ('textify', 'extract the text, to allow for indexing'),
-            ('textify-with-ocr', 'extract the text to allow for indexing (and using OCR if possible)')]
+_shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
+def _parse_datetime(var):
+    """Returns a date string according to the format string.
+       It can handle normal date strings and shifts with respect
+       to now."""
+    if not var:
+        return None
+    date = time.time()
+    factors = {"d":24*3600, "h":3600, "m":60, "s":1}
+    m = _shift_re.match(var)
+    if m:
+        sign = m.groups()[0] == "-" and -1 or 1
+        factor = factors[m.groups()[2]]
+        value = float(m.groups()[1])
+        return datetime.datetime.fromtimestamp(date + sign * factor * value)
+    else:
+        return datetime.datetime.strptime(var, "%Y-%m-%d %H:%M:%S")
 
+def _parse_date_range(var):
+    """Returns the two dates contained as a low,high tuple"""
+    limits = var.split(",")
+    if len(limits)==1:
+        low = _parse_datetime(limits[0])
+        return low, None
+    if len(limits)==2:
+        low = _parse_datetime(limits[0])
+        high = _parse_datetime(limits[1])
+        return low, high
+    return None, None
 
-_actions_with_parameter = {
-    #'set-doctype' : 'doctype',
-    #'set-docname' : 'docname',
-    #'set-comment' : 'comment',
-    #'set-description' : 'description',
-    #'set-restriction' : 'restriction',
-    'append' : ('append_path', 'specify the URL/path of the file that will appended to the bibdoc'),
-    'revise' : ('revise_path', 'specify the URL/path of the file that will revise the bibdoc'),
-    'revise_hide_previous' : ('revise_hide_path', 'specify the URL/path of the file that will revise the bibdoc, previous revisions will be hidden'),
-    'merge-into' : ('into_docname', 'merge the docname speficied --docname into_docname'),
-}
+def cli_quick_match_all_recids(options):
+    """Return an quickly an approximate but (by excess) list of good recids."""
+    url = getattr(options, 'url', None)
+    if url:
+        return intbitset([decompose_bibdocfile_url(url)[0]])
+    path = getattr(options, 'path', None)
+    if path:
+        return intbitset([decompose_bibdocfile_fullpath(path)[0]])
+    collection = getattr(options, 'collection', None)
+    pattern = getattr(options, 'pattern', None)
+    recids = getattr(options, 'recids', None)
+    md_rec = getattr(options, 'md_rec', None)
+    cd_rec = getattr(options, 'cd_rec', None)
+    tmp_date_query = []
+    tmp_date_params = []
+    if recids is None:
+        debug('Initially considering all the recids')
+        recids = intbitset(run_sql('SELECT id FROM bibrec'))
+        if not recids:
+            print >> sys.stderr, 'WARNING: No record in the database'
+    if md_rec[0] is not None:
+        tmp_date_query.append('modification_date>=%s')
+        tmp_date_params.append(md_rec[0])
+    if md_rec[1] is not None:
+        tmp_date_query.append('modification_date<=%s')
+        tmp_date_params.append(md_rec[1])
+    if cd_rec[0] is not None:
+        tmp_date_query.append('creation_date>=%s')
+        tmp_date_params.append(cd_rec[0])
+    if cd_rec[1] is not None:
+        tmp_date_query.append('creation_date<=%s')
+        tmp_date_params.append(cd_rec[1])
+    if tmp_date_query:
+        tmp_date_query = ' AND '.join(tmp_date_query)
+        tmp_date_params = tuple(tmp_date_params)
+        query = 'SELECT id FROM bibrec WHERE %s' % tmp_date_query
+        debug('Query: %s, param: %s' % (query, tmp_date_params))
+        recids &= intbitset(run_sql(query % tmp_date_query, tmp_date_params))
+        debug('After applying dates we obtain recids: %s' % recids)
+        if not recids:
+            print >> sys.stderr, 'WARNING: Time constraints for records are too strict'
+    if collection or pattern:
+        recids &= intbitset(perform_request_search(cc=collection or '', p=pattern or ''))
+        debug('After applyings pattern and collection we obtain recids: %s' % recids)
+    debug('Quick recids: %s' % recids)
+    return recids
+
+def cli_quick_match_all_docids(options, recids=None):
+    """Return an quickly an approximate but (by excess) list of good docids."""
+    url = getattr(options, 'url', None)
+    if url:
+        return intbitset([bibdocfile_url_to_bibdoc(url).get_id()])
+    path = getattr(options, 'path', None)
+    if path:
+        return intbitset([decompose_bibdocfile_fullpath(path)[0]])
+
+    deleted_docs = getattr(options, 'deleted_docs', None)
+    action_undelete = getattr(options, 'action', None) == 'undelete'
+    docids = getattr(options, 'docids', None)
+    md_doc = getattr(options, 'md_doc', None)
+    cd_doc = getattr(options, 'cd_doc', None)
+    if docids is None:
+        debug('Initially considering all the docids')
+        docids = intbitset(run_sql('SELECT id_bibdoc FROM bibrec_bibdoc'))
+    else:
+        debug('Initially considering this docids: %s' % docids)
+    tmp_query = []
+    tmp_params = []
+    if deleted_docs is None and action_undelete:
+        deleted_docs = 'only'
+    if deleted_docs == 'no':
+        tmp_query.append('status<>"DELETED"')
+    elif deleted_docs == 'only':
+        tmp_query.append('status="DELETED"')
+    if md_doc[0] is not None:
+        tmp_query.append('modification_date>=%s')
+        tmp_params.append(md_doc[0])
+    if md_doc[1] is not None:
+        tmp_query.append('modification_date<=%s')
+        tmp_params.append(md_doc[1])
+    if cd_doc[0] is not None:
+        tmp_query.append('creation_date>=%s')
+        tmp_params.append(cd_doc[0])
+    if cd_doc[1] is not None:
+        tmp_query.append('creation_date<=%s')
+        tmp_params.append(cd_doc[1])
+    if tmp_query:
+        tmp_query = ' AND '.join(tmp_query)
+        tmp_params = tuple(tmp_params)
+        query = 'SELECT id FROM bibdoc WHERE %s' % tmp_query
+        debug('Query: %s, param: %s' % (query, tmp_params))
+        docids &= intbitset(run_sql(query, tmp_params))
+        debug('After applying dates we obtain docids: %s' % docids)
+    return docids
+
+def cli_slow_match_single_recid(options, recid, recids=None, docids=None):
+    """Apply all the given queries in order to assert wethever a recid
+    match or not.
+    if with_docids is True, the recid is matched if it has at least one docid that is matched"""
+    debug('cli_slow_match_single_recid checking: %s' % recid)
+    deleted_docs = getattr(options, 'deleted_docs', None)
+    deleted_recs = getattr(options, 'deleted_recs', None)
+    empty_recs = getattr(options, 'empty_recs', None)
+    docname = cli2docname(options)
+    bibrecdocs = BibRecDocs(recid, deleted_too=(deleted_docs != 'no'))
+    if bibrecdocs.deleted_p() and (deleted_recs == 'no'):
+        return False
+    elif not bibrecdocs.deleted_p() and (deleted_recs != 'only'):
+        if docids:
+            for bibdoc in bibrecdocs.list_bibdocs():
+                if bibdoc.get_id() in docids:
+                    break
+            else:
+                return False
+        if docname:
+            for other_docname in bibrecdocs.get_bibdoc_names():
+                if docname and fnmatch.fnmatchcase(other_docname, docname):
+                    break
+            else:
+                return False
+        if bibrecdocs.empty_p() and (empty_recs != 'no'):
+            return True
+        elif not bibrecdocs.empty_p() and (empty_recs != 'only'):
+            return True
+    return False
+
+def cli_slow_match_single_docid(options, docid, recids=None, docids=None):
+    """Apply all the given queries in order to assert wethever a recid
+    match or not."""
+    debug('cli_slow_match_single_docid checking: %s' % docid)
+    empty_docs = getattr(options, 'empty_docs', None)
+    docname = getattr(options, 'docname', None)
+    if recids is None:
+        recids = cli_quick_match_all_recids(options)
+    bibdoc = BibDoc(docid)
+    if docname and not fnmatch.fnmatchcase(bibdoc.get_docname(), docname):
+        debug('docname %s does not match the pattern %s' % (repr(bibdoc.get_docname()), repr(docname)))
+        return False
+    elif bibdoc.get_recid() and bibdoc.get_recid() not in recids:
+        debug('recid %s is not in pattern %s' % (repr(bibdoc.get_recid()), repr(recids)))
+        return False
+    elif empty_docs == 'no' and bibdoc.empty_p():
+        debug('bibdoc is empty')
+        return False
+    elif empty_docs == 'only' and not bibdoc.empty_p():
+        debug('bibdoc is not empty')
+        return False
+    else:
+        return True
+
+def cli2recid(options, recids=None, docids=None):
+    """Given the command line options return a recid."""
+    recids = list(cli_recids_iterator(options, recids=recids, docids=docids))
+    if len(recids) == 1:
+        return recids[0]
+    if recids:
+        raise StandardError, "More than one recid has been matched: %s" % recids
+    else:
+        raise StandardError, "No recids matched"
+
+def cli2docid(options, recids=None, docids=None):
+    """Given the command line options return a docid."""
+    docids = list(cli_docids_iterator(options, recids=recids, docids=docids))
+    if len(docids) == 1:
+        return docids[0]
+    if docids:
+        raise StandardError, "More than one docid has been matched: %s" % docids
+    else:
+        raise StandardError, "No docids matched"
+
+def cli2icon(options):
+    """Return a good value for the icon."""
+    icon = getattr(options, 'set_icon', None)
+    if icon is None:
+        icon = KEEP_OLD_VALUE
+    elif icon:
+        icon = clean_url(icon)
+        check_valid_url(icon)
+    return icon
+
+def cli2description(options):
+    """Return a good value for the description."""
+    description = getattr(options, 'set_description', None)
+    if description is None:
+        description = KEEP_OLD_VALUE
+    return description
+
+def cli2restriction(options):
+    """Return a good value for the restriction."""
+    restriction = getattr(options, 'set_restriction', None)
+    if restriction is None:
+        restriction = KEEP_OLD_VALUE
+    return restriction
+
+def cli2comment(options):
+    """Return a good value for the comment."""
+    comment = getattr(options, 'set_comment', None)
+    if comment is None:
+        comment = KEEP_OLD_VALUE
+    return comment
+
+def cli2doctype(options):
+    """Return a good value for the doctype."""
+    doctype = getattr(options, 'set_doctype', None)
+    if not doctype:
+        return 'Main'
+    return doctype
+
+def cli2docname(options, docid=None, url=None):
+    """Given the command line options and optional precalculated docid
+    returns the corresponding docname."""
+    if docid:
+        bibdoc = BibDoc(docid=docid)
+        return bibdoc.get_docname()
+    docname = getattr(options, 'docname', None)
+    if docname is not None:
+        return docname
+    if url is not None:
+        return get_docname_from_url(url)
+    else:
+        return None
+
+def cli2format(options, url=None):
+    """Given the command line options returns the corresponding format."""
+    format = getattr(options, 'format', None)
+    if format is not None:
+        return format
+    elif url is not None:
+        ## FIXME: to deploy once conversion-tools branch is merged
+        #return guess_format_from_url(url)
+        return guess_format_from_url(url)
+    else:
+        raise OptionValueError("Not enough information to retrieve a valid format")
+
+def cli_recids_iterator(options, recids=None, docids=None):
+    """Slow iterator over all the matched recids.
+    if with_docids is True, the recid must be attached to at least a matched docid"""
+    debug('cli_recids_iterator')
+    if recids is None:
+        recids = cli_quick_match_all_recids(options)
+    debug('working on recids: %s, docids: %s' % (recids, docids))
+    for recid in recids:
+        if cli_slow_match_single_recid(options, recid, recids, docids):
+            yield recid
+    raise StopIteration
+
+def cli_docids_iterator(options, recids=None, docids=None):
+    """Slow iterator over all the matched docids."""
+    if recids is None:
+        recids = cli_quick_match_all_recids(options)
+    if docids is None:
+        docids = cli_quick_match_all_docids(options)
+    for docid in docids:
+        if cli_slow_match_single_docid(options, docid, recids, docids):
+            yield docid
+    raise StopIteration
 
 class OptionParserSpecial(OptionParser):
     def format_help(self, *args, **kwargs):
@@ -140,118 +394,123 @@ class OptionParserSpecial(OptionParser):
 
 def prepare_option_parser():
     """Parse the command line options."""
-    parser = OptionParserSpecial(usage="usage: %prog <query> <action> [options]",
+
+    def _ids_ranges_callback(option, opt, value, parser):
+        """Callback for optparse to parse a set of ids ranges in the form
+        nnn1-nnn2,mmm1-mmm2... returning the corresponding intbitset.
+        """
+        try:
+            debug('option: %s, opt: %s, value: %s, parser: %s' % (option, opt, value, parser))
+            debug('Parsing range: %s' % value)
+            value = ranges2ids(value)
+            setattr(parser.values, option.dest, value)
+        except Exception, e:
+            raise OptionValueError("It's impossible to parse the range '%s' for option %s: %s" % (value, opt, e))
+
+    def _date_range_callback(option, opt, value, parser):
+        """Callback for optparse to parse a range of dates in the form
+        [date1],[date2]. Both date1 and date2 could be optional.
+        the date can be expressed absolutely ("%Y-%m-%d %H:%M:%S")
+        or relatively (([-\+]{0,1})([\d]+)([dhms])) to the current time."""
+        try:
+            value = _parse_date_range(value)
+            setattr(parser.values, option.dest, value)
+        except Exception, e:
+            raise OptionValueError("It's impossible to parse the range '%s' for option %s: %s" % (value, opt, e))
+
+    parser = OptionParserSpecial(usage="usage: %prog [options]",
     #epilog="""With <query> you select the range of record/docnames/single files to work on. Note that some actions e.g. delete, append, revise etc. works at the docname level, while others like --set-comment, --set-description, at single file level and other can be applied in an iterative way to many records in a single run. Note that specifing docid(2) takes precedence over recid(2) which in turns takes precedence over pattern/collection search.""",
         version=__revision__)
     parser.trailing_text = """
 Examples:
     $ bibdocfile --append foo.tar.gz --recid=1
-    $ bibdocfile --revise http://foo.com?search=123 --docname='sam'
-            --format=pdf --recid=3 --new-docname='pippo'
-    $ bibdocfile --delete *sam --all
-    $ bibdocfile --undelete -c "Test Collection"
+    $ bibdocfile --revise http://foo.com?search=123 --with-docname='sam'
+            --format=pdf --recid=3 --set-docname='pippo' # revise for record 3
+                    # the document sam, renaming it to pippo.
+    $ bibdocfile --delete --with-docname="*sam" --all # delete all documents
+                                                      # starting ending
+                                                      # with "sam"
+    $ bibdocfile --undelete -c "Test Collection" # undelete documents for
+                                                 # the collection
+    $ bibdocfile --get-info --recids=1-4,6-8 # obtain informations
+    $ bibdocfile -r 1 --with-docname=foo --set-docname=bar # Rename a document
     """
-    parser.trailing_text += wrap_text_in_a_box("""
-The bibdocfile command line tool is in a state of high developement. Please
-do not rely on the command line parameters to remain compatible for the next
-release. You should in particular be aware that if you need to build scripts
-on top of the bibdocfile command line interfaces, you will probably need to
-revise them with the next release of CDS Invenio.""", 'WARNING')
-    query_options = OptionGroup(parser, 'Query parameters')
-    query_options.add_option('-a', '--all', action='store_true', dest='all', help='Select all the records')
-    query_options.add_option('--show-deleted', action='store_true', dest='show_deleted', help='Show deleted docname, too')
-    query_options.add_option('-p', '--pattern', dest='pattern', help='select by specifying the search pattern')
-    query_options.add_option('-c', '--collection', dest='collection', help='select by collection')
-    query_options.add_option('-r', '--recid', type='int', dest='recid', help='select the recid (or the first recid in a range)')
-    query_options.add_option('--recid2', type='int', dest='recid2', help='select the end of the range')
-    query_options.add_option('-d', '--docid', type='int', dest='docid', help='select by docid (or the first docid in a range)')
-    query_options.add_option('--docid2', type='int', dest='docid2', help='select the end of the range')
-    query_options.add_option('--docname', dest='docname', help='specify the docname to work on')
-    query_options.add_option('--new-docname', dest='newdocname', help='specify the desired new docname for revising')
-    query_options.add_option('--doctype', dest='doctype', help='specify the new doctype')
-    query_options.add_option('--format', dest='format', help='specify the format')
-    query_options.add_option('--icon', dest='icon', help='specify the URL/path for an icon')
-    query_options.add_option('--description', dest='description', help='specify a description')
-    query_options.add_option('--comment', dest='comment', help='specify a comment')
-    query_options.add_option('--restriction', dest='restriction', help='specify a restriction tag')
-    query_options.add_option('--force', dest='force', help='force an action even when it\'s not necessary e.g. textify on an already textified bibdoc.', action='store_true', default=False)
+    query_options = OptionGroup(parser, 'Query options')
 
+    query_options.add_option('-r', '--recids', action="callback", callback=_ids_ranges_callback, type='string', dest='recids', help='matches records by recids, e.g.: --recids=1-3,5-7')
+    query_options.add_option('-d', '--docids', action="callback", callback=_ids_ranges_callback, type='string', dest='docids', help='matches documents by docids, e.g.: --docids=1-3,5-7')
+    query_options.add_option('-a', '--all', action='store_true', dest='all', help='Select all the records')
+    query_options.add_option("--with-deleted-recs", choices=['yes', 'no', 'only'], type="choice", dest="deleted_recs", help="'Yes' to also match deleted records, 'no' to exclude them, 'only' to match only deleted ones", metavar="yes/no/only", default='no')
+    query_options.add_option("--with-deleted-docs", choices=['yes', 'no', 'only'], type="choice", dest="deleted_docs", help="'Yes' to also match deleted documents, 'no' to exclude them, 'only' to match only deleted ones (e.g. for undeletion)", metavar="yes/no/only", default='no')
+    query_options.add_option("--with-empty-recs", choices=['yes', 'no', 'only'], type="choice", dest="empty_recs", help="'Yes' to also match records without attached documents, 'no' to exclude them, 'only' to consider only such records (e.g. for statistics)", metavar="yes/no/only", default='no')
+    query_options.add_option("--with-empty-docs", choices=['yes', 'no', 'only'], type="choice", dest="empty_docs", help="'Yes' to also match documents without attached files, 'no' to exclude them, 'only' to consider only such documents (e.g. for sanity checking)", metavar="yes/no/only", default='no')
+    query_options.add_option("--with-record-modification-date", action="callback", callback=_date_range_callback, dest="md_rec", nargs=1, type="string", default=(None, None), help="matches records modified date1 and date2; dates can be expressed relatively, e.g.:\"-5m,2030-2-23 04:40\" # matches records modified since 5 minutes ago until the 2030...", metavar="date1,date2")
+    query_options.add_option("--with-record-creation-date", action="callback", callback=_date_range_callback, dest="cd_rec", nargs=1, type="string", default=(None, None), help="matches records created between date1 and date2; dates can be expressed relatively", metavar="date1,date2")
+    query_options.add_option("--with-document-modification-date", action="callback", callback=_date_range_callback, dest="md_doc", nargs=1, type="string", default=(None, None), help="matches documents modified between date1 and date2; dates can be expressed relatively", metavar="date1,date2")
+    query_options.add_option("--with-document-creation-date", action="callback", callback=_date_range_callback, dest="cd_doc", nargs=1, type="string", default=(None, None), help="matches documents created between date1 and date2; dates can be expressed relatively", metavar="date1,date2")
+    query_options.add_option("--url", dest="url", help='matches the document referred by the URL, e.g. "%s/record/1/files/foobar.pdf?version=2"' % CFG_SITE_URL)
+    query_options.add_option("--path", dest="path", help='matches the document referred by the internal filesystem path, e.g. %s/g0/1/foobar.pdf\\;1' % CFG_WEBSUBMIT_FILEDIR)
+    query_options.add_option("--with-docname", dest="docname", help='matches documents with the given docname (accept wildcards)')
+    query_options.add_option("--with-doctype", dest="doctype", help='matches documents with the given doctype')
+    query_options.add_option('-p', '--pattern', dest='pattern', help='matches records by pattern')
+    query_options.add_option('-c', '--collection', dest='collection', help='matches records by collection')
+    query_options.add_option('--force', dest='force', help='force an action even when it\'s not necessary e.g. textify on an already textified bibdoc.', action='store_true', default=False)
     parser.add_option_group(query_options)
-    action_options = OptionGroup(parser, 'Actions')
-    for (action, help) in _actions:
-        action_options.add_option('--%s' % action, action='store_const', const=action, dest='action', help=help)
-    parser.add_option_group(action_options)
-    action_with_parameters = OptionGroup(parser, 'Actions with parameter')
-    for action, (dest, help) in _actions_with_parameter.iteritems():
-        action_with_parameters.add_option('--%s' % action, dest=dest, help=help)
-    parser.add_option_group(action_with_parameters)
-    parser.add_option('-v', '--verbose', type='int', dest='verbose', default=1)
-    parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know')
+
+    getting_information_options = OptionGroup(parser, 'Actions for getting information')
+    getting_information_options.add_option('--get-info', dest='action', action='store_const', const='get-info', help='print all the informations about the matched record/documents')
+    getting_information_options.add_option('--get-disk-usage', dest='action', action='store_const', const='get-disk-usage', help='print disk usage statistics of the matched documents')
+    getting_information_options.add_option('--get-history', dest='action', action='store_const', const='get-history', help='print the matched documents history')
+    parser.add_option_group(getting_information_options)
+
+    setting_information_options = OptionGroup(parser, 'Actions for setting information')
+    setting_information_options.add_option('--set-doctype', dest='set_doctype', help='specify the new doctype', metavar='doctype')
+    setting_information_options.add_option('--set-description', dest='set_description', help='specify a description', metavar='description')
+    setting_information_options.add_option('--set-comment', dest='set_comment', help='specify a comment', metavar='comment')
+    setting_information_options.add_option('--set-restriction', dest='set_restriction', help='specify a restriction tag', metavar='restriction')
+    setting_information_options.add_option('--set-docname', dest='new_docname', help='specifies a new docname for renaming', metavar='docname')
+    setting_information_options.add_option("--unset-comment", action="store_const", const='', dest="set_comment", help="remove any comment")
+    setting_information_options.add_option("--unset-descriptions", action="store_const", const='', dest="set_description", help="remove any description")
+    setting_information_options.add_option("--unset-restrictions", action="store_const", const='', dest="set_restriction", help="remove any restriction")
+    setting_information_options.add_option("--hide", dest="action", action='store_const', const='hide', help="hides matched documents and revisions")
+    setting_information_options.add_option("--unhide", dest="action", action='store_const', const='unhide', help="hides matched documents and revisions")
+    parser.add_option_group(setting_information_options)
+
+    revising_options = OptionGroup(parser, 'Action for revising content')
+    revising_options.add_option("--append", dest='append_path', help='specify the URL/path of the file that will appended to the bibdoc', metavar='PATH/URL')
+    revising_options.add_option("--revise", dest='revise_path', help='specify the URL/path of the file that will revise the bibdoc', metavar='PATH/URL')
+    revising_options.add_option("--revert", dest='action', action='store_const', const='revert', help='reverts a document to the specified version')
+    revising_options.add_option("--delete", action='store_const', const='delete', dest='action', help='soft-delete the matched documents (applies to all revisions and formats)')
+    revising_options.add_option("--hard-delete", action='store_const', const='hard_delete', dest='action', help='hard-delete the matched documents (applies to matched revisions and formats)')
+    revising_options.add_option("--undelete", action='store_const', const='undelete', dest='action', help='undelete previosuly soft-deleted documents (applies to all revisions and formats)')
+    revising_options.add_option("--purge", action='store_const', const='purge', dest='action', help='purge (i.e. hard-delete previous versions) the matched documents')
+    revising_options.add_option("--expunge", action='store_const', const='expunge', dest='action', help='expunge (i.e. hard-delete any version and formats) the matched documents')
+    revising_options.add_option("--with-versions", dest="version", help="specifies the version(s) to be used with hard-delete, hide, revert, e.g.: 1-2,3 or all")
+    revising_options.add_option("--with-format", dest="format", help='to specify a format when appending/revising/deleting/reverting a document, e.g. "pdf"', metavar='FORMAT')
+    revising_options.add_option("--with-hide-previous", dest='hide_previous', action='store_true', help='when revising, hides previous versions', default=False)
+    parser.add_option_group(revising_options)
+
+    housekeeping_options = OptionGroup(parser, 'Actions for housekeeping')
+    housekeeping_options.add_option("--check-md5", action='store_const', const='check-md5', dest='action', help='check md5 checksum validity of files')
+    housekeeping_options.add_option("--check-format", action='store_const', const='check-format', dest='action', help='check if any format-related inconsistences exists')
+    housekeeping_options.add_option("--check-duplicate-docnames", action='store_const', const='check-duplicate-docnames', dest='action', help='check for duplicate docnames associated with the same record')
+    housekeeping_options.add_option("--update-md5", action='store_const', const='update-md5', dest='action', help='update md5 checksum of files')
+    housekeeping_options.add_option("--fix-all", action='store_const', const='fix-all', dest='action', help='fix inconsistences in filesystem vs database vs MARC')
+    housekeeping_options.add_option("--fix-marc", action='store_const', const='fix-marc', dest='action', help='synchronize MARC after filesystem/database')
+    housekeeping_options.add_option("--fix-format", action='store_const', const='fix-format', dest='action', help='fix format related inconsistences')
+    housekeeping_options.add_option("--fix-duplicate-docnames", action='store_const', const='fix-duplicate-docnames', dest='action', help='fix duplicate docnames associated with the same record')
+    parser.add_option_group(housekeeping_options)
+
+    experimental_options = OptionGroup(parser, 'Experimental options (do not expect to find them in the next release)')
+    experimental_options.add_option('--set-icon', dest='set_icon', help='attache the specified icon to the matched documents', metavar='URL/PATH')
+    experimental_options.add_option("--unset-icon", action="store_const", const='', dest="set_icon", help="remove any icon on the matched documents")
+    experimental_options.add_option('--textify', dest='action', action='store_const', const='textify', help='extract text from matched documents and store it for later indexing')
+    experimental_options.add_option('--with-ocr', dest='perform_ocr', action='store_true', default=False, help='when used with --textify, wether to perform OCR')
+    parser.add_option_group(experimental_options)
+
+    parser.add_option('-D', '--debug', action='store_true', dest='debug', default=False)
     parser.add_option('-H', '--human-readable', dest='human_readable', action='store_true', default=False, help='print sizes in human readable format (e.g., 1KB 234MB 2GB)')
     return parser
-
-def get_recids_from_query(pattern, collection, recid, recid2, docid, docid2):
-    """Return the proper set of recids corresponding to the given
-    parameters."""
-    if docid:
-        ret = intbitset()
-        if not docid2:
-            docid2 = docid
-        for adocid in xrange(docid, docid2 + 1):
-            try:
-                bibdoc = BibDoc(adocid)
-                if bibdoc and bibdoc.get_recid():
-                    ret.add(bibdoc.get_recid())
-            except (InvenioWebSubmitFileError, TypeError):
-                pass
-        return ret
-    elif recid:
-        if not recid2:
-            recid2 = recid
-        recid_range = intbitset(xrange(recid, recid2 + 1))
-        recid_set = intbitset(run_sql('select id from bibrec'))
-        recid_set &= recid_range
-        return recid_set
-    elif pattern or collection:
-        return intbitset(perform_request_search(cc=collection or "", p=pattern or ""))
-    else:
-        print >> sys.stderr, "ERROR: no record specified."
-        sys.exit(1)
-
-def get_docids_from_query(recid_set, docname, docid, docid2, show_deleted=False):
-    """Given a set of recid and an optional range of docids
-    return a corresponding docids set. The range of docids
-    takes precedence over the recid_set."""
-    if docname:
-        ret = intbitset()
-        for recid in recid_set:
-            bibrec = BibRecDocs(recid, deleted_too=show_deleted)
-            for bibdoc in bibrec.list_bibdocs():
-                if fnmatch.fnmatch(bibdoc.get_docname(), docname):
-                    ret.add(bibdoc.get_id())
-        return ret
-    elif docid:
-        ret = intbitset()
-        if not docid2:
-            docid2 = docid
-        for adocid in xrange(docid, docid2 + 1):
-            try:
-                bibdoc = BibDoc(adocid)
-                if bibdoc:
-                    ret.add(adocid)
-            except (InvenioWebSubmitFileError, TypeError):
-                pass
-        return ret
-    else:
-        ret = intbitset()
-        for recid in recid_set:
-            bibrec = BibRecDocs(recid, deleted_too=show_deleted)
-            for bibdoc in bibrec.list_bibdocs():
-                ret.add(bibdoc.get_id())
-                icon = bibdoc.get_icon()
-                if icon:
-                    ret.add(icon.get_id())
-        return ret
 
 def print_info(recid, docid, info):
     """Nicely print info about a recid, docid pair."""
@@ -275,134 +534,121 @@ def bibupload_ffts(ffts, append=False):
             task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name)
             print "BibUpload correct submitted with id %s" % task
     else:
-        print "WARNING: no MARC to upload."
+        print >> sys.stderr, "WARNING: no MARC to upload."
     return True
 
-def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None):
-    """Create a bibupload FFT task submission for appending a format."""
-    if docid is not None:
-        bibdoc = BibDoc(docid)
-        if recid is not None and recid != bibdoc.get_recid():
-            print >> sys.stderr, "ERROR: Provided recid %i is not linked with provided docid %i" % (recid, docid)
-            return False
-        if docname is not None and docname != bibdoc.get_docname():
-            print >> sys.stderr, "ERROR: Provided docid %i is not named as the provided docname %s" % (docid, docname)
-            return False
-        recid = bibdoc.get_recid()
-        docname = bibdoc.get_docname()
-    elif recid is None:
-        print >> sys.stderr, "ERROR: Not enough information to identify the record and desired document"
-        return False
-    try:
-        url = clean_url(url)
-        check_valid_url(url)
-    except StandardError, e:
-        print >> sys.stderr, "ERROR: Not a valid url has been specified: %s" % e
-        return False
-    if docname is None:
-        docname = get_docname_from_url(url)
-    if not docname:
-        print >> sys.stderr, "ERROR: Not enough information to decide a docname!"
-        return False
-    if format is None:
-        format = get_format_from_url(url)
-    if not format:
-        print >> sys.stderr, "ERROR: Not enough information to decide a format!"
-        return False
-    if icon is not None and icon != KEEP_OLD_VALUE:
-        try:
-            icon = clean_url(icon)
-            check_valid_url(url)
-        except StandardError, e:
-            print >> sys.stderr, "ERROR: Not a valid url has been specified for the icon: %s" % e
-            return False
-    if doctype is None:
-        doctype = 'Main'
+def ranges2ids(parse_string):
+    """Parse a string and return the intbitset of the corresponding ids."""
+    ids = intbitset()
+    ranges = parse_string.split(",")
+    for arange in ranges:
+        tmp_ids = arange.split("-")
+        if len(tmp_ids)==1:
+            ids.add(int(tmp_ids[0]))
+        else:
+            if int(tmp_ids[0]) > int(tmp_ids[1]): # sanity check
+                tmp = tmp_ids[0]
+                tmp_ids[0] = tmp_ids[1]
+                tmp_ids[1] = tmp
+            ids += xrange(int(tmp_ids[0]), int(tmp_ids[1]) + 1)
+    return ids
 
-    fft = {
-        'url' : url,
+def cli_append(options, append_path):
+    """Create a bibupload FFT task submission for appending a format."""
+    recid = cli2recid(options)
+    comment = getattr(options, 'comment', None)
+    description = getattr(options, 'comment', None)
+    restriction = getattr(options, 'restriction', None)
+    doctype = getattr(options, 'doctype', None) or 'Main'
+    icon = cli2icon(options)
+    if icon == KEEP_OLD_VALUE:
+        icon = None
+    docname = cli2docname(options, url=append_path)
+    if not docname:
+        raise OptionValueError, 'Not enough information to retrieve a valid docname'
+    format = cli2format(options, append_path)
+    url = clean_url(append_path)
+    check_valid_url(url)
+    ffts = {recid: [{
         'docname' : docname,
-        'format' :format,
-        'icon' : icon,
         'comment' : comment,
         'description' : description,
         'restriction' : restriction,
-        'doctype' : doctype
-    }
-    ffts = {recid : [fft]}
+        'doctype' : doctype,
+        'icon' : icon,
+        'format' : format,
+        'url' : url
+    }]}
     return bibupload_ffts(ffts, append=True)
 
-def cli_revise(recid=None, docid=None, docname=None, new_docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None, hide_previous=False):
+def cli_revise(options, revise_path):
     """Create a bibupload FFT task submission for appending a format."""
-    if docid is not None:
-        bibdoc = BibDoc(docid)
-        if recid is not None and recid != bibdoc.get_recid():
-            print >> sys.stderr, "ERROR: Provided recid %i is not linked with provided docid %i" % (recid, docid)
-            return False
-        if docname is not None and docname != bibdoc.get_docname():
-            print >> sys.stderr, "ERROR: Provided docid %i is not named as the provided docname %s" % (docid, docname)
-            return False
-        recid = bibdoc.get_recid()
-        docname = bibdoc.get_docname()
-    elif recid is None:
-        print >> sys.stderr, "ERROR: Not enough information to identify the record and desired document"
-        return False
-    if url is not None:
-        try:
-            url = clean_url(url)
-            check_valid_url(url)
-        except StandardError, e:
-            print >> sys.stderr, "ERROR: Not a valid url has been specified: %s" % e
-            return False
-    if docname is None and url is not None:
-        docname = get_docname_from_url(url)
+    recid = cli2recid(options)
+    comment = cli2comment(options)
+    description = cli2description(options)
+    restriction = cli2restriction(options)
+    docname = cli2docname(options, url=revise_path)
+    hide_previous = getattr(options, 'hide_previous', None)
     if not docname:
-        print >> sys.stderr, "ERROR: Not enough information to decide a docname!"
-        return False
-    if docname not in BibRecDocs(recid).get_bibdoc_names():
-        print >> sys.stderr, "ERROR: docname %s is not connected with recid %s!" % (docname, recid)
-        return False
-    if format is None and url is not None:
-        format = get_format_from_url(url)
-    if not format:
-        print >> sys.stderr, "ERROR: Not enough information to decide a format!"
-        return False
-    if icon is not None and icon != KEEP_OLD_VALUE:
-        try:
-            icon = clean_url(icon)
-            check_valid_url(url)
-        except StandardError, e:
-            print >> sys.stderr, "ERROR: Not a valid url has been specified for the icon: %s" % e
-            return False
-    if doctype is None:
-        doctype = 'Main'
-
-    fft = {
-        'url' : url,
+        raise OptionValueError, 'Not enough information to retrieve a valid docname'
+    format = cli2format(options, revise_path)
+    doctype = cli2doctype(options)
+    icon = cli2icon(options)
+    url = clean_url(revise_path)
+    new_docname = getattr(options, 'new_docname', None)
+    check_valid_url(url)
+    ffts = {recid : [{
         'docname' : docname,
-        'newdocname' : new_docname,
-        'format' :format,
-        'icon' : icon,
+        'new_docname' : new_docname,
         'comment' : comment,
         'description' : description,
         'restriction' : restriction,
-        'doctype' : doctype
-    }
-    if hide_previous:
-        fft['options'] = 'PERFORM_HIDE_PREVIOUS'
-    ffts = {recid : [fft]}
+        'doctype' : doctype,
+        'icon' : icon,
+        'format' : format,
+        'url' : url,
+        'options' : hide_previous and ['PERFORM_HIDE_PREVIOUS'] or None
+    }]}
+    return bibupload_ffts(ffts)
+
+def cli_set_batch(options):
+    """Change in batch the doctype, description, comment and restriction."""
+    ffts = {}
+    doctype = getattr(options, 'set_doctype', None)
+    description = getattr(options, 'set_description', None)
+    comment = getattr(options, 'set_comment', None)
+    restriction = getattr(options, 'set_restriction', None)
+    with_format = getattr(options, 'format', None)
+    for docid in cli_docids_iterator(options):
+        bibdoc = BibDoc(docid)
+        recid = bibdoc.get_recid()
+        docname = bibdoc.get_docname()
+        fft = []
+        if description is not None or comment is not None:
+            for bibdocfile in bibdoc.list_latest_files():
+                format = bibdocfile.get_format()
+                if not with_format or with_format == format:
+                    fft.append({
+                        'docname': docname,
+                        'restriction': restriction,
+                        'comment': comment,
+                        'description': description,
+                        'format': format,
+                        'doctype': doctype
+                    })
+        else:
+            fft.append({
+                'docname': docname,
+                'restriction': restriction,
+                'doctype': doctype,
+            })
+        ffts[recid] = fft
     return bibupload_ffts(ffts, append=False)
 
-def cli_get_history(docid_set):
-    """Print the history of a docid_set."""
-    for docid in docid_set:
-        bibdoc = BibDoc(docid)
-        history = bibdoc.get_history()
-        for row in history:
-            print_info(bibdoc.get_recid(), docid, row)
-
-def cli_textify(docid_set, perform_ocr=False, force=False):
+def cli_textify(options):
     """Extract text to let indexing on fulltext be possible."""
+    force = getattr(options, 'force', None)
+    perform_ocr = getattr(options, 'perform_ocr', None)
     if perform_ocr:
         if not can_perform_ocr():
             print >> sys.stderr, "WARNING: OCR requested but OCR is not possible"
@@ -411,7 +657,7 @@ def cli_textify(docid_set, perform_ocr=False, force=False):
         additional = ' using OCR (this might take some time)'
     else:
         additional = ''
-    for docid in docid_set:
+    for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
         print 'Extracting text for docid %s%s...' % (docid, additional),
         sys.stdout.flush()
@@ -424,29 +670,57 @@ def cli_textify(docid_set, perform_ocr=False, force=False):
         else:
             print "not needed"
 
-def cli_fix_all(recid_set):
+def cli_rename(options):
+    """Rename a docname within a recid."""
+    new_docname = getattr(options, 'new_docname', None)
+    docid = cli2docid(options)
+    bibdoc = BibDoc(docid)
+    docname = bibdoc.get_docname()
+    recid = bibdoc.get_recid()
+    ffts = {recid : [{'docname' : docname, 'new_docname' : new_docname}]}
+    return bibupload_ffts(ffts, append=False)
+
+def cli_set_icon(options):
+    """Rename a docname within a recid."""
+    docid = cli2docid(options)
+    bibdoc = BibDoc(docid)
+    docname = bibdoc.get_docname()
+    recid = bibdoc.get_recid()
+    icon = cli2icon(options)
+    ffts = {recid : [{'docname' : docname, 'icon' : icon}]}
+    return bibupload_ffts(ffts, append=False)
+
+def cli_fix_all(options):
     """Fix all the records of a recid_set."""
     ffts = {}
-    for recid in recid_set:
+    for recid in cli_recids_iterator(options):
         ffts[recid] = []
         for docname in BibRecDocs(recid).get_bibdoc_names():
             ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-ALL'})
     return bibupload_ffts(ffts, append=False)
 
-def cli_fix_marc(recid_set):
+def cli_fix_marc(options, explicit_recid_set=None):
     """Fix all the records of a recid_set."""
     ffts = {}
-    for recid in recid_set:
-        ffts[recid] = []
-        for docname in BibRecDocs(recid).get_bibdoc_names():
-            ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
+    if explicit_recid_set is not None:
+        for recid in explicit_recid_set:
+            ffts[recid] = []
+            for docname in BibRecDocs(recid).get_bibdoc_names():
+                ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
+    else:
+        for recid in cli_recids_iterator(options):
+            ffts[recid] = []
+            for docname in BibRecDocs(recid).get_bibdoc_names():
+                ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
     return bibupload_ffts(ffts, append=False)
 
-def cli_check_format(recid_set):
+def cli_check_format(options):
     """Check if any format-related inconsistences exists."""
     count = 0
+    tot = 0
     duplicate = False
-    for recid in recid_set:
+    for recid in cli_recids_iterator(options):
+        tot += 1
         bibrecdocs = BibRecDocs(recid)
         if not bibrecdocs.check_duplicate_docnames():
             print >> sys.stderr, "recid %s has duplicate docnames!"
@@ -461,7 +735,7 @@ def cli_check_format(recid_set):
         if broken:
             count += 1
     if count:
-        result = "%d out of %d records need their formats to be fixed." % (count, len(recid_set))
+        result = "%d out of %d records need their formats to be fixed." % (count, tot)
     else:
         result = "All records appear to be correct with respect to formats."
     if duplicate:
@@ -469,25 +743,29 @@ def cli_check_format(recid_set):
     print wrap_text_in_a_box(result, style="conclusion")
     return not(duplicate or count)
 
-def cli_check_duplicate_docnames(recid_set):
+def cli_check_duplicate_docnames(options):
     """Check if some record is connected with bibdoc having the same docnames."""
     count = 0
-    for recid in recid_set:
+    tot = 0
+    for recid in cli_recids_iterator(options):
+        tot += 1
         bibrecdocs = BibRecDocs(recid)
         if bibrecdocs.check_duplicate_docnames():
             count += 1
             print sys.stderr, "recid %s has duplicate docnames!"
     if count:
-        result = "%d out of %d records have duplicate docnames." % (count, len(recid_set))
+        print "%d out of %d records have duplicate docnames." % (count, tot)
         return False
     else:
-        result = "All records appear to be correct with respect to duplicate docnames."
+        print "All records appear to be correct with respect to duplicate docnames."
         return True
 
-def cli_fix_format(recid_set):
+def cli_fix_format(options):
     """Fix format-related inconsistences."""
     fixed = intbitset()
-    for recid in recid_set:
+    tot = 0
+    for recid in cli_recids_iterator(options):
+        tot += 1
         bibrecdocs = BibRecDocs(recid)
         for docname in bibrecdocs.get_bibdoc_names():
             if not bibrecdocs.check_format(docname):
@@ -498,14 +776,16 @@ def cli_fix_format(recid_set):
                 fixed.add(recid)
     if fixed:
         print "Now we need to synchronize MARC to reflect current changes."
-        cli_fix_marc(fixed)
-    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (len(recid_set), len(fixed)), style="conclusion")
+        cli_fix_marc(options, explicit_recid_set=fixed)
+    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (tot, len(fixed)), style="conclusion")
     return not fixed
 
-def cli_fix_duplicate_docnames(recid_set):
+def cli_fix_duplicate_docnames(options):
     """Fix duplicate docnames."""
     fixed = intbitset()
-    for recid in recid_set:
+    tot = 0
+    for recid in cli_recids_iterator():
+        tot += 1
         bibrecdocs = BibRecDocs(recid)
         if not bibrecdocs.check_duplicate_docnames():
             bibrecdocs.fix_duplicate_docnames(skip_check=True)
@@ -513,72 +793,136 @@ def cli_fix_duplicate_docnames(recid_set):
             fixed.add(recid)
     if fixed:
         print "Now we need to synchronize MARC to reflect current changes."
-        cli_fix_marc(fixed)
-    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (len(recid_set), len(fixed)), style="conclusion")
+        cli_fix_marc(options, explicit_recid_set=fixed)
+    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (tot, len(fixed)), style="conclusion")
     return not fixed
 
-def cli_delete(docid_set):
+def cli_delete(options):
     """Delete the given docid_set."""
     ffts = {}
-    for docid in docid_set:
+    for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
         if not bibdoc.icon_p():
             ## Icons are indirectly deleted with the relative bibdoc.
             docname = bibdoc.get_docname()
             recid = bibdoc.get_recid()
-            ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
-    if ffts:
-        return bibupload_ffts(ffts, append=False)
-    else:
-        print >> sys.stderr, 'ERROR: nothing to delete'
-    return False
+            if recid not in ffts:
+                ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
+            else:
+                ffts[recid].append({'docname' : docname, 'doctype' : 'DELETE'})
+    return bibupload_ffts(ffts)
 
-def cli_undelete(recid_set, docname, status):
+def cli_delete_file(options):
+    """Delete the given file irreversibely."""
+    docid = cli2docid(options)
+    recid = cli2recid(options, docids=intbitset([docid]))
+    format = cli2format(options)
+    docname = BibDoc(docid).get_docname()
+    version = getattr(options, 'version', None)
+    ffts = {recid : [{'docname' : docname, 'version' : version, 'format' : format, 'doctype' : 'DELETE-FILE'}]}
+    return bibupload_ffts(ffts)
+
+def cli_revert(options):
+    """Revert a bibdoc to a given version."""
+    docid = cli2docid(options)
+    recid = cli2recid(options, docids=intbitset([docid]))
+    docname = BibDoc(docid).get_docname()
+    version = getattr(options, 'version', None)
+    try:
+        version = int(version)
+        if 0 >= version:
+            raise ValueError
+    except ValueError:
+        raise OptionValueError, 'when reverting, version should be valid positive integer, not %s' % version
+    ffts = {recid : [{'docname' : docname, 'version' : version, 'doctype' : 'REVERT'}]}
+    return bibupload_ffts(ffts)
+
+def cli_undelete(options):
     """Delete the given docname"""
-    fix_marc = intbitset()
+    docname = cli2docname(options)
+    restriction = getattr(options, 'restriction', None)
     count = 0
+    if not docname:
+        docname = 'DELETED-*-*'
     if not docname.startswith('DELETED-'):
         docname = 'DELETED-*-' + docname
-    for recid in recid_set:
-        bibrecdocs = BibRecDocs(recid, deleted_too=True)
-        for bibdoc in bibrecdocs.list_bibdocs():
-            if bibdoc.get_status() == 'DELETED' and fnmatch.fnmatch(bibdoc.get_docname(), docname):
-                bibdoc.undelete(status)
-                fix_marc.add(recid)
-                count += 1
-    cli_fix_marc(fix_marc)
-    print wrap_text_in_a_box("%s bibdoc successfuly undeleted with status '%s'" % (count, status), style="conclusion")
-
-def cli_merge_into(recid, docname, into_docname):
-    """Merge docname into_docname for the given recid."""
-    bibrecdocs = BibRecDocs(recid)
-    docnames = bibrecdocs.get_bibdoc_names()
-    if docname in docnames and into_docname in docnames:
-        try:
-            bibrecdocs.merge_bibdocs(into_docname, docname)
-        except InvenioWebSubmitFileError, e:
-            print >> sys.stderr, e
-        else:
-            cli_fix_marc(intbitset((recid)))
-    else:
-        print >> sys.stderr, 'ERROR: Either %s or %s is not a valid docname for recid %s' % (docname, into_docname, recid)
-
-def cli_get_info(recid_set, show_deleted=False, human_readable=False):
-    """Print all the info of a recid_set."""
-    for recid in recid_set:
-        print BibRecDocs(recid, deleted_too=show_deleted, human_readable=human_readable)
-
-def cli_get_docnames(docid_set):
-    """Print all the docnames of a docid_set."""
-    for docid in docid_set:
+    to_be_undeleted = intbitset()
+    fix_marc = intbitset()
+    setattr(options, 'deleted_docs', 'only')
+    for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
-        print_info(bibdoc.get_recid(), docid, bibdoc.get_docname())
+        if bibdoc.get_status() == 'DELETED' and fnmatch.fnmatch(bibdoc.get_docname(), docname):
+            to_be_undeleted.add(docid)
+            fix_marc.add(bibdoc.get_recid())
+            count += 1
+            print '%s (docid %s from recid %s) will be undeleted to restriction: %s' % (bibdoc.get_docname(), docid, bibdoc.get_recid(), restriction)
+    wait_for_user("I'll proceed with the undeletion")
+    for docid in to_be_undeleted:
+        bibdoc = BibDoc(docid)
+        bibdoc.undelete(restriction)
+    cli_fix_marc(options, explicit_recid_set=fix_marc)
+    print wrap_text_in_a_box("%s bibdoc successfuly undeleted with status '%s'" % (count, restriction), style="conclusion")
 
-def cli_get_disk_usage(docid_set, human_readable=False):
+def cli_get_info(options):
+    """Print all the info of the matched docids or recids."""
+    debug('Getting info!')
+    human_readable = bool(getattr(options, 'human_readable', None))
+    debug('human_readable: %s' % human_readable)
+    deleted_docs = getattr(options, 'deleted_docs', None) in ('yes', 'only')
+    debug('deleted_docs: %s' % deleted_docs)
+    if getattr(options, 'docids', None):
+        for docid in cli_docids_iterator(options):
+            sys.stdout.write(str(BibDoc(docid, human_readable=human_readable)))
+    else:
+        for recid in cli_recids_iterator(options):
+            sys.stdout.write(str(BibRecDocs(recid, deleted_too=deleted_docs, human_readable=human_readable)))
+
+def cli_purge(options):
+    """Purge the matched docids."""
+    ffts = {}
+    for docid in cli_docids_iterator(options):
+        bibdoc = BibDoc(docid)
+        recid = bibdoc.get_recid()
+        docname = bibdoc.get_docname()
+        if recid:
+            if recid not in ffts:
+                ffts[recid] = []
+            ffts[recid].append({
+                'docname' : docname,
+                'doctype' : 'PURGE',
+            })
+    return bibupload_ffts(ffts)
+
+def cli_expunge(options):
+    """Expunge the matched docids."""
+    ffts = {}
+    for docid in cli_docids_iterator(options):
+        bibdoc = BibDoc(docid)
+        recid = bibdoc.get_recid()
+        docname = bibdoc.get_docname()
+        if recid:
+            if recid not in ffts:
+                ffts[recid] = []
+            ffts[recid].append({
+                'docname' : docname,
+                'doctype' : 'EXPUNGE',
+            })
+    return bibupload_ffts(ffts)
+
+def cli_get_history(options):
+    """Print the history of a docid_set."""
+    for docid in cli_docids_iterator(options):
+        bibdoc = BibDoc(docid)
+        history = bibdoc.get_history()
+        for row in history:
+            print_info(bibdoc.get_recid(), docid, row)
+
+def cli_get_disk_usage(options):
     """Print the space usage of a docid_set."""
+    human_readable = getattr(options, 'human_readable', None)
     total_size = 0
     total_latest_size = 0
-    for docid in docid_set:
+    for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
         size = bibdoc.get_total_size()
         total_size += size
@@ -599,11 +943,10 @@ def cli_get_disk_usage(docid_set, human_readable=False):
             % (total_size, total_latest_size),
             style='conclusion')
 
-
-def cli_check_md5(docid_set):
+def cli_check_md5(options):
     """Check the md5 sums of a docid_set."""
     failures = 0
-    for docid in docid_set:
+    for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
         if bibdoc.md5s.check():
             print_info(bibdoc.get_recid(), docid, 'checksum OK')
@@ -617,9 +960,9 @@ def cli_check_md5(docid_set):
     else:
         print wrap_text_in_a_box('All files are correct', style='conclusion')
 
-def cli_update_md5(docid_set):
+def cli_update_md5(options):
     """Update the md5 sums of a docid_set."""
-    for docid in docid_set:
+    for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
         if bibdoc.md5s.check():
             print_info(bibdoc.get_recid(), docid, 'checksum OK')
@@ -630,112 +973,143 @@ def cli_update_md5(docid_set):
             wait_for_user('Updating the md5s of this document can hide real problems.')
             bibdoc.md5s.update(only_new=False)
 
-def cli_assert_recid(options):
-    """Check for recid to be correctly set."""
-    try:
-        assert(int(options.recid) > 0)
-        return True
-    except:
-        print >> sys.stderr, 'ERROR: recid not correctly set: "%s"' % options.recid
-        return False
+def cli_hide(options):
+    """Hide the matched versions of documents."""
+    documents_to_be_hidden = {}
+    to_be_fixed = intbitset()
+    versions = getattr(options, 'versions', 'all')
+    if versions != 'all':
+        try:
+            versions = ranges2ids(versions)
+        except:
+            raise OptionValueError, 'You should specify correct versions. Not %s' % versions
+    else:
+        versions = intbitset(trailing_bits=True)
+    for docid in cli_docids_iterator(options):
+        bibdoc = BibDoc(docid)
+        recid = bibdoc.get_recid()
+        if recid:
+            for bibdocfile in bibdoc.list_all_files():
+                this_version = bibdocfile.get_version()
+                this_format = bibdocfile.get_format()
+                if this_version in versions:
+                    if docid not in documents_to_be_hidden:
+                        documents_to_be_hidden[docid] = []
+                    documents_to_be_hidden[docid].append((this_version, this_format))
+                    to_be_fixed.add(recid)
+                    print '%s (docid: %s, recid: %s) will be hidden' % (bibdocfile.get_full_name(), docid, recid)
+    wait_for_user('Proceeding to hide the matched documents...')
+    for docid, documents in documents_to_be_hidden.iteritems():
+        bibdoc = BibDoc(docid)
+        for version, format in documents:
+            bibdoc.set_flag('HIDDEN', format, version)
+    return cli_fix_marc(options, to_be_fixed)
 
-def cli_assert_docname(options):
-    """Check for recid to be correctly set."""
-    try:
-        assert(options.docname)
-        return True
-    except:
-        print >> sys.stderr, 'ERROR: docname not correctly set: "%s"' % options.docname
-        return False
-
-def get_all_recids():
-    """Return all the existing recids."""
-    return intbitset(run_sql('select id from bibrec')) - search_unit(p='DELETED', f='collection', m='e')
-
-def cli_list_available_flags():
-    """
-    Return the available flags that can be associated with a docname.
-    """
-    print "Available flags:", ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS)
-
-def cli_list_available_flags():
-    """
-    Return the available flags that can be associated with a docname.
-    """
-    print "Available flags:", ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS)
+def cli_unhide(options):
+    """Unhide the matched versions of documents."""
+    documents_to_be_unhidden = {}
+    to_be_fixed = intbitset()
+    versions = getattr(options, 'versions', 'all')
+    if versions != 'all':
+        try:
+            versions = ranges2ids(versions)
+        except:
+            raise OptionValueError, 'You should specify correct versions. Not %s' % versions
+    else:
+        versions = intbitset(trailing_bits=True)
+    for docid in cli_docids_iterator(options):
+        bibdoc = BibDoc(docid)
+        recid = bibdoc.get_recid()
+        if recid:
+            for bibdocfile in bibdoc.list_all_files():
+                this_version = bibdocfile.get_version()
+                this_format = bibdocfile.get_format()
+                if this_version in versions:
+                    if docid not in documents_to_be_unhidden:
+                        documents_to_be_hidden[docid] = []
+                    documents_to_be_unhidden[docid].append((this_version, this_format))
+                    to_be_fixed.add(recid)
+                    print '%s (docid: %s, recid: %s) will be unhidden' % (bibdocfile.get_full_name(), docid, recid)
+    wait_for_user('Proceeding to unhide the matched documents...')
+    for docid, documents in documents_to_be_unhidden.iteritems():
+        bibdoc = BibDoc(docid)
+        for version, format in documents:
+            bibdoc.unset_flag('HIDDEN', format, version)
+    return cli_fix_marc(options, to_be_fixed)
 
 def main():
     parser = prepare_option_parser()
     (options, args) = parser.parse_args()
-    if options.all:
-        recid_set = get_all_recids()
-    else:
-        recid_set = get_recids_from_query(options.pattern, options.collection, options.recid, options.recid2, options.docid, options.docid2)
-    docid_set = get_docids_from_query(recid_set, options.docname, options.docid, options.docid2, options.show_deleted is True or options.action == 'undelete')
+    if getattr(options, 'debug', None):
+        getLogger().setLevel(DEBUG)
+        debug('test')
+    debug('options: %s, args: %s' % (options, args))
     try:
-        if options.action == 'get-history':
-            cli_get_history(docid_set)
-        elif options.action == 'get-info':
-            cli_get_info(recid_set, options.show_deleted is True, options.human_readable)
-        elif options.action == 'get-docnames':
-            cli_get_docnames(docid_set)
-        elif options.action == 'get-disk-usage':
-            cli_get_disk_usage(docid_set, options.human_readable)
-        elif options.action == 'check-md5':
-            cli_check_md5(docid_set)
-        elif options.action == 'update-md5':
-            cli_update_md5(docid_set)
-        elif options.action == 'fix-all':
-            cli_fix_all(recid_set)
-        elif options.action == 'fix-marc':
-            cli_fix_marc(recid_set)
-        elif options.action == 'delete':
-            cli_delete(docid_set)
-        elif options.action == 'fix-duplicate-docnames':
-            cli_fix_duplicate_docnames(recid_set)
-        elif options.action == 'fix-format':
-            cli_fix_format(recid_set)
-        elif options.action == 'check-duplicate-docnames':
-            cli_check_duplicate_docnames(recid_set)
-        elif options.action == 'check-format':
-            cli_check_format(recid_set)
-        elif options.action == 'list-available-flags':
-            cli_list_available_flags()
-        elif options.action == 'undelete':
-            cli_undelete(recid_set, options.docname or '*', options.restriction or '')
-        elif options.action == 'textify':
-            cli_textify(docid_set, force=options.force)
-        elif options.action == 'textify-with-ocr':
-            cli_textify(docid_set, perform_ocr=True, force=options.force)
-        elif options.append_path:
-            if cli_assert_recid(options):
-                res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
-                if not res:
-                    sys.exit(1)
-        elif options.revise_path:
-            if cli_assert_recid(options):
-                res = cli_revise(options.recid, options.docid, options.docname,
-                options.newdocname, options.doctype, options.revise_path, options.format,
-                options.icon, options.description, options.comment, options.restriction)
-                if not res:
-                    sys.exit(1)
-        elif options.revise_hide_path:
-            if cli_assert_recid(options):
-                res = cli_revise(options.recid, options.docid, options.docname,
-                options.newdocname, options.doctype, options.revise_path, options.format,
-                options.icon, options.description, options.comment, options.restriction, True)
-                if not res:
-                    sys.exit(1)
-        elif options.into_docname:
-            if options.recid and options.docname:
-                cli_merge_into(options.recid, options.docname, options.into_docname)
+        if not getattr(options, 'action', None) and \
+                not getattr(options, 'append_path', None) and \
+                not getattr(options, 'revise_path', None):
+            if getattr(options, 'set_doctype', None) is not None or \
+                    getattr(options, 'set_comment', None) is not None or \
+                    getattr(options, 'set_description', None) is not None or \
+                    getattr(options, 'set_restriction', None) is not None:
+                cli_set_batch(options)
+            elif getattr(options, 'new_docname', None):
+                cli_rename(options)
+            elif getattr(options, 'set_icon', None) is not None:
+                cli_set_icon(options)
             else:
-                print >> sys.stderr, "ERROR: You have to specify both the recid and a docname for using --merge-into"
+                print >> sys.stderr, "ERROR: no action specified"
+                sys.exit(1)
+        elif getattr(options, 'append_path', None):
+            cli_append(options, getattr(options, 'append_path', None))
+        elif getattr(options, 'revise_path', None):
+            cli_revise(options, getattr(options, 'revise_path', None))
+        elif options.action == 'textify':
+            cli_textify(options)
+        elif getattr(options, 'action', None) == 'get-history':
+            cli_get_history(options)
+        elif getattr(options, 'action', None) == 'get-info':
+            cli_get_info(options)
+        elif getattr(options, 'action', None) == 'get-disk-usage':
+            cli_get_disk_usage(options)
+        elif getattr(options, 'action', None) == 'check-md5':
+            cli_check_md5(options)
+        elif getattr(options, 'action', None) == 'update-md5':
+            cli_update_md5(options)
+        elif getattr(options, 'action', None) == 'fix-all':
+            cli_fix_all(options)
+        elif getattr(options, 'action', None) == 'fix-marc':
+            cli_fix_marc(options)
+        elif getattr(options, 'action', None) == 'delete':
+            cli_delete(options)
+        elif getattr(options, 'action', None) == 'delete-file':
+            cli_delete_file(options)
+        elif getattr(options, 'action', None) == 'fix-duplicate-docnames':
+            cli_fix_duplicate_docnames(options)
+        elif getattr(options, 'action', None) == 'fix-format':
+            cli_fix_format(options)
+        elif getattr(options, 'action', None) == 'check-duplicate-docnames':
+            cli_check_duplicate_docnames(options)
+        elif getattr(options, 'action', None) == 'check-format':
+            cli_check_format(options)
+        elif getattr(options, 'action', None) == 'undelete':
+            cli_undelete(options)
+        elif getattr(options, 'action', None) == 'purge':
+            cli_purge(options)
+        elif getattr(options, 'action', None) == 'expunge':
+            cli_expunge(options)
+        elif getattr(options, 'action', None) == 'revert':
+            cli_revert(options)
+        elif getattr(options, 'action', None) == 'hide':
+            cli_hide(options)
+        elif getattr(options, 'action', None) == 'unhide':
+            cli_unhide(options)
         else:
-            print >> sys.stderr, "ERROR: Action %s is not valid" % options.action
+            print >> sys.stderr, "ERROR: Action %s is not valid" % getattr(options, 'action', None)
             sys.exit(1)
-    except InvenioWebSubmitFileError, e:
-        print >> sys.stderr, 'ERROR: Exception caught: %s' % e
+    except StandardError, e:
+        register_exception()
+        print >> sys.stderr, 'ERROR: %s' % e
         sys.exit(1)
 
 if __name__ == '__main__':

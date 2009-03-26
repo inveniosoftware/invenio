@@ -74,6 +74,7 @@ AC_ARG_WITH(openoffice-python, AC_HELP_STRING([--with-openoffice-python], [path 
 
 if test -z "$OPENOFFICE_PYTHON"; then
    OPENOFFICE_PYTHON=`locate -n 1 -r "o.*office/program/python$"`
+   OPENOFFICE_PYTHON="$PYTHON $OPENOFFICE_PYTHON"
    if test -n "$OPENOFFICE_PYTHON" && ($OPENOFFICE_PYTHON -c "import pyuno" 2> /dev/null); then
       AC_MSG_RESULT($OPENOFFICE_PYTHON)
    else

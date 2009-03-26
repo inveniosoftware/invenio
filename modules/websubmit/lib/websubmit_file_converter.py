@@ -30,7 +30,6 @@ from htmlentitydefs import entitydefs
 from optparse import OptionParser
 
 from invenio.hocrlib import create_pdf, extract_hocr
-from invenio.spellutils import get_spell_checker, spell_check
 from invenio.shellutils import escape_shell_arg, run_shell_command
 from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_PATH_ANY2DJVU, \
@@ -321,15 +320,9 @@ def guess_is_OCR_needed(input_file, ln='en'):
     Return True if OCR is needed, False if it's already
     possible to retrieve information from the document.
     """
-    output_file = convert_file(input_file, format='.txt', perform_ocr=False)
-    text = open(output_file).read()
-    os.remove(output_file)
-    if can_spell_check(ln):
-        text = spell_check(text, ln)
-        text = _RE_CLEAN_SPACES.sub(' ', text)
-        words = text.split(' ')
-        if len(words) > 100:
-            return False
+    ## FIXME: a way to understand if pdftotext has returned garbage
+    ## shuould be found. E.g. 1.0*len(text)/len(zlib.compress(text)) < 2.1
+    ## could be a good hint for garbage being found.
     return True
 
 def convert_file(input_file, output_file=None, format=None, **params):
