@@ -3770,6 +3770,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             # Print empty, but valid XML
             print_records_prologue(req, of)
             print_records_epilogue(req, of)
+            return page_end(req, of, ln)
         else:
             return page_end(req, of, ln)
 
