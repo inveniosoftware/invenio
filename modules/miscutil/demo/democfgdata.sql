@@ -2122,6 +2122,65 @@ INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('THESIS','phdthesis', '3');
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('POETRY','unpublished', '3');
 
+-- crcLIBRARY demo data:
+INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('CERN Library', 'CH-1211 Geneva 23', 'lib@cern.ch', '1234567', '');
+
+-- crcITEM demo data:
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-34001', '34', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-34002', '34', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-33001', '33', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-32001', '32', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-32002', '32', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-32003', '32', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-31001', '31', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-31002', '31', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-30001', '30', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-29001', '29', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-28001', '28', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-27001', '27', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-26001', '26', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-25001', '25', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-24001', '24', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-23001', '23', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-22001', '22', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-21001', '21', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+-- crcBORROWER demo data:
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Admin', 'admin@cds.cern.ch', '20003', '99-Z-019', '2008-07-21 00:00:00', '');
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Jekyll', 'jekyll@cds.cern.ch', '01234', '21-Z-019', '2008-07-21 00:00:00', '');
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Hyde', 'Hyde@cds.cern.ch', '01574', '22-Z-119', '2008-07-21 00:00:00', '');
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Dorian Gray', 'dorian.gray@cds.cern.ch', '33234', '38-Y-819', '2008-07-21 00:00:00', '');
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Romeo Montague', 'romeo.montague@cds.cern.ch', '93844', '98-W-859', '2008-07-21 00:00:00', '');
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Juliet Capulet', 'juliet.capulet@cds.cern.ch', '99874', '91-X-098', '2008-07-21 00:00:00', '');
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Benvolio Montague', 'benvolio.montague@cds.cern.ch', '32354', '93-P-019', '2008-07-21 00:00:00', '');
+INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)
+                VALUES ('Balthasar Montague', 'balthasar.montague@cds.cern.ch', '78644', '20-M-349', '2008-07-21 00:00:00', '');
+
 -- switch on stemming for some indexes:
 UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');
 
