@@ -31,64 +31,83 @@ from invenio.config import \
      CFG_SITE_LANG
 from invenio.dateutils import get_datetext
 import datetime
-from invenio.search_engine import get_fieldvalues
-
+from invenio.webuser import collect_user_info
+from invenio.mailutils import send_email
+from invenio.bibcirculation_utils import hold_request_mail, \
+     book_title_from_MARC, \
+     make_copy_available
+from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 
 def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
     """
+    Display Loans historical overview for user uid.
+
+    @param uid: user id
     @param ln: language of the page
     """
+    invenio_user_email = db.get_invenio_user_email(uid)
+    is_borrower = db.is_borrower(invenio_user_email)
+    result = db.get_historical_overview(is_borrower)
 
-    result = db.get_historical_overview(uid)
-
-    body = bibcirculation_templates.tmpl_loanshistoricaloverview(result=result, ln=ln)
+    body = bibcirculation_templates.tmpl_loanshistoricaloverview(result=result,
+                                                                 ln=ln)
 
     return body
 
 
-def perform_borrower_loans(uid, barcode, borrower, ln=CFG_SITE_LANG):
+def perform_borrower_loans(uid, barcode, borrower_id,
+                           request_id, ln=CFG_SITE_LANG):
     """
+    @param uid: user id
+    @param barcode: book's barcode
     @param ln: language of the page
     """
 
     infos = []
 
-    now = datetime.date.today()
-    year = now.year
-    month = now.month + 1
-    day = now.day
-    new_due_date = get_datetext(year, month, day)
+    is_borrower = db.is_borrower(db.get_invenio_user_email(uid))
+    loans = db.get_borrower_loans(is_borrower)
+    requests = db.get_borrower_requests(is_borrower)
+
+    tmp_date = datetime.date.today() + datetime.timedelta(days=30)
+    new_due_date = get_datetext(tmp_date.year, tmp_date.month, tmp_date.day)
 
     if barcode:
         recid = db.get_id_bibrec(barcode)
         queue = db.get_queue_request(recid)
-        title = ''.join(get_fieldvalues(recid, "245__a"))
 
         if len(queue) != 0:
-            infos.append("Sorry. It is not possible to renew your loan for "+title+". Another user is waiting for this book.")
+            infos.append("It is not possible to renew your loan for " \
+                         "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user " \
+                         "is waiting for this book.")
         else:
             db.update_due_date(barcode, new_due_date)
-            infos.append("Done!!!")
+            infos.append("Your loan has been renewed with sucess.")
 
-    elif borrower:
-        list_of_recids = db.get_recid_borrower_loans(borrower)
+    if request_id:
+        db.cancel_request(request_id, 'cancelled')
+        make_copy_available(request_id)
 
-
+    elif borrower_id:
+        list_of_recids = db.get_borrower_recids(borrower_id)
         for (recid) in list_of_recids:
-            recid = recid[0]
-            queue = db.get_queue_request(recid)
-            title = ''.join(get_fieldvalues(recid, "245__a"))
+            queue = db.get_queue_request(recid[0])
 
             if len(queue) != 0:
-                infos.append("Sorry. It is not possible to renew your loan for "+title+". Another user is waiting for this book.")
+                infos.append("It is not possible to renew your loan for " \
+                             "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user" \
+                             " is waiting for this book.")
             else:
-                db.update_recid_due_date_borrower(borrower, new_due_date, recid)
-                infos.append("Done :-) ")
+                db.update_recid_due_date_borrower(borrower_id,
+                                                  new_due_date,
+                                                  recid[0])
+        infos.append("All loans has been renewed with sucess.")
 
-    result = db.get_borrower_loans(uid)
-    #name = db.get_borrower_name(uid)
-
-    body = bibcirculation_templates.tmpl_yourloans(result=result, uid=uid, infos=infos, ln=ln)
+    body = bibcirculation_templates.tmpl_yourloans(loans=loans,
+                                                   requests=requests,
+                                                   borrower_id=is_borrower,
+                                                   infos=infos,
+                                                   ln=ln)
 
     return body
 
@@ -97,88 +116,45 @@ def perform_get_holdings_information(recid, ln=CFG_SITE_LANG):
     @param recid: recID - CDS Invenio record identifier
     @param ln: language of the page
     """
-    infos = []
 
-    nb_requests = db.get_number_requests(recid)
+    holdings_information = db.get_holdings_information(recid)
 
-    nb_copies = db.get_number_copies(recid)
-
-    hold_details = db.get_holdings_details(recid)
-    loan_details = db.get_loan_details(recid)
-
-    if len(loan_details) != 0:
-        for(barcod, stat) in loan_details:
-            barcode = barcod
-            status = stat
-        due_date = " - "
-        nb_requests = ""
-    else:
-        barcode = ""
-        status = "On loan"
-        title = ''.join(get_fieldvalues(recid, "245__a"))
-        due_date = db.get_due_date_loan(recid)
-        infos.append('Sorry. Actually, all copies of "' + repr(title) + '" are on loan. One copy should be available on ' + repr(due_date) + '.')
-        nb_requests = db.get_number_requests(recid)
-
-    body = bibcirculation_templates.tmpl_holdings_information(recid=recid,
-                                                              status=status,
-                                                              barcode=barcode,
-                                                              hold_details=hold_details,
-                                                              nb_requests=nb_requests,
-                                                              nb_copies=nb_copies,
-                                                              due_date=due_date,
-                                                              infos=infos,
-                                                              ln=ln)
-
+    body = bibcirculation_templates.tmpl_holdings_information2(recid=recid,
+                                                               holdings_info=holdings_information,
+                                                               ln=ln)
     return body
 
 
-def perform_get_pending_loan_request(ln=CFG_SITE_LANG):
+def perform_get_pending_request(ln=CFG_SITE_LANG):
     """
     @param ln: language of the page
     """
 
     status = db.get_pending_loan_request("pending")
 
-    body = bibcirculation_templates.tmpl_get_pending_loan_request(status=status,
+    body = bibcirculation_templates.tmpl_get_pending_request(status=status,
                                                                   ln=ln)
 
     return body
 
 
-def perform_new_loan_request(uid,
-                             recid,
-                             due_date,
-                             barcode,
-                             from_year=0,
-                             from_month=0,
-                             from_day=0,
-                             to_year=0,
-                             to_month=0,
-                             to_day=0,
-                             ln=CFG_SITE_LANG):
+def perform_new_request(uid, recid, barcode, ln=CFG_SITE_LANG):
     """
     @param recid: recID - CDS Invenio record identifier
     """
 
-    body = bibcirculation_templates.tmpl_new_loan_request(uid=uid,
-                                                          recid=recid,
-                                                          barcode=barcode,
-                                                          ln=ln)
+    body = bibcirculation_templates.tmpl_new_request(uid=uid,
+                                                     recid=recid,
+                                                     barcode=barcode,
+                                                     ln=ln)
 
     return body
 
 
-def perform_new_loan_request_send(uid,
-                                  recid,
-                                  barcode,
-                                  from_year=0,
-                                  from_month=0,
-                                  from_day=0,
-                                  to_year=0,
-                                  to_month=0,
-                                  to_day=0,
-                                  ln=CFG_SITE_LANG):
+def perform_new_request_send(uid, recid,
+                             from_year, from_month, from_day,
+                             to_year, to_month, to_day,
+                             barcode, ln=CFG_SITE_LANG):
 
     """
     @param recid: recID - CDS Invenio record identifier
@@ -188,18 +164,131 @@ def perform_new_loan_request_send(uid,
     request_from = get_datetext(from_year, from_month, from_day)
     request_to = get_datetext(to_year, to_month, to_day)
 
-    body = bibcirculation_templates.tmpl_new_loan_request_send(ln=ln)
+    nb_requests = db.get_number_requests_per_copy(barcode)
 
-    db.new_loan_request(uid=uid,
-                        recid=recid,
-                        barcode=barcode,
-                        date_from=request_from,
-                        date_to=request_to,
-                        status='pending',
-                        notes='')
+    if nb_requests == 0:
+        status = 'pending'
+    else:
+        status = 'waiting'
 
-    if barcode !="":
-        db.update_item_status('requested', barcode)
+    user = collect_user_info(uid)
+    is_borrower = db.is_borrower(user['email'])
+
+    if is_borrower != 0:
+        address = db.get_borrower_address(user['email'])
+        if address != 0:
+            message = "Your request has been registered and the " \
+                      "document will be sent to you via internal mail."
+            db.new_hold_request(is_borrower, recid, barcode,
+                                request_from, request_to,
+                                status)
+
+            db.update_item_status('requested', barcode)
+
+            send_email(fromaddr="CERN Library<library.desk@cern.ch>",
+                       toaddr='joaquim.rodrigues.silvestre@cern.ch',
+                       subject='Hold request for books confirmation',
+                       content=hold_request_mail(recid, is_borrower),
+                       header='',
+                       footer='',
+                       attempt_times=1,
+                       attempt_sleeptime=10
+                       )
+
+        else:
+            result = get_user_info_from_ldap(email=user['email'])
+
+            try:
+                ldap_address = result['physicalDeliveryOfficeName'][0]
+            except KeyError:
+                ldap_address = None
+
+            if ldap_address != None:
+                db.add_borrower_address(ldap_address, email)
+
+                message = "Your request has been registered and the document"\
+                          " will be sent to you via internal mail."
+
+                db.new_hold_request(is_borrower, recid, barcode,
+                                    request_from, request_to, status)
+
+                db.update_item_status('requested', barcode)
+
+                send_email(fromaddr="CERN Library<library.desk@cern.ch>",
+                       toaddr='joaquim.rodrigues.silvestre@cern.ch',
+                       subject='Hold request for books confirmation',
+                       content=hold_request_mail(recid, is_borrower),
+                       header='',
+                       footer='',
+                       attempt_times=1,
+                       attempt_sleeptime=10
+                       )
+
+            else:
+                message = "It is not possible to validate your request. "\
+                          "Your office address is not available. "\
+                          "Please contact ... "
+
+    else:
+        result = get_user_info_from_ldap(email=user['email'])
+
+        try:
+            name = result['cn'][0]
+        except KeyError:
+            name = None
+
+        try:
+            email = result['mail'][0]
+        except KeyError:
+            email = None
+
+        try:
+            phone = result['telephoneNumber'][0]
+        except KeyError:
+            phone = None
+
+        try:
+            address = result['physicalDeliveryOfficeName'][0]
+        except KeyError:
+            address = None
+
+        try:
+            mailbox = result['postOfficeBox'][0]
+        except KeyError:
+            mailbox = None
+
+        if address != None:
+            db.new_borrower(name, email, phone, address, mailbox, '')
+
+            is_borrower = db.is_borrower(email)
+
+            message = "Your request has been registered and the document"\
+                      " will be sent to you via internal mail."
+
+            db.new_hold_request(is_borrower, recid, barcode,
+                                request_from, request_to,
+                                status)
+
+            db.update_item_status('requested', barcode)
+
+            send_email(fromaddr="CERN Library<library.desk@cern.ch>",
+                       toaddr='joaquim.rodrigues.silvestre@cern.ch',
+                       subject='Hold request for books confirmation',
+                       content=hold_request_mail(recid, is_borrower),
+                       header='',
+                       footer='',
+                       attempt_times=1,
+                       attempt_sleeptime=10
+                       )
+
+        else:
+            message = "It is not possible to validate your request. "\
+                      "Your office address is not available."\
+                      " Please contact ... "
+
+
+    body = bibcirculation_templates.tmpl_new_request_send(message=message,
+                                                          ln=ln)
 
     return body
 

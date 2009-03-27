@@ -1,3 +1,5 @@
+## $Id: Makefile.am,v 1.4 2008/08/25 13:23:38 joaquim Exp $
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -9,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -24,7 +26,9 @@ pylib_DATA = bibcirculation.py \
              bibcirculation_dblayer.py \
 	     bibcirculation_config.py \
 	     bibcirculation_daemon.py \
-	     bibcirculation_utils.py	
+	     bibcirculation_utils.py \
+	     bibcirculation_cern_ldap.py \
+             bibcirculation_regression_tests.py	 
 
 EXTRA_DIST = $(pylib_DATA)
 

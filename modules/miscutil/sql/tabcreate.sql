@@ -3139,100 +3139,105 @@ CREATE TABLE IF NOT EXISTS hstDOCUMENT (
 
 -- tables of BibCirculation Module
 
-CREATE TABLE IF NOT EXISTS crcBORROWER(
-        id int(15) unsigned NOT NULL AUTO_INCREMENT,
-        name VARCHAR(255) NOT NULL DEFAULT '' ,
-	email VARCHAR(255) NOT NULL DEFAULT '',
-	phone int(15) unsigned NOT NULL DEFAULT '0',
-	adress VARCHAR(15) NOT NULL DEFAULT '',
-	borrower_since datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	borrower_until datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	notes text DEFAULT NULL,
-	PRIMARY KEY(id)
-        )TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS crcBORROWER (
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(255) NOT NULL default '',
+  email varchar(255) NOT NULL default '',
+  phone int(15) unsigned NOT NULL default '0',
+  address varchar(60) NOT NULL default '',
+  mailbox varchar(30) NOT NULL default '',
+  borrower_since datetime NOT NULL default '0000-00-00 00:00:00',
+  borrower_until datetime NOT NULL default '0000-00-00 00:00:00',
+  notes text,
+  PRIMARY KEY (id)
+) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS crcLOANREQUEST(
-        id int(15) unsigned NOT NULL AUTO_INCREMENT,
-	id_crcBORROWER int(15) unsigned NOT NULL,
-	id_bibrec int(15) unsigned NOT NULL,
-	barcode VARCHAR(30) NOT NULL DEFAULT '',
-	request_date_from datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	request_date_to datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	status VARCHAR(20) NOT NULL DEFAULT '',
-	notes text DEFAULT NULL,
-	PRIMARY KEY (id),
-	KEY id_crcborrower (id_crcBORROWER),
-	KEY id_bibrec (id_bibrec),
-	KEY barcode (barcode)
-	)TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS crcILLREQUEST (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_crcBORROWER int(15) unsigned NOT NULL default '0',
+  barcode varchar(30) NOT NULL default '',
+  request_date_from datetime NOT NULL default '0000-00-00 00:00:00',
+  request_date_to datetime NOT NULL default '0000-00-00 00:00:00',
+  status varchar(20) NOT NULL default '',
+  cost decimal(10,0) NOT NULL default '0',
+  notes text,
+  PRIMARY KEY (id),
+  KEY id_crcborrower (id_crcBORROWER),
+  KEY barcode (barcode)
+) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS crcILLREQUEST(
-        id int(15) unsigned NOT NULL AUTO_INCREMENT,
-	id_crcBORROWER int(15) unsigned NOT NULL,
-	barcode VARCHAR(30) NOT NULL,
-	request_date_from datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	request_date_to datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	status VARCHAR(20) NOT NULL DEFAULT '',
-	cost decimal NOT NULL DEFAULT '0.0',
-	notes text DEFAULT NULL,
-	PRIMARY KEY (id),
-	KEY id_crcborrower (id_crcborrower),
-	KEY barcode (barcode)
-	)TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS  crcLOANREQUEST (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_crcBORROWER int(15) unsigned NOT NULL default '0',
+  id_bibrec int(15) unsigned NOT NULL default '0',
+  barcode varchar(30) NOT NULL default '',
+  period_of_interest_from datetime NOT NULL default '0000-00-00 00:00:00',
+  period_of_interest_to datetime NOT NULL default '0000-00-00 00:00:00',
+  status varchar(20) NOT NULL default '',
+  notes text,
+  request_date datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY (id),
+  KEY id_crcborrower (id_crcBORROWER),
+  KEY id_bibrec (id_bibrec),
+  KEY barcode (barcode)
+) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS crcLOAN(
-        id int(15) unsigned NOT NULL AUTO_INCREMENT,
-	id_crcBORROWER int(15) unsigned NOT NULL,
-	id_bibrec int(15) unsigned NOT NULL,
-	barcode VARCHAR(30) NOT NULL,
-	loaned_on datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	returned_on date NOT NULL DEFAULT '0000-00-00',
-	due_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	number_of_renewals int(3) unsigned NOT NULL DEFAULT '0',
-	overdue_letter_number int(3) unsigned NOT NULL DEFAULT '0',
-	overdue_letter_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	status VARCHAR(20) NOT NULL DEFAULT '',
-	type VARCHAR(20) NOT NULL DEFAULT '',
-	notes text DEFAULT NULL,
-	PRIMARY KEY (id),
-	KEY id_crcborrower (id_crcBORROWER),
-	KEY id_bibrec (id_bibrec),
-	KEY barcode (barcode)
-	)TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS crcITEM (
+  barcode varchar(30) NOT NULL default '',
+  id_bibrec int(15) unsigned NOT NULL default '0',
+  id_crcLIBRARY int(15) unsigned NOT NULL default '0',
+  collection varchar(60) default NULL,
+  location varchar(60) default NULL,
+  description varchar(60) default NULL,
+  loan_period varchar(30) NOT NULL default '',
+  status varchar(20) NOT NULL default '',
+  creation_date datetime NOT NULL default '0000-00-00 00:00:00',
+  modification_date datetime NOT NULL default '0000-00-00 00:00:00',
+  number_of_requests int(3) unsigned NOT NULL default '0',
+  PRIMARY KEY (barcode),
+  KEY id_bibrec (id_bibrec),
+  KEY id_crclibrary (id_crcLIBRARY)
+) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS crcITEM(
-	barcode VARCHAR(30) NOT NULL,
-	id_bibrec int(15) unsigned NOT NULL,
-	id_crcLIBRARY int(15) unsigned NOT NULL,
-	loan_period VARCHAR(30) NOT NULL DEFAULT '',
-	status VARCHAR(20) NOT NULL DEFAULT '',
-	creation_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	modification_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	number_of_requests int(3) unsigned NOT NULL DEFAULT '0',
-	PRIMARY KEY (barcode),
-	KEY id_bibrec (id_bibrec),
-	KEY id_crclibrary (id_crcLIBRARY)
-	)TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS crcLIBRARY (
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(80) NOT NULL default '',
+  address varchar(255) NOT NULL default '',
+  email varchar(255) NOT NULL default '',
+  phone varchar(30) NOT NULL default '',
+  notes text,
+  PRIMARY KEY (id)
+) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS crcPURCHASE(
-	id_bibrec int(15) unsigned NOT NULL,
-	date_ordered datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	shop VARCHAR(50) NOT NULL DEFAULT '',
-	price decimal NOT NULL DEFAULT '0.0',
-	status VARCHAR(20) NOT NULL DEFAULT '',
-	notes text DEFAULT NULL,
-	KEY id_bibrec (id_bibrec)
-	)TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS crcLOAN (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_crcBORROWER int(15) unsigned NOT NULL default '0',
+  id_bibrec int(15) unsigned NOT NULL default '0',
+  barcode varchar(30) NOT NULL default '',
+  loaned_on datetime NOT NULL default '0000-00-00 00:00:00',
+  returned_on date NOT NULL default '0000-00-00',
+  due_date datetime NOT NULL default '0000-00-00 00:00:00',
+  number_of_renewals int(3) unsigned NOT NULL default '0',
+  overdue_letter_number int(3) unsigned NOT NULL default '0',
+  overdue_letter_date datetime NOT NULL default '0000-00-00 00:00:00',
+  status varchar(20) NOT NULL default '',
+  type varchar(20) NOT NULL default '',
+  notes text,
+  PRIMARY KEY (id),
+  KEY id_crcborrower (id_crcBORROWER),
+  KEY id_bibrec (id_bibrec),
+  KEY barcode (barcode)
+) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS crcLIBRARY(
-	id int(15) unsigned NOT NULL AUTO_INCREMENT,
-	name VARCHAR(80) NOT NULL DEFAULT '',
-	address VARCHAR(255) NOT NULL DEFAULT '',
-	email VARCHAR(255) NOT NULL DEFAULT '',
-	phone VARCHAR(30) NOT NULL DEFAULT '',
-	notes text DEFAULT NULL,
-	PRIMARY KEY (id)
-	)TYPE=MyISAM;
+CREATE TABLE IF NOT EXISTS crcPURCHASE (
+  id_bibrec int(15) unsigned NOT NULL default '0',
+  date_ordered datetime NOT NULL default '0000-00-00 00:00:00',
+  shop varchar(50) NOT NULL default '',
+  price decimal(10,0) NOT NULL default '0',
+  status varchar(20) NOT NULL default '',
+  notes text,
+  KEY id_bibrec (id_bibrec)
+) TYPE=MyISAM;
 
 -- BibExport tables:
 

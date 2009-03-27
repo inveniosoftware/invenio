@@ -51,8 +51,8 @@ websearch_templates = invenio.template.load('websearch')
 
 # bibcirculation imports
 bibcirculation_templates = invenio.template.load('bibcirculation')
-from invenio.bibcirculation import perform_new_loan_request, \
-                                   perform_new_loan_request_send, \
+from invenio.bibcirculation import perform_new_request, \
+                                   perform_new_request_send, \
                                    perform_get_holdings_information, \
                                    perform_borrower_loans, \
                                    perform_loanshistoricaloverview
@@ -66,7 +66,8 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/yourloans/display?%s" % (CFG_SITE_URL, req.args))
+        redirect_to_url(req, "%s/yourloans/display?%s" % (CFG_SITE_URL,
+                                                          req.args))
 
     def display(self, req, form):
         """
@@ -74,15 +75,16 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
         @param ln:  language
         @return the page for inbox
         """
-        argd = wash_urlargd(form, {'barcode': (str, ""),
-                                   'borrower': (int, 0)})
 
+        argd = wash_urlargd(form, {'barcode': (str, ""),
+                                   'borrower_id': (int, 0),
+                                   'request_id': (int, 0)})
 
         # Check if user is logged
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourloans/display" % \
-                                             (CFG_SITE_URL,),
+                                       (CFG_SITE_URL,),
                                        navmenuid="yourloans")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
@@ -102,7 +104,8 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
         body = perform_borrower_loans(uid=uid,
                                       barcode=argd['barcode'],
-                                      borrower=argd['borrower'],
+                                      borrower_id=argd['borrower_id'],
+                                      request_id=argd['request_id'],
                                       ln=argd['ln'])
 
         return page(title       = _("Your Loans"),
@@ -115,7 +118,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
     def loanshistoricaloverview(self, req, form):
         """
-
+        Show loans historical overview.
         """
 
         argd = wash_urlargd(form, {})
@@ -124,7 +127,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourloans/loanshistoricaloverview" % \
-                                             (CFG_SITE_URL,),
+                                       (CFG_SITE_URL,),
                                        navmenuid="yourloans")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
@@ -167,11 +170,12 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         """
         Redirects to display function
         """
+
         return self.display(req, form)
 
     def display(self, req, form):
         """
-
+        Show the tab 'holdings'.
         """
 
         argd = wash_urlargd(form, {'do': (str, "od"),
@@ -223,7 +227,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                                                      tabs,
                                                                      argd['ln'])
 
-        title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
+        title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
         navtrail += title
@@ -248,43 +252,18 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
     def request(self, req, form):
         """
-
+        Show new hold request form.
         """
-
-        #raise repr(form)
-        # Copy of webcomment
-
-        argd = wash_urlargd(form, {'due_date': (str, ""),
-                                   'barcode': (str, ""),
-                                   'from_year': (int, 0),
-                                   'from_month': (int, 0),
-                                   'from_day': (int, 0),
-                                   'to_year': (int, 0),
-                                   'to_month': (int, 0),
-                                   'to_day': (int, 0),
-                                   })
-        uid = getUid(req)
-
-        #due_date=argd['due_date'],
-
-       # raise repr(form)
-
-        body = perform_new_loan_request(recid=self.recid,
-                                        uid=uid,
-                                        due_date=argd['due_date'],
-                                        barcode=argd['barcode'],
-                                        from_year=argd['from_year'],
-                                        from_month=argd['from_month'],
-                                        from_day=argd['from_day'],
-                                        to_year=argd['to_year'],
-                                        to_month=argd['to_month'],
-                                        to_day=argd['to_day'],
-                                        ln=argd['ln'])
-
+        argd = wash_urlargd(form, {'ln': (str, ""), 'barcode': (str, "")})
 
         _ = gettext_set_language(argd['ln'])
+        uid = getUid(req)
 
-        #"""
+        body = perform_new_request(recid=self.recid,
+                                   uid=uid,
+                                   barcode=argd['barcode'],
+                                   ln=argd['ln'])
+
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../holdings/request",
@@ -300,9 +279,6 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                         self.recid,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
-
-        #"""
-
 
 
         user_info = collect_user_info(req)
@@ -340,7 +316,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                                                      tabs,
                                                                      argd['ln'])
 
-        title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
+        title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
         navtrail += title
@@ -364,31 +340,30 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
     def send(self, req, form):
         """
-
+        Create a new hold request.
         """
 
-        argd = wash_urlargd(form, {'barcode': (str, ""),
-                                   'from_year': (int, 0),
+        argd = wash_urlargd(form, {'from_year': (int, 0),
                                    'from_month': (int, 0),
                                    'from_day': (int, 0),
                                    'to_year': (int, 0),
                                    'to_month': (int, 0),
                                    'to_day': (int, 0),
+                                   'barcode': (str, "")
                                    })
 
-        #raise repr(form)
 
         uid = getUid(req)
 
-        body = perform_new_loan_request_send(recid=self.recid,
+        body = perform_new_request_send(recid=self.recid,
                                              uid=uid,
-                                             barcode=argd['barcode'],
                                              from_year=argd['from_year'],
                                              from_month=argd['from_month'],
                                              from_day=argd['from_day'],
                                              to_year=argd['to_year'],
                                              to_month=argd['to_month'],
                                              to_day=argd['to_day'],
+                                             barcode=argd['barcode'],
                                              ln=argd['ln'])
 
 
@@ -430,7 +405,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                                                      tabs,
                                                                      argd['ln'])
 
-        title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
+        title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
         navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
         navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
         navtrail += title

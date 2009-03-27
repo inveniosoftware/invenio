@@ -18,10 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-bibcirculation config file, here you can manage
+bibcirculation config file
 """
 
 __revision__ = "$Id$"
+
 
 # templates used to notify borrowers
 CFG_BIBCIRCULATION_TEMPLATES = {
@@ -30,4 +31,8 @@ CFG_BIBCIRCULATION_TEMPLATES = {
     'NOTIFICATION': 'Notification letter template (write some text)',
     'EMPTY': 'Please choose one template'
 }
+
+ACCESS_KEY = '1T6P3M3TDMW9HWJ212R2'
+
+USER_ON_CERN_LDAP = 'true'
 
