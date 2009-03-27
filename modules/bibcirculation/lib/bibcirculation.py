@@ -98,10 +98,9 @@ def perform_borrower_loans(uid, barcode, borrower_id,
                              "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user" \
                              " is waiting for this book.")
             else:
-                db.update_recid_due_date_borrower(borrower_id,
-                                                  new_due_date,
-                                                  recid[0])
-        infos.append("All loans has been renewed with sucess.")
+                db.update_due_date_borrower(borrower_id,
+                                            new_due_date)
+        infos.append("All loans have been renewed with success.")
 
     body = bibcirculation_templates.tmpl_yourloans(loans=loans,
                                                    requests=requests,
