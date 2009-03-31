@@ -468,12 +468,25 @@ def get_nicely_ordered_collection_list(collid=1, level=0, ln=CFG_SITE_LANG):
     return colls_nicely_ordered
 
 def get_index_id_from_field(field):
-    """Returns first index id where the field code FIELD is indexed.
-       Returns zero in case there is no table for this index.
-       Example: field='author', output=4."""
+    """
+    Return index id with name corresponding to FIELD, or the first
+    index id where the logical field code named FIELD is indexed.
+
+    Return zero in case there is no index defined for this field.
+
+    Example: field='author', output=4.
+    """
     out = 0
     if field == '':
-        field = 'anyfield' # empty string field means 'anyfield'
+        field = 'global' # empty string field means 'global' index (field 'anyfield')
+
+    # first look in the index table:
+    res = run_sql("""SELECT id FROM idxINDEX WHERE name=%s""", (field,))
+    if res:
+        out = res[0][0]
+        return out
+
+    # not found in the index table, now look in the field table:
     res = run_sql("""SELECT w.id FROM idxINDEX AS w, idxINDEX_field AS wf, field AS f
                       WHERE f.code=%s AND wf.id_field=f.id AND w.id=wf.id_idxINDEX
                       LIMIT 1""", (field,))
