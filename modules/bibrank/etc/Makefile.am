@@ -33,7 +33,10 @@ etc_DATA = bibrankgkb.cfg \
            template_single_tag_rank_method.cfg \
            template_word_similarity.cfg \
            wrd.cfg \
-           citation.cfg
+           citation.cfg \
+           citerank_citation_t.cfg \
+           citerank_pagerank_c.cfg \
+           citerank_pagerank_t.cfg
 
 EXTRA_DIST = bibrankgkb.cfg.in \
              bibrankgkb_jif_conv.kb \
@@ -51,6 +54,9 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              template_single_tag_rank_method.cfg.in \
              template_word_similarity.cfg \
              wrd.cfg \
-             citation.cfg
+             citation.cfg \
+             citerank_citation_t.cfg \
+             citerank_pagerank_c.cfg \
+             citerank_pagerank_t.cfg
 
 CLEANFILES = *~ *.tmp
