@@ -59,13 +59,13 @@ MAXSELECTUSERS = 25
 # max number of users to display in a page (mainly for user area)
 MAXPAGEUSERS = 25
 
-""" Source of the default role definition"""
+# default role definition, source:
 CFG_ACC_EMPTY_ROLE_DEFINITION_SRC = 'deny all'
 
-""" Compiled default role definition"""
+# default role definition, compiled:
 CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ = (False, False, ())
 
-""" Serialized compiled default role definition"""
+# default role definition, compiled and serialized:
 CFG_ACC_EMPTY_ROLE_DEFINITION_SER = None
 
 # List of tags containing (multiple) emails of users who should authorize
