@@ -123,7 +123,7 @@ def Display_File_List(bibrecdocs):
             for bibdoc in bibdocs:
                 if mytype == bibdoc.get_type():
                     t+="<table cellpadding=0 cellspacing=1 border=0><tr><td bgcolor=\"white\">"
-                    t+="<center><input type=radio name=mybibdocname value=%s><br /><br /><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/img/smallbin.gif border=0 align=center></a><br /></small></center>" % (bibdoc.get_docname(),bibdoc.get_docname(),CFG_SITE_URL)
+                    t+="<center><input type=radio name=mybibdocname value=%s><br /><br /><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';user_must_confirm_before_leaving_page = false;document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/img/smallbin.gif border=0 align=center></a><br /></small></center>" % (bibdoc.get_docname(),bibdoc.get_docname(),CFG_SITE_URL)
                     t+="</td><td>"
                     t+=bibdoc.display()
                     t+="</td></tr></table>"
@@ -219,6 +219,7 @@ function step2()
       if(confirm(\"You are about to submit the files and end the upload process.\"))
       {
           document.forms[0].step.value = 2;
+          user_must_confirm_before_leaving_page = false;
           document.forms[0].submit();
       }
     return true;

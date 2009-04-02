@@ -634,6 +634,8 @@ def interface(req,
           mainmenu = mainmenu,
          )
 
+    t += websubmit_templates.tmpl_page_do_not_leave_submission_js(ln)
+
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
@@ -643,6 +645,7 @@ def interface(req,
                    'docname' : docname,
                    'ln' : ln
                  }
+
     return page(title= actname,
                 body = t,
                 navtrail = p_navtrail,
@@ -1037,6 +1040,9 @@ def endaction(req,
           function_content = function_content,
           next_action = next_action,
         )
+
+    if not finished:
+        t += websubmit_templates.tmpl_page_do_not_leave_submission_js(ln)
 
     # start display:
     req.content_type = "text/html"

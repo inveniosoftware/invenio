@@ -25,6 +25,16 @@ test = "FALSE"
 ## CC all action confirmation mails to administrator? (0 == NO; 1 == YES)
 CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN = 0
 
+## During submission, warn user if she is going to leave the
+## submission by following some link on the page?
+## Does not work with Opera and Konqueror.
+## This requires all submission functions to set Javascript variable
+## 'user_must_confirm_before_leaving_page' to 'false' before
+## programmatically submitting a form , or else users will be asked
+## confirmation after each submission step.
+## (0 == NO; 1 == YES)
+CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION = 0
+
 class InvenioWebSubmitFunctionError(Exception):
     """This exception should only ever be raised by WebSubmit functions.
        It will be caught and handled by the WebSubmit core itself.

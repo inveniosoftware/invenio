@@ -40,6 +40,7 @@ CFG_MSG_USER_NOT_AUTHORIZED = """
    document.forms[0].action="/submit";
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
+   user_must_confirm_before_leaving_page = false;
    document.forms[0].submit();
    alert('You are neither owner, nor curator of this record. You are not authorized to modify it.');
 </SCRIPT>"""

@@ -197,7 +197,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
                 text = "%s: unknown field type" % field
             t = t + "<small>%s</small>" % text
     # output some more text
-    t = t + "<br /><br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;document.forms[0].submit();\"></small></CENTER></H4>"
+    t = t + "<br /><br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;user_must_confirm_before_leaving_page = false;document.forms[0].submit();\"></small></CENTER></H4>"
     # Flag File to be written if first call to page, which tells function that if page is reloaded,
     # it should get field values from text files in curdir, instead of from DB record:
     if not os.path.exists("%s/%s" % (curdir, "Create_Modify_Interface_DONE")):

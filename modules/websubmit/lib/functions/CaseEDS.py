@@ -66,6 +66,7 @@ def CaseEDS(parameters, curdir, form, user_info=None):
 <SCRIPT LANGUAGE="JavaScript1.1">
     document.forms[0].action="/submit";
     document.forms[0].step.value=%s;
+    user_must_confirm_before_leaving_page = false;
     document.forms[0].submit();
 </SCRIPT>""" % nextstep
         raise InvenioWebSubmitFunctionStop(t)

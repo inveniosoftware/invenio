@@ -37,6 +37,8 @@ from invenio.dateutils import convert_datetext_to_dategui
 from invenio.urlutils import create_html_link
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.htmlutils import escape_html
+from websubmit_config import \
+     CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION
 import invenio.template
 
 class Template:
@@ -482,7 +484,7 @@ class Template:
             if i == int(curpage):
                 out += """<td class="submitCurrentPage"><small>&nbsp;page: %s&nbsp;</small></td>""" % curpage
             else:
-                out += """<td class="submitPage"><small>&nbsp;<a href='' onclick="if (tester2() == 1){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else { return false; }">%s</a>&nbsp;</small></td>""" % (i, i)
+                out += """<td class="submitPage"><small>&nbsp;<a href='' onclick="if (tester2() == 1){document.forms[0].curpage.value=%s;user_must_confirm_before_leaving_page = false;document.forms[0].submit();return false;} else { return false; }">%s</a>&nbsp;</small></td>""" % (i, i)
         out += """        <td class="submitEmptyPage">&nbsp;&nbsp;
                         </td></tr></table>
                     </td>
@@ -529,7 +531,7 @@ class Template:
         out += """<tr><td colspan="5"><table border="0" cellpadding="0" cellspacing="0" width="100%%"><tr>"""
         if int(curpage) != 1:
             out += """ <td class="submitHeader" align="left">&nbsp;
-                         <a href='' onclick="if (tester2() == 1) {document.forms[0].curpage.value=%(prpage)s;document.forms[0].submit();return false;} else { return false; }">
+                         <a href='' onclick="if (tester2() == 1) {document.forms[0].curpage.value=%(prpage)s;user_must_confirm_before_leaving_page = false;document.forms[0].submit();return false;} else { return false; }">
                            <img src="%(images)s/left-trans.gif" alt="%(prevpage)s" border="0" />
                              <strong><font color="white">%(prevpage)s</font></strong>
                          </a>
@@ -549,7 +551,7 @@ class Template:
         # Display the "next page" navigation arrow
         if int(curpage) != int(nbpages):
             out += """ <td class="submitHeader" align="right">
-                         <a href='' onclick="if (tester2()){document.forms[0].curpage.value=%(nxpage)s;document.forms[0].submit();return false;} else {return false;}; return false;">
+                         <a href='' onclick="if (tester2()){document.forms[0].curpage.value=%(nxpage)s;user_must_confirm_before_leaving_page = false;document.forms[0].submit();return false;} else {return false;}; return false;">
                           <strong><font color="white">%(nextpage)s</font></strong>
                           <img src="%(images)s/right-trans.gif" alt="%(nextpage)s" border="0" />
                         </a>
@@ -565,7 +567,7 @@ class Template:
 
                   <br />
                   <br />
-                 <a href="%(mainmenu)s" onclick="return confirm('%(surequit)s')">
+                 <a href="%(mainmenu)s" onclick="if (%(check_not_already_enabled)s){return confirm('%(surequit)s')}">
                  <img src="%(images)s/mainmenu.gif" border="0" alt="%(back)s" align="right" /></a>
                  <br /><br />
                  <hr />
@@ -573,6 +575,7 @@ class Template:
                   <small>%(explain_summary)s</small><br />
                """ % {
                  'surequit' : _("Are you sure you want to quit this submission?"),
+                 'check_not_already_enabled': CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION and 'false' or 'true',
                  'back' : _("Back to main menu"),
                  'mainmenu' : cgi.escape(mainmenu),
                  'images' : CFG_SITE_URL + '/img',
@@ -791,7 +794,7 @@ class Template:
                                 el.checked=true;
                               }""" % {
                                 'fieldname' : fieldname,
-                                'text' : cgi.escape(str(text)),
+                                'text' : cgi.escape(str(text)).replace('"', '\\"'),
                               }
                 elif upload[i] == 0:
                     text = text.replace('"','\"')
@@ -802,7 +805,7 @@ class Template:
                                el.value="%(text)s";
                            """ % {
                              'fieldname' : fieldname,
-                             'text' : cgi.escape(str(text)),
+                             'text' : cgi.escape(str(text)).replace('"', '\\"'),
                            }
         out += """<!--End Fill in section-->
                """
@@ -818,6 +821,7 @@ class Template:
             if returnto:
                 out += """alert ("%(msg)s");
                           document.forms[0].curpage.value="%(page)s";
+                          user_must_confirm_before_leaving_page = false;
                           document.forms[0].submit();
                          }
                        """ % {
@@ -830,12 +834,45 @@ class Template:
                 out += """ if (tester2()) {
                              document.forms[0].action="/submit";
                              document.forms[0].step.value=1;
+                             user_must_confirm_before_leaving_page = false;
                              document.forms[0].submit();
                            } else {
                              return false;
                            }
                          }"""
         out += """</script>"""
+        return out
+
+    def tmpl_page_do_not_leave_submission_js(self, ln):
+        """
+        Code to ask user confirmation when leaving the page, so that the
+        submission is not interrupted by mistake.
+
+        All submission functions should set the Javascript variable
+        'user_must_confirm_before_leaving_page' to 'false' before
+        programmatically submitting the submission form.
+
+        Parameters:
+        - 'ln' *string* - The language to display the interface in
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = '''
+        <script language="JavaScript">
+            var user_must_confirm_before_leaving_page = %s;
+
+            window.onbeforeunload = confirmExit;
+            function confirmExit() {
+            if (user_must_confirm_before_leaving_page)
+                return "%s";
+            }
+
+        </script>
+        ''' % (CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION and 'true' or 'false',
+               _('Your modifications will not be saved.').replace('"', '\\"'))
+
         return out
 
     def tmpl_page_endaction(self, ln, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, mainmenu, finished, function_content, next_action):
@@ -880,7 +917,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-          <form ENCTYPE="multipart/form-data" action="/submit" method="post">
+          <form ENCTYPE="multipart/form-data" action="/submit" onsubmit="user_must_confirm_before_leaving_page=false;" method="post">
           <input type="hidden" name="nextPg" value="%(nextPg)s" />
           <input type="hidden" name="startPg" value="%(startPg)s" />
           <input type="hidden" name="access" value="%(access)s" />
@@ -930,7 +967,7 @@ class Template:
         else:
             for i in range(1, nbpages + 1):
                 out += """<td class="submitPage"><small>&nbsp;
-                            <a href='' onclick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;document.forms[0].submit();return false;">%s</a>&nbsp;</small></td>""" % (i,i)
+                            <a href='' onclick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;user_must_confirm_before_leaving_page = false;document.forms[0].submit();return false;">%s</a>&nbsp;</small></td>""" % (i,i)
             out += """<td class="submitCurrentPage">%(end_action)s</td><td class="submitEmptyPage">&nbsp;&nbsp;</td></tr></table></td>
                       <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
                         'end_action' : _("end of action"),
@@ -972,13 +1009,14 @@ class Template:
         <br />"""
         # Add the "back to main menu" button
         if finished == 0:
-            out += """ <a href="%(mainmenu)s" onclick="return confirm('%(surequit)s')">
+            out += """ <a href="%(mainmenu)s" onclick="if (%(check_not_already_enabled)s){return confirm('%(surequit)s')}">
                        <img src="%(images)s/mainmenu.gif" border="0" alt="%(back)s" align="right" /></a>
                        <br /><br />""" % {
                            'surequit' : _("Are you sure you want to quit this submission?"),
                            'back' : _("Back to main menu"),
                            'images' : CFG_SITE_URL + '/img',
-                           'mainmenu' : cgi.escape(mainmenu)
+                           'mainmenu' : cgi.escape(mainmenu),
+                           'check_not_already_enabled': CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION and 'false' or 'true',
                            }
         else:
             out += """ <a href="%(mainmenu)s">
@@ -1086,7 +1124,7 @@ class Template:
             if i > 0:
                 out += " <b>" + _("or") + "</b> "
             i += 1
-            out += """<li><a href="" onclick="document.forms[0].action='/submit';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';document.forms[0].submit();return false;"> %(name)s </a></li>""" % action
+            out += """<li><a href="" onclick="document.forms[0].action='/submit';document.forms[0].curpage.value='%(page)s';document.forms[0].startPg.value='%(page)s';document.forms[0].act.value='%(action)s';document.forms[0].doctype.value='%(doctype)s';document.forms[0].indir.value='%(nextdir)s';document.forms[0].access.value='%(access)s';document.forms[0].fromdir.value='%(indir)s';user_must_confirm_before_leaving_page = falsedocument.forms[0].submit();return false;"> %(name)s </a></li>""" % action
 
         out += "</ul>"
         return out

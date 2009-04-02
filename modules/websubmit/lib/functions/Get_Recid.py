@@ -34,6 +34,7 @@ CFG_ALERT_DOCUMENT_NOT_FOUND = """\n<script type="text/javascript">
 document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
 document.forms[0].step.value=0;
+user_must_confirm_before_leaving_page = false;
 document.forms[0].submit();
 alert('The document with report-number [%s] cannot be found in our """ \
 """database.\\nPerhaps it has not yet been integrated?\\nYou can choose """ \
@@ -45,6 +46,7 @@ CFG_ALERT_MULTIPLE_DOCUMENTS_FOUND = """\n<script type="text/javascript">
 document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
 document.forms[0].step.value=0;
+user_must_confirm_before_leaving_page = false;
 document.forms[0].submit();
 alert('Multiple documents with the report number [%s] have been found.\\n""" \
 """You can choose another report number or retry this action in a few """ \
