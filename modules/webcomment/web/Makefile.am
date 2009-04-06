@@ -16,3 +16,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 SUBDIRS = admin
+
+testdir = $(libdir)/webtest/invenio
+
+test_DATA = test_comment_add.html test_review_add.html
+
+EXTRA_DIST = $(test_DATA)
+
+CLEANFILES = *~ *.tmp
