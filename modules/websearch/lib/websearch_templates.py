@@ -1659,7 +1659,7 @@ class Template:
         out = """<table class="searchresultsbox">
               <thead>
                <tr>
-                <th class="searchresultsboxheader" style="text-align: right;">
+                <th class="searchresultsboxheader" style="text-align: right;" width="15">
                   %(hits)s
                 </th>
                 <th class="searchresultsboxheader" width="15">
