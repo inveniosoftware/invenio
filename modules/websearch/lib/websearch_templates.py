@@ -1390,8 +1390,13 @@ class Template:
             body += '''
             <tr>
               <td class="latestadditionsboxtimebody">%(date)s</td>
-              <td class="latestadditionsboxrecordbody">%(body)s</td>
-            </tr>''' % {'date': recid['date'],
+              <td class="latestadditionsboxrecordbody">
+                <abbr class="unapi-id" title="%(recid)s"></abbr>
+                %(body)s
+              </td>
+            </tr>''' % {
+                        'recid': recid['id'],
+                        'date': recid['date'],
                         'body': recid['body']
                       }
         body += "</table>"
