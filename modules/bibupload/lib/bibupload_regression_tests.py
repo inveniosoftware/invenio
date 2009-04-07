@@ -338,21 +338,21 @@ class BibUploadCorrectModeTest(unittest.TestCase):
         <record>
         <controlfield tag="001">123456789</controlfield>
         <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1=" " ind2=" ">
-          <subfield code="a">Test, Jane</subfield>
-          <subfield code="u">Test Institute</subfield>
-         </datafield>
-         <datafield tag="100" ind1="4" ind2="7">
-          <subfield code="a">Test, John</subfield>
-          <subfield code="u">Test University</subfield>
-         </datafield>
-         <datafield tag="100" ind1="4" ind2="8">
-          <subfield code="a">Cool</subfield>
-         </datafield>
-         <datafield tag="100" ind1="4" ind2="7">
-          <subfield code="a">Test, Jim</subfield>
-          <subfield code="u">Test Laboratory</subfield>
-         </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+         <subfield code="a">Test, Jane</subfield>
+         <subfield code="u">Test Institute</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, John</subfield>
+         <subfield code="u">Test University</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="8">
+         <subfield code="a">Cool</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, Jim</subfield>
+         <subfield code="u">Test Laboratory</subfield>
+        </datafield>
         </record>
         """
         self.testrec1_hm = """
@@ -366,35 +366,35 @@ class BibUploadCorrectModeTest(unittest.TestCase):
         self.testrec1_xm_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
-         <datafield tag="100" ind1="4" ind2="7">
-          <subfield code="a">Test, Joseph</subfield>
-          <subfield code="u">Test Academy</subfield>
-         </datafield>
-         <datafield tag="100" ind1="4" ind2="7">
-          <subfield code="a">Test2, Joseph</subfield>
-          <subfield code="u">Test2 Academy</subfield>
-         </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, Joseph</subfield>
+         <subfield code="u">Test Academy</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test2, Joseph</subfield>
+         <subfield code="u">Test2 Academy</subfield>
+        </datafield>
         </record>
         """
         self.testrec1_corrected_xm = """
         <record>
         <controlfield tag="001">123456789</controlfield>
         <controlfield tag="003">SzGeCERN</controlfield>
-         <datafield tag="100" ind1=" " ind2=" ">
-          <subfield code="a">Test, Jane</subfield>
-          <subfield code="u">Test Institute</subfield>
-         </datafield>
-         <datafield tag="100" ind1="4" ind2="8">
-          <subfield code="a">Cool</subfield>
-         </datafield>
-         <datafield tag="100" ind1="4" ind2="7">
-          <subfield code="a">Test, Joseph</subfield>
-          <subfield code="u">Test Academy</subfield>
-         </datafield>
-         <datafield tag="100" ind1="4" ind2="7">
-          <subfield code="a">Test2, Joseph</subfield>
-          <subfield code="u">Test2 Academy</subfield>
-         </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+         <subfield code="a">Test, Jane</subfield>
+         <subfield code="u">Test Institute</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="8">
+         <subfield code="a">Cool</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, Joseph</subfield>
+         <subfield code="u">Test Academy</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test2, Joseph</subfield>
+         <subfield code="u">Test2 Academy</subfield>
+        </datafield>
         </record>
         """
         self.testrec1_corrected_hm = """

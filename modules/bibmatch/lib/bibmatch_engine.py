@@ -29,7 +29,8 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_VERSION
 from invenio.search_engine import perform_request_search
-from invenio.bibrecord import *
+from invenio.bibrecord import create_records, record_get_field_instances, \
+    record_get_field_values, record_xml_output
 from invenio import bibconvert
 from invenio.dbquery import run_sql
 
@@ -532,7 +533,7 @@ def main():
         pass
     else:
         for record in recs_out:
-            print print_rec(record[0])
+            print record_xml_output(record[0])
 
         if (batch_output != ""):
             filename = "%s.0" % batch_output
@@ -542,11 +543,11 @@ def main():
             filename = "%s.2" % batch_output
             file_2 = open(filename,"w")
             for record in out_0:
-                file_0.write(print_rec(record[0]))
+                file_0.write(record_xml_output(record[0]))
             for record in out_1:
-                file_1.write(print_rec(record[0]))
+                file_1.write(record_xml_output(record[0]))
             for record in out_2:
-                file_2.write(print_rec(record[0]))
+                file_2.write(record_xml_output(record[0]))
             file_0.close()
             file_1.close()
             file_2.close()

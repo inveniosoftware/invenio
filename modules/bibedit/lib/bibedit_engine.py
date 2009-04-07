@@ -27,7 +27,7 @@ from invenio.bibedit_utils import get_file_path, get_record, \
     record_locked_p, save_temp_record, save_xml_record
 from invenio.bibrecord import record_add_field, record_add_subfield_into, \
     record_modify_controlfield, record_modify_subfield, record_move_subfield, \
-    record_delete_subfield_from, record_delete_field_from
+    record_delete_subfield, record_delete_field
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL
 from invenio.search_engine import record_exists, search_pattern
@@ -237,13 +237,13 @@ def perform_request_update_record(requestType, recid, uid, data):
             for field_number in to_delete[tag]:
                 if not to_delete[tag][field_number]:
                     # No subfields specified - delete entire field.
-                    record_delete_field_from(record, tag, int(field_number))
+                    record_delete_field(record, tag, int(field_number))
                     deleted_fields += 1
                 else:
                     for subfield_index in to_delete[tag][field_number][::-1]:
                         # Delete subfields in reverse order (to keep the
                         # indexing correct).
-                        record_delete_subfield_from(record, tag,
+                        record_delete_subfield(record, tag,
                             int(field_number), int(subfield_index))
                         deleted_subfields += 1
         if deleted_fields == 1 and deleted_subfields == 0:

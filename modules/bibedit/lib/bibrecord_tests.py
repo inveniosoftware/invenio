@@ -26,38 +26,10 @@ from invenio.config import CFG_TMPDIR, CFG_ETCDIR
 from invenio import bibrecord
 from invenio.testutils import make_test_suite, run_test_suite
 
-# pylint: disable-msg=C0301
-
-class BibRecordSanityTest(unittest.TestCase):
-    """ bibrecord - sanity test (xml -> create records -> xml)"""
-    def test_for_sanity(self):
-        """ bibrecord - demo file sanity test (xml -> create records -> xml)"""
-        f = open(CFG_TMPDIR + '/demobibdata.xml', 'r')
-        xmltext = f.read()
-        f.close()
-        # let's try to reproduce the demo XML MARC file by parsing it and printing it back:
-        recs = map((lambda x:x[0]), bibrecord.create_records(xmltext))
-        xmltext_reproduced = bibrecord.records_xml_output(recs)
-        x = xmltext_reproduced
-        y = xmltext
-        # 'normalize' the two XML MARC files for the purpose of comparing
-        x = expandtabs(x)
-        y = expandtabs(y)
-        x = x.replace(' ', '')
-        y = y.replace(' ', '')
-        x = x.replace('<!DOCTYPEcollectionSYSTEM"file://%s/bibedit/MARC21slim.dtd">\n<collection>' % CFG_ETCDIR,
-                      '<collectionxmlns="http://www.loc.gov/MARC21/slim">')
-        x = x.replace('</record><record>', "</record>\n<record>")
-        x = x.replace('</record></collection>', "</record>\n</collection>\n")
-        x = x[1:100]
-        y = y[1:100]
-        self.assertEqual(x, y)
-
 class BibRecordSuccessTest(unittest.TestCase):
     """ bibrecord - demo file parsing test """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         f = open(CFG_TMPDIR + '/demobibdata.xml', 'r')
         xmltext = f.read()
@@ -118,6 +90,14 @@ class BibRecordSuccessTest(unittest.TestCase):
 
 class BibRecordBadInputTreatmentTest(unittest.TestCase):
     """ bibrecord - testing for bad input treatment """
+    def test_empty_collection(self):
+        """bibrecord - empty collection"""
+        xml_error0 = """<collection></collection>"""
+        rec, st, e = bibrecord.create_record(xml_error0)
+        self.assertEqual(rec, {})
+        records = bibrecord.create_records(xml_error0)
+        self.assertEqual(len(records), 0)
+
     def test_wrong_attribute(self):
         """bibrecord - bad input subfield \'cde\' instead of \'code\'"""
         ws = bibrecord.CFG_BIBRECORD_WARNING_MSGS
@@ -141,7 +121,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
             if type(i).__name__ == 'str':
                 if i.count(ws[3])>0:
                     ee = i
-        self.assertEqual(bibrecord.warning((3, '(field number: 4)')), ee)
+        self.assertEqual(bibrecord._warning((3, '(field number: 4)')), ee)
 
     def test_missing_attribute(self):
         """ bibrecord - bad input missing \"tag\" """
@@ -166,7 +146,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
             if type(i).__name__ == 'str':
                 if i.count(ws[1])>0:
                     ee = i
-        self.assertEqual(bibrecord.warning((1, '(field number(s): [2])')), ee)
+        self.assertEqual(bibrecord._warning((1, '(field number(s): [2])')), ee)
 
     def test_empty_datafield(self):
         """ bibrecord - bad input no subfield """
@@ -190,7 +170,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
             if type(i).__name__ == 'str':
                 if i.count(ws[8])>0:
                     ee = i
-        self.assertEqual(bibrecord.warning((8, '(field number: 2)')), ee)
+        self.assertEqual(bibrecord._warning((8, '(field number: 2)')), ee)
 
     def test_missing_tag(self):
         """bibrecord - bad input missing end \"tag\" """
@@ -214,13 +194,12 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
             if type(i).__name__ == 'str':
                 if i.count(ws[99])>0:
                     ee = i
-        self.assertEqual(bibrecord.warning((99, '(Tagname : datafield)')), ee)
+        self.assertEqual(bibrecord._warning((99, '(Tagname : datafield)')), ee)
 
 class BibRecordAccentedUnicodeLettersTest(unittest.TestCase):
     """ bibrecord - testing accented UTF-8 letters """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         self.xml_example_record = """<record>
   <controlfield tag="001">33</controlfield>
@@ -256,7 +235,6 @@ class BibRecordGettingFieldValuesTest(unittest.TestCase):
     """ bibrecord - testing for getting field/subfield values """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -312,7 +290,6 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
     """ bibrecord - testing for getting field/subfield values via wildcards """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -465,7 +442,6 @@ class BibRecordAddFieldTest(unittest.TestCase):
     """ bibrecord - testing adding field """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -492,10 +468,12 @@ class BibRecordAddFieldTest(unittest.TestCase):
 
     def test_add_controlfield(self):
         """bibrecord - adding controlfield"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "003", " ", " ", "SzGeCERN")
-        field_number_2 = bibrecord.record_add_field(self.rec, "004", " ", " ", "Test")
-        self.assertEqual(field_number_1, 7)
-        self.assertEqual(field_number_2, 8)
+        field_position_global_1 = bibrecord.record_add_field(self.rec, "003",
+                                                    controlfield_value="SzGeCERN")
+        field_position_global_2 = bibrecord.record_add_field(self.rec, "004",
+                                                    controlfield_value="Test")
+        self.assertEqual(field_position_global_1, 2)
+        self.assertEqual(field_position_global_2, 3)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "003", " ", " ", ""),
                          ['SzGeCERN'])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "004", " ", " ", ""),
@@ -503,12 +481,12 @@ class BibRecordAddFieldTest(unittest.TestCase):
 
     def test_add_datafield(self):
         """bibrecord - adding datafield"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "100", " ", " ", "",
-                                                    [('a', 'Doe3, John')])
-        field_number_2 = bibrecord.record_add_field(self.rec, "100", " ", " ", "",
-                                                    [('a', 'Doe4, John'), ('b', 'editor')])
-        self.assertEqual(field_number_1, 7)
-        self.assertEqual(field_number_2, 8)
+        field_position_global_1 = bibrecord.record_add_field(self.rec, "100",
+                                                    subfields=[('a', 'Doe3, John')])
+        field_position_global_2 = bibrecord.record_add_field(self.rec, "100",
+                                                    subfields= [('a', 'Doe4, John'), ('b', 'editor')])
+        self.assertEqual(field_position_global_1, 5)
+        self.assertEqual(field_position_global_2, 6)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "a"),
                          ['Doe1, John', 'Doe2, John', 'Doe3, John', 'Doe4, John'])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b"),
@@ -516,25 +494,106 @@ class BibRecordAddFieldTest(unittest.TestCase):
 
     def test_add_controlfield_on_desired_position(self):
         """bibrecord - adding controlfield on desired position"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "005", " ", " ", "Foo", [], 0)
-        field_number_2 = bibrecord.record_add_field(self.rec, "006", " ", " ", "Bar", [], 0)
-        self.assertEqual(field_number_1, 0)
-        self.assertEqual(field_number_2, 7)
+        field_position_global_1 = bibrecord.record_add_field(self.rec, "005",
+                                                    controlfield_value="Foo",
+                                                    field_position_global=0)
+        field_position_global_2 = bibrecord.record_add_field(self.rec, "006",
+                                                    controlfield_value="Bar",
+                                                    field_position_global=0)
+        self.assertEqual(field_position_global_1, 7)
+        self.assertEqual(field_position_global_2, 8)
 
-    def test_add_datafield_on_desired_position(self):
-        """bibrecord - adding datafield on desired position"""
-        field_number_1 = bibrecord.record_add_field(self.rec, "100", " ", " ", " ",
-                                                    [('a', 'Doe3, John')], 0)
-        field_number_2 = bibrecord.record_add_field(self.rec, "100", " ", " ", " ",
-                                                    [('a', 'Doe4, John'), ('b', 'editor')], 0)
-        self.assertEqual(field_number_1, 0)
-        self.assertEqual(field_number_2, 7)
+    def test_add_datafield_on_desired_position_field_position_global(self):
+        """bibrecord - adding datafield on desired global field position"""
+        field_position_global_1 = bibrecord.record_add_field(self.rec, "100",
+            subfields=[('a', 'Doe3, John')], field_position_global=0)
+        field_position_global_2 = bibrecord.record_add_field(self.rec, "100",
+            subfields=[('a', 'Doe4, John'), ('b', 'editor')], field_position_global=0)
+        self.assertEqual(field_position_global_1, 3)
+        self.assertEqual(field_position_global_2, 3)
+
+    def test_add_datafield_on_desired_position_field_position_local(self):
+        """bibrecord - adding datafield on desired local field position"""
+        field_position_global_1 = bibrecord.record_add_field(self.rec, "100",
+             subfields=[('a', 'Doe3, John')], field_position_local=0)
+        field_position_global_2 = bibrecord.record_add_field(self.rec, "100",
+             subfields=[('a', 'Doe4, John'), ('b', 'editor')],
+             field_position_local=2)
+        self.assertEqual(field_position_global_1, 3)
+        self.assertEqual(field_position_global_2, 5)
+
+class BibRecordManageMultipleFieldsTest(unittest.TestCase):
+    """ bibrecord - testing the management of multiple fields """
+
+    def setUp(self):
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">subfield1</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">subfield2</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">subfield3</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2=" ">
+        <subfield code="a">subfield4</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+
+    def test_delete_multiple_datafields(self):
+        """bibrecord - deleting multiple datafields"""
+        self.fields = bibrecord.record_delete_fields(self.rec, '245', [1, 2])
+        self.assertEqual(self.fields[0],
+            ([('a', 'subfield2')], ' ', ' ', '', 3))
+        self.assertEqual(self.fields[1],
+            ([('a', 'subfield3')], ' ', ' ', '', 4))
+
+    def test_add_multiple_datafields_default_index(self):
+        """bibrecord - adding multiple fields with the default index"""
+        fields = [([('a', 'subfield5')], ' ', ' ', '', 4),
+            ([('a', 'subfield6')], ' ', ' ', '', 19)]
+        index = bibrecord.record_add_fields(self.rec, '245', fields)
+        self.assertEqual(index, None)
+        self.assertEqual(self.rec['245'][-2],
+            ([('a', 'subfield5')], ' ', ' ', '', 6))
+        self.assertEqual(self.rec['245'][-1],
+            ([('a', 'subfield6')], ' ', ' ', '', 7))
+
+    def test_add_multiple_datafields_with_index(self):
+        """bibrecord - adding multiple fields with an index"""
+        fields = [([('a', 'subfield5')], ' ', ' ', '', 4),
+            ([('a', 'subfield6')], ' ', ' ', '', 19)]
+        index = bibrecord.record_add_fields(self.rec, '245', fields, index=0)
+        self.assertEqual(index, 0)
+        self.assertEqual(self.rec['245'][0],
+            ([('a', 'subfield5')], ' ', ' ', '', 2))
+        self.assertEqual(self.rec['245'][1],
+            ([('a', 'subfield6')], ' ', ' ', '', 3))
+        self.assertEqual(self.rec['245'][2],
+            ([('a', 'subfield1')], ' ', ' ', '', 4))
+
+    def test_move_multiple_fields(self):
+        """bibrecord - move multiple fields"""
+        index = bibrecord.record_move_fields(self.rec, '245', [1, 3])
+        self.assertEqual(self.rec['245'][0],
+            ([('a', 'subfield1')], ' ', ' ', '', 2))
+        self.assertEqual(self.rec['245'][1],
+            ([('a', 'subfield3')], ' ', ' ', '', 4))
+        self.assertEqual(self.rec['245'][2],
+            ([('a', 'subfield2')], ' ', ' ', '', 5))
+        self.assertEqual(self.rec['245'][3],
+            ([('a', 'subfield4')], ' ', ' ', '', 6))
 
 class BibRecordDeleteFieldTest(unittest.TestCase):
     """ bibrecord - testing field deletion """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -595,15 +654,17 @@ class BibRecordDeleteFieldTest(unittest.TestCase):
 
     def test_add_delete_add_field_to_empty_record(self):
         """bibrecord - adding, deleting, and adding back a field to an empty record"""
-        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", " ", " ", "SzGeCERN")
-        self.assertEqual(field_number_1, 1)
+        field_position_global_1 = bibrecord.record_add_field(self.rec_empty, "003",
+                                                    controlfield_value="SzGeCERN")
+        self.assertEqual(field_position_global_1, 1)
         self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          ['SzGeCERN'])
         bibrecord.record_delete_field(self.rec_empty, "003", " ", " ")
         self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          [])
-        field_number_1 = bibrecord.record_add_field(self.rec_empty, "003", " ", " ", "SzGeCERN2")
-        self.assertEqual(field_number_1, 1)
+        field_position_global_1 = bibrecord.record_add_field(self.rec_empty, "003",
+                                                    controlfield_value="SzGeCERN2")
+        self.assertEqual(field_position_global_1, 1)
         self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          ['SzGeCERN2'])
 
@@ -612,7 +673,6 @@ class BibRecordDeleteFieldFromTest(unittest.TestCase):
     """ bibrecord - testing field deletion from position"""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -639,25 +699,24 @@ class BibRecordDeleteFieldFromTest(unittest.TestCase):
 
     def test_delete_field_from(self):
         """bibrecord - deleting field from position"""
-        bibrecord.record_delete_field_from(self.rec, "100", 4)
+        bibrecord.record_delete_field(self.rec, "100", field_position_global=4)
         self.assertEqual(self.rec['100'], [([('a', 'Doe1, John')], ' ', ' ', '', 3)])
-        bibrecord.record_delete_field_from(self.rec, "100", 3)
+        bibrecord.record_delete_field(self.rec, "100", field_position_global=3)
         self.failIf(self.rec.has_key('100'))
-        bibrecord.record_delete_field_from(self.rec, "001", 1)
-        bibrecord.record_delete_field_from(self.rec, "245", 6)
+        bibrecord.record_delete_field(self.rec, "001", field_position_global=1)
+        bibrecord.record_delete_field(self.rec, "245", field_position_global=6)
         self.failIf(self.rec.has_key('001'))
         self.assertEqual(self.rec['245'], [([('a', 'On the foo and bar1')], ' ', '1', '', 5)])
 
         # Some crash tests
-        bibrecord.record_delete_field_from(self.rec, '999', 1)
-        bibrecord.record_delete_field_from(self.rec, '245', 999)
+        bibrecord.record_delete_field(self.rec, '999', field_position_global=1)
+        bibrecord.record_delete_field(self.rec, '245', field_position_global=999)
 
 
 class BibRecordAddSubfieldIntoTest(unittest.TestCase):
     """ bibrecord - testing subfield addition """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -699,7 +758,6 @@ class BibRecordModifyControlfieldTest(unittest.TestCase):
     """ bibrecord - testing controlfield modification """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -736,7 +794,6 @@ class BibRecordModifySubfieldTest(unittest.TestCase):
     """ bibrecord - testing subfield modification """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -775,7 +832,6 @@ class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
     """ bibrecord - testing subfield deletion """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -819,7 +875,6 @@ class BibRecordMoveSubfieldTest(unittest.TestCase):
     """ bibrecord - testing subfield moving """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         xml_example_record = """
         <record>
@@ -858,7 +913,6 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
     """ bibrecord - parsing special tags (FMT, FFT)"""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """setting up example records"""
         self.xml_example_record_with_fmt = """
         <record>
@@ -988,7 +1042,6 @@ class BibRecordPrintingTest(unittest.TestCase):
     """ bibrecord - testing for printing record """
 
     def setUp(self):
-        # pylint: disable-msg=C0103
         """Initialize stuff"""
         self.xml_example_record = """
         <record>
@@ -1049,122 +1102,21 @@ class BibRecordPrintingTest(unittest.TestCase):
         <controlfield tag="001">82</controlfield>
         </record>"""
 
-    def test_print_rec(self):
-        """bibrecord - print rec"""
+    def test_record_xml_output(self):
+        """bibrecord - xml output"""
         rec, st, e = bibrecord.create_record(self.xml_example_record, 1, 1)
         rec_short, st_short, e_short = bibrecord.create_record(self.xml_example_record_short, 1, 1)
-        self.assertEqual(bibrecord.create_record(bibrecord.print_rec(rec, tags=[]), 1, 1)[0], rec)
-        self.assertEqual(bibrecord.create_record(bibrecord.print_rec(rec, tags=["001", "037"]), 1, 1)[0], rec_short)
-        self.assertEqual(bibrecord.create_record(bibrecord.print_rec(rec, tags=["037"]), 1, 1)[0], rec_short)
+        self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=[]), 1, 1)[0], rec)
+        self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["001", "037"]), 1, 1)[0], rec_short)
+        self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["037"]), 1, 1)[0], rec_short)
 
-    def test_print_recs(self):
-        """bibrecord - print multiple recs"""
-        list_of_recs = bibrecord.create_records(self.xml_example_multi_records, 1, 1)
-        list_of_recs_elems = [elem[0] for elem in list_of_recs]
-        list_of_recs_short = bibrecord.create_records(self.xml_example_multi_records_short, 1, 1)
-        list_of_recs_short_elems = [elem[0] for elem in list_of_recs_short]
-        self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=[]), 1, 1), list_of_recs)
-        self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["001", "037"]), 1, 1), list_of_recs_short)
-        self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["037"]), 1, 1), list_of_recs_short)
-
-class BibRecordComparingTest(unittest.TestCase):
-    """ bibrecord - testing for comparing record """
-
-    def setUp(self):
-        self.record1 = bibrecord.create_record("""
-            <record>
-                <controlfield tag="003">SzGeCERN</controlfield>
-            </record>
-         """)
-        self.record2 = bibrecord.create_record("""
-            <record>
-                <controlfield tag="003">SzGeCERN</controlfield>
-                <datafield tag="035" ind1=" " ind2=" ">
-                    <subfield code="9">arXiv</subfield>
-                    <subfield code="a">oai:arXiv.org:0704.0299</subfield>
-                </datafield>
-            </record>
-         """)
-        self.record3 = bibrecord.create_record("""
-            <record>
-                <controlfield tag="003">SzGeCERN</controlfield>
-                <datafield tag="035" ind1=" " ind2=" ">
-                    <subfield code="9">arX</subfield>
-                    <subfield code="a">oai:arXiv.org:0704.0299</subfield>
-                </datafield>
-            </record>
-         """)
-        self.record4 = bibrecord.create_record("""
-            <record>
-                <controlfield tag="003">SzGeCERN</controlfield>
-                <datafield tag="035" ind1=" " ind2=" ">
-                    <subfield code="9">arX</subfield>
-                </datafield>
-            </record>
-         """)
-        self.record5 = bibrecord.create_record("""
-            <record>
-                <controlfield tag="003">SzGeCERN</controlfield>
-                <datafield tag="035" ind1=" " ind2=" ">
-                    <subfield code="9">arX</subfield>
-                </datafield>
-                <datafield tag="773" ind1=" " ind2=" ">
-                    <subfield code="p">Journal of Applied Philosobhy</subfield>
-                </datafield>
-            </record>
-         """)
-
-    def test_comparing_records(self):
-        """bibrecord - comparing two records"""
-
-        def compare_lists2(list1, list2):
-            """Comparing two lists of changes... the order does not play any role"""
-            dict2 = {}
-            for el in list2:
-                dict2[el[0]] = el[1]
-            for el in list1:
-                if not dict2.has_key(el[0]):
-                    return False
-                else:
-                    if dict2[el[0]] != el[1]:
-                        return False
-                    else:
-                        del dict2[el[0]]
-            return True
-
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record1), [])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record3), [("035", "a",
-            [([('9', 'arX'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record4), [("035", "a",
-            [([('9', 'arX')], ' ', ' ', '', 2)])])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record2), [("035", "a",
-            [([('9', 'arXiv'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
-        self.assertEqual(bibrecord.record_diff(self.record2, self.record1), [("035", "r",
-            [([('9', 'arXiv'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
-        self.assertEqual(bibrecord.record_diff(self.record2, self.record3), [("035", "c",
-            [([('9', 'arXiv'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)],
-            [([('9', 'arX'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
-        self.assertEqual(bibrecord.record_diff(self.record3, self.record4), [("035", "c",
-            [([('9', 'arX'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)],
-            [([('9', 'arX')], ' ', ' ', '', 2)])])
-        self.assertEqual(bibrecord.record_diff(self.record4, self.record5), [("773", "a",
-            [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)])])
-        self.assertEqual(bibrecord.record_diff(self.record5, self.record4), [("773", "r",
-            [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)])])
-        self.failUnless(compare_lists2(bibrecord.record_diff(self.record1, self.record5),
-            [('773', 'a', [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)]),
-                ('035', 'a', [([('9', 'arX')], ' ', ' ', '', 2)])]))
-        self.failUnless(compare_lists2(bibrecord.record_diff(self.record5, self.record1),
-            [('773', 'r', [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)]),
-                ('035', 'r', [([('9', 'arX')], ' ', ' ', '', 2)])]))
-
-TEST_SUITE = make_test_suite(BibRecordSanityTest,
-                             BibRecordSuccessTest,
+TEST_SUITE = make_test_suite(BibRecordSuccessTest,
                              BibRecordBadInputTreatmentTest,
                              BibRecordGettingFieldValuesTest,
                              BibRecordGettingFieldValuesViaWildcardsTest,
                              BibRecordAddFieldTest,
                              BibRecordDeleteFieldTest,
+                             BibRecordManageMultipleFieldsTest,
                              BibRecordDeleteFieldFromTest,
                              BibRecordAddSubfieldIntoTest,
                              BibRecordModifyControlfieldTest,
@@ -1173,8 +1125,7 @@ TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordMoveSubfieldTest,
                              BibRecordAccentedUnicodeLettersTest,
                              BibRecordSpecialTagParsingTest,
-                             BibRecordPrintingTest,
-                             BibRecordComparingTest,)
+                             BibRecordPrintingTest,)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

@@ -28,7 +28,7 @@ import getopt
 import string
 import sys
 
-from invenio.bibrecord import *
+from invenio.bibrecord import create_records, print_errors, concat, print_recs
 
 cmdusage = """Usage: %s [options] <marcxmlfile>
 General options:

@@ -62,8 +62,7 @@ import urllib2
 import socket
 import marshal
 
-from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, \
+from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
@@ -87,7 +86,6 @@ from invenio.bibrecord import create_records, \
 from invenio.search_engine import get_record
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
-from invenio.bibformat import format_record
 from invenio.intbitset import intbitset
 from invenio.config import CFG_WEBSUBMIT_FILEDIR
 from invenio.bibtask import task_init, write_message, \
@@ -95,8 +93,7 @@ from invenio.bibtask import task_init, write_message, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
-    KEEP_OLD_VALUE, decompose_bibdocfile_url, bibdocfile_url_p, \
-    InvenioWebSubmitFileError
+    KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioWebSubmitFileError
 
 #Statistic variables
 stat = {}
@@ -169,7 +166,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             # Found record ID by means of SYSNO or OAIID, and the
             # input MARCXML buffer does not have this 001 tag, so we
             # should add it now:
-            error = record_add_field(record, '001', '', '', rec_id, [], 0)
+            error = record_add_field(record, '001', controlfield_value=rec_id)
             if error is None:
                 write_message("   Failed: " \
                                             "Error during adding the 001 controlfield "  \
@@ -200,7 +197,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         write_message("   -Creation of a new record id (%d): DONE" % rec_id, verbose=2)
 
         # we add the record Id control field to the record
-        error = record_add_field(record, '001', '', '', rec_id, [], 0)
+        error = record_add_field(record, '001', controlfield_value=rec_id)
         if error is None:
             write_message("   Failed: " \
                                         "Error during adding the 001 controlfield "  \
@@ -1498,7 +1495,8 @@ def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
                 for single_tuple in record[tag]:
                     controlfield_value = single_tuple[3]
                     # add the field to the old record
-                    newfield_number = record_add_field(rec_old, tag, "", "", controlfield_value)
+                    newfield_number = record_add_field(rec_old, tag,
+                        controlfield_value=controlfield_value)
                     if newfield_number is None:
                         write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
         else:
@@ -1510,7 +1508,8 @@ def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
                 ind2 = single_tuple[2]
                 # We add the datafield to the old record
                 write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
-                newfield_number = record_add_field(rec_old, tag, ind1, ind2, "", subfield_list)
+                newfield_number = record_add_field(rec_old, tag, ind1, ind2,
+                    subfields=subfield_list)
                 if newfield_number is None:
                     write_message("Error when adding the field"+tag, verbose=1, stream=sys.stderr)
     else:
@@ -1526,7 +1525,8 @@ def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
                         ind2 = single_tuple[2]
                         # We add the datafield to the old record
                         write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
-                        newfield_number = record_add_field(rec_old, tag, ind1, ind2, "", subfield_list)
+                        newfield_number = record_add_field(rec_old, tag, ind1,
+                            ind2, subfields=subfield_list)
                         if newfield_number is None:
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
             else:
@@ -1538,7 +1538,8 @@ def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
                         for single_tuple in record[tag]:
                             controlfield_value = single_tuple[3]
                             # add the field to the old record
-                            newfield_number = record_add_field(rec_old, tag, "", "", controlfield_value)
+                            newfield_number = record_add_field(rec_old, tag,
+                                controlfield_value=controlfield_value)
                             if newfield_number is None:
                                 write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
                 else:
@@ -1550,7 +1551,8 @@ def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
                         ind2 = single_tuple[2]
                         # We add the datafield to the old record
                         write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
-                        newfield_number = record_add_field(rec_old, tag, ind1, ind2, "", subfield_list)
+                        newfield_number = record_add_field(rec_old, tag, ind1,
+                            ind2, subfields=subfield_list)
                         if newfield_number is None:
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
     return rec_old
@@ -1629,7 +1631,7 @@ def delete_tags_to_correct(record, rec_old, opt_tag):
     for tag, fields in fields_to_readd.iteritems():
         for sf_vals in fields:
             write_message("      Adding tag: " + tag[:3] + " ind1=" + tag[3] + " ind2=" + tag[4] + " code=" + str(sf_vals), verbose=9)
-            record_add_field(rec_old, tag[:3], tag[3], tag[4], datafield_subfield_code_value_tuples=sf_vals)
+            record_add_field(rec_old, tag[:3], tag[3], tag[4], subfields=sf_vals)
 
 def delete_bibrec_bibxxx(record, id_bibrec):
     """Delete the database record from the table bibxxx given in parameters"""
