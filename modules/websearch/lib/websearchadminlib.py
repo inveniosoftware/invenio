@@ -62,6 +62,7 @@ from invenio.messages import gettext_set_language
 from invenio.bibrank_citation_searcher import get_cited_by
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.errorlib import register_exception
 
 
 def getnavtrail(previous = ''):
@@ -542,6 +543,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
             output += """
             """
     except StandardError, e:
+        register_exception()
         return """<b><span class="info">An error occured.</span></b>
         """
 
@@ -2551,6 +2553,7 @@ def get_col_tree(colID, rtype=''):
             tree = tree[0:ssize] + ntree + tree[ssize:len(tree)]
         return tree
     except StandardError, e:
+        register_exception()
         return ()
 
 def add_col_dad_son(add_dad, add_son, rtype):
@@ -2569,6 +2572,7 @@ def add_col_dad_son(add_dad, add_son, rtype):
         res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,%s)", (add_dad, add_son, highscore, rtype))
         return (1, highscore)
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def compare_on_val(first, second):
@@ -2584,21 +2588,18 @@ def get_col_fld(colID=-1, type = '', id_field=''):
     sql = "SELECT id_field,id_fieldvalue,type,score,score_fieldvalue FROM collection_field_fieldvalue, field WHERE id_field=field.id"
 
     params = []
-    try:
-        if colID > -1:
-            sql += " AND id_collection=%s"
-            params.append(colID)
-        if id_field:
-            sql += " AND id_field=%s"
-            params.append(id_field)
-        if type:
-            sql += " AND type=%s"
-            params.append(type)
-        sql += " ORDER BY type, score desc, score_fieldvalue desc"
-        res = run_sql(sql, tuple(params))
-        return res
-    except StandardError, e:
-        return ""
+    if colID > -1:
+        sql += " AND id_collection=%s"
+        params.append(colID)
+    if id_field:
+        sql += " AND id_field=%s"
+        params.append(id_field)
+    if type:
+        sql += " AND type=%s"
+        params.append(type)
+    sql += " ORDER BY type, score desc, score_fieldvalue desc"
+    res = run_sql(sql, tuple(params))
+    return res
 
 def get_col_pbx(colID=-1, ln='', position = ''):
     """Returns either all portalboxes associated with a collection, or based on either colID or language or both.
@@ -2608,34 +2609,28 @@ def get_col_pbx(colID=-1, ln='', position = ''):
     sql = "SELECT id_portalbox, id_collection, ln, score, position, title, body FROM collection_portalbox, portalbox WHERE id_portalbox = portalbox.id"
 
     params = []
-    try:
-        if colID > -1:
-            sql += " AND id_collection=%s"
-            params.append(colID)
-        if ln:
-            sql += " AND ln=%s"
-            params.append(ln)
-        if position:
-            sql += " AND position=%s"
-            params.append(position)
-        sql += " ORDER BY position, ln, score desc"
-        res = run_sql(sql, tuple(params))
-        return res
-    except StandardError, e:
-        return ""
+    if colID > -1:
+        sql += " AND id_collection=%s"
+        params.append(colID)
+    if ln:
+        sql += " AND ln=%s"
+        params.append(ln)
+    if position:
+        sql += " AND position=%s"
+        params.append(position)
+    sql += " ORDER BY position, ln, score desc"
+    res = run_sql(sql, tuple(params))
+    return res
 
 def get_col_fmt(colID=-1):
     """Returns all formats currently associated with a collection, or for one specific collection
     colID - the id of the collection"""
 
-    try:
-        if colID not in [-1, "-1"]:
-            res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id AND id_collection=%s ORDER BY score desc", (colID, ))
-        else:
-            res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id ORDER BY score desc")
-        return res
-    except StandardError, e:
-        return ""
+    if colID not in [-1, "-1"]:
+        res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id AND id_collection=%s ORDER BY score desc", (colID, ))
+    else:
+        res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id ORDER BY score desc")
+    return res
 
 def get_col_rnk(colID, ln):
     """ Returns a list of the rank methods the given collection is attached to
@@ -2652,26 +2647,20 @@ def get_col_rnk(colID, ln):
 def get_pbx():
     """Returns all portalboxes"""
 
-    try:
-        res = run_sql("SELECT id, title, body FROM portalbox ORDER by title,body")
-        return res
-    except StandardError, e:
-        return ""
+    res = run_sql("SELECT id, title, body FROM portalbox ORDER by title,body")
+    return res
 
 def get_fld_value(fldvID = ''):
     """Returns fieldvalue"""
 
-    try:
-        sql = "SELECT id, name, value FROM fieldvalue"
-        params = []
-        if fldvID:
-            sql += " WHERE id=%s"
-            params.append(fldvID)
-        sql += " ORDER BY name"
-        res = run_sql(sql, tuple(params))
-        return res
-    except StandardError, e:
-        return ""
+    sql = "SELECT id, name, value FROM fieldvalue"
+    params = []
+    if fldvID:
+        sql += " WHERE id=%s"
+        params.append(fldvID)
+    sql += " ORDER BY name"
+    res = run_sql(sql, tuple(params))
+    return res
 
 def get_pbx_pos():
     """Returns a list of all the positions for a portalbox"""
@@ -2783,6 +2772,7 @@ def attach_rnk_col(colID, rnkID):
         res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)", (colID, rnkID))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def detach_rnk_col(colID, rnkID):
@@ -2794,6 +2784,7 @@ def detach_rnk_col(colID, rnkID):
         res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s", (colID, rnkID))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def switch_col_treescore(col_1, col_2):
@@ -2804,6 +2795,7 @@ def switch_col_treescore(col_1, col_2):
         res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s", (res1[0][0], col_2[3], col_2[0]))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def move_col_tree(col_from, col_to, move_to_rtype=''):
@@ -2825,6 +2817,7 @@ def move_col_tree(col_from, col_to, move_to_rtype=''):
         res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,%s)", (col_to[0], col_from[0], highscore, move_to_rtype))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def remove_pbx(colID, pbxID, ln):
@@ -2837,6 +2830,7 @@ def remove_pbx(colID, pbxID, ln):
         res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s AND id_portalbox=%s AND ln=%s", (colID, pbxID, ln))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def remove_fmt(colID, fmtID):
@@ -2848,6 +2842,7 @@ def remove_fmt(colID, fmtID):
         res = run_sql("DELETE FROM collection_format WHERE id_collection=%s AND id_format=%s", (colID, fmtID))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def remove_fld(colID, fldID, fldvID=''):
@@ -2867,6 +2862,7 @@ def remove_fld(colID, fldID, fldvID=''):
         res = run_sql(sql, tuple(params))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def delete_fldv(fldvID):
@@ -2878,6 +2874,7 @@ def delete_fldv(fldvID):
         res = run_sql("DELETE FROM fieldvalue WHERE id=%s", (fldvID, ))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def delete_pbx(pbxID):
@@ -2889,6 +2886,7 @@ def delete_pbx(pbxID):
         res = run_sql("DELETE FROM portalbox WHERE id=%s", (pbxID, ))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def delete_fmt(fmtID):
@@ -2901,6 +2899,7 @@ def delete_fmt(fmtID):
         res = run_sql("DELETE FROM formatname WHERE id_format=%s", (fmtID, ))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def delete_col(colID):
@@ -2918,6 +2917,7 @@ def delete_col(colID):
         res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s", (colID, ))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def add_fmt(code, name, rtype):
@@ -2933,6 +2933,7 @@ def add_fmt(code, name, rtype):
                       (fmtID[0][0], rtype, CFG_SITE_LANG, name))
         return (1, fmtID)
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def update_fldv(fldvID, name, value):
@@ -2946,6 +2947,7 @@ def update_fldv(fldvID, name, value):
         res = run_sql("UPDATE fieldvalue set value=%s where id=%s", (value, fldvID))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def add_fldv(name, value):
@@ -2963,6 +2965,7 @@ def add_fldv(name, value):
         else:
             raise StandardError
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def add_pbx(title, body):
@@ -2974,6 +2977,7 @@ def add_pbx(title, body):
         else:
             raise StandardError
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def add_col(colNAME, dbquery=None):
@@ -3000,6 +3004,7 @@ def add_col(colNAME, dbquery=None):
         else:
             raise StandardError
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def add_col_pbx(colID, pbxID, ln, position, score=''):
@@ -3022,9 +3027,8 @@ def add_col_pbx(colID, pbxID, ln, position, score=''):
             res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,%s,%s,%s)", (pbxID, colID, ln, (score + 1), position))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
-
-
 
 def add_col_fmt(colID, fmtID, score=''):
     """Add a output format to the collection.
@@ -3044,6 +3048,7 @@ def add_col_fmt(colID, fmtID, score=''):
             res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)", (fmtID, colID, (score + 1)))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def add_col_fld(colID, fldID, type, fldvID=''):
@@ -3083,6 +3088,7 @@ def add_col_fld(colID, fldID, type, fldvID=''):
                 res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,%s,%s, 0)", (fldID, colID, type, 1))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def modify_dbquery(colID, dbquery=None):
@@ -3096,6 +3102,7 @@ def modify_dbquery(colID, dbquery=None):
         res = run_sql("UPDATE collection SET dbquery=%s WHERE id=%s", (dbquery, colID))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
@@ -3119,6 +3126,7 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
             res = run_sql("UPDATE collection_portalbox SET position=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (position, colID, pbxID, sel_ln))
         return (1, "")
     except Exception, e:
+        register_exception()
         return (0, e)
 
 def switch_fld_score(colID, id_1, id_2):
@@ -3137,6 +3145,7 @@ def switch_fld_score(colID, id_1, id_2):
             res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s", (res1[0][0], colID, id_2))
         return (1, "")
     except StandardError, e:
+        register_exception()
         return (0, e)
 
 def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
@@ -3155,6 +3164,7 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
             res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (res1[0][0], colID, id_1, fldvID_2))
         return (1, "")
     except Exception, e:
+        register_exception()
         return (0, e)
 
 def switch_pbx_score(colID, id_1, id_2, sel_ln):
@@ -3172,6 +3182,7 @@ def switch_pbx_score(colID, id_1, id_2, sel_ln):
         res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (res1[0][0], colID, id_2, sel_ln))
         return (1, "")
     except Exception, e:
+        register_exception()
         return (0, e)
 
 def switch_score(colID, id_1, id_2, table):
@@ -3189,6 +3200,7 @@ def switch_score(colID, id_1, id_2, table):
         res = run_sql("UPDATE collection_%s SET score=%%s WHERE id_collection=%%s and id_%s=%%s" % (table, table), (res1[0][0], colID, id_2))
         return (1, "")
     except Exception, e:
+        register_exception()
         return (0, e)
 
 def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
