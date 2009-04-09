@@ -703,7 +703,7 @@ can_add_format_to_doctypes - the list of doctypes for which users can
     # Delete link
     if main_bibdocfile.get_type() in can_delete_doctypes or \
            '*' in can_delete_doctypes:
-        out += '''[<a href="" onclick="if(confirm('Are you sure you want to delete %(bibdocname)s?')){document.forms[0].fileTarget.value = '%(bibdocname)s';javascript:document.forms[0].fileAction.value='delete';document.forms[0].submit();}return false;">%(delete)s</a>]
+        out += '''[<a href="" onclick="if(confirm('Are you sure you want to delete %(bibdocname)s?')){document.forms[0].fileTarget.value = '%(bibdocname)s';javascript:document.forms[0].fileAction.value='delete';user_must_confirm_before_leaving_page = false;document.forms[0].submit();}return false;">%(delete)s</a>]
         ''' % {'bibdocname': abstract_bibdoc['get_docname'],
                'delete': _("delete")}
     out += '''</td>'''
@@ -1528,6 +1528,7 @@ function nextStep()
       if(confirm("You are about to submit the files and end the upload process."))
       {
           document.forms[0].step.value = 2;
+          user_must_confirm_before_leaving_page = false;
           document.forms[0].submit();
       }
       return true;
