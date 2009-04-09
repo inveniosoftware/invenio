@@ -516,9 +516,13 @@ template function generated it.
                 parts.append(create_html_link(args,
                                               {}, lang_namelong,
                                               {'class': "langinfo"}))
-
-        return _("This site is also available in the following languages:") + \
+        if len(parts) > 1:
+            return _("This site is also available in the following languages:") + \
                  "<br />" + ' &nbsp;'.join(parts)
+        else:
+            ## There is only one (or zero?) languages configured,
+            ## so there so need to display language alternatives.
+            return ""
 
     def tmpl_error_box(self, ln, title, verbose, req, errors):
         """Produces an error box.
