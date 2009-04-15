@@ -728,11 +728,11 @@ class Manager:
             if ring == 4:
                 if self.display == 1:
                     table = "schTASK"
-                    where = "and status='DONE'"
+                    where = "and (status='DONE' or status LIKE 'ACK%')"
                     order = "runtime DESC"
                 elif self.display == 2:
                     table = "schTASK"
-                    where = "and status<>'DONE'"
+                    where = "and (status<>'DONE' and status NOT LIKE 'ACK%')"
                     order = "runtime ASC"
                 else:
                     table = "hstTASK"
