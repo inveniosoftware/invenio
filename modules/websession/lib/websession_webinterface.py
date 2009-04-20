@@ -749,7 +749,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         mess = ""
         act = ""
         if args['p_pw'] == args['p_pw2']:
-            ruid = webuser.registerUser(req, args['p_email'], args['p_pw'], args['p_nickname'])
+            ruid = webuser.registerUser(req, args['p_email'], args['p_pw'],
+                                        args['p_nickname'], ln=args['ln'])
         else:
             ruid = -2
         if ruid == 0:

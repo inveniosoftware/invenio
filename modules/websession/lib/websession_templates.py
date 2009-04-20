@@ -952,6 +952,7 @@ class Template:
             out += """
               <form method="post" action="../youraccount/register">
               <input type="hidden" name="referer" value="%(referer)s" />
+              <input type="hidden" name="ln" value="%(ln)s" />
               <table>
                 <tr>
                  <td align="right"><strong><label for="p_email">%(email_address)s:</label></strong><br /><small class="important">(%(mandatory)s)</small></td>
@@ -989,6 +990,7 @@ class Template:
               </form>
               <p><strong>%(note)s:</strong> %(explain_acc)s""" % {
                 'referer' : cgi.escape(referer),
+                'ln' : cgi.escape(ln),
                 'email_address' : _("Email address"),
                 'nickname' : _("Nickname"),
                 'password' : _("Password"),
