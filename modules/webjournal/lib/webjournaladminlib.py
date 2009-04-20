@@ -39,7 +39,8 @@ from invenio.messages import gettext_set_language
 from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalReleaseUpdateError, \
-     InvenioWebJournalIssueNotFoundDBError
+     InvenioWebJournalIssueNotFoundDBError, \
+     InvenioWebJournalNoJournalOnServerError
 from invenio.webjournal_utils import \
      get_journals_ids_and_names, \
      guess_journal_name, \
