@@ -28,7 +28,8 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
+     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 from invenio.search_engine import get_fieldvalues
 
 
@@ -66,7 +67,7 @@ def send_overdue_letter(borrower_id, subject):
 
     to_borrower = db.get_borrower_email(borrower_id)
 
-    send_email(fromaddr="library.desk@cern.ch",
+    send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
                toaddr=to_borrower,
                subject=subject,
                content=CFG_BIBCIRCULATION_TEMPLATES['OVERDUE'],

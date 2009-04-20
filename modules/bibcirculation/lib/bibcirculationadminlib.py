@@ -28,26 +28,26 @@ import datetime, time
 # Others Invenio imports
 from invenio.config import \
     CFG_SITE_LANG, \
-    CFG_SITE_URL
+    CFG_SITE_URL, \
+    CFG_CERN_SITE
 import invenio.access_control_engine as acce
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.mailutils import send_email
 from invenio.search_engine import perform_request_search
-from invenio.search_engine import get_fieldvalues
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
-from invenio.bibcirculation_utils import book_information_from_MARC, \
-      book_title_from_MARC, \
+from invenio.bibcirculation_utils import book_title_from_MARC, \
       update_status_if_expired, \
       renew_loan_for_X_days, \
       print_pending_hold_requests_information, \
-      print_new_loan_information
+      print_new_loan_information, \
+      update_request_data
 
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
      CFG_BIBCIRCULATION_TEMPLATES, ACCESS_KEY, \
-     USER_ON_CERN_LDAP
+     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 import invenio.bibcirculation_dblayer as db
 import invenio.template
 bibcirculation_templates = invenio.template.load('bibcirculation')
@@ -55,7 +55,7 @@ bibcirculation_templates = invenio.template.load('bibcirculation')
 def is_adminuser(req):
     """check if user is a registered administrator. """
 
-    return acce.acc_authorize_action(req, "cfgbibformat")
+    return acce.acc_authorize_action(req, "runbibcirculation")
 
 def mustloginpage(req, message):
     """show a page asking the user to login."""
@@ -83,36 +83,6 @@ def index(req, ln=CFG_SITE_LANG):
     body = bibcirculation_templates.tmpl_index(ln=ln)
 
     return page(title="BibCirculation Admin",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
-
-
-def manage_holdings(req, ln=CFG_SITE_LANG):
-    """
-    Main page of Bibcirculation (for administrator).
-    It is possible to see in this page the number of pending requests
-    and other relevant informations.
-    """
-
-    result = db.get_pending_loan_request("pending")
-    result = len(result)
-
-    navtrail_previous_links = '<a class="navtrail"' \
-                              ' href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
-
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
-
-    body = bibcirculation_templates.tmpl_manage_holdings(pending_request=result,
-                                                         ln=ln)
-
-    return page(title="Manage Holdings",
                 uid=id_user,
                 req=req,
                 body=body,
@@ -188,12 +158,32 @@ def borrower_search_result(req, column, string, ln=CFG_SITE_LANG):
     @param str: string used on the search query
     """
 
-    if column == 'name':
-        result = db.search_borrower_by_name(string)
-    elif column == 'email':
-        result = db.search_borrower_by_email(string)
+    if CFG_CERN_SITE == 1:
+        if column == 'name':
+            result = db.search_borrower_by_name(string)
+        elif column == 'email':
+            result = db.search_borrower_by_email(string)
+        else:
+            from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+            ldap_info = get_user_info_from_ldap(ccid=string)
+
+            try:
+                mail = ldap_info['mail'][0]
+            except KeyError:
+                mail = None
+
+            if mail:
+                result = db.search_borrower_by_email(mail)
+            else:
+                result = ()
+
     else:
-        result = db.search_borrower_by_id(string)
+        if column == 'name':
+            result = db.search_borrower_by_name(string)
+        elif column == 'email':
+            result = db.search_borrower_by_email(string)
+        else:
+            result = db.search_borrower_by_id(string)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -204,14 +194,17 @@ def borrower_search_result(req, column, string, ln=CFG_SITE_LANG):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_borrower_search_result(result=result, ln=ln)
+    if len(result) == 1:
+        return get_borrower_details(req, result[0][0], ln)
+    else:
+        body = bibcirculation_templates.tmpl_borrower_search_result(result=result, ln=ln)
 
-    return page(title="Borrower search result",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
+        return page(title="Borrower search result",
+                    uid=id_user,
+                    req=req,
+                    body=body,
+                    navtrail=navtrail_previous_links,
+                    lastupdated=__lastupdated__)
 
 
 def item_search(req, ln=CFG_SITE_LANG):
@@ -253,6 +246,9 @@ def load_template(template):
     elif template == "notification":
         output = CFG_BIBCIRCULATION_TEMPLATES['NOTIFICATION']
 
+    elif template == "claim_return":
+        output = CFG_BIBCIRCULATION_TEMPLATES['CLAIM_RETURN']
+
     else:
         output = CFG_BIBCIRCULATION_TEMPLATES['EMPTY']
 
@@ -280,11 +276,11 @@ def borrower_notification(req, borrower_id, template, message,
 
     email = db.get_borrower_email(borrower_id)
 
-    if load_msg_template and template != None:
+    if load_msg_template and template is not None:
         show_template = load_template(template)
 
     elif send_message:
-        send_email(fromaddr="CERN Library<library.desk@cern.ch>",
+        send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
                    toaddr=email,
                    subject=subject,
                    content=message,
@@ -336,6 +332,7 @@ def get_next_waiting_loan_request(req, recid, barcode, check_id,
 
     if check_id:
         db.update_loan_request_status(check_id,'cancelled')
+        update_request_data(check_id)
     else:
         returned_on = datetime.date.today()
         db.update_item_status('available', barcode)
@@ -378,14 +375,14 @@ def update_next_loan_request_status(req, check_id, barcode, ln=CFG_SITE_LANG):
               crcITEM.
     """
 
-    recid = db.get_recid_from_crcLOANREQUEST(check_id)
-    borrower_id = db.get_borrower_id_from_crcLOANREQUEST(check_id)
+    recid = db.get_request_recid(check_id)
+    borrower_id = db.get_request_borrower_id(check_id)
 
     loaned_on = datetime.date.today()
     due_date = renew_loan_for_X_days(barcode)
 
     db.update_loan_request_status(check_id,'done')
-    db.update_barcode_on_crcloanrequest(barcode, check_id)
+    db.update_request_barcode(barcode, check_id)
     db.new_loan(borrower_id, recid, barcode, loaned_on, due_date, 'on loan', 'normal','')
     db.update_item_status('on loan', barcode)
 
@@ -447,7 +444,7 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
 
     list_infos = []
 
-    if USER_ON_CERN_LDAP == 'true':
+    if CFG_CERN_SITE == 1:
         from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 
         if key =='name' and string:
@@ -704,7 +701,7 @@ def loan_on_desk_step5(req, list_of_books, user_info,
     Register a new loan.
     """
 
-    (ccid, name, email, phone, address, mailbox) = user_info
+    (_ccid, name, email, phone, address, mailbox) = user_info
 
     loaned_on = datetime.date.today()
     is_borrower = db.is_borrower(email)
@@ -825,7 +822,7 @@ def register_new_loan(req, barcode, borrower_id,
             db.update_item_status('available', requested_barcode)
 
         db.update_loan_request_status(request_id, 'done')
-        db.update_barcode_on_crcloanrequest(barcode, request_id)
+        db.update_request_barcode(barcode, request_id)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -898,6 +895,7 @@ def get_borrower_details(req, borrower_id, ln=CFG_SITE_LANG):
     borrower_id - identify the borrower. It is also the primary key of
                   the table crcBORROWER.
     """
+
     borrower = db.get_borrower_details(borrower_id)
     requests = db.get_borrower_request_details(borrower_id)
     loans = db.get_borrower_loan_details(borrower_id)
@@ -1291,20 +1289,20 @@ def get_library_details(req, library_id, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def get_borrower_requests_details(req, borrower_id, id_request, ln=CFG_SITE_LANG):
+def get_borrower_requests_details(req, borrower_id, request_id, ln=CFG_SITE_LANG):
     """
     Display loans details of a borrower.
 
-    borrower_id - identify the borrower. It is also the primary key of
+    borrower_id: identify the borrower. It is also the primary key of
                   the table crcBORROWER.
 
-    id_request - identify the hold request. It is also the primary key
+    request_id: identify the hold request. It is also the primary key
                  of the table crcLOANREQUEST.
     """
 
-    if id_request:
-        status = 'cancelled'
-        db.cancel_request(id_request, status)
+    if request_id:
+        db.cancel_request(request_id, 'cancelled')
+        update_request_data(request_id)
 
     result = db.get_borrower_request_details(borrower_id)
 
@@ -1344,10 +1342,11 @@ def get_pending_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
 
     elif request_id:
         db.update_loan_request_status(request_id,'cancelled')
-        result = db.get_pending_loan_request('pending')
+        update_request_data(request_id)
+        result = db.get_loan_request_by_status('pending')
 
     else:
-        result = db.get_pending_loan_request('pending')
+        result = db.get_loan_request_by_status('pending')
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -1361,7 +1360,45 @@ def get_pending_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
     body = bibcirculation_templates.tmpl_get_pending_requests(result=result,
                                                              ln=ln)
 
-    return page(title="List of all pending requests",
+    return page(title="On shelve items with holds",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+
+def get_waiting_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
+    """
+    Get all loans requests who are waiting.
+    """
+
+    _ = gettext_set_language(ln)
+
+    if print_data == 'true':
+        return print_pending_hold_requests_information(req, ln)
+
+    elif request_id:
+        db.update_loan_request_status(request_id,'cancelled')
+        update_request_data(request_id)
+        result = db.get_loan_request_by_status('waiting')
+
+    else:
+        result = db.get_loan_request_by_status('waiting')
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_get_waiting_requests(result=result,
+                                                             ln=ln)
+
+    return page(title="On loan items with holds",
                 uid=id_user,
                 req=req,
                 body=body,
@@ -1378,6 +1415,7 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
 
     if request_id:
         db.update_loan_request_status(request_id, "cancelled")
+        update_request_data(request_id)
         result = db.get_all_requests()
     else:
         result = db.get_all_requests()
@@ -1401,20 +1439,12 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def all_loans(req, show, loans_per_page, jloan, ln=CFG_SITE_LANG):
+def all_loans(req, loans_per_page, jloan, ln=CFG_SITE_LANG):
     """
     Display all loans.
     """
 
-    if show == 'expired':
-        result = db.get_all_expired_loans()
-        title = "List of all expired loans"
-    elif show == 'on_loan':
-        result = db.get_all_loans_onloan()
-        title = "List of all loans ON LOAN?!?!"
-    else:
-        result = db.get_all_loans()
-        title = "List of all loans"
+    result = db.get_all_loans()
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -1426,12 +1456,38 @@ def all_loans(req, show, loans_per_page, jloan, ln=CFG_SITE_LANG):
         return mustloginpage(req, auth_message)
 
     body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                   show=show,
                                                    loans_per_page=loans_per_page,
                                                    jloan=jloan,
                                                    ln=ln)
 
-    return page(title=title,
+    return page(title="Current loans",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def all_expired_loans(req, loans_per_page, jloan, ln=CFG_SITE_LANG):
+    """
+    Display all loans.
+    """
+    result = db.get_all_expired_loans()
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_all_expired_loans(result=result,
+                                                           loans_per_page=loans_per_page,
+                                                           jloan=jloan,
+                                                           ln=ln)
+
+    return page(title='Overdue loans',
                 uid=id_user,
                 req=req,
                 body=body,
@@ -1450,10 +1506,12 @@ def get_item_requests_details(req, recid, request_id, ln=CFG_SITE_LANG):
                of the table crcLOANREQUEST.
     """
 
-    result = db.get_item_requests(recid)
 
     if request_id:
         db.cancel_request(request_id, 'cancelled')
+        update_request_data(request_id)
+
+    result = db.get_item_requests(recid)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -1627,6 +1685,15 @@ def add_new_borrower_step2(req, name, email, phone, address, mailbox,
     Add new borrower. Step 2.
     """
 
+    infos = []
+
+    is_borrower = db.is_borrower(email)
+
+    if is_borrower != 0:
+        infos.append("There is already a borrower using "\
+                     "the following email: \n\n <strong>%s</strong> \n\n"\
+                     "Please go back to previous page and give a different email. " % email)
+
     tup_infos = (name, email, phone, address, mailbox, notes)
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -1639,6 +1706,7 @@ def add_new_borrower_step2(req, name, email, phone, address, mailbox,
         return mustloginpage(req, auth_message)
 
     body = bibcirculation_templates.tmpl_add_new_borrower_step2(tup_infos=tup_infos,
+                                                                infos=infos,
                                                                 ln=ln)
 
     return page(title="Add new borrower - II",
@@ -2596,6 +2664,893 @@ def get_library_notes(req, library_id, add_notes, new_note, ln=CFG_SITE_LANG):
                                                        add_notes=add_notes,
                                                        ln=ln)
     return page(title="Library notes",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def change_due_date_step1(req, loan_id, borrower_id, ln=CFG_SITE_LANG):
+    """
+    Change the due date of a loan, step1.
+
+    loan_id: identify a loan. It is the primery key of the table
+             crcLOAN.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
+    """
+
+    loan_details = db.get_loan_infos(loan_id)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_change_due_date_step1(loan_details=loan_details,
+                                                               loan_id=loan_id,
+                                                               borrower_id=borrower_id,
+                                                               ln=ln)
+    return page(title="Change due date",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+
+def change_due_date_step2(req, due_date, loan_id, borrower_id, ln=CFG_SITE_LANG):
+    """
+    Change the due date of a loan, step2.
+
+    due_date: new due date.
+
+    loan_id: identify a loan. It is the primery key of the table
+             crcLOAN.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
+    """
+
+    db.update_due_date(loan_id, due_date)
+    due_date = db.get_loan_due_date(loan_id)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_change_due_date_step2(due_date=due_date,
+                                                               borrower_id=borrower_id,
+                                                               ln=ln)
+    return page(title="Change due date",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def claim_book_return(req, borrower_id, recid, template, ln=CFG_SITE_LANG):
+    """
+    Claim the return of an item.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                  the table crcBORROWER.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    template: letter template.
+    """
+
+    email = db.get_borrower_email(borrower_id)
+    subject = "Claim return for: %s" % (book_title_from_MARC(recid))
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    show_template = load_template(template)
+    body = bibcirculation_templates.tmpl_borrower_notification(email=email,
+                                                               subject=subject,
+                                                               template=show_template,
+                                                               borrower_id=borrower_id,
+                                                               ln=ln)
+
+    return page(title="Claim return",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def create_new_loan_step1(req, borrower_id, ln=CFG_SITE_LANG):
+    """
+    Create a new loan from the borrower's page, step1.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                  the table crcBORROWER.
+    """
+
+    borrower = db.get_borrower_details(borrower_id)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+
+    body = bibcirculation_templates.tmpl_create_new_loan_step1(borrower=borrower,
+                                                               ln=ln)
+
+    return page(title="New loan",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+
+def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
+    """
+    Create a new loan from the borrower's page, step2.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                  the table crcBORROWER.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    notes: notes about the new loan.
+    """
+    borrower_info = db.get_borrower_data(borrower_id)
+    recid = db.get_id_bibrec(barcode)
+
+    loaned_on = datetime.date.today()
+    due_date = renew_loan_for_X_days(barcode)
+
+    if notes:
+        note = '[' + time.ctime() + '] ' + notes + '\n'
+        db.new_loan(borrower_id, recid, barcode,
+                    loaned_on, due_date, 'on loan', 'normal', note)
+    else:
+        db.new_loan(borrower_id, recid, barcode,
+                    loaned_on, due_date, 'on loan', 'normal','')
+
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_register_new_loan(loan_information=borrower_info,
+                                                           ln=ln)
+
+    return page(title="New loan",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def create_new_request_step1(req, borrower_id, p, f, search, ln=CFG_SITE_LANG):
+    """
+    Create a new request from the borrower's page, step1.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                  the table crcBORROWER.
+
+    p: search pattern.
+
+    f: field
+
+    search: search an item.
+    """
+
+    if search:
+        result = perform_request_search(cc="Books", sc="1", p=p, f=f)
+    else:
+        result = ''
+
+    borrower = db.get_borrower_details(borrower_id)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+
+    body = bibcirculation_templates.tmpl_create_new_request_step1(borrower=borrower,
+                                                                  result=result,
+                                                                  p=p,
+                                                                  f=f,
+                                                                  ln=ln)
+
+    return page(title="New request",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+
+def create_new_request_step2(req, recid, borrower_id, ln=CFG_SITE_LANG):
+    """
+    Create a new request from the borrower's page, step2.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                  the table crcBORROWER.
+    """
+
+    holdings_information = db.get_holdings_information(recid)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+
+    body = bibcirculation_templates.tmpl_create_new_request_step2(borrower_id=borrower_id,
+                                                                  holdings_information = holdings_information,
+                                                                  recid=recid,
+                                                                  ln=ln)
+
+    return page(title="New request",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+
+def create_new_request_step3(req, borrower_id, barcode, recid, ln=CFG_SITE_LANG):
+    """
+    Create a new request from the borrower's page, step3.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                  the table crcBORROWER.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+    """
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+
+    body = bibcirculation_templates.tmpl_create_new_request_step3(borrower_id=borrower_id,
+                                                                  barcode=barcode,
+                                                                  recid=recid,
+                                                                  ln=ln)
+
+    return page(title="New request",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def create_new_request_step4(req, period_from, period_to, barcode,
+                             borrower_id, recid, ln=CFG_SITE_LANG):
+    """
+    Create a new request from the borrower's page, step4.
+
+    period_from: begining of the period of interest.
+
+    period_to: end of the period of interest.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                  the table crcBORROWER.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+    """
+
+    nb_requests = db.get_number_requests_per_copy(barcode)
+    is_on_loan = db.is_item_on_loan(barcode)
+
+    if nb_requests == 0 and is_on_loan is not None:
+        status = 'waiting'
+    elif nb_requests == 0 and is_on_loan is None:
+        status = 'pending'
+    else:
+        status = 'waiting'
+
+    db.new_hold_request(borrower_id, recid, barcode,
+                        period_from, period_to,
+                        status)
+
+    db.update_item_status('requested', barcode)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+
+    body = bibcirculation_templates.tmpl_create_new_request_step4(ln=ln)
+
+    return page(title="New request",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
+    """
+    Place a new request from the item's page, step1.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    key: search field.
+
+    string: search pattern.
+    """
+
+    recid = db.get_id_bibrec(barcode)
+    list_infos = []
+
+    if CFG_CERN_SITE == 1:
+        from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+
+        if key =='name' and string:
+            result = get_user_info_from_ldap(nickname=string)
+
+            for i in range(len(result)):
+
+                try:
+                    name = result[i][1]['cn'][0]
+                except KeyError:
+                    name = ""
+
+                try:
+                    ccid = result[i][1]['employeeID'][0]
+                except KeyError:
+                    ccid = ""
+
+                try:
+                    email = result[i][1]['mail'][0]
+                except KeyError:
+                    email = ""
+
+                try:
+                    phone = result[i][1]['telephoneNumber'][0]
+                except KeyError:
+                    phone = ""
+
+                try:
+                    address = result[i][1]['physicalDeliveryOfficeName'][0]
+                except KeyError:
+                    address = ""
+
+                try:
+                    mailbox = result[i][1]['postOfficeBox'][0]
+                except KeyError:
+                    mailbox = ""
+
+                tup = (ccid, name, email, phone, address, mailbox)
+                list_infos.append(tup)
+
+        elif key =='email' and string:
+            result = get_user_info_from_ldap(email=string)
+            try:
+                name = result['cn'][0]
+            except KeyError:
+                name = ""
+
+            try:
+                ccid = result['employeeID'][0]
+            except KeyError:
+                ccid = ""
+
+            try:
+                email = result['mail'][0]
+            except KeyError:
+                email = ""
+
+            try:
+                phone = result['telephoneNumber'][0]
+            except KeyError:
+                phone = ""
+
+            try:
+                address = result['physicalDeliveryOfficeName'][0]
+            except KeyError:
+                address = ""
+
+            try:
+                mailbox = result['postOfficeBox'][0]
+            except KeyError:
+                mailbox = ""
+
+            tup = (ccid, name, email, phone, address, mailbox)
+            list_infos.append(tup)
+
+        elif key =='ccid' and string:
+            result = get_user_info_from_ldap(ccid=string)
+
+            try:
+                name = result['cn'][0]
+            except KeyError:
+                name = ""
+
+            try:
+                ccid = result['employeeID'][0]
+            except KeyError:
+                ccid = ""
+
+            try:
+                email = result['mail'][0]
+            except KeyError:
+                email = ""
+
+            try:
+                phone = result['telephoneNumber'][0]
+            except KeyError:
+                phone = ""
+
+            try:
+                address = result['physicalDeliveryOfficeName'][0]
+            except KeyError:
+                address = ""
+
+            try:
+                mailbox = result['postOfficeBox'][0]
+            except KeyError:
+                mailbox = ""
+
+            tup = (ccid, name, email, phone, address, mailbox)
+            list_infos.append(tup)
+
+        else:
+            list_infos = []
+
+    else:
+        if key =='name' and string:
+            result = db.get_borrower_data_by_name(string)
+
+        elif key =='email' and string:
+            result = db.get_borrower_data_by_email(string)
+
+        else:
+            result = db.get_borrower_data_by_id(string)
+
+        for (borrower_id, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, name, email, phone, address, mailbox)
+            list_infos.append(tup)
+
+
+    body = bibcirculation_templates.tmpl_place_new_request_step1(result=list_infos,
+                                                                 key=key,
+                                                                 string=string,
+                                                                 barcode=barcode,
+                                                                 recid=recid,
+                                                                 ln=ln)
+
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+
+
+    return page(title="New request",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+
+
+
+def place_new_request_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
+    """
+    Place a new request from the item's page, step2.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    user_info - information of the user/borrower who was selected.
+    """
+
+    body = bibcirculation_templates.tmpl_place_new_request_step2(barcode=barcode,
+                                                                 recid=recid,
+                                                                 user_info=user_info,
+                                                                 ln=ln)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    return page(title="New request",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def place_new_request_step3(req, barcode, recid, _ccid, name, email, phone,
+                            address, mailbox, period_from, period_to, ln=CFG_SITE_LANG):
+    """
+    Place a new request from the item's page, step3.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+    """
+
+    nb_requests = db.get_number_requests_per_copy(barcode)
+    is_on_loan = db.is_item_on_loan(barcode)
+
+    if nb_requests == 0 and is_on_loan is not None:
+        status = 'waiting'
+    elif nb_requests == 0 and is_on_loan is None:
+        status = 'pending'
+    else:
+        status = 'waiting'
+
+    is_borrower = db.is_borrower(email)
+
+    if is_borrower != 0:
+        db.new_hold_request(is_borrower, recid, barcode,
+                            period_from, period_to, status)
+        db.update_item_status('requested', barcode)
+
+    else:
+        db.new_borrower(name, email, phone, address, mailbox, '')
+        is_borrower = db.is_borrower(email)
+
+        db.new_hold_request(is_borrower, recid, barcode,
+                            period_from, period_to, status)
+        db.update_item_status('requested', barcode)
+
+
+    body = bibcirculation_templates.tmpl_place_new_request_step3(ln=ln)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    return page(title="New request",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
+    """
+    Place a new loan from the item's page, step1.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    key: search field.
+
+    string: search pattern.
+    """
+
+    recid = db.get_id_bibrec(barcode)
+    list_infos = []
+
+    if CFG_CERN_SITE == 1:
+        from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+
+        if key =='name' and string:
+            result = get_user_info_from_ldap(nickname=string)
+
+            for i in range(len(result)):
+
+                try:
+                    name = result[i][1]['cn'][0]
+                except KeyError:
+                    name = ""
+
+                try:
+                    ccid = result[i][1]['employeeID'][0]
+                except KeyError:
+                    ccid = ""
+
+                try:
+                    email = result[i][1]['mail'][0]
+                except KeyError:
+                    email = ""
+
+                try:
+                    phone = result[i][1]['telephoneNumber'][0]
+                except KeyError:
+                    phone = ""
+
+                try:
+                    address = result[i][1]['physicalDeliveryOfficeName'][0]
+                except KeyError:
+                    address = ""
+
+                try:
+                    mailbox = result[i][1]['postOfficeBox'][0]
+                except KeyError:
+                    mailbox = ""
+
+                tup = (ccid, name, email, phone, address, mailbox)
+                list_infos.append(tup)
+
+        elif key =='email' and string:
+            result = get_user_info_from_ldap(email=string)
+            try:
+                name = result['cn'][0]
+            except KeyError:
+                name = ""
+
+            try:
+                ccid = result['employeeID'][0]
+            except KeyError:
+                ccid = ""
+
+            try:
+                email = result['mail'][0]
+            except KeyError:
+                email = ""
+
+            try:
+                phone = result['telephoneNumber'][0]
+            except KeyError:
+                phone = ""
+
+            try:
+                address = result['physicalDeliveryOfficeName'][0]
+            except KeyError:
+                address = ""
+
+            try:
+                mailbox = result['postOfficeBox'][0]
+            except KeyError:
+                mailbox = ""
+
+            tup = (ccid, name, email, phone, address, mailbox)
+            list_infos.append(tup)
+
+        elif key =='ccid' and string:
+            result = get_user_info_from_ldap(ccid=string)
+
+            try:
+                name = result['cn'][0]
+            except KeyError:
+                name = ""
+
+            try:
+                ccid = result['employeeID'][0]
+            except KeyError:
+                ccid = ""
+
+            try:
+                email = result['mail'][0]
+            except KeyError:
+                email = ""
+
+            try:
+                phone = result['telephoneNumber'][0]
+            except KeyError:
+                phone = ""
+
+            try:
+                address = result['physicalDeliveryOfficeName'][0]
+            except KeyError:
+                address = ""
+
+            try:
+                mailbox = result['postOfficeBox'][0]
+            except KeyError:
+                mailbox = ""
+
+            tup = (ccid, name, email, phone, address, mailbox)
+            list_infos.append(tup)
+
+        else:
+            list_infos = []
+
+    else:
+        if key =='name' and string:
+            result = db.get_borrower_data_by_name(string)
+
+        elif key =='email' and string:
+            result = db.get_borrower_data_by_email(string)
+
+        else:
+            result = db.get_borrower_data_by_id(string)
+
+        for (borrower_id, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, name, email, phone, address, mailbox)
+            list_infos.append(tup)
+
+
+    body = bibcirculation_templates.tmpl_place_new_loan_step1(result=list_infos,
+                                                              key=key,
+                                                              string=string,
+                                                              barcode=barcode,
+                                                              recid=recid,
+                                                              ln=ln)
+
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+
+
+    return page(title="New loan",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def place_new_loan_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
+    """
+    Place a new loan from the item's page, step2.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    user_info - information of the user/borrower who was selected.
+    """
+
+    body = bibcirculation_templates.tmpl_place_new_loan_step2(barcode=barcode,
+                                                              recid=recid,
+                                                              user_info=user_info,
+                                                              ln=ln)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    return page(title="New loan",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def place_new_loan_step3(req, barcode, recid, _ccid, name, email, phone,
+                         address, mailbox, due_date, notes, ln=CFG_SITE_LANG):
+    """
+    Place a new loan from the item's page, step3.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    """
+
+    loaned_on = datetime.date.today()
+    is_borrower = db.is_borrower(email)
+
+    if notes:
+        notes_format = '[' + time.ctime() + '] ' +  notes +  '\n'
+    else:
+        notes_format = None
+
+    if is_borrower != 0:
+
+        db.new_loan(is_borrower, recid, barcode,
+                    loaned_on, due_date, 'on loan', 'normal', notes_format)
+        db.update_item_status('on loan', barcode)
+
+    else:
+        db.new_borrower(name, email, phone, address, mailbox, '')
+        is_borrower = db.is_borrower(email)
+
+        db.new_loan(is_borrower, recid, barcode,
+                    loaned_on, due_date, 'on loan', 'normal', notes_format)
+        db.update_item_status('on loan', barcode)
+
+    borrower_info = db.get_borrower_data(is_borrower)
+
+    body = bibcirculation_templates.tmpl_register_new_loan(loan_information=borrower_info,
+                                                           ln=ln)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    return page(title="New loan",
                 uid=id_user,
                 req=req,
                 body=body,

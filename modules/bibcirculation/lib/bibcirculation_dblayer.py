@@ -44,14 +44,16 @@ def verify_office_reference(uid):
 def get_holdings_info(recid):
     """
     Get information about holding, using recid.
-    recid: CDS Invenio record identifier.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""
-                  select count(lr.id_bibrec),
-                         it.loan_period,
-                         DATE_FORMAT(max(lr.period_of_interest_to),'%%Y-%%m-%%d'),
-                         lib.name
-                  from crcLOANREQUEST lr, crcITEM it, crcLIBRARY lib
+                 select count(lr.id_bibrec),
+                        it.loan_period,
+                        DATE_FORMAT(max(lr.period_of_interest_to),'%%Y-%%m-%%d'),
+                        lib.name
+                   from crcLOANREQUEST lr, crcITEM it, crcLIBRARY lib
                   where lib.id = it.id_crcLIBRARY and
                         lr.id_bibrec=it.id_bibrec and
                         it.id_bibrec=%s and
@@ -62,6 +64,8 @@ def get_holdings_info(recid):
 
 def get_holdings_information(recid):
     """
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql("""select it.barcode,
@@ -85,7 +89,9 @@ def get_holdings_information(recid):
 def get_holdings_details(recid):
     """
     Get details about holdings (loan period, location and library).
-    recid: CDS Invenio record identifier.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql(""" select it.loan_period, lib.name, it.location
@@ -97,8 +103,10 @@ def get_holdings_details(recid):
 
 def get_loan_details(recid):
     """
-    Get details about loans (barcode and status).
-    recid: CDS Invenio record identifier
+    Get details about a loan (barcode and status).
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql("""select barcode, status
@@ -112,7 +120,10 @@ def get_loan_details(recid):
 def get_due_date_loan(recid):
     """
     Get the due date of a loan.
-    recid: CDS Invenio record identifier.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
     """
 
     res = run_sql("""select DATE_FORMAT(max(due_date),'%%Y-%%m-%%d')
@@ -125,7 +136,8 @@ def get_due_date_loan(recid):
 
 def get_holdings_info_no_requests(recid):
     """
-    recid: CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql(""" select it.loan_period, lib.name
@@ -135,58 +147,52 @@ def get_holdings_info_no_requests(recid):
 
     return res
 
-def get_recid_from_crcLOANREQUEST(loan_request_id):
+def get_request_recid(request_id):
     """
-    @param loan_request_id: primary key of crcLOANREQUEST
+    request_id: identify the hold request. It is also the primary key
+                of the table crcLOANREQUEST.
     """
-
     res = run_sql(""" select id_bibrec
                       from crcLOANREQUEST
                       where id=%s
-                  """, (loan_request_id, ))
+                  """, (request_id, ))
 
     return res[0][0]
 
-def get_borrower_id_from_crcLOANREQUEST(loan_request_id):
+def get_request_borrower_id(request_id):
     """
-    @param loan_request_id: primary key of crcLOANREQUEST
+    request_id: identify the hold request. It is also the primary key
+                of the table crcLOANREQUEST.
     """
 
     res = run_sql(""" select id_crcBORROWER
                       from crcLOANREQUEST
                       where id=%s
-                  """, (loan_request_id, ))
+                  """, (request_id, ))
 
     return res[0][0]
 
 
-def get_barcode_from_crcLOANREQUEST(loan_request_id):
+def get_request_barcode(request_id):
     """
-    @param loan_request_id: primary key of crcLOANREQUEST
-    """
+    Get the barcode associate to a request_id.
 
+    request_id: identify the hold request. It is also the primary key
+                of the table crcLOANREQUEST.
+    """
     res = run_sql(""" select barcode
                       from crcLOANREQUEST
                       where id=%s
-                  """, (loan_request_id, ))
-
-    return res[0][0]
-
-def get_request_date_to_from_crcLOANREQUEST(loan_request_id):
-    """
-    @param loan_request_id: primary key of crcLOANREQUEST
-    """
-
-    res = run_sql(""" select period_of_interest_to
-                      from crcLOANREQUEST
-                      where id=%s
-                  """, (loan_request_id, ))
+                  """, (request_id, ))
 
     return res[0][0]
 
 def get_id_bibrec(barcode):
     """
-    @param barcode: primary key of crcITEM
+    Get the id bibrec.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
     """
 
     res = run_sql("""select id_bibrec
@@ -199,10 +205,15 @@ def get_id_bibrec(barcode):
     except IndexError:
         return None
 
+
 def update_item_status(status, barcode):
     """
-    @param status: new item's status
-    @param barcode: primary key of crcITEM
+    Update the status of an item.
+
+    status: status of the item.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
     """
     if status == 'on loan':
         return int(run_sql("""UPDATE  crcITEM
@@ -219,9 +230,22 @@ def update_item_status(status, barcode):
 
 def new_hold_request(borrower_id, recid, barcode, date_from, date_to, status):
     """
-    @param uid: user ID
-    @param recid: recID - CDS Invenio record identifier
-    @param barcode: primary key of crcITEM
+    Create a new hold request.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    date_from: begining of the period of interest.
+
+    date_to: end of the period of interest.
+
+    status: hold request status.
     """
     res = run_sql("""INSERT INTO crcLOANREQUEST(id_crcBORROWER,
                                                 id_bibrec,
@@ -239,7 +263,10 @@ def new_hold_request(borrower_id, recid, barcode, date_from, date_to, status):
 
 def get_barcode(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    Get all the barcodes(copies) of a record.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql("""select barcode
@@ -251,7 +278,8 @@ def get_barcode(recid):
 
 def get_due_date(barcode):
     """
-    @param barcode: primary key of crcITEM
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
     """
 
     res = run_sql("""select period_of_interest_to
@@ -263,7 +291,8 @@ def get_due_date(barcode):
 
 def get_number_requests(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res =  run_sql("""
                       select id_bibrec
@@ -273,37 +302,45 @@ def get_number_requests(recid):
 
     return res
 
-def get_number_requests2(barcode, checkid):
+def get_number_requests2(barcode, request_id):
     """
-    @param barcode: primary key of crcITEM
-    @param checkid: id of crcLOANREQUEST
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    request_id: identify the hold request. It is also the primary key
+                of the table crcLOANREQUEST.
     """
 
     res =  run_sql("""select id_bibrec
                       from crcLOANREQUEST
                       where id < %s and barcode=%s and status != 'done'
-                   """, (checkid, barcode))
+                   """, (request_id, barcode))
 
     return res
 
 
-def loan_return_confirm(uid, recid):
+def loan_return_confirm(borrower_id, recid):
     """
-    @param uid: user ID
-    @param recid: recID - CDS Invenio record identifier
+    borrower_id: identify the borrower. It is also the primary key of
+             the table crcBORROWER.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""select bor.name, it.id_bibrec
                      from crcBORROWER bor, crcITEM it
                      where bor.id=%s and it.id_bibrec=%s
-                     """, (uid, recid))
+                     """, (borrower_id, recid))
 
     return res
 
 def get_borrower_id(barcode):
     """
-    @param barcode: primary key of crcITEM
-    """
+    Get the borrower id who is associate to a loan.
 
+    barcode: identify the item. It is the primary key of the table
+              crcITEM.
+    """
     res = run_sql(""" select id_crcBORROWER
                       from crcLOAN
                       where barcode=%s and status='on loan'""",
@@ -313,20 +350,25 @@ def get_borrower_id(barcode):
     except IndexError:
         return None
 
-def get_borrower_email(uid):
+def get_borrower_email(borrower_id):
     """
-    @param uid: user ID
-    """
+    Get the email of a borrower.
 
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
+    """
     res = run_sql("""select email
                      from crcBORROWER
-                     where id=%s""", (uid, ))
+                     where id=%s""", (borrower_id, ))
 
     return res[0][0]
 
 def get_next_waiting_loan_request(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    Get the next waiting loan request.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""SELECT lr.id,
                             bor.name,
@@ -346,9 +388,13 @@ def get_next_waiting_loan_request(recid):
 
 def update_loan_info(returned_on, status, barcode):
     """
-    @param barcode: primary key of crcITEM
-    """
+    returned_on: return date.
 
+    status: new loan status
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+    """
 
     return int(run_sql("""update crcLOAN
                           set returned_on=%s, status=%s
@@ -359,7 +405,8 @@ def update_loan_info(returned_on, status, barcode):
 
 def get_item_copies_details(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""select it.barcode, it.loan_period, lib.name,
                             lib.id, it.location, it.number_of_requests,
@@ -373,7 +420,8 @@ def get_item_copies_details(recid):
 
 def get_number_copies(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql("""select count(barcode)
@@ -386,6 +434,8 @@ def get_number_copies(recid):
 
 def bor_loans_historical_overview(borrower_id):
     """
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
     res = run_sql("""
                      select l.id_bibrec,
@@ -407,8 +457,9 @@ def bor_loans_historical_overview(borrower_id):
 
 def bor_requests_historical_overview(borrower_id):
     """
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
-
     res = run_sql("""select lr.id_bibrec,
                             lr.barcode,
                             lib.name,
@@ -426,6 +477,8 @@ def bor_requests_historical_overview(borrower_id):
 
 def get_item_loans_historical_overview(recid):
     """
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""select bor.name,
                             bor.id,
@@ -450,6 +503,8 @@ def get_item_loans_historical_overview(recid):
 
 def get_item_requests_historical_overview(recid):
     """
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql("""
@@ -474,9 +529,9 @@ def get_item_requests_historical_overview(recid):
 
 def get_library_details(library_id):
     """
-    @param libid: primary key of crcLIBRARY
+    library_id: identify the library. It is also the primary key of
+            the table crcLIBRARY.
     """
-
     res = run_sql("""select id, name, address, email, phone, notes
                      from crcLIBRARY
                      where id=%s;
@@ -484,9 +539,9 @@ def get_library_details(library_id):
 
     return res[0]
 
-def get_pending_loan_request(status):
+def get_loan_request_by_status(status):
     """
-    @param status: status=pending
+    status: request status.
     """
     res = run_sql("""SELECT DISTINCT
                             lr.id,
@@ -509,60 +564,22 @@ def get_pending_loan_request(status):
                      (status, ))
     return res
 
-def get_pending_loan_request_on_loan(status):
-    """
-    @param status: status=pending
-    """
-    res = run_sql("""SELECT lr.id,
-                            lr.id_bibrec,
-                            bor.name,
-                            bor.id,
-                            it.location,
-                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
-                     FROM   crcLOANREQUEST lr,
-                            crcBORROWER bor,
-			    crcITEM it
-                     WHERE  lr.id_crcBORROWER=bor.id AND it.id_bibrec=lr.id_bibrec AND
-                            lr.status=%s AND lr.barcode='' """,
-                     (status, ))
-    return res
-
-def get_pending_loan_request_available(status):
-    """
-    @param status: status=pending
-    """
-    res = run_sql("""SELECT lr.id,
-                            lr.id_bibrec,
-                            bor.name,
-                            bor.id,
-                            it.location,
-                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
-                     FROM   crcLOANREQUEST lr,
-                            crcBORROWER bor,
-			    crcITEM it
-                     WHERE  lr.id_crcBORROWER=bor.id AND it.id_bibrec=lr.id_bibrec AND
-                            lr.status=%s AND lr.barcode!='' """,
-                     (status, ))
-    return res
-
 
 def update_loan_request_status(request_id, status):
     """
-    @param request_id: primary key of crcLOANREQUEST
-    @param status: new status
-    """
+    request_id: identify the hold request. It is also the primary key
+                of the table crcLOANREQUEST.
 
+    status: new request status.
+    """
     return int(run_sql("""UPDATE  crcLOANREQUEST
                              SET  status=%s
                            WHERE  id=%s""",
                        (status, request_id)))
 
-
-
 def get_all_requests():
     """
+    Retrieve all requests.
     """
     res = run_sql("""SELECT lr.id,
                             bor.id,
@@ -583,21 +600,26 @@ def get_all_requests():
 
 def get_item_requests(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""SELECT bor.id,
                             bor.name,
                             lr.id_bibrec,
                             lr.status,
+                            lib.name,
+                            it.location,
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.id,
                             lr.request_date
                      FROM   crcLOANREQUEST lr,
-                            crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s and lr.status!='done'
-                            and lr.status!='cancelled'
-
+                            crcBORROWER bor,
+                            crcITEM it,
+                            crcLIBRARY lib
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s
+                            and lr.status!='done' and lr.status!='cancelled'
+                            and lr.barcode = it.barcode and lib.id = it.id_crcLIBRARY
                      """, (recid, ))
 
     return res
@@ -605,7 +627,8 @@ def get_item_requests(recid):
 
 def get_all_requests_for_item_order_by_status(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""SELECT bor.id,
                             bor.name,
@@ -622,7 +645,8 @@ def get_all_requests_for_item_order_by_status(recid):
 
 def get_all_requests_for_item_order_by_name(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql("""SELECT bor.id,
                             bor.name,
@@ -639,7 +663,7 @@ def get_all_requests_for_item_order_by_name(recid):
 
 def get_all_requests_order_by_status():
     """
-
+    Get all requests order by status.
     """
     res = run_sql("""SELECT bor.id,
                             bor.name,
@@ -656,6 +680,7 @@ def get_all_requests_order_by_status():
 
 def get_all_requests_order_by_name():
     """
+    Get all requests order by name.
     """
     res = run_sql("""SELECT bor.id,
                             bor.name,
@@ -674,6 +699,7 @@ def get_all_requests_order_by_name():
 
 def get_all_requests_order_by_item():
     """
+    Get all requests order by item.
     """
     res = run_sql("""SELECT bor.id,
                             bor.name,
@@ -690,7 +716,8 @@ def get_all_requests_order_by_item():
 
 def get_borrower_details(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
     res =  run_sql("""select id, name, email, phone, address, mailbox
                       from crcBORROWER
@@ -698,20 +725,25 @@ def get_borrower_details(borrower_id):
     return res[0]
 
 
-def get_borrower_name(uid):
+def get_borrower_name(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
     res = run_sql("""select name
                      from crcBORROWER
-                     where id=%s""", (uid, ))
+                     where id=%s""", (borrower_id, ))
 
     return res[0][0]
 
 def loan_on_desk_confirm(barcode, borrower_id):
     """
-    """
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
 
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
+    """
     res = run_sql("""select it.id_bibrec, bor.name
                      from crcITEM it, crcBORROWER bor
                      where it.barcode=%s and bor.id=%s
@@ -721,19 +753,20 @@ def loan_on_desk_confirm(barcode, borrower_id):
 
 def search_borrower_by_name(string):
     """
-    @param str: parameter used by regexp
+    string: search pattern.
     """
+    search_pattern = '^' + string
 
     res = run_sql("""select id, name
                      from crcBORROWER
-                     where name regexp %s
-                     """, (string, ))
+                     where name regexp %s order by name
+                     """, (search_pattern, ))
 
     return res
 
 def search_borrower_by_email(string):
     """
-    @param str: parameter used by regexp
+    string: search pattern.
     """
 
     res = run_sql("""select id, name
@@ -743,8 +776,11 @@ def search_borrower_by_email(string):
 
     return res
 
+
+
 def search_borrower_by_phone(string):
     """
+    string: search pattern.
     """
 
     res = run_sql("""select id, name
@@ -757,32 +793,34 @@ def search_borrower_by_phone(string):
 
 def search_borrower_by_id(string):
     """
-    @param str: parameter used by regexp
+    string: search pattern.
     """
 
     res = run_sql("""select id, name
                      from crcBORROWER
-                     where id regexp %s
+                     where id=%s
                      """, (string, ))
 
     return res
 
-def search_user_by_email(str):
+def search_user_by_email(string):
     """
+    string: search pattern.
     """
 
     res = run_sql("""
                   select id, email
                   from user
                   where email regexp %s
-                  """, (str, ))
+                  """, (string, ))
 
     return res
 
 
-def get_borrower_loan_details(uid):
+def get_borrower_loan_details(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
     res = run_sql("""
@@ -799,32 +837,38 @@ def get_borrower_loan_details(uid):
                          l.status
                   from crcLOAN l, crcITEM it
                   where l.barcode=it.barcode and id_crcBORROWER=%s and l.status!='returned'
-    """, (uid, ))
+    """, (borrower_id, ))
 
     return res
 
 
-def get_borrower_request_details(uid):
+def get_borrower_request_details(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
-    res = run_sql("""SELECT lr.id_crcBORROWER,
-                            lr.id_bibrec,
+    res = run_sql("""SELECT lr.id_bibrec,
                             lr.status,
+                            lib.name,
+                            it.location,
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date,
                             lr.id
-                     FROM   crcLOANREQUEST lr
+                     FROM   crcLOANREQUEST lr,
+                            crcITEM it,
+                            crcLIBRARY lib
                      WHERE  lr.id_crcBORROWER =%s and (lr.status='waiting' or lr.status='pending')
-                            """, (uid, ))
+                            and lib.id = it.id_crcLIBRARY and lr.barcode = it.barcode
+                            """, (borrower_id, ))
 
     return res
 
-def get_borrower_request_details_order_by_item(uid):
+def get_borrower_request_details_order_by_item(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
     res = run_sql("""SELECT lr.id_crcBORROWER,
@@ -834,14 +878,15 @@ def get_borrower_request_details_order_by_item(uid):
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
                      WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY id_bibrec
-                            """, (uid, ))
+                            """, (borrower_id, ))
 
     return res
 
 
-def get_borrower_request_details_order_by_status(uid):
+def get_borrower_request_details_order_by_status(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
     res = run_sql("""SELECT lr.id_crcBORROWER,
@@ -851,14 +896,15 @@ def get_borrower_request_details_order_by_status(uid):
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
                      WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY status
-                            """, (uid, ))
+                            """, (borrower_id, ))
 
     return res
 
 
-def get_borrower_request_details_order_by_from(uid):
+def get_borrower_request_details_order_by_from(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
     res = run_sql("""SELECT lr.id_crcBORROWER,
@@ -868,14 +914,15 @@ def get_borrower_request_details_order_by_from(uid):
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
                      WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY period_of_interest_from
-                            """, (uid, ))
+                            """, (borrower_id, ))
 
     return res
 
 
-def get_borrower_request_details_order_by_to(uid):
+def get_borrower_request_details_order_by_to(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
     res = run_sql("""SELECT lr.id_crcBORROWER,
@@ -885,27 +932,47 @@ def get_borrower_request_details_order_by_to(uid):
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
                      WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY period_of_interest_to
-                            """, (uid, ))
+                            """, (borrower_id, ))
 
     return res
 
-def new_loan(borrower_id, id_bibrec, barcode,
-             loaned_on, due_date, status, type, notes):
+def new_loan(borrower_id, recid, barcode,
+             loaned_on, due_date, status, loan_type, notes):
     """
-    @param barcode: primary of crcITEM
+    Create a new loan.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
+
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    loaned_on: loan date.
+
+    due_date: due date.
+
+    status: loan status.
+
+    loan_type: loan type(normal, ILL, etc...)
+
+    notes: loan notes.
     """
     res = run_sql(""" insert into crcLOAN (id_crcBORROWER, id_bibrec,
                                            barcode, loaned_on, due_date,
                                            status, type, notes)
                       values(%s, %s, %s, %s, %s, %s ,%s, %s)
-                  """, (borrower_id, id_bibrec, barcode, loaned_on,
-                        due_date, status, type, notes))
+                  """, (borrower_id, recid, barcode, loaned_on,
+                        due_date, status, loan_type, notes))
 
     return res
 
 def get_item_loans(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
 
     res = run_sql(
@@ -932,6 +999,7 @@ def get_item_loans(recid):
 
 def get_all_loans():
     """
+    Get all loans.
     """
 
     res = run_sql(
@@ -958,6 +1026,7 @@ def get_all_loans():
 
 def get_all_expired_loans():
     """
+    Get all expired(overdue) loans.
     """
     res = run_sql(
     """
@@ -981,35 +1050,10 @@ def get_all_expired_loans():
     return res
 
 
-def get_all_loans_onloan():
+def get_borrower_loans(borrower_id):
     """
-    """
-    res = run_sql(
-    """
-    select bor.id,
-           bor.name,
-           it.id_bibrec,
-           l.barcode,
-           DATE_FORMAT(l.loaned_on,'%Y-%m-%d'),
-           DATE_FORMAT(l.returned_on,'%Y-%m-%d'),
-           DATE_FORMAT(l.due_date,'%Y-%m-%d'),
-           l.number_of_renewals,
-           l.overdue_letter_number,
-           DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
-           l.status
-    from crcLOAN l, crcBORROWER bor, crcITEM it
-    where l.id_crcBORROWER = bor.id and
-          l.barcode=it.barcode and l.status='on loan';
-    """)
-
-    return res
-
-
-
-
-def get_borrower_loans(uid):
-    """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+             the table crcBORROWER.
     """
 
     res = run_sql(""" select id_bibrec,
@@ -1018,14 +1062,17 @@ def get_borrower_loans(uid):
                              DATE_FORMAT(due_date,'%%Y-%%m-%%d')
                       from crcLOAN
                       where id_crcBORROWER=%s and status != 'returned'
-                  """, (uid, ))
+                  """, (borrower_id, ))
 
     return res
 
 
 def update_due_date(loan_id, new_due_date):
     """
-    @param barcode: primary key of crcITEM
+    loan_id: identify a loan. It is the primery key of the table
+             crcLOAN.
+
+    new_due_date: new due date.
     """
     return int(run_sql("""UPDATE  crcLOAN
                              SET  due_date=%s,
@@ -1033,17 +1080,22 @@ def update_due_date(loan_id, new_due_date):
                            WHERE  id=%s""",
                        (new_due_date, loan_id)))
 
-def update_due_date_borrower(borrower, new_due_date):
+def update_due_date_borrower(borrower_id, new_due_date):
     """
+    borrower_id: identify the borrower. It is also the primary key of
+             the table crcBORROWER.
+
+    new_due_date: new due date.
     """
     return int(run_sql("""UPDATE  crcLOAN
                              SET  due_date=%s
                            WHERE  id_crcBORROWER=%s and status='on loan'
-                           """, (new_due_date, borrower)))
+                           """, (new_due_date, borrower_id)))
 
 def get_queue_request(recid):
     """
-    @param recid: recID - CDS Invenio record identifier
+    recid: identify the record. It is also the primary key of
+           the table bibrec.
     """
     res = run_sql(""" select id
                       from crcLOANREQUEST
@@ -1052,30 +1104,21 @@ def get_queue_request(recid):
 
     return res
 
-def get_recid_borrower_loans(uid):
+def get_recid_borrower_loans(borrower_id):
     """
-    @param uid: user ID
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
     res = run_sql(""" select id, id_bibrec, barcode
                       from crcLOAN
                       where id_crcBORROWER=%s and status != 'returned'
-                  """, (uid, ))
+                  """, (borrower_id, ))
 
 
     return res
 
-def get_borrowerID(name):
-    """
-    """
-
-    res = run_sql(""" select id
-                      from crcBORROWER
-                      where name=%s """, (name, ))
-
-    return res [0][0]
-
-def update_barcode_on_crcloanrequest(barcode, request_id):
+def update_request_barcode(barcode, request_id):
     """
     Update the barcode of an hold request.
     barcode: new barcode (after update). It is also the
@@ -1117,8 +1160,10 @@ def get_borrower_requests(borrower_id):
                  It is also the primary key of the crcBORROWER table.
     """
     res = run_sql("""
-                  select id, id_bibrec,
-                         DATE_FORMAT(request_date,'%%Y-%%m-%%d'), status
+                  select id,
+                         id_bibrec,
+                         DATE_FORMAT(request_date,'%%Y-%%m-%%d'),
+                         status
                   from   crcLOANREQUEST
                   where  id_crcBORROWER=%s and
                          (status='pending' or status='waiting')""",
@@ -1220,16 +1265,16 @@ def new_borrower(name, email, phone, address, mailbox, notes):
     address: borrower's address.
     """
 
-    res = run_sql("""insert into crcBORROWER (name,
-                                              email,
-                                              phone,
-                                              address,
-                                              mailbox,
-                                              borrower_since,
-                                              borrower_until,
-                                              notes)
-                      values(%s, %s, %s, %s, %s, NOW(), '0000-00-00 00:00:00', %s)""",
-                      (name, email, phone, address, mailbox, notes))
+    run_sql("""insert into crcBORROWER (name,
+                                         email,
+                                         phone,
+                                         address,
+                                         mailbox,
+                                         borrower_since,
+                                         borrower_until,
+                                         notes)
+               values(%s, %s, %s, %s, %s, NOW(), '0000-00-00 00:00:00', %s)""",
+            (name, email, phone, address, mailbox, notes))
 
 def get_borrower_address(email):
     """
@@ -1317,7 +1362,7 @@ def get_loan_due_date(loan_id):
 
 def get_pdf_request_data(status):
     """
-    @param status: status=pending
+    status: request status.
     """
     res = run_sql("""SELECT DISTINCT
                             lr.id_bibrec,
@@ -1373,6 +1418,9 @@ def get_borrower_data(borrower_id):
 def update_borrower_info(borrower_id, name, email, phone, address, mailbox):
     """
     Update borrower info.
+
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
     return int(run_sql("""update crcBORROWER
                              set name=%s,
@@ -1395,7 +1443,7 @@ def add_new_library(name, email, phone, address, notes):
 
 def search_library_by_name(string):
     """
-    @param str: parameter used by regexp
+    string: search pattern.
     """
 
     res = run_sql("""select id, name
@@ -1407,7 +1455,7 @@ def search_library_by_name(string):
 
 def search_library_by_email(string):
     """
-    @param str: parameter used by regexp
+    string: search pattern.
     """
 
     res = run_sql("""select id, name
@@ -1419,7 +1467,10 @@ def search_library_by_email(string):
 
 def update_library_info(library_id, name, email, phone, address):
     """
-    Update library info.
+    Update library information.
+
+    library_id: identify the library. It is also the primary key of
+                the table crcLIBRARY.
     """
     return int(run_sql("""update crcLIBRARY
                              set name=%s,
@@ -1442,6 +1493,9 @@ def get_libraries():
 def get_library_name(library_id):
     """
     Get Library's name.
+
+    library_id: identify the library. It is also the primary key of
+                the table crcLIBRARY.
     """
 
     res = run_sql("""select name
@@ -1456,6 +1510,15 @@ def add_new_copy(barcode, recid, library_id, collection, location, description,
 
     """
     Add a new copy
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    recid: identify the record. It is also the primary key of
+       the table bibrec.
+
+    library_id: identify the library. It is also the primary key of
+                the table crcLIBRARY.
     """
 
     run_sql("""insert into crcITEM (barcode, id_bibrec, id_crcLIBRARY,
@@ -1468,6 +1531,9 @@ def add_new_copy(barcode, recid, library_id, collection, location, description,
 def get_item_info(barcode):
     """
     Get item's information.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
     """
 
     res = run_sql("""select it.barcode,
@@ -1489,6 +1555,12 @@ def update_item_info(barcode, library_id, collection, location, description,
                  loan_period, status):
     """
     Update item's information.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    library_id: identify the library. It is also the primary key of
+                the table crcLIBRARY.
     """
 
     int(run_sql("""update crcITEM
@@ -1507,6 +1579,9 @@ def update_item_info(barcode, library_id, collection, location, description,
 def get_library_items(library_id):
     """
     Get all items who belong to a library.
+
+    library_id: identify the library. It is also the primary key of
+                the table crcLIBRARY.
     """
     res = run_sql("""select barcode, id_bibrec, collection,
                             location, description, loan_period, status, number_of_requests
@@ -1519,7 +1594,7 @@ def get_library_items(library_id):
 def get_library_notes(library_id):
     """
     Get the notes of a library.
-    borrower_id: identify the library. The data associate
+    library_id: identify the library. The data associate
                  to this library will be retrieved. It is also
                  the primary key of the crcLIBRARY table.
     """
@@ -1535,7 +1610,7 @@ def add_new_library_note(new_note, library_id):
     """
     Add a new borrower's note.
     new_note: note who will be added.
-    borrower_id: identify the borrower. A new note will be
+    library_id: identify the borrower. A new note will be
                  associate to this borrower. It is also
                  the primary key of the crcBORROWER table.
     """
@@ -1546,7 +1621,7 @@ def add_new_library_note(new_note, library_id):
 
 def get_borrower_data_by_name(name):
     """
-
+    Retrieve borrower's data by name.
     """
 
     res = run_sql("""select id, name, email, phone,
@@ -1560,7 +1635,7 @@ def get_borrower_data_by_name(name):
 
 def get_borrower_data_by_email(email):
     """
-
+    Retrieve borrower's data by email.
     """
 
     res = run_sql("""select id, name, email, phone,
@@ -1573,7 +1648,7 @@ def get_borrower_data_by_email(email):
 
 def get_borrower_data_by_id(borrower_id):
     """
-
+    Retrieve borrower's data by borrower_id.
     """
 
     res = run_sql("""select id, name, email, phone,
@@ -1586,11 +1661,14 @@ def get_borrower_data_by_id(borrower_id):
 
 def get_number_requests_per_copy(barcode):
     """
+    barcode: identify the item. It is the primary key of the table
+         crcITEM.
     """
 
     res = run_sql("""select count(barcode)
                        from crcLOANREQUEST
-                      where barcode=%s and status != 'done'""",
+                      where barcode=%s and
+                            (status != 'done' and status != 'cancelled')""",
                   (barcode, ))
 
     return res[0][0]
@@ -1598,6 +1676,8 @@ def get_number_requests_per_copy(barcode):
 
 def get_requested_barcode(request_id):
     """
+    request_id: identify the hold request. It is also the primary key
+                of the table crcLOANREQUEST.
     """
 
     res = run_sql("""select barcode
@@ -1609,6 +1689,8 @@ def get_requested_barcode(request_id):
 
 def get_borrower_recids(borrower_id):
     """
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
     """
 
     res = run_sql("""select id_bibrec
@@ -1621,6 +1703,9 @@ def get_borrower_recids(borrower_id):
 def get_loan_status(loan_id):
     """
     Get loan's status
+
+    loan_id: identify a loan. It is the primery key of the table
+             crcLOAN.
     """
 
     res = run_sql("""select status
@@ -1633,6 +1718,9 @@ def get_loan_status(loan_id):
 def get_loan_period(barcode):
     """
     Retrieve the loan period of a book.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
     """
 
     res = run_sql("""select loan_period
@@ -1641,3 +1729,43 @@ def get_loan_period(barcode):
                   (barcode, ))
 
     return res[0][0]
+
+def get_loan_infos(loan_id):
+    """
+    loan_id: identify a loan. It is the primery key of the table
+             crcLOAN.
+    """
+
+    res =  run_sql("""select l.id_bibrec,
+                             l.barcode,
+                             DATE_FORMAT(l.loaned_on, '%%Y-%%m-%%d'),
+                             DATE_FORMAT(l.due_date, '%%Y-%%m-%%d'),
+                             l.status,
+                             it.loan_period,
+                             it.status
+                        from crcLOAN l, crcITEM it, crcLOANREQUEST lr
+                        where l.barcode=it.barcode and
+                              l.id=%s""",
+                   (loan_id, ))
+
+    return res[0]
+
+def is_item_on_loan(barcode):
+    """
+    Check if an item is on loan.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+    """
+
+    res = run_sql("""select id
+                       from crcLOAN
+                      where status='on loan' and
+                            barcode=%s""",
+                  (barcode, ))
+
+    try:
+        return res[0][0]
+    except IndexError:
+        return None
+

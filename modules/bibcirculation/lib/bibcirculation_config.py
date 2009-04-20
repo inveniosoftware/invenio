@@ -29,10 +29,15 @@ CFG_BIBCIRCULATION_TEMPLATES = {
     'OVERDUE': 'Overdue letter template (write some text)',
     'REMINDER': 'Reminder letter template (write some text)',
     'NOTIFICATION': 'Notification letter template (write some text)',
+    'CLAIM_RETURN': 'Claim return letter template (write some text)',
     'EMPTY': 'Please choose one template'
 }
 
 ACCESS_KEY = '1T6P3M3TDMW9HWJ212R2'
 
-USER_ON_CERN_LDAP = 'true'
+CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'CERN Library<library.desk@cern.ch>'
+
+CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'CERN Library<library.desk@cern.ch>'
+
+
 

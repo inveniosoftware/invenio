@@ -28,7 +28,9 @@ bibcirculation_templates = invenio.template.load('bibcirculation')
 
 # others invenio imports
 from invenio.config import \
-     CFG_SITE_LANG
+     CFG_SITE_LANG, \
+     CFG_CERN_SITE, \
+     CFG_SITE_SUPPORT_EMAIL
 from invenio.dateutils import get_datetext
 import datetime
 from invenio.webuser import collect_user_info
@@ -37,6 +39,7 @@ from invenio.bibcirculation_utils import hold_request_mail, \
      book_title_from_MARC, \
      make_copy_available
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 
 def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
     """
@@ -129,7 +132,7 @@ def perform_get_pending_request(ln=CFG_SITE_LANG):
     @param ln: language of the page
     """
 
-    status = db.get_pending_loan_request("pending")
+    status = db.get_loan_request_by_status("pending")
 
     body = bibcirculation_templates.tmpl_get_pending_request(status=status,
                                                                   ln=ln)
@@ -164,8 +167,11 @@ def perform_new_request_send(uid, recid,
     request_to = get_datetext(to_year, to_month, to_day)
 
     nb_requests = db.get_number_requests_per_copy(barcode)
+    is_on_loan = db.is_item_on_loan(barcode)
 
-    if nb_requests == 0:
+    if nb_requests == 0 and is_on_loan is not None:
+        status = 'waiting'
+    elif nb_requests == 0 and is_on_loan is None:
         status = 'pending'
     else:
         status = 'waiting'
@@ -178,14 +184,13 @@ def perform_new_request_send(uid, recid,
         if address != 0:
             message = "Your request has been registered and the " \
                       "document will be sent to you via internal mail."
-            db.new_hold_request(is_borrower, recid, barcode,
-                                request_from, request_to,
-                                status)
 
+            db.new_hold_request(is_borrower, recid, barcode,
+                                request_from, request_to, status)
             db.update_item_status('requested', barcode)
 
-            send_email(fromaddr="CERN Library<library.desk@cern.ch>",
-                       toaddr='joaquim.rodrigues.silvestre@cern.ch',
+            send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                       toaddr=CFG_SITE_SUPPORT_EMAIL,
                        subject='Hold request for books confirmation',
                        content=hold_request_mail(recid, is_borrower),
                        header='',
@@ -195,15 +200,72 @@ def perform_new_request_send(uid, recid,
                        )
 
         else:
+            if CFG_CERN_SITE == 1:
+                result = get_user_info_from_ldap(email=user['email'])
+
+                try:
+                    ldap_address = result['physicalDeliveryOfficeName'][0]
+                except KeyError:
+                    ldap_address = None
+
+                if ldap_address is not None:
+                    db.add_borrower_address(ldap_address, email)
+
+                    message = "Your request has been registered and the document"\
+                              " will be sent to you via internal mail."
+
+                    db.new_hold_request(is_borrower, recid, barcode,
+                                        request_from, request_to, status)
+
+                    db.update_item_status('requested', barcode)
+
+                    send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                               toaddr=CFG_SITE_SUPPORT_EMAIL,
+                               subject='Hold request for books confirmation',
+                               content=hold_request_mail(recid, is_borrower),
+                               header='',
+                               footer='',
+                               attempt_times=1,
+                               attempt_sleeptime=10
+                               )
+                else:
+                    message = "It is not possible to validate your request. "\
+                              "Your office address is not available. "\
+                              "Please contact ... "
+
+    else:
+        if CFG_CERN_SITE == 1:
             result = get_user_info_from_ldap(email=user['email'])
 
             try:
-                ldap_address = result['physicalDeliveryOfficeName'][0]
+                name = result['cn'][0]
             except KeyError:
-                ldap_address = None
+                name = None
 
-            if ldap_address != None:
-                db.add_borrower_address(ldap_address, email)
+            try:
+                email = result['mail'][0]
+            except KeyError:
+                email = None
+
+            try:
+                phone = result['telephoneNumber'][0]
+            except KeyError:
+                phone = None
+
+            try:
+                address = result['physicalDeliveryOfficeName'][0]
+            except KeyError:
+                address = None
+
+            try:
+                mailbox = result['postOfficeBox'][0]
+            except KeyError:
+                mailbox = None
+
+            if address is not None:
+                db.new_borrower(name, email, phone, address, mailbox, '')
+
+                is_borrower = db.is_borrower(email)
 
                 message = "Your request has been registered and the document"\
                           " will be sent to you via internal mail."
@@ -213,77 +275,20 @@ def perform_new_request_send(uid, recid,
 
                 db.update_item_status('requested', barcode)
 
-                send_email(fromaddr="CERN Library<library.desk@cern.ch>",
-                       toaddr='joaquim.rodrigues.silvestre@cern.ch',
-                       subject='Hold request for books confirmation',
-                       content=hold_request_mail(recid, is_borrower),
-                       header='',
-                       footer='',
-                       attempt_times=1,
-                       attempt_sleeptime=10
-                       )
+                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                           toaddr=CFG_SITE_SUPPORT_EMAIL,
+                           subject='Hold request for books confirmation',
+                           content=hold_request_mail(recid, is_borrower),
+                           header='',
+                           footer='',
+                           attempt_times=1,
+                           attempt_sleeptime=10
+                           )
 
             else:
                 message = "It is not possible to validate your request. "\
-                          "Your office address is not available. "\
-                          "Please contact ... "
-
-    else:
-        result = get_user_info_from_ldap(email=user['email'])
-
-        try:
-            name = result['cn'][0]
-        except KeyError:
-            name = None
-
-        try:
-            email = result['mail'][0]
-        except KeyError:
-            email = None
-
-        try:
-            phone = result['telephoneNumber'][0]
-        except KeyError:
-            phone = None
-
-        try:
-            address = result['physicalDeliveryOfficeName'][0]
-        except KeyError:
-            address = None
-
-        try:
-            mailbox = result['postOfficeBox'][0]
-        except KeyError:
-            mailbox = None
-
-        if address != None:
-            db.new_borrower(name, email, phone, address, mailbox, '')
-
-            is_borrower = db.is_borrower(email)
-
-            message = "Your request has been registered and the document"\
-                      " will be sent to you via internal mail."
-
-            db.new_hold_request(is_borrower, recid, barcode,
-                                request_from, request_to,
-                                status)
-
-            db.update_item_status('requested', barcode)
-
-            send_email(fromaddr="CERN Library<library.desk@cern.ch>",
-                       toaddr='joaquim.rodrigues.silvestre@cern.ch',
-                       subject='Hold request for books confirmation',
-                       content=hold_request_mail(recid, is_borrower),
-                       header='',
-                       footer='',
-                       attempt_times=1,
-                       attempt_sleeptime=10
-                       )
-
-        else:
-            message = "It is not possible to validate your request. "\
-                      "Your office address is not available."\
-                      " Please contact ... "
+                          "Your office address is not available."\
+                          " Please contact ... "
 
 
     body = bibcirculation_templates.tmpl_new_request_send(message=message,

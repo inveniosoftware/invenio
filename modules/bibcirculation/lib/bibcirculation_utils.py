@@ -26,7 +26,6 @@ import invenio.bibcirculation_dblayer as db
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL
 from invenio.bibcirculation_config import ACCESS_KEY
-from invenio.dateutils import get_datetext
 from invenio.messages import gettext_set_language
 
 import datetime, time
@@ -44,6 +43,7 @@ def hold_request_mail(recid, borrower_id):
                                   '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
                                   {'recid': recid},
                                   (book_title))
+
     out = """
     Hello,
 
@@ -66,7 +66,7 @@ def hold_request_mail(recid, borrower_id):
         CERN Document Server <http://cdsweb.cern.ch>
         Need human intervention?  Contact <cds.support@cern.ch>
 
-    """ % (borrower_infos[0][1], borrower_infos[0][2],
+    """ % (borrower_infos[1], borrower_infos[2],
            title_link, book_author, more_holdings_infos[0][1],
            more_holdings_infos[0][2],
            book_editor, book_year, book_isbn)
@@ -83,7 +83,8 @@ def get_book_cover(isbn):
     import urllib
 
     cover_xml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml' \
-                               '?Service=AWSECommerceService&AWSAccessKeyId=' + ACCESS_KEY + \
+                               '?Service=AWSECommerceService&AWSAccessKeyId=' \
+                               + ACCESS_KEY + \
                                '&Operation=ItemSearch&Condition=All&' \
                                'ResponseGroup=Images&SearchIndex=Books&' \
                                'Keywords=' + isbn)
@@ -111,14 +112,13 @@ def book_information_from_MARC(recid):
 
     book_year = ' '.join(get_fieldvalues(recid, "260__c"))
 
-    book_author = '  '.join(get_fieldvalues(recid, "270__p") + \
-                            get_fieldvalues(recid, "100__a") +
+    book_author = '  '.join(get_fieldvalues(recid, "100__a") + \
                             get_fieldvalues(recid, "100__u"))
 
     book_isbn = ' '.join(get_fieldvalues(recid, "020__a"))
 
-    book_editor = ' , '.join(get_fieldvalues(recid, "260__b") + \
-                             get_fieldvalues(recid, "260__a"))
+    book_editor = ' , '.join(get_fieldvalues(recid, "260__a") + \
+                             get_fieldvalues(recid, "260__b"))
 
 
     return (book_title, book_year, book_author, book_isbn, book_editor)
@@ -358,3 +358,38 @@ def print_pending_hold_requests_information(req, ln):
     req.write("</html>")
 
     return "\n"
+
+def get_item_info_for_search_result(recid):
+    """
+    Get the item's info from MARC in order to create a
+    search result with more details
+    """
+    book_author = '  '.join(get_fieldvalues(recid, "100__a") + \
+                            get_fieldvalues(recid, "100__u"))
+
+    book_editor = ' , '.join(get_fieldvalues(recid, "260__a") + \
+                             get_fieldvalues(recid, "260__b") + \
+                             get_fieldvalues(recid, "260__c"))
+
+    book_copies = '  '.join(get_fieldvalues(recid, "964__a"))
+
+    book_infos = (book_author, book_editor, book_copies)
+
+    return book_infos
+
+def update_request_data(request_id):
+    """
+    Update
+    """
+    barcode = db.get_request_barcode(request_id)
+    nb_requests = db.get_number_requests_per_copy(barcode)
+    is_on_loan = db.is_item_on_loan(barcode)
+
+    if nb_requests == 0 and is_on_loan is not None:
+        db.update_item_status('on loan', barcode)
+    elif nb_requests == 0 and is_on_loan is None:
+        db.update_item_status('available', barcode)
+    else:
+        db.update_item_status('requested', barcode)
+
+    return

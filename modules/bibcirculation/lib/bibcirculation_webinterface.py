@@ -218,7 +218,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                  '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
-                for (tab_id, order) in ordered_tabs_id
+                for (tab_id, _order) in ordered_tabs_id
                 if unordered_tabs[tab_id]['visible'] == True]
         top = webstyle_templates.detailed_record_container_top(self.recid,
                                                                tabs,
@@ -307,7 +307,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                  '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
-                for (tab_id, order) in ordered_tabs_id
+                for (tab_id, _order) in ordered_tabs_id
                 if unordered_tabs[tab_id]['visible'] == True]
         top = webstyle_templates.detailed_record_container_top(self.recid,
                                                                tabs,
@@ -396,7 +396,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                  '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
                  tab_id in ['holdings'],
                  unordered_tabs[tab_id]['enabled']) \
-                for (tab_id, order) in ordered_tabs_id
+                for (tab_id, _order) in ordered_tabs_id
                 if unordered_tabs[tab_id]['visible'] == True]
         top = webstyle_templates.detailed_record_container_top(self.recid,
                                                                tabs,
