@@ -40,7 +40,7 @@ from invenio.search_engine import search_pattern, \
                            get_fieldvalues, perform_request_search
 from invenio.websearch_webcoll import get_collection
 from invenio.bibrank_downloads_indexer import uniq
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME
 
 try:
     Set = set
@@ -1428,7 +1428,7 @@ def kb_export(req, kbname="", format="", ln=CFG_SITE_LANG):
                 colldbquery = coll.dbquery
         if not collname:
             return page(title=_("Invalid collection"),
-                    body = _("Collection")+" "+str(coll_id)+" "+_("not found"),
+                    body = _("Collection")+" "+str(coll.id)+" "+_("not found"),
                     language=ln,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
