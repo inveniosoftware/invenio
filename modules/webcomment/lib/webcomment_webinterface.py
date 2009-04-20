@@ -257,7 +257,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             return redirect_to_url(req, target)
         elif (auth_code_1 or auth_code_2):
             return page_not_authorized(req, "../", \
-                text = auth_msg)
+                text = auth_msg_1 + auth_msg_2)
 
         can_attach_files = False
         (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
