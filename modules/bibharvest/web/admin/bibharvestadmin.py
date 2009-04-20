@@ -473,6 +473,7 @@ def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, confirm=0, record_id=None)
 
 
 def preview_original_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
     except Error, e:
@@ -496,6 +497,7 @@ def preview_original_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = N
 
 
 def preview_harvested_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
     except Error, e:
