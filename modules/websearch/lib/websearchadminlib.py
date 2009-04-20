@@ -2617,7 +2617,7 @@ def get_col_pbx(colID=-1, ln='', position = ''):
             params.append(ln)
         if position:
             sql += " AND position=%s"
-            params.append(positon)
+            params.append(position)
         sql += " ORDER BY position, ln, score desc"
         res = run_sql(sql, tuple(params))
         return res
