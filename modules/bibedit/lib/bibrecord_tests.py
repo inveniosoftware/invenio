@@ -23,7 +23,7 @@ import unittest
 from string import expandtabs, replace
 
 from invenio.config import CFG_TMPDIR, CFG_ETCDIR
-from invenio import bibrecord
+from invenio import bibrecord, bibrecord_config
 from invenio.testutils import make_test_suite, run_test_suite
 
 class BibRecordSuccessTest(unittest.TestCase):
@@ -1111,22 +1111,133 @@ class BibRecordPrintingTest(unittest.TestCase):
         self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["001", "037"]), 1, 1)[0], rec_short)
         self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["037"]), 1, 1)[0], rec_short)
 
-TEST_SUITE = make_test_suite(BibRecordSuccessTest,
-                             BibRecordBadInputTreatmentTest,
-                             BibRecordGettingFieldValuesTest,
-                             BibRecordGettingFieldValuesViaWildcardsTest,
-                             BibRecordAddFieldTest,
-                             BibRecordDeleteFieldTest,
-                             BibRecordManageMultipleFieldsTest,
-                             BibRecordDeleteFieldFromTest,
-                             BibRecordAddSubfieldIntoTest,
-                             BibRecordModifyControlfieldTest,
-                             BibRecordModifySubfieldTest,
-                             BibRecordDeleteSubfieldFromTest,
-                             BibRecordMoveSubfieldTest,
-                             BibRecordAccentedUnicodeLettersTest,
-                             BibRecordSpecialTagParsingTest,
-                             BibRecordPrintingTest,)
+class BibRecordCreateFieldTest(unittest.TestCase):
+    """ bibrecord - testing for creating field """
+
+    def test_create_valid_field(self):
+        """bibrecord - create and check a valid field"""
+        bibrecord.create_field()
+        bibrecord.create_field([('a', 'testa'), ('b', 'testb')], '2', 'n',
+            'controlfield', 15)
+
+    def test_invalid_field_raises_exception(self):
+        """bibrecord - exception raised when creating an invalid field"""
+        # Invalid subfields.
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, 'subfields', '1', '2', 'controlfield', 10)
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, ('1', 'value'), '1', '2', 'controlfield', 10)
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, [('value')], '1', '2', 'controlfield', 10)
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, [('1', 'value', '2')], '1', '2', 'controlfield', 10)
+        # Invalid indicators.
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, [], 1, '2', 'controlfield', 10)
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, [], '1', 2, 'controlfield', 10)
+        # Invalid controlfield value
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, [], '1', '2', 13, 10)
+        # Invalid global position
+        self.assertRaises(bibrecord_config.InvenioBibRecordFieldError,
+            bibrecord.create_field, [], '1', '2', 'controlfield', 'position')
+
+    def test_compare_fields(self):
+        """bibrecord - compare fields"""
+        # Identical
+        field0 = ([('a', 'test')], '1', '2', '', 0)
+        field1 = ([('a', 'test')], '1', '2', '', 3)
+        self.assertEqual(True,
+            bibrecord._compare_fields(field0, field1, strict=True))
+        self.assertEqual(True,
+            bibrecord._compare_fields(field0, field1, strict=False))
+
+        # Order of the subfields changed.
+        field0 = ([('a', 'testa'), ('b', 'testb')], '1', '2', '', 0)
+        field1 = ([('b', 'testb'), ('a', 'testa')], '1', '2', '', 3)
+        self.assertEqual(False,
+            bibrecord._compare_fields(field0, field1, strict=True))
+        self.assertEqual(True,
+            bibrecord._compare_fields(field0, field1, strict=False))
+
+        # Different
+        field0 = ([], '3', '2', '', 0)
+        field1 = ([], '1', '2', '', 3)
+        self.assertEqual(False,
+            bibrecord._compare_fields(field0, field1, strict=True))
+        self.assertEqual(False,
+            bibrecord._compare_fields(field0, field1, strict=False))
+
+class BibRecordFindFieldTest(unittest.TestCase):
+    """ bibrecord - testing for finding field """
+
+    def setUp(self):
+        xml = """
+        <record>
+        <controlfield tag="001">81</controlfield>
+        <datafield tag="037" ind1=" " ind2=" ">
+        <subfield code="a">TEST-ARTICLE-2006-001</subfield>
+        <subfield code="b">ARTICLE-2007-001</subfield>
+        </datafield>
+        </record>
+        """
+        self.rec = bibrecord.create_record(xml)[0]
+        self.field0 = self.rec['001'][0]
+        self.field1 = self.rec['037'][0]
+        self.field2 = (
+            [self.field1[0][1], self.field1[0][0]],
+            self.field1[1],
+            self.field1[2],
+            self.field1[3],
+            self.field1[4],
+            )
+
+    def test_finding_field_strict(self):
+        """bibrecord - test finding field strict"""
+        self.assertEqual((1, 0),
+            bibrecord.record_find_field(self.rec, '001', self.field0,
+            strict=True))
+        self.assertEqual((2, 0),
+            bibrecord.record_find_field(self.rec, '037', self.field1,
+            strict=True))
+        self.assertEqual((None, None),
+            bibrecord.record_find_field(self.rec, '037', self.field2,
+            strict=True))
+
+    def test_finding_field_loose(self):
+        """bibrecord - test finding field loose"""
+        self.assertEqual((1, 0),
+            bibrecord.record_find_field(self.rec, '001', self.field0,
+            strict=False))
+        self.assertEqual((2, 0),
+            bibrecord.record_find_field(self.rec, '037', self.field1,
+            strict=False))
+        self.assertEqual((2, 0),
+            bibrecord.record_find_field(self.rec, '037', self.field2,
+            strict=False))
+
+
+TEST_SUITE = make_test_suite(
+    BibRecordSuccessTest,
+    BibRecordBadInputTreatmentTest,
+    BibRecordGettingFieldValuesTest,
+    BibRecordGettingFieldValuesViaWildcardsTest,
+    BibRecordAddFieldTest,
+    BibRecordDeleteFieldTest,
+    BibRecordManageMultipleFieldsTest,
+    BibRecordDeleteFieldFromTest,
+    BibRecordAddSubfieldIntoTest,
+    BibRecordModifyControlfieldTest,
+    BibRecordModifySubfieldTest,
+    BibRecordDeleteSubfieldFromTest,
+    BibRecordMoveSubfieldTest,
+    BibRecordAccentedUnicodeLettersTest,
+    BibRecordSpecialTagParsingTest,
+    BibRecordPrintingTest,
+    BibRecordCreateFieldTest,
+    BibRecordFindFieldTest,
+    )
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)

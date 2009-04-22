@@ -32,14 +32,21 @@ try:
     PSYCO_AVAILABLE = True
 except ImportError:
     PSYCO_AVAILABLE = False
+try:
+    # For Python 2.3 compatibility
+    from sets import Set as set
+except ImportError:
+    # Let's hope we're using a Python > 2.3.
+    pass
 
 from invenio.bibrecord_config import CFG_MARC21_DTD, \
     CFG_BIBRECORD_WARNING_MSGS, CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
     CFG_BIBRECORD_DEFAULT_CORRECT, CFG_BIBRECORD_PARSERS_AVAILABLE, \
-    InvenioBibRecordGenericParsingError
+    InvenioBibRecordGenericParsingError, InvenioBibRecordFieldError
 
 from invenio.config import CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.textutils import encode_for_xml
+
 
 # Some values used for the RXP parsing.
 TAG, ATTRS, CHILDREN = 0, 1, 2
@@ -70,6 +77,16 @@ if 'minidom' in CFG_BIBRECORD_PARSERS_AVAILABLE:
         pass
 
 ### INTERFACE / VISIBLE FUNCTIONS
+
+def create_field(subfields=[], ind1=' ', ind2=' ', controlfield_value='',
+    global_position=-1):
+    """
+    Returns a field created with the provided elements. Global position is
+    set arbitrary to -1."""
+    ind1, ind2 = _wash_indicators(ind1, ind2)
+    field = (subfields, ind1, ind2, controlfield_value, global_position)
+    _check_field_validity(field)
+    return field
 
 def create_records(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
     correct=CFG_BIBRECORD_DEFAULT_CORRECT, parser=''):
@@ -838,35 +855,101 @@ def print_errors(alist):
         text = '%s\n%s'% (text, l)
     return text
 
+def record_find_field(rec, tag, field, strict=False):
+    """
+    Returns the global and local positions of the first occurrence
+    of the field in a record.
+
+    @param rec:    A record dictionary structure
+    @type  rec:    dictionary
+    @param tag:    The tag of the field to search for
+    @type  tag:    string
+    @param field:  A field tuple as returned by create_field()
+    @type  field:  tuple
+    @param strict: A boolean describing the search method. If strict
+                   is False, then the order of the subfields doesn't
+                   matter. Default search method is strict.
+    @type  strict: boolean
+    @return:       A tuple of (global_position, local_position) or a
+                   tuple (None, None) if the field is not present.
+    @rtype:        tuple
+    @raise InvenioBibRecordFieldError: If the provided field is invalid.
+    """
+    try:
+        _check_field_validity(field)
+    except InvenioBibRecordFieldError:
+        raise
+
+    for local_position, field1 in enumerate(rec[tag]):
+        if _compare_fields(field, field1, strict):
+            return (field1[4], local_position)
+
+    return (None, None)
+
 ### IMPLEMENTATION / INVISIBLE FUNCTIONS
 
-def _is_field(field):
+def _compare_fields(field1, field2, strict=True):
+    """
+    Compares 2 fields. If strict is True, then the order of the
+    subfield will be taken care of, if not then the order of the
+    subfields doesn't matter.
+
+    @returns True if the field are equivalent, False otherwise.
+    """
+    if strict:
+        # Return a simple equal test on the field minus the position.
+        return field1[:4] == field2[:4]
+    else:
+        if field1[1:4] != field2[1:4]:
+            # Different indicators or controlfield value.
+            return False
+        else:
+            # Compare subfields in a loose way.
+            return set(field1[0]) == set(field2[0])
+
+def _check_field_validity(field):
     """
     Checks if a field is well-formed.
 
-    @param field a field to test
-    @return True is the field is well-formed, False otherwise
+    @param field: A field tuple as returned by create_field()
+    @type field:  tuple
+    @raise InvenioBibRecordFieldError: If the field is invalid.
     """
     if type(field) not in (list, tuple):
-        return False
+        raise InvenioBibRecordFieldError("Field of type '%s' should be either "
+            "a list or a tuple." % type(field))
 
     if len(field) != 5:
-        return False
+        raise InvenioBibRecordFieldError("Field of length '%d' should have 5 "
+            "elements." % len(field))
 
-    if (type(field[0]) not in (list, tuple) or
-        type(field[1]) is not str or
-        type(field[2]) is not str or
-        type(field[3]) is not str or
-        type(field[4]) is not int):
-        return False
+    if type(field[0]) not in (list, tuple):
+        raise InvenioBibRecordFieldError("Subfields of type '%s' should be "
+            "either a list or a tuple." % type(field[0]))
+
+    if type(field[1]) is not str:
+        raise InvenioBibRecordFieldError("Indicator 1 of type '%s' should be "
+            "a string." % type(field[1]))
+
+    if type(field[2]) is not str:
+        raise InvenioBibRecordFieldError("Indicator 2 of type '%s' should be "
+            "a string." % type(field[2]))
+
+    if type(field[3]) is not str:
+        raise InvenioBibRecordFieldError("Controlfield value of type '%s' "
+            "should be a string." % type(field[3]))
+
+    if type(field[4]) is not int:
+        raise InvenioBibRecordFieldError("Global position of type '%s' should "
+            "be an int." % type(field[4]))
 
     for subfield in field[0]:
         if (type(subfield) not in (list, tuple) or
+            len(subfield) != 2 or
             type(subfield[0]) is not str or
             type(subfield[1]) is not str):
-            return False
-
-    return True
+            raise InvenioBibRecordFieldError("Subfields are malformed. "
+                "Should a list of tuples of 2 strings.")
 
 def _shift_field_positions_global(record, start, delta=1):
     """Shifts all global field positions with global field positions
