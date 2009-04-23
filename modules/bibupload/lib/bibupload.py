@@ -34,6 +34,7 @@ tables according to options.
      -i, --insert            insert the new record in the database
      -r, --replace           the existing record is entirely replaced
         by the new one
+     -d, --delete            specified fields are deleted if existing
      -z, --reference         update references (update only 999 fields)
      -s, --stage=STAGE       stage to start from in the algorithm
         (0: always done; 1: FMT tags;
@@ -87,7 +88,8 @@ from invenio.bibrecord import create_records, \
                               record_modify_subfield, \
                               record_delete_subfield_from, \
                               record_delete_fields, \
-                              record_add_subfield_into
+                              record_add_subfield_into, \
+                              record_find_field
 from invenio.search_engine import get_record
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
@@ -154,7 +156,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     Return (error_code, recID) of the processed record.
     """
     assert(opt_mode in ('insert', 'replace', 'replace_or_insert', 'reference',
-        'correct', 'append', 'format', 'holdingpen'))
+        'correct', 'append', 'format', 'holdingpen', 'delete'))
     error = None
     # If there are special tags to proceed check if it exists in the record
     if opt_tag is not None and not(record.has_key(opt_tag)):
@@ -218,6 +220,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         # Update Mode
         # Retrieve the old record to update
         rec_old = get_record(rec_id)
+        # Also save a copy to restore previous situation in case of errors
+        original_recod = get_record(rec_id)
         if rec_old is None:
             write_message("   Failed during the creation of the old record!",
                         verbose=1, stream=sys.stderr)
@@ -235,6 +239,11 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             delete_tags_to_correct(record, rec_old, opt_tag)
             write_message("   -Delete the old tags to correct in the old record: DONE",
                         verbose=2)
+
+        # Delete tags specified if in delete mode
+        if opt_mode == 'delete':
+            record = delete_tags(record, rec_old)
+            write_message("   -Delete specified tags in the old record: DONE", verbose=2)
 
         # Append new tag to the old record and update the new record with the old_record modified
         if opt_mode == 'append' or opt_mode == 'correct' or \
@@ -346,12 +355,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         write_message("Stage 4: Start (Update the database with the metadata).",
                     verbose=2)
         if opt_stage_to_start_from <= 4:
-            if opt_mode == 'insert' or \
-            opt_mode == 'replace' or \
-            opt_mode == 'replace_or_insert' or \
-            opt_mode == 'append' or \
-            opt_mode == 'correct' or \
-            opt_mode == 'reference':
+            if opt_mode in ('insert', 'replace', 'replace_or_insert',
+                'append', 'correct', 'reference', 'delete'):
                 update_database_with_metadata(record, rec_id, oai_rec_id)
                 record_deleted_p = False
             else:
@@ -387,7 +392,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         if record_deleted_p:
             ## BibUpload has failed living the record deleted. We should
             ## back the original record then.
-            update_database_with_metadata(rec_old, rec_id, oai_rec_id)
+            update_database_with_metadata(original_recod, rec_id, oai_rec_id)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
 
 def insert_record_into_holding_pen(record, oai_id):
@@ -1047,6 +1052,9 @@ def elaborate_fft_tags(record, rec_id, mode):
                 raise
         return True
 
+    if mode == 'delete':
+        raise StandardError('FFT tag specified but bibupload executed in --delete mode')
+
     tuple_list = extract_tag_from_record(record, 'FFT')
     if tuple_list: # FFT Tags analysis
         write_message("FFTs: "+str(tuple_list), verbose=9)
@@ -1632,6 +1640,30 @@ def copy_strong_tags_from_old_record(record, rec_old):
     return
 
 ### Delete functions
+def delete_tags(record, rec_old):
+    """
+    For every tag in 'record', if it appears in 'rec_old',
+    then it will be removed from 'rec_old'.
+
+    @note: As a side effect 'rec_old' is modified inline.
+
+    @param record: The record containing tags to delete.
+    @type record: record structure
+
+    @param rec_old: The record being modified.
+    @type rec_old: record structure
+
+    @return: The modified record.
+    @rtype: record structure
+    """
+    for tag, fields in record.iteritems():
+        if tag in ('001', ):
+            continue
+        for field in fields:
+            local_position = record_find_field(rec_old, tag, field)[1]
+            if local_position is not None:
+                record_delete_field(rec_old, tag, field_position_local=local_position)
+    return rec_old
 
 def delete_tags_to_correct(record, rec_old, opt_tag):
     """
@@ -1776,19 +1808,21 @@ Examples:
   -i, --insert\t\tinsert the new record in the database
   -r, --replace\t\tthe existing record is entirely replaced by the new one
   -z, --reference\tupdate references (update only 999 fields)
+  -d, --delete\t\tspecified fields are deleted in existing record
   -S, --stage=STAGE\tstage to start from in the algorithm (0: always done; 1: FMT tags;
 \t\t\t2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
   -n, --notimechange\tdo not change record last modification date when updating
   -o, --holdingpen\t\tInsert record into holding pen instead of the normal database
 """,
             version=__revision__,
-            specific_params=("ircazS:fno",
+            specific_params=("ircazdS:fno",
                  [
                    "insert",
                    "replace",
                    "correct",
                    "append",
                    "reference",
+                   "delete",
                    "stage=",
                    "format",
                    "notimechange",
@@ -1853,6 +1887,11 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     # Reference mode option
     elif key in ("-z", "--reference"):
         task_set_option('mode', 'reference')
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.abspath(args[0]))
+
+    elif key in ("-d", "--delete"):
+        task_set_option('mode', 'delete')
         fix_argv_paths([args[0]])
         task_set_option('file_path', os.path.abspath(args[0]))
 

@@ -131,33 +131,39 @@ input file should contain record ID in the 001 tag and the title in
 <p>There are several updating modes:
 <pre>
 
-    -r, --replacerecord Replace existing records by those from the XML
-                        MARC file.  The original content is wiped out
-                        and fully replaced.  Signals error if record
-                        is not found via matching record IDs or system
-                        numbers.
+    -r, --replace Replace existing records by those from the XML
+                  MARC file.  The original content is wiped out
+                  and fully replaced.  Signals error if record
+                  is not found via matching record IDs or system
+                  numbers.
 
-                        Note also that `-r' can be combined with `-i'
-                        into an `-ir' option that would automatically
-                        either insert records as new if they are not
-                        found in the system, or correct existing
-                        records if they are found to exist.
+                  Note also that `-r' can be combined with `-i'
+                  into an `-ir' option that would automatically
+                  either insert records as new if they are not
+                  found in the system, or correct existing
+                  records if they are found to exist.
 
-    -a, --appendfield Append fields from XML MARC file at the end of
-                        existing records.  The original content is
-                        enriched only.  Signals error if record is not
-                        found via matching record IDs or system
-                        numbers.
+    -a, --append  Append fields from XML MARC file at the end of
+                  existing records.  The original content is
+                  enriched only.  Signals error if record is not
+                  found via matching record IDs or system
+                  numbers.
 
-    -c, --correctfield Correct fields of existing records by those
-                        from XML MARC file.  The original record
-                        content is modified only in the fields from
-                        the XML MARC file: the original fields are
-                        removed and replaced by those from the XML
-                        MARC file.  Fields not present in XML MARC
-                        file are not changed (unlike the -r option).
-                        Signals error if record is not found via
-                        matching record IDs or system numbers.
+    -c, --correct Correct fields of existing records by those
+                  from XML MARC file.  The original record
+                  content is modified only in the fields from
+                  the XML MARC file: the original fields are
+                  removed and replaced by those from the XML
+                  MARC file.  Fields not present in XML MARC
+                  file are not changed (unlike the -r option).
+                  Signals error if record is not found via
+                  matching record IDs or system numbers.
+
+    -d, --delete  Delete fields of existing records that are
+                  contained in the XML MARC file. The fields in
+                  the original record that are not present in
+                  the XML MARC file are preserved.
+                  This is incompatible with FFT (see below).
 </pre>
 </p>
 
@@ -284,6 +290,9 @@ semantic of the metadata upload:
 <tr>
 <td>   replace   </td><td>   replace all tags, whatever XXX are</td><td> replace all files, whatever filenames are </td>
 </tr>
+<tr>
+<td>   delete    </td><td>   delete all existing tag instances</td><td> not supported </td>
+</tr>
 </tbody>
 </table>
 </blockquote>
@@ -295,40 +304,24 @@ semantic of the metadata upload:
 $n subfield the original docname that should be renamed and in $m the new name.
 </p>
 
-<p>In order to purge previous file revisions (i.e. in order to keep
-only the latest file version), please use the correct mode with $n
-docname and $t PURGE as the special keyword.
-</p>
+<p>Special values can be assigned to the $t subfield.</p>
 
-<p>In order to delete all existing versions of a file, making it
-effectively hidden, please use the correct mode with $n docname
-and $t DELETE as the special keyword.
-</p>
-
-<p>In order to expunge (i.e. remove completely, also from the
-filesystem) all existing versions of a file, making it effectively
-disappear, please use the correct mode with $n docname and $t EXPUNGE
-as the special keyword.
-</p>
-
-<p>In order to synchronize MARC to the bibrec/bibdoc structure
-(e.g. after an update or a tweak in the database), please use the
-correct mode with $n docname and $t FIX-MARC as the special keyword.
-
-<p>In order to fix a record (i.e. put all its linked documents in a
-coherent state) and synchronize the MARC to the table, please use the
-correct mode with $n docname and $t FIX-ALL as the special keyword.
-</p>
-
-<p>In order to revert to a previous file revision (i.e. to create a
-new revision with the same content as some previous revision had),
-please use the correct mode with $n docname, $t REVERT as the special
-keyword and $v the number corresponding to the desired version.</p>
-
-<p>In order to delete a particular file added by mistake, please use
-the correct mode with $n docname, $t DELETE-FILE, specifing $v version
-and $f format. Note that this operation is not reversible. Note that
-if you don't spcify a version, the last version will be used.</p>
+<table border="1">
+<thead><tr><th>Value</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><tt>PURGE</tt></td><td>In order to purge previous file revisions (i.e. in order to keep only the latest file version), please use the correct mode with $n docname and $t PURGE as the special keyword.</td></tr>
+<tr><td><tt>DELETE</tt></td><td>In order to delete all existing versions of a file, making it effectively hidden, please use the correct mode with $n docname
+and $t DELETE as the special keyword.</td></tr>
+<tr><td>EXPUNGE</td><td>In order to expunge (i.e. remove completely, also from the
+filesystem) all existing versions of a file, making it effectively disappear, please use the correct mode with $n docname and $t EXPUNGE as the special keyword.
+</td><tr>
+<tr><td><tt>FIX-MARC</tt></td><td>In order to synchronize MARC to the bibrec/bibdoc structure (e.g. after an update or a tweak in the database), please use the correct mode with $n docname and $t FIX-MARC as the special keyword.</td></tr>
+<tr><td><tt>FIX-ALL</tt></td><td>In order to fix a record (i.e. put all its linked documents in a coherent state) and synchronize the MARC to the table, please use the correct mode with $n docname and $t FIX-ALL as the special keyword.</td></tr>
+<tr><td><tt>REVERT</tt></td><td>In order to revert to a previous file revision (i.e. to create a new revision with the same content as some previous revision had), please use the correct mode with $n docname, $t REVERT as the special
+keyword and $v the number corresponding to the desired version.</td></tr>
+<tr><td><tt>DELETE-FILE</tt></td><td>In order to delete a particular file added by mistake, please use the correct mode with $n docname, $t DELETE-FILE, specifing $v version and $f format. Note that this operation is not reversible. Note that
+if you don't spcify a version, the last version will be used.</td></tr>
+</tbody></table>
 
 <p>In order to preserve previous comments and descriptions when
 correcting, please use the KEEP-OLD-VALUE special keyword with the

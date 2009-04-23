@@ -437,6 +437,114 @@ class BibUploadCorrectModeTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid)
         return
 
+class BibUploadDeleteModeTest(unittest.TestCase):
+    """
+    Testing deleting specific tags from a record while keeping anything else
+    untouched.  Currently CDS Invenio deletes only those tags that have
+    matching indicators too, unlike ALEPH500 that does not pay attention to
+    indicators, it corrects all fields with the same tag, regardless of the
+    indicator values.
+    """
+
+    def setUp(self):
+        """Initialize the MARCXML test record."""
+        self.testrec1_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+         <subfield code="a">Test, Jane</subfield>
+         <subfield code="u">Test Institute</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, John</subfield>
+         <subfield code="u">Test University</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="8">
+         <subfield code="a">Cool</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, Jim</subfield>
+         <subfield code="u">Test Laboratory</subfield>
+        </datafield>
+        </record>
+        """
+        self.testrec1_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, Jane$$uTest Institute
+        10047 $$aTest, John$$uTest University
+        10048 $$aCool
+        10047 $$aTest, Jim$$uTest Laboratory
+        """
+        self.testrec1_xm_to_delete = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <datafield tag="100" ind1=" " ind2=" ">
+         <subfield code="a">Test, Jane</subfield>
+         <subfield code="u">Test Institute</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, Johnson</subfield>
+         <subfield code="u">Test University</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="8">
+         <subfield code="a">Cool</subfield>
+        </datafield>
+        </record>
+        """
+        self.testrec1_corrected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, John</subfield>
+         <subfield code="u">Test University</subfield>
+        </datafield>
+        <datafield tag="100" ind1="4" ind2="7">
+         <subfield code="a">Test, Jim</subfield>
+         <subfield code="u">Test Laboratory</subfield>
+        </datafield>
+        </record>
+        """
+        self.testrec1_corrected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        10047 $$aTest, John$$uTest University
+        10047 $$aTest, Jim$$uTest Laboratory
+        """
+        # insert test record:
+        task_set_task_param('verbose', 0)
+        test_record_xm = self.testrec1_xm.replace('<controlfield tag="001">123456789</controlfield>',
+                                                  '')
+        recs = bibupload.xml_marc_to_records(test_record_xm)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recID:
+        self.testrec1_xm = self.testrec1_xm.replace('123456789', str(recid))
+        self.testrec1_hm = self.testrec1_hm.replace('123456789', str(recid))
+        self.testrec1_xm_to_delete = self.testrec1_xm_to_delete.replace('123456789', str(recid))
+        self.testrec1_corrected_xm = self.testrec1_corrected_xm.replace('123456789', str(recid))
+        self.testrec1_corrected_hm = self.testrec1_corrected_hm.replace('123456789', str(recid))
+        # test of the inserted record:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.assertEqual(compare_xmbuffers(inserted_xm, self.testrec1_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm, self.testrec1_hm), '')
+
+    def test_record_tags_deletion(self):
+        """bibupload - delete mode, deleting specific tags"""
+        # correct some tags:
+        recs = bibupload.xml_marc_to_records(self.testrec1_xm_to_delete)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='delete')
+        corrected_xm = print_record(recid, 'xm')
+        corrected_hm = print_record(recid, 'hm')
+        # did it work?
+        self.assertEqual(compare_xmbuffers(corrected_xm, self.testrec1_corrected_xm), '')
+        self.assertEqual(compare_hmbuffers(corrected_hm, self.testrec1_corrected_hm), '')
+        # clean up after ourselves:
+        bibupload.wipe_out_record_from_all_tables(recid)
+        return
+
 class BibUploadReplaceModeTest(unittest.TestCase):
     """Testing replace mode."""
 
@@ -3290,6 +3398,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
 TEST_SUITE = make_test_suite(BibUploadInsertModeTest,
                              BibUploadAppendModeTest,
                              BibUploadCorrectModeTest,
+                             BibUploadDeleteModeTest,
                              BibUploadReplaceModeTest,
                              BibUploadReferencesModeTest,
                              BibUploadRecordsWithSYSNOTest,
@@ -3301,8 +3410,6 @@ TEST_SUITE = make_test_suite(BibUploadInsertModeTest,
                              BibUploadControlledProvenanceTest,
                              BibUploadStrongTagsTest,
                              BibUploadFFTModeTest)
-
-#TEST_SUITE = make_test_suite(BibUploadStrongTagsTest,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
