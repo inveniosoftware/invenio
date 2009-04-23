@@ -281,11 +281,18 @@ def record_add_field(rec, tag, ind1=' ', ind2=' ', controlfield_value='',
         field_position_local = len(rec.get(tag, []))
         _shift_field_positions_global(rec, field_position_global, 1)
     elif field_position_local is not None:
-        try:
-            field_position_global = rec[tag][field_position_local][4]
+        if tag in rec:
+            if field_position_local >= len(rec[tag]):
+                field_position_global = rec[tag][-1][4] + 1
+            else:
+                field_position_global = rec[tag][field_position_local][4]
             _shift_field_positions_global(rec, field_position_global, 1)
-        except (IndexError, KeyError):
-            return -1
+        else:
+            if all_field_positions_global:
+                field_position_global = max(all_field_positions_global) + 1
+            else:
+                # Empty record.
+                field_position_global = 1
     elif field_position_global is not None:
         # If the user chose an existing global field position, shift all the
         # global field positions greater than the input global field position.
@@ -397,13 +404,15 @@ def record_delete_field(rec, tag, ind1=' ', ind2=' ',
     return deleted
 
 def record_delete_fields(rec, tag, field_positions_local=None):
-    """Delete all/some fields defined with MARC tag 'tag' and indicators
-    'ind1' and 'ind2' from record 'rec'. If 'field_position_global' and
-    'field_position_local' is None, then delete all the field instances.
-    Otherwise delete only the field instance corresponding to given
-    'field_position_global' or 'field_position_local'.
+    """
+    Delete all/some fields defined with MARC tag 'tag' and indicators
+    'ind1' and 'ind2' from record 'rec'. If 'field_position_global'
+    and 'field_position_local' is None, then delete all the field
+    instances.  Otherwise delete only the field instance corresponding
+    to given 'field_position_global' or 'field_position_local'.
 
-    Returns True if fields were deleted, False otherwise."""
+    Returns True if fields were deleted, False otherwise.
+    """
     if tag not in rec:
         return []
 
@@ -422,47 +431,53 @@ def record_delete_fields(rec, tag, field_positions_local=None):
 
     return deleted_fields
 
-def record_add_fields(rec, tag, fields, index=None):
+def record_add_fields(rec, tag, fields, field_position_local=None,
+    field_position_global=None):
     """
     Adds the fields into the record at the required position. The
-    position is specified by the tag and the index in the list of
-    fields.
+    position is specified by the tag and the field_position_local in
+    the list of fields.
 
-    @param rec a record structure
-    @param tag the tag of the fields to be moved
-    @param index the index to which the field will be inserted. If not
-        specified, appends the fields to the tag.
-    @param a list of fields to be added
-    @return -1 if the operation failed, or the index if it was
-        successful
+    @param rec a record structure @param tag the tag of the fields
+    to be moved
+    @param field_position_local the field_position_local to which the
+    field will be inserted. If not specified, appends the fields to
+    the tag.
+    @param a list of fields to be added @return -1 if the operation
+    failed, or the field_position_local if it was successful
     """
-    if index is None:
+    if field_position_local is None and field_position_global is None:
         for field in fields:
             record_add_field(rec, tag, ind1=field[1],
-                ind2=field[2], subfields=field[0], controlfield_value=field[3])
+                ind2=field[2], subfields=field[0],
+                controlfield_value=field[3])
     else:
         fields.reverse()
         for field in fields:
-            record_add_field(rec, tag, ind1=field[1],
-                ind2=field[2], subfields=field[0], controlfield_value=field[3],
-                field_position_local=index)
+            record_add_field(rec, tag, ind1=field[1], ind2=field[2],
+                subfields=field[0], controlfield_value=field[3],
+                field_position_local=field_position_local,
+                field_position_global=field_position_global)
 
-    return index
+    return field_position_local
 
-def record_move_fields(rec, tag, field_positions_local, index=None):
+def record_move_fields(rec, tag, field_positions_local, field_position_local=None):
     """
-    Moves some fields to the position specified by 'index'.
+    Moves some fields to the position specified by
+    'field_position_local'.
 
     @param rec a record structure as returned by create_record()
     @param tag the tag of the fields to be moved
-    @param field_positions_local the indexes of the fields to move
-    @param index insert the field before that index. If unspecified,
-        appends the fields
-    @return the index is the operation was successful
+    @param field_positions_local the indexes of the
+    fields to move
+    @param field_position_local insert the field before that
+    field_position_local. If unspecified, appends the fields
+    @return the field_position_local is the operation was successful
     """
     fields = record_delete_fields(rec, tag,
         field_positions_local=field_positions_local)
-    return record_add_fields(rec, tag, fields, index)
+    return record_add_fields(rec, tag, fields,
+        field_position_local=field_position_local)
 
 def record_delete_subfield(rec, tag, subfield_code, ind1=' ', ind2=' '):
     """Deletes all subfields with subfield_code in the record."""

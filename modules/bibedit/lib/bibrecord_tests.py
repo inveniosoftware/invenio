@@ -569,7 +569,8 @@ class BibRecordManageMultipleFieldsTest(unittest.TestCase):
         """bibrecord - adding multiple fields with an index"""
         fields = [([('a', 'subfield5')], ' ', ' ', '', 4),
             ([('a', 'subfield6')], ' ', ' ', '', 19)]
-        index = bibrecord.record_add_fields(self.rec, '245', fields, index=0)
+        index = bibrecord.record_add_fields(self.rec, '245', fields,
+            field_position_local=0)
         self.assertEqual(index, 0)
         self.assertEqual(self.rec['245'][0],
             ([('a', 'subfield5')], ' ', ' ', '', 2))
