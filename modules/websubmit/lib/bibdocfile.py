@@ -2340,8 +2340,8 @@ def download_url(url, format, user=None, password=None, sleep=2):
                     urlopener.retrieve(url, tmppath)
                 else:
                     urllib.urlretrieve(url, tmppath)
-                #cmd_exit_code, cmd_out, cmd_err = run_shell_command(CFG_PATH_WGET + ' %s -O %s -t 2 -T 40' % \
-                                                                    #(escape_shell_arg(url), escape_shell_arg(tmppath)))
+                #cmd_exit_code, cmd_out, cmd_err = run_shell_command(CFG_PATH_WGET + ' %s -O %s -t 2 -T 40',
+                                                                    #(url, tmppath))
                 #if cmd_exit_code:
                     #raise StandardError, "It's impossible to download %s: %s" % (url, cmd_err)
                 if os.path.getsize(tmppath) > 0:

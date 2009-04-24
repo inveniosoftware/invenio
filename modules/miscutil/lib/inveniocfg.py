@@ -854,8 +854,8 @@ def _grep_version_from_executable(path_to_exec, version_regexp):
     from invenio.shellutils import run_shell_command
     exec_version = ""
     if os.path.exists(path_to_exec):
-        dummy1, cmd2_out, dummy2 = run_shell_command("strings %s | grep %s" % \
-                                               (path_to_exec, version_regexp))
+        dummy1, cmd2_out, dummy2 = run_shell_command("strings %s | grep %s",
+                                                     (path_to_exec, version_regexp))
         if cmd2_out:
             for cmd2_out_line in cmd2_out.split("\n"):
                 if len(cmd2_out_line) > len(exec_version):

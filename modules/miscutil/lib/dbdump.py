@@ -86,7 +86,7 @@ def _dump_database(dirname, filename):
             escape_shell_arg(CFG_DATABASE_USER),
             escape_shell_arg(CFG_DATABASE_PASS),
             escape_shell_arg(CFG_DATABASE_NAME))
-    dummy1, dummy2, dummy3 = run_shell_command(cmd, dirname + os.sep + filename)
+    dummy1, dummy2, dummy3 = run_shell_command(cmd, None, dirname + os.sep + filename)
     if dummy1:
         write_message("ERROR: mysqldump exit code is %s." % repr(dummy1),
                       stream=sys.stderr)

@@ -23,41 +23,43 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.shellutils import escape_shell_arg
+from invenio.shellutils import escape_shell_arg, run_shell_command
 from invenio.testutils import make_test_suite, run_test_suite
 
 class EscapeShellArgTest(unittest.TestCase):
-    """Testing escaping of shell arguments."""
+    """Testing of escaping shell arguments."""
 
-    def test_escape_simple_strings(self):
+    def test_escape_simple(self):
         """shellutils - escaping simple strings"""
         self.assertEqual("'hello'",
                          escape_shell_arg("hello"))
 
-    def test_escape_backtick_strings(self):
+    def test_escape_backtick(self):
         """shellutils - escaping strings containing backticks"""
         self.assertEqual(r"'hello `world`'",
                          escape_shell_arg(r'hello `world`'))
 
-    def test_escape_quoted_strings(self):
+    def test_escape_quoted(self):
         """shellutils - escaping strings containing single quotes"""
         self.assertEqual("'hello'\\''world'",
                          escape_shell_arg("hello'world"))
 
-    def test_escape_double_quoted_strings(self):
+    def test_escape_double_quoted(self):
         """shellutils - escaping strings containing double-quotes"""
         self.assertEqual("""'"hello world"'""",
                          escape_shell_arg('"hello world"'))
 
-    def test_escape_complex_quoted_strings(self):
+    def test_escape_complex_quoted(self):
         """shellutils - escaping strings containing complex quoting"""
         self.assertEqual(r"""'"Who is this `Eve'\'', Bob?", asked Alice.'""",
              escape_shell_arg(r""""Who is this `Eve', Bob?", asked Alice."""))
 
     def test_escape_windows_style_path(self):
         """shellutils - escaping strings containing windows-style file paths"""
-        self.assertEqual(r"'C:\Users\Test User\My Documents\funny file name (for testing).pdf'",
-                         escape_shell_arg(r'C:\Users\Test User\My Documents\funny file name (for testing).pdf'))
+        self.assertEqual(r"'C:\Users\Test User\My Documents" \
+                          "\funny file name (for testing).pdf'",
+                         escape_shell_arg(r'C:\Users\Test User\My Documents' \
+                          '\funny file name (for testing).pdf'))
 
     def test_escape_unix_style_path(self):
         """shellutils - escaping strings containing unix-style file paths"""
@@ -69,23 +71,46 @@ class EscapeShellArgTest(unittest.TestCase):
         self.assertEqual(r"'Python comments start with #.'",
                          escape_shell_arg(r'Python comments start with #.'))
 
-    def test_escape_ampersand_string(self):
+    def test_escape_ampersand(self):
         """shellutils - escaping strings containing ampersand"""
         self.assertEqual(r"'Today the weather is hot & sunny'",
                          escape_shell_arg(r'Today the weather is hot & sunny'))
 
-    def test_escape_greater_that_strings(self):
+    def test_escape_greater_than(self):
         """shellutils - escaping strings containing the greater-than sign"""
         self.assertEqual(r"'10 > 5'",
                          escape_shell_arg(r'10 > 5'))
 
-    def test_escape_less_that_strings(self):
+    def test_escape_less_than(self):
         """shellutils - escaping strings containing the less-than sign"""
         self.assertEqual(r"'5 < 10'",
                          escape_shell_arg(r'5 < 10'))
 
+class RunShellCommandTest(unittest.TestCase):
+    """Testing of running shell commands."""
 
-TEST_SUITE = make_test_suite(EscapeShellArgTest,)
+    def test_run_cmd_hello(self):
+        """shellutils - running simple command"""
+        self.assertEqual((0, "hello world\n", ''),
+                         run_shell_command("echo 'hello world'"))
+
+    def test_run_cmd_hello_args(self):
+        """shellutils - running simple command with an argument"""
+        self.assertEqual((0, "hello world\n", ''),
+                         run_shell_command("echo 'hello %s'", ("world",)))
+
+    def test_run_cmd_hello_quote(self):
+        """shellutils - running simple command with an argument with quote"""
+        self.assertEqual((0, "hel'lo world\n", ''),
+                         run_shell_command("echo %s %s", ("hel'lo", "world",)))
+
+    def test_run_cmd_errorneous(self):
+        """shellutils - running wrong command should raise an exception"""
+        self.assertRaises(TypeError, run_shell_command,
+                          "echo %s %s %s", ("hello", "world",))
+
+TEST_SUITE = make_test_suite(EscapeShellArgTest,
+                             RunShellCommandTest,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
