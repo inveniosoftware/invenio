@@ -2530,6 +2530,90 @@ class BibUploadFFTModeTest(unittest.TestCase):
 
         bibupload.wipe_out_record_from_all_tables(recid)
 
+    def test_fft_vs_bibedit(self):
+        """bibupload - FFT Vs. BibEdit compatibility"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">http://cds.cern.ch/img/cds.gif</subfield>
+         </datafield>
+        </record>
+        """
+        test_to_replace = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">http://www.google.com/</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="z">BibEdit Comment</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="y">BibEdit Description</subfield>
+          <subfield code="x">01</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">http://cern.ch/</subfield>
+         </datafield>
+        </record>
+        """ % { 'siteurl': CFG_SITE_URL}
+
+        testrec_expected_xm = str(test_to_replace)
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$uhttp://www.google.com/
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif$$x01$$yBibEdit Description$$zBibEdit Comment
+        8564_ $$uhttp://cern.ch/
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
+        # insert test record:
+        task_set_task_param('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        test_to_replace = test_to_replace.replace('123456789',
+                                                          str(recid))
+        # correct test record with new FFT:
+        task_set_task_param('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_replace)
+        bibupload.bibupload(recs[0], opt_mode='replace')
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(try_url_download(testrec_expected_url))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
+
+        self._test_bibdoc_status(recid, 'cds', '')
+
+        bibrecdocs = BibRecDocs(recid)
+        bibdoc = bibrecdocs.get_bibdoc('cds')
+        self.assertEqual(bibdoc.get_description('.gif'), 'BibEdit Description')
+
+        bibupload.wipe_out_record_from_all_tables(recid)
+
 
     def test_detailed_fft_correct(self):
         """bibupload - detailed FFT correct"""

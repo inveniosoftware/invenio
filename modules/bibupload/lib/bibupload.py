@@ -82,7 +82,12 @@ from invenio.bibrecord import create_records, \
                               record_get_field_instances, \
                               record_get_field_values, \
                               field_get_subfield_values, \
-                              record_extract_oai_id
+                              field_get_subfield_instances, \
+                              record_extract_oai_id, \
+                              record_modify_subfield, \
+                              record_delete_subfield_from, \
+                              record_delete_fields, \
+                              record_add_subfield_into
 from invenio.search_engine import get_record
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
@@ -93,7 +98,8 @@ from invenio.bibtask import task_init, write_message, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
-    KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioWebSubmitFileError
+    KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioWebSubmitFileError, \
+    bibdocfile_url_p
 
 #Statistic variables
 stat = {}
@@ -499,7 +505,6 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
     Try to find records in the database from the external EXTOAIID number.
     Return list of record ID if found, None otherwise.
     """
-    from invenio.search_engine import print_record
     assert(CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:5] == CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[:5])
     bibxxx = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:2]+'x'
     bibrec_bibxxx = 'bibrec_' + bibxxx
@@ -812,88 +817,142 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx,
     return res
 
 def synchronize_8564(rec_id, record, record_had_FFT):
-    """Sinchronize the 8564 tags for record with actual files. descriptions
-    should be a dictionary docname:description for the new description to be
-    inserted.
-    If record_had_FFT the algorithm assume that every fulltext operation
-    has been performed through FFT, hence it discard current 8564 local tags,
-    and rebuild them after bibdocfile tables. Otherwise it first import
-    from 8564 tags the $y and $z subfields corresponding to local files and
-    merge them into bibdocfile tables.
+    """
+    Synchronize 8564_ tags and BibDocFile tables.
+
+    This function directly manipulate the record parameter.
+
+    @type rec_id: positive integer
+    @param rec_id: the record identifier.
+    @param record: the record structure as created by bibrecord.create_record
+    @type record_had_FFT: boolean
+    @param record_had_FFT: True if the incoming bibuploaded-record used FFT
+    @return: the manipulated record (which is also modified as a side effect)
     """
     def merge_marc_into_bibdocfile(field):
-        """Given the 8564 tag it retrieve the corresponding bibdoc and
-        merge the $y and $z subfields."""
-        url = field_get_subfield_values(field, 'u')[:1]
+        """
+        Internal function that reads a single field and store its content
+        in BibDocFile tables.
+        @param field: the 8564_ field containing a BibDocFile URL.
+        """
+        write_message('Merging field: %s' % (field, ), verbose=9)
+        url = field_get_subfield_values(field, 'u')[:1] or field_get_subfield_values(field, 'q')[:1]
         description = field_get_subfield_values(field, 'y')[:1]
         comment = field_get_subfield_values(field, 'z')[:1]
         if url:
             recid, docname, format = decompose_bibdocfile_url(url[0])
-            try:
-                bibdoc = BibRecDocs(recid).get_bibdoc(docname)
-                if description:
-                    bibdoc.set_description(description[0], format)
-                if comment:
-                    bibdoc.set_comment(comment[0], format)
-            except InvenioWebSubmitFileError:
-                ## Apparently the referenced docname doesn't exist anymore.
-                ## Too bad. Let's skip it.
-                write_message("WARNING: docname %s doesn't exist for record %s. Has it been renamed outside FFT?" % (docname, recid), stream=sys.stderr)
+            if recid != rec_id:
+                write_message("INFO: URL %s is not pointing to a fulltext owned by this record (%s)" % (url, recid), stream=sys.stderr)
+            else:
+                try:
+                    bibdoc = BibRecDocs(recid).get_bibdoc(docname)
+                    if description:
+                        bibdoc.set_description(description[0], format)
+                    if comment:
+                        bibdoc.set_comment(comment[0], format)
+                except InvenioWebSubmitFileError:
+                    ## Apparently the referenced docname doesn't exist anymore.
+                    ## Too bad. Let's skip it.
+                    write_message("WARNING: docname %s doesn't exist for record %s. Has it been renamed outside FFT?" % (docname, recid), stream=sys.stderr)
+
+    def merge_bibdocfile_into_marc(field, subfields):
+        """
+        Internal function that reads BibDocFile table entries referenced by
+        the URL in the given 8564_ field and integrate the given information
+        directly with the provided subfields.
+
+        @param field: the 8564_ field containing a BibDocFile URL.
+        @param subfields: the subfields corresponding to the BibDocFile URL
+                          generated after BibDocFile tables.
+        """
+        write_message('Merging subfields %s into field %s' % (subfields, field), verbose=9)
+        subfields = dict(subfields) ## We make a copy not to have side-effects
+        subfield_to_delete = []
+        for subfield_index, (code, value) in enumerate(field_get_subfield_instances(field)):
+            ## For each subfield instance already existing...
+            if code in subfields:
+                ## ...We substitute it with what is in BibDocFile tables
+                record_modify_subfield(record, '856', field[4], code, subfields[code], subfield_index)
+                del subfields[code]
+            else:
+                ## ...We delete it otherwise
+                subfield_to_delete.append(subfield_index)
+
+        subfield_to_delete.sort()
+
+        for counter, position in enumerate(subfield_to_delete):
+            ## FIXME: Very hackish algorithm. Since deleting a subfield
+            ## will alterate the position of following subfields, we
+            ## are taking note of this and adjusting further position
+            ## by using a counter.
+            record_delete_subfield_from(record, '856', field[4], position - counter)
+
+        subfields = subfields.items()
+        subfields.sort()
+        for code, value in subfields:
+            ## Let's add non-previously existing subfields
+            record_add_subfield_into(record, '856', field[4], code, value)
+
+    def get_bibdocfile_managed_info():
+        """
+        Internal function to eturns a dictionary of
+        BibDocFile URL -> wanna-be subfields.
+
+        @rtype: mapping
+        @return: BibDocFile URL -> wanna-be subfields dictionary
+        """
+        ret = {}
+        bibrecdocs = BibRecDocs(rec_id)
+        latest_files = bibrecdocs.list_latest_files()
+        for afile in latest_files:
+            url = afile.get_url()
+            ret[url] = {'u' : url}
+            description = afile.get_description()
+            comment = afile.get_comment()
+            if description:
+                ret[url]['y'] = description
+            if comment:
+                ret[url]['z'] = comment
+
+        for bibdoc in bibrecdocs.list_bibdocs():
+            icon = bibdoc.get_icon()
+            if icon:
+                icon = icon.list_all_files()
+                if icon:
+                    url = icon[0].get_url()
+                    ret[url] = {'q' : url, 'x' : 'icon'}
+        return ret
 
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
     tags8564s = record_get_field_instances(record, '856', '4', ' ')
-    filtered_tags8564s = []
+    write_message("Original 8564_ instances: %s" % tags8564s, verbose=9)
+    tags8564s_to_add = get_bibdocfile_managed_info()
+    write_message("BibDocFile instances: %s" % tags8564s_to_add, verbose=9)
+    positions_tags8564s_to_remove = []
 
-    # Let's discover all the previous internal urls, in order to rebuild them!
-    for field in tags8564s:
-        to_be_removed = False
-        for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
-            try:
-                recid, docname, format = decompose_bibdocfile_url(value)
-                if recid == rec_id:
-                    if not record_had_FFT:
-                        ## If the submission didn't have FFTs, i.e. could be
-                        ## not FFTs aware, and it specify 8564s pointing to local
-                        ## owned files, then we should import comment and
-                        ## description from the 8564s tags.
-                        ## Anything else will be discarded.
-                        merge_marc_into_bibdocfile(field)
-                    to_be_removed = True
-            except InvenioWebSubmitFileError:
-                ## The URL is not a bibdocfile URL.
-                pass
-        if not to_be_removed:
-            filtered_tags8564s.append(field)
+    for local_position, field in enumerate(tags8564s):
+        for url in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
+            if url in tags8564s_to_add:
+                if record_had_FFT:
+                    merge_bibdocfile_into_marc(field, tags8564s_to_add[url])
+                else:
+                    merge_marc_into_bibdocfile(field)
+                del tags8564s_to_add[url]
+                break
+            elif bibdocfile_url_p(url) and decompose_bibdocfile_url(url)[0] == rec_id:
+                positions_tags8564s_to_remove.append(local_position)
+                break
 
-    # Let's keep in the record only external 8564
-    record_delete_field(record, '856', '4', ' ') # First we delete 8564
-    for field in filtered_tags8564s: # Then we readd external ones
-        record_add_field(record, '856', '4', ' ', '', field[0])
+    record_delete_fields(record, '856', positions_tags8564s_to_remove)
 
-    # Now we refresh with existing internal 8564
-    bibrecdocs = BibRecDocs(rec_id)
-    latest_files = bibrecdocs.list_latest_files()
-    for afile in latest_files:
-        url = afile.get_url()
-        description = afile.get_description()
-        comment = afile.get_comment()
-        new_subfield = [('u', url)]
-        if description:
-            new_subfield.append(('y', description))
-        if comment:
-            new_subfield.append(('z', comment))
-        record_add_field(record, '856', '4', ' ', '', new_subfield)
+    tags8564s_to_add = tags8564s_to_add.values()
+    tags8564s_to_add.sort()
+    for subfields in tags8564s_to_add:
+        subfields = subfields.items()
+        subfields.sort()
+        record_add_field(record, '856', '4', ' ', subfields=subfields)
 
-    # Let'handle all the icons
-    for bibdoc in bibrecdocs.list_bibdocs():
-        icon = bibdoc.get_icon()
-        if icon:
-            icon = icon.list_all_files()
-            if icon:
-                url = icon[0].get_url() ## The 1st format found should be ok
-                new_subfield = [('q', url)]
-                new_subfield.append(('x', 'icon'))
-                record_add_field(record, '856', '4', ' ', '', new_subfield)
+    write_message('Final record: %s' % record, verbose=9)
     return record
 
 def elaborate_fft_tags(record, rec_id, mode):
