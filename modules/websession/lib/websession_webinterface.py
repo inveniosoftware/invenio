@@ -281,6 +281,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'latestbox' : (int, None),
             'helpbox' : (int, None),
             'lang' : (str, None),
+            'bibcatalog_username' : (str, None),
+            'bibcatalog_password' : (str, None),
             })
 
         uid = webuser.getUid(req)
@@ -438,6 +440,18 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
             mess = _("User settings saved correctly.")
+        elif args['bibcatalog_username'] or args['bibcatalog_password']:
+            act = "/youraccount/display?ln=%s" % args['bibcatalog_username']
+            linkname = _("Show account")
+            if ((len(args['bibcatalog_username']) == 0) or (len(args['bibcatalog_password']) == 0)):
+                title = _("Editing bibcatalog authorization failed")
+                mess = _("Empty username or password")
+            else:
+                title = _("Settings edited")
+                prefs['bibcatalog_username'] = args['bibcatalog_username']
+                prefs['bibcatalog_password'] = args['bibcatalog_password']
+                webuser.set_user_preferences(uid, prefs)
+                mess = _("User settings saved correctly.")
         else:
             mess = _("Unable to update settings.")
             act = "/youraccount/edit?ln=%s" % args['ln']

@@ -231,6 +231,33 @@ class Template:
         return out
 
 
+    def tmpl_user_bibcatalog_auth(self, bibcatalog_username="", bibcatalog_password="", ln=CFG_SITE_LANG):
+        """template for setting username and pw for bibcatalog backend"""
+        _ = gettext_set_language(ln)
+        out = """
+            <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_bibcatalog_settings">
+              <p><big><strong class="headline">%(edit_bibcatalog_settings)s</strong></big></p>
+              <table>
+                <tr>
+                  <td> %(username)s: <input type="text" size="25" name="bibcatalog_username" value="%(bibcatalog_username)s" id="bibcatuid"></td>
+                  <td> %(password)s: <input type="password" size="25" name="bibcatalog_password" value="%(bibcatalog_password)s" id="bibcatpw"></td>
+                </tr>
+                <tr>
+                  <td><input class="formbutton" type="submit" value="%(update_settings)s" /></td>
+                </tr>
+              </table>
+        """ % {
+          'sitesecureurl' : CFG_SITE_SECURE_URL,
+          'bibcatalog_username' : bibcatalog_username,
+          'bibcatalog_password' : bibcatalog_password,
+          'edit_bibcatalog_settings' : _("Edit cataloging interface settings"),
+          'username' :  _("Username"),
+          'password' :  _("Password"),
+          'update_settings' : _('Update settings')
+        }
+        return out
+
+
     def tmpl_user_lang_edit(self, ln, preferred_lang):
         _ = gettext_set_language(ln)
         out = """

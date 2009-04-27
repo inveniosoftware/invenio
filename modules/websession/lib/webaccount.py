@@ -323,6 +323,13 @@ def perform_set(email, ln, verbose=0):
                 ln = ln,
                 preferred_lang = preferred_lang
                 )
+    #show this dialog only if the system has been configured to use a ticket system
+    from invenio.config import CFG_BIBCATALOG_SYSTEM
+    if CFG_BIBCATALOG_SYSTEM:
+        bibcatalog_username = prefs.get('bibcatalog_username', "")
+        bibcatalog_password = prefs.get('bibcatalog_password', "")
+        out += websession_templates.tmpl_user_bibcatalog_auth(bibcatalog_username, \
+                                                          bibcatalog_password, ln=ln)
 
     if verbose >= 9:
         for key, value in prefs.items():

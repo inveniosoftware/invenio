@@ -906,6 +906,19 @@ def list_users_in_roles(role_list):
         return map(lambda x: int(x[0]), res)
     return []
 
+def get_uid_based_on_pref(prefname, prefvalue):
+    """get the user's UID based where his/her preference prefname has value prefvalue in preferences"""
+    prefs = run_sql("SELECT id, settings FROM user WHERE settings is not NULL")
+    the_uid = None
+    for pref in prefs:
+        try:
+            settings = deserialize_via_marshal(pref[1])
+            if (settings.has_key(prefname)) and (settings[prefname] == prefvalue):
+                the_uid = pref[0]
+        except:
+            pass
+    return the_uid
+
 def get_user_preferences(uid):
     pref = run_sql("SELECT id, settings FROM user WHERE id=%s", (uid,))
     if pref:
