@@ -151,8 +151,9 @@ input file should contain record ID in the 001 tag and the title in
 
     -c, --correct Correct fields of existing records by those
                   from XML MARC file.  The original record
-                  content is modified only in the fields from
-                  the XML MARC file: the original fields are
+                  content is modified only on those fields from
+                  the XML MARC file where both the tags and the
+                  indicators match: the original fields are
                   removed and replaced by those from the XML
                   MARC file.  Fields not present in XML MARC
                   file are not changed (unlike the -r option).
