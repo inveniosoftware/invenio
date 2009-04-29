@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
+import cgi
 from datetime import timedelta
 
 from invenio.config import \
@@ -285,6 +286,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'bibcatalog_password' : (str, None),
             })
 
+        # sanity checks:
+        args['login_method'] = wash_login_method(args['login_method'])
+
         uid = webuser.getUid(req)
 
         # load the right message language
@@ -317,7 +321,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     mess = "<p>" + _("Switched to internal login method.") + " "
                     mess += _("Please note that if this is the first time that you are using this account "
                               "with the internal login method then the system has set for you "
-                              "a randomly generated password. Please clic the "
+                              "a randomly generated password. Please click the "
                               "following button to obtain a password reset request "
                               "link sent to you via email:") + '</p>'
                     mess += """<p><form  method="post" action="../youraccount/send_email">
@@ -333,17 +337,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     else:
                         email = None
                     if not email:
-                        mess = _("Unable to switch to external login method %s, because your email address is unknown.") % args['login_method']
+                        mess = _("Unable to switch to external login method %s, because your email address is unknown.") % cgi.escape(args['login_method'])
                     else:
                         try:
                             if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0].user_exists(email):
-                                mess = _("Unable to switch to external login method %s, because your email address is unknown to the external login system.") % args['login_method']
+                                mess = _("Unable to switch to external login method %s, because your email address is unknown to the external login system.") % cgi.escape(args['login_method'])
                             else:
                                 prefs['login_method'] = args['login_method']
                                 webuser.set_user_preferences(uid, prefs)
                                 mess = _("Login method successfully selected.")
                         except AttributeError:
-                            mess = _("The external login method %s does not support email address based logins.  Please contact the site administrators.") % args['login_method']
+                            mess = _("The external login method %s does not support email address based logins.  Please contact the site administrators.") % cgi.escape(args['login_method'])
 
         elif args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
             return webuser.page_not_authorized(req, "../youraccount/change",
@@ -372,26 +376,26 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 linkname = _("Show account")
                 title = _("Settings edited")
             elif args['nickname'] is not None and not webuser.nickname_valid_p(args['nickname']):
-                mess = _("Desired nickname %s is invalid.") % args['nickname']
+                mess = _("Desired nickname %s is invalid.") % cgi.escape(args['nickname'])
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif not webuser.email_valid_p(args['email']):
-                mess = _("Supplied email address %s is invalid.") % args['email']
+                mess = _("Supplied email address %s is invalid.") % cgi.escape(args['email'])
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid2 == -1 or uid2 != uid and not uid2 == 0:
-                mess = _("Supplied email address %s already exists in the database.") % args['email']
+                mess = _("Supplied email address %s already exists in the database.") % cgi.escape(args['email'])
                 mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
                 mess += " " + _("Or please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid_with_the_same_nickname == -1 or uid_with_the_same_nickname != uid and not uid_with_the_same_nickname == 0:
-                mess = _("Desired nickname %s is already in use.") % args['nickname']
+                mess = _("Desired nickname %s is already in use.") % cgi.escape(args['nickname'])
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
@@ -441,7 +445,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             linkname = _("Show account")
             mess = _("User settings saved correctly.")
         elif args['bibcatalog_username'] or args['bibcatalog_password']:
-            act = "/youraccount/display?ln=%s" % args['bibcatalog_username']
+            act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
             if ((len(args['bibcatalog_username']) == 0) or (len(args['bibcatalog_password']) == 0)):
                 title = _("Editing bibcatalog authorization failed")
@@ -647,9 +651,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'remember_me' : (str, ''),
             'referer': (str, '')})
 
+        # sanity checks:
+        args['login_method'] = wash_login_method(args['login_method'])
         if args['p_un']:
             args['p_un'] = args['p_un'].strip()
-
         args['remember_me'] = args['remember_me'] != ''
 
         locals().update(args)
@@ -712,10 +717,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             else:
                 return self.display(req, form)
         else:
-            mess = CFG_WEBACCESS_WARNING_MSGS[msgcode] % args['login_method']
+            mess = CFG_WEBACCESS_WARNING_MSGS[msgcode] % cgi.escape(args['login_method'])
             if msgcode == 14:
                 if webuser.username_exists_p(args['p_un']):
-                    mess = CFG_WEBACCESS_WARNING_MSGS[15] % args['login_method']
+                    mess = CFG_WEBACCESS_WARNING_MSGS[15] % cgi.escape(args['login_method'])
             act = '/youraccount/login%s' % make_canonical_urlargd({'ln' : args['ln'], 'referer' : args['referer']}, {})
             return page(title=_("Login"),
                         body=webaccount.perform_back(mess, act, _("login"), args['ln']),
@@ -786,23 +791,23 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 1:
-            mess = _("Supplied email address %s is invalid.") % args['p_email']
+            mess = _("Supplied email address %s is invalid.") % cgi.escape(args['p_email'])
             mess += " " + _("Please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 2:
-            mess = _("Desired nickname %s is invalid.") % args['p_nickname']
+            mess = _("Desired nickname %s is invalid.") % cgi.escape(args['p_nickname'])
             mess += " " + _("Please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 3:
-            mess = _("Supplied email address %s already exists in the database.") % args['p_email']
+            mess = _("Supplied email address %s already exists in the database.") % cgi.escape(args['p_email'])
             mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
             mess += " " + _("Or please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 4:
-            mess = _("Desired nickname %s already exists in the database.") % args['p_nickname']
+            mess = _("Desired nickname %s already exists in the database.") % cgi.escape(args['p_nickname'])
             mess += " " + _("Please try again.")
             act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
@@ -1199,3 +1204,22 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     navmenuid     = 'yourgroups')
 
 
+def wash_login_method(login_method):
+    """
+    Wash the login_method parameter that came from the web input form.
+
+    @param login_method: Wanted login_method value as it came from the
+        web input form.
+    @type login_method: string
+
+    @return: Washed version of login_method.  If the login_method
+        value is valid, then return it.  If it is not valid, then
+        return `Local' (the default login method).
+    @rtype: string
+
+    @warning: Beware, 'Local' is hardcoded here!
+    """
+    if login_method in CFG_EXTERNAL_AUTHENTICATION.keys():
+        return login_method
+    else:
+        return 'Local'

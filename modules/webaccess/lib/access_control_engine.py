@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+import cgi
+from urllib import quote
+
 from invenio.config import CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql_cached
 from invenio.access_control_admin import acc_find_possible_roles, acc_is_user_in_role, CFG_SUPERADMINROLE_ID
@@ -26,7 +29,6 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACC
 from invenio.webuser import collect_user_info
 from invenio.access_control_firerole import acc_firerole_suggest_apache_p, deserialize
 from invenio.urlutils import make_canonical_urlargd
-from urllib import quote
 
 CFG_CALLED_FROM_APACHE = 1 #1=web,0=cli
 try:
@@ -113,6 +115,6 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
         else:
             ## User is not authorized.
-            return (20, CFG_WEBACCESS_WARNING_MSGS[20] % name_action)
+            return (20, CFG_WEBACCESS_WARNING_MSGS[20] % cgi.escape(name_action))
     ## User is not authorized
     return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (CFG_CALLED_FROM_APACHE and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info['uri'])))

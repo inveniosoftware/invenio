@@ -36,8 +36,9 @@ try:
 except ImportError:
     pass
 
+import cgi
+import urllib
 from socket import gethostbyname, gaierror
-from cgi import parse_qs
 import os
 import crypt
 import socket
@@ -138,8 +139,8 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
                 if text:
                     body = text
                 else:
-                    body = "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[9] % res[0][0],
-                                      ("%s %s" % (CFG_WEBACCESS_MSGS[0] % referer, CFG_WEBACCESS_MSGS[1])))
+                    body = "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[9] % cgi.escape(res[0][0]),
+                                      ("%s %s" % (CFG_WEBACCESS_MSGS[0] % urllib.quote(referer), CFG_WEBACCESS_MSGS[1])))
             else:
                 if text:
                     body = text
@@ -979,7 +980,7 @@ def get_preferred_user_language(req):
 
     if not new_lang:
         try:
-            new_lang = wash_languages(parse_qs(req.args)['ln'])
+            new_lang = wash_languages(cgi.parse_qs(req.args)['ln'])
         except (TypeError, AttributeError, KeyError):
             pass
 
