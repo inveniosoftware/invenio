@@ -19,11 +19,8 @@
 
 """
 Provide a "ticket" interface with a request tracker.
-See: https://twiki.cern.ch/twiki/bin/view/Inspire/SystemDesignBibCatalogue
 This is a subclass of BibCatalogSystem
 """
-
-BIBCATALOG_RT_SERVER = "" #construct this by http://user:password@RT_URL
 
 import os
 import os.path
@@ -38,6 +35,8 @@ from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_QUEUES
 
 class BibCatalogSystemRT(BibCatalogSystem):
+
+    BIBCATALOG_RT_SERVER = "" #construct this by http://user:password@RT_URL
 
     def check_system(self, uid):
         """return an error string if there are problems"""

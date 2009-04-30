@@ -19,7 +19,7 @@
 
 """
 Provide a "ticket" interface with a request tracker.
-See: https://twiki.cern.ch/twiki/bin/view/Inspire/SystemDesignBibCatalogue
+Please see the help/hacking/bibcatalog-api page for details.
 This is a base class that cannot be instantiated.
 """
 
@@ -31,76 +31,120 @@ class BibCatalogSystem:
     TICKET_ATTRIBUTES = ['ticketid', 'priority', 'recordid', 'subject', 'text', 'creator', 'owner', 'date', 'status', 'queue', 'url_display', 'url_close']
 
     def check_system(self, uid):
-        """check connectivity. Return a string describing the error or an empty str
-           @param uid invenio user id.
+        """Check connectivity. Return a string describing the error or an empty str
+           @param uid: invenio user id
+           @type uid: number
+           @return: empty string on success. Otherwise a string describing error.
+           @rtype: string
         """
         return "this class cannot be instantiated"
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
                       date_from="", date_until="", status="", priority=""):
-        """search for tickets based on various criteria. Return an array of ticket numbers
-           @param uid invenio user id.
-           @param recordid search criteria: ticket contains this record id.
-           @param subject search criteria: ticket has this subject (substr).
-           @param text search criteria: ticket has this text in body (substr).
-           @param creator search criteria: ticket creator's id.
-           @param owner search criteria: ticket owner's id.
-           @param date_from search criteria: ticket created starting from this date. Example: '2009-01-24'
-           @param date_until search criteria: ticket created until from this date. Example: '2009-01-24'
-           @param status search criteria: ticket has this status. Example: 'resolved'.
-           @param priority search criteria: ticket priority number.
+        """Search for tickets based on various criteria. Return an array of ticket numbers
+           @param uid: invenio user id.
+           @type uid: number
+           @param recordid: search criteria - ticket contains this record id.
+           @type recordid: number
+           @param subject: search criteria - ticket has this subject (substr).
+           @type subject: string
+           @param text: search criteria - ticket has this text in body (substr).
+           @type text: string
+           @param creator: search criteria - ticket creator's id.
+           @type creator: number
+           @param owner: search criteria - ticket owner's id.
+           @type owner: number
+           @param date_from: search criteria - ticket created starting from this date. Example: '2009-01-24'
+           @type date_until: date in yyyy-mm-dd format
+           @param date_until: search criteria - ticket created until from this date. Example: '2009-01-24'
+           @type date_from: date in yyyy-mm-dd format
+           @param status: search criteria - ticket has this status. Example: 'resolved'.
+           @type status: string
+           @param priority: search criteria - ticket priority number.
+           @type priority: number.
         """
         pass
 
     def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner=""):
         """submit a ticket. Return 1 on success
-           @param uid invenio user id.
-           @param subject set this as the ticket's subject.
-           @param recordid ticket concerns this record.
-           @param text ticket body.
-           @param queue the queue for this ticket (if supported).
-           @param priority ticket priority.
-           @param owner set ticket owner to this uid.
+           @param uid: invenio user id
+           @type uid: number
+           @param subject: set this as the ticket's subject.
+           @type subject: string
+           @param recordid: ticket concerns this record.
+           @type recordid: number
+           @param text: ticket body.
+           @type text: string
+           @param queue: the queue for this ticket (if supported).
+           @type queue: string
+           @param priority: ticket priority.
+           @type priority: number
+           @param owner: set ticket owner to this uid.
+           @type owner: number
         """
         pass
 
     def ticket_assign(self, uid, ticketid, to_user):
         """assign a ticket to a user. Return 1 on success
-           @param uid invenio user id.
-           @param tickeid ticket id.
-           @param to_user assign ticket to this user.
+           @param uid: invenio user id
+           @type uid: number
+           @param ticketid: ticket id
+           @type ticketid: number
+           @param to_user: assign ticket to this user
+           @type to_user: number
+           @return: 1 on success, 0 otherwise
+           @rtype: number
         """
         pass
 
     def ticket_set_attribute(self, uid, ticketid, attribute, new_value):
         """set an attribute of a ticket. Return 1 on success
-           @param uid invenio user id.
-           @param tickeid ticket id.
+           @param uid: invenio user id
+           @type uid: number
+           @param ticketid: ticket id
+           @type ticketid: number
            @param attribute. This is a member of TICKET_ATTRIBUTES.
-           @param new_value new value for this attribute.
+           @type attribute: string
+           @param new_value: new value for this attribute.
+           @type new_value: string
+           @return: 1 on success, 0 otherwise
+           @rtype: number
         """
         pass
 
     def ticket_get_attribute(self, uid, ticketid, attrname):
         """return an attribute
-           @param uid invenio user id.
-           @param tickeid ticket id.
-           @param attrname attribute name.
+           @param uid: invenio user id
+           @type uid: number
+           @param ticketid: ticket id
+           @type ticketid: number
+           @param attrname: attribute name.
+           @type attrname: string
+           @return: the value of the attribute, or None if the ticket or attribute does not exist
+           @rtype: string
         """
         pass
 
-    def ticket_get_info(self, uid, ticketid, attrlist):
+    def ticket_get_info(self, uid, ticketid, attrlist = None):
         """Return the attributes of a ticket as a dictionary whose fields are TICKET_ATTRIBUTES.
-           @param uid user id.
-           @param tickeid ticket id.
-           @param attrlist a list of attributes, each in TICKET_ATTRIBUTES.
+           @param uid: user id
+           @type uid: number
+           @param ticketid: ticket id
+           @type ticketid: number
+           @param attrlist: a list of attributes, each in TICKET_ATTRIBUTES.
+           @type attrlist: list
+           @return: dictionary whose fields are TICKET_ATTRIBUTES
+           @rtype: dictionary
         """
         pass
 
 def get_bibcat_from_prefs(uid):
     """gets username and pw from user prefs as a tuple.
        if not successfull, returns None
-       @param uid user id.
+       @param uid: user id
+       @type uid: number
+       @return: ('bibcatalog_username', 'bibcatalog_password')
+       @rtype: tuple
     """
     user_pref = get_user_preferences(uid)
     if not user_pref.has_key('bibcatalog_username'):
@@ -108,9 +152,4 @@ def get_bibcat_from_prefs(uid):
     if not user_pref.has_key('bibcatalog_password'):
         return (None, None)
     return (user_pref['bibcatalog_username'], user_pref['bibcatalog_password'])
-
-
-
-
-
 

@@ -44,7 +44,7 @@ from invenio import webbasket
 from invenio import webalert
 from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
-from invenio.access_control_engine import make_apache_message, make_list_apache_firerole
+from invenio.access_control_engine import make_apache_message, make_list_apache_firerole, acc_authorize_action
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
@@ -250,16 +250,20 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                text=_("This functionality is forbidden to guest users."),
                                                navmenuid='youraccount')
         body = ''
+
+        user_info = webuser.collect_user_info(req)
         if args['verbose'] == 9:
-            user_info = webuser.collect_user_info(req)
             keys = user_info.keys()
             keys.sort()
             for key in keys:
                 body += "<b>%s</b>:%s<br />" % (key, user_info[key])
 
+        #check if the user should see bibcatalog user name / passwd in the settings
+        can_config_bibcatalog = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
         return page(title= _("Your Settings"),
                     body=body+webaccount.perform_set(webuser.get_email(uid),
-                                                args['ln'], verbose=args['verbose']),
+                                                     args['ln'], can_config_bibcatalog,
+                                                     verbose=args['verbose']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s Personalize, Your Settings")  % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),

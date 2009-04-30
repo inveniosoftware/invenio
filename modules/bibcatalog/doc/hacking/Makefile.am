@@ -15,4 +15,11 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+webdoclibdir = $(libdir)/webdoc/invenio/hacking
+
+webdoclib_DATA = bibcatalog-api.webdoc
+
+EXTRA_DIST = $(webdoclib_DATA)
+
+
 CLEANFILES = *~ *.tmp

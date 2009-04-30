@@ -253,9 +253,10 @@ def perform_delete(ln):
     # TODO
     return websession_templates.tmpl_account_delete(ln = ln)
 
-def perform_set(email, ln, verbose=0):
+def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
     """Perform_set(email,password): edit your account parameters, email and
     password.
+    If can_config_bibcatalog is True, show the bibcatalog dialog (if configured).
     """
 
     try:
@@ -325,7 +326,7 @@ def perform_set(email, ln, verbose=0):
                 )
     #show this dialog only if the system has been configured to use a ticket system
     from invenio.config import CFG_BIBCATALOG_SYSTEM
-    if CFG_BIBCATALOG_SYSTEM:
+    if CFG_BIBCATALOG_SYSTEM and can_config_bibcatalog:
         bibcatalog_username = prefs.get('bibcatalog_username', "")
         bibcatalog_password = prefs.get('bibcatalog_password', "")
         out += websession_templates.tmpl_user_bibcatalog_auth(bibcatalog_username, \
