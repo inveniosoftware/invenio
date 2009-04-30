@@ -25,7 +25,8 @@ import datetime
 import time
 
 from invenio.urlutils import create_html_link
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_CERN_SITE
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
+     CFG_CERN_SITE, CFG_SITE_SECURE_URL
 from invenio.messages import gettext_set_language
 
 
@@ -54,11 +55,11 @@ _MENU_ = """
      </li>
 
      <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_return">Return</a>
+        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_return">Returns</a>
      </li>
 
      <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search">Request</a>
+        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search">Requests</a>
      </li>
 
      <li class="hassubmenu">
@@ -92,8 +93,8 @@ _MENU_ = """
          <ul class="subsubmenu" style="width:17.5em;">
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans">Current loans</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans">Overdue loans</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests">On Shelve items with holds</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_waiting_requests">On Loan items with holds</a></li>
+             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests">Items on shelf with holds</a></li>
+             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_waiting_requests">Items on loan with holds</a></li>
              <!-- <li><a href='#'># - Stats</a></li> -->
             </ul>
     </li>
@@ -143,10 +144,8 @@ _MENU_ = """
         """ % {'url': CFG_SITE_URL}
 
 
-
 class Template:
     """Templates for BibCirculation module"""
-
 
     def tmpl_infobox(self, infos, ln=CFG_SITE_LANG):
         """
@@ -216,8 +215,8 @@ class Template:
                           value='%s' class="formbutton"></td>
                      </tr>
 
-                """ % (barcode, library, collection, location,
-                       description, loan_period, status, due_date,
+                """ % (barcode, library, collection or '-', location,
+                       description or '-', loan_period, status, due_date or '-',
                        CFG_SITE_URL, recid, barcode,
                        _("Request"))
 
@@ -312,12 +311,12 @@ class Template:
         """
         _ = gettext_set_language(ln)
 
-        renew_all_link = create_html_link(CFG_SITE_URL +
+        renew_all_link = create_html_link(CFG_SITE_SECURE_URL +
                                           '/yourloans/display',
                                           {'borrower_id': borrower_id},
                                           (_("Renew all loans")))
 
-        loanshistoricaloverview_link = create_html_link(CFG_SITE_URL +
+        loanshistoricaloverview_link = create_html_link(CFG_SITE_SECURE_URL +
                                             '/yourloans/loanshistoricaloverview',
                                             {'ln': ln},
                                             (_("Loans - historical overview")))
@@ -352,7 +351,7 @@ class Template:
 
             for(recid, barcode, loaned_on, due_date) in loans:
 
-                renew_link = create_html_link(CFG_SITE_URL +
+                renew_link = create_html_link(CFG_SITE_SECURE_URL +
                                          '/yourloans/display',
                                          {'barcode': barcode},
                                          (_("Renew")))
@@ -1106,7 +1105,7 @@ class Template:
 
         return out
 
-    def tmpl_loan_return_confirm(self, borrower_name, recid, barcode,
+    def tmpl_loan_return_confirm(self, borrower_name, borrower_id, recid, barcode,
                                  ln=CFG_SITE_LANG):
         """
         @param borrower_name: person who returned the book
@@ -1119,6 +1118,17 @@ class Template:
         out = """
         """
         out += _MENU_
+
+
+        borrower_link = create_html_link(CFG_SITE_URL +
+                                         '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                         {'borrower_id': borrower_id, 'ln': ln},
+                                         (borrower_name))
+
+        title_link = create_html_link(CFG_SITE_URL +
+                                      '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                      {'recid': recid, 'ln': ln},
+                                      (book_title_from_MARC(recid)))
 
         out += """
            <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request" method="get" >
@@ -1171,11 +1181,11 @@ class Template:
         <input type=hidden name=barcode value=%s>
 
         """ % (_("Loan informations"),
-               _("Borrower"), borrower_name,
-               _("Item"), book_title,
+               _("Borrower"), borrower_link,
+               _("Item"), title_link,
                _("Author"), book_author,
                _("Year"), book_year,
-               _("Editor"), book_editor,
+               _("Publisher"), book_editor,
                _("ISBN"), book_isbn,
                str(book_cover),
                recid,
@@ -1385,7 +1395,7 @@ class Template:
               <td class="bibcirctableheader">%s</td>
               <td class="bibcirctableheader">%s</td>
             </tr>
-        """ % (len(result), _("Title"), _("Author"), _("Editor"), _("No. Copies"))
+        """ % (len(result), _("Title"), _("Author"), _("Publisher"), _("No. Copies"))
 
         for recid in result:
 
@@ -2267,8 +2277,7 @@ class Template:
                                         {'recid': recid, 'ln': ln},
                                         (_("More details")))
 
-
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -2326,7 +2335,7 @@ class Template:
                    _("Name"), book_title,
                    _("Author(s)"), book_author,
                    _("Year"), book_year,
-                   _("Editor"), book_editor,
+                   _("Publisher"), book_editor,
                    _("ISBN"), book_isbn,
                    str(book_cover), _("Additional details"))
 
@@ -2371,14 +2380,14 @@ class Template:
                      <td class="bibcirccontent" align="center">%s</td>
 
                      """% (barcode, status, library_link, location,
-                           loan_period, nb_requests, collection,
-                           description)
+                           loan_period, nb_requests, collection or '-',
+                           description or '-')
 
             if status == 'on loan':
                 out += """
                   <td class="bibcirccontent" align="center">
                     <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
-                      <OPTION VALUE="">Select an option
+                      <OPTION VALUE="">Select an action
                       <OPTION VALUE="update_item_info_step4?barcode=%s">Update
                       <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                       <OPTION VALUE="" DISABLED>New loan
@@ -2391,7 +2400,7 @@ class Template:
                 out += """
                      <td class="bibcirccontent" align="center">
                        <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
-                         <OPTION VALUE="">Select an option
+                         <OPTION VALUE="">Select an action
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
                          <OPTION VALUE="" DISABLED>New request
                          <OPTION VALUE="" DISABLED>New loan
@@ -2403,7 +2412,7 @@ class Template:
                 out += """
                      <td class="bibcirccontent" align="center">
                        <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
-                         <OPTION VALUE="">Select an option
+                         <OPTION VALUE="">Select an action
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
                          <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                          <OPTION VALUE="place_new_loan_step1?barcode=%s">New loan
@@ -3259,7 +3268,7 @@ class Template:
 
                  <td align="center">
                     <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
-                      <OPTION VALUE="">Select an option
+                      <OPTION VALUE="">Select an action
                       <OPTION VALUE="get_borrower_loans_details?borrower_id=%s&barcode=%s&loan_id=%s&recid=%s">Renew
                       <OPTION VALUE="loan_return_confirm?barcode=%s">Return
                       <OPTION VALUE="change_due_date_step1?loan_id=%s&borrower_id=%s">Change due date
@@ -3425,8 +3434,7 @@ class Template:
                        <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
-                       <td class="bibcirctableheader" align="center">%s</td>
-                       <td class="bibcirctableheader" align="center">%s</td>
+                                        <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
                     </tr>
 
@@ -3438,10 +3446,9 @@ class Template:
                           _("Due date"),
                           _("Renewals"),
                           _("Overdue letters"),
-                          _("Status"),
                           _("Loan Notes"))
 
-            for (borrower_id, borrower_name, recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, status, notes, loan_id) in result[initial:last]:
+            for (borrower_id, borrower_name, recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, notes, loan_id) in result[initial:last]:
 
                 borrower_link = create_html_link(CFG_SITE_URL +
                                                  '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
@@ -3498,13 +3505,16 @@ class Template:
                     <td class="bibcirccontent" align="center">%s</td>
                     <td class="bibcirccontent" align="center">%s - %s</td>
                     <td class="bibcirccontent" align="center">%s</td>
-                    <td class="bibcirccontent" align="center">%s</td>
+                    <td class="bibcirccontent" align="center">
+                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/claim_book_return?borrower_id=%s&recid=%s&template=claim_return'"
+                       value='%s' class='formbutton'></td>
                     </tr>
 
                     """ % (borrower_link, title_link, barcode,
                            loaned_on, due_date,
                            nb_renewall, nb_overdue, date_overdue,
-                           status, check_notes)
+                           check_notes, CFG_SITE_URL,
+                           borrower_id, recid, _("Claim return"))
 
             if int(loans_per_page) <= len(result):
 
@@ -3711,13 +3721,12 @@ class Template:
 
         else:
             out += """
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans" method="get" >
             <br \>
              <table class="bibcirctable">
                     <tr>
                        <td class="bibcirctableheader">%s</td>
                        <td class="bibcirctableheader">%s</td>
-                       <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
                        <td class="bibcirctableheader" align="center">%s</td>
@@ -3734,10 +3743,9 @@ class Template:
                           _("Due date"),
                           _("Renewals"),
                           _("Overdue letters"),
-                          _("Status"),
                           _("Loan Notes"))
 
-            for (borrower_id, borrower_name, recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, status, notes, loan_id) in result[initial:last]:
+            for (borrower_id, borrower_name, recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, notes, loan_id) in result[initial:last]:
 
                 borrower_link = create_html_link(CFG_SITE_URL +
                                                  '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
@@ -3755,22 +3763,22 @@ class Template:
                                                  (_("no notes")))
 
                 next_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                             '/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans',
                                              {'loans_per_page': loans_per_page, 'jloan': last, 'ln': ln},
                                              (_("next page >>>")))
 
                 previous_link = create_html_link(CFG_SITE_URL +
-                                                 '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                                 '/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans',
                                                  {'loans_per_page': loans_per_page, 'jloan': initial - int(loans_per_page), 'ln': ln},
                                                  (_("<<< previous page")))
 
                 begin_link = create_html_link(CFG_SITE_URL +
-                                              '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                              '/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans',
                                               {'loans_per_page': loans_per_page, 'jloan': 0, 'ln': ln},
                                               (_("|<< first page")))
 
                 end_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
+                                            '/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans',
                                             {'loans_per_page': loans_per_page, 'jloan': end, 'ln': ln},
                                             (_("last page >>|")))
 
@@ -3794,13 +3802,16 @@ class Template:
                     <td class="bibcirccontent" align="center">%s</td>
                     <td class="bibcirccontent" align="center">%s - %s</td>
                     <td class="bibcirccontent" align="center">%s</td>
-                    <td class="bibcirccontent" align="center">%s</td>
+                    <td class="bibcirccontent" align="center">
+                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/claim_book_return?borrower_id=%s&recid=%s&template=claim_return'"
+                       value='%s' class='formbutton'></td>
                     </tr>
 
                     """ % (borrower_link, title_link, barcode,
                            loaned_on, due_date,
                            nb_renewall, nb_overdue, date_overdue,
-                           status, check_notes)
+                           check_notes, CFG_SITE_URL,
+                           borrower_id, recid, _("Claim return"))
 
             if int(loans_per_page) <= len(result):
 
@@ -4096,7 +4107,7 @@ class Template:
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">
                    <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
-                      <OPTION VALUE="">Select an option
+                      <OPTION VALUE="">Select an action
                       <OPTION VALUE="get_item_loans_details?borrower_id=%s&barcode=%s&loan_id=%s&recid=%s">Renew
                       <OPTION VALUE="loan_return_confirm?barcode=%s">Return
                       <OPTION VALUE="change_due_date_step1?loan_id=%s&borrower_id=%s">Change due date
@@ -4149,7 +4160,7 @@ class Template:
         (book_title, _book_year, _book_author, book_isbn, _book_editor) =  book_information_from_MARC(recid)
 
         if book_isbn:
-            book_cover = get_book_cover(book_isbn)
+            book_cover  = get_book_cover(book_isbn)
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
@@ -5775,7 +5786,7 @@ class Template:
 
         out += _MENU_
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -5837,7 +5848,7 @@ class Template:
                    book_author,
                    _("Year"),
                    book_year,
-                   _("Editor"),
+                   _("Publisher"),
                    book_editor,
                    _("ISBN"),
                    book_isbn,
@@ -5885,7 +5896,7 @@ class Template:
                      <td class="bibcirccontent" align="center">%s</td>
                      <td class="bibcirccontent" width="250"></td>
                  </tr>
-                 """ % (barcode, status, library_link, location, loan_period, nb_requests, collection, description)
+                 """ % (barcode, status, library_link, location, loan_period, nb_requests, collection or '-', description or '-')
 
 
         out += """
@@ -6257,7 +6268,7 @@ class Template:
                    book_author,
                    _("Year"),
                    book_year,
-                   _("Editor"),
+                   _("Publisher"),
                    book_editor,
                    _("ISBN"),
                    book_isbn,
@@ -6398,7 +6409,7 @@ class Template:
                    book_author,
                    _("Year"),
                    book_year,
-                   _("Editor"),
+                   _("Publisher"),
                    book_editor,
                    _("ISBN"),
                    book_isbn,
@@ -7572,7 +7583,7 @@ class Template:
                    _("Name"), book_title,
                    _("Author(s)"), book_author,
                    _("Year"), book_year,
-                   _("Editor"), book_editor,
+                   _("Publisher"), book_editor,
                    _("ISBN"), book_isbn,
                    _("Barcode"), barcode,
                    str(book_cover))
@@ -7783,7 +7794,7 @@ class Template:
                      _("Name"), book_title,
                      _("Author(s)"), book_author,
                      _("Year"), book_year,
-                     _("Editor"), book_editor,
+                     _("Publisher"), book_editor,
                      _("ISBN"), book_isbn,
                      _("Barcode"), barcode,
                      str(book_cover))
@@ -8016,7 +8027,7 @@ class Template:
                    _("Name"), book_title,
                    _("Author(s)"), book_author,
                    _("Year"), book_year,
-                   _("Editor"), book_editor,
+                   _("Publisher"), book_editor,
                    _("ISBN"), book_isbn,
                    _("Barcode"), barcode,
                    str(book_cover))
@@ -8226,7 +8237,7 @@ class Template:
                      _("Name"), book_title,
                      _("Author(s)"), book_author,
                      _("Year"), book_year,
-                     _("Editor"), book_editor,
+                     _("Publisher"), book_editor,
                      _("ISBN"), book_isbn,
                      _("Barcode"), barcode,
                      str(book_cover))

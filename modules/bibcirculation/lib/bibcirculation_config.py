@@ -23,6 +23,7 @@ bibcirculation config file
 
 __revision__ = "$Id$"
 
+from invenio.config import CFG_CERN_SITE
 
 # templates used to notify borrowers
 CFG_BIBCIRCULATION_TEMPLATES = {
@@ -33,11 +34,12 @@ CFG_BIBCIRCULATION_TEMPLATES = {
     'EMPTY': 'Please choose one template'
 }
 
-ACCESS_KEY = '1T6P3M3TDMW9HWJ212R2'
+CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY = '1T6P3M3TDMW9HWJ212R2'
 
-CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'CERN Library<library.desk@cern.ch>'
-
-CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'CERN Library<library.desk@cern.ch>'
-
-
+if CFG_CERN_SITE == 1:
+    CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'CERN Library<library.desk@cern.ch>'
+    CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'CERN Library<library.desk@cern.ch>'
+else:
+    CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
+    CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
 

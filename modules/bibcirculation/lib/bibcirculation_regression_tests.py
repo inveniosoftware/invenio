@@ -25,7 +25,8 @@ import unittest
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+                              test_web_page_content, merge_error_messages, \
+                              test_web_page_existence
 
 class BibCirculationUsersWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibCirculation web pages whether they are up or not."""
@@ -44,7 +45,32 @@ class BibCirculationUsersWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-TEST_SUITE = make_test_suite(BibCirculationUsersWebPagesAvailabilityTest)
+class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
+    """Check BibCirculation web pages whether they are up or not for Admins."""
+
+    def test_admin_pages_availability(self):
+        """bibcirculation - availability of main admin page"""
+
+        baseurl = CFG_SITE_URL + '/admin/bibcirculation/bibcirculationadmin.py'
+
+        self.assertEqual([], test_web_page_content(baseurl,
+                                                   expected_text="BibCirculation Admin"))
+
+        return
+
+    def test_borrower_search_availability(self):
+        """bibcirculation - availability of borrower search"""
+
+        baseurl = CFG_SITE_URL + '/admin/bibcirculation/bibcirculationadmin.py/' \
+                               + 'borrower_search_result?column=name&string=john'
+
+        self.assertEqual([], test_web_page_content(baseurl, username='admin',
+                                                   expected_text='Borrower search result'))
+
+        return
+
+TEST_SUITE = make_test_suite(BibCirculationUsersWebPagesAvailabilityTest,
+                             BibCirculationAdminsWebPagesAvailabilityTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

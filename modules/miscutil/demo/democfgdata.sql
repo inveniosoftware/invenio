@@ -2123,45 +2123,84 @@ INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('POETRY','unpublished', '3');
 
 -- crcLIBRARY demo data:
-INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('CERN Library', 'CH-1211 Geneva 23', 'lib@cern.ch', '1234567', '');
+INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis Main Library', 'CH-1211 Geneva 23', 'atlantis@cds.cern.ch', '1234567', '');
+INSERT INTO crcLIBRARY (name, address, email, phone, notes) VALUES ('Atlantis HEP Library', 'CH-1211 Geneva 21', 'atlantis.hep@cds.cern.ch', '1234567', '');
 
 -- crcITEM demo data:
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-34001', '34', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-34002', '34', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-33001', '33', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-32001', '32', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-32002', '32', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-32003', '32', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-31001', '31', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-31002', '31', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-30001', '30', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-29001', '29', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-28001', '28', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-27001', '27', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-26001', '26', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-25001', '25', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-24001', '24', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-23001', '23', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-22001', '22', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
-INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, loan_period, status, creation_date, modification_date, number_of_requests)
-                VALUES ('bc-21001', '21', '1', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-34001', '34', '1', '', 'ABC-123', 'Book', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-34002', '34', '2', '', 'HEP-12A', 'Book', '4 weeks', 'requested', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-33001', '33', '1', '', 'AZ.12-AK', 'Book', '4 weeks', 'on loan', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-32001', '32', '1', 'Reference', 'WDFG-54', 'Book', 'Not for loan', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-32002', '32', '2', '', 'RZ.612-MK', 'Book', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-32003', '32', '1', '', 'RT-4654-E', 'Book', '4 weeks', 'missing', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-31001', '31', '2', '', '123LSKD', 'Book', '1 week', 'on loan', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-31002', '31', '1', '', 'QSQ452-S', 'Book', '1 week', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-30001', '30', '1', 'Reference', 'QSQS-52-S', 'Book', 'Not for loan', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-29001', '29', '1',  '', 'AZD456-465', 'Book', '4 weeks', 'requested', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-28001', '28', '1', '', 'AZD5-456', 'Book', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-27001', '27', '2', '', 'JLMQ-45-SQ', 'Book', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-26001', '26', '1', '', 'AZD456-465', 'Book', '1 week', 'missing', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-25001', '25', '2', '', 'AGT-MLL5', 'Book', '4 weeks', 'on loan', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-24001', '24', '2', '', 'J56-475', 'Book', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-23001', '23', '1', '', 'JHL-465.DS', 'Book', '4 weeks', 'requested', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-22001', '22', '1', '', 'AZD4E-865', 'Book', '1 week', 'requested', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+
+INSERT INTO crcITEM (barcode, id_bibrec, id_crcLIBRARY, collection, location, description, loan_period, status, creation_date, modification_date, number_of_requests)
+                VALUES ('bc-21001', '21', '2',  '', 'MLL-DS.63', 'Book', '4 weeks', 'available', '2008-07-21 00:00:00', '2008-07-21 00:00:00', '0');
+
+-- crcLOAN demo data:
+INSERT INTO crcLOAN (id_crcBORROWER, id_bibrec, barcode, loaned_on, due_date, status, type, notes)
+                     VALUES ('4', '33', 'bc-33001', NOW(), NOW() + INTERVAL 30 DAY, 'on loan' ,'normal', '');
+
+INSERT INTO crcLOAN (id_crcBORROWER, id_bibrec, barcode, loaned_on, due_date, status, type, notes)
+                     VALUES ('5', '31', 'bc-31001', NOW(), NOW() + INTERVAL 7 DAY, 'on loan' ,'normal', '');
+
+INSERT INTO crcLOAN (id_crcBORROWER, id_bibrec, barcode, loaned_on, due_date, status, type, notes)
+                     VALUES ('5', '31', 'bc-25001', NOW(), NOW() + INTERVAL 30 DAY, 'on loan' ,'normal', '');
+
+-- crcLOANREQUEST demo data:
+INSERT INTO crcLOANREQUEST (id_crcBORROWER, id_bibrec, barcode,  period_of_interest_from, period_of_interest_to, status, notes, request_date)
+                     VALUES ('5', '34', 'bc-34002', NOW(), NOW() + INTERVAL 60 DAY, 'pending' , '', NOW());
+INSERT INTO crcLOANREQUEST (id_crcBORROWER, id_bibrec, barcode,  period_of_interest_from, period_of_interest_to, status, notes, request_date)
+                     VALUES ('6', '29', 'bc-29001', NOW(), NOW() + INTERVAL 45 DAY, 'pending' , '', NOW());
+INSERT INTO crcLOANREQUEST (id_crcBORROWER, id_bibrec, barcode,  period_of_interest_from, period_of_interest_to, status, notes, request_date)
+                     VALUES ('5', '33', 'bc-33001', NOW(), NOW() + INTERVAL 45 DAY, 'waiting' , '', NOW());
+INSERT INTO crcLOANREQUEST (id_crcBORROWER, id_bibrec, barcode,  period_of_interest_from, period_of_interest_to, status, notes, request_date)
+                     VALUES ('7', '22', 'bc-22001', NOW(), NOW() + INTERVAL 90 DAY, 'pending' , '', NOW());
 
 -- crcBORROWER demo data:
 INSERT INTO crcBORROWER (name, email, phone, address, borrower_since, notes)

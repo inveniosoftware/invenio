@@ -1013,13 +1013,12 @@ def get_all_loans():
            l.number_of_renewals,
            l.overdue_letter_number,
            DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
-           l.status,
            l.notes,
            l.id
     from crcLOAN l, crcBORROWER bor, crcITEM it
     where l.id_crcBORROWER = bor.id
           and l.barcode=it.barcode
-          and l.status!='returned' ORDER BY l.id
+          and l.status='on loan' ORDER BY l.id
     """)
 
     return res
@@ -1039,7 +1038,6 @@ def get_all_expired_loans():
            l.number_of_renewals,
            l.overdue_letter_number,
            DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
-           l.status,
            l.notes,
            l.id
     from crcLOAN l, crcBORROWER bor, crcITEM it

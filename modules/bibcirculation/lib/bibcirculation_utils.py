@@ -25,7 +25,7 @@ from invenio.search_engine import get_fieldvalues
 import invenio.bibcirculation_dblayer as db
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL
-from invenio.bibcirculation_config import ACCESS_KEY
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY
 from invenio.messages import gettext_set_language
 
 import datetime, time
@@ -45,26 +45,19 @@ def hold_request_mail(recid, borrower_id):
                                   (book_title))
 
     out = """
-    Hello,
 
-        This is an automatic email for confirming the hold request for a
-    book on behalf of:
+           This is an automatic email for confirming the hold request for a
+           book on behalf of:
 
-        %s (email: %s)
+            %s (email: %s)
 
-        title: %s
-        author: %s
-        location: %s
-        library: %s
-        publisher: %s
-        year: %s
-        isbn: %s
-
-
-        Best regards
-        --
-        CERN Document Server <http://cdsweb.cern.ch>
-        Need human intervention?  Contact <cds.support@cern.ch>
+            title: %s
+            author: %s
+            location: %s
+            library: %s
+            publisher: %s
+            year: %s
+            isbn: %s
 
     """ % (borrower_infos[1], borrower_infos[2],
            title_link, book_author, more_holdings_infos[0][1],
@@ -84,7 +77,7 @@ def get_book_cover(isbn):
 
     cover_xml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml' \
                                '?Service=AWSECommerceService&AWSAccessKeyId=' \
-                               + ACCESS_KEY + \
+                               + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                '&Operation=ItemSearch&Condition=All&' \
                                'ResponseGroup=Images&SearchIndex=Books&' \
                                'Keywords=' + isbn)

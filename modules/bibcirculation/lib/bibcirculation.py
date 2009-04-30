@@ -193,8 +193,6 @@ def perform_new_request_send(uid, recid,
                        toaddr=CFG_SITE_SUPPORT_EMAIL,
                        subject='Hold request for books confirmation',
                        content=hold_request_mail(recid, is_borrower),
-                       header='',
-                       footer='',
                        attempt_times=1,
                        attempt_sleeptime=10
                        )
@@ -223,8 +221,6 @@ def perform_new_request_send(uid, recid,
                                toaddr=CFG_SITE_SUPPORT_EMAIL,
                                subject='Hold request for books confirmation',
                                content=hold_request_mail(recid, is_borrower),
-                               header='',
-                               footer='',
                                attempt_times=1,
                                attempt_sleeptime=10
                                )
@@ -279,8 +275,6 @@ def perform_new_request_send(uid, recid,
                            toaddr=CFG_SITE_SUPPORT_EMAIL,
                            subject='Hold request for books confirmation',
                            content=hold_request_mail(recid, is_borrower),
-                           header='',
-                           footer='',
                            attempt_times=1,
                            attempt_sleeptime=10
                            )
@@ -289,6 +283,9 @@ def perform_new_request_send(uid, recid,
                 message = "It is not possible to validate your request. "\
                           "Your office address is not available."\
                           " Please contact ... "
+
+        else:
+            message = "Your request has been registered."
 
 
     body = bibcirculation_templates.tmpl_new_request_send(message=message,

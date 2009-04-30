@@ -46,7 +46,7 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
 
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
-     CFG_BIBCIRCULATION_TEMPLATES, ACCESS_KEY, \
+     CFG_BIBCIRCULATION_TEMPLATES, CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
      CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 import invenio.bibcirculation_dblayer as db
 import invenio.template
@@ -122,6 +122,14 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
     the information desired, we use the method 'perform_request_search' (from
     search_engine.py). In the case of BibCirculation, we are just looking for
     books (items) inside the collection 'Books'.
+
+    @type p:   string
+    @param p:  search pattern
+
+    @type f:   string
+    @param f:  search field
+
+    @return:   list of recids
     """
 
     result = perform_request_search(cc="Books", sc="1", p=p, f=f)
@@ -150,12 +158,14 @@ def borrower_search_result(req, column, string, ln=CFG_SITE_LANG):
     """
     Search a borrower and return a list with all the possible results.
 
-    column - identify the column, of the table crcBORROWER, who will be
-             considered during the search. Can be 'name', 'email' or 'id'.
+    @type column:  string
+    @param column: identify the column, of the table crcBORROWER, who will be
+                   considered during the search. Can be 'name', 'email' or 'id'.
 
-    string - string used for the search process.
+    @type string:  string
+    @param string: string used for the search process.
 
-    @param str: string used on the search query
+    @return:       list of borrowers.
     """
 
     if CFG_CERN_SITE == 1:
@@ -234,7 +244,11 @@ def load_template(template):
     """
     Load a letter/notification template from
     bibcirculation_config.py.
-    template - template who will be used in the notification.
+
+    @type template:  string.
+    @param template: template who will be used in the notification.
+
+    @return:         template(string)
     """
 
     if template == "overdue_letter":
@@ -262,16 +276,20 @@ def borrower_notification(req, borrower_id, template, message,
     """
     Send a message/email to a borrower.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
 
-    template - identify the template who will be used in the notification.
+    @type template:      string.
+    @param template:     identify the template who will be used in the notification.
 
-    message - message written by the administrator.
+    @type message:       string.
+    @param message:      message written by the administrator.
 
-    subject - subject of the message.
+    @type subject:       string.
+    @param subject:      subject of the message.
 
-    send_message - send a message/email to a borrower.
+    @return:             send a message/email to a borrower.
     """
 
     email = db.get_borrower_email(borrower_id)
@@ -320,14 +338,19 @@ def get_next_waiting_loan_request(req, recid, barcode, check_id,
     """
     Return the next loan request who is waiting or pending.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:     integer.
+    @param recid:    identify the record. It is also the primary key of
+                     the table bibrec.
 
-    barcode - identify the item. It is the primary key of the table
-              crcITEM.
+    @type barcode:   string.
+    @param barcode:  identify the item. It is the primary key of the table
+                     crcITEM.
 
-    check_id - identify the hold request. It is also the primary key
-               of the table crcLOANREQUEST.
+    @type check_id:  integer.
+    @param check_id: identify the hold request. It is also the primary key
+                     of the table crcLOANREQUEST.
+
+    @return:         list of waiting requests with the same recid.
     """
 
     if check_id:
@@ -337,7 +360,6 @@ def get_next_waiting_loan_request(req, recid, barcode, check_id,
         returned_on = datetime.date.today()
         db.update_item_status('available', barcode)
         db.update_loan_info(returned_on, 'returned', barcode)
-
 
     result = db.get_next_waiting_loan_request(recid)
 
@@ -368,11 +390,13 @@ def update_next_loan_request_status(req, check_id, barcode, ln=CFG_SITE_LANG):
     Update the status of a loan request who is defined as 'waiting' or 'pending'.
     The new status can be 'done' or 'cancelled'.
 
-    check_id - identify the hold request. It is also the primary key
-               of the table crcLOANREQUEST.
+    @type check_id:  integer.
+    @param check_id: identify the hold request. It is also the primary key
+                     of the table crcLOANREQUEST.
 
-    barcode - identify the item. It is the primary key of the table
-              crcITEM.
+    @type barcode:   string.
+    @param barcode:  identify the item. It is the primary key of the table
+                     crcITEM.
     """
 
     recid = db.get_request_recid(check_id)
@@ -436,10 +460,14 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
     Step 1 of loan procedure. Search a user/borrower and return a list with
     all the possible results.
 
-    key - attribute who will be considered during the search. Can be 'name',
-          'email' or 'ccid/id'.
+    @type key:     string.
+    @param key:    attribute who will be considered during the search. Can be 'name',
+                   'email' or 'ccid/id'.
 
-    string - keyword used during the search.
+    @type string:  string.
+    @param string: keyword used during the search.
+
+    @return:       list of potential borrowers.
     """
 
     list_infos = []
@@ -603,7 +631,8 @@ def loan_on_desk_step2(req, user_info, ln=CFG_SITE_LANG):
     Return the information about the user/borower who was selected in the
     previous step.
 
-    user_info - information of the user/borrower who was selected.
+    @type user_info:   list.
+    @param user_info:  information of the user/borrower who was selected.
     """
 
     body = bibcirculation_templates.tmpl_loan_on_desk_step2(user_info=user_info,
@@ -629,6 +658,13 @@ def loan_on_desk_step3(req, ccid, name, email, phone,
                        address, mailbox, ln=CFG_SITE_LANG):
     """
     Display the user/borrower's information.
+
+    @type ccid:     integer.
+    @type name:     string.
+    @type email:    string.
+    @type phone:    string.
+    @type address:  string.
+    @type mailbox:  string.
     """
     user_info = (ccid, name, email, phone, address, mailbox)
 
@@ -655,6 +691,13 @@ def loan_on_desk_step4(req, user_info, barcode, ln=CFG_SITE_LANG):
     """
     Display the user/borrower's information and associate a
     list of barcodes to him.
+
+    @type user_info:   list.
+    @param user_info:  information of the user/borrower who was selected.
+
+    @type barcode:  string.
+    @param barcode: identify the item. It is the primary key of the table
+                    crcITEM.
     """
 
     infos = []
@@ -699,6 +742,20 @@ def loan_on_desk_step5(req, list_of_books, user_info,
                        due_date, note, ln=CFG_SITE_LANG):
     """
     Register a new loan.
+
+    @type list_of_books:  list.
+    @param list_of_books: list of books who will on loan.
+
+    @type user_info:      list.
+    @param user_info:     information of the user/borrower who was selected.
+
+    @type due_date:       list.
+    @param due_date:      list of due dates.
+
+    @type note:           string.
+    @param note:          note about the new loan.
+
+    @return:              new loan.
     """
 
     (_ccid, name, email, phone, address, mailbox) = user_info
@@ -745,11 +802,13 @@ def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
     """
     Confirm the return of an item.
 
-    barcode - identify the item. It is the primary key of the table
-              crcITEM.
+    @type barcode:       string.
+    @param barcode:      identify the item. It is the primary key of the table
+                         crcITEM.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
     """
 
     result = db.loan_on_desk_confirm(barcode, borrower_id)
@@ -781,18 +840,25 @@ def register_new_loan(req, barcode, borrower_id,
     """
     Register a new loan.
 
-    barcode - identify the item. It is the primary key of the table
-              crcITEM.
+    @type barcode:       string.
+    @param barcode:      identify the item. It is the primary key of the table
+                         crcITEM.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
 
-    request_id - identify the hold request. It is also the primary key
-               of the table crcLOANREQUEST.
+    @type request_id:    integer.
+    @param request_id:   identify the hold request. It is also the primary key
+                         of the table crcLOANREQUEST.
 
-    new_note - associate a note to this loan.
+    @type new_note:     string.
+    @param new_note:    associate a note to this loan.
 
-    print_data - print the information about this loan.
+    @type print_data:   string.
+    @param print_data:  print the information about this loan.
+
+    @return:            new loan.
     """
 
     _ = gettext_set_language(ln)
@@ -849,8 +915,9 @@ def loan_return_confirm(req, barcode, ln=CFG_SITE_LANG):
     """
     Display a form where it is possible to register the return of an item.
 
-    barcode - identify the item. It is the primary key of the table
-              crcITEM.
+    @type barcode:   string.
+    @param barcode:  identify the item. It is the primary key of the table
+                     crcITEM.
     """
 
     infos = []
@@ -864,6 +931,7 @@ def loan_return_confirm(req, barcode, ln=CFG_SITE_LANG):
         borrower_id = db.get_borrower_id(barcode)
         borrower_name = db.get_borrower_name(borrower_id)
         body = bibcirculation_templates.tmpl_loan_return_confirm(borrower_name=borrower_name,
+                                                                 borrower_id=borrower_id,
                                                                  recid=recid,
                                                                  barcode=barcode,
                                                                  ln=ln)
@@ -892,8 +960,9 @@ def get_borrower_details(req, borrower_id, ln=CFG_SITE_LANG):
     """
     Display the details of a borrower.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
     """
 
     borrower = db.get_borrower_details(borrower_id)
@@ -933,21 +1002,29 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
     """
     Show borrower's loans details.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:         integer.
+    @param recid:        identify the record. It is also the primary key of
+                         the table bibrec.
 
-    barcode - identify the item. It is the primary key of the table
-              crcITEM.
+    @type barcode:       string.
+    @param barcode:      identify the item. It is the primary key of the table
+                         crcITEM.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
 
-    renewall - renew all loans.
+    @type renewall:      string.
+    @param renewall:     renew all loans.
 
-    force - force the renew of a loan, when usually this is not possible.
+    @type force:         string.
+    @param force:        force the renew of a loan, when usually this is not possible.
 
-    loan_id - identify a loan. It is the primery key of the table
-              crcLOAN.
+    @type loan_id:       integer.
+    @param loan_id:      identify a loan. It is the primery key of the table
+                         crcLOAN.
+
+    @return:             borrower loans details.
     """
 
     infos = []
@@ -1031,16 +1108,22 @@ def get_item_loans_details(req, recid, barcode, loan_id, force, ln=CFG_SITE_LANG
     """
     Show all the details about all loans related with an item.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:      integer.
+    @param recid:     identify the record. It is also the primary key of
+                      the table bibrec.
 
-    barcode - identify the item. It is the primary key of the table
-              crcITEM.
+    @type barcode:    string.
+    @param barcode:   identify the item. It is the primary key of the table
+                      crcITEM.
 
-    loan_id - identify a loan. It is the primery key of the table
-              crcLOAN.
+    @type loan_id:    integer.
+    @param loan_id:   identify a loan. It is the primery key of the table
+                      crcLOAN.
 
-    force - force the renew of a loan, when usually this is not possible.
+    @type force:      string.
+    @param force:     force the renew of a loan, when usually this is not possible.
+
+    @return:          item loans details.
     """
 
     infos = []
@@ -1091,7 +1174,7 @@ def get_item_loans_details(req, recid, barcode, loan_id, force, ln=CFG_SITE_LANG
                                                                 infos=infos,
                                                                 ln=ln)
 
-    return page(title="Loans details - %s" % (book_title_from_MARC(recid)),
+    return page(title="Loans details - %s" % (book_title_from_MARC(int(recid))),
                 uid=id_user,
                 req=req,
                 body=body,
@@ -1102,8 +1185,12 @@ def get_item_details(req, recid, ln=CFG_SITE_LANG):
     """
     Display the details of an item.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+
+    @type recid:   integer.
+    @param recid:  identify the record. It is also the primary key of
+                   the table bibrec.
+
+    @return:       item details.
     """
 
     copies = db.get_item_copies_details(recid)
@@ -1141,8 +1228,11 @@ def get_item_req_historical_overview(req, recid, ln=CFG_SITE_LANG):
     """
     Display the requests historical overview of an item.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:   integer.
+    @param recid:  identify the record. It is also the primary key of
+                   the table bibrec.
+
+    @return:       Item requests - historical overview.
     """
 
     req_hist_overview = db.get_item_requests_historical_overview(recid)
@@ -1170,9 +1260,11 @@ def get_item_loans_historical_overview(req, recid, ln=CFG_SITE_LANG):
     """
     Display the loans historical overview of an item.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:   integer.
+    @param recid:  identify the record. It is also the primary key of
+                   the table bibrec.
 
+    @return:       Item loans - historical overview.
     """
 
     loans_hist_overview = db.get_item_loans_historical_overview(recid)
@@ -1200,8 +1292,11 @@ def bor_loans_historical_overview(req, borrower_id, ln=CFG_SITE_LANG):
     """
     Display the loans historical overview of a borrower.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
+
+    @return:             borrower loans - historical overview.
     """
 
     loans_hist_overview = db.bor_loans_historical_overview(borrower_id)
@@ -1231,8 +1326,11 @@ def bor_requests_historical_overview(req, borrower_id, ln=CFG_SITE_LANG):
     """
     Display the requests historical overview of a borrower.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
+
+    @return:             borrower requests - historical overview.
     """
 
     req_hist_overview = db.bor_requests_historical_overview(borrower_id)
@@ -1262,8 +1360,11 @@ def get_library_details(req, library_id, ln=CFG_SITE_LANG):
     """
     Display the details of a library.
 
-    library_id - identify the library. It is also the primary key of
-                 the table crcLIBRARY.
+    @type library_id:    integer.
+    @param library_id:   identify the library. It is also the primary key of
+                         the table crcLIBRARY.
+
+    @return:             library details.
     """
 
     library_details = db.get_library_details(library_id)
@@ -1293,11 +1394,15 @@ def get_borrower_requests_details(req, borrower_id, request_id, ln=CFG_SITE_LANG
     """
     Display loans details of a borrower.
 
-    borrower_id: identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:  integer.
+    @param borrower_id: identify the borrower. It is also the primary key of
+                        the table crcBORROWER.
 
-    request_id: identify the hold request. It is also the primary key
-                 of the table crcLOANREQUEST.
+    @type request_id:   integer.
+    @param request_id:  identify the hold request. It is also the primary key
+                        of the table crcLOANREQUEST.
+
+    @return:            borrower requests details.
     """
 
     if request_id:
@@ -1333,6 +1438,15 @@ def get_borrower_requests_details(req, borrower_id, request_id, ln=CFG_SITE_LANG
 def get_pending_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
     """
     Get all loans requests who are pending.
+
+    @type request_id:   integer.
+    @param request_id:  identify the hold request. It is also the primary key
+                        of the table crcLOANREQUEST.
+
+    @type print_data:   string.
+    @param print_data:  print requests information.
+
+    @return:            list of pending requests (on shelf with hold).
     """
 
     _ = gettext_set_language(ln)
@@ -1360,7 +1474,7 @@ def get_pending_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
     body = bibcirculation_templates.tmpl_get_pending_requests(result=result,
                                                              ln=ln)
 
-    return page(title="On shelve items with holds",
+    return page(title="Items on shelf with holds",
                 uid=id_user,
                 req=req,
                 body=body,
@@ -1371,6 +1485,15 @@ def get_pending_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
 def get_waiting_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
     """
     Get all loans requests who are waiting.
+
+    @type request_id:   integer.
+    @param request_id:  identify the hold request. It is also the primary key
+                        of the table crcLOANREQUEST.
+
+    @type print_data:   string.
+    @param print_data:  print requests information.
+
+    @return:            list of waiting requests (on loan with hold).
     """
 
     _ = gettext_set_language(ln)
@@ -1398,7 +1521,7 @@ def get_waiting_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
     body = bibcirculation_templates.tmpl_get_waiting_requests(result=result,
                                                              ln=ln)
 
-    return page(title="On loan items with holds",
+    return page(title="Items on loan with holds",
                 uid=id_user,
                 req=req,
                 body=body,
@@ -1409,8 +1532,9 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
     """
     Display all requests.
 
-    request_id - identify the hold request. It is also the primary key
-               of the table crcLOANREQUEST.
+    @type request_id:   integer.
+    @param request_id:  identify the hold request. It is also the primary key
+                        of the table crcLOANREQUEST.
     """
 
     if request_id:
@@ -1442,6 +1566,14 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
 def all_loans(req, loans_per_page, jloan, ln=CFG_SITE_LANG):
     """
     Display all loans.
+
+    @type loans_per_page:   integer.
+    @param loans_per_page:  number of loans per page.
+
+    @type jloan:            integer.
+    @param jloan:           jump to next loan.
+
+    @return:                list with all loans (current loans).
     """
 
     result = db.get_all_loans()
@@ -1470,6 +1602,14 @@ def all_loans(req, loans_per_page, jloan, ln=CFG_SITE_LANG):
 def all_expired_loans(req, loans_per_page, jloan, ln=CFG_SITE_LANG):
     """
     Display all loans.
+
+    @type loans_per_page:   integer.
+    @param loans_per_page:  number of loans per page.
+
+    @type jloan:            integer.
+    @param jloan:           jump to next loan.
+
+    @return:                list with all expired loans (overdue loans).
     """
     result = db.get_all_expired_loans()
 
@@ -1499,11 +1639,15 @@ def get_item_requests_details(req, recid, request_id, ln=CFG_SITE_LANG):
     """
     Display all requests for a specific item.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:         integer.
+    @param recid:        identify the record. It is also the primary key of
+                         the table bibrec.
 
-    request_id - identify the hold request. It is also the primary key
-               of the table crcLOANREQUEST.
+    @type request_id:    integer.
+    @param request_id:   identify the hold request. It is also the primary key
+                         of the table crcLOANREQUEST.
+
+    @return:             Item requests details.
     """
 
 
@@ -1538,14 +1682,17 @@ def associate_barcode(req, request_id, recid, borrower_id, ln=CFG_SITE_LANG):
     """
     Associate a barcode to an hold request.
 
-    request_id - identify the hold request. It is also the primary key
-                 of the table crcLOANREQUEST.
+    @type request_id:     integer.
+    @param request_id:    identify the hold request. It is also the primary key
+                          of the table crcLOANREQUEST.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:          integer.
+    @param recid:         identify the record. It is also the primary key of
+                          the table bibrec.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:    integer.
+    @param borrower_id:   identify the borrower. It is also the primary key of
+                          the table crcBORROWER.
     """
 
     borrower = db.get_borrower_details(borrower_id)
@@ -1577,12 +1724,15 @@ def get_borrower_notes(req, borrower_id, add_notes, new_note, ln=CFG_SITE_LANG):
     """
     Retrieve the notes of a borrower.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:    integer.
+    @param borrower_id:   identify the borrower. It is also the primary key of
+                          the table crcBORROWER.
 
-    add_notes - display the textarea where will be written a new notes.
+    @type add_notes;      string.
+    @param add_notes:     display the textarea where will be written a new notes.
 
-    new_notes - note who will be added to the others library's notes.
+    @type new_notes:      string.
+    @param new_notes:     note who will be added to the others library's notes.
     """
 
     if new_note:
@@ -1615,18 +1765,23 @@ def get_loans_notes(req, loan_id, recid, borrower_id, add_notes, new_note, ln=CF
     """
     Get loan's note(s).
 
-    loan_id - identify a loan. It is the primery key of the table
-              crcLOAN.
+    @type loan_id:       integer.
+    @param loan_id:      identify a loan. It is the primery key of the table
+                         crcLOAN.
 
-    recid - identify the record. It is also the primary key of
-            the table bibrec.
+    @type recid:         integer.
+    @param recid:        identify the record. It is also the primary key of
+                         the table bibrec.
 
-    borrower_id - identify the borrower. It is also the primary key of
-                  the table crcBORROWER.
+    @type borrower_id:   integer.
+    @param borrower_id:  identify the borrower. It is also the primary key of
+                         the table crcBORROWER.
 
-    add_notes - display the textarea where will be written a new notes.
+    @type add_notes;     string.
+    @param add_notes:    display the textarea where will be written a new notes.
 
-    new_notes - note who will be added to the others library's notes.
+    @type new_notes:      string.
+    @param new_notes:  note who will be added to the others library's notes.
     """
 
     if new_note:
@@ -1683,6 +1838,13 @@ def add_new_borrower_step2(req, name, email, phone, address, mailbox,
                            notes, ln=CFG_SITE_LANG):
     """
     Add new borrower. Step 2.
+
+    @type name:     string.
+    @type email:    string.
+    @type phone:    string.
+    @type address:  string.
+    @type mailbox:  string.
+    @type notes:    string.
     """
 
     infos = []
@@ -1719,6 +1881,9 @@ def add_new_borrower_step2(req, name, email, phone, address, mailbox,
 def add_new_borrower_step3(req, tup_infos, ln=CFG_SITE_LANG):
     """
     Add new borrower. Step 3.
+
+    @type tup_infos:   tuple.
+    @param tup_infos:  tuple containing borrower information.
     """
 
     db.new_borrower(tup_infos[0], tup_infos[1], tup_infos[2],
@@ -1802,7 +1967,7 @@ def update_borrower_info_step3(req, borrower_id, ln=CFG_SITE_LANG):
     """
     Update the borrower's information.
 
-    borrower_id - identify the borrower. It is also the primary key of
+    @param borrower_id:  identify the borrower. It is also the primary key of
                   the table crcBORROWER.
     """
 
@@ -1886,18 +2051,18 @@ def get_item_loans_notes(req, loan_id, recid, borrower_id, add_notes, new_note, 
     """
     Get loan's notes.
 
-    loan_id - identify a loan. It is the primery key of the table
+    @param loan_id:  identify a loan. It is the primery key of the table
               crcLOAN.
 
-    recid - identify the record. It is also the primary key of
+    @param recid:  identify the record. It is also the primary key of
             the table bibrec.
 
-    borrower_id - identify the borrower. It is also the primary key of
+    @param borrower_id:  identify the borrower. It is also the primary key of
                   the table crcBORROWER.
 
-    add_notes - display the textarea where will be written a new notes.
+    @param add_notes:  display the textarea where will be written a new notes.
 
-    new_notes - note who will be added to the others library's notes.
+    @param new_notes:  note who will be added to the others library's notes.
     """
 
     if new_note:
@@ -1953,7 +2118,8 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
         from xml.dom import minidom
         import urllib
         filexml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml?' \
-                                 'Service=AWSECommerceService&AWSAccessKeyId=' + ACCESS_KEY + \
+                                 'Service=AWSECommerceService&AWSAccessKeyId=' \
+                                 + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                  '&Operation=ItemSearch&Condition=All&' \
                                  'ResponseGroup=ItemAttributes&SearchIndex=Books&' \
                                  'Keywords=' + isbn)
@@ -2035,7 +2201,8 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
             book_info.append(str(edition))
 
         cover_xml = urllib.urlopen('http://ecs.amazonaws.com/onca/xml' \
-                                   '?Service=AWSECommerceService&AWSAccessKeyId=' + ACCESS_KEY + \
+                                   '?Service=AWSECommerceService&AWSAccessKeyId=' \
+                                   + CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY + \
                                    '&Operation=ItemSearch&Condition=All&' \
                                    'ResponseGroup=Images&SearchIndex=Books&' \
                                    'Keywords=' + isbn)
@@ -2047,7 +2214,7 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
             cover_link = get_cover_link.item(0).firstChild.firstChild.data
             book_info.append(str(cover_link))
         except AttributeError:
-            cover_link = "http://cdsweb.cern.ch/img/book_cover_placeholder.gif"
+            cover_link = CFG_SITE_URL + "/img/book_cover_placeholder.gif"
             book_info.append(str(cover_link))
 
         if len(errors)!=0:
@@ -2637,9 +2804,9 @@ def get_library_notes(req, library_id, add_notes, new_note, ln=CFG_SITE_LANG):
     library_id - identify the library. It is also the primary key of
                  the table crcLIBRARY.
 
-    add_notes - display the textarea where will be written a new notes.
+    @param add_notes:  display the textarea where will be written a new notes.
 
-    new_notes - note who will be added to the others library's notes.
+    @param new_notes:  note who will be added to the others library's notes.
     """
 
     if new_note:
@@ -2753,7 +2920,7 @@ def claim_book_return(req, borrower_id, recid, template, ln=CFG_SITE_LANG):
     """
 
     email = db.get_borrower_email(borrower_id)
-    subject = "Claim return for: %s" % (book_title_from_MARC(recid))
+    subject = "Recall loan on: %s" % (book_title_from_MARC(int(recid)))
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -3207,13 +3374,17 @@ def place_new_request_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
     """
     Place a new request from the item's page, step2.
 
-    barcode: identify the item. It is the primary key of the table
-             crcITEM.
+    @type barcode:     string.
+    @param barcode:    identify the item. It is the primary key of the table
+                       crcITEM.
 
-    recid: identify the record. It is also the primary key of
-           the table bibrec.
+    @type recid:       integer.
+    @param recid:      identify the record. It is also the primary key of
+                       the table bibrec.
 
-    user_info - information of the user/borrower who was selected.
+    @type user_info:   list.
+    @param user_info:  information of the user/borrower who was selected.
+
     """
 
     body = bibcirculation_templates.tmpl_place_new_request_step2(barcode=barcode,
@@ -3242,11 +3413,15 @@ def place_new_request_step3(req, barcode, recid, _ccid, name, email, phone,
     """
     Place a new request from the item's page, step3.
 
-    barcode: identify the item. It is the primary key of the table
-             crcITEM.
+    @type barcode:  string.
+    @param barcode: identify the item. It is the primary key of the table
+                    crcITEM.
 
-    recid: identify the record. It is also the primary key of
-           the table bibrec.
+    @type recid:    integer.
+    @param recid:   identify the record. It is also the primary key of
+                    the table bibrec.
+
+    @return:        new request.
     """
 
     nb_requests = db.get_number_requests_per_copy(barcode)
@@ -3297,15 +3472,21 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
     """
     Place a new loan from the item's page, step1.
 
-    barcode: identify the item. It is the primary key of the table
-             crcITEM.
+    @type barcode:  string.
+    @param barcode: identify the item. It is the primary key of the table
+                    crcITEM.
 
-    recid: identify the record. It is also the primary key of
-           the table bibrec.
+    @type recid:    integer.
+    @param recid:   identify the record. It is also the primary key of
+                    the table bibrec.
 
-    key: search field.
+    @type key:      string.
+    @param key:     search field.
 
-    string: search pattern.
+    @type string:   string.
+    @param string:  search pattern.
+
+    @return:        list of users/borrowers.
     """
 
     recid = db.get_id_bibrec(barcode)
@@ -3471,13 +3652,16 @@ def place_new_loan_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
     """
     Place a new loan from the item's page, step2.
 
-    barcode: identify the item. It is the primary key of the table
-             crcITEM.
+    @type barcode:    string.
+    @param barcode:   identify the item. It is the primary key of the table
+                      crcITEM.
 
-    recid: identify the record. It is also the primary key of
-           the table bibrec.
+    @type recid:      integer.
+    @param recid:     identify the record. It is also the primary key of
+                      the table bibrec.
 
-    user_info - information of the user/borrower who was selected.
+    @type user_info:  list.
+    @param user_info: information of the user/borrower who was selected.
     """
 
     body = bibcirculation_templates.tmpl_place_new_loan_step2(barcode=barcode,
@@ -3506,12 +3690,23 @@ def place_new_loan_step3(req, barcode, recid, _ccid, name, email, phone,
     """
     Place a new loan from the item's page, step3.
 
-    barcode: identify the item. It is the primary key of the table
-             crcITEM.
+    @type barcode:  string.
+    @param barcode: identify the item. It is the primary key of the table
+                    crcITEM.
 
-    recid: identify the record. It is also the primary key of
-           the table bibrec.
+    @type recid:    integer.
+    @param recid:   identify the record. It is also the primary key of
+                    the table bibrec.
 
+    @type name:     string.
+    @type email:    string.
+    @type phone:    string.
+    @type address:  string.
+    @type mailbos:  string.
+    @type due_date: string.
+    @type notes:    string.
+
+    @return:        new loan.
     """
 
     loaned_on = datetime.date.today()
