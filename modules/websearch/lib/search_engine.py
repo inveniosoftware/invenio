@@ -199,24 +199,46 @@ def get_permitted_restricted_collections(user_info):
             ret.append(collection)
     return ret
 
-def check_user_can_view_record(user_info, recid):
-    """Check if the user is authorized to view the given recid. The function
-    grants access in two cases: either user has author rights on ths record,
-    or he has view rights to the primary collection this record belongs to.
-    Returns the same type as acc_authorize_action
+def is_user_owner_of_record(user_info, recid):
     """
+    Check if the user is owner of the record, i.e. he is the submitter 
+    and/or belongs to a owner-like group authorized to 'see' the record.
 
-    def _is_user_in_authorized_author_list_for_recid(user_info, recid):
-        """Return True if the user have submitted the given record."""
-        authorized_emails = []
-        for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
-            authorized_emails.extend(get_fieldvalues(recid, tag))
-        for email in authorized_emails:
-            email = email.strip().lower()
-            if user_info['email'].strip().lower() == email:
-                return True
-        return False
+    @param user_info: the user_info dictionary that describe the user.
+    @type user_info: user_info dictionary
+    @param recid: the record identifier.
+    @type recid: positive integer
+    @return: True if the user is 'owner' of the record; False otherwise
+    @rtype: bool
+    """
+    authorized_emails_or_group = []
+    for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
+        authorized_emails_or_group.extend(get_fieldvalues(recid, tag))
+    for email_or_group in authorized_emails_or_group:
+        if email_or_group in user_info['group']:
+            return True
+        email = email_or_group.strip().lower()
+        if user_info['email'].strip().lower() == email:
+            return True
+    return False
 
+def check_user_can_view_record(user_info, recid):
+    """
+    Check if the user is authorized to view the given recid. The function
+    grants access in two cases: either user has author rights on this
+    record, or he has view rights to the primary collection this record
+    belongs to.
+
+    @param user_info: the user_info dictionary that describe the user.
+    @type user_info: user_info dictionary
+    @param recid: the record identifier.
+    @type recid: positive integer
+    @return: (0, ''), when authorization is granted, (>0, 'message') when
+    authorization is not granted
+    @rtype: (int, string)
+    """
+    if is_user_owner_of_record(user_info, recid):
+        return (0, '')
     record_primary_collection = guess_primary_collection_of_a_record(recid)
     if collection_restricted_p(record_primary_collection):
         (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
