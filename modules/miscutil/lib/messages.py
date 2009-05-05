@@ -62,6 +62,8 @@ def wash_language(ln):
        default language otherwise."""
     if not ln:
         return CFG_SITE_LANG
+    if isinstance(ln, list):
+        ln = ln[0]
     ln = ln.replace('-', '_')
     if ln in CFG_SITE_LANGS:
         return ln
