@@ -391,7 +391,7 @@ def _create_icon(file_path, icon_size, format='gif', verbosity=9):
     except InvenioWebSubmitIconCreatorError, e:
         register_exception(prefix='Icon for file %s could not be created: %s' % \
                            (file_path, str(e)),
-                           alert_admin=True)
+                           alert_admin=False)
     return icon_path
 
 def read_file(curdir, filename):
