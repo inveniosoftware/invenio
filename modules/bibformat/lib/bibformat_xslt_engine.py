@@ -56,19 +56,19 @@ CFG_BIBFORMAT_FUNCTION_NS = "http://cdsweb.cern.ch/bibformat/fn"
 processor_type = -1
 try:
     # libxml2 & libxslt
-    processor_type = 0
     import libxml2
     import libxslt
+    processor_type = 0
 except ImportError:
     pass
 
 if processor_type == -1:
     try:
         # 4suite
-        processor_type = 1
         from Ft.Xml.Xslt import Processor
         from Ft.Xml import InputSource
         from xml.dom import Node
+        processor_type = 1
     except ImportError:
         pass
 
