@@ -34,7 +34,7 @@ import os
 import re
 import time
 
-from invenio.bibedit_config import CFG_BIBEDIT_TMPFILENAMEPREFIX
+from invenio.bibedit_config import CFG_BIBEDIT_FILENAME
 from invenio.bibeditold_dblayer import get_bibupload_task_opts
 from invenio.bibrecord import create_records, record_get_field_value, \
     record_has_field
@@ -51,7 +51,7 @@ re_date = re.compile('\.(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 def get_file_path(recid):
     """Return the file path of a records tmp file."""
-    return "%s/%s_%s" % (CFG_TMPDIR, CFG_BIBEDIT_TMPFILENAMEPREFIX, recid)
+    return "%s/%s_%s" % (CFG_TMPDIR, CFG_BIBEDIT_FILENAME, recid)
 
 def record_in_use_p(recid):
     """Check if a record is currently being editing."""

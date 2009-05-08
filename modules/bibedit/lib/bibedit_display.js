@@ -21,11 +21,6 @@
  * This is the BibEdit Javascript for generation of webpage elements and HTML.
  */
 
-/*
- * Global variables
- */
-
-
 function displayRecord(){
   /*
    * Create the main content table.
@@ -188,9 +183,9 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     '</tr>';
 }
 
-function createAddFieldRowGroup(fieldTmpNo){
+function createAddFieldForm(fieldTmpNo){
   /*
-   * Create an 'Add field' rowgroup.
+   * Create an 'Add field' form.
    */
   return '' +
     '<tbody id="rowGroupAddField_' + fieldTmpNo + '">' +
@@ -228,7 +223,7 @@ function createAddFieldRowGroup(fieldTmpNo){
 
 function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
   /*
-   * Create a row in the 'Add field' rowgroup.
+   * Create a row in the 'Add field' form.
    */
   var txtAddFieldSubfieldCode = '', txtAddFieldInd1 = '', txtAddFieldInd2 = '',
     btnAddFieldRemove = '';
@@ -308,82 +303,161 @@ function createAddSubfieldsRow(fieldID, subfieldTmpNo){
     '</tr>';
 }
 
-function displayMessage(msgType){
+function displayMessage(msgCode){
   /*
-   * Display confirmation message in the main work area.
+   * Display message in the main work area. Messages codes returned from the
+   * server (positive integers) are as specified in the BibEdit configuration.
    */
   $('#bibEditContent').empty();
   var msg;
-  switch (msgType){
-    case 'Confirm: Submitted':
+  switch (msgCode){
+    case -1:
+      msg = 'Search term did not match any records.';
+      break;
+    case 0:
+      msg = 'A server error occured. Please contact your system administrator.';
+      break;
+    case 4:
       msg = 'Your modifications have now been submitted. ' +
 	'They will be processed as soon as the task queue is empty.';
       break;
-    case 'Confirm: Deleted':
+    case 6:
       msg = 'The record will be deleted as soon as the task queue is empty.';
       break;
-    case 'Error: Non-existent record':
-      msg = 'This record does not exist. Please try another record ID.';
-      break;
-    case 'Error: Locked record - by user':
+    case 104:
       msg = 'This record is currently being edited by another user. Please ' +
-	      'try again later.';
+	'try again later.';
       break;
-    case 'Error: Locked record - by queue':
+    case 105:
       msg = 'This record cannot be safely edited at the moment. Please ' +
-	      'try again in a few minutes.';
+	'try again in a few minutes.';
       break;
-    case 'Error: Deleted record':
-      msg = 'Cannot edit deleted record.';
+    case 106:
+      msg = 'An unexpected server error has occured. You may have lost your ' +
+	'changes to this record.';
       break;
-    case 'Error: Permission denied':
+    case 107:
+      msg = 'It seems that you have opened the record in another editor, ' +
+	'perhaps in a different window or computer. A record can only be ' +
+	'edited in one place at the time. Do you want to ' +
+	'<b><a href="#"id="lnkGetRecord">reopen the record</a></b> here?';
+	break;
+    case 101:
       msg = 'Could not access record. Permission denied.';
       break;
-    case 'Found 0 records':
-      msg = 'No records found matching this criteria.';
+    case 102:
+      msg = 'This record does not exist. Please try another record ID.';
+      break;
+    case 103:
+      msg = 'Cannot edit deleted record.';
       break;
     default:
-      msg = msgType;
+      msg = 'Result code: ' + msgCode;
   }
   $('#bibEditContent').append('<span id="bibEditMessage">' + msg + '</span>');
 }
 
-function displayAlert(alertType, msgType, ready, arg){
+function displayCacheOutdatedOptions(requestType){
   /*
-   * Display pop-up message.
+   * Display options to resolve the outdated cache scenario (DB record updated
+   * during editing). Options differ depending on wether the situation was
+   * discovered when fetching or when submitting the record.
+   */
+  $('#bibEditMessage').remove();
+  var recordURL = gSiteURL + '/record/' + gRecID + '/';
+  var viewMARCURL = recordURL + '?of=hm';
+  var viewMARCXMLURL = recordURL + '?of=xm';
+  var msg = '';
+  if (requestType == 'submit')
+    msg = '<div id="bibEditMessage">This record has been changed in the ' +
+      'database while you were editing. You can:<br/><ul>' +
+      '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
+      ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
+      ' <b><a href="' + viewMARCXMLURL + '" target="_blank">MARCXML</a></b>' +
+    ') the latest version</li>' +
+    '<li><a href="#" id="lnkMergeCache"><b>Merge</b></a> your changes ' +
+    'with the new version by using the merge interface</li>' +
+    '<li><a href="#" id="lnkForceSubmit"><b>Use your changes</b></a> ' +
+    '(force overwrite of the server version)</li>' +
+    '<li><a href="#" id="lnkDiscardChanges><b>Discard your changes</b></a> ' +
+    '(keep the server version)</li>' +
+    '</ul></div>';
+  else if (requestType == 'getRecord')
+    msg = '<div id="bibEditMessage">You have unsaved changes to this record, ' +
+      'but the record has been changed in the database while you were ' +
+      'editing. You can:<br/><ul>' +
+      '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
+      ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
+      ' <b><a href="' + viewMARCXMLURL + '" target="_blank">MARCXML</a></b>' +
+      ') the latest version</li>' +
+      '<li><a href="#" id="lnkMergeCache"><b>Merge</b></a> your changes ' +
+      'with the new version by using the merge interface</li>' +
+      '<li><a href="#" id="lnkDiscardChanges"><b>Load the new version' +
+      '</b></a> from the server (<b>Warning: </b>discards your changes)</li>' +
+      '<li>Keep editing. When submitting you will be offered to overwrite ' +
+      'the server version. Click <a href="#" id="lnkRemoveMsg">here' +
+      '</a> to remove this message.</li>' +
+      '</ul></div>';
+  $('#bibEditContent').prepend(msg);
+}
+
+function displayAlert(msgType, args){
+  /*
+   * Display pop-up of type alert or confirm.
+   * args can be an array with additional arguments.
    */
   var msg;
+  var popUpType = 'alert';
   switch (msgType){
-    case 'warningInvalidOrEmptyInput':
+    case 'confirmSubmit':
+      msg = 'Submit your changes to this record?\n\n';
+      popUpType = 'confirm';
+      break;
+    case 'confirmCancel':
+      msg = 'You have unsubmitted changes to this record.\n\n' +
+	'Discard your changes?';
+      popUpType = 'confirm';
+      break;
+    case 'confirmDeleteRecord':
+      msg = 'Really delete this record?\n\n';
+      popUpType = 'confirm';
+      break;
+    case 'confirmInvalidOrEmptyInput':
       msg =  'WARNING: Some subfields contain invalid MARC or are empty. \n' +
 	'Click Cancel to go back and correct. \n' +
 	'Click OK to ignore and continue (only valid subfields will be saved).';
+      popUpType = 'confirm';
       break;
-    case 'errorCriticalInput':
+    case 'confirmLeavingChangedRecord':
+      msg = '******************** WARNING ********************\n' +
+	'                  You have unsubmitted changes.\n\n' +
+	'You should go back to the record and click either:\n' +
+	' * Submit (to save your changes permanently)\n      or\n' +
+	' * Cancel (to discard your changes)\n\n' +
+	'Press OK to continue, or Cancel to stay on the current record.';
+      popUpType = 'confirm';
+      break;
+    case 'alertCriticalInput':
       msg = 'ERROR: Your input had critical errors. Please go back and ' +
 	'correct any fields with invalid MARC (red border) or fields that ' +
 	'should not be empty.';
       break;
-    case 'errorAddProtectedField':
-      msg = 'ERROR: Cannot add protected field ' + arg + '.';
+    case 'alertAddProtectedField':
+      msg = 'ERROR: Cannot add protected field ' + args[0] + '.';
       break;
-    case 'errorAddProtectedSubfield':
-      msg = 'ERROR: Cannot add protected subfield ' + arg + '.';
+    case 'alertAddProtectedSubfield':
+      msg = 'ERROR: Cannot add protected subfield ' + args[0] + '.';
       break;
-    case 'errorDeleteProtectedField':
-      msg = 'ERROR: Cannot delete protected field ' + arg + '.';
+    case 'alertDeleteProtectedField':
+      msg = 'ERROR: Cannot delete protected field ' + args[0] + '.';
       break;
     default:
       msg = msgType;
   }
-  var answer = true;
-  if (alertType == 'confirm')
-    answer = confirm(msg);
+  if (popUpType == 'confirm')
+    return confirm(msg);
   else
     alert(msg);
-  if (ready)
-    updateStatus('ready');
-  return answer;
 }
 
 function button(value, id, _class, attrs){

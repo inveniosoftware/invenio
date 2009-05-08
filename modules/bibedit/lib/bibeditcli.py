@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+## -*- coding: utf-8 -*-
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -42,8 +42,8 @@ __revision__ = "$Id$"
 import sys
 
 from invenio.bibedit_utils import get_marcxml_of_revision_id, \
-    get_record_revision_ids, get_xml_comparison, record_in_use_p, \
-    record_locked_p, revision_format_valid_p, save_xml_record, \
+    get_record_revision_ids, get_xml_comparison, record_locked_by_other_user, \
+    record_locked_by_queue, revision_format_valid_p, save_xml_record, \
     split_revid
 
 def print_usage():
@@ -55,9 +55,9 @@ def print_version():
     print __revision__
 
 def cli_list_revisions(recid):
-    """
-    Print list of all known record revisions (=RECID.REVDATE) for
-    record RECID.
+    """Print list of all known record revisions (=RECID.REVDATE) for record
+    RECID.
+
     """
     try:
         recid = int(recid)
@@ -71,10 +71,7 @@ def cli_list_revisions(recid):
         print 'ERROR: Record %s not found.' % recid
 
 def cli_get_revision(revid):
-    """
-    Return MARCXML for revision REVID (=RECID.REVDATE) of a record.
-    Exit if things go wrong.
-    """
+    """Return MARCXML for record revision REVID (=RECID.REVDATE) of a record."""
     if not revision_format_valid_p(revid):
         print 'ERROR: revision %s is invalid; ' \
               'must be NNN.YYYYMMDDhhmmss.' % revid
@@ -86,10 +83,7 @@ def cli_get_revision(revid):
         print 'ERROR: Revision %s not found.' % revid
 
 def cli_diff_revisions(revid1, revid2):
-    """
-    Return diffs of MARCXML record revisions REVID1, REVID2.
-    Exit if things go wrong.
-    """
+    """Return diffs of MARCXML for record revisions REVID1, REVID2."""
     for revid in [revid1, revid2]:
         if not revision_format_valid_p(revid):
             print 'ERROR: revision %s is invalid; ' \
@@ -106,8 +100,9 @@ def cli_diff_revisions(revid1, revid2):
     print get_xml_comparison(revid1, revid2, xml1, xml2)
 
 def cli_revert_to_revision(revid):
-    """
-    Submit specified revision for bibupload, to replace current version.
+    """Submit specified record revision REVID upload, to replace current
+    version.
+
     """
     if not revision_format_valid_p(revid):
         print 'ERROR: revision %s is invalid; ' \
@@ -121,17 +116,17 @@ def cli_revert_to_revision(revid):
 
     recid = split_revid(revid)[0]
 
-    if record_in_use_p(recid):
-        print 'This record is currently being edited by another user. ' \
-            'Please try again later.'
-        sys.exit(1)
-
-    if record_locked_p(recid):
-        print 'The record is locked because of unfinished upload tasks.' \
+    if record_locked_by_other_user(recid, -1):
+        print 'The record is currently being edited. ' \
             'Please try again in a few minutes.'
         sys.exit(1)
 
-    save_xml_record(recid, xml_record)
+    if record_locked_by_queue(recid):
+        print 'The record is locked because of unfinished upload tasks. ' \
+            'Please try again in a few minutes.'
+        sys.exit(1)
+
+    save_xml_record(recid, 0, xml_record)
     print 'Your modifications have now been submitted. They will be ' \
         'processed as soon as the task queue is empty.'
 

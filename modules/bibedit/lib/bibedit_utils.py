@@ -16,9 +16,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable-msg=C0103
-"""CDS Invenio BibEdit utilities.
+"""BibEdit Utilities.
 
-Utilities are support functions (i.e., those that are not called directly
+This module contains support functions (i.e., those that are not called directly
 by the web interface), that might be imported by other modules or that is called
 by both the web and CLI interfaces.
 
@@ -35,7 +35,9 @@ import re
 import time
 import zlib
 
-from invenio.bibedit_config import CFG_BIBEDIT_TMPFILENAMEPREFIX
+from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
+    CFG_BIBEDIT_TO_MERGE_SUFFIX
+from invenio.bibedit_dblayer import get_record_last_modification_date
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
@@ -45,99 +47,174 @@ from invenio.config import CFG_BINDIR, CFG_BIBEDIT_LOCKLEVEL, \
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions
-from invenio.search_engine import get_fieldvalues, print_record
+from invenio.search_engine import get_fieldvalues, print_record, record_exists
 
 # Precompile regexp:
 re_file_option = re.compile(r'^/')
-re_filename_suffix = re.compile('_(\d+)\.xml$')
+re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
 re_revid_split = re.compile('^(\d+)\.(\d{14})$')
 re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 re_taskid = re.compile('ID="(\d+)"')
 
+
 # Operations on the BibEdit cache file
-def get_file_path(recid):
-    """Return the file path of the BibEdit cache."""
-    return '%s/%s_%s' % (CFG_TMPDIR, CFG_BIBEDIT_TMPFILENAMEPREFIX, recid)
-
-def get_tmp_record(recid):
-    """Return the BibEdit cache (no questions asked). Unsafe, use get_record."""
-    file_path = file_path = '%s.tmp' % get_file_path(recid)
-    file_temp = open(file_path)
-    [uid, record] = cPickle.load(file_temp)
-    file_temp.close()
-    return uid, record
-
-def get_record(recid, uid):
-    """Conditionally create and/or return the record from the BibEdit cache.
-
-    Create the BibEdit cache if it doesn't exist or if it exists and belongs to
-    another user, but is outdated. Then return the record.
-    If it exists and belongs to the requesting uid, just return it.
-    If it exists, but belongs to another user and is not outdated, return an
-    empty dictionary.
+def get_file_path(recid, uid, filename=''):
+    """Return the file path to a BibEdit file (excluding suffix).
+    If filename is specified this replaces the config default.
 
     """
-    file_path = get_file_path(recid)
-
-    if os.path.isfile('%s.tmp' % file_path):
-        (tmp_record_uid, tmp_record) = get_tmp_record(recid)
-        if tmp_record_uid != uid:
-            time_tmp_file = os.path.getmtime('%s.tmp' % file_path)
-            time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
-            if time_tmp_file < time_out_file :
-                os.system('rm %s.tmp' % file_path)
-                tmp_record = create_record(print_record(recid, 'xm'))[0]
-                save_temp_record(tmp_record, uid, '%s.tmp' % file_path)
-            else:
-                tmp_record = {}
-
+    if not filename:
+        return '%s/%s_%s_%s' % (CFG_TMPDIR, CFG_BIBEDIT_FILENAME, recid, uid)
     else:
-        tmp_record = create_record(print_record(recid, 'xm'))[0]
-        save_temp_record(tmp_record, uid, '%s.tmp' % file_path)
+        return '%s/%s_%s_%s' % (CFG_TMPDIR, filename, recid, uid)
 
-    return tmp_record
+def cache_exists(recid, uid):
+    """Check if the BibEdit cache file exists."""
+    return os.path.isfile('%s.tmp' % get_file_path(recid, uid))
 
-def save_temp_record(record, uid, file_path):
-    """Save record in BibEdit cache."""
-    file_temp = open(file_path, 'w')
-    cPickle.dump([uid, record], file_temp)
-    file_temp.close()
+def get_cache_file(recid, uid, mode):
+    """Return a BibEdit cache file object."""
+    if cache_exists(recid, uid):
+        return open('%s.tmp' % get_file_path(recid, uid), mode)
 
-def save_xml_record(recid, xml_record=''):
-    """Create XML record file from BibEdit cache. Then pass it to BibUpload.
-
-    Optionally pass XML record directly to function.
+def get_cache_mtime(recid, uid):
+    """Get the last modified time of the BibEdit cache file. Check that the
+    cache exists before calling this function.
 
     """
-    file_path = get_file_path(recid)
-    os.system('rm -f %s.xml' % file_path)
-    file_temp = open('%s.xml' % file_path, 'w')
+    try:
+        return int(os.path.getmtime('%s.tmp' % get_file_path(recid, uid)))
+    except OSError:
+        pass
+
+def cache_expired(recid, uid):
+    """Has it been longer than the number of seconds given by
+    CFG_BIBEDIT_TIMEOUT since last cache update? Check that the
+    cache exists before calling this function.
+
+    """
+    return get_cache_mtime(recid, uid) < int(time.time()) - CFG_BIBEDIT_TIMEOUT
+
+def create_cache_file(recid, uid):
+    """Create a BibEdit cache file, and return revision and record. This will
+    overwrite any existing cache the user has for this record.
+
+    """
+    record = get_bibrecord(recid)
+    if record:
+        file_path = '%s.tmp' % get_file_path(recid, uid)
+        record_revision = get_record_last_modification_date(recid)
+        cache_file = open(file_path, 'w')
+        cPickle.dump([False, record_revision, record], cache_file)
+        cache_file.close()
+        return record_revision, record
+
+def touch_cache_file(recid, uid):
+    """Touch a BibEdit cache file. This should be used to indicate that the
+    user has again accessed the record, so that locking will work correctly.
+
+    """
+    if cache_exists(recid, uid):
+        os.system('touch %s.tmp' % get_file_path(recid, uid))
+
+def get_bibrecord(recid):
+    """Return record in BibRecord wrapping."""
+    if record_exists(recid):
+        return create_record(print_record(recid, 'xm'))[0]
+
+def get_cache_file_contents(recid, uid):
+    """Return the contents of a BibEdit cache file."""
+    cache_file = get_cache_file(recid, uid, 'r')
+    if cache_file:
+        cache_dirty, record_revision, record = cPickle.load(cache_file)
+        cache_file.close()
+        return cache_dirty, record_revision, record
+
+def update_cache_file_contents(recid, uid, record_revision, record):
+    """Save updates to the record in BibEdit cache. Return file modificaton
+    time.
+
+    """
+    cache_file = get_cache_file(recid, uid, 'w')
+    if cache_file:
+        cPickle.dump([True, record_revision, record], cache_file)
+        cache_file.close()
+        return get_cache_mtime(recid, uid)
+
+def delete_cache_file(recid, uid):
+    """Delete a BibEdit cache file."""
+    os.system('rm %s.tmp' % get_file_path(recid, uid))
+
+def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
+    """Write XML record to file. Default behaviour is to read the record from
+    a BibEdit cache file, write it back to an XML file and then pass this
+    file to BibUpload.
+
+    @param xml_record - give XML as string in stead of reading cache file
+    @param to_upload - pass the XML file to BibUpload
+    @param to_merge - prepare an XML file for BibMerge to use
+
+    """
+    if not xml_record:
+        # Read record from cache file.
+        cache = get_cache_file_contents(recid, uid)
+        if cache:
+            xml_record = record_xml_output(cache[2])
+            delete_cache_file(recid, uid)
     if xml_record:
-        file_temp.write(xml_record)
-    else:
-        file_temp.write(record_xml_output(get_tmp_record(recid)[1]))
-        os.system('rm %s.tmp' % file_path)
-    file_temp.close()
-    task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r',
-                              '%s.xml' % file_path)
+        # Write XML file.
+        if not to_merge:
+            file_path = '%s.xml' % get_file_path(recid, uid)
+        else:
+            file_path = '%s_%s.xml' % (get_file_path(recid, uid),
+                                       CFG_BIBEDIT_TO_MERGE_SUFFIX)
+        xml_file = open(file_path, 'w')
+        xml_file.write(xml_record)
+        xml_file.close()
+        if to_upload:
+            # Pass XML file to BibUpload.
+            task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r',
+                                      file_path)
+        return True
 
 
-# Locking
-def record_in_use_p(recid):
-    """Check if a record is currently being edited."""
-    file_path = '%s.tmp' % get_file_path(recid)
-    if os.path.isfile(file_path):
-        time_tmp_file = os.path.getmtime(file_path)
-        time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
-        if time_tmp_file > time_out_file :
-            return True
-        os.system('rm -f %s' % file_path)
-    return False
+# Security: Locking and integrity
+def latest_record_revision(recid, revision_time):
+    """Check if timetuple REVISION_TIME matches latest modification date."""
+    return revision_time == get_record_last_modification_date(recid)
 
-def record_locked_p(recid):
-    """Check if BibUpload queue state locks record.
+def record_locked_by_other_user(recid, uid):
+    """Return true if any other user than UID has active caches for record
+    RECID.
 
-    Check if record should be locked for editing because of the current state
+    """
+    active_uids = uids_with_active_caches(recid)
+    try:
+        active_uids.remove(uid)
+    except ValueError:
+        pass
+    return bool(active_uids)
+
+def uids_with_active_caches(recid):
+    """Return list of uids with active caches for record RECID. Active caches
+    are caches that have been modified a number of seconds ago that is less than
+    the one given by CFG_BIBEDIT_TIMEOUT.
+
+    """
+    re_tmpfilename = re.compile('%s_%s_(\d+)\.tmp' % (CFG_BIBEDIT_FILENAME,
+                                                      recid))
+    tmpfiles = os.listdir(CFG_TMPDIR)
+    expire_time = int(time.time()) - CFG_BIBEDIT_TIMEOUT
+    active_uids = []
+    for tmpfile in tmpfiles:
+        mo = re_tmpfilename.match(tmpfile)
+        if mo and int(os.path.getmtime(CFG_TMPDIR + '/' + tmpfile)) > \
+                expire_time:
+            active_uids.append(int(mo.group(1)))
+    return active_uids
+
+def record_locked_by_queue(recid):
+    """Check if record should be locked for editing because of the current state
     of the BibUpload queue. The level of checking is based on
     CFG_BIBEDIT_LOCKLEVEL.
 
@@ -152,7 +229,7 @@ def record_locked_p(recid):
     if CFG_BIBEDIT_LOCKLEVEL == 1:
         recids = []
         for filename in filenames:
-            filename_suffix = re_filename_suffix.search(filename)
+            filename_suffix = re_xmlfilename_suffix.search(filename)
             if filename_suffix:
                 recids.append(int(filename_suffix.group(1)))
         return recid in recids
@@ -173,8 +250,7 @@ def record_locked_p(recid):
                 return lock
 
 def get_bibupload_task_ids():
-    """Get and return list of all BibUpload task IDs.
-
+    """Return list of all BibUpload task IDs.
     Ignore tasks submitted by user bibreformat.
 
     """
@@ -192,7 +268,7 @@ def get_bibupload_task_ids():
     return res
 
 def get_bibupload_filenames():
-    """Get path to all files scheduled for upload."""
+    """Return paths to all files scheduled for upload."""
     task_ids = get_bibupload_task_ids()
     filenames = []
     tasks_opts = get_bibupload_task_opts(task_ids)
@@ -221,7 +297,7 @@ def record_in_files_p(recid, filenames):
             file_ = open(filename)
             records = create_records(file_.read(), 0, 0)
             for i in range(0, len(records)):
-                record, all_good, errs = records[i]
+                record, all_good = records[i][:2]
                 if record and all_good:
                     if record_has_id_p(record, recid, rec_oaiid, rec_sysno):
                         return True
@@ -268,7 +344,6 @@ def json_unicode_to_utf8(data):
 # History/revisions
 def get_record_revision_ids(recid):
     """Return list of all record revision IDs.
-
     Return revision IDs in chronologically decreasing order (latest first).
 
     """
@@ -280,8 +355,7 @@ def get_record_revision_ids(recid):
 
 def get_marcxml_of_revision_id(revid):
     """Return MARCXML string of revision.
-
-    Return empty string if revision does not exist. revid should be a string.
+    Return empty string if revision does not exist. REVID should be a string.
 
     """
     res = ''
@@ -293,14 +367,13 @@ def get_marcxml_of_revision_id(revid):
     return res
 
 def revision_format_valid_p(revid):
-    """Predicate to test validity of revision ID format (=RECID.REVDATE)."""
+    """Test validity of revision ID format (=RECID.REVDATE)."""
     if re_revid_split.match(revid):
         return True
     return False
 
 def split_revid(revid, dateformat=''):
     """Split revid and return tuple (recid, revdate).
-
     Optional dateformat can be datetext or dategui.
 
     """

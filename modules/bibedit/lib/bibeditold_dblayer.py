@@ -109,3 +109,8 @@ def get_record_revisions(recid):
                         FROM hstRECORD WHERE id_bibrec=%s
                     ORDER BY job_date DESC""",
                    (str(recid),))
+
+def get_record_last_modification_date(recid):
+    """Return last modification date of the given record as a timetuple."""
+    return run_sql('SELECT modification_date FROM bibrec WHERE id=%s' %
+                   recid)[0][0].timetuple()

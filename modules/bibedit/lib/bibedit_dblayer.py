@@ -16,14 +16,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable-msg=C0103
-"""CDS Invenio BibEdit Database Layer."""
+"""BibEdit Database Layer."""
 
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
 
 def get_name_tags_all():
-    """This function returns a dictionary of all MARC tag's textual names."""
+    """Return a dictionary of all MARC tag's textual names."""
     result = run_sql("SELECT name, value FROM tag")
 
     # Collect names in a dictionary with field codes as keys.
@@ -34,7 +34,7 @@ def get_name_tags_all():
     return nametags
 
 def get_bibupload_task_opts(task_ids):
-    """Returns a list with all options for a given list of task IDs."""
+    """Return a list with all set options for list of task IDs TASK_IDS."""
     res = []
     for task_id in task_ids:
         res.append(run_sql("SELECT arguments FROM schTASK WHERE id=%s" %
@@ -42,9 +42,7 @@ def get_bibupload_task_opts(task_ids):
     return res
 
 def get_marcxml_of_record_revision(recid, job_date):
-    """Return MARCXML string of revision.
-
-    Revision specified by recid and job date.
+    """Return MARCXML string of record revision specified by RECID and JOB_DATE.
 
     """
     return run_sql("""SELECT marcxml FROM hstRECORD
@@ -52,9 +50,13 @@ def get_marcxml_of_record_revision(recid, job_date):
                    (recid, job_date))
 
 def get_record_revisions(recid):
-    """Return dates for all known revisions of the given record."""
+    """Return dates for all known revisions of record RECID."""
     return run_sql("""SELECT id_bibrec,
                              DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
                         FROM hstRECORD WHERE id_bibrec=%s
-                    ORDER BY job_date DESC""",
-                   (str(recid),))
+                    ORDER BY job_date DESC""" % recid)
+
+def get_record_last_modification_date(recid):
+    """Return last modification date, as timetuple, of record RECID."""
+    return run_sql('SELECT modification_date FROM bibrec WHERE id=%s' %
+                   recid)[0][0].timetuple()

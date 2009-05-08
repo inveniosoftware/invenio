@@ -1,5 +1,5 @@
 ## This file is part of CDS Invenio.
-# Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
 
 # pylint: disable-msg=C0103
 
-"""CDS Invenio BibEdit Templates."""
+"""BibEdit Templates."""
 
 __revision__ = "$Id$"
 
@@ -31,10 +31,8 @@ class Template:
         """Initialize."""
         pass
 
-    def menu(self, recid=None):
+    def menu(self):
         """Create the menu."""
-        if recid == None:
-            recid = ''
 
         imgExpandMenuSection = img('/img/bullet_toggle_plus.png',
                             'bibEditImgExpandMenuSection')
@@ -80,7 +78,7 @@ class Template:
             '          </tr>\n' \
             '        </table>' % {
             'imgExpandMenuSection': imgExpandMenuSection,
-            'txtSearchPattern': inp('text', value=recid, id='txtSearchPattern'),
+            'txtSearchPattern': inp('text', id='txtSearchPattern'),
             'sctSearchType': '<select id="sctSearchType">\n' \
             '                <option value="recID">Rec ID</option>\n' \
             '                <option value="reportnumber">Rep No</option>\n' \
@@ -186,7 +184,7 @@ class Template:
                 }
 
 def img(src, _class='', **kargs):
-    """Create a HTML <img> element."""
+    """Create an HTML <img> element."""
     src = 'src="%s" ' % src
     if _class:
         _class = 'class="%s" ' % _class
@@ -196,7 +194,7 @@ def img(src, _class='', **kargs):
     return '<img %s%s%s/>' % (src, _class, args)
 
 def inp(_type, _class='', **kargs):
-    """Create a HTML <input> element."""
+    """Create an HTML <input> element."""
     _type = 'type="%s" ' % _type
     if _class:
         _class = 'class="%s" ' % _class
@@ -206,7 +204,7 @@ def inp(_type, _class='', **kargs):
     return '<input %s%s%s/>' % (_type, _class, args)
 
 def button(_type, value, _class='', **kargs):
-    """Create a HTML <button> element."""
+    """Create an HTML <button> element."""
     _type = 'type="%s" ' % _type
     if _class:
         _class = 'class="%s" ' % _class
@@ -216,7 +214,7 @@ def button(_type, value, _class='', **kargs):
     return '<button %s%s%s>%s</button>' % (_type, _class, args, value)
 
 def link(value, _class='', **kargs):
-    """Create a HTML <a> (link) element."""
+    """Create an HTML <a> (link) element."""
     if _class:
         _class = 'class="%s" ' % _class
     args = ''

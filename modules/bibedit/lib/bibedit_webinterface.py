@@ -28,9 +28,7 @@ except ImportError:
     pass # okay, no Ajax app will be possible, but continue anyway
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.bibedit_engine import perform_request_init, \
-    perform_request_record, perform_request_search, \
-    perform_request_update_record, perform_request_user
+from invenio.bibedit_engine import perform_request_init, perform_request_ajax
 from invenio.bibedit_utils import json_unicode_to_utf8
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.search_engine import guess_primary_collection_of_a_record
@@ -52,107 +50,81 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         self.recid = recid
 
     def index(self, req, form):
-        """Handle all BibEdit requests."""
+        """Handle all BibEdit requests.
+        The responsibilities of this functions is:
+        * JSON decoding and encoding.
+        * Redirection, if necessary.
+        * Authorization.
+        * Calling the appropriate function from the engine.
 
-        # Get any JSON data.
-        jsondata = None
+        """
+        # If it is an Ajax request, extract any JSON data.
+        ajax_request, recid = False, None
         if form.has_key('jsondata'):
-            jsondata = form['jsondata']
+            json_data = json.loads(str(form['jsondata']))
+            # Deunicode all strings (CDS Invenio doesn't have unicode
+            # support).
+            json_data = json_unicode_to_utf8(json_data)
+            ajax_request = True
+            if json_data.has_key('recID'):
+                recid = json_data['recID']
+            json_response = {'resultCode': 0, 'ID': json_data['ID']}
 
+        # Authorization.
         user_info = collect_user_info(req)
-        if not jsondata:
-            # Handle intial request.
-            if user_info['email'] == 'guest':
+        if user_info['email'] == 'guest':
+            # User is not logged in.
+            if not ajax_request:
                 # Do not display the introductory recID selection box to guest
                 # users (as it used to be with v0.99.0):
                 auth_code, auth_message = acc_authorize_action(req,
                                                                'runbibedit')
                 referer = '/edit/'
                 if self.recid:
-                    referer = '/edit/#state=edit&recid=%s' % self.recid
+                    referer = '/record/%s/edit/' % self.recid
                 return page_not_authorized(req=req, referer=referer,
                                            text=auth_message, navtrail=navtrail)
-
-            elif self.recid:
-                # Handle RESTful call by storing recid and redirecting to
-                # generic URL.
-                redirect_to_url(req, '%s/record/edit/#state=edit&recid=%s' % (
-                        CFG_SITE_URL, self.recid))
-
             else:
-                # Show BibEdit start page.
-                body, errors, warnings = perform_request_init()
+                # Session has most likely timed out.
+                json_response.update({'resultCode': 100})
+                return json.dumps(json_response)
 
-                title = 'BibEdit'
-                ln = CFG_SITE_LANG
+        elif self.recid:
+            # Handle RESTful calls from logged in users by redirecting to
+            # generic URL.
+            redirect_to_url(req, '%s/record/edit/#state=edit&recid=%s' % (
+                    CFG_SITE_URL, self.recid))
 
-                return page(title       = title,
-                            body        = body,
-                            errors      = errors,
-                            warnings    = warnings,
-                            uid         = getUid(req),
-                            language    = ln,
-                            navtrail    = navtrail,
-                            lastupdated = __lastupdated__,
-                            req         = req)
-
-        # Handle Ajax requests..
-        result = {}
-        if user_info['email'] == 'guest':
-            # Session has most likely timed out.
-            result.update({
-                    'resultCode': 1,
-                    'resultText':
-                        'Error: Not logged in'
-                    })
-
-        else:
-            data = json.loads(str(jsondata))
-            # Deunicode all strings (CDS Invenio doesn't have unicode
-            # support).
-            data = json_unicode_to_utf8(data)
-
-            # Authentication.
-            try:
-                recid = data['recID']
-            except KeyError:
-                # Not all requests have a record ID attached (like search).
-                auth_code, auth_message = acc_authorize_action(req,
-                                                               'runbibedit')
-            else:
-                auth_code, auth_message = acc_authorize_action(req,
-                    'runbibedit',
-                    collection=guess_primary_collection_of_a_record(recid))
+        elif recid is not None:
+            json_response.update({'recID': recid})
+            # Authorize access to record.
+            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+                collection=guess_primary_collection_of_a_record(recid))
             if auth_code != 0:
-                result.update({
-                        'resultCode': 1,
-                        'resultText':
-                            'Error: Permission denied'
-                        })
+                json_response.update({'resultCode': 101})
+                return json.dumps(json_response)
 
-            else:
-                uid = getUid(req)
-                requestType = data['requestType']
-
-                if requestType in ('searchForRecord'):
-                    # Search request.
-                    result.update(perform_request_search(req, data))
-
-                elif requestType in ('changeTagFormat'):
-                    # User related requests.
-                    result.update(perform_request_user(req, requestType, recid,
-                                                       data))
-                elif requestType in ('getRecord', 'submit', 'deleteRecord',
-                                   'cancel'):
-                    # 'Major' record related requests
-                    result.update(perform_request_record(req, requestType,
-                                                         recid, uid))
-                else:
-                    # Record updates
-                    result.update(perform_request_update_record(
-                            requestType, recid, uid, data))
-
-        return json.dumps(result)
+        # Handle request.
+        uid = getUid(req)
+        if not ajax_request:
+            # Show BibEdit start page.
+            body, errors, warnings = perform_request_init()
+            title = 'BibEdit'
+            ln = CFG_SITE_LANG
+            return page(title       = title,
+                        body        = body,
+                        errors      = errors,
+                        warnings    = warnings,
+                        uid         = uid,
+                        language    = ln,
+                        navtrail    = navtrail,
+                        lastupdated = __lastupdated__,
+                        req         = req)
+        else:
+            # Handle AJAX request.
+            json_response.update(perform_request_ajax(req, recid, uid,
+                                                      json_data))
+            return json.dumps(json_response)
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""

@@ -41,53 +41,83 @@ function initHotkeys(){
   // Submit record.
   $(document).bind('keydown', {combi: 'shift+s', disableInInput: true},
     function(event){
-      $('#btnSubmit').trigger('click');
-      event.preventDefault();
+      var btnSubmit = $('#btnSubmit');
+      if (!btnSubmit.attr('disabled')){
+	btnSubmit.trigger('click');
+	event.preventDefault();
+      }
   });
   // Cancel editing.
   $(document).bind('keydown', {combi: 'shift+c', disableInInput: true},
     function(event){
-      $('#btnCancel').trigger('click');
-      event.preventDefault();
+      var btnCancel = $('#btnCancel');
+      if (!btnCancel.attr('disabled')){
+	btnCancel.trigger('click');
+	event.preventDefault();
+      }
   });
   // Delete record.
   $(document).bind('keydown', {combi: 'shift+d', disableInInput: true},
     function(event){
-      $('#btnDeleteRecord').trigger('click');
-      event.preventDefault();
+      var btnDeleteRecord = $('#btnDeleteRecord');
+      if (!btnDeleteRecord.attr('disabled')){
+	btnDeleteRecord.trigger('click');
+	event.preventDefault();
+      }
   });
   // Toggle MARC/human tags.
   $(document).bind('keydown', {combi: 'shift+t', disableInInput: true},
     function(event){
-      if (gTagFormat == 'MARC')
-	$('#btnHumanTags').trigger('click');
-      else if (gTagFormat == 'human')
-	$('#btnMARCTags').trigger('click');
-      event.preventDefault();
+      if (gTagFormat == 'MARC'){
+	var btnHumanTags = $('#btnHumanTags');
+	if (!btnHumanTags.attr('disabled')){
+	  btnHumanTags.trigger('click');
+	  event.preventDefault();
+	}
+      }
+      else if (gTagFormat == 'human'){
+	var btnMARCTags = $('#btnMARCTags');
+	if (!btnMARCTags.attr('disabled')){
+	  btnMARCTags.trigger('click');
+	  event.preventDefault();
+	}
+      }
   });
   // Add new field.
   $(document).bind('keydown', {combi: 'a', disableInInput: true},
     function(event){
-      $('#btnAddField').trigger('click');
-      event.preventDefault();
+      var btnAddField = $('#btnAddField');
+      if (!btnAddField.attr('disabled')){
+	btnAddField.trigger('click');
+	event.preventDefault();
+      }
   });
   // Sort fields.
   $(document).bind('keydown', {combi: 'shift+o', disableInInput: true},
     function(event){
-      $('#btnSortFields').trigger('click');
-      event.preventDefault();
+      var btnSortFields = $('#btnSortFields');
+      if (!btnSortFields.attr('disabled')){
+	btnSortFields.trigger('click');
+	event.preventDefault();
+      }
   });
   // Delete selected (or focused subfield).
   $(document).bind('keydown', {combi: 'del', disableInInput: true},
     function(event){
-      onDeleteFields(event);
-      event.preventDefault();
+      var btnDeleteSelected = $('#btnDeleteSelected');
+      if (!btnDeleteSelected.attr('disabled')){
+	onDeleteClick(event);
+	event.preventDefault();
+      }
   });
   // Delete selected (or focused field).
   $(document).bind('keydown', {combi: 'shift+del', disableInInput: true},
     function(event){
-      onDeleteFields(event);
-      event.preventDefault();
+      var btnDeleteSelected = $('#btnDeleteSelected');
+      if (!btnDeleteSelected.attr('disabled')){
+	onDeleteClick(event);
+	event.preventDefault();
+      }
   });
   // Toggle 'selection mode'.
   $(document).bind('keydown', {combi: 's', disableInInput: true}, onKeyS);
@@ -128,23 +158,25 @@ function onKeyS(event){
   /*
    * Handle key 's' (toggle selection mode).
    */
-  if (gSelectionModeOn){
-    $('#bibEditTable').unbind('mouseover.selection');
-    gSelectionModeOn = false;
-    updateStatus('report', 'Selection mode: Off');
+  if (gRecID){
+    if (gSelectionModeOn){
+      $('#bibEditTable').unbind('mouseover.selection');
+      gSelectionModeOn = false;
+      updateStatus('report', 'Selection mode: Off');
+    }
+    else{
+      $('#bibEditTable').bind('mouseover.selection', function(event){
+	var targetID = event.target.id;
+	if (targetID.slice(0, targetID.indexOf('_')) == 'content' &&
+	    !$(event.target).hasClass('bibEditSelected'))
+	  onKeySpace(event);
+      });
+      gSelectionModeOn = true;
+      updateStatus('report', 'Selection mode: On');
+    }
+    if (!event.isDefaultPrevented())
+      event.preventDefault();
   }
-  else{
-    $('#bibEditTable').bind('mouseover.selection', function(event){
-      var targetID = event.target.id;
-      if (targetID.slice(0, targetID.indexOf('_')) == 'content' &&
-	  !$(event.target).hasClass('bibEditSelected'))
-	onKeySpace(event);
-    });
-    gSelectionModeOn = true;
-    updateStatus('report', 'Selection mode: On');
-  }
-  if (!event.isDefaultPrevented())
-    event.preventDefault();
 }
 
 function onKeyReturn(event){
@@ -172,11 +204,13 @@ function onKeySpace(event){
       var id = targetID.slice(targetID.indexOf('_')+1);
       var tmpArray = id.split('_');
       if (event.shiftKey){
+	// Shift is pressed. Select the full field.
 	id = (tmpArray.length == 3) ? tmpArray.slice(0, -1).join('_') :
 	  tmpArray.join('_');
 	$('#boxField_' + id).trigger('click');
       }
       else{
+	// Just select the subfield itself.
 	if (tmpArray.length == 3)
 	  $('#boxSubfield_' + id).trigger('click');
 	else
@@ -224,10 +258,12 @@ function onTriggerFormControl(command, event){
    */
   if (event.target.type == 'textarea'){
     if (command == 'Save'){
+      // Save edited content.
       $(event.target).parent().trigger('submit');
       event.preventDefault();
     }
     else if (command == 'Cancel'){
+      // Cancel content editing.
       $(event.target).parent().find('button[type=cancel]').trigger('click');
       event.preventDefault();
     }
@@ -236,11 +272,13 @@ function onTriggerFormControl(command, event){
     var rowGroup = $(event.target).closest('tbody')[0];
     if (rowGroup){
       if (rowGroup.id.indexOf('rowGroupAddField')+1){
+	// Click corresponding button in 'Add field' form.
 	$('#btnAddField' + command + '_' + rowGroup.id.slice(
 	  rowGroup.id.indexOf('_')+1)).trigger('click');
 	event.preventDefault();
       }
       else if (rowGroup.id.indexOf('rowGroup')+1){
+	// Click corresponding button in 'Add subfields' form.
 	var btnToTrigger = $('#btnAddSubfields' + command + '_' +
 			     rowGroup.id.slice(rowGroup.id.indexOf('_')+1));
 	if (btnToTrigger.length){
@@ -263,11 +301,13 @@ function onKeyCtrlShiftE(event){
     if (rowGroup){
       var btnAddSubfield;
       if (rowGroup.id.indexOf('rowGroupAddField')+1){
+	// Add extra subfield to 'Add field' form.
 	var fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
 	if (!$('#chkAddFieldControlfield_' + fieldID).attr('checked'))
 	  btnAddSubfield = $('#btnAddFieldAddSubfield_' + fieldID);
       }
       else if (rowGroup.id.indexOf('rowGroup')+1)
+	// Add extra subfield to 'Add subfields' form.
 	btnAddSubfield = $('#btnAddSubfield_' + rowGroup.id.slice(
 			   rowGroup.id.indexOf('_')+1));
       if (btnAddSubfield){
@@ -289,6 +329,7 @@ function onKeyCtrlShiftD(event){
     if (rowGroup){
       var fieldID, tmpNo, btnRemoveSubfield;
       if (rowGroup.id.indexOf('rowGroupAddField')+1){
+	// Remove extra subfield from 'Add field' form.
 	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
 	tmpNo = $('#rowGroupAddField_' + fieldID).data('freeSubfieldTmpNo')-1;
 	btnRemoveSubfield = $('#btnAddFieldRemove_' + fieldID + '_' + tmpNo);
@@ -298,6 +339,7 @@ function onKeyCtrlShiftD(event){
 	}
       }
       else if (rowGroup.id.indexOf('rowGroup')+1){
+	// Remove extra subfield from 'Add subfields' form.
       	fieldID = rowGroup.id.slice(rowGroup.id.indexOf('_')+1);
 	tmpNo = $('#rowGroup_' + fieldID).data('freeSubfieldTmpNo')-1;
 	btnRemoveSubfield = $('#btnAddSubfieldsRemove_' + fieldID + '_' +

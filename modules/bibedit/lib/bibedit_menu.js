@@ -22,22 +22,6 @@
  * left hand side menu, including event handlers for the controls.
  */
 
-/*
- * Global variables
- */
-
-// Interval (in ms) between menu repositioning.
-var gCHECK_SCROLL_INTERVAL = 250;
-
-// Display status messages for how long (in ms).
-var gSTATUS_RESET_TIMEOUT = 1000;
-
-// Color of new field form.
-var gNEW_ADD_FIELD_FORM_COLOR = 'lightblue';
-// Duration (in ms) for the color fading of new field form.
-var gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION = 2000;
-
-
 function initMenu(){
   /*
    * Initialize menu.
@@ -69,7 +53,7 @@ function initMenu(){
     displayRecord();
     updateStatus('ready');
   });
-  $('#btnDeleteSelected').bind('click', onDeleteFields);
+  $('#btnDeleteSelected').bind('click', onDeleteClick);
   $('#bibEditMenu .bibEditImgExpandMenuSection').bind('click',
     expandMenuSection);
   // Focus on record selection box.
@@ -102,7 +86,7 @@ positionMenu.yScroll = 0;
 
 function expandMenuSection(){
   /*
-   * Expand a section of the menu.
+   * Expand a menu section.
    */
   var currentMenuHeight = $('#bibEditMenu').height();
   var parent = $(this).parent();
@@ -123,7 +107,7 @@ function expandMenuSection(){
 
 function compressMenuSection(){
   /*
-   * Compress a section of the menu.
+   * Compress a menu section.
    */
   var currentMenuHeight = $('#bibEditMenu').height();
   var parent = $(this).parent();
@@ -143,9 +127,8 @@ function compressMenuSection(){
 
 function activateRecordMenu(){
   /*
-   * Activate record controls in menu.
+   * Activate menu record controls.
    */
-  $('#btnSubmit').removeAttr('disabled');
   $('#btnCancel').removeAttr('disabled');
   $('#btnDeleteRecord').removeAttr('disabled');
   $('#btnAddField').removeAttr('disabled');
@@ -155,9 +138,10 @@ function activateRecordMenu(){
 
 function deactivateRecordMenu(){
   /*
-   * Deactivate record controls in menu.
+   * Deactivate menu record controls.
    */
   $('#btnSubmit').attr('disabled', 'disabled');
+  $('#btnSubmit').css('background-color', '');
   $('#btnCancel').attr('disabled', 'disabled');
   $('#btnDeleteRecord').attr('disabled', 'disabled');
   $('#btnMARCTags').attr('disabled', 'disabled');
@@ -169,7 +153,7 @@ function deactivateRecordMenu(){
 
 function disableRecordBrowser(){
   /*
-   * Disable and hide the record browser in the menu.
+   * Disable and hide the menu record browser.
    */
   if ($('#rowRecordBrowser').css('display') != 'none'){
     $('#btnNext').unbind('click').attr('disabled', 'disabled');
@@ -198,7 +182,14 @@ function updateStatus(statusType, reporttext){
       text = reporttext;
       clearTimeout(updateStatus.statusResetTimerID);
       updateStatus.statusResetTimerID = setTimeout('updateStatus("ready")',
-				  gSTATUS_RESET_TIMEOUT);
+				  gSTATUS_INFO_TIME);
+      break;
+    case 'error':
+      image = img('/img/circle_red.png');
+      text = reporttext;
+      clearTimeout(updateStatus.statusResetTimerID);
+      updateStatus.statusResetTimerID = setTimeout('updateStatus("ready")',
+				  gSTATUS_ERROR_TIME);
       break;
     default:
       image = '';
@@ -212,31 +203,55 @@ function onSearchClick(event){
   /*
    * Handle 'Search' button (search for records).
    */
+  updateStatus('updating');
   var searchPattern = $('#txtSearchPattern').val();
   var searchType = $('#sctSearchType').val();
   if (searchType == 'recID'){
     // Record ID - do some basic validation.
     var recID = parseInt(searchPattern);
+    if (gRecID == recID){
+      // We are already editing this record.
+      updateStatus('ready');
+      return;
+    }
+    if (gRecordDirty){
+      // Warn of unsubmitted changes.
+      if (!displayAlert('confirmLeavingChangedRecord')){
+	updateStatus('ready');
+	return;
+      }
+    }
+    else if (gRecID)
+      // If the record is unchanged, delete the cache.
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+    gNavigatingRecordSet = false;
     if (isNaN(recID)){
-      deactivateRecordMenu();
+      // Invalid record ID.
       changeAndSerializeHash({state: 'edit', recid: searchPattern});
-      gState = 'RecordError';
+      cleanUp(true, null, null, true);
+      updateStatus('error', 'Error: Non-existent record');
       $('.headline').text('BibEdit: Record #' + searchPattern);
-      displayMessage('Error: Non-existent record');
+      displayMessage(102);
     }
     else{
+      // Get the record.
       $('#txtSearchPattern').val(recID);
-      if (gRecID == recID && gState == 'Edit')
-	// We are already editing this record.
-	return;
-      getRecord(recID, false);
+      getRecord(recID);
     }
   }
   else if (searchPattern.replace(/\s*/g, '')){
     // Custom search.
-    updateStatus('updating');
-    cleanUpDisplay();
-    disableRecordBrowser();
+    if (gRecordDirty){
+      // Warn of unsubmitted changes.
+      if (!displayAlert('confirmLeavingChangedRecord')){
+	updateStatus('ready');
+	return;
+      }
+    }
+    else if (gRecID)
+      // If the record is unchanged, delete the cache.
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+    gNavigatingRecordSet = false;
     createReq({requestType: 'searchForRecord', searchType: searchType,
       searchPattern: searchPattern}, onSearchForRecordSuccess);
   }
@@ -246,165 +261,200 @@ function onSearchForRecordSuccess(json){
   /*
    * Handle successfull 'searchForRecord' requests (custom search).
    */
-  if (json['resultCode'] != 0){
+  gResultSet = json['resultSet'];
+  if (gResultSet.length == 0){
     // Search yielded no results.
-    deactivateRecordMenu();
-    displayMessage(json['resultText']);
-    gState = 'RecordError';
-    $('.headline').text('BibEdit');
     changeAndSerializeHash({state: 'edit'});
-    updateStatus('report', json['resultText']);
+    cleanUp(true, null, null, true, true);
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+    displayMessage(-1);
   }
   else{
-    var resultSet = json['resultSet'];
-    gResultSet = resultSet;
-    if (resultSet.length > 1){
+    if (gResultSet.length > 1){
+      // Multiple results. Show record browser.
+      gNavigatingRecordSet = true;
       var recordCount = gResultSet.length;
       $('#cellRecordNo').text(1 + ' / ' + recordCount);
+      $('#btnPrev').attr('disabled', 'disabled');
       $('#btnNext').bind('click', onNextRecordClick).removeAttr('disabled');
       $('#rowRecordBrowser').show();
     }
-    getRecord(resultSet[0], true);
+    gResultSetIndex = 0;
+    getRecord(gResultSet[0]);
   }
 }
 
-function getRecord(recID, navigatingRecordSet){
+function getRecord(recID){
   /*
-   * Prepare the page and send request to get a given record.
+   * Get a record.
    */
-  updateStatus('updating');
-  cleanUpDisplay();
-  if (!navigatingRecordSet){
-    // Clear record set. Disable record browser.
-    gResultSet = null;
-    disableRecordBrowser();
-  }
-  gRecID = recID;
-  $('.headline').text('BibEdit: Record #' + recID);
+  // Temporary store the record ID by attaching it to the onGetRecordSuccess
+  // function.
   changeAndSerializeHash({state: 'edit', recid: recID});
-  createReq({recID: recID, requestType: 'getRecord', searchType:
-	     'recID'}, onGetRecordSuccess);
+  createReq({recID: recID, requestType: 'getRecord', deleteRecordCache:
+	     getRecord.deleteRecordCache}, onGetRecordSuccess);
+  getRecord.deleteRecordCache = false;
 }
+// Enable this flag to delete any existing cache before fetching next record.
+getRecord.deleteRecordCache = false;
+
 
 function onGetRecordSuccess(json){
   /*
-   * Handle successfull 'searchForRecord' requests (recID).
+   * Handle successfull 'getRecord' requests.
    */
-  gPageDirty = false;
-  if (json['resultCode'] != 0){
-    // Not that successfull requests...
-    deactivateRecordMenu();
-    displayMessage(json['resultText']);
-    gState = 'RecordError';
-    updateStatus('report', json['resultText']);
+  cleanUp(!gNavigatingRecordSet);
+  // Store record data.
+  gRecID = json['recID'];
+  $('.headline').html(
+    'BibEdit: Record #' + gRecID +
+    '<a href="' + gHistoryURL + '?recid=' + gRecID +
+    '" style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
+    '(view history)' +
+    '</a>').css('white-space', 'nowrap');
+  gRecord = json['record'];
+  gTagFormat = json['tagFormat'];
+  gRecordDirty = json['cacheDirty'];
+  gCacheMTime = json['cacheMTime'];
+  resetNewFieldNumber();
+  if (json['cacheOutdated']){
+    // User had an existing outdated cache.
+    displayCacheOutdatedOptions('getRecord');
+    $('#lnkMergeCache').bind('click', onMergeClick);
+    $('#lnkDiscardChanges').bind('click', function(event){
+      getRecord.deleteRecordCache = true;
+      getRecord(gRecID);
+      event.preventDefault();
+    });
+    $('#lnkRemoveMsg').bind('click', function(event){
+      $('#bibEditMessage').remove();
+      event.preventDefault();
+    });
   }
-  else{
-    // Display record.
-    gRecord = json['record'];
-    gTagFormat = json['tagFormat'];
-    $('.headline').html(
-      'BibEdit: Record #' + gRecID +
-      '<a href="' + gHistoryURL + '?recid=' + gRecID +
-      '" style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
-      '(view history)' +
-	'</a>').css('white-space', 'nowrap');
-    resetNewFieldNumber();
-    displayRecord();
-    // Activate menu record controls.
-    activateRecordMenu();
-    if (gTagFormat == 'MARC')
-      $('#btnHumanTags').bind('click', onHumanTagsClick).removeAttr('disabled');
-    else
-      $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
-    // Unfocus record selection field (to facilitate hotkeys).
-    $('#txtSearchPattern').blur();
-    tickets = json['tickets']
-    $('#tickets').html(tickets);
-    updateStatus('report', json['resultText']);
+  // Display record.
+  displayRecord();
+  // Activate menu record controls.
+  activateRecordMenu();
+  if (gRecordDirty){
+    $('#btnSubmit').removeAttr('disabled');
+    $('#btnSubmit').css('background-color', 'lightgreen');
   }
+  if (gTagFormat == 'MARC')
+    $('#btnHumanTags').bind('click', onHumanTagsClick).removeAttr('disabled');
+  else
+    $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
+  // Unfocus record selection field (to facilitate hotkeys).
+  $('#txtSearchPattern').blur();
+  tickets = json['tickets'];
+  $('#tickets').html(tickets);
+  updateStatus('report', gRESULT_CODES[json['resultCode']]);
 }
 
 function onSubmitClick(){
   /*
    * Handle 'Submit' button (submit record).
    */
-  var recID = gRecID;
   updateStatus('updating');
-  cleanUpDisplay();
-  disableRecordBrowser();
-  $('#txtSearchPattern').val('');
-  $('#txtSearchPattern').focus();
-  changeAndSerializeHash({state: 'submit',
-			  recid: recID});
-  createReq({recID: recID, requestType: 'submit'}, function(json){
-    updateStatus('report', json['resultText']);
-    displayMessage('Confirm: Submitted');
-  });
+  if (displayAlert('confirmSubmit')){
+    createReq({recID: gRecID, requestType: 'submit',
+	       force: onSubmitClick.force}, function(json){
+		 // Submission was successful.
+		 changeAndSerializeHash({state: 'submit', recid: gRecID});
+		 var resCode = json['resultCode'];
+		 cleanUp(!gNavigatingRecordSet, '', null, true);
+		 updateStatus('report', gRESULT_CODES[resCode]);
+		 displayMessage(resCode);
+	       });
+    onSubmitClick.force = false;
+  }
+  else
+    updateStatus('ready');
 }
+// Enable this flag to force the next submission even if cache is outdated.
+onSubmitClick.force = false;
 
 function onCancelClick(){
   /*
    * Handle 'Cancel' button (cancel editing).
    */
-  var recID = gRecID;
   updateStatus('updating');
-  cleanUpDisplay();
-  disableRecordBrowser();
-  $('#txtSearchPattern').val('');
-  $('#txtSearchPattern').focus();
-  changeAndSerializeHash({state: 'cancel',
-			  recid: recID});
-  createReq({recID: recID, requestType: 'cancel'}, function(json){
-    updateStatus('report', json['resultText']);
-  });
+  if (!gRecordDirty || displayAlert('confirmCancel')){
+    createReq({recID: gRecID, requestType: 'cancel'}, function(json){
+      // Cancellation was successful.
+      changeAndSerializeHash({state: 'cancel', recid: gRecID});
+      cleanUp(!gNavigatingRecordSet, '', null, true, true);
+      updateStatus('report', gRESULT_CODES[json['resultCode']]);
+    });
+  }
+  else
+    updateStatus('ready');
 }
 
 function onNextRecordClick(){
   /*
    * Handle click on the 'Next' button in the record browser.
    */
+  updateStatus('updating');
+  if (gRecordDirty){
+    if (!displayAlert('confirmLeavingChangedRecord')){
+      updateStatus('ready');
+      return;
+    }
+  }
+  else
+    // If the record is unchanged, erase the cache.
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
   var recordCount = gResultSet.length;
-  var prevIndex = $.inArray(gRecID, gResultSet);
+  var prevIndex = gResultSetIndex++;
   var currentIndex = prevIndex + 1;
   if (currentIndex == recordCount-1)
     $(this).unbind('click').attr('disabled', 'disabled');
   if (prevIndex == 0)
     $('#btnPrev').bind('click', onPrevRecordClick).removeAttr('disabled');
   $('#cellRecordNo').text((currentIndex+1) + ' / ' + recordCount);
-  getRecord(gResultSet[currentIndex], true);
+  getRecord(gResultSet[currentIndex]);
 }
 
 function onPrevRecordClick(){
   /*
    * Handle click on the 'Previous' button in the record browser.
    */
+  updateStatus('updating');
+  if (gRecordDirty){
+    if (!displayAlert('confirmLeavingChangedRecord')){
+      updateStatus('ready');
+      return;
+    }
+  }
+  else
+    // If the record is unchanged, erase the cache.
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
   var recordCount = gResultSet.length;
-  var prevIndex = $.inArray(gRecID, gResultSet);
+  var prevIndex = gResultSetIndex--;
   var currentIndex = prevIndex - 1;
   if (currentIndex == 0)
     $(this).unbind('click').attr('disabled', 'disabled');
   if (prevIndex == recordCount-1)
     $('#btnNext').bind('click', onNextRecordClick).removeAttr('disabled');
   $('#cellRecordNo').text((currentIndex+1) + ' / ' + recordCount);
-  getRecord(gResultSet[currentIndex], true);
+  getRecord(gResultSet[currentIndex]);
 }
 
 function onDeleteRecordClick(){
   /*
    * Handle 'Delete record' button.
    */
-  var recID = gRecID;
-  updateStatus('updating');
-  cleanUpDisplay();
-  disableRecordBrowser();
-  $('#txtSearchPattern').val('');
-  $('#txtSearchPattern').focus();
-  changeAndSerializeHash({state: 'deleteRecord',
-			  recid: recID});
-  createReq({recID: recID, requestType: 'deleteRecord'}, function(json){
-    displayMessage('Confirm: Deleted');
-    updateStatus('report', json['resultText']);
-  });
+  if (displayAlert('confirmDeleteRecord')){
+    updateStatus('updating');
+    createReq({recID: gRecID, requestType: 'deleteRecord'}, function(json){
+      // Record deletion was successful.
+      changeAndSerializeHash({state: 'deleteRecord', recid: gRecID});
+      cleanUp(!gNavigatingRecordSet, '', null, true);
+      var resCode = json['resultCode'];
+      updateStatus('report', gRESULT_CODES[resCode]);
+      displayMessage(resCode);
+    });
+  }
 }
 
 function onMARCTagsClick(event){
@@ -465,7 +515,7 @@ function onAddFieldClick(){
   var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
   var jQRowGroupID = '#rowGroupAddField_' + fieldTmpNo;
   $('#bibEditColFieldTag').css('width', '90px');
-  $('#bibEditTable tbody').eq(3).after(createAddFieldRowGroup(fieldTmpNo));
+  $('#bibEditTable tbody').eq(3).after(createAddFieldForm(fieldTmpNo));
   $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
 
   // Bind event handlers.
@@ -576,11 +626,13 @@ function onAddFieldSave(event){
   if (controlfield){
     // Controlfield. Validate and prepare to update.
     if (fieldIsProtected(tag)){
-      displayAlert('alert', 'errorAddProtectedField', true, tag);
+      displayAlert('alertAddProtectedField', [tag]);
+      updateStatus('ready');
       return;
     }
     if (!validMARC('ControlTag', tag) || value == ''){
-      displayAlert('alert', 'errorCriticalInput', true     );
+      displayAlert('alertCriticalInput');
+      updateStatus('ready');
       return;
     }
     var field = [[], ' ', ' ', value, gNewFieldNumber];
@@ -594,7 +646,8 @@ function onAddFieldSave(event){
     ind2 = (ind2 == '' || ind2 == ' ') ? '_' : ind2;
     var MARC = tag + ind1 + ind2;
     if (fieldIsProtected(MARC)){
-      displayAlert('alert', 'errorAddProtectedField', true, MARC);
+      displayAlert('alertAddProtectedField', [MARC]);
+      updateStatus('ready');
       return;
     }
     var validInd1 = (ind1 == '_' || validMARC('Indicator', ind1));
@@ -602,7 +655,8 @@ function onAddFieldSave(event){
     if (!validMARC('Tag', tag)
 	|| !(ind1 == '_' || validMARC('Indicator', ind1))
 	|| !(ind2 == '_' || validMARC('Indicator', ind2))){
-      displayAlert('alert', 'errorCriticalInput', true     );
+      displayAlert('alertCriticalInput');
+      updateStatus('ready');
       return;
     }
     // Collect valid subfields in an array.
@@ -625,10 +679,11 @@ function onAddFieldSave(event){
     if (invalidOrEmptySubfields){
       if (subfields.length < 1){
 	// No valid subfields.
-	displayAlert('alert', 'errorCriticalInput', true     );
+	displayAlert('alertCriticalInput');
+	updateStatus('ready');
 	return;
       }
-      else if (!displayAlert('confirm', 'warningInvalidOrEmptyInput')){
+      else if (!displayAlert('confirmInvalidOrEmptyInput')){
 	updateStatus('ready');
 	return;
       }
@@ -637,7 +692,6 @@ function onAddFieldSave(event){
     var newRowGroup = createField(tag, field);
   }
 
-  gPageDirty = true;
   // Create Ajax request.
   var data = {
     recID: gRecID,
@@ -650,7 +704,7 @@ function onAddFieldSave(event){
     value: value
   };
   createReq(data, function(json){
-    updateStatus('report', json['resultText']);
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
   });
 
   // Continue local updating.
@@ -677,4 +731,124 @@ function onAddFieldSave(event){
 		     gNEW_FIELDS_COLOR_FADE_DURATION);
 
   gNewFieldNumber++;
+}
+
+function onDeleteClick(event){
+  /*
+   * Handle 'Delete selected' button or delete hotkeys.
+   */
+  updateStatus('updating');
+  var toDelete = {};
+  // Collect and remove all marked fields.
+  var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked');
+  $(checkedFieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldNumber = tmpArray[2];
+    if (!toDelete[tag]){
+      toDelete[tag] = {};
+    }
+    toDelete[tag][fieldNumber] = [];
+  });
+  // Collect subfields to be deleted in a datastructure.
+  var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
+  $(checkedSubfieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldNumber = tmpArray[2],
+      subfieldIndex = tmpArray[3];
+    if (!toDelete[tag]){
+      toDelete[tag] = {};
+      toDelete[tag][fieldNumber] = [subfieldIndex];
+    }
+    else{
+      if (!toDelete[tag][fieldNumber])
+	toDelete[tag][fieldNumber] = [subfieldIndex];
+      else if (toDelete[tag][fieldNumber].length == 0)
+	// Entire field scheduled for the deletion.
+	return;
+      else
+	toDelete[tag][fieldNumber].push(subfieldIndex);
+    }
+  });
+  var fieldsDeleted = Boolean(checkedFieldBoxes.length);
+
+  if (!fieldsDeleted && !checkedSubfieldBoxes.length){
+    // No field/subfields selected.
+    if (event.type == 'keydown' && event.target.nodeName == 'TD'){
+      // Delete focused field/subfield.
+      var targetID = event.target.id;
+      var tmpArray = targetID.split('_');
+      if (tmpArray[0] == 'content'){
+	var tag = tmpArray[1], fieldNumber = tmpArray[2],
+	  subfieldIndex = tmpArray[3];
+	toDelete[tag] = {};
+	if (event.shiftKey){
+	  toDelete[tag][fieldNumber] = [];
+	  fieldsDeleted = true;
+	}
+	else
+	  toDelete[tag][fieldNumber] = [subfieldIndex];
+      }
+    }
+    else{
+      // Not a valid deletion event.
+      updateStatus('ready');
+      return;
+    }
+  }
+
+  // Assert that no protected fields are scheduled for deletion.
+  var protectedField = containsProtectedField(toDelete);
+  if (protectedField){
+    displayAlert('alertDeleteProtectedField', [protectedField]);
+    updateStatus('ready');
+    return;
+  }
+
+  // Create Ajax request.
+  var data = {
+    recID: gRecID,
+    requestType: 'deleteFields',
+    toDelete: toDelete
+  };
+  createReq(data, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  });
+
+  /* Continue local updating.
+  Parse datastructure and delete accordingly in record, then redraw
+  fields that had subfields deleted. */
+  var fieldNumbersToDelete, subfieldIndexesToDelete, field, subfields,
+    subfieldIndex;
+  for (var tag in toDelete){
+    fieldNumbersToDelete = toDelete[tag];
+    for (var fieldNumber in fieldNumbersToDelete){
+      var fieldID = tag + '_' + fieldNumber;
+      subfieldIndexesToDelete = fieldNumbersToDelete[fieldNumber];
+      if (subfieldIndexesToDelete.length == 0){
+	deleteFieldFromTag(tag, fieldNumber);
+	$('#rowGroup_' + tag + '_' + fieldNumber).remove();
+      }
+      else{
+	subfieldIndexesToDelete.sort();
+	field = getFieldFromTag(tag, fieldNumber);
+	subfields = field[0];
+	for (var j=subfieldIndexesToDelete.length-1; j>=0; j--)
+	  subfields.splice(subfieldIndexesToDelete[j], 1);
+	var rowGroup = $('#rowGroup_' + fieldID);
+	if (!fieldsDeleted){
+	  // Color subfield after updating.
+	  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
+	  $(rowGroup).replaceWith(createField(tag, field));
+	  if (coloredRowGroup)
+	    $('#rowGroup_' + fieldID).addClass( 'bibEditFieldColored');
+	}
+	else
+	  $(rowGroup).replaceWith(createField(tag, field));
+      }
+    }
+  }
+  if (fieldsDeleted)
+    // If entire fields has been deleted, recolor the full table.
+    reColorFields();
+  resetNewFieldNumber();
 }

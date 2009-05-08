@@ -28,11 +28,19 @@
 // Record data
 var gRecID = null;
 var gRecord = null;
+// Search results (record IDs)
 var gResultSet = null;
+// Current index in the result set
+var gResultSetIndex = null;
 // Tag format.
-var gTagFormat;
-// Is the page dirty?
-var gPageDirty = false;
+var gTagFormat = null;
+// Has the record been modified?
+var gRecordDirty = false;
+// Last recorded cache modification time
+var gCacheMTime = null;
+
+// Are we navigating a set of records?
+var gNavigatingRecordSet = false;
 
 // Highest available field number
 var gNewFieldNumber;
@@ -41,8 +49,6 @@ var gNewFieldNumber;
 var gHash;
 // The current hash deserialized to an object.
 var gHashParsed;
-// Interval (in ms) between checking if hash has changed.
-var gHASH_CHECK_INTERVAL = 250;
 // Hash check timer ID.
 var gHashCheckTimerID;
 // The previous and current state (this is not exactly the same as the state
@@ -50,16 +56,12 @@ var gHashCheckTimerID;
 var gPrevState;
 var gState;
 
-// Color of new fields.
-var gNEW_FIELDS_COLOR = 'lightgreen';
-// Duration (in ms) for the color fading of newly added fields.
-var gNEW_FIELDS_COLOR_FADE_DURATION = 2000;
 
 window.onload = function(){
   if (typeof(jQuery) == 'undefined'){
     alert('ERROR: jQuery not found!\n\n' +
 	  'BibEdit requires jQuery, which does not appear to be installed on ' +
-	  'this server. Please alert your site administrator.\n\n' +
+	  'this server. Please alert your system administrator.\n\n' +
 	  'Instructions on how to install jQuery and other required plug-ins ' +
 	  'can be found in CDS-Invenio\'s INSTALL file.');
     var imgError = document.createElement('img');
@@ -74,7 +76,7 @@ window.onload = function(){
 
 $(function(){
   /*
-   * Initialization of all components when documents is ready.
+   * Initialize all components.
    */
   initMenu();
   initJeditable();
@@ -84,40 +86,6 @@ $(function(){
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
   initHotkeys();
 });
-
-function initMisc(){
-  /*
-   * Miscellaneous initialization operations.
-   */
-  // CERN allows for capital MARC indicators.
-  if (gCERNSite)
-    validMARC.reIndicator = /[\dA-Za-z]{1}/;
-
-  // Show confirmation dialog when leaving page if content has changed.
-  window.onbeforeunload = function(){
-    if (gPageDirty)
-      return "Your changes have not been submitted.";
-  };
-
-  // Add global event handlers.
-  $(document).bind('dblclick', function(event){
-    onDoubleClick(event);
-  });
-}
-
-function initAjax(){
-  /*
-   * Initialize Ajax.
-   */
-  $.ajaxSetup(
-    { cache: false,
-      dataType: 'json',
-      error: onReqError,
-      type: 'POST',
-      url: '/record/edit/'
-    }
-  );
-}
 
 function initJeditable(){
   /* Initialize Jeditable with the Autogrow extension. Used for in-place
@@ -143,46 +111,232 @@ function initJeditable(){
   });
 }
 
+function initAjax(){
+  /*
+   * Initialize Ajax.
+   */
+  $.ajaxSetup(
+    { cache: false,
+      dataType: 'json',
+      error: onAjaxError,
+      type: 'POST',
+      url: '/record/edit/'
+    }
+  );
+}
+
+function createReq(data, onSuccess){
+  /*
+   * Create Ajax request.
+   */
+  // Include and increment transaction ID.
+  var tID = createReq.transactionID++;
+  createReq.transactions[tID] = data['requestType'];
+  data.ID = tID;
+  // Include cache modification time if we have it.
+  if (gCacheMTime)
+    data.cacheMTime = gCacheMTime;
+  // Send the request.
+  $.ajax({
+    data: {
+      jsondata: JSON.stringify(data)
+    },
+    success: function(json){
+      onAjaxSuccess(json, onSuccess);
+    }
+  });
+}
+// Transactions data.
+createReq.transactionID = 0;
+createReq.transactions = [];
+
+function onAjaxError(XHR, textStatus, errorThrown){
+  /*
+   * Handle Ajax request errors.
+   */
+  alert('Request completed with status ' + textStatus
+	+ '\nResult: ' + XHR.responseText
+	+ '\nError: ' + errorThrown);
+}
+
+function onAjaxSuccess(json, onSuccess){
+  /*
+   * Handle server response to Ajax requests, in particular error situations.
+   * If a function onSuccess is specified this will be called in the end,
+   * if no error was encountered.
+   */
+  var resCode = json['resultCode'];
+  var recID = json['recID'];
+  if (resCode == 100){
+    // User's session has timed out.
+    gRecID = null;
+    window.location = recID ? gSiteURL + '/record/' + recID + '/edit/'
+      : gSiteURL + '/record/edit/';
+    return;
+  }
+  else if ($.inArray(resCode, [101, 102, 103, 104, 105, 106, 107])
+	   != -1){
+    // Some error has occured. See BibEdit config for result codes.
+    cleanUp(!gNavigatingRecordSet, null, null, true, true);
+    updateStatus('error', gRESULT_CODES[resCode]);
+    $('.headline').text('BibEdit: Record #' + recID);
+    displayMessage(resCode);
+    if (resCode == 107)
+      $('#lnkGetRecord').bind('click', function(event){
+	getRecord(recID);
+	event.preventDefault();
+      });
+  }
+  else{
+    var cacheOutdated = json['cacheOutdated'];
+    var requestType = createReq.transactions[json['ID']];
+    if (cacheOutdated && requestType == 'submit'){
+      // User wants to submit, but cache is outdated. Outdated means that the
+      // DB version of the record has changed after the cache was created.
+      displayCacheOutdatedOptions(requestType);
+      $('#lnkMergeCache').bind('click', onMergeClick);
+      $('#lnkForceSubmit').bind('click', function(event){
+	onSubmitClick.force = true;
+	onSubmitClick();
+	event.preventDefault();
+      });
+      $('#lnkDiscardChanges').bind('click', function(event){
+	onCancelClick();
+	event.preventDefault();
+      });
+      updateStatus('error', 'Error: Cache is outdated');
+    }
+    else{
+      if (requestType != 'getRecord'){
+	// On getRecord requests the below actions will be performed in
+	// onGetRecordSuccess (after cleanup).
+	var cacheMTime = json['cacheMTime'];
+	if (cacheMTime)
+	  // Store new cache modification time.
+	  gCacheMTime = cacheMTime;
+	var cacheDirty = json['cacheDirty'];
+	if (cacheDirty){
+	  // Cache is dirty. Enable submit button.
+	  gRecordDirty = cacheDirty;
+	  $('#btnSubmit').removeAttr('disabled');
+	  $('#btnSubmit').css('background-color', 'lightgreen');
+	}
+      }
+      if (onSuccess)
+	// No critical errors; call onSuccess function.
+	onSuccess(json);
+    }
+  }
+}
+
+function initMisc(){
+  /*
+   * Miscellaneous initialization operations.
+   */
+  // CERN allows for capital MARC indicators.
+  if (gCERNSite)
+    validMARC.reIndicator = /[\dA-Za-z]{1}/;
+
+  // Warn user if BibEdit is being closed while a record is open.
+  window.onbeforeunload = function(){
+    if (gRecID && gRecordDirty)
+      return '******************** WARNING ********************\n' +
+	'                  You have unsubmitted changes.\n\n' +
+	'You should go back to the page and click either:\n' +
+	' * Submit (to save your changes permanently)\n      or\n' +
+	' * Cancel (to discard your changes)';
+  }
+
+  // Add global event handlers.
+  $(document).bind('dblclick', function(event){
+    onDoubleClick(event);
+  });
+}
+
 function initStateFromHash(){
   /*
-   * Initialize page state from hash.
+   * Initialize or update page state from hash.
+   * Any program functions changing the hash should use changeAndSerializeHash()
+   * which circumvents this function, meaning this function should only run on
+   * page load and when browser navigation buttons (ie. Back and Forward) are
+   * clicked. Any invalid hashes entered by the user will be ignored.
    */
   if (window.location.hash == gHash)
     // Hash is the same as last time we checked, do nothing.
     return;
 
   gHash = window.location.hash;
-  gHashParsed = (gHash) ? deserializeHash(gHash) : {state: 'edit'};
+  gHashParsed = deserializeHash(gHash);
   gPrevState = gState;
-  // Capitalize first letter for later use in eval.
-  var state = gHashParsed.state ? gHashParsed.state.charAt(0).toUpperCase() +
-    gHashParsed.state.slice(1) : null;
-  var recID = gHashParsed.recid;
+  var tmpState = gHashParsed.state;
+  var tmpRecID = gHashParsed.recid;
 
   // Find out which internal state the new hash leaves us with
-  if (state && recID){
+  if (tmpState && tmpRecID){
     // We have both state and record ID.
-    if ($.inArray(state, ['Edit', 'Submit', 'Cancel', 'DeleteRecord']) != -1)
-	gState = state;
+    if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord']) != -1)
+	gState = tmpState;
     else
-      // Not a sane state, ignore
+      // Invalid state, fail...
       return;
   }
-  else if (recID)
-    // We only have record ID.
-    gState = 'Edit';
-  else if (state)
+  else if (tmpState){
     // We only have state.
-    if (state == 'Edit')
-      gState = 'StartPage';
+    if (tmpState == 'edit')
+      gState = 'startPage';
     else
-      // All states but 'edit' are illegal without record ID, fail...
+      // Invalid state, fail... (all states but 'edit' are illegal without
+      // record ID).
       return;
-  if (gState != gPrevState || (gState == 'Edit' && recID != gRecID)){
-    // We have an actual and legal change of state. Do some common cleanup, then
-    // call the corresponding event handler.
+  }
+  else
+    // Invalid hash, fail...
+    return;
+
+  if (gState != gPrevState || (gState == 'edit' &&
+			       parseInt(tmpRecID) != gRecID)){
+    // We have an actual and legal change of state. Clean up and update the
+    // page.
     updateStatus('updating');
-    eval('onStateChangeTo' + gState + '(recID);');
+    if (gRecID && !gRecordDirty)
+      // If the record is unchanged, delete the cache.
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+    switch (gState){
+      case 'startPage':
+	cleanUp(true, '', 'recID', true, true);
+	updateStatus('ready');
+	break;
+      case 'edit':
+	var recID = parseInt(tmpRecID);
+	if (isNaN(recID)){
+	  // Invalid record ID.
+	  cleanUp(true, tmpRecID, 'recID', true);
+	  updateStatus('error', 'Error: Non-existent record');
+	  $('.headline').text('BibEdit: Record #' + tmpRecID);
+	  displayMessage(102);
+	}
+	else{
+	  cleanUp(true, recID, 'recID');
+	  getRecord(recID);
+	}
+	break;
+      case 'submit':
+	cleanUp(true, '', null, true);
+	updateStatus('ready');
+	$('.headline').text('BibEdit: Record #' + tmpRecID);
+	displayMessage(4);
+	break;
+      case 'cancel':
+	cleanUp(true, '', null, true, true);
+	updateStatus('ready');
+	break;
+      case 'deleteRecord':
+	cleanUp(true, '', null, true);
+	updateStatus('ready');
+      	$('.headline').text('BibEdit: Record #' + tmpRecID);
+	displayMessage(6);
+	break;
+    }
   }
   else
   // What changed was not of interest, continue as if nothing happened.
@@ -223,116 +377,56 @@ function changeAndSerializeHash(updateData){
     gHash += key + '=' + gHashParsed[key] + '&';
   }
   gHash = gHash.slice(0, -1);
-  gState = gHashParsed.state.charAt(0).toUpperCase() +
-    gHashParsed.state.slice(1);
+  gState = gHashParsed.state;
   window.location.hash = gHash;
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
 }
 
-function onStateChangeToStartPage(){
+function cleanUp(disableRecBrowser, searchPattern, searchType,
+		 focusOnSearchBox, resetHeadline){
   /*
-   * Handle change to internal state 'StartPage'.
+   * Clean up display and data.
    */
-  cleanUpDisplay();
-  disableRecordBrowser();
-  $('#txtSearchPattern').val('');
-  $('#sctSearchType').val('recID');
-  $('#txtSearchPattern').focus();
-  updateStatus('ready');
-}
-
-function onStateChangeToEdit(recID){
-  /*
-   * Handle change to internal state 'Edit'.
-   */
-  $('#txtSearchPattern').val(recID);
-  $('#sctSearchType').val('recID');
-  onSearchClick();
-}
-
-function onStateChangeToSubmit(){
-  /*
-   * Handle change to internal state 'Submit'.
-   */
-  cleanUpDisplay();
-  $('#txtSearchPattern').val('');
-  $('#txtSearchPattern').focus();
-  displayMessage('Confirm: Submitted');
-  updateStatus('ready');
-}
-
-function onStateChangeToCancel(){
-  /*
-   * Handle change to internal state 'Cancel'.
-   */
-  cleanUpDisplay();
-  disableRecordBrowser();
-  $('#txtSearchPattern').val('');
-  $('#sctSearchType').val('recID');
-  $('#txtSearchPattern').focus();
-  updateStatus('ready');
-}
-
-function onStateChangeToDeleteRecord(){
-  /*
-   * Handle change to internal state 'DeleteRecord'.
-   */
-  cleanUpDisplay();
-  disableRecordBrowser();
-  $('#txtSearchPattern').val('');
-  $('#txtSearchPattern').focus();
-  displayMessage('Confirm: Deleted');
-  updateStatus('ready');
-}
-
-function createReq(data, onSuccess){
-  /*
-   * Create Ajax request.
-   */
-  data.ID = createReq.transactionID++;
-  $.ajax({
-    data: {
-      jsondata: JSON.stringify(data)
-    },
-    success: function(json){
-      if (json['resultText'] == 'Error: Not logged in'){
-	// User's session has timed out.
-	gPageDirty = false;
-	window.location = gSiteURL + '/record/' + gRecID + '/edit/';
-      }
-      onSuccess(json);
-    }
-  });
-}
-// Incrementing transaction ID.
-createReq.transactionID = 0;
-
-function onReqError(XHR, textStatus, errorThrown){
-  /*
-   * Handle Ajax request errors.
-   */
-  alert('Request completed with status ' + textStatus
-	+ '\nResult: ' + XHR.responseText
-	+ '\nError: ' + errorThrown);
-}
-
-function cleanUpDisplay(){
-  /*
-   * Clears the display and the client side record data.
-   */
+  // Deactivate controls.
   deactivateRecordMenu();
+  if (disableRecBrowser){
+    disableRecordBrowser();
+    gResultSet = null;
+    gResultSetIndex = null;
+    gNavigatingRecordSet = false;
+  }
+  // Clear main content area.
+  if (resetHeadline)
+    $('.headline').text('BibEdit');
   $('#bibEditContent').empty();
-  $('.headline').text('BibEdit');
+  // Clear search area.
+  if (typeof(searchPattern) == 'string' || typeof(searchPattern) == 'number')
+    $('#txtSearchPattern').val(searchPattern);
+  if ($.inArray(searchType, ['recID', 'reportnumber', 'anywhere']) != -1)
+    $('#sctSearchType').val(searchPattern);
+  if (focusOnSearchBox)
+    $('#txtSearchPattern').focus();
+  // Clear data.
   gRecID = null;
   gRecord = null;
-  gPageDirty = false;
+  gTagFormat = null;
+  gRecordDirty = false;
+  gCacheMTime = null;
+  gSelectionMode = false;
 }
 
-function notImplemented(event){
+function onMergeClick(event){
   /*
-   * Handle unimplemented function.
+   * Handle click on 'Merge' link (to merge outdated cache with current DB
+   * version of record).
    */
-  alert('Sorry, this function is not implemented yet!');
+  updateStatus('updating');
+  createReq({recID: gRecID, requestType: 'prepareRecordMerge'}, function(json){
+    gRecID = null;
+    var recID = json['recID'];
+    window.location = gSiteURL + '/record/merge/#recid1=' + recID + '&recid2=' +
+      recID + '&mode=file';
+  });
   event.preventDefault();
 }
 
@@ -383,7 +477,6 @@ function onMoveSubfieldClick(arrow){
    * Handle subfield moving arrows.
    */
   updateStatus('updating');
-  gPageDirty = true;
   var tmpArray = arrow.id.split('_');
   var btnType = tmpArray[0], tag = tmpArray[1], fieldNumber = tmpArray[2],
     subfieldIndex = tmpArray[3];
@@ -405,7 +498,7 @@ function onMoveSubfieldClick(arrow){
     newSubfieldIndex: newSubfieldIndex
   };
   createReq(data, function(json){
-    updateStatus('report', json['resultText']);
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
   });
   // Continue local updating.
   var subfieldToSwap = subfields[newSubfieldIndex];
@@ -422,7 +515,8 @@ function onDoubleClick(event){
   /*
    * Handle double click on editable content fields.
    */
-  if (event.target.nodeName == 'TD'){
+  if (event.target.nodeName == 'TD' &&
+      !$(event.target).hasClass('bibEditCellContentProtected')){
     var targetID = event.target.id;
     var type = targetID.slice(0, targetID.indexOf('_'));
     if (type == 'content'){
@@ -465,11 +559,10 @@ function onContentChange(value){
    * Handle 'Save' button in editable content fields.
    */
   updateStatus('updating');
-  gPageDirty = true;
   var tmpArray = this.id.split('_');
   var tag = tmpArray[1], fieldNumber = tmpArray[2], subfieldIndex = tmpArray[3];
   var field = getFieldFromTag(tag, fieldNumber);
-  value = value.replace(/\n/g, ' '); // Replace newlines with spaces
+  value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   if (subfieldIndex == undefined){
     // Controlfield
     field[3] = value;
@@ -492,10 +585,10 @@ function onContentChange(value){
     value: value
   };
   createReq(data, function(json){
-    updateStatus('report', json['resultText']);
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
   });
 
-  // Return escaped value to display
+  // Return escaped value to display.
   return escapeHTML(value);
 }
 
@@ -583,18 +676,18 @@ function onAddSubfieldsSave(event){
        invalidOrEmptySubfields = true;
   });
 
+  // Report problems, like protected, empty or invalid fields.
   if (protectedSubfield){
-    displayAlert('alert', 'errorAddProtectedSubfield', true);
+    displayAlert('alertAddProtectedSubfield');
+    updateStatus('ready');
     return;
   }
-  if (invalidOrEmptySubfields && !displayAlert('confirm',
-					       'warningInvalidOrEmptyInput')){
+  if (invalidOrEmptySubfields && !displayAlert('confirmInvalidOrEmptyInput')){
     updateStatus('ready');
     return;
   }
 
   if (!subfields.length == 0){
-    gPageDirty = true;
     // Create Ajax request
     var data = {
       recID: gRecID,
@@ -604,7 +697,7 @@ function onAddSubfieldsSave(event){
       subfields: subfields
     };
     createReq(data, function(json){
-      updateStatus('report', json['resultText']);
+      updateStatus('report', gRESULT_CODES[json['resultCode']]);
     });
 
     // Continue local updating
@@ -626,126 +719,6 @@ function onAddSubfieldsSave(event){
     $('#rowAddSubfields_' + fieldID + '_' + 0).nextAll().andSelf().remove();
     updateStatus('ready');
   }
-}
-
-function onDeleteFields(event){
-  /*
-   * Handle 'Delete selected' button or delete hotkeys.
-   */
-  updateStatus('updating');
-  var toDelete = {};
-  // Collect and remove all marked fields.
-  var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked');
-  $(checkedFieldBoxes).each(function(){
-    var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldNumber = tmpArray[2];
-    if (!toDelete[tag]){
-      toDelete[tag] = {};
-    }
-    toDelete[tag][fieldNumber] = [];
-  });
-  // Collect subfields to be deleted in a datastructure.
-  var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
-  $(checkedSubfieldBoxes).each(function(){
-    var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldNumber = tmpArray[2],
-      subfieldIndex = tmpArray[3];
-    if (!toDelete[tag]){
-      toDelete[tag] = {};
-      toDelete[tag][fieldNumber] = [subfieldIndex];
-    }
-    else{
-      if (!toDelete[tag][fieldNumber])
-	toDelete[tag][fieldNumber] = [subfieldIndex];
-      else if (toDelete[tag][fieldNumber].length == 0)
-	// Entire field scheduled for the deletion.
-	return;
-      else
-	toDelete[tag][fieldNumber].push(subfieldIndex);
-    }
-  });
-  var fieldsDeleted = Boolean(checkedFieldBoxes.length);
-
-  if (!fieldsDeleted && !checkedSubfieldBoxes.length){
-    // No field/subfields selected.
-    if (event.type == 'keydown' && event.target.nodeName == 'TD'){
-      // Delete focused field/subfield.
-      var targetID = event.target.id;
-      var tmpArray = targetID.split('_');
-      if (tmpArray[0] == 'content'){
-	var tag = tmpArray[1], fieldNumber = tmpArray[2],
-	  subfieldIndex = tmpArray[3];
-	toDelete[tag] = {};
-	if (event.shiftKey){
-	  toDelete[tag][fieldNumber] = [];
-	  fieldsDeleted = true;
-	}
-	else
-	  toDelete[tag][fieldNumber] = [subfieldIndex];
-      }
-    }
-    else{
-      // Not a valid deletion event.
-      updateStatus('ready');
-      return;
-    }
-  }
-
-  // Assert that no protected fields are scheduled for deletion.
-  var protectedField = containsProtectedField(toDelete);
-  if (protectedField){
-    displayAlert('alert', 'errorDeleteProtectedField', true, protectedField);
-    return;
-  }
-
-  gPageDirty = true;
-  // Create Ajax request.
-  var data = {
-    recID: gRecID,
-    requestType: 'deleteFields',
-    toDelete: toDelete
-  };
-  createReq(data, function(json){
-    updateStatus('report', json['resultText']);
-  });
-
-  /* Continue local updating.
-  Parse datastructure and delete accordingly in record, then redraw
-  fields that had subfields deleted. */
-  var fieldNumbersToDelete, subfieldIndexesToDelete, field, subfields,
-    subfieldIndex;
-  for (var tag in toDelete){
-    fieldNumbersToDelete = toDelete[tag];
-    for (var fieldNumber in fieldNumbersToDelete){
-      var fieldID = tag + '_' + fieldNumber;
-      subfieldIndexesToDelete = fieldNumbersToDelete[fieldNumber];
-      if (subfieldIndexesToDelete.length == 0){
-	deleteFieldFromTag(tag, fieldNumber);
-	$('#rowGroup_' + tag + '_' + fieldNumber).remove();
-      }
-      else{
-	subfieldIndexesToDelete.sort();
-	field = getFieldFromTag(tag, fieldNumber);
-	subfields = field[0];
-	for (var j=subfieldIndexesToDelete.length-1; j>=0; j--)
-	  subfields.splice(subfieldIndexesToDelete[j], 1);
-	var rowGroup = $('#rowGroup_' + fieldID);
-	if (!fieldsDeleted){
-	  // Color subfield after updating.
-	  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
-	  $(rowGroup).replaceWith(createField(tag, field));
-	  if (coloredRowGroup)
-	    $('#rowGroup_' + fieldID).addClass( 'bibEditFieldColored');
-	}
-	else
-	  $(rowGroup).replaceWith(createField(tag, field));
-      }
-    }
-  }
-  if (fieldsDeleted)
-    // If entire fields has been deleted, recolor the full table.
-    reColorFields();
-  resetNewFieldNumber();
 }
 
 function colorFields(){
