@@ -448,7 +448,7 @@ class Template:
 
         # Asking for a recid? Return a /record/<recid> URL
         if 'recid' in parameters:
-            target = "%s/record/%d" % (CFG_SITE_URL, parameters['recid'])
+            target = "%s/record/%s" % (CFG_SITE_URL, parameters['recid'])
             del parameters['recid']
             target += make_canonical_urlargd(parameters, self.search_results_default_urlargd)
             return target
@@ -2913,7 +2913,7 @@ class Template:
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
                 out += '<span class="moreinfo">%s</span>' % \
-                    create_html_link(self.build_search_url(sysno=alephsysno,
+                    create_html_link(self.build_search_url(recid=alephsysno,
                                                            ln=ln),
                                      {}, _("Detailed record"),
                                      {'class': "moreinfo"})

@@ -47,7 +47,9 @@ from invenio.config import \
      CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
+     CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
+     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
@@ -2955,8 +2957,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                     link_ln = ''
                     if ln != CFG_SITE_LANG:
                         link_ln = '?ln=%s' % ln
+                    if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
+                        recid_to_display = get_fieldvalues(recIDs[irec], CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG)[0]
+                    else:
+                        recid_to_display = recIDs[irec]
                     tabs = [(unordered_tabs[tab_id]['label'], \
-                             '%s/record/%s/%s%s' % (CFG_SITE_URL, recIDs[irec], tab_id, link_ln), \
+                             '%s/record/%s/%s%s' % (CFG_SITE_URL, recid_to_display, tab_id, link_ln), \
                              tab_id == tab,
                              unordered_tabs[tab_id]['enabled']) \
                             for (tab_id, order) in ordered_tabs_id

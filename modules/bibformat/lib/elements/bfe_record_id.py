@@ -21,9 +21,14 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
+                           CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG
+
 def format(bfo):
     """
     Prints the record id.
     """
-
-    return bfo.control_field('001')
+    if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
+        return bfo.field(CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG)
+    else:
+        return bfo.control_field('001')

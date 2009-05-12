@@ -60,7 +60,8 @@ from invenio.config import \
      CFG_WEBDIR, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
-     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
+     CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
+     CFG_WEBSEARCH_USE_ALEPH_SYSNOS
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
@@ -76,7 +77,7 @@ from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, \
     check_user_can_view_record, collection_restricted_p, restricted_collection_cache, \
-    get_fieldvalues, get_most_popular_field_values
+    get_fieldvalues, get_most_popular_field_values, get_mysql_recid_from_aleph_sysno
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -746,7 +747,15 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         elif component == 'record' or component == 'record-restricted':
             try:
-                recid = int(path[0])
+                if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
+                    # let us try to recognize /record/<SYSNO> style of URLs:
+                    x = get_mysql_recid_from_aleph_sysno(path[0])
+                    if x:
+                        recid = x
+                    else:
+                        recid = int(path[0])
+                else:
+                    recid = int(path[0])
             except IndexError:
                 # display record #1 for URL /record without a number
                 recid = 1
