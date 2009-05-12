@@ -27,16 +27,16 @@ from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
 
 index = wal.index
 
-def rolearea(req):
+def rolearea(req, grep=''):
     """create the role area menu page."""
 
-    return wal.perform_rolearea(req=req)
+    return wal.perform_rolearea(req=req, grep=grep)
 
 
-def actionarea(req):
+def actionarea(req, grep=''):
     """create the role area menu page."""
 
-    return wal.perform_actionarea(req=req)
+    return wal.perform_actionarea(req=req, grep=grep)
 
 
 def userarea(req, email_user_pattern=''):

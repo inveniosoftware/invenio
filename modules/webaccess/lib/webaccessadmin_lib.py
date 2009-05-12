@@ -179,7 +179,7 @@ def perform_listgroups(req):
                 body=[output, extra],
                 adminarea=2)
 
-def perform_rolearea(req):
+def perform_rolearea(req, grep=""):
     """create the role area menu page."""
 
     (auth_code, auth_message) = is_adminuser(req)
@@ -190,7 +190,56 @@ def perform_rolearea(req):
     roles = acca.acc_get_all_roles()
 
     roles2 = []
+
+    if grep:
+        try:
+            re_grep = re.compile(grep)
+        except Exception, err:
+            re_grep = None
+            grep = ''
+    else:
+        re_grep = None
+
     for (id, name, desc, dummy, firerole_def_src) in roles:
+        if not firerole_def_src:
+            firerole_def_src = '' ## Workaround for None.
+        if re_grep and not re_grep.search(name) and not re_grep.search(desc) and not re_grep.search(firerole_def_src):
+            ## We're grepping for some word.
+            ## Let's dig into the authorization then.
+            all_actions = acca.acc_find_possible_actions_all(id)
+            ## FIXME: the acc_find_possible_actions_all is really an ugly
+            ## function, but is the closest to what it's needed in order
+            ## to retrieve all the authorization of a role.
+            for idx, row in enumerate(all_actions):
+                grepped = False
+                if idx % 2 == 0:
+                    ## even lines contains headers like in:
+                    ## ['role', 'action', '#', 'collection']
+                    ## the only useful text to grep is from index 3 onwards
+                    for keyword in row[3:]:
+                        if re_grep.search(keyword):
+                            grepped = True
+                            break
+                    if grepped:
+                        break
+                else:
+                    ## odd lines contains content like in:
+                    ## [1, 18L, 1, 'Theses']
+                    ## the useful text to grep is indirectly index 1
+                    ## which is indeed the id_action (needed to retrieve the
+                    ## action name) and from column 3 onwards.
+                    if re_grep.search(acca.acc_get_action_name(row[1])):
+                        break
+                    for value in row[3:]:
+                        if re_grep.search(value):
+                            grepped = True
+                            break
+                    if grepped:
+                        break
+            else:
+                ## We haven't grepped anything!
+                ## Let's skip to the next role then...
+                continue
         if len(desc) > 30:
             desc = desc[:30] + '...'
         if firerole_def_src and len(firerole_def_src) > 30:
@@ -222,7 +271,16 @@ def perform_rolearea(req):
     <dd>see all the information attached to a role and decide if you want
     to<br />delete it.</dd>
     </dl>
-    """
+    <!--make a search box-->
+    <table class="admin_wvar" cellspacing="0">
+    <tr><td>
+    <form>
+    Show only roles having any detail matching the regular expression:
+    <input type="text" name="grep" value="%s" />
+    <input type="submit" class="adminbutton" value="Search">
+    </form>
+    </td></tr></table>
+    """ % escape(grep)
 
     output += tupletotable(header=header, tuple=roles2)
 
@@ -240,19 +298,57 @@ def perform_rolearea(req):
                 adminarea=2)
 
 
-def perform_actionarea(req):
+def perform_actionarea(req, grep=''):
     """create the action area menu page."""
 
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    header = ['id', 'name', 'authorizations/roles', '']
+    if grep:
+        try:
+            re_grep = re.compile(grep)
+        except Exception, err:
+            re_grep = None
+            grep = ''
+    else:
+        re_grep = None
+
+    header = ['name', 'authorizations/roles', '']
     actions = acca.acc_get_all_actions()
 
     actions2 = []
     roles2 = []
-    for (id, name, dummy) in actions:
-        actions2.append([id, name])
+    for (id, name, description) in actions:
+        if re_grep and not re_grep.search(name) and not re_grep.search(description):
+            grepped = False
+            roles = acca.acc_get_action_roles(id)
+            for id_role, role_name, role_description in roles:
+                if re_grep.search(role_name) or re_grep.search(role_description):
+                    grepped = True
+                    break
+                elif re_grep.search(acca.acc_get_role_details(id_role)[3] or ''):
+                    ## Found in FireRole
+                    grepped = True
+                    break
+                else:
+                    details = acca.acc_find_possible_actions(id_role, id)
+                    if details:
+                        for argument in details[0][1:]:
+                            if re_grep.search(argument):
+                                grepped = True
+                                break
+                        for values in details[1:]:
+                            for value in values[1:]:
+                                if re_grep.search(value):
+                                    grepped = True
+                                    break
+                            if grepped:
+                                break
+                if grepped:
+                    break
+            if not grepped:
+                continue
+        actions2.append([name, description])
         for col in [(('add', 'addauthorization'),
                     ('modify', 'modifyauthorizations'),
                     ('remove', 'deleteroleaction')),
@@ -272,7 +368,16 @@ def perform_actionarea(req):
     <dt>Actions:</dt>
     <dd>see all the information attached to an action.</dd>
     </dl>
-    """
+    <!--make a search box-->
+    <table class="admin_wvar" cellspacing="0">
+    <tr><td>
+    <form>
+    Show only actions having any detail matching the regular expression:
+    <input type="text" name="grep" value="%s" />
+    <input type="submit" class="adminbutton" value="Search">
+    </form>
+    </td></tr></table>
+    """ % escape(grep)
 
     output += tupletotable(header=header, tuple=actions2)
 
@@ -1570,11 +1675,16 @@ def actiondetails(id_action=0):
         if roleshlp:
             roles = []
             for (id, name, dummy) in roleshlp:
+                res = acca.acc_find_possible_actions(id, id_action)
+                if res:
+                    authorization_details = tupletotable(header=res[0], tuple=res[1:])
+                else:
+                    authorization_details = 'no details to show'
+
                 roles.append([id, name,
-                            '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>'
-                            % (id, id_action),
+                            authorization_details,
                             '<a href="showroleusers?id_role=%s">show connected users</a>' % (id, )])
-            roletable = tupletotable(header=['id', 'name', '', ''], tuple=roles)
+            roletable = tupletotable(header=['id', 'name', 'authorization details', ''], tuple=roles)
 
             output += '<p>roles connected to %s:</p>\n' % (headerstrong(action=name_action, query=0), )
             output += roletable
@@ -1899,11 +2009,16 @@ def roledetails(id_role=0):
     actionshlp = acca.acc_get_role_actions(id_role)
     actions = []
     for (action_id, name, dummy) in actionshlp:
-        actions.append([action_id, name,
-                        '<a href="showactiondetails?id_role=%s&amp;id_action=%s">show action details</a>' % (id_role, action_id),
-                        '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>' % (id_role, action_id)])
+        res = acca.acc_find_possible_actions(id_role, action_id)
+        if res:
+            authorization_details = tupletotable(header=res[0], tuple=res[1:])
+        else:
+            authorization_details = 'no details to show'
 
-    actiontable = tupletotable(header=['id', 'name', '', ''], tuple=actions)
+        actions.append([action_id, name, authorization_details,
+                        '<a href="showactiondetails?id_role=%s&amp;id_action=%s">show action details</a>' % (id_role, action_id)])
+
+    actiontable = tupletotable(header=['id', 'name', 'parameters', ''], tuple=actions)
 
     # show role details
     details  = '<p>role details:</p>'
