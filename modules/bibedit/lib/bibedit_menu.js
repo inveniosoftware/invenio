@@ -318,6 +318,8 @@ function onGetRecordSuccess(json){
       $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
     // Unfocus record selection field (to facilitate hotkeys).
     $('#txtSearchPattern').blur();
+    tickets = json['tickets']
+    $('#tickets').html(tickets);
     updateStatus('report', json['resultText']);
   }
 }

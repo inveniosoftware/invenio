@@ -147,12 +147,16 @@ class BibCatalogSystemRT(BibCatalogSystem):
         passwd = escape_shell_arg(passwd)
         #make a call. This is safe since passwd and all variables in searchexp have been escaped.
         dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls \"" + searchexp + "\"")
+
         for line in myout.split("\n"):
-            #if there are matchin lines they will look like NUM:subj.. so pick num
+            #if there are matching lines they will look like NUM:subj.. so pick num
             if (line.count(': ') > 0) and (line.count("Invalid") == 0): #the parameters may be insane
-                tnum, dummy = line.split(': ')
-                inum = int(tnum)
-                tickets.append(inum)
+                tnum, dummy = line.split(': ') #get the ticket id and transform it to int
+                try:
+                    inum = int(tnum)
+                    tickets.append(tnum)
+                except:
+                    pass
         return tickets
 
     def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner=""):

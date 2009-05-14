@@ -31,7 +31,8 @@ from invenio.bibrecord import record_add_field, record_add_subfield_into, \
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL
 from invenio.search_engine import record_exists, search_pattern
-from invenio.webuser import session_param_get, session_param_set
+from invenio.webuser import getUid, session_param_get, session_param_set
+from invenio.bibcatalog import bibcatalog_system
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -153,6 +154,17 @@ def perform_request_record(req, requestType, recid, uid):
                 os.system("rm %s.tmp" % get_file_path(recid))
             else:
                 result['record'], result['resultText'] = record, 'Record loaded'
+                #insert the ticket data in the result, if possible
+                if uid and bibcatalog_system.check_system(uid) == "":
+                    tickets_found = bibcatalog_system.ticket_search(uid, recordid=recid)
+                    t_url_str = '' #put ticket urls here, formatted for HTML display
+                    for t_id in tickets_found:
+                        t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_display')
+                        #format..
+                        t_url_str += '<a href="'+t_url+'">'+str(t_id)+'</a> '
+                        #t_url_str += str(t_id)+" "
+                    t_url_str = t_url_str.rstrip()
+                    result['tickets'] = t_url_str
                 try:
                     tagformat_settings = session_param_get(req,
                                                            'bibedit_tagformat')
