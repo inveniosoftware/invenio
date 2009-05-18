@@ -62,6 +62,7 @@ from zlib import compress
 import urllib2
 import socket
 import marshal
+import copy
 
 from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
@@ -221,7 +222,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         # Retrieve the old record to update
         rec_old = get_record(rec_id)
         # Also save a copy to restore previous situation in case of errors
-        original_recod = get_record(rec_id)
+        original_record = get_record(rec_id)
         if rec_old is None:
             write_message("   Failed during the creation of the old record!",
                         verbose=1, stream=sys.stderr)
@@ -392,7 +393,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         if record_deleted_p:
             ## BibUpload has failed living the record deleted. We should
             ## back the original record then.
-            update_database_with_metadata(original_recod, rec_id, oai_rec_id)
+            update_database_with_metadata(original_record, rec_id, oai_rec_id)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
 
 def insert_record_into_holding_pen(record, oai_id):
@@ -1552,76 +1553,55 @@ def update_database_with_metadata(record, rec_id, oai_rec_id = "oai"):
 
 def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
     """Append new tags to a old record"""
-    if opt_tag is not None:
-        tag = opt_tag
-        if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
-            if tag == '001':
-                pass
-            else:
-                # if it is a controlfield,just access the value
+
+    def _append_tag(tag):
+        # Reference mode append only reference tag
+        if opt_mode == 'reference':
+            if tag == CFG_BIBUPLOAD_REFERENCE_TAG:
                 for single_tuple in record[tag]:
-                    controlfield_value = single_tuple[3]
-                    # add the field to the old record
-                    newfield_number = record_add_field(rec_old, tag,
-                        controlfield_value=controlfield_value)
+                    # We retrieve the information of the tag
+                    subfield_list = single_tuple[0]
+                    ind1 = single_tuple[1]
+                    ind2 = single_tuple[2]
+                    # We add the datafield to the old record
+                    write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
+                    newfield_number = record_add_field(rec_old, tag, ind1,
+                        ind2, subfields=subfield_list)
                     if newfield_number is None:
                         write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
         else:
-            # For each tag there is a list of tuples representing datafields
-            for single_tuple in record[tag]:
-                # We retrieve the information of the tag
-                subfield_list = single_tuple[0]
-                ind1 = single_tuple[1]
-                ind2 = single_tuple[2]
-                # We add the datafield to the old record
-                write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
-                newfield_number = record_add_field(rec_old, tag, ind1, ind2,
-                    subfields=subfield_list)
-                if newfield_number is None:
-                    write_message("Error when adding the field"+tag, verbose=1, stream=sys.stderr)
-    else:
-        # Go through each tag in the appended record
-        for tag in record.keys():
-            # Reference mode append only reference tag
-            if opt_mode == 'reference':
-                if tag == CFG_BIBUPLOAD_REFERENCE_TAG:
+            if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
+                if tag == '001':
+                    pass
+                else:
+                    # if it is a controlfield,just access the value
                     for single_tuple in record[tag]:
-                        # We retrieve the information of the tag
-                        subfield_list = single_tuple[0]
-                        ind1 = single_tuple[1]
-                        ind2 = single_tuple[2]
-                        # We add the datafield to the old record
-                        write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
-                        newfield_number = record_add_field(rec_old, tag, ind1,
-                            ind2, subfields=subfield_list)
+                        controlfield_value = single_tuple[3]
+                        # add the field to the old record
+                        newfield_number = record_add_field(rec_old, tag,
+                            controlfield_value=controlfield_value)
                         if newfield_number is None:
                             write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
             else:
-                if tag in CFG_BIBUPLOAD_CONTROLFIELD_TAGS:
-                    if tag == '001':
-                        pass
-                    else:
-                        # if it is a controlfield,just access the value
-                        for single_tuple in record[tag]:
-                            controlfield_value = single_tuple[3]
-                            # add the field to the old record
-                            newfield_number = record_add_field(rec_old, tag,
-                                controlfield_value=controlfield_value)
-                            if newfield_number is None:
-                                write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
-                else:
-                    # For each tag there is a list of tuples representing datafields
-                    for single_tuple in record[tag]:
-                        # We retrieve the information of the tag
-                        subfield_list = single_tuple[0]
-                        ind1 = single_tuple[1]
-                        ind2 = single_tuple[2]
-                        # We add the datafield to the old record
-                        write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
-                        newfield_number = record_add_field(rec_old, tag, ind1,
-                            ind2, subfields=subfield_list)
-                        if newfield_number is None:
-                            write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
+                # For each tag there is a list of tuples representing datafields
+                for single_tuple in record[tag]:
+                    # We retrieve the information of the tag
+                    subfield_list = single_tuple[0]
+                    ind1 = single_tuple[1]
+                    ind2 = single_tuple[2]
+                    # We add the datafield to the old record
+                    write_message("      Adding tag: %s ind1=%s ind2=%s code=%s" % (tag, ind1, ind2, subfield_list), verbose=9)
+                    newfield_number = record_add_field(rec_old, tag, ind1,
+                        ind2, subfields=subfield_list)
+                    if newfield_number is None:
+                        write_message("   Error when adding the field"+tag, verbose=1, stream=sys.stderr)
+
+    if opt_tag is not None:
+        _append_tag(opt_tag)
+    else:
+        # Go through each tag in the appended record
+        for tag in record:
+            _append_tag(tag)
     return rec_old
 
 def copy_strong_tags_from_old_record(record, rec_old):
@@ -1642,28 +1622,27 @@ def copy_strong_tags_from_old_record(record, rec_old):
 ### Delete functions
 def delete_tags(record, rec_old):
     """
-    For every tag in 'record', if it appears in 'rec_old',
-    then it will be removed from 'rec_old'.
-
-    @note: As a side effect 'rec_old' is modified inline.
+    Returns a record structure with all the fields in rec_old minus the
+    fields in record.
 
     @param record: The record containing tags to delete.
     @type record: record structure
 
-    @param rec_old: The record being modified.
+    @param rec_old: The original record.
     @type rec_old: record structure
 
     @return: The modified record.
     @rtype: record structure
     """
+    returned_record = copy.deepcopy(rec_old)
     for tag, fields in record.iteritems():
         if tag in ('001', ):
             continue
         for field in fields:
-            local_position = record_find_field(rec_old, tag, field)[1]
+            local_position = record_find_field(returned_record, tag, field)[1]
             if local_position is not None:
-                record_delete_field(rec_old, tag, field_position_local=local_position)
-    return rec_old
+                record_delete_field(returned_record, tag, field_position_local=local_position)
+    return returned_record
 
 def delete_tags_to_correct(record, rec_old, opt_tag):
     """

@@ -467,6 +467,9 @@ class BibUploadDeleteModeTest(unittest.TestCase):
          <subfield code="a">Test, Jim</subfield>
          <subfield code="u">Test Laboratory</subfield>
         </datafield>
+        <datafield tag="888" ind1=" " ind2=" ">
+         <subfield code="a">dumb text</subfield>
+        </datafield>
         </record>
         """
         self.testrec1_hm = """
@@ -476,6 +479,7 @@ class BibUploadDeleteModeTest(unittest.TestCase):
         10047 $$aTest, John$$uTest University
         10048 $$aCool
         10047 $$aTest, Jim$$uTest Laboratory
+        888__ $$adumb text
         """
         self.testrec1_xm_to_delete = """
         <record>
@@ -490,6 +494,9 @@ class BibUploadDeleteModeTest(unittest.TestCase):
         </datafield>
         <datafield tag="100" ind1="4" ind2="8">
          <subfield code="a">Cool</subfield>
+        </datafield>
+        <datafield tag="888" ind1=" " ind2=" ">
+         <subfield code="a">dumb text</subfield>
         </datafield>
         </record>
         """
@@ -530,6 +537,8 @@ class BibUploadDeleteModeTest(unittest.TestCase):
         inserted_hm = print_record(recid, 'hm')
         self.assertEqual(compare_xmbuffers(inserted_xm, self.testrec1_xm), '')
         self.assertEqual(compare_hmbuffers(inserted_hm, self.testrec1_hm), '')
+        # Checking dumb text is in bibxxx
+        self.failUnless(run_sql("SELECT * from bibrec_bib88x WHERE id_bibrec=%s", (recid, )))
 
     def test_record_tags_deletion(self):
         """bibupload - delete mode, deleting specific tags"""
@@ -541,6 +550,8 @@ class BibUploadDeleteModeTest(unittest.TestCase):
         # did it work?
         self.assertEqual(compare_xmbuffers(corrected_xm, self.testrec1_corrected_xm), '')
         self.assertEqual(compare_hmbuffers(corrected_hm, self.testrec1_corrected_hm), '')
+        # Checking dumb text is no more in bibxxx
+        self.failIf(run_sql("SELECT * from bibrec_bib88x WHERE id_bibrec=%s", (recid, )))
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(recid)
         return
@@ -3409,7 +3420,8 @@ TEST_SUITE = make_test_suite(BibUploadInsertModeTest,
                              BibUploadUpperLowerCaseTest,
                              BibUploadControlledProvenanceTest,
                              BibUploadStrongTagsTest,
-                             BibUploadFFTModeTest)
+                             BibUploadFFTModeTest,
+                             )
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
