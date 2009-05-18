@@ -890,46 +890,80 @@ def display_collection(req, c, as, verbose, ln):
                     language=ln,
                     req=req,
                     navmenuid='search')
+    # wash `as' argument:
+    if not os.path.exists("%s/collections/%d/body-as=%d-ln=%s.html" % \
+                          (CFG_CACHEDIR, colID, as, ln)):
+        # nonexistent `as' asked for, fall back to Simple Search:
+        as = 0
     # display collection interface page:
     try:
-        filedesc = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (CFG_CACHEDIR, colID, as, ln), "r")
+        filedesc = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % \
+                        (CFG_CACHEDIR, colID, as, ln), "r")
         c_navtrail = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/body-as=%d-ln=%s.html" % (CFG_CACHEDIR, colID, as, ln), "r")
+    except:
+        c_navtrail = ""
+    try:
+        filedesc = open("%s/collections/%d/body-as=%d-ln=%s.html" % \
+                        (CFG_CACHEDIR, colID, as, ln), "r")
         c_body = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/portalbox-tp-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
+    except:
+        c_body = ""
+    try:
+        filedesc = open("%s/collections/%d/portalbox-tp-ln=%s.html" % \
+                        (CFG_CACHEDIR, colID, ln), "r")
         c_portalbox_tp = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/portalbox-te-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
+    except:
+        c_portalbox_tp = ""
+    try:
+        filedesc = open("%s/collections/%d/portalbox-te-ln=%s.html" % \
+                        (CFG_CACHEDIR, colID, ln), "r")
         c_portalbox_te = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
+    except:
+        c_portalbox_te = ""
+    try:
+        filedesc = open("%s/collections/%d/portalbox-lt-ln=%s.html" % \
+                        (CFG_CACHEDIR, colID, ln), "r")
         c_portalbox_lt = filedesc.read()
         filedesc.close()
+    except:
+        c_portalbox_lt = ""
+    try:
         # show help boxes (usually located in "tr", "top right")
         # if users have not banned them in their preferences:
         c_portalbox_rt = ""
         if user_preferences.get('websearch_helpbox', 1) > 0:
-            filedesc = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
+            filedesc = open("%s/collections/%d/portalbox-rt-ln=%s.html" % \
+                            (CFG_CACHEDIR, colID, ln), "r")
             c_portalbox_rt = filedesc.read()
             filedesc.close()
-        filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
+    except:
+        c_portalbox_rt = ""
+    try:
+        filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % \
+                        (CFG_CACHEDIR, colID, ln), "r")
         c_last_updated = filedesc.read()
         filedesc.close()
-
+    except:
+        c_last_updated = ""
+    try:
         title = get_coll_i18nname(c, ln)
         # if there is only one collection defined, do not print its
         # title on the page as it would be displayed repetitively.
         if len(search_engine.collection_reclist_cache.cache.keys()) == 1:
             title = ""
+    except:
+        title = ""
+    # RSS:
+    rssurl = CFG_SITE_URL + '/rss'
+    if c != CFG_SITE_NAME:
+        rssurl += '?cc=' + quote(c)
 
-        rssurl = CFG_SITE_URL + '/rss'
-        if c != CFG_SITE_NAME:
-            rssurl += '?cc=' + quote(c)
-
-        if 'hb' in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
-            metaheaderadd = """
+    if 'hb' in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
+        metaheaderadd = """
   <script type='text/javascript'>
     jsMath = {
         Controls: {cookie: {printwarn: 0}}
@@ -937,44 +971,26 @@ def display_collection(req, c, as, verbose, ln):
   </script>
   <script src='/jsMath/easy/invenio-jsmath.js' type='text/javascript'></script>
 """
-        else:
-            metaheaderadd = ''
+    else:
+        metaheaderadd = ''
 
-        return page(title=title,
-                    body=c_body,
-                    navtrail=c_navtrail,
-                    description="%s - %s" % (CFG_SITE_NAME, c),
-                    keywords="%s, %s" % (CFG_SITE_NAME, c),
-                    metaheaderadd=metaheaderadd,
-                    uid=uid,
-                    language=ln,
-                    req=req,
-                    cdspageboxlefttopadd=c_portalbox_lt,
-                    cdspageboxrighttopadd=c_portalbox_rt,
-                    titleprologue=c_portalbox_tp,
-                    titleepilogue=c_portalbox_te,
-                    lastupdated=c_last_updated,
-                    navmenuid='search',
-                    rssurl=rssurl,
-                    show_title_p=-1 not in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES)
-    except:
-        if verbose >= 9:
-            req.write("<br />c=%s" % c)
-            req.write("<br />as=%s" % as)
-            req.write("<br />ln=%s" % ln)
-            req.write("<br />colID=%s" % colID)
-            req.write("<br />uid=%s" % uid)
-        register_exception(req=req, alert_admin=True)
-        return page(title=_("Internal Error"),
-                    body = create_error_box(req, ln=ln),
-                    description="%s - Internal Error" % CFG_SITE_NAME,
-                    keywords="%s, Internal Error" % CFG_SITE_NAME,
-                    uid=uid,
-                    language=ln,
-                    req=req,
-                    navmenuid='search')
-
-    return "\n"
+    return page(title=title,
+                body=c_body,
+                navtrail=c_navtrail,
+                description="%s - %s" % (CFG_SITE_NAME, c),
+                keywords="%s, %s" % (CFG_SITE_NAME, c),
+                metaheaderadd=metaheaderadd,
+                uid=uid,
+                language=ln,
+                req=req,
+                cdspageboxlefttopadd=c_portalbox_lt,
+                cdspageboxrighttopadd=c_portalbox_rt,
+                titleprologue=c_portalbox_tp,
+                titleepilogue=c_portalbox_te,
+                lastupdated=c_last_updated,
+                navmenuid='search',
+                rssurl=rssurl,
+                show_title_p=-1 not in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES)
 
 class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
     """RSS 2.0 feed service pages."""
