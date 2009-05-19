@@ -89,6 +89,8 @@ Contents
              <http://gnuplot-py.sourceforge.net/>
           - (recommended) Snowball Stemmer, for stemming:
              <http://snowball.tartarus.org/wrappers/PyStemmer-1.0.1.tar.gz>
+          - (recommended) py-editdist, for record merging:
+             <http://www.mindrot.org/projects/py-editdist/>
           - (optional) 4suite, slower alternative to PyRXP and
              libxml2-python:
              <http://4suite.org/>

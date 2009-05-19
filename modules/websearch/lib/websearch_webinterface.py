@@ -91,6 +91,7 @@ from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.search_engine_summarizer import summarize_records
 from invenio.errorlib import register_exception
 from invenio.bibedit_webinterface import WebInterfaceEditPages
+from invenio.bibmerge_webinterface import WebInterfaceMergePages
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -335,7 +336,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords']
+                'keywords', 'merge']
 
     #_exports.extend(output_formats)
 
@@ -355,6 +356,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
+        self.merge = WebInterfaceMergePages(self.recid)
 
         return
 
@@ -411,7 +413,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords']
+                'keywords', 'merge']
 
     #_exports.extend(output_formats)
 
@@ -430,6 +432,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
+        self.merge = WebInterfaceMergePages(self.recid)
 
         return
 
@@ -742,6 +745,9 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             return answer, []
 
 
+        elif component == 'record' and path and path[0] == 'merge':
+            return WebInterfaceMergePages(), path[1:]
+
         elif component == 'record' and path and path[0] == 'edit':
             return WebInterfaceEditPages(), path[1:]
 
@@ -776,7 +782,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
-                               'keywords']:
+                               'keywords', 'merge']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

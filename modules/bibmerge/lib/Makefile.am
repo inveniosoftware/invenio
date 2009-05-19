@@ -9,12 +9,25 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibcatalog bibcheck bibcirculation bibclassify bibconvert bibedit bibexport bibharvest bibmatch bibmerge bibsched bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webmessage webstat webcomment webjournal
+pylibdir = $(libdir)/python/invenio
 
-CLEANFILES = *~
+pylib_DATA = \
+        bibmerge_differ.py \
+        bibmerge_merger.py \
+        bibmerge_templates.py \
+        bibmerge_webinterface.py \
+        bibmerge_engine.py
+
+jsdir=$(localstatedir)/www/js
+
+js_DATA = bibmerge_engine.js
+
+EXTRA_DIST = $(pylib_DATA)
+
+CLEANFILES = *~ *.tmp *.pyc

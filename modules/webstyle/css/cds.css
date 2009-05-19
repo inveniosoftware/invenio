@@ -1613,6 +1613,147 @@ input.hyperlinkformSubmitButton {
   background: rgb(250, 209, 99);
 }
 /* end of BibEdit module */
+/* BibMerge module */
+#bibMergePanel {
+	background: white;
+	width: 160px;
+	position: fixed;
+	top: 220px;
+	left: 5px;
+	margin-bottom: 20px;
+	font-size: 0.8em;
+}
+#bibMergePanel button {
+	font-size: 0.8em;
+	font-weight: bold;
+}
+.bibMergeRecNumInput {
+    width: 75px;
+}
+a.bibMergeImgClickable img {
+    border: 0px;
+}
+a:hover.bibMergeImgClickable img {
+    background: orange;
+}
+#bibMergeSearchInput {
+    width: 130px;
+}
+#bibMergeSelectList option{
+    border-bottom: 1px solid grey;
+    color: blue;
+    text-decoration: underline;
+    cursor:pointer;
+    width: 130px;
+}
+.bibMergeSelectListSelected {
+    background: orange;
+}
+#bibMergeMessage {
+	border-style: solid;
+	border-width: 4px 1px 1px 1px;
+	padding: 1px;
+}
+.bibMergeMessageError {
+	border-color: red !important;
+}
+.bibMergeMessageOK {
+	border-color: green;
+}
+#bibMergeContent {
+	min-height: 300px;
+	font-size:0.8em;
+	margin-left:160px;
+}
+#bibMergeContent a:hover img {
+	background: orange;
+}
+#bibMergeContent img {
+	border: 0px;
+}
+.bibMergeFieldGroupDiv {
+	width: 100%;
+	margin-bottom: 4px;
+}
+.bibMergeFieldGroupHeaderDiv {
+	width: 150px;
+	font-size:1.2em;
+	background-color: #6699CC;
+	border-bottom: 3px solid #FFCC99;
+	color: #FFFFFF;
+	padding: 1px 1px;
+}
+.bibMergeFieldGroupHeaderDiv > * {
+	color: inherit !important;
+}
+.bibMergeFieldTable {
+	border: 0.5px solid #FFCC99;
+	border-top: 2.5px solid #6699CC;
+	border-left: 2.5px solid #6699CC;
+	border-right: 2.5px solid #6699CC;
+	border-bottom: 2.5px solid #6699CC;
+	border-collapse:collapse;
+	width:100%;
+	table-layout: fixed;
+}
+.bibMergeColHeaderLeft span, .bibMergeColHeaderRight span {
+	font-weight: bold;
+}
+.bibMergeFieldTable td {
+	border: 0.5px solid #FFCC99;
+	word-wrap:break-word;
+}
+.bibMergeFieldTable td div {
+    overflow:auto;
+}
+.bibMergeColSubfieldTag {
+	border-left: 1px solid #FFCC99;
+	min-width: 30px;
+	max-width: 30px;
+	width: 25px;
+}
+.bibMergeColContent {
+	border-left: 1px solid #FFCC99;
+	width: 50%;
+}
+.bibMergeColContentLeft { background:#F1F1F1;}
+.bibMergeColContentRight { background:#FFFCF9;}
+.bibMergeColHeaderLeft { background:#BDD5DD;}
+.bibMergeColHeaderRight { background:#FFCC99;}
+.bibMergeColHeaderLeft a { float:right; }
+.bibMergeColHeaderRight a { float:left; }
+.bibMergeColActions {
+	border-left: 1px solid #FFCC99;
+	min-width: 60px;
+	max-width: 60px;
+	width: 60px;
+}
+.bibMergeFieldTable td {
+	vertical-align:top;
+}
+.bibMergeCellSimilarityRed {
+	color: red;
+	border-right: 5px solid red;
+}
+.bibMergeCellSimilarityGreen {
+	color: green;
+	border-right: 5px solid green;
+}
+.bibMergeDiffSpanSame {
+}
+.bibMergeDiffSpanIns {
+	background:#FFCC99;
+}
+.bibMergeDiffSpanDel {
+	background:#BDD5DD;
+}
+.bibMergeDiffSpanSub {
+	background:Pink;
+}
+.bibMergeDiffHighlight {
+	background:Yellow;
+}
+/* end of BibMerge module */
 /* WebAlert module */
 .alrtTable{
     border: 1px solid black;
@@ -1958,7 +2099,7 @@ text-decoration:underline;
 	clear:both;
 	width:100%;
 	border-bottom:2px solid #36c;
-	border-top:2px solid #36c;	
+	border-top:2px solid #36c;
 	height:auto;
 	padding:0;
 	position:relative;
@@ -1987,7 +2128,7 @@ text-decoration:underline;
 	padding-right:5px;
 	margin-right:10px;
 	background: transparent url(list_sep_blue.gif) no-repeat left center;
-	
+
 }
 #bibcircmenu li.hassubmenu{
 	position:relative;
@@ -2090,7 +2231,7 @@ text-decoration:underline;
         .bibcircwarning {
         color: #f11010;
         }
-  	
+
 	 .bibcircpending {
         color: #f16f10;
         }

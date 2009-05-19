@@ -1,3 +1,5 @@
+## $Id$
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -9,12 +11,16 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibcatalog bibcheck bibcirculation bibclassify bibconvert bibedit bibexport bibharvest bibmatch bibmerge bibsched bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webmessage webstat webcomment webjournal
+webappdir = $(localstatedir)/www/admin/bibmerge
 
-CLEANFILES = *~
+webapp_DATA =
+
+EXTRA_DIST =  $(webapp_DATA)
+
+CLEANFILES = *~ *.tmp
