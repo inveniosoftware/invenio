@@ -231,12 +231,18 @@ class BibUploadAppendModeTest(unittest.TestCase):
         <subfield code="a">Tester, T</subfield>
         <subfield code="u">DESY</subfield>
         </datafield>
+        <datafield tag ="970" ind1=" " ind2=" ">
+        <subfield code="a">0003719PHOPHO</subfield>
+        </datafield>
         </record>"""
         self.test_to_append = """<record>
         <controlfield tag="001">123456789</controlfield>
         <datafield tag ="100" ind1=" " ind2=" ">
         <subfield code="a">Tester, U</subfield>
         <subfield code="u">CERN</subfield>
+        </datafield>
+        <datafield tag ="970" ind1=" " ind2=" ">
+        <subfield code="a">0003719PHOPHO</subfield>
         </datafield>
         </record>"""
         self.test_expected_xm = """<record>
@@ -249,17 +255,22 @@ class BibUploadAppendModeTest(unittest.TestCase):
         <subfield code="a">Tester, U</subfield>
         <subfield code="u">CERN</subfield>
         </datafield>
+        <datafield tag ="970" ind1=" " ind2=" ">
+        <subfield code="a">0003719PHOPHO</subfield>
+        </datafield>
         </record>"""
         self.test_expected_hm = """
         001__ 123456789
         100__ $$aTester, T$$uDESY
         100__ $$aTester, U$$uCERN
+        970__ $$a0003719PHOPHO
         """
         # insert test record:
 
         test_to_upload =  self.test_existing.replace('<controlfield tag="001">123456789</controlfield>',
                                                      '')
         recs = bibupload.xml_marc_to_records(test_to_upload)
+        task_set_task_param('verbose', 0)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         self.test_recid = recid
         # replace test buffers with real recid of inserted test record:
