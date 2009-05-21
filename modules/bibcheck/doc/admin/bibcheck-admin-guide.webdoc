@@ -1,3 +1,5 @@
+## -*- mode: html; coding: utf-8; -*-
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -9,12 +11,28 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = doc etc web
+<!-- WebDoc-Page-Title: BibCheck Admin Guide -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 
-CLEANFILES = *~
+<lang>
+<en>
+<p>
+The BibCheck Admin module allows the administrator to manage BibCheck configuration files.
+The following functionality is available:
+<ul>
+<li>Creating a new BibCheck configuration file.
+<li>Editing existing BibCheck configuration files.
+<li>Deleting a new BibCheck configuration file (confirmation is requested if your browser runs JavaScript).
+<li>Testing the syntax of a BibCheck configuration file by calling "bibcheck".
+<li>Searching for a string in BibCheck configuration files.
+</ul>
+<p>
+</en>
+
+

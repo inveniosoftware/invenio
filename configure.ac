@@ -20,8 +20,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.1.20090519, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20090519)
+AC_INIT(cds-invenio, 0.99.1.20090602, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20090602)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -444,6 +444,9 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibcatalog/doc/hacking/Makefile
 	  modules/bibcatalog/lib/Makefile \
 	  modules/bibcheck/Makefile \
+	  modules/bibcheck/doc/Makefile \
+	  modules/bibcheck/doc/admin/Makefile \
+	  modules/bibcheck/doc/hacking/Makefile \
 	  modules/bibcheck/etc/Makefile \
 	  modules/bibcheck/web/Makefile \
 	  modules/bibcheck/web/admin/Makefile \

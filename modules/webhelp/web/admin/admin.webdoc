@@ -295,6 +295,23 @@ engine.
 
 <tr>
 <td>
+  <strong>BibCheck Admin</strong>
+</td>
+<td>
+    Enables you to manage BibCheck configuration files. BibCheck is used to verify and
+    correct records.
+
+</td>
+<td>
+  <a href="<CFG_SITE_URL>/admin/bibcheck/bibcheckadmin.py">BibCheck Admin Interface</a>
+</td>
+<td>
+  <a href="bibcheck-admin-guide">BibCheck Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
   <strong>WebSearch Admin</strong>
 </td>
 <td>
