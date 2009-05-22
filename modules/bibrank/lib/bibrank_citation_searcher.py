@@ -152,26 +152,17 @@ def get_cited_by_list(recordlist):
     cache_cited_by_dictionary = get_citation_dict("citationdict")
     result = []
     for recid in recordlist:
-        if cache_cited_by_dictionary.has_key(recid):
-            tmp = [recid, cache_cited_by_dictionary[recid]]
-        else:
-            tmp = [recid, []]
-        result.append(tmp)
+        result.append([recid, cache_cited_by_dictionary.get(recid, [])])
     return result
 
 def get_cited_by_weight(recordlist):
     """Return a tuple of ([recid,number_of_citing_records],...) for all the
        records in recordlist.
     """
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
     result = []
-    tuples = get_cited_by_list(recordlist)
-    for recid, rlist in tuples:
-        #just return recid - length
-        if rlist:
-            tmp = [recid, len(rlist)]
-        else:
-            tmp = [recid, 0]
-        result.append(tmp)
+    for recid in recordlist:
+        result.append([recid, len(cache_cited_by_dictionary.get(recid, []))])
     return result
 
 def calculate_cited_by_list(record_id, sort_order="d"):
