@@ -88,6 +88,8 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
                 if os.path.exists(possible_original_path):
                     icon_location = original_location
                     original_location = possible_original_path
+                    new_url = build_url(sysno, "icon-" + name,
+                                        file_type, extension)
 
             docname = build_docname(name, file_type, extension)
             write_fft(original_location,
