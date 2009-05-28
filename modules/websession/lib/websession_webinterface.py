@@ -304,9 +304,22 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         prefs = webuser.get_user_preferences(uid)
         mess = ''
-
         if args['email']:
             args['email'] = args['email'].lower()
+
+        #change the bibcatalog settings
+        if args['bibcatalog_username'] or args['bibcatalog_password']:
+            act = "/youraccount/display?ln=%s" % args['ln']
+            linkname = _("Show account")
+            if ((len(args['bibcatalog_username']) == 0) or (len(args['bibcatalog_password']) == 0)):
+                title = _("Editing bibcatalog authorization failed")
+                mess = _("Empty username or password")
+            else:
+                title = _("Settings edited")
+                prefs['bibcatalog_username'] = args['bibcatalog_username']
+                prefs['bibcatalog_password'] = args['bibcatalog_password']
+                webuser.set_user_preferences(uid, prefs)
+                mess = _("User settings saved correctly.")
 
         if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
                 and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION.keys():
@@ -448,18 +461,6 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
             mess = _("User settings saved correctly.")
-        elif args['bibcatalog_username'] or args['bibcatalog_password']:
-            act = "/youraccount/display?ln=%s" % args['ln']
-            linkname = _("Show account")
-            if ((len(args['bibcatalog_username']) == 0) or (len(args['bibcatalog_password']) == 0)):
-                title = _("Editing bibcatalog authorization failed")
-                mess = _("Empty username or password")
-            else:
-                title = _("Settings edited")
-                prefs['bibcatalog_username'] = args['bibcatalog_username']
-                prefs['bibcatalog_password'] = args['bibcatalog_password']
-                webuser.set_user_preferences(uid, prefs)
-                mess = _("User settings saved correctly.")
         else:
             mess = _("Unable to update settings.")
             act = "/youraccount/edit?ln=%s" % args['ln']
