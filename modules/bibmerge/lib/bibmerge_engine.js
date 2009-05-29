@@ -1,3 +1,22 @@
+/*
+ * This file is part of CDS Invenio.
+ * Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 2009 CERN.
+ *
+ * CDS Invenio is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
+ *
+ * CDS Invenio is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+ */
+
 var gRecID1 = null;
 var gRecID2 = null;
 var gSelectedSubfield = null;
@@ -102,21 +121,194 @@ function changeAndSerializeHash(updateData) {
 
 function initContent() {
   initFieldGroupHeaders(".bibMergeHeaderFieldnum"); //initialize all of them
+  $('#bibMergeContent a').live('click', resetDiffs);
   $('.bibMergeFieldGroupRefresh').live('click', onclickFieldGroupRefresh);
-  $('.bibMergeFieldGroupDiff').live('click', onclickFieldGroupRefresh);
+  //$('.bibMergeFieldGroupDiff').live('click', onclickFieldGroupRefresh);
   $('.bibMergeFieldGroupMerge').live('click', onclickFieldGroupMerge)
   $('.bibMergeFieldGroupMergeNC').live('click', onclickFieldGroupMerge)
   $('.bibMergeFieldReplace').live('click', onclickFieldReplace);
   $('.bibMergeFieldAdd').live('click', onclickFieldAdd);
   $('.bibMergeFieldDelete').live('click', onclickFieldDelete);
   $('.bibMergeFieldMerge').live('click', onclickFieldMerge);
+  $('.bibMergeSubfieldDelete').live('click', onclickSubfieldDelete);
+  $('.bibMergeSubfieldReplace').live('click', onclickSubfieldReplace);
+  $('.bibMergeSubfieldAdd').live('click', onclickSubfieldAdd);
+  $('.bibMergeFieldGroupDiff').live('click', onclickSubfieldDiff);
   $('#bibMergeContent a:not([class])').live('click', notImplemented);
+}
+function resetDiffs() {
+  $('#bibMergeContent td:has(span.bibMergeDiffSpanSame, span.bibMergeDiffSpanIns, span.bibMergeDiffSpanDel, span.bibMergeDiffSpanSub, )').each(function (i) {
+    var subfield_value = $(this).text();
+    $(this).html( subfield_value );
+  });
+}
+function getSubfieldInfo(subfield) {
+  var sfinfo = {}; //result
+  sfinfo.sfindex1 = -1;
+  sfinfo.sfindex2 = -1;
+  sfinfo.subfield_lines = 0;
+  var currTR = subfield.parents('tr');
+  var currSF1id = currTR.children('td').eq(1).attr('id');
+  while(!currSF1id) {
+    sfinfo.subfield_lines++;
+    if ( currTR.children('td').eq(1).text() != '')
+      sfinfo.sfindex1++;
+    if ( currTR.children('td').eq(3).text() != '')
+      sfinfo.sfindex2++;
+    currTR = currTR.prev('tr');
+    currSF1id = currTR.children('td').eq(1).attr('id');
+  }
+  sfinfo.field1id = currSF1id;
+  sfinfo.field2id = currTR.children('td').eq(3).attr('id');
+  sfinfo.numOfSubfields1 = sfinfo.sfindex1 + 1;
+  sfinfo.numOfSubfields2 = sfinfo.sfindex2 + 1;
+
+  currTR = subfield.parents('tr');
+  currTR = currTR.next('tr');
+  while( currTR.size() > 0 && !currTR.children('td').eq(1).attr('id')) {
+    sfinfo.subfield_lines++;
+    if ( currTR.children('td').eq(1).text() != '')
+      sfinfo.numOfSubfields1++;
+    if ( currTR.children('td').eq(3).text() != '')
+      sfinfo.numOfSubfields2++;
+    currTR = currTR.next('tr');
+  }
+  return sfinfo;
+}
+function onclickSubfieldDiff() {
+  var sfinfo = getSubfieldInfo( $(this) );
+  var currTR = $(this).parents('tr'); //the current row of the table
+  var value1 = currTR.children('td').eq(1).text();
+  var value2 = currTR.children('td').eq(3).text();
+  //if one of the subfields is empty
+  if (value1 == '' || value2 == '')
+    showMessage('ErrorMsg', 'One of the subfields is missing, no difference to show', 6000);
+  else if (value1 == value2)
+    showMessage('OKMsg', 'Subfields are identical, no difference to show', 6000);
+  else {
+    //ajax request to get the diffed row from server side
+    var _data = {
+      requestType: 'diffSubfield',
+      recID1: gRecID1,
+      recID2: gRecID2,
+      fieldCode1: sfinfo.field1id,
+      fieldCode2: sfinfo.field2id,
+      sfindex1: sfinfo.sfindex1,
+      sfindex2: sfinfo.sfindex2
+    };
+    showMessage('LoadingMsg', 'Diffing subfields...');
+    ajaxRequest(_data, function(html){
+      var prevTR = currTR.prev('tr');
+      currTR.remove();
+      prevTR.after(html);
+    });
+  }
+  return false;
+}
+function onclickSubfieldDelete() {
+  var sfinfo = getSubfieldInfo( $(this) );
+  var currTR = $(this).parents('tr');
+  if (currTR.children('td').eq(1).text() == '') { //if subfield1 is empty
+    showMessage('ErrorMsg', 'Cannot delete subfield that doesn\'t exist', 6000);
+    return false;
+  }
+  if (sfinfo.numOfSubfields1 == 1) //if field has one subfield, then delete field
+    $("td#"+ sfinfo.field1id +" a.bibMergeFieldDelete").click();
+  else {
+    //ajax request to delete subfield on the server side
+    var _data = {
+      requestType: 'deleteSubfield',
+      recID1: gRecID1,
+      recID2: gRecID2,
+      fieldCode1: sfinfo.field1id,
+      fieldCode2: sfinfo.field2id,
+      sfindex1: sfinfo.sfindex1,
+      sfindex2: sfinfo.sfindex2
+    };
+    showMessage('LoadingMsg', 'Deleting subfield...');
+    ajaxRequest(_data, function(html){} );
+    //perform deletion on the client side
+    if (currTR.children('td').eq(3).text() == '') //if subfield2 is empty
+      currTR.remove();
+    else
+      currTR.children('td').eq(1).empty();
+    currTR.children('td.bibMergeCellSimilarityGreen').attr('class', 'bibMergeCellSimilarityRed');
+  }
+  return false;
+}
+function onclickSubfieldReplace() {
+  var sfinfo = getSubfieldInfo( $(this) );
+  var currTR = $(this).parents('tr');
+  if (currTR.children('td').eq(3).text() == '') { //if subfield2 is empty
+    showMessage('ErrorMsg', 'Cannot replace subfield with one that doesn\'t exist', 6000);
+    return false;
+  }
+  if (currTR.children('td').eq(1).text() != '') { //if subfield1 is not empty
+    //ajax request to replace subfield on the server side
+    var _data = {
+      requestType: 'replaceSubfield',
+      recID1: gRecID1,
+      recID2: gRecID2,
+      fieldCode1: sfinfo.field1id,
+      fieldCode2: sfinfo.field2id,
+      sfindex1: sfinfo.sfindex1,
+      sfindex2: sfinfo.sfindex2
+    };
+    showMessage('LoadingMsg', 'Replacing subfield...');
+    ajaxRequest(_data, function(html){} );
+    //perform replacement on the client side
+    currTR.children('td').eq(1).text( currTR.children('td').eq(3).text() );
+    currTR.children('td.bibMergeCellSimilarityRed').attr('class', 'bibMergeCellSimilarityGreen');
+    return false;
+  }
+  else {
+    currTR.children('td').eq(2).children('a.bibMergeSubfieldAdd').click();
+  }
+  return false;
+}
+function onclickSubfieldAdd() {
+  var sfinfo = getSubfieldInfo( $(this) );
+  var currTR = $(this).parents('tr');
+  if (currTR.children('td').eq(3).text() == '') { //if subfield2 is empty
+    showMessage('ErrorMsg', 'Cannot add subfield that doesn\'t exist', 6000);
+    return false;
+  }
+  if (sfinfo.numOfSubfields1 == 0) {//field1 doesn't exist
+    showMessage('ErrorMsg', 'Field in the first record doesn\'t exist. Use Add Field instead which creates a new field', 8000);
+  }
+  else {
+    if (currTR.children('td').eq(1).text() == '') //if subfield1 is empty
+      sfinfo.sfindex1++;  //insertion should be before the next subfield that exists
+
+    //ajax add subfield before sfindex1 on the server side
+    var _data = {
+      requestType: 'addSubfield',
+      recID1: gRecID1,
+      recID2: gRecID2,
+      fieldCode1: sfinfo.field1id,
+      fieldCode2: sfinfo.field2id,
+      sfindex1: sfinfo.sfindex1,
+      sfindex2: sfinfo.sfindex2
+    };
+    showMessage('LoadingMsg', 'Adding subfield...');
+    ajaxRequest(_data, function(html){} );
+    //perform addition of subfield on the client side
+    if (currTR.children('td').eq(1).text() != '') { //if subfield1 is not empty
+      //create another subfield line
+      currTR.after( "<tr>"+ currTR.html() +"</tr>" );
+      currTR.next('tr').children('td').eq(3).empty();
+      currTR.next('tr').children('td.bibMergeCellSimilarityGreen').attr('class', 'bibMergeCellSimilarityRed');
+    }
+    currTR.children('td').eq(1).text( currTR.children('td').eq(3).text() ); //replace value
+    currTR.children('td.bibMergeCellSimilarityRed').attr('class', 'bibMergeCellSimilarityGreen');
+  }
+  return false;
 }
 function onclickFieldMerge() {
   var fieldGroupDiv = $(this).parents('.bibMergeFieldGroupDiv');
   var ftag = getFieldTag(fieldGroupDiv);
-  var fieldID1 = $(this).parents('tr').next().children('td').eq(1).attr('id');
-  var fieldID2 = $(this).parents('tr').next().children('td').eq(3).attr('id');
+  var fieldID1 = $(this).parents('tr').children('td').eq(1).attr('id');
+  var fieldID2 = $(this).parents('tr').children('td').eq(3).attr('id');
   var _data = {
     requestType: 'mergeField',
     recID1: gRecID1,
@@ -141,8 +333,8 @@ function onclickFieldMerge() {
 function onclickFieldDelete() {
   var fieldGroupDiv = $(this).parents('.bibMergeFieldGroupDiv');
   var ftag = getFieldTag(fieldGroupDiv);
-  var fieldID1 = $(this).parents('tr').next().children('td').eq(1).attr('id');
-  var fieldID2 = $(this).parents('tr').next().children('td').eq(3).attr('id');
+  var fieldID1 = $(this).parents('tr').children('td').eq(1).attr('id');
+  var fieldID2 = $(this).parents('tr').children('td').eq(3).attr('id');
   var _data = {
     requestType: 'deleteField',
     recID1: gRecID1,
@@ -167,8 +359,8 @@ function onclickFieldDelete() {
 function onclickFieldAdd() {
   var fieldGroupDiv = $(this).parents('.bibMergeFieldGroupDiv');
   var ftag = getFieldTag(fieldGroupDiv);
-  var fieldID1 = $(this).parents('tr').next().children('td').eq(1).attr('id');
-  var fieldID2 = $(this).parents('tr').next().children('td').eq(3).attr('id');
+  var fieldID1 = $(this).parents('tr').children('td').eq(1).attr('id');
+  var fieldID2 = $(this).parents('tr').children('td').eq(3).attr('id');
   var _data = {
     requestType: 'addField',
     recID1: gRecID1,
@@ -192,8 +384,8 @@ function onclickFieldAdd() {
 function onclickFieldReplace() {
   var fieldGroupDiv = $(this).parents('.bibMergeFieldGroupDiv');
   var ftag = getFieldTag(fieldGroupDiv);
-  var fieldID1 = $(this).parents('tr').next().children('td').eq(1).attr('id');
-  var fieldID2 = $(this).parents('tr').next().children('td').eq(3).attr('id');
+  var fieldID1 = $(this).parents('tr').children('td').eq(1).attr('id');
+  var fieldID2 = $(this).parents('tr').children('td').eq(3).attr('id');
   var _data = {
     requestType: 'replaceField',
     recID1: gRecID1,

@@ -28,6 +28,7 @@ jsdir=$(localstatedir)/www/js
 
 js_DATA = bibmerge_engine.js
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) \
+             $(js_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

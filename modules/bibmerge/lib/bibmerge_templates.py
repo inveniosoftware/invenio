@@ -118,6 +118,17 @@ class Template:
                     result += BM_html_field_group_div(ftag, diff[0][0], diff[0][1], rec1, rec2, show_diffs, diff[1])
         return result
 
+    def BM_html_subfield_row_diffed(self, rec1, rec2, fieldtag, findex1, findex2, sfindex1, sfindex2):
+        sftag = rec1[fieldtag][findex1][0][sfindex1][0]
+        value1 = rec1[fieldtag][findex1][0][sfindex1][1]
+        value2 = rec2[fieldtag][findex2][0][sfindex2][1]
+        if value1 == value2:
+            score = 1.0
+        else:
+            score = 0.0
+        return BM_html_subfield(fieldtag, sftag, value1, value2, score, findex1, sfindex1, findex2, sfindex2, True)
+
+
 ####### Main content html #####################################################
 def BM_html_field_group_div_all(rec1, rec2, show_diffs=False):
     """Produce html code for all the fields. (a <div> for  every field group)"""
@@ -196,13 +207,14 @@ def BM_html_field_group_div(tagnum, ind1, ind2, rec1, rec2, show_diffs, fdiff_li
     result = """
 <div id="bibMergeFGroup-%s" class="bibMergeFieldGroupDiv">
   <div class="bibMergeFieldGroupHeaderDiv">
-    <a href="#" class="bibMergeHeaderFieldnum">%s</a> <a class="bibMergeFieldGroupRefresh" href="#"><img src="/img/refresh.png" /></a> <a class="bibMergeFieldGroupMerge" href="#"><img src="/img/merge.png" /></a> <a class="bibMergeFieldGroupMergeNC" href="#"><img src="/img/mergeNC.png" /></a> <a class="bibMergeFieldGroupDiff" href="#"><img src="/img/diff.png" /></a>
+    <a href="#" class="bibMergeHeaderFieldnum">%s</a> <a class="bibMergeFieldGroupRefresh" href="#"><img src="/img/refresh.png" /></a> <a class="bibMergeFieldGroupMerge" href="#"><img src="/img/merge.png" /></a> <a class="bibMergeFieldGroupMergeNC" href="#"><img src="/img/mergeNC.png" /></a>
   </div>
   <table class="bibMergeFieldTable">
     <col span="1" class="bibMergeColSubfieldTag"/>
     <col span="1" class="bibMergeColContent bibMergeColContentLeft"/>
     <col span="1" class="bibMergeColActions"/>
     <col span="1" class="bibMergeColContent bibMergeColContentRight"/>
+    <col span="1" class="bibMergeColDiff"/>
     <tbody>""" % (ftag, ftag)
 
     # if fields are the same in both records
@@ -240,17 +252,18 @@ def BM_html_field_header(ftag, flist1, findex1, flist2, findex2, show_diffs, sfd
     result ="""
     <tr>
       <td></td>
-      <td class="bibMergeColHeaderLeft">
+      <td %(id1)s class="bibMergeColHeaderLeft">
         <span style="float:left;">%(tagname)s</span>
         <a class="bibMergeFieldMerge" href="#"> <img src="/img/merge-small.png" /> </a>
         <a class="bibMergeFieldDelete" href="#"> <img src="/img/delete-big.png" /> </a> </td>
       <td></td>
-      <td class="bibMergeColHeaderRight">
+      <td %(id2)s class="bibMergeColHeaderRight">
         <a class="bibMergeFieldAdd" href="#"> <img src="/img/add.png" /> </a>
         <a class="bibMergeFieldReplace" href="#"> <img src="/img/replace.png" /> </a>
         <span style="float:right;">%(tagname)s</span> </td>
+      <td></td>
     </tr>
-    """ % {"tagname": ftag}
+    """ % {"tagname": ftag, 'id1': BM_field_id(1, ftag, findex1), 'id2': BM_field_id(2, ftag, findex2)}
 
     if findex1==None:
         sflist2 = flist2[findex2][0]
@@ -311,11 +324,15 @@ def BM_html_subfield(ftag, sftag, value1, value2, score, findex1, sfindex1, find
     return """
     <tr>
       <td class="%s">$%s</td>
-      <td %s><div>%s</div></td>
-      <td><a href="#"> <img src="/img/delete-small.png" /> </a><a href="#"> <img src="/img/move.png" /> </a><a href="#"> <img src="/img/add-small.png" /> </a></td>
-      <td %s><div>%s</div></td>
-    </tr>""" % (similarity_class, sftag, id1, value1, id2, value2)
+      <td><div>%s</div></td>
+      <td><a class="bibMergeSubfieldDelete" href="#"> <img src="/img/delete-small.png" /> </a><a class="bibMergeSubfieldReplace" href="#"> <img src="/img/move.png" /> </a><a class="bibMergeSubfieldAdd" href="#"> <img src="/img/add-small.png" /> </a></td>
+      <td><div>%s</div></td>
+      <td><a class="bibMergeFieldGroupDiff" href="#"><img src="/img/diff.png" /></a></td>
+    </tr>""" % (similarity_class, sftag, value1, value2)
 
+def BM_field_id(record_position, ftag, findex): #record_position = 1 | 2
+    """The id attribute of a subfield is produced."""
+    return 'id="R%s-%s-%s"' % (record_position, ftag, findex)
 def BM_subfield_id(record_position, ftag, findex, sftag, sfindex): #record_position = 1 | 2
     """The id attribute of a subfield is produced."""
     return 'id="R%s-%s-%s-%s-%s"' % (record_position, ftag, findex, sftag, sfindex)

@@ -1716,6 +1716,12 @@ a:hover.bibMergeImgClickable img {
 	border-left: 1px solid #FFCC99;
 	width: 50%;
 }
+.bibMergeColDiff {
+	border-left: 1px solid #FFCC99;
+	min-width: 30px;
+	max-width: 30px;
+	width: 20px;
+}
 .bibMergeColContentLeft { background:#F1F1F1;}
 .bibMergeColContentRight { background:#FFFCF9;}
 .bibMergeColHeaderLeft { background:#BDD5DD;}

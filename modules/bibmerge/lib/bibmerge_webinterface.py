@@ -36,7 +36,8 @@ from invenio.bibmerge_engine import perform_request_init, \
                                     perform_record_compare, \
                                     perform_candidate_record_search, \
                                     perform_request_record, \
-                                    perform_request_update_record
+                                    perform_request_update_record, \
+                                    perform_small_request_update_record
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
             ) % CFG_SITE_URL
@@ -124,6 +125,9 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
                 result = perform_request_update_record(requestType, recid1, recid2, uid, data)
             elif requestType == "searchCanditates":
                 result = perform_candidate_record_search(data['query'])
+            elif requestType == 'deleteSubfield' or requestType == 'addSubfield' \
+               or requestType == 'replaceSubfield' or requestType == 'diffSubfield':
+                result = perform_small_request_update_record(requestType, data, uid)
             else:
                 result = { 'resultCode': 1, 'resultText': 'Error unknown' }
 

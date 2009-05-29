@@ -229,7 +229,7 @@ function onSearchClick(event){
       // Invalid record ID.
       changeAndSerializeHash({state: 'edit', recid: searchPattern});
       cleanUp(true, null, null, true);
-      updateStatus('error', 'Error: Non-existent record');
+      updateStatus('error', gRESULT_CODES[102]);
       $('.headline').text('BibEdit: Record #' + searchPattern);
       displayMessage(102);
     }

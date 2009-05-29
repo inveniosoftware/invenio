@@ -17,6 +17,7 @@ po/POTFILES
 po/stamp-po
 po/*.gmo
 po/*.mo
+*~
 *.pyc
 *.clisp.mem
 *.cmucl.core

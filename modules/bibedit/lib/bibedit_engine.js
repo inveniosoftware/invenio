@@ -204,7 +204,7 @@ function onAjaxSuccess(json, onSuccess){
 	onCancelClick();
 	event.preventDefault();
       });
-      updateStatus('error', 'Error: Cache is outdated');
+      updateStatus('error', 'Error: Record cache is outdated');
     }
     else{
       if (requestType != 'getRecord'){
@@ -311,7 +311,7 @@ function initStateFromHash(){
 	if (isNaN(recID)){
 	  // Invalid record ID.
 	  cleanUp(true, tmpRecID, 'recID', true);
-	  updateStatus('error', 'Error: Non-existent record');
+	    updateStatus('error', gRESULT_CODES[102]);
 	  $('.headline').text('BibEdit: Record #' + tmpRecID);
 	  displayMessage(102);
 	}
@@ -382,6 +382,14 @@ function changeAndSerializeHash(updateData){
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
 }
 
+function notImplemented(event){
+  /*
+   * Handle unimplemented function.
+   */
+  alert('Sorry, this function is not implemented yet!');
+  event.preventDefault();
+}
+
 function cleanUp(disableRecBrowser, searchPattern, searchType,
 		 focusOnSearchBox, resetHeadline){
   /*
@@ -420,6 +428,9 @@ function onMergeClick(event){
    * Handle click on 'Merge' link (to merge outdated cache with current DB
    * version of record).
    */
+  notImplemented(event);
+  /*
+  TODO (when ready in BibMerge):
   updateStatus('updating');
   createReq({recID: gRecID, requestType: 'prepareRecordMerge'}, function(json){
     gRecID = null;
@@ -428,6 +439,7 @@ function onMergeClick(event){
       recID + '&mode=file';
   });
   event.preventDefault();
+  */
 }
 
 function onFieldBoxClick(box){

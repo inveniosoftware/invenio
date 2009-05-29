@@ -315,7 +315,9 @@ function displayMessage(msgCode){
       msg = 'Search term did not match any records.';
       break;
     case 0:
-      msg = 'A server error occured. Please contact your system administrator.';
+      msg = 'A server error has occured. Please contact your system ' +
+	'administrator.<br />' +
+	'Error code: <b>' + msgCode + '</b>';
       break;
     case 4:
       msg = 'Your modifications have now been submitted. ' +
@@ -333,13 +335,15 @@ function displayMessage(msgCode){
 	'try again in a few minutes.';
       break;
     case 106:
-      msg = 'An unexpected server error has occured. You may have lost your ' +
-	'changes to this record.';
+      msg = 'A server error has occured. You may have lost your changes to ' +
+	'this record.<br />' +
+	'Error code: <b>' + msgCode + '</b> (missing cache file)';
       break;
     case 107:
-      msg = 'It seems that you have opened the record in another editor, ' +
-	'perhaps in a different window or computer. A record can only be ' +
-	'edited in one place at the time. Do you want to ' +
+      msg = 'It appears that you have opened this record in another editor, ' +
+	'perhaps in a different window or on a different computer. A record ' +
+	'can only be edited in one place at the time.<br />' +
+	'Do you want to ' +
 	'<b><a href="#"id="lnkGetRecord">reopen the record</a></b> here?';
 	break;
     case 101:
@@ -352,9 +356,9 @@ function displayMessage(msgCode){
       msg = 'Cannot edit deleted record.';
       break;
     default:
-      msg = 'Result code: ' + msgCode;
+      msg = 'Result code: <b>' + msgCode + '</b>';
   }
-  $('#bibEditContent').append('<span id="bibEditMessage">' + msg + '</span>');
+  $('#bibEditContent').append('<div id="bibEditMessage">' + msg + '</div>');
 }
 
 function displayCacheOutdatedOptions(requestType){
@@ -369,33 +373,33 @@ function displayCacheOutdatedOptions(requestType){
   var viewMARCXMLURL = recordURL + '?of=xm';
   var msg = '';
   if (requestType == 'submit')
-    msg = '<div id="bibEditMessage">This record has been changed in the ' +
-      'database while you were editing. You can:<br/><ul>' +
+    msg = '<div id="bibEditMessage">Someone has changed this record ' +
+      'while you were editing. You can:<br/><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
       ' <b><a href="' + viewMARCXMLURL + '" target="_blank">MARCXML</a></b>' +
     ') the latest version</li>' +
     '<li><a href="#" id="lnkMergeCache"><b>Merge</b></a> your changes ' +
-    'with the new version by using the merge interface</li>' +
-    '<li><a href="#" id="lnkForceSubmit"><b>Use your changes</b></a> ' +
-    '(force overwrite of the server version)</li>' +
+    'with the latest version by using the merge interface</li>' +
+    '<li><a href="#" id="lnkForceSubmit"><b>Force your changes</b></a> ' +
+    '(<b>Warning: </b>overwrites the latest version)</li>' +
     '<li><a href="#" id="lnkDiscardChanges><b>Discard your changes</b></a> ' +
-    '(keep the server version)</li>' +
+    '(keep the latest version)</li>' +
     '</ul></div>';
   else if (requestType == 'getRecord')
-    msg = '<div id="bibEditMessage">You have unsaved changes to this record, ' +
-      'but the record has been changed in the database while you were ' +
-      'editing. You can:<br/><ul>' +
+    msg = '<div id="bibEditMessage">You have unsubmitted changes to this ' +
+      'record, but someone has changed the record while you were editing. ' +
+      'You can:<br/><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
       ' <b><a href="' + viewMARCXMLURL + '" target="_blank">MARCXML</a></b>' +
       ') the latest version</li>' +
       '<li><a href="#" id="lnkMergeCache"><b>Merge</b></a> your changes ' +
-      'with the new version by using the merge interface</li>' +
-      '<li><a href="#" id="lnkDiscardChanges"><b>Load the new version' +
-      '</b></a> from the server (<b>Warning: </b>discards your changes)</li>' +
+      'with the latest version by using the merge interface</li>' +
+      '<li><a href="#" id="lnkDiscardChanges"><b>Get the latest version' +
+      '</b></a> (<b>Warning: </b>discards your changes)</li>' +
       '<li>Keep editing. When submitting you will be offered to overwrite ' +
-      'the server version. Click <a href="#" id="lnkRemoveMsg">here' +
+      'the latest version. Click <a href="#" id="lnkRemoveMsg">here' +
       '</a> to remove this message.</li>' +
       '</ul></div>';
   $('#bibEditContent').prepend(msg);

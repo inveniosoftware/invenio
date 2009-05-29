@@ -248,3 +248,44 @@ def delete_field(rec, fnum, findex):
     """
     record_delete_field(rec, fnum, field_position_local=findex)
 
+def delete_subfield(rec, fnum, findex, sfindex):
+    """Delete a specific subfield.
+    @param rec - a record dictionary structure
+    @param fnum a 3 characters long string indicating field tag number
+    @param findex the rec field position in the group of fields it belongs
+    @param sfindex the index position of the subfield in the field
+    """
+    field = rec[fnum][findex]
+    subfields = field[0]
+    if len(subfields) > 1:
+        del subfields[sfindex]
+
+def replace_subfield(rec1, rec2, fnum, findex1, findex2, sfindex1, sfindex2):
+    """Replaces a subfield of rec1 with a subfield of rec2.
+    @param rec1 - First record (a record dictionary structure)
+    @param rec2 - Second record (a record dictionary structure)
+    @param fnum a 3 characters long string indicating field tag number
+    @param findex1 the rec1 field position in the group of fields it belongs
+    @param findex2 the rec2 field position in the group of fields it belongs
+    @param sfindex1 the index position of the subfield in the field of rec1
+    @param sfindex2 the index position of the subfield in the field of rec2
+    """
+    subfields1 = rec1[fnum][findex1][0]
+    subfields2 = rec2[fnum][findex2][0]
+    subfields1[sfindex1] = subfields2[sfindex2]
+
+def add_subfield(rec1, rec2, fnum, findex1, findex2, sfindex1, sfindex2):
+    """Adds a subfield of rec2 in a field of rec1, before or after sfindex1.
+    @param rec1 - First record (a record dictionary structure)
+    @param rec2 - Second record (a record dictionary structure)
+    @param fnum a 3 characters long string indicating field tag number
+    @param findex1 the rec1 field position in the group of fields it belongs
+    @param findex2 the rec2 field position in the group of fields it belongs
+    @param sfindex1 the index position of the subfield in the field of rec1
+    @param sfindex2 the index position of the subfield in the field of rec2
+    """
+    subfield_to_insert = rec2[fnum][findex2][0][sfindex2]
+    #insert at the sfindex1 position
+    subfields1 = rec1[fnum][findex1][0]
+    subfields1[sfindex1:sfindex1] = [ subfield_to_insert ]
+
