@@ -68,9 +68,7 @@ class Template:
             '            <td colspan="2">%(btnCancel)s</td>\n' \
             '          </tr>\n' \
             '          <tr>\n' \
-            '            <td colspan="2">%(tickets)s</td>\n' \
-            '            <td id="tickets" colspan="2"></td>\n' \
-            '            </td>\n' \
+            '            <td id="tickets" colspan="4"><!--filled by bibedit_menu.js--></td>\n' \
             '          </tr>\n' \
             '          <tr class="bibEditMenuMore">\n' \
             '            <td colspan="4">%(btnDeleteRecord)s</td>\n' \
@@ -92,7 +90,6 @@ class Template:
                                 id='btnSubmit', disabled='disabled'),
             'btnCancel': button('button', 'Cancel', id='btnCancel',
                                 disabled='disabled'),
-            'tickets': "Tickets",
             'imgDeleteRecord': img('/img/trash.png'),
             'btnDeleteRecord': button('button', 'Delete record',
                 id='btnDeleteRecord', disabled='disabled')

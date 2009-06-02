@@ -28,7 +28,7 @@ from invenio.webuser import get_user_preferences
 class BibCatalogSystem:
     """ A template class for ticket support."""
 
-    TICKET_ATTRIBUTES = ['ticketid', 'priority', 'recordid', 'subject', 'text', 'creator', 'owner', 'date', 'status', 'queue', 'url_display', 'url_close']
+    TICKET_ATTRIBUTES = ['ticketid', 'priority', 'recordid', 'subject', 'text', 'creator', 'owner', 'date', 'status', 'queue', 'url_display', 'url_modify', 'url_close']
 
     def check_system(self, uid):
         """Check connectivity. Return a string describing the error or an empty str
@@ -66,7 +66,7 @@ class BibCatalogSystem:
         pass
 
     def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner=""):
-        """submit a ticket. Return 1 on success
+        """submit a ticket. Return ticket number on success, otherwise None
            @param uid: invenio user id
            @type uid: number
            @param subject: set this as the ticket's subject.
@@ -81,6 +81,7 @@ class BibCatalogSystem:
            @type priority: number
            @param owner: set ticket owner to this uid.
            @type owner: number
+           @return: new ticket id or None
         """
         pass
 

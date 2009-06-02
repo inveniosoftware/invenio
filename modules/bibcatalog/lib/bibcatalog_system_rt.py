@@ -88,11 +88,13 @@ class BibCatalogSystemRT(BibCatalogSystem):
         return ""
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
-                      date_from="", date_until="", status="", priority=""):
+                      date_from="", date_until="", status="", priority="", include_resolved=False):
         """returns a list of ticket ID's related to this record or by
            matching the subject, creator or owner of the ticket."""
 
         search_atoms = [] #the search expression will be made by and'ing these
+        if not include_resolved:
+            search_atoms.append("Status != 'resolved'")
         if (recordid > -1):
             #search by recid
             search_atoms.append("CF.{RecordID} = " + escape_shell_arg(str(recordid)))
@@ -173,7 +175,9 @@ class BibCatalogSystemRT(BibCatalogSystem):
         textset = ""
         priorityset = ""
         ownerset = ""
-        subjectset = " subject=" + escape_shell_arg(subject)
+        subjectset = ""
+        if subject:
+            subjectset = " subject=" + escape_shell_arg(subject)
         recidset = " CF-RecordID=" + escape_shell_arg(str(recordid))
         if text:
             textset = " text=" + escape_shell_arg(text)
@@ -199,7 +203,10 @@ class BibCatalogSystemRT(BibCatalogSystem):
         for line in myout.split("\n"):
             if line.count(' ') > 0:
                 stuff = line.split(' ')
-                inum = int(stuff[2])
+                try:
+                    inum = int(stuff[2])
+                except:
+                    pass
         if inum > 0:
             return inum
         return None
@@ -336,6 +343,8 @@ class BibCatalogSystemRT(BibCatalogSystem):
             candict['url_display'] = url_display
             url_close = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Update.html?Action=Resolve&id="+str(ticketid)
             candict['url_close'] = url_close
+            url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Modify.html?id="+str(ticketid)
+            candict['url_modify'] = url_modify
             #change the ticket owner into invenio UID
             if tdict.has_key('owner'):
                 rt_owner = tdict["owner"]

@@ -28,22 +28,26 @@ except ImportError:
     pass # okay, no Ajax app will be possible, but continue anyway
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.bibedit_engine import perform_request_init, perform_request_ajax
+from invenio.bibedit_engine import perform_request_init, perform_request_ajax, \
+    perform_request_record, perform_request_search, \
+    perform_request_update_record, perform_request_user, perform_request_newticket
 from invenio.bibedit_utils import json_unicode_to_utf8
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.search_engine import guess_primary_collection_of_a_record
 from invenio.urlutils import redirect_to_url
-from invenio.webinterface_handler import WebInterfaceDirectory
+from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.webpage import page
 from invenio.webuser import collect_user_info, getUid, page_not_authorized
+from invenio.messages import gettext_set_language
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
             ) % CFG_SITE_URL
 
+
 class WebInterfaceEditPages(WebInterfaceDirectory):
     """Defines the set of /edit pages."""
 
-    _exports = ['']
+    _exports = ['', 'new_ticket']
 
     def __init__(self, recid=None):
         """Initialize."""
@@ -125,6 +129,32 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             json_response.update(perform_request_ajax(req, recid, uid,
                                                       json_data))
             return json.dumps(json_response)
+
+    def new_ticket(self, req, form):
+        """handle a edit/new_ticket request"""
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG), 'recid': (int, 0)})
+        ln = argd['ln']
+        _ = gettext_set_language(ln)
+        auth_code, auth_message = acc_authorize_action(req, 'runbibedit')
+        if auth_code != 0:
+            return page_not_authorized(req=req, referer="/edit",
+                                       text=auth_message, navtrail=navtrail)
+        uid = getUid(req)
+        if argd['recid']:
+            (errmsg, url) = perform_request_newticket(argd['recid'], uid)
+            if errmsg:
+                return page(title       = _("Failed to create a ticket"),
+                            body        = _("Error")+": "+errmsg,
+                            errors      = [],
+                            warnings    = [],
+                            uid         = uid,
+                            language    = ln,
+                            navtrail    = navtrail,
+                            lastupdated = __lastupdated__,
+                            req         = req)
+            else:
+                #redirect..
+                redirect_to_url(req, url)
 
     def __call__(self, req, form):
         """Redirect calls without final slash."""
