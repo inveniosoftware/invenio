@@ -421,6 +421,8 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
     $('#sctSearchType').val(searchPattern);
   if (focusOnSearchBox)
     $('#txtSearchPattern').focus();
+  // Clear tickets.
+  $('#tickets').empty();
   // Clear data.
   gRecID = null;
   gRecord = null;

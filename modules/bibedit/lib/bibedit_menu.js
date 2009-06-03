@@ -364,9 +364,8 @@ function onGetRecordSuccess(json){
     $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
   // Unfocus record selection field (to facilitate hotkeys).
   $('#txtSearchPattern').blur();
-  tickets = json['tickets'];
-  $('#tickets').html(tickets);
   updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
 }
 
 function onSubmitClick(){
@@ -429,9 +428,23 @@ function onCloneRecordClick(){
   });
 }
 
+function onGetTicketsSuccess(json){
+/*
+ * Handle successfull 'getTickets' requests.
+ */
+  var tickets = json['tickets'];
+  if (json['resultCode'] == 20 && json['tickets'] && gRecID){
+    $('#tickets').html(tickets);
+    $('#lnkNewTicket').bind('click', function(event){
+      setTimeout('createReq({recID: gRecID, requestType: "getTickets"},' +
+		 'onGetTicketsSuccess)', gTICKET_REFRESH_DELAY);
+    });
+  }
+}
+
 function onNextRecordClick(){
   /*
-   * Handle click on the 'Next' button in the record browser.
+   * Handle on the 'Next' button in the record browser.
    */
   updateStatus('updating');
   if (gRecordDirty){
@@ -456,7 +469,7 @@ function onNextRecordClick(){
 
 function onPrevRecordClick(){
   /*
-   * Handle click on the 'Previous' button in the record browser.
+   * Handle the 'Previous' button in the record browser.
    */
   updateStatus('updating');
   if (gRecordDirty){

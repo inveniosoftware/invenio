@@ -60,6 +60,10 @@ CFG_BIBEDIT_JS_NEW_FIELDS_COLOR = 'lightgreen'
 ## fading of new fields' highlighting.
 CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION = 2000
 
+## CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY - Duration (in ms) before refreshing
+## a record's tickets after the user clicks on the link to create a new one.
+CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY = 5000
+
 ## CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
 ## by the Ajax engine.
 CFG_BIBEDIT_AJAX_RESULT_CODES = {
@@ -86,6 +90,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     28: 'Subfield deleted',
     29: 'Subfields deleted',
     30: 'Selection deleted',
+    31: 'Tickets retrieved',
     100: 'Error: Not logged in',
     101: 'Error: Permission denied',
     102: 'Error: Non-existent record',

@@ -20,13 +20,14 @@
 
 __revision__ = "$Id"
 
-from invenio.bibedit_config import CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
-    CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_STATUS_ERROR_TIME, \
-    CFG_BIBEDIT_JS_STATUS_INFO_TIME, CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR, \
+from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
+    CFG_BIBEDIT_JS_CHECK_SCROLL_INTERVAL, CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
+    CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR, \
     CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR_FADE_DURATION, \
     CFG_BIBEDIT_JS_NEW_FIELDS_COLOR, \
     CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION, \
-    CFG_BIBEDIT_AJAX_RESULT_CODES, CFG_BIBEDIT_MAX_SEARCH_RESULTS, \
+    CFG_BIBEDIT_JS_STATUS_ERROR_TIME, CFG_BIBEDIT_JS_STATUS_INFO_TIME, \
+    CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY, CFG_BIBEDIT_MAX_SEARCH_RESULTS, \
     CFG_BIBEDIT_TAG_FORMAT
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id
 from invenio.bibedit_utils import cache_exists, cache_expired, \
@@ -82,7 +83,8 @@ def perform_request_init():
             'gNEW_FIELDS_COLOR': '"' + CFG_BIBEDIT_JS_NEW_FIELDS_COLOR + '"',
             'gNEW_FIELDS_COLOR_FADE_DURATION':
                 CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION,
-            'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES,
+            'gTICKET_REFRESH_DELAY': CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY,
+            'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -106,6 +108,23 @@ def perform_request_init():
 
     return body, errors, warnings
 
+def perform_request_newticket(recid, uid):
+    """create a new ticket with this record's number
+    @param recid: record id
+    @param uid: user id
+    @return: (error_msg, url)
+
+    """
+    t_id = bibcatalog_system.ticket_submit(uid, "", recid, "")
+    t_url = ""
+    errmsg = ""
+    if t_id:
+        #get the ticket's URL
+        t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_modify')
+    else:
+        errmsg = "ticket_submit failed"
+    return (errmsg, t_url)
+
 def perform_request_ajax(req, recid, uid, data):
     """Handle Ajax requests by redirecting to appropriate function."""
     response = {}
@@ -123,10 +142,15 @@ def perform_request_ajax(req, recid, uid, data):
         # 'Major' record related requests.
         response.update(perform_request_record(req, request_type, recid, uid,
                                                data))
-    else:
+    elif request_type in ('addField', 'addSubfields', 'modifyContent', \
+                              'moveSubfield', 'deleteFields'):
         # Record updates.
-        response.update(perform_request_update_record(
+        response.update(perform_request_bibcatalog(
                 request_type, recid, uid, data))
+
+    elif request_type in ('getTickets'):
+        # BibCatalog requests.
+        response.update(perform_request_bibcatalog(request_type, recid, uid))
 
     return response
 
@@ -243,26 +267,6 @@ def perform_request_record(req, request_type, recid, uid, data):
             response['resultCode'], response['cacheDirty'], \
                 response['record'], response['cacheMTime'] = 3, cache_dirty, \
                 record, mtime
-            # Insert the ticket data in the response, if possible
-            if uid:
-                bibcat_resp = bibcatalog_system.check_system(uid)
-                if bibcat_resp == "":
-                    tickets_found = bibcatalog_system.ticket_search(uid, recordid=recid)
-                    t_url_str = '' #put ticket urls here, formatted for HTML display
-                    for t_id in tickets_found:
-                        #t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_display')
-                        ticket_info = bibcatalog_system.ticket_get_info(uid, t_id, ['url_display','url_close'])
-                        t_url = ticket_info['url_display']
-                        t_close_url = ticket_info['url_close']
-                        #format..
-                        t_url_str += "#"+str(t_id)+'<a href="'+t_url+'" target="_blank">[read]</a> <a href="'+t_close_url+'" target="_blank">[close]</a><br/>'
-                    #put ticket header and tickets links in the box
-                    t_url_str = "<strong>Tickets</strong><br/>"+t_url_str+"<br/>"+'<a href="new_ticket?recid='+str(recid)+'" target="_blank">[new ticket]<a>'
-                    response['tickets'] = t_url_str
-                    #add a new ticket link
-                else:
-                    #put something in the tickets container, for debug
-                    response['tickets'] = "<!--"+bibcat_resp+"-->"
             # Set tag format from user's session settings.
             try:
                 tagformat_settings = session_param_get(req, 'bibedit_tagformat')
@@ -460,18 +464,33 @@ def perform_request_update_record(request_type, recid, uid, data):
 
     return response
 
-def perform_request_newticket(recid, uid):
-    """create a new ticket with this record's number
-       @param recid: record id
-       @param uid: user id
-       @return: (error_msg, url)
+def perform_request_bibcatalog(request_type, recid, uid):
+    """Handle request to BibCatalog (RT).
+
     """
-    t_id = bibcatalog_system.ticket_submit(uid, "", recid, "")
-    t_url = ""
-    errmsg = ""
-    if t_id:
-        #get the ticket's URL
-        t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_modify')
-    else:
-        errmsg = "ticket_submit failed"
-    return (errmsg, t_url)
+    response = {}
+
+    if request_type == 'getTickets':
+        # Insert the ticket data in the response, if possible
+        if uid:
+            bibcat_resp = bibcatalog_system.check_system(uid)
+            if bibcat_resp == "":
+                tickets_found = bibcatalog_system.ticket_search(uid, recordid=recid)
+                t_url_str = '' #put ticket urls here, formatted for HTML display
+                for t_id in tickets_found:
+                    #t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_display')
+                    ticket_info = bibcatalog_system.ticket_get_info(uid, t_id, ['url_display','url_close'])
+                    t_url = ticket_info['url_display']
+                    t_close_url = ticket_info['url_close']
+                    #format..
+                    t_url_str += "#"+str(t_id)+'<a href="'+t_url+'" target="_blank">[read]</a> <a href="'+t_close_url+'" target="_blank">[close]</a><br/>'
+                #put ticket header and tickets links in the box
+                t_url_str = "<strong>Tickets</strong><br/>"+t_url_str+"<br/>"+'<a href="new_ticket?recid=' + str(recid) + '" id="lnkNewTicket" target="_blank">[new ticket]<a>'
+                response['tickets'] = t_url_str
+                #add a new ticket link
+            else:
+                #put something in the tickets container, for debug
+                response['tickets'] = "<!--"+bibcat_resp+"-->"
+        response['resultCode'] = 31
+
+    return response

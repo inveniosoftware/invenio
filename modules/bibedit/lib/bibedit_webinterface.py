@@ -30,17 +30,16 @@ except ImportError:
     pass
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.bibedit_engine import perform_request_init, perform_request_ajax, \
-    perform_request_record, perform_request_search, \
-    perform_request_update_record, perform_request_user, perform_request_newticket
+from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
+    perform_request_newticket
 from invenio.bibedit_utils import json_unicode_to_utf8
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
+from invenio.messages import gettext_set_language
 from invenio.search_engine import guess_primary_collection_of_a_record
 from invenio.urlutils import redirect_to_url
 from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
 from invenio.webpage import page
 from invenio.webuser import collect_user_info, getUid, page_not_authorized
-from invenio.messages import gettext_set_language
 
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
             ) % CFG_SITE_URL
