@@ -175,7 +175,6 @@ class Template:
                 <table>
                   <tr>
                     <td align="right"><strong><label for="old_password">%(old_password)s:</label></strong><br />
-                      <small class="important">(%(mandatory)s)</small>
                     </td><td align="left">
                       <input type="password" size="25" name="old_password" id="old_password" %(password_disabled)s /><br />
                       <small><span class="quicknote">%(note)s:</span>
@@ -185,7 +184,6 @@ class Template:
                   </tr>
                   <tr>
                     <td align="right"><strong><label for="new_password">%(new_password)s:</label></strong><br />
-                      <small class="quicknote">(%(optional)s)</small>
                     </td><td align="left">
                       <input type="password" size="25" name="password" id="new_password" %(password_disabled)s /><br />
                       <small><span class="quicknote">%(note)s:</span>

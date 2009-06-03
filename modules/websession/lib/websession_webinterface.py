@@ -290,37 +290,33 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'bibcatalog_password' : (str, None),
             })
 
-        # sanity checks:
+        ## Wash arguments:
         args['login_method'] = wash_login_method(args['login_method'])
+        if args['email']:
+            args['email'] = args['email'].lower()
 
-        uid = webuser.getUid(req)
-
-        # load the right message language
+        ## Load the right message language:
         _ = gettext_set_language(args['ln'])
 
+        ## Identify user and load old preferences:
+        uid = webuser.getUid(req)
+        prefs = webuser.get_user_preferences(uid)
+
+        ## Check rights:
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/change",
                                                navmenuid='youraccount')
 
-        prefs = webuser.get_user_preferences(uid)
+        # FIXME: the branching below is far from optimal.  Should be
+        # based on the submitted form name ids, to know precisely on
+        # which form the user clicked.  Not on the passed values, as
+        # is the case now.  The function body is too big and in bad
+        # need of refactoring anyway.
+
+        ## Will hold the output messages:
         mess = ''
-        if args['email']:
-            args['email'] = args['email'].lower()
 
-        #change the bibcatalog settings
-        if args['bibcatalog_username'] or args['bibcatalog_password']:
-            act = "/youraccount/display?ln=%s" % args['ln']
-            linkname = _("Show account")
-            if ((len(args['bibcatalog_username']) == 0) or (len(args['bibcatalog_password']) == 0)):
-                title = _("Editing bibcatalog authorization failed")
-                mess = _("Empty username or password")
-            else:
-                title = _("Settings edited")
-                prefs['bibcatalog_username'] = args['bibcatalog_username']
-                prefs['bibcatalog_password'] = args['bibcatalog_password']
-                webuser.set_user_preferences(uid, prefs)
-                mess = _("User settings saved correctly.")
-
+        ## Change login method if needed:
         if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
                 and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION.keys():
             title = _("Settings edited")
@@ -328,14 +324,16 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             linkname = _("Show account")
 
             if prefs['login_method'] != args['login_method']:
-                if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0]:
+                if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
+                    mess += '<p>' + _("Unable to change login method.")
+                elif not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0]:
                     # Switching to internal authentication: we drop any external datas
                     p_email = webuser.get_email(uid)
                     webuser.drop_external_settings(uid)
                     webgroup_dblayer.drop_external_groups(uid)
                     prefs['login_method'] = args['login_method']
                     webuser.set_user_preferences(uid, prefs)
-                    mess = "<p>" + _("Switched to internal login method.") + " "
+                    mess += "<p>" + _("Switched to internal login method.") + " "
                     mess += _("Please note that if this is the first time that you are using this account "
                               "with the internal login method then the system has set for you "
                               "a randomly generated password. Please click the "
@@ -354,25 +352,20 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     else:
                         email = None
                     if not email:
-                        mess = _("Unable to switch to external login method %s, because your email address is unknown.") % cgi.escape(args['login_method'])
+                        mess += '<p>' + _("Unable to switch to external login method %s, because your email address is unknown.") % cgi.escape(args['login_method'])
                     else:
                         try:
                             if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0].user_exists(email):
-                                mess = _("Unable to switch to external login method %s, because your email address is unknown to the external login system.") % cgi.escape(args['login_method'])
+                                mess += '<p>' +  _("Unable to switch to external login method %s, because your email address is unknown to the external login system.") % cgi.escape(args['login_method'])
                             else:
                                 prefs['login_method'] = args['login_method']
                                 webuser.set_user_preferences(uid, prefs)
-                                mess = _("Login method successfully selected.")
+                                mess += '<p>' + _("Login method successfully selected.")
                         except AttributeError:
-                            mess = _("The external login method %s does not support email address based logins.  Please contact the site administrators.") % cgi.escape(args['login_method'])
+                            mess += '<p>' + _("The external login method %s does not support email address based logins.  Please contact the site administrators.") % cgi.escape(args['login_method'])
 
-        elif args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
-            return webuser.page_not_authorized(req, "../youraccount/change",
-                                               navmenuid='youraccount')
-        elif args['email']:
-            # We should ignore the password if the authentication method is an
-            # external one.
-            ignore_password_p = CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][0] != None
+        ## Change email or nickname:
+        if args['email'] or args['nickname']:
             uid2 = webuser.emailUnique(args['email'])
             uid_with_the_same_nickname = webuser.nicknameUnique(args['nickname'])
             if (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2 or (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and \
@@ -388,59 +381,70 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     return webuser.page_not_authorized(req, "../youraccount/change",
                                                        navmenuid='youraccount')
                 if change:
-                    mess = _("Settings successfully edited.")
+                    mess += '<p>' + _("Settings successfully edited.")
+                    mess += '<p>' + _("Note that if you have changed your email address, "
+                                      "you will have to %(x_url_open)sreset your password%(x_url_close)s anew.") % \
+                                      {'x_url_open': '<a href="%s">' % (CFG_SITE_SECURE_URL + '/youraccount/lost?ln=%s' % args['ln']),
+                                       'x_url_close': '</a>'}
                 act = "/youraccount/display?ln=%s" % args['ln']
                 linkname = _("Show account")
                 title = _("Settings edited")
             elif args['nickname'] is not None and not webuser.nickname_valid_p(args['nickname']):
-                mess = _("Desired nickname %s is invalid.") % cgi.escape(args['nickname'])
+                mess += '<p>' + _("Desired nickname %s is invalid.") % cgi.escape(args['nickname'])
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif not webuser.email_valid_p(args['email']):
-                mess = _("Supplied email address %s is invalid.") % cgi.escape(args['email'])
+                mess += '<p>' + _("Supplied email address %s is invalid.") % cgi.escape(args['email'])
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid2 == -1 or uid2 != uid and not uid2 == 0:
-                mess = _("Supplied email address %s already exists in the database.") % cgi.escape(args['email'])
+                mess += '<p>' + _("Supplied email address %s already exists in the database.") % cgi.escape(args['email'])
                 mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
                 mess += " " + _("Or please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid_with_the_same_nickname == -1 or uid_with_the_same_nickname != uid and not uid_with_the_same_nickname == 0:
-                mess = _("Desired nickname %s is already in use.") % cgi.escape(args['nickname'])
+                mess += '<p>' + _("Desired nickname %s is already in use.") % cgi.escape(args['nickname'])
                 mess += " " + _("Please try again.")
                 act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
-        elif args['old_password'] != None and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-            res = run_sql("SELECT id FROM user "
-                "WHERE AES_ENCRYPT(email,%s)=password AND id=%s",
-                (args['old_password'], uid))
-            if res:
-                if args['password'] == args['password2']:
-                    webuser.updatePasswordUser(uid, args['password'])
-                    mess = _("Password successfully edited.")
-                    act = "/youraccount/display?ln=%s" % args['ln']
-                    linkname = _("Show account")
-                    title = _("Password edited")
+
+        ## Change passwords:
+        if args['old_password'] or args['password'] or args['password2']:
+            if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 3:
+                mess += '<p>' + _("Users cannot edit passwords on this site.")
+            else:
+                res = run_sql("SELECT id FROM user "
+                    "WHERE AES_ENCRYPT(email,%s)=password AND id=%s",
+                    (args['old_password'], uid))
+                if res:
+                    if args['password'] == args['password2']:
+                        webuser.updatePasswordUser(uid, args['password'])
+                        mess += '<p>' + _("Password successfully edited.")
+                        act = "/youraccount/display?ln=%s" % args['ln']
+                        linkname = _("Show account")
+                        title = _("Password edited")
+                    else:
+                        mess += '<p>' + _("Both passwords must match.")
+                        mess += " " + _("Please try again.")
+                        act = "/youraccount/edit?ln=%s" % args['ln']
+                        linkname = _("Edit settings")
+                        title = _("Editing password failed")
                 else:
-                    mess = _("Both passwords must match.")
+                    mess += '<p>' + _("Wrong old password inserted.")
                     mess += " " + _("Please try again.")
                     act = "/youraccount/edit?ln=%s" % args['ln']
                     linkname = _("Edit settings")
                     title = _("Editing password failed")
-            else:
-                mess = _("Wrong old password inserted.")
-                mess += " " + _("Please try again.")
-                act = "/youraccount/edit?ln=%s" % args['ln']
-                linkname = _("Edit settings")
-                title = _("Editing password failed")
-        elif args['group_records']:
+
+        ## Change search-related settings:
+        if args['group_records']:
             prefs = webuser.get_user_preferences(uid)
             prefs['websearch_group_records'] = args['group_records']
             prefs['websearch_latestbox'] = args['latestbox']
@@ -449,8 +453,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             title = _("Settings edited")
             act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
-            mess = _("User settings saved correctly.")
-        elif args['lang']:
+            mess += '<p>' + _("User settings saved correctly.")
+
+        ## Change language-related settings:
+        if args['lang']:
             lang = wash_language(args['lang'])
             prefs = webuser.get_user_preferences(uid)
             prefs['language'] = lang
@@ -460,13 +466,32 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             title = _("Settings edited")
             act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
-            mess = _("User settings saved correctly.")
-        else:
+            mess += '<p>' + _("User settings saved correctly.")
+
+        ## Edit cataloging-related settings:
+        if args['bibcatalog_username'] or args['bibcatalog_password']:
+            act = "/youraccount/display?ln=%s" % args['ln']
+            linkname = _("Show account")
+            if ((len(args['bibcatalog_username']) == 0) or (len(args['bibcatalog_password']) == 0)):
+                title = _("Editing bibcatalog authorization failed")
+                mess += '<p>' + _("Empty username or password")
+            else:
+                title = _("Settings edited")
+                prefs['bibcatalog_username'] = args['bibcatalog_username']
+                prefs['bibcatalog_password'] = args['bibcatalog_password']
+                webuser.set_user_preferences(uid, prefs)
+                mess += '<p>' + _("User settings saved correctly.")
+
+        if not mess:
             mess = _("Unable to update settings.")
+        if not act:
             act = "/youraccount/edit?ln=%s" % args['ln']
+        if not linkname:
             linkname = _("Edit settings")
+        if not title:
             title = _("Editing settings failed")
 
+        ## Finally, output the results:
         return page(title=title,
                     body=webaccount.perform_back(mess, act, linkname, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
