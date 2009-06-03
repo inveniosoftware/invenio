@@ -201,7 +201,7 @@ def get_permitted_restricted_collections(user_info):
 
 def is_user_owner_of_record(user_info, recid):
     """
-    Check if the user is owner of the record, i.e. he is the submitter 
+    Check if the user is owner of the record, i.e. he is the submitter
     and/or belongs to a owner-like group authorized to 'see' the record.
 
     @param user_info: the user_info dictionary that describe the user.
@@ -237,12 +237,10 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
-    if is_user_owner_of_record(user_info, recid):
-        return (0, '')
     record_primary_collection = guess_primary_collection_of_a_record(recid)
     if collection_restricted_p(record_primary_collection):
         (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-        if auth_code == 0 or _is_user_in_authorized_author_list_for_recid(user_info, recid):
+        if auth_code == 0 or is_user_owner_of_record(user_info, recid):
             return (0, '')
         else:
             return (auth_code, auth_msg)
