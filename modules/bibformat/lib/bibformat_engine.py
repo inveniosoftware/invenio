@@ -380,7 +380,12 @@ def decide_format_template(bfo, of):
     output_format = get_output_format(of)
 
     for rule in output_format['rules']:
-        value = bfo.field(rule['field']).strip()#Remove spaces
+        if rule['field'].startswith('00'):
+            # Rule uses controlfield
+            value = bfo.control_field(rule['field']).strip() #Remove spaces
+        else:
+            # Rule uses datafield
+            value = bfo.field(rule['field']).strip() #Remove spaces
         pattern = rule['value'].strip() #Remove spaces
         match_obj = re.match(pattern, value, re.IGNORECASE)
         if match_obj is not None and \
