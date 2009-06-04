@@ -138,28 +138,34 @@ def get_existing_records_for_reportnumber(reportnum):
     """Given a report number, return a list of recids of real (live) records
        that are associated with it.
        That's to say if the record does not exist (prehaps deleted, for example)
-       it's recid will now be returned in the list.
+       its recid will now be returned in the list.
 
        @param reportnum: the report number for which recids are to be returned.
        @type reportnum: string
        @return: list of recids.
        @rtype: list
-       @note: Searches directly in bibxxx tables via MARC tags, so that the
-           record does not have to be phrase-indexed.
+       @note: If reportnum was not found in phrase indexes, the function searches
+           directly in bibxxx tables via MARC tags, so that the record does not
+           have to be phrase-indexed.
     """
     existing_records = []  ## List of the report numbers of existing records
 
-    ## Get list of records with the report-number rn:
-    reclist = []
-    tags = get_field_tags("reportnumber")
-    for tag in tags:
-        recids = list(search_pattern(req=None,
-                                     p=reportnum,
-                                     f=tag,
-                                     m="e"))
-        reclist.extend(recids)
+    ## Get list of records with the report-number: (first in phrase indexes)
+    reclist = list(search_pattern(req=None,
+                                  p=reportnum,
+                                  f="reportnumber",
+                                  m="e"))
+    if not reclist:
+        # Maybe the record has not been indexed yet? (look in bibxxx tables)
+        tags = get_field_tags("reportnumber")
+        for tag in tags:
+            recids = list(search_pattern(req=None,
+                                         p=reportnum,
+                                         f=tag,
+                                         m="e"))
+            reclist.extend(recids)
 
-    reclist = dict.fromkeys(reclist).keys() # Remove duplicates
+        reclist = dict.fromkeys(reclist).keys() # Remove duplicates
 
     ## Loop through all recids retrieved and testing to see whether the record
     ## actually exists or not. If none of the records exist, there is no record
