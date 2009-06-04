@@ -25,7 +25,9 @@ __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 try:
     import simplejson as json
 except ImportError:
-    pass # okay, no Ajax app will be possible, but continue anyway
+    # Okay, no Ajax app will be possible, but continue anyway,
+    # since this package is only recommended, not mandatory.
+    pass
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_init, perform_request_ajax, \

@@ -1,5 +1,3 @@
-## $Id$
-##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -18,7 +16,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable-msg=C0103
-import editdist
+try:
+    import editdist
+except ImportError:
+    # Okay, diffing will not be possible, but continue anyway,
+    # since this package is only recommended, not mandatory.
+    pass
 
 def record_diff(rec1, rec2, compare_subfields, ind1='', ind2=''):
     """Compares two given records

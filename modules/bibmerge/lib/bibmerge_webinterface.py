@@ -22,6 +22,13 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
+try:
+    import simplejson as json
+except ImportError:
+    # Okay, no Ajax app will be possible, but continue anyway,
+    # since this package is only recommended, not mandatory.
+    pass
+
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.search_engine import record_exists
@@ -31,7 +38,6 @@ from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.urlutils import redirect_to_url
 from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio.bibedit_utils import json_unicode_to_utf8
-import simplejson as json
 from invenio.bibmerge_engine import perform_request_init, \
                                     perform_record_compare, \
                                     perform_candidate_record_search, \
