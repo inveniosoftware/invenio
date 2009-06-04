@@ -107,7 +107,9 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         """
         argd = wash_urlargd(form, {'msg_reply_id': (int, 0),
                                    'msg_to': (str, ""),
-                                   'msg_to_group': (str, "")})
+                                   'msg_to_group': (str, ""),
+                                   'msg_subject' : (str, ""),
+                                   'msg_body' : (str, "")})
 
         # Check if user is logged
         uid = getUid(req)
@@ -138,6 +140,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                         msg_reply_id=argd['msg_reply_id'],
                                         msg_to=argd['msg_to'],
                                         msg_to_group=argd['msg_to_group'],
+                                        msg_subject=argd['msg_subject'],
+                                        msg_body=argd['msg_body'],
                                         ln=argd['ln'])
         title = _("Write a message")
 
@@ -154,25 +158,39 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
 
     def send(self, req, form):
         """
-        Sends the message
-        @param msg_to_user: comma separated usernames (str)
-        @param msg_to_group: comma separated groupnames (str)
-        @param msg_subject: message subject (str)
-        @param msg_body: message body (string)
-        @param msg_send_year: year to send this message on (int)
-        @param_msg_send_month: month to send this message on (int)
-        @param_msg_send_day: day to send this message on (int)
+        Sends the message.
+
+        Possible form keys:
+        @param msg_to_user: comma separated usernames.
+        @type msg_to_user: string
+        @param msg_to_group: comma separated groupnames.
+        @type msg_to_group: string
+        @param msg_subject: message subject.
+        @type msg_subject: string
+        @param msg_body: message body.
+        @type msg_body: string
+        @param msg_send_year: year to send this message on.
+        @type msg_send_year: int
+        @param_msg_send_month: month to send this message on
+        @type msg_send_month: year
+        @param_msg_send_day: day to send this message on
+        @type msg_send_day: int
         @param results_field: value determining which results field to display.
                               See CFG_WEBMESSAGE_RESULTS_FIELD in
-                              webmessage_config.py
-        @param names_to_add: list of usernames ['str'] to add to
-                             msg_to_user / group
-        @param search_pattern: will search for users/groups with this pattern
+                              webmessage_config.py.
+        @param names_to_add: list of usernames to add to
+                             msg_to_user / group.
+        @type names_to_add: list of strings
+        @param search_pattern: will search for users/groups with this pattern.
+        @type search_pattern: string
         @param add_values: if 1 users_to_add will be added to msg_to_user
-                           field..
-        @param *button: which button was pressed
-        @param ln: language
-        @return a (body, errors, warnings) formed tuple.
+                           field.
+        @type add_values: int
+        @param *button: which button was pressed.
+        @param ln: language.
+        @type ln: string
+        @return: a (body, errors, warnings) formed tuple.
+        @rtype: tuple
         """
         argd = wash_urlargd(form, {'msg_to_user': (str, ""),
                                    'msg_to_group': (str, ""),

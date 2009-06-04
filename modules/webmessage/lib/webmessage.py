@@ -153,21 +153,34 @@ def perform_request_write(uid,
                           msg_reply_id="",
                           msg_to="",
                           msg_to_group="",
+                          msg_subject="",
+                          msg_body="",
                           ln=CFG_SITE_LANG):
     """
     Display a write a message page.
-    @param uid: user id (int)
-    @param msg_reply_id: if this message is a reply to another, other's ID (int)
-    @param msg_to: comma separated usernames (string)
-    @param msg_to_group: comma separated groupnames (string)
-    @param ln: language
-    @return a (body, errors, warnings) tuple
+
+    @param uid: user id.
+    @type uid: int
+    @param msg_reply_id: if this message is a reply to another, other's ID.
+    @type msg_reply_id: int
+    @param msg_to: comma separated usernames.
+    @type msg_to: string
+    @param msg_to_group: comma separated groupnames.
+    @type msg_to_group: string
+    @param msg_subject: message subject.
+    @type msg_subject: string
+    @param msg_body: message body.
+    @type msg_body: string
+    @param ln: language.
+    @type ln: string
+    @return: (body, errors, warnings).
+    @rtype: tuple
     """
     errors = []
     warnings = []
     body = ""
 
-    msg_from_nickname = msg_subject = msg_body = ""
+    msg_from_nickname = ""
     msg_id = 0
     if (msg_reply_id):
         if (db.check_user_owns_message(uid, msg_reply_id) == 0):

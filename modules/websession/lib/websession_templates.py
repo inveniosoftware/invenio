@@ -34,7 +34,7 @@ from invenio.config import \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
-from invenio.urlutils import make_canonical_urlargd
+from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
 from invenio.htmlutils import escape_html, nmtoken_from_string
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -1909,13 +1909,29 @@ class Template:
         header1 = self.tmpl_group_table_title(text=_("Current members"))
         header2 = self.tmpl_group_table_title(text=_("Members awaiting approval"))
         header3 = _("Invite new members")
-        link_open = '<a href="%s/yourmessages/write?ln=%s">'
-        link_open %= (CFG_SITE_URL, ln)
+        write_a_message_url = create_url(
+            "%s/yourmessages/write" % CFG_SITE_URL,
+            {
+                'ln' : ln,
+                'msg_subject' : _('Invitation to join "%s" group' % escape_html(group_name)),
+                'msg_body' : _("""\
+Hello:
+
+I think you might be interested in joining the group "%s".
+You can join by clicking here: %s.
+
+Best regards.
+""") % (group_name, create_html_link("%s/yourgroups/join" % CFG_SITE_URL, {
+    'grpID' : grpID,
+    'join_button' : "1",
+}, link_label=group_name, escape_urlargd=True, escape_linkattrd=True))})
+
+        link_open = '<a href="%s">' % escape_html(write_a_message_url)
         invite_text = _("If you want to invite new members to join your group, please use the %(x_url_open)sweb message%(x_url_close)s system.") % \
             {'x_url_open': link_open,
              'x_url_close': '</a>'}
         action = CFG_SITE_URL + '/yourgroups/members?ln=' + ln
-        out %= {'title':_('Group: %s') % group_name,
+        out %= {'title':_('Group: %s') % escape_html(group_name),
                 'member_text' : member_text,
                 'pending_text' :pending_text,
                 'action':action,
