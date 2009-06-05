@@ -42,9 +42,6 @@ var gCacheMTime = null;
 // Are we navigating a set of records?
 var gNavigatingRecordSet = false;
 
-// Highest available field number
-var gNewFieldNumber;
-
 // The current hash (fragment part of the URL).
 var gHash;
 // The current hash deserialized to an object.
@@ -461,8 +458,9 @@ function onSubfieldBoxClick(box){
    * Handle subfield select boxes.
    */
   var tmpArray = box.id.split('_');
-  var tag = tmpArray[1], fieldNumber = tmpArray[2], subfieldIndex = tmpArray[3];
-  var fieldID = tag + '_' + fieldNumber;
+  var tag = tmpArray[1], fieldPosition = tmpArray[2],
+    subfieldIndex = tmpArray[3];
+  var fieldID = tag + '_' + fieldPosition;
   var subfieldID = fieldID + '_' + subfieldIndex;
   // If uncheck, uncheck field box and remove selected class.
   if (!box.checked){
@@ -474,7 +472,7 @@ function onSubfieldBoxClick(box){
   // selected class.
   else{
     $('#content_' + subfieldID).addClass('bibEditSelected');
-    var field = getFieldFromTag(tag, fieldNumber);
+    var field = gRecord[tag][fieldPosition];
     if (field[0].length == $(
       '#rowGroup_' + fieldID + ' input[type=checkbox]' +
       '[class=bibEditBoxSubfield]:checked').length){
@@ -490,10 +488,10 @@ function onMoveSubfieldClick(arrow){
    */
   updateStatus('updating');
   var tmpArray = arrow.id.split('_');
-  var btnType = tmpArray[0], tag = tmpArray[1], fieldNumber = tmpArray[2],
+  var btnType = tmpArray[0], tag = tmpArray[1], fieldPosition = tmpArray[2],
     subfieldIndex = tmpArray[3];
-  var fieldID = tag + '_' + fieldNumber;
-  var field = getFieldFromTag(tag, fieldNumber);
+  var fieldID = tag + '_' + fieldPosition;
+  var field = gRecord[tag][fieldPosition];
   var subfields = field[0];
   var newSubfieldIndex;
   if (btnType == 'btnMoveSubfieldUp')
@@ -505,7 +503,7 @@ function onMoveSubfieldClick(arrow){
     recID: gRecID,
     requestType: 'moveSubfield',
     tag: tag,
-    fieldNumber: fieldNumber,
+    fieldPosition: fieldPosition,
     subfieldIndex: subfieldIndex,
     newSubfieldIndex: newSubfieldIndex
   };
@@ -518,7 +516,7 @@ function onMoveSubfieldClick(arrow){
   subfields[subfieldIndex] = subfieldToSwap;
   var rowGroup = $('#rowGroup_' + fieldID);
   var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
-  $(rowGroup).replaceWith(createField(tag, field));
+  $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
   if (coloredRowGroup)
     $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
 }
@@ -541,9 +539,9 @@ function onDoubleClick(event){
 	    // Get the real content from the record structure (in stead of
 	    // from the view, where HTML entities are escaped).
 	    var tmpArray = this.id.split('_');
-	    var tag = tmpArray[1], fieldNumber = tmpArray[2],
+	    var tag = tmpArray[1], fieldPosition = tmpArray[2],
 	      subfieldIndex = tmpArray[3];
-	    var field = getFieldFromTag(tag, fieldNumber);
+	    var field = gRecord[tag][fieldPosition];
 	    if (subfieldIndex == undefined)
 	      // Controlfield
 	      return field[3];
@@ -572,8 +570,8 @@ function onContentChange(value){
    */
   updateStatus('updating');
   var tmpArray = this.id.split('_');
-  var tag = tmpArray[1], fieldNumber = tmpArray[2], subfieldIndex = tmpArray[3];
-  var field = getFieldFromTag(tag, fieldNumber);
+  var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
+  var field = gRecord[tag][fieldPosition];
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   if (subfieldIndex == undefined){
     // Controlfield
@@ -591,7 +589,7 @@ function onContentChange(value){
     recID: gRecID,
     requestType: 'modifyContent',
     tag: tag,
-    fieldNumber: fieldNumber,
+    fieldPosition: fieldPosition,
     subfieldIndex: subfieldIndex,
     subfieldCode: subfieldCode,
     value: value
@@ -663,14 +661,14 @@ function onAddSubfieldsSave(event){
    */
   updateStatus('updating');
   var tmpArray = this.id.split('_');
-  var tag = tmpArray[1], fieldNumber = tmpArray[2];
-  var fieldID = tag + '_' + fieldNumber;
+  var tag = tmpArray[1], fieldPosition = tmpArray[2];
+  var fieldID = tag + '_' + fieldPosition;
   var subfields = [];
   var protectedSubfield = false, invalidOrEmptySubfields = false;
   // Collect valid fields in an array.
   $('#rowGroup_' + fieldID + ' .bibEditTxtSubfieldCode'
    ).each(function(){
-     var MARC = getMARC(tag, fieldNumber) + this.value;
+     var MARC = getMARC(tag, fieldPosition) + this.value;
      if ($.inArray(MARC, gProtectedFields) != -1){
        protectedSubfield = MARC;
        return false;
@@ -705,7 +703,7 @@ function onAddSubfieldsSave(event){
       recID: gRecID,
       requestType: 'addSubfields',
       tag: tag,
-      fieldNumber: fieldNumber,
+      fieldPosition: fieldPosition,
       subfields: subfields
     };
     createReq(data, function(json){
@@ -713,11 +711,11 @@ function onAddSubfieldsSave(event){
     });
 
     // Continue local updating
-    var field = getFieldFromTag(tag, fieldNumber);
+    var field = gRecord[tag][fieldPosition];
     field[0] = field[0].concat(subfields);
     var rowGroup  = $('#rowGroup_' + fieldID);
     var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
-    $(rowGroup).replaceWith(createField(tag, field));
+    $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
     if (coloredRowGroup)
       $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
 
@@ -763,11 +761,11 @@ function getTagsSorted(){
   return tags.sort();
 }
 
-function getMARC(tag, fieldNumber, subfieldIndex){
+function getMARC(tag, fieldPosition, subfieldIndex){
   /*
    * Return the MARC representation of a field or a subfield.
    */
-  var field = getFieldFromTag(tag, fieldNumber);
+  var field = gRecord[tag][fieldPosition];
   var ind1, ind2;
   if (tag < 10)
     ind1 = '', ind2 = '';
@@ -781,31 +779,27 @@ function getMARC(tag, fieldNumber, subfieldIndex){
     return tag + ind1 + ind2 + field[0][subfieldIndex][0];
 }
 
-function getFieldFromTag(tag, fieldNumber){
-  /*
-   * Get a specified field.
-   */
-  var fields = gRecord[tag];
-  var field;
-  for (var i=0, n=fields.length; i<n; i++){
-    field = fields[i];
-    if (fieldNumber == field[4])
-      break;
-  }
-  return field;
-}
-
-function deleteFieldFromTag(tag, fieldNumber){
+function deleteFieldFromTag(tag, fieldPosition){
   /*
    * Delete a specified field.
    */
-  var field = getFieldFromTag(tag, fieldNumber);
+  var field = gRecord[tag][fieldPosition];
   var fields = gRecord[tag];
   fields.splice($.inArray(field, fields), 1);
   // If last field, delete tag.
   if (fields.length == 0){
     delete gRecord[tag];
   }
+}
+
+function determineNewFieldPosition(tag, field){
+  /*
+   * Determine the local (in tag) position of a new field.
+   */
+  var fields = gRecord[tag], fieldLength = fields.length, i = 0;
+  while (i < fieldLength && cmpFields(field, fields[i]) != -1)
+    i++;
+  return i;
 }
 
 function cmpFields(field1, field2){
@@ -818,25 +812,9 @@ function cmpFields(field1, field2){
     return -1;
   else if (field1[2].toLowerCase() > field2[2].toLowerCase())
     return 1;
-  else if (field1[1].toLowerCase() < field2[1].toLowerCase())
+  else if (field1[2].toLowerCase() < field2[2].toLowerCase())
     return -1;
   return 0;
-}
-
-function resetNewFieldNumber(){
-  /*
-   * Reset first available field number.
-   */
-  var existingNumbers = [];
-  var fields, field;
-  for (var tag in gRecord){
-    fields = gRecord[tag];
-    for (var i=0, n=fields.length; i<n; i++){
-      existingNumbers.push(fields[i][4]);
-    }
-  }
-  existingNumbers.sort(function (a,b){ return a-b; });
-  gNewFieldNumber = existingNumbers.pop() + 1;
 }
 
 function validMARC(datatype, value){
@@ -928,22 +906,22 @@ function containsProtectedField(fieldData){
    * when checking if a deletion command is valid).
    * The data structure must be an object with the following levels
    * - Tag
-   *   - Field number
+   *   - Field position
    *     - Subfield index
    */
-  var fieldNumbers, subfieldIndexes, MARC;
+  var fieldPositions, subfieldIndexes, MARC;
   for (var tag in fieldData){
-    fieldNumbers = fieldData[tag];
-    for (var fieldNumber in fieldNumbers){
-      subfieldIndexes = fieldNumbers[fieldNumber];
+    fieldPositions = fieldData[tag];
+    for (var fieldPosition in fieldPositions){
+      subfieldIndexes = fieldPositions[fieldPosition];
       if (subfieldIndexes.length == 0){
-	MARC = getMARC(tag, fieldNumber);
+	MARC = getMARC(tag, fieldPosition);
 	if (fieldIsProtected(MARC))
 	  return MARC;
 	}
       else{
 	for (var i=0, n=subfieldIndexes.length; i<n; i++){
-	  MARC = getMARC(tag, fieldNumber, subfieldIndexes[i]);
+	  MARC = getMARC(tag, fieldPosition, subfieldIndexes[i]);
 	  if (fieldIsProtected(MARC))
 	    return MARC;
 	}

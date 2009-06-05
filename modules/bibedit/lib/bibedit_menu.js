@@ -47,12 +47,6 @@ function initMenu(){
   $('#btnMARCTags').bind('click', onMARCTagsClick);
   $('#btnHumanTags').bind('click', onHumanTagsClick);
   $('#btnAddField').bind('click', onAddFieldClick);
-  $('#btnSortFields').bind('click', function(){
-    updateStatus('updating');
-    $('#bibEditContent').empty();
-    displayRecord();
-    updateStatus('ready');
-  });
   $('#btnDeleteSelected').bind('click', onDeleteClick);
   $('#bibEditMenu .bibEditImgExpandMenuSection').bind('click',
     expandMenuSection);
@@ -132,7 +126,6 @@ function activateRecordMenu(){
   $('#btnCancel').removeAttr('disabled');
   $('#btnDeleteRecord').removeAttr('disabled');
   $('#btnAddField').removeAttr('disabled');
-  $('#btnSortFields').removeAttr('disabled');
   $('#btnDeleteSelected').removeAttr('disabled');
 }
 
@@ -147,7 +140,6 @@ function deactivateRecordMenu(){
   $('#btnMARCTags').attr('disabled', 'disabled');
   $('#btnHumanTags').attr('disabled', 'disabled');
   $('#btnAddField').attr('disabled', 'disabled');
-  $('#btnSortFields').attr('disabled', 'disabled');
   $('#btnDeleteSelected').attr('disabled', 'disabled');
 }
 
@@ -316,7 +308,6 @@ function onGetRecordSuccess(json){
   gTagFormat = json['tagFormat'];
   gRecordDirty = json['cacheDirty'];
   gCacheMTime = json['cacheMTime'];
-  resetNewFieldNumber();
   if (json['cacheOutdated']){
     // User had an existing outdated cache.
     displayCacheOutdatedOptions('getRecord');
@@ -490,17 +481,17 @@ function updateTags(){
   $('.bibEditCellFieldTag').each(function(){
     var currentTag = $(this).text();
     var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldNumber = tmpArray[2];
-    var newTag = getFieldTag(getMARC(tag, fieldNumber));
+    var tag = tmpArray[1], fieldPosition = tmpArray[2];
+    var newTag = getFieldTag(getMARC(tag, fieldPosition));
     if (newTag != currentTag)
       $(this).text(newTag);
   });
   $('.bibEditCellSubfieldTag').each(function(){
     var currentTag = $(this).text();
     var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldNumber = tmpArray[2],
+    var tag = tmpArray[1], fieldPosition = tmpArray[2],
       subfieldIndex = tmpArray[3];
-    var newTag = getSubfieldTag(getMARC(tag, fieldNumber, subfieldIndex));
+    var newTag = getSubfieldTag(getMARC(tag, fieldPosition, subfieldIndex));
     if (newTag != currentTag)
       $(this).text(newTag);
   });
@@ -635,8 +626,8 @@ function onAddFieldSave(event){
       updateStatus('ready');
       return;
     }
-    var field = [[], ' ', ' ', value, gNewFieldNumber];
-    var newRowGroup = createControlField(tag, field);
+    var field = [[], ' ', ' ', value, 0];
+    var fieldPosition = determineNewFieldPosition(tag, field);
   }
   else{
     // Regular field. Validate and prepare to update.
@@ -677,7 +668,7 @@ function onAddFieldSave(event){
       });
 
     if (invalidOrEmptySubfields){
-      if (subfields.length < 1){
+      if (!subfields.length){
 	// No valid subfields.
 	displayAlert('alertCriticalInput');
 	updateStatus('ready');
@@ -688,8 +679,8 @@ function onAddFieldSave(event){
 	return;
       }
     }
-    var field = [subfields, ind1, ind2, '', gNewFieldNumber];
-    var newRowGroup = createField(tag, field);
+    var field = [subfields, ind1, ind2, '', 0];
+    var fieldPosition = determineNewFieldPosition(tag, field);
   }
 
   // Create Ajax request.
@@ -697,6 +688,7 @@ function onAddFieldSave(event){
     recID: gRecID,
     requestType: 'addField',
     controlfield: controlfield,
+    fieldPosition: fieldPosition,
     tag: tag,
     ind1: ind1,
     ind2: ind2,
@@ -713,24 +705,20 @@ function onAddFieldSave(event){
   if (!fields)
     gRecord[tag] = [field];
   else{
-    fields.push(field);
-    fields.sort(cmpFields);
+    fields.splice(fieldPosition, 0, field);
   }
-  var rowGroupAddField = $('#rowGroupAddField_' + fieldTmpNo);
-  var coloredRowGroup = $(rowGroupAddField).hasClass('bibEditFieldColored');
-  $(rowGroupAddField).replaceWith(newRowGroup);
-  if (coloredRowGroup)
-    $('#rowGroup_' + tag + '_' + gNewFieldNumber).addClass(
-      'bibEditFieldColored');
+  // Remove form.
+  $('#rowGroupAddField_' + fieldTmpNo).remove();
   if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
       $('#bibEditColFieldTag').css('width', '48px');
-
-  // Color the new form for a short period.
-  var rowGroup = $('#rowGroup_' + tag + '_' + gNewFieldNumber);
+  // Redraw all fields with the same tag and recolor the full table.
+  redrawFields(tag);
+  reColorFields();
+  // Scroll to and color the new field for a short period.
+  var rowGroup = $('#rowGroup_' + tag + '_' + fieldPosition);
+  $(document).scrollTop($(rowGroup).position().top - $(window).height()*0.5);
   $(rowGroup).effect('highlight', {color: gNEW_FIELDS_COLOR},
 		     gNEW_FIELDS_COLOR_FADE_DURATION);
-
-  gNewFieldNumber++;
 }
 
 function onDeleteClick(event){
@@ -743,30 +731,30 @@ function onDeleteClick(event){
   var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked');
   $(checkedFieldBoxes).each(function(){
     var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldNumber = tmpArray[2];
+    var tag = tmpArray[1], fieldPosition = tmpArray[2];
     if (!toDelete[tag]){
       toDelete[tag] = {};
     }
-    toDelete[tag][fieldNumber] = [];
+    toDelete[tag][fieldPosition] = [];
   });
   // Collect subfields to be deleted in a datastructure.
   var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
   $(checkedSubfieldBoxes).each(function(){
     var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldNumber = tmpArray[2],
+    var tag = tmpArray[1], fieldPosition = tmpArray[2],
       subfieldIndex = tmpArray[3];
     if (!toDelete[tag]){
       toDelete[tag] = {};
-      toDelete[tag][fieldNumber] = [subfieldIndex];
+      toDelete[tag][fieldPosition] = [subfieldIndex];
     }
     else{
-      if (!toDelete[tag][fieldNumber])
-	toDelete[tag][fieldNumber] = [subfieldIndex];
-      else if (toDelete[tag][fieldNumber].length == 0)
+      if (!toDelete[tag][fieldPosition])
+	toDelete[tag][fieldPosition] = [subfieldIndex];
+      else if (toDelete[tag][fieldPosition].length == 0)
 	// Entire field scheduled for the deletion.
 	return;
       else
-	toDelete[tag][fieldNumber].push(subfieldIndex);
+	toDelete[tag][fieldPosition].push(subfieldIndex);
     }
   });
   var fieldsDeleted = Boolean(checkedFieldBoxes.length);
@@ -778,15 +766,15 @@ function onDeleteClick(event){
       var targetID = event.target.id;
       var tmpArray = targetID.split('_');
       if (tmpArray[0] == 'content'){
-	var tag = tmpArray[1], fieldNumber = tmpArray[2],
+	var tag = tmpArray[1], fieldPosition = tmpArray[2],
 	  subfieldIndex = tmpArray[3];
 	toDelete[tag] = {};
 	if (event.shiftKey){
-	  toDelete[tag][fieldNumber] = [];
+	  toDelete[tag][fieldPosition] = [];
 	  fieldsDeleted = true;
 	}
 	else
-	  toDelete[tag][fieldNumber] = [subfieldIndex];
+	  toDelete[tag][fieldPosition] = [subfieldIndex];
       }
     }
     else{
@@ -817,38 +805,43 @@ function onDeleteClick(event){
   /* Continue local updating.
   Parse datastructure and delete accordingly in record, then redraw
   fields that had subfields deleted. */
-  var fieldNumbersToDelete, subfieldIndexesToDelete, field, subfields,
+  var fieldsToDelete, subfieldIndexesToDelete, field, subfields,
     subfieldIndex;
+  var tagsToRedraw = [];
   for (var tag in toDelete){
-    fieldNumbersToDelete = toDelete[tag];
-    for (var fieldNumber in fieldNumbersToDelete){
-      var fieldID = tag + '_' + fieldNumber;
-      subfieldIndexesToDelete = fieldNumbersToDelete[fieldNumber];
+    fieldsToDelete = toDelete[tag];
+    for (var fieldPosition in fieldsToDelete){
+      var fieldID = tag + '_' + fieldPosition;
+      subfieldIndexesToDelete = fieldsToDelete[fieldPosition];
       if (subfieldIndexesToDelete.length == 0){
-	deleteFieldFromTag(tag, fieldNumber);
-	$('#rowGroup_' + tag + '_' + fieldNumber).remove();
+	deleteFieldFromTag(tag, fieldPosition);
+	tagsToRedraw[tag] = true;
+	// $('#rowGroup_' + fieldID).remove();
       }
       else{
 	subfieldIndexesToDelete.sort();
-	field = getFieldFromTag(tag, fieldNumber);
+	field = gRecord[tag][fieldPosition];
 	subfields = field[0];
 	for (var j=subfieldIndexesToDelete.length-1; j>=0; j--)
 	  subfields.splice(subfieldIndexesToDelete[j], 1);
 	var rowGroup = $('#rowGroup_' + fieldID);
 	if (!fieldsDeleted){
-	  // Color subfield after updating.
+	  // Color and redraw the field, if it won't be done later.
 	  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
 	  $(rowGroup).replaceWith(createField(tag, field));
 	  if (coloredRowGroup)
 	    $('#rowGroup_' + fieldID).addClass( 'bibEditFieldColored');
 	}
-	else
+	else if (!tagsToRedraw.tag)
+	  // Redraw the field if it won't be done later.
 	  $(rowGroup).replaceWith(createField(tag, field));
       }
     }
   }
   if (fieldsDeleted)
-    // If entire fields has been deleted, recolor the full table.
+    // If entire fields has been deleted, redraw all fields with the same tag
+    // and recolor the full table.
+    for (tag in tagsToRedraw)
+      redrawFields(tag);
     reColorFields();
-  resetNewFieldNumber();
 }

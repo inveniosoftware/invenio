@@ -56,14 +56,14 @@ function displayRecord(){
       break;
     fields = gRecord[tag];
     for (var j=0, m=fields.length; j<m; j++)
-      table += createControlField(tag, fields[j]);
+      table += createControlField(tag, fields[j], j);
   }
   // For each instance of each field, create row(s).
   for (n=tags.length; i<n; i++){
     tag = tags[i];
     fields = gRecord[tag];
     for (var j=0, m=fields.length; j<m; j++){
-      table += createField(tag, fields[j]);
+      table += createField(tag, fields[j], j);
     }
   }
   // Close and display table.
@@ -72,11 +72,11 @@ function displayRecord(){
   colorFields();
 }
 
-function createControlField(tag, field){
+function createControlField(tag, field, fieldPosition){
   /*
    * Create control field row.
    */
-  var fieldID = tag + '_' + field[4];
+  var fieldID = tag + '_' + fieldPosition;
   var cellContentClass = 'class="bibEditCellContentProtected" ';
   if (!fieldIsProtected(tag))
     cellContentClass = '';
@@ -101,13 +101,12 @@ function createControlField(tag, field){
     '</tbody>';
 }
 
-function createField(tag, field){
+function createField(tag, field, fieldPosition){
   /*
    * Create field row(s).
    */
-  var subfields = field[0], ind1 = field[1], ind2 = field[2],
-    fieldNumber = field[4];
-  var fieldID = tag + '_' + fieldNumber;
+  var subfields = field[0], ind1 = field[1], ind2 = field[2];
+  var fieldID = tag + '_' + fieldPosition;
   ind1 = (ind1 != ' ' && ind1 != '') ? ind1 : '_';
   ind2 = (ind2 != ' ' && ind2 != '') ? ind2 : '_';
   var protectedField = fieldIsProtected(tag + ind1 + ind2);
@@ -183,6 +182,30 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     '</tr>';
 }
 
+function redrawFields(tag){
+  /*
+   * Redraw all fields for a given tag.
+   */
+  var prevRowGroup = $('#rowGroup_' + tag + '_0').prev();
+  // Remove the fields from view.
+  prevRowGroup.nextAll('[id^=rowGroup_' + tag + ']').remove();
+
+  // Redraw all fields and append to table.
+  if (gRecord[tag]){
+    var fields = gRecord[tag];
+    var result = '', i, n;
+    if (tag <= 9){
+      for (i=0, n=fields.length; i<n; i++)
+	result += createControlField(tag, fields[i], i);
+    }
+    else{
+      for (i=0, n=fields.length; i<n; i++)
+	result += createField(tag, fields[i], i);
+    }
+    prevRowGroup.after(result);
+  }
+}
+
 function createAddFieldForm(fieldTmpNo){
   /*
    * Create an 'Add field' form.
@@ -204,7 +227,7 @@ function createAddFieldForm(fieldTmpNo){
 	    title: 'Add subfield'}) +
 	'</td>' +
       '</tr>' +
-    createAddFieldRow(fieldTmpNo, 0) +
+      createAddFieldRow(fieldTmpNo, 0) +
       '<tr>' +
 	'<td></td>' +
 	'<td></td>' +

@@ -122,10 +122,6 @@ class Template:
             '            <td>%(btnAddField)s</td>\n' \
             '          </tr>\n' \
             '          <tr>\n' \
-            '            <td>%(imgSortFields)s</td>\n' \
-            '            <td>%(btnSortFields)s</td>\n' \
-            '          </tr>\n' \
-            '          <tr>\n' \
             '            <td>%(imgDeleteSelected)s</td>\n' \
             '            <td>%(btnDeleteSelected)s</td>\n' \
             '          </tr>\n' \
@@ -134,9 +130,6 @@ class Template:
             'imgAddField': img('/img/table_row_insert.png'),
             'btnAddField': button('button', 'Add', id='btnAddField',
                                   disabled='disabled'),
-            'imgSortFields': img('/img/table_sort.png'),
-            'btnSortFields': button('button', 'Sort', id='btnSortFields',
-                                    disabled='disabled'),
             'imgDeleteSelected': img('/img/table_row_delete.png'),
             'btnDeleteSelected': button('button', 'Delete selected',
                 id='btnDeleteSelected', disabled='disabled')}
