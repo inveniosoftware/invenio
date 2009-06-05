@@ -23,10 +23,6 @@ Utilities for special formatting of records.
 API functions: highlight, get_contextual_content, encode_for_xml
 
 Used mainly by BibFormat elements.
-
-Depends on search_engine.py for record_exists()
-
-FIXME: currently copies record_exists() code from search engine.  Refactor later.
 """
 
 __revision__ = "$Id$"
@@ -151,6 +147,8 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
         - 'xd' for XML Dublin Core
 
     If record does not exist, returns empty string.
+    If the record is deleted, returns an empty MARCXML (with recid
+    controlfield, OAI ID fields and 980__c=DELETED)
 
     @param recID: the id of the record to retrieve
     @param on_the_fly: if False, try to fetch precreated one in database

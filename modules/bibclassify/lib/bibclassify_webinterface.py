@@ -135,7 +135,7 @@ def get_keywords_body(keywords, req, recid, argd):
             escape_html(record_xml_output(rec, ['653'])))
     else:
         body = 'Unknown type: ' + argd['type']
-    
+
     out = ''
     for element in body:
         out += '<br>' + element.encode('utf-8')

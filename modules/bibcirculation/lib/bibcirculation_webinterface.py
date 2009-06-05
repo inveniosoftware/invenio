@@ -37,7 +37,8 @@ from invenio.webuser import getUid, page_not_authorized, isGuestUser, \
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
-     get_colID, check_user_can_view_record
+     get_colID, check_user_can_view_record, \
+     record_exists
 from invenio.urlutils import redirect_to_url, \
                              make_canonical_urlargd
 from invenio.messages import gettext_set_language
@@ -314,11 +315,29 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                    'voted': (int, -1),
                                    'reported': (int, -1),
                                    })
+        _ = gettext_set_language(argd['ln'])
 
+        record_exists_p = record_exists(self.recid)
+        if record_exists_p != 1:
+            if record_exists_p == -1:
+                msg = _("The record has been deleted.")
+            else:
+                msg = _("Requested record does not seem to exist.")
+            msg = '<span class="quicknote">' + msg + '</span>'
+            title, description, keywords = \
+                   websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
+            return page(title = title,
+                        show_title_p = False,
+                        body = msg,
+                        description = description,
+                        keywords = keywords,
+                        uid = getUid(req),
+                        language = argd['ln'],
+                        req = req,
+                        navmenuid='search')
 
         body = perform_get_holdings_information(self.recid, req, argd['ln'])
 
-        _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
 
 

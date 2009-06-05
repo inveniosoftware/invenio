@@ -29,8 +29,6 @@ does not handle, as it works on a single record basis) should be put,
 with name create_*.
 
 SEE: bibformat_utils.py
-
-FIXME: currently copies record_exists() code from search engine.  Refactor later.
 """
 
 __revision__ = "$Id$"
@@ -125,6 +123,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     @param on_the_fly: if False, try to return an already preformatted version of the record in the database
     @return: formatted record
     """
+    from invenio.search_engine import record_exists
     if search_pattern is None:
         search_pattern = []
 
@@ -138,19 +137,20 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     if CFG_BIBFORMAT_USE_OLD_BIBFORMAT and CFG_PATH_PHP:
         return bibformat_engine.call_old_bibformat(recID, format=of, on_the_fly=on_the_fly)
     ############################# END ##################################
-
     if not on_the_fly and \
        (ln == CFG_SITE_LANG or \
         of.lower() == 'xm' or \
         CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
-        (CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT == False and of.lower() == 'hb')):
-        # Try to fetch preformatted record
-        # Only possible for records formatted in CFG_SITE_LANG
-        # language (other are never stored), or of='xm' which does not
-        # depend on language.
+        (CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT == False and of.lower() == 'hb')) and \
+        record_exists(recID) != -1:
+        # Try to fetch preformatted record Only possible for records
+        # formatted in CFG_SITE_LANG language (other are never
+        # stored), or of='xm' which does not depend on language.
         # Also, when formatting in HB, and when
         # CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT is set to False,
         # ignore other languages and fetch the preformatted output.
+        # Also, do not fetch from DB when record has been deleted: we
+        # want to return an "empty" record in that case
         res = bibformat_dblayer.get_preformatted_record(recID, of)
         if res is not None:
             # record 'recID' is formatted in 'of', so return it
