@@ -329,7 +329,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
         (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
         from_addr = '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
         to_addr = CFG_SITE_ADMIN_EMAIL
-        subject = "An error report has been sent from a user"
+        subject = "A comment has been reported as inappropriate by a user"
         body = '''
 The following comment has been reported a total of %(cmt_reported)s times.
 
