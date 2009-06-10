@@ -112,14 +112,20 @@ you're done. The changes will be applied to the record as soon as possible.
 </p>
 
 <h3><a name="reviseafile">
-Adding a file to an existing record
+Adding / Revising / Deleting the file(s) of an existing record
 </a></h3>
-<p>Currently, if you would like to revise or add a new file to an existing
-record, please send a copy of it to
+<p>If you want to manage the file(s) attached to an existing record,
+go to your document type's submission entry page, and choose the
+appropriate action: "Revise Files", "Transfer Files", etc.</p>
+<p>If such an option is not available for your document type, please
+send a copy of it to
 <a href="mailto:<CFG_SITE_SUPPORT_EMAIL>"><CFG_SITE_SUPPORT_EMAIL></a>, quoting
 the record's reference number and title and they will attach it to the record
 on your behalf.
 </p>
+<p>Note that modification of files is not always allowed: it might
+depends on the submission's policy (Eg. a document that has been
+approved might not be changed in some cases).</p>
 
 <h3><a name="submissionhints">
 Submission hints
