@@ -1162,7 +1162,7 @@ def _create_record_minidom(marcxml,
     try:
         dom = xml.dom.minidom.parseString(marcxml)
     except xml.parsers.expat.ExpatError, ex1:
-        raise InvenioBibRecordGenericParsingError(ex1.message)
+        raise InvenioBibRecordGenericParsingError(str(ex1))
 
     return _create_record_from_document(dom)
 
