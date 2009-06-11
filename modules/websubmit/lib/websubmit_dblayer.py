@@ -44,7 +44,6 @@ def get_storage_directory_of_action(action):
     ## return the directory name (or None, if no action was found)
     return directory
 
-
 def get_longname_of_doctype(doctype):
     """Given the ID of a document type (doctype), query the database to
        retrieve the doctype's long name.
@@ -484,7 +483,7 @@ def get_doctype_details(doctype):
         are to be retrieved.
        @return: (tuple -OR- None) - If the document type exists, a tuple
         containing its details is returned:
-          (sdocname, ldocname, cd, md, description); if not, None is
+          (ldocname, sdocname, cd, md, description); if not, None is
         returned.
     """
     doctype_details = None

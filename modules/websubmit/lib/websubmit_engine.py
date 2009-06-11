@@ -1293,7 +1293,9 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
         return warningMsg(_("Unable to find document type: %s") % escape(str(doctype)), req, c, ln)
     else:
         docFullDesc  = doctype_details[0]
-        docShortDesc = doctype_details[1]
+        # Also update the doctype as returned by the database, since
+        # it might have a differnent case (eg. DemOJrN->demoJRN)
+        doctype = docShortDesc = doctype_details[1]
         description  = doctype_details[4]
 
     ## Get the details of the actions supported by this document-type:
