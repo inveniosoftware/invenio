@@ -28,6 +28,7 @@ import os
 import time
 import fnmatch
 from optparse import OptionParser, OptionGroup
+from tempfile import mkstemp
 
 from invenio.config import CFG_TMPDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
@@ -249,15 +250,17 @@ def bibupload_ffts(ffts, append=False):
     xml = ffts_to_xml(ffts)
     if xml:
         print xml
-        tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
-        open(tmp_file, 'w').write(xml)
+        tmp_file_fd, tmp_file_name = mkstemp(suffix='.xml', prefix="bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"), dir=CFG_TMPDIR)
+        os.write(tmp_file_fd, xml)
+        os.close(tmp_file_fd)
+        os.chmod(tmp_file_name, 0644)
         if append:
             wait_for_user("This will be appended via BibUpload")
-            task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file)
+            task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name)
             print "BibUpload append submitted with id %s" % task
         else:
             wait_for_user("This will be corrected via BibUpload")
-            task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file)
+            task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name)
             print "BibUpload correct submitted with id %s" % task
     else:
         print "WARNING: no MARC to upload."
