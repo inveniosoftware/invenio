@@ -339,7 +339,7 @@ class Manager:
         else:
             msg += 'executable : %s\n\n' % arguments[0]
             msg += ' arguments : %s\n\n' % ' '.join(arguments[1:])
-        msg += '\n\nPress a key to continue...'
+        msg += '\n\nPress q to quit this panel...'
         msg = wrap_text_in_a_box(msg, style='no_border')
         rows = msg.split('\n')
         height = len(rows) + 2
@@ -361,7 +361,8 @@ class Manager:
             self.win.addstr(i, 2, row, self.current_attr)
             i += 1
         self.win.refresh()
-        self.win.getch()
+        while self.win.getkey() != 'q':
+            pass
 
     def count_processes(self, status):
         out = 0
