@@ -46,7 +46,8 @@ pylib_DATA = __init__.py \
              shellutils_tests.py
 
 noinst_DATA = testimport.py \
-              kwalitee.py
+              kwalitee.py \
+              pep8.py
 
 EXTRA_DIST = $(pylib_DATA) \
              testimport.py \

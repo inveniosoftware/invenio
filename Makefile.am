@@ -43,7 +43,7 @@ check-custom-templates:
 	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
 
 kwalitee-check:
-	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py $(top_srcdir)
+	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --stats $(top_srcdir)
 
 kwalitee-check-errors-only:
 	@find $(top_srcdir) -name '*.py' -exec pylint -e {} \; 2> /dev/null

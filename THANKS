@@ -123,4 +123,10 @@ Function icon set, and (iii) the activity indicator icon.
 <http://wefunction.com/2008/07/function-free-icon-set/>
 <http://www.badeziner.com/2008/05/04/120-free-ajax-activity-indicator-gif-icons/>
 
+The PEP8 conformance checking script (pep8.py) was written by Johann
+C. Rocholl <johann@browsershots.org>.  The pep8.py version included
+with CDS Invenio was downloaded from
+<http://svn.browsershots.org/trunk/devtools/pep8/pep8.py> on
+2009-06-14.
+
 - end of file -
