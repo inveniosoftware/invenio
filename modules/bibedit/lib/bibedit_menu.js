@@ -40,9 +40,11 @@ function initMenu(){
   $('#cellIndicator').html(img('/img/circle_green'));
   $('#cellStatus').text('Ready');
   // Bind button event handlers.
+  $('#lnkNewRecord').bind('click', onNewRecordClick);
   $('#btnSearch').bind('click', onSearchClick);
   $('#btnSubmit').bind('click', onSubmitClick);
   $('#btnCancel').bind('click', onCancelClick);
+  $('#btnCloneRecord').bind('click', onCloneRecordClick);
   $('#btnDeleteRecord').bind('click', onDeleteRecordClick);
   $('#btnMARCTags').bind('click', onMARCTagsClick);
   $('#btnHumanTags').bind('click', onHumanTagsClick);
@@ -126,6 +128,7 @@ function activateRecordMenu(){
   $('#btnCancel').removeAttr('disabled');
   $('#btnDeleteRecord').removeAttr('disabled');
   $('#btnAddField').removeAttr('disabled');
+  $('#btnCloneRecord').removeAttr('disabled');
   $('#btnDeleteSelected').removeAttr('disabled');
 }
 
@@ -140,6 +143,7 @@ function deactivateRecordMenu(){
   $('#btnMARCTags').attr('disabled', 'disabled');
   $('#btnHumanTags').attr('disabled', 'disabled');
   $('#btnAddField').attr('disabled', 'disabled');
+  $('#btnCloneRecord').attr('disabled', 'disabled');
   $('#btnDeleteSelected').attr('disabled', 'disabled');
 }
 
@@ -189,6 +193,30 @@ function updateStatus(statusType, reporttext){
   }
   $('#cellIndicator').html(image);
   $('#cellStatus').html(text);
+}
+
+function onNewRecordClick(event){
+  /*
+   * Handle 'New' button (new record).
+   */
+  updateStatus('updating');
+  if (gRecordDirty){
+    if (!displayAlert('confirmLeavingChangedRecord')){
+      updateStatus('ready');
+      event.preventDefault();
+      return;
+    }
+  }
+  else
+    // If the record is unchanged, erase the cache.
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  changeAndSerializeHash({state: 'newRecord'});
+  cleanUp(true, '');
+  $('.headline').text('BibEdit: Create new record');
+  displayNewRecordList();
+  bindNewRecordHandlers();
+  updateStatus('ready');
+  event.preventDefault();
 }
 
 function onSearchClick(event){
@@ -381,6 +409,26 @@ function onCancelClick(){
     updateStatus('ready');
 }
 
+function onCloneRecordClick(){
+  /*
+   * Handle 'Clone' button (clone record).
+   */
+  updateStatus('updating');
+  if (gRecordDirty){
+    if (!displayAlert('confirmLeavingChangedRecord')){
+      updateStatus('ready');
+      return;
+    }
+  }
+  else
+    // If the record is unchanged, erase the cache.
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  createReq({requestType: 'newRecord', newType: 'clone', recIDToClone: gRecID},
+	    function(json){
+    getRecord(json['recID']);
+  });
+}
+
 function onNextRecordClick(){
   /*
    * Handle click on the 'Next' button in the record browser.
@@ -506,7 +554,10 @@ function onAddFieldClick(){
   var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
   var jQRowGroupID = '#rowGroupAddField_' + fieldTmpNo;
   $('#bibEditColFieldTag').css('width', '90px');
-  $('#bibEditTable tbody').eq(3).after(createAddFieldForm(fieldTmpNo));
+  var tbodyElements = $('#bibEditTable tbody');
+  var insertionPoint = (tbodyElements.length >= 4) ? 3 : tbodyElements.length-1;
+  $('#bibEditTable tbody').eq(insertionPoint).after(
+    createAddFieldForm(fieldTmpNo));
   $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
 
   // Bind event handlers.

@@ -60,3 +60,8 @@ def get_record_last_modification_date(recid):
     """Return last modification date, as timetuple, of record RECID."""
     return run_sql('SELECT modification_date FROM bibrec WHERE id=%s' %
                    recid)[0][0].timetuple()
+
+def reserve_record_id():
+    """Reserve a new record ID in the bibrec table."""
+    return run_sql("""INSERT INTO bibrec (creation_date, modification_date)
+                       VALUES (NOW(), NOW())""")

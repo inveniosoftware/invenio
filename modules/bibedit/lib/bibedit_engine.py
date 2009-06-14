@@ -28,19 +28,21 @@ from invenio.bibedit_config import CFG_BIBEDIT_JS_HASH_CHECK_INTERVAL, \
     CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION, \
     CFG_BIBEDIT_AJAX_RESULT_CODES, CFG_BIBEDIT_MAX_SEARCH_RESULTS, \
     CFG_BIBEDIT_TAG_FORMAT
-from invenio.bibedit_dblayer import get_name_tags_all
+from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id
 from invenio.bibedit_utils import cache_exists, cache_expired, \
-    create_cache_file, delete_cache_file, get_cache_file_contents, \
-    get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
+    create_cache_file, delete_cache_file, get_bibrecord, \
+    get_cache_file_contents, get_cache_mtime, get_record_templates, \
+    get_record_template, latest_record_revision, record_locked_by_other_user, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
     update_cache_file_contents
-from invenio.bibrecord import record_add_field, record_add_subfield_into, \
-    record_modify_controlfield, record_modify_subfield, record_move_subfield, \
-    record_delete_subfield_from, record_delete_field
+from invenio.bibrecord import create_record, record_add_field, \
+    record_add_subfield_into, record_delete_field, \
+    record_delete_subfield_from, record_modify_controlfield, \
+    record_modify_subfield, record_move_subfield
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL
 from invenio.search_engine import record_exists, search_pattern
-from invenio.webuser import getUid, session_param_get, session_param_set
+from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 
 import invenio.template
@@ -48,12 +50,14 @@ import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
 
 def perform_request_init():
-    """Handle the initial request by adding menu and Javascript to the page."""
+    """Handle the initial request by adding menu and JavaScript to the page."""
     errors   = []
     warnings = []
     body = ''
 
     # Add script data.
+    record_templates = get_record_templates()
+    record_templates.sort()
     tag_names = get_name_tags_all()
     protected_fields = ['001']
     protected_fields.extend(CFG_BIBEDIT_PROTECTED_FIELDS.split(','))
@@ -61,7 +65,8 @@ def perform_request_init():
     cern_site = 'false'
     if CFG_CERN_SITE:
         cern_site = 'true'
-    data = {'gTagNames': tag_names,
+    data = {'gRECORD_TEMPLATES': record_templates,
+            'gTagNames': tag_names,
             'gProtectedFields': protected_fields,
             'gSiteURL': '"' + CFG_SITE_URL + '"',
             'gHistoryURL': history_url,
@@ -77,7 +82,7 @@ def perform_request_init():
             'gNEW_FIELDS_COLOR': '"' + CFG_BIBEDIT_JS_NEW_FIELDS_COLOR + '"',
             'gNEW_FIELDS_COLOR_FADE_DURATION':
                 CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION,
-            'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES
+            'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES,
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -113,8 +118,8 @@ def perform_request_ajax(req, recid, uid, data):
     elif request_type in ['changeTagFormat']:
         # User related requests.
         response.update(perform_request_user(req, request_type, recid, data))
-    elif request_type in ('getRecord', 'submit', 'deleteRecord', 'cancel',
-        'deleteRecordCache', 'prepareRecordMerge'):
+    elif request_type in ('getRecord', 'submit', 'cancel', 'newRecord',
+        'deleteRecord', 'deleteRecordCache', 'prepareRecordMerge'):
         # 'Major' record related requests.
         response.update(perform_request_record(req, request_type, recid, uid,
                                                data))
@@ -158,7 +163,47 @@ def perform_request_record(req, request_type, recid, uid, data):
 
     """
     response = {}
-    if request_type == 'getRecord':
+
+    if request_type == 'newRecord':
+        # Create a new record.
+        recid = reserve_record_id()
+        new_type = data['newType']
+        if new_type == 'empty':
+            # Create a new empty record.
+            create_cache_file(recid, uid)
+            response['resultCode'], response['recID'] = 6, recid
+
+        elif new_type == 'template':
+            # Create a new record from XML record template.
+            template_filename = data['templateFilename']
+            template = get_record_template(template_filename)
+            if not template:
+                response['resultCode']  = 108
+            else:
+                record = create_record(template)[0]
+                if not record:
+                    response['resultCode']  = 109
+                else:
+                    record_add_field(record, '001',
+                                     controlfield_value=str(recid))
+                    create_cache_file(recid, uid, record)
+                    response['resultCode'], response['recID']  = 7, recid
+
+        elif new_type == 'clone':
+            # Clone an existing record (from the users cache).
+            recid_to_clone = data['recIDToClone']
+            existing_cache = cache_exists(recid_to_clone, uid)
+            if not existing_cache:
+                record = get_bibrecord(recid_to_clone)
+            else:
+                # Cache missing. Fall back to using original version.
+                record = get_cache_file_contents(recid_to_clone, uid)[2]
+            record_delete_field(record, '001')
+            record_add_field(record, '001', controlfield_value=str(recid))
+            create_cache_file(recid, uid, record)
+            response['resultCode'], response['recID'] = 8, recid
+
+    elif request_type == 'getRecord':
         # Fetch the record. Possible error situations:
         # - Non-existing record
         # - Deleted record
@@ -286,7 +331,7 @@ def perform_request_record(req, request_type, recid, uid, data):
             record_add_field(record, '980', ' ', ' ', '', [('c', 'DELETED')])
             update_cache_file_contents(recid, uid, record_revision, record)
             save_xml_record(recid, uid)
-            response['resultCode'] = 6
+            response['resultCode'] = 9
 
     elif request_type == 'deleteRecordCache':
         # Delete the cache file. Ignore the request if the cache has been
@@ -294,7 +339,7 @@ def perform_request_record(req, request_type, recid, uid, data):
         if cache_exists(recid, uid) and get_cache_mtime(recid, uid) == \
                 data['cacheMTime']:
             delete_cache_file(recid, uid)
-        response['resultCode'] = 7
+        response['resultCode'] = 10
 
     elif request_type == 'prepareRecordMerge':
         # We want to merge the cache with the current DB version of the record,
@@ -314,7 +359,7 @@ def perform_request_record(req, request_type, recid, uid, data):
             response['resultCode'] = 105
         else:
             save_xml_record(recid, uid, to_upload=False, to_merge=True)
-            response['resultCode'] = 8
+            response['resultCode'] = 11
 
     return response
 
@@ -334,9 +379,10 @@ def perform_request_update_record(request_type, recid, uid, data):
     else:
         record_revision, record = get_cache_file_contents(recid, uid)[1:]
 
-        # TODO: Get BibRecord updated so that this conversion isn't necessary
-        if data.get('fieldPositon'):
-            field_position_local = int(data.get('fieldPositon'))
+        # FIXME: Get BibRecord updated so that this conversion isn't necessary
+        field_position = data.get('fieldPosition')
+        if field_position:
+            field_position_local = int(field_position)
             field_position_global = \
                 record[data['tag']][int(field_position_local)][4]
 
@@ -344,12 +390,12 @@ def perform_request_update_record(request_type, recid, uid, data):
             if data['controlfield']:
                 record_add_field(record, data['tag'],
                                  controlfield_value=data['value'])
-                response['resultCode'] = 9
+                response['resultCode'] = 20
             else:
                 record_add_field(record, data['tag'], data['ind1'],
                                  data['ind2'], subfields=data['subfields'],
                                  field_position_local=data['fieldPosition'])
-                response['resultCode'] = 10
+                response['resultCode'] = 21
 
         elif request_type == 'addSubfields':
             subfields = data['subfields']
@@ -357,9 +403,9 @@ def perform_request_update_record(request_type, recid, uid, data):
                 record_add_subfield_into(record, data['tag'],
                     field_position_global, subfield[0], subfield[1], None)
             if len(subfields) == 1:
-                response['resultCode'] = 11
+                response['resultCode'] = 22
             else:
-                response['resultCode'] = 12
+                response['resultCode'] = 23
 
         elif request_type == 'modifyContent':
             if data['subfieldIndex'] != None:
@@ -369,12 +415,12 @@ def perform_request_update_record(request_type, recid, uid, data):
             else:
                 record_modify_controlfield(record, data['tag'],
                     field_position_global, data['value'])
-            response['resultCode'] = 13
+            response['resultCode'] = 24
 
         elif request_type == 'moveSubfield':
             record_move_subfield(record, data['tag'], field_position_global,
                 int(data['subfieldIndex']), int(data['newSubfieldIndex']))
-            response['resultCode'] = 14
+            response['resultCode'] = 25
 
         elif request_type == 'deleteFields':
             to_delete = data['toDelete']
@@ -398,15 +444,15 @@ def perform_request_update_record(request_type, recid, uid, data):
                                 field_position_global, int(subfield_index))
                             deleted_subfields += 1
             if deleted_fields == 1 and deleted_subfields == 0:
-                response['resultCode'] = 15
+                response['resultCode'] = 26
             elif deleted_fields and deleted_subfields == 0:
-                response['resultCode'] = 16
+                response['resultCode'] = 27
             elif deleted_subfields == 1 and deleted_fields == 0:
-                response['resultCode'] = 17
+                response['resultCode'] = 28
             elif deleted_subfields and deleted_fields == 0:
-                response['resultCode'] = 18
+                response['resultCode'] = 29
             else:
-                response['resultCode'] = 19
+                response['resultCode'] = 30
 
         response['cacheMTime'], response['cacheDirty'] = \
             update_cache_file_contents(recid, uid, record_revision, record), \

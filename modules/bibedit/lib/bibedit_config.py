@@ -19,6 +19,9 @@
 
 __revision__ = "$Id$"
 
+from invenio.config import CFG_ETCDIR
+
+import os
 
 ## CFG_BIBEDIT_FILENAME - default filename for BibEdit files.
 CFG_BIBEDIT_FILENAME = "bibedit_record"
@@ -66,20 +69,23 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     3: 'Record loaded',
     4: 'Record submitted',
     5: 'Cancelled',
-    6: 'Record deleted',
-    7: 'Cache deleted',
-    8: 'Record ready for merge',
-    9: 'Added controlfield',
-    10: 'Added field',
-    11: 'Added subfield',
-    12: 'Added subfields',
-    13: 'Content modified',
-    14: 'Subfield moved',
-    15: 'Field deleted',
-    16: 'Fields deleted',
-    17: 'Subfield deleted',
-    18: 'Subfields deleted',
-    19: 'Selection deleted',
+    6: 'Record created (new)',
+    7: 'Record created (from template)',
+    8: 'Record created (from existing)',
+    9: 'Record deleted',
+    10: 'Cache deleted',
+    11: 'Record ready for merge',
+    20: 'Added controlfield',
+    21: 'Added field',
+    22: 'Added subfield',
+    23: 'Added subfields',
+    24: 'Content modified',
+    25: 'Subfield moved',
+    26: 'Field deleted',
+    27: 'Fields deleted',
+    28: 'Subfield deleted',
+    29: 'Subfields deleted',
+    30: 'Selection deleted',
     100: 'Error: Not logged in',
     101: 'Error: Permission denied',
     102: 'Error: Non-existent record',
@@ -87,7 +93,9 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     104: 'Error: Record locked by user',
     105: 'Error: Record locked by queue',
     106: 'Error: Cache file missing',
-    107: 'Error: Cache file changed'
+    107: 'Error: Cache file changed',
+    108: 'Error: Template file missing',
+    109: 'Error: Invalid template file'
 }
 
 ## CFG_BIBEDIT_MAX_SEARCH_RESULTS
@@ -100,3 +108,6 @@ CFG_BIBEDIT_TAG_FORMAT = 'MARC'
 ## merged. Filename will then be constructed like this:
 ## <CFG_BIBEDIT_FILENAME>_<RECID>_<UID>_<CFG_BIBEDIT_TO_MERGE_SUFFIX>.xml
 CFG_BIBEDIT_TO_MERGE_SUFFIX = 'merge'
+
+# CFG_BIBEDIT_RECORD_TEMPLATES_PATH - path to record template directory
+CFG_BIBEDIT_RECORD_TEMPLATES_PATH = "%s%sbibedit%srecord_templates" % (CFG_ETCDIR, os.sep, os.sep)

@@ -9,7 +9,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -18,6 +18,10 @@
 etcdir = $(sysconfdir)/bibedit/
 etc_DATA = MARC21slim.dtd refextract-journal-titles.kb refextract-report-numbers.kb
 
-EXTRA_DIST = $(etc_DATA)
+rectmpldir = $(etcdir)/record_templates/
+rectmpl_DATA = poem.xml
+
+EXTRA_DIST = $(etc_DATA) \
+             $(rectmpl_DATA)
 
 CLEANFILES = *~ *.tmp

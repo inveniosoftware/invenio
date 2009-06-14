@@ -29,6 +29,7 @@ __revision__ = "$Id$"
 import commands
 import cPickle
 import difflib
+import fnmatch
 import marshal
 import os
 import re
@@ -36,7 +37,7 @@ import time
 import zlib
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
-    CFG_BIBEDIT_TO_MERGE_SUFFIX
+    CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX
 from invenio.bibedit_dblayer import get_record_last_modification_date
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output
@@ -55,6 +56,8 @@ re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
 re_revid_split = re.compile('^(\d+)\.(\d{14})$')
 re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 re_taskid = re.compile('ID="(\d+)"')
+re_tmpl_name = re.compile('<!-- BibEdit-Template-Name: (.*) -->')
+re_tmpl_description = re.compile('<!-- BibEdit-Template-Description: (.*) -->')
 
 
 # Operations on the BibEdit cache file
@@ -95,19 +98,22 @@ def cache_expired(recid, uid):
     """
     return get_cache_mtime(recid, uid) < int(time.time()) - CFG_BIBEDIT_TIMEOUT
 
-def create_cache_file(recid, uid):
+def create_cache_file(recid, uid, record=''):
     """Create a BibEdit cache file, and return revision and record. This will
     overwrite any existing cache the user has for this record.
 
     """
-    record = get_bibrecord(recid)
-    if record:
-        file_path = '%s.tmp' % get_file_path(recid, uid)
-        record_revision = get_record_last_modification_date(recid)
-        cache_file = open(file_path, 'w')
-        cPickle.dump([False, record_revision, record], cache_file)
-        cache_file.close()
-        return record_revision, record
+    if not record:
+        record = get_bibrecord(recid)
+        if not record:
+            return
+
+    file_path = '%s.tmp' % get_file_path(recid, uid)
+    record_revision = get_record_last_modification_date(recid)
+    cache_file = open(file_path, 'w')
+    cPickle.dump([False, record_revision, record], cache_file)
+    cache_file.close()
+    return record_revision, record
 
 def touch_cache_file(recid, uid):
     """Touch a BibEdit cache file. This should be used to indicate that the
@@ -391,3 +397,43 @@ def get_xml_comparison(header1, header2, xml1, xml2):
     """Return diff of two MARCXML records."""
     return ''.join(difflib.unified_diff(xml1.splitlines(1),
         xml2.splitlines(1), header1, header2))
+
+
+# Record templates
+def get_record_templates():
+    """Return list of record template (filename, name, description) tuples."""
+    template_fnames = fnmatch.filter(os.listdir(
+            CFG_BIBEDIT_RECORD_TEMPLATES_PATH), '*.xml')
+
+    templates = []
+    for fname in template_fnames:
+        template_file = open('%s/%s' % (
+                CFG_BIBEDIT_RECORD_TEMPLATES_PATH, fname),'r')
+        template = template_file.read()
+        template_file.close()
+        fname_stripped = os.path.splitext(fname)[0]
+        mo_name = re_tmpl_name.search(template)
+        mo_description = re_tmpl_description.search(template)
+        if mo_name:
+            name = mo_name.group(1)
+        else:
+            name = fname_stripped
+        if mo_description:
+            description = mo_description.group(1)
+        else:
+            description = ''
+        templates.append([fname_stripped, name, description])
+
+    return templates
+
+def get_record_template(name):
+    """Return an XML record template."""
+    filepath = '%s/%s.xml' % (CFG_BIBEDIT_RECORD_TEMPLATES_PATH, name)
+    if os.path.isfile(filepath):
+        template_file = open(filepath, 'r')
+        template = template_file.read()
+        template_file.close()
+        # Return just the <record> element from the XML to avoid BibRecord crash
+        # FIXME: Fix BibRecord so we can return the full XML.XS
+        return template[
+            template.index('<record>'):template.index('</record>')+9]

@@ -39,23 +39,21 @@ class Template:
 
         recordmenu = '<div class="bibEditMenuSectionHeader">\n' \
             '          %(imgExpandMenuSection)sRecord\n' \
+            '          %(lnkNewRecord)s\n' \
             '        </div>\n' \
             '        <table>\n' \
-            '          <col width="28px">\n' \
-            '          <col width="40px">\n' \
-            '          <col width="40px">\n' \
-            '          <col width="28px">\n' \
+            '          <col width="18px">\n' \
+            '          <col width="45px">\n' \
+            '          <col width="73px">\n' \
             '          <tr>\n' \
             '            <td colspan="2">\n' \
             '              <form onsubmit="return false;">\n' \
             '                %(txtSearchPattern)s\n' \
             '              </form>\n' \
-            '            <td colspan="2">\n' \
-            '              %(sctSearchType)s\n' \
-            '            </td>\n' \
+            '            <td>%(sctSearchType)s</td>\n' \
             '          </tr>\n' \
             '          <tr>\n' \
-            '            <td colspan="4">%(btnSearch)s</td>\n' \
+            '            <td colspan="3">%(btnSearch)s</td>\n' \
             '          </tr>\n' \
             '          <tr id="rowRecordBrowser" style="display: none">\n' \
             '            <td>%(btnPrev)s</td>\n' \
@@ -65,17 +63,22 @@ class Template:
             '          </tr>\n' \
             '          <tr>\n' \
             '            <td colspan="2">%(btnSubmit)s</td>\n' \
-            '            <td colspan="2">%(btnCancel)s</td>\n' \
+            '            <td>%(btnCancel)s</td>\n' \
+            '          </tr>\n' \
+            '          <tr class="bibEditMenuMore">\n' \
+            '            <td>%(imgCloneRecord)s</td>\n' \
+            '            <td colspan="2">%(btnCloneRecord)s</td>\n' \
             '          </tr>\n' \
             '          <tr>\n' \
             '            <td id="tickets" colspan="4"><!--filled by bibedit_menu.js--></td>\n' \
             '          </tr>\n' \
             '          <tr class="bibEditMenuMore">\n' \
-            '            <td colspan="4">%(btnDeleteRecord)s</td>\n' \
-            '            </td>\n' \
+            '            <td>%(imgDeleteRecord)s</td>\n' \
+            '            <td colspan="2">%(btnDeleteRecord)s</td>\n' \
             '          </tr>\n' \
             '        </table>' % {
             'imgExpandMenuSection': imgExpandMenuSection,
+            'lnkNewRecord': link('New', href="#", id='lnkNewRecord'), \
             'txtSearchPattern': inp('text', id='txtSearchPattern'),
             'sctSearchType': '<select id="sctSearchType">\n' \
             '                <option value="recID">Rec ID</option>\n' \
@@ -90,8 +93,11 @@ class Template:
                                 id='btnSubmit', disabled='disabled'),
             'btnCancel': button('button', 'Cancel', id='btnCancel',
                                 disabled='disabled'),
-            'imgDeleteRecord': img('/img/trash.png'),
-            'btnDeleteRecord': button('button', 'Delete record',
+            'imgCloneRecord': img('/img/table_multiple.png'),
+            'btnCloneRecord': button('button', 'Clone',
+                id='btnCloneRecord', disabled='disabled'),
+            'imgDeleteRecord': img('/img/table_delete.png'),
+            'btnDeleteRecord': button('button', 'Delete',
                 id='btnDeleteRecord', disabled='disabled')
             }
 

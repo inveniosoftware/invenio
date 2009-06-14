@@ -171,12 +171,13 @@ function onAjaxSuccess(json, onSuccess){
       : gSiteURL + '/record/edit/';
     return;
   }
-  else if ($.inArray(resCode, [101, 102, 103, 104, 105, 106, 107])
+  else if ($.inArray(resCode, [101, 102, 103, 104, 105, 106, 107, 108, 109])
 	   != -1){
     // Some error has occured. See BibEdit config for result codes.
     cleanUp(!gNavigatingRecordSet, null, null, true, true);
     updateStatus('error', gRESULT_CODES[resCode]);
-    $('.headline').text('BibEdit: Record #' + recID);
+    if ($.inArray(resCode, [108, 109]) == -1)
+      $('.headline').text('BibEdit: Record #' + recID);
     displayMessage(resCode);
     if (resCode == 107)
       $('#lnkGetRecord').bind('click', function(event){
@@ -281,9 +282,11 @@ function initStateFromHash(){
     // We only have state.
     if (tmpState == 'edit')
       gState = 'startPage';
+    else if (tmpState == 'newRecord')
+      gState = 'newRecord';
     else
-      // Invalid state, fail... (all states but 'edit' are illegal without
-      // record ID).
+      // Invalid state, fail... (all states but 'edit' and 'newRecord' are
+      // illegal without record ID).
       return;
   }
   else
@@ -308,20 +311,27 @@ function initStateFromHash(){
 	if (isNaN(recID)){
 	  // Invalid record ID.
 	  cleanUp(true, tmpRecID, 'recID', true);
-	    updateStatus('error', gRESULT_CODES[102]);
 	  $('.headline').text('BibEdit: Record #' + tmpRecID);
 	  displayMessage(102);
+	  updateStatus('error', gRESULT_CODES[102]);
 	}
 	else{
 	  cleanUp(true, recID, 'recID');
 	  getRecord(recID);
 	}
 	break;
+      case 'newRecord':
+	cleanUp(true, '', null, null, true);
+        $('.headline').text('BibEdit: Create new record');
+	displayNewRecordList();
+        bindNewRecordHandlers();
+	updateStatus('ready');
+	break;
       case 'submit':
 	cleanUp(true, '', null, true);
-	updateStatus('ready');
 	$('.headline').text('BibEdit: Record #' + tmpRecID);
 	displayMessage(4);
+	updateStatus('ready');
 	break;
       case 'cancel':
 	cleanUp(true, '', null, true, true);
@@ -329,9 +339,9 @@ function initStateFromHash(){
 	break;
       case 'deleteRecord':
 	cleanUp(true, '', null, true);
-	updateStatus('ready');
       	$('.headline').text('BibEdit: Record #' + tmpRecID);
 	displayMessage(6);
+	updateStatus('ready');
 	break;
     }
   }
@@ -418,6 +428,29 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gRecordDirty = false;
   gCacheMTime = null;
   gSelectionMode = false;
+}
+
+function bindNewRecordHandlers(){
+  /*
+   * Bind event handlers to links on 'Create new record' page.
+   */
+  $('#lnkNewEmptyRecord').bind('click', function(event){
+    updateStatus('updating');
+    createReq({requestType: 'newRecord', newType: 'empty'}, function(json){
+      getRecord(json['recID']);
+    });
+    event.preventDefault();
+  });
+  for (var i=0, n=gRECORD_TEMPLATES.length; i<n; i++)
+    $('#lnkNewTemplateRecord_' + i).bind('click', function(event){
+      updateStatus('updating');
+      var templateNo = this.id.split('_')[1];
+      createReq({requestType: 'newRecord', newType: 'template',
+	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
+	  getRecord(json['recID']);
+      });
+      event.preventDefault();
+    });
 }
 
 function onMergeClick(event){

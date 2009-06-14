@@ -331,7 +331,6 @@ function displayMessage(msgCode){
    * Display message in the main work area. Messages codes returned from the
    * server (positive integers) are as specified in the BibEdit configuration.
    */
-  $('#bibEditContent').empty();
   var msg;
   switch (msgCode){
     case -1:
@@ -348,6 +347,15 @@ function displayMessage(msgCode){
       break;
     case 6:
       msg = 'The record will be deleted as soon as the task queue is empty.';
+      break;
+    case 101:
+      msg = 'Could not access record. Permission denied.';
+      break;
+    case 102:
+      msg = 'This record does not exist. Please try another record ID.';
+      break;
+    case 103:
+      msg = 'Cannot edit deleted record.';
       break;
     case 104:
       msg = 'This record is currently being edited by another user. Please ' +
@@ -369,19 +377,44 @@ function displayMessage(msgCode){
 	'Do you want to ' +
 	'<b><a href="#"id="lnkGetRecord">reopen the record</a></b> here?';
 	break;
-    case 101:
-      msg = 'Could not access record. Permission denied.';
+    case 108:
+      msg = 'Could not find record template file. Please notify your system ' +
+	'administrator.';
       break;
-    case 102:
-      msg = 'This record does not exist. Please try another record ID.';
-      break;
-    case 103:
-      msg = 'Cannot edit deleted record.';
+    case 109:
+      msg = 'The record template file is invalid. Please notify your system ' +
+	'administrator';
       break;
     default:
       msg = 'Result code: <b>' + msgCode + '</b>';
   }
-  $('#bibEditContent').append('<div id="bibEditMessage">' + msg + '</div>');
+  $('#bibEditContent').html('<div id="bibEditMessage">' + msg + '</div>');
+}
+
+function displayNewRecordList(){
+  /*
+   * Display options for creating a new record: An empty record or a template
+   * selected from a list of templates.
+   */
+  var msg = '<ul><li style="padding-bottom: 20px;">' +
+    '<a href="#" id="lnkNewEmptyRecord"><b>Empty record</b></a></li>' +
+    '<li style="padding-bottom: 10px;">Use record template:' +
+    '<table>';
+  var templatesCount = gRECORD_TEMPLATES.length;
+  if (!templatesCount)
+    msg += '<tr><td style="padding-left: 10px;">No record templates found' +
+      '</td></tr>';
+  else{
+    for (var i=0, n=templatesCount; i<n; i++)
+      msg += '<tr style="border-width: 1px;">' +
+	'<td style="padding-left: 10px; padding-right: 10px;">' +
+	'<a href="#" id="lnkNewTemplateRecord_' + i + '"><b>' +
+	gRECORD_TEMPLATES[i][1] + '</b></a></td>' +
+	'<td style="padding-left: 10px; padding-right: 10px;">' +
+	'<td>' + gRECORD_TEMPLATES[i][2] + '</td></tr>';
+  }
+  msg += '</table></li>';
+  $('#bibEditContent').html(msg);
 }
 
 function displayCacheOutdatedOptions(requestType){
@@ -396,8 +429,8 @@ function displayCacheOutdatedOptions(requestType){
   var viewMARCXMLURL = recordURL + '?of=xm';
   var msg = '';
   if (requestType == 'submit')
-    msg = '<div id="bibEditMessage">Someone has changed this record ' +
-      'while you were editing. You can:<br/><ul>' +
+    msg = 'Someone has changed this record while you were editing. ' +
+      'You can:<br /><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
       ' <b><a href="' + viewMARCXMLURL + '" target="_blank">MARCXML</a></b>' +
@@ -408,11 +441,10 @@ function displayCacheOutdatedOptions(requestType){
     '(<b>Warning: </b>overwrites the latest version)</li>' +
     '<li><a href="#" id="lnkDiscardChanges><b>Discard your changes</b></a> ' +
     '(keep the latest version)</li>' +
-    '</ul></div>';
+    '</ul>';
   else if (requestType == 'getRecord')
-    msg = '<div id="bibEditMessage">You have unsubmitted changes to this ' +
-      'record, but someone has changed the record while you were editing. ' +
-      'You can:<br/><ul>' +
+    msg = 'You have unsubmitted changes to this record, but someone has ' +
+      'changed the record while you were editing. You can:<br /><ul>' +
       '<li>View (<b><a href="' + recordURL + '" target="_blank">HTML</a></b>,' +
       ' <b><a href="' + viewMARCURL + '" target="_blank">MARC</a></b>,' +
       ' <b><a href="' + viewMARCXMLURL + '" target="_blank">MARCXML</a></b>' +
@@ -424,8 +456,8 @@ function displayCacheOutdatedOptions(requestType){
       '<li>Keep editing. When submitting you will be offered to overwrite ' +
       'the latest version. Click <a href="#" id="lnkRemoveMsg">here' +
       '</a> to remove this message.</li>' +
-      '</ul></div>';
-  $('#bibEditContent').prepend(msg);
+      '</ul>';
+  $('#bibEditContent').prepend('<div id="bibEditMessage">' + msg + '</div>');
 }
 
 function displayAlert(msgType, args){
