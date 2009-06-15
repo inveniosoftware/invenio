@@ -30,7 +30,7 @@ def format(bfo, width="50"):
     This format element is an example of large element, which does
     all the formatting by itself
 
-    @param width the width (in number of characters) of the record
+    @param width: the width (in number of characters) of the record
     """
     out = "@"
     width = int(width)
@@ -419,8 +419,8 @@ def get_year(date, default=""):
     If year cannot be found, returns 'default'
     Returns first value found.
 
-    @param date the textual date to retrieve the year from
-    @param default a default value to return if year not fount
+    @param date: the textual date to retrieve the year from
+    @param default: a default value to return if year not fount
     """
     import re
     year_pattern = re.compile(r'\d\d\d\d')
@@ -437,8 +437,8 @@ def get_month(date, ln=CFG_SITE_LANG, default=""):
     The returned value is the 3 letters short month name in language 'ln'
     If year cannot be found, returns 'default'
 
-    @param date the textual date to retrieve the year from
-    @param default a default value to return if year not fount
+    @param date: the textual date to retrieve the year from
+    @param default: a default value to return if year not fount
     """
     import re
     from invenio.dateutils import get_i18n_month_name

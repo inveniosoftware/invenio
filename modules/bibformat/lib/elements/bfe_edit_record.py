@@ -24,7 +24,7 @@ def format(bfo, style):
     """
     Prints a link to BibEdit, if authorization is granted
 
-    @param style the CSS style to be applied to the link.
+    @param style: the CSS style to be applied to the link.
     """
     from invenio.config import CFG_SITE_URL
     from invenio.access_control_engine import acc_authorize_action

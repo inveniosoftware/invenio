@@ -763,12 +763,11 @@ class WordTable:
 
     def __init__(self, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map, wash_index_terms=True):
         """Creates words table instance.
-        @param index_id  the index integer identificator
-        @param fields_to_index a list of fields to index
-        @param table_name_pattern i.e. idxWORD%02dF or idxPHRASE%02dF
-        @parm default_get_words_fnc the default function called to extract
-        words from a metadata
-        @param tag_to_words_fnc_map a mapping to specify particular function to
+        @param index_id: the index integer identificator
+        @param fields_to_index: a list of fields to index
+        @param table_name_pattern: i.e. idxWORD%02dF or idxPHRASE%02dF
+        @parm default_get_words_fnc: the default function called to extract words from a metadata
+        @param tag_to_words_fnc_map: a mapping to specify particular function to
         extract words from particular metdata (such as 8564_u)
         """
         self.index_id = index_id

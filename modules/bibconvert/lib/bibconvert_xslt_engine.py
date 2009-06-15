@@ -154,10 +154,10 @@ def convert(xmltext, template_filename=None, template_source=None):
     Raises an exception if cannot find an appropriate XSLT processor.
 
 
-    @param xmltext The string representation of the XML to process
-    @param template_filename The name of the template to use for the processing
-    @param template_source The configuration describing the processing.
-    @return the transformed XML text, or None if an error occured
+    @param xmltext: The string representation of the XML to process
+    @param template_filename: The name of the template to use for the processing
+    @param template_source: The configuration describing the processing.
+    @return: the transformed XML text, or None if an error occured
     """
     if processor_type == -1:
         # No XSLT processor found

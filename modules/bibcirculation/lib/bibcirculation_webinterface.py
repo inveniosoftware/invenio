@@ -73,7 +73,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
         """
         Displays all loans of a given user
         @param ln:  language
-        @return the page for inbox
+        @return: the page for inbox
         """
 
         argd = wash_urlargd(form, {'barcode': (str, ""),

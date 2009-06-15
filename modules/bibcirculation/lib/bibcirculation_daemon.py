@@ -35,7 +35,7 @@ from invenio.search_engine import get_fieldvalues
 
 def get_expired_loan():
     """
-    @return all expired loans
+    @return: all expired loans
     """
 
     res = run_sql("""select id_crcBORROWER, id, id_bibrec

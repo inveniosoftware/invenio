@@ -30,8 +30,8 @@ def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
 
     @param keyword_prefix a prefix before each keyword
     @param keyword_suffix a suffix after each keyword
-    @param separator a separator between keywords
-    @param link links the keywords if 'yes' (HTML links)
+    @param separator: a separator between keywords
+    @param link: links the keywords if 'yes' (HTML links)
     """
 
     keywords = bfo.fields('6531_a')

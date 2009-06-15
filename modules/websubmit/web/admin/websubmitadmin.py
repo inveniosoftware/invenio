@@ -210,7 +210,7 @@ def actionadd(req, actid=None, actname=None, working_dir=None, status_text=None,
        @param working_dir: action working directory for WebSubmit
        @param status_text: status text displayed at end of WebSubmit action
        @param ln: language
-       @return page
+       @return: page
     """
 
     ln = wash_language(ln)
@@ -274,7 +274,7 @@ def jscheckadd(req, chname=None, chdesc=None, chcommit="", ln=CFG_SITE_LANG):
        @param chdesc: description of new JS check (the JavaScript code that is the check.) (If empty,
                       Web form will be displayed)
        @param ln: language
-       @return page
+       @return: page
     """
 
     ln = wash_language(ln)
@@ -346,7 +346,7 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
        @param elcommit: flag variable used to determine whether to commit element modifications or whether
                         to simply display a form containing element details.
        @param ln: language
-       @return page
+       @return: page
     """
 
     ln = wash_language(ln)
@@ -391,7 +391,7 @@ def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=N
        @param elcommit: flag variable used to determine whether to commit element modifications or whether
                         to simply display a form containing element details.
        @param ln: language
-       @return page
+       @return: page
     """
 
     ln = wash_language(ln)

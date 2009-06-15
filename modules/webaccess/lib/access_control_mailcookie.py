@@ -46,10 +46,10 @@ _datetime_format = "%Y-%m-%d %H:%M:%S"
 
 def mail_cookie_create_generic(kind, params, cookie_timeout=timedelta(days=1), onetime=False):
     """Create a unique url to be sent via email to access this authorization
-    @param kind kind of authorization (e.g. 'pw_reset', 'mail_activation', 'role')
-    @param params whatever parameters are needed
-    @param cookie_timeout for how long the url will be valid
-    @param onetime whetever to remove the cookie after it has used.
+    @param kind: kind of authorization (e.g. 'pw_reset', 'mail_activation', 'role')
+    @param params: whatever parameters are needed
+    @param cookie_timeout: for how long the url will be valid
+    @param onetime: whetever to remove the cookie after it has used.
     """
     assert(kind in _authorizations_kind)
     expiration = datetime.today()+cookie_timeout

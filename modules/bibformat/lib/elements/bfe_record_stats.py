@@ -24,7 +24,7 @@ def format(bfo, display='day_distinct_ip_nb_views'):
     '''
     Prints record statistics
 
-    @param display the type of statistics displayed. Can be 'total_nb_view', 'day_nb_views', 'total_distinct_ip_nb_views', 'day_distincts_ip_nb_views', 'total_distinct_ip_per_day_nb_views'
+    @param display: the type of statistics displayed. Can be 'total_nb_view', 'day_nb_views', 'total_distinct_ip_nb_views', 'day_distincts_ip_nb_views', 'total_distinct_ip_per_day_nb_views'
     '''
 
     if display == 'total_nb_views':

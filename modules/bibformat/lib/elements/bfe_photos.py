@@ -29,9 +29,9 @@ def format(bfo, separator=" ", style='', print_links='yes'):
     files, for which a preview icon has been generated. If there are
     several formats for one photo, use the first one found.
 
-    @param separator separator between each photo
-    @param print_links if 'yes', print links to the original photo
-    @param style style attributes of the images. Eg: "width:50px;border:none"
+    @param separator: separator between each photo
+    @param print_links: if 'yes', print links to the original photo
+    @param style: style attributes of the images. Eg: "width:50px;border:none"
     """
 
     photos = []

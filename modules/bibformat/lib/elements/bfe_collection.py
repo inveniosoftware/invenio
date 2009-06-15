@@ -26,7 +26,7 @@ def format(bfo, kb):
     Prints the collection identifier.
     Translate using given knowledge base.
 
-    @param kb a knowledge base use to translate the collection identifier
+    @param kb: a knowledge base use to translate the collection identifier
     """
 
     collection_identifier = bfo.field("980__a")

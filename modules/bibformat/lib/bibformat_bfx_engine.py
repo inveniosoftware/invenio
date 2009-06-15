@@ -39,10 +39,10 @@ def format_with_bfx(recIDs, out_file, template_name, preprocess=None):
     Format a set of records according to a BFX template.
     This is the main entry point to the BFX engine.
 
-    @param recIDs a list of record IDs to format
-    @param out_file an object to write in; this can be every object which has a 'write' method: file, req, StringIO
-    @param template_name the file name of the BFX template without the path and the .bfx extension
-    @param preprocess an optional function; every record is passed through this function for initial preprocessing before formatting
+    @param recIDs: a list of record IDs to format
+    @param out_file: an object to write in; this can be every object which has a 'write' method: file, req, StringIO
+    @param template_name: the file name of the BFX template without the path and the .bfx extension
+    @param preprocess: an optional function; every record is passed through this function for initial preprocessing before formatting
     '''
     trans = MARCTranslator(CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS)
     trans.set_record_ids(recIDs, preprocess)
@@ -82,7 +82,7 @@ class BFXParser:
             - is_defined(name)
             - iterator(name)
             - get_value(name, [display_specifier])
-        @param translator the translator used by the class instance
+        @param translator: the translator used by the class instance
         '''
         self.translator = translator
         self.known_operators = ['style', 'format', 'template', 'template_ref', 'text', 'field', 'element', 'loop', 'if', 'then', 'else', 'elif']
@@ -104,8 +104,8 @@ class BFXParser:
         standard directory for bfx template) or directly using the template source.
         If given, template_source overrides template_name
 
-        @param template_name the name of the BFX template, the same as the name of the filename without the extension
-        @return a DOM tree of the template
+        @param template_name: the name of the BFX template, the same as the name of the filename without the extension
+        @return: a DOM tree of the template
         '''
         if template_source is None:
             template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + '/' + template_name + '.' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
@@ -139,8 +139,8 @@ class BFXParser:
         '''
         A function to check if an expression is of the special form [!name:display].
         A short form for saying <bx:field name="name" display="tag">, used in element attributes.
-        @param expression a string, usually taken from an attribute value
-        @return if the string is special, parse it and return the corresponding value; else return the initial expression
+        @param expression: a string, usually taken from an attribute value
+        @return: if the string is special, parse it and return the corresponding value; else return the initial expression
         '''
         output = expression
         pattern = '\[!(?P<tmp>[\w_.:]*)\]'
@@ -166,10 +166,10 @@ class BFXParser:
            - for 'execution' of a format/template
         The different behaviour is achieved through the use of flags, which can be set to True or False.
 
-        @param parent a node to process; in an API call this is the root node
-        @param out_file an object to write to; must have a 'write' method
+        @param parent: a node to process; in an API call this is the root node
+        @param out_file: an object to write to; must have a 'write' method
 
-        @return None
+        @return: None
         '''
         for node in parent.childNodes:
             if node.nodeType == Node.TEXT_NODE:
@@ -632,8 +632,8 @@ class MARCTranslator:
     def set_record_ids(self, recIDs, preprocess=None):
         '''
         Initialize the translator with the set of record IDs.
-        @param recIDs a list of the record IDs
-        @param preprocess an optional function which acts on every record structure after creating it
+        @param recIDs: a list of the record IDs
+        @param preprocess: an optional function which acts on every record structure after creating it
                This can be used to enrich the record with fields not present in the record initially,
                verify the record data or whatever plausible.
                Another solution is to use external function elements.
@@ -678,7 +678,7 @@ class MARCTranslator:
     def is_defined(self, name):
         '''
         Check whether a variable is defined.
-        @param name the name of the variable
+        @param name: the name of the variable
         '''
         return self.memory.has_key(name)
 
@@ -699,8 +699,8 @@ class MARCTranslator:
         The API function for quering the translator for values of a certain variable.
         Called in a loop will result in a different value each time.
         Objects are cached in memory, so subsequent calls for the same variable take less time.
-        @param name the name of the variable you want the value of
-        @param display_type an optional value for the type of the desired output, one of: value, tag, ind1, ind2, code, fulltag;
+        @param name: the name of the variable you want the value of
+        @param display_type: an optional value for the type of the desired output, one of: value, tag, ind1, ind2, code, fulltag;
                These can be easily added in the proper place of the code (display_value)
         '''
         if name == 'record':
@@ -735,9 +735,9 @@ class MARCTranslator:
     def call_function(self, function_name, parameters=None):
         '''
         Call an external element which is a Python file, using BibFormat
-        @param function_name the name of the function to call
-        @param parameters a dictionary of the parameters to pass as key=value pairs
-        @return a string value, which is the result of the function call
+        @param function_name: the name of the function to call
+        @param parameters: a dictionary of the parameters to pass as key=value pairs
+        @return: a string value, which is the result of the function call
         '''
         if parameters is None:
             parameters = {}
@@ -793,9 +793,9 @@ class MARCTranslator:
     def display_record(self, record, display_type='value'):
         '''
         Decide what the final output value is according to the display_type.
-        @param record the record structure to display; this is most probably just a single subfield
-        @param display_type a string specifying the desired output; can be one of: value, tag, ind1, ind2, code, fulltag
-        @return a string to output
+        @param record: the record structure to display; this is most probably just a single subfield
+        @param display_type: a string specifying the desired output; can be one of: value, tag, ind1, ind2, code, fulltag
+        @return: a string to output
         '''
         output = ''
         tag, ind1, ind2, code, value = '', '', '', '', ''
@@ -852,8 +852,8 @@ The record structure has the form:
 def convert_record(old_record):
     '''
     Convert a record from the format defined in bibrecord to the format defined here
-    @param old_record the record as returned from bibrecord.create_record()
-    @return a record of the new form
+    @param old_record: the record as returned from bibrecord.create_record()
+    @return: a record of the new form
     '''
     fields = {}
     old_tags = old_record.keys()
@@ -891,8 +891,8 @@ def convert_record(old_record):
 def get_bfx_record(recID):
     '''
     Get a record with a specific recID.
-    @param recID the ID of the record
-    @return a record in the structure defined here
+    @param recID: the ID of the record
+    @return: a record in the structure defined here
     '''
     bfo = BibFormatObject(recID)
     return convert_record(bfo.get_record())
@@ -912,9 +912,9 @@ def record_fields_value(record, tag, subfield):
     '''
     Return a list of all the fields with a certain tag and subfield code.
     Works on subfield level.
-    @param record a record
-    @param tag a 3 or 5 letter tag; required
-    @param subfield a subfield code; required
+    @param record: a record
+    @param tag: a 3 or 5 letter tag; required
+    @param subfield: a subfield code; required
     '''
     output = []
     if record.has_key(tag):
@@ -927,10 +927,10 @@ def record_fields_value(record, tag, subfield):
 def record_add_field_instance(record, tag, field_instance):
     '''
     Add a field_instance to the beginning of the instances of a corresponding tag.
-    @param record a record
-    @param tag a 3 or 5 letter tag; required
-    @param field_instance the field instance to add
-    @return None
+    @param record: a record
+    @param tag: a 3 or 5 letter tag; required
+    @param field_instance: the field instance to add
+    @return: None
     '''
     if not record.has_key(tag):
         record[tag] = []
@@ -941,10 +941,10 @@ def record_num_parts(record, level):
     '''
     Count the number of instances or the number of subfields in the whole record.
     @param record
-    @param level either 1 or 2
+    @param level: either 1 or 2
            level=1 - view record on instance level
            level=2 - view record on subfield level
-    @return the number of parts
+    @return: the number of parts
     '''
     num = 0
     for part in record_parts(record, level):
@@ -954,7 +954,7 @@ def record_parts(record, level):
     '''
     An iterator over the instances or subfields of a record.
     @param record
-    @param level either 1 or 2
+    @param level: either 1 or 2
            level=1 - iterate over instances
            level=2 - iterate over subfields
     @yield a record structure representing the part (instance or subfield)
@@ -1001,10 +1001,10 @@ def copy(old_record, address=''):
     '''
     Copy a record by filtering all parts of the old record specified by address
     (A better name for the function is filter.)
-    @param record the initial record
-    @param address an address; for examples see bibformat_bfx_engine_config.
+    @param record: the initial record
+    @param address: an address; for examples see bibformat_bfx_engine_config.
            If no address is specified, return the initial record.
-    @return the filtered record
+    @return: the filtered record
     '''
     if not old_record:
         return {}
@@ -1059,7 +1059,7 @@ def merge(record1, record2):
     Merge two records.
     Controlfields with the same tag in record2 as in record1 are ignored.
     @param record1, record2
-    @return the merged record
+    @return: the merged record
     '''
     new_record = {}
     if record1:
@@ -1105,15 +1105,15 @@ xmlempty = 4
 def create_xml_element(name, value='', attrs=None, element_type=xmlfull, level=0):
     '''
     Create a XML element as string.
-    @param name the name of the element
-    @param value the element value; default is ''
-    @param attrs a dictionary with the element attributes
-    @param element_type a constant which defines the type of the output
+    @param name: the name of the element
+    @param value: the element value; default is ''
+    @param attrs: a dictionary with the element attributes
+    @param element_type: a constant which defines the type of the output
            xmlopen = 1   <element attr="attr_value">
            xmlclose = 2  </element>
            xmlfull = 3   <element attr="attr_value">value</element>
            xmlempty = 4  <element attr="attr_value"/>
-    @return a formatted XML string
+    @return: a formatted XML string
     '''
     output = ''
     if attrs is None:
@@ -1151,16 +1151,16 @@ def create_xml_element(name, value='', attrs=None, element_type=xmlfull, level=0
 def xml_escape(value):
     '''
     Escape a string value for use as a xml element or attribute value.
-    @param value the string value to escape
-    @return escaped value
+    @param value: the string value to escape
+    @return: escaped value
     '''
     return saxutils.escape(value)
 
 def xml_unescape(value):
     '''
     Unescape a string value for use as a xml element.
-    @param value the string value to unescape
-    @return unescaped value
+    @param value: the string value to unescape
+    @return: unescaped value
     '''
     return saxutils.unescape(value)
 
@@ -1168,7 +1168,7 @@ def node_has_subelements(node):
     '''
     Check if a node has any childnodes.
     Check for element or text nodes.
-    @return True if childnodes exist, False otherwise.
+    @return: True if childnodes exist, False otherwise.
     '''
     result = False
     for node in node.childNodes:
@@ -1179,10 +1179,10 @@ def node_has_subelements(node):
 def get_node_subelement(parent_node, name, namespace = None):
     '''
     Get the first childnode with specific name and (optional) namespace
-    @param parent_node the node to check
-    @param name the name to search
-    @param namespace An optional namespace URI. This is usually a URL: http://cdsware.cern.ch/invenio/
-    @return the found node; None otherwise
+    @param parent_node: the node to check
+    @param name: the name to search
+    @param namespace: An optional namespace URI. This is usually a URL: http://cdsware.cern.ch/invenio/
+    @return: the found node; None otherwise
     '''
     output = None
     for node in parent_node.childNodes:
@@ -1194,32 +1194,32 @@ def get_node_subelement(parent_node, name, namespace = None):
 def get_node_value(node):
     '''
     Get the node value of a node. For use with text nodes.
-    @param node a text node
-    @return a string of the nodevalue encoded in utf-8
+    @param node: a text node
+    @return: a string of the nodevalue encoded in utf-8
     '''
     return node.nodeValue.encode('utf-8')
 
 def get_node_namespace(node):
     '''
     Get node namespace. For use with element nodes.
-    @param node an element node
-    @return the namespace of the node
+    @param node: an element node
+    @return: the namespace of the node
     '''
     return node.namespaceURI
 
 def get_node_name(node):
     '''
     Get the node value of a node. For use with element nodes.
-    @param node an element node
-    @return a string of the node name
+    @param node: an element node
+    @return: a string of the node name
     '''
     return node.nodeName
 
 def get_node_attributes(node):
     '''
     Get attributes of an element node.  For use with element nodes
-    @param node an element node
-    @return a dictionary of the attributes as key:value pairs
+    @param node: an element node
+    @return: a dictionary of the attributes as key:value pairs
     '''
     attributes = {}
     attrs = node.attributes
@@ -1232,9 +1232,9 @@ def get_node_attributes(node):
 def pass_through_regexp(value, regexp):
     '''
     Pass a value through a regular expression.
-    @param value a string
-    @param regexp a regexp with a group 'value' in it. No group named 'value' will result in an error.
-    @return if the string matches the regexp, return named group 'value', otherwise return ''
+    @param value: a string
+    @param regexp: a regexp with a group 'value' in it. No group named 'value' will result in an error.
+    @return: if the string matches the regexp, return named group 'value', otherwise return ''
     '''
     output = ''
     expr = re.compile(regexp)
@@ -1246,8 +1246,8 @@ def pass_through_regexp(value, regexp):
 def is_number(value):
     '''
     Check if a value is a number.
-    @param value the value to check
-    @return True or False
+    @param value: the value to check
+    @return: True or False
     '''
     result = True
     try:

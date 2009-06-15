@@ -946,7 +946,7 @@ def build_issns_from_distant_site(url):
 
     Print the result as Python dict structure.
 
-    @param url the url to load issn from (in the *exact* form: http://www.mysite.com/)
+    @param url: the url to load issn from (in the *exact* form: http://www.mysite.com/)
     """
     ## Parse the results of the http request:
     ## http://cdsweb.cern.ch/search?cc=Periodicals&ot=022,210&of=tm&rg=9000

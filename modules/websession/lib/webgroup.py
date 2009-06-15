@@ -50,7 +50,7 @@ def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], \
     @param uid:   user id
     @param info: info about last user action
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     _ = gettext_set_language(ln)
     body = ""
@@ -78,7 +78,7 @@ def display_admin_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is admin of.
     @param uid: user id
     @param ln: language
-    @return a (body, errors[]) formed tuple
+    @return: a (body, errors[]) formed tuple
     return html groups representation the user is admin of
     """
     body = ""
@@ -94,7 +94,7 @@ def display_member_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is member of.
     @param uid: user id
     @param ln: language
-    @return a (body, errors[]) formed tuple
+    @return: a (body, errors[]) formed tuple
     body : html groups representation the user is member of
     """
     body = ""
@@ -111,7 +111,7 @@ def display_external_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is admin of.
     @param uid: user id
     @param ln: language
-    @return a (body, errors[]) formed tuple
+    @return: a (body, errors[]) formed tuple
     return html groups representation the user is admin of
     """
     body = ""
@@ -137,7 +137,7 @@ def perform_request_input_create_group(group_name,
     @param join_policy: join  policy chosen if the page has been reloaded
     @param warnings: warnings
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     body: html for group creation page
     """
     body = ""
@@ -160,7 +160,7 @@ def perform_request_create_group(uid,
     @param group_description: description of the group entered
     @param join_policy: join  policy of the group entered
     @param ln: language
-    @return a (body, errors, warnings) formed tuple
+    @return: a (body, errors, warnings) formed tuple
     warning != [] if group_name or join_policy are not valid
     or if the name already exists in the database
     body="1" if succeed in order to display info on the main page
@@ -224,7 +224,7 @@ def perform_request_input_join_group(uid,
     @param search=1 if search performed else 0
     @param warnings: warnings coming from perform_request_join_group
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     errors = []
     group_from_search = {}
@@ -252,7 +252,7 @@ def perform_request_join_group(uid,
     @param group_name: name of the group entered if search on name performed
     @param search=1 if search performed else 0
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     warnings != [] if 0 or more than one group is selected
     """
     _ = gettext_set_language(ln)
@@ -327,7 +327,7 @@ def perform_request_input_leave_group(uid,
     @param warnings: warnings != [] if 0 group is selected or if not admin
         of the
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     body = ""
     errors = []
@@ -349,7 +349,7 @@ def perform_request_leave_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     @param warnings: warnings != [] if 0 group is selected
     @param confirmed: a confirmed page is first displayed
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     _ = gettext_set_language(ln)
     body = ""
@@ -382,7 +382,7 @@ def perform_request_edit_group(uid,
     @param grpID: ID of the group
     @param warnings: warnings
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
 
     body = ''
@@ -420,7 +420,7 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
     @param group_description: description of the group
     @param join_policy: join policy of the group
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     body = ''
     errors = []
@@ -473,9 +473,9 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     then(confirmed=1) delete group and all its members
     @param uid: user ID
     @param grpID: ID of the group
-    @param confirmed =1 if confirmed message has been previously displayed
+    @param confirmed: =1 if confirmed message has been previously displayed
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     body = ""
     warnings = []
@@ -530,7 +530,7 @@ def perform_request_manage_member(uid,
     @param info: info about last user action
     @param warnings: warnings
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     body = ''
     errors = []
@@ -566,7 +566,7 @@ def perform_request_remove_member(uid, grpID, member_id, ln=CFG_SITE_LANG):
     @param grpID: ID of the group
     @param member_id: selected member ID
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     body = ''
     errors = []
@@ -601,7 +601,7 @@ def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
     @param grpID: ID of the group
     @param user_id: selected member ID
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     body = ''
     errors = []
@@ -662,7 +662,7 @@ def perform_request_reject_member(uid,
     @param grpID: ID of the group
     @param member_id: selected member ID
     @param ln: language
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     body = ''
     errors = []
@@ -719,7 +719,7 @@ def account_group(uid, ln=CFG_SITE_LANG):
     """Display group info for myaccount.py page.
     @param uid: user id (int)
     @param ln: language
-    @return html body
+    @return: html body
     """
     nb_admin_groups = db.count_nb_group_user(uid,
         CFG_WEBSESSION_USERGROUP_STATUS["ADMIN"])
@@ -734,7 +734,7 @@ def get_navtrail(ln=CFG_SITE_LANG, title=""):
     """Gets the navtrail for title.
     @param title: title of the page
     @param ln: language
-    @return HTML output
+    @return: HTML output
     """
     navtrail = websession_templates.tmpl_navtrail(ln, title)
     return navtrail
@@ -808,9 +808,9 @@ def synchronize_groups_with_login_method():
 
 def synchronize_all_external_groups(usersgroups, login_method):
     """Merges all the groups vs users memberships.
-    @param usersgroups is {'mygroup': ('description',
+    @param usersgroups: is {'mygroup': ('description',
         ['email1', 'email2', ...]), ...}
-    @return True in case everythings is ok, False otherwise
+    @return: True in case everythings is ok, False otherwise
     """
     db_users = db.get_all_users() # All users of the database {email:uid, ...}
     db_users_set = set(db_users.keys()) # Set of all users set('email1',

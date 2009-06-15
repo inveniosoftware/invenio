@@ -26,7 +26,7 @@ def format(bfo, separator='; '):
     """
     Prints a list of records citing this record
 
-    @param separator a separator between citations
+    @param separator: a separator between citations
     """
     from urllib import quote
     from invenio.config import CFG_SITE_URL

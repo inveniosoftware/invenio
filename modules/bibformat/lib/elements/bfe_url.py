@@ -23,8 +23,8 @@ __revision__ = "$Id$"
 def format(bfo, style, separator='; '):
     """
     This is the default format for formatting full-text URLs.
-    @param separator the separator between urls.
-    @param style CSS class of the link
+    @param separator: the separator between urls.
+    @param style: CSS class of the link
     """
 
     urls_u = bfo.fields("8564_u")

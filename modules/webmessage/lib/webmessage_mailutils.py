@@ -60,7 +60,7 @@ def email_quoted_txt2html(text,
     @param indent_html: tuple of (opening, closing) html tags.
                         default: ('<div class="commentbox">', "</div>")
     @param linebreak_html: line separator in html (default: '<br/>')
-    @return string containing html formatted output
+    @return: string containing html formatted output
     """
     final_body = ""
     nb_indent = 0
@@ -118,7 +118,7 @@ def email_quote_txt(text,
                             default: '\n'
     @param linebreak_output: linebreak used for output
                              default: '\n'
-    @return the text as a quoted string
+    @return: the text as a quoted string
     """
     if (text == ""):
         return ""

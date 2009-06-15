@@ -47,7 +47,7 @@ def wash_url_argument(var, new_type):
     calling this function.
     @param var: variable value
     @param new_type: variable type, 'list', 'str', 'int', 'tuple' or 'dict'
-    @return as much as possible, value var as type new_type
+    @return: as much as possible, value var as type new_type
             If var is a list, will change first element into new_type.
             If int check unsuccessful, returns 0
     """

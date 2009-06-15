@@ -24,10 +24,10 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
     """
     Prints the list of editors of a record.
 
-    @param limit the maximum number of editors to display
-    @param separator the separator between editors.
-    @param extension a text printed if more editors than 'limit' exist
-    @param print_links if yes, print the editors as HTML link to their publications
+    @param limit: the maximum number of editors to display
+    @param separator: the separator between editors.
+    @param extension: a text printed if more editors than 'limit' exist
+    @param print_links: if yes, print the editors as HTML link to their publications
     """
     from urllib import quote
     from invenio.config import CFG_SITE_URL

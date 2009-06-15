@@ -25,8 +25,8 @@ def format(bfo, limit, separator=" "):
     """
     Prints the additional report numbers of the record
 
-    @param separator the separator between report numbers.
-    @param limit the max number of report numbers to display
+    @param separator: the separator between report numbers.
+    @param limit: the max number of report numbers to display
     """
 
     numbers = bfo.fields("088__a")

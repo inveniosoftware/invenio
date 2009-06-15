@@ -30,11 +30,11 @@ def format(bfo, tag, limit, instances_separator=" ",
     that it accesses a control field. Else it considers it
     accesses a data field.
 
-    @param tag the tag code of the field that is to be printed
-    @param instances_separator a separator between instances of field
-    @param subfields_separator a separator between subfields of an instance
-    @param limit the maximum number of values to display.
-    @param extension a text printed at the end if 'limit' has been exceeded
+    @param tag: the tag code of the field that is to be printed
+    @param instances_separator: a separator between instances of field
+    @param subfields_separator: a separator between subfields of an instance
+    @param limit: the maximum number of values to display.
+    @param extension: a text printed at the end if 'limit' has been exceeded
     """
     # Check if data or control field
     p_tag = parse_tag(tag)

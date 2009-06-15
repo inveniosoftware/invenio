@@ -28,7 +28,7 @@ def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
 
     @param note_prefix a prefix before each group of notes
     @param note_suffix a suffix after each group of notes
-    @param separator a separator between notes of a group
+    @param separator: a separator between notes of a group
     """
     notes = []
 

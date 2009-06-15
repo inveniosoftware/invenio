@@ -88,7 +88,7 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
     @param uid: the id of the user who is reading comments
     @param can_send_comments: if user can send comment or not
     @oaram can_attach_files: if user can attach file to comment or not
-    @return html body.
+    @return: html body.
     """
     errors = []
     warnings = []
@@ -196,7 +196,7 @@ def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
     @param cmt_id: review id
     @param value: +1 for voting positively
                   -1 for voting negatively
-    @return integer 1 if successful, integer 0 if not
+    @return: integer 1 if successful, integer 0 if not
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
     client_ip_address = wash_url_argument(client_ip_address, 'str')
@@ -294,7 +294,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
     Report a comment/review for inappropriate content.
     Will send an email to the administrator if number of reports is a multiple of CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN
     @param cmt_id: comment id
-    @return integer 1 if successful, integer 0 if not. -2 if comment does not exist
+    @return: integer 1 if successful, integer 0 if not. -2 if comment does not exist
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
     if cmt_id <= 0:
@@ -401,7 +401,7 @@ def check_user_can_report(cmt_id, client_ip_address, uid=-1):
 def query_get_user_contact_info(uid):
     """
     Get the user contact information
-    @return tuple (nickname, email, last_login), if none found return ()
+    @return: tuple (nickname, email, last_login), if none found return ()
     Note: for the moment, if no nickname, will return email address up to the '@'
     """
     query1 = """SELECT nickname, email,
@@ -419,7 +419,7 @@ def query_get_user_reports_and_votes(uid):
     """
     Retrieve total number of reports and votes of a particular user
     @param uid: user id
-    @return tuple (total_nb_reports, total_nb_votes_yes, total_nb_votes_total)
+    @return: tuple (total_nb_reports, total_nb_votes_yes, total_nb_votes_total)
             if none found return ()
     """
     query1 = """SELECT nb_votes_yes,
@@ -442,7 +442,7 @@ def query_get_comment(comID):
     """
     Get all fields of a comment
     @param comID: comment id
-    @return tuple (comID, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports)
+    @return: tuple (comID, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports)
             if none found return ()
     """
     query1 = """SELECT id,
@@ -468,7 +468,7 @@ def query_record_report_this(comID):
     """
     Increment the number of reports for a comment
     @param comID: comment id
-    @return tuple (success, new_total_nb_reports_for_this_comment) where
+    @return: tuple (success, new_total_nb_reports_for_this_comment) where
     success is integer 1 if success, integer 0 if not, -2 if comment does not exist
     """
     #retrieve nb_abuse_reports
@@ -491,7 +491,7 @@ def query_record_useful_review(comID, value):
     Adjust the number of useful votes and number of total votes for a comment.
     @param comID: comment id
     @param value: +1 or -1
-    @return integer 1 if successful, integer 0 if not
+    @return: integer 1 if successful, integer 0 if not
     """
     # retrieve nb_useful votes
     query1 = "SELECT nb_votes_total, nb_votes_yes FROM cmtRECORDCOMMENT WHERE id=%s"
@@ -525,7 +525,7 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
     @param display_since: datetime, e.g. 0000-00-00 00:00:00
     @param ranking: boolean, enabled if reviews, disabled for comments
     @param full_reviews_p: boolean, filter out empty reviews (with score only) if False
-    @return tuple of comment where comment is
+    @return: tuple of comment where comment is
             tuple (nickname, uid, date_creation, body, id) if ranking disabled or
             tuple (nickname, uid, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
     Note: for the moment, if no nickname, will return email address up to '@'
@@ -591,7 +591,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     @param score: review star score
     @param priority: remark priority #!FIXME
     @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
-    @return integer >0 representing id if successful, integer 0 if not
+    @return: integer >0 representing id if successful, integer 0 if not
     """
     current_date = calculate_start_date('0d')
     #change utf-8 message into general unicode
@@ -634,13 +634,13 @@ def calculate_start_date(display_since):
     Private function
     Returns the datetime of display_since argument in MYSQL datetime format
     calculated according to the local time.
-    @param display_since =  all= no filtering
+    @param display_since: =  all= no filtering
                             nd = n days ago
                             nw = n weeks ago
                             nm = n months ago
                             ny = n years ago
                             where n is a single digit number
-    @return string of wanted datetime.
+    @return: string of wanted datetime.
             If 'all' given as argument, will return datetext_default
             datetext_default is defined in miscutils/lib/dateutils and
             equals 0000-00-00 00:00:00 => MySQL format
@@ -714,7 +714,7 @@ def get_first_comments_or_remarks(recID=-1,
     @param nb: number of comment/reviews or remarks to get
     @param voted: 1 if user has voted for a remark
     @param reported: 1 if user has reported a comment or review
-    @return if comment, tuple (comments, reviews) both being html of first nb comments/reviews
+    @return: if comment, tuple (comments, reviews) both being html of first nb comments/reviews
             if remark, tuple (remakrs, None)
     """
     warnings = []
@@ -772,7 +772,7 @@ def calculate_avg_score(res):
     private function
     Calculate the avg score of reviews present in res
     @param res: tuple of tuple returned from query_retrieve_comments_or_remarks
-    @return a float of the average score rounded to the closest 0.5
+    @return: a float of the average score rounded to the closest 0.5
     """
     c_star_score = 6
     avg_score = 0.0
@@ -824,7 +824,7 @@ def perform_request_add_comment_or_remark(recID=0,
     @param comID: if replying, this is the comment id of the commetn are replying to
     @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
     @param can_attach_files: if user can attach files to comments or not
-    @return html add form if action is display or reply
+    @return: html add form if action is display or reply
             html successful added form if action is submit
     """
     warnings = []
@@ -1014,7 +1014,7 @@ def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
     Append error messages to errors listi
     @param recID: record id
     @param warnings: the warnings list of the calling function
-    @return tuple (boolean, html) where boolean (1=true, 0=false)
+    @return: tuple (boolean, html) where boolean (1=true, 0=false)
                                   and html is the body of the page to display if there was a problem
     """
     # Make errors into a list if needed
@@ -1053,7 +1053,7 @@ def check_int_arg_is_in_range(value, name, errors, gte_value, lte_value=None):
     @param errors: list of error tuples (error_id, value)
     @param gte_value: greater than or equal to value
     @param lte_value: less than or equal to value
-    @return boolean (1=true, 0=false)
+    @return: boolean (1=true, 0=false)
     """
     # Make errors into a list if needed
     if type(errors) is not list:
@@ -1084,8 +1084,8 @@ def get_mini_reviews(recid, ln=CFG_SITE_LANG):
     Returns the web controls to add reviews to a record from the
     detailed record pages mini-panel.
 
-    @param recid the id of the displayed record
-    @param ln the user's language
+    @param recid: the id of the displayed record
+    @param ln: the user's language
     """
     if CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS:
         action = 'SUBMIT'

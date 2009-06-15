@@ -26,7 +26,7 @@ from invenio.search_engine import get_all_collections_of_a_record, \
 def format(bfo, separator="<br />"):
     """Prints the list of collections the record belongs to.
 
-    @param separator a separator between each collection link.
+    @param separator: a separator between each collection link.
     """
 
     coll_names = get_all_collections_of_a_record(bfo.recID)

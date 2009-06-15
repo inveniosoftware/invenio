@@ -459,7 +459,7 @@ def update_action_details(actid, actname, working_dir, status_text):
        @param actname: action name (lactname)
        @param working_dir: directory action works from (dir)
        @param status_text: text string indicating action status (statustext)
-       @return 0 (ZERO) if update is performed; 1 (ONE) if insert not performed due to rows existing for
+       @return: 0 (ZERO) if update is performed; 1 (ONE) if insert not performed due to rows existing for
                  given action name.
    """
     # Check record with code 'actid' does not already exist:
@@ -490,7 +490,7 @@ def get_actid_actname_allactions():
 def get_number_actions_with_actid(actid):
     """Return the number of actions found for a given action id.
        @param actid: action id (sactname) to query for
-       @return an integer count of the number of actions in the websubmit database for this actid.
+       @return: an integer count of the number of actions in the websubmit database for this actid.
     """
     q = """SELECT COUNT(sactname) FROM sbmACTION WHERE sactname=%s"""
     return int(run_sql(q, (actid,))[0][0])
@@ -502,7 +502,7 @@ def insert_action_details(actid, actname, working_dir, status_text):
        @param actname: action name (lactname)
        @param working_dir: directory action works from (dir)
        @param status_text: text string indicating action status (statustext)
-       @return 0 (ZERO) if insert is performed; 1 (ONE) if insert not performed due to rows existing for
+       @return: 0 (ZERO) if insert is performed; 1 (ONE) if insert not performed due to rows existing for
                  given action name.
    """
     # Check record with code 'actid' does not already exist:
@@ -522,7 +522,7 @@ def insert_action_details(actid, actname, working_dir, status_text):
 def get_number_jschecks_with_chname(chname):
     """Return the number of Checks found for a given check name/id.
        @param chname: Check name/id (chname) to query for
-       @return an integer count of the number of Checks in the WebSubmit database for this chname.
+       @return: an integer count of the number of Checks in the WebSubmit database for this chname.
     """
     q = """SELECT COUNT(chname) FROM sbmCHECKS where chname=%s"""
     return int(run_sql(q, (chname,))[0][0])
@@ -554,7 +554,7 @@ def insert_jscheck_details(chname, chdesc):
        with the same Check-name (chname).
        @param chname: unique check id/name (chname)
        @param chdesc: Check description (the JavaScript code body that is the Check) (chdesc)
-       @return 0 (ZERO) if insert is performed; 1 (ONE) if insert not performed due to rows existing for
+       @return: 0 (ZERO) if insert is performed; 1 (ONE) if insert not performed due to rows existing for
                  given Check name/id.
    """
     # Check record with code 'chname' does not already exist:
@@ -572,7 +572,7 @@ def update_jscheck_details(chname, chdesc):
        with that check id/name (chname).
        @param chname: unique Check id/name (chname)
        @param chdesc: Check description (the JavaScript code body that is the Check) (chdesc)
-       @return 0 (ZERO) if update is performed; 1 (ONE) if insert not performed due to rows existing for
+       @return: 0 (ZERO) if update is performed; 1 (ONE) if insert not performed due to rows existing for
                  given Check.
     """
     # Check record with code 'chname' does not already exist:
@@ -619,7 +619,7 @@ def get_number_parameters_with_paramname_funcname(funcname, paramname):
        number of times a given parameter appears for a given function.
        @param funcname: Function name (function) to query for.
        @param paramname: name of the parameter whose instances for the given function are to be counted.
-       @return an integer count of the number of parameters matching the criteria.
+       @return: an integer count of the number of parameters matching the criteria.
     """
     q = """SELECT COUNT(param) FROM sbmFUNDESC WHERE function=%s AND param=%s"""
     return int(run_sql(q, (funcname, paramname))[0][0])
@@ -1260,7 +1260,7 @@ def add_function_parameter(function, parameter_name):
 def get_number_elements_with_elname(elname):
     """Return the number of Elements found for a given element name/id.
        @param elname: Element name/id (name) to query for
-       @return an integer count of the number of Elements in the WebSubmit database for this elname.
+       @return: an integer count of the number of Elements in the WebSubmit database for this elname.
     """
     q = """SELECT COUNT(name) FROM sbmFIELDDESC where name=%s"""
     return int(run_sql(q, (elname,))[0][0])
@@ -1327,7 +1327,7 @@ def update_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, e
        @param elval: element default value
        @param elfidesc: element description
        @param elmodifytext: element's modification text
-       @return 0 (ZERO) if update is performed; 1 (ONE) if update not performed due to rows existing for
+       @return: 0 (ZERO) if update is performed; 1 (ONE) if update not performed due to rows existing for
                  given Element.
     """
     # Check record with code 'elname' does not already exist:
@@ -1364,7 +1364,7 @@ def insert_element_details(elname, elmarccode, eltype, elsize, elrows, elcols, \
        @param elval: element default value
        @param elfidesc: element description
        @param elmodifytext: element's modification text
-       @return 0 (ZERO) if insert is performed; 1 (ONE) if insert not performed due to rows existing for
+       @return: 0 (ZERO) if insert is performed; 1 (ONE) if insert not performed due to rows existing for
                  given Element.
     """
     # Check element record with code 'elname' does not already exist:
@@ -1411,7 +1411,7 @@ def get_docid_docname_and_docid_alldoctypes():
 def get_number_doctypes_docid(docid):
     """Return the number of DOCUMENT TYPES found for a given document type id (sdocname).
        @param docid: unique ID of document type whose instances are to be counted.
-       @return an integer count of the number of document types in the WebSubmit database for this doctype id.
+       @return: an integer count of the number of document types in the WebSubmit database for this doctype id.
     """
     q = """SELECT COUNT(sdocname) FROM sbmDOCTYPE where sdocname=%s"""
     return int(run_sql(q, (docid,))[0][0])
@@ -1419,7 +1419,7 @@ def get_number_doctypes_docid(docid):
 def get_number_functions_doctype(doctype):
     """Return the number of FUNCTIONS found for a given DOCUMENT TYPE.
        @param doctype: unique ID of doctype for which the number of functions are to be counted
-       @return an integer count of the number of functions in the WebSubmit database for this doctype.
+       @return: an integer count of the number of functions in the WebSubmit database for this doctype.
     """
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s"""
     return int(run_sql(q, (doctype,))[0][0])
@@ -1428,7 +1428,7 @@ def get_number_functions_action_doctype(doctype, action):
     """Return the number of FUNCTIONS found for a given ACTION of a given DOCUMENT TYPE.
        @param doctype: unique ID of doctype for which the number of functions are to be counted
        @param action: the action (of the document type "doctype") that owns the functions to be counted
-       @return an integer count of the number of functions in the WebSubmit database for this doctype/action.
+       @return: an integer count of the number of functions in the WebSubmit database for this doctype/action.
     """
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s"""
     return int(run_sql(q, (doctype, action))[0][0])
@@ -1438,7 +1438,7 @@ def get_number_of_functions_in_step_of_submission(doctype, action, step):
        @param doctype: (string) unique ID of a doctype
        @param action:  (string) unique ID of an action
        @param step:   (integer) the number of the step in which the functions to be counted are situated
-       @return an integer count of the number of functions found within the step of the submission
+       @return: an integer count of the number of functions found within the step of the submission
     """
     q = """SELECT COUNT(doctype) FROM sbmFUNCTIONS where doctype=%s AND action=%s AND step=%s"""
     return int(run_sql(q, (doctype, action, step))[0][0])
@@ -1446,7 +1446,7 @@ def get_number_of_functions_in_step_of_submission(doctype, action, step):
 def get_number_categories_doctype(doctype):
     """Return the number of CATEGORIES (used to distinguish between submissions) found for a given DOCUMENT TYPE.
        @param doctype: unique ID of doctype for which submission categories are to be counted
-       @return an integer count of the number of categories in the WebSubmit database for this doctype.
+       @return: an integer count of the number of categories in the WebSubmit database for this doctype.
     """
     q = """SELECT COUNT(doctype) FROM sbmCATEGORIES where doctype=%s"""
     return int(run_sql(q, (doctype,))[0][0])
@@ -1457,7 +1457,7 @@ def get_number_categories_doctype_category(doctype, categ):
         for a given document type.
        @param doctype: unique ID of doctype for which the submission category is to be tested
        @param categ: the category ID of the category to be tested for
-       @return an integer count of the number of categories in the WebSubmit database for this doctype.
+       @return: an integer count of the number of categories in the WebSubmit database for this doctype.
     """
     q = """SELECT COUNT(sname) FROM sbmCATEGORIES where doctype=%s and sname=%s"""
     return int(run_sql(q, (doctype, categ))[0][0])
@@ -1465,7 +1465,7 @@ def get_number_categories_doctype_category(doctype, categ):
 def get_number_parameters_doctype(doctype):
     """Return the number of PARAMETERS (used by functions) found for a given DOCUMENT TYPE.
        @param doctype: unique ID of doctype whose parameters are to be counted
-       @return an integer count of the number of parameters in the WebSubmit database for this doctype.
+       @return: an integer count of the number of parameters in the WebSubmit database for this doctype.
     """
     q = """SELECT COUNT(name) FROM sbmPARAMETERS where doctype=%s"""
     return int(run_sql(q, (doctype,))[0][0])
@@ -1479,7 +1479,7 @@ def get_number_submissionfields_submissionnames(submission_names):
        @param submission_names: unique IDs of all submissions whose fields are to be counted.  If this
         value is a string, it will be classed as a single submission name. Otherwise, a list/tuple of
         strings must be passed - where each string is a submission name.
-       @return an integer count of the number of fields in the WebSubmit database for these submission(s)
+       @return: an integer count of the number of fields in the WebSubmit database for these submission(s)
     """
     q = """SELECT COUNT(subname) FROM sbmFIELD WHERE subname=%s"""
     if type(submission_names) in (str, unicode):
@@ -1543,7 +1543,7 @@ def get_all_category_details_for_doctype(doctype):
 def get_all_categories_sname_lname_for_doctype_categsname(doctype, categsname):
     """Return the short and long names of all CATEGORIES found for a given DOCUMENT TYPE.
        @param doctype: unique ID of doctype for which submission categories are to be counted
-       @return a tuple of tuples: (sname, lname)
+       @return: a tuple of tuples: (sname, lname)
     """
     q = """SELECT sname, lname FROM sbmCATEGORIES where doctype=%s AND sname=%s"""
     return run_sql(q, (doctype, categsname) )

@@ -609,9 +609,9 @@ def build_history_table_header(show_selection = True, show_oai_source = False, \
 
 def build_month_history_table(oai_src_id, date, ln):
     """ Function formats the historical data
-     @param oai_src_id - identifier of the harvesting source
-     @param date - date designing the month of interest
-     @result - String containing the history table
+     @param oai_src_id: identifier of the harvesting source
+     @param date: date designing the month of interest
+     @return: String containing the history table
     """
     day_limit = 10
     orig_data = get_history_entries(oai_src_id, date)

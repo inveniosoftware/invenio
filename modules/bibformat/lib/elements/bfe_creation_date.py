@@ -23,7 +23,7 @@ from invenio.search_engine import get_creation_date
 def format(bfo, format='%Y-%m-%d'):
     '''
     Get the record creation date.
-    @param format The date format in MySQL syntax
+    @param format: The date format in MySQL syntax
     '''
     recID = bfo.recID
     out = get_creation_date(recID, format)

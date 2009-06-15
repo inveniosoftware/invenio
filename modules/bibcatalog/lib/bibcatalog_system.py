@@ -104,7 +104,7 @@ class BibCatalogSystem:
            @type uid: number
            @param ticketid: ticket id
            @type ticketid: number
-           @param attribute. This is a member of TICKET_ATTRIBUTES.
+           @param attribute: This is a member of TICKET_ATTRIBUTES.
            @type attribute: string
            @param new_value: new value for this attribute.
            @type new_value: string

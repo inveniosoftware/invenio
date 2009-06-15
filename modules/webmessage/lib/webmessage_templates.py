@@ -57,7 +57,7 @@ class Template:
         @param nb_messages: number of messages user has
         @param no_quota: 1 if user has no quota (admin) or 0 else.
         @param ln: language of the page.
-        @return the list in HTML format
+        @return: the list in HTML format
         """
         _ = gettext_set_language(ln)
         dummy = 0
@@ -170,7 +170,7 @@ class Template:
         @param search_pattern: pattern used for searching
         @param results_field: 'none', 'user' or 'group', see CFG_WEBMESSAGE_RESULTS_FIELD
         @param ln: language of the form
-        @return the form in HTML format
+        @return: the form in HTML format
         """
         _ = gettext_set_language(ln)
         write_box = self.tmpl_warning(warnings)
@@ -313,7 +313,7 @@ class Template:
         @param msg_received_date: date at which the message had to be received
                                   (if this argument != 0000-00-00 => reminder
         @param ln: language of the page
-        @return the message in HTML format
+        @return: the message in HTML format
         """
 
         # load the right message language
@@ -478,7 +478,7 @@ class Template:
         """
         display a confirm message
         @param ln: language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         out = """
@@ -513,7 +513,7 @@ class Template:
         """Display len(infos) information fields
         @param infos: list of strings
         @param ln=language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         if not((type(infos) is list) or (type(infos) is tuple)):
@@ -533,7 +533,7 @@ class Template:
         Display len(warnings) warning fields
         @param infos: list of strings
         @param ln=language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         if not((type(warnings) is list) or (type(warnings) is tuple)):
@@ -556,7 +556,7 @@ class Template:
         Display a quota bar.
         @nb_messages: number of messages in inbox.
         @ln=language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         quota = float(CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES)
@@ -576,7 +576,7 @@ class Template:
     def tmpl_multiple_select(self, select_name, tuples_list, ln=CFG_SITE_LANG):
         """displays a multiple select environment
         @param tuples_list: a list of (value, isSelected) tuples
-        @return HTML output
+        @return: HTML output
         """
         _ = gettext_set_language(ln)
         if not((type(tuples_list) is list) or (type(tuples_list) is tuple)):
@@ -604,7 +604,7 @@ class Template:
         @param search_pattern: text to display in this field
         @param results_field: either 'none', 'user', 'group', look at CFG_WEBMESSAGE_RESULTS_FIELD
         @param ln: language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         multiple_select = ''

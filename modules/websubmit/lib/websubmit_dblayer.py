@@ -503,7 +503,7 @@ def get_actions_on_submission_page_for_doctype(doctype):
        (action-IDs) that are on that document-type's
        submission page, ordered by the button-order.
        @param doctype: (string) - the ID of the document type.
-       @return (tuple) of tuples, each containing the action ID
+       @return: (tuple) of tuples, each containing the action ID
         of an action that should appear as a button on the
         document type's submission page.
     """
@@ -517,7 +517,7 @@ def get_actions_on_submission_page_for_doctype(doctype):
 def get_action_details(action):
     """Get the details of a given action.
        @param action: (string) - the ID of the given action.
-       @return (tuple -OR- None) - If the action exists in the DB,
+       @return: (tuple -OR- None) - If the action exists in the DB,
         a tuple containing its details is returned:
         (lactname, dir, cd, md, actionbutton, statustext); If no
         details were found for the action, None is returned.

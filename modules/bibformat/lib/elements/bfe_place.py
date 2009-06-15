@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 def format(bfo):
     """
     Prints the imprint publication place as HTML
-    @see date.py, publisher.py, reprints.py, imprint.py, pagination.py
+    @see: date.py, publisher.py, reprints.py, imprint.py, pagination.py
     """
     place = bfo.field('260__a')
 

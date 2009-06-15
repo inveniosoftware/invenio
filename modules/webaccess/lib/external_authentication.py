@@ -55,7 +55,7 @@ class ExternalAuth:
 
     def user_exists(self, email, req=None):
         """Check the external authentication system for existance of email.
-        @return True if the user exists, False otherwise
+        @return: True if the user exists, False otherwise
         """
         raise NotImplementedError
 
@@ -93,6 +93,6 @@ class ExternalAuth:
     def fetch_all_users_groups_membership(self, req=None):
         """Fetch all the groups with a description, and users who belong to
         each groups.
-        @return {'mygroup': ('description', ['email1', 'email2', ...]), ...}
+        @return: {'mygroup': ('description', ['email1', 'email2', ...]), ...}
         """
         raise NotImplementedError

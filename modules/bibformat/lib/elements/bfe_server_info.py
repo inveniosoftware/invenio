@@ -23,7 +23,7 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CF
 def format(bfo, var=''):
     '''
     Print several server specific variables.
-    @param var the name of the desired variable. Can be one of: CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANG, CFG_VERSION, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_URL, searchurl, recurl
+    @param var: the name of the desired variable. Can be one of: CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANG, CFG_VERSION, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_URL, searchurl, recurl
            CFG_SITE_NAME: the name of the server
            CFG_SITE_NAME_INTL: internationalized name
            CFG_SITE_LANG: the default language of the server

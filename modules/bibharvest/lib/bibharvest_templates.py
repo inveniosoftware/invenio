@@ -243,8 +243,8 @@ class Template:
     def tmpl_output_table(self, title_row = [], data = []):
         """
            Prints a table of given titles and data
-           @param title_row is a list of titles of columns
-           @param data is a list o rows. Each row is a list of string values
+           @param title_row: is a list of titles of columns
+           @param data: is a list o rows. Each row is a list of string values
         """
         result = "<table><tr>"
         for header in title_row:
@@ -407,7 +407,7 @@ class Template:
     def tmpl_output_identifiers(self, identifiers):
         """
         Creates the Javascript array of identifiers.
-        @param identifiers is a dictionary containning day as a key and list of identifiers as a value
+        @param identifiers: is a dictionary containning day as a key and list of identifiers as a value
         """
         result = '<script type="text/javascript">\n'
         result += "   var identifiers = {\n"
@@ -459,8 +459,8 @@ class Template:
     def format_al_twodigits(self, number):
         """
         Converts integers to string guaranteeing that there will be at least 2 digits
-        @param number - Nuber to be formatted
-        @result - string representation with at least 2 digits
+        @param number: Nuber to be formatted
+        @return: string representation with at least 2 digits
         """
         if number < 10:
             return "0" + str(number)
@@ -470,8 +470,8 @@ class Template:
     def format_ym(self, date):
         """
         formats year and month of a given date in the human-readabla format
-        @param date - date containing data to be formatted
-        @returns string representation
+        @param date: date containing data to be formatted
+        @return: string representation
         """
         if date == None:
             return "(None)"

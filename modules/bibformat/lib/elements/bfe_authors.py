@@ -31,15 +31,15 @@ def format(bfo, limit, separator=' ; ',
     """
     Prints the list of authors of a record.
 
-    @param limit the maximum number of authors to display
-    @param separator the separator between authors.
-    @param extension a text printed if more authors than 'limit' exist
-    @param print_links if yes, prints the authors as HTML link to their publications
-    @param print_affiliations if yes, make each author name followed by its affiliation
-    @param affiliation_prefix prefix printed before each affiliation
-    @param affiliation_suffix suffix printed after each affiliation
-    @param interactive if yes, enable user to show/hide authors when there are too many (html + javascript)
-    @param highlight highlights authors corresponding to search query if set to 'yes'
+    @param limit: the maximum number of authors to display
+    @param separator: the separator between authors.
+    @param extension: a text printed if more authors than 'limit' exist
+    @param print_links: if yes, prints the authors as HTML link to their publications
+    @param print_affiliations: if yes, make each author name followed by its affiliation
+    @param affiliation_prefix: prefix printed before each affiliation
+    @param affiliation_suffix: suffix printed after each affiliation
+    @param interactive: if yes, enable user to show/hide authors when there are too many (html + javascript)
+    @param highlight: highlights authors corresponding to search query if set to 'yes'
     """
     from urllib import quote
     from cgi import escape

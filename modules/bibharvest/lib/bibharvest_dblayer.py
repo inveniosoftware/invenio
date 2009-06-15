@@ -61,11 +61,11 @@ def get_history_entries(oai_src_id, monthdate, method = "harvested"):
 def get_history_entries_for_day(oai_src_id, date, limit = -1, start = 0, method = "harvested"):
     """
        Returns harvesting history entries for a given day
-       @param oai_src_id - harvesting source identifier
-       @param date - Date designing the deserved day
-       @limit - How many records (at most) do we want to get
-       @start - From which index do we want to start ?
-       @method - method of getting data (two possible values "harvested" and "inserted")
+       @param oai_src_id: harvesting source identifier
+       @param date: Date designing the deserved day
+       @param limit: How many records (at most) do we want to get
+       @param start: From which index do we want to start ?
+       @param method: method of getting data (two possible values "harvested" and "inserted")
                  Describes if the harvesting or inserting data should be used
     """
     sql_column = "date_harvested"
@@ -95,9 +95,11 @@ def get_entry_history(oai_id, start = 0, limit = -1 , method = "harvested"):
 
 
 def get_month_logs_size(oai_src_id, date, method = "harvested"):
-    # Function which returns number of inserts which took place in given month (splited into days)
-    # @param oai_src_id - harvesting source identifier
-    # @result Dictionary of harvesting statistics - keys describe days. values - numbers of inserted recordds
+    """
+    Function which returns number of inserts which took place in given month (splited into days)
+    @param oai_src_id: harvesting source identifier
+    @return: Dictionary of harvesting statistics - keys describe days. values - numbers of inserted recordds
+    """
     sql_column = "date_harvested"
     if method == "inserted":
         sql_column = "date_inserted"
@@ -110,9 +112,11 @@ def get_month_logs_size(oai_src_id, date, method = "harvested"):
     return result
 
 def get_day_logs_size(oai_src_id, date, method = "harvested"):
-    # Function which returns number of inserts which took place in given day
-    # @param oai_src_id - harvesting source identifier
-    # @result Number of inserts during the given day
+    """
+    Function which returns number of inserts which took place in given day
+    @param oai_src_id: harvesting source identifier
+    @return: Number of inserts during the given day
+    """
     sql_column = "date_harvested"
     if method == "inserted":
         sql_column = "date_inserted"
@@ -123,9 +127,11 @@ def get_day_logs_size(oai_src_id, date, method = "harvested"):
     return 0
 
 def get_entry_logs_size(oai_id):
-    # Function which returns number of inserts which took place in given day
-    # @param oai_src_id - harvesting source identifier
-    # @result Number of inserts during the given day
+    """
+    Function which returns number of inserts which took place in given day
+    @param oai_src_id: harvesting source identifier
+    @return: Number of inserts during the given day
+    """
     query = "SELECT COUNT(*) FROM oaiHARVESTLOG WHERE oai_id = %s"
     query_result = run_sql(query, (str(oai_id),))
     for entry in query_result:

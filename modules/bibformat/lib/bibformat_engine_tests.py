@@ -198,7 +198,7 @@ class FormatElementTest(unittest.TestCase):
         self.assertEqual(element_1['attrs']['name'], "TEST_1")
         #Test description parsing
         self.assertEqual(element_1['attrs']['description'], "Prints test")
-        #Test @see parsing
+        #Test @see: parsing
         self.assertEqual(element_1['attrs']['seealso'], ["element2.py", "unknown_element.py"])
         #Test @param parsing
         self.assert_({'name':"param1",
@@ -228,7 +228,7 @@ class FormatElementTest(unittest.TestCase):
         self.assertEqual(attrs['name'], "TEST_1")
         #Test description parsing
         self.assertEqual(attrs['description'], "Prints test")
-        #Test @see parsing
+        #Test @see: parsing
         self.assertEqual(attrs['seealso'], ["element2.py", "unknown_element.py"])
 
     def test_get_format_elements(self):
@@ -463,9 +463,9 @@ class PatternTest(unittest.TestCase):
         text = '''
         a description for my element
         some text
-        @param param1 desc1
-        @param param2 desc2
-        @see seethis, seethat
+        @param param1: desc1
+        @param param2: desc2
+        @see: seethis, seethat
         '''
         names = ["param1", "param2"]
         descriptions = ["desc1", "desc2"]
@@ -481,9 +481,9 @@ class PatternTest(unittest.TestCase):
         text = '''
         a description for my element
         some text
-        @param param1 desc1
-        @param param2 desc2
-        @see seethis, seethat
+        @param param1: desc1
+        @param param2: desc2
+        @see: seethis, seethat
         '''
         result = bibformat_engine.pattern_format_element_seealso.search(text)
         self.assertEqual(result.group('see').strip(), 'seethis, seethat')

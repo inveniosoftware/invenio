@@ -78,18 +78,18 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     is the same object as the one returned by
     'webuser.collect_user_info(req)'
 
-    @param recID the ID of record to format
-    @param of an output format code (or short identifier for the output format)
-    @param ln the language to use to format the record
-    @param verbose the level of verbosity from 0 to 9 (O: silent,
+    @param recID: the ID of record to format
+    @param of: an output format code (or short identifier for the output format)
+    @param ln: the language to use to format the record
+    @param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings, stop if error in format elements
                                                        9: errors and warnings, stop if error (debug mode ))
-    @param search_pattern list of strings representing the user request in web interface
-    @param xml_record an xml string represention of the record to format
-    @param user_info the information of the user who will view the formatted page (if applicable)
-    @param on_the_fly if False, try to return an already preformatted version of the record in the database
-    @return formatted record
+    @param search_pattern: list of strings representing the user request in web interface
+    @param xml_record: an xml string represention of the record to format
+    @param user_info: the information of the user who will view the formatted page (if applicable)
+    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
+    @return: formatted record
     """
     if search_pattern is None:
         search_pattern = []
@@ -190,8 +190,8 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 
     If record does not exist, returns empty string.
 
-    @param recID the id of the record to retrieve
-    @return the xml string of the record
+    @param recID: the id of the record to retrieve
+    @return: the xml string of the record
     """
     return bibformat_utils.record_get_xml(recID=recID, format=format, decompress=decompress)
 
@@ -233,12 +233,12 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     http header before calling this function as it will not do it.
 
     This function takes the same parameters as 'format_record' except for:
-    @param recIDs a list of record IDs
-    @param xml_records a list of xml string representions of the records to format
-    @param header a string printed before all formatted records
-    @param separator either a string or a function that returns string to separate formatted records
-    @param req an optional request object where to print records
-    @param on_the_fly if False, try to return an already preformatted version of the record in the database
+    @param recIDs: a list of record IDs
+    @param xml_records: a list of xml string representions of the records to format
+    @param header: a string printed before all formatted records
+    @param separator: either a string or a function that returns string to separate formatted records
+    @param req: an optional request object where to print records
+    @param on_the_fly: if False, try to return an already preformatted version of the record in the database
     """
     if req is not None:
         req.write(prologue)
@@ -321,10 +321,10 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
     output is produced on the basis of the fields that 'ot' defines
     (see search_engine.perform_request_search(..) 'ot' param).
 
-    @param recIDs a list of record IDs
-    @param ot a list of fields that should be included in the excel output as columns(see perform_request_search 'ot' param)
-    @param ot_sep a separator used to separate values for the same record, in the same columns, if any
-    @return a string in Excel format
+    @param recIDs: a list of record IDs
+    @param ot: a list of fields that should be included in the excel output as columns(see perform_request_search 'ot' param)
+    @param ot_sep: a separator used to separate values for the same record, in the same columns, if any
+    @return: a string in Excel format
     """
     # Prepare the column headers to display in the Excel file
     column_headers_list = ['Title',
@@ -388,7 +388,7 @@ def get_output_format_content_type(of):
     Returns the content type (eg. 'text/html' or 'application/ms-excel') \
     of the given output format.
 
-    @param of the code of output format for which we want to get the content type
+    @param of: the code of output format for which we want to get the content type
     """
     content_type = bibformat_dblayer.get_output_format_content_type(of)
 

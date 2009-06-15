@@ -582,7 +582,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
         Called by substitution in 'transform(...)', used to collection
         parameters such as <!-- WebDoc-Page-Title: Title -->
 
-        @param match a match object corresponding to the special tag
+        @param match: a match object corresponding to the special tag
         that must be interpreted
         """
         tag = match.group("tag")
@@ -757,10 +757,10 @@ def filter_languages(text, ln='en', defined_tags=None):
     <lang><..><..></lang> tags in order to print them with the correct
     language
 
-    @param text the input text
-    @param ln the language that is NOT filtered out from the input
-    @return the input text as string with unnecessary languages filtered out
-    @see bibformat_engine.py, from where this function was originally extracted
+    @param text: the input text
+    @param ln: the language that is NOT filtered out from the input
+    @return: the input text as string with unnecessary languages filtered out
+    @see: bibformat_engine.py, from where this function was originally extracted
     """
     # First define search_lang_tag(match) and clean_language_tag(match), used
     # in re.sub() function
@@ -771,7 +771,7 @@ def filter_languages(text, ln='en', defined_tags=None):
 
         If current_lang cannot be found inside <lang> ... </lang>, try to use 'CFG_SITE_LANG'
 
-        @param match a match object corresponding to the special tag that must be interpreted
+        @param match: a match object corresponding to the special tag that must be interpreted
         """
         current_lang = ln
 
@@ -787,7 +787,7 @@ def filter_languages(text, ln='en', defined_tags=None):
 
             Called by substitution in 'filter_languages(...)'
 
-            @param match a match object corresponding to the special tag that must be interpreted
+            @param match: a match object corresponding to the special tag that must be interpreted
             """
             if match.group('lang') == current_lang or \
                    keep == True:

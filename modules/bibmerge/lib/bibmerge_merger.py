@@ -29,8 +29,8 @@ from copy import deepcopy
 
 def merge_record(rec1, rec2):
     """Merges all non-conflicting fields from 'rec2' to 'rec1'
-    @param rec1 - First record (a record dictionary structure)
-    @param rec2 - Second record (a record dictionary structure)
+    @param rec1: First record (a record dictionary structure)
+    @param rec2: Second record (a record dictionary structure)
     """
     for fnum in rec2:
         merge_field_group(rec1, rec2, fnum)
@@ -38,12 +38,12 @@ def merge_record(rec1, rec2):
 def merge_field_group(rec1, rec2, fnum, ind1='', ind2='', merge_conflicting_fields=False):
     """Merges non-conflicting fields from 'rec2' to 'rec1' for a specific tag.
     the second record.
-    @param rec1 - First record (a record dictionary structure)
-    @param rec2 - Second record (a record dictionary structure)
-    @param fnum a 3 characters long string indicating field tag number
-    @param ind1 a 1 character long string
-    @param ind2 a 1 character long string
-    @param merge_conflicting_fields whether to merge conflicting fields or not
+    @param rec1: First record (a record dictionary structure)
+    @param rec2: Second record (a record dictionary structure)
+    @param fnum: a 3 characters long string indicating field tag number
+    @param ind1: a 1 character long string
+    @param ind2: a 1 character long string
+    @param merge_conflicting_fields: whether to merge conflicting fields or not
     """
     ### Check if merging goes for all indicators and set a boolean
     merging_all_indicators = not ind1 and not ind2
@@ -154,11 +154,11 @@ def _first_and_last_index_for_each_indicator(fields):
 def add_field(rec1, rec2, fnum, findex1, findex2):
     """Adds the field of rec2 into rec1 in a position that depends on the
     diffing of rec1 with rec2.
-    @param rec1 - First record (a record dictionary structure)
-    @param rec2 - Second record (a record dictionary structure)
-    @param fnum a 3 characters long string indicating field tag number
-    @param findex1 the rec1 field position in the group of fields it belongs
-    @param findex2 the rec2 field position in the group of fields it belongs
+    @param rec1: First record (a record dictionary structure)
+    @param rec2: Second record (a record dictionary structure)
+    @param fnum: a 3 characters long string indicating field tag number
+    @param findex1: the rec1 field position in the group of fields it belongs
+    @param findex2: the rec2 field position in the group of fields it belongs
     """
     field_to_add = rec2[fnum][findex2]
     ### if findex1 indicates an existing field in rec1, insert the field of rec2
@@ -190,11 +190,11 @@ def add_field(rec1, rec2, fnum, findex1, findex2):
 
 def replace_field(rec1, rec2, fnum, findex1, findex2):
     """Replaces the contents of a field of rec1 with those of rec2.
-    @param rec1 - First record (a record dictionary structure)
-    @param rec2 - Second record (a record dictionary structure)
-    @param fnum a 3 characters long string indicating field tag number
-    @param findex1 the rec1 field position in the group of fields it belongs
-    @param findex2 the rec2 field position in the group of fields it belongs
+    @param rec1: First record (a record dictionary structure)
+    @param rec2: Second record (a record dictionary structure)
+    @param fnum: a 3 characters long string indicating field tag number
+    @param findex1: the rec1 field position in the group of fields it belongs
+    @param findex2: the rec2 field position in the group of fields it belongs
     """
     #if there is no field in rec1 to replace, just add a new one
     if findex1 is None:
@@ -209,11 +209,11 @@ def replace_field(rec1, rec2, fnum, findex1, findex2):
 def merge_field(rec1, rec2, fnum, findex1, findex2):
     """Merges the contents of a field of rec1 with those of rec2, inserting
     them in the place of the field of rec1.
-    @param rec1 - First record (a record dictionary structure)
-    @param rec2 - Second record (a record dictionary structure)
-    @param fnum a 3 characters long string indicating field tag number
-    @param findex1 the rec1 field position in the group of fields it belongs
-    @param findex2 the rec2 field position in the group of fields it belongs
+    @param rec1: First record (a record dictionary structure)
+    @param rec2: Second record (a record dictionary structure)
+    @param fnum: a 3 characters long string indicating field tag number
+    @param findex1: the rec1 field position in the group of fields it belongs
+    @param findex2: the rec2 field position in the group of fields it belongs
     """
     #if there is no field in rec1 to merge to, just add a new one
     if findex1 is None:
@@ -242,18 +242,18 @@ def merge_field(rec1, rec2, fnum, findex1, findex2):
 
 def delete_field(rec, fnum, findex):
     """Delete a specific field.
-    @param rec - a record dictionary structure
-    @param fnum a 3 characters long string indicating field tag number
-    @param findex the rec field position in the group of fields it belongs
+    @param rec: a record dictionary structure
+    @param fnum: a 3 characters long string indicating field tag number
+    @param findex: the rec field position in the group of fields it belongs
     """
     record_delete_field(rec, fnum, field_position_local=findex)
 
 def delete_subfield(rec, fnum, findex, sfindex):
     """Delete a specific subfield.
-    @param rec - a record dictionary structure
-    @param fnum a 3 characters long string indicating field tag number
-    @param findex the rec field position in the group of fields it belongs
-    @param sfindex the index position of the subfield in the field
+    @param rec: a record dictionary structure
+    @param fnum: a 3 characters long string indicating field tag number
+    @param findex: the rec field position in the group of fields it belongs
+    @param sfindex: the index position of the subfield in the field
     """
     field = rec[fnum][findex]
     subfields = field[0]
@@ -262,13 +262,13 @@ def delete_subfield(rec, fnum, findex, sfindex):
 
 def replace_subfield(rec1, rec2, fnum, findex1, findex2, sfindex1, sfindex2):
     """Replaces a subfield of rec1 with a subfield of rec2.
-    @param rec1 - First record (a record dictionary structure)
-    @param rec2 - Second record (a record dictionary structure)
-    @param fnum a 3 characters long string indicating field tag number
-    @param findex1 the rec1 field position in the group of fields it belongs
-    @param findex2 the rec2 field position in the group of fields it belongs
-    @param sfindex1 the index position of the subfield in the field of rec1
-    @param sfindex2 the index position of the subfield in the field of rec2
+    @param rec1: First record (a record dictionary structure)
+    @param rec2: Second record (a record dictionary structure)
+    @param fnum: a 3 characters long string indicating field tag number
+    @param findex1: the rec1 field position in the group of fields it belongs
+    @param findex2: the rec2 field position in the group of fields it belongs
+    @param sfindex1: the index position of the subfield in the field of rec1
+    @param sfindex2: the index position of the subfield in the field of rec2
     """
     subfields1 = rec1[fnum][findex1][0]
     subfields2 = rec2[fnum][findex2][0]
@@ -276,13 +276,13 @@ def replace_subfield(rec1, rec2, fnum, findex1, findex2, sfindex1, sfindex2):
 
 def add_subfield(rec1, rec2, fnum, findex1, findex2, sfindex1, sfindex2):
     """Adds a subfield of rec2 in a field of rec1, before or after sfindex1.
-    @param rec1 - First record (a record dictionary structure)
-    @param rec2 - Second record (a record dictionary structure)
-    @param fnum a 3 characters long string indicating field tag number
-    @param findex1 the rec1 field position in the group of fields it belongs
-    @param findex2 the rec2 field position in the group of fields it belongs
-    @param sfindex1 the index position of the subfield in the field of rec1
-    @param sfindex2 the index position of the subfield in the field of rec2
+    @param rec1: First record (a record dictionary structure)
+    @param rec2: Second record (a record dictionary structure)
+    @param fnum: a 3 characters long string indicating field tag number
+    @param findex1: the rec1 field position in the group of fields it belongs
+    @param findex2: the rec2 field position in the group of fields it belongs
+    @param sfindex1: the index position of the subfield in the field of rec1
+    @param sfindex2: the index position of the subfield in the field of rec2
     """
     subfield_to_insert = rec2[fnum][findex2][0][sfindex2]
     #insert at the sfindex1 position

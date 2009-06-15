@@ -25,7 +25,7 @@ import re
 def format(bfo):
     """
     Prints the publication year.
-    @see pagination.py, publisher.py, reprints.py, imprint.py, place.py
+    @see: pagination.py, publisher.py, reprints.py, imprint.py, place.py
     """
     for date_field in ['773__y', '260__c', '269__c', '909C4y', '925__a']:
         date = bfo.field(date_field)

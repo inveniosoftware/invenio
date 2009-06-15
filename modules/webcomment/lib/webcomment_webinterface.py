@@ -107,7 +107,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param voted: boolean, active if user voted for a review, see vote function
         @param reported: int, active if user reported a certain comment/review, see report function
         @param reviews: boolean, enabled for reviews, disabled for comments
-        @return the full html page.
+        @return: the full html page.
         """
 
         argd = wash_urlargd(form, {'do': (str, "od"),
@@ -230,7 +230,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param comid: comment id, needed for replying
         @param editor_type: the type of editor used for submitting the
                             comment: 'textarea', 'fckeditor'.
-        @return the full html page.
+        @return: the full html page.
         """
 
         argd = wash_urlargd(form, {'action': (str, "DISPLAY"),

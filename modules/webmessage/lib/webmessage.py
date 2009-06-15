@@ -44,7 +44,7 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
     @param uid:   user id
     @param msgid: message id
 
-    @return a (body, errors[], warnings[]) formed tuple
+    @return: a (body, errors[], warnings[]) formed tuple
     """
     errors = []
     warnings = []
@@ -87,7 +87,7 @@ def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=CFG_SITE_L
     Displays the user's Inbox
     @param uid:   user id
 
-    @return a (body, [errors], [warnings]) formed tuple
+    @return: a (body, [errors], [warnings]) formed tuple
     """
     body = ""
     rows = []
@@ -111,7 +111,7 @@ def perform_request_delete_msg(uid, msgid, ln=CFG_SITE_LANG):
     @param uid: user id (int)
     @param msgid: message id (int)
     @param ln: language
-    @return a (body, errors, warning tuple)
+    @return: a (body, errors, warning tuple)
     """
     _ = gettext_set_language(ln)
 
@@ -135,7 +135,7 @@ def perform_request_delete_all(uid, confirmed=False, ln=CFG_SITE_LANG):
     @param uid: user id (int)
     @param confirmed: 0 will produce a confirmation message
     @param ln: language
-    @return a (body, errors, warnings) tuple
+    @return: a (body, errors, warnings) tuple
     """
     infos = []
     warnings = []
@@ -239,7 +239,7 @@ def perform_request_write_with_search(
     @param mode_user: if 1 display user search box, else group search box
     @param add_values: if 1 users_to_add will be added to msg_to_user field..
     @param ln: language
-    @return a (body, errors, warnings) formed tuple.
+    @return: a (body, errors, warnings) formed tuple.
     """
     warnings = []
     errors = []
@@ -312,7 +312,7 @@ def perform_request_send(uid,
     @param msg_send_month: send this message on month y (int)
     @param msg_send_day: send this message on day z (int)
     @param ln: language
-    @return a (body, errors, warnings) tuple
+    @return: a (body, errors, warnings) tuple
     """
     _ = gettext_set_language(ln)
 
@@ -444,7 +444,7 @@ def account_new_mail(uid, ln=CFG_SITE_LANG):
     display new mail info for myaccount.py page.
     @param uid: user id (int)
     @param ln: language
-    @return html body
+    @return: html body
     """
     nb_new_mail = db.get_nb_new_messages_for_user(uid)
     total_mail = db.get_nb_readable_messages_for_user(uid)
@@ -456,7 +456,7 @@ def get_navtrail(ln=CFG_SITE_LANG, title=""):
     gets the navtrail for title...
     @param title: title of the page
     @param ln: language
-    @return HTML output
+    @return: HTML output
     """
     navtrail = webmessage_templates.tmpl_navtrail(ln, title)
     return navtrail

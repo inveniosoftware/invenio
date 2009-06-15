@@ -182,7 +182,7 @@ def get_personal_baskets_infos(uid, topic):
     share level is assumed to be MA (MAnage) for a personal basket!
     @param uid: user id (int)
     @param topic: topic of the basket
-    @return a tuple of (id,
+    @return: a tuple of (id,
                        name,
                        share_level,
                        date_modification
@@ -243,7 +243,7 @@ def get_personal_topics_infos(uid):
     Get the list of every topic user has defined,
     and the number of baskets in each topic
     @param uid: user id (int)
-    @return a list of tuples (topic name, nb of baskets)
+    @return: a list of tuples (topic name, nb of baskets)
     """
     query = """SELECT topic, count(b.id)
                FROM   user_bskBASKET ub JOIN bskBASKET b
@@ -512,7 +512,7 @@ def get_group_baskets_infos(gid):
     """
     get useful infos (see below) for every basket of a group
     @param gid: group id (int)
-    @return a tuple of (id,
+    @return: a tuple of (id,
                         name,
                         topic,
                         rigths,
@@ -705,7 +705,7 @@ def get_public_basket_infos(bskid):
 
 def get_basket_general_infos(bskid):
     """return information about a basket, suited for public access.
-    @return a (id, name, date of modification, nb of views, nb of records, id of owner) tuple
+    @return: a (id, name, date of modification, nb of views, nb of records, id of owner) tuple
     """
     query = """SELECT bsk.id,
                       bsk.name,
@@ -929,7 +929,7 @@ def get_groups_user_member_of(uid):
     """
     Get uids and names of groups user is member of.
     @param uid: user id (int)
-    @return a tuple of (group_id, group_name) tuples
+    @return: a tuple of (group_id, group_name) tuples
     """
     query = """
     SELECT g.id,

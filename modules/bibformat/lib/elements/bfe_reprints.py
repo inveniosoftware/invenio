@@ -22,8 +22,8 @@ def format(bfo, separator):
     """
     Prints the reprinted editions of a record
 
-    @param separator a separator between reprinted editions
-    @see place.py, publisher.py, imprint.py, date.py, pagination.py
+    @param separator: a separator between reprinted editions
+    @see: place.py, publisher.py, imprint.py, date.py, pagination.py
     """
 
     reprints = bfo.field('260__g')

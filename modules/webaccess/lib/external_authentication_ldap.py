@@ -130,7 +130,7 @@ class ExternalAuthLDAP(ExternalAuth):
 
     def user_exists(self, email, req=None):
         """Check the external authentication system for existance of email.
-        @return True if the user exists, False otherwise
+        @return: True if the user exists, False otherwise
         """
         query = '(%s=%s)' % (CFG_EXTERNAL_AUTH_LDAP_MAIL_ENTRY, email)
         def _check (connection):

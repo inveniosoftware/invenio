@@ -880,7 +880,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         Displays groups the user is admin of
         and the groups the user is member of(but not admin)
         @param ln:  language
-        @return the page for all the groups
+        @return: the page for all the groups
         """
         argd = wash_urlargd(form, {})
         uid = webuser.getUid(req)
@@ -915,12 +915,12 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
     def create(self, req, form):
         """create(): interface for creating a new group
-        @param group_name : name of the new webgroup.Must be filled
-        @param group_description : description of the new webgroup.(optionnal)
-        @param join_policy : join policy of the new webgroup.Must be chosen
+        @param group_name: : name of the new webgroup.Must be filled
+        @param group_description: : description of the new webgroup.(optionnal)
+        @param join_policy: : join policy of the new webgroup.Must be chosen
         @param *button: which button was pressed
         @param ln: language
-        @return the compose page Create group
+        @return: the compose page Create group
         """
 
         argd = wash_urlargd(form, {'group_name': (str, ""),
@@ -975,12 +975,12 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
     def join(self, req, form):
         """join(): interface for joining a new group
-        @param grpID : list of the group the user wants to become a member.
+        @param grpID: : list of the group the user wants to become a member.
         The user must select only one group.
-        @param group_name :  will search for groups matching group_name
+        @param group_name: :  will search for groups matching group_name
         @param *button: which button was pressed
         @param ln: language
-        @return the compose page Join group
+        @return: the compose page Join group
         """
 
         argd = wash_urlargd(form, {'grpID':(list, []),
@@ -1038,12 +1038,12 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
     def leave(self, req, form):
         """leave(): interface for leaving a group
-        @param grpID : group the user wants to leave.
-        @param group_name :  name of the group the user wants to leave
+        @param grpID: : group the user wants to leave.
+        @param group_name: :  name of the group the user wants to leave
         @param *button: which button was pressed
-        @param confirmed : the user is first asked to confirm
+        @param confirmed: : the user is first asked to confirm
         @param ln: language
-        @return the compose page Leave group
+        @return: the compose page Leave group
         """
 
         argd = wash_urlargd(form, {'grpID':(str, ""),
@@ -1091,16 +1091,16 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
     def edit(self, req, form):
         """edit(): interface for editing group
-        @param grpID : group ID
-        @param group_name : name of the new webgroup.Must be filled
-        @param group_description : description of the new webgroup.(optionnal)
-        @param join_policy : join policy of the new webgroup.Must be chosen
+        @param grpID: : group ID
+        @param group_name: : name of the new webgroup.Must be filled
+        @param group_description: : description of the new webgroup.(optionnal)
+        @param join_policy: : join policy of the new webgroup.Must be chosen
         @param update: button update group pressed
         @param delete: button delete group pressed
         @param cancel: button cancel pressed
-        @param confirmed : the user is first asked to confirm before deleting
+        @param confirmed: : the user is first asked to confirm before deleting
         @param ln: language
-        @return the main page displaying all the groups
+        @return: the main page displaying all the groups
         """
         argd = wash_urlargd(form, {'grpID': (str, ""),
                                    'update': (str, ""),
@@ -1163,17 +1163,17 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
     def members(self, req, form):
         """member(): interface for managing members of a group
-        @param grpID : group ID
+        @param grpID: : group ID
         @param add_member: button add_member pressed
         @param remove_member: button remove_member pressed
         @param reject_member: button reject__member pressed
         @param delete: button delete group pressed
-        @param member_id : ID of the existing member selected
-        @param pending_member_id : ID of the pending member selected
+        @param member_id: : ID of the existing member selected
+        @param pending_member_id: : ID of the pending member selected
         @param cancel: button cancel pressed
-        @param info : info about last user action
+        @param info: : info about last user action
         @param ln: language
-        @return the same page with data updated
+        @return: the same page with data updated
         """
         argd = wash_urlargd(form, {'grpID': (int, 0),
                                    'cancel': (str, ""),

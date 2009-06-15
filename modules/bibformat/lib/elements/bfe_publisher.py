@@ -24,7 +24,7 @@ def format(bfo):
     """
     Prints the publisher name
 
-    @see place.py, date.py, reprints.py, imprint.py, pagination.py
+    @see: place.py, date.py, reprints.py, imprint.py, pagination.py
     """
 
     publisher = bfo.field('260__b')

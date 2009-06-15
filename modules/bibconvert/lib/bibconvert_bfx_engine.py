@@ -75,10 +75,10 @@ def convert(xmltext, template_filename=None, template_source=None):
 
     Raises an exception if cannot find an appropriate XPath module.
 
-    @param xmltext The string representation of the XML to process
-    @param template_filename The name of the template to use for the processing
-    @param template_source The configuration describing the processing.
-    @return the transformed XML text.
+    @param xmltext: The string representation of the XML to process
+    @param template_filename: The name of the template to use for the processing
+    @param template_source: The configuration describing the processing.
+    @return: the transformed XML text.
     """
     if processor_type == -1:
         # No XPath processor found
@@ -146,7 +146,7 @@ class XML2XMLTranslator:
 
         Accept all names. get_value will return empty string if not exist
 
-        @param name the name of the variable
+        @param name: the name of the variable
         '''
         return True
 ##         context = Context(self.current_node, processorNss=self.namespaces)
@@ -171,8 +171,8 @@ class XML2XMLTranslator:
         The API function for quering the translator for values of a certain variable.
         Called in a loop will result in a different value each time.
 
-        @param name the name of the variable you want the value of
-        @param display_type an optional value for the type of the desired output, one of: value, tag, ind1, ind2, code, fulltag;
+        @param name: the name of the variable you want the value of
+        @param display_type: an optional value for the type of the desired output, one of: value, tag, ind1, ind2, code, fulltag;
                These can be easily added in the proper place of the code (display_value)
         '''
         context = Context(self.current_node, processorNss=self.namespaces)
@@ -201,9 +201,9 @@ class XML2XMLTranslator:
     def call_function(self, function_name, parameters=None):
         '''
         Call an external element which is a Python file, using BibFormat
-        @param function_name the name of the function to call
-        @param parameters a dictionary of the parameters to pass as key=value pairs
-        @return a string value, which is the result of the function call
+        @param function_name: the name of the function to call
+        @param parameters: a dictionary of the parameters to pass as key=value pairs
+        @return: a string value, which is the result of the function call
         '''
         #No support for this in bibconvert_bfx_engine
         ## if parameters is None:
@@ -219,7 +219,7 @@ class XML2XMLTranslator:
         """
         Specify the source XML for this transformer
 
-        @param xmltext the XML text representation to use as source
+        @param xmltext: the XML text representation to use as source
         """
         self.xml_source = xmltext
         self.dom = minidom.parseString(xmltext)
@@ -232,8 +232,8 @@ def doc_order_iter_filter(node, filter_func):
     applying the filter function to each in turn,
     starting with the given node, and yielding each node in
     cases where the filter function computes true
-    @param node the starting point (subtree rooted at node will be iterated over document order)
-    @param filter_func a callable object taking a node and returning true or false
+    @param node: the starting point (subtree rooted at node will be iterated over document order)
+    @param filter_func: a callable object taking a node and returning true or false
     """
     if filter_func(node):
         yield node
@@ -259,8 +259,8 @@ def build_namespaces(dom):
     Necessary to use prior processing an XML file
     in order to execute XPath queries correctly.
 
-    @param dom the dom tree to parse to discover namespaces
-    @return a dictionary with prefix as key and namespace as value
+    @param dom: the dom tree to parse to discover namespaces
+    @return: a dictionary with prefix as key and namespace as value
     """
     namespaces = {}
     for elem in get_all_elements(dom):

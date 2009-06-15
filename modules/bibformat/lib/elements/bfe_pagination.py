@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 def format(bfo):
     """
     Prints the record pagination
-    @see date.py, publisher.py, reprints.py, imprint.py, place.py
+    @see: date.py, publisher.py, reprints.py, imprint.py, place.py
     """
     pagination = bfo.field('300__a')
 

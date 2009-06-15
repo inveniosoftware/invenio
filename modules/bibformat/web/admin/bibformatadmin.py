@@ -93,8 +93,8 @@ def index(req, ln=CFG_SITE_LANG):
 def output_formats_manage(req, ln=CFG_SITE_LANG, sortby="code"):
     """
     Main page for output formats management. Check for authentication and print output formats list.
-    @param ln language
-    @param sortby the sorting crieteria (can be 'code' or 'name')
+    @param ln: language
+    @param sortby: the sorting crieteria (can be 'code' or 'name')
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -159,13 +159,13 @@ def output_format_show(req, bfo, ln=CFG_SITE_LANG,
 
 
 
-    @param ln language
-    @param bfo the filename of the output format to show
-    @param r_fld the list of 'field' attribute for each rule
-    @param r_val the list of 'value' attribute for each rule
-    @param r_tpl the list of 'template' attribute for each rule
-    @param default the default format template used by this output format
-    @param r_upd the rule that we want to increase/decrease in order of evaluation
+    @param ln: language
+    @param bfo: the filename of the output format to show
+    @param r_fld: the list of 'field' attribute for each rule
+    @param r_val: the list of 'value' attribute for each rule
+    @param r_tpl: the list of 'template' attribute for each rule
+    @param default: the default format template used by this output format
+    @param r_upd: the rule that we want to increase/decrease in order of evaluation
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -235,8 +235,8 @@ def output_format_show_attributes(req, bfo, ln=CFG_SITE_LANG):
     """
     Page for output format names and descrition attributes edition.
 
-    @param ln language
-    @param bfo the filename of the template to show
+    @param ln: language
+    @param bfo: the filename of the template to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -280,8 +280,8 @@ def output_format_show_dependencies(req, bfo, ln=CFG_SITE_LANG):
     """
     Show the dependencies of the given output format.
 
-    @param ln language
-    @param bfo the filename of the output format to show
+    @param ln: language
+    @param bfo: the filename of the output format to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -328,14 +328,14 @@ def output_format_update_attributes(req, bfo, ln=CFG_SITE_LANG,
     """
     Update the name, description and code of given output format
 
-    @param ln language
-    @param description the new description
-    @param name the new name
-    @param code the new short code (== new bfo) of the output format
-    @param content_type the new content_type of the output format
-    @param bfo the filename of the output format to update
-    @param names_trans the translations in the same order as the languages from get_languages()
-    @param visibility the visibility of the output format in the output formats list (public pages)
+    @param ln: language
+    @param description: the new description
+    @param name: the new name
+    @param code: the new short code (== new bfo) of the output format
+    @param content_type: the new content_type of the output format
+    @param bfo: the filename of the output format to update
+    @param names_trans: the translations in the same order as the languages from get_languages()
+    @param visibility: the visibility of the output format in the output formats list (public pages)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -373,7 +373,7 @@ def output_format_delete(req, bfo, ln=CFG_SITE_LANG, chosen_option=""):
     """
     Delete an output format
 
-    @param bfo the filename of the output format to delete
+    @param bfo: the filename of the output format to delete
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -436,8 +436,8 @@ def output_format_add(req, ln=CFG_SITE_LANG):
 def format_templates_manage(req, ln=CFG_SITE_LANG, checking='0'):
     """
     Main page for formats templates management. Check for authentication and print formats list.
-    @param ln language
-    @param checking if 0, basic checking. Else perform extensive checking (time-consuming)
+    @param ln: language
+    @param checking: if 0, basic checking. Else perform extensive checking (time-consuming)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -472,13 +472,13 @@ def format_template_show(req, bft, code=None, ln=CFG_SITE_LANG,
     """
     Main page for template edition. Check for authentication and print formats editor.
 
-    @param ln language
-    @param code the code being edited
-    @param bft the name of the template to show
-    @param ln_for_preview the language for the preview (for bfo)
-    @param pattern_for_preview the search pattern to be used for the preview (for bfo)
-    @param content_type_for_preview the (MIME) content type of the preview
-    @param chosen_option returned value for dialog_box warning
+    @param ln: language
+    @param code: the code being edited
+    @param bft: the name of the template to show
+    @param ln_for_preview: the language for the preview (for bfo)
+    @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
+    @param content_type_for_preview: the (MIME) content type of the preview
+    @param chosen_option: returned value for dialog_box warning
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -549,9 +549,9 @@ def format_template_show_attributes(req, bft, ln=CFG_SITE_LANG, new=0):
     False and we can offer specific option to user (for ex
     let him make a duplicate of existing template).
 
-    @param ln language
-    @param bft the name of the template to show
-    @param new if "False", the template has not just been added
+    @param ln: language
+    @param bft: the name of the template to show
+    @param new: if "False", the template has not just been added
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -595,8 +595,8 @@ def format_template_show_dependencies(req, bft, ln=CFG_SITE_LANG):
     """
     Show the dependencies (on elements) of the given format.
 
-    @param ln language
-    @param bft the filename of the template to show
+    @param ln: language
+    @param bft: the filename of the template to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -629,11 +629,11 @@ def format_template_update_attributes(req, bft, ln=CFG_SITE_LANG,
     """
     Update the name and description of given format template
 
-    @param ln language
-    @param description the new description
-    @param name the new name
-    @param bft the filename of the template to update
-    @param duplicate the filename of template that we want to copy (the code)
+    @param ln: language
+    @param description: the new description
+    @param name: the new name
+    @param bft: the filename of the template to update
+    @param duplicate: the filename of template that we want to copy (the code)
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -725,12 +725,12 @@ def format_template_show_preview_or_save(req, bft, ln=CFG_SITE_LANG, code=None,
     Print the preview of a record with a format template. To be included inside Format template
     editor. If the save_action has a value, then the code should also be saved at the same time
 
-    @param code the code of a template to use for formatting
-    @param ln_for_preview the language for the preview (for bfo)
-    @param pattern_for_preview the search pattern to be used for the preview (for bfo)
-    @param save_action has a value if the code has to be saved
-    @param bft the filename of the template to save
-    @param navtrail standard navtrail
+    @param code: the code of a template to use for formatting
+    @param ln_for_preview: the language for the preview (for bfo)
+    @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
+    @param save_action: has a value if the code has to be saved
+    @param bft: the filename of the template to save
+    @param navtrail: standard navtrail
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -812,8 +812,8 @@ def format_template_show_short_doc(req, ln=CFG_SITE_LANG, search_doc_pattern="")
     editor.
 
     @param ln: language
-    @param search_doc_pattern a search pattern that specified which elements to display
-    @param bft the name of the template to show
+    @param search_doc_pattern: a search pattern that specified which elements to display
+    @param bft: the name of the template to show
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -834,7 +834,7 @@ def format_template_show_short_doc(req, ln=CFG_SITE_LANG, search_doc_pattern="")
 def format_elements_doc(req, ln=CFG_SITE_LANG):
     """
     Main page for format elements documentation. Check for authentication and print format elements list.
-    @param ln language
+    @param ln: language
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -863,8 +863,8 @@ def format_element_show_dependencies(req, bfe, ln=CFG_SITE_LANG):
     """
     Shows format element dependencies
 
-    @param bfe the name of the bfe to show
-    @param ln language
+    @param bfe: the name of the bfe to show
+    @param ln: language
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -895,9 +895,9 @@ def format_element_test(req, bfe, ln=CFG_SITE_LANG, param_values=None):
     function of the element as parameters, in the order ...
     If params is None, this means that they have not be defined by user yet.
 
-    @param bfe the name of the element to test
-    @param ln language
-    @param param_values the list of parameters to pass to element format function
+    @param bfe: the name of the element to test
+    @param ln: language
+    @param param_values: the list of parameters to pass to element format function
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -927,8 +927,8 @@ def kb_manage(req, ln=CFG_SITE_LANG, search=""):
     """
     Main page for knowledge bases management. Check for authentication.
 
-    @param ln language
-    @param search search for this in kb's
+    @param ln: language
+    @param search: search for this in kb's
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -960,12 +960,12 @@ def kb_show(req, kb, sortby="to", ln=CFG_SITE_LANG, startat=0, kb_type=None, sea
     Before displaying the content of the knowledge base, check if a form was submitted asking for
     adding, editing or removing a value.
 
-    @param ln language
-    @param kb the kb id to show
-    @param sortby the sorting criteria ('from' or 'to')
-    @param startat the number from which start showing mapping rules in kb
-    @param kb_type None or taxonomy
-    @param search search for these in the kb
+    @param ln: language
+    @param kb: the kb id to show
+    @param sortby: the sorting criteria ('from' or 'to')
+    @param startat: the number from which start showing mapping rules in kb
+    @param kb_type: None or taxonomy
+    @param search: search for these in the kb
     """
 
     ln = wash_language(ln)
@@ -1010,9 +1010,9 @@ def kb_show_attributes(req, kb, ln=CFG_SITE_LANG, sortby="to"):
     """
     Shows the attributes (name, description) of a given kb
 
-    @param ln language
-    @param kb the kb id to show
-    @param sortby the sorting criteria ('from' or 'to')
+    @param ln: language
+    @param kb: the kb id to show
+    @param sortby: the sorting criteria ('from' or 'to')
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1054,12 +1054,12 @@ def kb_show_attributes(req, kb, ln=CFG_SITE_LANG, sortby="to"):
 def kb_collection_update(req, kb_id, coll_id, field, expression, ln=CFG_SITE_LANG):
     """
     Updates the configuration of a collection based KB by checking user rights and calling bibadminlib..
-    @param req request
-    @param kb_id knowledge base id
-    @param coll_id collection id
-    @param field the field in the collection's records
-    @param expression expression in the field
-    @param ln language
+    @param req: request
+    @param kb_id: knowledge base id
+    @param coll_id: collection id
+    @param field: the field in the collection's records
+    @param expression: expression in the field
+    @param ln: language
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1092,9 +1092,9 @@ def kb_show_dependencies(req, kb, ln=CFG_SITE_LANG, sortby="to"):
     """
     Shows the dependencies of a given kb
 
-    @param kb the kb id to show
-    @param ln language
-    @param sortby the sorting criteria ('from' or 'to')
+    @param kb: the kb id to show
+    @param ln: language
+    @param sortby: the sorting criteria ('from' or 'to')
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1138,14 +1138,14 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=CFG_SITE_LANG, force
     """
     Adds a new mapping to a kb.
 
-    @param ln language
-    @param kb the kb id to show
-    @param sortby the sorting criteria ('from' or 'to')
-    @param forcetype indicates if this function should ask about replacing left/right sides (None or 'no')
+    @param ln: language
+    @param kb: the kb id to show
+    @param sortby: the sorting criteria ('from' or 'to')
+    @param forcetype: indicates if this function should ask about replacing left/right sides (None or 'no')
                      replace in current kb ('curr') or in all ('all')
-    @param replacements an object containing kbname+++left+++right strings.
+    @param replacements: an object containing kbname+++left+++right strings.
                      Can be a string or an array of strings
-    @param kb_type None for normal from-to kb's, 't' for taxonomies
+    @param kb_type: None for normal from-to kb's, 't' for taxonomies
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1239,13 +1239,13 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
     """
     Edit a mapping to in kb. Edit can be "update old value" or "delete existing value"
 
-    @param kb the knowledge base id to edit
-    @param key the key of the mapping that will be modified
-    @param mapFrom the new key of the mapping
-    @param mapTo the new value of the mapping
-    @param update contains a value if the mapping is to be updated
-    @param delete contains a value if the mapping is to be deleted
-    @param sortby the sorting criteria ('from' or 'to')
+    @param kb: the knowledge base id to edit
+    @param key: the key of the mapping that will be modified
+    @param mapFrom: the new key of the mapping
+    @param mapTo: the new value of the mapping
+    @param update: contains a value if the mapping is to be updated
+    @param delete: contains a value if the mapping is to be deleted
+    @param sortby: the sorting criteria ('from' or 'to')
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1292,12 +1292,12 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
     """
     Update the attributes of the kb
 
-    @param ln language
-    @param kb the kb id to update
-    @param sortby the sorting criteria ('from' or 'to')
-    @param name the new name of the kn
-    @param description the new description of the kb
-    @param chosen_option set to dialog box value
+    @param ln: language
+    @param kb: the kb id to update
+    @param sortby: the sorting criteria ('from' or 'to')
+    @param name: the new name of the kn
+    @param description: the new description of the kb
+    @param chosen_option: set to dialog box value
     """
 
     ln = wash_language(ln)
@@ -1465,9 +1465,9 @@ def kb_export(req, kbname="", format="", ln=CFG_SITE_LANG):
 def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
     """
     Adds a new kb
-    @param req the request
-    @param ln language
-    @param sortby to or from
+    @param req: the request
+    @param ln: language
+    @param sortby: to or from
     @kbtype type of knowledge base: "", taxonomy, collection
     """
     ln = wash_language(ln)
@@ -1501,7 +1501,7 @@ def kb_delete(req, kb, ln=CFG_SITE_LANG, chosen_option="", sortby="to"):
     """
     Deletes an existing kb
 
-    @param kb the kb id to delete
+    @param kb: the kb id to delete
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1555,10 +1555,10 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
     The page only shows the status of one of the format, depending on
     the specified one. If multiple are specified, shows the first one.
 
-    @param ln language
-    @param bfo an output format 6 chars code
-    @param bft a format element filename
-    @param bfe a format element name
+    @param ln: language
+    @param bfo: an output format 6 chars code
+    @param bft: a format element filename
+    @param bfe: a format element name
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1671,8 +1671,8 @@ def dialog_box(req, url="", ln=CFG_SITE_LANG, navtrail="",
 
     The page that will receive the result must take 'chosen_option' as parameter.
 
-    @param url the url used to submit the options chosen by the user
-    @param options the list of labels for the buttons given as choice to user
+    @param url: the url used to submit the options chosen by the user
+    @param options: the list of labels for the buttons given as choice to user
     """
     import invenio
     bibformat_templates = invenio.template.load('bibformat')

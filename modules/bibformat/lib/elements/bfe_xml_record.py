@@ -24,8 +24,8 @@ def format(bfo, type='xml', encodeForXML='yes'):
     """
     Prints the complete current record as XML.
 
-    @param type the type of xml. Can be 'xml', 'oai_dc', 'marcxml', 'xd'
-    @param encodeForXML if 'yes', replace all < > and & with html corresponding escaped characters.
+    @param type: the type of xml. Can be 'xml', 'oai_dc', 'marcxml', 'xd'
+    @param encodeForXML: if 'yes', replace all < > and & with html corresponding escaped characters.
     """
     from invenio.bibformat_utils import record_get_xml
     from invenio.textutils import encode_for_xml

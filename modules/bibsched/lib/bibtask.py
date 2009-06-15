@@ -89,19 +89,19 @@ def fix_argv_paths(paths, argv=None):
 
 def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
-    @param name is the name of the bibtask. It must be a valid executable under
+    @param name: is the name of the bibtask. It must be a valid executable under
                 CFG_BINDIR.
-    @param user is a string that will appear as the "user" submitting the task.
+    @param user: is a string that will appear as the "user" submitting the task.
                 Since task are submitted via API it make sense to set the
                 user to the name of the module/function that called
                 task_low_level_submission.
-    @param argv will be merged with the default setting of the given task as
+    @param argv: will be merged with the default setting of the given task as
                 they can be found in bibtask_config. In order to know which
                 variable are valid and which is the semantic, please have
                 a glimpse at bibtask_config and to the source of the
                 task_submit_elaborate_specific_parameter function of the
                 desired bibtask.
-    @return the task_id when the task is correctly enqueued.
+    @return: the task_id when the task is correctly enqueued.
     Use with care!
     Please use absolute paths in argv!
     """
@@ -151,21 +151,21 @@ def task_init(
     task_submit_check_options_fnc=None,
     task_run_fnc=None):
     """ Initialize a BibTask.
-    @param authorization_action is the name of the authorization action
+    @param authorization_action: is the name of the authorization action
     connected with this task;
-    @param authorization_msg is the header printed when asking for an
+    @param authorization_msg: is the header printed when asking for an
     authorization password;
-    @param description is the generic description printed in the usage page;
-    @param help_specific_usage is the specific parameter help
-    @param task_stop_fnc is a function that will be called
+    @param description: is the generic description printed in the usage page;
+    @param help_specific_usage: is the specific parameter help
+    @param task_stop_fnc: is a function that will be called
     whenever the task is stopped
-    @param task_submit_elaborate_specific_parameter_fnc will be called passing
+    @param task_submit_elaborate_specific_parameter_fnc: will be called passing
     a key and a value, for parsing specific cli parameters. Must return True if
     it has recognized the parameter. Must eventually update the options with
     bibtask_set_option;
-    @param task_submit_check_options must check the validity of options (via
+    @param task_submit_check_options: must check the validity of options (via
     bibtask_get_option) once all the options where parsed;
-    @param task_run_fnc will be called as the main core function. Must return
+    @param task_run_fnc: will be called as the main core function. Must return
     False in case of errors.
     """
     global _task_params, _options
@@ -308,14 +308,14 @@ def _task_build_params(
     task_submit_elaborate_specific_parameter_fnc=None,
     task_submit_check_options_fnc=None):
     """ Build the BibTask params.
-    @param argv a list of string as in sys.argv
-    @param description is the generic description printed in the usage page;
-    @param help_specific_usage is the specific parameter help
-    @param task_submit_elaborate_specific_parameter_fnc will be called passing
+    @param argv: a list of string as in sys.argv
+    @param description: is the generic description printed in the usage page;
+    @param help_specific_usage: is the specific parameter help
+    @param task_submit_elaborate_specific_parameter_fnc: will be called passing
     a key and a value, for parsing specific cli parameters. Must return True if
     it has recognized the parameter. Must eventually update the options with
     bibtask_set_option;
-    @param task_submit_check_options must check the validity of options (via
+    @param task_submit_check_options: must check the validity of options (via
     bibtask_get_option) once all the options where parsed;
     """
     global _task_params, _options
@@ -691,7 +691,7 @@ def _task_run(task_run_fnc):
     This is what BibSched will be invoking via daemon call.
     The task prints Fibonacci numbers for up to NUM on the stdout, and some
     messages on stderr.
-    @param task_run_fnc will be called as the main core function. Must return
+    @param task_run_fnc: will be called as the main core function. Must return
     False in case of errors.
     Return True in case of success and False in case of failure."""
 

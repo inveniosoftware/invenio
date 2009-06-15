@@ -195,7 +195,7 @@ class Template:
         @param create_link: link for the creation of basket
                             (will appear next to descriptions)
         @param ln: language
-        @return html as string
+        @return: html as string
         """
         _ = gettext_set_language(ln)
         label = _("There are %i baskets") % len(basket_infos)
@@ -301,8 +301,8 @@ class Template:
         """Display list of public baskets.
         @param baskets: list of (bskid, name, nb_views,
                                  owner_id, owner_nickname)
-        @param inf limit: inferior limit
-        @param total baskets: nb of baskets in total (>len(baskets) generally)
+        @param inf_limit: inferior limit
+        @param total_baskets: nb of baskets in total (>len(baskets) generally)
         @param order: 1: order by name,
                       2: order by nb of views,
                       3: order by owner
@@ -664,7 +664,7 @@ class Template:
                            content='',
                            ln=CFG_SITE_LANG):
         """display footer of a basket.
-        @param group sharing level: None: basket is not shared,
+        @param group_sharing_level: None: basket is not shared,
                                     0: basket is publcly accessible,
                                     any positive int: basket is shared to groups"""
         _ = gettext_set_language(ln)
@@ -722,7 +722,7 @@ class Template:
         @param basket_infos: (bskid, bsk_name, bsk_date_modification,
                               nb_views, bsk_nb_records, id_owner)
                              as returned from db_layer: get_basket_general_infos
-        @param group sharing level: None: basket is not shared,
+        @param group_sharing_level: None: basket is not shared,
                                     0: basket is publcly accessible,
                                     any positive int: basket is shared to groups
         @param rights_on_item: tuple of booleans expressing capabilities :
@@ -945,14 +945,14 @@ class Template:
         @param recid: record id (int)
         @param record: text of the record (str)
         @param cmt_title: initial value for title (str)
-        @param cmt_body_textual initial value for comment box (when displayed as textual box) (str)
-        @param cmt_body_html initial value for comment box (when displayed with FCKeditor) (str)
+        @param cmt_body_textual: initial value for comment box (when displayed as textual box) (str)
+        @param cmt_body_html: initial value for comment box (when displayed with FCKeditor) (str)
         @param selected_category: CFG_WEBBASKET_CATEGORIES
         @param selected_topic: # of topic
         @param selected_group_id: in case of category: group, id of selected group
         @param ln: language
         @param warnings: list of warnings
-        @param can_attach_files if user can attach file or not"""
+        @param can_attach_files: if user can attach file or not"""
         _ = gettext_set_language(ln)
         action = '%s/yourbaskets/save_comment?bskid=%i&amp;recid=%i' % (CFG_SITE_URL, bskid, recid)
         action += '&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s' % ( selected_category, selected_topic, selected_group_id, ln)
@@ -1255,7 +1255,7 @@ class Template:
         @param selected_topic: if private baskets, topic nb
         @param selected_group_id: if group: group to display baskets of
         @param ln: language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         message = _("Are you sure you want to delete this basket?")

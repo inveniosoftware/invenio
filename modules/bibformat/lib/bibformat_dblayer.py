@@ -115,8 +115,8 @@ def get_kb_name(kb_id):
 
 def get_kb_type(kb_id):
     """Returns the type of the kb with given id
-    @param kb_id knowledge base id
-    @return kb_type
+    @param kb_id: knowledge base id
+    @return: kb_type
     """
     res = run_sql("""SELECT kbtype FROM fmtKNOWLEDGEBASES WHERE id=%s""",
                   (kb_id,))
@@ -128,7 +128,7 @@ def get_kb_type(kb_id):
 def get_kb_mappings(kb_name, sortby="to"):
     """Returns a list of all mappings from the given kb, ordered by key
 
-    @param sortby the sorting criteria ('from' or 'to')
+    @param sortby: the sorting criteria ('from' or 'to')
     """
     out = []
     k_id = get_kb_id(kb_name)
@@ -191,9 +191,9 @@ def add_kb(kb_name, kb_description, kb_type=None):
 
     If name already exists replace old value
 
-    @param kb_name the name of the kb to create
-    @param kb_description a description for the kb
-    @return the id of the newly created kb
+    @param kb_name: the name of the kb to create
+    @param kb_description: a description for the kb
+    @return: the id of the newly created kb
     """
 
     kb_db = 'w' #the typical written_as - change_to
@@ -288,9 +288,9 @@ def get_kb_mapping_value(kb_name, key):
     Returns a value of the given key from the given kb.
     If mapping not found, returns None #'default'
 
-    @param kb_name the name of a knowledge base
-    @param key the key to look for
-    #@param default a default value to return if mapping is not found
+    @param kb_name: the name of a knowledge base
+    @param key: the key to look for
+    #@param default: a default value to return if mapping is not found
     """
     k_id = get_kb_id(kb_name)
     res = run_sql("""SELECT m_value FROM fmtKNOWLEDGEBASEMAPPINGS
@@ -414,7 +414,7 @@ def get_all_name_tag_mappings():
     we will take the value of one of them, as we cannot make the difference in format
     templates)
 
-    @return a dict containing list of mapping in 'tag' table
+    @return: a dict containing list of mapping in 'tag' table
     """
     out = {}
     query = "SELECT value, name FROM tag"
@@ -432,7 +432,7 @@ def get_output_format_id(code):
 
     Output formats are located inside 'format' table
 
-    @return the id in the database of the output format. None if not found
+    @return: the id in the database of the output format. None if not found
     """
     f_code = code
     if len(code)>6:
@@ -449,10 +449,10 @@ def add_output_format(code, name="", description="", content_type="text/html", v
 
     If format with given code already exists, do nothing
 
-    @param code the code of the new format
-    @param name a new for the new format
-    @param description a description for the new format
-    @param content_type the content_type (if applicable) of the new output format
+    @param code: the code of the new format
+    @param name: a new for the new format
+    @param description: a description for the new format
+    @param content_type: the content_type (if applicable) of the new output format
     """
     output_format_id = get_output_format_id(code);
     if output_format_id is None:
@@ -468,7 +468,7 @@ def remove_output_format(code):
     If code does not exist in database, do nothing
     The function also removes all localized names in formatname table
 
-    @param the code of the output format to remove
+    @param the: code of the output format to remove
     """
     output_format_id = get_output_format_id(code);
     if output_format_id is None:
@@ -485,8 +485,8 @@ def get_output_format_description(code):
 
     If code or description does not exist, return empty string
 
-    @param code the code of the output format to get the description from
-    @return output format description
+    @param code: the code of the output format to get the description from
+    @return: output format description
     """
 
     res = run_sql("SELECT description FROM format WHERE code=%s", (code,))
@@ -502,8 +502,8 @@ def set_output_format_description(code, description):
 
     If 'code' does not exist, create format
 
-    @param code the code of the output format to update
-    @param description the new description
+    @param code: the code of the output format to update
+    @param description: the new description
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
@@ -518,7 +518,7 @@ def get_output_format_visibility(code):
     Returns the visibility of the output format, given by its code
 
     If code does not exist, return 0
-    @return output format visibility (0 if not visible, 1 if visible
+    @return: output format visibility (0 if not visible, 1 if visible
     """
     res = run_sql("SELECT visibility FROM format WHERE code=%s", (code,))
     if len(res) > 0:
@@ -533,8 +533,8 @@ def set_output_format_visibility(code, visibility):
 
     If 'code' does not exist, create format
 
-    @param code the code of the output format to update
-    @param visibility the new visibility (0: not visible, 1:visible)
+    @param code: the code of the output format to update
+    @param visibility: the new visibility (0: not visible, 1:visible)
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
@@ -551,7 +551,7 @@ def get_existing_content_types():
 
     Always returns at least a list with 'text/html'
 
-    @return a list of content-type strings
+    @return: a list of content-type strings
     """
     query = "SELECT DISTINCT content_type FROM format GROUP BY content_type"
     res = run_sql(query)
@@ -570,8 +570,8 @@ def get_output_format_content_type(code):
 
     If code or content_type does not exist, return empty string
 
-    @param code the code of the output format to get the description from
-    @return output format content_type
+    @param code: the code of the output format to get the description from
+    @return: output format content_type
     """
     res = run_sql("SELECT content_type FROM format WHERE code=%s", (code,))
     if len(res) > 0:
@@ -586,8 +586,8 @@ def set_output_format_content_type(code, content_type):
 
     If 'code' does not exist, create format
 
-    @param code the code of the output format to update
-    @param content_type the content type for the format
+    @param code: the code of the output format to update
+    @param content_type: the content type for the format
     """
     output_format_id = get_output_format_id(code)
     if output_format_id is None:
@@ -616,8 +616,8 @@ def get_output_format_names(code):
 
     The localized names of output formats are located in formatname table.
 
-    @param code the code of the output format to get the names from
-    @return a dict containing output format names
+    @param code: the code of the output format to get the names from
+    @return: a dict containing output format names
     """
     out = {'sn':{}, 'ln':{}, 'generic':''}
     output_format_id = get_output_format_id(code);
@@ -645,10 +645,10 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
 
     The localized names of output formats are located in formatname table.
 
-    @param code the code of an ouput format
-    @param type either 'ln' (for long name) and 'sn' (for short name)
-    @param lang the language in which the name is given
-    @param name the name to give to the output format
+    @param code: the code of an ouput format
+    @param type: either 'ln' (for long name) and 'sn' (for short name)
+    @param lang: the language in which the name is given
+    @param name: the name to give to the output format
     """
 
     if len(name) > 256:
@@ -676,8 +676,8 @@ def change_output_format_code(old_code, new_code):
     """
     Change the code of an output format
 
-    @param old_code the code of the output format to change
-    @param new_code the new code
+    @param old_code: the code of the output format to change
+    @param new_code: the new code
     """
     output_format_id = get_output_format_id(old_code);
     if output_format_id is None:
@@ -694,10 +694,10 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
     If corresponding record does not exist for given output format,
     returns None
 
-    @param recID the id of the record to fetch
-    @param of the output format code
-    @param decompress the method used to decompress the preformatted record in database
-    @return formatted record as String, or None if not exist
+    @param recID: the id of the record to fetch
+    @param of: the output format code
+    @param decompress: the method used to decompress the preformatted record in database
+    @return: formatted record as String, or None if not exist
     """
     # Try to fetch preformatted record
     query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
@@ -717,9 +717,9 @@ def get_preformatted_record_date(recID, of):
     If corresponding record does not exist for given output format,
     returns None
 
-    @param recID the id of the record to fetch
-    @param of the output format code
-    @return the date of the last update of the cache, or None if not exist
+    @param recID: the id of the record to fetch
+    @param of: the output format code
+    @return: the date of the last update of the cache, or None if not exist
     """
     # Try to fetch preformatted record
     query = "SELECT last_updated FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)

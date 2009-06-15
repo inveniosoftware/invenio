@@ -47,7 +47,7 @@ class Template:
         @param comments: tuple as returned from webcomment.py/query_retrieve_comments_or_remarks
         @param nb_comments_total: total number of comments for this record
         @param warnings: list of warning tuples (warning_msg, arg1, arg2, ...)
-        @return html of comments
+        @return: html of comments
         """
 
         # load the right message language
@@ -172,7 +172,7 @@ class Template:
         @param nb_comments_total: total number of comments for this record
         @param avg_score: average score of all reviews
         @param warnings: list of warning tuples (warning_msg, arg1, arg2, ...)
-        @return html of comments
+        @return: html of comments
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -306,7 +306,7 @@ class Template:
         @param body: comment body
         @param reply_link: if want reply and report, give the http links
         @param repot_link: if want reply and report, give the http links
-        @return html table of comment
+        @return: html table of comment
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -346,7 +346,7 @@ class Template:
         @param nb_votes_yes: number of positive votes for this record
         @param star_score: star score for this record
         @param title: title of review
-        @return html table of review
+        @return: html table of review
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -700,7 +700,7 @@ class Template:
         @param button: value/caption on the submit button
         @param cnfrm: if given, must check checkbox to confirm
         @param **hidden: dictionary with name=value pairs for hidden input
-        @return html form
+        @return: html form
         """
 
         output  = """
@@ -740,7 +740,7 @@ class Template:
         """
         Prepare the warnings list
         @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
-        @return html string of warnings
+        @return: html string of warnings
         """
         red_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED',
                             'WRN_WEBCOMMENT_ALREADY_VOTED']
@@ -782,7 +782,7 @@ class Template:
                             version in case user cannot display FCKeditor
         @param warnings: list of warning tuples (warning_msg, color)
         @param can_attach_files: if user can upload attach file to record or not
-        @return html add comment form
+        @return: html add comment form
         """
         _ = gettext_set_language(ln)
         link_dic =  {   'siteurl'    : CFG_SITE_URL,
@@ -856,7 +856,7 @@ class Template:
         @param warnings: list of warning tuples (warning_msg, color)
         @param show_title_p: if True, prefix the form with "Add Review" as title
         @param can_attach_files: if user can upload attach file to record or not
-        @return html add review form
+        @return: html add review form
         """
         _ = gettext_set_language(ln)
         link_dic =  {   'siteurl'    : CFG_SITE_URL,
@@ -973,7 +973,7 @@ class Template:
         """
         @param recID: record id
         @param ln: language
-        @return html page of successfully added comment/review
+        @return: html page of successfully added comment/review
         """
         _ = gettext_set_language(ln)
         link_dic =  {   'siteurl'    : CFG_SITE_URL,

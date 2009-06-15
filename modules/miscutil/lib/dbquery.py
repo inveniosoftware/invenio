@@ -146,7 +146,7 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=['bibrec']
     @param with_desc: if true, will return a
     DB API 7-tuple describing columns in query
 
-    @param affected_tables is a list of tablenames of affected tables,
+    @param affected_tables: is a list of tablenames of affected tables,
     used to decide whether we should update the cache or whether we
     can return cached result, depending on the last modification time
     for corresponding tables.  If empty, and if the cached result is
@@ -157,7 +157,7 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=['bibrec']
     restarts.  Note that this would be a dangerous default for any
     query.)
 
-    @return the result as provided by run_sql()
+    @return: the result as provided by run_sql()
 
     Note that it is pointless and even wrong to use this function with
     SQL commands different from SELECT.

@@ -156,7 +156,7 @@ def get_i18n_day_name(day_nb, display='short', ln=CFG_SITE_LANG):
     @param day_nb: number of weekday UNIX like.
                    => 0=Sunday
     @param ln: language for output
-    @return the string representation of the day
+    @return: the string representation of the day
     """
     _ = gettext_set_language(ln)
     if display == 'short':
@@ -184,7 +184,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
     @param month_nb: number of month, (1 based!)
                      =>1=jan,..,12=dec
     @param ln: language for output
-    @return the string representation of month
+    @return: the string representation of month
     """
     _ = gettext_set_language(ln)
     if display == 'short':
@@ -223,7 +223,7 @@ def create_day_selectbox(name, selected_day=0, ln=CFG_SITE_LANG):
     @param name: name of the control (i.e. name of the var you'll get)
     @param selected_day: preselect a day. Use 0 for the label 'Day'
     @param ln: language of the menu
-    @return html a string
+    @return: html a string
     """
     _ = gettext_set_language(ln)
     out = "<select name=\"%s\">\n"% name
@@ -244,7 +244,7 @@ def create_month_selectbox(name, selected_month=0, ln=CFG_SITE_LANG):
     @param name: name of the control (your form will be sent with name=value...)
     @param selected_month: preselect a month. use 0 for the Label 'Month'
     @param ln: language of the menu
-    @return html as string
+    @return: html as string
     """
     out = "<select name=\"%s\">\n"% name
 
@@ -261,7 +261,7 @@ def create_year_inputbox(name, value=0):
     Creates an HTML field (simple input) for year selection.
     @param name: name of the control (i.e. name of the variable you'll get)
     @param value: prefilled value (int)
-    @return html as string
+    @return: html as string
     """
     out = "<input type=\"text\" name=\"%s\" value=\"%i\" maxlength=\"4\" size=\"4\"/>\n"% (name, value)
     return out
@@ -274,7 +274,7 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG
     @param length: number of items in menu
     @param selected_year: initial selected year (if in range), else: label is selected
     @param ln: language
-    @return html as string
+    @return: html as string
     """
     _ = gettext_set_language(ln)
     if from_year < 0:

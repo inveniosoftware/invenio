@@ -25,10 +25,10 @@ def format(bfo, param1, param2='default value'):
     """
     Prints test
 
-    @param param1 desc 1
-    @param param2 desc 2
-    @param unknown_param desc3
-    @see element2.py, unknown_element.py
+    @param param1: desc 1
+    @param param2: desc 2
+    @param unknown_param: desc3
+    @see: element2.py, unknown_element.py
     """
 
     return "test"

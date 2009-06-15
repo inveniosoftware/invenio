@@ -28,7 +28,7 @@ def format(bfo, template='DC'):
 
     For further details, please read the documentation.
 
-    @param template the name of the template file without the bfx extension
+    @param template: the name of the template file without the bfx extension
     """
     output = ""
     recIDs = [bfo.recID]

@@ -65,7 +65,7 @@ class AuthCernWrapper:
 
     def _request(self, name, params):
         """Call the name request with a dictionary parms.
-        @return the XML response.
+        @return: the XML response.
         """
         params = urllib.urlencode(params)
         socket_timeout = socket.getdefaulttimeout()

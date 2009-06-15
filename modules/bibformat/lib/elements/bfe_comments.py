@@ -26,8 +26,8 @@ def format(bfo, nbReviews='all', nbComments='all'):
     """
     Prints comments posted for the record.
 
-    @param nbReviews The max number of reviews to print
-    @param nbComments The max number of comments to print
+    @param nbReviews: The max number of reviews to print
+    @param nbComments: The max number of comments to print
     """
 
     nb_reviews = nbReviews

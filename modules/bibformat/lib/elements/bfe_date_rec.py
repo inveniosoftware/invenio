@@ -22,7 +22,7 @@ def format(bfo):
     """
     Date of the entry of the record in the database
 
-    @see date.py
+    @see: date.py
     """
     date = bfo.field('909C1c')
 

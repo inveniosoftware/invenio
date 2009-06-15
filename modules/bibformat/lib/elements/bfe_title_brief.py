@@ -24,7 +24,7 @@ def format(bfo, highlight="no", multilang='no'):
     """
     Prints a short title, suitable for brief format.
 
-    @param highlight highlights the words corresponding to search query if set to 'yes'
+    @param highlight: highlights the words corresponding to search query if set to 'yes'
     """
     if multilang == 'yes':
         if bfo.lang == 'fr':

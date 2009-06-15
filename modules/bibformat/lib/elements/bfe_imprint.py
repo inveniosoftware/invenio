@@ -32,12 +32,12 @@ def format(bfo, place_label, publisher_label, date_label,
          "%d %B %Y"   -> 24 September 1982
          "%I:%M"      -> 07:32
     </pre>
-    @param separator a separator between the elements of imprint
-    @param place_label a label to print before the publication place value
-    @param publisher_label a label to print before the publisher name
-    @param date_label a a label to print before the publication date
-    @param date_format date format
-    @see place.py, publisher.py, date.py, reprints.py, pagination.py
+    @param separator: a separator between the elements of imprint
+    @param place_label: a label to print before the publication place value
+    @param publisher_label: a label to print before the publisher name
+    @param date_label: a a label to print before the publication date
+    @param date_format: date format
+    @see: place.py, publisher.py, date.py, reprints.py, pagination.py
     """
 
     place = bfo.field('260__a')

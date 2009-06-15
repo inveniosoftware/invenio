@@ -56,7 +56,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         """
         Displays the Inbox of a given user
         @param ln:  language
-        @return the page for inbox
+        @return: the page for inbox
         """
         argd = wash_urlargd(form, {})
 
@@ -103,7 +103,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                        must be delivered to.
         @param msg_to_group: name of group to send message to
         @param ln: language
-        @return the compose page
+        @return: the compose page
         """
         argd = wash_urlargd(form, {'msg_reply_id': (int, 0),
                                    'msg_to': (str, ""),
@@ -281,7 +281,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         Suppress a message
         @param msgid: id of message
         @param ln: language
-        @return page
+        @return: page
         """
         argd = wash_urlargd(form, {'msgid': (int, -1),
                                    })
@@ -375,7 +375,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         Display a message
         @param msgid: id of message
         @param ln: languae
-        @return page
+        @return: page
         """
         argd = wash_urlargd(form, {'msgid': (int, -1),
                                    })

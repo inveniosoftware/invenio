@@ -137,11 +137,11 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
        |                    |                        |
 ('a', 'value') ('b', 'value for subfield b') ('a', 'value for another a')
 
-    @param marcxml an XML string representation of the record to create
-    @param verbose the level of verbosity: 0 (silent), 1-2 (warnings),
+    @param marcxml: an XML string representation of the record to create
+    @param verbose: the level of verbosity: 0 (silent), 1-2 (warnings),
         3(strict:stop when errors)
-    @param correct 1 to enable correction of marcxml syntax. Else 0.
-    @return a tuple (record, status_code, list_of_errors), where status
+    @param correct: 1 to enable correction of marcxml syntax. Else 0.
+    @return: a tuple (record, status_code, list_of_errors), where status
         code is 0 where there are errors, 1 when no errors"""
     # Select the appropriate parser.
     parser = _select_parser(parser)
@@ -184,12 +184,12 @@ def record_get_field_instances(rec, tag="", ind1=" ", ind2=" "):
 
     Parameters (tag, ind1, ind2) can contain wildcard %.
 
-    @param rec a record structure as returned by create_record()
-    @param tag a 3 characters long string
-    @param ind1 a 1 character long string
-    @param ind2 a 1 character long string
-    @param code a 1 character long string
-    @return a list of field tuples (Subfields, ind1, ind2, value,
+    @param rec: a record structure as returned by create_record()
+    @param tag: a 3 characters long string
+    @param ind1: a 1 character long string
+    @param ind2: a 1 character long string
+    @param code: a 1 character long string
+    @return: a list of field tuples (Subfields, ind1, ind2, value,
         field_position_global) where subfields is list of (code, value)"""
     if not tag:
         return rec.items()
@@ -227,15 +227,15 @@ def record_add_field(rec, tag, ind1=' ', ind2=' ', controlfield_value='',
     If both field_position_global and field_position_local are present,
     then field_position_local takes precedence.
 
-    @param rec the record data structure
-    @param tag the tag of the field to be added
-    @param ind1 the first indicator
-    @param ind2 the second indicator
-    @param controlfield_value the value of the controlfield
-    @param subfields the subfields (a list of tuples (code, value))
-    @param field_position_global the global field position (record wise)
-    @param field_position_local the local field position (tag wise)
-    @return the global field position of the newly inserted field or -1 if the
+    @param rec: the record data structure
+    @param tag: the tag of the field to be added
+    @param ind1: the first indicator
+    @param ind2: the second indicator
+    @param controlfield_value: the value of the controlfield
+    @param subfields: the subfields (a list of tuples (code, value))
+    @param field_position_global: the global field position (record wise)
+    @param field_position_local: the local field position (tag wise)
+    @return: the global field position of the newly inserted field or -1 if the
         operation failed
     """
     error = validate_record_field_positions_global(rec)
@@ -350,9 +350,9 @@ def record_has_field(rec, tag):
     """
     Checks if the tag exists in the record.
 
-    @param rec the record data structure
-    @param the field
-    @return a boolean
+    @param rec: the record data structure
+    @param the: field
+    @return: a boolean
     """
     return tag in rec
 
@@ -369,13 +369,13 @@ def record_delete_field(rec, tag, ind1=' ', ind2=' ',
     If both field_position_global and field_position_local are present,
     then field_position_local takes precedence.
 
-    @param rec the record data structure
-    @param tag the tag of the field to be deleted
-    @param ind1 the first indicator of the field to be deleted
-    @param ind2 the second indicator of the field to be deleted
-    @param field_position_global the global field position (record wise)
-    @param field_position_local the local field position (tag wise)
-    @return the list of deleted fields
+    @param rec: the record data structure
+    @param tag: the tag of the field to be deleted
+    @param ind1: the first indicator of the field to be deleted
+    @param ind2: the second indicator of the field to be deleted
+    @param field_position_global: the global field position (record wise)
+    @param field_position_local: the local field position (tag wise)
+    @return: the list of deleted fields
     """
     error = validate_record_field_positions_global(rec)
     if error:
@@ -455,13 +455,14 @@ def record_add_fields(rec, tag, fields, field_position_local=None,
     position is specified by the tag and the field_position_local in
     the list of fields.
 
-    @param rec a record structure @param tag the tag of the fields
+    @param rec: a record structure @param tag: the tag of the fields
     to be moved
-    @param field_position_local the field_position_local to which the
+    @param field_position_local: the field_position_local to which the
     field will be inserted. If not specified, appends the fields to
     the tag.
-    @param a list of fields to be added @return -1 if the operation
-    failed, or the field_position_local if it was successful
+    @param a: list of fields to be added
+    @return: -1 if the operation failed, or the field_position_local
+    if it was successful
     """
     if field_position_local is None and field_position_global is None:
         for field in fields:
@@ -483,13 +484,13 @@ def record_move_fields(rec, tag, field_positions_local, field_position_local=Non
     Moves some fields to the position specified by
     'field_position_local'.
 
-    @param rec a record structure as returned by create_record()
-    @param tag the tag of the fields to be moved
-    @param field_positions_local the indexes of the
+    @param rec: a record structure as returned by create_record()
+    @param tag: the tag of the fields to be moved
+    @param field_positions_local: the indexes of the
     fields to move
-    @param field_position_local insert the field before that
+    @param field_position_local: insert the field before that
     field_position_local. If unspecified, appends the fields
-    @return the field_position_local is the operation was successful
+    @return: the field_position_local is the operation was successful
     """
     fields = record_delete_fields(rec, tag,
         field_positions_local=field_positions_local)
@@ -601,12 +602,12 @@ def record_get_field_value(rec, tag, ind1=" ", ind2=" ", code=""):
       >> record_get_field_value(record, '%%%', '%', '%', '%')
       >> "val1"
 
-    @param rec a record structure as returned by create_record()
-    @param tag a 3 characters long string
-    @param ind1 a 1 character long string
-    @param ind2 a 1 character long string
-    @param code a 1 character long string
-    @return string value (empty if nothing found)"""
+    @param rec: a record structure as returned by create_record()
+    @param tag: a 3 characters long string
+    @param ind1: a 1 character long string
+    @param ind2: a 1 character long string
+    @param code: a 1 character long string
+    @return: string value (empty if nothing found)"""
     # Note: the code is quite redundant for speed reasons (avoid calling
     # functions or doing tests inside loops)
     ind1, ind2 = _wash_indicators(ind1, ind2)
@@ -676,12 +677,12 @@ def record_get_field_values(rec, tag, ind1=" ", ind2=" ", code=""):
 
     Parameters (tag, ind1, ind2, code) can contain wildcard %.
 
-    @param rec a record structure as returned by create_record()
-    @param tag a 3 characters long string
-    @param ind1 a 1 character long string
-    @param ind2 a 1 character long string
-    @param code a 1 character long string
-    @return a list of strings"""
+    @param rec: a record structure as returned by create_record()
+    @param tag: a 3 characters long string
+    @param ind1: a 1 character long string
+    @param ind2: a 1 character long string
+    @param code: a 1 character long string
+    @return: a list of strings"""
     tmp = []
 
     ind1, ind2 = _wash_indicators(ind1, ind2)
@@ -894,7 +895,7 @@ def _compare_fields(field1, field2, strict=True):
     subfield will be taken care of, if not then the order of the
     subfields doesn't matter.
 
-    @returns True if the field are equivalent, False otherwise.
+    @return: True if the field are equivalent, False otherwise.
     """
     if strict:
         # Return a simple equal test on the field minus the position.
@@ -979,9 +980,9 @@ def _tag_matches_pattern(tag, pattern):
     >> _tag_matches_pattern("909", "9%9") -> True
     >> _tag_matches_pattern("909", "9%8") -> False
 
-    @param tag a 3 characters long string
-    @param pattern a 3 characters long string
-    @return False or True"""
+    @param tag: a 3 characters long string
+    @param pattern: a 3 characters long string
+    @return: False or True"""
     for char1, char2 in zip(tag, pattern):
         if char2 not in ('%', char1):
             return False
@@ -993,8 +994,8 @@ def validate_record_field_positions_global(record):
     duplicate global field positions and local field positions in the
     list of fields are ascending.
 
-    @param record the record data structure
-    @return the first error found as a string or None if no error was found
+    @param record: the record data structure
+    @return: the first error found as a string or None if no error was found
     """
     all_fields = []
     for tag, fields in record.items():
@@ -1211,8 +1212,8 @@ def _wash_indicators(*indicators):
     Washes the values of the indicators. An empty string or an
     underscore is replaced by a blank space.
 
-    @param indicators a series of indicators to be washed
-    @return a list of washed indicators
+    @param indicators: a series of indicators to be washed
+    @return: a list of washed indicators
     """
     return [indicator in ('', '_') and ' ' or indicator
             for indicator in indicators]
@@ -1221,8 +1222,8 @@ def _correct_record(record):
     """
     Checks and corrects the structure of the record.
 
-    @param record the record data structure
-    @return a list of errors found
+    @param record: the record data structure
+    @return: a list of errors found
     """
     errors = []
 
@@ -1300,11 +1301,11 @@ def _warnings(alist):
 
 def _compare_lists(list1, list2, custom_cmp):
     """Compares twolists using given comparing function
-    @param list1 first list to compare
-    @param list2 second list to compare
-    @param custom_cmp - a function taking two arguments (element of
+    @param list1: first list to compare
+    @param list2: second list to compare
+    @param custom_cmp: a function taking two arguments (element of
         list 1, element of list 2) and
-    @return True or False depending if the values are the same"""
+    @return: True or False depending if the values are the same"""
     if len(list1) != len(list2):
         return False
     for element1, element2 in zip(list1, list2):

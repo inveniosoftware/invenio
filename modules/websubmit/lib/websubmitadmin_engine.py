@@ -53,7 +53,7 @@ def get_navtrail(ln=CFG_SITE_LANG):
     """gets the navtrail for title...
        @param title: title of the page
        @param ln: language
-       @return HTML output
+       @return: HTML output
     """
     navtrail = websubmitadmin_templates.tmpl_navtrail(ln)
     return navtrail

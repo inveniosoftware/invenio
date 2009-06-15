@@ -36,7 +36,7 @@ from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 def get_groups_by_user_status(uid, user_status, login_method='INTERNAL'):
     """Select all the groups the user is admin of.
     @param uid: user id
-    @return ((id_usergroup,
+    @return: ((id_usergroup,
               group_name,
               group_description, ))
     """
@@ -57,7 +57,7 @@ def get_groups_by_login_method(uid, login_method):
     """Select all the groups the user is member of selecting the login_method.
     @param uid: user id
     @param login_method: the login_method (>0 external)
-    @return ((id_usergroup,
+    @return: ((id_usergroup,
               group_name,
               group_description, ))
     """
@@ -77,7 +77,7 @@ def get_groups_by_login_method(uid, login_method):
 def get_groups_with_description(uid):
     """Select all the groups the user is member of.
     @param uid: user id
-    @return ((id_usergroup,
+    @return: ((id_usergroup,
               group_name,
               group_description, ))
     """
@@ -97,7 +97,7 @@ def get_external_groups(uid):
     """Select all the groups the user is member of selecting the login_method.
     @param uid: user id
     @param login_method: the login_method (>0 external)
-    @return ((id_usergroup,
+    @return: ((id_usergroup,
               group_name,
               group_description, ))
     """
@@ -126,7 +126,7 @@ def get_groups(uid):
     return res
 
 def get_group_id(group_name, login_method='INTERNAL'):
-    """@return the id of the group called group_name with given login_method."""
+    """@return: the id of the group called group_name with given login_method."""
     return run_sql("""
         SELECT id FROM usergroup
         WHERE  login_method = %s AND name = %s""", (login_method, group_name,))
@@ -134,7 +134,7 @@ def get_group_id(group_name, login_method='INTERNAL'):
 def get_login_method_groups(uid, login_method='INTERNAL'):
     """Select all the external groups of a particular login_method for which
     the user is subscrided.
-    @return ((group_name, group_id))
+    @return: ((group_name, group_id))
     """
     return run_sql("""
         SELECT g.name as name, g.id as id
@@ -146,7 +146,7 @@ def get_login_method_groups(uid, login_method='INTERNAL'):
 
 def get_all_login_method_groups(login_method):
     """Select all the external groups of a particular login_method.
-    @return ({group_name: group_id, ...})
+    @return: ({group_name: group_id, ...})
     """
     return dict(run_sql("""
         SELECT name, id
@@ -170,7 +170,7 @@ def get_all_users_with_groups_with_login_method(login_method):
 def get_visible_group_list(uid, pattern=""):
     """List the group the user can join (not already member
     of the group regardless user's status).
-     @return groups {id : name} whose name matches pattern
+     @return: groups {id : name} whose name matches pattern
     """
     grpID = []
     groups = {}
@@ -235,7 +235,7 @@ def insert_only_new_group(new_group_name,
                           join_policy,
                           login_method='INTERNAL'):
     """Create a group with no user in (yet).
-    @return its id
+    @return: its id
     """
 
     query = """INSERT INTO usergroup (name, description, join_policy, login_method)
@@ -300,7 +300,7 @@ def get_user_status(uid, grpID):
 
 def get_users_by_status(grpID, status, ln=CFG_SITE_LANG):
     """Get the list of users with the given status.
-    @return ((id, nickname),) nickname= user # uid if
+    @return: ((id, nickname),) nickname= user # uid if
     the user has no nickname
     """
     _ = gettext_set_language(ln)
@@ -396,7 +396,7 @@ def count_nb_group_user(uid, user_status):
     """
     @param uid: user id
     @param status: member status
-    @return integer of number of groups the user belongs to
+    @return: integer of number of groups the user belongs to
     with the given status, 0 if none
     """
     res = run_sql("""SELECT count(id_user)
@@ -410,7 +410,7 @@ def count_nb_group_user(uid, user_status):
         return 0
 
 def get_all_users():
-    """@return all the email:id"""
+    """@return: all the email:id"""
     query = """SELECT UPPER(email), id
                FROM user
                WHERE email != ''
@@ -422,7 +422,7 @@ def get_all_users():
         return {}
 
 def get_users_in_group(grpID):
-    """@return all uids of users belonging to group grpID"""
+    """@return: all uids of users belonging to group grpID"""
 
     grpID = int(grpID)
     query = """SELECT id_user

@@ -97,7 +97,7 @@ def send_email(fromaddr,
     e.g.:
     send_email('foo.bar@cern.ch', 'bar.foo@cern.ch', 'Let\'s try!'', 'check 1234', '<strong>check</strong> <em>1234</em><img src="cid:image1">', {'image1': '/tmp/quantum.jpg'})
 
-    @return [bool]: True if email was sent okay, False if it was not.
+    @return: [bool]: True if email was sent okay, False if it was not.
     """
 
     if html_images is None:
@@ -137,7 +137,7 @@ def send_email(fromaddr,
 def email_header(ln=CFG_SITE_LANG):
     """The header of the email
     @param ln: language
-    @return header as a string"""
+    @return: header as a string"""
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     #standard header
@@ -150,7 +150,7 @@ def email_header(ln=CFG_SITE_LANG):
 def email_html_header(ln=CFG_SITE_LANG):
     """The header of the email
     @param ln: language
-    @return header as a string"""
+    @return: header as a string"""
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     #standard header
@@ -164,7 +164,7 @@ def email_html_header(ln=CFG_SITE_LANG):
 def email_footer(ln=CFG_SITE_LANG):
     """The footer of the email
     @param ln: language
-    @return footer as a string"""
+    @return: footer as a string"""
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     #standard footer
@@ -184,7 +184,7 @@ def email_footer(ln=CFG_SITE_LANG):
 def email_html_footer(ln=CFG_SITE_LANG):
     """The html footer of the email
     @param ln: language
-    @return footer as a string"""
+    @return: footer as a string"""
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     #standard footer
@@ -220,7 +220,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     @param ln: language
     @charset: [string] the content charset. By default is None which means
     to try to encode the email as ascii, then latin1 then utf-8.
-    @return forged email as a string"""
+    @return: forged email as a string"""
 
     if html_images is None:
         html_images = {}

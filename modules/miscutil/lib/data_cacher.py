@@ -40,8 +40,8 @@ class DataCacher:
     lists.
     """
     def __init__(self, cache_filler, timestamp_verifier):
-        """ @param cache_filler a function that fills the cache dictionary.
-            @param timestamp_verifier a function that returns a timestamp for
+        """ @param cache_filler: a function that fills the cache dictionary.
+            @param timestamp_verifier: a function that returns a timestamp for
                    checking if something has changed after cache creation.
         """
         self.timestamp = 0 # WARNING: may be exposed to clients
@@ -82,9 +82,9 @@ class SQLDataCacher(DataCacher):
     their results.
     """
     def __init__(self, query, param=None, affected_tables=()):
-        """ @param query the query to cache
-            @param param its optional parameters as a tuple
-            @param affected_tables the list of tables queried by the query.
+        """ @param query: the query to cache
+            @param param: its optional parameters as a tuple
+            @param affected_tables: the list of tables queried by the query.
         """
         self.query = query
         self.affected_tables = affected_tables

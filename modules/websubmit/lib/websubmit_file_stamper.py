@@ -265,7 +265,7 @@ def create_final_latex_template(working_dirname, \
         been parsed for replacements.
        @latex_template_var: (dict) dictionnary whose keys are the string to
         replace in latex_template and values are the replacement content
-       @return name of the final latex template (after replacements)
+       @return: name of the final latex template (after replacements)
     """
     ## Regexp used for finding a substitution line in the original template:
     re_replacement = re.compile("""XXX-(.+?)-XXX""")

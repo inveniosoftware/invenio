@@ -40,10 +40,10 @@ class Template:
         """
         Returns the main BibFormat admin page.
 
-        @param ln language
-        @param warnings a list of warnings to display at top of page. None if no warning
-        @param is_admin indicate if user is authorized to use BibFormat
-        @return main BibFormat admin page
+        @param ln: language
+        @param warnings: a list of warnings to display at top of page. None if no warning
+        @param is_admin: indicate if user is authorized to use BibFormat
+        @return: main BibFormat admin page
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -291,14 +291,14 @@ class Template:
         If template is new, offer a way to create a duplicate from an
         existing template
 
-        @param ln language
-        @param name the name of the format
-        @param description the description of the format
-        @param filename the filename of the template
-        @param editable True if we let user edit, else False
-        @param all_templates a list of tuples (filename, name) of all other templates
-        @param new if True, the format template has just been added (is new)
-        @return editor for 'format'
+        @param ln: language
+        @param name: the name of the format
+        @param description: the description of the format
+        @param filename: the filename of the template
+        @param editable: True if we let user edit, else False
+        @param all_templates: a list of tuples (filename, name) of all other templates
+        @param new: if True, the format template has just been added (is new)
+        @return: editor for 'format'
         """
         _ = gettext_set_language(ln)    # load the right message language
 
@@ -401,11 +401,11 @@ class Template:
         """
         Shows the dependencies (on elements) of the given format.
 
-        @param name the name of the template
-        @param filename the filename of the template
-        @param format_elements the elements (and list of tags in each element) this template depends on
-        @param output_formats the output format that depend on this template
-        @param tags the tags that are called by format elements this template depends on.
+        @param name: the name of the template
+        @param filename: the filename of the template
+        @param format_elements: the elements (and list of tags in each element) this template depends on
+        @param output_formats: the output format that depend on this template
+        @param tags: the tags that are called by format elements this template depends on.
         """
         _ = gettext_set_language(ln)    # load the right message language
 
@@ -479,14 +479,14 @@ class Template:
         """
         Returns the editor for format templates. Edit 'format'
 
-        @param ln language
-        @param format the format to edit
-        @param filename the filename of the template
-        @param ln_for_preview the language for the preview (for bfo)
-        @param pattern_for_preview the search pattern to be used for the preview (for bfo)
-        @param editable True if we let user edit, else False
-        @param code the code of the template of the editor
-        @return editor for 'format'
+        @param ln: language
+        @param format: the format to edit
+        @param filename: the filename of the template
+        @param ln_for_preview: the language for the preview (for bfo)
+        @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
+        @param editable: True if we let user edit, else False
+        @param code: the code of the template of the editor
+        @return: editor for 'format'
         """
         _ = gettext_set_language(ln)    # load the right message language
 
@@ -747,8 +747,8 @@ class Template:
         This page is different from others: it is displayed inside a <iframe>
         tag in template tmpl_admin_format_template_show.
 
-        @param ln language
-        @param format_elements a list of format elements structures as returned by get_format_elements
+        @param ln: language
+        @param format_elements: a list of format elements structures as returned by get_format_elements
         """
         out = '''
         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -888,9 +888,9 @@ class Template:
         Returns the management console for formats. Includes list of formats and
         associated administration tools.
 
-        @param ln language
-        @param formats a list of dictionaries with formats attributes
-        @return format management console as html
+        @param ln: language
+        @param formats: a list of dictionaries with formats attributes
+        @return: format management console as html
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -1016,9 +1016,9 @@ class Template:
         """
         Returns the main management console for formats. Includes list of formats and
         associated administration tools.
-        @param ln language
-        @param output_formats a list of output formats
-        @return main management console as html
+        @param ln: language
+        @param output_formats: a list of output formats
+        @return: main management console as html
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -1146,14 +1146,14 @@ class Template:
         IMPORTANT: we display rules evaluation index starting at 1 in
         interface, but we start internally at 0
 
-        @param ln language
-        @param code the code of the output to show
-        @param name the name of this output format
-        @param rules the list of rules for this output format
-        @param default the default format template of the output format
-        @param format_templates the list of format_templates
-        @param editable True if we let user edit, else False
-        @return the management console for this output format
+        @param ln: language
+        @param code: the code of the output to show
+        @param name: the name of this output format
+        @param rules: the list of rules for this output format
+        @param default: the default format template of the output format
+        @param format_templates: the list of format_templates
+        @param editable: True if we let user edit, else False
+        @return: the management console for this output format
         """
         _ = gettext_set_language(ln)
         out = '''
@@ -1345,15 +1345,15 @@ class Template:
 
         names_trans is an ordered list of dicts with keys 'lang' and 'trans'
 
-        @param ln language
-        @param name the name of the format
-        @param description the description of the format
-        @param code the code of the format
-        @param content_type the (MIME) content type of the ouput format
-        @param names_trans the translations in the same order as the languages from get_languages()
-        @param editable True if we let user edit, else False
-        @param visible True if output format should be shown in list of available output formats
-        @return editor for output format attributes
+        @param ln: language
+        @param name: the name of the format
+        @param description: the description of the format
+        @param code: the code of the format
+        @param content_type: the (MIME) content type of the ouput format
+        @param names_trans: the translations in the same order as the languages from get_languages()
+        @param editable: True if we let user edit, else False
+        @param visible: True if output format should be shown in list of available output formats
+        @return: editor for output format attributes
         """
         _ = gettext_set_language(ln)    # load the right message language
 
@@ -1451,9 +1451,9 @@ class Template:
         """
         Shows the dependencies of the given format.
 
-        @param name the name of the output format
-        @param code the code of the output format
-        @param format_templates format templates that depend on this format (and also elements and tags)
+        @param name: the name of the output format
+        @param code: the code of the output format
+        @param format_templates: format templates that depend on this format (and also elements and tags)
         """
         _ = gettext_set_language(ln)    # load the right message language
         out = '''
@@ -1516,9 +1516,9 @@ class Template:
         Returns the main management console for format elements. Includes list of formats elements and
         associated administration tools.
 
-        @param ln language
-        @param formats a list of dictionaries with formats elements attributes
-        @return main management console as html
+        @param ln: language
+        @param formats: a list of dictionaries with formats elements attributes
+        @return: main management console as html
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -1589,10 +1589,10 @@ class Template:
         Prints the formatted documentation of a single element. Used in main documentation of element and
         in creation of floater for Dreamweaver.
 
-        @param ln language
-        @param name the name of the element
-        @param attributes the attributes of the element, as returned by get_format_element_attrs_from_*
-        @param print_see_also if True, prints links to other sections related to element
+        @param ln: language
+        @param name: the name of the element
+        @param attributes: the attributes of the element, as returned by get_format_element_attrs_from_*
+        @param print_see_also: if True, prints links to other sections related to element
         """
         params_names = ""
         for param in attributes['params']:
@@ -1660,9 +1660,9 @@ class Template:
         """
         Shows the dependencies of the given format element
 
-        @param name the name of the element
-        @param format_templates format templates that depend on this element
-        @param tags the tags that are called by this format element
+        @param name: the name of the element
+        @param format_templates: format templates that depend on this element
+        @param tags: the tags that are called by this format element
         """
         out = '''
         <p>Go back to <a href="format_elements_doc?ln=%(ln)s#%(name)s">documentation</a></p>
@@ -1707,13 +1707,13 @@ class Template:
         """
         Prints a page where the user can test the given format element with his own parameters.
 
-        @param ln language
-        @param bfe the format element name
-        @param description a description of the element
-        @param param_names a list of parameters names/labels
-        @param param_values a list of values for parameters
-        @param param_descriptions a list of description for parameters
-        @param result the result of the evaluation
+        @param ln: language
+        @param bfe: the format element name
+        @param description: a description of the element
+        @param param_names: a list of parameters names/labels
+        @param param_values: a list of values for parameters
+        @param param_descriptions: a list of description for parameters
+        @param result: the result of the evaluation
         """
 
         out = '''
@@ -1761,7 +1761,7 @@ class Template:
         """
         Shows how to add a format element (mainly doc)
 
-        @param ln language
+        @param ln: language
         """
         _ = gettext_set_language(ln)    # load the right message language
 
@@ -1776,10 +1776,10 @@ class Template:
         """
         Returns the main management console for knowledge bases.
 
-        @param ln language
-        @param kbs a list of dictionaries with knowledge bases attributes
-        @param lookup_term hunt for this string in kb's
-        @return main management console as html
+        @param ln: language
+        @param kbs: a list of dictionaries with knowledge bases attributes
+        @param lookup_term: hunt for this string in kb's
+        @return: main management console as html
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -1886,11 +1886,11 @@ class Template:
     def tmpl_kb_prevnextlink(self, p_or_n, ln, kb_id, sortby, startat):
         """
         An aux routine to make "Next" link
-        @param p_or_n p for previous, n for next
-        @param ln language
-        @param kb_id knowledge base id
-        @param sortby sort by to or from
-        @param startat start at this pair
+        @param p_or_n: p for previous, n for next
+        @param ln: language
+        @param kb_id: knowledge base id
+        @param sortby: sort by to or from
+        @param startat: start at this pair
         """
         _ = gettext_set_language(ln)    # load the right message language
         label = _("Next")
@@ -1902,16 +1902,16 @@ class Template:
         """
         Returns the content of a knowledge base.
 
-        @param ln language
-        @param kb_id the id of the kb
-        @param kb_name the name of the kb
-        @param mappings a list of dictionaries with mappings
-        @param sortby the sorting criteria ('from' or 'to')
-        @param startat start showing the mappings from number x. Usefull for large kb's.
-        @param kb_type None or 't' meaning taxonomy, or 'c' meaning collection. If taxonomy, show 'taxonomy config' instead of map from/to
-        @param lookup_term focus on this left side if it is in the KB
-        @param coll_config collection configuration for collection kb's
-        @return main management console as html
+        @param ln: language
+        @param kb_id: the id of the kb
+        @param kb_name: the name of the kb
+        @param mappings: a list of dictionaries with mappings
+        @param sortby: the sorting criteria ('from' or 'to')
+        @param startat: start showing the mappings from number x. Usefull for large kb's.
+        @param kb_type: None or 't' meaning taxonomy, or 'c' meaning collection. If taxonomy, show 'taxonomy config' instead of map from/to
+        @param lookup_term: focus on this left side if it is in the KB
+        @param coll_config: collection configuration for collection kb's
+        @return: main management console as html
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -2160,13 +2160,13 @@ class Template:
         """
         Returns the attributes of a knowledge base.
 
-        @param ln language
-        @param kb_id the id of the kb
-        @param kb_name the name of the kb
-        @param description the description of the kb
-        @param sortby the sorting criteria ('from' or 'to')
+        @param ln: language
+        @param kb_id: the id of the kb
+        @param kb_name: the name of the kb
+        @param description: the description of the kb
+        @param sortby: the sorting criteria ('from' or 'to')
         @param kb_type: None or taxonomy
-        @return main management console as html
+        @return: main management console as html
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -2231,11 +2231,11 @@ class Template:
         """
         Returns the attributes of a knowledge base.
 
-        @param ln language
-        @param kb_id the id of the kb
-        @param kb_name the name of the kb
-        @param sortby the sorting criteria ('from' or 'to')
-        @param format_elements the elements that use this kb
+        @param ln: language
+        @param kb_id: the id of the kb
+        @param kb_name: the name of the kb
+        @param sortby: the sorting criteria ('from' or 'to')
+        @param format_elements: the elements that use this kb
         """
 
         _ = gettext_set_language(ln)    # load the right message language
@@ -2287,7 +2287,7 @@ class Template:
         'floater' will let users of Dreamweaver to insert Format elements
         into their code right from the floater.
 
-        @param format_elements an ordered list of format elements structures as returned by get_format_elements
+        @param format_elements: an ordered list of format elements structures as returned by get_format_elements
         """
         names_list = [] # list of element names such as ['Authors', 'Title']
         codes_list = [] # list of element code such as ['<BFE_AUTHORS limit="" separator="," />', '<BFE_TITLE />']
@@ -2394,8 +2394,8 @@ class Template:
         Prints the errors of the validation of a format (might be any
         kind of format)
 
-        @param ln language
-        @param errors a list of tuples (error code, string error message)
+        @param ln: language
+        @param errors: a list of tuples (error code, string error message)
         """
         _ = gettext_set_language(ln)    # load the right message language
         out = ""
@@ -2416,11 +2416,11 @@ class Template:
         """
         Prints a dialog box with given title, message and options
 
-        @param url the url of the page that must process the result of the dialog box
-        @param ln language
-        @param title the title of the dialog box
-        @param message a formatted message to display inside dialog box
-        @param options a list of string options to display as button to the user
+        @param url: the url of the page that must process the result of the dialog box
+        @param ln: language
+        @param title: the title of the dialog box
+        @param message: a formatted message to display inside dialog box
+        @param options: a list of string options to display as button to the user
         """
 
         out = ""

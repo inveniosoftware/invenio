@@ -87,9 +87,9 @@ def indent_text(text,
     @param tab_str: type of tab (could be, for example "\t", default: 2 spaces
     @param linebreak_input: linebreak on input
     @param linebreak_output: linebreak on output
-    @param wrap wethever to apply smart text wrapping.
+    @param wrap: wethever to apply smart text wrapping.
         (by means of wrap_text_in_a_box)
-    @return indented text as string
+    @return: indented text as string
     """
     if not wrap:
         lines = text.split(linebreak_input)
@@ -115,28 +115,28 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
        ******************
 
     Indentation and newline are respected.
-    @param body the main text
-    @param title an optional title
-    @param style the name of one of the style in CFG_WRAP_STYLES. By default
+    @param body: the main text
+    @param title: an optional title
+    @param style: the name of one of the style in CFG_WRAP_STYLES. By default
         the double_star style is used.
 
     You can further tune the desired style by setting various optional
     parameters:
-        @param horiz_sep a string that is repeated in order to produce a
+        @param horiz_sep: a string that is repeated in order to produce a
             separator row between the title and the body (if needed)
-        @param max_col the maximum number of coulmns used by the box
+        @param max_col: the maximum number of coulmns used by the box
             (including indentation)
-        @param min_col the symmetrical minimum number of columns
-        @param tab_str a string to represent indentation
-        @param tab_num the number of leveles of indentations
-        @param border a tuple of 8 element in the form
+        @param min_col: the symmetrical minimum number of columns
+        @param tab_str: a string to represent indentation
+        @param tab_num: the number of leveles of indentations
+        @param border: a tuple of 8 element in the form
             (tl, t, tr, l, r, bl, b, br) of strings that represent the
             different corners and sides of the box
-        @param prefix a prefix string added before the box
-        @param suffix a suffix string added after the box
-        @param break_long wethever to break long words in order to respect
+        @param prefix: a prefix string added before the box
+        @param suffix: a suffix string added after the box
+        @param break_long: wethever to break long words in order to respect
             max_col
-        @param force_horiz True in order to print the horizontal line even when
+        @param force_horiz: True in order to print the horizontal line even when
             there is no title
 
     e.g.:
@@ -277,8 +277,8 @@ def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
 def encode_for_xml(text):
     """Encodes special characters in a text so that it would be
     XML-compliant.
-    @param text text to encode
-    @return an encoded text"""
+    @param text: text to encode
+    @return: an encoded text"""
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
     return text

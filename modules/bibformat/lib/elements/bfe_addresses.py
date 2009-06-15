@@ -29,8 +29,8 @@ def format(bfo, separator="; ", print_link="yes"):
     """
     Prints a list of addresses linked to this report
 
-    @param separator the separator between addresses.
-    @param print_link Links the addresses to search engine (HTML links) if 'yes'
+    @param separator: the separator between addresses.
+    @param print_link: Links the addresses to search engine (HTML links) if 'yes'
     """
 
     addresses = bfo.fields('270')

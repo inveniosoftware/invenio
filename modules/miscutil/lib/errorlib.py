@@ -129,19 +129,19 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
 
     @param stream: 'error' or 'warning'
 
-    @param req = mod_python request
+    @param req: mod_python request
 
-    @param prefix a message to be printed before the exception in
+    @param prefix: a message to be printed before the exception in
     the log
 
-    @param suffix a message to be printed before the exception in
+    @param suffix: a message to be printed before the exception in
     the log
 
-    @param alert_admin wethever to send the exception to the administrator via email
+    @param alert_admin: wethever to send the exception to the administrator via email
 
-    @param subject overrides the email subject
+    @param subject: overrides the email subject
 
-    @return 1 if successfully wrote to stream, 0 if not
+    @return: 1 if successfully wrote to stream, 0 if not
     """
 
     def _truncate_dynamic_string(val, maxlength=500):
@@ -309,8 +309,8 @@ def register_errors(errors_or_warnings_list, stream, req=None):
 
     @param stream: 'error' or 'warning'
 
-    @param req = mod_python request
-    @return tuple integer 1 if successfully wrote to stream, integer 0 if not
+    @param req: mod_python request
+    @return: tuple integer 1 if successfully wrote to stream, integer 0 if not
             will append another error to errors_list if unsuccessful
     """
     client_info_dict = ""
@@ -375,7 +375,7 @@ def get_msg_associated_to_code(err_code, stream='error'):
     Returns string of code
     @param code: error or warning code
     @param stream: 'error' or 'warning'
-    @return tuple (err_code, formatted_message)
+    @return: tuple (err_code, formatted_message)
     """
     err_code = wash_url_argument(err_code, 'str')
     stream = wash_url_argument(stream, 'str')
@@ -421,7 +421,7 @@ def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
 
     @param stream: 'error' or 'warning'
 
-    @return list of tuples of length 2 [('ERR_...', err_msg), ...]
+    @return: list of tuples of length 2 [('ERR_...', err_msg), ...]
             if code_list empty, will return None.
             if errors retrieving error messages, will append an error to the list
     """

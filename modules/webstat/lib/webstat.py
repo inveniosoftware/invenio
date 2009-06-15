@@ -830,7 +830,7 @@ def _get_timespans(dt=None):
     @param dt: A datetime object indicating the current date and time
     @type dt: datetime.datetime
 
-    @return [(Internal name, Readable name, t_start, t_end, granularity, format, xtic_format)]
+    @return: [(Internal name, Readable name, t_start, t_end, granularity, format, xtic_format)]
     @type [(str, str, str, str, str, str, str)]
     """
     if dt is None:
@@ -911,7 +911,7 @@ def _get_formats(with_dump=False):
     @param with_dump: Optionally displays the custom-event only type 'asciidump'
     @type with_dump: bool
 
-    @return [(Internal name, Readable name)]
+    @return: [(Internal name, Readable name)]
     @type [(str, str)]
     """
     # The third tuple value is internal

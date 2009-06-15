@@ -35,19 +35,19 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
 
     @param prefix_en a prefix for english abstract (printed only if english abstract exists)
     @param prefix_fr a prefix for french abstract (printed only if french abstract exists)
-    @param limit the maximum number of sentences of the abstract to display (for each language)
-    @param max_chars the maximum number of chars of the abstract to display (for each language)
-    @param extension_en a text printed after english abstracts longer than parameter 'limit'
-    @param extension_fr a text printed after french abstracts longer than parameter 'limit'
-    @param suffix_en a suffix for english abstract(printed only if english abstract exists)
-    @param suffix_fr a suffix for french abstract(printed only if french abstract exists)
+    @param limit: the maximum number of sentences of the abstract to display (for each language)
+    @param max_chars: the maximum number of chars of the abstract to display (for each language)
+    @param extension_en: a text printed after english abstracts longer than parameter 'limit'
+    @param extension_fr: a text printed after french abstracts longer than parameter 'limit'
+    @param suffix_en: a suffix for english abstract(printed only if english abstract exists)
+    @param suffix_fr: a suffix for french abstract(printed only if french abstract exists)
     @parmm contextual if 'yes' prints sentences the most relative to user search keyword (if limit < abstract)
-    @param highlight if 'yes' highlights words from user search keyword
-    @param print_lang the comma-separated list of languages to print. Now restricted to 'en' and 'fr'
-    @param escape escaping method (overrides default escape parameter to not escape separators)
-    @param separator_en a separator between each english abstract
-    @param separator_fr a separator between each french abstract
-    @param latex_to_html if 'yes', interpret as LaTeX abstract
+    @param highlight: if 'yes' highlights words from user search keyword
+    @param print_lang: the comma-separated list of languages to print. Now restricted to 'en' and 'fr'
+    @param escape: escaping method (overrides default escape parameter to not escape separators)
+    @param separator_en: a separator between each english abstract
+    @param separator_fr: a separator between each french abstract
+    @param latex_to_html: if 'yes', interpret as LaTeX abstract
     """
     out = ''
 

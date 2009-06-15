@@ -50,7 +50,7 @@ def is_admin(req):
 def index(req, search="", ln=CFG_SITE_LANG):
     """
     Main BibCheck administration page.
-    @param ln language
+    @param ln: language
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)

@@ -122,7 +122,7 @@ class ExternalAuthCern(ExternalAuth):
 
     def user_exists(self, email, req=None):
         """Checks against CERN NICE/CRA for existance of email.
-        @return True if the user exists, False otherwise
+        @return: True if the user exists, False otherwise
         """
         users = self._try_twice(funct=AuthCernWrapper.list_users, \
                 params={"display_name":email})
@@ -131,7 +131,7 @@ class ExternalAuthCern(ExternalAuth):
 
     def fetch_user_groups_membership(self, email, password=None, req=None):
         """Fetch user groups membership from the CERN NICE/CRA account.
-        @return a dictionary of groupname, group description
+        @return: a dictionary of groupname, group description
         """
         groups = self._try_twice(funct=AuthCernWrapper.get_groups_for_user, \
                 params={"user_name":email})
@@ -164,7 +164,7 @@ class ExternalAuthCern(ExternalAuth):
         """Fetch user preferences/settings from the CERN Nice account.
         the external key will be '1' if the account is external to NICE/CRA,
         otherwise 0
-        @return a dictionary. Note: auth and respccid are hidden
+        @return: a dictionary. Note: auth and respccid are hidden
         """
         prefs = self._try_twice(funct=AuthCernWrapper.get_user_info, \
                 params={"user_name":username, "password":password})

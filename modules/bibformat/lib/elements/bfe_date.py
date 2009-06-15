@@ -31,7 +31,7 @@ def format(bfo, date_format='%d %B %Y'):
         "%d %B %Y"   -> 24 September 1982
         "%I:%M"      -> 07:32
     </pre>
-    @see pagination.py, publisher.py, reprints.py, imprint.py, place.py
+    @see: pagination.py, publisher.py, reprints.py, imprint.py, place.py
     @param date_format date format
     """
     date = bfo.field('260__c')

@@ -280,7 +280,7 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
     @param cmtid: if provided this comment is a reply to comment cmtid.
     @param category: selected category
     @param topic: selected topic
-    @param group id: selected group id
+    @param group_id: selected group id
     @param ln: language
     """
     body = ''
@@ -358,7 +358,7 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='',
     @param text: comment's body (string)
     @param ln: language (string)
     @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
-    @return (errors, infos) where errors: list of errors while saving
+    @return: (errors, infos) where errors: list of errors while saving
                                   infos: list of informations to display"""
     _ = gettext_set_language(ln)
     errors = []
@@ -404,7 +404,7 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
     @param new_topic_name: new basket goes into new topic
     @param create_in_topic: # of topic to put basket into
     @param ln: language
-    @return (body, errors, warnings) tuple
+    @return: (body, errors, warnings) tuple
     """
     body = ''
     errors = []
@@ -510,7 +510,7 @@ def perform_request_delete(uid, bskid, confirmed=0,
     @param confirmed: if 0 will return a confirmation page; if 1 will delete basket.
     @param category: category currently displayed
     @param selected_topic: topic currently displayed
-    @param selected_group id: if category is group, id of the group currently displayed
+    @param selected_group_id: if category is group, id of the group currently displayed
     @param ln: language"""
     body = ''
     errors = []

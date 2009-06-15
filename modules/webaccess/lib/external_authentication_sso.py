@@ -108,7 +108,7 @@ class ExternalAuthSSO(ExternalAuth):
 
     #def user_exists(self, email, req=None):
         #"""Checks against CERN NICE/CRA for existance of email.
-        #@return True if the user exists, False otherwise
+        #@return: True if the user exists, False otherwise
         #"""
         #users = self._try_twice(funct=AuthCernWrapper.list_users, \
                 #params={"display_name":email})
@@ -117,7 +117,7 @@ class ExternalAuthSSO(ExternalAuth):
 
     def fetch_user_groups_membership(self, email, password=None, req=None):
         """Fetch user groups membership from the SSO system.
-        @return a dictionary of groupname, group description
+        @return: a dictionary of groupname, group description
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """
@@ -170,7 +170,7 @@ class ExternalAuthSSO(ExternalAuth):
         """Fetch user preferences/settings from the SSO account.
         the external key will be '1' if the account is external to SSO,
         otherwise 0
-        @return a dictionary.
+        @return: a dictionary.
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """

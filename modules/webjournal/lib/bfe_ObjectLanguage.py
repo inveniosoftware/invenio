@@ -26,8 +26,8 @@ def format(bfo, letters="2", filter='no'):
     """
     Returns the user-chosen langage.
 
-    @param letters Can be 2 or 3, to return for example "en" or "eng"
-    @param filter if 'yes', returns only know languages
+    @param letters: Can be 2 or 3, to return for example "en" or "eng"
+    @param filter: if 'yes', returns only know languages
     """
     ln = bfo.lang
     if filter.lower() == 'yes' and \

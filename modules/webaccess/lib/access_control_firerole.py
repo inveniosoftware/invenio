@@ -113,9 +113,9 @@ def repair_role_definitions():
 def store_role_definition(role_id, firerole_def_ser, firerole_def_src):
     """ Store a compiled serialized definition and its source in the database
     alongside the role to which it belong.
-    @param role_id the role_id
-    @param firerole_def_ser the serialized compiled definition
-    @param firerole_def_src the sources from which the definition was taken
+    @param role_id: the role_id
+    @param firerole_def_ser: the serialized compiled definition
+    @param firerole_def_src: the sources from which the definition was taken
     """
     run_sql("UPDATE accROLE SET firerole_def_ser=%s, firerole_def_src=%s WHERE id=%s", (firerole_def_ser, firerole_def_src, role_id))
 
@@ -123,8 +123,8 @@ def load_role_definition(role_id):
     """ Load the definition corresponding to a role. If the compiled definition
     is corrupted it try to repairs definitions from their sources and try again
     to return the definition.
-    @param the role_id
-    @return a deserialized compiled role definition
+    @param role_id:
+    @return: a deserialized compiled role definition
     """
     res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1)
     if res:
@@ -151,11 +151,11 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
     """ Given a user_info dictionary, it matches the rules inside the deserializez
     compiled definition in order to discover if the current user match the roles
     corresponding to this definition.
-    @param user_info a dict produced by collect_user_info which contains every
+    @param user_info: a dict produced by collect_user_info which contains every
     info about a user
-    @param firerole_def_obj a compiled deserialized definition produced by
+    @param firerole_def_obj: a compiled deserialized definition produced by
     compile_role_defintion
-    @return True if the user match the definition, False otherwise.
+    @return: True if the user match the definition, False otherwise.
     """
     try:
         default_allow_p, suggest_apache_p, rules = firerole_def_obj
@@ -249,8 +249,8 @@ _aliasTable = (('group', 'groups'), ('apache_group', 'apache_groups'))
 
 def _ip_matcher_builder(group):
     """ Compile a string "ip/bitmask" (i.e. 127.0.0.0/24)
-    @param group a classical "ip/bitmask" string
-    @return a tuple containing the gip and mask in a binary version.
+    @param group: a classical "ip/bitmask" string
+    @return: a tuple containing the gip and mask in a binary version.
     """
     gip, gmk = group.split('/')
     gip = _mkip(gip)
@@ -262,9 +262,9 @@ def _ip_matcher_builder(group):
 
 def _ipmatch(ip, ip_matcher):
     """ Check if an ip matches an ip_group.
-    @param ip the ip to check
-    @param ip_matcher a compiled ip_group produced by ip_matcher_builder
-    @return True if ip matches, False otherwise
+    @param ip: the ip to check
+    @param ip_matcher: a compiled ip_group produced by ip_matcher_builder
+    @return: True if ip matches, False otherwise
     """
     return _mkip(ip) & ip_matcher[1] == ip_matcher[0]
 

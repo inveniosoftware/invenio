@@ -26,8 +26,8 @@ def format(bfo, separator=" ", highlight='no'):
     """
     Prints the titles of a record.
 
-    @param separator separator between the different titles
-    @param highlight highlights the words corresponding to search query if set to 'yes'
+    @param separator: separator between the different titles
+    @param highlight: highlights the words corresponding to search query if set to 'yes'
     """
     titles = []
 

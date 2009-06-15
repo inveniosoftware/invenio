@@ -48,9 +48,9 @@ def highlight(text, keywords=None, prefix_tag='<strong>', suffix_tag="</strong>"
 
     for example set prefix_tag='<b style="color: black; background-color: rgb(255, 255, 102);">' and suffix_tag="</b>"
 
-    @param text the text to modify
-    @param keywords a list of string
-    @return highlighted text
+    @param text: the text to modify
+    @param keywords: a list of string
+    @return: highlighted text
     """
 
     if not keywords:
@@ -73,10 +73,10 @@ def get_contextual_content(text, keywords, max_lines=2):
     Returns some lines from a text contextually to the keywords in
     'keywords_string'
 
-    @param text the text from which we want to get contextual content
-    @param keywords a list of keyword strings ("the context")
-    @param max_lines the maximum number of line to return from the record
-    @return a string
+    @param text: the text from which we want to get contextual content
+    @param keywords: a list of keyword strings ("the context")
+    @param max_lines: the maximum number of line to return from the record
+    @return: a string
     """
 
     def grade_line(text_line, keywords):
@@ -147,9 +147,9 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
 
     If record does not exist, returns empty string.
 
-    @param recID the id of the record to retrieve
-    @param on_the_fly if False, try to fetch precreated one in database
-    @return the xml string of the record
+    @param recID: the id of the record to retrieve
+    @param on_the_fly: if False, try to fetch precreated one in database
+    @return: the xml string of the record
     """
     from invenio.search_engine import record_exists
 

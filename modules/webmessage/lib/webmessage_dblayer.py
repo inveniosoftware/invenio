@@ -41,7 +41,7 @@ def check_user_owns_message(uid, msgid):
     Checks whether a user owns a message
     @param uid:   user id
     @param msgid: message id
-    @return 1 if the user owns the message, else 0
+    @return: 1 if the user owns the message, else 0
     """
     query  = """SELECT count(*)
                 FROM   user_msgMESSAGE
@@ -56,7 +56,7 @@ def get_message(uid, msgid):
     get a message with its status
     @param uid: user id
     @param msgid: message id
-    @return a (message_id,
+    @return: a (message_id,
                id_user_from,
                nickname_user_from,
                sent_to_user_nicks,
@@ -104,7 +104,7 @@ def set_message_status(uid, msgid, new_status):
     @param uid:        user ID
     @param msgid:      Message ID
     @param new_status: new status. Should be a single character
-    @return 1 if succes, 0 if not
+    @return: 1 if succes, 0 if not
     """
 
     return int(run_sql("""UPDATE user_msgMESSAGE
@@ -116,7 +116,7 @@ def set_message_status(uid, msgid, new_status):
 def get_nb_new_messages_for_user(uid):
     """ Get number of new mails for a given user
     @param uid: user id (int)
-    @return number of new mails as int.
+    @return: number of new mails as int.
     """
     update_user_inbox_for_reminders(uid)
     new_status = CFG_WEBMESSAGE_STATUS_CODE['NEW']
@@ -132,7 +132,7 @@ def get_nb_new_messages_for_user(uid):
 def get_nb_readable_messages_for_user(uid):
     """ Get number of mails of a fiven user. Reminders are not counted
     @param uid: user id (int)
-    @return number of messages (int)
+    @return: number of messages (int)
     """
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     query = """SELECT count(id_msgMESSAGE)
@@ -152,7 +152,7 @@ def get_all_messages_for_user(uid):
     non-expired reminders.
 
     @param uid: user id
-    @return [(message_id,
+    @return: [(message_id,
               id_user_from,
               nickname_user_from,
               message_subject,
@@ -180,7 +180,7 @@ def get_all_messages_for_user(uid):
 def count_nb_messages(uid):
     """
     @param uid: user id
-    @return integer of number of messages a user has, 0 if none
+    @return: integer of number of messages a user has, 0 if none
     """
     uid = int(uid)
     query = """SELECT count(id_user_to)
@@ -200,7 +200,7 @@ def delete_message_from_user_inbox(uid, msg_id):
     delete it permanently from the database
     @param uid: user id
     @param msg_id: message id
-    @return integer 1 if delete was successful, integer 0 else
+    @return: integer 1 if delete was successful, integer 0 else
     """
     query1 = """DELETE FROM user_msgMESSAGE
                 WHERE id_user_to=%s AND
@@ -215,7 +215,7 @@ def check_if_need_to_delete_message_permanently(msg_ids):
     Checks if a list of messages exist in anyone's inbox, if not,
     delete them permanently
     @param msg_id: sequence of message ids
-    @return number of deleted messages
+    @return: number of deleted messages
     """
     if not((type(msg_ids) is list) or (type(msg_ids) is tuple)):
         msg_ids = [msg_ids]
@@ -245,7 +245,7 @@ def delete_all_messages(uid):
     """
     Delete all messages of a user (except reminders)
     @param uid: user id
-    @return the number of messages deleted
+    @return: the number of messages deleted
     """
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
     query1 = """SELECT id_msgMESSAGE
@@ -266,7 +266,7 @@ def get_uids_from_nicks(nicks):
     """
     Get the association uid/nickname of given nicknames
     @param nicks: list or sequence of strings, each string being a nickname
-    @return a dictionary {nickname: uid}
+    @return: a dictionary {nickname: uid}
     """
     # FIXME: test case
     if not((type(nicks) is list) or (type(nicks) is tuple)):
@@ -294,7 +294,7 @@ def get_nicks_from_uids(uids):
     """
     Get the association uid/nickname of given uids
     @param uids: list or sequence of uids
-    @return a dictionary {uid: nickname} where empty value is possible
+    @return: a dictionary {uid: nickname} where empty value is possible
     """
     if not((type(uids) is list) or (type(uids) is tuple)):
         uids = [uids]
@@ -318,7 +318,7 @@ def get_uids_from_emails(emails):
     """
     Get the association uid/nickname of given nicknames
     @param nicks: list or sequence of strings, each string being a nickname
-    @return a dictionary {nickname: uid}
+    @return: a dictionary {nickname: uid}
     """
     # FIXME: test case
     if not((type(emails) is list) or (type(emails) is tuple)):
@@ -347,7 +347,7 @@ def get_gids_from_groupnames(groupnames):
     """
     Get the gids of given groupnames
     @param groupnames: list or sequence of strings, each string being a groupname
-    @return a dictionary {groupname: gid}
+    @return: a dictionary {groupname: gid}
     """
     # FIXME: test case
     if not((type(groupnames) is list) or (type(groupnames) is tuple)):
@@ -375,7 +375,7 @@ def get_uids_members_of_groups(gids):
     """
     Get the distinct ids of users members of given groups.
     @param groupnames: list or sequence of group ids
-    @return a list of uids.
+    @return: a list of uids.
     """
     if not((type(gids) is list) or (type(gids) is tuple)):
         gids = [gids]
@@ -417,7 +417,7 @@ def create_message(uid_from,
     @param msg_body: string containing the body of the message
     @param msg_send_on_date: date on which message must be sent. Has to be a
                              datetex format (i.e. YYYY-mm-dd HH:MM:SS)
-    @return id of the created message
+    @return: id of the created message
     """
     now = convert_datestruct_to_datetext(localtime())
     msg_id = run_sql("""INSERT INTO msgMESSAGE(id_user_from,
@@ -443,7 +443,7 @@ def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
     @param uids: sequence of user ids
     @param msg_id: id of message
     @param status: status of the message. (single char, see webmessage_config.py).
-    @return a list of users having their mailbox full
+    @return: a list of users having their mailbox full
     """
     if not((type(uids_to) is list) or (type(uids_to) is tuple)):
         uids_to = [uids_to]
@@ -472,7 +472,7 @@ def send_message(uids_to, msgid, status=CFG_WEBMESSAGE_STATUS_CODE['NEW']):
 def check_quota(nb_messages):
     """
     @param nb_messages: max number of messages a user can have
-    @return a dictionary of users over-quota
+    @return: a dictionary of users over-quota
     """
     where = ''
     no_quota_users = list_users_in_roles(CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA)
@@ -503,7 +503,7 @@ def update_user_inbox_for_reminders(uid):
     """
     Updates user's inbox with any reminders that should have arrived
     @param uid: user id
-    @return integer number of new expired reminders
+    @return: integer number of new expired reminders
     """
     now =  convert_datestruct_to_datetext(localtime())
     reminder_status = CFG_WEBMESSAGE_STATUS_CODE['REMINDER']
@@ -569,7 +569,7 @@ def get_groupnames_like(uid, pattern):
 def get_element(sql_res):
     """convert mySQL output
     @param x: a tuple like this: (6789L,)
-    @return integer conversion of the number in tuple
+    @return: integer conversion of the number in tuple
     """
     return int(sql_res[0])
 

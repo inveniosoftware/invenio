@@ -152,7 +152,7 @@ class Template:
         Display len(infos) information fields
         @param infos: list of strings
         @param ln: language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         if not((type(infos) is list) or (type(infos) is tuple)):

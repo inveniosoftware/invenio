@@ -1221,7 +1221,7 @@ class Template:
         """
         Prepare the warnings list
         @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
-        @return html string of warnings
+        @return: html string of warnings
         """
         from invenio.errorlib import get_msgs_for_code_list
         span_class = 'important'
@@ -1248,7 +1248,7 @@ class Template:
         Display len(warnings) warning fields
         @param infos: list of strings
         @param ln=language
-        @return html output
+        @return: html output
         """
         if not((type(warnings) is list) or (type(warnings) is tuple)):
             warnings = [warnings]
@@ -2038,7 +2038,7 @@ Best regards.
         """
         display a confirm message when deleting a group
         @param ln: language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         action = CFG_SITE_URL + '/yourgroups/edit'
@@ -2077,7 +2077,7 @@ Best regards.
         """
         display a confirm message
         @param ln: language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         action = CFG_SITE_URL + '/yourgroups/leave'
@@ -2150,7 +2150,7 @@ Best regards.
         """Display len(infos) information fields
         @param infos: list of strings
         @param ln=language
-        @return html output
+        @return: html output
         """
         _ = gettext_set_language(ln)
         if not((type(infos) is list) or (type(infos) is tuple)):

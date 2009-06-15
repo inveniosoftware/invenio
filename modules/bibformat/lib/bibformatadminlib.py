@@ -61,10 +61,10 @@ def perform_request_index(ln=CFG_SITE_LANG, warnings=None, is_admin=False):
     """
     Returns the main BibFormat admin page.
 
-    @param ln language
-    @param warnings a list of messages to display at top of the page, that prevents writability in etc
-    @param is_admin indicate if user is authorized to use BibFormat
-    @return the main admin page
+    @param ln: language
+    @param warnings: a list of messages to display at top of the page, that prevents writability in etc
+    @param is_admin: indicate if user is authorized to use BibFormat
+    @return: the main admin page
     """
     if warnings is not None and len(warnings) > 0:
         warnings = get_msgs_for_code_list(warnings, 'warning', ln)
@@ -76,9 +76,9 @@ def perform_request_format_templates_management(ln=CFG_SITE_LANG, checking=0):
     """
     Returns the main management console for format templates
 
-    @param ln language
-    @param checking the level of checking (0: basic, 1:extensive (time consuming) )
-    @return the main page for format templates management
+    @param ln: language
+    @param checking: the level of checking (0: basic, 1:extensive (time consuming) )
+    @return: the main page for format templates management
     """
 
 
@@ -118,7 +118,7 @@ def perform_request_format_templates_management(ln=CFG_SITE_LANG, checking=0):
     def sort_by_attr(seq):
         """
         Sort 'seq' by attribute name.
-        @param seq a list of dictionaries, containing each one key named 'name'
+        @param seq: a list of dictionaries, containing each one key named 'name'
         """
         intermed = [ (x['name'].lower(), i, x) for i, x in enumerate(seq)]
         intermed.sort()
@@ -134,12 +134,12 @@ def perform_request_format_template_show(bft, ln=CFG_SITE_LANG, code=None,
     """
     Returns the editor for format templates.
 
-    @param ln language
-    @param bft the template to edit
+    @param ln: language
+    @param bft: the template to edit
     @param code, the code being edited
-    @param ln_for_preview the language for the preview (for bfo)
-    @param pattern_for_preview the search pattern to be used for the preview (for bfo)
-    @return the main page for formats management
+    @param ln_for_preview: the language for the preview (for bfo)
+    @param pattern_for_preview: the search pattern to be used for the preview (for bfo)
+    @return: the main page for formats management
     """
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
 
@@ -177,8 +177,8 @@ def perform_request_format_template_show_dependencies(bft, ln=CFG_SITE_LANG):
     """
     Show the dependencies (on elements) of the given format.
 
-    @param ln language
-    @param bft the filename of the template to show
+    @param ln: language
+    @param bft: the filename of the template to show
     """
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
     name = format_template['attrs']['name']
@@ -207,10 +207,10 @@ def perform_request_format_template_show_attributes(bft, ln=CFG_SITE_LANG, new=F
     If format template is new, offer the possibility to
     make a duplicate of an existing format template.
 
-    @param ln language
-    @param bft the template to edit
-    @param new if True, the template has just been added (is new)
-    @return the main page for format templates attributes edition
+    @param ln: language
+    @param bft: the template to edit
+    @param new: if True, the template has just been added (is new)
+    @return: the main page for format templates attributes edition
     """
     all_templates = []
     if new:
@@ -254,9 +254,9 @@ def perform_request_format_template_show_short_doc(ln=CFG_SITE_LANG, search_doc_
     Keep only elements that have 'search_doc_pattern' text inside description,
     if pattern not empty
 
-    @param ln language
-    @param search_doc_pattern a search pattern that specified which elements to display
-    @return a brief version of the format element documentation
+    @param ln: language
+    @param search_doc_pattern: a search pattern that specified which elements to display
+    @return: a brief version of the format element documentation
     """
     # Get format elements lists of attributes
     elements = bibformat_engine.get_format_elements(with_built_in_params=True)
@@ -290,8 +290,8 @@ def perform_request_format_elements_documentation(ln=CFG_SITE_LANG):
     Returns the main management console for format elements.
 
     Includes list of format elements and associated administration tools.
-    @param ln language
-    @return the main page for format elements management
+    @param ln: language
+    @return: the main page for format elements management
     """
     # Get format elements lists of attributes
     elements = bibformat_engine.get_format_elements(with_built_in_params=True)
@@ -312,8 +312,8 @@ def perform_request_format_element_show_dependencies(bfe, ln=CFG_SITE_LANG):
     """
     Show the dependencies of the given format.
 
-    @param ln language
-    @param bfe the filename of the format element to show
+    @param ln: language
+    @param bfe: the filename of the format element to show
     """
     format_templates = get_templates_that_use_element(bfe)
     tags = get_tags_used_by_element(bfe)
@@ -331,10 +331,10 @@ def perform_request_format_element_test(bfe, ln=CFG_SITE_LANG, param_values=None
     function of the element as parameters, in the order ...
     If params is None, this means that they have not be defined by user yet.
 
-    @param ln language
-    @param bfe the name of the format element to show
-    @param params the list of parameters to pass to element format function
-    @param user_info the user_info of this request
+    @param ln: language
+    @param bfe: the name of the format element to show
+    @param params: the list of parameters to pass to element format function
+    @param user_info: the user_info of this request
     """
     _ = gettext_set_language(ln)
     format_element = bibformat_engine.get_format_element(bfe, with_built_in_params=True)
@@ -412,9 +412,9 @@ def perform_request_output_formats_management(ln=CFG_SITE_LANG, sortby="code"):
     Returns the main management console for output formats.
 
     Includes list of output formats and associated administration tools.
-    @param ln language
-    @param sortby the sorting crieteria (can be 'code' or 'name')
-    @return the main page for output formats management
+    @param ln: language
+    @param sortby: the sorting crieteria (can be 'code' or 'name')
+    @return: the main page for output formats management
     """
     # Reload in case a format was changed
     bibformat_engine.clear_caches()
@@ -456,8 +456,8 @@ def perform_request_output_formats_management(ln=CFG_SITE_LANG, sortby="code"):
         If attr is equal to 'code', returns the code attribute of the dictionary.
         Else returns the generic name
 
-        @param dic a dictionary of the attribute of an output format, as returned by bibformat_engine.get_output_format
-        @param the attribute we want to fetch. Either 'code' or any other string
+        @param dic: a dictionary of the attribute of an output format, as returned by bibformat_engine.get_output_format
+        @param the: attribute we want to fetch. Either 'code' or any other string
         """
         if attr == "code":
             return dic['attrs']['code']
@@ -516,13 +516,13 @@ def perform_request_output_format_show(bfo, ln=CFG_SITE_LANG, r_fld=[], r_val=[]
     IMPORTANT: we display rules evaluation index starting at 1 in
     interface, but we start internally at 0
 
-    @param ln language
-    @param bfo the filename of the output format to show
-    @param r_fld the list of 'field' attribute for each rule
-    @param r_val the list of 'value' attribute for each rule
-    @param r_tpl the list of 'template' attribute for each rule
-    @param default the default format template used by this output format
-    @param r_upd the rule that we want to increase/decrease in order of evaluation
+    @param ln: language
+    @param bfo: the filename of the output format to show
+    @param r_fld: the list of 'field' attribute for each rule
+    @param r_val: the list of 'value' attribute for each rule
+    @param r_tpl: the list of 'template' attribute for each rule
+    @param default: the default format template used by this output format
+    @param r_upd: the rule that we want to increase/decrease in order of evaluation
     """
 
     output_format = bibformat_engine.get_output_format(bfo, with_attributes=True)
@@ -602,8 +602,8 @@ def perform_request_output_format_show_dependencies(bfo, ln=CFG_SITE_LANG):
     """
     Show the dependencies of the given format.
 
-    @param ln language
-    @param bfo the filename of the output format to show
+    @param ln: language
+    @param bfo: the filename of the output format to show
     """
     output_format = bibformat_engine.get_output_format(code=bfo, with_attributes=True)
     name = output_format['attrs']['names']['generic']
@@ -618,9 +618,9 @@ def perform_request_output_format_show_attributes(bfo, ln=CFG_SITE_LANG):
     """
     Page for output format names and description attributes edition.
 
-    @param ln language
-    @param bfo filename of output format to edit
-    @return the main page for output format attributes edition
+    @param ln: language
+    @param bfo: filename of output format to edit
+    @return: the main page for output format attributes edition
     """
     output_format = bibformat_engine.get_output_format(code=bfo, with_attributes=True)
 
@@ -651,9 +651,9 @@ def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG, search=""):
     """
     Returns the main page for knowledge bases management.
 
-    @param ln language
-    @param search search for this string in kb's
-    @return the main page for knowledge bases management
+    @param ln: language
+    @param search: search for this string in kb's
+    @return: the main page for knowledge bases management
     """
     kbs = bibformat_dblayer.get_kbs()
 
@@ -683,12 +683,12 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", st
     """
     Show the content of a knowledge base
 
-    @param ln language
-    @param kb a knowledge base id
-    @param sortby the sorting criteria ('from' or 'to')
-    @param startat start showing mapping rules at what number
-    @param search_term search for this string in kb
-    @return the content of the given knowledge base
+    @param ln: language
+    @param kb: a knowledge base id
+    @param sortby: the sorting criteria ('from' or 'to')
+    @param startat: start showing mapping rules at what number
+    @param search_term: search for this string in kb
+    @return: the content of the given knowledge base
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     mappings = bibformat_dblayer.get_kb_mappings(name, sortby)
@@ -723,10 +723,10 @@ def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG, sort
     """
     Show the attributes of a knowledge base
 
-    @param ln language
-    @param kb a knowledge base id
-    @param sortby the sorting criteria ('from' or 'to')
-    @return the content of the given knowledge base
+    @param ln: language
+    @param kb: a knowledge base id
+    @param sortby: the sorting criteria ('from' or 'to')
+    @return: the content of the given knowledge base
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     description = bibformat_dblayer.get_kb_description(name)
@@ -738,10 +738,10 @@ def perform_request_knowledge_base_show_dependencies(kb_id, ln=CFG_SITE_LANG, so
     """
     Show the dependencies of a kb
 
-    @param ln language
-    @param kb a knowledge base id
-    @param sortby the sorting criteria ('from' or 'to')
-    @return the dependencies of the given knowledge base
+    @param ln: language
+    @param kb: a knowledge base id
+    @param sortby: the sorting criteria ('from' or 'to')
+    @return: the dependencies of the given knowledge base
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     format_elements = get_elements_that_use_kb(name)
@@ -752,7 +752,7 @@ def add_format_template():
     """
     Adds a new format template (mainly create file with unique name)
 
-    @return the filename of the created format
+    @return: the filename of the created format
     """
     (filename, name) = bibformat_engine.get_fresh_format_template_filename("Untitled")
 
@@ -772,7 +772,7 @@ def delete_format_template(filename):
 
     If format template is not writable, do not remove
 
-    @param filename the format template filename
+    @param filename: the format template filename
     """
     if not can_write_format_template(filename):
         return
@@ -816,8 +816,8 @@ def update_format_template_attributes(filename, name="", description="", duplica
     the code of the template whoose filename is given in 'duplicate' for the code
     of our template.
 
-    @param duplicate the filename of a template that we want to copy
-    @return the filename of the modified format
+    @param duplicate: the filename of a template that we want to copy
+    @return: the filename of the modified format
     """
     if filename.endswith('.'+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
         format_template = bibformat_engine.get_format_template(filename, with_attributes=True)
@@ -873,7 +873,7 @@ def add_output_format():
     """
     Adds a new output format (mainly create file with unique name)
 
-    @return the code of the created format, or None if it could not be created
+    @return: the code of the created format, or None if it could not be created
     """
 
     if not os.access(CFG_BIBFORMAT_OUTPUTS_PATH, os.W_OK):
@@ -901,7 +901,7 @@ def delete_output_format(code):
 
     if file is not writable, don't remove
 
-    @param code the 6 letters code of the output format to remove
+    @param code: the 6 letters code of the output format to remove
     """
     if not can_write_output_format(code):
         return
@@ -952,14 +952,14 @@ def update_output_format_attributes(code, name="", description="", new_code="",
 
     If new_code already exist, use fresh code (we never overwrite other output).
 
-    @param description the new description
-    @param name the new name
-    @param code the new short code (== new bfo) of the output format
-    @param code the code of the output format to update
-    @param names_trans the translations in the same order as the languages from get_languages()
-    @param content_type the new content_type of the output format
-    @param visibility the visibility of the output format in the output formats list (public pages)
-    @return the filename of the modified format
+    @param description: the new description
+    @param name: the new name
+    @param code: the new short code (== new bfo) of the output format
+    @param code: the code of the output format to update
+    @param names_trans: the translations in the same order as the languages from get_languages()
+    @param content_type: the new content_type of the output format
+    @param visibility: the visibility of the output format in the output formats list (public pages)
+    @return: the filename of the modified format
     """
 
     bibformat_dblayer.set_output_format_description(code, description)
@@ -990,9 +990,9 @@ def add_kb_mapping(kb_name, key, value=""):
     """
     Adds a new mapping to given kb
 
-    @param kb_name the name of the kb where to insert the new value
-    @param key the key of the mapping
-    @param value the value of the mapping
+    @param kb_name: the name of the kb where to insert the new value
+    @param key: the key of the mapping
+    @param value: the value of the mapping
     """
     bibformat_dblayer.add_kb_mapping(kb_name, key, value)
 
@@ -1000,8 +1000,8 @@ def remove_kb_mapping(kb_name, key):
     """
     Delete an existing kb mapping in kb
 
-    @param kb_name the name of the kb where to insert the new value
-    @param key the key of the mapping
+    @param kb_name: the name of the kb where to insert the new value
+    @param key: the key of the mapping
     """
     bibformat_dblayer.remove_kb_mapping(kb_name, key)
 
@@ -1009,10 +1009,10 @@ def update_kb_mapping(kb_name, old_key, key, value):
     """
     Update an existing kb mapping with key old_key with a new key and value
 
-    @param kb_name the name of the kb where to insert the new value
-    @param the key of the mapping in the kb
-    @param key the new key of the mapping
-    @param value the new value of the mapping
+    @param kb_name: the name of the kb where to insert the new value
+    @param the: key of the mapping in the kb
+    @param key: the new key of the mapping
+    @param value: the new value of the mapping
     """
     bibformat_dblayer.update_kb_mapping(kb_name, old_key, key, value)
 
@@ -1030,9 +1030,9 @@ def update_kb_attributes(kb_name, new_name, new_description):
     """
     Updates given kb_name with a new name and new description
 
-    @param kb_name the name of the kb to update
-    @param new_name the new name for the kb
-    @param new_description the new description for the kb
+    @param kb_name: the name of the kb to update
+    @param new_name: the new name for the kb
+    @param new_description: the new description for the kb
     """
     bibformat_dblayer.update_kb(kb_name, new_name, new_description)
 
@@ -1042,9 +1042,9 @@ def add_kb(kb_name="Untitled", kb_type=None):
     The name of the kb will be 'Untitled#'
     such that it is unique.
 
-    @param kb_name the name of the kb
-    @param kb_type the type of the kb, incl 'taxonomy' and 'collection'. None for typical.
-    @return the id of the newly created kb
+    @param kb_name: the name of the kb
+    @param kb_type: the type of the kb, incl 'taxonomy' and 'collection'. None for typical.
+    @return: the id of the newly created kb
     """
     name = kb_name
     i = 1
@@ -1136,7 +1136,7 @@ def get_outputs_that_use_template(filename):
 
     Returns output formats references sorted by (generic) name
 
-    @param filename a format template filename
+    @param filename: a format template filename
     """
     output_formats_list = {}
     tags = []
@@ -1190,7 +1190,7 @@ def get_elements_used_by_template(filename):
 
     Returns elements sorted by name
 
-    @param filename a format template filename
+    @param filename: a format template filename
     """
     format_elements = {}
     format_template = bibformat_engine.get_format_template(filename=filename, with_attributes=True)
@@ -1245,7 +1245,7 @@ def get_tags_used_by_element(filename):
 
     Returns tags sorted by value
 
-    @param filename a format element filename
+    @param filename: a format element filename
     """
     tags = {}
 
@@ -1291,7 +1291,7 @@ def get_templates_that_use_element(name):
 
     Returns templates sorted by name
 
-    @param name a format element name
+    @param name: a format element name
     """
     format_templates = {}
     tags = []
@@ -1413,10 +1413,10 @@ def perform_request_format_validate(ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=No
     The page only shows the status of one of the format, depending on
     the specified one. If multiple are specified, shows the first one.
 
-    @param ln language
-    @param bfo an output format 6 chars code
-    @param bft a format element filename
-    @param bfe a format element name
+    @param ln: language
+    @param bfo: an output format 6 chars code
+    @param bft: a format element filename
+    @param bfe: a format element name
     """
 
     if bfo is not None:
@@ -1443,8 +1443,8 @@ def check_output_format(code):
 
     The errors are the formatted errors defined in bibformat_config.py file.
 
-    @param code the 6 chars code of the output format to check
-    @return a list of errors
+    @param code: the 6 chars code of the output format to check
+    @return: a list of errors
     """
     errors = []
     filename = bibformat_engine.resolve_output_format_filename(code)
@@ -1527,9 +1527,9 @@ def check_format_template(filename, checking=0):
 
     The errors are the formatted errors defined in bibformat_config.py file.
 
-    @param filename the filename of the format template to check
-    @param checking the level of checking (0:basic, >=1 extensive (time-consuming))
-    @return a list of errors
+    @param filename: the filename of the format template to check
+    @param checking: the level of checking (0:basic, >=1 extensive (time-consuming))
+    @return: a list of errors
     """
     errors = []
     if can_read_format_template(filename):#Can template be read?
@@ -1607,8 +1607,8 @@ def check_format_element(name):
 
     The errors are the formatted errors defined in bibformat_config.py file.
 
-    @param name the name of the format element to check
-    @return a list of errors
+    @param name: the name of the format element to check
+    @return: a list of errors
     """
     errors = []
     filename = bibformat_engine.resolve_format_element_filename(name)

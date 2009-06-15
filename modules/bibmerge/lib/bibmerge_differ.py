@@ -26,10 +26,10 @@ except ImportError:
 def record_diff(rec1, rec2, compare_subfields, ind1='', ind2=''):
     """Compares two given records
     Considers the change of order of fields as a change
-    @param rec1 - First record
-    @param rec2 - Second record
+    @param rec1: First record
+    @param rec2: Second record
 
-    @return dictionary of differences. Each difference is of a form:
+    @return: dictionary of differences. Each difference is of a form:
      field_id: None - if field is the same for both records
      field_id: ('r',) - if field field_id exists in rec1 but not in
          rec2

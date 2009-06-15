@@ -309,10 +309,10 @@ def format(xmltext, template_filename=None, template_source=None):
     for templates. If not found, template_filename will be assumed to be a path to
     a template. If none can be found, return None.
 
-    @param xmltext The string representation of the XML to process
-    @param template_filename The name of the template to use for the processing
-    @param template_source The configuration describing the processing.
-    @return the transformed XML text.
+    @param xmltext: The string representation of the XML to process
+    @param template_filename: The name of the template to use for the processing
+    @param template_source: The configuration describing the processing.
+    @return: the transformed XML text.
     """
     if processor_type == -1:
         # No XSLT processor found

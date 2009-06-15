@@ -349,7 +349,7 @@ def get_last_login(uid):
 def get_user_info(uid, ln=CFG_SITE_LANG):
     """Get infos for a given user.
     @param uid: user id (int)
-    @return tuple: (uid, nickname, display_name)
+    @return: tuple: (uid, nickname, display_name)
     """
     _ = gettext_set_language(ln)
     query = """SELECT id, nickname
@@ -872,7 +872,7 @@ def list_registered_users():
 def list_users_in_role(role):
     """List all users of a given role (see table accROLE)
     @param role: role of user (string)
-    @return list of uids
+    @return: list of uids
     """
     res = run_sql("""SELECT uacc.id_user
                        FROM user_accROLE uacc JOIN accROLE acc
@@ -886,7 +886,7 @@ def list_users_in_role(role):
 def list_users_in_roles(role_list):
     """List all users of given roles (see table accROLE)
     @param role_list: list of roles [string]
-    @return list of uids
+    @return: list of uids
     """
     if not(type(role_list) is list or type(role_list) is tuple):
         role_list = [role_list]

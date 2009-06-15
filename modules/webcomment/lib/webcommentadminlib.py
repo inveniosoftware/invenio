@@ -102,7 +102,7 @@ def perform_request_users(ln=CFG_SITE_LANG):
 def query_get_users_reported():
     """
     Get the users who have been reported at least one.
-    @return tuple of ct, i.e. (ct, ct, ...)
+    @return: tuple of ct, i.e. (ct, ct, ...)
             where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported,
                                  total_nb_votes_yes_of_reported, total_nb_votes_total_of_reported, user_id, user_email, user_nickname)
             sorted by order of ct having highest total_number_reported
@@ -260,7 +260,7 @@ def suppress_abuse_report(ln=CFG_SITE_LANG, comIDs=[]):
 
 def query_suppress_abuse_report(comID):
     """ suppress abuse report for a given comment
-    @return integer 1 if successful, integer 0 if not
+    @return: integer 1 if successful, integer 0 if not
     """
     query = "UPDATE cmtRECORDCOMMENT SET nb_abuse_reports=0 WHERE id=%i"
     params = comID
@@ -270,7 +270,7 @@ def query_suppress_abuse_report(comID):
 def query_delete_comment(comID):
     """
     delete comment with id comID
-    @return integer 1 if successful, integer 0 if not
+    @return: integer 1 if successful, integer 0 if not
     """
     query1 = "DELETE FROM cmtRECORDCOMMENT WHERE id=%s"
     params1 = (comID,)

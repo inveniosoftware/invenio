@@ -37,9 +37,9 @@ def format(bfo, style, separator='; ', show_icons='no'):
     submission time between main and additional files, returns
     all the files
 
-    @param separator the separator between urls.
-    @param style CSS class of the link
-    @param show_icons if 'yes', print icons for fulltexts
+    @param separator: the separator between urls.
+    @param style: CSS class of the link
+    @param show_icons: if 'yes', print icons for fulltexts
     """
     _ = gettext_set_language(bfo.lang)
 
