@@ -741,18 +741,27 @@ class BibRecordAddSubfieldIntoTest(unittest.TestCase):
 
     def test_add_subfield_into(self):
         """bibrecord - adding subfield into position"""
-        bibrecord.record_add_subfield_into(self.rec, "100", 3, "b", "Samekniv")
+        bibrecord.record_add_subfield_into(self.rec, "100", "b", "Samekniv",
+            field_position_global=3)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b"),
                          ['editor', 'Samekniv'])
-        bibrecord.record_add_subfield_into(self.rec, "245", 4, "x", "Elgokse")
-        bibrecord.record_add_subfield_into(self.rec, "245", 4, "x", "Fiskeflue", 0)
-        bibrecord.record_add_subfield_into(self.rec, "245", 4, "z", "Ulriken", 2)
-        bibrecord.record_add_subfield_into(self.rec, "245", 4, "z", "Stortinget", 999)
+        bibrecord.record_add_subfield_into(self.rec, "245", "x", "Elgokse",
+            field_position_global=4)
+        bibrecord.record_add_subfield_into(self.rec, "245", "x", "Fiskeflue",
+            subfield_position=0, field_position_global=4)
+        bibrecord.record_add_subfield_into(self.rec, "245", "z", "Ulriken",
+            subfield_position=2, field_position_global=4)
+        bibrecord.record_add_subfield_into(self.rec, "245", "z",
+            "Stortinget", subfield_position=999, field_position_global=4)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "%"),
                          ['Fiskeflue', 'On the foo and bar1', 'Ulriken', 'Elgokse', 'Stortinget'])
         # Some crash tests
-        bibrecord.record_add_subfield_into(self.rec, "187", 1, "x", "Crash")
-        bibrecord.record_add_subfield_into(self.rec, "245", 999, "x", "Crash")
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_add_subfield_into, self.rec, "187", "x", "Crash",
+            field_position_global=1)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_add_subfield_into, self.rec, "245", "x", "Crash",
+            field_position_global=999)
 
 
 class BibRecordModifyControlfieldTest(unittest.TestCase):
@@ -778,15 +787,23 @@ class BibRecordModifyControlfieldTest(unittest.TestCase):
 
     def test_modify_controlfield(self):
         """bibrecord - modify controlfield"""
-        bibrecord.record_modify_controlfield(self.rec, "001", 1, "34")
-        bibrecord.record_modify_controlfield(self.rec, "008", 3, "Foo Foo")
+        bibrecord.record_modify_controlfield(self.rec, "001", "34",
+            field_position_global=1)
+        bibrecord.record_modify_controlfield(self.rec, "008", "Foo Foo",
+            field_position_global=3)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "001"), ["34"])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "005"), ["A Foo's Tale"])
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "008"), ["Foo Foo", "Whoop Whoop"])
         # Some crash tests
-        bibrecord.record_modify_controlfield(self.rec, "187", 1, "Crash")
-        bibrecord.record_modify_controlfield(self.rec, "008", 10, "Test")
-        bibrecord.record_modify_controlfield(self.rec, "245", 5, "Burn")
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_modify_controlfield, self.rec, "187", "Crash",
+            field_position_global=1)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_modify_controlfield, self.rec, "008", "Test",
+            field_position_global=10)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_modify_controlfield, self.rec, "245", "Burn",
+            field_position_global=5)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "2", "%"),
                          ["On the foo and bar2"])
 
@@ -819,15 +836,22 @@ class BibRecordModifySubfieldTest(unittest.TestCase):
 
     def test_modify_subfield(self):
         """bibrecord - modify subfield"""
-        bibrecord.record_modify_subfield(self.rec, "245", 4, "a", "Holmenkollen", 0)
-        bibrecord.record_modify_subfield(self.rec, "245", 4, "x", "Brann", 1)
+        bibrecord.record_modify_subfield(self.rec, "245", "a", "Holmenkollen",
+            0, field_position_global=4)
+        bibrecord.record_modify_subfield(self.rec, "245", "x", "Brann", 1,
+            field_position_global=4)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "%"),
                          ['Holmenkollen', 'Brann'])
         # Some crash tests
-        bibrecord.record_modify_subfield(self.rec, "187", 1, "x", "Crash", 0)
-        bibrecord.record_modify_subfield(self.rec, "245", 999, "x", "Burn", 1)
-        bibrecord.record_modify_subfield(self.rec, "245", 4, "a", "Burn", 999)
-
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_modify_subfield, self.rec, "187", "x", "Crash", 0,
+            field_position_global=1)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_modify_subfield, self.rec, "245", "x", "Burn", 1,
+            field_position_global=999)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_modify_subfield, self.rec, "245", "a", "Burn",
+            999, field_position_global=4)
 
 class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
     """ bibrecord - testing subfield deletion """
@@ -857,20 +881,28 @@ class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
 
     def test_delete_subfield_from(self):
         """bibrecord - delete subfield from position"""
-        bibrecord.record_delete_subfield_from(self.rec, "100", 3, 2)
+        bibrecord.record_delete_subfield_from(self.rec, "100", 2,
+            field_position_global=3)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "z"),
                          [])
-        bibrecord.record_delete_subfield_from(self.rec, "100", 3, 0)
+        bibrecord.record_delete_subfield_from(self.rec, "100", 0,
+            field_position_global=3)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "%"),
                          ['editor'])
-        bibrecord.record_delete_subfield_from(self.rec, "100", 3, 0)
+        bibrecord.record_delete_subfield_from(self.rec, "100", 0,
+            field_position_global=3)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "%"),
                          [])
         # Some crash tests
-        bibrecord.record_delete_subfield_from(self.rec, "187", 1, 0)
-        bibrecord.record_delete_subfield_from(self.rec, "245", 999, 0)
-        bibrecord.record_delete_subfield_from(self.rec, "245", 4, 999)
-
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_delete_subfield_from, self.rec, "187", 0,
+            field_position_global=1)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_delete_subfield_from, self.rec, "245", 0,
+            field_position_global=999)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_delete_subfield_from, self.rec, "245", 999,
+            field_position_global=4)
 
 class BibRecordMoveSubfieldTest(unittest.TestCase):
     """ bibrecord - testing subfield moving """
@@ -899,16 +931,24 @@ class BibRecordMoveSubfieldTest(unittest.TestCase):
 
     def test_move_subfield(self):
         """bibrecord - move subfields"""
-        bibrecord.record_move_subfield(self.rec, "100", 3, 2, 4)
-        bibrecord.record_move_subfield(self.rec, "100", 3, 1, 0)
-        bibrecord.record_move_subfield(self.rec, "100", 3, 2, 999)
+        bibrecord.record_move_subfield(self.rec, "100", 2, 4,
+            field_position_global=3)
+        bibrecord.record_move_subfield(self.rec, "100", 1, 0,
+            field_position_global=3)
+        bibrecord.record_move_subfield(self.rec, "100", 2, 999,
+            field_position_global=3)
         self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "%"),
                          ['editor', 'Doe2, John', 'hammer', 'fisk', 'eple'])
         # Some crash tests
-        bibrecord.record_move_subfield(self.rec, "187", 3, 0, 1)
-        bibrecord.record_move_subfield(self.rec, "100", 999, 1, 0)
-        bibrecord.record_move_subfield(self.rec, "100", 3, 999, 0)
-
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_move_subfield, self.rec, "187", 0, 1,
+            field_position_global=3)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_move_subfield, self.rec, "100", 1, 0,
+            field_position_global=999)
+        self.assertRaises(bibrecord.InvenioBibRecordFieldError,
+            bibrecord.record_move_subfield, self.rec, "100", 999, 0,
+            field_position_global=3)
 
 class BibRecordSpecialTagParsingTest(unittest.TestCase):
     """ bibrecord - parsing special tags (FMT, FFT)"""

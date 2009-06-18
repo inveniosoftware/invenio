@@ -874,15 +874,16 @@ def synchronize_8564(rec_id, record, record_had_FFT):
         write_message('Merging subfields %s into field %s' % (subfields, field), verbose=9)
         subfields = dict(subfields) ## We make a copy not to have side-effects
         subfield_to_delete = []
-        for subfield_index, (code, value) in enumerate(field_get_subfield_instances(field)):
+        for subfield_position, (code, value) in enumerate(field_get_subfield_instances(field)):
             ## For each subfield instance already existing...
             if code in subfields:
                 ## ...We substitute it with what is in BibDocFile tables
-                record_modify_subfield(record, '856', field[4], code, subfields[code], subfield_index)
+                record_modify_subfield(record, '856', code, subfields[code],
+                    subfield_position, field_position_global=field[4])
                 del subfields[code]
             else:
                 ## ...We delete it otherwise
-                subfield_to_delete.append(subfield_index)
+                subfield_to_delete.append(subfield_position)
 
         subfield_to_delete.sort()
 
@@ -891,13 +892,15 @@ def synchronize_8564(rec_id, record, record_had_FFT):
             ## will alterate the position of following subfields, we
             ## are taking note of this and adjusting further position
             ## by using a counter.
-            record_delete_subfield_from(record, '856', field[4], position - counter)
+            record_delete_subfield_from(record, '856', position - counter,
+                field_position_global=field[4])
 
         subfields = subfields.items()
         subfields.sort()
         for code, value in subfields:
             ## Let's add non-previously existing subfields
-            record_add_subfield_into(record, '856', field[4], code, value)
+            record_add_subfield_into(record, '856', code, value,
+                field_position_global=field[4])
 
     def get_bibdocfile_managed_info():
         """

@@ -27,22 +27,21 @@ Note: Does not access the database, the input is MARCXML only."""
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 
 import re
+import sys
 try:
     import psyco
     PSYCO_AVAILABLE = True
 except ImportError:
     PSYCO_AVAILABLE = False
-try:
+
+if sys.version[:3] == '2.3':
     # For Python 2.3 compatibility
     from sets import Set as set
-except ImportError:
-    # Let's hope we're using a Python > 2.3.
-    pass
 
 from invenio.bibrecord_config import CFG_MARC21_DTD, \
     CFG_BIBRECORD_WARNING_MSGS, CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
     CFG_BIBRECORD_DEFAULT_CORRECT, CFG_BIBRECORD_PARSERS_AVAILABLE, \
-    InvenioBibRecordGenericParsingError, InvenioBibRecordFieldError
+    InvenioBibRecordParserError, InvenioBibRecordFieldError
 
 from invenio.config import CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.textutils import encode_for_xml
@@ -78,11 +77,14 @@ if 'minidom' in CFG_BIBRECORD_PARSERS_AVAILABLE:
 
 ### INTERFACE / VISIBLE FUNCTIONS
 
-def create_field(subfields=[], ind1=' ', ind2=' ', controlfield_value='',
+def create_field(subfields=None, ind1=' ', ind2=' ', controlfield_value='',
     global_position=-1):
     """
     Returns a field created with the provided elements. Global position is
     set arbitrary to -1."""
+    if subfields is None:
+        subfields = []
+
     ind1, ind2 = _wash_indicators(ind1, ind2)
     field = (subfields, ind1, ind2, controlfield_value, global_position)
     _check_field_validity(field)
@@ -108,8 +110,8 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
     Uses the best parser available in CFG_BIBRECORD_PARSERS_AVAILABLE or
     the parser specified.
 
-    The returned object is a tuple (record, status_code, list_of_errors), where
-    status_code is 0 when there are errors, 1 when no errors.
+    The returned object is a tuple (record, status_code, list_of_errors),
+    where status_code is 0 when there are errors, 1 when no errors.
 
     The return record structure is as follows:
     Record := {tag : [Field]}
@@ -162,7 +164,7 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
 
     try:
         rec = _create_record[parser](marcxml, verbose)
-    except InvenioBibRecordGenericParsingError, ex1:
+    except InvenioBibRecordParserError, ex1:
         return (None, 0, str(ex1))
 
     if sort_fields_by_indicators:
@@ -334,9 +336,9 @@ def record_add_field(rec, tag, ind1=' ', ind2=' ', controlfield_value='',
                 _shift_field_positions_global(rec, field_position_global, 1)
 
             field_position_local = 0
-            for index, field in enumerate(rec[tag]):
+            for position, field in enumerate(rec[tag]):
                 if field[4] == field_position_global + 1:
-                    field_position_local = index
+                    field_position_local = position
 
     # Create the new field.
     newfield = (subfields, ind1, ind2, str(controlfield_value),
@@ -435,8 +437,8 @@ def record_delete_fields(rec, tag, field_positions_local=None):
 
     new_fields, deleted_fields = [], []
 
-    for index, field in enumerate(rec.get(tag, [])):
-        if field_positions_local is None or index in field_positions_local:
+    for position, field in enumerate(rec.get(tag, [])):
+        if field_positions_local is None or position in field_positions_local:
             deleted_fields.append(field)
         else:
             new_fields.append(field)
@@ -479,14 +481,15 @@ def record_add_fields(rec, tag, fields, field_position_local=None,
 
     return field_position_local
 
-def record_move_fields(rec, tag, field_positions_local, field_position_local=None):
+def record_move_fields(rec, tag, field_positions_local,
+    field_position_local=None):
     """
     Moves some fields to the position specified by
     'field_position_local'.
 
     @param rec: a record structure as returned by create_record()
     @param tag: the tag of the fields to be moved
-    @param field_positions_local: the indexes of the
+    @param field_positions_local: the positions of the
     fields to move
     @param field_position_local: insert the field before that
     field_position_local. If unspecified, appends the fields
@@ -506,61 +509,166 @@ def record_delete_subfield(rec, tag, subfield_code, ind1=' ', ind2=' '):
             field[0] = [subfield for subfield in field[0]
                         if subfield_code != subfield[0]]
 
-def record_delete_subfield_from(rec, tag, field_position_global,
-    subfield_index):
+def record_get_field(rec, tag, field_position_global=None,
+    field_position_local=None):
+    """
+    Returns the the matching field. One has to enter either a global
+    field position or a local field position.
+
+    @return: a list of subfield tuples (subfield code, value).
+    @rtype:  list
+    """
+    if field_position_global is None and field_position_local is None:
+        raise InvenioBibRecordFieldError("A field position is required to "
+            "complete this operation.")
+    elif field_position_global is not None and field_position_local is not None:
+        raise InvenioBibRecordFieldError("Only one field position is required "
+            "to complete this operation.")
+    elif field_position_global:
+        if not tag in rec:
+            raise InvenioBibRecordFieldError("No tag '%s' in record." % tag)
+
+        for field in rec[tag]:
+            if field[4] == field_position_global:
+                return field
+        raise InvenioBibRecordFieldError("No field has the tag '%s' and the "
+            "global field position '%d'." % (tag, field_position_global))
+    else:
+        try:
+            return rec[tag][field_position_local]
+        except KeyError:
+            raise InvenioBibRecordFieldError("No tag '%s' in record." % tag)
+        except IndexError:
+            raise InvenioBibRecordFieldError("No field has the tag '%s' and "
+                "the local field position '%d'." % (tag, field_position_local))
+
+def record_replace_field(rec, tag, new_field, field_position_global=None,
+    field_position_local=None):
+    """Replaces a field with a new field."""
+    if field_position_global is None and field_position_local is None:
+        raise InvenioBibRecordFieldError("A field position is required to "
+            "complete this operation.")
+    elif field_position_global is not None and field_position_local is not None:
+        raise InvenioBibRecordFieldError("Only one field position is required "
+            "to complete this operation.")
+    elif field_position_global:
+        if not tag in rec:
+            raise InvenioBibRecordFieldError("No tag '%s' in record." % tag)
+
+        replaced = False
+        for position, field in enumerate(rec[tag]):
+            if field[4] == field_position_global:
+                rec[tag][position] = new_field
+                replaced = True
+
+        if not replaced:
+            raise InvenioBibRecordFieldError("No field has the tag '%s' and "
+                "the global field position '%d'." %
+                (tag, field_position_global))
+    else:
+        try:
+            rec[tag][field_position_local] = new_field
+        except KeyError:
+            raise InvenioBibRecordFieldError("No tag '%s' in record." % tag)
+        except IndexError:
+            raise InvenioBibRecordFieldError("No field has the tag '%s' and "
+                "the local field position '%d'." % (tag, field_position_local))
+
+def record_get_subfields(rec, tag, field_position_global=None,
+    field_position_local=None):
+    """
+    Returns the subfield of the matching field. One has to enter either a
+    global field position or a local field position.
+
+    @return: a list of subfield tuples (subfield code, value).
+    @rtype:  list
+    """
+    field = record_get_field(rec, tag,
+        field_position_global=field_position_global,
+        field_position_local=field_position_local)
+
+    return field[0]
+
+def record_delete_subfield_from(rec, tag, subfield_position,
+    field_position_global=None, field_position_local=None):
     """Delete subfield from position specified by tag, field number and
-    subfield index."""
-    for field in rec.get(tag, []):
-        if field[4] == field_position_global:
-            try:
-                field[0].pop(subfield_index)
-            except IndexError:
-                pass
-            if not field[0]:
-                rec[tag].remove(field)
-                if not rec[tag]:
-                    del rec[tag]
+    subfield position."""
+    subfields = record_get_subfields(rec, tag,
+        field_position_global=field_position_global,
+        field_position_local=field_position_local)
 
-def record_add_subfield_into(rec, tag, field_position_global, subfield, value,
-    subfield_index=None):
+    try:
+        del subfields[subfield_position]
+    except IndexError:
+        raise InvenioBibRecordFieldError("No subfield has the subfield "
+            "position '%s'." % subfield_position)
+
+    if not subfields:
+        if field_position_global is not None:
+            for position, field in enumerate(rec[tag]):
+                if field[4] == field_position_global:
+                    del rec[tag][position]
+        else:
+            del rec[tag][field_position_local]
+
+        if not rec[tag]:
+            del rec[tag]
+
+def record_add_subfield_into(rec, tag, subfield_code, value,
+    subfield_position=None, field_position_global=None,
+    field_position_local=None):
     """Add subfield into position specified by tag, field number and
-    optionally by subfield index."""
-    for field in rec.get(tag, []):
-        if field[4] == field_position_global:
-            if subfield_index is None:
-                field[0].append((subfield, value))
-            else:
-                field[0].insert(subfield_index, (subfield, value))
+    optionally by subfield position."""
+    subfields = record_get_subfields(rec, tag,
+        field_position_global=field_position_global,
+        field_position_local=field_position_local)
 
-def record_modify_controlfield(rec, tag, field_position_global, value):
+    if subfield_position is None:
+        subfields.append((subfield_code, value))
+    else:
+        subfields.insert(subfield_position, (subfield_code, value))
+
+def record_modify_controlfield(rec, tag, controlfield_value,
+    field_position_global=None, field_position_local=None):
     """Modify controlfield at position specified by tag and field number."""
-    if int(tag) < 10 and tag in rec:
-        for i in range(len(rec[tag])):
-            if rec[tag][i][4] == field_position_global:
-                rec[tag][i] = ([], " ", " ", value, rec[tag][i][4])
+    field = record_get_field(rec, tag,
+        field_position_global=field_position_global,
+        field_position_local=field_position_local)
 
-def record_modify_subfield(rec, tag, field_position_global, subfield, value,
-    subfield_index):
+    new_field = (field[0], field[1], field[2], controlfield_value, field[4])
+
+    record_replace_field(rec, tag, new_field,
+        field_position_global=field_position_global,
+        field_position_local=field_position_local)
+
+def record_modify_subfield(rec, tag, subfield_code, value, subfield_position,
+    field_position_global=None, field_position_local=None):
     """Modify subfield at position specified by tag, field number and
-    subfield index."""
-    for field in rec.get(tag, []):
-        if field[4] == field_position_global:
-            try:
-                field[0][subfield_index] = (subfield, value)
-            except IndexError:
-                pass
+    subfield position."""
+    subfields = record_get_subfields(rec, tag,
+        field_position_global=field_position_global,
+        field_position_local=field_position_local)
 
-def record_move_subfield(rec, tag, field_position_global, subfield_index,
-    new_subfield_index):
+    try:
+        subfields[subfield_position] = (subfield_code, value)
+    except IndexError:
+        raise InvenioBibRecordFieldError("There is no subfield with position "
+            "'%d'." % subfield_position)
+
+def record_move_subfield(rec, tag, subfield_position, new_subfield_position,
+    field_position_global=None, field_position_local=None):
     """Move subfield at position specified by tag, field number and
-    subfield index to new subfield index."""
-    for field in rec.get(tag, []):
-        if field[4] == field_position_global:
-            try:
-                subfield = field[0].pop(subfield_index)
-                field[0].insert(new_subfield_index, subfield)
-            except IndexError:
-                pass
+    subfield position to new subfield position."""
+    subfields = record_get_subfields(rec, tag,
+        field_position_global=field_position_global,
+        field_position_local=field_position_local)
+
+    try:
+        subfield = subfields.pop(subfield_position)
+        subfields.insert(new_subfield_position, subfield)
+    except IndexError:
+        raise InvenioBibRecordFieldError("There is no subfield with position "
+            "'%d'." % subfield_position)
 
 def record_get_field_value(rec, tag, ind1=" ", ind2=" ", code=""):
     """Returns first (string) value that matches specified field
@@ -1068,7 +1176,7 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL):
     try:
         root = pyrxp_parser.parse(marcxml)
     except pyRXP.error, ex1:
-        raise InvenioBibRecordGenericParsingError(str(ex1))
+        raise InvenioBibRecordParserError(str(ex1))
 
     # If record is enclosed in a collection tag, extract it.
     if root[TAG] == 'collection':
@@ -1114,7 +1222,14 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL):
 def _create_record_from_document(document):
     """Creates a record from the document (of type
     xml.dom.minidom.Document or Ft.Xml.Domlette.Document)."""
-    root = document.childNodes[0]
+    root = None
+    for node in document.childNodes:
+        if node.nodeType == node.ELEMENT_NODE:
+            root = node
+            break
+
+    if root is None:
+        return {}
 
     if root.tagName == 'collection':
         children = _get_children_by_tag_name(root, 'record')
@@ -1163,7 +1278,7 @@ def _create_record_minidom(marcxml,
     try:
         dom = xml.dom.minidom.parseString(marcxml)
     except xml.parsers.expat.ExpatError, ex1:
-        raise InvenioBibRecordGenericParsingError(str(ex1))
+        raise InvenioBibRecordParserError(str(ex1))
 
     return _create_record_from_document(dom)
 
@@ -1173,7 +1288,7 @@ def _create_record_4suite(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL):
         dom = Ft.Xml.Domlette.NonvalidatingReader.parseString(marcxml,
             "urn:dummy")
     except Ft.Xml.ReaderException, ex1:
-        raise InvenioBibRecordGenericParsingError(ex1.message)
+        raise InvenioBibRecordParserError(ex1.message)
 
     return _create_record_from_document(dom)
 

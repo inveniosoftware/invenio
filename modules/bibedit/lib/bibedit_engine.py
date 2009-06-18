@@ -404,8 +404,9 @@ def perform_request_update_record(request_type, recid, uid, data):
         elif request_type == 'addSubfields':
             subfields = data['subfields']
             for subfield in subfields:
-                record_add_subfield_into(record, data['tag'],
-                    field_position_global, subfield[0], subfield[1], None)
+                record_add_subfield_into(record, data['tag'], subfield[0],
+                    subfield[1], subfield_position=None,
+                    field_position_global=field_position_global)
             if len(subfields) == 1:
                 response['resultCode'] = 22
             else:
@@ -414,16 +415,18 @@ def perform_request_update_record(request_type, recid, uid, data):
         elif request_type == 'modifyContent':
             if data['subfieldIndex'] != None:
                 record_modify_subfield(record, data['tag'],
-                    field_position_global, data['subfieldCode'],
-                    data['value'], int(data['subfieldIndex']))
+                    data['subfieldCode'], data['value'],
+                    int(data['subfieldIndex']),
+                    field_position_global=field_position_global)
             else:
-                record_modify_controlfield(record, data['tag'],
-                    field_position_global, data['value'])
+                record_modify_controlfield(record, data['tag'], data['value'],
+                    field_position_global=field_position_global)
             response['resultCode'] = 24
 
         elif request_type == 'moveSubfield':
-            record_move_subfield(record, data['tag'], field_position_global,
-                int(data['subfieldIndex']), int(data['newSubfieldIndex']))
+            record_move_subfield(record, data['tag'],
+                int(data['subfieldIndex']), int(data['newSubfieldIndex']),
+                field_position_global=field_position_global)
             response['resultCode'] = 25
 
         elif request_type == 'deleteFields':
@@ -440,12 +443,13 @@ def perform_request_update_record(request_type, recid, uid, data):
                             field_position_global=field_position_global)
                         deleted_fields += 1
                     else:
-                        for subfield_index in \
+                        for subfield_position in \
                                 to_delete[tag][field_position_local][::-1]:
                             # Delete subfields in reverse order (to keep the
                             # indexing correct).
                             record_delete_subfield_from(record, tag,
-                                field_position_global, int(subfield_index))
+                                int(subfield_position),
+                                field_position_global=field_position_global)
                             deleted_subfields += 1
             if deleted_fields == 1 and deleted_subfields == 0:
                 response['resultCode'] = 26

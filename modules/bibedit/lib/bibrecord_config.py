@@ -52,10 +52,10 @@ CFG_BIBRECORD_DEFAULT_CORRECT = 0
 CFG_BIBRECORD_PARSERS_AVAILABLE = ['pyrxp', '4suite', 'minidom']
 
 # Exceptions
-class InvenioBibRecordGenericParsingError(Exception):
+class InvenioBibRecordParserError(Exception):
     """A generic parsing exception for all available parsers."""
     pass
 
 class InvenioBibRecordFieldError(Exception):
-    """An error raised when an invalid field is encountered."""
+    """An generic error for BibRecord."""
     pass
