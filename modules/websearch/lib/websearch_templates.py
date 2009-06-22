@@ -132,6 +132,7 @@ class Template:
         'rm': (str, ""),
         'of': (str, "hb"),
         'ot': (list, []),
+        'aas': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'p1': (str, ""), 'f1': (str, ""), 'm1': (str, ""), 'op1':(str, ""),
         'p2': (str, ""), 'f2': (str, ""), 'm2': (str, ""), 'op2':(str, ""),
@@ -155,6 +156,7 @@ class Template:
 
     # ...and for search interfaces
     search_interface_default_urlargd = {
+        'aas': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'verbose': (int, 0)}
 
@@ -446,6 +448,11 @@ class Template:
         # Now, we only have the arguments which have _not_ their default value
         parameters = drop_default_urlargd(parameters, self.search_results_default_urlargd)
 
+        # Treat `as' argument specially:
+        if parameters.has_key('aas'):
+            parameters['as'] = parameters['aas']
+            del parameters['aas']
+
         # Asking for a recid? Return a /record/<recid> URL
         if 'recid' in parameters:
             target = "%s/record/%s" % (CFG_SITE_URL, parameters['recid'])
@@ -466,11 +473,18 @@ class Template:
         del parameters['c']
 
         # Now, we only have the arguments which have _not_ their default value
+        parameters = drop_default_urlargd(parameters, self.search_results_default_urlargd)
+
+        # Treat `as' argument specially:
+        if parameters.has_key('aas'):
+            parameters['as'] = parameters['aas']
+            del parameters['aas']
+
         if c and c != CFG_SITE_NAME:
             base = CFG_SITE_URL + '/collection/' + quote(c)
         else:
             base = CFG_SITE_URL
-        return create_url(base, drop_default_urlargd(parameters, self.search_results_default_urlargd))
+        return create_url(base, parameters)
 
     def build_rss_url(self, known_parameters,  **kargs):
         """Helper for generating a canonical RSS URL"""
@@ -518,13 +532,13 @@ class Template:
 
         return [cgi.escape(x, True) for x in (title, description, keywords)]
 
-    def tmpl_navtrail_links(self, as, ln, dads):
+    def tmpl_navtrail_links(self, aas, ln, dads):
         """
         Creates the navigation bar at top of each search page (*Home > Root collection > subcollection > ...*)
 
         Parameters:
 
-          - 'as' *int* - Should we display an advanced search box?
+          - 'aas' *int* - Should we display an advanced search box?
 
           - 'ln' *string* - The language to display
 
@@ -534,7 +548,8 @@ class Template:
         """
         out = []
         for url, name in dads:
-            out.append(create_html_link(self.build_search_interface_url(c=url, as=as, ln=ln), {}, cgi.escape(name), {'class': 'navtrail'}))
+            args = {'c': url, 'as': aas, 'ln': ln}
+            out.append(create_html_link(self.build_search_interface_url(**args), {}, cgi.escape(name), {'class': 'navtrail'}))
 
         return ' &gt; '.join(out)
 
@@ -635,13 +650,13 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         asearchurl = self.build_search_interface_url(c=collection_id,
-                                                     as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                     aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                      ln=ln)
 
         # Build example of queries for this collection
         example_search_queries_links = [create_html_link(self.build_search_url(p=example_query,
                                                                                ln=ln,
-                                                                               as=-1,
+                                                                               aas=-1,
                                                                                c=collection_id),
                                                          {},
                                                          cgi.escape(example_query),
@@ -784,7 +799,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         asearchurl = self.build_search_interface_url(c=collection_id,
-                                                     as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                     aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                      ln=ln)
 
         # print commentary start:
@@ -871,7 +886,7 @@ class Template:
         <!--create_searchfor_advanced()-->
         '''
 
-        argd = drop_default_urlargd({'ln': ln, 'as': 1, 'cc': collection_id, 'sc': CFG_WEBSEARCH_SPLIT_BY_COLLECTION},
+        argd = drop_default_urlargd({'ln': ln, 'aas': 1, 'cc': collection_id, 'sc': CFG_WEBSEARCH_SPLIT_BY_COLLECTION},
                                     self.search_results_default_urlargd)
 
         # Only add non-default hidden values
@@ -882,7 +897,7 @@ class Template:
         header = _("Search %s records for") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         header += ':'
-        ssearchurl = self.build_search_interface_url(c=collection_id, as=min(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES), ln=ln)
+        ssearchurl = self.build_search_interface_url(c=collection_id, aas=min(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES), ln=ln)
 
         out += '''
         <table class="searchbox">
@@ -1184,18 +1199,18 @@ class Template:
                     }
         return box
 
-    def tmpl_narrowsearch(self, as, ln, type, father,
+    def tmpl_narrowsearch(self, aas, ln, type, father,
                           has_grandchildren, sons, display_grandsons,
                           grandsons):
 
         """
         Creates list of collection descendants of type *type* under title *title*.
-        If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
+        If aas==1, then links to Advanced Search interfaces; otherwise Simple Search.
         Suitable for 'Narrow search' and 'Focus on' boxes.
 
         Parameters:
 
-          - 'as' *bool* - Should we display an advanced search box?
+          - 'aas' *bool* - Should we display an advanced search box?
 
           - 'ln' *string* - The language to display
 
@@ -1252,7 +1267,7 @@ class Template:
             else:
                 out += '</td>'
             out += """<td valign="top">%(link)s%(recs)s """ % {
-                'link': create_html_link(self.build_search_interface_url(c=son.name, ln=ln, as=as),
+                'link': create_html_link(self.build_search_interface_url(c=son.name, ln=ln, aas=aas),
                                          {}, style_prolog + cgi.escape(son.get_name(ln)) + style_epilog),
                 'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
 
@@ -1263,7 +1278,7 @@ class Template:
                 out += """<br />"""
                 for grandson in grandsons[i]:
                     out += """ <small>%(link)s%(nbrec)s</small> """ % {
-                        'link': create_html_link(self.build_search_interface_url(c=grandson.name, ln=ln, as=as),
+                        'link': create_html_link(self.build_search_interface_url(c=grandson.name, ln=ln, aas=aas),
                                                  {},
                                                  cgi.escape(grandson.get_name(ln))),
                         'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
@@ -1366,13 +1381,13 @@ class Template:
         return _("This collection does not contain any document yet.")
 
 
-    def tmpl_instant_browse(self, as, ln, recids, more_link = None):
+    def tmpl_instant_browse(self, aas, ln, recids, more_link = None):
         """
           Formats a list of records (given in the recids list) from the database.
 
         Parameters:
 
-          - 'as' *int* - Advanced Search interface or not (0 or 1)
+          - 'aas' *int* - Advanced Search interface or not (0 or 1)
 
           - 'ln' *string* - The language to display
 
@@ -1761,7 +1776,7 @@ class Template:
             </table>"""
         return out
 
-    def tmpl_search_box(self, ln, as, cc, cc_intl, ot, sp,
+    def tmpl_search_box(self, ln, aas, cc, cc_intl, ot, sp,
                         action, fieldslist, f1, f2, f3, m1, m2, m3,
                         p1, p2, p3, op1, op2, rm, p, f, coll_selects,
                         d1y, d2y, d1m, d2m, d1d, d2d, dt, sort_fields,
@@ -1775,7 +1790,7 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - 'as' *bool* - Should we display an advanced search box? -1 -> 1, from simpler to more advanced
+          - 'aas' *bool* - Should we display an advanced search box? -1 -> 1, from simpler to more advanced
 
           - 'cc_intl' *string* - the i18nized current collection name, used for display
 
@@ -1825,14 +1840,14 @@ class Template:
 
         # These are hidden fields the user does not manipulate
         # directly
-        if as == -1:
+        if aas == -1:
             argd = drop_default_urlargd({
-                'ln': ln, 'as': as,
+                'ln': ln, 'aas': aas,
                 'ot': ot, 'sp': sp, 'ec': ec,
                 }, self.search_results_default_urlargd)
         else:
             argd = drop_default_urlargd({
-                'cc': cc, 'ln': ln, 'as': as,
+                'cc': cc, 'ln': ln, 'aas': aas,
                 'ot': ot, 'sp': sp, 'ec': ec,
                 }, self.search_results_default_urlargd)
 
@@ -1855,7 +1870,7 @@ class Template:
         if action == 'browse':
             leadingtext = _("Browse")
 
-        if as == 1:
+        if aas == 1:
             # print Advanced Search form:
 
             # define search box elements:
@@ -1950,7 +1965,7 @@ class Template:
               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
             }
-        elif as == 0:
+        elif aas == 0:
             # print Simple Search form:
             out += '''
             <table class="searchbox">
@@ -1984,7 +1999,7 @@ class Template:
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
-                                                                        as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                                        aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                                         cc=cc,
                                                                         jrec=jrec,
                                                                         ln=ln,
@@ -2041,7 +2056,7 @@ class Template:
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
-                                                                        as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
+                                                                        aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                                         cc=cc,
                                                                         jrec=jrec,
                                                                         ln=ln,
@@ -2067,7 +2082,7 @@ class Template:
             }
         ## secondly, print Collection(s) box:
 
-        if show_colls and as > -1:
+        if show_colls and aas > -1:
             # display collections only if there is more than one
             selects = ''
             for sel in coll_selects:
@@ -2151,7 +2166,7 @@ class Template:
                       }
 
         ## fifthly, print Display results box, including sort/rank, formats, etc:
-        if action != _("Browse") and as > -1:
+        if action != _("Browse") and aas > -1:
 
             rgs = []
             for i in [10, 25, 50, 100, 250, 500]:
@@ -2224,6 +2239,10 @@ class Template:
             list_input = [self.tmpl_input_hidden(name, val) for val in value]
             return "\n".join(list_input)
 
+        # # Treat `as', `aas' arguments specially:
+        if name == 'aas':
+            name = 'as'
+
         return """<input type="hidden" name="%(name)s" value="%(value)s" />""" % {
                  'name' : cgi.escape(str(name), 1),
                  'value' : cgi.escape(str(value), 1),
@@ -2273,7 +2292,7 @@ class Template:
 
     def tmpl_print_search_info(self, ln, middle_only,
                                collection, collection_name, collection_id,
-                               as, sf, so, rm, rg, nb_found, of, ot, p, f, f1,
+                               aas, sf, so, rm, rg, nb_found, of, ot, p, f, f1,
                                f2, f3, m1, m2, m3, op1, op2, p1, p2,
                                p3, d1y, d1m, d1d, d2y, d2m, d2d, dt,
                                all_fieldcodes, cpu_time, pl_in_url,
@@ -2294,7 +2313,7 @@ class Template:
 
           - 'collection_name' *string* - the i18nized current collection name
 
-          - 'as' *bool* - if we display the advanced search interface
+          - 'aas' *bool* - if we display the advanced search interface
 
           - 'sf' *string* - the currently selected sort format
 
@@ -2342,7 +2361,7 @@ class Template:
                   ''' % {
                     'collection_id': collection_id,
                     'siteurl' : CFG_SITE_URL,
-                    'collection_link': create_html_link(self.build_search_interface_url(c=collection, as=as, ln=ln),
+                    'collection_link': create_html_link(self.build_search_interface_url(c=collection, aas=aas, ln=ln),
                                                         {}, cgi.escape(collection_name))
                   }
         else:
@@ -2368,7 +2387,7 @@ class Template:
                      'sf': sf, 'so': so,
                      'sp': sp, 'rm': rm,
                      'of': of, 'ot': ot,
-                     'as': as, 'ln': ln,
+                     'aas': aas, 'ln': ln,
                      'p1': p1, 'p2': p2, 'p3': p3,
                      'f1': f1, 'f2': f2, 'f3': f3,
                      'm1': m1, 'm2': m2, 'm3': m3,
@@ -2417,7 +2436,7 @@ class Template:
             # still in the navigation part
             cc = collection
             sc = 0
-            for var in ['p', 'cc', 'f', 'sf', 'so', 'of', 'rg', 'as', 'ln', 'p1', 'p2', 'p3', 'f1', 'f2', 'f3', 'm1', 'm2', 'm3', 'op1', 'op2', 'sc', 'd1y', 'd1m', 'd1d', 'd2y', 'd2m', 'd2d', 'dt']:
+            for var in ['p', 'cc', 'f', 'sf', 'so', 'of', 'rg', 'aas', 'ln', 'p1', 'p2', 'p3', 'f1', 'f2', 'f3', 'm1', 'm2', 'm3', 'op1', 'op2', 'sc', 'd1y', 'd1m', 'd1d', 'd2y', 'd2m', 'd2d', 'dt']:
                 out += self.tmpl_input_hidden(name = var, value = vars()[var])
             for var in ['ot', 'sp', 'rm']:
                 if vars()[var]:

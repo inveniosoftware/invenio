@@ -160,12 +160,14 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
 
         # Drop unnecessary arguments, like ln and as (when they are
         # the default value)
-        check(make_url('/', c='Poetry', as=0),
+        args = {'as': 0}
+        check(make_url('/', c='Poetry', **args),
               make_url('/collection/Poetry', ln=CFG_SITE_LANG))
 
         # Otherwise, keep them
-        check(make_url('/', c='Poetry', as=1),
-              make_url('/collection/Poetry', as=1, ln=CFG_SITE_LANG))
+        args = {'as': 1, 'ln': CFG_SITE_LANG}
+        check(make_url('/', c='Poetry', **args),
+              make_url('/collection/Poetry', **args))
 
         # Support the /index.py addressing too
         check(make_url('/index.py', c='Poetry'),
@@ -288,13 +290,14 @@ class WebSearchTestCollections(unittest.TestCase):
         browser = Browser()
 
         try:
-            for as in (0, 1):
-                browser.open(make_url('/collection/Preprints', as=as))
+            for aas in (0, 1):
+                args = {'as': aas}
+                browser.open(make_url('/collection/Preprints', **args))
 
                 for jrec in (11, 21, 11, 27):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
-                    if as:
-                        args['as'] = as
+                    if aas:
+                        args['as'] = aas
 
                     url = make_url('/search', **args)
                     try:
@@ -323,8 +326,8 @@ class WebSearchTestCollections(unittest.TestCase):
                     cur, url))
             return
 
-        for as in (0, 1):
-            if as:
+        for aas in (0, 1):
+            if aas:
                 kargs = {'as': 1}
             else:
                 kargs = {}
@@ -555,7 +558,8 @@ class WebSearchTestSearch(unittest.TestCase):
         """ websearch - switch to simple search """
 
         browser = Browser()
-        browser.open(make_url('/collection/ISOLDE', as=1))
+        args = {'as': 1}
+        browser.open(make_url('/collection/ISOLDE', **args))
 
         browser.select_form(name='search')
         browser['p1'] = 'tandem'

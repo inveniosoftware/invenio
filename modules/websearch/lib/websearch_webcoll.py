@@ -281,24 +281,24 @@ class Collection:
                 _ = gettext_set_language(lang)
 
                 ## first, update navtrail:
-                for as in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
-                    self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang),
-                                          self.create_navtrail_links(as, lang))
+                for aas in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
+                    self.write_cache_file("navtrail-as=%s-ln=%s" % (aas, lang),
+                                          self.create_navtrail_links(aas, lang))
 
                 ## second, update page body:
-                for as in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES: # do light, simple and advanced search pages:
+                for aas in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES: # do light, simple and advanced search pages:
                     body = websearch_templates.tmpl_webcoll_body(
                         ln=lang, collection=self.name,
                         te_portalbox = self.create_portalbox(lang, 'te'),
-                        searchfor = self.create_searchfor(as, lang),
+                        searchfor = self.create_searchfor(aas, lang),
                         np_portalbox = self.create_portalbox(lang, 'np'),
-                        narrowsearch = self.create_narrowsearch(as, lang, 'r'),
-                        focuson = self.create_narrowsearch(as, lang, "v") + \
+                        narrowsearch = self.create_narrowsearch(aas, lang, 'r'),
+                        focuson = self.create_narrowsearch(aas, lang, "v") + \
                         self.create_external_collections_box(lang),
-                        instantbrowse = self.create_instant_browse(as=as, ln=lang),
+                        instantbrowse = self.create_instant_browse(aas=aas, ln=lang),
                         ne_portalbox = self.create_portalbox(lang, 'ne')
                         )
-                    self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
+                    self.write_cache_file("body-as=%s-ln=%s" % (aas, lang), body)
                 ## third, write portalboxes:
                 self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
                 self.write_cache_file("portalbox-te-ln=%s" % lang, self.create_portalbox(lang, "te"))
@@ -310,9 +310,9 @@ class Collection:
                                                                     ln=lang))
         return
 
-    def create_navtrail_links(self, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
+    def create_navtrail_links(self, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         """Creates navigation trail links, i.e. links to collection
-        ancestors (except Home collection).  If as==1, then links to
+        ancestors (except Home collection).  If aas==1, then links to
         Advanced Search interfaces; otherwise Simple Search.
         """
 
@@ -322,7 +322,7 @@ class Collection:
                 dads.append((dad.name, dad.get_name(ln)))
 
         return websearch_templates.tmpl_navtrail_links(
-            as=as, ln=ln, dads=dads)
+            aas=aas, ln=ln, dads=dads)
 
 
     def create_portalbox(self, lang=CFG_SITE_LANG, position="rt"):
@@ -343,9 +343,9 @@ class Collection:
                 out += body
         return out
 
-    def create_narrowsearch(self, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG, type="r"):
+    def create_narrowsearch(self, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG, type="r"):
         """Creates list of collection descendants of type 'type' under title 'title'.
-        If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
+        If aas==1, then links to Advanced Search interfaces; otherwise Simple Search.
         Suitable for 'Narrow search' and 'Focus on' boxes."""
 
         # get list of sons and analyse it
@@ -365,7 +365,7 @@ class Collection:
 
         # return ""
         return websearch_templates.tmpl_narrowsearch(
-                 as = as,
+                 aas = aas,
                  ln = ln,
                  type = type,
                  father = self,
@@ -419,7 +419,7 @@ class Collection:
                                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
         return
 
-    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
+    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Searches database and produces list of last 'rg' records."
 
         if self.restricted_p():
@@ -451,12 +451,12 @@ class Collection:
 
             if self.nbrecs > rg:
                 url = websearch_templates.build_search_url(
-                    cc=self.name, jrec=rg+1, ln=ln, as=as)
+                    cc=self.name, jrec=rg+1, ln=ln, aas=aas)
             else:
                 url = ""
 
             return websearch_templates.tmpl_instant_browse(
-                as=as, ln=ln, recids=passIDs, more_link=url)
+                aas=aas, ln=ln, recids=passIDs, more_link=url)
 
         return websearch_templates.tmpl_box_no_records(ln=ln)
 
@@ -621,11 +621,11 @@ class Collection:
         out = "$collSearchExamples = getSearchExample(%d, $se);" % self.id
         return out
 
-    def create_searchfor(self, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
+    def create_searchfor(self, aas=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Produces either Simple or Advanced 'Search for' box for the current collection."
-        if as == 1:
+        if aas == 1:
             return self.create_searchfor_advanced(ln)
-        elif as == 0:
+        elif aas == 0:
             return self.create_searchfor_simple(ln)
         else:
             return self.create_searchfor_light(ln)

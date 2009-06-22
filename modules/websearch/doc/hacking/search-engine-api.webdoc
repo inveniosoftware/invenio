@@ -45,7 +45,7 @@ via both a high-level and low-level API interface.
 
    Signature:
 
-       def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
+       def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
                                   p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                                   recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="",
                                   d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None):
@@ -97,7 +97,7 @@ via both a high-level and low-level API interface.
                      Useful if only some fields are to be shown in the
                      output, e.g. for library to control some fields.
 
-                as - advanced search ("0" means no, "1" means yes).  Whether
+               aas - advanced search ("0" means no, "1" means yes).  Whether
                      search was called from within the advanced search
                      interface.
 

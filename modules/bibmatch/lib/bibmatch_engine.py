@@ -80,7 +80,7 @@ def usage():
     return
 
 class Querystring:
-    "Holds the information about querystring (p1,f1,m1,op1,p2,f2,m2,op2,p3,f3,m3,as)."
+    "Holds the information about querystring (p1,f1,m1,op1,p2,f2,m2,op2,p3,f3,m3,aas)."
 
     def __init__(self, mode="1"):
         """Creates querystring instance"""
@@ -455,7 +455,7 @@ def main():
                     recID_list = perform_request_search(
                           p1=inst[0], f1=querystring.field[0], m1=querystring.mode[0], op1=querystring.operator[0],
                           p2=inst[1], f2=querystring.field[1], m2=querystring.mode[1], op2=querystring.operator[1],
-                          p3=inst[2], f3=querystring.field[2], m3=querystring.mode[2], as=querystring.advanced)
+                          p3=inst[2], f3=querystring.field[2], m3=querystring.mode[2], aas=querystring.advanced)
                 else:
                     recID_list = []
 

@@ -150,12 +150,11 @@ def get_record_ids(argstr, date_from, date_until):
     p       = get_argument(argd, 'p')
     c       = get_argument(argd, 'c')
     cc      = get_argument(argd, 'cc')
-    as      = get_argument(argd, 'as')
+    aas     = get_argument(argd, 'aas')
     f       = get_argument(argd, 'f')
     so      = get_argument(argd, 'so')
     sp      = get_argument(argd, 'sp')
     ot      = get_argument(argd, 'ot')
-    as      = get_argument(argd, 'as')
     p1      = get_argument(argd, 'p1')
     f1      = get_argument(argd, 'f1')
     m1      = get_argument(argd, 'm1')
@@ -173,7 +172,7 @@ def get_record_ids(argstr, date_from, date_until):
     d2y, d2m, d2d = _date_to_tuple(date_until)
 
     return perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot,
-                                  as=as, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2,
+                                  aas=aas, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2,
                                   m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, d1y=d1y,
                                   d1m=d1m, d1d=d1d, d2y=d2y, d2m=d2m, d2d=d2d)
 

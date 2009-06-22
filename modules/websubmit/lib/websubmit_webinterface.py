@@ -254,7 +254,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                                                          args['ln'])
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, args['ln'])
             return pageheaderonly(title=title,
-                        navtrail=create_navtrail_links(cc=cc, as=0, ln=ln) + \
+                        navtrail=create_navtrail_links(cc=cc, aas=0, ln=ln) + \
                                         ''' &gt; <a class="navtrail" href="%s/record/%s">%s</a>
                                         &gt; %s''' % \
                         (CFG_SITE_URL, self.recid, title, _("Access to Fulltext")),
