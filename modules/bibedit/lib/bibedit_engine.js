@@ -21,8 +21,76 @@
  * This is the main BibEdit Javascript.
  */
 
+/* ************************* Table of contents ********************************
+ *
+ * 1. Global variables
+ *
+ * 2. Initialization
+ *   - $()
+ *   - initJeditable
+ *   - initMisc
+ *
+ * 3. Ajax
+ *   - initAjax
+ *   - createReq
+ *   - onAjaxError
+ *   - onAjaxSuccess
+ *
+ * 4. Hash management
+ *   - initStateFromHash
+ *   - deserializeHash
+ *   - changeAndSerializeHash
+ *
+ * 5. Data logic
+ *   - getTagsSorted
+ *   - getFieldPositionInTag
+ *   - getPreviousTag
+ *   - deleteFieldFromTag
+ *   - cmpFields
+ *   - fieldIsProtected
+ *   - containsProtected
+ *   - getMARC
+ *   - getFieldTag
+ *   - getSubfieldTag
+ *   - validMARC
+ *
+ * 6. Record UI
+ *   - onNewRecordClick
+ *   - getRecord
+ *   - onGetRecordSuccess
+ *   - onSubmitClick
+ *   - onCancelClick
+ *   - onCloneRecordClick
+ *   - onDeleteRecordClick
+ *   - onMergeClick
+ *   - bindNewRecordHandlers
+ *   - cleanUp
+ *
+ * 7. Editor UI
+ *   - colorFields
+ *   - reColorFields
+ *   - onMARCTagsClick
+ *   - onHumanTagsClick
+ *   - updateTags
+ *   - onFieldBoxClick
+ *   - onSubfieldBoxClick
+ *   - onAddFieldClick
+ *   - onAddFieldControlfieldClick
+ *   - onAddFieldChange
+ *   - onAddFieldSave
+ *   - onAddSubfieldsClick
+ *   - onAddSubfieldsChange
+ *   - onAddSubfieldsSave
+ *   - onDoubleClick
+ *   - onContentChange
+ *   - onMoveSubfieldClick
+ *   - onDeleteClick
+ */
+
+
+
 /*
- * Global variables
+ * **************************** 1. Global variables ****************************
  */
 
 // Record data
@@ -54,13 +122,17 @@ var gPrevState;
 var gState;
 
 
+/*
+ * **************************** 2. Initialization ******************************
+ */
+
 window.onload = function(){
   if (typeof(jQuery) == 'undefined'){
     alert('ERROR: jQuery not found!\n\n' +
-	  'BibEdit requires jQuery, which does not appear to be installed on ' +
-	  'this server. Please alert your system administrator.\n\n' +
-	  'Instructions on how to install jQuery and other required plug-ins ' +
-	  'can be found in CDS-Invenio\'s INSTALL file.');
+	  'The Record Editor requires jQuery, which does not appear to be ' +
+	  'installed on this server. Please alert your system ' +
+	  'administrator.\n\nInstructions on how to install jQuery and other ' +
+	  'required plug-ins can be found in CDS-Invenio\'s INSTALL file.');
     var imgError = document.createElement('img');
     imgError.setAttribute('src', '/img/circle_red.png');
     var txtError = document.createTextNode('jQuery missing');
@@ -107,6 +179,32 @@ function initJeditable(){
     }
   });
 }
+
+function initMisc(){
+  /*
+   * Miscellaneous initialization operations.
+   */
+  // CERN allows for capital MARC indicators.
+  if (gCERN_SITE){
+    validMARC.reIndicator1 = /[\dA-Za-z]{1}/;
+    validMARC.reIndicator2 = /[\dA-Za-z]{1}/;
+  }
+
+  // Warn user if BibEdit is being closed while a record is open.
+  window.onbeforeunload = function(){
+    if (gRecID && gRecordDirty)
+      return '******************** WARNING ********************\n' +
+	'                  You have unsubmitted changes.\n\n' +
+	'You should go back to the page and click either:\n' +
+	' * Submit (to save your changes permanently)\n      or\n' +
+	' * Cancel (to discard your changes)';
+  }
+}
+
+
+/*
+ * **************************** 3. Ajax ****************************************
+ */
 
 function initAjax(){
   /*
@@ -159,6 +257,7 @@ function onAjaxError(XHR, textStatus, errorThrown){
 function onAjaxSuccess(json, onSuccess){
   /*
    * Handle server response to Ajax requests, in particular error situations.
+   * See BibEdit config for result codes.
    * If a function onSuccess is specified this will be called in the end,
    * if no error was encountered.
    */
@@ -167,23 +266,27 @@ function onAjaxSuccess(json, onSuccess){
   if (resCode == 100){
     // User's session has timed out.
     gRecID = null;
-    window.location = recID ? gSiteURL + '/record/' + recID + '/edit/'
-      : gSiteURL + '/record/edit/';
+    window.location = recID ? gSITE_URL + '/record/' + recID + '/edit/'
+      : gSITE_URL + '/record/edit/';
     return;
   }
   else if ($.inArray(resCode, [101, 102, 103, 104, 105, 106, 107, 108, 109])
 	   != -1){
-    // Some error has occured. See BibEdit config for result codes.
     cleanUp(!gNavigatingRecordSet, null, null, true, true);
-    updateStatus('error', gRESULT_CODES[resCode]);
     if ($.inArray(resCode, [108, 109]) == -1)
-      $('.headline').text('BibEdit: Record #' + recID);
+      $('.headline').text('Record Editor: Record #' + recID);
     displayMessage(resCode);
     if (resCode == 107)
       $('#lnkGetRecord').bind('click', function(event){
 	getRecord(recID);
 	event.preventDefault();
       });
+    updateStatus('error', gRESULT_CODES[resCode]);
+  }
+  else if (resCode == 110){
+    displayMessage(resCode, true, [json['errors'].toString()]);
+    $(document).scrollTop(0);
+    updateStatus('error', gRESULT_CODES[resCode]);
   }
   else{
     var cacheOutdated = json['cacheOutdated'];
@@ -191,7 +294,7 @@ function onAjaxSuccess(json, onSuccess){
     if (cacheOutdated && requestType == 'submit'){
       // User wants to submit, but cache is outdated. Outdated means that the
       // DB version of the record has changed after the cache was created.
-      displayCacheOutdatedOptions(requestType);
+      displayCacheOutdatedScreen(requestType);
       $('#lnkMergeCache').bind('click', onMergeClick);
       $('#lnkForceSubmit').bind('click', function(event){
 	onSubmitClick.force = true;
@@ -227,29 +330,10 @@ function onAjaxSuccess(json, onSuccess){
   }
 }
 
-function initMisc(){
-  /*
-   * Miscellaneous initialization operations.
-   */
-  // CERN allows for capital MARC indicators.
-  if (gCERNSite)
-    validMARC.reIndicator = /[\dA-Za-z]{1}/;
 
-  // Warn user if BibEdit is being closed while a record is open.
-  window.onbeforeunload = function(){
-    if (gRecID && gRecordDirty)
-      return '******************** WARNING ********************\n' +
-	'                  You have unsubmitted changes.\n\n' +
-	'You should go back to the page and click either:\n' +
-	' * Submit (to save your changes permanently)\n      or\n' +
-	' * Cancel (to discard your changes)';
-  }
-
-  // Add global event handlers.
-  $(document).bind('dblclick', function(event){
-    onDoubleClick(event);
-  });
-}
+/*
+ * **************************** 4. Hash management *****************************
+ */
 
 function initStateFromHash(){
   /*
@@ -311,7 +395,7 @@ function initStateFromHash(){
 	if (isNaN(recID)){
 	  // Invalid record ID.
 	  cleanUp(true, tmpRecID, 'recID', true);
-	  $('.headline').text('BibEdit: Record #' + tmpRecID);
+	  $('.headline').text('Record Editor: Record #' + tmpRecID);
 	  displayMessage(102);
 	  updateStatus('error', gRESULT_CODES[102]);
 	}
@@ -322,14 +406,14 @@ function initStateFromHash(){
 	break;
       case 'newRecord':
 	cleanUp(true, '', null, null, true);
-        $('.headline').text('BibEdit: Create new record');
-	displayNewRecordList();
+        $('.headline').text('Record Editor: Create new record');
+	displayNewRecordScreen();
         bindNewRecordHandlers();
 	updateStatus('ready');
 	break;
       case 'submit':
 	cleanUp(true, '', null, true);
-	$('.headline').text('BibEdit: Record #' + tmpRecID);
+	$('.headline').text('Record Editor: Record #' + tmpRecID);
 	displayMessage(4);
 	updateStatus('ready');
 	break;
@@ -339,7 +423,7 @@ function initStateFromHash(){
 	break;
       case 'deleteRecord':
 	cleanUp(true, '', null, true);
-      	$('.headline').text('BibEdit: Record #' + tmpRecID);
+      	$('.headline').text('Record Editor: Record #' + tmpRecID);
 	displayMessage(6);
 	updateStatus('ready');
 	break;
@@ -389,12 +473,436 @@ function changeAndSerializeHash(updateData){
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
 }
 
-function notImplemented(event){
+
+/*
+ * **************************** 5. Data logic **********************************
+ */
+
+function getTagsSorted(){
   /*
-   * Handle unimplemented function.
+   * Return field tags in sorted order.
    */
-  alert('Sorry, this function is not implemented yet!');
+  var tags = [];
+  for (var tag in gRecord){
+    tags.push(tag);
+  }
+  return tags.sort();
+}
+
+function getFieldPositionInTag(tag, field){
+  /*
+   * Determine the local (in tag) position of a new field.
+   */
+  var fields = gRecord[tag];
+  if (fields){
+    var fieldLength = fields.length, i = 0;
+    while (i < fieldLength && cmpFields(field, fields[i]) != -1)
+      i++;
+    return i;
+  }
+  else
+    return 0;
+}
+
+function getPreviousTag(tag){
+  /*
+   * Determine the previous tag in the record (if the given tag is the first
+   * tag, 0 will be returned).
+   */
+  var tags = getTagsSorted();
+  var tagPos = $.inArray(tag, tags);
+  if (tagPos == -1){
+    tags.push(tag);
+    tags.sort();
+    tagPos = $.inArray(tag, tags);
+  }
+  if (tagPos > 0)
+    return tags[tagPos-1];
+  return 0;
+}
+
+function deleteFieldFromTag(tag, fieldPosition){
+  /*
+   * Delete a specified field.
+   */
+  var field = gRecord[tag][fieldPosition];
+  var fields = gRecord[tag];
+  fields.splice($.inArray(field, fields), 1);
+  // If last field, delete tag.
+  if (fields.length == 0){
+    delete gRecord[tag];
+  }
+}
+
+function cmpFields(field1, field2){
+  /*
+   * Compare fields by indicators (tag assumed equal).
+   */
+  if (field1[1].toLowerCase() > field2[1].toLowerCase())
+    return 1;
+  else if (field1[1].toLowerCase() < field2[1].toLowerCase())
+    return -1;
+  else if (field1[2].toLowerCase() > field2[2].toLowerCase())
+    return 1;
+  else if (field1[2].toLowerCase() < field2[2].toLowerCase())
+    return -1;
+  return 0;
+}
+
+function fieldIsProtected(MARC){
+  /*
+   * Determine if a MARC field is protected or part of a protected group of
+   * fields.
+   */
+  do{
+    var i = MARC.length - 1;
+    if ($.inArray(MARC, gPROTECTED_FIELDS) != -1)
+      return true;
+    MARC = MARC.substr(0, i);
+    i--;
+  }
+  while (i >= 1)
+  return false;
+}
+
+function containsProtectedField(fieldData){
+  /*
+   * Determine if a field data structure contains protected elements (useful
+   * when checking if a deletion command is valid).
+   * The data structure must be an object with the following levels
+   * - Tag
+   *   - Field position
+   *     - Subfield index
+   */
+  var fieldPositions, subfieldIndexes, MARC;
+  for (var tag in fieldData){
+    fieldPositions = fieldData[tag];
+    for (var fieldPosition in fieldPositions){
+      subfieldIndexes = fieldPositions[fieldPosition];
+      if (subfieldIndexes.length == 0){
+	MARC = getMARC(tag, fieldPosition);
+	if (fieldIsProtected(MARC))
+	  return MARC;
+	}
+      else{
+	for (var i=0, n=subfieldIndexes.length; i<n; i++){
+	  MARC = getMARC(tag, fieldPosition, subfieldIndexes[i]);
+	  if (fieldIsProtected(MARC))
+	    return MARC;
+	}
+      }
+    }
+  }
+  return false;
+}
+
+function getMARC(tag, fieldPosition, subfieldIndex){
+  /*
+   * Return the MARC representation of a field or a subfield.
+   */
+  var field = gRecord[tag][fieldPosition];
+  var ind1, ind2;
+  if (validMARC.reControlTag.test(tag))
+    ind1 = '', ind2 = '';
+  else{
+    ind1 = (field[1] == ' ' || !field[1]) ? '_' : field[1];
+    ind2 = (field[2] == ' ' || !field[2]) ? '_' : field[2];
+  }
+  if (subfieldIndex == undefined)
+    return tag + ind1 + ind2;
+  else
+    return tag + ind1 + ind2 + field[0][subfieldIndex][0];
+}
+
+function getFieldTag(MARC){
+  /*
+   * Get the tag name of a field in format as specified by gTagFormat.
+   */
+  MARC = MARC.substr(0, 5);
+  if (gTagFormat == 'human'){
+    var tagName = gTAG_NAMES[MARC];
+    if (tagName != undefined)
+      // Direct hit. Return it.
+      return tagName;
+    else{
+      // Start looking for wildcard hits.
+      if (MARC.length == 3){
+	// Controlfield
+	tagName = gTAG_NAMES[MARC.substr(0, 2) + '%'];
+	if (tagName != undefined && tagName != MARC + 'x')
+	  return tagName;
+      }
+      else{
+	// Regular field, try finding wildcard hit by shortening expression
+	// gradually. Ignores wildcards which gives values like '27x'.
+	var term = MARC + '%', i = 5;
+	do{
+	  tagName = gTAG_NAMES[term];
+	  if (tagName != undefined){
+	    if (tagName != MARC.substr(0, i) + 'x')
+	      return tagName;
+	    break;
+	  }
+	  i--;
+	  term = MARC.substr(0, i) + '%';
+	}
+	while (i >= 3)
+      }
+    }
+  }
+  return MARC;
+}
+
+function getSubfieldTag(MARC){
+  /*
+   * Get the tag name of a subfield in format as specified by gTagFormat.
+   */
+  if (gTagFormat == 'human'){
+    var subfieldName = gTAG_NAMES[MARC];
+      if (subfieldName != undefined)
+	return subfieldName;
+  }
+  return '$$' + MARC.charAt(5);
+}
+
+function validMARC(datatype, value){
+  /*
+   * Validate a value of given datatype according to the MARC standard. The
+   * value should be restricted/extended to it's expected size before being
+   * passed to this function.
+   * Datatype can be 'ControlTag', 'Tag', 'Indicator' or 'SubfieldCode'.
+   * Returns a boolean.
+   */
+  return eval('validMARC.re' + datatype + '.test(value)');
+}
+// MARC validation REs
+validMARC.reControlTag = /00[1-9A-Za-z]{1}/;
+validMARC.reTag = /(0([1-9A-Z][0-9A-Z])|0([1-9a-z][0-9a-z]))|(([1-9A-Z][0-9A-Z]{2})|([1-9a-z][0-9a-z]{2}))/;
+validMARC.reIndicator1 = /[\da-z]{1}/;
+validMARC.reIndicator2 = /[\da-z]{1}/;
+validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
+
+
+/*
+ * **************************** 6. Record UI ***********************************
+ */
+
+function onNewRecordClick(event){
+  /*
+   * Handle 'New' button (new record).
+   */
+  updateStatus('updating');
+  if (gRecordDirty){
+    if (!displayAlert('confirmLeavingChangedRecord')){
+      updateStatus('ready');
+      event.preventDefault();
+      return;
+    }
+  }
+  else
+    // If the record is unchanged, erase the cache.
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  changeAndSerializeHash({state: 'newRecord'});
+  cleanUp(true, '');
+  $('.headline').text('Record Editor: Create new record');
+  displayNewRecordScreen();
+  bindNewRecordHandlers();
+  updateStatus('ready');
   event.preventDefault();
+}
+
+function getRecord(recID){
+  /*
+   * Get a record.
+   */
+  // Temporary store the record ID by attaching it to the onGetRecordSuccess
+  // function.
+  changeAndSerializeHash({state: 'edit', recid: recID});
+  createReq({recID: recID, requestType: 'getRecord', deleteRecordCache:
+    getRecord.deleteRecordCache, clonedRecord: getRecord.clonedRecord},
+    onGetRecordSuccess);
+  getRecord.deleteRecordCache = false;
+  getRecord.clonedRecord = false;
+}
+// Enable this flag to delete any existing cache before fetching next record.
+getRecord.deleteRecordCache = false;
+// Enable this flag to tell that we are fetching a record that has just been
+// cloned (enables proper feedback, highlighting).
+getRecord.clonedRecord = false;
+
+
+function onGetRecordSuccess(json){
+  /*
+   * Handle successfull 'getRecord' requests.
+   */
+  cleanUp(!gNavigatingRecordSet);
+  // Store record data.
+  gRecID = json['recID'];
+  $('.headline').html(
+    'Record Editor: Record #<span id="spnRecID">' + gRecID + '</span>' +
+    '<a href="' + gHISTORY_URL + '?recid=' + gRecID +
+    '" style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
+    '(view history)' +
+    '</a>').css('white-space', 'nowrap');
+  gRecord = json['record'];
+  gTagFormat = json['tagFormat'];
+  gRecordDirty = json['cacheDirty'];
+  gCacheMTime = json['cacheMTime'];
+  if (json['cacheOutdated']){
+    // User had an existing outdated cache.
+    displayCacheOutdatedScreen('getRecord');
+    $('#lnkMergeCache').bind('click', onMergeClick);
+    $('#lnkDiscardChanges').bind('click', function(event){
+      getRecord.deleteRecordCache = true;
+      getRecord(gRecID);
+      event.preventDefault();
+    });
+    $('#lnkRemoveMsg').bind('click', function(event){
+      $('#bibEditMessage').remove();
+      event.preventDefault();
+    });
+  }
+  // Display record.
+  displayRecord();
+  // Activate menu record controls.
+  activateRecordMenu();
+  if (gRecordDirty){
+    $('#btnSubmit').removeAttr('disabled');
+    $('#btnSubmit').css('background-color', 'lightgreen');
+  }
+  if (gTagFormat == 'MARC')
+    $('#btnHumanTags').bind('click', onHumanTagsClick).removeAttr('disabled');
+  else
+    $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
+  // Unfocus record selection field (to facilitate hotkeys).
+  $('#txtSearchPattern').blur();
+  if (json['resultCode'] == 9)
+    $('#spnRecID').effect('highlight', {color: gCLONED_RECORD_COLOR},
+      gCLONED_RECORD_COLOR_FADE_DURATION);
+  updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
+}
+
+function onSubmitClick(){
+  /*
+   * Handle 'Submit' button (submit record).
+   */
+  updateStatus('updating');
+  if (displayAlert('confirmSubmit')){
+    createReq({recID: gRecID, requestType: 'submit',
+	       force: onSubmitClick.force}, function(json){
+		 // Submission was successful.
+		 changeAndSerializeHash({state: 'submit', recid: gRecID});
+		 var resCode = json['resultCode'];
+		 cleanUp(!gNavigatingRecordSet, '', null, true);
+		 updateStatus('report', gRESULT_CODES[resCode]);
+		 displayMessage(resCode);
+	       });
+    onSubmitClick.force = false;
+  }
+  else
+    updateStatus('ready');
+}
+// Enable this flag to force the next submission even if cache is outdated.
+onSubmitClick.force = false;
+
+function onCancelClick(){
+  /*
+   * Handle 'Cancel' button (cancel editing).
+   */
+  updateStatus('updating');
+  if (!gRecordDirty || displayAlert('confirmCancel')){
+    createReq({recID: gRecID, requestType: 'cancel'}, function(json){
+      // Cancellation was successful.
+      changeAndSerializeHash({state: 'cancel', recid: gRecID});
+      cleanUp(!gNavigatingRecordSet, '', null, true, true);
+      updateStatus('report', gRESULT_CODES[json['resultCode']]);
+    });
+  }
+  else
+    updateStatus('ready');
+}
+
+function onCloneRecordClick(){
+  /*
+   * Handle 'Clone' button (clone record).
+   */
+  updateStatus('updating');
+  if (!displayAlert('confirmClone')){
+    updateStatus('ready');
+    return;
+  }
+  else if (!gRecordDirty)
+    // If the record is unchanged, erase the cache.
+    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  createReq({requestType: 'newRecord', newType: 'clone', recID: gRecID},
+    function(json){
+      var newRecID = json['newRecID'];
+      $('#txtSearchPattern').val(newRecID);
+      getRecord.clonedRecord = true;
+      getRecord(newRecID);
+  });
+}
+
+function onDeleteRecordClick(){
+  /*
+   * Handle 'Delete record' button.
+   */
+  if (displayAlert('confirmDeleteRecord')){
+    updateStatus('updating');
+    createReq({recID: gRecID, requestType: 'deleteRecord'}, function(json){
+      // Record deletion was successful.
+      changeAndSerializeHash({state: 'deleteRecord', recid: gRecID});
+      cleanUp(!gNavigatingRecordSet, '', null, true);
+      var resCode = json['resultCode'];
+      updateStatus('report', gRESULT_CODES[resCode]);
+      displayMessage(resCode);
+    });
+  }
+}
+
+function onMergeClick(event){
+  /*
+   * Handle click on 'Merge' link (to merge outdated cache with current DB
+   * version of record).
+   */
+  notImplemented(event);
+
+  // FIXME (uncomment when ready in BibMerge):
+  /*
+  updateStatus('updating');
+  createReq({recID: gRecID, requestType: 'prepareRecordMerge'}, function(json){
+    // Null gRecID to avoid warning when leaving page.
+    gRecID = null;
+    var recID = json['recID'];
+    window.location = gSITE_URL + '/record/merge/#recid1=' + recID + '&recid2=' +
+      'tmp';
+  });
+  event.preventDefault();
+  */
+}
+
+function bindNewRecordHandlers(){
+  /*
+   * Bind event handlers to links on 'Create new record' page.
+   */
+  $('#lnkNewEmptyRecord').bind('click', function(event){
+    updateStatus('updating');
+    createReq({requestType: 'newRecord', newType: 'empty'}, function(json){
+      getRecord(json['newRecID']);
+    });
+    event.preventDefault();
+  });
+  for (var i=0, n=gRECORD_TEMPLATES.length; i<n; i++)
+    $('#lnkNewTemplateRecord_' + i).bind('click', function(event){
+      updateStatus('updating');
+      var templateNo = this.id.split('_')[1];
+      createReq({requestType: 'newRecord', newType: 'template',
+	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
+	  getRecord(json['newRecID']);
+      });
+      event.preventDefault();
+    });
 }
 
 function cleanUp(disableRecBrowser, searchPattern, searchType,
@@ -412,7 +920,7 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   }
   // Clear main content area.
   if (resetHeadline)
-    $('.headline').text('BibEdit');
+    $('.headline').text('Record Editor');
   $('#bibEditContent').empty();
   // Clear search area.
   if (typeof(searchPattern) == 'string' || typeof(searchPattern) == 'number')
@@ -432,46 +940,77 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gSelectionMode = false;
 }
 
-function bindNewRecordHandlers(){
+
+/*
+ * **************************** 7. Editor UI ***********************************
+ */
+
+function colorFields(){
   /*
-   * Bind event handlers to links on 'Create new record' page.
+   * Color every other field (rowgroup) gray to increase readability.
    */
-  $('#lnkNewEmptyRecord').bind('click', function(event){
-    updateStatus('updating');
-    createReq({requestType: 'newRecord', newType: 'empty'}, function(json){
-      getRecord(json['recID']);
-    });
-    event.preventDefault();
+  $('#bibEditTable tbody:even').each(function(){
+    $(this).addClass('bibEditFieldColored');
   });
-  for (var i=0, n=gRECORD_TEMPLATES.length; i<n; i++)
-    $('#lnkNewTemplateRecord_' + i).bind('click', function(event){
-      updateStatus('updating');
-      var templateNo = this.id.split('_')[1];
-      createReq({requestType: 'newRecord', newType: 'template',
-	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
-	  getRecord(json['recID']);
-      });
-      event.preventDefault();
-    });
 }
 
-function onMergeClick(event){
+function reColorFields(){
   /*
-   * Handle click on 'Merge' link (to merge outdated cache with current DB
-   * version of record).
+   * Update coloring by removing existing, then recolor.
    */
-  notImplemented(event);
-  /*
-  TODO (when ready in BibMerge):
-  updateStatus('updating');
-  createReq({recID: gRecID, requestType: 'prepareRecordMerge'}, function(json){
-    gRecID = null;
-    var recID = json['recID'];
-    window.location = gSiteURL + '/record/merge/#recid1=' + recID + '&recid2=' +
-      recID + '&mode=file';
+  $('#bibEditTable tbody').each(function(){
+    $(this).removeClass('bibEditFieldColored');
   });
+  colorFields();
+}
+
+function onMARCTagsClick(event){
+  /*
+   * Handle 'MARC' link (MARC tags).
+   */
+  $(this).unbind('click').attr('disabled', 'disabled');
+  createReq({recID: gRecID, requestType: 'changeTagFormat', tagFormat: 'MARC'});
+  gTagFormat = 'MARC';
+  updateTags();
+  $('#btnHumanTags').bind('click', onHumanTagsClick).removeAttr('disabled');
   event.preventDefault();
-  */
+}
+
+function onHumanTagsClick(event){
+  /*
+   * Handle 'Human' link (Human tags).
+   */
+  $(this).unbind('click').attr('disabled', 'disabled');
+  createReq({recID: gRecID, requestType: 'changeTagFormat',
+	     tagFormat: 'human'});
+  gTagFormat = 'human';
+  updateTags();
+  $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
+  event.preventDefault();
+}
+
+function updateTags(){
+  /*
+   * Check and update all tags (also subfield codes) against the currently
+   * selected tag format.
+   */
+  $('.bibEditCellFieldTag').each(function(){
+    var currentTag = $(this).text();
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2];
+    var newTag = getFieldTag(getMARC(tag, fieldPosition));
+    if (newTag != currentTag)
+      $(this).text(newTag);
+  });
+  $('.bibEditCellSubfieldTag').each(function(){
+    var currentTag = $(this).text();
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2],
+      subfieldIndex = tmpArray[3];
+    var newTag = getSubfieldTag(getMARC(tag, fieldPosition, subfieldIndex));
+    if (newTag != currentTag)
+      $(this).text(newTag);
+  });
 }
 
 function onFieldBoxClick(box){
@@ -480,11 +1019,17 @@ function onFieldBoxClick(box){
    */
   // Check/uncheck all subfield boxes, add/remove selected class.
   var rowGroup = $('#rowGroup_' + box.id.slice(box.id.indexOf('_')+1));
-  if (box.checked)
+  if (box.checked){
     $(rowGroup).find('td[id^=content]').andSelf().addClass('bibEditSelected');
-  else
+    $('#btnDeleteSelected').removeAttr('disabled');
+  }
+    else{
     $(rowGroup).find('td[id^=content]').andSelf().removeClass(
       'bibEditSelected');
+    if (!$('.bibEditSelected').length)
+      // Nothing is selected, disable "Delete selected"-button.
+      $('#btnDeleteSelected').attr('disabled', 'disabled');
+  }
   $(rowGroup).find('input[type="checkbox"]').attr('checked', box.checked);
 }
 
@@ -502,6 +1047,9 @@ function onSubfieldBoxClick(box){
     $('#content_' + subfieldID).removeClass('bibEditSelected');
     $('#boxField_' + fieldID).attr('checked', false);
     $('#rowGroup_' + fieldID).removeClass('bibEditSelected');
+    if (!$('.bibEditSelected').length)
+      // Nothing is selected, disable "Delete selected"-button.
+      $('#btnDeleteSelected').attr('disabled', 'disabled');
   }
   // If check and all other subfield boxes checked, check field box, add
   // selected class.
@@ -514,127 +1062,258 @@ function onSubfieldBoxClick(box){
       $('#boxField_' + fieldID).attr('checked', true);
       $('#rowGroup_' + fieldID).addClass('bibEditSelected');
     }
+    $('#btnDeleteSelected').removeAttr('disabled');
   }
 }
 
-function onMoveSubfieldClick(arrow){
+function onAddFieldClick(){
   /*
-   * Handle subfield moving arrows.
+   * Handle 'Add field' button.
    */
-  updateStatus('updating');
-  var tmpArray = arrow.id.split('_');
-  var btnType = tmpArray[0], tag = tmpArray[1], fieldPosition = tmpArray[2],
-    subfieldIndex = tmpArray[3];
-  var fieldID = tag + '_' + fieldPosition;
-  var field = gRecord[tag][fieldPosition];
-  var subfields = field[0];
-  var newSubfieldIndex;
-  if (btnType == 'btnMoveSubfieldUp')
-    newSubfieldIndex = parseInt(subfieldIndex) - 1;
-  else
-    newSubfieldIndex = parseInt(subfieldIndex) + 1;
-  // Create Ajax request.
-  var data = {
-    recID: gRecID,
-    requestType: 'moveSubfield',
-    tag: tag,
-    fieldPosition: fieldPosition,
-    subfieldIndex: subfieldIndex,
-    newSubfieldIndex: newSubfieldIndex
-  };
-  createReq(data, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  // Create form and scroll close to the top of the table.
+  $(document).scrollTop(0);
+  var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
+  var jQRowGroupID = '#rowGroupAddField_' + fieldTmpNo;
+  $('#bibEditColFieldTag').css('width', '90px');
+  var tbodyElements = $('#bibEditTable tbody');
+  var insertionPoint = (tbodyElements.length >= 4) ? 3 : tbodyElements.length-1;
+  $('#bibEditTable tbody').eq(insertionPoint).after(
+    createAddFieldForm(fieldTmpNo));
+  $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
+
+  // Bind event handlers.
+  $('#chkAddFieldControlfield_' + fieldTmpNo).bind('click',
+    onAddFieldControlfieldClick);
+  $('#btnAddFieldAddSubfield_' + fieldTmpNo).bind('click', function(){
+    var subfieldTmpNo = $(jQRowGroupID).data('freeSubfieldTmpNo');
+    $(jQRowGroupID).data('freeSubfieldTmpNo', subfieldTmpNo+1);
+    var addFieldRows = $(jQRowGroupID + ' tr');
+    $(addFieldRows).eq(addFieldRows.length-1).before(createAddFieldRow(
+      fieldTmpNo, subfieldTmpNo));
+    $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_' + subfieldTmpNo).bind(
+      'keyup', onAddFieldChange);
+    $('#btnAddFieldRemove_' + fieldTmpNo + '_' + subfieldTmpNo).bind('click',
+      function(){
+	$('#rowAddField_' + this.id.slice(this.id.indexOf('_')+1)).remove();
+      });
   });
-  // Continue local updating.
-  var subfieldToSwap = subfields[newSubfieldIndex];
-  subfields[newSubfieldIndex] = subfields[subfieldIndex];
-  subfields[subfieldIndex] = subfieldToSwap;
-  var rowGroup = $('#rowGroup_' + fieldID);
-  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
-  $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
-  if (coloredRowGroup)
-    $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
+  $('#txtAddFieldTag_' + fieldTmpNo).bind('keyup', onAddFieldChange);
+  $('#txtAddFieldInd1_' + fieldTmpNo).bind('keyup', onAddFieldChange);
+  $('#txtAddFieldInd2_' + fieldTmpNo).bind('keyup', onAddFieldChange);
+  $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0').bind('keyup',
+							  onAddFieldChange);
+  $('#btnAddFieldSave_' + fieldTmpNo).bind('click', onAddFieldSave);
+  $('#btnAddFieldCancel_' + fieldTmpNo).bind('click', function(){
+    $(jQRowGroupID).remove();
+    if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
+      $('#bibEditColFieldTag').css('width', '48px');
+    reColorFields();
+  });
+  $('#btnAddFieldClear_' + fieldTmpNo).bind('click', function(){
+    $(jQRowGroupID + ' input[type="text"]').val(''
+      ).removeClass('bibEditInputError');
+    $('#txtAddFieldTag_' + fieldTmpNo).focus();
+  });
+
+  reColorFields();
+  $('#txtAddFieldTag_' + fieldTmpNo).focus();
+  // Color the new form for a short period.
+  $(jQRowGroupID).effect('highlight', {color: gNEW_ADD_FIELD_FORM_COLOR},
+    gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION);
+}
+// Incrementing temporary field numbers.
+onAddFieldClick.addFieldFreeTmpNo = 100000;
+
+function onAddFieldControlfieldClick(){
+  /*
+   * Handle 'Controlfield' checkbox in add field form.
+   */
+  var fieldTmpNo = this.id.split('_')[1];
+
+  // Remove any extra rows.
+  var addFieldRows = $('#rowGroupAddField_' + fieldTmpNo + ' tr');
+  $(addFieldRows).slice(2, addFieldRows.length-1).remove();
+
+  // Clear all fields.
+  var addFieldTextInput = $('#rowGroupAddField_' + fieldTmpNo +
+			    ' input[type=text]');
+  $(addFieldTextInput).val('').removeClass('bibEditInputError');
+
+  // Toggle hidden fields.
+  var elems = $('#txtAddFieldInd1_' + fieldTmpNo + ', #txtAddFieldInd2_' +
+    fieldTmpNo + ', #txtAddFieldSubfieldCode_' + fieldTmpNo + '_0,' +
+    '#btnAddFieldAddSubfield_' + fieldTmpNo).toggle();
+
+  $('#txtAddFieldTag_' + fieldTmpNo).focus();
 }
 
-function onDoubleClick(event){
+function onAddFieldChange(event){
   /*
-   * Handle double click on editable content fields.
+   * Validate MARC and add or remove error class.
    */
-  if (event.target.nodeName == 'TD' &&
-      !$(event.target).hasClass('bibEditCellContentProtected')){
-    var targetID = event.target.id;
-    var type = targetID.slice(0, targetID.indexOf('_'));
-    if (type == 'content'){
-      if (!$(event.target).hasClass('edit_area')){
-	// Add event handler for content editing.
-	$(event.target).addClass('edit_area').editable(onContentChange, {
-	  type: 'autogrow',
-	  event: 'dblclick',
-	  data: function(){
-	    // Get the real content from the record structure (in stead of
-	    // from the view, where HTML entities are escaped).
-	    var tmpArray = this.id.split('_');
-	    var tag = tmpArray[1], fieldPosition = tmpArray[2],
-	      subfieldIndex = tmpArray[3];
-	    var field = gRecord[tag][fieldPosition];
-	    if (subfieldIndex == undefined)
-	      // Controlfield
-	      return field[3];
-	    else
-	      return field[0][subfieldIndex][1];
-	  },
-	  submit: 'Save',
-	  cancel: 'Cancel',
-	  placeholder: '',
-	  width: '100%',
-	  onblur: 'ignore',
-	  autogrow: {
-	    lineHeight: 16,
-	    minHeight: 32
-	  }
-	}).dblclick();
+  if (this.value.length == this.maxLength){
+    var fieldTmpNo = this.id.split('_')[1];
+    var fieldType;
+    if (this.id.indexOf('Tag') != -1)
+      fieldType = ($('#chkAddFieldControlfield_' + fieldTmpNo).attr('checked')
+		  ) ? 'ControlTag' : 'Tag';
+    else if (this.id.indexOf('Ind1') != -1)
+      fieldType = 'Indicator1';
+    else if (this.id.indexOf('Ind2') != -1)
+      fieldType = 'Indicator2';
+    else
+      fieldType = 'SubfieldCode';
+
+    var valid = (((fieldType == 'Indicator1' || fieldType == 'Indicator2')
+		  && (this.value == '_' || this.value == ' '))
+		 || validMARC(fieldType, this.value));
+    if (!valid && !$(this).hasClass('bibEditInputError'))
+      $(this).addClass('bibEditInputError');
+    else if (valid){
+      if ($(this).hasClass('bibEditInputError'))
+	$(this).removeClass('bibEditInputError');
+      if (event.keyCode != 9 && event.keyCode != 16){
+	switch(fieldType){
+	  case 'ControlTag':
+	    $(this).parent().nextAll().eq(3).children('input').focus();
+	    break;
+	  case 'Tag':
+	  case 'Indicator1':
+	    $(this).next().focus();
+	    break;
+	  case 'Indicator2':
+	    $(this).parent().nextAll().eq(2).children('input').focus();
+	    break;
+	  case 'SubfieldCode':
+	    $(this).parent().next().children('input').focus();
+	    break;
+	  default:
+	    ;
+	}
       }
-      event.preventDefault();
     }
   }
+  else if ($(this).hasClass('bibEditInputError'))
+    $(this).removeClass('bibEditInputError');
 }
 
-function onContentChange(value){
+function onAddFieldSave(event){
   /*
-   * Handle 'Save' button in editable content fields.
+   * Handle 'Save' button in add field form.
    */
   updateStatus('updating');
-  var tmpArray = this.id.split('_');
-  var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
-  var field = gRecord[tag][fieldPosition];
-  value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
-  if (subfieldIndex == undefined){
-    // Controlfield
-    field[3] = value;
-    subfieldIndex = null;
-    var subfieldCode = null;
+  var fieldTmpNo = this.id.split('_')[1];
+  var controlfield = $('#chkAddFieldControlfield_' + fieldTmpNo).attr(
+		       'checked');
+  var tag = $('#txtAddFieldTag_' + fieldTmpNo).val();
+  var value = $('#txtAddFieldValue_' + fieldTmpNo + '_0').val();
+  var subfields = [], ind1 = ' ', ind2 = ' ';
+
+  if (controlfield){
+    // Controlfield. Validate and prepare to update.
+    if (fieldIsProtected(tag)){
+      displayAlert('alertAddProtectedField', [tag]);
+      updateStatus('ready');
+      return;
+    }
+    if (!validMARC('ControlTag', tag) || value == ''){
+      displayAlert('alertCriticalInput');
+      updateStatus('ready');
+      return;
+    }
+    var field = [[], ' ', ' ', value, 0];
+    var fieldPosition = getFieldPositionInTag(tag, field);
   }
   else{
-    // Regular field
-    field[0][subfieldIndex][1] = value;
-    var subfieldCode = field[0][subfieldIndex][0];
+    // Regular field. Validate and prepare to update.
+    ind1 = $('#txtAddFieldInd1_' + fieldTmpNo).val();
+    ind1 = (ind1 == '' || ind1 == ' ') ? '_' : ind1;
+    ind2 = $('#txtAddFieldInd2_' + fieldTmpNo).val();
+    ind2 = (ind2 == '' || ind2 == ' ') ? '_' : ind2;
+    var MARC = tag + ind1 + ind2;
+    if (fieldIsProtected(MARC)){
+      displayAlert('alertAddProtectedField', [MARC]);
+      updateStatus('ready');
+      return;
+    }
+    var validInd1 = (ind1 == '_' || validMARC('Indicator1', ind1));
+    var validInd2 = (ind2 == '_' || validMARC('Indicator2', ind2));
+    if (!validMARC('Tag', tag)
+	|| !validInd1
+	|| !validInd2){
+      displayAlert('alertCriticalInput');
+      updateStatus('ready');
+      return;
+    }
+    // Collect valid subfields in an array.
+    var invalidOrEmptySubfields = false;
+    $('#rowGroupAddField_' + fieldTmpNo + ' .bibEditTxtSubfieldCode'
+      ).each(function(){
+        var subfieldTmpNo = this.id.slice(this.id.lastIndexOf('_')+1);
+        var txtValue = $('#txtAddFieldValue_' + fieldTmpNo + '_' +
+	  subfieldTmpNo);
+        var value = $(txtValue).val();
+        if (!$(this).hasClass('bibEditInputError')
+	  && this.value != ''
+	  && !$(txtValue).hasClass('bibEditInputError')
+	  && value != '')
+            subfields.push([this.value, value]);
+        else
+          invalidOrEmptySubfields = true;
+      });
+
+    if (invalidOrEmptySubfields){
+      if (!subfields.length){
+	// No valid subfields.
+	displayAlert('alertCriticalInput');
+	updateStatus('ready');
+	return;
+      }
+      else if (!displayAlert('confirmInvalidOrEmptyInput')){
+	updateStatus('ready');
+	return;
+      }
+    }
+    var field = [subfields, ind1, ind2, '', 0];
+    var fieldPosition = getFieldPositionInTag(tag, field);
   }
+
   // Create Ajax request.
   var data = {
     recID: gRecID,
-    requestType: 'modifyContent',
-    tag: tag,
+    requestType: 'addField',
+    controlfield: controlfield,
     fieldPosition: fieldPosition,
-    subfieldIndex: subfieldIndex,
-    subfieldCode: subfieldCode,
+    tag: tag,
+    ind1: ind1,
+    ind2: ind2,
+    subfields: subfields,
     value: value
   };
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
   });
 
-  // Return escaped value to display.
-  return escapeHTML(value);
+  // Continue local updating.
+  var fields = gRecord[tag];
+  // New field?
+  if (!fields)
+    gRecord[tag] = [field];
+  else{
+    fields.splice(fieldPosition, 0, field);
+  }
+  // Remove form.
+  $('#rowGroupAddField_' + fieldTmpNo).remove();
+  if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
+      $('#bibEditColFieldTag').css('width', '48px');
+  // Redraw all fields with the same tag and recolor the full table.
+  redrawFields(tag);
+  reColorFields();
+  // Scroll to and color the new field for a short period.
+  var rowGroup = $('#rowGroup_' + tag + '_' + fieldPosition);
+  $(document).scrollTop($(rowGroup).position().top - $(window).height()*0.5);
+  $(rowGroup).effect('highlight', {color: gNEW_CONTENT_COLOR},
+		     gNEW_CONTENT_COLOR_FADE_DURATION);
 }
 
 function onAddSubfieldsClick(img){
@@ -683,8 +1362,13 @@ function onAddSubfieldsChange(event){
     var valid = validMARC('SubfieldCode', this.value);
     if (!valid && !$(this).hasClass('bibEditInputError'))
       $(this).addClass('bibEditInputError');
-    else if (valid && $(this).hasClass('bibEditInputError'))
-      $(this).removeClass('bibEditInputError');
+    else if (valid){
+      if ($(this).hasClass('bibEditInputError'))
+	$(this).removeClass('bibEditInputError');
+      if (event.keyCode != 9 && event.keyCode != 16){
+	$(this).parent().next().children('input').focus();
+      }
+    }
   }
   else if ($(this).hasClass('bibEditInputError'))
     $(this).removeClass('bibEditInputError');
@@ -704,7 +1388,7 @@ function onAddSubfieldsSave(event){
   $('#rowGroup_' + fieldID + ' .bibEditTxtSubfieldCode'
    ).each(function(){
      var MARC = getMARC(tag, fieldPosition) + this.value;
-     if ($.inArray(MARC, gProtectedFields) != -1){
+     if ($.inArray(MARC, gPROTECTED_FIELDS) != -1){
        protectedSubfield = MARC;
        return false;
      }
@@ -756,8 +1440,8 @@ function onAddSubfieldsSave(event){
 
     // Color the new fields for a short period.
     var rows = $('#rowGroup_' + fieldID + ' tr');
-    $(rows).slice(rows.length - subfields.length).effect(
-      'highlight', {color: gNEW_FIELDS_COLOR}, gNEW_FIELDS_COLOR_FADE_DURATION);
+    $(rows).slice(rows.length - subfields.length).effect('highlight', {
+      color: gNEW_CONTENT_COLOR}, gNEW_CONTENT_COLOR_FADE_DURATION);
   }
   else{
     // No valid fields were submitted.
@@ -766,202 +1450,228 @@ function onAddSubfieldsSave(event){
   }
 }
 
-function colorFields(){
+function onContentClick(cell){
   /*
-   * Color every other field (rowgroup) gray to increase readability.
+   * Handle click on editable content fields.
    */
-  $('#bibEditTable tbody:even').each(function(){
-    $(this).addClass('bibEditFieldColored');
-  });
-}
-
-function reColorFields(){
-  /*
-   * Update coloring by removing existing, then recolor.
-   */
-  $('#bibEditTable tbody').each(function(){
-    $(this).removeClass('bibEditFieldColored');
-  });
-  colorFields();
-}
-
-function getTagsSorted(){
-  /*
-   * Return field tags in sorted order.
-   */
-  var tags = [];
-  for (var tag in gRecord){
-    tags.push(tag);
+  if (!$(cell).hasClass('edit_area')){
+    // Add event handler for content editing.
+    $(cell).addClass('edit_area').removeAttr('onclick').editable(
+      onContentChange, {
+      type: 'autogrow',
+      event: 'click',
+      data: function(){
+	// Get the real content from the record structure (in stead of
+	// from the view, where HTML entities are escaped).
+	var tmpArray = this.id.split('_');
+	var tag = tmpArray[1], fieldPosition = tmpArray[2],
+	  subfieldIndex = tmpArray[3];
+	var field = gRecord[tag][fieldPosition];
+	if (subfieldIndex == undefined)
+	  // Controlfield
+	  return field[3];
+	else
+	  return field[0][subfieldIndex][1];
+      },
+      placeholder: '',
+      width: '100%',
+      onblur: 'submit',
+      autogrow: {
+	lineHeight: 16,
+	minHeight: 36
+      }
+    });
+    $(cell).trigger('click');
   }
-  return tags.sort();
 }
 
-function getMARC(tag, fieldPosition, subfieldIndex){
+function onContentChange(value){
   /*
-   * Return the MARC representation of a field or a subfield.
+   * Handle 'Save' button in editable content fields.
    */
+  var tmpArray = this.id.split('_');
+  var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
   var field = gRecord[tag][fieldPosition];
-  var ind1, ind2;
-  if (tag < 10)
-    ind1 = '', ind2 = '';
+  value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
+  if (subfieldIndex == undefined){
+    // Controlfield
+    if (field[3] == value)
+      return escapeHTML(value);
+    field[3] = value;
+    subfieldIndex = null;
+    var subfieldCode = null;
+  }
   else{
-    ind1 = (field[1] == ' ' || !field[1]) ? '_' : field[1];
-    ind2 = (field[2] == ' ' || !field[2]) ? '_' : field[2];
+    if (field[0][subfieldIndex][1] == value)
+      return escapeHTML(value);
+    // Regular field
+    field[0][subfieldIndex][1] = value;
+    var subfieldCode = field[0][subfieldIndex][0];
   }
-  if (subfieldIndex == undefined)
-    return tag + ind1 + ind2;
-  else
-    return tag + ind1 + ind2 + field[0][subfieldIndex][0];
+  updateStatus('updating');
+  // Create Ajax request.
+  var data = {
+    recID: gRecID,
+    requestType: 'modifyContent',
+    tag: tag,
+    fieldPosition: fieldPosition,
+    subfieldIndex: subfieldIndex,
+    subfieldCode: subfieldCode,
+    value: value
+  };
+  createReq(data, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  });
+
+  setTimeout('$("#content_' + tag + '_' + fieldPosition + '_' + subfieldIndex +
+    '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
+    'gNEW_CONTENT_COLOR_FADE_DURATION)', gNEW_CONTENT_HIGHLIGHT_DELAY);
+
+  // Return escaped value to display.
+  return escapeHTML(value);
 }
 
-function deleteFieldFromTag(tag, fieldPosition){
+function onMoveSubfieldClick(arrow){
   /*
-   * Delete a specified field.
+   * Handle subfield moving arrows.
    */
+  updateStatus('updating');
+  var tmpArray = arrow.id.split('_');
+  var btnType = tmpArray[0], tag = tmpArray[1], fieldPosition = tmpArray[2],
+    subfieldIndex = tmpArray[3];
+  var fieldID = tag + '_' + fieldPosition;
   var field = gRecord[tag][fieldPosition];
-  var fields = gRecord[tag];
-  fields.splice($.inArray(field, fields), 1);
-  // If last field, delete tag.
-  if (fields.length == 0){
-    delete gRecord[tag];
-  }
+  var subfields = field[0];
+  var newSubfieldIndex;
+  if (btnType == 'btnMoveSubfieldUp')
+    newSubfieldIndex = parseInt(subfieldIndex) - 1;
+  else
+    newSubfieldIndex = parseInt(subfieldIndex) + 1;
+  // Create Ajax request.
+  var data = {
+    recID: gRecID,
+    requestType: 'moveSubfield',
+    tag: tag,
+    fieldPosition: fieldPosition,
+    subfieldIndex: subfieldIndex,
+    newSubfieldIndex: newSubfieldIndex
+  };
+  createReq(data, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  });
+  // Continue local updating.
+  var subfieldToSwap = subfields[newSubfieldIndex];
+  subfields[newSubfieldIndex] = subfields[subfieldIndex];
+  subfields[subfieldIndex] = subfieldToSwap;
+  var rowGroup = $('#rowGroup_' + fieldID);
+  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
+  $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
+  if (coloredRowGroup)
+    $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
 }
 
-function determineNewFieldPosition(tag, field){
+function onDeleteClick(event){
   /*
-   * Determine the local (in tag) position of a new field.
+   * Handle 'Delete selected' button or delete hotkeys.
    */
-  var fields = gRecord[tag], fieldLength = fields.length, i = 0;
-  while (i < fieldLength && cmpFields(field, fields[i]) != -1)
-    i++;
-  return i;
-}
-
-function cmpFields(field1, field2){
-  /*
-   * Compare fields by indicators (tag assumed equal).
-   */
-  if (field1[1].toLowerCase() > field2[1].toLowerCase())
-    return 1;
-  else if (field1[1].toLowerCase() < field2[1].toLowerCase())
-    return -1;
-  else if (field1[2].toLowerCase() > field2[2].toLowerCase())
-    return 1;
-  else if (field1[2].toLowerCase() < field2[2].toLowerCase())
-    return -1;
-  return 0;
-}
-
-function validMARC(datatype, value){
-  /*
-   * Validate a value of given datatype according to the MARC standard. The
-   * value should be restricted/extended to it's expected size before being
-   * passed to this function.
-   * Datatype can be 'ControlTag', 'Tag', 'Indicator' or 'SubfieldCode'.
-   * Returns a boolean.
-   */
-  return eval('validMARC.re' + datatype + '.test(value)');
-}
-// MARC validation REs
-validMARC.reControlTag = /00[1-9A-Za-z]{1}/;
-validMARC.reTag = /(0([1-9A-Z][0-9A-Z])|0([1-9a-z][0-9a-z]))|(([1-9A-Z][0-9A-Z]{2})|([1-9a-z][0-9a-z]{2}))/;
-validMARC.reIndicator = /[\da-z]{1}/;
-validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
-
-function getFieldTag(MARC){
-  /*
-   * Get the tag name of a field in format as specified by gTagFormat.
-   */
-  MARC = MARC.substr(0, 5);
-  if (gTagFormat == 'human'){
-    var tagName = gTagNames[MARC];
-    if (tagName != undefined)
-      // Direct hit. Return it.
-      return tagName;
+  // Find all checked checkboxes.
+  var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked');
+  var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
+  if (!checkedFieldBoxes.length && !checkedSubfieldBoxes.length)
+    // No fields selected for deletion.
+    return;
+  updateStatus('updating');
+  // toDelete is the complete datastructure of fields and subfields to delete.
+  var toDelete = {};
+  // tagsToRedraw is a list of tags that needs to be redrawn (to update element
+  // IDs).
+  var tagsToRedraw = [];
+  // reColorTable is true if any field are completely deleted.
+  var reColorTable = false;
+  // Collect fields to be deleted in toDelete.
+  $(checkedFieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2];
+    if (!toDelete[tag]){
+      toDelete[tag] = {};
+    }
+    toDelete[tag][fieldPosition] = [];
+    tagsToRedraw[tag] = true;
+    reColorTable = true;
+  });
+  // Collect subfields to be deleted in toDelete.
+  $(checkedSubfieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2],
+      subfieldIndex = tmpArray[3];
+    if (!toDelete[tag]){
+      toDelete[tag] = {};
+      toDelete[tag][fieldPosition] = [subfieldIndex];
+    }
     else{
-      // Start looking for wildcard hits.
-      if (MARC.length == 3){
-	// Controlfield
-	tagName = gTagNames[MARC.substr(0, 2) + '%'];
-	if (tagName != undefined && tagName != MARC + 'x')
-	  return tagName;
-      }
+      if (!toDelete[tag][fieldPosition])
+	toDelete[tag][fieldPosition] = [subfieldIndex];
+      else if (toDelete[tag][fieldPosition].length == 0)
+	// Entire field scheduled for the deletion.
+	return;
+      else
+	toDelete[tag][fieldPosition].push(subfieldIndex);
+    }
+  });
+
+  // Assert that no protected fields are scheduled for deletion.
+  var protectedField = containsProtectedField(toDelete);
+  if (protectedField){
+    displayAlert('alertDeleteProtectedField', [protectedField]);
+    updateStatus('ready');
+    return;
+  }
+
+  // Create Ajax request.
+  var data = {
+    recID: gRecID,
+    requestType: 'deleteFields',
+    toDelete: toDelete
+  };
+  createReq(data, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  });
+
+  // Continue local updating.
+  // Parse datastructure and delete accordingly in record.
+  var fieldsToDelete, subfieldIndexesToDelete, field, subfields,
+  subfieldIndex;
+  for (var tag in toDelete){
+    fieldsToDelete = toDelete[tag];
+    for (var fieldPosition in fieldsToDelete){
+      var fieldID = tag + '_' + fieldPosition;
+      subfieldIndexesToDelete = fieldsToDelete[fieldPosition];
+      if (subfieldIndexesToDelete.length == 0)
+	deleteFieldFromTag(tag, fieldPosition);
       else{
-	// Regular field, try finding wildcard hit by shortening expression
-	// gradually. Ignores wildcards which gives values like '27x'.
-	var term = MARC + '%', i = 5;
-	do{
-	  tagName = gTagNames[term];
-	  if (tagName != undefined){
-	    if (tagName != MARC.substr(0, i) + 'x')
-	      return tagName;
-	    break;
-	  }
-	  i--;
-	  term = MARC.substr(0, i) + '%';
+	subfieldIndexesToDelete.sort();
+	field = gRecord[tag][fieldPosition];
+	subfields = field[0];
+	for (var j=subfieldIndexesToDelete.length-1; j>=0; j--)
+	  subfields.splice(subfieldIndexesToDelete[j], 1);
+	var rowGroup = $('#rowGroup_' + fieldID);
+	if (!reColorTable){
+	  // Color and redraw the field, if it won't be done later.
+	  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
+	  $(rowGroup).replaceWith(createField(tag, field));
+	  if (coloredRowGroup)
+	    $('#rowGroup_' + fieldID).addClass( 'bibEditFieldColored');
 	}
-	while (i >= 3)
+	else if (!tagsToRedraw[tag])
+	  // Redraw the field if it won't be done later.
+	  $(rowGroup).replaceWith(createField(tag, field));
       }
     }
   }
-  return MARC;
-}
-
-function getSubfieldTag(MARC){
-  /*
-   * Get the tag name of a subfield in format as specified by gTagFormat.
-   */
-  if (gTagFormat == 'human'){
-    var subfieldName = gTagNames[MARC];
-      if (subfieldName != undefined)
-	return subfieldName;
-  }
-  return '$$' + MARC.charAt(5);
-}
-
-function fieldIsProtected(MARC){
-  /*
-   * Determine if a MARC field is protected or part of a protected group of
-   * fields.
-   */
-  do{
-    var i = MARC.length - 1;
-    if ($.inArray(MARC, gProtectedFields) != -1)
-      return true;
-    MARC = MARC.substr(0, i);
-    i--;
-  }
-  while (i >= 1)
-  return false;
-}
-
-function containsProtectedField(fieldData){
-  /*
-   * Determine if a field data structure contains protected elements (useful
-   * when checking if a deletion command is valid).
-   * The data structure must be an object with the following levels
-   * - Tag
-   *   - Field position
-   *     - Subfield index
-   */
-  var fieldPositions, subfieldIndexes, MARC;
-  for (var tag in fieldData){
-    fieldPositions = fieldData[tag];
-    for (var fieldPosition in fieldPositions){
-      subfieldIndexes = fieldPositions[fieldPosition];
-      if (subfieldIndexes.length == 0){
-	MARC = getMARC(tag, fieldPosition);
-	if (fieldIsProtected(MARC))
-	  return MARC;
-	}
-      else{
-	for (var i=0, n=subfieldIndexes.length; i<n; i++){
-	  MARC = getMARC(tag, fieldPosition, subfieldIndexes[i]);
-	  if (fieldIsProtected(MARC))
-	    return MARC;
-	}
-      }
-    }
-  }
-  return false;
+  if (reColorTable)
+    // If entire fields has been deleted, redraw all fields with the same tag
+    // and recolor the full table.
+    for (tag in tagsToRedraw)
+      redrawFields(tag);
+    reColorFields();
 }

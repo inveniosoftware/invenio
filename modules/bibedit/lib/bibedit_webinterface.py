@@ -24,10 +24,11 @@ __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 
 try:
     import simplejson as json
+    simplejson_available = True
 except ImportError:
     # Okay, no Ajax app will be possible, but continue anyway,
     # since this package is only recommended, not mandatory.
-    pass
+    simplejson_available = False
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
@@ -63,6 +64,24 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         * Calling the appropriate function from the engine.
 
         """
+        uid = getUid(req)
+        ln = CFG_SITE_LANG
+        # Abort if the simplejson module isn't available
+        if not simplejson_available:
+            title = 'Record Editor'
+            body = '''Sorry, the record editor cannot operate when the
+                `simplejson' module is not installed.  Please see the INSTALL
+                file.'''
+            return page(title       = title,
+                        body        = body,
+                        errors      = [],
+                        warnings    = [],
+                        uid         = uid,
+                        language    = ln,
+                        navtrail    = navtrail,
+                        lastupdated = __lastupdated__,
+                        req         = req)
+
         # If it is an Ajax request, extract any JSON data.
         ajax_request, recid = False, None
         if form.has_key('jsondata'):
@@ -110,12 +129,10 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
                 return json.dumps(json_response)
 
         # Handle request.
-        uid = getUid(req)
         if not ajax_request:
             # Show BibEdit start page.
             body, errors, warnings = perform_request_init()
-            title = 'BibEdit'
-            ln = CFG_SITE_LANG
+            title = 'Record Editor'
             return page(title       = title,
                         body        = body,
                         errors      = errors,

@@ -155,7 +155,7 @@ DEF_ACTIONS = (
                ('runbibrank', 'run BibRank', '', 'no'),
                ('runoaiharvest', 'run oaiharvest task', '', 'no'),
                ('runoaiarchive', 'run oaiarchive task', '', 'no'),
-               ('runbibedit', 'run BibEdit', 'collection', 'yes'),
+               ('runbibedit', 'run Record Editor', 'collection', 'yes'),
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ',    'yes'),
@@ -209,7 +209,7 @@ DEF_DEMO_AUTHS = (
 _ = gettext_set_language(CFG_SITE_LANG)
 # Activities (i.e. actions) for which it exist an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit' : (_("Run BibEdit"), "%s/record/edit/?ln=%%s" % CFG_SITE_URL),
+    'runbibedit' : (_("Run Record Editor"), "%s/record/edit/?ln=%%s" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibharvest' : (_("Configure BibHarvest"), "%s/admin/bibharvest/bibharvestadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/bibharvest/oaiarchiveadmin.py?ln=%%s" % CFG_SITE_URL),

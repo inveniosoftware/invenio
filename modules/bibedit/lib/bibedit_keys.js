@@ -32,11 +32,44 @@ function initHotkeys(){
   /*
    * Initialize all hotkeys.
    */
+  // New record.
+  $(document).bind('keydown', {combi: 'shift+n', disableInInput: true},
+    function(event){
+      $('#imgNewRecord').trigger('click');
+      event.preventDefault();
+  });
+    // Clone record.
+  $(document).bind('keydown', {combi: 'shift+l', disableInInput: true},
+    function(event){
+      var imgCloneRecord = $('#imgCloneRecord');
+      if (!imgCloneRecord.hasClass('bibEditImgFaded')){
+	imgCloneRecord.trigger('click');
+	event.preventDefault();
+      }
+  });
   // Focus on record selection field.
   $(document).bind('keydown', {combi: 'g', disableInInput: true},
     function(event){
       $('#txtSearchPattern').focus();
       event.preventDefault();
+  });
+  // Previous record.
+  $(document).bind('keydown', {combi: 'ctrl+right', disableInInput: true},
+    function(event){
+      var btnNext = $('#btnNext');
+      if (!btnNext.attr('disabled')){
+	btnNext.trigger('click');
+	event.preventDefault();
+      }
+  });
+  // Next record.
+  $(document).bind('keydown', {combi: 'ctrl+left', disableInInput: true},
+    function(event){
+      var btnPrev = $('#btnPrev');
+      if (!btnPrev.attr('disabled')){
+	btnPrev.trigger('click');
+	event.preventDefault();
+      }
   });
   // Submit record.
   $(document).bind('keydown', {combi: 'shift+s', disableInInput: true},
@@ -92,26 +125,8 @@ function initHotkeys(){
 	event.preventDefault();
       }
   });
-  // Sort fields.
-  $(document).bind('keydown', {combi: 'shift+o', disableInInput: true},
-    function(event){
-      var btnSortFields = $('#btnSortFields');
-      if (!btnSortFields.attr('disabled')){
-	btnSortFields.trigger('click');
-	event.preventDefault();
-      }
-  });
-  // Delete selected (or focused subfield).
+  // Delete selected field(s).
   $(document).bind('keydown', {combi: 'del', disableInInput: true},
-    function(event){
-      var btnDeleteSelected = $('#btnDeleteSelected');
-      if (!btnDeleteSelected.attr('disabled')){
-	onDeleteClick(event);
-	event.preventDefault();
-      }
-  });
-  // Delete selected (or focused field).
-  $(document).bind('keydown', {combi: 'shift+del', disableInInput: true},
     function(event){
       var btnDeleteSelected = $('#btnDeleteSelected');
       if (!btnDeleteSelected.attr('disabled')){
@@ -122,8 +137,14 @@ function initHotkeys(){
   // Toggle 'selection mode'.
   $(document).bind('keydown', {combi: 's', disableInInput: true}, onKeyS);
   // Edit focused subfield.
-  $(document).bind('keydown', {combi: 'return', disableInInput: true},
+  $(document).bind('keydown', {combi: 'return'},
 		   onKeyReturn);
+  // Save content and jump to next content field.
+  $(document).bind('keydown', {combi: 'tab'},
+		   onKeyTab);
+  // Save content and jump to previous content field.
+  $(document).bind('keydown', {combi: 'shift+tab'},
+		   onKeyTab);
   // Select focused subfield.
   $(document).bind('keydown', {combi: 'space', disableInInput: true},
 		   onKeySpace);
@@ -183,13 +204,33 @@ function onKeyReturn(event){
   /*
    * Handle key return (edit subfield).
    */
-  if (event.target.nodeName == 'TD'){
+  if (event.target.nodeName == 'TEXTAREA'){
+    $(event.target).parent().submit();
+    event.preventDefault();
+  }
+  else if (event.target.nodeName == 'TD'){
     var targetID = event.target.id;
     var type = targetID.slice(0, targetID.indexOf('_'));
     if (type == 'content'){
-      $('#' + targetID).trigger('dblclick');
+      $('#' + targetID).trigger('click');
       event.preventDefault();
     }
+  }
+}
+
+function onKeyTab(event){
+  /*
+   * Handle key tab (save content and jump to next content field).
+   */
+  if (event.target.nodeName == 'TEXTAREA'){
+    var contentCells = $('.bibEditCellContent');
+    var cell = $(event.target).parent().parent();
+    $(event.target).parent().submit();
+    if (!event.shiftKey)
+      $(contentCells).eq($(contentCells).index(cell)+1).trigger('click');
+    else
+      $(contentCells).eq($(contentCells).index(cell)-1).trigger('click');
+    event.preventDefault();
   }
 }
 
@@ -256,35 +297,21 @@ function onTriggerFormControl(command, event){
    * Handle key shortcuts for triggering form controls ('Save', 'Cancel' or
    * 'Clear').
    */
-  if (event.target.type == 'textarea'){
-    if (command == 'Save'){
-      // Save edited content.
-      $(event.target).parent().trigger('submit');
+  var rowGroup = $(event.target).closest('tbody')[0];
+  if (rowGroup){
+    if (rowGroup.id.indexOf('rowGroupAddField')+1){
+      // Click corresponding button in 'Add field' form.
+      $('#btnAddField' + command + '_' + rowGroup.id.slice(
+	rowGroup.id.indexOf('_')+1)).trigger('click');
       event.preventDefault();
     }
-    else if (command == 'Cancel'){
-      // Cancel content editing.
-      $(event.target).parent().find('button[type=cancel]').trigger('click');
-      event.preventDefault();
-    }
-  }
-  else{
-    var rowGroup = $(event.target).closest('tbody')[0];
-    if (rowGroup){
-      if (rowGroup.id.indexOf('rowGroupAddField')+1){
-	// Click corresponding button in 'Add field' form.
-	$('#btnAddField' + command + '_' + rowGroup.id.slice(
-	  rowGroup.id.indexOf('_')+1)).trigger('click');
+    else if (rowGroup.id.indexOf('rowGroup')+1){
+      // Click corresponding button in 'Add subfields' form.
+      var btnToTrigger = $('#btnAddSubfields' + command + '_' +
+			   rowGroup.id.slice(rowGroup.id.indexOf('_')+1));
+      if (btnToTrigger.length){
+	$(btnToTrigger).trigger('click');
 	event.preventDefault();
-      }
-      else if (rowGroup.id.indexOf('rowGroup')+1){
-	// Click corresponding button in 'Add subfields' form.
-	var btnToTrigger = $('#btnAddSubfields' + command + '_' +
-			     rowGroup.id.slice(rowGroup.id.indexOf('_')+1));
-	if (btnToTrigger.length){
-	  $(btnToTrigger).trigger('click');
-	  event.preventDefault();
-	}
       }
     }
   }

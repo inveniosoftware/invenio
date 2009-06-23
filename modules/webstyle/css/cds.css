@@ -1486,9 +1486,6 @@ input.hyperlinkformSubmitButton {
 #bibEditMenu form {
   margin: 0px;
 }
-#bibEditMenu .bibEditMenuMore {
-  display: none;
-}
 #bibEditMenu .bibEditImgExpandMenuSection,
 #bibEditMenu .bibEditImgCompressMenuSection {
   margin: 0px;
@@ -1505,8 +1502,18 @@ input.hyperlinkformSubmitButton {
 #bibEditMenu button, #bibEditMenu input, #bibEditMenu select  {
   width: 100%;
 }
+#bibEditMenu .bibEditImgCtrlEnabled {
+  cursor: pointer;
+  opacity: 1.0;
+  vertical-align: bottom;
+}
+#bibEditMenu .bibEditImgCtrlDisabled {
+  cursor: default;
+  opacity: 0.4;
+  vertical-align: bottom;
+}
 #bibEditContent {
-  min-height: 200px;
+  min-height: 300px;
   margin-left: 150px;
 }
 #bibEditTable {
@@ -1543,8 +1550,9 @@ input.hyperlinkformSubmitButton {
   min-width: 16px;
   max-width: 16px;
 }
-#bibEditTable td:focus {
-  background: yellow;
+#bibEditTable .bibEditCellContent:hover,
+#bibEditTable .bibEditCellContentProtected:hover{
+  background: lightyellow;
 }
 #bibEditTable .bibEditFieldColored {
   background-color: rgb(235, 235, 235);
@@ -1568,6 +1576,9 @@ input.hyperlinkformSubmitButton {
 }
 #bibEditTable .bibEditCellContentProtected {
   font-weight: bold;
+}
+#bibEditTable textarea {
+  min-height: 36px;
 }
 #bibEditTable .bibEditCellAddSubfields {
   vertical-align: bottom;

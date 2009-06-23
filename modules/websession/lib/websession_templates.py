@@ -1070,7 +1070,7 @@ class Template:
             tmp_out = ''
             for action in activities:
                 if action == "runbibedit":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/edit/">%s</a>""" % (CFG_SITE_URL, _("Run BibEdit"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/edit/">%s</a>""" % (CFG_SITE_URL, _("Run Record Editor"))
                 if action == "runbibcirculation":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
                 if action == "cfgbibformat":

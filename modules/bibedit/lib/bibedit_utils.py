@@ -51,7 +51,7 @@ from invenio.bibedit_dblayer import get_bibupload_task_opts, \
 from invenio.search_engine import get_fieldvalues, print_record, record_exists
 
 # Precompile regexp:
-re_file_option = re.compile(r'^/')
+re_file_option = re.compile(r'^%s' % CFG_TMPDIR)
 re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
 re_revid_split = re.compile('^(\d+)\.(\d{14})$')
 re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
@@ -61,24 +61,9 @@ re_tmpl_description = re.compile('<!-- BibEdit-Template-Description: (.*) -->')
 
 
 # Operations on the BibEdit cache file
-def get_file_path(recid, uid, filename=''):
-    """Return the file path to a BibEdit file (excluding suffix).
-    If filename is specified this replaces the config default.
-
-    """
-    if not filename:
-        return '%s/%s_%s_%s' % (CFG_TMPDIR, CFG_BIBEDIT_FILENAME, recid, uid)
-    else:
-        return '%s/%s_%s_%s' % (CFG_TMPDIR, filename, recid, uid)
-
 def cache_exists(recid, uid):
     """Check if the BibEdit cache file exists."""
-    return os.path.isfile('%s.tmp' % get_file_path(recid, uid))
-
-def get_cache_file(recid, uid, mode):
-    """Return a BibEdit cache file object."""
-    if cache_exists(recid, uid):
-        return open('%s.tmp' % get_file_path(recid, uid), mode)
+    return os.path.isfile('%s.tmp' % _get_file_path(recid, uid))
 
 def get_cache_mtime(recid, uid):
     """Get the last modified time of the BibEdit cache file. Check that the
@@ -86,7 +71,7 @@ def get_cache_mtime(recid, uid):
 
     """
     try:
-        return int(os.path.getmtime('%s.tmp' % get_file_path(recid, uid)))
+        return int(os.path.getmtime('%s.tmp' % _get_file_path(recid, uid)))
     except OSError:
         pass
 
@@ -98,7 +83,7 @@ def cache_expired(recid, uid):
     """
     return get_cache_mtime(recid, uid) < int(time.time()) - CFG_BIBEDIT_TIMEOUT
 
-def create_cache_file(recid, uid, record=''):
+def create_cache_file(recid, uid, record='', cache_dirty=False):
     """Create a BibEdit cache file, and return revision and record. This will
     overwrite any existing cache the user has for this record.
 
@@ -108,10 +93,10 @@ def create_cache_file(recid, uid, record=''):
         if not record:
             return
 
-    file_path = '%s.tmp' % get_file_path(recid, uid)
+    file_path = '%s.tmp' % _get_file_path(recid, uid)
     record_revision = get_record_last_modification_date(recid)
     cache_file = open(file_path, 'w')
-    cPickle.dump([False, record_revision, record], cache_file)
+    cPickle.dump([cache_dirty, record_revision, record], cache_file)
     cache_file.close()
     return record_revision, record
 
@@ -121,7 +106,7 @@ def touch_cache_file(recid, uid):
 
     """
     if cache_exists(recid, uid):
-        os.system('touch %s.tmp' % get_file_path(recid, uid))
+        os.system('touch %s.tmp' % _get_file_path(recid, uid))
 
 def get_bibrecord(recid):
     """Return record in BibRecord wrapping."""
@@ -130,7 +115,7 @@ def get_bibrecord(recid):
 
 def get_cache_file_contents(recid, uid):
     """Return the contents of a BibEdit cache file."""
-    cache_file = get_cache_file(recid, uid, 'r')
+    cache_file = _get_cache_file(recid, uid, 'r')
     if cache_file:
         cache_dirty, record_revision, record = cPickle.load(cache_file)
         cache_file.close()
@@ -141,7 +126,7 @@ def update_cache_file_contents(recid, uid, record_revision, record):
     time.
 
     """
-    cache_file = get_cache_file(recid, uid, 'w')
+    cache_file = _get_cache_file(recid, uid, 'w')
     if cache_file:
         cPickle.dump([True, record_revision, record], cache_file)
         cache_file.close()
@@ -149,7 +134,7 @@ def update_cache_file_contents(recid, uid, record_revision, record):
 
 def delete_cache_file(recid, uid):
     """Delete a BibEdit cache file."""
-    os.system('rm %s.tmp' % get_file_path(recid, uid))
+    os.remove('%s.tmp' % _get_file_path(recid, uid))
 
 def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     """Write XML record to file. Default behaviour is to read the record from
@@ -170,9 +155,9 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     if xml_record:
         # Write XML file.
         if not to_merge:
-            file_path = '%s.xml' % get_file_path(recid, uid)
+            file_path = '%s.xml' % _get_file_path(recid, uid)
         else:
-            file_path = '%s_%s.xml' % (get_file_path(recid, uid),
+            file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
                                        CFG_BIBEDIT_TO_MERGE_SUFFIX)
         xml_file = open(file_path, 'w')
         xml_file.write(xml_record)
@@ -194,30 +179,12 @@ def record_locked_by_other_user(recid, uid):
     RECID.
 
     """
-    active_uids = uids_with_active_caches(recid)
+    active_uids = _uids_with_active_caches(recid)
     try:
         active_uids.remove(uid)
     except ValueError:
         pass
     return bool(active_uids)
-
-def uids_with_active_caches(recid):
-    """Return list of uids with active caches for record RECID. Active caches
-    are caches that have been modified a number of seconds ago that is less than
-    the one given by CFG_BIBEDIT_TIMEOUT.
-
-    """
-    re_tmpfilename = re.compile('%s_%s_(\d+)\.tmp' % (CFG_BIBEDIT_FILENAME,
-                                                      recid))
-    tmpfiles = os.listdir(CFG_TMPDIR)
-    expire_time = int(time.time()) - CFG_BIBEDIT_TIMEOUT
-    active_uids = []
-    for tmpfile in tmpfiles:
-        mo = re_tmpfilename.match(tmpfile)
-        if mo and int(os.path.getmtime(CFG_TMPDIR + '/' + tmpfile)) > \
-                expire_time:
-            active_uids.append(int(mo.group(1)))
-    return active_uids
 
 def record_locked_by_queue(recid):
     """Check if record should be locked for editing because of the current state
@@ -227,9 +194,9 @@ def record_locked_by_queue(recid):
     """
     # Check for *any* scheduled bibupload tasks.
     if CFG_BIBEDIT_LOCKLEVEL == 2:
-        return get_bibupload_task_ids()
+        return _get_bibupload_task_ids()
 
-    filenames = get_bibupload_filenames()
+    filenames = _get_bibupload_filenames()
     # Check for match between name of XML-files and record.
     # Assumes that filename ends with _<recid>.xml.
     if CFG_BIBEDIT_LOCKLEVEL == 1:
@@ -243,10 +210,10 @@ def record_locked_by_queue(recid):
     # Check for match between content of files and record.
     if CFG_BIBEDIT_LOCKLEVEL == 3:
         while True:
-            lock = record_in_files_p(recid, filenames)
+            lock = _record_in_files_p(recid, filenames)
             # Check if any new files were added while we were searching
             if not lock:
-                filenames_updated = get_bibupload_filenames()
+                filenames_updated = _get_bibupload_filenames()
                 for filename in filenames_updated:
                     if not filename in filenames:
                         break
@@ -254,81 +221,6 @@ def record_locked_by_queue(recid):
                     return lock
             else:
                 return lock
-
-def get_bibupload_task_ids():
-    """Return list of all BibUpload task IDs.
-    Ignore tasks submitted by user bibreformat.
-
-    """
-    cmd = '%s/bibsched status -t bibupload' % CFG_BINDIR
-    err, out = commands.getstatusoutput(cmd)
-    if err:
-        raise StandardError, '%s: %s' % (err, out)
-    tasks = out.splitlines()[3:-1]
-    res = []
-    for task in tasks:
-        if task.find('USER="bibreformat"') == -1:
-            matchobj = re_taskid.search(task)
-            if matchobj:
-                res.append(matchobj.group(1))
-    return res
-
-def get_bibupload_filenames():
-    """Return paths to all files scheduled for upload."""
-    task_ids = get_bibupload_task_ids()
-    filenames = []
-    tasks_opts = get_bibupload_task_opts(task_ids)
-    for task_opts in tasks_opts:
-        if task_opts:
-            record_options = marshal.loads(task_opts[0][0])
-            for option in record_options[1:]:
-                if re_file_option.search(option):
-                    filenames.append(option)
-    return filenames
-
-def record_in_files_p(recid, filenames):
-    """Search XML files for given record."""
-    # Get id tags of record in question
-    rec_oaiid = rec_sysno = -1
-    rec_oaiid_tag = get_fieldvalues(recid, OAIID_TAG)
-    if rec_oaiid_tag:
-        rec_oaiid = rec_oaiid_tag[0]
-    rec_sysno_tag = get_fieldvalues(recid, SYSNO_TAG)
-    if rec_sysno_tag:
-        rec_sysno = rec_sysno_tag[0]
-
-    # For each record in each file, compare ids and abort if match is found
-    for filename in filenames:
-        try:
-            file_ = open(filename)
-            records = create_records(file_.read(), 0, 0)
-            for i in range(0, len(records)):
-                record, all_good = records[i][:2]
-                if record and all_good:
-                    if record_has_id_p(record, recid, rec_oaiid, rec_sysno):
-                        return True
-            file_.close()
-        except IOError:
-            continue
-    return False
-
-def record_has_id_p(record, recid, rec_oaiid, rec_sysno):
-    """Check if record matches any of the given IDs."""
-    if record_has_field(record, '001'):
-        if (record_get_field_value(record, '001', '%', '%')
-            == str(recid)):
-            return True
-    if record_has_field(record, OAIID_TAG[0:3]):
-        if (record_get_field_value(
-                record, OAIID_TAG[0:3], OAIID_TAG[3],
-                OAIID_TAG[4], OAIID_TAG[5]) == rec_oaiid):
-            return True
-    if record_has_field(record, SYSNO_TAG[0:3]):
-        if (record_get_field_value(
-                record, SYSNO_TAG[0:3], SYSNO_TAG[3],
-                SYSNO_TAG[4], SYSNO_TAG[5]) == rec_sysno):
-            return True
-    return False
 
 
 # JSON
@@ -407,8 +299,8 @@ def get_record_templates():
 
     templates = []
     for fname in template_fnames:
-        template_file = open('%s/%s' % (
-                CFG_BIBEDIT_RECORD_TEMPLATES_PATH, fname),'r')
+        template_file = open('%s%s%s' % (
+                CFG_BIBEDIT_RECORD_TEMPLATES_PATH, os.sep, fname),'r')
         template = template_file.read()
         template_file.close()
         fname_stripped = os.path.splitext(fname)[0]
@@ -428,12 +320,121 @@ def get_record_templates():
 
 def get_record_template(name):
     """Return an XML record template."""
-    filepath = '%s/%s.xml' % (CFG_BIBEDIT_RECORD_TEMPLATES_PATH, name)
+    filepath = '%s%s%s.xml' % (CFG_BIBEDIT_RECORD_TEMPLATES_PATH, os.sep, name)
     if os.path.isfile(filepath):
         template_file = open(filepath, 'r')
         template = template_file.read()
         template_file.close()
-        # Return just the <record> element from the XML to avoid BibRecord crash
-        # FIXME: Fix BibRecord so we can return the full XML.XS
-        return template[
-            template.index('<record>'):template.index('</record>')+9]
+        return template
+
+
+# Private functions
+def _get_cache_file(recid, uid, mode):
+    """Return a BibEdit cache file object."""
+    if cache_exists(recid, uid):
+        return open('%s.tmp' % _get_file_path(recid, uid), mode)
+
+def _get_file_path(recid, uid, filename=''):
+    """Return the file path to a BibEdit file (excluding suffix).
+    If filename is specified this replaces the config default.
+
+    """
+    if not filename:
+        return '%s%s%s_%s_%s' % (CFG_TMPDIR, os.sep, CFG_BIBEDIT_FILENAME,
+                                 recid, uid)
+    else:
+        return '%s%s%s_%s_%s' % (CFG_TMPDIR, os.sep, filename, recid, uid)
+
+def _uids_with_active_caches(recid):
+    """Return list of uids with active caches for record RECID. Active caches
+    are caches that have been modified a number of seconds ago that is less than
+    the one given by CFG_BIBEDIT_TIMEOUT.
+
+    """
+    re_tmpfilename = re.compile('%s_%s_(\d+)\.tmp' % (CFG_BIBEDIT_FILENAME,
+                                                      recid))
+    tmpfiles = fnmatch.filter(os.listdir(CFG_TMPDIR), '%s*.tmp' %
+                              CFG_BIBEDIT_FILENAME)
+    expire_time = int(time.time()) - CFG_BIBEDIT_TIMEOUT
+    active_uids = []
+    for tmpfile in tmpfiles:
+        mo = re_tmpfilename.match(tmpfile)
+        if mo and int(os.path.getmtime('%s%s%s' % (
+                    CFG_TMPDIR, os.sep, tmpfile))) > expire_time:
+            active_uids.append(int(mo.group(1)))
+    return active_uids
+
+def _get_bibupload_task_ids():
+    """Return list of all BibUpload task IDs.
+    Ignore tasks submitted by user bibreformat.
+
+    """
+    cmd = '%s%sbibsched status -t bibupload' % (CFG_BINDIR, os.sep)
+    err, out = commands.getstatusoutput(cmd)
+    if err:
+        raise StandardError, '%s: %s' % (err, out)
+    tasks = out.splitlines()[3:-1]
+    res = []
+    for task in tasks:
+        if task.find('USER="bibreformat"') == -1:
+            matchobj = re_taskid.search(task)
+            if matchobj:
+                res.append(matchobj.group(1))
+    return res
+
+def _get_bibupload_filenames():
+    """Return paths to all files scheduled for upload."""
+    task_ids = _get_bibupload_task_ids()
+    filenames = []
+    tasks_opts = get_bibupload_task_opts(task_ids)
+    for task_opts in tasks_opts:
+        if task_opts:
+            record_options = marshal.loads(task_opts[0][0])
+            for option in record_options[1:]:
+                if re_file_option.search(option):
+                    filenames.append(option)
+    return filenames
+
+def _record_in_files_p(recid, filenames):
+    """Search XML files for given record."""
+    # Get id tags of record in question
+    rec_oaiid = rec_sysno = -1
+    rec_oaiid_tag = get_fieldvalues(recid, OAIID_TAG)
+    if rec_oaiid_tag:
+        rec_oaiid = rec_oaiid_tag[0]
+    rec_sysno_tag = get_fieldvalues(recid, SYSNO_TAG)
+    if rec_sysno_tag:
+        rec_sysno = rec_sysno_tag[0]
+
+    # For each record in each file, compare ids and abort if match is found
+    for filename in filenames:
+        try:
+            file_ = open(filename)
+            records = create_records(file_.read(), 0, 0)
+            for i in range(0, len(records)):
+                record, all_good = records[i][:2]
+                if record and all_good:
+                    if _record_has_id_p(record, recid, rec_oaiid, rec_sysno):
+                        return True
+            file_.close()
+        except IOError:
+            continue
+    return False
+
+def _record_has_id_p(record, recid, rec_oaiid, rec_sysno):
+    """Check if record matches any of the given IDs."""
+    if record_has_field(record, '001'):
+        if (record_get_field_value(record, '001', '%', '%')
+            == str(recid)):
+            return True
+    if record_has_field(record, OAIID_TAG[0:3]):
+        if (record_get_field_value(
+                record, OAIID_TAG[0:3], OAIID_TAG[3],
+                OAIID_TAG[4], OAIID_TAG[5]) == rec_oaiid):
+            return True
+    if record_has_field(record, SYSNO_TAG[0:3]):
+        if (record_get_field_value(
+                record, SYSNO_TAG[0:3], SYSNO_TAG[3],
+                SYSNO_TAG[4], SYSNO_TAG[5]) == rec_sysno):
+            return True
+    return False

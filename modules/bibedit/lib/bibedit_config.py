@@ -45,6 +45,13 @@ CFG_BIBEDIT_JS_STATUS_INFO_TIME = 1000
 ## (in ms).
 CFG_BIBEDIT_JS_STATUS_ERROR_TIME = 2000
 
+## CFG_BIBEDIT_JS_CLONED_RECORD_COLOR - Color of cloned record ID highlighting.
+CFG_BIBEDIT_JS_CLONED_RECORD_COLOR = 'yellow'
+
+## CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION - Duration (in ms) for the
+## fading of cloned record ID highlighting.
+CFG_BIBEDIT_JS_CLONED_RECORD_COLOR_FADE_DURATION = 5000
+
 ## CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR - Color of new field forms'
 ## highlighting.
 CFG_BIBEDIT_JS_NEW_ADD_FIELD_FORM_COLOR = 'lightblue'
@@ -60,8 +67,23 @@ CFG_BIBEDIT_JS_NEW_FIELDS_COLOR = 'lightgreen'
 ## fading of new fields' highlighting.
 CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION = 2000
 
+## CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY - Duration (in ms) before
+## highlighting newly modified content.
+## WARNING: If set to low, the Jeditable plugin won't have time to update the
+## cell with the new content (recommended: >50).
+CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY = 50
+
+## CFG_BIBEDIT_JS_NEW_FIELDS_COLOR - Color of new fields' highlighting
+CFG_BIBEDIT_JS_NEW_CONTENT_COLOR = 'lightgreen'
+
+## CFG_BIBEDIT_JS_NEW_FIELDS_COLOR_FADE_DURATION - Duration (in ms) for the
+## fading of new fields' highlighting.
+CFG_BIBEDIT_JS_NEW_CONTENT_COLOR_FADE_DURATION = 2000
+
 ## CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY - Duration (in ms) before refreshing
 ## a record's tickets after the user clicks on the link to create a new one.
+## WARNING: If set to low, the request for RT to generate the ticket won't have
+## time to finish (recommended: >2000).
 CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY = 5000
 
 ## CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
@@ -76,9 +98,10 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     6: 'Record created (new)',
     7: 'Record created (from template)',
     8: 'Record created (from existing)',
-    9: 'Record deleted',
-    10: 'Cache deleted',
-    11: 'Record ready for merge',
+    9: 'Record cloned',
+    10: 'Record deleted',
+    11: 'Cache deleted',
+    12: 'Record ready for merge',
     20: 'Added controlfield',
     21: 'Added field',
     22: 'Added subfield',
@@ -100,7 +123,8 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     106: 'Error: Cache file missing',
     107: 'Error: Cache file changed',
     108: 'Error: Template file missing',
-    109: 'Error: Invalid template file'
+    109: 'Error: Invalid template file',
+    110: 'Error: Invalid content in record'
 }
 
 ## CFG_BIBEDIT_MAX_SEARCH_RESULTS

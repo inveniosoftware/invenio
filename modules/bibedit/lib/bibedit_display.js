@@ -46,13 +46,12 @@ function displayRecord(){
 	  '<td style="padding: 0px; max-width: 16px;"></td>' +
 	'</tr>' +
       '</tbody>';
-  var tags = getTagsSorted();
-  var tag, fields, field;
+  var tags = getTagsSorted(), tag, fields;
   // For each controlfield, create row.
   for (var i=0, n=tags.length; i<n; i++){
     tag = tags[i];
     // If not controlfield, move on.
-    if (tag > 9)
+    if (!validMARC.reControlTag.test(tag))
       break;
     fields = gRecord[tag];
     for (var j=0, m=fields.length; j<m; j++)
@@ -130,7 +129,9 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var subfieldID = fieldID + '_' + subfieldIndex;
   var boxField = '', cellFieldTagAttrs = 'class="bibEditCellField"',
     fieldTagToPrint = '', btnMoveSubfieldUp = '', btnMoveSubfieldDown = '',
-    cellContentClass = 'class="bibEditCellContentProtected"';
+  cellContentClass = 'class="bibEditCellContentProtected" ',
+  cellContentTitle='',
+  cellContentOnClick = '';
   if (!protectedField){
     // Enable features for unprotected fields.
     btnMoveSubfieldUp = img('/img/arrow_up2.png', 'btnMoveSubfieldUp_' +
@@ -139,8 +140,11 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     btnMoveSubfieldDown = img('/img/arrow_down2.png', 'btnMoveSubfieldDown_' +
       subfieldID, 'bibEditBtnMoveSubfieldDown',
       {title: 'Move subfield down', onclick: 'onMoveSubfieldClick(this)'});
-    if (!protectedSubfield)
-      cellContentClass = '';
+    if (!protectedSubfield){
+      cellContentClass = 'class="bibEditCellContent" ';
+      cellContentTitle = 'title="Click to edit" ';
+      cellContentOnClick = 'onclick="onContentClick(this)" ';
+    }
   }
   var boxSubfield = input('checkbox', 'boxSubfield_' + subfieldID,
     'bibEditBoxSubfield', {onclick: 'onSubfieldBoxClick(this)', tabindex: -1});
@@ -174,8 +178,8 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
 	'" class="bibEditCellSubfieldTag">' +
 	subfieldTagToPrint +
       '</td>' +
-      '<td id="content_' + subfieldID + '" ' + cellContentClass + '"' +
-	'tabindex="0">' +
+      '<td id="content_' + subfieldID + '" ' + cellContentClass +
+	cellContentTitle + cellContentOnClick + 'tabindex="0">' +
 	subfieldValue +
       '</td>' +
       '<td class="bibEditCellAddSubfields">' + btnAddSubfield + '</td>' +
@@ -186,15 +190,23 @@ function redrawFields(tag){
   /*
    * Redraw all fields for a given tag.
    */
-  var prevRowGroup = $('#rowGroup_' + tag + '_0').prev();
-  // Remove the fields from view.
-  prevRowGroup.nextAll('[id^=rowGroup_' + tag + ']').remove();
+  var rowGroup = $('#rowGroup_' + tag + '_0'), prevRowGroup;
+  if (rowGroup.length){
+    // Remove the fields from view.
+    prevRowGroup = rowGroup.prev();
+    prevRowGroup.nextAll('[id^=rowGroup_' + tag + ']').remove();
+  }
+  else{
+    // New tag. Determine previous sibling.
+    var prevTag = getPreviousTag(tag);
+    prevRowGroup = $('#rowGroup_' + prevTag + '_0');
+  }
 
   // Redraw all fields and append to table.
   if (gRecord[tag]){
     var fields = gRecord[tag];
     var result = '', i, n;
-    if (tag <= 9){
+    if (validMARC.reControlTag.test(tag)){
       for (i=0, n=fields.length; i<n; i++)
 	result += createControlField(tag, fields[i], i);
     }
@@ -248,10 +260,10 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
   /*
    * Create a row in the 'Add field' form.
    */
-  var txtAddFieldSubfieldCode = '', txtAddFieldInd1 = '', txtAddFieldInd2 = '',
+  var txtAddFieldTag = '', txtAddFieldInd1 = '', txtAddFieldInd2 = '',
     btnAddFieldRemove = '';
   if (subfieldTmpNo == 0){
-    txtAddFieldSubfieldCode = input('text', 'txtAddFieldTag_' + fieldTmpNo,
+    txtAddFieldTag = input('text', 'txtAddFieldTag_' + fieldTmpNo,
 				    'bibEditTxtTag', {maxlength: 3});
     txtAddFieldInd1 = input('text', 'txtAddFieldInd1_' + fieldTmpNo,
 			    'bibEditTxtInd', {maxlength: 1});
@@ -265,7 +277,7 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
     '<tr id="rowAddField_' + fieldTmpNo + '_' + subfieldTmpNo + '">' +
       '<td></td>' +
       '<td>' +
-	txtAddFieldSubfieldCode + txtAddFieldInd1 + txtAddFieldInd2 +
+	txtAddFieldTag + txtAddFieldInd1 + txtAddFieldInd2 +
       '</td>' +
       '<td></td>' +
       '<td></td>' +
@@ -326,7 +338,7 @@ function createAddSubfieldsRow(fieldID, subfieldTmpNo){
     '</tr>';
 }
 
-function displayMessage(msgCode){
+function displayMessage(msgCode, keepContent, args){
   /*
    * Display message in the main work area. Messages codes returned from the
    * server (positive integers) are as specified in the BibEdit configuration.
@@ -385,13 +397,21 @@ function displayMessage(msgCode){
       msg = 'The record template file is invalid. Please notify your system ' +
 	'administrator';
       break;
+    case 110:
+      msg = 'The record contains invalid content. Remove the invalid content ' +
+	'and resubmit the record.<br />' +
+	'Errors: <b>' + args[0] + '</b><br /><br />';
+      break;
     default:
       msg = 'Result code: <b>' + msgCode + '</b>';
   }
-  $('#bibEditContent').html('<div id="bibEditMessage">' + msg + '</div>');
+  if (!keepContent)
+    $('#bibEditContent').html('<div id="bibEditMessage">' + msg + '</div>');
+  else
+    $('#bibEditContent').prepend('<div id="bibEditMessage">' + msg + '</div>');
 }
 
-function displayNewRecordList(){
+function displayNewRecordScreen(){
   /*
    * Display options for creating a new record: An empty record or a template
    * selected from a list of templates.
@@ -417,14 +437,14 @@ function displayNewRecordList(){
   $('#bibEditContent').html(msg);
 }
 
-function displayCacheOutdatedOptions(requestType){
+function displayCacheOutdatedScreen(requestType){
   /*
    * Display options to resolve the outdated cache scenario (DB record updated
    * during editing). Options differ depending on wether the situation was
    * discovered when fetching or when submitting the record.
    */
   $('#bibEditMessage').remove();
-  var recordURL = gSiteURL + '/record/' + gRecID + '/';
+  var recordURL = gSITE_URL + '/record/' + gRecID + '/';
   var viewMARCURL = recordURL + '?of=hm';
   var viewMARCXMLURL = recordURL + '?of=xm';
   var msg = '';
@@ -468,6 +488,10 @@ function displayAlert(msgType, args){
   var msg;
   var popUpType = 'alert';
   switch (msgType){
+    case 'confirmClone':
+      msg = 'Clone this record?\n\n';
+      popUpType = 'confirm';
+      break;
     case 'confirmSubmit':
       msg = 'Submit your changes to this record?\n\n';
       popUpType = 'confirm';
@@ -517,6 +541,14 @@ function displayAlert(msgType, args){
     return confirm(msg);
   else
     alert(msg);
+}
+
+function notImplemented(event){
+  /*
+   * Handle unimplemented function.
+   */
+  alert('Sorry, this function is not implemented yet!');
+  event.preventDefault();
 }
 
 function button(value, id, _class, attrs){
