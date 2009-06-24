@@ -17,12 +17,13 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-__revision__ = "$Id$"
+"""
+The BibRecord test suite.
+"""
 
 import unittest
-from string import expandtabs, replace
 
-from invenio.config import CFG_TMPDIR, CFG_ETCDIR
+from invenio.config import CFG_TMPDIR
 from invenio import bibrecord, bibrecord_config
 from invenio.testutils import make_test_suite, run_test_suite
 
@@ -34,7 +35,7 @@ class BibRecordSuccessTest(unittest.TestCase):
         f = open(CFG_TMPDIR + '/demobibdata.xml', 'r')
         xmltext = f.read()
         f.close()
-        self.recs = map((lambda x: x[0]), bibrecord.create_records(xmltext))
+        self.recs = [rec[0] for rec in bibrecord.create_records(xmltext)]
 
     def test_records_created(self):
         """ bibrecord - demo file how many records are created """
@@ -43,9 +44,12 @@ class BibRecordSuccessTest(unittest.TestCase):
     def test_tags_created(self):
         """ bibrecord - demo file which tags are created """
         ## check if the tags are correct
-        # tags = ['020', '037', '041', '080', '088', '100', '245', '246', '250', '260', '270', '300', '340', '490', '500', '502', '520', '590', '595', '650', '653', '690', '700', '710', '856', '909', '980', '999']
 
-        tags = [u'003', u'005', '020', '035', '037', '041', '080', '088', '100', '245', '246', '250', '260', '269', '270', '300', '340', '490', '500', '502', '520', '590', '595', '650', '653', '690', '695', '700', '710', '720', '856', '859', '901', '909', '916', '960', '961', '962', '963', '970', '980', '999', 'FFT']
+        tags = [u'003', u'005', '020', '035', '037', '041', '080', '088',
+            '100', '245', '246', '250', '260', '269', '270', '300', '340',
+            '490', '500', '502', '520', '590', '595', '650', '653', '690',
+            '695', '700', '710', '720', '856', '859', '901', '909', '916',
+            '960', '961', '962', '963', '970', '980', '999', 'FFT']
 
         t = []
         for rec in self.recs:
@@ -63,7 +67,12 @@ class BibRecordSuccessTest(unittest.TestCase):
         """bibrecord - demo file how many fields are created"""
         ## check if the number of fields for each record is correct
 
-        fields = [14, 14, 8, 11, 11, 12, 11, 15, 10, 18, 14, 16, 10, 9, 15, 10, 11, 11, 11, 9, 11, 11, 10, 9, 9, 9, 10, 9, 10, 10, 8, 9, 8, 9, 14, 13, 14, 14, 15, 12, 12, 12, 15, 14, 12, 16, 16, 15, 15, 14, 16, 15, 15, 15, 16, 15, 16, 15, 15, 16, 15, 14, 14, 15, 12, 13, 11, 15, 8, 11, 14, 13, 12, 13, 6, 6, 25, 24, 27, 26, 26, 24, 26, 27, 25, 28, 24, 23, 27, 25, 25, 26, 26, 24, 19, 26]
+        fields = [14, 14, 8, 11, 11, 12, 11, 15, 10, 18, 14, 16, 10, 9, 15, 10,
+            11, 11, 11, 9, 11, 11, 10, 9, 9, 9, 10, 9, 10, 10, 8, 9, 8, 9, 14,
+            13, 14, 14, 15, 12, 12, 12, 15, 14, 12, 16, 16, 15, 15, 14, 16, 15,
+            15, 15, 16, 15, 16, 15, 15, 16, 15, 14, 14, 15, 12, 13, 11, 15, 8,
+            11, 14, 13, 12, 13, 6, 6, 25, 24, 27, 26, 26, 24, 26, 27, 25, 28,
+            24, 23, 27, 25, 25, 26, 26, 24, 19, 26]
 
         cr = []
         ret = []
@@ -88,12 +97,62 @@ class BibRecordSuccessTest(unittest.TestCase):
         record1 = bibrecord.create_records(xmltext)[0]
         self.assertEqual(record1, record)
 
+class BibRecordParsersTest(unittest.TestCase):
+    """ bibrecord - testing the creation of records with different parsers"""
+
+    def setUp(self):
+        """Initialize stuff"""
+        self.xmltext = """
+        <!-- A first comment -->
+        <collection>
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <!-- A second comment -->
+        <subfield code="a">eng</subfield>
+        </datafield>
+        </record>
+        </collection>
+        """
+        self.expected_record = {
+            '001': [([], ' ', ' ', '33', 1)],
+            '041': [([('a', 'eng')], ' ', ' ', '', 2)]
+            }
+
+    def test_pyRXP(self):
+        """ bibrecord - create_record() with pyRXP """
+        try:
+            import pyRXP
+        except ImportError:
+            self.fail("SKIPPED: pyRXP not available, test skipped.")
+        record = bibrecord._create_record_rxp(self.xmltext)
+        self.assertEqual(record, self.expected_record)
+
+    def test_4suite(self):
+        """ bibrecord - create_record() with 4suite """
+        try:
+            import Ft.Xml.Domlette
+        except ImportError:
+            self.fail("SKIPPED: 4suite not available, test skipped.")
+        record = bibrecord._create_record_4suite(self.xmltext)
+        self.assertEqual(record, self.expected_record)
+
+    def test_minidom(self):
+        """ bibrecord - create_record() with minidom """
+        try:
+            import xml.dom.minidom
+            import xml.parsers.expat
+        except ImportError:
+            self.fail("SKIPPED: minidom not available, test skipped.")
+        record = bibrecord._create_record_minidom(self.xmltext)
+        self.assertEqual(record, self.expected_record)
+
 class BibRecordBadInputTreatmentTest(unittest.TestCase):
     """ bibrecord - testing for bad input treatment """
     def test_empty_collection(self):
         """bibrecord - empty collection"""
         xml_error0 = """<collection></collection>"""
-        rec, st, e = bibrecord.create_record(xml_error0)
+        rec = bibrecord.create_record(xml_error0)[0]
         self.assertEqual(rec, {})
         records = bibrecord.create_records(xml_error0)
         self.assertEqual(len(records), 0)
@@ -115,7 +174,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (rec, st, e) = bibrecord.create_record(xml_error1, 1, 1)
+        e = bibrecord.create_record(xml_error1, 1, 1)[2]
         ee =''
         for i in e:
             if type(i).__name__ == 'str':
@@ -140,7 +199,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (rec, st, e) = bibrecord.create_record(xml_error2, 1, 1)
+        e = bibrecord.create_record(xml_error2, 1, 1)[2]
         ee = ''
         for i in e:
             if type(i).__name__ == 'str':
@@ -164,7 +223,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (rec, st, e) = bibrecord.create_record(xml_error3, 1, 1)
+        e = bibrecord.create_record(xml_error3, 1, 1)[2]
         ee = ''
         for i in e:
             if type(i).__name__ == 'str':
@@ -188,7 +247,7 @@ class BibRecordBadInputTreatmentTest(unittest.TestCase):
         <subfield code="a">On the foo and bar</subfield>
         </record>
         """
-        (rec, st, e) = bibrecord.create_record(xml_error4, 1, 1)
+        e = bibrecord.create_record(xml_error4, 1, 1)[2]
         ee = ''
         for i in e:
             if type(i).__name__ == 'str':
@@ -220,7 +279,7 @@ class BibRecordAccentedUnicodeLettersTest(unittest.TestCase):
     <subfield code="a">On the foo and bar2</subfield>
   </datafield>
 </record>"""
-        (self.rec, st, e) = bibrecord.create_record(self.xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(self.xml_example_record, 1, 1)[0]
 
     def test_accented_unicode_characters(self):
         """bibrecord - accented Unicode letters"""
@@ -257,7 +316,7 @@ class BibRecordGettingFieldValuesTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_get_field_instances(self):
         """bibrecord - getting field instances"""
@@ -319,7 +378,7 @@ class BibRecordGettingFieldValuesViaWildcardsTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_get_field_instances_via_wildcard(self):
         """bibrecord - getting field instances via wildcards"""
@@ -464,7 +523,7 @@ class BibRecordAddFieldTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_add_controlfield(self):
         """bibrecord - adding controlfield"""
@@ -544,7 +603,7 @@ class BibRecordManageMultipleFieldsTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_delete_multiple_datafields(self):
         """bibrecord - deleting multiple datafields"""
@@ -581,7 +640,7 @@ class BibRecordManageMultipleFieldsTest(unittest.TestCase):
 
     def test_move_multiple_fields(self):
         """bibrecord - move multiple fields"""
-        index = bibrecord.record_move_fields(self.rec, '245', [1, 3])
+        bibrecord.record_move_fields(self.rec, '245', [1, 3])
         self.assertEqual(self.rec['245'][0],
             ([('a', 'subfield1')], ' ', ' ', '', 2))
         self.assertEqual(self.rec['245'][1],
@@ -617,13 +676,13 @@ class BibRecordDeleteFieldTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
         xml_example_record_empty = """
         <record>
         </record>
         """
-        (self.rec_empty, st, e) = bibrecord.create_record(xml_example_record_empty, 1, 1)
+        self.rec_empty = bibrecord.create_record(xml_example_record_empty, 1, 1)[0]
 
     def test_delete_controlfield(self):
         """bibrecord - deleting controlfield"""
@@ -696,7 +755,7 @@ class BibRecordDeleteFieldFromTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_delete_field_from(self):
         """bibrecord - deleting field from position"""
@@ -737,7 +796,7 @@ class BibRecordAddSubfieldIntoTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_add_subfield_into(self):
         """bibrecord - adding subfield into position"""
@@ -783,7 +842,7 @@ class BibRecordModifyControlfieldTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_modify_controlfield(self):
         """bibrecord - modify controlfield"""
@@ -832,7 +891,7 @@ class BibRecordModifySubfieldTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_modify_subfield(self):
         """bibrecord - modify subfield"""
@@ -877,7 +936,7 @@ class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_delete_subfield_from(self):
         """bibrecord - delete subfield from position"""
@@ -927,7 +986,7 @@ class BibRecordMoveSubfieldTest(unittest.TestCase):
         </datafield>
         </record>
         """
-        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+        self.rec = bibrecord.create_record(xml_example_record, 1, 1)[0]
 
     def test_move_subfield(self):
         """bibrecord - move subfields"""
@@ -994,7 +1053,7 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
 
     def test_parsing_file_containing_fmt_special_tag_with_correcting(self):
         """bibrecord - parsing special FMT tag, correcting on"""
-        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 1)
+        rec = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 1)[0]
         self.assertEqual(rec,
                          {u'001': [([], " ", " ", '33', 1)],
                           'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
@@ -1008,7 +1067,7 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
 
     def test_parsing_file_containing_fmt_special_tag_without_correcting(self):
         """bibrecord - parsing special FMT tag, correcting off"""
-        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 0)
+        rec = bibrecord.create_record(self.xml_example_record_with_fmt, 1, 0)[0]
         self.assertEqual(rec,
                          {u'001': [([], " ", " ", '33', 1)],
                           'FMT': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
@@ -1022,7 +1081,7 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
 
     def test_parsing_file_containing_fft_special_tag_with_correcting(self):
         """bibrecord - parsing special FFT tag, correcting on"""
-        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fft, 1, 1)
+        rec = bibrecord.create_record(self.xml_example_record_with_fft, 1, 1)[0]
         self.assertEqual(rec,
                          {u'001': [([], " ", " ", '33', 1)],
                           'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], " ", " ", "", 3)],
@@ -1034,7 +1093,7 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
 
     def test_parsing_file_containing_fft_special_tag_without_correcting(self):
         """bibrecord - parsing special FFT tag, correcting off"""
-        rec, st, e = bibrecord.create_record(self.xml_example_record_with_fft, 1, 0)
+        rec = bibrecord.create_record(self.xml_example_record_with_fft, 1, 0)[0]
         self.assertEqual(rec,
                          {u'001': [([], " ", " ", '33', 1)],
                           'FFT': [([('a', 'file:///foo.pdf'), ('a', 'http://bar.com/baz.ps.gz')], " ", " ", "", 3)],
@@ -1047,7 +1106,7 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
     def test_parsing_file_containing_xyz_special_tag_with_correcting(self):
         """bibrecord - parsing unrecognized special XYZ tag, correcting on"""
         # XYZ should not get accepted when correcting is on; should get changed to 000
-        rec, st, e = bibrecord.create_record(self.xml_example_record_with_xyz, 1, 1)
+        rec = bibrecord.create_record(self.xml_example_record_with_xyz, 1, 1)[0]
         self.assertEqual(rec,
                          {u'001': [([], " ", " ", '33', 1)],
                           '000': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
@@ -1066,7 +1125,7 @@ class BibRecordSpecialTagParsingTest(unittest.TestCase):
     def test_parsing_file_containing_xyz_special_tag_without_correcting(self):
         """bibrecord - parsing unrecognized special XYZ tag, correcting off"""
         # XYZ should get accepted without correcting
-        rec, st, e = bibrecord.create_record(self.xml_example_record_with_xyz, 1, 0)
+        rec = bibrecord.create_record(self.xml_example_record_with_xyz, 1, 0)[0]
         self.assertEqual(rec,
                          {u'001': [([], " ", " ", '33', 1)],
                           'XYZ': [([('f', 'HB'), ('g', 'Let us see if this gets inserted well.')], " ", " ", "", 3)],
@@ -1145,8 +1204,8 @@ class BibRecordPrintingTest(unittest.TestCase):
 
     def test_record_xml_output(self):
         """bibrecord - xml output"""
-        rec, st, e = bibrecord.create_record(self.xml_example_record, 1, 1)
-        rec_short, st_short, e_short = bibrecord.create_record(self.xml_example_record_short, 1, 1)
+        rec = bibrecord.create_record(self.xml_example_record, 1, 1)[0]
+        rec_short = bibrecord.create_record(self.xml_example_record_short, 1, 1)[0]
         self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=[]), 1, 1)[0], rec)
         self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["001", "037"]), 1, 1)[0], rec_short)
         self.assertEqual(bibrecord.create_record(bibrecord.record_xml_output(rec, tags=["037"]), 1, 1)[0], rec_short)
@@ -1213,6 +1272,7 @@ class BibRecordFindFieldTest(unittest.TestCase):
     """ bibrecord - testing for finding field """
 
     def setUp(self):
+        """Initialize stuff"""
         xml = """
         <record>
         <controlfield tag="001">81</controlfield>
@@ -1260,6 +1320,7 @@ class BibRecordFindFieldTest(unittest.TestCase):
 
 TEST_SUITE = make_test_suite(
     BibRecordSuccessTest,
+    BibRecordParsersTest,
     BibRecordBadInputTreatmentTest,
     BibRecordGettingFieldValuesTest,
     BibRecordGettingFieldValuesViaWildcardsTest,

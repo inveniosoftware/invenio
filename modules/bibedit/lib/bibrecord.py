@@ -27,25 +27,23 @@ Note: Does not access the database, the input is MARCXML only."""
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 
 import re
-import sys
 try:
     import psyco
     PSYCO_AVAILABLE = True
 except ImportError:
     PSYCO_AVAILABLE = False
 
-if sys.version[:3] == '2.3':
-    # For Python 2.3 compatibility
-    from sets import Set as set
+try:
+    Set = set
+except NameError:
+    from sets import Set
 
 from invenio.bibrecord_config import CFG_MARC21_DTD, \
     CFG_BIBRECORD_WARNING_MSGS, CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
     CFG_BIBRECORD_DEFAULT_CORRECT, CFG_BIBRECORD_PARSERS_AVAILABLE, \
     InvenioBibRecordParserError, InvenioBibRecordFieldError
-
 from invenio.config import CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.textutils import encode_for_xml
-
 
 # Some values used for the RXP parsing.
 TAG, ATTRS, CHILDREN = 0, 1, 2
@@ -53,27 +51,27 @@ TAG, ATTRS, CHILDREN = 0, 1, 2
 # Find out about the best usable parser:
 AVAILABLE_PARSERS = []
 
-if 'pyrxp' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-    try:
-        import pyRXP
+try:
+    import pyRXP
+    if 'pyrxp' in CFG_BIBRECORD_PARSERS_AVAILABLE:
         AVAILABLE_PARSERS.append('pyrxp')
-    except ImportError:
-        pass
+except ImportError:
+    pass
 
-if '4suite' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-    try:
-        import Ft.Xml.Domlette
+try:
+    import Ft.Xml.Domlette
+    if '4suite' in CFG_BIBRECORD_PARSERS_AVAILABLE:
         AVAILABLE_PARSERS.append('4suite')
-    except ImportError:
-        pass
+except ImportError:
+    pass
 
-if 'minidom' in CFG_BIBRECORD_PARSERS_AVAILABLE:
-    try:
-        import xml.dom.minidom
-        import xml.parsers.expat
+try:
+    import xml.dom.minidom
+    import xml.parsers.expat
+    if 'minidom' in CFG_BIBRECORD_PARSERS_AVAILABLE:
         AVAILABLE_PARSERS.append('minidom')
-    except ImportError:
-        pass
+except ImportError:
+    pass
 
 ### INTERFACE / VISIBLE FUNCTIONS
 
@@ -148,24 +146,26 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
     # Select the appropriate parser.
     parser = _select_parser(parser)
 
-    if parser == 'pyrxp' and correct:
-        # Note that with pyRXP < 1.13 a memory leak has been found
-        # involving DTD parsing. So enable correction only if you have
-        # pyRXP 1.13 or greater.
-        marcxml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<!DOCTYPE collection SYSTEM "file://%s">\n'
-            '<collection>\n%s\n</collection>' % (CFG_MARC21_DTD, marcxml))
-
-    _create_record = {
-        'pyrxp': _create_record_rxp,
-        '4suite': _create_record_4suite,
-        'minidom': _create_record_minidom,
-        }
-
     try:
-        rec = _create_record[parser](marcxml, verbose)
+        if parser == 'pyrxp':
+            rec = _create_record_rxp(marcxml, verbose, correct)
+        elif parser == '4suite':
+            rec = _create_record_4suite(marcxml)
+        elif parser == 'minidom':
+            rec = _create_record_minidom(marcxml)
     except InvenioBibRecordParserError, ex1:
         return (None, 0, str(ex1))
+
+#   _create_record = {
+#       'pyrxp': _create_record_rxp,
+#       '4suite': _create_record_4suite,
+#       'minidom': _create_record_minidom,
+#       }
+
+#   try:
+#       rec = _create_record[parser](marcxml, verbose)
+#   except InvenioBibRecordParserError, ex1:
+#       return (None, 0, str(ex1))
 
     if sort_fields_by_indicators:
         _record_sort_by_indicators(rec)
@@ -1014,7 +1014,7 @@ def _compare_fields(field1, field2, strict=True):
             return False
         else:
             # Compare subfields in a loose way.
-            return set(field1[0]) == set(field2[0])
+            return Set(field1[0]) == Set(field2[0])
 
 def _check_field_validity(field):
     """
@@ -1153,7 +1153,8 @@ def _select_parser(parser=None):
     else:
         return parser
 
-def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL):
+def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
+    correct=CFG_BIBRECORD_DEFAULT_CORRECT):
     """Creates a record object using the RXP parser.
 
     If verbose>3 then the parser will be strict and will stop in case of
@@ -1165,6 +1166,14 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL):
     correct != 0 -> We will try to correct errors such as missing
         attributes
     correct = 0 -> there will not be any attempt to correct errors"""
+    if correct:
+        # Note that with pyRXP < 1.13 a memory leak has been found
+        # involving DTD parsing. So enable correction only if you have
+        # pyRXP 1.13 or greater.
+        marcxml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<!DOCTYPE collection SYSTEM "file://%s">\n'
+            '<collection>\n%s\n</collection>' % (CFG_MARC21_DTD, marcxml))
+
     # Create the pyRXP parser.
     pyrxp_parser = pyRXP.Parser(ErrorOnValidityErrors=0, ProcessDTD=1,
         ErrorOnUnquotedAttributeValues=0, srcName='string input')
@@ -1272,8 +1281,7 @@ def _create_record_from_document(document):
 
     return record
 
-def _create_record_minidom(marcxml,
-    verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL):
+def _create_record_minidom(marcxml):
     """Creates a record using minidom."""
     try:
         dom = xml.dom.minidom.parseString(marcxml)
@@ -1282,7 +1290,7 @@ def _create_record_minidom(marcxml,
 
     return _create_record_from_document(dom)
 
-def _create_record_4suite(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL):
+def _create_record_4suite(marcxml):
     """Creates a record using the 4suite parser."""
     try:
         dom = Ft.Xml.Domlette.NonvalidatingReader.parseString(marcxml,
