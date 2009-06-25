@@ -479,7 +479,7 @@ def perform_request_bibcatalog(request_type, recid, uid):
         if uid:
             bibcat_resp = bibcatalog_system.check_system(uid)
             if bibcat_resp == "":
-                tickets_found = bibcatalog_system.ticket_search(uid, recordid=recid)
+                tickets_found = bibcatalog_system.ticket_search(uid, status=['new', 'open'], recordid=recid)
                 t_url_str = '' #put ticket urls here, formatted for HTML display
                 for t_id in tickets_found:
                     #t_url = bibcatalog_system.ticket_get_attribute(uid, t_id, 'url_display')
@@ -487,9 +487,9 @@ def perform_request_bibcatalog(request_type, recid, uid):
                     t_url = ticket_info['url_display']
                     t_close_url = ticket_info['url_close']
                     #format..
-                    t_url_str += "#"+str(t_id)+'<a href="'+t_url+'" target="_blank">[read]</a> <a href="'+t_close_url+'" target="_blank">[close]</a><br/>'
+                    t_url_str += "#"+str(t_id)+'<a href="'+t_url+'">[read]</a> <a href="'+t_close_url+'">[close]</a><br/>'
                 #put ticket header and tickets links in the box
-                t_url_str = "<strong>Tickets</strong><br/>"+t_url_str+"<br/>"+'<a href="new_ticket?recid=' + str(recid) + '" id="lnkNewTicket" target="_blank">[new ticket]<a>'
+                t_url_str = "<strong>Tickets</strong><br/>"+t_url_str+"<br/>"+'<a href="new_ticket?recid='+str(recid)+'>[new ticket]<a>'
                 response['tickets'] = t_url_str
                 #add a new ticket link
             else:

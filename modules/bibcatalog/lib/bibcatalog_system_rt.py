@@ -88,13 +88,11 @@ class BibCatalogSystemRT(BibCatalogSystem):
         return ""
 
     def ticket_search(self, uid, recordid=-1, subject="", text="", creator="", owner="", \
-                      date_from="", date_until="", status="", priority="", include_resolved=False):
+                      date_from="", date_until="", status="", priority=""):
         """returns a list of ticket ID's related to this record or by
            matching the subject, creator or owner of the ticket."""
 
         search_atoms = [] #the search expression will be made by and'ing these
-        if not include_resolved:
-            search_atoms.append("Status != 'resolved'")
         if (recordid > -1):
             #search by recid
             search_atoms.append("CF.{RecordID} = " + escape_shell_arg(str(recordid)))
@@ -120,7 +118,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             search_atoms.append("Created >= " + escape_shell_arg(str(date_from)))
         if (len(date_until) > 0):
             search_atoms.append("Created <= " + escape_shell_arg(str(date_until)))
-        if (len(str(status)) > 0):
+        if (len(str(status)) > 0) and (type(status) == type("this is a string")):
             search_atoms.append("Status = " + escape_shell_arg(str(status)))
         if (len(str(priority)) > 0):
             #try to convert to int
@@ -148,17 +146,29 @@ class BibCatalogSystemRT(BibCatalogSystem):
             searchexp = "Created > '1900-01-01'"
         passwd = escape_shell_arg(passwd)
         #make a call. This is safe since passwd and all variables in searchexp have been escaped.
-        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls \"" + searchexp + "\"")
-
+        dummy, myout, dummyerr = run_shell_command("echo "+passwd+" | " + CFG_BIBCATALOG_SYSTEM_RT_CLI + " ls -l \"" + searchexp + "\"")
+        statuses = []
         for line in myout.split("\n"):
             #if there are matching lines they will look like NUM:subj.. so pick num
-            if (line.count(': ') > 0) and (line.count("Invalid") == 0): #the parameters may be insane
-                tnum, dummy = line.split(': ') #get the ticket id and transform it to int
+            if (line.count('id: ticket/') > 0):
+                dummy, tnum = line.split('/') #get the ticket id
                 try:
                     inum = int(tnum)
                     tickets.append(tnum)
                 except:
                     pass
+            if (line.count('Status: ') > 0):
+                dummy, tstatus = line.split('Status: ')
+                statuses.append(tstatus)
+        if (type(status) == type([])):
+            #take only those tickets whose status matches with one of the status list
+            alltickets = tickets
+            tickets = []
+            for i in range(len(alltickets)):
+                tstatus = statuses[i]
+                tnum = alltickets[i]
+                if (status.count(tstatus) > 0): #match
+                    tickets.append(tnum)
         return tickets
 
     def ticket_submit(self, uid, subject, recordid, text="", queue="", priority="", owner=""):
@@ -341,7 +351,7 @@ class BibCatalogSystemRT(BibCatalogSystem):
             #make specific URL attributes:
             url_display = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Display.html?id="+str(ticketid)
             candict['url_display'] = url_display
-            url_close = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Update.html?Action=Resolve&id="+str(ticketid)
+            url_close = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Update.html?Action=Comment&DefaultStatus=resolved&id="+str(ticketid)
             candict['url_close'] = url_close
             url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Modify.html?id="+str(ticketid)
             candict['url_modify'] = url_modify
