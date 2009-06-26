@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import cgi
+import os
 from datetime import timedelta
 
 from invenio.config import \
@@ -48,6 +49,7 @@ from invenio.access_control_engine import make_apache_message, make_list_apache_
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
+from invenio import bibcatalog_system
 from invenio import webgroup_dblayer
 from invenio.messages import gettext_set_language, wash_language
 from invenio.mailutils import send_email
@@ -62,6 +64,7 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
 
 import invenio.template
 websession_templates = invenio.template.load('websession')
+bibcatalog_templates = invenio.template.load('bibcatalog')
 
 class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
@@ -867,6 +870,39 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     lastupdated=__lastupdated__,
                     navmenuid='youraccount')
 
+
+class WebInterfaceYourTicketsPages(WebInterfaceDirectory):
+    #support for /yourtickets url
+    _exports = ['', 'display']
+
+    def __call__(self, req, form):
+        #if there is no trailing slash
+        self.index(req, form)
+
+    def index(self, req, form):
+        #take all the parameters..
+        unparsed_uri = req.unparsed_uri
+        qstr = ""
+        if unparsed_uri.count('?') > 0:
+            dummy, qstr = unparsed_uri.split('?')
+            qstr = '?'+qstr
+        redirect_to_url(req, '/yourtickets/display'+qstr)
+
+    def display(self, req, form):
+        #show tickets for this user
+        argd = wash_urlargd(form, {'ln': (str, ''), 'start': (int, 1) })
+        uid = webuser.getUid(req)
+        ln = argd['ln']
+        start = argd['start']
+        _ = gettext_set_language(ln)
+        body = bibcatalog_templates.tmpl_your_tickets(uid, ln, start)
+        return page(title=_("Your tickets"),
+                    body=body,
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, argd['ln']) + _("Your Account") + """</a>""",
+                    uid=uid,
+                    req=req,
+                    language=argd['ln'],
+                    lastupdated=__lastupdated__)
 
 class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 

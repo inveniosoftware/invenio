@@ -286,14 +286,14 @@ class BibCatalogSystemRT(BibCatalogSystem):
             #print str(mylines)
         return 0
 
-    def ticket_get_attribute(self, uid, ticketid, attrname):
+    def ticket_get_attribute(self, uid, ticketid, attribute):
         """return an attribute of a ticket"""
-        ticinfo = self.ticket_get_info(uid, ticketid, [attrname])
-        if ticinfo.has_key(attrname):
-            return ticinfo[attrname]
+        ticinfo = self.ticket_get_info(uid, ticketid, [attribute])
+        if ticinfo.has_key(attribute):
+            return ticinfo[attribute]
         return None
 
-    def ticket_get_info(self, uid, ticketid, attrlist = None):
+    def ticket_get_info(self, uid, ticketid, attributes = None):
         """return ticket info as a dictionary of pre-defined attribute names.
            Or just those listed in attrlist.
            Returns None on failure"""
@@ -304,8 +304,8 @@ class BibCatalogSystemRT(BibCatalogSystem):
             dummy = int(ticketid)
         except:
             return 0
-        if attrlist is None:
-            attrlist = []
+        if attributes is None:
+            attributes = []
         (username, passwd) = get_bibcat_from_prefs(uid)
         httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
         BIBCATALOG_RT_SERVER = httppart + "//" + username + ":" + passwd + "@" + siteandpath
@@ -353,20 +353,20 @@ class BibCatalogSystemRT(BibCatalogSystem):
             candict['url_display'] = url_display
             url_close = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Update.html?Action=Comment&DefaultStatus=resolved&id="+str(ticketid)
             candict['url_close'] = url_close
-            url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/Modify.html?id="+str(ticketid)
+            url_modify = CFG_BIBCATALOG_SYSTEM_RT_URL + "/Ticket/ModifyAll.html?id="+str(ticketid)
             candict['url_modify'] = url_modify
             #change the ticket owner into invenio UID
             if tdict.has_key('owner'):
                 rt_owner = tdict["owner"]
                 uid = invenio.webuser.get_uid_based_on_pref("bibcatalog_username", rt_owner)
                 candict['owner'] = uid
-            if len(attrlist) == 0: #return all fields
+            if len(attributes) == 0: #return all fields
                 return candict
             else: #return only the fields that were requested
                 tdict = {}
-                for f in attrlist:
-                    if candict.has_key(f):
-                        tdict[f] = candict[f]
+                for myatt in attributes:
+                    if candict.has_key(myatt):
+                        tdict[myatt] = candict[myatt]
                 return tdict
         else:
             return None

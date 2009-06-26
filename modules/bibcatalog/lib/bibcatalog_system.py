@@ -113,27 +113,27 @@ class BibCatalogSystem:
         """
         pass
 
-    def ticket_get_attribute(self, uid, ticketid, attrname):
+    def ticket_get_attribute(self, uid, ticketid, attribute):
         """return an attribute
            @param uid: invenio user id
            @type uid: number
            @param ticketid: ticket id
            @type ticketid: number
-           @param attrname: attribute name.
-           @type attrname: string
+           @param attribute: attribute name.
+           @type attribute: string
            @return: the value of the attribute, or None if the ticket or attribute does not exist
            @rtype: string
         """
         pass
 
-    def ticket_get_info(self, uid, ticketid, attrlist = None):
+    def ticket_get_info(self, uid, ticketid, attributes = None):
         """Return the attributes of a ticket as a dictionary whose fields are TICKET_ATTRIBUTES.
            @param uid: user id
            @type uid: number
            @param ticketid: ticket id
            @type ticketid: number
-           @param attrlist: a list of attributes, each in TICKET_ATTRIBUTES.
-           @type attrlist: list
+           @param attributes: a list of attributes, each in TICKET_ATTRIBUTES.
+           @type attributes: list
            @return: dictionary whose fields are TICKET_ATTRIBUTES
            @rtype: dictionary
         """

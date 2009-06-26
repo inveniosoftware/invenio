@@ -105,6 +105,12 @@ except:
     WebInterfaceYourAccountPages = WebInterfaceDumbPages
 
 try:
+    from invenio.websession_webinterface import WebInterfaceYourTicketsPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceYourTicketsPages = WebInterfaceDumbPages
+
+try:
     from invenio.websession_webinterface import WebInterfaceYourGroupsPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -181,6 +187,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'yourmessages',
         'yourloans',
         'yourgroups',
+        'yourtickets',
         'comments',
         'error',
         'oai2d', ('oai2d.py', 'oai2d'),
@@ -204,6 +211,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     yourmessages = WebInterfaceYourMessagesPages()
     yourloans = WebInterfaceYourLoansPages()
     yourgroups = WebInterfaceYourGroupsPages()
+    yourtickets = WebInterfaceYourTicketsPages()
     comments = WebInterfaceCommentsPages()
     error = WebInterfaceErrorPages()
     oai2d = WebInterfaceOAIProviderPages()

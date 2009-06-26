@@ -563,7 +563,7 @@ class Template:
                           </table>""" % (url, title, body)
         return out
 
-    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, submissions, approvals, administrative):
+    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, submissions, approvals, tickets, administrative):
         """
         Displays the your account page
 
@@ -632,6 +632,12 @@ class Template:
                                   'x_url_close': '</a>'}
             out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln, '/yourapprovals.py?ln=%s' % ln)
 
+        #check if this user might have tickets
+        if tickets:
+            ticket_description =  _("You can consult the list of %(x_url_open)syour tickets%(x_url_close)s.")
+            ticket_description %=  {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourtickets?ln=' + ln + '">',
+                                    'x_url_close': '</a>'}
+            out += self.tmpl_account_template(_("Your Tickets"), ticket_description, ln, '/yourtickets?ln=%s' % ln)
         if administrative:
             out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln, '/admin')
         return out

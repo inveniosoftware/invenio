@@ -31,6 +31,7 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_DATABASE_HOST, \
      CFG_DATABASE_NAME
+from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
@@ -137,6 +138,9 @@ def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, s
 
     warning_list = superuser_account_warnings()
 
+    #check if tickets ok
+    tickets = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+
     return websession_templates.tmpl_account_page(
              ln = ln,
              warnings = warnings,
@@ -150,6 +154,7 @@ def perform_display_account(req, username, bask, aler, sear, msgs, loan, grps, s
              groups = grps,
              submissions = sbms,
              approvals = appr,
+             tickets = tickets,
              administrative = admn
            )
 
