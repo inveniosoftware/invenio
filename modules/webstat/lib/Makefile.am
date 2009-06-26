@@ -22,7 +22,8 @@ pylib_DATA = webstat.py \
              webstat_webinterface.py \
              webstat_templates.py \
              webstat_engine.py \
-             webstatadmin.py
+             webstatadmin.py \
+             webstat_regression_tests.py
 
 lispimagedir = $(libdir)/lisp/invenio
 lispimage_DATA = webstat.clisp.mem webstat.cmucl.core webstat.sbcl.core

@@ -414,7 +414,9 @@ def basket_display():
     Display basket statistics.
     """
     tbl_name = get_customevent_table("baskets")
-
+    if not tbl_name:
+        # custom event baskets not defined, so return empty output:
+        return []
     try:
         res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % tbl_name)
         days = (res[-1][0] - res[0][0]).days + 1
@@ -440,7 +442,9 @@ def alert_display():
     Display alert statistics.
     """
     tbl_name = get_customevent_table("alerts")
-
+    if not tbl_name:
+        # custom event alerts not defined, so return empty output:
+        return []
     try:
         res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % tbl_name)
         days = (res[-1][0] - res[0][0]).days + 1
