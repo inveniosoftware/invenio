@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL, \
      CFG_SITE_LANG
 from invenio.bibformat import format_record
-from invenio.bibindex_engine import re_html
+from invenio.htmlutils import remove_html_markup
 from invenio.messages import gettext_set_language
 
 whitespaces_pattern = re.compile(r'[ \t]+')
@@ -171,7 +171,7 @@ def get_as_text(record_id, ln=CFG_SITE_LANG):
         htparser.close()
         out = htparser.result
     except:
-        out = re_html.sub(' ', rec_in_hb)
+        out = remove_html_markup(rec_in_hb)
 
     # Remove trailing whitespace and linefeeds
     out = out.strip('\n').strip()

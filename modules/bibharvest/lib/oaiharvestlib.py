@@ -47,7 +47,6 @@ from invenio.bibrecord import record_extract_oai_id, create_records
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
-re_html = re.compile("(?s)<[^>]*>|&#?\w+;")
 re_datetime_shift = re.compile("([-\+]{0, 1})([\d]+)([dhms])")
 
 tmpHARVESTpath = CFG_TMPDIR + '/oaiharvest'

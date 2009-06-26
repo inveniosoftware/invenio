@@ -39,6 +39,9 @@ cfg_html_buffer_allowed_tag_whitelist = ('a',
 # <p style="background: url(myxss_suite.js)">
 cfg_html_buffer_allowed_attribute_whitelist = ('href', 'name')
 
+## precompile some often-used regexp for speed reasons:
+re_html = re.compile("(?s)<[^>]*>|&#?\w+;")
+
 def nmtoken_from_string(text):
     """
     Returns a Nmtoken from a string.
@@ -85,11 +88,12 @@ class HTMLWasher(HTMLParser):
     Creates a washer for HTML, avoiding XSS attacks. See wash function for
     details on parameters.
 
-    Usage: from invenio.htmlutils import HTMLWasher
-           washer = HTMLWasher()
-           escaped_text = washer.wash(unescaped_text)
+    Usage::
+       from invenio.htmlutils import HTMLWasher
+       washer = HTMLWasher()
+       escaped_text = washer.wash(unescaped_text)
 
-    Examples:
+    Examples::
         a.wash('Spam and <b><blink>eggs</blink></b>')
         => 'Spam and <b>eggs</b>'
         a.wash('Spam and <b><blink>eggs</blink></b>', True)
@@ -142,10 +146,8 @@ class HTMLWasher(HTMLParser):
         """
         Wash HTML buffer, escaping XSS attacks.
         @param html_buffer: text to escape
-        @param render_unallowed_tags: if True:
-                                         print unallowed tags escaping < and >.
-                                      else:
-                                         only print content of unallowed tags.
+        @param render_unallowed_tags: if True, print unallowed tags escaping
+            < and >.  Else, only print content of unallowed tags.
         @param allowed_tag_whitelist: list of allowed tags
         @param allowed_attribute_whitelist: list of allowed attributes
         """
@@ -229,63 +231,58 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     Fall back to a simple textarea when the library is not installed,
     or when the user's browser is not compatible with the editor, or
-    when 'enable' == False, or when javascript is not enabled.
+    when 'enable' is False, or when javascript is not enabled.
 
     NOTE that the output also contains a hidden field named
-    'editor_type' that contains the kind of editor used: 'textarea' or
-    'fckeditor'
+    'editor_type' that contains the kind of editor used, 'textarea' or
+    'fckeditor'.
 
     Based on 'editor_type' you might want to take different actions,
-    like replace \n\r with <br/> when editor_type == 'textarea', but
-    not when editor_type == 'fckeditor'.
+    like replace CRLF with <br/> when editor_type equals to
+    'textarea', but not when editor_type equals to 'fckeditor'.
 
-    Parameters:
+    @param name: *str* the name attribute of the returned editor
 
-           name - *str* the name attribute of the returned editor
+    @param id: *str* the id attribute of the returned editor (when
+        applicable)
 
-             id - *str* the id attribute of the returned editor (when
-                  applicable)
+    @param content: *str* the default content of the editor.
 
-        content - *str* the default content of the editor.
+    @param textual_content: *str* a content formatted for the case where the
+        wysiwyg editor is not available for user. When not
+        specified, use value of 'content'
 
-textual_content - *str* a content formatted for the case where the
-                  wysiwyg editor is not available for user. When not
-                  specified, use value of 'content'
+    @param width: *str* width of the editor in an html compatible unit:
+        Eg: '400px', '50%'.
 
-          width - *str* width of the editor in an html compatible unit:
-                  Eg: '400px', '50%'
+    @param height: *str* height of the editor in an html compatible unit:
+        Eg: '400px', '50%'.
 
-         height - *str* height of the editor in an html compatible unit:
-                  Eg: '400px', '50%'
+    @param enabled: *bool* if the wysiwyg editor is return (True) or if a
+        simple texteara is returned (False)
 
-         enable - *bool* if the wysiwyg editor is return (True) or if a
-                  simple texteara is returned (False)
+    @param file_upload_url: *str* the URL used to upload new files via the
+        editor upload panel. You have to implement the
+        handler for your own use. The URL handler will get
+        form variables 'File' as POST for the uploaded file,
+        and 'Type' as GET for the type of file ('file',
+        'image', 'flash', 'media')
+        When value is not given, the file upload is disabled.
 
-file_upload_url - *str* the URL used to upload new files via the
-                  editor upload panel. You have to implement the
-                  handler for your own use. The URL handler will get
-                  form variables 'File' as POST for the uploaded file,
-                  and 'Type' as GET for the type of file ('file',
-                  'image', 'flash', 'media')
-                  When value is not given, the file upload is disabled.
+    @param toolbar_set: *str* the name of the toolbar layout to
+        use. FCKeditor comes by default with 'Basic' and
+        'Default'. To define other sets, customize the
+        config file in
+        /opt/cds-invenio/var/www/fckeditor/invenio-fckconfig.js
 
-    toolbar_set - *str* the name of the toolbar layout to
-                  use. FCKeditor comes by default with 'Basic' and
-                  'Default'. To define other sets, customize the
-                  config file in
-                  /opt/cds-invenio/var/www/fckeditor/invenio-fckconfig.js
+    @param custom_configurations_path: *str* value for the FCKeditor config
+        variable 'CustomConfigurationsPath',
+        which allows to specify the path of a
+        file that contains a custom configuration
+        for the editor. The path is relative to
+        /opt/cds-invenio/var/www/
 
-custom_configurations_path - *str* value for the FCKeditor config
-                             variable 'CustomConfigurationsPath',
-                             which allows to specify the path of a
-                             file that contains a custom configuration
-                             for the editor. The path is relative to
-                             /opt/cds-invenio/var/www/
-
-    Returns:
-
-        the HTML markup of the editor
-
+    @return: the HTML markup of the editor
     """
 
 ##     NOTE that the FCKeditor is instantiated using the Python interface
@@ -357,3 +354,17 @@ custom_configurations_path - *str* value for the FCKeditor config
         editor += '<input type="hidden" name="editor_type" value="textarea" />'
 
     return editor
+
+def remove_html_markup(text, replacechar=' '):
+    """
+    Remove HTML markup from text.
+
+    @param text: Input text.
+    @type text: string.
+    @param replacechar: By which character should we replace HTML markup.
+        Usually, a single space or an empty string are nice values.
+    @type replacechar: string
+    @return: Input text with HTML markup removed.
+    @rtype: string
+    """
+    return re_html.sub(replacechar, text)

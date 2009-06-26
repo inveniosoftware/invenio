@@ -57,6 +57,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 from invenio.shellutils import escape_shell_arg
+from invenio.htmlutils import remove_html_markup
 
 # FIXME: journal tag and journal pubinfo standard format are defined here:
 if CFG_CERN_SITE:
@@ -71,7 +72,6 @@ else:
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
-re_html = re.compile("(?s)<[^>]*>|&#?\w+;")
 re_block_punctuation_begin = re.compile(r"^"+CFG_BIBINDEX_CHARS_PUNCTUATION+"+")
 re_block_punctuation_end = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION+"+$")
 re_punctuation = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
@@ -530,7 +530,7 @@ def get_words_from_phrase(phrase, stemming_language=None):
     words = {}
     formulas = []
     if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
-        phrase = re_html.sub(' ', phrase)
+        phrase = remove_html_markup(phrase)
     if CFG_BIBINDEX_REMOVE_LATEX_MARKUP:
         formulas = latex_formula_re.findall(phrase)
         phrase = remove_latex_markup(phrase)

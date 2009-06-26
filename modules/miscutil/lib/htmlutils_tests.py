@@ -24,7 +24,8 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import dbquery
-from invenio.htmlutils import HTMLWasher, nmtoken_from_string
+from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
+     remove_html_markup
 from invenio.testutils import make_test_suite, run_test_suite
 
 class XSSEscapingTest(unittest.TestCase):
@@ -120,9 +121,28 @@ class HTMLWashingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '<b> a &lt; b &gt; c </b> &#247;')
 
+
+class HTMLMarkupRemovalTest(unittest.TestCase):
+    """Test functions related to removing HTML markup."""
+
+    def test_remove_html_markup_empty(self):
+        """htmlutils - remove HTML markup, empty replacement"""
+        test_input = 'This is <a href="test">test</a>.'
+        test_expected = 'This is test.'
+        self.assertEqual(remove_html_markup(test_input, ''),
+                         test_expected)
+
+    def test_remove_html_markup_replacement(self):
+        """htmlutils - remove HTML markup, some replacement"""
+        test_input = 'This is <a href="test">test</a>.'
+        test_expected = 'This is XtestX.'
+        self.assertEqual(remove_html_markup(test_input, 'X'),
+                         test_expected)
+
 TEST_SUITE = make_test_suite(XSSEscapingTest,
                              CharactersEscapingTest,
-                             HTMLWashingTest,)
+                             HTMLWashingTest,
+                             HTMLMarkupRemovalTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
