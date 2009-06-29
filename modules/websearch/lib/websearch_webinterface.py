@@ -91,6 +91,7 @@ from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.search_engine_summarizer import summarize_records
 from invenio.errorlib import register_exception
 from invenio.bibedit_webinterface import WebInterfaceEditPages
+from invenio.bibeditmulti_webinterface import WebInterfaceMultiEditPages
 from invenio.bibmerge_webinterface import WebInterfaceMergePages
 
 import invenio.template
@@ -336,7 +337,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'merge']
+                'keywords', 'multiedit', 'merge']
 
     #_exports.extend(output_formats)
 
@@ -413,7 +414,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'merge']
+                'keywords', 'multiedit', 'merge']
 
     #_exports.extend(output_formats)
 
@@ -750,6 +751,9 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         elif component == 'record' and path and path[0] == 'edit':
             return WebInterfaceEditPages(), path[1:]
+        
+        elif component == 'record' and path[0] == 'multiedit':
+            return WebInterfaceMultiEditPages(), path[1:]
 
         elif component == 'record' or component == 'record-restricted':
             try:
@@ -780,9 +784,9 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             format = None
             tab = ''
             try:
-                if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
+                if path[1] in ['', 'files', 'reviews', 'comments','usage',
                                'references', 'citations', 'holdings', 'edit',
-                               'keywords', 'merge']:
+                               'keywords', 'multiedit', 'merge']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

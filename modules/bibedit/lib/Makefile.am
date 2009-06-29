@@ -9,7 +9,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -34,14 +34,18 @@ pylib_DATA = bibrecord_config.py \
              bibeditcli.py \
              bibeditold_utils.py \
              bibedit_utils.py \
-             bibedit_webinterface.py
+             bibedit_webinterface.py \
+             bibeditmulti_templates.py \
+             bibeditmulti_webinterface.py \
+             bibeditmulti_engine.py
 
 jsdir=$(localstatedir)/www/js
 
 js_DATA = bibedit_display.js \
           bibedit_engine.js \
           bibedit_keys.js \
-          bibedit_menu.js
+          bibedit_menu.js \
+          bibeditmulti.js
 
 EXTRA_DIST = $(pylib_DATA) \
              $(js_DATA)
