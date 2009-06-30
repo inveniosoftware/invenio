@@ -3242,12 +3242,67 @@ CREATE TABLE IF NOT EXISTS crcPURCHASE (
 -- BibExport tables:
 
 CREATE TABLE IF NOT EXISTS expJOB (
-  id mediumint(9) unsigned NOT NULL auto_increment,
+  id int(15) unsigned NOT NULL auto_increment,
   jobname varchar(50) NOT NULL default '',
   jobfreq mediumint(12) NOT NULL default '0',
+  output_format mediumint(12) NOT NULL default '0',
+  deleted mediumint(12) NOT NULL default '0',
   lastrun datetime NOT NULL default '0000-00-00 00:00:00',
+  output_directory text, 
   PRIMARY KEY  (id),
   UNIQUE KEY jobname (jobname)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS expQUERY (
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(255) NOT NULL,
+  search_criteria text NOT NULL,
+  output_fields text NOT NULL,
+  notes text,
+  deleted mediumint(12) NOT NULL default '0',
+  PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS expJOB_expQUERY (
+  id_expJOB int(15) NOT NULL,
+  id_expQUERY int(15) NOT NULL,
+  PRIMARY KEY  (id_expJOB,id_expQUERY),
+  KEY id_expJOB (id_expJOB),
+  KEY id_expQUERY (id_expQUERY)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS expQUERYRESULT (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_expQUERY int(15) NOT NULL,
+  result text NOT NULL,
+  status mediumint(12) NOT NULL default '0',
+  status_message text NOT NULL,
+  PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS expJOBRESULT (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_expJOB int(15) NOT NULL,
+  execution_time datetime NOT NULL default '0000-00-00 00:00:00',
+  status mediumint(12) NOT NULL default '0',
+  status_message text NOT NULL,
+  PRIMARY KEY  (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS expJOBRESULT_expQUERYRESULT (
+  id_expJOBRESULT int(15) NOT NULL,
+  id_expQUERYRESULT int(15) NOT NULL,
+  PRIMARY KEY  (id_expJOBRESULT, id_expQUERYRESULT),
+  KEY id_expJOBRESULT (id_expJOBRESULT),
+  KEY id_expQUERYRESULT (id_expQUERYRESULT)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS user_expJOB (
+  id_user int(15) NOT NULL,
+  id_expJOB int(15) NOT NULL,
+  PRIMARY KEY  (id_user, id_expJOB),
+  KEY id_user (id_user),
+  KEY id_expJOB (id_expJOB)
 ) TYPE=MyISAM;
 
 -- end of file
