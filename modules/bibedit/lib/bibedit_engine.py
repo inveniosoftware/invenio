@@ -451,7 +451,7 @@ def perform_request_update_record(request_type, recid, uid, data):
                     if not to_delete[tag][field_position_local]:
                         # No subfields specified - delete entire field.
                         record_delete_field(record, tag,
-                            field_position_local=field_position_local)
+                            field_position_local=int(field_position_local))
                         deleted_fields += 1
                     else:
                         for subfield_position in \
@@ -460,7 +460,7 @@ def perform_request_update_record(request_type, recid, uid, data):
                             # indexing correct).
                             record_delete_subfield_from(record, tag,
                                 int(subfield_position),
-                                field_position_local=field_position_local)
+                                field_position_local=int(field_position_local))
                             deleted_subfields += 1
             if deleted_fields == 1 and deleted_subfields == 0:
                 response['resultCode'] = 26
