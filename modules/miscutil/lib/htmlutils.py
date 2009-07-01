@@ -285,6 +285,13 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
     @return: the HTML markup of the editor
     """
 
+    def remove_line_breaks(text):
+        """
+        Remove line breaks from input, including unicode 'line
+        separator', 'paragraph separator', and 'next line' characters.
+        """
+        return unicode(text, 'utf-8').replace('\f', '').replace('\n', '').replace('\r', '').replace(u'\xe2\x80\xa8', '').replace(u'\xe2\x80\xa9', '').replace(u'\xc2\x85', '').encode('utf-8')
+
 ##     NOTE that the FCKeditor is instantiated using the Python interface
 ##     provided with the editor, which must have access to the
 ##     os.environ['HTTP_USER_AGENT'] variable to check if user's browser
@@ -338,7 +345,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
         if oFCKeditor.IsCompatible():
             # Browser seems compatible
             editor += '<script language="JavaScript" type="text/javascript">'
-            editor += "document.write('" + oFCKeditor.Create().replace('\n', '').replace('\r', '') + "');"
+            editor += "document.write('" + remove_line_breaks(oFCKeditor.Create()) + "');"
             editor += "document.write('<input type=\"hidden\" name=\"editor_type\" value=\"fckeditor\" />');"
             editor += '</script>'
             # In case javascript is disabled
