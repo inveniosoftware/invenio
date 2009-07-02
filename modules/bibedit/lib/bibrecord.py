@@ -989,7 +989,7 @@ def record_find_field(rec, tag, field, strict=False):
     except InvenioBibRecordFieldError:
         raise
 
-    for local_position, field1 in enumerate(rec[tag]):
+    for local_position, field1 in enumerate(rec.get(tag, [])):
         if _compare_fields(field, field1, strict):
             return (field1[4], local_position)
 
