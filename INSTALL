@@ -5,7 +5,7 @@ About
 =====
 
 This document specifies how to build, customize, and install CDS
-Invenio v0.99.1 for the first time.  See RELEASE-NOTES if you are 
+Invenio v0.99.1 for the first time.  See RELEASE-NOTES if you are
 upgrading from a previous CDS Invenio release.
 
 Contents
@@ -85,6 +85,9 @@ Contents
              <ftp://xmlsoft.org/libxml2/python/>
           - (recommended) simplejson, for AJAX apps:
              <http://undefined.org/python/#simplejson>
+             Note that if you are using Python-2.6, you don't need to
+             install simplejson, because the module is already included
+             in the main Python distribution.
           - (recommended) Gnuplot.Py, for producing graphs:
              <http://gnuplot-py.sourceforge.net/>
           - (recommended) Snowball Stemmer, for stemming:

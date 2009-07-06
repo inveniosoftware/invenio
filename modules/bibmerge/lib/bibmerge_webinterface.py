@@ -22,12 +22,14 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-try:
-    import simplejson as json
-except ImportError:
-    # Okay, no Ajax app will be possible, but continue anyway,
-    # since this package is only recommended, not mandatory.
-    pass
+import sys
+if sys.hexversion < 0x2060000:
+    try:
+        import simplejson as json
+    except ImportError:
+        # Okay, no Ajax app will be possible, but continue anyway,
+        # since this package is only recommended, not mandatory.
+        pass
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
