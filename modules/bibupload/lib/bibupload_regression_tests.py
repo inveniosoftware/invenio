@@ -28,8 +28,12 @@ import unittest
 import datetime
 import os
 import time
+import sys
 from urllib2 import urlopen
-from md5 import md5
+if sys.hexversion < 0x2060000:
+    from md5 import md5
+else:
+    from hashlib import md5
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR, \
      CFG_WEBSUBMIT_FILEDIR, \

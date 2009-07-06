@@ -20,7 +20,6 @@ __revision__ = "$Id$"
 import os
 import re
 import shutil
-import md5
 import filecmp
 import time
 import random
@@ -33,6 +32,10 @@ import base64
 import binascii
 import cgi
 import sys
+if sys.hexversion < 0x2060000:
+    from md5 import md5
+else:
+    from hashlib import md5
 
 try:
     import magic
@@ -2132,7 +2135,7 @@ def calculate_md5(filename, force_internal=False):
     if not CFG_PATH_MD5SUM or force_internal or os.path.getsize(filename) < CFG_BIBDOCFILE_MD5_THRESHOLD:
         try:
             to_be_read = open(filename, "rb")
-            computed_md5 = md5.new()
+            computed_md5 = md5()
             while True:
                 buf = to_be_read.read(CFG_BIBDOCFILE_MD5_BUFFER)
                 if buf:

@@ -71,8 +71,12 @@ try:
     import copy
     import fileinput
     import getopt
+    import sys
+    if sys.hexversion < 0x2060000:
+        import md5
+    else:
+        import hashlib
     import marshal
-    import md5
     import os
     import signal
     import tempfile

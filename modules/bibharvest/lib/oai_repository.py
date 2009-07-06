@@ -24,7 +24,11 @@ import os
 import re
 import urllib
 import time
-import md5
+import sys
+if sys.hexversion < 0x2060000:
+    from md5 import md5
+else:
+    from hashlib import md5
 
 from invenio.config import \
      CFG_OAI_DELETED_POLICY, \
@@ -744,7 +748,7 @@ def oaigetsysnolist(set="", fromdate="", untildate=""):
 def oaigenresumptionToken():
     "Generates unique ID for resumption token management."
 
-    return md5.new(str(time.time())).hexdigest()
+    return md5(str(time.time())).hexdigest()
 
 
 def oaicachein(resumptionToken, sysnos):

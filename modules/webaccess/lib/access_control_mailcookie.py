@@ -25,13 +25,18 @@ __lastupdated__ = """$Date$"""
 unique urls sent by email.
 """
 
+import sys
+if sys.hexversion < 0x2060000:
+    from md5 import md5
+else:
+    from hashlib import md5
+
 from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_get_role_id, acc_add_user_role
 from datetime import datetime, timedelta
 from random import random
 from cPickle import dumps, loads
-import md5
 
 
 class InvenioWebAccessMailCookieError(Exception):
@@ -54,7 +59,7 @@ def mail_cookie_create_generic(kind, params, cookie_timeout=timedelta(days=1), o
     assert(kind in _authorizations_kind)
     expiration = datetime.today()+cookie_timeout
     data = (kind, params, expiration, onetime)
-    password = md5.new(str(random())).hexdigest()
+    password = md5(str(random())).hexdigest()
     cookie_id = run_sql('INSERT INTO accMAILCOOKIE (data,expiration,kind,onetime) VALUES '
         '(AES_ENCRYPT(%s, %s),%s,%s,%s)',
         (dumps(data), password, expiration.strftime(_datetime_format), kind, onetime))
