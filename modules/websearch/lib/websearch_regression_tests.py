@@ -27,7 +27,12 @@ __revision__ = "$Id$"
 import unittest
 import re
 import urlparse, cgi
-from sets import Set
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from mechanize import Browser, LinkNotFoundError, HTTPError
 
@@ -359,8 +364,8 @@ class WebSearchTestCollections(unittest.TestCase):
             each link to a detailed record, we also have the
             corresponding link to the similar records."""
 
-            records = Set()
-            similar = Set()
+            records = set()
+            similar = set()
 
             for link in browser.links():
                 path, q = parse_url(link.url)

@@ -34,8 +34,13 @@ import time
 import re
 import sys
 from numpy import array, ones, zeros, int32, float32, sqrt, dot
-from sets import Set
 from zlib import decompress
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
+
 from invenio.dbquery import run_sql, serialize_via_marshal
 from invenio.bibtask import write_message
 from invenio.config import CFG_ETCDIR
@@ -92,7 +97,7 @@ def get_citations_from_db():
         if cit:
             for item in cit:
                 #check for duplicates in citation dictionary
-                cit[item] = Set(cit[item])
+                cit[item] = set(cit[item])
                 if item in cit[item]:
                     cit[item].remove(item)
                 if item not in dict_of_ids:

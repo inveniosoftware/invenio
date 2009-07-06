@@ -23,8 +23,13 @@
 __revision__ = "$Id$"
 
 import cgi
+import sys
 from copy import copy
-from sets import Set
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql, OperationalError
@@ -141,8 +146,8 @@ def select_external_engines(collection_name, selected_external_searches):
     if not type(selected_external_searches) is list:
         selected_external_searches = [selected_external_searches]
 
-    seealso_engines = Set()
-    search_engines = Set()
+    seealso_engines = set()
+    search_engines = set()
 
     if dico_collection_seealso.has_key(collection_id):
         seealso_engines = copy(dico_collection_seealso[collection_id])
@@ -232,7 +237,7 @@ def external_collection_load_states():
                 continue
 
             if not dictionary.has_key(collection_id):
-                dictionary[collection_id] = Set()
+                dictionary[collection_id] = set()
             engine_set = dictionary[collection_id]
             engine_set.add(engine)
 

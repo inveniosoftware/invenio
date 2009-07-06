@@ -18,8 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import unittest
+import sys
 
-from sets import Set
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
+
 from numpy import array
 from invenio import bibrank_citerank_indexer
 from invenio.testutils import make_test_suite, run_test_suite
@@ -29,7 +34,7 @@ class TestCiterankIndexer(unittest.TestCase):
 
     def setUp(self):
         """Initialization"""
-        self.cit = {74: Set([92]), 77: Set([85, 86]), 78: Set([91, 79]), 79: Set([91]), 81: Set([89, 82, 83, 87]), 18: Set([96]), 84: Set([88, 91, 85]), 91: Set([92]), 94: Set([80]), 95: Set([77, 86])}
+        self.cit = {74: set([92]), 77: set([85, 86]), 78: set([91, 79]), 79: set([91]), 81: set([89, 82, 83, 87]), 18: set([96]), 84: set([88, 91, 85]), 91: set([92]), 94: set([80]), 95: set([77, 86])}
         self.dict_of_ids = {96: 14, 18: 13, 74: 0, 77: 2, 78: 5, 79: 7, 80: 18, 81: 8, 82: 10, 83: 11, 84: 15, 85: 3, 86: 4, 87: 12, 88: 16, 89: 9, 91: 6, 92: 1, 94: 17, 95: 19}
         self.ref = list([0, 2, 1, 2, 2, 0, 3, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0])
         self.dates = {0: 2001, 1: 2006, 2: 2002, 3: 2003, 4: 2003, 5: 2002, 6: 2007, 7: 2003, 8: 2002, 9: 2005, 10: 2002, 11: 2003, 12: 2003, 13: 1984, 14: 2000, 15: 2003, 16: 2003, 17: 1997, 18: 2002, 19: 1999}

@@ -27,6 +27,11 @@ import marshal
 import traceback
 from zlib import decompress, error
 
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
+
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
 from invenio.search_engine import search_pattern, get_fieldvalues, \
@@ -36,11 +41,6 @@ from invenio.bibtask import write_message, task_get_option, \
                      task_update_progress, task_sleep_now_if_required, \
                      task_get_task_param
 from invenio.errorlib import register_exception
-
-try:
-    Set = set
-except NameError:
-    from sets import Set
 
 class memoise:
     def __init__(self, function):
@@ -543,7 +543,7 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
             if (these_cite_k is None):
                 these_cite_k = [] #verify it is an empty list, not None
             #do things only if these_cite_k contains any new stuff
-            intersec_list = list(Set(these_cite_k)&Set(updated_redic_list))
+            intersec_list = list(set(these_cite_k)&set(updated_redic_list))
             if intersec_list:
                 authors = get_fieldvalues(k, mainauthortag)
                 coauthl = get_fieldvalues(k, coauthortag)

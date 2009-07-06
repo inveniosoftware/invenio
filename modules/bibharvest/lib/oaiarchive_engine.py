@@ -28,7 +28,11 @@ __revision__ = "$Id$"
 import os
 import sys
 import time
-import sets
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from stat import ST_SIZE
 from tempfile import mkstemp
@@ -363,14 +367,14 @@ def oaiarchive_task():
 
         # Get the sets to which this record already belongs according
         # to the metadata
-        current_oai_sets = sets.Set(\
+        current_oai_sets = set(\
             [_oai_set for _oai_set in \
              get_fieldvalues(recid, CFG_OAI_SET_FIELD[0:2]) \
              if _oai_set.strip() != ''])
 
         # Get the sets that should be in this record according to
         # settings
-        updated_oai_sets = sets.Set(\
+        updated_oai_sets = set(\
             [_set for _set, _recids in recids_for_set.iteritems()
              if recid in _recids])
 

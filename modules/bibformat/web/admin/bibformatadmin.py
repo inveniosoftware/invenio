@@ -29,6 +29,13 @@ from invenio import bibformatadminlib, \
 
 import os
 import re
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
+
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
@@ -41,11 +48,6 @@ from invenio.search_engine import search_pattern, \
 from invenio.websearch_webcoll import get_collection
 from invenio.bibrank_downloads_indexer import uniq
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME
-
-try:
-    Set = set
-except NameError:
-    from sets import Set
 
 def index(req, ln=CFG_SITE_LANG):
     """
@@ -1448,7 +1450,7 @@ def kb_export(req, kbname="", format="", ln=CFG_SITE_LANG):
             pattern=expr+"*"
             res2 = search_pattern(p=pattern, f=cconfig['field'])
         if res2:
-            res = list(Set(res)&Set(res2))
+            res = list(set(res)&set(res2))
 
         seq = [] #sequence of values to be printed
         for recid in res:

@@ -23,6 +23,12 @@ __revision__ = "$Id$"
 
 ## import interesting modules:
 
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG
@@ -32,7 +38,6 @@ from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
 from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
-from sets import Set
 from invenio.intbitset import intbitset
 
 id_tmp = run_sql('SELECT id FROM accROLE WHERE name=%s', (SUPERADMINROLE, ))
@@ -1302,7 +1307,7 @@ def acc_find_user_role_actions(user_info):
                     # Ok, every action. There's no need to go on :-)
                     return [(id_superadmin, action[0]) for action in acc_get_all_actions()]
                 res4.append((role_name, action_name))
-        return list(Set(res2) | Set(res4))
+        return list(set(res2) | set(res4))
     else:
         return res2
 

@@ -27,16 +27,17 @@ Note: Does not access the database, the input is MARCXML only."""
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 
 import re
+import sys
 try:
     import psyco
     PSYCO_AVAILABLE = True
 except ImportError:
     PSYCO_AVAILABLE = False
 
-try:
-    Set = set
-except NameError:
-    from sets import Set
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from invenio.bibrecord_config import CFG_MARC21_DTD, \
     CFG_BIBRECORD_WARNING_MSGS, CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
@@ -1014,7 +1015,7 @@ def _compare_fields(field1, field2, strict=True):
             return False
         else:
             # Compare subfields in a loose way.
-            return Set(field1[0]) == Set(field2[0])
+            return set(field1[0]) == set(field2[0])
 
 def _check_field_validity(field):
     """

@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-import sets
+import sys
 import smtplib
 import cPickle
 import re
@@ -28,6 +28,12 @@ import MimeWriter
 import mimetools
 import cStringIO
 from urllib2 import urlopen
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
+
 from invenio.errorlib import register_exception
 from invenio.config import \
      CFG_SITE_URL, \
@@ -293,17 +299,17 @@ def perform_request_issue_control(journal_name, issues,
                                                   n=get_journal_issue_grouping(journal_name))
             if action == _("Refresh"):
                 next_issues += issues
-                next_issues = list(sets.Set(next_issues))# avoid double entries
+                next_issues = list(set(next_issues))# avoid double entries
             elif action == _("Add"):
                 next_issues += issues
-                next_issues = list(sets.Set(next_issues))# avoid double entries
+                next_issues = list(set(next_issues))# avoid double entries
                 next_issues.sort(compare_issues)
                 highest_issue_so_far = next_issues[-1]
                 one_more_issue = get_next_journal_issues(highest_issue_so_far,
                                                          journal_name,
                                                          1)
                 next_issues += one_more_issue
-                next_issues = list(sets.Set(next_issues)) # avoid double entries
+                next_issues = list(set(next_issues)) # avoid double entries
             else:
                 # get the next issue numbers to publish
                 next_issues = get_next_journal_issues(current_issue,
@@ -316,7 +322,7 @@ def perform_request_issue_control(journal_name, issues,
     elif action == _("Publish"):
         # Publish the given issues (mark them as current issues)
         publish_issues = issues
-        publish_issues = list(sets.Set(publish_issues)) # avoid double entries
+        publish_issues = list(set(publish_issues)) # avoid double entries
         publish_issues.sort(compare_issues)
         if len(publish_issues) == 0:
             # User did not select an issue

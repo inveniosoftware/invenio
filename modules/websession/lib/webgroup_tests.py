@@ -22,14 +22,13 @@
 __revision__ = "$Id$"
 
 import unittest
+import sys
 from invenio.testutils import make_test_suite, run_test_suite
 
-# Compatibility stuff for python 2.3. Warning: don't use fancy methods!
-try:
-    set
-except NameError:
-    from sets import Set
-    set = Set
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 class WebGroupTests(unittest.TestCase):
     """Test functions related to the WebGroup usage."""

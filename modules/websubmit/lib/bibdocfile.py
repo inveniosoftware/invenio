@@ -32,6 +32,7 @@ import cPickle
 import base64
 import binascii
 import cgi
+import sys
 
 try:
     import magic
@@ -50,10 +51,10 @@ except ImportError:
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
 
-try:
-    set
-except NameError:
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
     from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from invenio.shellutils import escape_shell_arg
 from invenio.dbquery import run_sql, DatabaseError, blob_to_string

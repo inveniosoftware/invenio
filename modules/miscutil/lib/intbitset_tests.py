@@ -22,14 +22,15 @@
 __revision__ = "$Id$"
 
 import unittest
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from invenio.intbitset import intbitset
 from invenio.testutils import make_test_suite, run_test_suite
-
-try:
-    set()
-except NameError:
-    from sets import Set as set
 
 class IntBitSetTest(unittest.TestCase):
     """Test functions related to intbitset data structure."""

@@ -23,6 +23,7 @@ import cgi
 import os
 import datetime
 import time
+import sys
 from urllib import quote
 try:
     from mod_python import apache
@@ -40,10 +41,10 @@ AUTHOR_INST_TAG = "100__u"
 VENUE_TAG = "909C4p"
 KEYWORD_TAG = "6531_a"
 
-try:
-    Set = set
-except NameError:
-    from sets import Set
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from invenio.config import \
      CFG_SITE_URL, \
@@ -523,7 +524,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 ## the restricted collections the user has rights to view.
                 try:
                     restricted_collections = user_info['precached_permitted_restricted_collections']
-                    argd_collections = Set(argd['c'])
+                    argd_collections = set(argd['c'])
                     argd_collections.update(restricted_collections)
                     argd['c'] = list(argd_collections)
                 except KeyError:
@@ -532,7 +533,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
-        involved_collections = Set()
+        involved_collections = set()
         involved_collections.update(argd['c'])
         involved_collections.add(argd['cc'])
 

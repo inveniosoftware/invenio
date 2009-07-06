@@ -19,6 +19,8 @@
 
 __revision__ = "$Id$"
 
+import sys
+
 from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
@@ -34,15 +36,10 @@ try:
 except ImportError:
     pass
 
-
-
-# Compatibility stuff for python 2.3. Warning: don't use fancy methods!
-try:
-    set
-except NameError:
-    from sets import Set
-    set = Set
-
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], \
         ln=CFG_SITE_LANG):
