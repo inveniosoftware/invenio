@@ -27,7 +27,7 @@ FCKConfig.ToolbarSets["WebJournal"] = [
 ['FitWindow','ShowBlocks']
 ];
 
-FCKConfig.EditorAreaCSS = '/img/journal.css' ;
+FCKConfig.EditorAreaCSS = '/img/AtlantisTimes.css' ;
 FCKConfig.CustomStyles = {};
 FCKConfig.EditorAreaStyles = 'body { background-color: White !important}';
 FCKConfig.StylesXmlPath = '/fckeditor/journal-editor-styles.xml' ;
