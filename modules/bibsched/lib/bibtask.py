@@ -90,33 +90,65 @@ def fix_argv_paths(paths, argv=None):
 def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
     @param name: is the name of the bibtask. It must be a valid executable under
-                CFG_BINDIR.
+        C{CFG_BINDIR}.
+    @type name: string
     @param user: is a string that will appear as the "user" submitting the task.
-                Since task are submitted via API it make sense to set the
-                user to the name of the module/function that called
-                task_low_level_submission.
-    @param argv: will be merged with the default setting of the given task as
-                they can be found in bibtask_config. In order to know which
-                variable are valid and which is the semantic, please have
-                a glimpse at bibtask_config and to the source of the
-                task_submit_elaborate_specific_parameter function of the
-                desired bibtask.
-    @return: the task_id when the task is correctly enqueued.
-    Use with care!
-    Please use absolute paths in argv!
+        Since task are submitted via API it make sense to set the
+        user to the name of the module/function that called
+        task_low_level_submission.
+    @type user: string
+    @param argv: are all the additional CLI parameters that would have been
+        passed on the CLI (one parameter per variable).
+        e.g.:
+        >>> task_low_level_submission('bibupload', 'admin', '-a', '/tmp/z.xml')
+    @type: strings
+    @return: the task identifier when the task is correctly enqueued.
+    @rtype: int
+    @note: use absolute paths in argv
     """
     def get_priority(argv):
         """Try to get the priority by analysing the arguments."""
         priority = 0
-        try:
-            stripped_argv = [arg for arg in argv if not arg.startswith('-') or arg.startswith('-P') or arg.startswith('--priority')]
-            opts, args = getopt.gnu_getopt(stripped_argv, 'P:', ['priority='])
-            for opt in opts:
-                if opt[0] in ('-P', '--priority'):
-                    priority = opt[1]
-        except:
-            pass
+        argv = list(argv)
+        while True:
+            try:
+                opts, args = getopt.gnu_getopt(argv, 'P:', ['priority='])
+            except getopt.GetoptError, err:
+                ## We remove one by one all the non recognized parameters
+                if len(err.opt) > 1:
+                    argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
+                else:
+                    argv = [arg for arg in argv if not arg.startswith('-%s' % err.opt)]
+            else:
+                break
+        for opt in opts:
+            if opt[0] in ('-P', '--priority'):
+                try:
+                    priority = int(opt[1])
+                except ValueError:
+                    pass
         return priority
+
+    def get_special_name(argv):
+        """Try to get the special name by analysing the arguments."""
+        special_name = ''
+        argv = list(argv)
+        while True:
+            try:
+                opts, args = getopt.gnu_getopt(argv, 'N:', ['name='])
+            except getopt.GetoptError, err:
+                ## We remove one by one all the non recognized parameters
+                if len(err.opt) > 1:
+                    argv = [arg for arg in argv if arg != '--%s' % err.opt and not arg.startswith('--%s=' % err.opt)]
+                else:
+                    argv = [arg for arg in argv if not arg.startswith('-%s' % err.opt)]
+            else:
+                break
+        for opt in opts:
+            if opt[0] in ('-N', '--name'):
+                special_name = opt[1]
+        return special_name
+
 
     task_id = None
     try:
@@ -124,7 +156,11 @@ def task_low_level_submission(name, user, *argv):
             raise StandardError('%s is not a valid task name' % name)
 
         priority = get_priority(argv)
+        special_name = get_special_name(argv)
         argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
+
+        if special_name:
+            name = '%s:%s' % (name, special_name)
 
         ## submit task:
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
@@ -133,7 +169,7 @@ def task_low_level_submission(name, user, *argv):
             (name, user, marshal.dumps(argv), priority))
 
     except Exception:
-        register_exception()
+        register_exception(alert_admin=True)
         if task_id:
             run_sql("""DELETE FROM schTASK WHERE id=%s""", (task_id, ))
         raise
