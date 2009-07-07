@@ -110,10 +110,8 @@ Contents
               you are using an older version of MySQLdb, you may get
               into problems with character encoding.
 
-     e) mod_python Apache module.  Tested mainly with versions
-        3.0BETA4 and above.  mod_python 3.x is required for Apache 2.
-        Previous versions (as well as Apache 1 ones) exhibited some
-        problems with MySQL connectivity in our experience.
+     e) mod_python Apache module.  Minimal required version is
+        3.3.1.
           <http://www.modpython.org/>
 
      f) If you want to be able to extract references from PDF fulltext

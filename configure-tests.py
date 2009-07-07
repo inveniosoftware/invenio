@@ -25,6 +25,7 @@ running from configure.ac.
 ## minimally recommended/required versions:
 cfg_min_python_version = "2.3"
 cfg_min_mysqldb_version = "1.2.1_p2"
+cfg_min_mod_python_version = "3.3.1"
 
 ## 0) import modules needed for this testing:
 import string
@@ -64,6 +65,7 @@ if sys.version < cfg_min_python_version:
 ## 2) check for required modules:
 try:
     import MySQLdb
+    import mod_python
     import base64
     import cPickle
     import cStringIO
@@ -249,6 +251,24 @@ if MySQLdb.__version__ < cfg_min_mysqldb_version:
     ** for more details.                               **
     *****************************************************
     """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
+    sys.exit(1)
+
+try:
+    current_mod_python_version = mod_python.version
+except AttributeError:
+    # old versions did not have mod_python.version
+    current_mod_python_version = ' ' # space is less then 3
+if current_mod_python_version < cfg_min_mod_python_version:
+    print """
+    *****************************************************
+    ** ERROR: MOD_PYTHON OLD VERSION DETECTED: %s
+    *****************************************************
+    ** You have to upgrade your mod_python to at least **
+    ** version %s.  You must fix this problem       **
+    ** before continuing.  Please see the INSTALL file **
+    ** for more details.                               **
+    *****************************************************
+    """ % (current_mod_python_version, cfg_min_mod_python_version)
     sys.exit(1)
 
 try:

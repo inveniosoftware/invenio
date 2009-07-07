@@ -67,29 +67,6 @@ no_lang_recognition_uris = ['/rss',
                             '/oai2d',
                             '/journal']
 
-def _enhance_req(req):
-    """
-    Enhance the mod_python request object with missing methods due to
-    old version of mod_python.
-    """
-    if not hasattr(req, 'is_https'):
-        if self.subprocess_env.has_key('HTTPS') and \
-                self.subprocess_env['HTTPS'] == 'on':
-            def is_https(self):
-                return 1
-        else:
-            def is_https(self):
-                return 0
-        if sys.hexversion < 0x2060000:
-            import new
-            is_https = new.instancemethod(is_https, req, type(req))
-        else:
-            ## In Python 2.6 new module is deprecated in favour of types.
-            import types
-            is_https = types.MethodType(is_https, req, type(req))
-        setattr(req, 'is_https', is_https)
-    return req
-
 def _debug(msg):
     if DEBUG:
         apache.log_error(msg, apache.APLOG_WARNING)
@@ -341,7 +318,6 @@ def create_handler(root):
 
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
-        req = _enhance_req(req)
         try:
             allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
             req.allow_methods(allowed_methods, 1)
