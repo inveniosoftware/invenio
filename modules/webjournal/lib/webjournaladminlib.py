@@ -34,8 +34,11 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_ETCDIR, \
-     CFG_CACHEDIR
+     CFG_CACHEDIR, \
+     CFG_TMPDIR, \
+     CFG_SITE_SUPPORT_EMAIL
 from invenio.messages import gettext_set_language
+from invenio.mailutils import send_email
 from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalReleaseUpdateError, \
@@ -45,26 +48,32 @@ from invenio.webjournal_utils import \
      get_journals_ids_and_names, \
      guess_journal_name, \
      get_current_issue, \
-     get_current_publication, \
-     get_list_of_issues_for_publication, \
-     count_week_string_up, \
+     get_issue_number_display, \
      get_featured_records, \
      add_featured_record, \
      remove_featured_record, \
      clear_cache_for_issue, \
-     get_current_issue_time, \
-     get_all_issue_weeks, \
      get_next_journal_issues, \
-     issue_times_to_week_strings, \
-     issue_week_strings_to_times, \
-     get_release_time, \
+     get_release_datetime, \
      get_journal_id, \
-     sort_by_week_number, \
-     get_xml_from_config, \
-     get_journal_info_path
-
+     compare_issues, \
+     get_journal_info_path, \
+     get_journal_css_url, \
+     get_journal_alert_sender_email, \
+     get_journal_alert_recipient_email, \
+     get_journal_draft_keyword_to_remove, \
+     get_journal_categories, \
+     get_journal_articles, \
+     get_grouped_issues, \
+     get_journal_issue_grouping
 from invenio.dbquery import run_sql
-
+from invenio.bibrecord import \
+     create_record, \
+     print_rec
+from invenio.bibformat import format_record
+from invenio.bibtask import task_low_level_submission
+from invenio.webjournal_config import \
+     InvenioWebJournalNoJournalOnServerError
 import invenio.template
 wjt = invenio.template.load('webjournal')
 
@@ -129,19 +138,19 @@ def perform_administrate(ln=CFG_SITE_LANG, journal_name=None):
             return e.user_box()
 
     if not can_read_xml_config(journal_name):
-        return '<span style="color:#f00">Configuration could not be read. Please check that %s/webjournal/%s/config.xml exists and can be read by the server.</span><br/>' % (CFG_ETCDIR, journal_name)
+        return '<span style="color:#f00">Configuration could not be read. Please check that %s/webjournal/%s/%s-config.xml exists and can be read by the server.</span><br/>' % (CFG_ETCDIR, journal_name, journal_name)
 
     current_issue = get_current_issue(ln, journal_name)
-    current_publication = get_current_publication(journal_name,
-                                                  current_issue,
-                                                  ln)
-    issue_list = get_list_of_issues_for_publication(current_publication)
-    next_issue_number = count_week_string_up(issue_list[-1])
+    current_publication = get_issue_number_display(current_issue,
+                                                   journal_name,
+                                                   ln)
+    issue_list = get_grouped_issues(journal_name, current_issue)
+    next_issue_number = get_next_journal_issues(issue_list[-1], journal_name, 1)
     return wjt.tmpl_admin_administrate(journal_name,
                                        current_issue,
                                        current_publication,
                                        issue_list,
-                                       next_issue_number,
+                                       next_issue_number[0],
                                        ln)
 
 def perform_feature_record(journal_name,
@@ -245,6 +254,7 @@ def perform_regenerate_issue(issue,
         return wjt.tmpl_admin_regenerate_error(ln,
                                                journal_name,
                                                issue)
+
 def perform_request_issue_control(journal_name, issues,
                                   action, ln=CFG_SITE_LANG):
     """
@@ -266,60 +276,40 @@ def perform_request_issue_control(journal_name, issues,
     out = ''
     if action == "cfg" or action == _("Refresh") or action == _("Add"):
         # find out if we are in update or release
-        try:
-            current_issue_time = get_current_issue_time(journal_name)
-            all_issue_weeks = get_all_issue_weeks(current_issue_time,
-                                                  journal_name,
-                                                  ln)
-        except InvenioWebJournalIssueNotFoundDBError, e:
-            register_exception(req=None)
-            return e.user_box()
-        except InvenioWebJournalJournalIdNotFoundDBError, e:
-            register_exception(req=None)
-            return e.user_box()
-        if max(all_issue_weeks) > current_issue_time:
-            # propose an update
-            next_issue_week = None
-            all_issue_weeks.sort()
-            for issue_week in all_issue_weeks:
-                if issue_week > current_issue_time:
-                    next_issue_week = issue_week
-                    break
+        current_issue = get_current_issue(ln, journal_name)
+        grouped_issues = get_grouped_issues(journal_name, current_issue)
+        if current_issue != grouped_issues[-1]:
+            # The current issue has "pending updates", i.e. is grouped
+            # with unreleased issues. Propose to update these issues
+            next_issue = grouped_issues[grouped_issues.index(current_issue) + 1]
             out = wjt.tmpl_admin_update_issue(ln,
                                               journal_name,
-                                              issue_times_to_week_strings([next_issue_week,])[0],
-                                              issue_times_to_week_strings([current_issue_time,])[0])
+                                              next_issue,
+                                              current_issue)
         else:
-            # propose a release
-            next_issues = get_next_journal_issues(current_issue_time,
-                                                  journal_name)
-            next_issues = issue_times_to_week_strings(next_issues,
-                                                      ln)
+            # Propose a release
+            next_issues = get_next_journal_issues(current_issue,
+                                                  journal_name,
+                                                  n=get_journal_issue_grouping(journal_name))
             if action == _("Refresh"):
                 next_issues += issues
                 next_issues = list(sets.Set(next_issues))# avoid double entries
             elif action == _("Add"):
                 next_issues += issues
                 next_issues = list(sets.Set(next_issues))# avoid double entries
-                next_issues_times = issue_week_strings_to_times(next_issues,
-                                                                ln)
-                highest_issue_so_far = max(next_issues_times)
+                next_issues.sort(compare_issues)
+                highest_issue_so_far = next_issues[-1]
                 one_more_issue = get_next_journal_issues(highest_issue_so_far,
                                                          journal_name,
-                                                         ln,
                                                          1)
-                one_more_issue = issue_times_to_week_strings(one_more_issue,
-                                                            ln)
                 next_issues += one_more_issue
                 next_issues = list(sets.Set(next_issues)) # avoid double entries
-                next_issues.sort()
             else:
-                # get the next (default 2) issue numbers to publish
-                next_issues = get_next_journal_issues(current_issue_time,
+                # get the next issue numbers to publish
+                next_issues = get_next_journal_issues(current_issue,
                                                       journal_name,
-                                                      ln)
-                next_issues = issue_times_to_week_strings(next_issues,
-                                                          ln)
+                                                      n=get_journal_issue_grouping(journal_name))
+            next_issues.sort(compare_issues)
             out = wjt.tmpl_admin_control_issue(ln,
                                                journal_name,
                                                next_issues)
@@ -327,7 +317,19 @@ def perform_request_issue_control(journal_name, issues,
         # Publish the given issues (mark them as current issues)
         publish_issues = issues
         publish_issues = list(sets.Set(publish_issues)) # avoid double entries
-        publish_issues.sort()
+        publish_issues.sort(compare_issues)
+        if len(publish_issues) == 0:
+            # User did not select an issue
+            current_issue = get_current_issue(ln, journal_name)
+            next_issues = get_next_journal_issues(current_issue,
+                                                  journal_name,
+                                                  n=get_journal_issue_grouping(journal_name))
+            out = '<p style="color:#f00;text-align:center">' + \
+                  _('Please select an issue') + '</p>'
+            out += wjt.tmpl_admin_control_issue(ln,
+                                                journal_name,
+                                                next_issues)
+            return out
         try:
             release_journal_issue(publish_issues, journal_name, ln)
         except InvenioWebJournalJournalIdNotFoundDBError, e:
@@ -384,7 +386,7 @@ def perform_request_alert(journal_name, issue,
                   ln  -  language
     """
 
-    if not get_release_time(issue, journal_name, ln):
+    if not get_release_datetime(issue, journal_name, ln):
         # Trying to send an alert for an unreleased issue
         return wjt.tmpl_admin_alert_unreleased_issue(ln,
                                                      journal_name)
@@ -398,9 +400,7 @@ def perform_request_alert(journal_name, issue,
                                                      ln,
                                                      issue)
         plain_text = plain_text.encode('utf-8')
-        recipients = wjt.tmpl_admin_alert_recipients(journal_name,
-                                                     ln,
-                                                     issue)
+        recipients = get_journal_alert_recipient_email(journal_name)
         return wjt.tmpl_admin_alert_interface(ln,
                                               journal_name,
                                               subject,
@@ -420,29 +420,20 @@ def perform_request_alert(journal_name, issue,
                                                          recipients,
                                                          html_mail,
                                                          issue)
+        html_string = None
         if html_mail == "html":
             # Also send as HTML: retrieve from current issue
-            html_file = urlopen('%s/journal/%s?ln=en'
+            html_file = urlopen('%s/journal/%s'
                                 % (CFG_SITE_URL, journal_name))
             html_string = html_file.read()
             html_file.close()
             html_string = put_css_in_file(html_string, journal_name)
-        else:
-            # Send just as plain text
-            html_string = plain_text.replace("<br/>", '\n')
 
-        message = createhtmlmail(html_string, plain_text,
-                                 subject, recipients)
+        sender_email = get_journal_alert_sender_email(journal_name)
+        send_email(sender_email, recipients, subject, plain_text,
+                   html_string, header='', footer='', html_header='',
+                   html_footer='', charset='utf-8')
 
-        ## Transform the recipients string into a list for the mail server:
-        to_addresses = [raw_address.strip() for raw_address in \
-                        recipients.split(",")]
-        recipients = to_addresses
-
-        ## Send the mail:
-        server = smtplib.SMTP("localhost", 25)
-        server.sendmail('Bulletin-Support@cern.ch', recipients, message)
-        # todo: has to go to some messages config
         update_DB_for_alert(issue, journal_name, ln)
         return wjt.tmpl_admin_alert_success_msg(ln,
                                                 journal_name)
@@ -463,8 +454,8 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
         # Read existing config
         if journal_name is not None:
             if not can_read_xml_config(journal_name):
-                return '<span style="color:#f00">Configuration could not be read. Please check that %s/webjournal/%s/config.xml exists and can be read by the server.</span><br/>' % (CFG_ETCDIR, journal_name)
-            config_path = '%s/webjournal/%s/config.xml' % (CFG_ETCDIR, journal_name)
+                return '<span style="color:#f00">Configuration could not be read. Please check that %s/webjournal/%s/%s-config.xml exists and can be read by the server.</span><br/>' % (CFG_ETCDIR, journal_name, journal_name)
+            config_path = '%s/webjournal/%s/%s-config.xml' % (CFG_ETCDIR, journal_name, journal_name)
             xml_config = file(config_path).read()
         else:
             # cannot edit unknown journal...
@@ -477,7 +468,7 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
                 msg = '<span style="color:#f00">A journal with that name already exists. Please choose another name.</span>'
                 action = 'add'
             elif res == -2:
-                msg = '<span style="color:#f00">Configuration could not be written (no permission). Please manually copy your config to %s/webjournal/%s/config.xml</span><br/>' % (CFG_ETCDIR, journal_name)
+                msg = '<span style="color:#f00">Configuration could not be written (no permission). Please manually copy your config to %s/webjournal/%s/%s-config.xml</span><br/>' % (CFG_ETCDIR, journal_name, journal_name)
                 action = 'edit'
             elif res == -4:
                 msg = '<span style="color:#f00">Cache file could not be written (no permission). Please manually create directory %s/webjournal/%s/ and make it writable for your Apache user</span><br/>' % (CFG_CACHEDIR, journal_name)
@@ -489,47 +480,53 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
                 msg = '<span style="color:#f00">An error occurred. The journal could not be added</span>'
                 action = 'edit'
     if action == 'add':
-        # Display a sample config. TODO: makes it less CERN-specific
+        # Display a sample config.
         xml_config = '''<?xml version="1.0" encoding="UTF-8"?>
-<webjournal name="CERNBulletin">
+<webjournal name="AtlantisTimes">
     <view>
-        <niceName>CERN Bulletin</niceName>
-        <niceURL>http://bulletin.cern.ch</niceURL>
+        <niceName>Atlantis Times</niceName>
+        <niceURL>%(CFG_SITE_URL)s</niceURL>
         <css>
-            <screen>img/webjournal_CERNBulletin/webjournal_CERNBulletin_screen.css</screen>
-            <print>img/webjournal_CERNBulletin/webjournal_CERNBulletin_print.css</print>
+            <screen>/img/AtlantisTimes.css</screen>
+            <print>/img/AtlantisTimes.css</print>
         </css>
-        <images>
-            <path>img/Objects/Common</path>
-        </images>
         <format_template>
-            <index>CERN_Bulletin_Index.bft</index>
-            <detailed>CERN_Bulletin_Detailed.bft</detailed>
-            <search>CERN_Bulletin_Search.bft</search>
-            <popup>CERN_Bulletin_Popup.bft</popup>
-            <contact>CERN_Bulletin_Contact.bft</contact>
+            <index>AtlantisTimes_Index.bft</index>
+            <detailed>AtlantisTimes_Detailed.bft</detailed>
+            <search>AtlantisTimes_Search.bft</search>
+            <popup>AtlantisTimes_Popup.bft</popup>
+            <contact>AtlantisTimes_Contact.bft</contact>
         </format_template>
     </view>
 
     <model>
         <record>
-            <rule>News Articles, 980__a:BULLETINNEWS</rule>
-            <rule>Official News, 980__a:BULLETINOFFICIAL</rule>
-            <rule>Training and Development, 980__a:BULLETINTRAINING</rule>
-            <rule>General Information, 980__a:BULLETINGENERAL</rule>
+            <rule>News, 980__a:ATLANTISTIMESNEWS or 980__a:ATLANTISTIMESNEWSDRAFT</rule>
+            <rule>Science, 980__a:ATLANTISTIMESSCIENCE or 980__a:ATLANTISTIMESSCIENCEDRAFT</rule>
+            <rule>Arts, 980__a:ATLANTISTIMESARTS or 980__a:ATLANTISTIMESARTSDRAFT</rule>
         </record>
     </model>
 
     <controller>
-        <widgets>webjournal_weather</widgets>
-        <frequency>14</frequency>
-        <issue_grouping>True</issue_grouping>
+        <issue_grouping>2</issue_grouping>
+	<issues_per_year>52</issues_per_year>
+	<hide_unreleased_issues>all</hide_unreleased_issues>
         <marc_tags>
-            <rule_tag>980__a</rule_tag>
             <issue_number>773__n</issue_number>
+	    <order_number>773__c</order_number>
         </marc_tags>
+	<alert_sender>%(CFG_SITE_SUPPORT_EMAIL)s</alert_sender>
+	<alert_recipients>recipients@atlantis.atl</alert_recipients>
+	<languages>en,fr</languages>
+	<submission>
+            <doctype>DEMOJRN</doctype>
+            <report_number_field>DEMOJRN_RN</report_number_field>
+	</submission>
+        <first_issue>02/2009</first_issue>
+        <draft_keyword>DRAFT</draft_keyword>
     </controller>
-</webjournal>'''
+</webjournal>''' % {'CFG_SITE_URL': CFG_SITE_URL,
+                    'CFG_SITE_SUPPORT_EMAIL': CFG_SITE_SUPPORT_EMAIL}
 
     out = wjt.tmpl_admin_configure_journal(ln=ln,
                                            journal_name=journal_name,
@@ -565,7 +562,7 @@ def add_journal(journal_name, xml_config):
         try:
             if not os.path.exists(config_dir):
                 os.makedirs(config_dir)
-            xml_config_file = file(config_dir + 'config.xml', 'w')
+            xml_config_file = file(config_dir + journal_name + '-config.xml', 'w')
             xml_config_file.write(xml_config)
             xml_config_file.close()
         except Exception:
@@ -589,9 +586,8 @@ def add_journal(journal_name, xml_config):
 
 def remove_journal(journal_name):
     """
-    Remove a journal from the DB. Keep everything else, since the
-    journal should still be accessible.
-    TODO: Think about removing config.xml file too if needed.
+    Remove a journal from the DB.  Does not completely remove
+    everything, in case it was an error from the editor..
 
     Parameters:
          journal_name  -  the journal to remove
@@ -621,7 +617,7 @@ def release_journal_issue(publish_issues, journal_name, ln=CFG_SITE_LANG):
     """
     journal_id = get_journal_id(journal_name, ln)
     if len(publish_issues) > 1:
-        publish_issues.sort(sort_by_week_number)
+        publish_issues.sort(compare_issues)
         low_bound = publish_issues[0]
         high_bound = publish_issues[-1]
         issue_display = '%s-%s/%s' % (low_bound.split("/")[0],
@@ -632,6 +628,7 @@ def release_journal_issue(publish_issues, journal_name, ln=CFG_SITE_LANG):
         issue_display = publish_issues[0]
     # produce the DB lines
     for publish_issue in publish_issues:
+        move_drafts_articles_to_ready(journal_name, publish_issue)
         run_sql("INSERT INTO jrnISSUE (id_jrnJOURNAL, issue_number, issue_display) \
                 VALUES(%s, %s, %s)", (journal_id,
                                       publish_issue,
@@ -707,11 +704,83 @@ def release_journal_update(update_issue, journal_name, ln=CFG_SITE_LANG):
     """
     Releases an update to a journal.
     """
+    move_drafts_articles_to_ready(journal_name, update_issue)
     journal_id = get_journal_id(journal_name, ln)
     run_sql("UPDATE jrnISSUE set date_released=NOW() \
                 WHERE issue_number=%s \
                 AND id_jrnJOURNAL=%s", (update_issue,
                                         journal_id))
+
+def move_drafts_articles_to_ready(journal_name, issue):
+    """
+    Move draft articles to their final "collection".
+
+    To do so we rely on the convention that an admin-chosen keyword
+    must be removed from the metadata
+    """
+    protected_datafields = ['100', '245', '246', '520', '590', '700']
+    keyword_to_remove = get_journal_draft_keyword_to_remove(journal_name)
+
+    categories = get_journal_categories(journal_name, issue)
+    for category in categories:
+        articles = get_journal_articles(journal_name, issue, category)
+        for order, recids in articles.iteritems():
+            for recid in recids:
+                record_xml = format_record(recid, of='xm')
+                if not record_xml:
+                    continue
+                new_record_xml_path = os.path.join(CFG_TMPDIR,
+                                                   'webjournal_publish_' + \
+                                                   str(recid) + '.xml')
+                if os.path.exists(new_record_xml_path):
+                    # Do not modify twice
+                    continue
+                record_struc = create_record(record_xml)
+                record = record_struc[0]
+                new_record = update_draft_record_metadata(record,
+                                                          protected_datafields,
+                                                          keyword_to_remove)
+                new_record_xml = print_rec(new_record)
+                if new_record_xml.find(keyword_to_remove) >= 0:
+                    new_record_xml = new_record_xml.replace(keyword_to_remove, '')
+                    # Write to file
+                    new_record_xml_file = file(new_record_xml_path, 'w')
+                    new_record_xml_file.write(new_record_xml)
+                    new_record_xml_file.close()
+                    # Submit
+                    task_low_level_submission('bibupload',
+                                              'WebJournal',
+                                              '-c', new_record_xml_path)
+
+def update_draft_record_metadata(record, protected_datafields, keyword_to_remove):
+    """
+    Returns a new record with fields that should be modified in order
+    for this draft record to be considered as 'ready': keep only
+    controlfield 001 and non-protected fields that contains the
+    'keyword_to_remove'
+
+    Parameters:
+                  record - a single recored (as BibRecord structure)
+
+    protected_datafields - *list* tags that should not be part of the
+                           returned record
+
+       keyword_to_remove - *str* keyword that should be considered
+                           when checking if a field should be part of
+                           the returned record.
+    """
+    new_record = {}
+    for tag, field in record.iteritems():
+        if tag in protected_datafields:
+            continue
+        elif not keyword_to_remove in str(field) and \
+                 not tag == '001':
+            continue
+        else:
+            # Keep
+            new_record[tag] = field
+
+    return new_record
 
 ######################## XML CONFIG ###############################
 
@@ -720,7 +789,8 @@ def can_read_xml_config(journal_name):
     Check that configuration xml for given journal name is exists and
     can be read.
     """
-    config_path = '%s/webjournal/%s/config.xml' % (CFG_ETCDIR, journal_name)
+    config_path = '%s/webjournal/%s/%s-config.xml' % \
+                  (CFG_ETCDIR, journal_name, journal_name)
     try:
         file(config_path).read()
     except IOError:
@@ -729,63 +799,6 @@ def can_read_xml_config(journal_name):
     return True
 
 ######################## EMAIL HELPER FUNCTIONS ###############################
-
-def createhtmlmail (html, text, subject, toaddr):
-    """
-    Create a mime-message that will render HTML in popular
-    MUAs, text in better ones.
-    """
-    out = cStringIO.StringIO() # output buffer for our message
-    htmlin = cStringIO.StringIO(html)
-    txtin = cStringIO.StringIO(text)
-
-    writer = MimeWriter.MimeWriter(out)
-    #
-    # set up some basic headers... we put subject here
-    # because smtplib.sendmail expects it to be in the
-    # message body
-    #
-    writer.addheader("Subject", subject)
-    writer.addheader("MIME-Version", "1.0")
-
-    ## Instead of a comma-separated "To" field, add a new "To" header for
-    ## each of the addresses:
-    to_addresses = [raw_address.strip() for raw_address in toaddr.split(",")]
-    for to_address in to_addresses:
-        writer.addheader("To", to_address)
-    #
-    # start the multipart section of the message
-    # multipart/alternative seems to work better
-    # on some MUAs than multipart/mixed
-    #
-    writer.startmultipartbody("alternative")
-    writer.flushheaders()
-    #
-    # the plain text section
-    #
-    subpart = writer.nextpart()
-    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-    #pout = subpart.startbody("text/plain", [("charset", 'us-ascii')])
-    pout = subpart.startbody("text/plain", [("charset", 'utf-8')])
-    mimetools.encode(txtin, pout, 'quoted-printable')
-    txtin.close()
-    #
-    # start the html subpart of the message
-    #
-    subpart = writer.nextpart()
-    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-    pout = subpart.startbody("text/html", [("charset", 'utf-8')])
-    mimetools.encode(htmlin, pout, 'quoted-printable')
-    htmlin.close()
-    #
-    # Now that we're done, close our writer and
-    # return the message body
-    #
-    writer.lastpart()
-    msg = out.getvalue()
-    out.close()
-    print msg
-    return msg
 
 def put_css_in_file(html_message, journal_name):
     """
@@ -799,15 +812,10 @@ def put_css_in_file(html_message, journal_name):
     Returns:
           the HTML message with its CSS inlined
     """
-    config_strings = get_xml_from_config(["screen"], journal_name)
-    try:
-        css_path = config_strings["screen"][0]
-    except Exception:
-        register_exception(req=None,
-                           suffix="No css file for journal %s. Is this right?"
-                           % journal_name)
+    css_path = get_journal_css_url(journal_name)
+    if not css_path:
         return
-    css_file = urlopen('%s/%s' % (CFG_SITE_URL, css_path))
+    css_file = urlopen(css_path)
     css = css_file.read()
     css = make_full_paths_in_css(css, journal_name)
     html_parted = html_message.split("</head>")
@@ -852,5 +860,3 @@ def make_full_paths_in_css(css, journal_name):
     for url in rel_to_full_path.keys():
         css = css.replace(url, rel_to_full_path[url])
     return css
-
-

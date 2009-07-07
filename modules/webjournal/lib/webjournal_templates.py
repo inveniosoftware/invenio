@@ -22,10 +22,7 @@ BibFormat format templates files.
 """
 
 import os
-import time
-
 from invenio.config import \
-     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_ETCDIR, \
      CFG_SITE_URL, \
@@ -34,9 +31,9 @@ from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import \
      get_number_of_articles_for_issue, \
-     get_release_time, \
-     get_announcement_time, \
-     get_current_publication
+     get_release_datetime, \
+     get_announcement_datetime, \
+     get_issue_number_display
 
 class Template:
     """Templating class, refer to bibformat.py for examples of call"""
@@ -57,10 +54,14 @@ class Template:
             all_journals = find_journals('%s/webjournal/' % CFG_ETCDIR)
         except:
             all_journals = []
+
+        mail_msg = _("Contact %(x_url_open)sthe administrator%(x_url_close)s") % \
+                   {'x_url_open' :
+                    '<a href="mailto:%s">' % CFG_SITE_SUPPORT_EMAIL,
+                    'x_url_close' : '</a>'}
         box = '''
         <div style="text-align: center;">
-            <fieldset style="width:400px; margin-left: auto; margin-right:
-            auto;background: url('%s/img/blue_gradient.gif') top left repeat-x;">
+            <fieldset style="width:400px; margin-left: auto; margin-right:auto">
                 <legend style="color:#a70509;background-color:#fff;">
                     <i>%s</i>
                 </legend>
@@ -71,20 +72,18 @@ class Template:
                 </ul>
                 <br/>
                 <div style="text-align:right;">
-                    Mail
-                    <a href="mailto:%s"> the Administrator.</a>
+                %s
                 </div>
             </fieldset>
         </div>
-                ''' % (CFG_SITE_URL,
-                       box_title,
+                ''' % (box_title,
                        box_text,
                        box_list_title,
                        "".join(['<li><a href="%s/journal/?name=%s">%s</a></li>'
                                 % (CFG_SITE_URL,
                                    journal,
                                    journal) for journal in all_journals]),
-                       CFG_SITE_ADMIN_EMAIL)
+                       mail_msg)
         return page(title=title, body=box)
 
     def tmpl_webjournal_error_box(self, ln, title, title_msg, msg):
@@ -95,13 +94,13 @@ class Template:
         title = _(title)
         title_msg = _(title_msg)
         msg = _(msg)
-        mail_msg = _("Mail %(x_url_open)sdevelopers%(x_url_close)s") % {'x_url_open' :
-            '<a href="mailto:%s">' % CFG_SITE_SUPPORT_EMAIL,
-            'x_url_close' : '</a>'}
+        mail_msg = _("Contact %(x_url_open)sthe administrator%(x_url_close)s") % \
+                   {'x_url_open' :
+                    '<a href="mailto:%s">' % CFG_SITE_SUPPORT_EMAIL,
+                    'x_url_close' : '</a>'}
         box = '''
         <div style="text-align: center;">
-            <fieldset style="width:400px; margin-left: auto; margin-right: auto;
-            background: url('%s/img/red_gradient.gif') top left repeat-x;">
+            <fieldset style="width:400px; margin-left: auto; margin-right: auto;">
                 <legend style="color:#a70509;background-color:#fff;">
                     <i>%s</i>
                 </legend>
@@ -112,7 +111,7 @@ class Template:
                 </div>
             </fieldset>
         </div>
-                ''' % (CFG_SITE_URL, title_msg, msg, mail_msg)
+                ''' % (title_msg, msg, mail_msg)
         return page(title=title, body=box)
 
     def tmpl_admin_regenerate_success(self, ln, journal_name, issue):
@@ -224,7 +223,7 @@ class Template:
         Customize this function to return different default texts
         based on journal name and language,
         """
-        current_publication = get_current_publication(journal_name, issue)
+        current_publication = get_issue_number_display(issue, journal_name, ln)
         plain_text = u'''Dear Subscriber,
 
     The latest issue of %(journal_name)s, no. %(current_publication)s, has been released.
@@ -257,18 +256,9 @@ Cher Abonné,
         based on journal name and language,
         """
         return "%s %s released" % (journal_name, \
-                                   get_current_publication(journal_name,
-                                                           issue))
-
-    def tmpl_admin_alert_recipients(self, journal_name, ln, issue):
-        """
-        Default recipients for email alert of journal updates.
-
-        Customize this function to return different recipients
-        based on journal name and language.
-        Must return a list of comma-separated emails
-        """
-        return ""
+                                   get_issue_number_display(issue,
+                                                            journal_name,
+                                                            ln))
 
     def tmpl_admin_alert_interface(self, ln, journal_name, default_subject,
                                    default_msg, default_recipients):
@@ -277,24 +267,33 @@ Cher Abonné,
         """
         _ = gettext_set_language(ln)
         interface = '''
+        <table>
+        <tr>
+        <td valign="top">
         <form action="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/alert" name="alert" method="post">
             <input type="hidden" name="journal_name" value="%(journal_name)s"/>
             <p>Recipients:</p>
-            <input type="text" name="recipients" value="%(default_recipients)s" size="100" />
+            <input type="text" name="recipients" value="%(default_recipients)s" size="60" />
             <p>Subject:</p>
-            <input type="text" name="subject" value="%(subject)s" readonly="readonly" size="100" />
+            <input type="text" name="subject" value="%(subject)s" readonly="readonly" size="60" />
             <p>Plain Text Message:</p>
-            <textarea name="plainText" wrap="soft" rows="25" cols="85">%(plain_text)s</textarea>
-            <p> Send Homepage as html:
-               <input type="checkbox" name="htmlMail" value="html" checked="checked" />
+            <textarea name="plainText" wrap="soft" rows="25" cols="80">%(plain_text)s</textarea>
+            <p> <input type="checkbox" name="htmlMail" id="htmlMail" value="html" checked="checked" />
+               <label for="htmlMail">Send journal front-page <small>(<em>HTML newsletter</em>)</small></label>
             </p>
             <br/>
             <input class="formbutton" type="submit" value="Send Alert" name="sent"/>
-        </form>''' % {'CFG_SITE_URL': CFG_SITE_URL,
-                      'journal_name': journal_name,
-                      'subject': default_subject,
-                      'plain_text': default_msg,
-                      'default_recipients': default_recipients}
+        </form>
+        </td><td valign="top">
+        <p>HTML newsletter preview:</p>
+        <iframe id="htmlMailPreview" src="%(CFG_SITE_URL)s/journal/%(journal_name)s" height="600" width="600"></iframe>
+        </tr>
+        </table>
+        ''' % {'CFG_SITE_URL': CFG_SITE_URL,
+               'journal_name': journal_name,
+               'subject': default_subject,
+               'plain_text': default_msg,
+               'default_recipients': default_recipients}
 
         return interface
 
@@ -312,13 +311,11 @@ Cher Abonné,
             <input type="hidden" name="plainText" value="%(plain_text)s" />
             <input type="hidden" name="htmlMail" value="%(html_mail)s" />
             <input type="hidden" name="force" value="True" />
-            <p><em>ATTENTION! </em>The alert email for the issue %(issue)s has already been
-            sent. Are you absolutely sure you want to resend it?</p>
+            <p><em>WARNING! </em>The email alert for the issue %(issue)s has already been
+            sent. Are you absolutely sure you want to it send it again?</p>
             <p>Maybe you forgot to release an update issue? If so, please do this
             first <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%(journal_name)s&amp;issue=%(issue)s">here</a>.</p>
-            <p>Be aware, if you go on with this, the whole configured mailing list
-            will receive this message a second time. Only proceed if you know what
-            you are doing!</p>
+            <p>Proceed with caution, or your subscribers will receive the alert a second time.</p>
             <br/>
             <input class="formbutton" type="submit" value="I really want this!" name="sent"/>
         </form>
@@ -414,7 +411,7 @@ Cher Abonné,
                  <a href="%s/journal/%s"> %s </a>
                  </p>
                  <p>Make additional publications here: >>
-                 <a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">Issue Interface</a>
+                 <a href="%s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%s">Publishing Interface</a>
                 </p>
                 <p>Send an alert email here: >>
                 <a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s"> Send an alert</a>
@@ -473,7 +470,7 @@ Cher Abonné,
                  <a href="%s/journal/%s"> %s </a>
                  </p>
                  <p>Go back to the publishing interface: >>
-                 <a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">Issue Interface</a>
+                 <a href="%s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%s">Issue Interface</a>
                  </p>
                  <p>Send an alert email here: >>
                  <a href="%s/journal/alert?name=%s"> Send an alert</a>
@@ -510,8 +507,8 @@ Cher Abonné,
             articles = get_number_of_articles_for_issue(issue,
                                                         journal_name,
                                                         ln)
-            released_on = get_release_time(issue, journal_name, ln)
-            announced_on = get_announcement_time(issue, journal_name, ln)
+            released_on = get_release_datetime(issue, journal_name, ln)
+            announced_on = get_announcement_datetime(issue, journal_name, ln)
             issue_box = '''
                 <tr style="%s">
                     <td class="admintdright" style="vertical-align: middle;"></td>
@@ -527,7 +524,7 @@ Cher Abonné,
                         <p>%s</p>
                     </td>
                     <td class="admintdright" style="vertical-align: middle;">
-                        <p><a href="%s/journal/regenerate?name=%s&issue=%s">&gt;regenerate</a></p>
+                        <p><a href="%s/admin/webjournal/webjournaladmin.py/regenerate?journal_name=%s&amp;issue=%s&amp;ln=%s">&gt;regenerate</a></p>
                     </td>
                 <tr>
             ''' % ((issue==current_issue) and "background:#00FF00;" or "background:#F1F1F1;",
@@ -540,15 +537,15 @@ Cher Abonné,
                                 issue.split('/')[1], issue.split('/')[0], item[0]) \
                                for item in articles.iteritems()]),
 
-                    (released_on==False) and
+                    (not released_on) and
                     '<em>not released</em><br/><a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">&gt;release now</a>' % (CFG_SITE_URL, journal_name) or
-                    'released on: %s' % time.strftime("%d.%m.%Y", released_on),
+                    'released on: %s' % released_on.strftime("%d.%m.%Y"),
 
-                    (announced_on==False)
+                    (not announced_on)
                     and '<em>not announced</em><br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;announce now</a>' % (CFG_SITE_URL, journal_name, issue) or
-                    'announced on: %s <br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;re-announce</a>' % (time.strftime("%d.%m.%Y", announced_on), CFG_SITE_URL, journal_name, issue),
+                    'announced on: %s <br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;re-announce</a>' % (announced_on.strftime("%d.%m.%Y"), CFG_SITE_URL, journal_name, issue),
 
-                    CFG_SITE_URL, journal_name, issue
+                    CFG_SITE_URL, journal_name, issue, ln
                 )
             issue_boxes.append(issue_box)
         out += '''

@@ -84,6 +84,9 @@ be tweaked to give various output.</dd>
 <dd>Describes information useful to understand what can be found inside the miscellaneous utilities
 module, like database access, error management, date handling library, etc.</dd>
 
+<dt><a href="webjournal-internals">WebJournal Internals</a></dt>
+<dd>Describes the WebJournal database and required MARC tags for article records.</dd>
+
 <dt><a href="search-engine-internals">WebSearch Internals</a></dt>
 <dd>Describes information useful to understand the search process
 internals, like the different search stages, the high- and low-level
@@ -101,6 +104,7 @@ internals, its API, etc.</dd>
 
 <dt><a href="bibsched-bibtask">Bibliographic Task Howto</a></dt>
 <dd>Describes how to customize create a new Bibliographic Task.</dd>
+
 
 </dl>
 </blockquote>

@@ -2252,4 +2252,9 @@ UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','k
 INSERT INTO expJOB (jobname) VALUES ('sitemap');
 INSERT INTO expJOB (jobname) VALUES ('googlescholar');
 
+-- WebJournal demo:
+INSERT INTO jrnJOURNAL (id,name) VALUES(1,'AtlantisTimes');
+INSERT INTO jrnISSUE (id_jrnJOURNAL,issue_number,issue_display,date_released,date_announced) VALUES (1,'02/2009','02-03/2009','2009-01-09','2009-01-09');
+INSERT INTO jrnISSUE (id_jrnJOURNAL,issue_number,issue_display,date_released) VALUES (1,'03/2009','02-03/2009','2009-01-16');
+
 -- end of file

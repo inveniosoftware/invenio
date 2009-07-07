@@ -26,7 +26,10 @@ __lastupdated__ = """$Date$"""
 import urllib
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
+from invenio.config import \
+     CFG_SITE_URL, \
+     CFG_SITE_LANG, \
+     CFG_CERN_SITE
 from invenio.webuser import getUid
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
@@ -39,14 +42,12 @@ from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalNoArticleNumberError, \
      InvenioWebJournalNoPopupRecordError, \
+     InvenioWebJournalIssueNotFoundDBError, \
      InvenioWebJournalNoCategoryError
 from invenio.webjournal_utils import \
-     get_xml_from_config, \
      get_current_issue, \
-     guess_journal_name, \
-     get_current_issue, \
-     get_journal_id, \
-     get_recid_from_legacy_number
+     get_recid_from_legacy_number, \
+     get_journal_categories
 from invenio.webjournal_washer import \
      wash_category, \
      wash_issue_number, \
@@ -79,7 +80,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs """
         if component in ['article', 'issue_control', 'edit_article', 'alert',
-                         'feature_record', 'regenerate', 'administrate']:
+                         'feature_record', 'regenerate', 'administrate'] and \
+                         CFG_CERN_SITE:
             return WebInterfaceJournalPagesLegacy(), [component]
 
         return self, []
@@ -94,14 +96,14 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         article_id = None
         if len(path) > 1:
             journal_name = path[1]
-        if len(path) > 2:
+        if len(path) > 2 and path[2].isdigit():
             journal_issue_year = path[2]
-        if len(path) > 3:
+        if len(path) > 3 and path[3].isdigit():
             journal_issue_number = path[3]
         if len(path) > 4:
             category = urllib.unquote(path[4])
         if len(path) > 5 and path[5].isdigit():
-            article_id = path[5]
+            article_id = int(path[5])
 
         ## Support for legacy journal/[empty]?(args*) urls. There are
         ## these parameters only in that case
@@ -136,7 +138,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             except InvenioWebJournalJournalIdNotFoundDBError, e:
                 register_exception(req=req)
                 return e.user_box()
-            category = wash_category(ln, argd['category'], journal_name).replace(' ', '%20')
+            category = wash_category(ln, argd['category'], journal_name, issue).replace(' ', '%20')
             redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
                             {'name': journal_name,
                              'issue_year': issue_year,
@@ -146,41 +148,51 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
 
         ## End support for legacy urls
 
-        # Check that given journal name exists.
-        if journal_name:
-            try:
-                get_journal_id(journal_name)
-            except InvenioWebJournalJournalIdNotFoundDBError, e:
-                register_exception(req=req)
-                return e.user_box()
+        # Check that given journal name exists and that it is written
+        # with correct casing.
+        redirect_p = False
+        try:
+            washed_journal_name = wash_journal_name(argd['ln'], journal_name)
+            if washed_journal_name != journal_name:
+                redirect_p = True
+        except InvenioWebJournalNoNameError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoJournalOnServerError, e:
+            register_exception(req=req)
+            return e.user_box()
 
         # If some parameters are missing, deduce them and
         # redirect
-        if not journal_name or \
-           not journal_issue_year or \
+        if not journal_issue_year or \
            not journal_issue_number or \
-           not category:
-            if not journal_name:
-                try:
-                    journal_name = guess_journal_name(argd['ln'])
-                except InvenioWebJournalNoJournalOnServerError, e:
-                    register_exception(req=req)
-                    return e.user_box()
-                except InvenioWebJournalNoNameError, e:
-                    register_exception(req=req)
-                    return e.user_box()
+           not category or \
+           redirect_p:
             if not journal_issue_year or not journal_issue_number:
-                journal_issue = get_current_issue(argd['ln'], journal_name)
+                journal_issue = get_current_issue(argd['ln'], washed_journal_name)
                 journal_issue_year = journal_issue.split('/')[1]
                 journal_issue_number = journal_issue.split('/')[0]
-
             if not category:
-                config_strings = get_xml_from_config(["index", "rule", "issue_number"],
-                                                     journal_name)
-                rule_list = config_strings["rule"]
-                category = rule_list[0].split(",")[0].replace(' ', '%20')
+                categories = get_journal_categories(washed_journal_name,
+                                                    journal_issue_number + \
+                                                    '/' + journal_issue_year)
+                if not categories:
+                    # Mmh, it seems that this issue has no
+                    # category. Ok get all of them regardless of the
+                    # issue
+                    categories = get_journal_categories(washed_journal_name)
+                    if not categories:
+                        # Mmh we really have no category!
+                        try:
+                            raise InvenioWebJournalIssueNotFoundDBError(argd['ln'],
+                                                                        journal_name,
+                                                                        '')
+                        except InvenioWebJournalIssueNotFoundDBError, e:
+                            register_exception(req=req)
+                            return e.user_box()
+                category = categories[0].replace(' ', '%20')
             redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
-                            {'name': journal_name,
+                            {'name': washed_journal_name,
                              'issue_year': journal_issue_year,
                              'issue_number': journal_issue_number,
                              'category': category,
@@ -193,9 +205,9 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                             journal_issue_year
 
         try:
-            journal_name = wash_journal_name(argd['ln'], journal_name)
+            journal_name = washed_journal_name
             issue = wash_issue_number(argd['ln'], journal_name, journal_issue)
-            category = wash_category(argd['ln'], category, journal_name)
+            category = wash_category(argd['ln'], category, journal_name, issue)
         except InvenioWebJournalNoJournalOnServerError, e:
             register_exception(req=req)
             return e.user_box()
@@ -226,7 +238,6 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                          editor,
                                          verbose=argd['verbose'])
         else:
-            #req.journal_defaults["editor"] = editor
             html = perform_request_article(req,
                                            journal_name,
                                            journal_issue,
@@ -247,7 +258,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                    })
         try:
             ln = wash_journal_language(argd['ln'])
-            journal_name = wash_journal_name(ln, argd['name'])
+            washed_journal_name = wash_journal_name(ln, argd['name'])
         except InvenioWebJournalNoJournalOnServerError, e:
             register_exception(req=req)
             return e.user_box()
@@ -255,8 +266,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
 
-        html = perform_request_contact(req, ln, journal_name,
-                                      verbose=argd['verbose'])
+        html = perform_request_contact(req, ln, washed_journal_name,
+                                       verbose=argd['verbose'])
 
         return html
 
@@ -270,8 +281,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                    })
         try:
             ln = wash_journal_language(argd['ln'])
-            journal_name = wash_journal_name(ln, argd['name'])
-            record = wash_popup_record(ln, argd['record'], journal_name)
+            washed_journal_name = wash_journal_name(ln, argd['name'])
+            record = wash_popup_record(ln, argd['record'], washed_journal_name)
         except InvenioWebJournalNoJournalOnServerError, e:
             register_exception(req=req)
             return e.user_box()
@@ -282,7 +293,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
 
-        html = perform_request_popup(req, ln, journal_name, record)
+        html = perform_request_popup(req, ln, washed_journal_name, record)
 
         return html
 
@@ -300,11 +311,12 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                    'ln': (str, CFG_SITE_LANG),
                                    'verbose': (int, 0)})
         try:
+            # FIXME: if journal_name is empty, redirect
             ln = wash_journal_language(argd['ln'])
-            journal_name = wash_journal_name(ln, argd['name'])
-            archive_issue = wash_issue_number(ln, journal_name,
+            washed_journal_name = wash_journal_name(ln, argd['name'])
+            archive_issue = wash_issue_number(ln, washed_journal_name,
                                               argd['archive_issue'])
-            archive_date = wash_archive_date(ln, journal_name,
+            archive_date = wash_archive_date(ln, washed_journal_name,
                                              argd['archive_date'])
             archive_select = argd['archive_select']
             archive_search = argd['archive_search']
@@ -328,7 +340,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             return e.user_box()
 
         html = perform_request_search(req=req,
-                                      journal_name=journal_name,
+                                      journal_name=washed_journal_name,
                                       ln=ln,
                                       archive_issue=archive_issue,
                                       archive_select=archive_select,
@@ -364,7 +376,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             journal_name = wash_journal_name(ln, argd['name'])
             issue_number = wash_issue_number(ln, journal_name,
                                              argd['issue'])
-            category = wash_category(ln, argd['category'], journal_name)
+            category = wash_category(ln, argd['category'], journal_name, issue_number)
         except InvenioWebJournalNoJournalOnServerError, e:
             register_exception(req=req)
             return e.user_box()
@@ -415,7 +427,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
                                       argd['issue'])
             issue_year = issue.split('/')[1]
             issue_number = issue.split('/')[0]
-            category = wash_category(ln, argd['category'], journal_name)
+            category = wash_category(ln, argd['category'], journal_name, issue_number)
             number = wash_article_number(ln, argd['number'], journal_name)
             recid = get_recid_from_legacy_number(issue, category, int(number))
         except InvenioWebJournalNoJournalOnServerError, e:

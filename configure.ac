@@ -632,10 +632,12 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webhelp/web/admin/howto/Makefile \
 	  modules/webhelp/web/hacking/Makefile \
 	  modules/webjournal/Makefile \
+	  modules/webjournal/etc/Makefile \
 	  modules/webjournal/doc/Makefile \
 	  modules/webjournal/doc/admin/Makefile \
 	  modules/webjournal/doc/hacking/Makefile \
 	  modules/webjournal/lib/Makefile \
+	  modules/webjournal/lib/elements/Makefile \
 	  modules/webjournal/lib/widgets/Makefile \
 	  modules/webjournal/web/Makefile \
 	  modules/webjournal/web/admin/Makefile \

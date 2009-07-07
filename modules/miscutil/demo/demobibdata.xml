@@ -22306,4 +22306,183 @@
       <subfield code="s">Phys. Rev. D 54 (1996) 7561</subfield>
     </datafield>
   </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">BUL-NEWS-2009-001</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Charles Darwin</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">A naturalist's voyage around the world</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">After having been twice driven back by heavy south-western gales, Her Majesty's ship Beagle" a ten-gun brig, under the command of Captain Fitz Roy, R.N., sailed from Devonport on the 27th of December, 1831. The object of the expedition was to complete the survey of Patagonia and Tierra del Fuego, commenced under Captain King in 1826 to 1830--to survey the shores of Chile, Peru, and of some islands in the Pacific--and to carry a chain of chronometrical measurements round the World.&lt;/p> &lt;div class="phwithcaption"> &lt;div class="imageScale">&lt;img alt="" src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_hms_beagle_image.gif" />&lt;/div> &lt;p>H.M.S. Beagle&lt;/p> &lt;/div> &lt;p>On the 6th of January we reached Teneriffe, but were prevented landing, by fears of our bringing the cholera: the next morning we saw the sun rise behind the rugged outline of the Grand Canary Island, and suddenly illumine the Peak of Teneriffe, whilst the lower parts were veiled in fleecy clouds. This was the first of many delightful days never to be forgotten. On the 16th of January 1832 we anchored at Porto Praya, in St. Jago, the chief island of the Cape de Verd archipelago.&lt;/p> &lt;p>The neighbourhood of Porto Praya, viewed from the sea, wears a desolate aspect. The volcanic fires of a past age, and the scorching heat of a tropical sun, have in most places rendered the soil unfit for vegetation. The country rises in successive steps of table-land, interspersed with some truncate conical hills, and the horizon is bounded by an irregular chain of more lofty mountains. The scene, as beheld through the hazy atmosphere of this climate, is one of great interest; if, indeed, a person, fresh from sea, and who has just walked, for the first time, in a grove of cocoa-nut trees, can be a judge of anything but his own happiness. The island would generally be considered as very uninteresting, but to any one accustomed only to an English landscape, the novel aspect of an utterly sterile land possesses a grandeur which more vegetation might spoil. A single green leaf can scarcely be discovered over wide tracts of the lava plains; yet flocks of goats, together with a few cows, contrive to exist. It rains very seldom, but during a short portion of the year heavy torrents fall, and immediately afterwards a light vegetation springs out of every crevice. This soon withers; and upon such naturally formed hay the animals live. It had not now rained for an entire year. When the island was discovered, the immediate neighbourhood of Porto Praya was clothed with trees,1 the reckless destruction of which has caused here, as at St. Helena, and at some of the Canary islands, almost entire sterility. The broad, flat-bottomed valleys, many of which serve during a few days only in the season as watercourses, are clothed with thickets of leafless bushes. Few living creatures inhabit these valleys. The commonest bird is a kingfisher (Dacelo Iagoensis), which tamely sits on the branches of the castor-oil plant, and thence darts on grasshoppers and lizards. It is brightly coloured, but not so beautiful as the European species: in its flight, manners, and place of habitation, which is generally in the driest valley, there is also a wide difference. One day, two of the officers and myself rode to Ribeira Grande, a village a few miles eastward of Porto Praya. Until we reached the valley of St. Martin, the country presented its usual dull brown appearance; but here, a very small rill of water produces a most refreshing margin of luxuriant vegetation. In the course of an hour we arrived at Ribeira Grande, and were surprised at the sight of a large ruined fort and cathedral. This little town, before its harbour was filled up, was the principal place in the island: it now presents a melancholy, but very picturesque appearance. Having procured a black Padre for a guide, and a Spaniard who had served in the Peninsular war as an interpreter, we visited a collection of buildings, of which an ancient church formed the principal part. It is here the governors and captain-generals of the islands have been buried. Some of the tombstones recorded dates of the sixteenth century.1 The heraldic ornaments were the only things in this retired place that reminded us of Europe. The church or chapel formed one side of a quadrangle, in the middle of which a large clump of bananas were growing. On another side was a hospital, containing about a ozen miserable-looking inmates.&lt;/p> &lt;p>We returned to the Vênda to eat our dinners. A considerable number of men, women, and children, all as black as jet, collected to watch us. Our companions were extremely merry; and everything we said or did was followed by their hearty laughter. Before leaving the town we visited the cathedral. It does not appear so rich as the smaller church, but boasts of a little organ, which sent forth singularly inharmonious cries. We presented the black priest with a few shillings, and the Spaniard, patting him on the head, said, with much candour, he thought his colour made no great difference. We then returned, as fast as the ponies would go, to Porto Praya.&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 1, By Charles Darwin)</subfield>
+    </datafield>
+    <datafield tag="590" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">3</subfield>
+      <subfield code="n">02/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">3</subfield>
+      <subfield code="n">03/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ATLANTISTIMESNEWS</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_hms_beagle_image.gif</subfield>
+      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_hms_beagle_image.gif</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">BUL-NEWS-2009-002</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Plato</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Atlantis (Critias)</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">I have before remarked in speaking of the allotments of the gods, that they distributed the whole earth into portions differing in extent, and made for themselves temples and instituted sacrifices. And Poseidon, receiving for his lot the island of Atlantis, begat children by a mortal woman, and settled them in a part of the island, which I will describe.&lt;/p> &lt;p>Looking towards the sea, but in the centre of the whole island, there was a plain which is said to have been the fairest of all plains and very fertile. Near the plain again, and also in the centre of the island at a distance of about fifty stadia, there was a mountain not very high on any side. In this mountain there dwelt one of the earth-born primeval men of that country, whose name was Evenor, and he had a wife named Leucippe, and they had an only daughter who was called Cleito. The maiden had already reached womanhood, when her father and mother died; Poseidon fell in love with her and had intercourse with her, and breaking the ground, inclosed the hill in which she dwelt all round, making alternate zones of sea and land larger and smaller, encircling one another; there were two of land and three of water, which he turned as with a lathe, each having its circumference equidistant every way from the centre, so that no man could get to the island, for ships and voyages were not as yet. He himself, being a god, found no difficulty in making special arrangements for the centre island, bringing up two springs of water from beneath the earth, one of warm water and the other of cold, and making every variety of food to spring up abundantly from the soil. He also begat and brought up five pairs of twin male children; and dividing the island of Atlantis into ten portions, he gave to the first-born of the eldest pair his mother's dwelling and the surrounding allotment, which was the largest and best, and made him king over the rest; the others he made princes, and gave them rule over many men, and a large territory. And he named them all; the eldest, who was the first king, he named Atlas, and after him the whole island and the ocean were called Atlantic. To his twin brother, who was born after him, and obtained as his lot the extremity of the island towards the pillars of Heracles, facing the country which is now called the region of Gades in that part of the world, he gave the name which in the Hellenic language is Eumelus, in the language of the country which is named after him, Gadeirus. Of the second pair of twins he called one Ampheres, and the other Evaemon. To the elder of the third pair of twins he gave the name Mneseus, and Autochthon to the one who followed him. Of the fourth pair of twins he called the elder Elasippus, and the younger Mestor. And of the fifth pair he gave to the elder the name of Azaes, and to the younger that of Diaprepes. All these and their descendants for many generations were the inhabitants and rulers of divers islands in the open sea; and also, as has been already said, they held sway in our direction over the country within the pillars as far as Egypt and Tyrrhenia. Now Atlas had a numerous and honourable family, and they retained the kingdom, the eldest son handing it on to his eldest for many generations; and they had such an amount of wealth as was never before possessed by kings and potentates, and is not likely ever to be again, and they were furnished with everything which they needed, both in the city and country. For because of the greatness of their empire many things were brought to them from foreign countries, and the island itself provided most of what was required by them for the uses of life. In the first place, they dug out of the earth whatever was to be found there, solid as well as fusile, and that which is now only a name and was then something more than a name, orichalcum, was dug out of the earth in many parts of the island, being more precious in those days than anything except gold. There was an abundance of wood for carpenter's work, and sufficient maintenance for tame and wild animals. Moreover, there were a great number of elephants in the island; for as there was provision for all other sorts of animals, both for those which live in lakes and marshes and rivers, and also for those which live in mountains and on plains, so there was for the animal which is the largest and most voracious of all. Also whatever fragrant things there now are in the earth, whether roots, or herbage, or woods, or essences which distil from fruit and flower, grew and thrived in that land; also the fruit which admits of cultivation, both the dry sort, which is given us for nourishment and any other which we use for food&amp;mdash;we call them all by the common name of pulse, and the fruits having a hard rind, affording drinks and meats and ointments, and good store of chestnuts and the like, which furnish pleasure and amusement, and are fruits which spoil with keeping, and the pleasant kinds of dessert, with which we console ourselves after dinner, when we are tired of eating&amp;mdash;all these that sacred island which then beheld the light of the sun, brought forth fair and wondrous and in infinite abundance. With such blessings the earth freely furnished them; meanwhile they went on constructing their temples and palaces and harbours and docks.&lt;/p> (Excerpt from CRITIAS, By Plato, translated By Jowett, Benjamin)</subfield>
+    </datafield>
+    <datafield tag="590" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">2</subfield>
+      <subfield code="n">02/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">2</subfield>
+      <subfield code="n">03/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ATLANTISTIMESNEWS</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">BUL-NEWS-2009-003</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Plato</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Atlantis (Timaeus)</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">This great island lay over against the Pillars of Heracles, in extent greater than Libya and Asia put together, and was the passage to other islands and to a great ocean of which the Mediterranean sea was only the harbour; and within the Pillars the empire of Atlantis reached in Europe to Tyrrhenia and in Libya to Egypt.&lt;/p> &lt;p>This mighty power was arrayed against Egypt and Hellas and all the countries&lt;/p> &lt;div class="phrwithcaption"> &lt;div class="imageScale">&lt;img src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif" alt="" />&lt;/div> &lt;p>Representation of Atlantis by Athanasius Kircher (1669)&lt;/p> &lt;/div> bordering on the Mediterranean. Then your city did bravely, and won renown over the whole earth. For at the peril of her own existence, and when the other Hellenes had deserted her, she repelled the invader, and of her own accord gave liberty to all the nations within the Pillars. A little while afterwards there were great earthquakes and floods, and your warrior race all sank into the earth; and the great island of Atlantis also disappeared in the sea. This is the explanation of the shallows which are found in that part of the Atlantic ocean. &lt;p> &lt;/p> (Excerpt from TIMAEUS, By Plato, translated By Jowett, Benjamin)&lt;br /></subfield>
+    </datafield>
+    <datafield tag="590" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">02/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">03/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">04/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ATLANTISTIMESNEWS</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
+      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">BUL-SCIENCE-2009-001</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Charles Darwin</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">The order Rodentia in South America</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;p>The order Rodentia is here very numerous in species: of mice alone I obtained no less than eight kinds. &lt;sup>&lt;a name="note1" href="#footnote1">1&lt;/a>&lt;/sup>The largest gnawing animal in the world, the Hydrochærus capybara (the water-hog), is here also common. One which I shot at Monte Video weighed ninety-eight pounds: its length, from the end of the snout to the stump-like tail, was three feet two inches; and its girth three feet eight. These great Rodents occasionally frequent the islands in the mouth of the Plata, where the water is quite salt, but are far more abundant on the borders of fresh-water lakes and rivers. Near Maldonado three or four generally live together. In the daytime they either lie among the aquatic plants, or openly feed on the turf plain.&lt;sup>&lt;a name="note2" href="#footnote2">2&lt;/a>&lt;/sup>&lt;/p> &lt;p> &lt;div class="phlwithcaption"> &lt;div class="imageScale">&lt;img src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_water_dog_image.gif" alt="" />&lt;/div> &lt;p>Hydrochærus capybara or Water-hog&lt;/p> &lt;/div> When viewed at a distance, from their manner of walking and colour they resemble pigs: but when seated on their haunches, and attentively watching any object with one eye, they reassume the appearance of their congeners, cavies and rabbits. Both the front and side view of their head has quite a ludicrous aspect, from the great depth of their jaw. These animals, at Maldonado, were very tame; by cautiously walking, I approached within three yards of four old ones. This tameness may probably be accounted for, by the Jaguar having been banished for some years, and by the Gaucho not thinking it worth his while to hunt them. As I approached nearer and nearer they frequently made their peculiar noise, which is a low abrupt grunt, not having much actual sound, but rather arising from the sudden expulsion of air: the only noise I know at all like it, is the first hoarse bark of a large dog. Having watched the four from almost within arm's length (and they me) for several minutes, they rushed into the water at full gallop with the greatest impetuosity, and emitted at the same time their bark. After diving a short distance they came again to the surface, but only just showed the upper part of their heads. When the female is swimming in the water, and has young ones, they are said to sit on her back. These animals are easily killed in numbers; but their skins are of trifling value, and the meat is very indifferent. On the islands in the Rio Parana they are exceedingly abundant, and afford the ordinary prey to the Jaguar.&lt;/p> &lt;p>&lt;small>&lt;sup>&lt;a name="footnote1" href="#note1">1&lt;/a>&lt;/sup>. In South America I collected altogether twenty-seven species of mice, and thirteen more are known from the works of Azara and other authors. Those collected by myself have been named and described by Mr. Waterhouse at the meetings of the Zoological Society. I must be allowed to take this opportunity of returning my cordial thanks to Mr. Waterhouse, and to the other gentleman attached to that Society, for their kind and most liberal assistance on all occasions.&lt;/small>&lt;/p> &lt;p>&lt;small>&lt;sup>&lt;a name="footnote2" href="#note2">2&lt;/a>&lt;/sup>. In the stomach and duodenum of a capybara which I opened, I found a very large quantity of a thin yellowish fluid, in which scarcely a fibre could be distinguished. Mr. Owen informs me that a part of the oesophagus is so constructed that nothing much larger than a crowquill can be passed down. Certainly the broad teeth and strong jaws of this animal are well fitted to grind into pulp the aquatic plants on which it feeds.&lt;/small>&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 3, By Charles Darwin)</subfield>
+    </datafield>
+    <datafield tag="590" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;br />test fr</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">02/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">03/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ATLANTISTIMESSCIENCE</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_water_dog_image.gif</subfield>
+      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_water_dog_image.gif</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="037" ind1=" " ind2=" ">
+      <subfield code="a">BUL-NEWS-2009-004</subfield>
+    </datafield>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">eng</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">Charles Darwin</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">Rio Macâe</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">April 14th, 1832.—Leaving Socêgo, we rode to another estate on the Rio Macâe, which was the last patch of cultivated ground in that direction. The estate was two and a half miles long, and the owner had forgotten how many broad.&lt;/p> &lt;p> &lt;div class="phlwithcaption"> &lt;div class="imageScale">&lt;img src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_virgin_forest_image.gif" alt="" />&lt;/div> &lt;p>Virgin Forest&lt;/p> &lt;/div> Only a very small piece had been cleared, yet almost every acre was capable of yielding all the various rich productions of a tropical land. Considering the enormous area of Brazil, the proportion of cultivated ground can scarcely be considered as anything compared to that which is left in the state of nature: at some future age, how vast a population it will support! During the second day's journey we found the road so shut up that it was necessary that a man should go ahead with a sword to cut away the creepers. The forest abounded with beautiful objects; among which the tree ferns, though not large, were, from their bright green foliage, and the elegant curvature of their fronds, most worthy of admiration. In the evening it rained very heavily, and although the thermometer stood at 65°, I felt very cold. As soon as the rain ceased, it was curious to observe the extraordinary evaporation which commenced over the whole extent of the forest. At the height of a hundred feet the hills were buried in a dense white vapour, which rose like columns of smoke from the most thickly-wooded parts, and especially from the valleys. I observed this phenomenon on several occasions: I suppose it is owing to the large surface of foliage, previously heated by the sun's rays.&lt;/p> &lt;p>While staying at this estate, I was very nearly being an eye-witness to one of those atrocious acts which can only take place in a slave country. Owing to a quarrel and a lawsuit, the owner was on the point of taking all the women and children from the male slaves, and selling them separately at the public auction at Rio. Interest, and not any feeling of compassion, prevented this act. Indeed, I do not believe the inhumanity of separating thirty families, who had lived together for many years, even occurred to the owner. Yet I will pledge myself, that in humanity and good feeling he was superior to the common run of men. It may be said there exists no limit to the blindness of interest and selfish habit. I may mention one very trifling anecdote, which at the time struck me more forcibly than any story of cruelty. I was crossing a ferry with a negro who was uncommonly stupid. In endeavouring to make him understand, I talked loud, and made signs, in doing which I passed my hand near his face. He, I suppose, thought I was in a passion, and was going to strike him; for instantly, with a frightened look and half-shut eyes, he dropped his hands. I shall never forget my feelings of surprise, disgust, and shame, at seeing a great powerful man afraid even to ward off a blow, directed, as he thought, at his face. This man had been trained to a degradation lower than the slavery of the most helpless animal.&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 2, By Charles Darwin)</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="c">1</subfield>
+      <subfield code="n">03/2009</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">ATLANTISTIMESNEWS</subfield>
+      <subfield code="t">Atlantis Times</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_virgin_forest_image.gif</subfield>
+      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_virgin_forest_image.gif</subfield>
+    </datafield>
+  </record>
 </collection>

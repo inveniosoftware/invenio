@@ -143,7 +143,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
 
             #for sentence in s_abstract:
             #    out += sentence + "."
-            out = '. '.join(s_abstract)
+            out += '. '.join(s_abstract)
 
             # Add final dot if needed
             if abstract_fr.endswith('.'):

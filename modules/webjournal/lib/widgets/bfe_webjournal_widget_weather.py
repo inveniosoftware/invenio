@@ -17,59 +17,72 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
+WebJournal widget - Display weather forecast
 """
-from invenio import errorlib
-from invenio.config import CFG_CACHEDIR
+import os
+import time
+import re
+from urllib2 import urlopen
 try:
+    # Try to load feedparser.  Remember for later if it was installed
+    # or not. Note that feedparser is slow to load: if we don't load
+    # it in a 'global' way, it will be loaded for every call to this
+    # element.
+    global feedparser
     import feedparser
     feedparser_available = 1
 except ImportError:
     feedparser_available = 0
-import time
-from urllib2 import urlopen
+
+from invenio.config import \
+     CFG_CACHEDIR, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.errorlib import register_exception
-import re
+from invenio.webjournal_utils import \
+     parse_url_string
+from invenio.messages import gettext_set_language
 
-Weather_Service = "Yahoo! Weather"
-# rss feed on yahoo weather, check developer.yahoo.com/weather for details
-RSS_Feed = "http://weather.yahooapis.com/forecastrss?p=SZXX0008&u=c"
-# filename of the rss feed in cache
-Cached_Filename = "webjournal_widget_YahooWeather.rss"
-# filename of flat file in cache that holds the expire time
-Expire_Time_Filename = "weather_RSS_expires"
+re_image_pattern = re.compile(r'<img\s*(class=["\']imageScale["\'])*?\s*src="(?P<image>\S*)"\s*/>',
+                              re.DOTALL | re.IGNORECASE | re.VERBOSE)
 
-image_pattern = re.compile('''
-                           <img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*/>*
-                           ''', re.DOTALL | re.IGNORECASE | re.VERBOSE)
+yahoo_weather_rss_base_url = 'http://weather.yahooapis.com/forecastrss?p=%(location)s&u=%(degree_unit)s'
 
-def format(bfo, title_en="", title_fr=""):
+def format(bfo, location='SZXX0008', degree_unit='c' ,
+           display_weather_icon='false', weather_icon_only='false'):
     """
-    wrapper function needed for BibFormat to route the widget HTML
+    Display the latest weather forecast from Yahoo Weather
+
+    @param location Yahoo location code for the forecast
+    @param degree_unit Degree unit ('f'=Fahrenheit or 'c'=Celsius)
+    @param display_weather_icon if 'true', display weather icon inside the forecasts
+    @param weather_icon_only it 'true' display only the wheater icon (without text)
+
     """
-    out = get_widget_HTML()
-    if bfo.lang == "fr":
-        title = title_fr
-    else:
-        title = title_en
-    if title != "":
+    args = parse_url_string(bfo.user_info['uri'])
+    journal_name = args["journal_name"]
+    cached_filename = "webjournal_widget_weather_%s.rss" % journal_name
+    expire_time_filename = "webjournal_widget_weather_%s_RSS_expires" % \
+                           journal_name
+
+    out = get_widget_html(yahoo_weather_rss_base_url % \
+                          {'location': location, 'degree_unit': degree_unit},
+                          cached_filename,
+                          expire_time_filename,
+                          journal_name)
+
+    if weather_icon_only == 'true':
         try:
-            weather_image_match = image_pattern.findall(out)[0]
-            weather_image = weather_image_match[1]
-            out = re.sub(image_pattern, "", out)
+            out = '<img alt="" src="%s" align="bottom" />' % \
+                  re_image_pattern.findall(out)[0][1]
         except:
             register_exception(req=bfo.req)
-            weather_image = ""
-        weather_image = weather_image.replace("\"", "\'")
-        out = '''
-<div id="weather" style="background: url(%s) left bottom no-repeat;" class="rmenuitem">
-    <h3 class="rmenutext">
-        <a href="http://weather.yahoo.com/" target="_blank">%s</a>
-    </h3>
-</div>
-<p class="rmenulist">
-%s
-</p>
-''' % (weather_image, title, out)
+            out = ''
+    elif display_weather_icon == 'false':
+        try:
+            out = re.sub(re_image_pattern, "", out)
+        except:
+            register_exception(req=bfo.req)
+            out = ''
 
     return out
 
@@ -80,7 +93,7 @@ def escape_values(bfo):
     """
     return 0
 
-def get_widget_HTML():
+def get_widget_html(yahoo_weather_rss, cached_filename, expire_time_filename, journal_name):
     """
     weather forecast using Yahoo! Weather service
     we check and store the "expires" data from the rss feed to decide when
@@ -88,52 +101,118 @@ def get_widget_HTML():
     there always resides a cached version in cds CFG_CACHEDIR along with a flat
     file that indicates the time when the feed expires.
     """
-    if not feedparser_available:
-        return ''
+    cached_weather_box =  _get_weather_from_cache(journal_name)
+    if cached_weather_box:
+        return cached_weather_box
 
+    # No HTML cache? Then read locally saved feed data, and even
+    # refresh it from Yahoo if it has expired.
     try:
-        weather_feed = feedparser.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
+        weather_feed = feedparser.parse('%s/%s' % \
+                                        (CFG_CACHEDIR, cached_filename))
     except:
-        _update_feed()
-        weather_feed = feedparser.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
+        try:
+            _update_feed(yahoo_weather_rss, cached_filename, expire_time_filename)
+            weather_feed = feedparser.parse('%s/%s' % \
+                                            (CFG_CACHEDIR, cached_filename))
+        except:
+            return "<ul><li><i>" + _("No information available") + "</i></li></ul>"
 
     now_in_gmt = time.gmtime()
-    now_time_string = time.strftime( "%a, %d %b %Y %H:%M:%S GMT", now_in_gmt)
     try:
-        expire_time_string = open('%s/%s' % (CFG_CACHEDIR, Expire_Time_Filename)).read()
-        expire_time = time.strptime(open(Expire_Time_Filename).read(), "%a, %d %b %Y %H:%M:%S %Z")
-        #expire_time['tm_isdt'] = 0
-        expire_in_seconds = time.mktime(expire_time)
-        now_in_seconds = time.mktime(now_in_gmt)
+        expire_time = time.strptime(open(expire_time_filename).read(),
+                                    "%a, %d %b %Y %H:%M:%S %Z")
         diff = time.mktime(expire_time) - time.mktime(now_in_gmt)
     except:
         diff = -1
     if diff < 0:
-        _update_feed()
-        weather_feed = feedparser.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
+        try:
+            _update_feed(yahoo_weather_rss, cached_filename, expire_time_filename)
+            weather_feed = feedparser.parse('%s/%s' % \
+                                            (CFG_CACHEDIR, cached_filename))
+        except:
+            return "<ul><li><i>" + _("No information available") + "</i></li></ul>"
 
-    # construct the HTML
+    # Construct the HTML. Well, simply take the one provided by
+    # Yahoo..
     html = weather_feed.entries[0]['summary']
+    cache_weather(html, journal_name)
 
     return html
 
 
-def _update_feed():
+def _get_weather_from_cache(journal_name):
     """
-    helper function that updates the feed by copying the new rss file to the
-    cache dir and resetting the time string on the expireTime flat file
+    Try to get the weather information from cache. Return False if
+    cache does not exist
     """
-    feed = urlopen(RSS_Feed)
-    cached_file = open('%s/%s' % (CFG_CACHEDIR, Cached_Filename), 'w')
+    cache_path = os.path.realpath('%s/webjournal/%s/weather.html' % \
+                                  (CFG_CACHEDIR,
+                                   journal_name))
+    if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
+        # Make sure we are reading from correct directory (you
+        # know, in case there are '../../' inside journal name..)
+        return False
+    try:
+        last_update = os.path.getctime(cache_path)
+    except:
+        return False
+
+    now = time.time()
+    if (last_update + 15*60) < now:
+        # invalidate after 15 minutes
+        return False
+    try:
+        cached_file = open(cache_path).read()
+    except:
+        return False
+
+    return cached_file
+
+def cache_weather(html, journal_name):
+    """
+    Caches the weather box for 30 minutes.
+    """
+    if not CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+        cache_path = os.path.realpath('%s/webjournal/%s/weather.html' % \
+                                      (CFG_CACHEDIR,
+                                       journal_name))
+        if cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
+            # Do not try to cache if the journal name led us to some
+            # other directory ('../../' inside journal name for
+            # example)
+            cache_dir = CFG_CACHEDIR + '/webjournal/' + journal_name
+            if not os.path.isdir(cache_dir):
+                os.makedirs(cache_dir)
+            cache_file = file(cache_path, "w")
+            cache_file.write(html)
+            cache_file.close()
+
+def _update_feed(yahoo_weather_rss, cached_filename, expire_time_filename):
+    """
+    Retrieve the latest weather information from Yahoo and write it to
+    'cached_filename'. Also write the supposed expiration date
+    provided by Yahoo to 'expire_time_filename'.
+    """
+    default_timeout = socket.getdefaulttimeout()
+    socket.setdefaulttimeout(2.0)
+    try:
+        try:
+            feed = urlopen(yahoo_weather_rss)
+        except:
+            return
+    finally:
+        socket.setdefaulttimeout(default_timeout)
+
+    cached_file = open('%s/%s' % (CFG_CACHEDIR, cached_filename), 'w')
     cached_file.write(feed.read())
     cached_file.close()
-    feed_data = feedparser.parse(RSS_Feed)
+
+    feed_data = feedparser.parse(yahoo_weather_rss)
     expire_time = feed_data.headers['expires']
-    expire_file = open('%s/%s' % (CFG_CACHEDIR, Expire_Time_Filename), 'w')
+    expire_file = open('%s/%s' % (CFG_CACHEDIR, expire_time_filename), 'w')
     expire_file.write(expire_time)
     expire_file.close()
 
-if __name__ == "__main__":
-    from invenio.bibformat_engine import BibFormatObject
-    myrec = BibFormatObject(7)
-    format(myrec)
+_ = gettext_set_language('en')
+dummy = _("Under the CERN sky")

@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
-##
+## -*- mode: html; coding: utf-8; -*-
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -17,32 +17,24 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# Consider moving this element to CERN specific CVS
-CFG_TWO_TO_THREE_LETTER_MAPPING = {}
-CFG_TWO_TO_THREE_LETTER_MAPPING["en"] = "eng"
-CFG_TWO_TO_THREE_LETTER_MAPPING["fr"] = "fre"
+<!-- WebDoc-Page-Title: WebJournal Internals -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Revision: $Id$ -->
 
-def format(bfo, letters="2", filter='no'):
-    """
-    Returns the user-chosen langage.
+<p>This page summarizes all the information suitable to dig inside
+WebJournal internals.</p>
 
-    @param letters: Can be 2 or 3, to return for example "en" or "eng"
-    @param filter: if 'yes', returns only know languages
-    """
-    ln = bfo.lang
-    if filter.lower() == 'yes' and \
-           ln not in CFG_TWO_TO_THREE_LETTER_MAPPING.keys():
-        ln = 'en'
+<blockquote>
+<dl>
 
-    if letters == "3":
-        try:
-            return CFG_TWO_TO_THREE_LETTER_MAPPING[ln]
-        except:
-            return ln
-    else:
-        return ln
+<dt><a href="webjournal-record-metadata">WebJournal Record
+Metadata</a></dt>
+<dd>Describes the requirements on the MARC tags for a record to be
+considered as an article by WebJournal.</dd>
 
-def escape_values(bfo):
-    """
-    """
-    return 0
+<dt><a href="webjournal-table-structure">WebJournal Table Structure</a></dt>
+<dd>Documents the details of the WebJournal database.</dd>
+
+</dl>
+
+</blockquote>

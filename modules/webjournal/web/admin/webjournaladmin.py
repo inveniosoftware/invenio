@@ -62,8 +62,8 @@ def index(req, ln=CFG_SITE_LANG, journal_name=None, action=""):
         journal_name = wash_journal_name(ln, journal_name)
         action = wash_url_argument(action, 'str')
     except InvenioWebJournalNoJournalOnServerError, e:
-        register_exception(req=req)
-        return e.user_box()
+        # Ok, no journal. Let the admin add one...
+        pass
     except InvenioWebJournalNoNameError, e:
         register_exception(req=req)
         return e.user_box()
@@ -195,6 +195,9 @@ def alert(req, journal_name="", ln=CFG_SITE_LANG, sent="False", plainText=u"",
         register_exception(req=req)
         return e.user_box()
     except InvenioWebJournalIssueNumberBadlyFormedError, e:
+        register_exception(req=req)
+        return e.user_box()
+    except InvenioWebJournalJournalIdNotFoundDBError, e:
         register_exception(req=req)
         return e.user_box()
 
@@ -340,12 +343,12 @@ def configure(req, journal_name=None, ln=CFG_SITE_LANG, xml_config=u'', action='
         return error_page(req)
 
     try:
-        journal_name = wash_journal_name(ln, journal_name)
+        journal_name = wash_journal_name(ln, journal_name, guess=False)
         xml_config = wash_url_argument(xml_config, 'str')
         action = wash_url_argument(action, 'str')
     except InvenioWebJournalNoJournalOnServerError, e:
-        register_exception(req=req)
-        return e.user_box()
+        # Ok, no journal. Let the admin add one...
+        pass
     except InvenioWebJournalNoNameError, e:
         register_exception(req=req)
         return e.user_box()

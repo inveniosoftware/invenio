@@ -15,16 +15,13 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = widgets
+SUBDIRS = widgets elements
 
 pylibdir = $(libdir)/python/invenio
 pylib_DATA = webjournal_webinterface.py webjournal_utils.py \
              webjournal_config.py webjournal.py webjournal_washer.py \
              webjournal_templates.py webjournaladminlib.py
 
-formatdir = $(pylibdir)/bibformat_elements
-format_DATA = bfe_ObjectLanguage.py
-
-EXTRA_DIST = $(pylib_DATA) $(format_DATA)
+EXTRA_DIST = $(pylib_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

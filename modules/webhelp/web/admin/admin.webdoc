@@ -344,6 +344,23 @@ engine.
 </td>
 </tr>
 
+<tr>
+<td>
+  <strong>WebJournal Admin</strong>
+</td>
+
+<td> Enables you to configure and run an online journal hosted on your
+ CDS Invenio server, using the same tools and concepts at those you
+ use to manage bibliographic data.  </td>
+
+<td>
+  <a href="<CFG_SITE_URL>/admin/webjournal/webjournaladmin.py">WebJournal Admin Interface</a>
+</td>
+<td>
+  <a href="webjournal-admin-guide">WebJournal Admin Guide</a><br/><br/>
+  <a href="webjournal-editor-guide">WebJournal Editor Guide</a>
+</td>
+</tr>
 </table>
 
 <h3>Personalization related modules</h3>

@@ -16,7 +16,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""
+WebJournal input parameters washing related functions
+"""
 import time
 import re
 from invenio.webjournal_config import \
@@ -28,12 +30,12 @@ from invenio.webjournal_config import \
 from invenio.webjournal_utils import \
      get_current_issue, \
      guess_journal_name, \
-     get_xml_from_config, \
-     get_categories_from_rule_list
+     get_journal_categories, \
+     get_journal_nb_issues_per_year
 from invenio.config import CFG_SITE_LANG
 
 # precompiled patterns for the parameters
-issue_number_pattern = re.compile("^\d{1,2}/\d{4}$")
+issue_number_pattern = re.compile("^\d{1,3}/\d{4}$")
 
 def wash_journal_language(ln):
     """
@@ -45,13 +47,16 @@ def wash_journal_language(ln):
     else:
         return ln
 
-def wash_journal_name(ln, journal_name):
+def wash_journal_name(ln, journal_name, guess=True):
     """
-    Washes the journal name parameter. In case of non-empty string, returns it,
-    otherwise redirects to a guessing function.
+    Washes the journal name parameter. In case of non-empty string,
+    returns it, otherwise redirects to a guessing function.
+
+    If 'guess' is True the function tries to fix the capitalization of
+    the journal name.
     """
-    if journal_name == "":
-        return guess_journal_name(ln)
+    if guess or not journal_name:
+        return guess_journal_name(ln, journal_name)
     else:
         return journal_name
 
@@ -67,21 +72,19 @@ def wash_issue_number(ln, journal_name, issue_number):
         issue_number_match = issue_number_pattern.match(issue_number)
         if issue_number_match:
             issue_number = issue_number_match.group()
-            if len(issue_number.split("/")[0]) == 1:
-                issue_number = "0%s" % issue_number
-            return issue_number
+            number, year = issue_number.split('/')
+            number_issues_per_year = get_journal_nb_issues_per_year(journal_name)
+            precision = len(str(number_issues_per_year))
+            return ("%0" + str(precision) + "i/%s") % (int(number), year)
         else:
             raise InvenioWebJournalIssueNumberBadlyFormedError(ln,
                                                                issue_number)
 
-def wash_category(ln, category, journal_name):
+def wash_category(ln, category, journal_name, issue):
     """
     Washes a category name.
     """
-    config_strings = get_xml_from_config(["rule"],
-                                         journal_name)
-    categories = get_categories_from_rule_list(config_strings["rule"])
-
+    categories = get_journal_categories(journal_name, issue=None)
     if category in categories:
         return category
     elif category == "" and len(categories) > 0:

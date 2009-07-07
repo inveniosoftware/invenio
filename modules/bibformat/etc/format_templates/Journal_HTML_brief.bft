@@ -1,0 +1,12 @@
+<name>Journal HTML brief</name>
+<description>Brief HTML format for journals.</description>
+<strong><BFE_TITLE_BRIEF highlight="no"/></strong>
+<BFE_AUTHORS limit="4" prefix=" / " extension=" ;<em> et al</em> " highlight="no"/>
+
+<BFE_ABSTRACT limit="3" escape="4" prefix="<br /><small>" suffix="</small><br/>"
+highlight="no" contextual="no"/>
+
+<small>Published in: <a href="<BFE_SERVER_INFO var="CFG_SITE_URL" />journal/AtlantisTimes/">Atlantis Times <BFE_FIELD tag="773__n" instances_separator=", "/></a></small>
+
+
+
