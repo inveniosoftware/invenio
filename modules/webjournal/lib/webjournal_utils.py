@@ -349,6 +349,15 @@ def _cache_journal_articles(journal_name, issue, category, articles):
     if not journal_info.has_key('journal_articles'):
         journal_info['journal_articles'] = {}
     journal_info['journal_articles'][category] = articles
+
+    # Create cache directory if it does not exist
+    journal_cache_dir = os.path.dirname(journal_cache_path)
+    if not os.path.exists(journal_cache_dir):
+        try:
+            os.makedirs(journal_cache_dir)
+        except:
+            return False
+
     journal_cache_file = open(journal_cache_path, 'w')
     cPickle.dump(journal_info, journal_cache_file)
     journal_cache_file.close()
