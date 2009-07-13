@@ -252,7 +252,7 @@ class Template:
           <td>&nbsp;5.&nbsp;<small><a href="%(adminurl)s/jschecklist">Available Checks</a></small></td>
          </tr>
          <tr>
-          <td>6.&nbsp;<small><a href="%(adminurl)s/elementlist">Available Element descriptions</a></small></td>
+          <td>6.&nbsp;<small><a href="%(adminurl)s/elementlist">Available Elements</a></small></td>
           <td>&nbsp;7.&nbsp;<small><a href="%(adminurl)s/functionlist">Available Functions</a></small></td>
           <td>&nbsp;8.&nbsp;<small><a href="%(adminurl)s/organisesubmissionpage">Organise Main Page</a></small></td>
           <td colspan=2>&nbsp;9.&nbsp;<small><a href="%(siteurl)s/help/admin/websubmit-admin-guide">Guide</a></small></td>
