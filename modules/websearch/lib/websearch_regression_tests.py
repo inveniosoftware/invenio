@@ -654,6 +654,14 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_target=CFG_SITE_URL+"/search?ln=en&p=embed",
                                                expected_link_label='embed'))
 
+    def test_nearest_terms_box_in_unsuccessful_simple_accented_query(self):
+        """ websearch - nearest terms box for unsuccessful accented query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=elliszà',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=embed",
+                                               expected_link_label='embed'))
+
     def test_nearest_terms_box_in_unsuccessful_structured_query(self):
         """ websearch - nearest terms box for unsuccessful structured query """
         self.assertEqual([],
@@ -676,6 +684,11 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_label='Enqvist, K'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%22ellisz%22&f=author',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
+                                               expected_link_label='Enqvist, K'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%22elliszà%22&f=author',
                                                expected_text="Nearest terms in any collection are",
                                                expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))

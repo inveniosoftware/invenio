@@ -2175,16 +2175,20 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         # check which fields contained the requested parameter, and replace it.
         for (px, fx) in ('p', 'f'), ('p1', 'f1'), ('p2', 'f2'), ('p3', 'f3'):
             if px in argd:
+                argd_px = argd[px]
+                if t == 'w':
+                    # p was stripped of accents, to do the same:
+                    argd_px = strip_accents(argd_px)
                 if f == argd[fx] or f == "anyfield" or f == "":
-                    if string.find(argd[px], p) > -1:
-                        argd[px] = string.replace(argd[px], p, term)
+                    if string.find(argd_px, p) > -1:
+                        argd[px] = string.replace(argd_px, p, term)
                         break
                 else:
-                    if string.find(argd[px], f+':'+p) > -1:
-                        argd[px] = string.replace(argd[px], f+':'+p, f+':'+term)
+                    if string.find(argd_px, f+':'+p) > -1:
+                        argd[px] = string.replace(argd_px, f+':'+p, f+':'+term)
                         break
-                    elif string.find(argd[px], f+':"'+p+'"') > -1:
-                        argd[px] = string.replace(argd[px], f+':"'+p+'"', f+':"'+term+'"')
+                    elif string.find(argd_px, f+':"'+p+'"') > -1:
+                        argd[px] = string.replace(argd_px, f+':"'+p+'"', f+':"'+term+'"')
                         break
 
         terminfo.append((term, hits, argd))
