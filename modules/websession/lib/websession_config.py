@@ -67,3 +67,19 @@ CFG_WEBSESSION_INFO_MESSAGES = {"GROUP_CREATED": 'You have successfully created 
                                 "LEAVE_GROUP": 'You have successfully left a group.'
 
 }
+
+CFG_WEBSESSION_COOKIE_NAME = "INVENIOSESSION"
+CFG_WEBSESSION_ONE_DAY = 86400 #: how many seconds are there in one day
+CFG_WEBSESSION_CLEANUP_CHANCE = 10000 #: cleanups have 1 in CLEANUP_CHANCE chance
+
+## FIXME: Session locking is currently disabled because, since it's
+## implementing the mod_python technique of using Apache mutexes, these
+## are by default a very limited resources (according to
+## <http://www.modpython.org/live/current/doc-html/inst-apacheconfig.html#l2h-21>)
+## only 8 mutexes are available by default)
+## Since the session would be locked at constructor time and unlocked at
+## destructor time, and since we cache the session for the whole request
+## handling time, enabling locking would mean that at most only 8 requests
+## could been handled at the same time. This is quite limited and, anyway
+## there's already local locking available thanks to our MySQL backend.
+CFG_WEBSESSION_ENABLE_LOCKING = False

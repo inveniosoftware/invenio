@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -16,761 +18,504 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-CDS session management, without persistence (code adpated from Quixote).
-See websession.py for persistence.
+Session management adapted from mod_python Session class.
 
-There are two levels to CDS session management system:
-  - SessionManager
-  - Session
-
-A SessionManager is responsible for creating sessions, setting and reading
-session cookies, maintaining the collection of all sessions, and so forth.
-There should be one SessionManager instance per process.
-SessionManager is a generic class borrowed from Quixote, the class
-MPSessionManager provides the session management on top of mod_python requests.
-
-A Session is the umbrella object for a single session (notionally, a (user,
-host, browser_process) triple).  Simple applications can probably get away
-with putting all session data into a Session object (or, better, into an
-application-specific subclass of Session).
-
-The default implementation provided here is not persistent: when the
-process shuts down, all session data is lost.  You will need to
-subclass SessionManager if you want to implement persistent sessions.
+Just use L{get_session} to obtain a session object (with a dictionary
+interface, which will let you store permanent information).
 """
 
-__revision__ = "$Id$"
+try:
+    from mod_python.Cookie import add_cookie, Cookie, get_cookie
+    from mod_python.apache import APLOG_NOTICE, AP_MPMQ_IS_THREADED, \
+        AP_MPMQ_MAX_SPARE_THREADS, _apache
+    CFG_IN_APACHE = True
+except ImportError:
+    CFG_IN_APACHE = False
 
-#default configuration values
-DEFAULT_SESSION_COOKIE_NAME = "CDSSESSION"
-DEFAULT_SESSION_COOKIE_DOMAIN = None
-DEFAULT_SESSION_COOKIE_PATH = "/"
-
+import cPickle
+import time
+import random
 import re
-from time import time, gmtime, strftime, clock
+import sys
+import os
+if sys.hexversion < 0x2060000:
+    from md5 import md5
+else:
+    from hashlib import md5
 
-from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
+from invenio.dbquery import run_sql, blob_to_string
+from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
+    CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT
+from invenio.websession_config import CFG_WEBSESSION_COOKIE_NAME, \
+    CFG_WEBSESSION_ONE_DAY, CFG_WEBSESSION_CLEANUP_CHANCE, \
+    CFG_WEBSESSION_ENABLE_LOCKING
 
-_qparm_re = re.compile(r'([\0- ]*'
-                       r'([^\0- ;,=\"]+)="([^"]*)"'
-                       r'([\0- ]*[;,])?[\0- ]*)')
-_parm_re = re.compile(r'([\0- ]*'
-                      r'([^\0- ;,="]+)=([^\0- ;,"]*)'
-                      r'([\0- ]*[;,])?[\0- ]*)')
+def get_session(req, sid=None):
+    """
+    Obtain a session.
 
-def parse_cookie (text):
-    result = {}
+    If the session has already been created for the current request,
+    returns the already existing session.
 
-    pos = 0
-    while 1:
-        mq = _qparm_re.match(text, pos)
-        m = _parm_re.match(text, pos)
-        if mq is not None:
-            # Match quoted correct cookies
-            name = mq.group(2)
-            value = mq.group(3)
-            pos = mq.end()
-        elif m is not None:
-            # Match evil MSIE cookies ;)
-            name = m.group(2)
-            value = m.group(3)
-            pos = m.end()
+    @param req: the mod_python request object.
+    @type req: mod_python request object
+    @param sid: the session identifier of an already existing session.
+    @type sid: 32 hexadecimal string
+    @return: the session.
+    @rtype: InvenioSession
+    @raise ValueError: if C{sid} is provided and it doesn't correspond to a
+        valid session.
+    @note: if the session has already been retrieved once within the current
+        request handling, the same session object will be returned and, if
+        provided, the C{sid} parameter will be ignored.
+    """
+    if not hasattr(req, '_session'):
+        req._session = InvenioSession(req, sid)
+    return req._session
+
+class InvenioSession(dict):
+    """
+    This class implements a Session handling based on MySQL.
+
+    @param req: the mod_python request object.
+    @type req: mod_python request object
+    @param sid: the session identifier if already known
+    @type sid: 32 hexadecimal string
+    @ivar _remember_me: if the session cookie should last one day or until
+        the browser is closed.
+    @type _remember_me: bool
+
+    @note: The code is heavily based on ModPython 3.3.1 DBMSession
+        implementation.
+    @note: This class implements IP verification to prevent basic cookie
+        stealing.
+    @raise ValueError: if C{sid} is provided and correspond to a broken
+        session.
+    """
+
+    def __init__(self, req, sid=None):
+        self._remember_me = False
+        self._req, self._sid, self._secret = req, sid, None
+        self._lock = CFG_WEBSESSION_ENABLE_LOCKING
+        self._new = 1
+        self._created = 0
+        self._accessed = 0
+        self._timeout = 0
+        self._locked = 0
+        self._invalid = 0
+        self._http_ip = None
+        self._https_ip = None
+
+        dict.__init__(self)
+
+        if not self._sid:
+            # check to see if cookie exists
+            cookie = get_cookie(req, CFG_WEBSESSION_COOKIE_NAME)
+            if cookie:
+                self._sid = cookie.value
+
+        if self._sid:
+            if not _check_sid(self._sid):
+                if sid:
+                    # Supplied explicitly by user of the class,
+                    # raise an exception and make the user code
+                    # deal with it.
+                    raise ValueError("Invalid Session ID: sid=%s" % sid)
+                else:
+                    # Derived from the cookie sent by browser,
+                    # wipe it out so it gets replaced with a
+                    # correct value.
+                    self._sid = None
+
+        if self._sid:
+            # attempt to load ourselves
+            self.lock()
+            if self.load():
+                self._new = 0
+
+        if self._new:
+            # make a new session
+            if self._sid:
+                self.unlock() # unlock old sid
+            self._sid = _new_sid(self._req)
+            self.lock()                 # lock new sid
+            remote_ip = self._req.connection.remote_ip
+            if self._req.is_https():
+                self._https_ip = remote_ip
+            else:
+                self._http_ip = remote_ip
+            add_cookie(self._req, self.make_cookie())
+            self._created = time.time()
+            self._timeout = CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT * \
+                CFG_WEBSESSION_ONE_DAY
+
+        self._accessed = time.time()
+
+        # need cleanup?
+        if random.randint(1, CFG_WEBSESSION_CLEANUP_CHANCE) == 1:
+            self.cleanup()
+
+    def set_remember_me(self, remember_me=True):
+        """
+        Set/Unset the L{_remember_me} flag.
+
+        @param remember_me: True if the session cookie should last one day or
+            until the browser is closed.
+        @type remember_me: bool
+        """
+        self._remember_me = remember_me
+        if remember_me:
+            self.set_timeout(CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER *
+                CFG_WEBSESSION_ONE_DAY)
         else:
-            # this may be an invalid cookie.
-            # We'll simply bail without raising an error
-            # if the cookie is invalid.
-            return result
+            self.set_timeout(CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT *
+                CFG_WEBSESSION_ONE_DAY)
+        add_cookie(self._req, self.make_cookie())
 
-        if not result.has_key(name):
-            result[name] = value
+    def load(self):
+        """
+        Load the session from the database.
+        @return: 1 in case of success, 0 otherwise.
+        @rtype: integer
+        """
+        session_dict = None
+        invalid = False
+        if CFG_WEBSESSION_ENABLE_LOCKING:
+            _apache._global_lock(self._req.server, None, 0)
+        try:
+            res = run_sql("SELECT session_object FROM session "
+                          "WHERE session_key=%s", (self._sid, ))
+            if res:
+                session_dict = cPickle.loads(blob_to_string(res[0][0]))
+                remote_ip = self._req.connection.remote_ip
+                if self._req.is_https():
+                    if session_dict['_https_ip'] is not None and \
+                            session_dict['_https_ip'] != remote_ip:
+                        invalid = True
+                    else:
+                        session_dict['_https_ip'] = remote_ip
+                else:
+                    if session_dict['_http_ip'] is not None and \
+                            session_dict['_http_ip'] != remote_ip:
+                        invalid = True
+                    else:
+                        session_dict['_http_ip'] = remote_ip
+        finally:
+            if CFG_WEBSESSION_ENABLE_LOCKING:
+                _apache._global_unlock(self._req.server, None, 0)
+
+        if session_dict is None:
+            return 0
+
+        if invalid:
+            return 0
+
+        if (time.time() - session_dict["_accessed"]) > \
+                session_dict["_timeout"]:
+            return 0
+
+        self._created  = session_dict["_created"]
+        self._accessed = session_dict["_accessed"]
+        self._timeout  = session_dict["_timeout"]
+        self._remember_me = session_dict["_remember_me"]
+        self.update(session_dict["_data"])
+        return 1
+
+    def save(self):
+        """
+        Save the session to the database.
+        """
+        if not self._invalid:
+            session_dict = {"_data" : self.copy(),
+                    "_created" : self._created,
+                    "_accessed": self._accessed,
+                    "_timeout" : self._timeout,
+                    "_http_ip" : self._http_ip,
+                    "_https_ip" : self._https_ip,
+                    "_remember_me" : self._remember_me
+            }
+            if CFG_WEBSESSION_ENABLE_LOCKING:
+                _apache._global_lock(self._req.server, None, 0)
+            try:
+                session_key = self._sid
+                session_object = cPickle.dumps(session_dict, -1)
+                session_expiry = time.time() + self._timeout + \
+                    CFG_WEBSESSION_ONE_DAY
+                uid = session_dict.get('uid', -1)
+                run_sql("""
+                    INSERT session(
+                        session_key,
+                        session_expiry,
+                        session_object,
+                        uid
+                    ) VALUE(%s,
+                        %s,
+                        %s,
+                        %s
+                    ) ON DUPLICATE KEY UPDATE
+                        session_expiry=%s,
+                        session_object=%s,
+                        uid=%s
+                """, (session_key, session_expiry, session_object, uid,
+                    session_expiry, session_object, uid))
+            finally:
+                if CFG_WEBSESSION_ENABLE_LOCKING:
+                    _apache._global_unlock(self._req.server, None, 0)
+
+    def delete(self):
+        """
+        Delete the session.
+        """
+        if CFG_WEBSESSION_ENABLE_LOCKING:
+            _apache._global_lock(self._req.server, None, 0)
+        try:
+            run_sql("DELETE FROM session WHERE session_key=%s", (self._sid, ))
+        finally:
+            if CFG_WEBSESSION_ENABLE_LOCKING:
+                _apache._global_unlock(self._req.server, None, 0)
+        self.clear()
+
+    def invalidate(self):
+        """
+        Declare the session as invalid.
+        """
+        cookie = self.make_cookie()
+        cookie.expires = 0
+        add_cookie(self._req, cookie)
+        self.delete()
+        self._invalid = 1
+        if hasattr(self._req, '_session'):
+            delattr(self._req, '_session')
+
+    def make_cookie(self):
+        """
+        Reimplementation of L{BaseSession.make_cookie} method, that also
+        consider the L{_remember_me} flag
+
+        @return: a session cookie.
+        @rtpye: {mod_python.Cookie.Cookie}
+        """
+        cookie = Cookie(CFG_WEBSESSION_COOKIE_NAME, self._sid)
+        cookie.path = '/'
+
+        if self._remember_me:
+            cookie.expires = time.time() + self._timeout
+
+        return cookie
+
+    def initial_http_ip(self):
+        """
+        @return: the initial ip addressed for the HTTP protocol for which this
+        session was issued.
+        @rtype: string
+        @note: it returns None if this session has always been used through
+            HTTPS requests.
+        """
+        return self._http_ip
+
+    def initial_https_ip(self):
+        """
+        @return: the initial ip addressed for the HTTPS protocol for which this
+        session was issued.
+        @rtype: string
+        @note: it returns None if this session has always been used through
+            HTTP requests.
+        """
+        return self._https_ip
+
+    def lock(self):
+        """
+        Lock the session.
+        """
+        if self._lock:
+            if CFG_WEBSESSION_ENABLE_LOCKING:
+                _apache._global_lock(self._req.server, self._sid)
+                self._req.register_cleanup(_unlock_session_cleanup, self)
+            self._locked = 1
+
+    def unlock(self):
+        """
+        Unlock the session.
+        """
+        if self._lock and self._locked:
+            if CFG_WEBSESSION_ENABLE_LOCKING:
+                _apache._global_unlock(self._req.server, self._sid)
+            self._locked = 0
+
+    def is_new(self):
+        """
+        @return: True if the session has just been created.
+        @rtype: bool
+        """
+        return not not self._new
+
+    def sid(self):
+        """
+        @return: the session identifier.
+        @rtype: 32 hexadecimal string
+        """
+        return self._sid
+
+    def created(self):
+        """
+        @return: the UNIX timestamp for when the session has been created.
+        @rtype: double
+        """
+        return self._created
+
+    def last_accessed(self):
+        """
+        @return: the UNIX timestamp for when the session has been last
+            accessed.
+        @rtype: double
+        """
+        return self._accessed
+
+    def timeout(self):
+        """
+        @return: the number of seconds from the last accessed timestamp,
+            after which the session is invalid.
+        @rtype: double
+        """
+        return self._timeout
+
+    def set_timeout(self, secs):
+        """
+        Set the number of seconds from the last accessed timestamp,
+            after which the session is invalid.
+        @param secs: the number of seconds.
+        @type secs: double
+        """
+        self._timeout = secs
+
+    def cleanup(self):
+        """
+        Perform the database session cleanup.
+        """
+        def session_cleanup():
+            """
+            Session cleanup procedure which to be executed at the end
+            of the request handling.
+            """
+            run_sql("""
+                DELETE FROM session
+                WHERE session_expiry<=UNIX_TIMESTAMP()
+            """)
+        self._req.register_cleanup(session_cleanup)
+        self._req.log_error("InvenioSession: registered database cleanup.",
+                            APLOG_NOTICE)
+
+    def __del__(self):
+        self.unlock()
+
+def _unlock_session_cleanup(session):
+    """
+    Auxliary function to unlock a session.
+    """
+    session.unlock()
+
+def _init_rnd():
+    """
+    Initialize random number generators.
+    This is key in multithreaded env, see Python docs for random.
+    @return: the generators.
+    @rtype: list of generators
+    """
+
+    # query max number of threads
+
+    if _apache.mpm_query(AP_MPMQ_IS_THREADED):
+        gennum = _apache.mpm_query(AP_MPMQ_MAX_SPARE_THREADS)
+    else:
+        gennum = 10
+
+    # make generators
+    # this bit is from Python lib reference
+    random_generator = random.Random(time.time())
+    result = [random_generator]
+    for dummy in range(gennum - 1):
+        laststate = random_generator.getstate()
+        random_generator = random.Random()
+        random_generator.setstate(laststate)
+        random_generator.jumpahead(1000000)
+        result.append(random_generator)
 
     return result
 
-def packbytes(s):
-    "convert a string of bytes into a long integer"
-    n = 0L
-    for b in s:
-        n <<= 8
-        n |= ord(b)
-    return n
+if CFG_IN_APACHE:
+    _RANDOM_GENERATORS = _init_rnd()
+    _RANDOM_ITERATOR = iter(_RANDOM_GENERATORS)
 
-try:
-    # /dev/urandom is just as good as /dev/random for cookies (assuming
-    # SHA-1 is secure) and it never blocks.
-    open("/dev/urandom")
-    def randlong(bytes):
-        """Return bits of random data as a long integer."""
-        return packbytes(open("/dev/urandom").read(bytes))
-
-except IOError:
-    # this is much less secure than the above function
-    import sha
-    _randstate = sha.new(str(time() + clock()))
-    def randlong(bytes):
-        """Return bits of random data as a long integer."""
-        global _randstate
-        s = ""
-        while len(s) < bytes:
-            _randstate.update(str(time() + clock()))
-            s += _randstate.digest()
-        return packbytes(s[:bytes])
-
-#-----------------------------------------------------------------------
-
-class SessionManager:
+def _get_generator():
     """
-    SessionManager acts as a dictionary of all sessions, mapping session
-    ID strings to individual session objects.  Session objects are
-    instances of Session (or a custom subclass for your application).
-    SessionManager is also responsible for creating and destroying
-    sessions, for generating and interpreting session cookies, and for
-    session persistence (if any -- this implementation is not
-    persistent).
-
-    Most applications can just use this class directly; sessions will
-    be kept in memory-based dictionaries, and will be lost when the
-    handling process dies.  Alternatively an application can subclass
-    SessionManager to implement specific behaviour, such as persistence.
-
-    For working on top of mod_python, the base class must be MPSessionManager.
-
-    Instance attributes:
-      session_class : class
-        the class that is instantiated to create new session objects
-        (in new_session())
-      sessions : mapping { session_id:string : Session }
-        the collection of sessions managed by this SessionManager
+    get rnd_iter.next(), or start over
+    if we reached the end of it
+    @return: the next random number.
+    @rtype: double
     """
+    global _RANDOM_ITERATOR
+    try:
+        return _RANDOM_ITERATOR.next()
+    except StopIteration:
+        # the small potential for two threads doing this
+        # seems does not warrant use of a lock
+        _RANDOM_ITERATOR = iter(_RANDOM_GENERATORS)
+        return _RANDOM_ITERATOR.next()
 
-    ACCESS_TIME_RESOLUTION = 1 # in seconds
-
-
-    def __init__ (self, session_class=None, session_mapping=None):
-        """SessionManager(session_class : class = Session,
-                          session_mapping : mapping = {})
-
-        Create a new session manager.  There should be one session
-        manager per handling process (or even better per application).
-
-        session_class is used by the new_session() method -- it returns
-        an instance of session_class.
-        """
-        self.sessions = {}
-        if session_class is None:
-            self.session_class = Session
-        else:
-            self.session_class = session_class
-        if session_mapping is None:
-            self.sessions = {}
-        else:
-            self.sessions = session_mapping
-
-    def __repr__ (self):
-        return "<%s at %x>" % (self.__class__.__name__, id(self))
-
-    def __str__(self):
-        return str(self.sessions)
-
-    # -- Mapping interface ---------------------------------------------
-    # (subclasses shouldn't need to override any of this, unless
-    # your application passes in a session_mapping object that
-    # doesn't provide all of the mapping methods needed here)
-
-    def keys (self):
-        """keys() -> [string]
-
-        Return the list of session IDs of sessions in this session manager.
-        """
-        return self.sessions.keys()
-
-    def sorted_keys (self):
-        """sorted_keys() -> [string]
-
-        Return the same list as keys(), but sorted.
-        """
-        keys = self.keys()
-        keys.sort()
-        return keys
-
-    def values (self):
-        """values() -> [Session]
-
-        Return the list of sessions in this session manager.
-        """
-        return self.sessions.values()
-
-    def items (self):
-        """items() -> [(string, Session)]
-
-        Return the list of (session_id, session) pairs in this session
-        manager.
-        """
-        return self.sessions.items()
-
-    def get (self, session_id, default=None):
-        """get(session_id : string, default : any = None) -> Session
-
-        Return the session object identified by 'session_id', or None if
-        no such session.
-        """
-        return self.sessions.get(session_id, default)
-
-    def __getitem__ (self, session_id):
-        """__getitem__(session_id : string) -> Session
-
-        Return the session object identified by 'session_id'.  Raise KeyError
-        if no such session.
-        """
-        return self.sessions[session_id]
-
-    def has_key (self, session_id):
-        """has_key(session_id : string) -> boolean
-
-        Return true if a session identified by 'session_id' exists in
-        the session manager.
-        """
-        return self.sessions.has_key(session_id)
-
-    # has_session() is a synonym for has_key() -- if you override
-    # has_key(), be sure to repeat this alias!
-    has_session = has_key
-
-    def __setitem__ (self, session_id, session):
-        """__setitem__(session_id : string, session : Session)
-
-        Store 'session' in the session manager under 'session_id'.
-        """
-        if not isinstance(session, self.session_class):
-            raise TypeError("session not an instance of %r: %r"
-                            % (self.session_class, session))
-        assert session_id == session.id, "session ID mismatch"
-        self.sessions[session_id] = session
-
-    def __delitem__ (self, session_id):
-        """__getitem__(session_id : string) -> Session
-
-        Remove the session object identified by 'session_id' from the session
-        manager.  Raise KeyError if no such session.
-        """
-        del self.sessions[session_id]
-
-
-
-    # -- Configuration params--------------------------------------------
-    # Some configurable aspects. It returns the default values provided
-    #   by the module constants. Subclasses can override these methods
-    #   and set up the values at their convenience (example: from a
-    #   configuration object)
-    def _getSessionCookieName(self):
-        """Returns the preferred cookie name for the sessions
-        """
-        return DEFAULT_SESSION_COOKIE_NAME
-
-    def _getSessionCookieDomain(self):
-        """Returns the preferred cookie domain for the sessions
-        """
-        return DEFAULT_SESSION_COOKIE_DOMAIN
-
-    def _getSessionCookiePath(self):
-        """Returns the preferred cookie path for the sessions
-        """
-        return DEFAULT_SESSION_COOKIE_PATH
-
-    # -- Session management --------------------------------------------
-    # these build on the storage mechanism implemented by the
-    # above mapping methods, and are concerned with all the high-
-    # level details of managing web sessions
-
-    def new_session(self, request, id):
-        """new_session(request : HTTPRequest, id : string)
-           -> Session
-
-        Return a new session object, ie. an instance of the session_class
-        class passed to the constructor (defaults to Session).
-        """
-        return self.session_class(request, id)
-
-    def _get_session_id (self, request):
-        """_get_session_id(request : HTTPRequest) -> string
-
-        Find the ID of the current session by looking for the session
-        cookie in 'request'.  Return None if no such cookie or the
-        cookie has been expired, otherwise return the cookie's value.
-        """
-        sessid = request.cookies.get(self._getSessionCookieName())
-        if sessid == "" or sessid == "*del*":
-            return None
-        else:
-            return sessid
-
-    def _create_session (self, request):
-        # Generate a session ID, which is just the value of the session
-        # cookie we are about to drop on the user.  (It's also the key
-        # used with the session manager mapping interface.)
-        sessid = None
-        while sessid is None or self.has_session(sessid):
-            sessid = "%016X" % randlong(8)  # 64-bit random number
-
-        # Create a session object which will be looked up the next
-        # time this user comes back carrying the session cookie
-        # with the session ID just generated.
-        return self.new_session(request, sessid)
-
-    def get_session (self, request):
-        """get_session(request : HTTPRequest) -> Session
-
-        Fetch or create a session object for the current session, and
-        return it.  If a session cookie is found in the HTTP request
-        object 'request', use it to look up and return an existing
-        session object.  If no session cookie is found, create a new
-        session.  If the session cookie refers to a non-existent
-        session, raise SessionError.  If the check_session_addr flag
-        is true, then a mismatch between the IP address stored
-        in an existing session the IP address of the current request
-        also causes SessionError.
-
-        Note that this method does *not* cause the new session to be
-        stored in the session manager, nor does it drop a session cookie
-        on the user.  Those are both the responsibility of
-        maintain_session(), called at the end of a request.
-        """
-        sessid = self._get_session_id(request)
-        session = None
-        if sessid is not None:
-            session = self.get(sessid)
-            if session is None:
-                # Note that it's important to revoke the session cookie
-                # so the user doesn't keep getting "Expired session ID"
-                # error pages.  However, it has to be done in the
-                # response object for the error document, which doesn't
-                # exist yet.  Thus, the code that formats SessionError
-                # exceptions -- SessionError.format() by default -- is
-                # responsible for revoking the session cookie.  Yuck.
-                raise SessionError(session_id=sessid)
-            if request.is_https():
-                address = session.get_remote_https_address()
-            else:
-                address = session.get_remote_http_address()
-            if address is not None:
-                if address != request.get_environ("REMOTE_ADDR"):
-                    raise SessionError("Remote IP address does not match the "
-                                "IP address that created the session",
-                                session_id=sessid)
-            else:
-                if request.is_https():
-                    session.set_remote_https_address(request.get_environ("REMOTE_ADDR"))
-                else:
-                    session.set_remote_http_address(request.get_environ("REMOTE_ADDR"))
-
-        if sessid is None or session is None:
-            # Generate a session ID and create the session.
-            session = self._create_session(request)
-
-        session._set_access_time(self.ACCESS_TIME_RESOLUTION)
-        return session
-
-    def maintain_session (self, request, session, remember_me=False):
-        """maintain_session(request : HTTPRequest, session : Session)
-
-        Maintain session information.  This method is called by
-        SessionPublisher after servicing an HTTP request, just before
-        the response is returned.  If a session contains information it
-        is saved and a cookie dropped on the client.  If not, the
-        session is discarded and the client will be instructed to delete
-        the session cookie (if any).
-        """
-        if not session.has_info():
-            # Session has no useful info -- forget it.  If it previously
-            # had useful information and no longer does, we have to
-            # explicitly forget it.
-            if self.has_session(session.id):
-                del self[session.id]
-                ## Hack to call exactly sessionManager implementation against
-                ## request. Otherwise a derivate method could be called
-                ## that can expect a wrapper outside request
-                ## which is not the case now.
-                SessionManager.revoke_session_cookie(self, request)
-            return
-
-        if not self.has_session(session.id) or session.is_dirty_remember_me():
-            # This is the first time this session has had useful
-            # info -- store it and set the session cookie.
-            self[session.id] = session
-
-        elif session.is_dirty():
-            # We have already stored this session, but it's dirty
-            # and needs to be stored again.  This will never happen
-            # with the default Session class, but it's there for
-            # applications using a persistence mechanism that requires
-            # repeatedly storing the same object in the same mapping.
-            self[session.id] = session
-        SessionManager.set_session_cookie(self, request, session.id, remember_me)
-
-
-    def set_session_cookie (self, request, session_id, remember_me=False):
-        """set_session_cookie(request : HTTPRequest, session_id : string)
-
-        Ensure that a session cookie with value 'session_id' will be
-        returned to the client via 'request.response'.
-        """
-        if remember_me:
-            ## Keep the cookie for one month.
-            request.response.set_cookie(self._getSessionCookieName(), session_id,
-                                    domain = self._getSessionCookieDomain(),
-                                    path = self._getSessionCookiePath(),
-                                    HttpOnly = True,
-                                    expires = strftime('%a, %d-%b-%Y %H:%M:%S GMT', gmtime(time() +
-                                    CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER*86400)))
-        else:
-            request.response.set_cookie(self._getSessionCookieName(), session_id,
-                                    domain = self._getSessionCookieDomain(),
-                                    path = self._getSessionCookiePath())
-
-    def revoke_session_cookie (self, request):
-        """revoke_session_cookie(request : HTTPRequest)
-
-        Remove the session cookie from the remote user's session by
-        resetting the value and maximum age in 'request.response'.  Also
-        remove the cookie from 'request' so that further processing of
-        this request does not see the cookie's revoked value.
-        """
-        response = request.response
-        response.set_cookie(self._getSessionCookieName(), "",
-                            domain = self._getSessionCookieDomain(),
-                            path = self._getSessionCookiePath(),
-                            expires = 0)
-        if request.cookies.has_key(self._getSessionCookieName()):
-            del request.cookies[self._getSessionCookieName()]
-
-    def expire_session (self, request):
-        """expire_session(request : HTTPRequest)
-
-        Expire the current session, ie. revoke the session cookie from
-        the client and remove the session object from the session
-        manager and from 'request'.
-        """
-        self.revoke_session_cookie(request)
-        try:
-            del self[request.session.id]
-        except KeyError:
-            # This can happen if the current session hasn't been saved
-            # yet, eg. if someone tries to leave a session with no
-            # interesting data.  That's not a big deal, so ignore it.
-            pass
-        request.session = None
-
-    def has_session_cookie (self, request, must_exist=0):
-        """has_session_cookie(request : HTTPRequest,
-                              must_exist : boolean = false)
-           -> boolean
-
-        Return true if 'request' already has a cookie identifying a
-        session object.  If 'must_exist' is true, the cookie must
-        correspond to a currently existing session; otherwise (the
-        default), we just check for the existence of the session cookie
-        and don't inspect its content at all.
-        """
-        sessid = request.cookies.get(self._getSessionCookieName())
-        if sessid is None:
-            return 0
-        if must_exist:
-            return self.has_session(sessid)
-        else:
-            return 1
-
-# SessionManager
-
-
-class Session:
+_RE_VALIDATE_SID = re.compile('[0-9a-f]{32}$')
+def _check_sid(sid):
     """
-    Holds information about the current session.  The only information
-    that is likely to be useful to applications is the 'user' attribute,
-    which applications can use as they please.
+    Check the validity of the session identifier.
+    The sid must be 32 characters long, and consisting of the characters
+    0-9 and a-f.
 
-    Instance attributes:
-      id : string
-        the session ID (generated by SessionManager and used as the
-        value of the session cookie)
-      __remote_address : string
-        IP address of user owning this session (only set when the
-        session is created -- requests for this session from a different
-        IP address will either raise SessionError or be treated
-        normally, depending on the CHECK_SESSION_ADDR flag)
-      __creation_time : float
-      __access_time : float
-        two ways of keeping track of the "age" of the session.
-        Note that '__access_time' is maintained by the SessionManager that
-        owns this session, using _set_access_time().
+    The sid may be passed in a cookie from the client and as such
+    should not be trusted. This is particularly important in
+    FileSession, where the session filename is derived from the sid.
+    A sid containing '/' or '.' characters could result in a directory
+    traversal attack
 
-    Feel free to access 'id' directly, but do not modify it. The other
-    attributes are private -- keep your grubby hands off of them and use
-    the appropriate accessor methods.
+    @param sid: the session identifier.
+    @type sid: string
+    @return: True if the session identifier is valid.
+    @rtype: bool
+    """
+    return not not _RE_VALIDATE_SID.match(sid)
+
+def _new_sid(req):
+    """
+    Make a number based on current time, pid, remote ip
+    and two random ints, then hash with md5. This should
+    be fairly unique and very difficult to guess.
+
+    @param req: the mod_python request object.
+    @type req: mod_python request object.
+    @return: the session identifier.
+    @rtype: 32 hexadecimal string
+
+    @warning: The current implementation of _new_sid returns an
+        md5 hexdigest string. To avoid a possible directory traversal
+        attack in FileSession the sid is validated using
+        the _check_sid() method and the compiled regex
+        validate_sid_re. The sid will be accepted only if len(sid) == 32
+        and it only contains the characters 0-9 and a-f.
+
+        If you change this implementation of _new_sid, make sure to also
+        change the validation scheme, as well as the test_Session_illegal_sid()
+        unit test in test/test.py.
     """
 
-    MAX_FORM_TOKENS = 16 # maximum number of outstanding form tokens
+    the_time = long(time.time()*10000)
+    pid = os.getpid()
+    random_generator = _get_generator()
+    rnd1 = random_generator.randint(0, 999999999)
+    rnd2 = random_generator.randint(0, 999999999)
+    remote_ip = req.connection.remote_ip
 
-    def __init__ (self, request, id):
-        self.id = id
-        if request.is_https():
-            self.__remote_https_address = request.get_environ("REMOTE_ADDR")
-            self.__remote_http_address = None
-        else:
-            self.__remote_http_address = request.get_environ("REMOTE_ADDR")
-            self.__remote_https_address = None
-        self.__creation_time = self.__access_time = time()
-
-    def __repr__ (self):
-        return "<%s at %x: %s>" % (self.__class__.__name__, id(self), self.id)
-
-    def __str__ (self):
-        return "session %s, remote http address: %s, remote https address: %s, creation time: %s" % (self.id, self.__remote_http_address, self.__remote_https_address, self.__creation_time)
-
-    def has_info (self):
-        """has_info() -> boolean
-
-        Return true if this session contains any information that must
-        be saved.
-        """
-        return 1
-
-    def is_dirty (self):
-        """is_dirty() -> boolean
-
-        Return true if this session has changed since it was last saved
-        such that it needs to be saved again.
-
-        Default implementation always returns false since the default
-        storage mechanism is an in-memory dictionary, and you don't have
-        to put the same object into the same slot of a dictionary twice.
-        If sessions are stored to, eg., files in a directory or slots in
-        a hash file, is_dirty() should probably be an alias or wrapper
-        for has_info().  See doc/session-mgmt.txt.
-        """
-        return 0
-
-    # -- Simple accessors and modifiers --------------------------------
-    def set_remote_http_address (self, address):
-        self.__remote_http_address = address
-        self.__dirty = 1
-
-    def set_remote_https_address (self, address):
-        self.__remote_https_address = address
-        self.__dirty = 1
-
-    def get_remote_http_address (self):
-        """Return the IP address (dotted-quad string) that made the
-        initial request in this session.
-        """
-        return self.__remote_http_address
-
-    def get_remote_https_address (self):
-        """Return the IP address (dotted-quad string) that made the
-        initial request in this session.
-        """
-        return self.__remote_https_address
-
-    def get_creation_time (self):
-        """Return the time that this session was created (seconds
-        since epoch).
-        """
-        return self.__creation_time
-
-    def get_access_time (self):
-        """Return the time that this session was last accessed (seconds
-        since epoch).
-        """
-        return self.__access_time
-
-    def get_creation_age (self, _now=None):
-        """Return the number of seconds since session was created."""
-        # _now arg is not strictly necessary, but there for consistency
-        # with get_access_age()
-        return (_now or time()) - self.__creation_time
-
-    def get_access_age (self, _now=None):
-        """Return the number of seconds since session was last accessed."""
-        # _now arg is for SessionManager's use
-        return (_now or time()) - self.__access_time
-
-
-    # -- Methods for SessionManager only -------------------------------
-
-    def _set_access_time (self, resolution):
-        now = time()
-        if now - self.__access_time > resolution:
-            self.__access_time = now
-
-
-class MPSessionManager(SessionManager):
-    """Specialised SessionManager which allows to use Quixote's session
-       management system with mod_python request objects. The role of this
-       class is basically convert mod_python request objects in other type
-       of objects (RequestWrapper) which can be handled by the SessionManager
-       class.
-       With this we are able to re-use the Quixote's code (very few
-       modifications have been done) in a very transparent way.
-    """
-
-    def get_session (self, request):
-        """Proxy method to SessionManager get_session. It converts the
-           mod_python request objects in a SessionManager compatible one
-           and executes the parent implementation passing the compatible object
-        """
-
-        rw = RequestWrapper.getWrapper( request )
-        s = SessionManager.get_session( self, rw )
-        rw.setSession( s )
-        return s
-
-    def maintain_session (self, request, session, remember_me=False):
-        """Proxy method to SessionManager maintain_session. It converts the
-           mod_python request objects in a SessionManager compatible one
-           and executes the parent implementation passing the compatible object
-        """
-        rw = RequestWrapper.getWrapper( request )
-        SessionManager.maintain_session( self, rw, session, remember_me )
-
-    def has_session_cookie (self, request, must_exist=0):
-        """Proxy method to SessionManager has_session_cookie. It converts the
-           mod_python request objects in a SessionManager compatible one
-           and executes the parent implementation passing the compatible object
-        """
-        rw = RequestWrapper.getWrapper( request )
-        return SessionManager.has_session_cookie( self, rw, must_exist )
-
-    def expire_session (self, request):
-        """Proxy method to SessionManager expire_session. It converts the
-           mod_python request objects in a SessionManager compatible one
-           and executes the parent implementation passing the compatible object
-        """
-        rw = RequestWrapper.getWrapper( request )
-        SessionManager.expire_session(self, rw )
-
-    def revoke_session_cookie (self, request):
-        """Proxy method to SessionManager revoke_session_cookie. It
-           converts the mod_python request objects in a SessionManager
-           compatible one and executes the parent implementation
-           passing the compatible object
-        """
-        rw = RequestWrapper.getWrapper( request )
-        SessionManager.revoke_session_cookie(self, rw)
-
-class RequestWrapper:
-    """This class implements a HTTP request which is compatible with Quixote's
-       session management system. It builds a wrapper arround mod_python request
-       objects to adapt it to Quixote's classes.
-       Intance attributes:
-            __request: MPRequest
-                Reference to the wrapped mod_python request object
-            cookies: Dictionary
-                Conatins the received cookies (these found in headers_in)
-                indexed by the cookie name
-            environ: Dictionary
-                Contains a list of different variables or parameters of the
-                HTTP request
-            response: ResponseWrapper
-                Reference to the HTTP response wrapping object
-            session: Session
-                Refence to the current session associated with the request,
-                if any
-    """
-
-    def __init__(self, request):
-        """Constructor of the class. Initialises the necessesary values. It
-            should never be used, use getWrapper method instead.
-        """
-        self.__request = request
-        try:
-            self.cookies = parse_cookie(self.__request.headers_in[ "Cookie" ])
-        except KeyError:
-            self.cookies = {}
-        self.environ = {}
-        self.environ["REMOTE_ADDR"] = self.__request.connection.remote_ip
-        self.response = ResponseWrapper( request )
-        try:
-            self.session = request.session
-        except AttributeError:
-            self.session = None
-        request.cds_wrapper = self #sticks the current wrapper to the mp request
-                                   # so in succesive request it can be recovered
-
-    def __str__(self):
-        return 'request: %s, cookies: %s, environ: %s, session: %s' % (self.__request, self.cookies, self.environ, self.session)
-
-    def is_https(self):
-        return self.__request.subprocess_env.has_key('HTTPS') \
-                        and self.__request.subprocess_env['HTTPS'] == 'on'
-
-    def getWrapper( req ):
-        """Returns a RequestWrapper for a given request.
-
-            The session manager modifies the contents of the wrapper and
-            therefore its state must be kept. This method returns the request
-            sticked wrapper (carrying the current status) and if it doesn't
-            have any it creates a new one. The RequestWrapper initialisation
-            method will take care of sticking any new wrapper to the request.
-        """
-        try:
-            w = req.cds_wrapper
-        except AttributeError:
-            w = RequestWrapper( req )
-        return w
-    getWrapper = staticmethod( getWrapper )
-
-    def get_environ(self, name):
-        """Returns a "environ" variable value
-        """
-        return self.environ[name]
-
-    def setSession(self, session):
-        """Sets the reference to a session. It also sets this reference in the
-           mod_python request object so it can be kept for future requests.
-        """
-        self.session = session
-        self.__request.session = session
-
-
-class ResponseWrapper:
-    """This class implements a HTTP response which is compatible with Quixote's
-       session management system. It builds a wrapper arround mod_python request
-       objects to adapt it to Quixote's classes.
-       Instance attributes:
-            request: RequestWrapper
-                Reference to the request object to which this will represent
-                the reply
-    """
-
-    def __init__(self, request):
-        """Constructor of the class.
-        """
-        self.request = request
-
-    def __str__(self):
-        return str(self.request)
-
-    def set_cookie(self, cookie_name, cookie_value, **attrs):
-        """
-        """
-        options = ""
-        for (name, value) in attrs.items():
-            if value is None:
-                continue
-            if name in ("expires", "path"):
-                name = name.replace("_", "-")
-                options += "; %s=%s" % (name, value)
-            elif name == "secure" and value:
-                options += "; secure"
-            elif name == "HttpOnly" and value:
-                options += "; HttpOnly"
-        cookie_str = "%s=%s%s" % (cookie_name, cookie_value, options)
-        self.request.headers_out.add("Set-Cookie", cookie_str)
-        if 'expires' not in attrs or attrs['expires'] != 0:
-            self.request.cds_wrapper.setSession(cookie_value)
-            self.request.cds_wrapper.cookies[cookie_name] = cookie_value
-
-class SessionError(Exception):
-    """
-    """
-
-    def __init__(self, msg="", **args):
-        pass
+    return md5("%d%d%d%d%s" % (
+        the_time,
+        pid,
+        rnd1,
+        rnd2,
+        remote_ip)
+    ).hexdigest()

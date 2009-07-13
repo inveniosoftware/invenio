@@ -67,6 +67,29 @@ no_lang_recognition_uris = ['/rss',
                             '/oai2d',
                             '/journal']
 
+def _enhance_req(req):
+    """
+    Enhance the mod_python request object with missing methods due to
+    old version of mod_python.
+    """
+    if not hasattr(req, 'is_https'):
+        if self.subprocess_env.has_key('HTTPS') and \
+                self.subprocess_env['HTTPS'] == 'on':
+            def is_https(self):
+                return 1
+        else:
+            def is_https(self):
+                return 0
+        if sys.hexversion < 0x2060000:
+            import new
+            is_https = new.instancemethod(is_https, req, type(req))
+        else:
+            ## In Python 2.6 new module is deprecated in favour of types.
+            import types
+            is_https = types.MethodType(is_https, req, type(req))
+        setattr(req, 'is_https', is_https)
+    return req
+
 def _debug(msg):
     if DEBUG:
         apache.log_error(msg, apache.APLOG_WARNING)
@@ -171,11 +194,9 @@ class WebInterfaceDirectory(object):
 
         # We have found the next segment. If we know that from this
         # point our subpages are over HTTPS, do the switch.
-        is_over_https = req.subprocess_env.has_key('HTTPS') \
-                        and req.subprocess_env['HTTPS'] == 'on'
 
-        if has_https_support and self._force_https:
-            if not is_over_https:
+        if req.is_https() and self._force_https:
+            if not req.is_https():
                 # We need to isolate the part of the URI that is after
                 # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
                 original_parts = urlparse.urlparse(req.unparsed_uri)
@@ -193,7 +214,7 @@ class WebInterfaceDirectory(object):
 
                 target = urlparse.urlunparse(final_parts)
                 redirect_to_url(req, target)
-        if CFG_EXTERNAL_AUTH_USING_SSO and is_over_https and guest_p:
+        if CFG_EXTERNAL_AUTH_USING_SSO and req.is_https() and guest_p:
             (iden, p_un, p_pw, msgcode) = loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
             if len(iden)>0:
                 uid = update_Uid(req, p_un)
@@ -320,6 +341,7 @@ def create_handler(root):
 
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
+        req = _enhance_req(req)
         try:
             allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
             req.allow_methods(allowed_methods, 1)
@@ -378,7 +400,7 @@ def create_handler(root):
             # Serve an error by default.
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
         finally:
-            if hasattr(req, 'cds_wrapper'):
+            if hasattr(req, '_session'):
                 ## The session handler saves for caching a request_wrapper
                 ## in req.
                 ## This saves req as an attribute, creating a circular
@@ -386,10 +408,11 @@ def create_handler(root):
                 ## Since we have have reached the end of the request handler
                 ## we can safely drop the request_wrapper so to avoid
                 ## memory leaks.
-                del req.cds_wrapper
+                delattr(req, '_session')
             if hasattr(req, '_user_info'):
                 ## For the same reason we can delete the user_info.
-                del req._user_info
+                delattr(req, '_user_info')
+
             ## as suggested in
             ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
             del gc.garbage[:]

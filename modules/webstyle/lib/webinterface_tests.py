@@ -41,7 +41,7 @@ class _FakeApache(object):
         self.table = None
         self.config_tree = None
         self.server_root = None
-        self.mpm_query = None
+        self.mpm_query = lambda dummy: False
         self.exists_config_define = None
         self.stat = None
         self.AP_CONN_UNKNOWN = None

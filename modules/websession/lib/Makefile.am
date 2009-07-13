@@ -17,7 +17,7 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = websession.py session.py webuser.py webuser_tests.py \
+pylib_DATA = session.py webuser.py webuser_tests.py \
 	websession_templates.py websession_webinterface.py \
 	webgroup.py webgroup_dblayer.py websession_config.py \
 	webaccount.py websession_regression_tests.py \

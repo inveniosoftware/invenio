@@ -288,6 +288,8 @@ def test_web_page_content(url,
 
     # logout after tests:
     browser.open(CFG_SITE_SECURE_URL + "/youraccount/logout")
+    browser.response().read()
+    browser.close()
 
     if CFG_TESTUTILS_VERBOSE >= 9:
         print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \

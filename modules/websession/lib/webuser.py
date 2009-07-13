@@ -68,11 +68,12 @@ from invenio.config import \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
      CFG_CERN_SITE, \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL
-from invenio import session
+try:
+    from invenio.session import get_session
+except ImportError:
+    pass
 from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
-from invenio.websession import pSession, pSessionMapping
-from invenio.session import SessionError
 from invenio.access_control_admin import acc_get_role_id, acc_get_action_roles, acc_get_action_id, acc_is_user_in_role, acc_find_possible_activities
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
@@ -172,16 +173,8 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
 
 def getApacheUser(req):
     """Return the ApacheUser taking it from the cookie of the request."""
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie (req)
-        s = sm.get_session(req)
-    apache_user = s.getApacheUser()
-    remember_me = s.getRememberMe()
-    sm.maintain_session(req, s, remember_me)
-    return apache_user
+    session = get_session(req)
+    return session.get('apache_user')
 
 def getUid(req):
     """Return user ID taking it from the cookie of the request.
@@ -197,51 +190,43 @@ def getUid(req):
 
        getUid(req) -> userId
     """
-
+    if hasattr(req, '_user_info'):
+        return req._user_info['uid']
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 1: return 0
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 2: return -1
 
     guest = 0
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie (req)
-        s = sm.get_session(req)
-    userId = s.getUid()
-    if userId == -1: # first time, so create a guest user
+    session = get_session(req)
+    uid = session.get('uid', -1)
+    if uid == -1: # first time, so create a guest user
         if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-            s.setUid(createGuestUser())
-            userId = s.getUid()
+            uid = session['uid'] = createGuestUser()
             guest = 1
         else:
-            sm.maintain_session(req, s)
             if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
+                session['uid'] = 0
                 return 0
             else:
                 return -1
     else:
-        if not hasattr(req, '_user_info') and 'user_info' in s.param_list():
-            req._user_info = s.param_get('user_info')
+        if not hasattr(req, '_user_info') and 'user_info' in session:
+            req._user_info = session['user_info']
             req._user_info = collect_user_info(req, refresh=True)
 
-    remember_me = s.getRememberMe()
-    sm.maintain_session(req, s, remember_me)
-
     if guest == 0:
-        guest = isGuestUser(userId)
+        guest = isGuestUser(uid)
 
     if guest:
         if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
-            return userId
+            return uid
         elif CFG_ACCESS_CONTROL_LEVEL_GUESTS >= 1:
             return -1
     else:
-        res = run_sql("SELECT note FROM user WHERE id=%s" % userId)
+        res = run_sql("SELECT note FROM user WHERE id=%s", (uid, ))
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 0:
-            return userId
+            return uid
         elif CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1 and res and res[0][0] in [1, "1"]:
-            return userId
+            return uid
         else:
             return -1
 
@@ -250,17 +235,12 @@ def setApacheUser(req, apache_user):
     """
     if hasattr(req, '_user_info'):
         del req._user_info
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie(req)
-        s = sm.get_session(req)
-    s.setApacheUser(apache_user)
-    sm.maintain_session(req, s)
+    session = get_session(req)
+    session['apache_user'] = apache_user
     user_info = collect_user_info(req, login_time=True)
-    session_param_set(req, 'user_info', user_info)
+    session['user_info'] = user_info
     req._user_info = user_info
+    session.save()
     return apache_user
 
 def setUid(req, uid, remember_me=False):
@@ -268,75 +248,50 @@ def setUid(req, uid, remember_me=False):
     """
     if hasattr(req, '_user_info'):
         del req._user_info
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie(req)
-        s = sm.get_session(req)
-    s.setUid(uid)
-    s.setRememberMe(remember_me)
-    sm.maintain_session(req, s, remember_me)
+    session = get_session(req)
+    session['uid'] = uid
+    if remember_me:
+        session.set_timeout(86400)
+        session.set_remember_me()
     if uid > 0:
         user_info = collect_user_info(req, login_time=True)
-        session_param_set(req, 'user_info', user_info)
+        session['user_info'] = user_info
         req._user_info = user_info
     else:
-        session_param_del(req, 'user_info')
+        del session['user_info']
+    session.save()
     return uid
 
 def session_param_del(req, key):
     """
     Remove a given key from the session.
     """
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie(req)
-        s = sm.get_session(req)
-    s.param_del(key)
-    remember_me = s.getRememberMe()
-    sm.maintain_session(req, s, remember_me)
+    session = get_session(req)
+    del session[key]
+    session.save()
 
 def session_param_set(req, key, value):
     """
     Associate a VALUE to the session param KEY for the current session.
     """
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie(req)
-        s = sm.get_session(req)
-    s.param_set(key, value)
-    remember_me = s.getRememberMe()
-    sm.maintain_session(req, s, remember_me)
+    session = get_session(req)
+    session[key] = value
+    session.save()
 
 def session_param_get(req, key):
     """
     Return session parameter value associated with session parameter KEY for the current session.
     If the key doesn't exists raise KeyError.
     """
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie(req)
-        s = sm.get_session(req)
-    return s.param_get(key)
+    session = get_session(req)
+    return session[key]
 
 def session_param_list(req):
     """
     List all available session parameters.
     """
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie(req)
-        s = sm.get_session(req)
-    return s.param_list()
+    session = get_session(req)
+    return session.keys()
 
 def get_last_login(uid):
     """Return the last_login datetime for uid if any, otherwise return the Epoch."""
@@ -701,19 +656,17 @@ def drop_external_settings(userId):
 def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
-    sm = session.MPSessionManager(pSession, pSessionMapping())
-    try:
-        s = sm.get_session(req)
-    except SessionError:
-        sm.revoke_session_cookie(req)
-        s = sm.get_session(req)
+    session = get_session(req)
     if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-        id1 = createGuestUser()
+        uid = createGuestUser()
+        session['uid'] = uid
+        session.save()
     else:
-        id1 = 0
-    s.setUid(id1)
-    sm.maintain_session(req, s)
-    return id1
+        uid = 0
+        session.invalidate()
+    if hasattr(req, '_user_info'):
+        delattr(req, '_user_info')
+    return uid
 
 def username_exists_p(username):
     """Check if USERNAME exists in the system.  Username may be either
@@ -1024,6 +977,7 @@ def collect_user_info(req, login_time=False, refresh=False):
         'email' : '',
         'group' : [],
         'guest' : '1',
+        'session' : None,
         'precached_permitted_restricted_collections' : [],
         'precached_usebaskets' : False,
         'precached_useloans' : False,
@@ -1067,6 +1021,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             except gaierror:
                 #FIXME: we should support IPV6 too. (hint for FireRole)
                 pass
+            user_info['session'] = get_session(req).sid()
             user_info['remote_host'] = req.connection.remote_host or ''
             user_info['referer'] = req.headers_in.get('Referer', '')
             user_info['uri'] = req.unparsed_uri or ()
@@ -1091,9 +1046,7 @@ def collect_user_info(req, login_time=False, refresh=False):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
                 if not CFG_EXTERNAL_AUTH_USING_SSO or (
-                    is_req and
-                    req.subprocess_env.has_key('HTTPS') and
-                    req.subprocess_env['HTTPS'] == 'on'):
+                    is_req and req.is_https()):
                     ## If we're using SSO we must be sure to be in HTTPS
                     ## otherwise we can't really read anything, hence
                     ## it's better skeep the synchronization
