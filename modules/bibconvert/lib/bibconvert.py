@@ -997,7 +997,11 @@ def FormatField(value, fn):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
                 par[0] = re.search(par[0], value).group()
-        tmp = value.split(par[0])
+        if par[0]:
+            tmp = value.split(par[0], 1) # split into two parts only
+        else:
+            # split by empty par means keep value full
+            tmp = [value]
         if (par[1] == "L"):
             out = par[0] + tmp[1]
         if (par[1] == "R"):

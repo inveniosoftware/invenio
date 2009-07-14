@@ -511,15 +511,15 @@ parameter.
 </blockquote>
 
 <h4>
-<a name="LIM"></a>LIM(n,side)/LIMW(str,side)&nbsp;&nbsp; - limit to n letters
-from L/R</h4>
+<a name="LIM"></a>LIM(n,side)/LIMW(str,side)&nbsp;&nbsp; - limit to n letters while trimming
+L/R side</h4>
 
 <blockquote>default: LIM(0,)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 no change
 <br />default: LIMW(,R)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; no change
-<p>Limits the value in order to get the required number of characters by
-cutting excess characters from either side.
-<br />LIMW removes the Left/Right side to the (str) string.
+<p>Limits the value to the required number of characters by
+cutting excess characters either on the Left or Right.
+<br />LIMW locates the first occurrence of (str) string and cut either Left or Right side.
 <blockquote>&nbsp;
 <table border  width="50%"  >
 <tr>
@@ -558,13 +558,11 @@ cutting excess characters from either side.
 </blockquote>
 
 <h4>
-<a name="WORDS"></a>WORDS(n,side)&nbsp; - limit to n words from L/R</h4>
+<a name="WORDS"></a>WORDS(n,side)&nbsp; - limit to n words while trimming L/R side</h4>
 
 <blockquote>default: WORDS(0,R)
-<p>Keeps the number of words specified in the first parameter from either
-side.
-<br />&nbsp;
-<br />&nbsp;
+<p>Keeps the number of words specified in the first parameter and cuts the excessive
+characters either on Left or Right.
 <blockquote>&nbsp;
 <table border  width="50%"  >
 <tr>
@@ -576,19 +574,19 @@ side.
 </tr>
 
 <tr>
-<td>WORDS(1)</td>
+<td>WORDS(1,R)</td>
 
-<td>sep_1999</td>
+<td>Sep 1999</td>
 
-<td>1999</td>
+<td>Sep</td>
 </tr>
 
 <tr>
 <td>WORDS(1,L)</td>
 
-<td>sep_1999</td>
+<td>Sep 1999</td>
 
-<td>sep_</td>
+<td>1999</td>
 </tr>
 </table>
 </blockquote>
@@ -599,10 +597,8 @@ side.
 
 <blockquote>default: MINL(1)
 <p>All words shorter than the limit specified in the parameter are replaced
-fro mthe sentence.
+from the sentence.
 <br />The words with length exactly n are kept.
-<br />&nbsp;
-<br />&nbsp;
 <blockquote>&nbsp;
 <table border  width="50%"  >
 <tr>
@@ -638,8 +634,6 @@ MAXL(n)&nbsp;&nbsp; - exp. words longer than n</h4>
 <blockquote>default: MAXL(0)
 <p>All words greater in number of characters than the limit specified in
 the parameter are replaced. Words with length exactly n are kept.
-<br />&nbsp;
-<br />&nbsp;
 <blockquote>&nbsp;
 <table border  width="50%"  >
 <tr>
@@ -697,8 +691,6 @@ string.
 <br />The second parameter states whether the string approves the word (0)
 or disables it (1).
 <p>for example, to get the email address from the value, use the following
-<br />&nbsp;
-<br />&nbsp;
 <blockquote>&nbsp;
 <table border  width="50%"  >
 <tr>
@@ -757,8 +749,6 @@ of character.
 <br />NPUNCT&nbsp; .. non punctuation
 <p>Note: SPACE is not handled as a keyword, since all space characters
 are considered as word separators.
-<br />&nbsp;
-<br />&nbsp;
 <blockquote>&nbsp;
 <table border  width="50%"  >
 <tr>
@@ -797,8 +787,6 @@ the input value is replaced with the second parameter, otherwise the input
 value is replaced with the third parameter.
 <br />In case the input value has to be kept, whatever it is, the keyword
 ORIG can be used (usually in the place of the third parameter)
-<br />&nbsp;
-<br />&nbsp;
 <blockquote>&nbsp;
 <table border width="50%" >
 <tr>

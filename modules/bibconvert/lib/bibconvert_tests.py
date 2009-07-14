@@ -83,11 +83,91 @@ class TestRegExp(unittest.TestCase):
 
         self.assertEqual("Hello world!", bibconvert.FormatField("Hello world!", "RE([A-Z][a-z].*!)"))
 
+class TestLim(unittest.TestCase):
+    """Test bibconvert LIM() function."""
+
+    def test_lim_default(self):
+        """bibconvert - LIM(0,)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual(test_input,
+                         bibconvert.FormatField(test_input, "LIM(0,)"))
+
+    def test_lim_left(self):
+        """bibconvert - LIM(n,L)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual("2 34",
+                         bibconvert.FormatField(test_input, "LIM(4,L)"))
+        test_input = "sep_1999"
+        self.assertEqual("1999",
+                         bibconvert.FormatField(test_input, "LIM(4,L)"))
+
+    def test_lim_right(self):
+        """bibconvert - LIM(n,R)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual("ab c",
+                         bibconvert.FormatField(test_input, "LIM(4,R)"))
+        test_input = "sep_1999"
+        self.assertEqual("sep_",
+                         bibconvert.FormatField(test_input, "LIM(4,R)"))
+
+class TestLimw(unittest.TestCase):
+    """Test bibconvert LIMW() function."""
+
+    def test_limw_default(self):
+        """bibconvert - LIMW(,)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual(test_input,
+                         bibconvert.FormatField(test_input, "LIMW(,)"))
+        self.assertEqual(test_input,
+                         bibconvert.FormatField(test_input, "LIMW(,R)"))
+
+    def test_limw_left(self):
+        """bibconvert - LIMW(c,L)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual(" cd xx 12 34",
+                         bibconvert.FormatField(test_input, "LIMW( ,L)"))
+
+    def test_limw_right(self):
+        """bibconvert - LIMW(c,R)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual("ab ",
+                         bibconvert.FormatField(test_input, "LIMW( ,R)"))
+        test_input = "sep_1999"
+        self.assertEqual("sep_",
+                         bibconvert.FormatField(test_input, "LIMW(_,R)"))
+
+class TestWords(unittest.TestCase):
+    """Test bibconvert WORDS() function."""
+
+    def test_words_default(self):
+        """bibconvert - WORDS(,)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual(test_input,
+                         bibconvert.FormatField(test_input, "WORDS(,)"))
+
+    def test_words_left(self):
+        """bibconvert - WORDS(n,L)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual("12 34",
+                         bibconvert.FormatField(test_input, "WORDS(2,L)"))
+        test_input = "Sep 1999"
+        self.assertEqual("1999",
+                         bibconvert.FormatField(test_input, "WORDS(1,L)"))
+
+    def test_words_right(self):
+        """bibconvert - WORDS(n,R)"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual("ab cd",
+                         bibconvert.FormatField(test_input, "WORDS(2,R)"))
+        test_input = "Sep 1999"
+        self.assertEqual("Sep",
+                         bibconvert.FormatField(test_input, "WORDS(1,R)"))
+
 class TestBCCL(unittest.TestCase):
-    """Test bibconvert BCCL complinacy"""
+    """Test bibconvert BCCL compliance"""
 
     def xtest_bccl_09(self):
-        """bibconvert - BCCL v.0.9 compliancy"""
+        """bibconvert - BCCL v.0.9 compliance"""
 
         # FIXME: put proper tests here
         self.assertEqual(1, 1)
@@ -125,6 +205,9 @@ TEST_SUITE = make_test_suite(TestFormattingFunctions,
                              TestGenerateValues,
                              TestParseData,
                              TestRegExp,
+                             TestLim,
+                             TestLimw,
+                             TestWords,
                              TestBCCL,
                              TestKnowledgeBase,
                              TestErrorCodes,
