@@ -661,9 +661,9 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
         <option value="-1">- Select portalbox -</option>
         """
         for (id, t_title, t_body) in res:
-            text += """<option value="%s" %s>%s - %s...</option>""" % \
+            text += """<option value="%s" %s>%s - %s...</option>\n""" % \
                      (id, id  == int(pbxID) and 'selected="selected"' or '',
-                      t_title, cgi.escape(t_body[0:25 - len(t_title)]))
+                      t_title[:40], cgi.escape(t_body[0:40 - min(40, len(t_title))]))
         text += """</select><br />
         <span class="adminlabel">Language</span>
         <select name="sel_ln" class="admin_w200">
@@ -879,10 +879,10 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     pos = get_pbx_pos()
 
     output = """<dl>
-     <dt>Portalbox actions (not related to this collection)
+     <dt>Portalbox actions (not related to this collection)</dt>
      <dd><a href="addportalbox?colID=%s&amp;ln=%s#5.1">Create new portalbox</a></dd>
      <dd><a href="deleteportalbox?colID=%s&amp;ln=%s#5.3">Delete an unused portalbox</a></dd>
-     <dt>Collection specific actions
+     <dt>Collection specific actions</dt>
      <dd><a href="addexistingportalbox?colID=%s&amp;ln=%s#5.2">Add existing portalbox to collection</a></dd>
     </dl>
     """  % (colID, ln, colID, ln, colID, ln)
@@ -903,13 +903,13 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
                 for (pbxID, colID_pbx, tln, score, position, title, body) in res:
                     move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
                     if i != 0:
-                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smallup.gif" title="Move portalbox up"></a>""" % (CFG_SITE_URL, colID, ln, pbxID, res[i - 1][0], tln, random.randint(0, 1000), CFG_SITE_URL)
+                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smallup.gif" title="Move portalbox up" alt="up" /></a>""" % (CFG_SITE_URL, colID, ln, pbxID, res[i - 1][0], tln, random.randint(0, 1000), CFG_SITE_URL)
                     else:
                         move += "&nbsp;&nbsp;&nbsp;"
                     move += "</td><td>"
                     i += 1
                     if i != len(res):
-                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smalldown.gif" title="Move portalbox down"></a>""" % (CFG_SITE_URL, colID, ln, pbxID, res[i][0], tln, random.randint(0, 1000), CFG_SITE_URL)
+                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smalldown.gif" title="Move portalbox down" alt="down" /></a>""" % (CFG_SITE_URL, colID, ln, pbxID, res[i][0], tln, random.randint(0, 1000), CFG_SITE_URL)
                     move += """</td></tr></table>"""
                     actions.append(["%s" % (i==1 and pos[position] or ''), "%s" % (i==1 and lang[tln] or ''), move, "%s" % title])
 
