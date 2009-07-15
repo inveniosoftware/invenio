@@ -97,6 +97,7 @@ CFG_EXTERNAL_COLLECTIONS = {
              'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
              'nbrecs_url': 'http://invenio-demo.cern.ch/search?c=Books&rg=0&of=xm'},
          'search_url': 'http://invenio-demo.cern.ch/search?cc=Books&p=',
+         'record_url': 'http://invenio-demo.cern.ch/record/',
          'selected_by_default': False},
     'Atlantis Institute Articles':
         {'engine': 'CDSInvenio',
@@ -110,6 +111,7 @@ CFG_EXTERNAL_COLLECTIONS = {
              'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
              'nbrecs_url': 'http://invenio-demo.cern.ch/search?cc=Articles&rg=0&of=xm'},
          'search_url': 'http://invenio-demo.cern.ch/search?cc=Articles&p=',
+         'record_url': 'http://invenio-demo.cern.ch/record/',
          'selected_by_default': True},
 }
 

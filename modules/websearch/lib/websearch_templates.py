@@ -2991,14 +2991,12 @@ class Template:
         name = _(engine.name)
         db_id = get_collection_id(engine.name)
         base_url = engine.base_url
-        # temporary variable to control the printing of the webbasket-related form and input
-        tmp_enable_webbasket = False
 
         out = ""
 
         results = engine.parser.parse_and_get_results(None, of=of, req=req, parseonly=True)
 
-        if len(results) != 0 and tmp_enable_webbasket:
+        if len(results) != 0:
             if of == 'hb':
                 out += """
                       <form action="%(siteurl)s/yourbaskets/add" method="post">
@@ -3017,7 +3015,7 @@ class Template:
         for result in results:
             out += result.html
 
-        if len(results) != 0 and tmp_enable_webbasket:
+        if len(results) != 0:
             if of == 'hb':
                 out += """</table>
                        <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />

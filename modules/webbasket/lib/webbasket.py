@@ -44,6 +44,11 @@ try:
     webbasket_templates = invenio.template.load('webbasket')
 except ImportError:
     pass
+from invenio.websearch_external_collections_utils import get_collection_name_by_id
+from invenio.websearch_external_collections import select_hosted_search_engines
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.websearch_external_collections_searcher import external_collections_dictionary
+from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 
 def perform_request_display(uid,
                             category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
@@ -176,6 +181,7 @@ def __display_basket(bskid, name, date_modification, nb_views,
     date_modification = convert_datetext_to_dategui(date_modification, ln)
 
     items = db.get_basket_content(bskid, 'hb')
+    external_recids = []
 
     for (recid, nb_cmt, last_cmt, ext_val, int_val, score) in items:
         cmt_dates.append(convert_datetext_to_datestruct(last_cmt))
@@ -185,12 +191,26 @@ def __display_basket(bskid, name, date_modification, nb_views,
         if recid < 0:
             if ext_val:
                 val = decompress(ext_val)
+            else:
+                external_recids.append(recid)
         else:
             if int_val:
                 val = decompress(int_val)
             else:
                 val = format_record(recid, 'hb', on_the_fly=True)
         records.append((recid, nb_cmt, last_cmt, val, score))
+
+    if external_recids:
+        external_records = format_external_records(external_recids, 'hb')
+
+        for external_record in external_records:
+            for record in records:
+                if record[0] == -external_record[0]:
+                    idx = records.index(record)
+                    tuple_to_list = list(records.pop(idx))
+                    tuple_to_list[3] = external_record[1]
+                    records.insert(idx,tuple(tuple_to_list))
+                    break
 
     if len(cmt_dates) > 0:
         last_cmt = convert_datestruct_to_dategui(max(cmt_dates), ln)
@@ -391,12 +411,13 @@ def perform_request_delete_comment(uid, bskid, recid, cmtid):
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
     return errors
 
-def perform_request_add(uid, recids=[], bskids=[], referer='',
+def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
                         new_basket_name='', new_topic_name='', create_in_topic='',
                         ln=CFG_SITE_LANG):
     """Add records to baskets
     @param uid: user id
     @param recids: list of records to add
+    @param colid: in case of external collections, the id of the collection the records belong to
     @param bskids: list of baskets to add records to. if not provided, will return a
                    page where user can select baskets
     @param referer: URL of the referring page
@@ -413,18 +434,27 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
         recids = [recids]
 
     validated_recids = []
-    for recid in recids:
-        recid = int(recid)
-        if record_exists(recid) == 1:
-            validated_recids.append(recid)
+    if colid == 0:
+        # local records
+        for recid in recids:
+            recid = int(recid)
+            if record_exists(recid) == 1:
+                validated_recids.append(recid)
 
-    user_info = collect_user_info(uid)
-    for recid in validated_recids:
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
-        if auth_code:
-            # User not authorized to view record
-            validated_recids.remove(recid)
-            warnings.append(('WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD', recid))
+        user_info = collect_user_info(uid)
+        for recid in validated_recids:
+            (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
+            if auth_code:
+                # User not authorized to view record
+                validated_recids.remove(recid)
+                warnings.append(('WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD', recid))
+    elif colid > 0:
+        # external records, no need to validate
+        validated_recids = recids
+    elif colid == -1:
+        # external url / resource.
+        # TODO: how to handle?
+        pass
 
     if not(len(validated_recids)):
         warnings.append('WRN_WEBBASKET_NO_RECORD')
@@ -483,6 +513,7 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
     external_baskets = db.get_all_external_baskets_names(uid)
     topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
     body += webbasket_templates.tmpl_add(recids=validated_recids,
+                                        colid=colid,
                                         personal_baskets=personal_baskets,
                                         group_baskets=group_baskets,
                                         external_baskets=external_baskets,
@@ -695,11 +726,13 @@ def perform_request_display_public(bskid=0, of='hb', ln=CFG_SITE_LANG):
         if len(basket) == 7:
             content = db.get_basket_content(bskid)
             for item in content:
+                # TODO: return xml for external records too?
                 items.append(format_record(item[0], of))
         return webbasket_templates.tmpl_xml_basket(items)
 
     if len(basket) == 7:
         items = db.get_basket_content(bskid)
+        external_recids = []
         last_cmt = _("N/A")
         records = []
         cmt_dates = []
@@ -710,10 +743,25 @@ def perform_request_display_public(bskid=0, of='hb', ln=CFG_SITE_LANG):
             if recid < 0:
                 if ext_val:
                     val = decompress(ext_val)
+                else:
+                    external_recids.append(recid)
             else:
                 if int_val:
                     val = format_record(recid, 'hb')
             records.append((recid, nb_cmt, last_cmt, val, score))
+
+        if external_recids:
+            external_records = format_external_records(external_recids, 'hb')
+    
+            for external_record in external_records:
+                for record in records:
+                    if record[0] == -external_record[0]:
+                        idx = records.index(record)
+                        tuple_to_list = list(records.pop(idx))
+                        tuple_to_list[3] = external_record[1]
+                        records.insert(idx,tuple(tuple_to_list))
+                        break            
+
         body = webbasket_templates.tmpl_display_public(basket, records, ln)
     else:
         errors.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
@@ -905,3 +953,67 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
          'x_nb_group': group_text,
          'x_nb_public': external_text}
     return out
+
+## External records functions
+
+def format_external_records(recids, of='hb'):
+    """Given a list of external records' recids, this function returns a list of tuples
+    with each recid and the actual formatted record using the selected output format.
+    It also stores the formatted record in the database for future use."""
+
+    if type(recids) is not list:
+        recids = [recids]
+
+    records_grouped_by_collection = db.get_external_records_by_collection(recids)
+
+    formatted_records = []
+
+    for records in records_grouped_by_collection:
+        external_records = fetch_and_store_external_records(records, of)
+        formatted_records.extend(external_records)
+
+    return tuple(formatted_records)
+
+def fetch_and_store_external_records(records, of="hb"):
+    """Function that fetches the formatted records for one collection and stores them
+    into the database. It also calculates and stores the original external url for each
+    record."""
+
+    results = []
+    parsed_results_list = []
+    parsed_results_dict = {}
+    formatted_records = []
+
+    ids = records[0].split(",")
+    external_ids = records[1].split(",")
+    collection_name = get_collection_name_by_id(records[2])
+    collection_engine_set = select_hosted_search_engines(collection_name)
+    collection_engine = collection_engine_set.pop()
+
+    external_ids_urls = collection_engine.build_record_urls(external_ids)
+    external_urls = [external_id_url[1] for external_id_url in external_ids_urls]
+    external_urls_dict = {}
+    for (local_id, url) in zip(ids,external_urls):
+        external_urls_dict[local_id] = url
+    db.store_external_urls(external_urls_dict)
+
+    url = collection_engine.build_search_url(None, req_args=external_ids)
+    pagegetters = [HTTPAsyncPageGetter(url)]
+
+    def finished(pagegetter, data, time):
+        """Function to be called when a page has been downloaded."""
+        results.append(pagegetter)
+
+    finished_list = async_download(pagegetters, finish_function=finished, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT)
+
+    if finished_list[0]:
+        collection_engine.parser.parse_and_get_results(results[0].data, feedonly=True)
+        (parsed_results_list, parsed_results_dict) = collection_engine.parser.parse_and_extract_records(of=of)
+        for (id,external_id) in zip(ids,external_ids):
+            formatted_records.append((int(id), parsed_results_dict[external_id]))
+        db.store_external_records(formatted_records, of)
+    else:
+        for (id,external_id) in zip(ids,external_ids):
+            formatted_records.append((int(id), "There was a timeout when fetching the record."))
+
+    return formatted_records

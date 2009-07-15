@@ -70,6 +70,17 @@ def get_collection_id(name):
     else:
         return None
 
+def get_collection_name_by_id(colid):
+    """Return the name of collection with id 'id'."""
+
+    collections_id_load()
+
+    for (name, id) in collections_id.iteritems():
+        if id == colid:
+            return name
+            break
+    return None
+
 def get_collection_descendants(id_dad):
     "Returns list of all descendants of the collection having for id id_dad."
 

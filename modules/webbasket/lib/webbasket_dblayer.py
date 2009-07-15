@@ -22,6 +22,7 @@
 __revision__ = "$Id$"
 
 from zlib import decompress
+from zlib import compress
 from time import localtime
 
 from invenio.dbquery import run_sql
@@ -59,6 +60,9 @@ from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 #    - delete_item
 #    - add_to_basket
 #    - get_basket_content
+#    - get_external_records_by_collection
+#    - store_external_records
+#    - store_external_urls
 #
 # 4. Group baskets
 #    - get_group_basket_infos
@@ -420,6 +424,9 @@ def move_item(bskid, recid, direction):
 
 def delete_item(bskid, recid):
     """Remove item recid from basket bskid"""
+    if recid < 0:
+        query0 = "DELETE from bskEXTREC WHERE id=%s" % (-int(recid))
+        run_sql(query0)
     query1 = "DELETE from bskREC WHERE id_bskBASKET=%s AND id_bibrec_or_bskEXTREC=%s"
     params1 = (int(bskid), int(recid))
     res = run_sql(query1, params1)
@@ -430,7 +437,7 @@ def delete_item(bskid, recid):
         run_sql(query2, params2)
     return res
 
-def add_to_basket(uid, recids=[], bskids=[]):
+def add_to_basket(uid, recids=[], colid=0, bskids=[]):
     """Add items recids to every basket in bskids list."""
     if len(recids) and len(bskids):
         query1 = """SELECT   id_bskBASKET,
@@ -445,6 +452,38 @@ def add_to_basket(uid, recids=[], bskids=[]):
         params = tuple(bskids)
         bsks.update(dict(run_sql(query1, params)))
 
+        if colid > 0:
+            query2A = """INSERT
+                        INTO bskEXTREC
+                            (external_id,
+                            collection_id,
+                            creation_date,
+                            modification_date)
+                        VALUES """
+            now = convert_datestruct_to_datetext(localtime())
+            records = ["(%s, %s, %s, %s)"] * len(recids)
+            query2A += ', '.join(records)
+            params = ()
+            for recid in recids:
+                params += (int(recid), colid, now, now)
+            res = run_sql(query2A, params)
+            recids = range(-res,-(res+len(recids)),-1)
+        elif colid < 0:
+            # the query for external sources. Not yet implemented.
+            # a url should be passed to this function and set as
+            # the fourth element of the params tuple
+            query2B = """INSERT
+                        INTO bskEXTREC
+                            (collection_id,
+                            original_url,
+                            creation_date,
+                            modification_date)
+                        VALUES (%s, %s, %s, %s)"""
+            now = convert_datestruct_to_datetext(localtime())
+            params = (colid, 'http://www.example.com/article/45', now, now)
+            res = run_sql(query2B, params)
+            recids = [res]
+
         query2 = """INSERT IGNORE
                     INTO   bskREC
                            (id_bibrec_or_bskEXTREC,
@@ -453,7 +492,8 @@ def add_to_basket(uid, recids=[], bskids=[]):
                             date_added,
                             score)
                     VALUES """
-        now = convert_datestruct_to_datetext(localtime())
+        if colid == 0:
+            now = convert_datestruct_to_datetext(localtime())
         records = ["(%s, %s, %s, %s, %s)"] * (len(recids) * len(bsks.items()))
         query2 += ', '.join(records)
         params = ()
@@ -504,6 +544,72 @@ def get_basket_content(bskid, format='hb'):
         run_sql(query2, (int(bskid),))
         return res
     return ()
+
+def get_external_records_by_collection(recids):
+    """Get the selected recids, both local and external, grouped by collection."""
+
+    if len(recids):
+        query = """SELECT GROUP_CONCAT(id),
+                    GROUP_CONCAT(external_id),
+                    collection_id
+                    FROM bskEXTREC
+                    WHERE %s
+                    GROUP BY collection_id"""
+    
+        recids = [-recid for recid in recids]
+        sep_or = ' OR '
+        query %= sep_or.join(['id=%s'] * len(recids))
+        params = tuple(recids)
+        res = run_sql(query,params)
+        return res
+    else:
+        return 0
+
+def store_external_records(records, of="hb"):
+    """Store formatted external records to the database."""
+
+    if len(records):
+        query = """INSERT
+                    INTO bskEXTFMT
+                        (id_bskEXTREC,
+                        format,
+                        last_updated,
+                        value)
+                    VALUES """
+        now = convert_datestruct_to_datetext(localtime())
+        formatted_records = ["(%s, %s, %s, %s)"] * len(records)
+        query += ', '.join(formatted_records)
+        params = ()
+        for record in records:
+            params += (record[0], of, now, compress(record[1]))
+        run_sql(query,params)
+
+def store_external_urls(urls):
+    """Store original urls for external records to the database."""
+
+    for url in urls.iteritems():
+        query = """UPDATE
+                    bskEXTREC
+                    SET original_url=%s
+                    WHERE id=%s"""
+        params = (url[1], url[0])
+        run_sql(query,params)
+
+def get_external_url(recid):
+    """Get the original url for an external record."""
+
+    if recid:
+        query = """SELECT
+                    original_url
+                    FROM bskEXTREC
+                    WHERE id=%s"""
+        params = (-recid,)
+        res = run_sql(query,params)
+        if res:
+            return res
+        else:
+            return 0
+
 
 ############################ Group baskets ####################################
 

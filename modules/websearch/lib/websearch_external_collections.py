@@ -130,7 +130,7 @@ def build_seealso_links(basic_search_units, seealso_engines, req, lang, query):
 
     links = []
     for engine in seealso_engines:
-        url = engine.build_search_url(basic_search_units, req, lang)
+        url = engine.build_search_url(basic_search_units, req.args, lang)
         if url:
             links.append('<a class="google" href="%(url)s">%(query)s %(text_in)s %(name)s</a>' % \
                 {'url': cgi.escape(url),
@@ -180,7 +180,7 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines):
     engines_list = []
 
     for engine in search_engines:
-        url = engine.build_search_url(basic_search_units, req, lang)
+        url = engine.build_search_url(basic_search_units, req.args, lang)
         if url:
             engines_list.append([url, engine])
 
@@ -421,7 +421,7 @@ def do_calculate_hosted_collections_results(req, lang, vprint, verbosity_level, 
     # in case this is an engine-only list
     if type(hosted_search_engines) is set:
         for engine in hosted_search_engines:
-            url = engine.build_search_url(basic_search_units, req, lang)
+            url = engine.build_search_url(basic_search_units, req.args, lang)
             if url:
                 engines_list.append([url, engine])
     # in case we are iterating a pre calculated url+engine list

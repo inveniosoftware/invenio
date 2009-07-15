@@ -35,6 +35,7 @@ from invenio.config import \
      CFG_WEBBASKET_USE_RICH_TEXT_EDITOR
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
+import invenio.webbasket_dblayer as db
 
 class Template:
     """Templating class for webbasket module"""
@@ -621,20 +622,35 @@ class Template:
   <td class="bskcontentcol" colspan="2">
     %(content)s
     <hr />"""
+        external_url = ""
         if view_comments:
             if nb_cmt > 0:
                 out += """
 %(nb_cmts)i %(cmts_label)s; %(last_cmt_label)s: %(last_cmt)s<br />
 """
             out += '<span class="moreinfo">'
-            out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a> - '
+            if item[0] > 0:
+                out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a> - '
+            else:
+                external_url = db.get_external_url(item[0])
+                if external_url and external_url[0][0]:
+                    out += '<a class="moreinfo" href="%(ext_url)s">%(detailed_record_label)s</a> - '
             out += '\n<a class="moreinfo" href="%(siteurl)s/yourbaskets/display_item?'\
                    'bskid=%(bskid)s&amp;recid=%(recid)i&amp;'\
                    'category=%(category)s&amp;group=%(group)i&amp;'\
                    'topic=%(topic)i&amp;ln=%(ln)s">%(view_comments_label)s</a>'
             out += '</span>'
         else:
-            out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a>'
+            if item[0] > 0:
+                out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a>'
+            else:
+                external_url = db.get_external_url(item[0])
+                if external_url and external_url[0][0]:
+                    out += '<a class="moreinfo" href="%(ext_url)s">%(detailed_record_label)s</a>'
+        if external_url:
+            ext_url = external_url[0][0]
+        else:
+            ext_url = ""
         out += """
   </td>
 </tr>"""
@@ -645,6 +661,7 @@ class Template:
                      'siteurl': CFG_SITE_URL,
                      'bskid': bskid,
                      'recid': recid,
+                     'ext_url': ext_url,
                      'cmts_label': _("comments"),
                      'last_cmt_label': _("last"),
                      'view_comments_label': _("View comments"),
@@ -1115,7 +1132,7 @@ class Template:
 
     ########################## functions on baskets #########################
 
-    def tmpl_add(self, recids,
+    def tmpl_add(self, recids, colid,
                  personal_baskets,
                  group_baskets,
                  external_baskets,
@@ -1123,6 +1140,7 @@ class Template:
                  referer, ln=CFG_SITE_LANG):
         """ returns HTML for the basket selection form when adding new records
         @param recids: list of record ids
+        @param colid: in case of external collections, the id of the collection the records belong to
         @param personal_baskets: list of (basket id, basket name, topic) tuples
         @param group_baskets: list of (bskid, bsk_name, group_name) tuples
         @param external_baskets: list of (bskid, bsk_name) tuples
@@ -1205,6 +1223,7 @@ class Template:
   <p>%(label)s:</p>
   <input type="hidden" name="referer" value="%(referer)s" />
   %(out_hidden_recids)s
+  <input type="hidden" name="colid" value="%(colid)s" />
   <table style="width:100%%;">
     <tr>
     <td style="width:50%%;vertical-align:top;">%(field1)s</td>
@@ -1223,6 +1242,7 @@ class Template:
 </form>""" % {'action': CFG_SITE_URL + '/yourbaskets/add?ln=' + ln,
               'referer': referer,
               'out_hidden_recids': out_hidden_recids,
+              'colid': colid,
               'label': _("Adding %i records to these baskets") % len(recids),
               'field1': fields[0],
               'field2': fields[1],

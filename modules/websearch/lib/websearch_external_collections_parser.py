@@ -418,9 +418,41 @@ class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsPars
     def parse(self, of='hb', req=None):
         """Parse buffer to extract records. Format the records using the selected output format."""
 
+        (recids, records) = self.parse_and_extract_records(of, req)
+
+        if req and cgi.parse_qs(req.args).has_key('jrec'):
+            counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
+        else:
+            counter = 0
+        for recid in recids:
+            counter += 1
+            if of == 'hb':
+                html = """
+                        <tr><td valign="top" align="right" style="white-space: nowrap;">
+                        <input name="recid" type="checkbox" value="%(recid)s" />
+
+                        %(counter)s.
+
+                        </td><td valign="top">%(record)s</td></tr>
+                        """ % {'recid': recid,
+                               'counter': counter,
+                               'record': records[recid]}
+            elif of == 'hd':
+                # HTML detailed (hd) is not supported yet
+                # TODO: either disable the hd output format or print it out correctly
+                html = """"""
+            elif of == 'xm':
+                html = records[recid]
+            self.add_html_result(html)
+
+    def parse_and_extract_records(self, of='hb', req=None):
+        """Parse the buffer and return a list of the recids and a
+        dictionary with key:value pairs like the following
+        recid:formated record with the selected output format"""
+
         # the patterns :
         # separate the records from one another
-        pat = re.compile(r'(<record.*?>.*?</record>)', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        record_pat = re.compile(r'(<record.*?>.*?</record>)', re.DOTALL + re.MULTILINE + re.IGNORECASE)
         # extract the recid
         recid_pat = re.compile(r'<controlfield tag="001">([0-9]+?)</controlfield>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
 
@@ -428,49 +460,18 @@ class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsPars
             of='hb'
 
         try:
-            results = pat.finditer(self.buffer)
-            if req and cgi.parse_qs(req.args).has_key('jrec'):
-                counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
-            else:
-                counter = 0
+            results = record_pat.finditer(self.buffer)
+            records = {}
+            recids = []
             for result in results:
-                counter += 1
                 xml_record = result.group(1)
-                # extract the recid
                 recid = recid_pat.search(xml_record).group(1)
-                # each result is converted from MARCXML to the selected output format
-                if of == 'hb':
-                    # we place each result in its own HTML table results data structure
-                    # things to add:
-                                #<input name="ext_colid" type="hidden" value="%(ext_colid)s" />
-                                #<abbr class="unapi-id" title="%(recid)s"></abbr>
-                    # None to be later changed by a boolean that controls hosted collections that support webbasket
-                    if None:
-                        html = """
-                                <tr><td valign="top" align="right" style="white-space: nowrap;">
-                                    <input name="recid" type="checkbox" value="%(recid)s" />
-
-                                %(number)s.
-                               """ % {'recid': recid,
-                                      'number': counter}
-
-                        html += """</td><td valign="top">%s</td></tr>""" % format_record(None, of, xml_record=xml_record)
-                    else:
-                        html = """
-                                <tr><td valign="top" align="right" style="white-space: nowrap;">
-                                %(number)s.
-                               """ % {'number': counter}
-                        html += """</td><td valign="top">%s</td></tr>""" % format_record(None, of, xml_record=xml_record)
-                elif of == 'hd':
-                    # is HTML detailed actually supported?
-                    #html = format_record(None, of, xml_record=result.group(1))
-                    html = ""
-                # should this be xm only or of.startswith("x")
+                recids.append(recid)
+                if of != 'xm':
+                    records[recid] = format_record(None, of, xml_record=xml_record)
                 elif of == 'xm':
-                    # XML needs no formatting
-                    html = result.group(1)
-                self.add_html_result(html)
+                    records[recid] = xml_record
+            return (recids,records)
         except AttributeError:
             # in case there were no results found an Attribute error is raised
-            # TODO: replace pass with some proper handling of the situation or at least a message
-            pass
+            return ([], {})

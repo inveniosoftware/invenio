@@ -4237,7 +4237,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             print_warning(req, "wash_colls debugging info : %s" % wash_colls_debug)
 
         # search into the hosted collections only if the output format is html or xml
-        if hosted_colls and (of.startswith("h") or of.startswith("x")):
+        if hosted_colls and (of.startswith("h") or of.startswith("x")) and not p.startswith("recid:"):
 
             # hosted_colls_results : the hosted collections' searches that did not timeout
             # hosted_colls_timeouts : the hosted collections' searches that timed out and will be searched later on again
@@ -4265,7 +4265,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                     for timeout in hosted_colls_timeouts:
                         print_warning(req, "Hosted collections (perform_search_request): %s timed out and will be searched again later" % timeout[0][1].name)
         # we need to know for later use if there were any hosted collections to be searched even if they weren't in the end
-        elif hosted_colls and not of.startswith("h") and not of.startswith("x"):
+        elif hosted_colls and ((not (of.startswith("h") or of.startswith("x"))) or p.startswith("recid:")):
             (hosted_colls_results, hosted_colls_timeouts) = (None, None)
         else:
             if verbose:

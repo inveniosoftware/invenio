@@ -665,6 +665,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
     def add(self, req, form):
         """Add records to baskets.
         @param recid: list of records to add
+        @param colid: in case of external collections, the id of the collection the records belong to
         @param bskids: list of baskets to add records to. if not provided,
                        will return a page where user can select baskets
         @param referer: URL of the referring page
@@ -673,6 +674,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         @param create_in_topic: # of topic to put basket into
         @param ln: language"""
         argd = wash_urlargd(form, {'recid': (list, []),
+                                   'colid': (int, 0),
                                    'bskids': (list, []),
                                    'referer': (str, ""),
                                    'new_basket_name': (str, ""),
@@ -706,6 +708,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         (body, errors, warnings) = perform_request_add(
                                         uid=uid,
                                         recids=argd['recid'],
+                                        colid=argd['colid'],
                                         bskids=argd['bskids'],
                                         referer=argd['referer'],
                                         new_basket_name=argd['new_basket_name'],
