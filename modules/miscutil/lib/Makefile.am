@@ -64,7 +64,7 @@ all:
 
 install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
-	$(PYTHON) $(srcdir)/intbitset_setup.py install
+	@find ${srcdir} -name intbitset.so -exec cp {} ${pylibdir} \;
 
 CLEANFILES = *~ *.tmp *.pyc
 

@@ -341,7 +341,7 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset1, eval(repr(intbitset1)))
 
     def test_set_cmp(self):
-        """intbitset - (non infinte) set comparison"""
+        """intbitset - (non infinite) set comparison"""
         for set1 in self.sets + [[]]:
             for set2 in self.sets + [[]]:
                 for op in self.cmp_list:
