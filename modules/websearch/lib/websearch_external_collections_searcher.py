@@ -24,6 +24,9 @@ __revision__ = "$Id$"
 import sys
 import urllib
 
+import cgi
+import types
+
 from invenio.config import CFG_SITE_LANG
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIONS, CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.websearch_external_collections_parser import CDSIndicoCollectionResutsParser, \
@@ -54,11 +57,18 @@ class ExternalSearchEngine(object):
 
     def __init__(self, configuration):
         self.search_url = ""
-        self.parser = None
         self.combiner = " "
         self.name = None
+        self.parser_params = None
+        self.parser = None
+        self.fetch_format = ""
+        self.selected_by_default = False
         for (name, value) in configuration.iteritems():
             setattr(self, name, value)
+        if self.parser_params:
+            setattr(self, 'parser', self.parser_params['parser'](self.parser_params))
+            if 'fetch_format' in self.parser_params.keys():
+                self.fetch_format = self.parser_params['fetch_format']
 
     def build_units(self, basic_search_units):
         """ Build the research units for basic_search_units provided"""
@@ -76,8 +86,8 @@ class ExternalSearchEngine(object):
             return basic[1]
         return None
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
-        """Build an URL for a specific set of search_units."""
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
+        """Build a URL for a specific set of search_units."""
 
         units = self.build_units(basic_search_units)
         if len(units) == 0:
@@ -104,8 +114,8 @@ class SortedFieldsSearchEngine(ExternalSearchEngine):
         self.converter = {}
         super(SortedFieldsSearchEngine, self).__init__(configuration)
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
-        """Build an URL for a search."""
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
+        """Build a search URL. Reuse the search pattern found in req only with Invenio-based search engines"""
         self.clear_fields()
         self.fill_fields(basic_search_units)
 
@@ -173,10 +183,10 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
             else:
                 return operator + '"' + pattern + '"'
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
         """Build an URL for a specific set of search_units."""
 
-        url = super(CDSIndicoSearchEngine, self).build_search_url(basic_search_units, lang)
+        url = super(CDSIndicoSearchEngine, self).build_search_url(basic_search_units, None, lang)
         if not url:
             return None
 
@@ -197,7 +207,7 @@ class CERNEDMSSearchEngine(SortedFieldsSearchEngine):
         self.search_url_simple = "http://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text="
         self.fields = ["author", "keyword", "abstract", "title", "reportnumber"]
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
         """Build an URL for CERN EDMS."""
         super(CERNEDMSSearchEngine, self).build_search_url(basic_search_units)
         if len(self.fields_content["default"]) > 0:
@@ -236,7 +246,7 @@ class CERNAgendaSearchEngine(ExternalSearchEngine):
         self.search_url_author = "http://agenda.cern.ch/search.php?field=speaker&search=Search&keywords="
         self.search_url_title = "http://agenda.cern.ch/search.php?field=title&search=Search&keywords="
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
         """Build an url for searching on CERN Agenda. This will only work if there is only author
         or title tags."""
         if only_field(basic_search_units, "author"):
@@ -273,9 +283,9 @@ class GoogleSearchEngine(ExternalSearchEngine):
             else:
                 return sign + author_tag + search_unit[1]
         if search_unit[3] == "w":
-            return search_unit[0] + search_unit[1]
+            return sign + search_unit[1]
         else:
-            return search_unit[0] + '"' + search_unit[1] + '"'
+            return sign + '"' + search_unit[1] + '"'
 
 class GoogleBooksSearchEngine(GoogleSearchEngine):
     """Interface for searching on Google Books."""
@@ -313,7 +323,7 @@ class KissSearchEngine(SortedFieldsSearchEngine):
         self.fields = self.converter.keys()
         self.parser = KISSExternalCollectionResultsParser()
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
         """Build an URL for a search."""
         super(KissSearchEngine, self).build_search_url(basic_search_units)
         url_parts = []
@@ -458,7 +468,7 @@ class AmazonSearchEngine(ExternalSearchEngine):
         self.search_url_general = "http://www.amazon.com/exec/obidos/external-search/?tag=cern&keyword="
         self.search_url_author = "http://www.amazon.com/exec/obidos/external-search/?tag=cern&field-author="
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
         """Build an URL for Amazon"""
         if only_field(basic_search_units, "author"):
             self.search_url = self.search_url_author
@@ -510,7 +520,7 @@ class NEBISSearchEngine(ExternalSearchEngine):
         self.search_url_author = "http://opac.nebis.ch/F/?func=find-b&find_code=WAU&REQUEST="
         self.search_url_title = "http://opac.nebis.ch/F/?func=find-b&find_code=WTI&REQUEST="
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
         """Build an URL for NEBIS"""
         if only_field(basic_search_units, "author"):
             self.search_url = self.search_url_author
@@ -519,6 +529,45 @@ class NEBISSearchEngine(ExternalSearchEngine):
         else:
             self.search_url = self.search_url_general
         return super(NEBISSearchEngine, self).build_search_url(basic_search_units)
+
+# Invenio based
+
+class CDSInvenioSearchEngine(ExternalSearchEngine):
+    """Generic search engine class for Invenio based sites"""
+
+    def __init__(self, configuration):
+        super(CDSInvenioSearchEngine, self).__init__(configuration)
+
+    def build_search_url(self, basic_search_units, req=None, lang=CFG_SITE_LANG):
+        """Build a URL for an Invenio based site"""
+
+        if req:
+            search_url_params = ""
+            if cgi.parse_qs(req.args).has_key('p'):
+                search_url_params += urllib.quote(cgi.parse_qs(req.args)['p'][0])
+            if cgi.parse_qs(req.args).has_key('jrec'):
+                search_url_params += '&jrec=' + cgi.parse_qs(req.args)['jrec'][0]
+            if cgi.parse_qs(req.args).has_key('rg'):
+                search_url_params += '&rg=' + cgi.parse_qs(req.args)['rg'][0]
+            search_url_params += '&of=' + self.fetch_format
+            return self.search_url + search_url_params
+        else:
+            units = self.build_units(basic_search_units)
+            if len(units) == 0:
+                return None
+            request = self.combine_units(units)
+            url_request = urllib.quote(request)
+            return self.search_url + url_request + '&of=' + self.fetch_format
+
+    def build_search_unit_unit(self, basic):
+        """Build a search string from a search unit. Reconstructs original user query"""
+
+        # TO DO: correct & improve the print out
+        # adding the semicolon in case a specific field is chosen
+        if basic[2] != "": basic[2] = basic[2] + ":"
+        # adding the single quotes in case a multi word values is searched for
+        if basic[3] == "a": basic[1] = "'" + basic[1] + "'"
+        return basic[0] + " " + basic[2] + basic[1]
 
 external_collections_dictionary = {}
 
@@ -533,4 +582,3 @@ def build_external_collections_dictionary():
             sys.stderr.write("Error : not found " + engine_name + "\n")
 
 build_external_collections_dictionary()
-

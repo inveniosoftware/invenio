@@ -36,6 +36,12 @@ import time
 import urllib
 import urlparse
 import zlib
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 ## import CDS Invenio stuff:
 from invenio.config import \
@@ -98,6 +104,10 @@ try:
     websearch_templates = invenio.template.load('websearch')
 except:
     pass
+
+from invenio.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
+from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
+from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
 
 ## global vars:
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
@@ -872,6 +882,10 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
                 temp.append({ 'value' : CFG_SITE_NAME,
                               'text' : '*** %s ***' % _("any public collection")
                             })
+                # this field is used to remove the current collection from the ones to be searched.
+                temp.append({ 'value' : '',
+                              'text' : '*** %s ***' % _("remove this collection")
+                            })
                 for val in colls_nice:
                     # print collection:
                     if not cx.startswith("Unnamed collection"):
@@ -1088,7 +1102,7 @@ def is_selected(var, fld):
         return " selected"
     return ""
 
-def wash_colls(cc, c, split_colls=0):
+def wash_colls(cc, c, split_colls=0, verbose=0):
     """Wash collection list by checking whether user has deselected
     anything under 'Narrow search'.  Checks also if cc is a list or not.
        Return list of cc, colls_to_display, colls_to_search since the list
@@ -1115,6 +1129,16 @@ def wash_colls(cc, c, split_colls=0):
 
     colls_out = []
     colls_out_for_display = []
+    # list to hold the hosted collections to be searched and displayed
+    hosted_colls_out = []
+    debug = ""
+
+    if verbose:
+        debug += "<br />"
+        debug += "<br />1) --- initial parameters ---"
+        debug += "<br />cc : %s" % cc
+        debug += "<br />c : %s" % c
+        debug += "<br />"
 
     # check what type is 'cc':
     if type(cc) is list:
@@ -1137,6 +1161,12 @@ def wash_colls(cc, c, split_colls=0):
     else:
         colls = [c]
 
+    if verbose:
+        debug += "<br />2) --- after check for the integrity of cc and the being or not c a list ---"
+        debug += "<br />cc : %s" % cc
+        debug += "<br />c : %s" % c
+        debug += "<br />"
+
     # remove all 'unreal' collections:
     colls_real = []
     for coll in colls:
@@ -1147,9 +1177,19 @@ def wash_colls(cc, c, split_colls=0):
                 raise InvenioWebSearchUnknownCollectionError(coll)
     colls = colls_real
 
+    if verbose:
+        debug += "<br />3) --- keeping only the real colls of c ---"
+        debug += "<br />colls : %s" % colls
+        debug += "<br />"
+
     # check if some real collections remain:
     if len(colls)==0:
         colls = [cc]
+
+    if verbose:
+        debug += "<br />4) --- in case no colls were left we use cc directly ---"
+        debug += "<br />colls : %s" % colls
+        debug += "<br />"
 
     # then let us check the list of non-restricted "real" sons of 'cc' and compare it to 'coll':
     res = run_sql("""SELECT c.name FROM collection AS c,
@@ -1157,6 +1197,19 @@ def wash_colls(cc, c, split_colls=0):
                                         collection AS ccc
                      WHERE c.id=cc.id_son AND cc.id_dad=ccc.id
                        AND ccc.name=%s AND cc.type='r'""", (cc,))
+
+    # list that holds all the non restricted sons of cc that are also not hosted collections
+    l_cc_nonrestricted_sons_and_nonhosted_colls = []
+    res_hosted = run_sql("""SELECT c.name FROM collection AS c,
+                         collection_collection AS cc,
+                         collection AS ccc
+                         WHERE c.id=cc.id_son AND cc.id_dad=ccc.id
+                         AND ccc.name=%s AND cc.type='r'
+                         AND (c.dbquery NOT LIKE 'hostedcollection:%%' OR c.dbquery IS NULL)""", (cc,))
+    for row_hosted in res_hosted:
+            l_cc_nonrestricted_sons_and_nonhosted_colls.append(row_hosted[0])
+    l_cc_nonrestricted_sons_and_nonhosted_colls.sort()
+
     l_cc_nonrestricted_sons = []
     l_c = colls
     for row in res:
@@ -1166,18 +1219,63 @@ def wash_colls(cc, c, split_colls=0):
     l_cc_nonrestricted_sons.sort()
     if l_cc_nonrestricted_sons == l_c:
         colls_out_for_display = [cc] # yep, washing permitted, it is sufficient to display 'cc'
+    # the following elif is a hack that preserves the above funcionality when we start searching from
+    # the frontpage with some hosted collections deselected (either by default or manually)
+    elif set(l_cc_nonrestricted_sons_and_nonhosted_colls).issubset(set(l_c)):
+        colls_out_for_display = colls
+        split_colls = 0
     else:
         colls_out_for_display = colls # nope, we need to display all 'colls' successively
 
     # remove duplicates:
-    colls_out_for_display_nondups=filter(lambda x, colls_out_for_display=colls_out_for_display: colls_out_for_display[x-1] not in colls_out_for_display[x:], range(1, len(colls_out_for_display)+1))
-    colls_out_for_display = map(lambda x, colls_out_for_display=colls_out_for_display:colls_out_for_display[x-1], colls_out_for_display_nondups)
+    #colls_out_for_display_nondups=filter(lambda x, colls_out_for_display=colls_out_for_display: colls_out_for_display[x-1] not in colls_out_for_display[x:], range(1, len(colls_out_for_display)+1))
+    #colls_out_for_display = map(lambda x, colls_out_for_display=colls_out_for_display:colls_out_for_display[x-1], colls_out_for_display_nondups)
+    colls_out_for_display = list(set(colls_out_for_display))
+
+    if verbose:
+        debug += "<br />5) --- decide whether colls_out_for_diplay should be colls or is it sufficient for it to be cc; remove duplicates ---"
+        debug += "<br />colls_out_for_display : %s" % colls_out_for_display
+        debug += "<br />"
+
+    # the following piece of code takes care of removing collections whose ancestors are going to be searched anyway
+    # list to hold the collections to be removed
+    colls_to_be_removed = []
+    # first calculate the collections that can safely be removed
+    for coll in colls_out_for_display:
+        for ancestor in get_coll_ancestors(coll):
+            #if ancestor in colls_out_for_display: colls_to_be_removed.append(coll)
+            if ancestor in colls_out_for_display and not is_hosted_collection(coll): colls_to_be_removed.append(coll)
+    # secondly remove the collections
+    for coll in colls_to_be_removed:
+        colls_out_for_display.remove(coll)
+
+    if verbose:
+        debug += "<br />6) --- remove collections that have ancestors about to be search, unless they are hosted ---"
+        debug += "<br />colls_out_for_display : %s" % colls_out_for_display
+        debug += "<br />"
+
+    # calculate the hosted collections to be searched.
+    if colls_out_for_display == [cc]:
+        if is_hosted_collection(cc):
+            hosted_colls_out.append(cc)
+        else:
+            for coll in get_coll_sons(cc):
+                if is_hosted_collection(coll):
+                    hosted_colls_out.append(coll)
+    else:
+        for coll in colls_out_for_display:
+            if is_hosted_collection(coll):
+                hosted_colls_out.append(coll)
+
+    if verbose:
+        debug += "<br />7) --- calculate the hosted_colls_out ---"
+        debug += "<br />hosted_colls_out : %s" % hosted_colls_out
+        debug += "<br />"
 
     # second, let us decide on collection splitting:
     if split_colls == 0:
         # type A - no sons are wanted
         colls_out = colls_out_for_display
-#    elif split_colls == 1:
     else:
         # type B - sons (first-level descendants) are wanted
         for coll in colls_out_for_display:
@@ -1185,13 +1283,36 @@ def wash_colls(cc, c, split_colls=0):
             if coll_sons == []:
                 colls_out.append(coll)
             else:
-                colls_out = colls_out + coll_sons
+                for coll_son in coll_sons:
+                    if not is_hosted_collection(coll_son):
+                        colls_out.append(coll_son)
+            #else:
+            #    colls_out = colls_out + coll_sons
 
     # remove duplicates:
-    colls_out_nondups=filter(lambda x, colls_out=colls_out: colls_out[x-1] not in colls_out[x:], range(1, len(colls_out)+1))
-    colls_out = map(lambda x, colls_out=colls_out:colls_out[x-1], colls_out_nondups)
+    #colls_out_nondups=filter(lambda x, colls_out=colls_out: colls_out[x-1] not in colls_out[x:], range(1, len(colls_out)+1))
+    #colls_out = map(lambda x, colls_out=colls_out:colls_out[x-1], colls_out_nondups)
+    colls_out = list(set(colls_out))
 
-    return (cc, colls_out_for_display, colls_out)
+    if verbose:
+        debug += "<br />8) --- calculate the colls_out; remove duplicates ---"
+        debug += "<br />colls_out : %s" % colls_out
+        debug += "<br />"
+
+    # remove the hosted collections from the collections to be searched
+    if hosted_colls_out:
+        for coll in hosted_colls_out:
+            try:
+                colls_out.remove(coll)
+            except ValueError:
+                # in case coll was not found in colls_out
+                pass
+
+    if verbose:
+        debug += "<br />9) --- remove the hosted_colls from the colls_out ---"
+        debug += "<br />colls_out : %s" % colls_out
+
+    return (cc, colls_out_for_display, colls_out, hosted_colls_out, debug)
 
 def strip_accents(x):
     """Strip accents in the input phrase X (assumed in UTF-8) by replacing
@@ -1393,6 +1514,16 @@ def wash_dates(d1="", d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0):
     # okay, return constructed YYYY-MM-DD HH:MM:SS datetexts:
     return (datetext1, datetext2)
 
+def is_hosted_collection(coll):
+    """Check if the given collection is a hosted one; i.e. its dbquery starts with hostedcollection:
+    Returns True if it is, False if it's not or if the result is empty or if the query failed"""
+
+    res = run_sql("SELECT dbquery FROM collection WHERE name=%s", (coll, ))
+    try:
+        return res[0][0].startswith("hostedcollection:")
+    except:
+        return False
+
 def get_colID(c):
     "Return collection ID for collection name C.  Return None if no match found."
     colID = None
@@ -1437,7 +1568,7 @@ def get_coll_sons(coll, type='r', public_only=1):
             coll_sons.append(name[0])
     return coll_sons
 
-def get_coll_real_descendants(coll):
+def get_coll_real_descendants(coll, type='_', get_hosted_colls=True):
     """Return a list of all descendants of collection 'coll' that are defined by a 'dbquery'.
        IOW, we need to decompose compound collections like "A & B" into "A" and "B" provided
        that "A & B" has no associated database query defined.
@@ -1446,11 +1577,15 @@ def get_coll_real_descendants(coll):
     res = run_sql("""SELECT c.name,c.dbquery FROM collection AS c
                      LEFT JOIN collection_collection AS cc ON c.id=cc.id_son
                      LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad
-                     WHERE ccc.name=%s ORDER BY cc.score DESC""",
-                  (coll,))
+                     WHERE ccc.name=%s AND cc.type LIKE %s ORDER BY cc.score DESC""",
+                  (coll, type,))
     for name, dbquery in res:
         if dbquery: # this is 'real' collection, so return it:
-            coll_sons.append(name)
+            if get_hosted_colls:
+                coll_sons.append(name)
+            else:
+                if not dbquery.startswith("hostedcollection:"):
+                    coll_sons.append(name)
         else: # this is 'composed' collection, so recurse:
             coll_sons.extend(get_coll_real_descendants(name))
     return coll_sons
@@ -1547,7 +1682,7 @@ def browse_in_bibwords(req, p, f, ln=CFG_SITE_LANG):
     ))
     return
 
-def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG):
+def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -1631,7 +1766,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     basic_search_units_hitsets.append(basic_search_unit_hitset)
                 else:
                     # stage 2-3: no hits found either, propose nearest indexed terms:
-                    if of.startswith('h'):
+                    if of.startswith('h') and display_nearest_terms_box:
                         if req:
                             if bsu_f == "recid":
                                 print_warning(req, "Requested record does not seem to exist.")
@@ -1640,7 +1775,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                     return hitset_empty
             else:
                 # stage 2-3: no hits found either, propose nearest indexed terms:
-                if of.startswith('h'):
+                if of.startswith('h') and display_nearest_terms_box:
                     if req:
                         if bsu_f == "recid":
                             print_warning(req, "Requested record does not seem to exist.")
@@ -1673,7 +1808,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 print_warning(req, "Invalid set operation %s." % cgi.escape(this_unit_operation), "Error")
     if len(hitset_in_any_collection) == 0:
         # no hits found, propose alternative boolean query:
-        if of.startswith('h'):
+        if of.startswith('h') and display_nearest_terms_box:
             nearestterms = []
             for idx_unit in range(0, len(basic_search_units)):
                 bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
@@ -1699,7 +1834,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
     return hitset_in_any_collection
 
-def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG):
+def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Search for complex pattern 'p' containing parenthesis within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -1714,7 +1849,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
     # sanity check: do not call parenthesised parser for search terms
     # like U(1):
     if not re_pattern_parens.search(p):
-        return search_pattern(req, p, f, m, ap, of, verbose, ln)
+        return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
 
     # Try searching with parentheses
     try:
@@ -1735,8 +1870,8 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
             current_operator = parsing_result[index]
             current_pattern = parsing_result[index+1]
 
-            # obtain a hitset for the current patter
-            current_hitset = search_pattern(req, current_pattern, f, m, ap, of, verbose, ln)
+            # obtain a hitset for the current pattern
+            current_hitset = search_pattern(req, current_pattern, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
 
             # combine the current hitset with resulting hitset using the current operator
             if current_operator == '+':
@@ -1760,7 +1895,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         p = p.replace('(', ' ')
         p = p.replace(')', ' ')
 
-        return search_pattern(req, p, f, m, ap, of, verbose, ln)
+        return search_pattern(req, p, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
 
 def search_unit(p, f=None, m=None):
     """Search for basic search unit defined by pattern 'p' and field
@@ -2008,7 +2143,7 @@ def search_unit_by_times_cited(p):
         allrecs = HitSet(run_sql_cached("SELECT id FROM bibrec", affected_tables=['bibrec']))
     return get_records_with_num_cites(numstr, allrecs)
 
-def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG):
+def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
     _ = gettext_set_language(ln)
 
@@ -2025,7 +2160,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         results_in_Home = hitset_in_any_collection & get_collection_reclist(CFG_SITE_NAME)
         if len(results_in_Home) > 0:
             # some hits found in Home, so propose this search:
-            if of.startswith("h"):
+            if of.startswith("h") and display_nearest_terms_box:
                 url = websearch_templates.build_search_url(req.argd, cc=CFG_SITE_NAME, c=[])
                 print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
                               {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln, False) for coll in colls], ', ') + '</em>',
@@ -2035,7 +2170,7 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
             results = {}
         else:
             # no hits found in Home, recommend different search terms:
-            if of.startswith("h"):
+            if of.startswith("h") and display_nearest_terms_box:
                 print_warning(req, _("No public collection matched your query. "
                                      "If you were looking for a non-public document, please choose "
                                      "the desired restricted collection first."))
@@ -2754,7 +2889,67 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb
              cpu_time = cpu_time,
            )
 
-def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=CFG_SITE_LANG, ec=[]):
+def print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=10,
+                      aas=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
+                      sc=1, pl_in_url="",
+                      d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
+                      cpu_time=-1, middle_only=0):
+    """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
+       Also, prints navigation links (beg/next/prev/end) inside the results set.
+       If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
+       This is suitable for displaying navigation links at the bottom of the search results page."""
+
+    out = ""
+
+    # sanity check:
+    if jrec < 1:
+        jrec = 1
+    if jrec > nb_found:
+        jrec = max(nb_found-rg+1, 1)
+
+    return websearch_templates.tmpl_print_hosted_search_info(
+             ln = ln,
+             collection = collection,
+             aas = aas,
+             collection_name = get_coll_i18nname(collection, ln, False),
+             collection_id = get_colID(collection),
+             middle_only = middle_only,
+             rg = rg,
+             nb_found = nb_found,
+             sf = sf,
+             so = so,
+             rm = rm,
+             of = of,
+             ot = ot,
+             p = p,
+             f = f,
+             p1 = p1,
+             p2 = p2,
+             p3 = p3,
+             f1 = f1,
+             f2 = f2,
+             f3 = f3,
+             m1 = m1,
+             m2 = m2,
+             m3 = m3,
+             op1 = op1,
+             op2 = op2,
+             pl_in_url = pl_in_url,
+             d1y = d1y,
+             d1m = d1m,
+             d1d = d1d,
+             d2y = d2y,
+             d2m = d2m,
+             d2d = d2d,
+             dt = dt,
+             jrec = jrec,
+             sc = sc,
+             sp = sp,
+             all_fieldcodes = get_fieldcodes(),
+             cpu_time = cpu_time,
+           )
+
+def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=CFG_SITE_LANG, ec=[], hosted_colls_potential_results_p=False):
     """Prints results overview box with links to particular collections below."""
 
     out = ""
@@ -2773,7 +2968,24 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
              cpu_time = cpu_time,
              colls = new_colls,
              ec = ec,
+             hosted_colls_potential_results_p = hosted_colls_potential_results_p,
            )
+
+def print_hosted_results(infos, of=None, ln=CFG_SITE_LANG, req=None, no_records_found=False, timeout=False):
+    """Prints the full results of a hosted collection"""
+
+    if of.startswith("h"):
+        if no_records_found:
+            return "<br />No results found.."
+        if timeout:
+            return "<br />The search engine did not respond in time"
+
+    return websearch_templates.tmpl_print_hosted_results(
+        ln=ln,
+        infos=infos,
+        of=of,
+        req=req
+        )
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG):
     """Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
@@ -3792,7 +4004,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
 
     # wash all arguments requiring special care
     try:
-        (cc, colls_to_display, colls_to_search) = wash_colls(cc, c, sc) # which colls to search and to display?
+        (cc, colls_to_display, colls_to_search, hosted_colls, wash_colls_debug) = wash_colls(cc, c, sc, verbose) # which colls to search and to display?
     except InvenioWebSearchUnknownCollectionError, exc:
         colname = exc.colname
         if of.startswith("h"):
@@ -4020,6 +4232,56 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         query_in_cache = False
         query_representation_in_cache = repr((p,f,colls_to_search))
         page_start(req, of, cc, aas, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3))
+
+        if of.startswith("h") and verbose and wash_colls_debug:
+            print_warning(req, "wash_colls debugging info : %s" % wash_colls_debug)
+
+        # search into the hosted collections only if the output format is html or xml
+        if hosted_colls and (of.startswith("h") or of.startswith("x")):
+
+            # hosted_colls_results : the hosted collections' searches that did not timeout
+            # hosted_colls_timeouts : the hosted collections' searches that timed out and will be searched later on again
+            (hosted_colls_results, hosted_colls_timeouts) = calculate_hosted_collections_results(req, [p, p1, p2, p3], f, hosted_colls, verbose, ln, CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH)
+
+            # successful searches
+            if hosted_colls_results:
+                hosted_colls_true_results = []
+                for result in hosted_colls_results:
+                    # if the number of results is None or 0 (or False) then just do nothing
+                    if result[1] == None or result[1] == False:
+                        # these are the searches the returned no or zero results
+                        if verbose:
+                            print_warning(req, "Hosted collections (perform_search_request): %s returned no results" % result[0][1].name)
+                    else:
+                        # these are the searches that actually returned results on time
+                        hosted_colls_true_results.append(result)
+                        if verbose:
+                            print_warning(req, "Hosted collections (perform_search_request): %s returned %s results in %s seconds" % (result[0][1].name, result[1], result[2]))
+            else:
+                if verbose:
+                    print_warning(req, "Hosted collections (perform_search_request): there were no hosted collections results to be printed at this time")
+            if hosted_colls_timeouts:
+                if verbose:
+                    for timeout in hosted_colls_timeouts:
+                        print_warning(req, "Hosted collections (perform_search_request): %s timed out and will be searched again later" % timeout[0][1].name)
+        # we need to know for later use if there were any hosted collections to be searched even if they weren't in the end
+        elif hosted_colls and not of.startswith("h") and not of.startswith("x"):
+            (hosted_colls_results, hosted_colls_timeouts) = (None, None)
+        else:
+            if verbose:
+                print_warning(req, "Hosted collections (perform_search_request): there were no hosted collections to be searched")
+
+        ## let's define some useful boolean variables:
+        # True means there are actual or potential hosted collections results to be printed
+        hosted_colls_actual_or_potential_results_p = not (not hosted_colls or not ((hosted_colls_results and hosted_colls_true_results) or hosted_colls_timeouts))
+
+        # True means there are hosted collections timeouts to take care of later
+        # (useful for more accurate printing of results later)
+        hosted_colls_potential_results_p = not (not hosted_colls or not hosted_colls_timeouts)
+
+        # True means we only have hosted collections to deal with
+        only_hosted_colls_actual_or_potential_results_p = not colls_to_search and hosted_colls_actual_or_potential_results_p
+
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, aas, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
@@ -4088,7 +4350,11 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                     print_warning(req, "Search stage 0: query found in cache, reusing cached results.")
             else:
                 try:
-                    results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
+                    # added the display_nearest_terms_box parameter to avoid printing out the "Nearest terms in any collection"
+                    # recommendations when there are results only in the hosted collections. Also added the if clause to avoid
+                    # searching in case we know we only have actual or potential hosted collections results
+                    if not only_hosted_colls_actual_or_potential_results_p:
+                        results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln, display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p)
                 except:
                     register_exception(req=req, alert_admin=True)
                     if of.startswith("h"):
@@ -4096,7 +4362,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                     return page_end(req, of, ln)
 
-        if len(results_in_any_collection) == 0:
+        if len(results_in_any_collection) == 0 and not hosted_colls_actual_or_potential_results_p:
             if of.startswith("h"):
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
             elif of.startswith("x"):
@@ -4115,7 +4381,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
 
         # search stage 4: intersection with collection universe:
         try:
-            results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose, ln)
+            # added the display_nearest_terms_box parameter to avoid printing out the "Nearest terms in any collection"
+            # recommendations when there results only in the hosted collections. Also added the if clause to avoid
+            # searching in case we know since the last stage that we have no results in any collection
+            if len(results_in_any_collection) != 0:
+                results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose, ln, display_nearest_terms_box=not hosted_colls_actual_or_potential_results_p)
+            else:
+                results_final = {}
         except:
             register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
@@ -4123,7 +4395,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
             return page_end(req, of, ln)
 
-        if results_final == {}:
+        if results_final == {} and not hosted_colls_actual_or_potential_results_p:
             if of.startswith("h"):
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
             if of.startswith("x"):
@@ -4133,7 +4405,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             return page_end(req, of, ln)
 
         # search stage 5: apply search option limits and restrictions:
-        if datetext1 != "":
+        if datetext1 != "" and results_final != {}:
             if verbose and of.startswith("h"):
                 print_warning(req, "Search stage 5: applying time etc limits, from %s until %s..." % (datetext1, datetext2))
             try:
@@ -4150,14 +4422,16 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
-            if results_final == {}:
+            if results_final == {} and not hosted_colls_actual_or_potential_results_p:
                 if of.startswith("h"):
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                #if of.startswith("x"):
+                #    # Print empty, but valid XML
+                #    print_records_prologue(req, of)
+                #    print_records_epilogue(req, of)
                 return page_end(req, of, ln)
 
-
-
-        if pl:
+        if pl and results_final != {}:
             pl = wash_pattern(pl)
             if verbose and of.startswith("h"):
                 print_warning(req, "Search stage 5: applying search pattern limit %s..." % cgi.escape(pl))
@@ -4175,7 +4449,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 return page_end(req, of, ln)
-            if results_final == {}:
+            if results_final == {} and not hosted_colls_actual_or_potential_results_p:
                 if of.startswith("h"):
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
                 if of.startswith("x"):
@@ -4212,8 +4486,23 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 results_final_for_all_selected_colls.union_update(results_final[coll])
             results_final_nb_total = len(results_final_for_all_selected_colls)
 
-        if results_final_nb_total == 0:
-            if of.startswith('h'):
+        #if hosted_colls and (of.startswith("h") or of.startswith("x")):
+        if hosted_colls_actual_or_potential_results_p:
+            if hosted_colls_results:
+                for result in hosted_colls_true_results:
+                    colls_to_search.append(result[0][1].name)
+                    results_final_nb[result[0][1].name] = result[1]
+                    results_final_nb_total += result[1]
+                    cpu_time += result[2]
+            if hosted_colls_timeouts:
+                for timeout in hosted_colls_timeouts:
+                    colls_to_search.append(timeout[1].name)
+                    # use -963 as a special number to identify the collections that timed out
+                    results_final_nb[timeout[1].name] = -963
+
+        # we continue past this point only if there is a hosted collection that has timed out and might offer potential results
+        if results_final_nb_total ==0 and not hosted_colls_potential_results_p:
+            if of.startswith("h"):
                 print_warning(req, "No match found, please enter different search terms.")
             elif of.startswith("x"):
                 # Print empty, but valid XML
@@ -4240,7 +4529,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 return recIDs
             elif of.startswith("h"):
                 if of not in ['hcs']:
-                    req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec))
+                    # added the hosted_colls_potential_results_p parameter to help print out the overview more accurately
+                    req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec, hosted_colls_potential_results_p=hosted_colls_potential_results_p))
                     selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
             # print number of hits found for XML outputs:
             if of.startswith("x"):
@@ -4293,9 +4583,74 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                         jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                         sc, pl_in_url,
                                                         d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+
+                #if hosted_colls and (of.startswith("h") or of.startswith("x")):
+                if hosted_colls_actual_or_potential_results_p:
+                    if hosted_colls_results:
+                        # TODO: add a verbose message here
+                        for result in hosted_colls_true_results:
+                            if of.startswith("h"):
+                                req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, results_final_nb[result[0][1].name],
+                                                            jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                            sc, pl_in_url,
+                                                            d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
+                            req.write(print_hosted_results(result[0], of, ln, req))
+                            if of.startswith("h"):
+                                req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, results_final_nb[result[0][1].name],
+                                                            jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                            sc, pl_in_url,
+                                                            d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                    if hosted_colls_timeouts:
+                        # TODO: add a verbose message here
+                        # TODO: check if verbose messages still work when dealing with (re)calculations of timeouts
+                        (hosted_colls_timeouts_results, hosted_colls_timeouts_timeouts) = do_calculate_hosted_collections_results(req, ln, None, verbose, None, hosted_colls_timeouts, CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH)
+                        if hosted_colls_timeouts_results:
+                            hosted_colls_timeouts_true_results = []
+                            for result in hosted_colls_timeouts_results:
+                                if result[1] == None or result[1] == False:
+                                    ## these are the searches the returned no or zero results
+                                    ## also print a nearest terms box, in case this is the only
+                                    ## collection being searched and it returns no results?
+                                    if of.startswith("h"):
+                                        req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, -963,
+                                                                    jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                                    sc, pl_in_url,
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
+                                        req.write(print_hosted_results(result[0], of, ln, req, no_records_found=True))
+                                        req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, -963,
+                                                                    jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                                    sc, pl_in_url,
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                                else:
+                                    # these are the searches that actually returned results on time
+                                    if of.startswith("h"):
+                                        req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, result[1],
+                                                                    jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                                    sc, pl_in_url,
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
+                                    req.write(print_hosted_results(result[0], of, ln, req))
+                                    if of.startswith("h"):
+                                        req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, result[1],
+                                                                    jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                                    sc, pl_in_url,
+                                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                        if hosted_colls_timeouts_timeouts:
+                            for timeout in hosted_colls_timeouts_timeouts:
+                                if of.startswith("h"):
+                                    req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[0][1].name, -963,
+                                                                jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                                sc, pl_in_url,
+                                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
+                                    req.write(print_hosted_results(timeout[0], of, ln, req, timeout=True))
+                                    req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[0][1].name, -963,
+                                                                jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                                sc, pl_in_url,
+                                                                d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+
                 print_records_epilogue(req, of)
                 if f == "author" and of.startswith("h"):
                     req.write(create_similarly_named_authors_link_box(p, ln))
+
             # log query:
             try:
                 id_query = log_query(req.remote_host, req.args, uid)

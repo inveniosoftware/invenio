@@ -337,6 +337,31 @@ def editcollection(req, colID=1, ln=CFG_SITE_LANG, mtype=''):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def checkexternalcollections(req, colID, ln=CFG_SITE_LANG, icl=None, update="", confirm=0, callback='yes'):
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
+
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return error_page(req)
+
+    auth = check_user(req,'cfgwebsearch')
+    if not auth[0]:
+        return page(title="WebSearch Admin",
+                body=wsc.perform_checkexternalcollections(colID=colID,
+                                                ln=ln,
+                                                icl=icl,
+                                                update=update,
+                                                confirm=confirm,
+                                                callback=callback),
+                uid=uid,
+                language=ln,
+                req=req,
+                navtrail = navtrail_previous_links,
+                lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
 def addoutputformat(req, colID, ln=CFG_SITE_LANG, code='', name='', callback='yes', confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 

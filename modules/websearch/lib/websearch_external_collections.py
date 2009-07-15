@@ -98,8 +98,13 @@ def bind_patterns(pattern_list):
     """Combine a list of patterns in an unique pattern.
     pattern_list[0] should be the standart search pattern,
     pattern_list[1:] are advanced search patterns."""
-    if pattern_list[0]:
-        return pattern_list[0]
+
+    # just in case an empty list is fed to this function
+    try:
+        if pattern_list[0]:
+            return pattern_list[0]
+    except IndexError:
+        return None
 
     pattern = ""
     for pattern_part in pattern_list[1:]:
@@ -115,17 +120,17 @@ def create_seealso_box(req, lang, vprint, basic_search_units=None, seealso_engin
     vprint(3, 'Create seealso box')
     seealso_engines_list = external_collection_sort_engine_by_name(seealso_engines)
     vprint(3, 'seealso_engines_list = ' + str(seealso_engines_list))
-    links = build_seealso_links(basic_search_units, seealso_engines_list, lang, query)
+    links = build_seealso_links(basic_search_units, seealso_engines_list, req, lang, query)
     html = template.external_collection_seealso_box(lang, links)
     req.write(html)
 
-def build_seealso_links(basic_search_units, seealso_engines, lang, query):
+def build_seealso_links(basic_search_units, seealso_engines, req, lang, query):
     """Build the links for the see also box."""
     _ = gettext_set_language(lang)
 
     links = []
     for engine in seealso_engines:
-        url = engine.build_search_url(basic_search_units, lang)
+        url = engine.build_search_url(basic_search_units, req, lang)
         if url:
             links.append('<a class="google" href="%(url)s">%(query)s %(text_in)s %(name)s</a>' % \
                 {'url': cgi.escape(url),
@@ -175,7 +180,7 @@ def do_external_search(req, lang, vprint, basic_search_units, search_engines):
     engines_list = []
 
     for engine in search_engines:
-        url = engine.build_search_url(basic_search_units, lang)
+        url = engine.build_search_url(basic_search_units, req, lang)
         if url:
             engines_list.append([url, engine])
 
@@ -304,5 +309,159 @@ def external_collection_getid(external_collection):
     external_collection.id = results[0][0]
     return external_collection.id
 
+def get_external_collection_engine(external_collection_name):
+    """Return the external collection engine given its name"""
+
+    if external_collections_dictionary.has_key(external_collection_name):
+        return external_collections_dictionary[external_collection_name]
+    else:
+        return None
+
 external_collection_init()
 
+# Hosted Collections related functions (the following functions should eventually be regrouped as above)
+# These functions could eventually be placed into there own file, ex. websearch_hosted_collections.py
+def calculate_hosted_collections_results(req, pattern_list, field, hosted_collections, verbosity_level=0,
+                                         lang=CFG_SITE_LANG, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT):
+    """Ruturn a list of the various results for a every hosted collection organized in tuples"""
+
+    # normally, the following should be checked before even running this function so the following line could be removed
+    if not hosted_collections: return (None, None)
+
+    vprint = get_verbose_print(req, 'Hosted collections: ', verbosity_level)
+    vprint(3, 'pattern_list = ' + str(pattern_list) + ', field = ' + str(field))
+
+    # firstly we calculate the search parameters, i.e. the actual hosted search engines and the basic search units
+    (hosted_search_engines, basic_search_units) = calculate_hosted_collections_search_params(
+        req, pattern_list, field, hosted_collections, verbosity_level, lang)
+
+    # in case something went wrong with the above calculation just return None
+    # however, once we run this function no fail should be expected here
+    # UPDATE : let search go on even there are no basic search units (an empty pattern_list and field)
+    #if basic_search_units == None or len(hosted_search_engines) == 0: return (None, None)
+    if len(hosted_search_engines) == 0: return (None, None)
+
+    # finally return the list of tuples with the results
+    return do_calculate_hosted_collections_results(req, lang, vprint, verbosity_level, basic_search_units, hosted_search_engines, timeout)
+
+    vprint(3, 'end')
+
+def calculate_hosted_collections_search_params(req, pattern_list, field, hosted_collections,
+                                               verbosity_level=0, lang=CFG_SITE_LANG):
+    """Calculate the searching parameters for the selected hosted collections
+    i.e. the actual hosted search engines and the basic search units"""
+
+    from invenio.search_engine import create_basic_search_units
+    assert req
+    vprint = get_verbose_print(req, 'Hosted collections (calculate_hosted_collections_search_params): ', verbosity_level)
+
+    pattern = bind_patterns(pattern_list)
+    vprint(3, 'pattern = ' + pattern)
+
+    # if for any strange reason there is no pattern, just return
+    # UPDATE : let search go on even there is no pattern (an empty pattern_list and field)
+    #if not pattern: return (None, None)
+
+    # calculate the basic search units
+    basic_search_units = create_basic_search_units(None, pattern, field)
+    vprint(3, 'basic_search_units = ' + str(basic_search_units))
+
+    # calculate the set of hosted search engines
+    hosted_search_engines = select_hosted_search_engines(hosted_collections)
+    vprint(3, 'hosted_search_engines = ' + str(hosted_search_engines))
+
+    # no need really to print out a sorted list of the hosted search engines, is there? I'll leave this commented out
+    #hosted_search_engines_list = external_collection_sort_engine_by_name(hosted_search_engines)
+    #vprint(3, 'hosted_search_engines_list (sorted) : ' + str(hosted_search_engines_list))
+
+    return (hosted_search_engines, basic_search_units)
+
+def select_hosted_search_engines(selected_hosted_collections):
+    """Build the set of engines to be used for the hosted collections"""
+
+    if not type(selected_hosted_collections) is list:
+        selected_hosted_collections = [selected_hosted_collections]
+
+    hosted_search_engines = set()
+
+    for hosted_collection_name in selected_hosted_collections:
+        if external_collections_dictionary.has_key(hosted_collection_name):
+            engine = external_collections_dictionary[hosted_collection_name]
+            # the hosted collection cannot present its results unless it has a parser implemented
+            if engine.parser:
+                hosted_search_engines.add(engine)
+        else:
+            warning('select_hosted_search_engines: %(hosted_collection_name)s unknown.' % locals())
+
+    return hosted_search_engines
+
+def do_calculate_hosted_collections_results(req, lang, vprint, verbosity_level, basic_search_units, hosted_search_engines,
+                                            timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT):
+    """Actually search the hosted collections and return their results and information in a list of tuples.
+    One tuple for each hosted collection. Handles timeouts"""
+
+    _ = gettext_set_language(lang)
+    if not vprint:
+        vprint = get_verbose_print(req, 'Hosted collections (calculate_hosted_collections_search_params): ', verbosity_level)
+        # defining vprint at this moment probably means we'll just run this one function at this time, therefore the "verbose"
+        # end hosted search string will not be printed (it is normally printed by the initial calculate function)
+        # Therefore, either define a flag here to print it by the end of this function or redefine the whole "verbose"
+        # printing logic of the above functions
+    vprint(3, 'beginning hosted search')
+
+    # list to hold the hosted search engines and their respective search urls
+    engines_list = []
+    # list to hold the non timed out results
+    results_list = []
+    # list to hold all the results
+    full_results_list = []
+    # list to hold all the timeouts
+    timeout_list = []
+
+    # in case this is an engine-only list
+    if type(hosted_search_engines) is set:
+        for engine in hosted_search_engines:
+            url = engine.build_search_url(basic_search_units, req, lang)
+            if url:
+                engines_list.append([url, engine])
+    # in case we are iterating a pre calculated url+engine list
+    elif type(hosted_search_engines) is list:
+        for engine in hosted_search_engines:
+            engines_list.append(engine)
+    # in both the above cases we end up with a [[search url], [engine]] kind of list
+
+    # create the list of search urls to be handed to the asynchronous getter
+    pagegetters_list = [HTTPAsyncPageGetter(engine[0]) for engine in engines_list]
+
+    # function to be run on every result
+    def finished(pagegetter, data, current_time):
+        """Function called, each time the download of a web page finish.
+        Will parse and print the results of this page."""
+        # each pagegetter that didn't timeout is added to this list
+        results_list.append((pagegetter, data, current_time))
+
+    # run the asynchronous getter
+    finished_list = async_download(pagegetters_list, finished, engines_list, timeout)
+
+    # create the complete list of tuples, one for each hosted collection, with the results and other information,
+    # including those that timed out
+    for (finished, engine) in zip(finished_list, engines_list): #finished_and_engines_list:
+        if finished:
+            for result in results_list:
+                if result[1] == engine:
+                    # the engine is fed the results, it will be parsed later, at printing time
+                    engine[1].parser.parse_and_get_results(result[0].data, feedonly=True)
+                    ## the list contains:
+                    ## * the engine itself: [ search url], [engine]
+                    ## * the parsed number of found results
+                    ## * the fetching time
+                    full_results_list.append(
+                        (engine, engine[1].parser.parse_num_results(), result[2])
+                    )
+                    break
+        elif not finished:
+                ## the list contains:
+                ## * the engine itself: [search url], [engine]
+                timeout_list.append(engine)
+
+    return (full_results_list, timeout_list)

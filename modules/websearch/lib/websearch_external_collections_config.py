@@ -26,7 +26,19 @@ __revision__ = "$Id$"
 from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT, \
      CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 
+# if we want to define a parser for an external collection directly using the following dictionary
+# we have to import them here instead of the searcher
+from invenio.websearch_external_collections_parser import CDSInvenioHTMLExternalCollectionResultsParser
+from invenio.websearch_external_collections_parser import CDSInvenioXMLExternalCollectionResultsParser
+
+
 CFG_EXTERNAL_COLLECTION_TIMEOUT = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
+
+CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS = 1
+
+CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH = 1
+
+CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH = 10
 
 CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
 
@@ -73,6 +85,32 @@ CFG_EXTERNAL_COLLECTIONS = {
         {'engine': 'SPIRES'},
     'SLAC Library Catalog':
         {'engine': 'SPIRESBooks'},
+    'Atlantis Institute Books':
+        {'engine': 'CDSInvenio',
+         'base_url': 'http://invenio-demo.cern.ch/',
+         'parser_params':
+            {'host': 'invenio-demo.cern.ch',
+             'path': '',
+             'parser': CDSInvenioHTMLExternalCollectionResultsParser,
+             'fetch_format': 'hb',
+             'num_results_regex_str': r'<strong>([0-9,]+?)</strong> records found',
+             'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
+             'nbrecs_url': 'http://invenio-demo.cern.ch/search?c=Books&rg=0&of=xm'},
+         'search_url': 'http://invenio-demo.cern.ch/search?cc=Books&p=',
+         'selected_by_default': False},
+    'Atlantis Institute Articles':
+        {'engine': 'CDSInvenio',
+         'base_url': 'http://invenio-demo.cern.ch/',
+         'parser_params':
+            {'host': 'invenio-demo.cern.ch',
+             'path': '',
+             'parser': CDSInvenioXMLExternalCollectionResultsParser,
+             'fetch_format': 'xm',
+             'num_results_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
+             'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
+             'nbrecs_url': 'http://invenio-demo.cern.ch/search?cc=Articles&rg=0&of=xm'},
+         'search_url': 'http://invenio-demo.cern.ch/search?cc=Articles&p=',
+         'selected_by_default': True},
 }
 
 CFG_EXTERNAL_COLLECTION_STATES_NAME = {0: 'Disabled', 1: 'See also', 2: 'External search', 3:'External search checked'}

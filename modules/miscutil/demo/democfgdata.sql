@@ -49,6 +49,8 @@ INSERT INTO collection VALUES (19,'Atlantis Times News','collection:ATLANTISTIME
 INSERT INTO collection VALUES (20,'Atlantis Times Arts','collection:ATLANTISTIMESARTS',NULL,NULL);
 INSERT INTO collection VALUES (21,'Atlantis Times Science','collection:ATLANTISTIMESSCIENCE',NULL,NULL);
 INSERT INTO collection VALUES (22,'Atlantis Times',NULL,NULL,NULL);
+INSERT INTO collection VALUES (23,'Atlantis Institute Books','hostedcollection:',NULL,NULL);
+INSERT INTO collection VALUES (24,'Atlantis Institute Articles','hostedcollection:',NULL,NULL);
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://cdsware.cern.ch/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://cdsware.cern.ch/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
@@ -484,9 +486,17 @@ INSERT INTO collectionname VALUES (21,'fr','ln','Atlantis Times Science');
 INSERT INTO collectionname VALUES (22,'en','ln','Atlantis Times');
 INSERT INTO collectionname VALUES (22,'fr','ln','Atlantis Times');
 
+INSERT INTO collectionname VALUES (23,'en','ln','Atlantis Institute Books');
+INSERT INTO collectionname VALUES (23,'fr','ln','Atlantis Institute Books');
+
+INSERT INTO collectionname VALUES (24,'en','ln','Atlantis Institute Articles');
+INSERT INTO collectionname VALUES (24,'fr','ln','Atlantis Institute Articles');
+
 INSERT INTO collection_collection VALUES (1,15,'r',60);
 INSERT INTO collection_collection VALUES (1,16,'r',40);
 INSERT INTO collection_collection VALUES (1,17,'r',30);
+INSERT INTO collection_collection VALUES (1,23,'r',20);
+INSERT INTO collection_collection VALUES (1,24,'r',10);
 INSERT INTO collection_collection VALUES (15,6,'r',20);
 INSERT INTO collection_collection VALUES (15,2,'r',10);
 INSERT INTO collection_collection VALUES (16,3,'r',30);
@@ -1495,6 +1505,8 @@ INSERT INTO externalcollection (id, name) VALUES (15, 'NEBIS');
 INSERT INTO externalcollection (id, name) VALUES (16, 'SLAC Library Catalog');
 INSERT INTO externalcollection (id, name) VALUES (17, 'SPIRES HEP');
 INSERT INTO externalcollection (id, name) VALUES (18, 'Scirus');
+INSERT INTO externalcollection (id, name) VALUES (19, 'Atlantis Institute Books');
+INSERT INTO externalcollection (id, name) VALUES (20, 'Atlantis Institute Articles');
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (1,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (1,2,1);
@@ -1514,6 +1526,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (1,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (1,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (1,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (1,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (1,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (2,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (2,2,1);
@@ -1533,6 +1547,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (2,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (2,17,2);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (2,18,2);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (2,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (2,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (3,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (3,2,1);
@@ -1552,6 +1568,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (3,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (3,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (3,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (3,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (3,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (4,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (4,2,1);
@@ -1571,6 +1589,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (4,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (4,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (4,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (4,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (4,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (5,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (5,2,1);
@@ -1590,6 +1610,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (5,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (5,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (5,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (5,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (5,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,2,1);
@@ -1609,6 +1631,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,17,2);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,18,2);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (6,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,2,1);
@@ -1628,6 +1652,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (7,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,2,1);
@@ -1647,6 +1673,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (8,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (9,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (9,2,1);
@@ -1666,6 +1694,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (9,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (9,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (9,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (9,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (9,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (10,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (10,2,1);
@@ -1685,6 +1715,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (10,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (10,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (10,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (10,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (10,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (11,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (11,2,1);
@@ -1704,6 +1736,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (11,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (11,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (11,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (11,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (11,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (12,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (12,2,1);
@@ -1723,6 +1757,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (12,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (12,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (12,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (12,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (12,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (13,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (13,2,1);
@@ -1742,6 +1778,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (13,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (13,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (13,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (13,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (13,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (14,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (14,2,1);
@@ -1761,6 +1799,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (14,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (14,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (14,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (14,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (14,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (15,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (15,2,1);
@@ -1780,6 +1820,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (15,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (15,17,2);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (15,18,2);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (15,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (15,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (16,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (16,2,1);
@@ -1799,6 +1841,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (16,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (16,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (16,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (16,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (16,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (17,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (17,2,1);
@@ -1818,6 +1862,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (17,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (17,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (17,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (17,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (17,20,0);
 
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,1,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,2,1);
@@ -1837,6 +1883,8 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,16,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,17,1);
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,18,1);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,19,0);
+INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,20,0);
 
 
 INSERT INTO knwKB VALUES ('1','DBCOLLID2COLL','DbCollID to Coll name correspondance.', NULL);

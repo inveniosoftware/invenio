@@ -27,7 +27,13 @@ engine.
 __revision__ = "$Id$"
 
 import re
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+#from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
+CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
+
+from invenio.bibformat import format_record
+from invenio.websearch_external_collections_getter import fetch_url_content
+import cgi
 
 re_href = re.compile(r'<a[^>]*href="?([^">]*)"?[^>]*>', re.IGNORECASE)
 re_img = re.compile(r'<img[^>]*src="?([^">]*)"?[^>]*>', re.IGNORECASE)
@@ -68,6 +74,7 @@ class ExternalCollectionResultsParser(object):
     """Mother class for parsers."""
 
     num_results_regex = None
+    nbrecs_regex = None
 
     def __init__(self, host='', path=''):
         self.buffer = ""
@@ -85,8 +92,8 @@ class ExternalCollectionResultsParser(object):
         """Feed buffer with data that will be parse later."""
         self.buffer += data
 
-    def parse(self):
-        """Parse the buffer."""
+    def parse(self, of=None, req=None):
+        """Parse the buffer. Set an optional output format."""
         pass
 
     def add_html_result(self, html):
@@ -112,13 +119,42 @@ class ExternalCollectionResultsParser(object):
             return int(match.group(1).replace(',', ''))
         return None
 
-    def parse_and_get_results(self, data):
-        """Parse given data and return results.
-        """
-        self.clean()
-        self.feed(data)
-        self.parse()
-        return self.results
+    def parse_nbrecs(self, timeout):
+        """Fetch and parse the contents of the nbrecs url with the nbrecs_regex to extract the total
+        number of records. This will be returned as a formated string."""
+
+        if self.nbrecs_regex is None:
+            return None
+        html = fetch_url_content([self.nbrecs_url], timeout)
+        try:
+            if len(html) == 1:
+                matches = self.nbrecs_regex.search(html[0])
+                return int(matches.group(1).replace(',', ''))
+            else: return None
+            # This last else should never occur. It means the list html has more (or less) than 1 elements,
+            # which is impossible since the fetch_url_content(url) function always returns a list with as many
+            # elements as the list's it was fed with
+        except AttributeError:
+            # This means that the pattern did not match anything, therefore the matches.group(1) raised the exception
+            return -1
+        except TypeError:
+            # This means that the pattern was ran on None instead of string or buffer, therefore the
+            # self.nbrecs_regex.search(html[0]) raised the exception, as html = [None]
+            return -2
+
+    def parse_and_get_results(self, data, of=None, req=None, feedonly=False, parseonly=False):
+        """Parse given data and return results."""
+
+        # parseonly = True just in case we only want to parse the data and return the results
+        # ex. the bufffer has already been fed
+        if not parseonly:
+            self.clean()
+            self.feed(data)
+        # feedonly = True just in case we just want to feed the buffer with the new data
+        # ex. the data will be used only to calculate the number of results
+        if not feedonly:
+            self.parse(of, req)
+            return self.results
 
     def buffer_decode_from(self, charset):
         """Convert the buffer to UTF-8 from the specified charset. Ignore errors."""
@@ -136,7 +172,7 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     def __init__(self, host="", path=""):
         super(CDSIndicoCollectionResutsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
 
         results = self.result_regex.finditer(self.buffer)
@@ -154,7 +190,7 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www-lib.kek.jp", path="cgi-bin/"):
         super(KISSExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
 
         self.buffer_decode_from('Shift_JIS')
@@ -181,7 +217,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www-lib.kek.jp", path="cgi-bin/"):
         super(KISSBooksExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
 
         self.buffer_decode_from('Shift_JIS')
@@ -219,7 +255,7 @@ class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host = "www.google.com", path=""):
         super(GoogleExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
         elements = self.buffer.split("<div class=g>")
         if len(elements) <= 1:
@@ -237,7 +273,7 @@ class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResul
     def __init__(self, host = "scholar.google.com", path=""):
         super(GoogleScholarExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
         elements = self.buffer.split("<p class=g>")
         if len(elements) <= 1:
@@ -257,7 +293,7 @@ class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResults
     def __init__(self, host = "books.google.com", path=""):
         super(GoogleBooksExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
         elements = self.buffer.split('<table class=rsi><tr><td class="covertd">')
         if len(elements) <= 1:
@@ -274,7 +310,7 @@ class SPIRESExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www.slac.stanford.edu", path="spires/find/hep/"):
         super(SPIRESExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
         elements = self.buffer.split('<p>')
 
@@ -296,7 +332,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host='www.scirus.com', path='srsapp/'):
         super(SCIRUSExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
         data = self.buffer.replace('\n', ' ')
 
@@ -323,8 +359,118 @@ class CiteSeerExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host='', path=''):
         super(CiteSeerExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None):
         """Parse buffer to extract records."""
         for element in self.result_separator.finditer(self.buffer):
             self.add_html_result(element.group() + '<br />')
 
+class CDSInvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsParser):
+    """HTML brief (hb) Parser for Invenio"""
+
+    def __init__(self, params):
+        self.buffer = ""
+        self.results = []
+        self.clean()
+        for (name, value) in params.iteritems():
+            setattr(self, name, value)
+        self.num_results_regex = re.compile(self.num_results_regex_str)
+        self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
+
+    def parse(self, of=None, req=None):
+        """Parse buffer to extract records."""
+
+        # the patterns :
+        # level_a : select only the results
+        level_a_pat = re.compile(r'<form[^>]*basket[^>]*?>.*?<table>(.*?)</table>.*?</form>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        # level_b : purge html from the basket input fields
+        level_b_pat = re.compile(r'<input[^>]*?/>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        # level_c : separate the results from one another
+        level_c_pat = re.compile(r'(<tr>.*?</tr>)', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+
+        # the long way :
+        #level_a_res = level_a_pat.search(self.buffer)
+        #level_ab_res = level_a_res.group(1)
+        #level_b_res = level_b_pat.sub('', level_ab_res)
+        #level_c_res = level_c_pat.finditer(level_b_res)
+
+        # the short way :
+        try:
+            results = level_c_pat.finditer(level_b_pat.sub('', level_a_pat.search(self.buffer).group(1)))
+            for result in results:
+               # each result is placed in each own table since it already has its rows and cells defined
+               self.add_html_result('<table>' + result.group(1) + '</table>')
+        except AttributeError:
+            # in case there were no results found an Attribute error is raised
+            pass
+
+class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser):
+    """XML (xm) parser for Invenio"""
+
+    def __init__(self, params):
+        self.buffer = ""
+        self.results = []
+        self.clean()
+        for (name, value) in params.iteritems():
+            setattr(self, name, value)
+        self.num_results_regex = re.compile(self.num_results_regex_str)
+        self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
+
+    def parse(self, of='hb', req=None):
+        """Parse buffer to extract records. Format the records using the selected output format."""
+
+        # the patterns :
+        # separate the records from one another
+        pat = re.compile(r'(<record.*?>.*?</record>)', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        # extract the recid
+        recid_pat = re.compile(r'<controlfield tag="001">([0-9]+?)</controlfield>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+
+        if not of:
+            of='hb'
+
+        try:
+            results = pat.finditer(self.buffer)
+            if req and cgi.parse_qs(req.args).has_key('jrec'):
+                counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
+            else:
+                counter = 0
+            for result in results:
+                counter += 1
+                xml_record = result.group(1)
+                # extract the recid
+                recid = recid_pat.search(xml_record).group(1)
+                # each result is converted from MARCXML to the selected output format
+                if of == 'hb':
+                    # we place each result in its own HTML table results data structure
+                    # things to add:
+                                #<input name="ext_colid" type="hidden" value="%(ext_colid)s" />
+                                #<abbr class="unapi-id" title="%(recid)s"></abbr>
+                    # None to be later changed by a boolean that controls hosted collections that support webbasket
+                    if None:
+                        html = """
+                                <tr><td valign="top" align="right" style="white-space: nowrap;">
+                                    <input name="recid" type="checkbox" value="%(recid)s" />
+
+                                %(number)s.
+                               """ % {'recid': recid,
+                                      'number': counter}
+
+                        html += """</td><td valign="top">%s</td></tr>""" % format_record(None, of, xml_record=xml_record)
+                    else:
+                        html = """
+                                <tr><td valign="top" align="right" style="white-space: nowrap;">
+                                %(number)s.
+                               """ % {'number': counter}
+                        html += """</td><td valign="top">%s</td></tr>""" % format_record(None, of, xml_record=xml_record)
+                elif of == 'hd':
+                    # is HTML detailed actually supported?
+                    #html = format_record(None, of, xml_record=result.group(1))
+                    html = ""
+                # should this be xm only or of.startswith("x")
+                elif of == 'xm':
+                    # XML needs no formatting
+                    html = result.group(1)
+                self.add_html_result(html)
+        except AttributeError:
+            # in case there were no results found an Attribute error is raised
+            # TODO: replace pass with some proper handling of the situation or at least a message
+            pass
