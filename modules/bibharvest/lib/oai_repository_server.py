@@ -15,13 +15,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""OAI interface for CDS Invenio written in Python compliant with OAI-PMH2.0"""
+"""Receive OAI-PMH 2.0 requests and responds"""
 
 __revision__ = "$Id$"
 
 import cPickle
 import os
 import re
+import cgi
 import urllib
 import time
 import sys
@@ -49,15 +50,6 @@ from invenio.search_engine import record_exists, perform_request_search
 from invenio.bibformat_dblayer import get_preformatted_record
 from invenio.bibformat import format_record
 from invenio.textutils import encode_for_xml
-
-## verbs = {
-##     "Identify"            : [""],
-##     "ListSets"            : ["resumptionToken"],
-##     "ListMetadataFormats" : ["resumptionToken"],
-##     "ListRecords"         : ["resumptionToken"],
-##     "ListIdentifiers"     : ["resumptionToken"],
-##     "GetRecord"           : [""]
-## }
 
 verbs = {
     'GetRecord'          : ['identifier', 'metadataPrefix'],
@@ -662,35 +654,40 @@ def oailistidentifiers(args):
     return out
 
 
-def oaiidentify(args):
-    "Generates response to oaiidentify verb."
+def oaiidentify(args, script_url):
+    """Generates a response to oaiidentify verb.
 
-    out = ""
+    Parameters:
+           args - *dict* query parameters
 
-    repositoryname        = "  <repositoryName>" + CFG_SITE_NAME + "</repositoryName>\n"
-    baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % CFG_SITE_URL
-    protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
-    adminemailtxt         = "  <adminEmail>%s</adminEmail>\n" % CFG_SITE_SUPPORT_EMAIL
-    earliestdst           = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
-    deletedrecord         = "  <deletedRecord>%s</deletedRecord>\n" % CFG_OAI_DELETED_POLICY
-    repositoryidentifier  = "%s" % CFG_OAI_ID_PREFIX
-    sampleidentifier      = CFG_OAI_SAMPLE_IDENTIFIER
-    identifydescription   = CFG_OAI_IDENTIFY_DESCRIPTION + "\n"
+     script_url - *str* URL of the script used to access the
+                  service. This is made necessary since the gateway
+                  can be accessed either via /oai2d or /oai2d/ (or for
+                  backward compatibility: oai2d.py or oai2d.py/), and
+                  that the base URL must be returned in the Identify
+                  response
+    """
 
-    out = out + repositoryname
-    out = out + baseurl
-    out = out + protocolversion
-    out = out + adminemailtxt
-    out = out + earliestdst
-    out = out + deletedrecord
-    out = out + "  <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>\n"
-    #    print "  <compression></compression>\n"
-    out = out + CFG_OAI_IDENTIFY_DESCRIPTION
+    out = """  <repositoryName>%(CFG_SITE_NAME)s</repositoryName>
+    <baseURL>%(CFG_SITE_URL)s%(script_url)s</baseURL>
+    <protocolVersion>2.0</protocolVersion>
+    <adminEmail>%(CFG_SITE_SUPPORT_EMAIL)s</adminEmail>
+    <earliestDatestamp>%(earliest_datestamp)s</earliestDatestamp>
+    <deletedRecord>%(CFG_OAI_DELETED_POLICY)s</deletedRecord>
+    <granularity>%(granularity)s</granularity>
+    %(CFG_OAI_IDENTIFY_DESCRIPTION)s\n""" % \
+        {"CFG_SITE_NAME": cgi.escape(CFG_SITE_NAME),
+         "CFG_SITE_URL": cgi.escape(CFG_SITE_URL),
+         "earliest_datestamp": cgi.escape(get_earliest_datestamp()),
+         "granularity": "YYYY-MM-DDThh:mm:ssZ",
+         "CFG_OAI_DELETED_POLICY": cgi.escape(CFG_OAI_DELETED_POLICY),
+         "CFG_SITE_SUPPORT_EMAIL": cgi.escape(CFG_SITE_SUPPORT_EMAIL),
+         "CFG_OAI_IDENTIFY_DESCRIPTION": CFG_OAI_IDENTIFY_DESCRIPTION,
+         "script_url": script_url}
 
     out = oai_header(args, "Identify") + out + oai_footer("Identify")
 
     return out
-
 
 def oaigetrequesturl(args):
     "Generates requesturl tag for OAI."
@@ -813,13 +810,13 @@ def oaicachestatus(resumptionToken):
 
 def get_sets():
     "Returns list of sets."
-    # TODO: Try to remove dependency on oaiARCHIVE table, by
+    # TODO: Try to remove dependency on oaiREPOSITORY table, by
     # determining available sets from data.
 
     out = {}
     row = ['', '']
 
-    query = "SELECT setSpec,setName,setDescription FROM oaiARCHIVE"
+    query = "SELECT setSpec,setName,setDescription FROM oaiREPOSITORY"
     res = run_sql(query)
     for row in res:
         row_bis = [row[0], row[1], row[2]]

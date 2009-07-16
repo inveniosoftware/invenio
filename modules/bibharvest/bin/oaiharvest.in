@@ -44,7 +44,7 @@ Examples:
 
 try:
     import sys
-    from invenio.oaiharvestlib import main
+    from invenio.oai_harvest_daemon import main
 except ImportError, e:
     print "Error: %s" % e
     import sys

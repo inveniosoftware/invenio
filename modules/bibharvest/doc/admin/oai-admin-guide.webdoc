@@ -1,0 +1,272 @@
+## -*- mode: html; coding: utf-8; -*-
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: OAI Admin Guide -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Revision: $Id$ -->
+
+<h2>Contents</h2>
+<strong>1. <a href="#1">Overview</a></strong><br />
+<strong>2. <a href="#2">OAI Data Harvesting</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Bibharvest Admin Interface</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">oaiharvest commmand-line tool</a><br />
+<strong>3. <a href="#3">OAI Repository (<i>Exporting</i>)</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Definition of OAI sets</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Exposing metadata via OAI Repository Gateway</a><br />
+
+
+<a name="1"></a><h2>1. Overview</h2>
+
+The OAI Harvest and OAI Repository modules handle metadata gathering and delivery between OAI-PMH v.2.0 compliant repositories. Metadata exchange is performed on top of the <a href="http://www.openarchives.org/pmh/">OAI-PMH</a>, the Open Archives Initiative's Protocol for Metadata Harvesting.
+The OAI Harvest and OAI Repository Admin Interfaces can be used to set up a database of OAI sources and open your repository for OAI harvesting.
+<br />
+
+<a name="2"></a><h2>2. OAI Data Harvesting</h2>
+
+<p>In order to periodically harvest metadata from one or several repositories, it is possible to organize OAI sources through the <a href="<CFG_SITE_URL>/admin/bibharvest/oaiharvestadmin.py<lang:link/>">OAI Harvest Admin Interface</a>.
+The interface allows the administrator to add new repositories as well as edit and delete existing ones.
+Once defined, run the <code>oaiharvest</code> command-line tool to start periodical harvesting of these repositories based on your settings.</p>
+<p>(Note that you can <b>alternatively</b> use the <code>oaiharvest</code> command-line tool to perform a manual harvesting of a repository independently of the settings in OAI Harvest admin interface, and save the result into a file. This lets you specify the OAI arguments for the harvesting (verb, dates, sets, metadata format, etc.). You would then need to run <code>bibconvert</code> and <code>bibupload</code> to integrate the harvested records into your repository. This method can be useful to play with repositories, or for writing custom harvesting scripts, but it is not recommended for periodical harvesting. Run <code>oaiharvest -h</code> for additional information.)</p>
+
+<a name="2.1"></a><h4>2.1 OAI Harvest Admin Interface</h4>
+
+<b>Add OAI sources</b><br />
+<p>The first step requires the administrator to enter the baseURL of the OAI repository. This is done for validation purposes - i.e. to check that the baseURL actually points to an OAI-compliant repository.
+(Note: the validation simply performs an 'Identify' query to the baseURL and parses the reply with crucial tags such as <code>OAI-PMH</code> and <code>Identify</code>).
+<br />Once the baseURL is validated, the administrator is required to fill into the following fields:
+<br /><ul>
+<li><strong>Source name</strong>: this will be the (alphanumeric) name used to refer to this OAI repository.</li>
+<li><strong>Metadata prefix</strong>: upon validation the baseURL is checked for the available metadata formats. The administator can choose the desired format to harvest metadata in.</li>
+<li><strong>Sets</strong>: upon validation the baseURL is checked for the available sets of the repository. The administator can choose the desired sets to harvest. If none is checked, all records are harvested. Otherwise selective harvesting for checked sets is done.</li>
+<li><strong>Frequency</strong>: how often do you intend to harvest from this repository? (Note: selecting "never" excludes this source from automatic periodical harvesting)</li>
+<li><strong>Starting date</strong>: on your first harvesting session, do you intend to harvest the whole repository (from beginning) or only newly added material (from today)? (WARNING: harvesting large collections of material may take very long!)</li>
+<li><strong>Postprocess</strong>: how is the harvested material be dealt with after harvesting?
+<ul><li>h: harvest only - metadata will be gathered and saved locally<li>h-u: harvest and upload - metadata will be automatically queued for upload (this is useful when harvested metadata is already in marcxml format)</li><li>h-c: harvest and convert - harvested metadata will be converted and saved locally</li><li>h-c-u: harvest, convert and upload - harvested metadata will be converted and queued for upload - this is useful when harvested metadata is in a format different from marcxml (e.g. oai_dc)</li><li>h-c-f-u: harvest, convert, filter, upload - useful when you want to filter harvested data in some non-trivial way before uploading</li></ul></li>
+<li><strong>BibConvert configuration file</strong>: if postprocess involves conversion, the filename of an existing BibConvert configuration file (or its full path if file is not in standard BibConvert config directory) is needed.
+This file determines how the metadata conversion will take place (e.g. oai_dc to marcxml).
+In order to ensure that the configuration file performs the desired conversion, please test it in advance and follow the instruction contained in the <a href="<CFG_SITE_URL>/help/admin/bibconvert-admin-guide<lang:link/>">BibConvert Admin Guide</a>.
+Please note that some conversion parameters previously input at the command line can now be handled by the BibConvert Configuration Language (namely record separator, file header and file footer). Please consult the <a href="<CFG_SITE_URL>/help/admin/bibconvert-admin-guide<lang:link/>">BibConvert Admin Guide</a> for more information on this.
+This allows fully automatised harvesting and conversion (and possibly upload) of records provided a valid, functioning, BibConvert template is provided.</li>
+</ul>
+
+<b>Edit and delete OAI sources</b><br />
+<p>Once a source has been added to the database, it will be visible in the overview page, as shown below</p>
+   <div class="pagebody">
+           <table class="admin_wvar_nomargin" summary="">
+            <tr>
+             <th class="adminheader">name</th>
+             <th class="adminheader">baseURL</th>
+             <th class="adminheader">metadataprefix</th>
+             <th class="adminheader">frequency</th>
+             <th class="adminheader">bibconvertfile</th>
+             <th class="adminheader">postprocess</th>
+             <th class="adminheader">actions</th>
+            </tr>
+            <tr>
+             <td class="admintdright">cdsweb</td>
+             <td class="admintdleft">http://cdsweb.cern.ch/oai2d</td>
+             <td class="admintdleft">marcxml</td>
+             <td class="admintdleft">daily</td>
+             <td class="admintdleft">NULL</td>
+             <td class="admintdleft">h-u</td>
+             <td class="admintdleft">edit / delete / test / history / harvest</td>
+             <td rowspan="4" style="vertical-align: bottom">
+             </td>
+            </tr>
+            </table>
+
+   </div>
+<p>At this point it will be possible to edit the definition of this source by clicking on the appropriate action button. All the fields described in 2.2.1 can be modified (except for the Starting date).
+There is no more validation at this stage, hence, please take extra care when editing important fields such as baseurl and metadataprefix.
+<br />
+OAI repositories can be removed from the database by clicking on the appropriate action button in the overview page.
+</p>
+
+<b>Testing OAI sources</b><br/>
+<p>This interface provides the possibility to test OAI harvesting settings. In order to see the harvesting and postprocessing results, administrator has to provide record identifier (insige the harvested OAI source) and click "test" button.
+After doing this, two new frames will appear.
+The upper contatins original OAI XML harvested from the source. The second contains the result of all the postprocessing activities or an error message.</p>
+
+<b>Viewing the harvesting history</b><br/>
+<p>This page allows the administrator to see which records have been recently harvested. All the data is shown in database insertion order. If there was more than 10 inserted records during a day, only first 10 will be displayed. In order to do manipulations connected with the rest, the administrator has to proceed to day details page which is available by "View next entries..." link.</p>
+<p>
+The same page provides the possibility of reharvesting the records present in the past.
+All have to be done in order to achieve this is selecting appropriate records by checking the checkboxes on the right side of the entry and clicking "reharvest selected records" button.
+</p>
+
+<b>Harvesting particular records</b><br/>
+<p>This page provides the possibility of harvesting records manually. The administrator has to provide internal OAI source identifier. After this, record will be harvested, converted and filtered according to the source settings and scheduled to be uploaded into the database. </p>
+
+<a name="2.2"></a><h4>2.2 oaiharvest commmand-line tool</h4>
+<p>Once administrators have set up their desired OAI repositories in the database through the Admin Interface they can invoke <code>oaiharvest</code> to start up periodical harvesting.<br />
+<br />
+<b>Oaiharvest usage</b>
+<blockquote>
+<pre>
+ oaiharvest [options]
+
+ Specific options:
+ -r, --repository=REPOS_ONE,"REPOS TWO"     name of the OAI repositories to be harvested (default=all)
+ -d, --dates=yyyy-mm-dd:yyyy-mm-dd          harvest repositories between specified dates (overrides repositories' last updated timestamps)
+
+ Scheduling options:
+ -u,  --user=USER          user name to store task, password needed
+ -s,  --sleeptime=SLEEP    time after which to repeat tasks (no)
+                           e.g.: 1s, 30m, 24h, 7d
+ -t,  --time=TIME          moment for the task to be active (now)
+                           e.g.: +15s, 5m, 3h , 2002-10-27 13:57:26
+
+ General options:
+ -h,  --help               print this help and exit
+ -V,  --version            print version and exit
+ -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
+</pre>
+<em>Note that oaiharvest has additional parameters for manual "single-shot" harvesting. Run <code>oaiharvest -h</code> for more details about this mode.</em>
+</blockquote>
+
+<code>oaiharvest</code> performs a number of operations on the repositories listed in the database. By default <code>oaiharvest</code> considers all repositories, one by one (this gets overridden when <code>--repository</code> argument is passed).
+<br /> For each repository that is considered, <code>oaiharvest</code> behaves according to the arguments passed at the command line:
+<ul>
+<li> If the <code>--dates</code> argument is not passed, it checks whether an update from the repository is needed (Note: the update status is calculated based on the time of the last harvesting and the frequency chosen by the administrator).
+<ul>
+<li>If an update is needed, it harvests all the metadata that the repository has added since the data of the last update. When the update is finished, the last update value is set to the current time and date.
+<li>If an update is not needed, the source is skipped.
+</ul>
+<li> If the <code>--dates</code> argument is passed, it simply harvests the metadata of the repository from/until the given dates. The last update date is left unchanged.
+<li> Finally, it performs the operations indicated in the postprocess mode, i.e. convert and/or upload the harvested metadata.
+</ul>
+<br />
+<b>Oaiharvest usage examples</b><br />
+<p>In most cases, administrators will want <code>oaiharvest</code> to run in the background, i.e. run in sleep mode and wake up periodically (e.g. every 24 hours) to check whether updates are needed:</p>
+<blockquote>
+<pre>
+$ oaiharvest -s 24h
+</pre>
+</blockquote>
+
+<p>In other cases, administrators may want to perform periodical harvesting only on specific sources:
+<blockquote>
+<pre>
+$ oaiharvest -r cdsweb -s 12h
+</pre>
+</blockquote>
+
+<p>Another option is that administrators may want to harvest from certain repositories within two specific dates. This will be regarded as a one-off operation and will not affect the last update value of the source:
+<blockquote>
+<pre>
+$oaiharvest -r cdsweb -d 2005-05-05:2005-05-30
+</pre>
+</blockquote>
+
+<a name="3"></a><h2>3. OAI Repository (<i>Exporting</i>)</h2>
+
+The OAI Repository corresponds to a set of metadata exposed for periodical harvesting by external OAI service providers. The following steps have to be done in order to expose metadata via OAI:
+
+<ul>
+<li>Definition of OAI sets</li>
+<li>Exposing metadata via OAI Repository Gateway</li>
+</ul>
+
+<a name="3.1"></a><h3>3.1. Definition of OAI sets</h3>
+
+<p>The definition of the OAI sets in the <a href="<CFG_SITE_URL>/admin/bibharvest/oairepositoryadmin.py">OAI Repository Admin Interface</a> lets you choose:
+<ol>
+  <li>which records are to be exposed via OAI, by using the standard <a href="<CFG_SITE_URL>/help/search-guide">CDS Invenio search syntax</a>.</li>
+  <li>which <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Set">OAI sets</a> are available in your repository. Simply specify the <code>setSpec</code> and <code>setName</code> of the set.</li>
+</ol>
+</p>
+
+<p>Let's say you want to expose all the records in the collection "<code>Articles</code>" that have a report number starting with <a href="<CFG_SITE_URL>/search?f1=reportnumber&amp;c=Articles&amp;p1=hep-*&amp;as=1">'<code>hep-</code>'</a>: simply add a new set definition in the <a href="<CFG_SITE_URL>/admin/bibharvest/oairepositoryadmin.py">OAI Repository Admin Interface</a>, choose the <code>setName</code> (Eg: "HEP Articles") and <code>setSpec</code> (Eg: "articles:hep"), and fill in the <code>collection</code> field with "Articles", the first <code>Phrase</code> field with "hep-*" and choose search field "report number".<p>
+
+<p>If you want to export all the records in your repository, just leave all the query parameters blank. You can also omit the OAI setSpec and setName if you do not want to organize your repository into a hierarchy.</p>
+
+<p>Tip: since the exposed records are retrieved using the CDS Invenio search engine, you can test your query definition in the <a href="<CFG_SITE_URL>/?as=1">advanced search interface</a> of your repostory.</p>
+
+<a name="3.2"></a><h3>3.2. Exposing metadata via OAI Repository Gateway</h3>
+
+<a name="3.2.1"></a><h4>3.2.1 oairepositoryupdater commmand-line tool</h4>
+<p>Once the settings of the OAI Repository are defined, the next step is to expose corresponding metadata via the OAI Repository Gateway. This is done by launching the <code>oairepositoryupdater</code> script, that will add the OAI identifier and OAI setSpec(s) to the records to be exposed (according to the settings defined in the OAI Repository admin interface).<br />
+
+<br />
+<b>Oairepositoryupdater usage</b>
+<blockquote>
+<pre>
+
+ oairepositoryupdater [options]
+
+ Options:
+   -r --report            OAI repository status
+   -d --detailed-report   OAI repository detailed status
+   -n --no-process        Do no upload the modifications
+
+ Scheduling options:
+   -u, --user=USER       User name to submit the task as, password needed.
+   -t, --runtime=TIME    Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
+   -s, --sleeptime=SLEEP Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d
+   -P, --priority=PRIORITY       Priority level (an integer, 0 is default)
+   -N, --task_specific_name=TASK_SPECIFIC_NAME   Advanced option
+
+ General options:
+   -h, --help            Print this help.
+   -V, --version         Print version information.
+   -v, --verbose=LEVEL   Verbose level (0=min, 1=default, 9=max).
+
+ Print OAI repository status
+   $ oairepositoryupdater -r
+ Print OAI repository detailed status
+   $ oairepositoryupdater -d
+
+</pre>
+</blockquote>
+
+<b>Oaiharvest usage examples</b><br />
+
+<p>To expose the sets defined in the OAI Repository Admin Interface and update them every day:</p>
+
+<blockquote>
+<pre>
+ $ oairepositoryupdater -s24
+</pre>
+</blockquote>
+
+To print out the current status of your OAI repository. Note that this
+is a quick report that might not be accurate if you repository is out
+of sync. See oairepositoryupdater -d for a more accurate ( but
+slower) report:
+
+<blockquote>
+<pre>
+$ oairepositoryupdater -r
+</pre>
+</blockquote>
+
+To print out the detailed status of yoyr OAI repository:
+
+<blockquote>
+<pre>
+$ oairepositoryupdater -d
+</pre>
+</blockquote>
+
+
+<p>
+
+Please see also invenio.conf for more fine configurations of the OAI Repository.
+
+

@@ -26,7 +26,7 @@ from invenio.config import CFG_LOGDIR
 # Which tasks are recognized as valid?
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
-                           "oaiharvest", "oaiarchive", "inveniogc",
+                           "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "webstatadmin", "bibclassify", "bibexport",
                            "dbdump")
 
@@ -50,11 +50,8 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'repository' : None,
         'dates' : None,
     },
-    'oaiarchive' : {
-        'upload' : 0,
-        'mode' : 0,
-        'oaiset' : 0,
-        'nice' : 0,
+    'oairepositoryupdater' : {
+        'no_upload' : 0,
     },
     'bibupload' : {
         'mode' : None,

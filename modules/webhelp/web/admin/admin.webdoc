@@ -44,7 +44,7 @@ presented below.
 
 <p>The metadata input into a running CDS Invenio system can be done in two
 ways: <em>(i) admin-oriented batch mode</em>,
-i.e. <strong>BibHarvest</strong> to get data from OAI repositories,
+i.e. <strong>OAI Harvest</strong> to get data from OAI repositories,
 <strong>BibConvert</strong> to convert any input data into XML MARC,
 and <strong>BibUpload</strong> to upload XML MARC files into CDS Invenio;
 and <em>(ii) author-oriented interactive mode</em>,
@@ -64,23 +64,22 @@ data are uploaded in CDS Invenio, you may want to modify them via
 
 <tr>
 <td>
-  <strong>BibHarvest Admin</strong>
+  <strong>OAI Harvest Admin</strong>
 </td>
 <td>
 
   Enables you to configure OAI metadata harvestor for eventual
   periodical batch upload of data.  For example, you can define from
   where to harvest, with what periodicity, how to transform data
-  before uploading them into CDS Invenio, etc.  Also, enables you to
-  define your OAI sets in case you want to export your own data.
+  before uploading them into CDS Invenio, etc. See also
+   <a href="<CFG_SITE_URL>/admin/bibharvest/oairepositoryadmin.py">OAI Repository Admin</a>
+   to expose your data to other harvesters.
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a>
-  <p>
-  <a href="<CFG_SITE_URL>/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a>
 </td>
 <td>
-  <a href="bibharvest-admin-guide">BibHarvest Admin Guide</a>
+  <a href="oai-admin-guide">OAI Admin Guide</a>
 </td>
 </tr>
 
@@ -181,6 +180,23 @@ data are uploaded in CDS Invenio, you may want to modify them via
 </td>
 <td>
   <a href="bibedit-admin-guide">BibEdit Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
+  <strong>BibCheck Admin</strong>
+</td>
+<td>
+    Enables you to manage BibCheck configuration files. BibCheck is used to verify and
+    correct records.
+
+</td>
+<td>
+  <a href="<CFG_SITE_URL>/admin/bibcheck/bibcheckadmin.py">BibCheck Admin Interface</a>
+</td>
+<td>
+  <a href="bibcheck-admin-guide">BibCheck Admin Guide</a>
 </td>
 </tr>
 
@@ -295,18 +311,20 @@ engine.
 
 <tr>
 <td>
-  <strong>BibCheck Admin</strong>
+  <strong>OAI Repository Admin</strong>
 </td>
 <td>
-    Enables you to manage BibCheck configuration files. BibCheck is used to verify and
-    correct records.
-
+    Enables you to define which records should be tagged to be exposed
+    via the OAI Repository gateway, so that other other repositories
+    can harvest your records. See also
+    <a href="<CFG_SITE_URL>/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin</a>
+    to import data into your repository.
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibcheck/bibcheckadmin.py">BibCheck Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/bibharvest/oairepositoryadmin.py">OAI repository Admin Interface</a>
 </td>
 <td>
-  <a href="bibcheck-admin-guide">BibCheck Admin Guide</a>
+  <a href="oai-admin-guide">OAI Admin Guide</a>
 </td>
 </tr>
 

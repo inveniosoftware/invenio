@@ -35,6 +35,18 @@ class HistoryEntry:
         self.bibupload_task_id = bibupload_task_id
         self.oai_src_id = oai_src_id
         self.inserted_to_db = inserted_to_db
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return "HistoryEntry(" + \
+               "date_harvested: " + str(self.date_harvested) + ', ' + \
+               "date_inserted: " + str(self.date_inserted) + ', ' + \
+               "oai_id: " + str(self.oai_id) + ', ' + \
+               "record_id: " + str(self.record_id) + ', ' + \
+               "bibupload_task_id: " + str(self.bibupload_task_id) + ', ' + \
+               "inserted_to_db: " + str(self.inserted_to_db) + ', ' + \
+               "oai_src_id: " + str(self.oai_src_id) + ', ' + ")"
 
 def get_history_entries_raw(query_suffix, sqlparameters):
     """

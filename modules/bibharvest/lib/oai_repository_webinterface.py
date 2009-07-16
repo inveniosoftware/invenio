@@ -24,12 +24,14 @@ import urllib
 import time
 from mod_python import apache
 
-from invenio import oai_repository
+from invenio import oai_repository_server
 from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
     """Defines the set of /oai2d OAI provider pages."""
+
+    _exports = ['']
 
     def __call__(self, req, form):
         "OAI repository interface"
@@ -70,7 +72,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
         ## check request for OAI compliancy
         ## also transform all the list arguments into string
-        oai_error = oai_repository.check_argd(argd)
+        oai_error = oai_repository_server.check_argd(argd)
 
         ## check availability (OAI requests for Identify, ListSets and
         ## ListMetadataFormats are served immediately, otherwise we
@@ -86,7 +88,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         os.system(command)
 
         ## construct args (argd string equivalent) for the
-        ## oai_repository business logic (later it may be good if it
+        ## oai_repository_server business logic (later it may be good if it
         ## takes argd directly):
         args = urllib.urlencode(argd)
 
@@ -100,51 +102,51 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
             ## OAI Identify
 
             if argd['verb']   == "Identify":
-                req.write(oai_repository.oaiidentify(args))
+                req.write(oai_repository_server.oaiidentify(args, script_url=req.uri))
 
 
             ## OAI ListSets
 
             elif argd['verb'] == "ListSets":
-                req.write(oai_repository.oailistsets(args))
+                req.write(oai_repository_server.oailistsets(args))
 
 
             ## OAI ListIdentifiers
 
             elif argd['verb'] == "ListIdentifiers":
-                req.write(oai_repository.oailistidentifiers(args))
+                req.write(oai_repository_server.oailistidentifiers(args))
 
 
             ## OAI ListRecords
 
             elif argd['verb'] == "ListRecords":
-                req.write(oai_repository.oailistrecords(args))
+                req.write(oai_repository_server.oailistrecords(args))
 
 
             ## OAI GetRecord
 
             elif argd['verb'] == "GetRecord":
-                req.write(oai_repository.oaigetrecord(args))
+                req.write(oai_repository_server.oaigetrecord(args))
 
 
             ## OAI ListMetadataFormats
 
             elif argd['verb'] == "ListMetadataFormats":
-                req.write(oai_repository.oailistmetadataformats(args))
+                req.write(oai_repository_server.oailistmetadataformats(args))
 
 
             ## Unknown verb
 
             else:
-                req.write(oai_repository.oai_error("badVerb","Illegal OAI verb"))
+                req.write(oai_repository_server.oai_error("badVerb","Illegal OAI verb"))
 
 
         ## OAI error
 
         else:
-            req.write(oai_repository.oai_header(args,""))
+            req.write(oai_repository_server.oai_header(args,""))
             req.write(oai_error)
-            req.write(oai_repository.oai_footer(""))
+            req.write(oai_repository_server.oai_footer(""))
 
         return "\n"
 

@@ -9,7 +9,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -17,20 +17,19 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = oai_repository.py \
-             oai_repository_config.py \
+pylib_DATA = oai_repository_server.py \
              oai_repository_tests.py \
              oai_repository_webinterface.py \
              oai_repository_regression_tests.py \
-             bibharvest.py \
-	     bibharvest_dblayer.py \
+             oai_harvest_getter.py \
+	     oai_harvest_dblayer.py \
              bibharvest_templates.py \
-             bibharvestadminlib.py \
-             bibharvestadmin_regression_tests.py \
-             oaiarchiveadminlib.py \
-             oaiarchiveadmin_regression_tests.py \
-             oaiharvestlib.py \
-             oaiarchive_engine.py
+             oai_harvest_admin.py \
+             oai_harvest_admin_regression_tests.py \
+             oai_repository_admin.py \
+             oai_repository_admin_regression_tests.py \
+             oai_harvest_daemon.py \
+             oai_repository_updater.py
 
 EXTRA_DIST = $(pylib_DATA)
 

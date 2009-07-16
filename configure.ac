@@ -20,8 +20,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.1.20090602, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20090602)
+AC_INIT(cds-invenio, 0.99.1.20090716, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20090716)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -512,8 +512,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibformat/web/admin/Makefile \
 	  modules/bibharvest/Makefile \
 	  modules/bibharvest/bin/Makefile \
-	  modules/bibharvest/bin/bibharvest \
-	  modules/bibharvest/bin/oaiarchive \
+	  modules/bibharvest/bin/oairepositoryupdater \
 	  modules/bibharvest/bin/oaiharvest \
 	  modules/bibharvest/doc/Makefile \
 	  modules/bibharvest/doc/admin/Makefile \

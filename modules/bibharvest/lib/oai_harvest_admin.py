@@ -16,15 +16,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDS Invenio Bibharvest Administrator Interface."""
+"""CDS Invenio OAI Harvest Administrator Interface."""
 
 __revision__ = "$Id$"
 
 import re
-import os, sys, string
-import ConfigParser
+import os
+import cgi
 import time
-import random
 import urllib
 import tempfile
 import datetime
@@ -33,98 +32,123 @@ from httplib import InvalidURL
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_TMPDIR, \
-     CFG_VERSION, \
      CFG_SITE_URL,\
      CFG_ETCDIR, \
      CFG_BINDIR, \
      CFG_LOGDIR, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.bibrankadminlib import \
-     write_outcome,modify_translations,\
-     get_def_name,\
-     get_i8n_name,\
-     get_name,\
-     get_rnk_nametypes,\
-     get_languages,\
-     check_user,\
-     is_adminuser,\
-     addadminbox,\
-     tupletotable,\
-     tupletotable_onlyselected,\
-     addcheckboxes,\
+     write_outcome, \
+     addadminbox, \
+     tupletotable, \
      createhiddenform
 from invenio.dbquery import run_sql
-from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
-from invenio.webuser import getUid, get_email
-from invenio.bibharvest_dblayer import get_history_entries, \
-    HistoryEntry, get_month_logs_size, get_history_entries_for_day, \
-    get_day_logs_size, get_entry_history, get_entry_logs_size, \
-    get_holdingpen_entries, delete_holdingpen_entry, get_holdingpen_entry
-from invenio.search_engine import search_pattern, get_record
+from invenio.oai_harvest_dblayer import get_history_entries, \
+     get_month_logs_size, get_history_entries_for_day, \
+     get_day_logs_size, get_entry_history, get_entry_logs_size, \
+     get_holdingpen_entries, delete_holdingpen_entry, get_holdingpen_entry
+from invenio.search_engine import search_pattern
 import invenio.template
-from invenio import oaiharvestlib
-from invenio.xmlmarc2textmarclib import recxml2recmarc, create_marc_record
-from invenio import bibformat
+from invenio import oai_harvest_daemon
+from invenio.xmlmarc2textmarclib import create_marc_record
 from invenio.bibrecord import create_record
+from invenio.urlutils import create_html_link
 
 bibharvest_templates = invenio.template.load('bibharvest')
+from invenio.messages import gettext_set_language
 
-tmppath = CFG_TMPDIR + '/bibharvestadmin.' + str(os.getpid())
-guideurl = "help/admin/bibharvest-admin-guide"
+tmppath = CFG_TMPDIR + '/oaiharvestadmin.' + str(os.getpid())
+guideurl = "help/admin/oai-admin-guide"
+oai_harvest_admin_url = CFG_SITE_URL + \
+                        "/admin/bibharvest/oaiharvestadmin.py"
 
-freqs = [[0, "never"], [24, "daily"], [168, "weekly"], [720, "monthly"] ]
-posts = [["h", "harvest only (h)"], ["h-c", "harvest and convert (h-c)"], ["h-u", "harvest and upload (h-u)"], ["h-c-u", "harvest, convert and upload (h-c-u)"], ["h-c-f-u", "harvest, convert, filter, upload (h-c-f-u)"]]
-dates = [[0, "from beginning"], [1, "from today"]]
+freqs = [[0, "never"],
+         [24, "daily"],
+         [168, "weekly"],
+         [720, "monthly"] ]
 
-def getnavtrail(previous = ''):
+posts = [["h", "harvest only (h)"],
+         ["h-c", "harvest and convert (h-c)"],
+         ["h-u", "harvest and upload (h-u)"],
+         ["h-c-u", "harvest, convert and upload (h-c-u)"],
+         ["h-c-f-u", "harvest, convert, filter, upload (h-c-f-u)"]]
+
+dates = [[0, "from beginning"],
+         [1, "from today"]]
+
+def getnavtrail(previous = '', ln = CFG_SITE_LANG):
     """Get the navtrail"""
-    return bibharvest_templates.tmpl_getnavtrail(previous = previous, ln = CFG_SITE_LANG)
+    return bibharvest_templates.tmpl_getnavtrail(previous = previous,
+                                                 ln = ln)
 
-def generate_sources_actions_menu(ln, oai_src_id):
-    namelinked_args = []
-    namelinked_args.append(["oai_src_id", str(oai_src_id)])
-    namelinked_args.append(["ln", ln])
-    editACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = "edit", args = namelinked_args)
-    delACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
-    testACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
-    historyACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewhistory", title = "history", args = namelinked_args)
-    harvestACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/harvest", title = "harvest", args = namelinked_args)
-    return editACTION + " / " + delACTION + " / " + testACTION + " / " + historyACTION + " / " + harvestACTION
+def generate_sources_actions_menu(oai_src_id, ln=CFG_SITE_LANG):
+    """
+    Create the links/actions to administrate the given OAI source.
+    """
+    _ = gettext_set_language(ln)
+    default_link_argd = {'ln': ln,
+                         'oai_src_id': str(oai_src_id)}
 
-def generate_oai_source_operations(ln, oai_src_id):
-    result = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "OAI source operations", guideurl=guideurl)
-    result += generate_sources_actions_menu(ln, oai_src_id)
-    return result
+    edit_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                 "/editsource",
+                                 urlargd=default_link_argd,
+                                 link_label=_("edit"))
+    del_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                "/delsource",
+                                urlargd=default_link_argd,
+                                link_label=_("delete"))
+    test_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                 "/testsource",
+                                 urlargd=default_link_argd,
+                                 link_label=_("test"))
+    hist_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                 "/viewhistory",
+                                 urlargd=default_link_argd,
+                                 link_label=_("history"))
+    harvest_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                    "/harvest",
+                                    urlargd=default_link_argd,
+                                    link_label=_("harvest"))
+
+    return edit_link + " / " + del_link + " / " + test_link + \
+           " / " + hist_link + " / " + harvest_link
 
 def perform_request_index(ln=CFG_SITE_LANG):
     """start area for administering harvesting from OAI repositories"""
+    _ = gettext_set_language(ln)
 
-    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "Overview of sources", guideurl = guideurl, extraname = "add new OAI source" , extraurl = "admin/bibharvest/bibharvestadmin.py/addsource" )
-    titlebar2 = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "Harvesting status", guideurl = guideurl)
-    header = ['name', 'baseURL', 'metadataprefix', 'frequency', 'bibconvertfile', 'postprocess', 'actions']
+    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = ln, title = _("Overview of sources"), guideurl = guideurl, extraname = "add new OAI source" , extraurl = "admin/bibharvest/oaiharvestadmin.py/addsource?ln=" + ln)
+    titlebar2 = bibharvest_templates.tmpl_draw_titlebar(ln = ln, title = _("Harvesting status"), guideurl = guideurl)
+    header = ['name', 'baseURL', 'metadataprefix', 'frequency',
+              'bibconvertfile', 'postprocess', 'actions']
     header2 = ['name', 'last update']
     oai_src = get_oai_src()
     upd_status = get_update_status()
 
     sources = []
-    for (oai_src_id,oai_src_name,oai_src_baseurl,oai_src_prefix,oai_src_frequency,oai_src_config,oai_src_post,oai_src_bibfilter,oai_src_setspecs) in oai_src:
-        namelinked_args = []
-        namelinked_args.append(["oai_src_id", str(oai_src_id)])
-        namelinked_args.append(["ln", ln])
+    for (oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, \
+         oai_src_frequency, oai_src_config, oai_src_post, \
+         oai_src_bibfilter, oai_src_setspecs) in oai_src:
 
-        namelinked = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = oai_src_name, args = namelinked_args)
-        freq = "Not Set"
-        if oai_src_frequency==0: freq = "never"
-        elif oai_src_frequency==24: freq = "daily"
-        elif oai_src_frequency==168: freq = "weekly"
-        elif oai_src_frequency==720: freq = "monthly"
-        action = generate_sources_actions_menu(ln, oai_src_id)
-        sources.append([namelinked,oai_src_baseurl,oai_src_prefix,freq,oai_src_config,oai_src_post, action])
+        default_link_argd = {'ln': ln,
+                             'oai_src_id': str(oai_src_id)}
+        namelinked = create_html_link(urlbase=oai_harvest_admin_url + \
+                                      "/editsource",
+                                      urlargd=default_link_argd,
+                                      link_label=cgi.escape(oai_src_name))
+        freq = _("Not Set")
+        if oai_src_frequency == 0: freq = _("never")
+        elif oai_src_frequency == 24: freq = _("daily")
+        elif oai_src_frequency == 168: freq = _("weekly")
+        elif oai_src_frequency == 720: freq = _("monthly")
+        action = generate_sources_actions_menu(oai_src_id, ln)
+        sources.append([namelinked, oai_src_baseurl, oai_src_prefix,
+                        freq, oai_src_config, oai_src_post, action])
 
     updates = []
     for (upd_name, upd_status) in upd_status:
         if not upd_status:
-            upd_status =  bibharvest_templates.tmpl_print_warning(CFG_SITE_LANG, "Never harvested")
+            upd_status =  bibharvest_templates.tmpl_print_warning(ln, _("Never harvested"))
         else: #cut away leading zeros
             upd_status = re.sub(r'\.[0-9]+$', '', str(upd_status))
         updates.append([upd_name, upd_status])
@@ -133,29 +157,41 @@ def perform_request_index(ln=CFG_SITE_LANG):
     if schtime:
         schtime = re.sub(r'\.[0-9]+$', '', str(schtime))
 
-
-    holdingpen_link = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewholdingpen", title = "View Holding Pen", args = [["ln", str(ln)],])
+    holdingpen_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                       "/viewholdingpen",
+                                       urlargd={'ln': ln},
+                                       link_label=_("View Holding Pen"))
     output = titlebar
-    output += bibharvest_templates.tmpl_output_numbersources(CFG_SITE_LANG, get_tot_oai_src())
+    output += bibharvest_templates.tmpl_output_numbersources(ln, get_tot_oai_src())
     output += tupletotable(header=header, tuple=sources)
-    output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
+    output += bibharvest_templates.tmpl_print_brs(ln, 2)
     output += titlebar2
-    output += bibharvest_templates.tmpl_output_schedule(CFG_SITE_LANG, schtime, str(schstatus))
+    output += bibharvest_templates.tmpl_output_schedule(ln, schtime, str(schstatus))
     output += holdingpen_link
     output += bibharvest_templates.tmpl_print_brs(ln, 2)
     output += tupletotable(header=header2, tuple=updates)
 
     return output
 
-def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='',ln=CFG_SITE_LANG, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def perform_request_editsource(oai_src_id=None, oai_src_name='',
+                               oai_src_baseurl='', oai_src_prefix='',
+                               oai_src_frequency='',
+                               oai_src_config='',
+                               oai_src_post='',ln=CFG_SITE_LANG,
+                               confirm=-1, oai_src_sets=None,
+                               oai_src_bibfilter=''):
     """creates html form to edit a OAI source. this method is calling other methods which again is calling this and sending back the output of the method.
     confirm - determines the validation status of the data input into the form"""
+    _ = gettext_set_language(ln)
 
     if oai_src_id is None:
-        return "No OAI source ID selected."
+        return _("No OAI source ID selected.")
+
+    if oai_src_sets is None:
+        oai_src_sets = []
 
     output  = ""
-    subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = CFG_SITE_LANG, title = "edit source", subtitle = "Edit OAI source", guideurl = guideurl)
+    subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = ln, title = "edit source", subtitle = "Edit OAI source", guideurl = guideurl)
 
     if confirm in [-1, "-1"]:
         oai_src = get_oai_src(oai_src_id)
@@ -168,9 +204,9 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         oai_src_sets = oai_src[0][7].split()
         oai_src_bibfilter = oai_src[0][8]
 
-    text = bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "Source name", name = "oai_src_name", value = oai_src_name)
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "Base URL", name = "oai_src_baseurl", value = oai_src_baseurl)
+    text = bibharvest_templates.tmpl_print_brs(ln, 1)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "Source name", name = "oai_src_name", value = oai_src_name)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "Base URL", name = "oai_src_baseurl", value = oai_src_baseurl)
 
     sets = findSets(oai_src_baseurl)
     if sets:
@@ -180,7 +216,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         sets_labels = [((set[1] and set[0]+' ('+set[1]+')') or set[0]) \
                        for set in sets]
         sets_states = [ ((set[0] in oai_src_sets and 1) or 0) for set in sets]
-        text += bibharvest_templates.tmpl_admin_checkboxes(ln=CFG_SITE_LANG,
+        text += bibharvest_templates.tmpl_admin_checkboxes(ln=ln,
                                                            title="Sets",
                                                            name="oai_src_sets",
                                                            values=sets_specs,
@@ -188,17 +224,17 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
                                                            states=sets_states)
     else:
         # Let user specify sets in free textbox
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG,
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = ln,
                                                           title = "Sets",
                                                           name='oai_src_sets',
                                                           value=' '.join(oai_src_sets))
 
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
-    text += bibharvest_templates.tmpl_admin_w200_select(ln = CFG_SITE_LANG, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
-    text += bibharvest_templates.tmpl_admin_w200_select(ln = CFG_SITE_LANG, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config)
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
-    text += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
+    text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
+    text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config, suffix="<small>Eg: </small><code>oaidc2marcxml.xsl</code>, <code>oaimarc2marcxml.xsl</code><br/>")
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
+    text += bibharvest_templates.tmpl_print_brs(ln, 2)
 
     output += createhiddenform(action="editsource#1",
                                 text=text,
@@ -208,18 +244,18 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
                                 confirm=1)
 
     if confirm in [1, "1"] and not oai_src_name:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a name for the source.")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please enter a name for the source.")
     elif confirm in [1, "1"] and not oai_src_prefix:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a metadata prefix.")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please enter a metadata prefix.")
     elif confirm in [1, "1"] and not oai_src_baseurl:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a base url.")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please enter a base url.")
     elif confirm in [1, "1"] and not oai_src_frequency:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose a frequency of harvesting")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please choose a frequency of harvesting")
     elif confirm in [1, "1"] and not oai_src_post:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose a postprocess mode")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please choose a postprocess mode")
     elif confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "You selected a postprocess mode which involves conversion.")
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
+        output += bibharvest_templates.tmpl_print_info(ln, "You selected a postprocess mode which involves conversion.")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
     elif oai_src_id > -1 and confirm in [1, "1"]:
         if not oai_src_frequency:
             oai_src_frequency = 0
@@ -230,29 +266,40 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='', oai_src_baseurl
         res = modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets, oai_src_bibfilter)
         output += write_outcome(res)
 
-    lnargs = [["ln", ln]]
-    output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
-    output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs )
+
+    output += bibharvest_templates.tmpl_print_brs(ln, 2)
+    output += create_html_link(urlbase=oai_harvest_admin_url + \
+                               "/index",
+                               urlargd={'ln': ln},
+                               link_label=_("Go back to the OAI sources overview"))
 
     body = [output]
 
     return addadminbox(subtitle, body)
 
-def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', ln=CFG_SITE_LANG, confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
+                              oai_src_prefix='', oai_src_frequency='',
+                              oai_src_lastrun='', oai_src_config='',
+                              oai_src_post='', ln=CFG_SITE_LANG,
+                              confirm=-1, oai_src_sets=None,
+                              oai_src_bibfilter=''):
     """creates html form to add a new source"""
+    _ = gettext_set_language(ln)
 
     if oai_src_name is None:
         return "No OAI source name selected."
 
-    subtitle = bibharvest_templates.tmpl_draw_subtitle(ln=CFG_SITE_LANG,
+    if oai_src_sets is None:
+        oai_src_sets = []
+    subtitle = bibharvest_templates.tmpl_draw_subtitle(ln=ln,
                                                        title="add source",
                                                        subtitle="Add new OAI source",
                                                        guideurl=guideurl)
     output  = ""
 
     if confirm <= -1:
-        text = bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln=CFG_SITE_LANG,
+        text = bibharvest_templates.tmpl_print_brs(ln, 1)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln=ln,
                                                           title="Enter the base url",
                                                           name="oai_src_baseurl",
                                                           value=oai_src_baseurl+'http://')
@@ -264,9 +311,9 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
 
     if (confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] == 0) or \
            confirm in ["1", 1]:
-        output += bibharvest_templates.tmpl_output_validate_info(CFG_SITE_LANG, 0, str(oai_src_baseurl))
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
-        text = bibharvest_templates.tmpl_admin_w200_text(ln=CFG_SITE_LANG,
+        output += bibharvest_templates.tmpl_output_validate_info(ln, 0, str(oai_src_baseurl))
+        output += bibharvest_templates.tmpl_print_brs(ln, 2)
+        text = bibharvest_templates.tmpl_admin_w200_text(ln=ln,
                                                          title="Source name",
                                                          name="oai_src_name",
                                                          value=oai_src_name)
@@ -277,7 +324,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
             prefixes = []
             for value in metadatas:
                 prefixes.append([value, str(value)])
-            text += bibharvest_templates.tmpl_admin_w200_select(ln=CFG_SITE_LANG,
+            text += bibharvest_templates.tmpl_admin_w200_select(ln=ln,
                                                                 title="Metadata prefix",
                                                                 name="oai_src_prefix",
                                                                 valuenil="- select prefix -" ,
@@ -285,7 +332,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                                                 lastval=oai_src_prefix)
         else:
             # Let user specify prefix in free textbox
-            text += bibharvest_templates.tmpl_admin_w200_text(ln=CFG_SITE_LANG,
+            text += bibharvest_templates.tmpl_admin_w200_text(ln=ln,
                                                               title="Metadata prefix",
                                                               name="oai_src_prefix",
                                                               value=oai_src_prefix)
@@ -299,7 +346,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                            for set in sets]
             sets_states = [ ((set[0] in oai_src_sets and 1) or 0) \
                             for set in sets]
-            text += bibharvest_templates.tmpl_admin_checkboxes(ln=CFG_SITE_LANG,
+            text += bibharvest_templates.tmpl_admin_checkboxes(ln=ln,
                                                                title="Sets",
                                                                name="oai_src_sets",
                                                                values=sets_specs,
@@ -307,17 +354,17 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                                                states=sets_states)
         else:
             # Let user specify sets in free textbox
-            text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG,
+            text += bibharvest_templates.tmpl_admin_w200_text(ln = ln,
                                                               title = "Sets",
                                                               name='oai_src_sets',
                                                               value=' '.join(oai_src_sets))
 
-        text += bibharvest_templates.tmpl_admin_w200_select(ln = CFG_SITE_LANG, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
-        text += bibharvest_templates.tmpl_admin_w200_select(ln = CFG_SITE_LANG, title = "Starting date", name = "oai_src_lastrun", valuenil = "- select a date -" , values = dates, lastval = oai_src_lastrun)
-        text += bibharvest_templates.tmpl_admin_w200_select(ln = CFG_SITE_LANG, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
-        text += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
+        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
+        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Starting date", name = "oai_src_lastrun", valuenil = "- select a date -" , values = dates, lastval = oai_src_lastrun)
+        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
+        text += bibharvest_templates.tmpl_print_brs(ln, 2)
 
 
         output += createhiddenform(action="addsource#1",
@@ -328,51 +375,69 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
                                    confirm=1)
     elif confirm in ["0", 0] and validate(oai_src_baseurl)[0] > 0:
         # Could not perform first url validation
-        lnargs = [["ln", ln]]
-        output += bibharvest_templates.tmpl_output_validate_info(CFG_SITE_LANG, 1, str(oai_src_baseurl))
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again with another url", args = [])
-        output += """ or """
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Continue anyway", args = [['oai_src_baseurl', urllib.urlencode({'':oai_src_baseurl})[1:]], ['confirm', '1']])
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-        output += """or"""
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs)
+        output += bibharvest_templates.tmpl_output_validate_info(ln, 1, str(oai_src_baseurl))
+        output += bibharvest_templates.tmpl_print_brs(ln, 2)
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/addsource",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Try again with another url"))
+        output += " " + _("or") + " "
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/addsource",
+                                   urlargd={'ln': ln,
+                                            'oai_src_baseurl': oai_src_baseurl,
+                                            'confirm': '1'},
+                                   link_label=_("Continue anyway"))
+        output += bibharvest_templates.tmpl_print_brs(ln, 1)
+        output += " " + _("or") + " "
+        output += bibharvest_templates.tmpl_print_brs(ln, 1)
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/index",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Go back to the OAI sources overview"))
     elif confirm not in ["-1", -1] and validate(oai_src_baseurl)[0] > 0:
-        lnargs = [["ln", ln]]
-        output += bibharvest_templates.tmpl_output_validate_info(CFG_SITE_LANG, 1, str(oai_src_baseurl))
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again", args = [])
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-        output += """or"""
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs)
-
+        output += bibharvest_templates.tmpl_output_validate_info(ln, 1, str(oai_src_baseurl))
+        output += bibharvest_templates.tmpl_print_brs(ln, 2)
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/addsource",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Try again"))
+        output += bibharvest_templates.tmpl_print_brs(ln, 1)
+        output += " " + _("or") + " "
+        output += bibharvest_templates.tmpl_print_brs(ln, 1)
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/index",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Go back to the OAI sources overview"))
     elif confirm not in ["-1", -1]:
         lnargs = [["ln", ln]]
-        output += bibharvest_templates.tmpl_output_error_info(CFG_SITE_LANG, str(oai_src_baseurl), validate(oai_src_baseurl)[1])
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/addsource", title = "Try again", args = [])
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-        output += """or"""
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs)
-
-
+        output += bibharvest_templates.tmpl_output_error_info(ln, str(oai_src_baseurl), validate(oai_src_baseurl)[1])
+        output += bibharvest_templates.tmpl_print_brs(ln, 2)
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/addsource",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Try again"))
+        output += bibharvest_templates.tmpl_print_brs(ln, 1)
+        output += " " + _("or") + " "
+        output += bibharvest_templates.tmpl_print_brs(ln, 1)
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/index",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Go back to the OAI sources overview"))
 
     if confirm in [1, "1"] and not oai_src_name:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a name for the source.")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please enter a name for the source.")
     elif confirm in [1, "1"] and not oai_src_prefix:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a metadata prefix.")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please enter a metadata prefix.")
     elif confirm in [1, "1"] and not oai_src_frequency:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose a frequency of harvesting")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please choose a frequency of harvesting")
     elif confirm in [1, "1"] and not oai_src_lastrun:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose the harvesting starting date")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please choose the harvesting starting date")
     elif confirm in [1, "1"] and not oai_src_post:
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose a postprocess mode")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please choose a postprocess mode")
     elif confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "You selected a postprocess mode which involves conversion.")
-        output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
+        output += bibharvest_templates.tmpl_print_info(ln, "You selected a postprocess mode which involves conversion.")
+        output += bibharvest_templates.tmpl_print_info(ln, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
     elif oai_src_name and confirm in [1, "1"]:
         if not oai_src_frequency:
             oai_src_frequency = 0
@@ -383,78 +448,87 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
         if not oai_src_post:
             oai_src_post = "h"
 
-        res = add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets, oai_src_bibfilter)
+        res = add_oai_src(oai_src_name, oai_src_baseurl,
+                          oai_src_prefix, oai_src_frequency,
+                          oai_src_lastrun, oai_src_config,
+                          oai_src_post, oai_src_sets,
+                          oai_src_bibfilter)
         output += write_outcome(res)
 
         lnargs = [["ln", ln]]
-        output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
-        output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/index", title = "Go back to the OAI sources overview", args = lnargs )
+        output += bibharvest_templates.tmpl_print_brs(ln, 2)
+        output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/index",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Go back to the OAI sources overview"))
 
     body = [output]
 
     return addadminbox(subtitle, body)
 
-def perform_request_delsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes', confirm=0):
+def perform_request_delsource(oai_src_id=None, ln=CFG_SITE_LANG,
+                              callback='yes', confirm=0):
     """creates html form to delete a source
     """
-
+    _ = gettext_set_language(ln)
     output = ""
     subtitle = ""
 
     if oai_src_id:
         oai_src = get_oai_src(oai_src_id)
         namesrc = (oai_src[0][1])
-        pagetitle = """Delete OAI source: %s""" % namesrc
-        subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = CFG_SITE_LANG, \
+        pagetitle = """Delete OAI source: %s""" % cgi.escape(namesrc)
+        subtitle = bibharvest_templates.tmpl_draw_subtitle(ln = ln, \
             title = "delete source", subtitle = pagetitle, guideurl = guideurl)
         output  = ""
 
         if confirm in ["0", 0]:
             if oai_src:
-                question = """Do you want to delete the OAI source '%s' and all its definitions?""" % namesrc
-                text = bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, question)
-                text += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 3)
+                question = """Do you want to delete the OAI source '%s' and all its definitions?""" % cgi.escape(namesrc)
+                text = bibharvest_templates.tmpl_print_info(ln, question)
+                text += bibharvest_templates.tmpl_print_brs(ln, 3)
                 output += createhiddenform(action="delsource#5",
                                        text=text,
                                        button="Confirm",
                                        oai_src_id=oai_src_id,
                                        confirm=1)
             else:
-                return bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Source specified does not exist.")
+                return bibharvest_templates.tmpl_print_info(ln, "Source specified does not exist.")
         elif confirm in ["1", 1]:
             res = delete_oai_src(oai_src_id)
             if res[0] == 1:
-                output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Source removed.")
-                output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 1)
+                output += bibharvest_templates.tmpl_print_info(ln, "Source removed.")
+                output += bibharvest_templates.tmpl_print_brs(ln, 1)
                 output += write_outcome(res)
             else:
                 output += write_outcome(res)
 
-    lnargs = [["ln", ln]]
-    output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
-    output += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, \
-        funcurl = "admin/bibharvest/bibharvestadmin.py/index", \
-        title = "Go back to the OAI sources overview", args = lnargs )
+    output += bibharvest_templates.tmpl_print_brs(ln, 2)
+    output += create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/index",
+                                   urlargd={'ln': ln},
+                                   link_label=_("Go back to the OAI sources overview"))
 
     body = [output]
 
     return addadminbox(subtitle, body)
 
-
-def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes', \
-    confirm=0, record_id=None):
-
+def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG,
+                               callback='yes', confirm=0,
+                               record_id=None):
+    """Test OAI source page"""
+    _ = gettext_set_language(ln)
     if oai_src_id is None:
-        return "No OAI source ID selected."
+        return _("No OAI source ID selected.")
     result = ""
-    guideurl = "help/admin/bibharvest-admin-guide"
+
     result += bibharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
-    result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = \
+    result += bibharvest_templates.tmpl_draw_titlebar(ln = ln, title = \
         "Record ID ( Recognized by the data source )", guideurl=guideurl)
     record_str = ""
     if record_id != None:
         record_str = str(record_id)
-    form_text = bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = \
+    form_text = bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = \
         "Record identifier", name = "record_id", value = record_str)
     result += createhiddenform(action="testsource",
                                text=form_text,
@@ -463,18 +537,18 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes'
                                ln=ln,
                                confirm=1)
     if record_id != None:
-        result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = \
+        result += bibharvest_templates.tmpl_draw_titlebar(ln = ln, title = \
             "OAI XML downloaded from the source" , guideurl = guideurl)
         result += bibharvest_templates.tmpl_embed_document( \
-            "/admin/bibharvest/bibharvestadmin.py/preview_original_xml?oai_src_id=" \
-            + urllib.quote(str(oai_src_id)) + "&record_id=" \
-            + urllib.quote(str(record_id)))
-        result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = \
+            "/admin/bibharvest/oaiharvestadmin.py/preview_original_xml?oai_src_id=" \
+            + str(oai_src_id) + "&record_id=" \
+            + str(record_id))
+        result += bibharvest_templates.tmpl_draw_titlebar(ln = ln, title = \
             "MARC XML after all the transformations", guideurl = guideurl)
         result += bibharvest_templates.tmpl_embed_document( \
-            "/admin/bibharvest/bibharvestadmin.py/preview_harvested_xml?oai_src_id=" \
-            + urllib.quote(str(oai_src_id)) + "&record_id=" \
-            + urllib.quote(str(record_id)))
+            "/admin/bibharvest/oaiharvestadmin.py/preview_harvested_xml?oai_src_id=" \
+            + str(oai_src_id) + "&record_id=" \
+            + str(record_id))
     return result
 
 ######################################
@@ -534,7 +608,6 @@ def perform_request_viewtasklogs(ln, confirm, task_id):
 
 ### Probably should be moved to some other data-connection file
 
-
 def build_history_row(item, ln, show_selection, show_oai_source, show_record_ids, identifier = ""):
     def get_cssclass(cssclass):
         if cssclass == "oddtablecolumn":
@@ -553,16 +626,20 @@ def build_history_row(item, ln, show_selection, show_oai_source, show_record_ids
         bibharvest_templates.format_time(item.date_inserted), cssclass = cssclass)
 
     if show_record_ids:
-        record_history_link = bibharvest_templates.tmpl_link_with_args(ln, \
-            "/admin/bibharvest/bibharvestadmin.py/viewentryhistory", \
-            str(item.oai_id), [["ln", ln], ["oai_id", str(item.oai_id)], \
-            ["start", "0"]])
+        record_history_link = create_html_link(urlbase=oai_harvest_admin_url + \
+               "/viewentryhistory",
+                urlargd={'ln': ln,
+                         'oai_id': str(item.oai_id),
+                         'start': "0"},
+                link_label=str(item.oai_id))
         cssclass = get_cssclass(cssclass)
         result += bibharvest_templates.tmpl_table_output_cell(record_history_link, \
             cssclass = cssclass)
 
-        record_details_link = bibharvest_templates.tmpl_link_with_args(ln, \
-            "/record/" + str(item.record_id), str(item.record_id), [["ln",str(ln)],])
+        record_details_link = create_html_link(CFG_SITE_URL + \
+                                               "/record/" + str(item.record_id),
+                                               urlargd={'ln': ln},
+                                               link_label=str(item.record_id))
         cssclass = get_cssclass(cssclass)
         result += bibharvest_templates.tmpl_table_output_cell(record_details_link, \
             cssclass = cssclass)
@@ -574,10 +651,11 @@ def build_history_row(item, ln, show_selection, show_oai_source, show_record_ids
     cssclass = get_cssclass(cssclass)
     task_id = str(item.bibupload_task_id)
     if does_errfile_exist(item.bibupload_task_id) or does_logfile_exist(item.bibupload_task_id):
-        task_id = bibharvest_templates.tmpl_link_with_args(ln, \
-            "/admin/bibharvest/bibharvestadmin.py/viewtasklogs", str(item.bibupload_task_id),\
-            [["ln",str(ln)],["task_id", str(item.bibupload_task_id)]])
-
+        task_id = create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/viewtasklogs",
+                                   urlargd={'ln': ln,
+                                            'task_id': str(item.bibupload_task_id)},
+                                   link_label=str(item.bibupload_task_id))
     result += bibharvest_templates.tmpl_table_output_cell(task_id, cssclass = cssclass)
 
     if show_selection:
@@ -654,7 +732,7 @@ def build_history_table(data, ln = CFG_SITE_LANG, show_selection = True, \
     for item in data:
         identifier = bibharvest_templates.format_date(item.date_harvested) + \
             bibharvest_templates.format_time(item.date_harvested) + "_" + item.oai_id
-        result += build_history_row(item, ln, show_selection = show_selection,\
+        result += build_history_row(item, ln, show_selection = show_selection, \
             show_oai_source = show_oai_source, show_record_ids = show_record_ids, \
             identifier = identifier)
         if show_selection:
@@ -684,15 +762,20 @@ def perform_request_viewhistory(oai_src_id = None, ln = CFG_SITE_LANG, callback 
     inner_text += bibharvest_templates.tmpl_print_brs(ln, 1)
     inner_text = bibharvest_templates.tmpl_output_scrollable_frame(inner_text)
     inner_text += bibharvest_templates.tmpl_output_selection_bar()
-    result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", \
+    result +=  createhiddenform(action="/admin/bibharvest/oaiharvestadmin.py/reharvest", \
         text = inner_text, button = "Reharvest selected records", oai_src_id = \
         oai_src_id, ln = ln)
     return result
 
 
-def perform_request_viewhistoryday(oai_src_id = None, ln = CFG_SITE_LANG, callback = 'yes',\
-    confirm = 0, month = None, year = None, day = None, start = 0):
-
+def perform_request_viewhistoryday(oai_src_id=None, ln=CFG_SITE_LANG,
+                                   callback='yes', confirm=0,
+                                   month=None, year=None, day=None,
+                                   start=0):
+    """
+    Records history page
+    """
+    _ = gettext_set_language(ln)
     page_length = 50
     result = ""
     result += bibharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
@@ -700,30 +783,42 @@ def perform_request_viewhistoryday(oai_src_id = None, ln = CFG_SITE_LANG, callba
     if year != None and month != None and day != None:
         considered_date = datetime.datetime(year, month, day)
     number_of_records = get_day_logs_size(oai_src_id, considered_date)
-    return_to_month_link =  bibharvest_templates.tmpl_link_with_args(ln, \
-        "/admin/bibharvest/bibharvestadmin.py/viewhistory", \
-        "&lt;&lt; Return to the month view", [["ln", ln], ["oai_src_id",\
-        str(oai_src_id)], ["year", str(considered_date.year)], \
-        ["month", str(considered_date.month)]])
+    return_to_month_link = create_html_link(
+        urlbase=oai_harvest_admin_url + \
+        "/viewhistory",
+        urlargd={'ln': ln,
+                 'oai_src_id': str(oai_src_id),
+                 'year': str(considered_date.year),
+                 'month': str(considered_date.month)},
+        link_label="&lt;&lt; " + _("Return to the month view"))
+
     next_page_link = ""
     if number_of_records > start + page_length:
-        next_page_link = bibharvest_templates.tmpl_link_with_args(ln, \
-          "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", \
-          "Next page &gt;&gt;", \
-          [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(considered_date.year)],\
-          ["month", str(considered_date.month)], ["day",  str(considered_date.day)], \
-          ["start", str(start + page_length)]])
+        next_page_link = create_html_link(
+            urlbase=oai_harvest_admin_url + \
+            "/viewhistoryday",
+            urlargd={'ln': ln,
+                     'oai_src_id': str(oai_src_id),
+                     'year': str(considered_date.year),
+                     'month': str(considered_date.month),
+                     'day': str(considered_date.day),
+                     'start': str(start + page_length)},
+            link_label=_("Next page") + " &gt;&gt;")
     prev_page_link = ""
     if start > 0:
         new_start = start - page_length
         if new_start < 0:
             new_start = 0
-        prev_page_link = bibharvest_templates.tmpl_link_with_args(ln, \
-          "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", \
-          "&lt;&lt; Previous page", \
-          [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(considered_date.year)],\
-          ["month", str(considered_date.month)], ["day",  str(considered_date.day)], \
-          ["start", str(new_start)]])
+        prev_page_link = create_html_link(
+            urlbase=oai_harvest_admin_url + \
+            "/viewhistoryday",
+            urlargd={'ln': ln,
+                     'oai_src_id': str(oai_src_id),
+                     'year': str(considered_date.year),
+                     'month': str(considered_date.month),
+                     'day': str(considered_date.day),
+                     'start': str(new_start)},
+            link_label="&lt;&lt; " + _("Previous page"))
     last_shown = start + page_length
     if last_shown > number_of_records:
         last_shown = number_of_records
@@ -740,13 +835,15 @@ def perform_request_viewhistoryday(oai_src_id = None, ln = CFG_SITE_LANG, callba
     inner_text = bibharvest_templates.tmpl_output_scrollable_frame(build_history_table(\
         current_day_records, ln=ln))
     inner_text += bibharvest_templates.tmpl_output_selection_bar()
-    result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", \
+    result +=  createhiddenform(action="/admin/bibharvest/oaiharvestadmin.py/reharvest", \
         text = inner_text, button = "Reharvest selected records", oai_src_id = oai_src_id, ln = ln)
     result += return_to_month_link + bibharvest_templates.tmpl_print_brs(ln, 1)
     return result
 
 
 def perform_request_viewentryhistory(oai_id, ln, confirm, start):
+    """History of an OAI record"""
+    _ = gettext_set_language(ln)
     page_length = 50
     result = ""
     result += bibharvest_templates.tmpl_output_menu(ln, None, guideurl)
@@ -756,21 +853,25 @@ def perform_request_viewentryhistory(oai_id, ln, confirm, start):
 
     next_page_link = ""
     if number_of_records > start + page_length:
-        next_page_link = bibharvest_templates.tmpl_link_with_args(ln, \
-          "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", \
-          "Next page &gt;&gt;", \
-          [["ln", ln], ["oai_id", str(oai_id)], \
-          ["start", str(start + page_length)]])
+        prev_page_link = create_html_link(
+            urlbase=oai_harvest_admin_url + \
+            "/viewhistoryday",
+            urlargd={'ln': ln,
+                     'oai_id': str(oai_id),
+                     'start': str(start + page_length)},
+            link_label=_("Next page") + " &gt;&gt;")
     prev_page_link = ""
     if start > 0:
         new_start = start - page_length
         if new_start < 0:
             new_start = 0
-        prev_page_link = bibharvest_templates.tmpl_link_with_args(ln, \
-          "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", \
-          "&lt;&lt; Previous page", \
-          [["ln", ln], ["oai_id", str(oai_id)], \
-          ["start", str(new_start)]])
+        prev_page_link = create_html_link(
+            urlbase=oai_harvest_admin_url + \
+            "/viewhistoryday",
+            urlargd={'ln': ln,
+                     'oai_id': str(oai_id),
+                     'start': str(new_start)},
+            link_label="&lt;&lt; " + _("Previous page"))
     last_shown = start + page_length
     if last_shown > number_of_records:
         last_shown = number_of_records
@@ -798,7 +899,7 @@ def harvest_record(record_id , oai_src_baseurl, oai_src_prefix):
     """
        Harvests given record and returns it's string as a result
     """
-    command = CFG_BINDIR + "/bibharvest -vGetRecord -i" + record_id \
+    command = CFG_BINDIR + "/oaiharvest -vGetRecord -i" + record_id \
               + " -p" + oai_src_prefix + " " + oai_src_baseurl
     program_output = os.popen(command)
     result = program_output.read(-1)
@@ -807,7 +908,7 @@ def harvest_record(record_id , oai_src_baseurl, oai_src_prefix):
 
 def convert_record(oai_src_config, record_to_convert):
     command = CFG_BINDIR + "/bibconvert -c " + oai_src_config
-    (s_in,s_out,s_err) = os.popen3(command)
+    (s_in, s_out, s_err) = os.popen3(command)
     s_in.write(record_to_convert)
     s_in.close()
     s_err.readlines()
@@ -816,7 +917,7 @@ def convert_record(oai_src_config, record_to_convert):
     s_out.close()
     return result
 
-def format_record(oai_src_bibfilter,  record_to_convert, treat_new = False):
+def format_record(oai_src_bibfilter, record_to_convert, treat_new = False):
     """
     Formats the record using given formatting program.
     Returns name of the file containing result,
@@ -843,6 +944,7 @@ def format_record(oai_src_bibfilter,  record_to_convert, treat_new = False):
         return (None, out, err)
 
 def harvest_postprocress_record(oai_src_id, record_id, treat_new = False):
+    """Havest ther record and postprocess it"""
     oai_src = get_oai_src(oai_src_id)
     oai_src_baseurl = oai_src[0][2]
     oai_src_prefix = oai_src[0][3]
@@ -869,14 +971,17 @@ def harvest_postprocress_record(oai_src_id, record_id, treat_new = False):
             return (False, "Error during formatting: " + fres[1] + "\n\n" + fres[2])
     return (True, result)
 
-def upload_record(record = None, uploader_paremeters = ["-r", "-i"], oai_source_id = None):
-    if record == None:
+def upload_record(record = None, uploader_paremeters = None, oai_source_id = None):
+    """Upload the given record"""
+    if record is None:
         return
+    if uploader_paremeters is None:
+        uploader_paremeters = ["-r", "-i"]
     (file_descriptor, file_name) = tempfile.mkstemp()
     f = os.fdopen(file_descriptor, "w")
     f.write(record)
     f.close()
-    oaiharvestlib.call_bibupload(file_name, uploader_paremeters, oai_src_id = oai_source_id)
+    oai_harvest_daemon.call_bibupload(file_name, uploader_paremeters, oai_src_id = oai_source_id)
     #command = CFG_BINDIR + "/bibupload " + uploader_paremeters + " "
     #command += file_name
 
@@ -885,6 +990,7 @@ def upload_record(record = None, uploader_paremeters = ["-r", "-i"], oai_source_
     #out.close()
 
 def perform_request_preview_original_xml(oai_src_id = None, record_id = None):
+    """Harvest a record and return it. No side effect, useful for preview"""
     oai_src = get_oai_src(oai_src_id)
     oai_src_baseurl = oai_src[0][2]
     oai_src_prefix = oai_src[0][3]
@@ -908,7 +1014,7 @@ def perform_request_reharvest_records(oai_src_id = None, ln = CFG_SITE_LANG, con
         transformed = harvest_postprocress_record(oai_src_id, record_id, treat_new = True)[1]
         upload_record(transformed, ["-i", "-r"], oai_src_id)
     result = bibharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
-    result += bibharvest_templates.tmpl_print_info(ln, "Submitted for inserion into the database")
+    result += bibharvest_templates.tmpl_print_info(ln, "Submitted for insertion into the database")
     return result
 
 def perform_request_harvest_record(oai_src_id = None, ln = CFG_SITE_LANG, confirm=0, record_id = None):
@@ -918,12 +1024,12 @@ def perform_request_harvest_record(oai_src_id = None, ln = CFG_SITE_LANG, confir
     result = ""
     guideurl = "help/admin/bibharvest-admin-guide"
     result += bibharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
-    result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, \
+    result += bibharvest_templates.tmpl_draw_titlebar(ln = ln, \
         title = "Record ID ( Recognized by the data source )", guideurl=guideurl)
     record_str = ""
     if record_id != None:
         record_str = str(record_id)
-    form_text = bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, \
+    form_text = bibharvest_templates.tmpl_admin_w200_text(ln = ln, \
         title = "Record identifier", name = "record_id", value = record_str)
     result += createhiddenform(action="harvest",
                                text=form_text,
@@ -935,14 +1041,15 @@ def perform_request_harvest_record(oai_src_id = None, ln = CFG_SITE_LANG, confir
         # there was a harvest-request
         transformed = harvest_postprocress_record(oai_src_id, record_id)[1]
         upload_record(transformed, ["-i"], oai_src_id)
-        result += bibharvest_templates.tmpl_print_info(ln, "Submitted for inserion into the database")
+        result += bibharvest_templates.tmpl_print_info(ln, "Submitted for insertion into the database")
     return result
 
 
 ############################
 ### Holding pen support  ###
 ############################
-def build_holdingpen_table(data, ln):
+def build_holdingpen_table(data, ln=CFG_SITE_LANG):
+    _ = gettext_set_language(ln)
     result = ""
     headers = ["OAI Record ID", "Insertion Date", "", ""]
     result += bibharvest_templates.tmpl_table_begin(headers)
@@ -952,15 +1059,19 @@ def build_holdingpen_table(data, ln):
         result += bibharvest_templates.tmpl_table_row_begin()
         result += bibharvest_templates.tmpl_table_output_cell(str(oai_id), cssclass = "oddtablecolumn")
         result += bibharvest_templates.tmpl_table_output_cell(str(date_inserted), cssclass = "pairtablecolumn")
-        details_link = bibharvest_templates.tmpl_link_with_args(ln, \
-                            "/admin/bibharvest/bibharvestadmin.py/viewhprecord", \
-                            "Compare with original", [["ln", ln], \
-                            ["oai_id", str(oai_id)], ["date_inserted", str(date_inserted)]])
+        details_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                        "/viewhprecord",
+                                        urlargd={'ln': ln,
+                                                 'oai_id': str(oai_id),
+                                                 'date_inserted': str(date_inserted)},
+                                        link_label=_("Compare with original"))
         result += bibharvest_templates.tmpl_table_output_cell(details_link, cssclass = "oddtablecolumn")
-        delete_hp_link = bibharvest_templates.tmpl_link_with_args(ln, \
-                            "/admin/bibharvest/bibharvestadmin.py/delhprecord", \
-                            "Delete from holding pen", [["ln", ln], \
-                            ["oai_id", str(oai_id)], ["date_inserted", str(date_inserted)]])
+        delete_hp_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                          "/delhprecord",
+                                          urlargd={'ln': ln,
+                                                   'oai_id': str(oai_id),
+                                                   'date_inserted': str(date_inserted)},
+                                          link_label=_("Delete from holding pen"))
         result += bibharvest_templates.tmpl_table_output_cell(delete_hp_link, cssclass = "pairtablecolumn")
         result += bibharvest_templates.tmpl_table_row_end()
     result += bibharvest_templates.tmpl_table_end()
@@ -973,6 +1084,7 @@ def perform_request_viewholdingpen(ln = CFG_SITE_LANG, confirm=0, start = 0, lim
     return result
 
 def perform_request_viewhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, confirm=0):
+    _ = gettext_set_language(ln)
     result = ""
     record_id = int(search_pattern( p = oai_id, f = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
                                         m = 'e' ).tolist()[0])
@@ -985,15 +1097,18 @@ def perform_request_viewhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, conf
     hp_content = bibharvest_templates.tmpl_output_preformatted(hp_MARC.encode("utf-8"))
     hp_label = bibharvest_templates.tmpl_print_brs(ln, 2) + "Holdingpen version of record"\
         + bibharvest_templates.tmpl_print_brs(ln, 1)
-    submit_link = bibharvest_templates.tmpl_link_with_args(ln,
-                      "admin/bibharvest/bibharvestadmin.py/accepthprecord",
-                      "Accept Holding Pen version",
-                      [["ln", str(ln)], ["oai_id", str(oai_id)], ["date_inserted",
-                      str(date_inserted)]])
-    delete_link = delete_hp_link = bibharvest_templates.tmpl_link_with_args(ln,
-                     "admin/bibharvest/bibharvestadmin.py/delhprecord",
-                     "Delete from holding pen", [["ln", ln],
-                     ["oai_id", str(oai_id)], ["date_inserted", str(date_inserted)]])
+    submit_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/accepthprecord",
+                                   urlargd={'ln': ln,
+                                            'oai_id': str(oai_id),
+                                            'date_inserted': str(date_inserted)},
+                                   link_label=_("Accept Holding Pen version"))
+    delete_link = create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/delhprecord",
+                                   urlargd={'ln': ln,
+                                            'oai_id': str(oai_id),
+                                            'date_inserted': str(date_inserted)},
+                                   link_label=_("Delete from holding pen"))
     result = ""
     result += db_label
     result += db_content
@@ -1029,8 +1144,10 @@ def get_oai_src(oai_src_id=''):
     except StandardError, e:
         return ""
 
-def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets=[], oai_src_bibfilter=''):
+def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_config, oai_src_post, oai_src_sets=None, oai_src_bibfilter=''):
     """Modifies a row's parameters"""
+    if oai_src_sets is None:
+        oai_src_sets = []
     try:
         res = run_sql("UPDATE oaiHARVEST SET name=%s WHERE id=%s", (oai_src_name, oai_src_id))
         res = run_sql("UPDATE oaiHARVEST SET baseurl=%s WHERE id=%s", (oai_src_baseurl, oai_src_id))
@@ -1044,8 +1161,10 @@ def modify_oai_src(oai_src_id, oai_src_name, oai_src_baseurl, oai_src_prefix, oa
     except StandardError, e:
         return (0, e)
 
-def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets=[], oai_src_bibfilter=''):
+def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency, oai_src_lastrun, oai_src_config, oai_src_post, oai_src_sets=None, oai_src_bibfilter=''):
     """Adds a new row to the database with the given parameters"""
+    if oai_src_sets is None:
+        oai_src_sets = []
     try:
         if oai_src_lastrun in [0, "0"]: lastrun_mode = 'NULL'
         else:
@@ -1152,9 +1271,9 @@ def validatefile(oai_src_config):
         # Try to read in config directory
         try:
             ftmp = open(path_to_config, 'r')
-            cfgstr= ftmp.read()
+            cfgstr = ftmp.read()
             ftmp.close()
-            if cfgstr!="":
+            if cfgstr != "":
                 #print "Valid!"
                 return 0
         except StandardError, e:
@@ -1163,9 +1282,9 @@ def validatefile(oai_src_config):
     # Try to read as complete path
     try:
         ftmp = open(oai_src_config, 'r')
-        cfgstr= ftmp.read()
+        cfgstr = ftmp.read()
         ftmp.close()
-        if cfgstr!="":
+        if cfgstr != "":
             #print "Valid!"
             return 0
         else:
@@ -1185,12 +1304,12 @@ def findMetadataFormats(oai_src_baseurl):
     except IOError:
         return formats
     ftmp = open(tmppath, 'r')
-    xmlstr= ftmp.read()
+    xmlstr = ftmp.read()
     ftmp.close()
     chunks = xmlstr.split('<metadataPrefix>')
     count = 0 # first chunk is invalid
     for chunk in chunks:
-        if count!=0:
+        if count != 0:
             formats.append(chunk.split('</metadataPrefix>')[0])
         count = count + 1
     return formats
@@ -1206,12 +1325,12 @@ def findSets(oai_src_baseurl):
     except IOError:
         return sets
     ftmp = open(tmppath, 'r')
-    xmlstr= ftmp.read()
+    xmlstr = ftmp.read()
     ftmp.close()
     chunks = xmlstr.split('<set>')
     count = 0 # first chunk is invalid
     for chunk in chunks:
-        if count!=0:
+        if count != 0:
             chunks_set = chunk.split('<setSpec>')[1].split("</setSpec>")
             set_spec = chunks_set[0]
             #chunks_set[1].split('<setName>')

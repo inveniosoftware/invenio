@@ -815,8 +815,8 @@ INSERT INTO fieldvalue VALUES (30,'Life at CERN','Life at CERN');
 INSERT INTO fieldvalue VALUES (31,'CERN ETT','ETT');
 INSERT INTO fieldvalue VALUES (32,'CERN EP','EP');
 
-INSERT INTO oaiARCHIVE VALUES (2,'CERN experimental papers','cern:experiment','','','c=;p1=CERN;f1=reportnumber;m1=a;p2=(EP|PPE);f2=division;m2=r;p3=;f3=;m3=;',NULL,'CERN','reportnumber','a','(EP|PPE)','division','r','','','');
-INSERT INTO oaiARCHIVE VALUES (3,'CERN theoretical papers','cern:theory','','','c=;p1=CERN;f1=reportnumber;m1=a;p2=TH;f2=division;m2=e;p3=;f3=;m3=;',NULL,'CERN','reportnumber','a','TH','division','e','','','');
+INSERT INTO oaiREPOSITORY VALUES (2,'CERN experimental papers','cern:experiment','','','c=;p1=CERN;f1=reportnumber;m1=a;p2=(EP|PPE);f2=division;m2=r;p3=;f3=;m3=;',NULL,'CERN','reportnumber','a','(EP|PPE)','division','r','','','');
+INSERT INTO oaiREPOSITORY VALUES (3,'CERN theoretical papers','cern:theory','','','c=;p1=CERN;f1=reportnumber;m1=a;p2=TH;f2=division;m2=e;p3=;f3=;m3=;',NULL,'CERN','reportnumber','a','TH','division','e','','','');
 
 INSERT INTO portalbox VALUES (1,'ABOUT THIS SITE','Welcome to the demo site of the CDS Invenio, a free document server software coming from CERN.  Please feel free to explore all the features of this demo site to the full.');
 INSERT INTO portalbox VALUES (2,'SEE ALSO','<a href=\"http://cdsware.cern.ch/\">CDS Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a><br /><a href=\"http://google.com/\">Google</a>');

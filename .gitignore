@@ -38,6 +38,7 @@ modules/bibformat/bin/bibreformat
 modules/bibharvest/bin/bibharvest
 modules/bibharvest/bin/oaiarchive
 modules/bibharvest/bin/oaiharvest
+modules/bibharvest/bin/oairepositoryupdater
 modules/bibindex/bin/bibindex
 modules/bibindex/bin/bibstat
 modules/bibmatch/bin/bibmatch

@@ -15,7 +15,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDS Invenio OAI Archive Administrator Interface."""
+"""CDS Invenio OAI Repository Administrator Interface."""
 
 __revision__ = "$Id$"
 
@@ -23,19 +23,19 @@ __lastupdated__ = """$Date$"""
 
 import sys
 
-import invenio.oaiarchiveadminlib as bhc
+import invenio.oai_repository_admin as ora
 from invenio.webpage import page, create_error_box
 from invenio.config import CFG_SITE_URL,CFG_SITE_LANG
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 def index(req, ln=CFG_SITE_LANG):
-    navtrail_previous_links = bhc.getnavtrail()
+    navtrail_previous_links = ora.getnavtrail(ln=ln)
 
     try:
         uid = getUid(req)
     except Error, e:
-        return page(title="OAI Archive Admin Interface - Error",
+        return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
                     language=ln,
@@ -43,11 +43,11 @@ def index(req, ln=CFG_SITE_LANG):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgoairepository')
+    auth = ora.check_user(req,'cfgoairepository')
     if not auth[0]:
 
         return page(title="OAI Repository Admin Interface",
-                body=bhc.perform_request_index(ln),
+                body=ora.perform_request_index(ln),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -58,12 +58,12 @@ def index(req, ln=CFG_SITE_LANG):
 
 def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=CFG_SITE_LANG, func=0):
 
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (CFG_SITE_URL)
+    navtrail_previous_links = ora.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/bibharvest/oairepositoryadmin.py?ln=%s">OAI Repository Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
         uid = getUid(req)
     except Error, e:
-        return page(title="OAI Archive Admin Interface - Error",
+        return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
                     language=ln,
@@ -71,10 +71,10 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgoairepository')
+    auth = ora.check_user(req,'cfgoairepository')
     if not auth[0]:
         return page(title="Add new OAI Set",
-                body=bhc.perform_request_addset(oai_set_name=oai_set_name,
+                body=ora.perform_request_addset(oai_set_name=oai_set_name,
                                            oai_set_spec=oai_set_spec,
                                            oai_set_collection=oai_set_collection,
                                            oai_set_description=oai_set_description,
@@ -103,12 +103,12 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
 
 
 def delset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (CFG_SITE_URL)
+    navtrail_previous_links = ora.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/bibharvest/oairepositoryadmin.py?ln=%s">OAI Repository Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
         uid = getUid(req)
     except Error, e:
-        return page(title="OAI Archive Admin Interface - Error",
+        return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
                     language=ln,
@@ -116,10 +116,10 @@ def delset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgoairepository')
+    auth = ora.check_user(req,'cfgoairepository')
     if not auth[0]:
         return page(title="Delete OAI Set",
-                    body=bhc.perform_request_delset(oai_set_id=oai_set_id,
+                    body=ora.perform_request_delset(oai_set_id=oai_set_id,
                                                     ln=ln,
                                                     func=func),
                     uid=uid,
@@ -132,12 +132,12 @@ def delset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
 
 def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=CFG_SITE_LANG, func=0):
 
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (CFG_SITE_URL)
+    navtrail_previous_links = ora.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/bibharvest/oairepositoryadmin.py?ln=%s">OAI Repository Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
 
     try:
         uid = getUid(req)
     except Error, e:
-        return page(title="OAI Archive Admin Interface - Error",
+        return page(title="OAI Repository Admin Interface - Error",
                     body=e,
                     uid=uid,
                     language=ln,
@@ -145,10 +145,10 @@ def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_coll
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgoairepository')
+    auth = ora.check_user(req,'cfgoairepository')
     if not auth[0]:
         return page(title="Edit OAI Set",
-                    body=bhc.perform_request_editset(oai_set_id=oai_set_id,
+                    body=ora.perform_request_editset(oai_set_id=oai_set_id,
                                                      oai_set_name=oai_set_name,
                                                      oai_set_spec=oai_set_spec,
                                                      oai_set_collection=oai_set_collection,

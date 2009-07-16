@@ -1081,10 +1081,10 @@ class Template:
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
                 if action == "cfgbibformat":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
-                if action == "cfgbibharvest":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibHarvest"))
+                if action == "cfgoaiharvest":
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oaiharvestadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure OAI Harvest"))
                 if action == "cfgoairepository":
-                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oaiarchiveadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln,  _("Configure OAI Repository"))
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oairepositoryadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln,  _("Configure OAI Repository"))
                 if action == "cfgbibindex":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibIndex"))
                 if action == "cfgbibrank":

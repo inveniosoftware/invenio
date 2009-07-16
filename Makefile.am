@@ -324,6 +324,7 @@ update-v0.99.0-tables:
 	echo "ALTER TABLE cmtACTIONHISTORY CHANGE client_host client_host int(10) unsigned default NULL;" | ${prefix}/bin/dbexec
 
 update-v0.99.1-tables:
+	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc CHANGE docname docname varchar(250) COLLATE utf8_bin NOT NULL default 'file';" | ${prefix}/bin/dbexec
@@ -334,6 +335,7 @@ update-v0.99.1-tables:
 	echo "ALTER TABLE bib85x DROP INDEX kv, ADD INDEX kv (value(100));" | ${prefix}/bin/dbexec
 	echo "UPDATE clsMETHOD SET location='http://cdsware.cern.ch/download/invenio-demo-site-files/HEP.rdf' WHERE name='HEP' AND location='';" | ${prefix}/bin/dbexec
 	echo "UPDATE clsMETHOD SET location='http://cdsware.cern.ch/download/invenio-demo-site-files/NASA-subjects.rdf' WHERE name='NASA-subjects' AND location='';" | ${prefix}/bin/dbexec
-
+	echo "UPDATE accACTION SET name='runoairepository', description='run oairepositoryupdater task' WHERE name='runoaiarchive';" | ${prefix}/bin/dbexec
+	echo "UPDATE accACTION SET name='cfgoaiharvest', description='configure OAI Harvest' WHERE name='cfgbibharvest';" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

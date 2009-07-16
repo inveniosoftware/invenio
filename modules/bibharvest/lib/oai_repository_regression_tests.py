@@ -17,7 +17,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""OAIRepository Regression Test Suite."""
+"""OAI Repository Regression Test Suite."""
 
 __revision__ = "$Id$"
 
@@ -29,7 +29,7 @@ from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
 class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
-    """Check OAIRepository web pages whether they are up or not."""
+    """Check OAI Repository web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
         """oairepository - availability of OAI server pages"""

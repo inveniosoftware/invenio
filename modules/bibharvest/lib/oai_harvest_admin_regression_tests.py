@@ -30,10 +30,10 @@ from invenio.testutils import make_test_suite, run_test_suite, \
 class BibHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibHarvest Admin web pages whether they are up or not."""
 
-    def test_bibharvest_admin_interface_pages_availability(self):
-        """bibharvestadmin - availability of BibHarvest Admin interface pages"""
+    def test_oaiharvestadmin_interface_pages_availability(self):
+        """oaiharvestadmin - availability of OAI Harvest Admin interface pages"""
 
-        baseurl = CFG_SITE_URL + '/admin/bibharvest/bibharvestadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/bibharvest/oaiharvestadmin.py/'
 
         _exports = ['', 'editsource', 'addsource', 'delsource']
 
@@ -51,12 +51,12 @@ class BibHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-    def test_bibharvest_admin_guide_availability(self):
-        """bibharvestadmin - availability of BibHarvest Admin guide pages"""
+    def test_oai_admin_guide_availability(self):
+        """oaiharvestadmin - availability of OAI Admin Guide"""
 
-        url = CFG_SITE_URL + '/help/admin/bibharvest-admin-guide'
+        url = CFG_SITE_URL + '/help/admin/oai-admin-guide'
         error_messages = test_web_page_content(url,
-                                               expected_text="BibHarvest Admin Guide")
+                                               expected_text="OAI Admin Guide")
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return

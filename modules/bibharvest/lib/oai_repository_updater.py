@@ -75,14 +75,14 @@ DATAFIELD_ID_HEAD  = \
 
 def get_set_definitions(set_spec):
     """
-    Retrieve set definitions from oaiARCHIVE table.
+    Retrieve set definitions from oaiREPOSITORY table.
 
     The set definitions are the search patterns that define the records
     which are in the set
     """
     set_definitions = []
 
-    query = "select setName, setDefinition from oaiARCHIVE where setSpec=%s"
+    query = "select setName, setDefinition from oaiREPOSITORY where setSpec=%s"
     res = run_sql(query, (set_spec, ))
 
     for (set_name, set_definition) in res:
@@ -123,7 +123,7 @@ def all_set_specs():
     given that a setSpec might be defined by several search
     queries. Here we return distinct values
     """
-    query = "SELECT DISTINCT setSpec FROM oaiARCHIVE"
+    query = "SELECT DISTINCT setSpec FROM oaiREPOSITORY"
     res = run_sql(query)
 
     return [row[0] for row in res]
@@ -172,7 +172,7 @@ def get_set_name_for_set_spec(set_spec):
       set_spec - *str* the set_spec for which we would like to get the
                  setName
     """
-    query = "select setName from oaiARCHIVE where setSpec=%s and setName!=''"
+    query = "select setName from oaiREPOSITORY where setSpec=%s and setName!=''"
     res = run_sql(query, (set_spec, ))
     if len(res) > 0:
         return res[0][0]
@@ -307,10 +307,9 @@ def repository_size():
                                       m1="e",
                                       ap=0))
 
-
 ### MAIN ###
 
-def oaiarchive_task():
+def oairepositoryupdater_task():
     """Main business logic code of oai_archive"""
     no_upload = task_get_option("no_upload")
     report = task_get_option("report")
@@ -342,7 +341,7 @@ def oaiarchive_task():
 
     # Prepare to save results in a tmp file
     (fd, filename) = mkstemp(dir=CFG_TMPDIR,
-                                  prefix='oaiarchive_' + \
+                                  prefix='oairepository_' + \
                                   time.strftime("%Y%m%d_%H%M%S_",
                                                 time.localtime()))
     oai_out = os.fdopen(fd, "w")
@@ -359,7 +358,7 @@ def oaiarchive_task():
         # not.
         oai_id_entry = ""
         oai_ids = [_oai_id for _oai_id in \
-                   get_fieldvalues(recid, CFG_OAI_ID_FIELD[0:2]) \
+                   get_fieldvalues(recid, CFG_OAI_ID_FIELD) \
                    if _oai_id.strip() != '']
         if len(oai_ids) == 0:
             oai_id_entry = "<subfield code=\"%s\">oai:%s:%s</subfield>\n" % \
@@ -369,7 +368,7 @@ def oaiarchive_task():
         # to the metadata
         current_oai_sets = set(\
             [_oai_set for _oai_set in \
-             get_fieldvalues(recid, CFG_OAI_SET_FIELD[0:2]) \
+             get_fieldvalues(recid, CFG_OAI_SET_FIELD) \
              if _oai_set.strip() != ''])
 
         # Get the sets that should be in this record according to
@@ -505,17 +504,17 @@ def main():
                                 verbose=mode)
         return
 
-    task_init(authorization_action='runoaiarchive',
+    task_init(authorization_action='runoairepository',
             authorization_msg="OAI Archive Task Submission",
             description="Examples:\n"
                 " Expose records according to sets defined in OAI Repository admin interface\n"
-                "   $ oaiarchive \n"
+                "   $ oairepositoryupdater \n"
                 " Expose records according to sets defined in OAI Repository admin interface and update them every day\n"
-                "   $ oaiarchive -s24\n"
+                "   $ oairepositoryupdater -s24\n"
                 " Print OAI repository status\n"
-                "   $ oaiarchive -r\n"
+                "   $ oairepositoryupdater -r\n"
                 " Print OAI repository detailed status\n"
-                "   $ oaiarchive -d\n\n",
+                "   $ oairepositoryupdater -d\n\n",
             help_specific_usage="Options:\n"
                 " -r --report\t\tOAI repository status\n"
                 " -d --detailed-report\t\tOAI repository detailed status\n"
@@ -527,10 +526,10 @@ def main():
                 "no-process"]),
             task_submit_elaborate_specific_parameter_fnc=
                 task_submit_elaborate_specific_parameter,
-            task_run_fnc=oaiarchive_task)
+            task_run_fnc=oairepositoryupdater_task)
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
-    """Elaborate specific CLI parameters of oaiarchive"""
+    """Elaborate specific CLI parameters of oairepositoryupdater"""
     if key in ("-r", "--report"):
         task_set_option("report", 1)
     if key in ("-d", "--detailed-report"):

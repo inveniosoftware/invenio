@@ -14,30 +14,30 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
+"""
+BibHarvest templates - HTML component to be used by OAI Harvest and
+                       OAI Repository
+"""
 __revision__ = "$Id$"
 
-import urllib
-import time
 import cgi
-import gettext
-import traceback
-import urllib
-import sys
 import datetime
-from invenio.config import \
-     CFG_VERSION, \
-     CFG_SITE_URL, \
-     CFG_SITE_LANG
-from invenio.messages import gettext_set_language, language_list_long
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.htmlutils import nmtoken_from_string
+from invenio.urlutils import create_html_link
+from invenio.messages import gettext_set_language
+
+oai_harvest_admin_url = CFG_SITE_URL + \
+                        "/admin/bibharvest/oaiharvestadmin.py"
 
 class Template:
-    def tmpl_getnavtrail(self, ln, previous):
+    """ BibHarvest templates"""
+
+    def tmpl_getnavtrail(self, previous="", ln=CFG_SITE_LANG):
         """Get the navigation trail
           - 'previous' *string* - The previous navtrail"""
         _ = gettext_set_language(ln)
-        navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
+        navtrail = """<a class="navtrail" href="%s/help/admin?ln=%s">Admin Area</a> """ % (CFG_SITE_URL, ln)
         navtrail = navtrail + previous
         return navtrail
 
@@ -74,31 +74,6 @@ class Template:
         titlebar += """ [<a title="%s" href="%s/%s">?</a>]</small>""" % (guidetitle, CFG_SITE_URL, guideurl)
         return titlebar
 
-    def tmpl_link_with_args(self, ln, funcurl, title, args):
-        """Draws an html title bar
-          - 'funcurl' *string* - The relative url to this section
-          - 'title' *string* - The name of the link
-          - 'args' *list* - The list of arguments to be appended to the url in the form [name, value]
-          """
-        _ = gettext_set_language(ln)
-        initurl = '<a href="' + CFG_SITE_URL + '/' + funcurl
-        endurl = '" title="' + title + '">' + title + '</a>'
-        noargs = len(args)
-        if noargs==0:
-            # there are no arguments, close link and return
-            return initurl + endurl
-        else:
-            # we have args. list them in the link, then close it and return it
-            argsurl = '?'
-            count = 1
-            for arg in args:
-                if count != noargs:
-                    argsurl += arg[0] + '=' + arg[1] + '&amp;'
-                else:
-                    argsurl += arg[0] + '=' + arg[1]
-                count = count + 1
-            return initurl+argsurl+endurl
-
     def tmpl_output_numbersources(self, ln, numbersources):
         """Get the navigation trail
           - 'number of sources' *int* - The number of sources in the database"""
@@ -127,14 +102,17 @@ class Template:
             output  = """&nbsp;&nbsp;&nbsp;&nbsp;<strong><span class="warning">%s</span></strong><br /><br />""" % msg_notask
             return output
 
-    def tmpl_admin_w200_text(self, ln, title, name, value):
+    def tmpl_admin_w200_text(self, ln, title, name, value, suffix="<br/>"):
         """Draws an html w200 text box
           - 'title' *string* - The name of the textbox
           - 'name' *string* - The name of the value in the textbox
-          - 'value' *string* - The value in the textbox"""
+          - 'value' *string* - The value in the textbox
+          - 'suffix' *string* - A value printed after the input box (must be already escaped)
+          """
         _ = gettext_set_language(ln)
         text = """<span class="adminlabel">%s""" % title
-        text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /><br />""" % (cgi.escape(name,1), cgi.escape(value, 1))
+        text += """</span><input class="admin_w200" type="text" name="%s" value="%s" /> %s
+        """ % (cgi.escape(name, 1), cgi.escape(value, 1), suffix)
         return text
 
     def tmpl_admin_checkboxes(self, ln, title, name, values, labels, states):
@@ -180,14 +158,14 @@ class Template:
         try:
             for val in values:
                 intval = int(lastval)
-                if intval==int(val[0]): ## retrieve and display last value inputted into drop-down box
+                if intval == int(val[0]): ## retrieve and display last value inputted into drop-down box
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
             text += """</select><br />"""
         except StandardError, e:
             for val in values:
-                if lastval==val[0]:
+                if lastval == val[0]:
                     text += """<option value="%s" %s>%s</option>""" % (val[0], 'selected="selected"', str(val[1]))
                 else:
                     text += """<option value="%s">%s</option>""" % (val[0], str(val[1]))
@@ -210,7 +188,7 @@ class Template:
         """Outputs some <br />s"""
         _ = gettext_set_language(ln)
         text = ""
-        while howmany>0:
+        while howmany > 0:
             text += """<br />"""
             howmany = howmany - 1
         return text
@@ -222,7 +200,7 @@ class Template:
         _ = gettext_set_language(ln)
         msg_success = _("successfully validated")
         msg_nosuccess = _("does not seem to be a OAI-compliant baseURL")
-        if outcome==0:
+        if outcome == 0:
             output = """<br /><span class="info">baseURL <strong>%s</strong> %s</span>""" % (base, msg_success)
             return output
         else:
@@ -240,12 +218,16 @@ class Template:
         output = "<iframe src=\"" + url + "\" width=\"80%\" height=\"400\"></iframe>"
         return output
 
-    def tmpl_output_table(self, title_row = [], data = []):
+    def tmpl_output_table(self, title_row=None, data=None):
         """
            Prints a table of given titles and data
            @param title_row: is a list of titles of columns
            @param data: is a list o rows. Each row is a list of string values
         """
+        if title_row is None:
+            title_row = []
+        if data is None:
+            data = []
         result = "<table><tr>"
         for header in title_row:
             result += "<td><b>"+ header + "</b></td>"
@@ -288,15 +270,17 @@ class Template:
         return "</table>\n"
 
     def tmpl_history_day_details_link(self, ln, date, oai_src_id):
-        return self.tmpl_link_with_args(ln, \
-                                            "/admin/bibharvest/bibharvestadmin.py/viewhistoryday",\
-                                            "View next entries...", \
-                                            [["ln", ln], \
-                                                 ["oai_src_id", str(oai_src_id)], \
-                                                 ["year", str(date.year)], \
-                                                 ["month", str(date.month)], \
-                                                 ["day",  str(date.day)], \
-                                                 ["start", str(10)]])
+        """Return link to detailed history for the day"""
+        _ = gettext_set_language(ln)
+        return create_html_link(urlbase = oai_harvest_admin_url + \
+                                "/viewhistoryday",
+                                urlargd={'ln':ln,
+                                         'oai_src_id': str(oai_src_id),
+                                         'year': str(date.year),
+                                         'month': str(date.month),
+                                         'day': str(date.day),
+                                         'start': str(10)},
+                                 link_label=_("View next entries..."))
 
     def tmpl_history_table_output_day_cell(self, date, number_of_records, oai_src_id, ln, show_details = False):
         inner_text = "<b>" + self.format_date(date)
@@ -329,7 +313,8 @@ class Template:
         return output
 
     def tmpl_output_month_selection_bar(self, oai_src_id, ln, current_year = None, current_month=None):
-        #constructs the month selection bar
+        """constructs the month selection bar"""
+        _ = gettext_set_language(ln)
         if current_month == None or current_year == None:
             current_month = datetime.datetime.today().month
             current_year = datetime.datetime.today().year
@@ -346,8 +331,20 @@ class Template:
             next_year += 1
             next_month = 1
         current_date = datetime.datetime(current_year, current_month, 1)
-        prevurl = self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistory", "&lt;&lt; previous month", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(prev_year)], ["month", str(prev_month)]])
-        nexturl = self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistory", "next month &gt;&gt;", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(next_year)], ["month", str(next_month)]])
+        prevurl = create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/viewhistory",
+                                   urlargd={'ln':ln,
+                                            'oai_src_id': str(oai_src_id),
+                                            'year': str(prev_year),
+                                            'month': str(prev_month)},
+                                   link_label="&lt;&lt; " + _("previous month"))
+        nexturl = create_html_link(urlbase=oai_harvest_admin_url + \
+                                   "/viewhistory",
+                                   urlargd={'ln':ln,
+                                            'oai_src_id': str(oai_src_id),
+                                            'year': str(next_year),
+                                            'month': str(next_month)},
+                                   link_label=_("next month") + " &gt;&gt;")
         result = prevurl + """&nbsp;&nbsp;&nbsp;&nbsp;"""
         result += "<b>Current month: " + self.format_ym(current_date) + "</b>"
         result += """&nbsp;&nbsp;&nbsp;&nbsp;""" + nexturl
@@ -361,7 +358,7 @@ class Template:
         return result
 
     def tmpl_output_history_javascript_functions(self):
-        # Writes necessary javascript functions
+        """Writes necessary javascript functions"""
         result = '<script type="text/javascript">'
         result += """
    function selectDay(day)
@@ -424,7 +421,7 @@ class Template:
                 if id_n != 0:
                     result += ","
                 result += "'" + identifiers[day][id_n] + "'\n"
-            result +="        ]\n"
+            result += "        ]\n"
         result += "    }\n"
         result += '</script>'
         return result
@@ -437,21 +434,45 @@ class Template:
         """
            Function which displays menu
         """
-        namelinked_args = []
-        namelinked_args.append(["ln", ln])
-        main_link =  self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py", title = "main page",  args = namelinked_args)
-        namelinked_args.append(["oai_src_id", str(oai_src_id)])
-        edit_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = "edit", args = namelinked_args)
-        delete_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
-        test_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
-        history_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewhistory", title = "history", args = namelinked_args)
-        harvest_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/harvest", title = "harvest", args = namelinked_args)
+        _ = gettext_set_language(ln)
+        link_default_argd = {'ln': ln}
+
+        main_link = create_html_link(urlbase = oai_harvest_admin_url,
+                                     urlargd=link_default_argd,
+                                     link_label=_("main Page"))
+
+        link_default_argd['oai_src_id'] = str(oai_src_id)
+
+        edit_link = create_html_link(urlbase = oai_harvest_admin_url + \
+                                     "/editsource",
+                                     urlargd=link_default_argd,
+                                     link_label=_("edit"))
+        delete_link = create_html_link(urlbase = oai_harvest_admin_url + \
+                                     "/delsource",
+                                     urlargd=link_default_argd,
+                                     link_label=_("delete"))
+        test_link = create_html_link(urlbase = oai_harvest_admin_url + \
+                                     "/testsource",
+                                     urlargd=link_default_argd,
+                                     link_label=_("test"))
+        hist_link = create_html_link(urlbase = oai_harvest_admin_url + \
+                                     "/viewhistory",
+                                     urlargd=link_default_argd,
+                                     link_label=_("history"))
+        harvest_link = create_html_link(urlbase = oai_harvest_admin_url + \
+                                        "/harvest",
+                                        urlargd=link_default_argd,
+                                        link_label=_("harvest"))
         separator = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
         menu_header = self.tmpl_draw_titlebar(ln, title = "Menu" , guideurl = guideurl)
         # Putting everything together
         result = menu_header + main_link
         if oai_src_id != None:
-            result += separator + edit_link + separator + delete_link + separator + test_link + separator + history_link + separator + harvest_link + separator
+            result += separator + edit_link + separator + \
+                      delete_link + separator + test_link + \
+                      separator + hist_link + separator + \
+                      harvest_link + separator
+
         result += self.tmpl_print_brs(ln, 2)
         return result
 
@@ -482,8 +503,10 @@ class Template:
             return "(None)"
         return self.format_ym(date) + "-" + self.format_al_twodigits(date.day)
 
-    def format_time(self, datetime):
-        if datetime == None:
+    def format_time(self, datetime_obj):
+        if datetime_obj == None:
             return "(None)"
-        return self.format_al_twodigits(datetime.hour) + ":" + self.format_al_twodigits(datetime.minute) + ":" + self.format_al_twodigits(datetime.second)
+        return self.format_al_twodigits(datetime_obj.hour) + ":" + \
+               self.format_al_twodigits(datetime_obj.minute) + ":" + \
+               self.format_al_twodigits(datetime_obj.second)
 

@@ -17,29 +17,30 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDS Invenio OAI harvestor."""
+"""OAI harvestor - 'wget' records from an OAI repository.
+
+This 'getter' simply retrieve the records from an OAI repository.
+"""
 
 __revision__ = "$Id$"
 
 try:
+    import sys
     import httplib
     import urllib
-    import sys
-    import re
-    import getopt
     import getpass
+    import socket
+    import re
     import time
     import base64
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
 
 try:
     from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_VERSION
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
 
 
@@ -294,18 +295,21 @@ def OAI_Request(server, script, params, method="POST", secure=False,
             try:
                 conn = httplib.HTTPConnection(server)
             except httplib.HTTPException, e:
-                sys.stderr.write("An error occured when trying to connect to %s: %s" % (server, e))
+                sys.stderr.write("An error occured when trying to connect to %s: %s\n" % (server, e))
                 sys.exit(0)
 
-        if method == "GET":
-            conn.request("GET", script + "?" + params, headers=headers)
-        elif method == "POST":
-            conn.request("POST", script, params, headers)
-
+        try:
+            if method == "GET":
+                conn.request("GET", script + "?" + params, headers=headers)
+            elif method == "POST":
+                conn.request("POST", script, params, headers)
+        except socket.gaierror, (err, str_e):
+            sys.stderr.write("An error occured when trying to connect to %s: %s\n" % (server, str_e))
+            sys.exit(0)
         try:
             response = conn.getresponse()
         except httplib.HTTPException, e:
-            sys.stderr.write("An error occured when trying to read response from %s: %s" % (server, e))
+            sys.stderr.write("An error occured when trying to read response from %s: %s\n" % (server, e))
             sys.exit(0)
 
         status = "%d" % response.status
@@ -367,139 +371,3 @@ def OAI_Request(server, script, params, method="POST", secure=False,
         % (time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()), params))
 
     sys.exit(1)
-
-
-def usage(exitcode=0, msg=""):
-    "Print out info"
-
-    if msg:
-        sys.stderr.write(msg + "\n")
-
-    sys.stderr.write("""
-Usage: bibharvest [options] baseURL
-Example:
-       bibharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml http://cdsweb.cern.ch/oai2d
-
-Options:
- -h, --help           print this help
- -V, --version        print version number
- -o, --output         specify output file
- -v, --verb           OAI verb to be executed
- -m, --method         http method (default POST)
- -p, --metadataPrefix metadata format
- -i, --identifier     OAI identifier
- -s, --set            OAI set(s). Whitespace-separated list
- -r, --resuptionToken Resume previous harvest
- -f, --from           from date (datestamp)
- -u, --until          until date (datestamp)
- -c, --certificate    path to public certificate (in case of certificate-based harvesting)
- -k, --key            path to private key (in case of certificate-based harvesting)
- -l, --user           username (in case of password-protected harvesting)
- -w, --password       password (in case of password-protected harvesting)
-""")
-
-    sys.exit(exitcode)
-
-def main():
-    "Main"
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVo:v:m:p:i:s:f:u:r:x:c:k:w:l:",
-                 [
-                   "help",
-                   "version",
-                   "output",
-                   "verb",
-                   "method",
-                   "metadataPrefix",
-                   "identifier",
-                   "set",
-                   "from",
-                   "until",
-                   "resumptionToken",
-                   "certificate",
-                   "key",
-                   "user",
-                   "password"
-                 ]
-        )
-    except getopt.error, e:
-        usage(1, e)
-
-    http_param_dict        = {}
-    method                 = "POST"
-    output                 = ""
-    user                   = None
-    password               = None
-    cert_file              = None
-    key_file               = None
-    sets = []
-
-    # get options and arguments
-    for opt, opt_value in opts:
-        if   opt in ["-v", "--version"]:
-            http_param_dict['verb']             = opt_value
-        elif opt in ["-m", '--method']:
-            if opt_value == "GET" or opt_value == "POST":
-                method                          = opt_value
-        elif opt in ["-p", "--metadataPrefix"]:
-            http_param_dict['metadataPrefix']   = opt_value
-        elif opt in ["-i", "--identifier"]:
-            http_param_dict['identifier']       = opt_value
-        elif opt in ["-s", "--set"]:
-            sets                                = opt_value.split()
-        elif opt in ["-f", "--from"]:
-            http_param_dict['from']             = opt_value
-        elif opt in ["-u", "--until"]:
-            http_param_dict['until']            = opt_value
-        elif opt in ["-r", "--resumptionToken"]:
-            http_param_dict['resumptionToken']  = opt_value
-        elif opt in ["-o", "--output"]:
-            output                              = opt_value
-        elif opt in ["-c", "--certificate"]:
-            cert_file                           = opt_value
-        elif opt in ["-k", "--key"]:
-            key_file                            = opt_value
-        elif opt in ["-l", "--user"]:
-            user                                = opt_value
-        elif opt in ["-w", "--password"]:
-            password                            = opt_value
-        elif opt in ["-V", "--version"]:
-            print __revision__
-            sys.exit(0)
-        else:
-            usage(1, "Option %s is not allowed" % opt)
-
-    if len(args) > 0:
-        server    = args[-1].split("/")[2]
-        secure    = args[-1].lower().strip().startswith('https')
-
-        if (cert_file and not key_file) or \
-           (key_file and not cert_file):
-            # Both are needed if one specified
-            usage(1, "You must specify both certificate and key files")
-
-        if password and not user:
-            # User must be specified when password is given
-            usage(1, "You must specify a username")
-        elif user and not password:
-            if not secure:
-                sys.stderr.write("*WARNING* Your password will be sent in clear!\n")
-            try:
-                password = getpass.getpass()
-            except KeyboardInterrupt, e:
-                sys.stderr.write("\n")
-                sys.exit(0)
-
-        script    = "/" + "/".join(args[0].split("/")[3:])
-        harvest(server, script, http_param_dict, method, output,
-                sets, secure, user, password, cert_file, key_file)
-        sys.stderr.write("Harvesting successfully completed at: %s\n\n" %
-            time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
-
-    else:
-        usage(1, "You must specify the URL to harvest")
-
-if __name__ == '__main__':
-    main()
-

@@ -17,7 +17,7 @@
 
 webdoclibdir = $(libdir)/webdoc/invenio/admin
 
-webdoclib_DATA = bibharvest-admin-guide.webdoc
+webdoclib_DATA = bibharvest-admin-guide.webdoc oai-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 

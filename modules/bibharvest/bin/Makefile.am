@@ -15,8 +15,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibharvest oaiharvest oaiarchive
+bin_SCRIPTS = oaiharvest oairepositoryupdater
 
-EXTRA_DIST = bibharvest.in oaiharvest.in oaiarchive.in
+EXTRA_DIST = oaiharvest.in oairepositoryupdater.in
 
 CLEANFILES = *~ *.tmp

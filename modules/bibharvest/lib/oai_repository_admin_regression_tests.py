@@ -27,13 +27,13 @@ from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
-class OAIArchiveAdminWebPagesAvailabilityTest(unittest.TestCase):
-    """Check OAIArchive Admin web pages whether they are up or not."""
+class OAIRepositoryAdminWebPagesAvailabilityTest(unittest.TestCase):
+    """Check OAI Repository Admin web pages whether they are up or not."""
 
-    def test_oaiarchiveadmin_interface_pages_availability(self):
-        """oaiarchiveadmin - availability of OAIArchive Admin interface pages"""
+    def test_oairepositoryadmin_interface_pages_availability(self):
+        """oairepositoryadmin - availability of OAI Repository Admin interface pages"""
 
-        baseurl = CFG_SITE_URL + '/admin/bibharvest/oaiarchiveadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/bibharvest/oairepositoryadmin.py/'
 
         _exports = ['', 'delset', 'editset', 'addset']
 
@@ -51,27 +51,27 @@ class OAIArchiveAdminWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-    def test_oaiarchiveadmin_edit_set(self):
-        """oaiarchiveadmin - edit set page"""
+    def test_oairepositoryadmin_edit_set(self):
+        """oairepositoryadmin - edit set page"""
         test_edit_url = CFG_SITE_URL + \
-               "/admin/bibharvest/oaiarchiveadmin.py/editset?oai_set_id=1"
+               "/admin/bibharvest/oairepositoryadmin.py/editset?oai_set_id=2"
         error_messages = test_web_page_content(test_edit_url,
                                                username='admin')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
 
-    def test_oaiarchiveadmin_delete_set(self):
-        """oaiarchiveadmin - delete set page"""
+    def test_oairepositoryadmin_delete_set(self):
+        """oairepositoryadmin - delete set page"""
         test_edit_url = CFG_SITE_URL + \
-               "/admin/bibharvest/oaiarchiveadmin.py/delset?oai_set_id=1"
+               "/admin/bibharvest/oairepositoryadmin.py/delset?oai_set_id=2"
         error_messages = test_web_page_content(test_edit_url,
                                                username='admin')
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
 
-TEST_SUITE = make_test_suite(OAIArchiveAdminWebPagesAvailabilityTest)
+TEST_SUITE = make_test_suite(OAIRepositoryAdminWebPagesAvailabilityTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

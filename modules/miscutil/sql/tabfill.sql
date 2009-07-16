@@ -355,8 +355,6 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (9,9);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (10,12);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (11,19);
 
-INSERT INTO oaiARCHIVE VALUES (1,'','global','','','',NULL,'','','','','','','','','');
-
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');
 INSERT INTO sbmACTION VALUES ('Submit New File','SRV','revise','0000-00-00','2001-11-07','','Submit New File');
