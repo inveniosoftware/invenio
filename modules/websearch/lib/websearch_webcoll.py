@@ -812,23 +812,25 @@ def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action="runwebcoll",
             authorization_msg="WebColl Task Submission",
-            description="""Description: webcoll updates the collection cache
-    (record universe for a given collection plus web page elements)
-    based on invenio.conf and DB configuration parameters.
-    If the collection name is passed as the second argument, it'll update
-    this collection only.  If the collection name is immediately followed
-    by a plus sign, it will also update all its desdendants.  The
-    top-level collection name may be entered as the void string.\n""",
+            description="""Description:
+    webcoll updates the collection cache (record universe for a
+    given collection plus web page elements) based on invenio.conf and DB
+    configuration parameters. If the collection name is passed as an argument,
+    only this collection's cache will be updated. If the recursive option is
+    set as well, the collection's descendants will also be updated.\n""",
             help_specific_usage="  -c, --collection\t Update cache for the given "
                      "collection only. [all]\n"
+                    "  -r, --recursive\t Update cache for the given collection and all its\n"
+                    "\t\t\t descendants (to be used in combination with -c). [no]\n"
                     "  -f, --force\t\t Force update even if cache is up to date. [no]\n"
                     "  -p, --part\t\t Update only certain cache parts (1=reclist,"
                     " 2=webpage). [both]\n"
                     "  -l, --language\t Update pages in only certain language"
                     " (e.g. fr,it,...). [all]\n",
             version=__revision__,
-            specific_params=("c:fp:l:", [
+            specific_params=("c:rfp:l:", [
                     "collection=",
+                    "recursive",
                     "force",
                     "part=",
                     "language="
@@ -851,6 +853,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """
     if key in ("-c", "--collection"):
         task_set_option("collection", value)
+    elif key in ("-r", "--recursive"):
+        task_set_option("recursive", 1)
     elif key in ("-f", "--force"):
         task_set_option("force", 1)
     elif key in ("-p", "--part"):
@@ -893,6 +897,11 @@ def task_run_core():
         if task_has_option("collection"):
             coll = get_collection(task_get_option("collection"))
             colls.append(coll)
+            if task_has_option("recursive"):
+                r_type_descendants = coll.get_descendants(type='r')
+                colls += r_type_descendants
+                v_type_descendants = coll.get_descendants(type='v')
+                colls += v_type_descendants
         else:
             res = run_sql("SELECT name FROM collection ORDER BY id")
             for row in res:
