@@ -45,6 +45,8 @@ def format(bfo, separator, display_email='yes',
 
     authors = bfo.fields('100__a', escape=1)
     emails = bfo.fields('859__a', escape=1)
+    # Add empty items to match length of authors list
+    emails += ['']*(len(authors) - len(emails))
 
     authors_list = []
     for author, email in zip(authors, emails):
