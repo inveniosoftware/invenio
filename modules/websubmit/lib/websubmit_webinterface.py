@@ -726,16 +726,18 @@ def retrieve_most_recent_attached_file(file_path):
     FCKeditor has renamed after the upload.
 
     Eg: 'prefix/image.jpg' was uploaded but did already
-    exist. FCKeditor silently renamed it to 'prefix/image(0001).jpg':
+    exist. FCKeditor silently renamed it to 'prefix/image(1).jpg':
     >>> retrieve_most_recent_attached_file('prefix/image.jpg')
-    'prefix/image(0001).jpg'
+    'prefix/image(1).jpg'
     """
     (base_path, filename) = os.path.split(file_path)
     base_name = os.path.splitext(filename)[0]
     file_ext = os.path.splitext(filename)[1][1:]
     most_recent_filename = filename
-    for i in range(1, 10000): # FCKeditor renames up to 9999. After it overwrites.
-        possible_filename = "%s(%04d).%s" % \
+    i = 0
+    while True:
+        i += 1
+        possible_filename = "%s(%d).%s" % \
                             (base_name, i, file_ext)
         if os.path.exists(base_path + os.sep + possible_filename):
             most_recent_filename = possible_filename
