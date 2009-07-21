@@ -65,3 +65,9 @@ modules/webstat/bin/webstat
 modules/webstat/bin/webstatadmin
 modules/webstyle/bin/webdoc
 modules/websubmit/bin/bibdocfile
+tags
+config.rpath
+config.status.lineno
+configure.lineno
+*.kdevelop
+*.kdevses
