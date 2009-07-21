@@ -27,6 +27,32 @@ The main API functions are:
 
 import os
 import tempfile
+import time
+import signal
+
+try:
+    import subprocess
+    from invenio.asyncproc import Timeout, with_timeout, Process
+    CFG_HAS_SUBPROCESS = True
+except ImportError:
+    CFG_HAS_SUBPROCESS = False
+
+from invenio.config import CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT
+
+__all__ = ['run_shell_command', 'run_process_with_timeout', 'Timeout']
+
+"""
+This module implements two functions:
+    - L{run_shell_command}
+    - L{run_process_with_timeout}
+
+L{run_shell_command} will run a command through a shell, capturing its
+standard output and standard error.
+
+L{run_process_with_timeout} will run a process on its own allowing to
+specify a input file, capturing the standard output and standard error and
+killing the process after a given timeout.
+"""
 
 def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     """Run operating system command cmd with arguments from the args
@@ -119,6 +145,93 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     os.close(cmd_err_fd)
     # return results:
     return cmd_exit_code, cmd_out, cmd_err
+
+def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, timeout=CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT):
+    """
+    Run a process capturing its output and killing it after a given timeout.
+
+    @param args: should be a string, or a sequence of program arguments. The
+        program to execute is the first item in the args sequence or the string
+        if a string is given.
+    @type args: string/sequence
+    @param filename_in: the path of a file to be used as standard input to
+        the process. If None, the process will receive no standard input.
+    @type filename_in: string
+    @param filename_out: the path of a file to be used as standard output from
+        the process. If None, the process standard output will still be
+        captured and returned.
+    @type filename_out: string
+    @param filename_err: the path of a file to be used as standard error from
+        the process. If None, the process standard error will still be
+        captured and returned.
+    @type filename_err: string
+    @param timeout: the number of seconds after which the process is killed.
+    @type timeout: int
+    @return: a tuple containing with the exit status, the captured output and
+        the captured error.
+    @rtype: tuple
+    @raise Timeout: in case the process is still in execution after the
+        specified timeout.
+    @note: that if C{Timeout} exception is raised and cmd_out_file/cmd_err_file
+        have  been specified, they will be probably partially filled.
+    @warning: in case Python 2.3 is used and the subprocess module is not
+        available this function will try to fallback on L{run_shell_command},
+        provided that no C{cmd_in_file} parameter is filled.
+    """
+    def call_the_process(the_process, stdout, stderr):
+        cmd_out = ''
+        cmd_err = ''
+        while True:
+            time.sleep(1)
+            poll = the_process.wait(os.WNOHANG)
+            tmp_cmd_out, tmp_cmd_err = the_process.readboth()
+            if stdout:
+                stdout.write(tmp_cmd_out)
+            if stderr:
+                stderr.write(tmp_cmd_err)
+            cmd_out += tmp_cmd_out
+            cmd_err += tmp_cmd_err
+            if poll != None:
+                break
+        return poll, cmd_out, cmd_err
+
+    if not CFG_HAS_SUBPROCESS:
+        ## Let's fall back on run_shell_command.
+        if filename_in is not None:
+            raise ImportError, "Failed to import subprocess module and " \
+            "run_process_with_timeout with cmd_in_file set, thus can not " \
+            "fall back on run_shell_command."
+        return run_shell_command(('%s ' * len(args))[:-1], args, filename_out=filename_out, filename_err=filename_err)
+
+    if filename_in is not None:
+        stdin = open(filename_in)
+    else:
+        stdin = None
+    if filename_out is not None:
+        stdout = open(filename_out, 'w')
+    else:
+        stdout = None
+    if filename_err is not None:
+        stderr = open(filename_err, 'w')
+    else:
+        stderr = None
+    the_process = Process(args, stdin=stdin)
+    try:
+        return with_timeout(timeout, call_the_process, the_process, stdout, stderr)
+    except Timeout:
+        ## the_process.terminate()
+        ## FIXME: the_process.terminate() would rather be a better
+        ## solution, but apparently it does not work. When signal.SIGTERM
+        ## is sent to the process the wait operation down there does
+        ## not respect any timeout and will wait until the very end
+        ## of the process. So the afterwards SIGKILL will not find any
+        ## process... So let's send SIGTERM/SIGKILL directly here without
+        ## waiting anything. Anyway we are not interested in the outcome
+        ## of a timeouted process, we just want to kill it!!
+        the_process.kill(signal.SIGTERM)
+        time.sleep(1)
+        the_process.kill(signal.SIGKILL)
+        raise
 
 def escape_shell_arg(shell_arg):
     """Escape shell argument shell_arg by placing it within
