@@ -24,13 +24,23 @@ argument washing, redirection, etc.
 
 __revision__ = "$Id$"
 
+import time
+import base64
+import hmac
 import re
+import sys
+import inspect
 from urllib import urlencode, quote_plus, quote
 from urlparse import urlparse
 from cgi import parse_qs, escape
 
-from invenio import webinterface_handler_config as apache
+try:
+    from hashlib import sha256
+    HASHLIB_IMPORTED = True
+except ImportError:
+    HASHLIB_IMPORTED = False
 
+from invenio import webinterface_handler_config as apache
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE
@@ -426,3 +436,179 @@ def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     if out.startswith("&amp;"):
         out = out[5:]
     return out
+
+def create_AWS_request_url(base_url, argd, _amazon_secret_access_key,
+                           _timestamp=None):
+    """
+    Create a signed AWS (Amazon Web Service) request URL corresponding
+    to the given parameters.
+
+    Example:
+    >> create_AWS_request_url("http://ecs.amazon.com/onca/xml",
+                             {'AWSAccessKeyID': '0000000000',
+                              'Service': 'AWSECommerceService',
+                              'Operation': 'ItemLookup',
+                              'ItemID': '0679722769',
+                              'ResponseGroup': 'ItemAttributes,Offers,Images,Review'},
+                             "1234567890")
+
+    @param base_url: Service URL of the Amazon store to query
+    @param argd: dictionary of arguments defining the query
+    @param _amazon_secret_access_key: your Amazon secret key
+    @param _timestamp: for testing purpose only (default: current timestamp)
+
+    @type base_url: string
+    @type argd: dict
+    @type _amazon_secret_access_key: string
+    @type _timestamp: string
+
+    @return signed URL of the request (string)
+    """
+
+    ## First define a few util functions
+
+    def get_AWS_signature(argd, _amazon_secret_access_key,
+                          method="GET", request_host="webservices.amazon.com",
+                          request_uri="/onca/xml",
+                          _timestamp=None):
+        """
+        Returns the signature of an Amazon request, based on the
+        arguments of the request.
+
+        @param argd: dictionary of arguments defining the query
+        @param _amazon_secret_access_key: your Amazon secret key
+        @param method: method of the request POST or GET
+        @param request_host: host contacted for the query. To embed in the signature.
+        @param request_uri: uri contacted at 'request_host'. To embed in the signature.
+        @param _timestamp: for testing purpose only (default: current timestamp)
+
+        @type argd: dict
+        @type _amazon_secret_access_key: string
+        @type method: string
+        @type host_header: string
+        @type http_request_uri: string
+        @type _timestamp: string
+
+        @return signature of the request (string)
+        """
+
+        # Add timestamp
+        if not _timestamp:
+            argd["Timestamp"] = time.strftime("%Y-%m-%dT%H:%M:%SZ",
+                                              time.gmtime())
+        else:
+            argd["Timestamp"] = _timestamp
+
+        # Order parameter keys by byte value
+        parameter_keys = argd.keys()
+        parameter_keys.sort()
+
+        # Encode arguments, according to RFC 3986. Make sure we
+        # generate a list which is ordered by byte value of the keys
+        arguments = [quote(str(key), safe="~/") + "=" + \
+                     quote(str(argd[key]), safe="~/") \
+                     for key in parameter_keys]
+
+        # Join
+        parameters_string = "&".join(arguments)
+
+        # Prefix
+        parameters_string = method.upper() + "\n" + \
+                            request_host.lower() + "\n" + \
+                            (request_uri or "/") + "\n" + \
+                            parameters_string
+
+        # Sign and return
+        return calculate_RFC2104_HMAC(parameters_string,
+                                      _amazon_secret_access_key)
+
+    def calculate_RFC2104_HMAC(data, _amazon_secret_access_key):
+        """
+        Computes a RFC 2104 compliant HMAC Signature and then Base64
+        encodes it.
+
+        Module hashlib must be installed if Python < 2.5
+        <http://pypi.python.org/pypi/hashlib/20081119>
+
+        @param data: data to sign
+        @param _amazon_secret_access_key: your Amazon secret key
+
+        @type data: string
+        @type _amazon_secret_access_key: string. Empty if hashlib module not installed
+        """
+        if not HASHLIB_IMPORTED:
+            try:
+                raise Exception("Module hashlib not installed. Please install it.")
+            except:
+                from invenio.errorlib import register_exception
+                register_exception(stream='warning', alert_admin=True, subject='Cannot create AWS signature')
+                return ""
+        else:
+            if sys.version_info < (2, 5):
+                # compatibility mode for Python < 2.5 and hashlib
+                my_digest_algo = _MySHA256(sha256())
+            else:
+                my_digest_algo = sha256
+
+        return base64.encodestring(hmac.new(_amazon_secret_access_key,
+                                            data, my_digest_algo).digest()).strip()
+     ## End util functions
+
+    parsed_url = urlparse(base_url)
+    signature = get_AWS_signature(argd, _amazon_secret_access_key,
+                                  request_host=parsed_url[1],
+                                  request_uri=parsed_url[2],
+                                  _timestamp=_timestamp)
+    if signature:
+        argd["Signature"] = signature
+    return base_url + "?" + urlencode(argd)
+
+
+class _MySHA256(object):
+    '''
+    Define a subclass of the sha256 class, with an additional "new()"
+    function, to work with the Python < 2.5 version of the hmac module.
+
+    (This class is more complex than it should, but it is not
+    possible to subclass sha256)
+    '''
+    new = lambda d = '': sha256()
+
+    def __init__(self, obj):
+        """Set the wrapped object."""
+        super(_MySHA256, self).__setattr__('_obj', obj)
+
+        methods = []
+        for name_value in inspect.getmembers(obj, inspect.ismethod):
+            methods.append(name_value[0])
+        super(_MySHA256, self).__setattr__('__methods__', methods)
+
+        def isnotmethod(object_):
+            "Opposite of ismethod(..)"
+            return not inspect.ismethod(object_)
+        members = []
+        for name_value in inspect.getmembers(obj, isnotmethod):
+            members.append(name_value[0])
+        super(_MySHA256, self).__setattr__('__members__', members)
+
+    def __getattr__(self, name):
+        """Redirect unhandled get attribute to self._obj."""
+        if not hasattr(self._obj, name):
+            raise AttributeError, ("'%s' has no attribute %s" %
+                                   (self.__class__.__name__, name))
+        else:
+            return getattr(self._obj, name)
+
+    def __setattr__(self, name, value):
+        """Redirect set attribute to self._obj if necessary."""
+        self_has_attr = True
+        try:
+            super(_MySHA256, self).__getattribute__(name)
+        except AttributeError:
+            self_has_attr = False
+
+        if (name == "_obj" or not hasattr(self, "_obj") or
+            not hasattr(self._obj, name) or self_has_attr):
+            return super(_MySHA256, self).__setattr__(name, value)
+        else:
+            return setattr(self._obj, name, value)
