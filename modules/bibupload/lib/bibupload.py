@@ -968,24 +968,27 @@ def synchronize_8564(rec_id, record, record_had_FFT):
         return ret
 
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
-    tags8564s = record_get_field_instances(record, '856', '4', ' ')
-    write_message("Original 8564_ instances: %s" % tags8564s, verbose=9)
+    tags856s = record_get_field_instances(record, '856', '%', '%')
+    write_message("Original 856%% instances: %s" % tags856s, verbose=9)
     tags8564s_to_add = get_bibdocfile_managed_info()
     write_message("BibDocFile instances: %s" % tags8564s_to_add, verbose=9)
     positions_tags8564s_to_remove = []
 
-    for local_position, field in enumerate(tags8564s):
-        for url in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
-            if url in tags8564s_to_add:
-                if record_had_FFT:
-                    merge_bibdocfile_into_marc(field, tags8564s_to_add[url])
-                else:
-                    merge_marc_into_bibdocfile(field)
-                del tags8564s_to_add[url]
-                break
-            elif bibdocfile_url_p(url) and decompose_bibdocfile_url(url)[0] == rec_id:
-                positions_tags8564s_to_remove.append(local_position)
-                break
+    for local_position, field in enumerate(tags856s):
+        if field[1] == '4' and field[2] == ' ':
+            write_message('Analysing %s' % (field, ), verbose=9)
+            for url in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
+                if url in tags8564s_to_add:
+                    if record_had_FFT:
+                        merge_bibdocfile_into_marc(field, tags8564s_to_add[url])
+                    else:
+                        merge_marc_into_bibdocfile(field)
+                    del tags8564s_to_add[url]
+                    break
+                elif bibdocfile_url_p(url) and decompose_bibdocfile_url(url)[0] == rec_id:
+                    positions_tags8564s_to_remove.append(local_position)
+                    write_message("%s to be deleted and re-synchronized" % (field, ),  verbose=9)
+                    break
 
     record_delete_fields(record, '856', positions_tags8564s_to_remove)
 
@@ -1146,8 +1149,10 @@ def elaborate_fft_tags(record, rec_id, mode):
             else:
                 if url:
                     name = get_docname_from_url(url)
-                else:
+                elif mode != 'correct' and doctype != 'FIX-MARC':
                     write_message("Warning: fft '%s' doesn't specifies neither a url nor a name" % str(fft), stream=sys.stderr)
+                    continue
+                else:
                     continue
 
             # Let's discover the desired new docname in case we want to change it

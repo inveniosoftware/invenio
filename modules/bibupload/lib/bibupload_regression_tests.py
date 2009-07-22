@@ -2667,6 +2667,83 @@ class BibUploadFFTModeTest(unittest.TestCase):
 
         bibupload.wipe_out_record_from_all_tables(recid)
 
+    def test_fft_implicit_fix_marc(self):
+        """bibupload - FFT implicit FIX-MARC"""
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="0" ind2=" ">
+          <subfield code="f">foo@bar.com</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="f">http://cds.cern.ch/img/cds.gif</subfield>
+         </datafield>
+        </record>
+        """
+        test_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="856" ind1="0" ind2=" ">
+          <subfield code="f">foo@bar.com</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">http://cds.cern.ch/img/cds.gif</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
+         </datafield>
+        </record>
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="0" ind2=" ">
+          <subfield code="f">foo@bar.com</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">http://cds.cern.ch/img/cds.gif</subfield>
+         </datafield>
+        </record>
+        """
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8560_ $$ffoo@bar.com
+        8564_ $$uhttp://cds.cern.ch/img/cds.gif
+        """
+        task_set_task_param('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        test_to_correct = test_to_correct.replace('123456789',
+                                                          str(recid))
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        # correct test record with implicit FIX-MARC:
+        task_set_task_param('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_correct)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
+        bibupload.wipe_out_record_from_all_tables(recid)
+
     def test_fft_vs_bibedit(self):
         """bibupload - FFT Vs. BibEdit compatibility"""
         # define the test case:

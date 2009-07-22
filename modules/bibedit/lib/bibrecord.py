@@ -428,13 +428,19 @@ def record_delete_field(rec, tag, ind1=' ', ind2=' ',
 
 def record_delete_fields(rec, tag, field_positions_local=None):
     """
-    Delete all/some fields defined with MARC tag 'tag' and indicators
-    'ind1' and 'ind2' from record 'rec'. If 'field_position_global'
-    and 'field_position_local' is None, then delete all the field
-    instances.  Otherwise delete only the field instance corresponding
-    to given 'field_position_global' or 'field_position_local'.
+    Delete all/some fields defined with MARC tag 'tag' from record 'rec'.
 
-    Returns True if fields were deleted, False otherwise.
+    @param rec: a record structure.
+    @type rec: tuple
+    @param tag: three letter field.
+    @type tag: string
+    @param field_position_local: if set, it is the list of local positions
+        within all the fields with the specified tag, that should be deleted.
+        If not set all the fields with the specified tag will be deleted.
+    @type field_position_local: sequence
+    @return: the list of deleted fields.
+    @rtype: list
+    @note: the record is modified in place.
     """
     if tag not in rec:
         return []
@@ -461,7 +467,8 @@ def record_add_fields(rec, tag, fields, field_position_local=None,
     position is specified by the tag and the field_position_local in
     the list of fields.
 
-    @param rec: a record structure @param tag: the tag of the fields
+    @param rec: a record structure
+    @param tag: the tag of the fields
     to be moved
     @param field_position_local: the field_position_local to which the
     field will be inserted. If not specified, appends the fields to

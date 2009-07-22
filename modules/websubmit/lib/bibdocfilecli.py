@@ -510,6 +510,7 @@ Examples:
 
     parser.add_option('-D', '--debug', action='store_true', dest='debug', default=False)
     parser.add_option('-H', '--human-readable', dest='human_readable', action='store_true', default=False, help='print sizes in human readable format (e.g., 1KB 234MB 2GB)')
+    parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know', help='use with care!')
     return parser
 
 def print_info(recid, docid, info):
@@ -527,11 +528,11 @@ def bibupload_ffts(ffts, append=False):
         os.chmod(tmp_file_name, 0644)
         if append:
             wait_for_user("This will be appended via BibUpload")
-            task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name)
+            task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2')
             print "BibUpload append submitted with id %s" % task
         else:
             wait_for_user("This will be corrected via BibUpload")
-            task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name)
+            task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name, '-N', 'FFT', '-S2')
             print "BibUpload correct submitted with id %s" % task
     else:
         print >> sys.stderr, "WARNING: no MARC to upload."
@@ -704,14 +705,10 @@ def cli_fix_marc(options, explicit_recid_set=None):
     ffts = {}
     if explicit_recid_set is not None:
         for recid in explicit_recid_set:
-            ffts[recid] = []
-            for docname in BibRecDocs(recid).get_bibdoc_names():
-                ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
+            ffts[recid] = [{'doctype' : 'FIX-MARC'}]
     else:
         for recid in cli_recids_iterator(options):
-            ffts[recid] = []
-            for docname in BibRecDocs(recid).get_bibdoc_names():
-                ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
+            ffts[recid] = [{'doctype' : 'FIX-MARC'}]
     return bibupload_ffts(ffts, append=False)
 
 def cli_check_format(options):
