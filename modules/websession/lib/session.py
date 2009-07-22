@@ -241,7 +241,7 @@ class InvenioSession(dict):
                 session_object = cPickle.dumps(session_dict, -1)
                 session_expiry = time.time() + self._timeout + \
                     CFG_WEBSESSION_ONE_DAY
-                uid = session_dict.get('uid', -1)
+                uid = self.get('uid', -1)
                 run_sql("""
                     INSERT session(
                         session_key,
