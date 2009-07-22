@@ -519,8 +519,8 @@ class BibRecDocs:
         record = get_record(self.id)
         fields = record_get_field_instances(record, '856', '4', ' ')
         for field in fields:
-            url = field_get_subfield_values(field, 'u')
-            if not bibdocfile_url_p(url):
+            urls = field_get_subfield_values(field, 'u')
+            if urls and not bibdocfile_url_p(urls[0]):
                 out += '\t<datafield tag="856" ind1="4" ind2=" ">\n'
                 for subfield, value in field_get_subfield_instances(field):
                     out += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(value))
