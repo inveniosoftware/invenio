@@ -2251,6 +2251,7 @@ class BibDoc:
             today = datetime.today()
             self.change_name('DELETED-%s%s-%s' % (today.strftime('%Y%m%d%H%M%S'), today.microsecond, self.docname))
             run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
+            self.status = 'DELETED'
         except Exception, e:
             register_exception()
             raise InvenioWebSubmitFileError, "It's impossible to delete bibdoc %s: %s" % (self.id, e)
