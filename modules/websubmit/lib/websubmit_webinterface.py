@@ -22,6 +22,7 @@ __revision__ = "$Id$"
 import os
 import time
 import cgi
+import sys
 
 from urllib import urlencode
 
@@ -39,6 +40,7 @@ from invenio.dbquery import run_sql
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
 from invenio.webuser import getUid, page_not_authorized, collect_user_info, isGuestUser
@@ -51,12 +53,14 @@ from invenio.search_engine import \
      get_colID, \
      create_navtrail_links, check_user_can_view_record
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
-    stream_restricted_icon, BibDoc, InvenioWebSubmitFileError, stream_file
+    stream_restricted_icon, BibDoc, InvenioWebSubmitFileError, stream_file, \
+    decompose_file, propose_next_docname
 from invenio.errorlib import register_exception
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.session import get_session
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
@@ -328,7 +332,222 @@ from invenio.websubmit_engine import home, action, interface, endaction
 
 class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
-    _exports = ['summary', 'sub', 'direct', '', 'attachfile']
+    _exports = ['summary', 'sub', 'direct', '', 'attachfile', 'uploadfile', 'getuploadedfile']
+
+    def uploadfile(self, req, form):
+        """
+        Similar to /submit, but only consider files. Nice for
+        asynchronous Javascript uploads. Should be used to upload a
+        single file.
+
+        Also try to create an icon, and return URL to file(s) + icon(s)
+
+        Authentication is performed based on session ID passed as
+        parameter instead of cookie-based authentication, due to the
+        use of this URL by the Flash plugin (to upload multiple files
+        at once), which does not route cookies.
+
+        FIXME: consider adding /deletefile and /modifyfile functions +
+        parsing of additional parameters to rename files, add
+        comments, restrictions, etc.
+        """
+        if sys.hexversion < 0x2060000:
+            try:
+                import simplejson as json
+                simplejson_available = True
+            except ImportError:
+                # Okay, no Ajax app will be possible, but continue anyway,
+                # since this package is only recommended, not mandatory.
+                simplejson_available = False
+        else:
+            import json
+            simplejson_available = True
+
+        argd = wash_urlargd(form, {
+            'doctype': (str, ''),
+            'access': (str, ''),
+            'indir': (str, ''),
+            'session_id': (str, ''),
+            'rename': (str, ''),
+            })
+
+        curdir = None
+        if not form.has_key("indir") or \
+               not form.has_key("doctype") or \
+               not form.has_key("access"):
+            return apache.HTTP_BAD_REQUEST
+        else:
+            curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,
+                                  argd['indir'],
+                                  argd['doctype'],
+                                  argd['access'])
+
+        user_info = collect_user_info(req)
+        if form.has_key("session_id"):
+            # Are we uploading using Flash, which does not transmit
+            # cookie? The expect to receive session_id as a form
+            # parameter.  First check that IP addresses do not
+            # mismatch. A ValueError will be raises if there is
+            # something wrong
+            session = get_session(req=req, sid=argd['session_id'])
+            try:
+                session = get_session(req=req, sid=argd['session_id'])
+            except ValueError, e:
+                return apache.HTTP_BAD_REQUEST
+
+            # Retrieve user information. We cannot rely on the session here.
+            res = run_sql("SELECT uid FROM session WHERE session_key=%s", (argd['session_id'],))
+            if len(res):
+                uid = res[0][0]
+                user_info = collect_user_info(uid)
+                try:
+                    act_fd = file(os.path.join(curdir, 'act'))
+                    action = act_fd.read()
+                    act_fd.close()
+                except:
+                    act = ""
+
+        # Is user authorized to perform this action?
+        (auth_code, auth_msg) = acc_authorize_action(uid, "submit",
+                                                     verbose=0,
+                                                     doctype=argd['doctype'],
+                                                     act=action)
+        if acc_is_role("submit", doctype=argd['doctype'], act=action) and auth_code != 0:
+            # User cannot submit
+            return apache.HTTP_UNAUTHORIZED
+        else:
+            # Process the upload and get the response
+            added_files = {}
+            for key, formfields in form.items():
+                filename = key.replace("[]", "")
+                file_to_open = os.path.join(curdir, filename)
+                if hasattr(formfields, "filename") and formfields.filename:
+                    dir_to_open = os.path.abspath(os.path.join(curdir,
+                                                               'files',
+                                                               str(user_info['uid']),
+                                                               key))
+                    try:
+                        assert(dir_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
+                    except AssertionError:
+                        register_exception(req=req, prefix='curdir="%s", key="%s"' % (curdir, key))
+                        return apache.HTTP_FORBIDDEN
+
+                    if not os.path.exists(dir_to_open):
+                        try:
+                            os.makedirs(dir_to_open)
+                        except:
+                            register_exception(req=req, alert_admin=True)
+                            return apache.HTTP_FORBIDDEN
+
+                    filename = formfields.filename
+                    ## Before saving the file to disc, wash the filename (in particular
+                    ## washing away UNIX and Windows (e.g. DFS) paths):
+                    filename = os.path.basename(filename.split('\\')[-1])
+                    filename = filename.strip()
+                    if filename != "":
+                        # Check that file does not already exist
+                        n = 1
+                        while os.path.exists(os.path.join(dir_to_open, filename)):
+                            #dirname, basename, extension = decompose_file(new_destination_path)
+                            basedir, name, extension = decompose_file(filename)
+                            new_name = propose_next_docname(name)
+                            filename = new_name + extension
+                        # This may be dangerous if the file size is bigger than the available memory
+                        fp = open(os.path.join(dir_to_open, filename), "w")
+                        fp.write(formfields.file.read())
+                        fp.close()
+                        fp = open(os.path.join(curdir, "lastuploadedfile"), "w")
+                        fp.write(filename)
+                        fp.close()
+                        fp = open(file_to_open, "w")
+                        fp.write(filename)
+                        fp.close()
+                        try:
+                            # Create icon
+                            (icon_path, icon_name) = create_icon(
+                                { 'input-file'           : os.path.join(dir_to_open, filename),
+                                  'icon-name'            : filename, # extension stripped automatically
+                                  'icon-file-format'     : 'gif',
+                                  'multipage-icon'       : False,
+                                  'multipage-icon-delay' : 100,
+                                  'icon-scale'           : "300>", # Resize only if width > 300
+                                  'verbosity'            : 0,
+                                  })
+
+                            icons_dir = os.path.join(os.path.join(curdir,
+                                                                  'icons',
+                                                                  str(user_info['uid']),
+                                                                  key))
+                            if not os.path.exists(icons_dir):
+                                # Create uid/icons dir if needed
+                                os.makedirs(icons_dir)
+                            os.rename(os.path.join(icon_path, icon_name),
+                                      os.path.join(icons_dir, icon_name))
+                            added_files[key] = {'name': filename,
+                                                'iconName': icon_name}
+                        except InvenioWebSubmitIconCreatorError, e:
+                            # We could not create the icon
+                            added_files[key] = {'name': filename}
+                            continue
+                    else:
+                        return apache.HTTP_BAD_REQUEST
+
+            # Send our response
+            if simplejson_available:
+                return json.dumps(added_files)
+
+    def getuploadedfile(self, req, form):
+        """
+        Stream uploaded files.
+
+        For the moment, restrict to files in ./curdir/files/uid or
+        ./curdir/icons/uid directory, so that we are sure we stream
+        files only to the user who uploaded them.
+        """
+        argd = wash_urlargd(form, {'indir': (str, None),
+                                   'doctype': (str, None),
+                                   'access': (str, None),
+                                   'icon': (int, 0),
+                                   'key': (str, None),
+                                   'filename': (str, None)})
+
+        if None in argd.values():
+            return apache.HTTP_BAD_REQUEST
+
+        uid = getUid(req)
+
+        if argd['icon']:
+            file_path = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,
+                                     argd['indir'],
+                                     argd['doctype'],
+                                     argd['access'],
+                                     'icons',
+                                     str(uid),
+                                     argd['key'],
+                                     argd['filename']
+                                     )
+        else:
+            file_path = os.path.join(CFG_WEBSUBMIT_STORAGEDIR,
+                                     argd['indir'],
+                                     argd['doctype'],
+                                     argd['access'],
+                                     'files',
+                                     str(uid),
+                                     argd['key'],
+                                     argd['filename']
+                                     )
+
+        abs_file_path = os.path.abspath(file_path)
+        if abs_file_path.startswith(CFG_WEBSUBMIT_STORAGEDIR):
+            # Check if file exist. Note that icon might not yet have
+            # been created.
+            for i in range(5):
+                if os.path.exists(abs_file_path):
+                    return stream_file(req, abs_file_path)
+                time.sleep(1)
+
+        # Send error 404 in all other cases
+        return apache.HTTP_NOT_FOUND
 
     def attachfile(self, req, form):
         """
