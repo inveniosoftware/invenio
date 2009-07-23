@@ -576,7 +576,7 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
                         raise Error('Found recid %s for extoaiid="%s" that doesn\'t specify any provenance, while input record does.' % (id_bibrec, extoaiid))
                 else:
                     if extoaiid is None:
-                        raise Error('Found recid %s for extoaiid="%s" that specify as provenance "%s", while input record does not specify any provenance.' % (id_bibrec, extoaiid, provenance))
+                        raise Error('Found recid %s for extoaiid="%s" that specifies as provenance "%s", while input record does not specify any provenance.' % (id_bibrec, extoaiid, provenance))
                     elif provenance == extoaisrc:
                         write_message('Found recid %s for extoaiid="%s" with provenance="%s"' % (id_bibrec, extoaiid, extoaisrc), verbose=9)
                         ret.add(id_bibrec)
@@ -1124,7 +1124,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 try:
                     check_valid_url(url)
                 except StandardError, e:
-                    raise StandardError, "fft '%s' specify an url ('%s') with problems: %s" % (fft, url, e)
+                    raise StandardError, "fft '%s' specifies in $a a location ('%s') with problems: %s" % (fft, url, e)
             else:
                 url = ''
 
@@ -1150,8 +1150,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 if url:
                     name = get_docname_from_url(url)
                 elif mode != 'correct' and doctype != 'FIX-MARC':
-                    write_message("Warning: fft '%s' doesn't specifies neither a url nor a name" % str(fft), stream=sys.stderr)
-                    continue
+                    raise StandardError, "Warning: fft '%s' doesn't specifies either a location in $a or a docname in $n" % str(fft)
                 else:
                     continue
 
@@ -1182,7 +1181,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     try:
                         check_valid_url(icon)
                     except StandardError, e:
-                        raise StandardError, "fft '%s' specify an icon ('%s') with problems: %s" % (fft, icon, e)
+                        raise StandardError, "fft '%s' specifies in $x an icon ('%s') with problems: %s" % (fft, icon, e)
             else:
                 if mode == 'correct' and doctype != 'FIX-MARC':
                     ## See comment on description
