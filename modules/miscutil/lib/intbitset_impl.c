@@ -19,6 +19,7 @@
 
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "intbitset.h"
@@ -371,13 +372,13 @@ IntBitSet *intBitSetISub(IntBitSet *const dst, IntBitSet *const src) {
 }
 
 int intBitSetGetNext(const IntBitSet *const x, register int last) {
-    register word_t* base = x->bitset + ++last / wordbitsize;
+    register word_t* base = x->bitset + (++last / wordbitsize);
     register int i = last % wordbitsize;
     register word_t *end = x->bitset + x->allocated;
     while(base < end) {
         if (*base)
             for (; i<wordbitsize; ++i)
-                if ((*base & ((word_t) 1 << (word_t) i)) != 0)
+                if ((*base & ((word_t) 1 << (word_t) i)))
                     return (int) i + (int) (base - x->bitset) * wordbitsize;
         i = 0;
         ++base;

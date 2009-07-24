@@ -384,6 +384,24 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset1, intbitset2)
             self.assertEqual(intbitset1, intbitset3)
 
+    def test_set_iterator(self):
+        """intbitset - set iterator"""
+        for set1 in self.sets + [[]]:
+            intbitset1 = intbitset(set1)
+            self._helper_sanity_test(intbitset1)
+            tmp_set1 = []
+            for recid in intbitset1:
+                self._helper_sanity_test(intbitset1)
+                tmp_set1.append(recid)
+            self._helper_sanity_test(intbitset1)
+            self.assertEqual(set1, tmp_set1)
+
+        for set1 in self.sets + [[]]:
+            tmp_set1 = []
+            for recid in intbitset(set1):
+                tmp_set1.append(recid)
+            self.assertEqual(set1, tmp_set1)
+
     def test_set_consistence(self):
         """intbitset - set consistence"""
         tests = (

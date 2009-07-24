@@ -741,13 +741,25 @@ cdef class intbitset:
 cdef class intbitset_iterator:
     cdef int last
     cdef IntBitSet *bitset
+    cdef bint sanity_checks
 
     def __cinit__(self, intbitset bitset not None):
         self.last = -1
-        self.bitset = bitset.bitset
+        ## A copy should be performed, in case the original bitset disappears
+        ## as in "for x in intbitset([1,2,3])"!
+        self.bitset = intBitSetClone(bitset.bitset)
+        self.sanity_checks = CFG_INTBITSET_ENABLE_SANITY_CHECKS
+
+    def __dealloc__(self):
+        if self.bitset:
+            intBitSetDestroy(self.bitset)
 
     def __next__(self):
-        self.last = intBitSetGetNext((<intbitset_iterator>self).bitset, self.last)
+        if self.last == -2:
+            raise StopIteration()
+        self.last = intBitSetGetNext(self.bitset, self.last)
+        if self.sanity_checks and (self.bitset.allocated < self.bitset.size):
+            raise MemoryError("intbitset corrupted: allocated: %s, size: %s" % (self.bitset.allocated, self.bitset.size))
         if self.last < 0:
             self.last = -2
             raise StopIteration()

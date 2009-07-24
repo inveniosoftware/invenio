@@ -44,7 +44,7 @@ typedef struct {
 } IntBitSet;
 
 IntBitSet *intBitSetCreate(register const int size, const bool_t trailing_bits);
-IntBitSet *intBitSetCreateNoAllocate();
+IntBitSet *intBitSetCreateNoAllocate(void);
 IntBitSet *intBitSetCreateFromBuffer(const void * const buf, const Py_ssize_t bufsize);
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize);
 IntBitSet *intBitSetReset(IntBitSet *const bitset);
