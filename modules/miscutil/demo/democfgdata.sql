@@ -23,7 +23,11 @@ INSERT INTO user VALUES (6,'juliet.capulet@cds.cern.ch',AES_ENCRYPT(email,'j123u
 INSERT INTO user VALUES (7,'benvolio.montague@cds.cern.ch',AES_ENCRYPT(email,'b123envolio'),'1','NULL','benvolio','');
 INSERT INTO user VALUES (8,'balthasar.montague@cds.cern.ch',AES_ENCRYPT(email,'b123althasar'),'1','NULL','balthasar','');
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
+INSERT INTO usergroup VALUES (2,'montague-family','The Montague family.','VM','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
+INSERT INTO user_usergroup VALUES (5,2,'A',NOW());
+INSERT INTO user_usergroup VALUES (6,2,'M',NOW());
+INSERT INTO user_usergroup VALUES (7,2,'M',NOW());
 
 INSERT INTO collection VALUES (2,'Preprints','collection:PREPRINT',NULL,NULL);
 INSERT INTO collection VALUES (3,'Books','collection:BOOK',NULL,NULL);
