@@ -846,9 +846,9 @@ def compare_issues(issue1, issue2):
     Comparison function for issues.
 
     Returns:
-        -1 if issue1 is newer than issue2
+        -1 if issue1 is older than issue2
          0 if issues are equal
-         1 if issue1 is older than issue2
+         1 if issue1 is newer than issue2
     """
     issue1_number, issue1_year = issue1.split('/', 1)
     issue2_number, issue2_year = issue2.split('/', 1)
@@ -1018,6 +1018,7 @@ def datetime_to_issue(issue_datetime, journal_name):
 DAILY   = 1
 WEEKLY  = 2
 MONTHLY = 3
+
 def issue_to_datetime(issue_number, journal_name, granularity=None):
     """
     Returns the *theoretical* date of release for given issue: useful
