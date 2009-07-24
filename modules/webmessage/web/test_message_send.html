@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost" />
+<title>test_message_send_</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_message_send</td></tr>
+</thead><tbody>
+<!--DESCRIPTION:
+              romeo sends a msg to juliet
+              "add to user" tested
+              juliet reads and deletes the msg -->
+<tr>
+	<td>open</td>
+	<td>http://localhost</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>romeo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>r123omeo</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=messages</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>del_all</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>search_pattern</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>search_user</td>
+	<td></td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>names_selected</td>
+	<td>label=juliet</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>add_user</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyValue</td>
+	<td>msg_to_user</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>msg_subject</td>
+	<td>dear Juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>msg_body</td>
+	<td>I love you</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>send_button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>j123uliet</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=messages</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=dear Juliet</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
