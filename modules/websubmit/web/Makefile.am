@@ -28,6 +28,8 @@ testdir = $(libdir)/webtest/invenio
 
 test_DATA = test.pdf \
             test.jpg \
+            test.gif \
+            icon-test.gif \
             test.tar.gz \
             test_submit_article.html \
             test_submit_poetry.html \

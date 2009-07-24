@@ -32,7 +32,8 @@ pylib_DATA = websubmit_config.py websubmit_engine.py file.py	\
              websubmit_file_stamper.py \
              websubmit_icon_creator.py \
              bibdocfile.py \
-             bibdocfilecli.py
+             bibdocfilecli.py \
+             bibdocfile_regression_tests.py
 
 noinst_DATA = fulltext_files_migration_kit.py
 
