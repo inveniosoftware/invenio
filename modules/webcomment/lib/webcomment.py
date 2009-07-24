@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 # non CDS Invenio imports:
 import time
 import math
+from datetime import datetime, timedelta
 
 # CDS Invenio imports:
 
@@ -629,7 +630,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         run_sql(query2, params2)
         return int(res)
 
-def calculate_start_date(display_since):
+def calculate_start_date_old(display_since):
     """
     Private function
     Returns the datetime of display_since argument in MYSQL datetime format
@@ -680,6 +681,50 @@ def calculate_start_date(display_since):
                   start_time[7],
                   start_time[8])
     return convert_datestruct_to_datetext(start_time)
+
+def calculate_start_date(display_since):
+
+    time_types = {'d':0, 'w':0, 'm':0, 'y':0}
+    today = datetime.today()
+    try:
+        nb = int(display_since[:-1])
+    except:
+        return datetext_default
+    if (display_since==(None or 'all')):
+        return datetext_default
+    if str(display_since[-1]) in time_types:
+        time_type = str(display_since[-1])
+    else:
+        return datetext_default
+    # year
+    if time_type == 'y':
+        if (int(display_since[:-1]) > today.year - 1) or (int(display_since[:-1]) < 1):
+            #   1 < nb years < 2008
+            return datetext_default
+        else:
+            final_nb_year = today.year - nb
+            yesterday = today.replace(year=final_nb_year)
+    # month
+    elif time_type == 'm':
+        # to convert nb of monthes in years
+        nb_year = nb / 12                        # nb_year = number of year to substract
+        nb = nb % 12
+        if nb > today.month-1:                    # ex: july(07)-9 monthes = -1year -3monthes
+            nb_year += 1
+            nb_month = 12 - (today.month % nb)
+        else:
+            nb_month = today.month - nb
+        final_nb_year = today.year - nb_year      # final_nb_year = number of year to print
+        yesterday = today.replace(year=final_nb_year, month=nb_month)
+    # week
+    elif time_type == 'w':
+        delta = timedelta(weeks=nb)
+        yesterday = today - delta
+    # day
+    elif time_type == 'd':
+        delta = timedelta(days=nb)
+        yesterday = today - delta
+    return yesterday.strftime("%Y-%m-%d %H:%M:%S")
 
 def count_comments(recID):
     """
