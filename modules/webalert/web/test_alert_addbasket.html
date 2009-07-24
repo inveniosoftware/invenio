@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost" />
+<title>test_alert_addbasket</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_alert_add_search</td></tr>
+</thead><tbody>
+<!--DESCRIPTION
+           romeo creates ""alerts" topic and "news physic" basket
+           "news physics" basket's creation is verified
+            romeo searches about physics,
+            sets as new alert and chooses to store results in "news physics" basket
+            alert added is verified
+            alert is removed, alert removed is verified
+            basket is deleted-->
+<tr>
+	<td>open</td>
+	<td>http://localhost</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>romeo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>r123omeo</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=baskets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Create new basket</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>new_topic_name</td>
+	<td>alerts</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>new_basket_name</td>
+	<td>news physics</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Create new basket']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td></td>
+	<td>news physics</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Search</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p</td>
+	<td>physics</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action_search</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=email alert</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>name</td>
+	<td>news</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>freq</td>
+	<td>label=daily</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>idb</td>
+	<td>label=alerts &gt; news physics</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td></td>
+	<td>The alert news has been added to your profile.</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Remove</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td></td>
+	<td>The alert news has been removed from your profile</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=baskets</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Edit basket</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Yes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
