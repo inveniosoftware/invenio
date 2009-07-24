@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost" />
+<title>test_group_set</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_group_set</td></tr>
+</thead><tbody>
+<!--DESCRIPTION
+                    juliet creates a group
+                    romeo tries to join the group
+                    juliet reads romeo's request and accept
+                    juliet deletes the group
+                    romeo deletes confirmation msgs-->
+<tr>
+	<td>open</td>
+	<td>http://localhost</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>j123uliet</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>create_group</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>group_name</td>
+	<td>my_friends</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>group_description</td>
+	<td>all my friends</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>join_policy</td>
+	<td>label=Visible but new members need approval</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>create_button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login here</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>romeo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>r123omeo</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>join_group</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>group_name</td>
+	<td>my_friends</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>join_button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>document.forms[0].elements[4]</td>
+	<td>label=my_friends</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>join_button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login here</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>j123uliet</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=messages</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Group my_friends: New membership request</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=accept or reject</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>pending_member_id</td>
+	<td>label=romeo</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>add_member</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=groups</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//small</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login here</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>romeo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>r123omeo</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=messages</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@name='del_all' and @value='Delete All']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Yes']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

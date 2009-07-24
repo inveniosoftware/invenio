@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost" />
+<title>test_group_msg</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_group_msg</td></tr>
+</thead><tbody>
+<!--DESCRIPTION
+
+            juliet sends a msg to the montague family group
+            romeo reads the msg (content msg verified)
+            and deletes the msg-->
+<tr>
+	<td>open</td>
+	<td>http://localhost</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>j123uliet</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=messages</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>del_all</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>search_pattern</td>
+	<td>montague-family</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>search_group</td>
+	<td></td>
+</tr>
+<tr>
+	<td>addSelection</td>
+	<td>names_selected</td>
+	<td>label=montague-family</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>add_group</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>msg_subject</td>
+	<td>hello everybody</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>msg_body</td>
+	<td>hello</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>send_button</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>romeo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>r123omeo</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=messages</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=hello everybody</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td></td>
+	<td>hello</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
