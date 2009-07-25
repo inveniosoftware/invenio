@@ -1531,12 +1531,6 @@ input.hyperlinkformSubmitButton {
   min-width: 48px;
   max-width: 100px;
   width: 48px;
-}
-#bibEditColSubfieldArrows {
-  width: 38px;
-  min-width: 38px;
-  max-width: 38px;
-  border-left: 1px solid #A1A1A1;
   border-right: 1px solid #A1A1A1;
 }
 #bibEditColSubfieldTag {

@@ -42,7 +42,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
     record_delete_subfield_from, record_modify_controlfield, \
-    record_modify_subfield, record_move_subfield
+    record_modify_subfield, record_move_subfield, record_move_fields
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL
 from invenio.search_engine import record_exists, search_pattern
@@ -152,7 +152,7 @@ def perform_request_ajax(req, recid, uid, data):
         response.update(perform_request_record(req, request_type, recid, uid,
                                                data))
     elif request_type in ('addField', 'addSubfields', 'modifyContent',
-                          'moveSubfield', 'deleteFields'):
+                          'moveSubfield', 'deleteFields', 'moveField'):
         # Record updates.
         response.update(perform_request_update_record(
                 request_type, recid, uid, data))
@@ -441,6 +441,15 @@ def perform_request_update_record(request_type, recid, uid, data):
                 int(data['subfieldIndex']), int(data['newSubfieldIndex']),
                 field_position_local=field_position_local)
             response['resultCode'] = 25
+
+        elif request_type == 'moveField':
+            if data['direction'] == 'up':
+                final_position_local = field_position_local-1
+            else: # direction is 'down'
+                final_position_local = field_position_local+1
+            record_move_fields(record, data['tag'], [field_position_local],
+                final_position_local)
+            response['resultCode'] = 32
 
         elif request_type == 'deleteFields':
             to_delete = data['toDelete']

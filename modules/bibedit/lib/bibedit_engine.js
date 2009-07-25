@@ -220,10 +220,12 @@ function initAjax(){
   );
 }
 
-function createReq(data, onSuccess){
+function createReq(data, onSuccess, asynchronous){
   /*
    * Create Ajax request.
    */
+  if (asynchronous == undefined)
+    asynchronous = true;
   // Include and increment transaction ID.
   var tID = createReq.transactionID++;
   createReq.transactions[tID] = data['requestType'];
@@ -232,13 +234,11 @@ function createReq(data, onSuccess){
   if (gCacheMTime)
     data.cacheMTime = gCacheMTime;
   // Send the request.
-  $.ajax({
-    data: {
-      jsondata: JSON.stringify(data)
-    },
-    success: function(json){
-      onAjaxSuccess(json, onSuccess);
-    }
+  $.ajax({ data: { jsondata: JSON.stringify(data) },
+           success: function(json){ 
+                      onAjaxSuccess(json, onSuccess);
+                    },
+           async: asynchronous
   });
 }
 // Transactions data.
@@ -278,8 +278,8 @@ function onAjaxSuccess(json, onSuccess){
     displayMessage(resCode);
     if (resCode == 107)
       $('#lnkGetRecord').bind('click', function(event){
-	getRecord(recID);
-	event.preventDefault();
+        getRecord(recID);
+        event.preventDefault();
       });
     updateStatus('error', gRESULT_CODES[resCode]);
   }
@@ -868,8 +868,6 @@ function onMergeClick(event){
    */
   notImplemented(event);
 
-  // FIXME (uncomment when ready in BibMerge):
-  /*
   updateStatus('updating');
   createReq({recID: gRecID, requestType: 'prepareRecordMerge'}, function(json){
     // Null gRecID to avoid warning when leaving page.
@@ -879,7 +877,6 @@ function onMergeClick(event){
       'tmp';
   });
   event.preventDefault();
-  */
 }
 
 function bindNewRecordHandlers(){
@@ -1227,17 +1224,17 @@ function onAddFieldSave(event){
   else{
     // Regular field. Validate and prepare to update.
     ind1 = $('#txtAddFieldInd1_' + fieldTmpNo).val();
-    ind1 = (ind1 == '' || ind1 == ' ') ? '_' : ind1;
+    ind1 = (ind1 == '' || ind1 == '_') ? ' ' : ind1;
     ind2 = $('#txtAddFieldInd2_' + fieldTmpNo).val();
-    ind2 = (ind2 == '' || ind2 == ' ') ? '_' : ind2;
+    ind2 = (ind2 == '' || ind2 == '_') ? ' ' : ind2;
     var MARC = tag + ind1 + ind2;
     if (fieldIsProtected(MARC)){
       displayAlert('alertAddProtectedField', [MARC]);
       updateStatus('ready');
       return;
     }
-    var validInd1 = (ind1 == '_' || validMARC('Indicator1', ind1));
-    var validInd2 = (ind2 == '_' || validMARC('Indicator2', ind2));
+    var validInd1 = (ind1 == ' ' || validMARC('Indicator1', ind1));
+    var validInd2 = (ind2 == ' ' || validMARC('Indicator2', ind2));
     if (!validMARC('Tag', tag)
 	|| !validInd1
 	|| !validInd2){
@@ -1531,22 +1528,30 @@ function onContentChange(value){
   return escapeHTML(value);
 }
 
-function onMoveSubfieldClick(arrow){
+function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
   /*
    * Handle subfield moving arrows.
    */
   updateStatus('updating');
-  var tmpArray = arrow.id.split('_');
-  var btnType = tmpArray[0], tag = tmpArray[1], fieldPosition = tmpArray[2],
-    subfieldIndex = tmpArray[3];
   var fieldID = tag + '_' + fieldPosition;
   var field = gRecord[tag][fieldPosition];
   var subfields = field[0];
   var newSubfieldIndex;
-  if (btnType == 'btnMoveSubfieldUp')
+  // Check if moving is possible
+  if (type == 'up') {
     newSubfieldIndex = parseInt(subfieldIndex) - 1;
-  else
+    if (newSubfieldIndex < 0) {
+      updateStatus('ready', '');
+      return;
+    }
+  }
+  else {
     newSubfieldIndex = parseInt(subfieldIndex) + 1;
+    if (newSubfieldIndex >= gRecord[tag][fieldPosition][0].length) {
+      updateStatus('ready', '');
+      return;
+    }
+  }
   // Create Ajax request.
   var data = {
     recID: gRecID,
@@ -1558,7 +1563,7 @@ function onMoveSubfieldClick(arrow){
   };
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  });
+  }, false);
   // Continue local updating.
   var subfieldToSwap = subfields[newSubfieldIndex];
   subfields[newSubfieldIndex] = subfields[subfieldIndex];
@@ -1568,6 +1573,7 @@ function onMoveSubfieldClick(arrow){
   $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
   if (coloredRowGroup)
     $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
+  $('#boxSubfield_'+fieldID+'_'+newSubfieldIndex).click();
 }
 
 function onDeleteClick(event){
@@ -1674,4 +1680,62 @@ function onDeleteClick(event){
     for (tag in tagsToRedraw)
       redrawFields(tag);
     reColorFields();
+}
+
+function onMoveFieldUp(tag, fieldPosition) {
+  fieldPosition = parseInt(fieldPosition);
+  var thisField = gRecord[tag][fieldPosition];
+  if (fieldPosition > 0) {
+    var prevField = gRecord[tag][fieldPosition-1];
+    // check if the previous field has the same indicators
+    if ( cmpFields(thisField, prevField) == 0 ) {
+      // Create Ajax request.
+      var data = {
+        recID: gRecID,
+        requestType: 'moveField',
+        tag: tag,
+        fieldPosition: fieldPosition,
+        direction: 'up'
+      };
+      createReq(data, function(json){
+        updateStatus('report', gRESULT_CODES[json['resultCode']]);
+      }, false);
+      //continue updating locally
+      gRecord[tag][fieldPosition] = prevField;
+      gRecord[tag][fieldPosition-1] = thisField;
+      $('tbody#rowGroup_'+tag+'_'+(fieldPosition-1)).replaceWith( createField(tag, thisField, fieldPosition-1) );
+      $('tbody#rowGroup_'+tag+'_'+fieldPosition).replaceWith( createField(tag, prevField, fieldPosition) );
+      reColorFields();
+      $('#boxField_'+tag+'_'+(fieldPosition-1)).click();
+    }
+  }
+}
+
+function onMoveFieldDown(tag, fieldPosition) {
+  fieldPosition = parseInt(fieldPosition);
+  var thisField = gRecord[tag][fieldPosition];
+  if (fieldPosition < gRecord[tag].length-1) {
+    var nextField = gRecord[tag][fieldPosition+1];
+    // check if the next field has the same indicators
+    if ( cmpFields(thisField, nextField) == 0 ) {
+      // Create Ajax request.
+      var data = {
+        recID: gRecID,
+        requestType: 'moveField',
+        tag: tag,
+        fieldPosition: fieldPosition,
+        direction: 'down'
+      };
+      createReq(data, function(json){
+        updateStatus('report', gRESULT_CODES[json['resultCode']]);
+      }, false);
+      //continue updating locally
+      gRecord[tag][fieldPosition] = nextField;
+      gRecord[tag][fieldPosition+1] = thisField;
+      $('tbody#rowGroup_'+tag+'_'+(fieldPosition+1)).replaceWith( createField(tag, thisField, fieldPosition+1) );
+      $('tbody#rowGroup_'+tag+'_'+fieldPosition).replaceWith( createField(tag, nextField, fieldPosition) );
+      reColorFields();
+      $('#boxField_'+tag+'_'+(fieldPosition+1)).click();
+    }
+  }
 }

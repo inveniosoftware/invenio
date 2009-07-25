@@ -114,6 +114,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     29: 'Subfields deleted',
     30: 'Selection deleted',
     31: 'Tickets retrieved',
+    32: 'Field moved',
     100: 'Error: Not logged in',
     101: 'Error: Permission denied',
     102: 'Error: Non-existent record',

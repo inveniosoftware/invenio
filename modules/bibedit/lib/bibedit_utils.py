@@ -40,7 +40,8 @@ from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX
 from invenio.bibedit_dblayer import get_record_last_modification_date
 from invenio.bibrecord import create_record, create_records, \
-    record_get_field_value, record_has_field, record_xml_output
+    record_get_field_value, record_has_field, record_xml_output, \
+    record_strip_empty_fields
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BINDIR, CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -150,7 +151,9 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
         # Read record from cache file.
         cache = get_cache_file_contents(recid, uid)
         if cache:
-            xml_record = record_xml_output(cache[2])
+            record = cache[2]
+            record_strip_empty_fields(record)
+            xml_record = record_xml_output(record)
             delete_cache_file(recid, uid)
     if xml_record:
         # Write XML file.

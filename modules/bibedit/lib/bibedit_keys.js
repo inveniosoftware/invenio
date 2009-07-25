@@ -27,6 +27,7 @@
  */
 
 var gSelectionModeOn = false;
+var gReady = true;
 
 function initHotkeys(){
   /*
@@ -151,12 +152,10 @@ function initHotkeys(){
   // Select focused subfields parent field.
   $(document).bind('keydown', {combi: 'shift+space', disableInInput: true},
 		   onKeySpace);
-  // Move focused subfield up.
-  $(document).bind('keydown', {combi: 'ctrl+up', disableInInput: true},
-		   onKeyCtrlUp);
-  // Move focused subfield down.
-  $(document).bind('keydown', {combi: 'ctrl+down', disableInInput: true},
-		   onKeyCtrlDown);
+  // Move selected field/subfield up.
+  $(document).bind('keydown', {combi: 'ctrl+up'}, onKeyCtrlUp);
+  // Move selected field/subfield down.
+  $(document).bind('keydown', {combi: 'ctrl+down'}, onKeyCtrlDown);
   // Save content in current form.
   $(document).bind('keydown', 'ctrl+shift+s', function(event){
     onTriggerFormControl('Save', event);
@@ -266,30 +265,58 @@ function onKeyCtrlUp(event){
   /*
    * Handle key ctrl+up (move subfield up).
    */
-  if (event.target.nodeName == 'TD'){
-    var targetID = event.target.id;
-    var type = targetID.slice(0, targetID.indexOf('_'));
-    if (type == 'content'){
-      var id = targetID.slice(targetID.indexOf('_')+1);
-      $('#btnMoveSubfieldUp_' + id).trigger('click');
-      event.preventDefault();
+  if (gReady==false)
+    return;
+  gReady = false;
+  // check if we want to move a field or subfield
+  var selectedFields = $('#bibEditTable tbody.bibEditSelected');
+  var selectedSubfields = $('#bibEditTable td.bibEditSelected');
+  //move unique selected field
+  if (selectedFields.length == 1) {
+    var targetID = selectedFields.eq(0).attr('id');
+    var targetInfo = targetID.split('_');
+    var tag = targetInfo[1], fieldPos = targetInfo[2];
+    onMoveFieldUp(tag, fieldPos);
+  }
+  else if (selectedSubfields.length == 1){// move subfield
+    var targetID = selectedSubfields.eq(0).attr('id');
+    var tmpArray = targetID.split('_');
+    if (tmpArray[0] == 'content'){
+      var tag = tmpArray[1], fieldPos = tmpArray[2], subfieldIndex = tmpArray[3];
+      onMoveSubfieldClick('up', tag, fieldPos, subfieldIndex);
     }
   }
+  event.preventDefault();
+  gReady = true;
 }
 
 function onKeyCtrlDown(event){
   /*
    * Handle key ctrl+down (move subfield down).
    */
-  if (event.target.nodeName == 'TD'){
-    var targetID = event.target.id;
-    var type = targetID.slice(0, targetID.indexOf('_'));
-    if (type == 'content'){
-      var id = targetID.slice(targetID.indexOf('_')+1);
-      $('#btnMoveSubfieldDown_' + id).trigger('click');
-      event.preventDefault();
+  if (gReady==false)
+    return;
+  gReady = false;
+  // check if we want to move a field or subfield
+  var selectedFields = $('#bibEditTable tbody.bibEditSelected');
+  var selectedSubfields = $('#bibEditTable td.bibEditSelected');
+  //move unique selected field
+  if (selectedFields.length == 1) {
+    var targetID = selectedFields.eq(0).attr('id');
+    var targetInfo = targetID.split('_');
+    var tag = targetInfo[1], fieldPos = targetInfo[2];
+    onMoveFieldDown(tag, fieldPos);
+  }
+  else if (selectedSubfields.length == 1){// move subfield
+    var targetID = selectedSubfields.eq(0).attr('id');
+    var tmpArray = targetID.split('_');
+    if (tmpArray[0] == 'content'){
+      var tag = tmpArray[1], fieldPos = tmpArray[2], subfieldIndex = tmpArray[3];
+      onMoveSubfieldClick('down', tag, fieldPos, subfieldIndex);
     }
   }
+  event.preventDefault();
+  gReady = true;
 }
 
 function onTriggerFormControl(command, event){

@@ -29,7 +29,6 @@ function displayRecord(){
     '<table id="bibEditTable">' +
       '<col span="1" class="bibEditColFieldBox"/>' +
       '<col span="1" id="bibEditColFieldTag"/>' +
-      '<col span="1" id="bibEditColSubfieldArrows" />' +
       '<col span="1" class="bibEditColFieldBox" />' +
       '<col span="1" id="bibEditColSubfieldTag" />' +
       '<col span="1" />' +
@@ -39,7 +38,6 @@ function displayRecord(){
 	'<tr>' +
 	  '<td style="padding: 0px; max-width: 14px;"></td>' +
 	  '<td style="padding: 0px; max-width: 100px;"></td>' +
-	  '<td style="padding: 0px; max-width: 38px;"></td>' +
 	  '<td style="padding: 0px; max-width: 14px;"></td>' +
 	  '<td style="padding: 0px; max-width: 80px;"></td>' +
 	  '<td style="padding: 0px"></td>' +
@@ -90,7 +88,6 @@ function createControlField(tag, field, fieldPosition){
         '<td id="fieldTag_' + fieldID + '" class="bibEditCellFieldTag">' +
 	  getFieldTag(tag) +
 	'</td>' +
-        '<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
 	'<td id="content_' + fieldID + '" ' + cellContentClass +
@@ -128,18 +125,12 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var protectedSubfield = (protectedField) ? true : fieldIsProtected(MARC);
   var subfieldID = fieldID + '_' + subfieldIndex;
   var boxField = '', cellFieldTagAttrs = 'class="bibEditCellField"',
-    fieldTagToPrint = '', btnMoveSubfieldUp = '', btnMoveSubfieldDown = '',
+    fieldTagToPrint = '',
   cellContentClass = 'class="bibEditCellContentProtected" ',
   cellContentTitle='',
   cellContentOnClick = '';
   if (!protectedField){
     // Enable features for unprotected fields.
-    btnMoveSubfieldUp = img('/img/arrow_up2.png', 'btnMoveSubfieldUp_' +
-      subfieldID, 'bibEditBtnMoveSubfieldUp',
-      {title: 'Move subfield up', onclick: 'onMoveSubfieldClick(this)'});
-    btnMoveSubfieldDown = img('/img/arrow_down2.png', 'btnMoveSubfieldDown_' +
-      subfieldID, 'bibEditBtnMoveSubfieldDown',
-      {title: 'Move subfield down', onclick: 'onMoveSubfieldClick(this)'});
     if (!protectedSubfield){
       cellContentClass = 'class="bibEditCellContent" ';
       cellContentTitle = 'title="Click to edit" ';
@@ -157,11 +148,9 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     cellFieldTagAttrs = 'id="fieldTag_' + fieldID +
       '" class="bibEditCellFieldTag"';
     fieldTagToPrint = getFieldTag(MARC);
-    btnMoveSubfieldUp = '';
   }
   // If last subfield, remove down arrow, add 'Add subfield' button.
   if (subfieldIndex == subfieldsLength - 1){
-    btnMoveSubfieldDown = '';
     if (!protectedField)
       btnAddSubfield = img('/img/add.png', 'btnAddSubfield_' + fieldID, '',
       {title: 'Add subfield', onclick: 'onAddSubfieldsClick(this)'});
@@ -170,9 +159,6 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
     '<tr id="row_' + subfieldID + '">' +
       '<td class="bibEditCellField">' + boxField + '</td>' +
       '<td ' + cellFieldTagAttrs  + '>' + fieldTagToPrint + '</td>' +
-      '<td class="bibEditCellSubfield">' +
-	btnMoveSubfieldUp + btnMoveSubfieldDown +
-      '</td>' +
       '<td class="bibEditCellSubfield">' + boxSubfield + '</td>' +
       '<td id="subfieldTag_' + subfieldID +
 	'" class="bibEditCellSubfieldTag">' +
@@ -208,11 +194,11 @@ function redrawFields(tag){
     var result = '', i, n;
     if (validMARC.reControlTag.test(tag)){
       for (i=0, n=fields.length; i<n; i++)
-	result += createControlField(tag, fields[i], i);
+        result += createControlField(tag, fields[i], i);
     }
     else{
       for (i=0, n=fields.length; i<n; i++)
-	result += createField(tag, fields[i], i);
+        result += createField(tag, fields[i], i);
     }
     prevRowGroup.after(result);
   }
@@ -229,7 +215,6 @@ function createAddFieldForm(fieldTmpNo){
 	'<td><b>New</b></td>' +
 	'<td></td>' +
 	'<td></td>' +
-	'<td></td>' +
 	'<td>' +
 	  'Controlfield ' + input('checkbox', 'chkAddFieldControlfield_' +
 				 fieldTmpNo) +
@@ -241,7 +226,6 @@ function createAddFieldForm(fieldTmpNo){
       '</tr>' +
       createAddFieldRow(fieldTmpNo, 0) +
       '<tr>' +
-	'<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
 	'<td></td>' +
@@ -280,7 +264,6 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
 	txtAddFieldTag + txtAddFieldInd1 + txtAddFieldInd2 +
       '</td>' +
       '<td></td>' +
-      '<td></td>' +
       '<td class="bibEditCellAddSubfieldCode">' +
 	input('text', 'txtAddFieldSubfieldCode_' + fieldTmpNo + '_' +
 	  subfieldTmpNo, 'bibEditTxtSubfieldCode', {maxlength: 1}) +
@@ -304,7 +287,6 @@ function createAddSubfieldsForm(fieldID){
       '<td></td>' +
       '<td></td>' +
       '<td></td>' +
-      '<td></td>' +
       '<td>' +
 	button('Save', 'btnAddSubfieldsSave_' + fieldID, 'bibEditBtnBold') +
 	button('Cancel', 'btnAddSubfieldsCancel_' + fieldID, '') +
@@ -323,7 +305,6 @@ function createAddSubfieldsRow(fieldID, subfieldTmpNo){
     'btnAddSubfieldsRemove_' + subfieldID, '', {title: 'Remove subfield'});
   return '' +
     '<tr id="rowAddSubfields_' + subfieldID + '">' +
-      '<td></td>' +
       '<td></td>' +
       '<td></td>' +
       '<td></td>' +
