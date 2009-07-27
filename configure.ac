@@ -75,7 +75,7 @@ AC_ARG_WITH(openoffice-python, AC_HELP_STRING([--with-openoffice-python], [path 
 if test -z "$OPENOFFICE_PYTHON"; then
    OPENOFFICE_PYTHON=`locate -n 1 -r "o.*office/program/python$"`
    OPENOFFICE_PYTHON="$PYTHON $OPENOFFICE_PYTHON"
-   if test -n "$OPENOFFICE_PYTHON" && ($OPENOFFICE_PYTHON -c "import pyuno" 2> /dev/null); then
+   if test -n "$OPENOFFICE_PYTHON" && ($OPENOFFICE_PYTHON -c "import uno" 2> /dev/null); then
       AC_MSG_RESULT($OPENOFFICE_PYTHON)
    else
       AC_MSG_WARN([
@@ -85,7 +85,7 @@ if test -z "$OPENOFFICE_PYTHON"; then
       and to rerun the configure script. OpenOffice.org is available from
       <http://www.openoffice.org/>.])
    fi
-elif ($OPENOFFICE_PYTHON -c "import pyuno" 2> /dev/null); then
+elif ($OPENOFFICE_PYTHON -c "import uno" 2> /dev/null); then
    AC_MSG_RESULT($OPENOFFICE_PYTHON)
 else
    AC_MSG_ERROR([
@@ -507,7 +507,7 @@ AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
 ## Define output files:
 AC_CONFIG_FILES([config.nice  \
 	  Makefile \
-      po/Makefile.in \
+	  po/Makefile.in \
 	  config/Makefile \
 	  config/invenio-autotools.conf \
 	  modules/Makefile \
