@@ -33,9 +33,10 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL, \
      CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES, \
-     CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES
+     CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES, \
+     CFG_SITE_NAME
 from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import perform_request_search, wash_colls, get_coll_sons, is_hosted_collection
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
 from invenio.webuser import get_email
@@ -43,48 +44,82 @@ from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
 
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
+from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
+from invenio.websearch_external_collections_utils import get_collection_id
+
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 webalert_templates = invenio.template.load('webalert')
 
 def update_date_lastrun(alert):
+    """Update the last time this alert was ran in the database."""
+
     return run_sql('update user_query_basket set date_lastrun=%s where id_user=%s and id_query=%s and id_basket=%s;', (strftime("%Y-%m-%d"), alert[0], alert[1], alert[2],))
 
-
 def get_alert_queries(frequency):
+    """Return all the queries for the given frequency."""
+
     return run_sql('select distinct id, urlargs from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.frequency=%s and uqb.date_lastrun <= now();', (frequency,))
 
 def get_alert_queries_for_user(uid):
+    """Returns all the queries for the given user id."""
+
     return run_sql('select distinct id, urlargs, uqb.frequency from query q, user_query_basket uqb where q.id=uqb.id_query and uqb.id_user=%s and uqb.date_lastrun <= now();', (uid,))
 
 def get_alerts(query, frequency):
+    """Returns a dictionary of all the records found for a specific query and frequency along with other informationm"""
+
     r = run_sql('select id_user, id_query, id_basket, frequency, date_lastrun, alert_name, notification from user_query_basket where id_query=%s and frequency=%s;', (query['id_query'], frequency,))
     return {'alerts': r, 'records': query['records'], 'argstr': query['argstr'], 'date_from': query['date_from'], 'date_until': query['date_until']}
 
-# Optimized version:
-def add_records_to_basket(record_ids, basket_id):
-    nrec = len(record_ids)
+def add_records_to_basket(records, basket_id):
+    """Add the given records to the given baskets"""
+
+    nrec = len(records[0])
     if nrec > 0:
         if CFG_WEBALERT_DEBUG_LEVEL > 0:
-            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, record_ids)
+            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, records[0])
         try:
             if CFG_WEBALERT_DEBUG_LEVEL < 4:
                 owner_uid = get_basket_owner_id(basket_id)
-                add_to_basket(owner_uid, record_ids, [basket_id])
+                add_to_basket(owner_uid, records[0], 0, [basket_id])
             else:
                 print '   NOT ADDED, DEBUG LEVEL == 4'
         except Exception:
             register_exception()
-
+    for external_collection_results in records[1][0]:
+        nrec = len(external_collection_results[1][0])
+        if nrec > 0:
+            if CFG_WEBALERT_DEBUG_LEVEL > 0:
+                print "-> adding %s external records (collection \"%s\") into basket %s: %s" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
+            try:
+                if CFG_WEBALERT_DEBUG_LEVEL < 4:
+                    owner_uid = get_basket_owner_id(basket_id)
+                    collection_id = get_collection_id(external_collection_results[0])
+                    add_to_basket(owner_uid, external_collection_results[1][0], collection_id, [basket_id])
+                    # TBD: maybe cache here the html brief format of the external records for the baskets later?
+                else:
+                    print '   NOT ADDED, DEBUG LEVEL == 4'
+            except Exception:
+                register_exception()
 
 def get_query(alert_id):
+    """Returns the query for that corresponds to this alert id."""
+
     r = run_sql('select urlargs from query where id=%s', (alert_id,))
     return r[0][0]
 
 def email_notify(alert, records, argstr):
+    """Send the notification e-mail for a specific alert."""
 
-    if len(records) == 0:
-        return
+    if len(records[0]) == 0:
+        total_n_external_records = 0
+        for external_collection_results in records[1][0]:
+            total_n_external_records += len(external_collection_results[1][0])
+        if total_n_external_records == 0:
+            return
 
     msg = ""
 
@@ -93,15 +128,19 @@ def email_notify(alert, records, argstr):
 
     url = CFG_SITE_URL + "/search?" + argstr
 
-    # Extract the pattern and catalogue list from the formatted query
+    # Extract the pattern, the collection list, the current collection
+    # and the sc (split collection) from the formatted query
     query = parse_qs(argstr)
     pattern = query.get('p', [''])[0]
-    catalogues = query.get('c', [])
+    collection_list = query.get('c', [])
+    current_collection = query.get('cc', [''])
+    sc = query.get('sc', ['1'])
+    collections = calculate_desired_collection_list(collection_list, current_collection, int(sc[0]))
 
     frequency = alert[3]
 
     msg += webalert_templates.tmpl_alert_email_body(
-        alert[5], url, records, pattern, catalogues, frequency)
+        alert[5], url, records, pattern, collections, frequency)
 
     email = get_email(alert[0])
 
@@ -136,68 +175,53 @@ def email_notify(alert, records, argstr):
                    attempt_times=CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
                    attempt_sleeptime=CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
 
-def get_argument(args, argname):
-    if args.has_key(argname):
-        return args[argname]
-    else:
-        return []
-
 def _date_to_tuple(date):
+    """Private function. Converts a date as a tuple of string into a list of integers."""
+
     return [int(part) for part in (date.year, date.month, date.day)]
 
 def get_record_ids(argstr, date_from, date_until):
+    """Returns the local and external records found for a specific query and timeframe."""
+
     argd = wash_urlargd(parse_qs(argstr), websearch_templates.search_results_default_urlargd)
-    p       = get_argument(argd, 'p')
-    c       = get_argument(argd, 'c')
-    cc      = get_argument(argd, 'cc')
-    aas     = get_argument(argd, 'aas')
-    f       = get_argument(argd, 'f')
-    so      = get_argument(argd, 'so')
-    sp      = get_argument(argd, 'sp')
-    ot      = get_argument(argd, 'ot')
-    p1      = get_argument(argd, 'p1')
-    f1      = get_argument(argd, 'f1')
-    m1      = get_argument(argd, 'm1')
-    op1     = get_argument(argd, 'op1')
-    p2      = get_argument(argd, 'p2')
-    f2      = get_argument(argd, 'f2')
-    m2      = get_argument(argd, 'm2')
-    op2     = get_argument(argd, 'op2')
-    p3      = get_argument(argd, 'p3')
-    f3      = get_argument(argd, 'f3')
-    m3      = get_argument(argd, 'm3')
-    sc      = get_argument(argd, 'sc')
+    p       = argd.get('p', [])
+    c       = argd.get('c', [])
+    cc      = argd.get('cc', [])
+    aas     = argd.get('aas', [])
+    f       = argd.get('f', [])
+    so      = argd.get('so', [])
+    sp      = argd.get('sp', [])
+    ot      = argd.get('ot', [])
+    p1      = argd.get('p1', [])
+    f1      = argd.get('f1', [])
+    m1      = argd.get('m1', [])
+    op1     = argd.get('op1', [])
+    p2      = argd.get('p2', [])
+    f2      = argd.get('f2', [])
+    m2      = argd.get('m2', [])
+    op2     = argd.get('op3', [])
+    p3      = argd.get('p3', [])
+    f3      = argd.get('f3', [])
+    m3      = argd.get('m3', [])
+    sc      = argd.get('sc', [])
 
     d1y, d1m, d1d = _date_to_tuple(date_from)
     d2y, d2m, d2d = _date_to_tuple(date_until)
 
-    return perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot,
+    washed_colls = wash_colls(cc, c, sc, 0)
+    hosted_colls = washed_colls[3]
+    if hosted_colls:
+        req_args = "p=%s&d1d=%s&d1m=%s&d1y=%s&d2d=%s&d2m=%s&d2y=%s&ap=%i" % (p, d1d, d1m, d1y, d2d, d2m, d2y, 0)
+        external_records = calculate_external_records(req_args, [p, p1, p2, p3], f, hosted_colls, CFG_EXTERNAL_COLLECTION_TIMEOUT, CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS)
+    else:
+        external_records = ([],[])
+
+    recids = perform_request_search(of='id', p=p, c=c, cc=cc, f=f, so=so, sp=sp, ot=ot,
                                   aas=aas, p1=p1, f1=f1, m1=m1, op1=op1, p2=p2, f2=f2,
                                   m2=m2, op2=op2, p3=p3, f3=f3, m3=m3, sc=sc, d1y=d1y,
                                   d1m=d1m, d1d=d1d, d2y=d2y, d2m=d2m, d2d=d2d)
 
-
-def get_argument_as_string(argstr, argname):
-    args = parse_qs(argstr)
-    a = get_argument(args, argname)
-    r = ''
-    if len(a):
-        r = a[0]
-    for i in a[1:len(a)]:
-        r += ", %s" % i
-    return r
-
-def get_pattern(argstr):
-    return get_argument_as_string(argstr, 'p')
-
-def get_catalogue(argstr):
-    return get_argument_as_string(argstr, 'c')
-
-def get_catalogue_num(argstr):
-    args = parse_qs(argstr)
-    a = get_argument(args, 'c')
-    return len(a)
-
+    return (recids, external_records)
 
 def run_query(query, frequency, date_until):
     """Return a dictionary containing the information of the performed query.
@@ -226,9 +250,14 @@ def run_query(query, frequency, date_until):
 
     recs = get_record_ids(query[1], date_from, date_until)
 
-    n = len(recs)
+    n = len(recs[0])
     if n:
-        log('query %08s produced %08s records' % (query[0], len(recs)))
+        log('query %08s produced %08s records for all the local collections' % (query[0], n))
+
+    for external_collection_results in recs[1][0]:
+        n = len(external_collection_results[1][0])
+        if n:
+            log('query %08s produced %08s records for external collection \"%s\"' % (query[0], n, external_collection_results[0]))
 
     if CFG_WEBALERT_DEBUG_LEVEL > 2:
         print "[%s] run query: %s with dates: from=%s, until=%s\n  found rec ids: %s" % (
@@ -236,7 +265,6 @@ def run_query(query, frequency, date_until):
 
     return {'id_query': query[0], 'argstr': query[1],
             'records': recs, 'date_from': date_from, 'date_until': date_until}
-
 
 def process_alert_queries(frequency, date):
     """Run the alerts according to the frequency.
@@ -251,6 +279,18 @@ def process_alert_queries(frequency, date):
         alerts = get_alerts(q, frequency)
         process_alerts(alerts)
 
+def process_alert_queries_for_user(uid, date):
+    """Process the alerts for the given user id.
+
+    All alerts are with reference date set as the current local time."""
+
+    alert_queries = get_alert_queries_for_user(uid)
+
+    for aq in alert_queries:
+        frequency = aq[2]
+        q = run_query(aq, frequency, date)
+        alerts = get_alerts(q, frequency)
+        process_alerts(alerts)
 
 def replace_argument(argstr, argname, argval):
     """Replace the given date argument value with the new one.
@@ -282,6 +322,8 @@ def update_arguments(argstr, date_from, date_until):
     return r
 
 def log(msg):
+    """Logs the given message in the alert engine log."""
+
     try:
         logfile = open(CFG_LOGDIR + '/alertengine.log', 'a')
         logfile.write(strftime('%Y%m%d%H%M%S#'))
@@ -291,6 +333,9 @@ def log(msg):
         register_exception()
 
 def process_alerts(alerts):
+    """Process the given alerts and store the records found to the user defined baskets
+    and/or notify them by e-mail"""
+
     # TBD: do not generate the email each time, forge it once and then
     # send it to all appropriate people
 
@@ -307,17 +352,23 @@ def process_alerts(alerts):
                 register_exception(alert_admin=True,
                                    prefix="Error when sending alert %s, %s\n." % \
                                    (repr(a), repr(argstr)))
+            # Inform the admin when external collections time out
+            if len(alerts['records'][1][1]) > 0:
+                register_exception(alert_admin=True,
+                                   prefix="External collections %s timed out when sending alert %s, %s\n." % \
+                                   (", ".join(alerts['records'][1][1]), repr(a), repr(argstr)))
 
         update_date_lastrun(a)
 
-
 def alert_use_basket_p(alert):
+    """Boolean. Should this alert store the records found in a basket?"""
+
     return alert[2] != 0
 
-
 def alert_use_notification_p(alert):
-    return alert[6] == 'y'
+    """Boolean. Should this alert send a notification e-mail about the records found?"""
 
+    return alert[6] == 'y'
 
 def run_alerts(date):
     """Run the alerts.
@@ -333,16 +384,104 @@ def run_alerts(date):
 
     process_alert_queries('day', date)
 
-def process_alert_queries_for_user(uid, date):
-    """Process the alerts for the given user id.
+# External records related functions
+def calculate_external_records(req_args, pattern_list, field, hosted_colls, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS):
+    """Function that returns the external records found and the potential time outs
+    given a search pattern and a list of hosted collections."""
 
-    All alerts are with reference date set as the current local time."""
+    (external_search_engines, basic_search_units) = calculate_external_search_params(req_args, pattern_list, field, hosted_colls)
 
-    alert_queries = get_alert_queries_for_user(uid)
-    print alert_queries
+    return do_calculate_external_records(req_args, basic_search_units, external_search_engines, timeout, limit)
 
-    for aq in alert_queries:
-        frequency = aq[2]
-        q = run_query(aq, frequency, date)
-        alerts = get_alerts(q, frequency)
-        process_alerts(alerts)
+def calculate_external_search_params(req_args, pattern_list, field, hosted_colls):
+    """Function that calculates the basic search units given the search pattern.
+    Also returns a set of hosted collections engines."""
+
+    from invenio.search_engine import create_basic_search_units
+    from invenio.websearch_external_collections import bind_patterns
+    from invenio.websearch_external_collections import select_hosted_search_engines as select_external_search_engines
+
+    pattern = bind_patterns(pattern_list)
+    basic_search_units = create_basic_search_units(None, pattern, field)
+
+    external_search_engines = select_external_search_engines(hosted_colls)
+
+    return (external_search_engines, basic_search_units)
+
+def do_calculate_external_records(req_args, basic_search_units, external_search_engines, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS):
+    """Function that returns the external records found and the potential time outs
+    given the basic search units or the req arguments and a set of hosted collections engines."""
+
+    # list to hold the hosted search engines and their respective search urls
+    engines_list = []
+    # list to hold the non timed out results
+    results_list = []
+    # list to hold all the results
+    full_results_list = []
+    # list to hold all the timeouts
+    timeout_list = []
+
+    for engine in external_search_engines:
+        url = engine.build_search_url(basic_search_units, req_args, limit=limit)
+        if url:
+            engines_list.append([url, engine])
+    # we end up with a [[search url], [engine]] kind of list
+
+    # create the list of search urls to be handed to the asynchronous getter
+    pagegetters_list = [HTTPAsyncPageGetter(engine[0]) for engine in engines_list]
+
+    # function to be run on every result
+    def finished(pagegetter, data, current_time):
+        """Function called, each time the download of a web page finish.
+        Will parse and print the results of this page."""
+        # each pagegetter that didn't timeout is added to this list
+        results_list.append((pagegetter, data))
+
+    # run the asynchronous getter
+    finished_list = async_download(pagegetters_list, finished, engines_list, timeout)
+
+    # create the complete list of tuples, one for each hosted collection, with the results and other information,
+    # including those that timed out
+    for (finished, engine) in zip(finished_list, engines_list): #finished_and_engines_list:
+        if finished:
+            for result in results_list:
+                if result[1] == engine:
+                    engine[1].parser.parse_and_get_results(result[0].data, feedonly=True)
+                    full_results_list.append((engine[1].name, engine[1].parser.parse_and_extract_records(of="xm")))
+                    break
+        elif not finished:
+            timeout_list.append(engine[1].name)
+
+    return (full_results_list, timeout_list)
+
+def calculate_desired_collection_list(c, cc, sc):
+    """Function that calculates the user desired collection list when sending a webalert e-mail"""
+
+    if not cc[0]:
+        cc = [CFG_SITE_NAME]
+
+    # quickly create the reverse function of is_hosted_collection
+    is_not_hosted_collection = lambda coll: not is_hosted_collection(coll)
+    
+    # calculate the list of non hosted, non restricted, regular sons of cc
+    washed_cc_sons = filter(is_not_hosted_collection, get_coll_sons(cc[0]))
+    # clean up c removing hosted collections
+    washed_c = filter(is_not_hosted_collection, c)
+
+    # try to simulate the wash_colls function behavior when calculating the collections to return
+    if washed_cc_sons == washed_c:
+        if sc == 0:
+            return cc
+        elif sc == 1:
+            return washed_c
+    else:
+        if sc == 0:
+            return washed_c
+        elif sc == 1:
+            washed_c_sons = []
+            for coll in washed_c:
+                if coll in washed_cc_sons:
+                    washed_c_sons.extend(get_coll_sons(coll))
+                else:
+                    washed_c_sons.append(coll)
+            return washed_c_sons

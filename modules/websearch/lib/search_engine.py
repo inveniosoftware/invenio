@@ -108,6 +108,7 @@ except:
 from invenio.websearch_external_collections import calculate_hosted_collections_results, do_calculate_hosted_collections_results
 from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_ANTE_SEARCH
 from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 ## global vars:
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
@@ -2971,20 +2972,21 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
              hosted_colls_potential_results_p = hosted_colls_potential_results_p,
            )
 
-def print_hosted_results(infos, of=None, ln=CFG_SITE_LANG, req=None, no_records_found=False, timeout=False):
+def print_hosted_results(url_and_engine, ln=CFG_SITE_LANG, of=None, req=None, no_records_found=False, search_timed_out=False, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
     """Prints the full results of a hosted collection"""
 
     if of.startswith("h"):
         if no_records_found:
-            return "<br />No results found.."
-        if timeout:
-            return "<br />The search engine did not respond in time"
+            return "<br />No results found."
+        if search_timed_out:
+            return "<br />The search engine did not respond in time."
 
     return websearch_templates.tmpl_print_hosted_results(
+        url_and_engine=url_and_engine,
         ln=ln,
-        infos=infos,
         of=of,
-        req=req
+        req=req,
+        limit=limit
         )
 
 def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG):
@@ -3994,6 +3996,10 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
     # wash output format:
     of = wash_output_format(of)
 
+    # raise an exception when trying to print out html or xml from the cli
+    if of.startswith("h") or of.startswith("x"):
+        assert req
+
     # for every search engine request asking for an HTML output, we
     # first regenerate cache of collection and field I18N names if
     # needed; so that later we won't bother checking timestamps for
@@ -4594,7 +4600,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                             sc, pl_in_url,
                                                             d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                            req.write(print_hosted_results(result[0], of, ln, req))
+                            req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, limit=rg))
                             if of.startswith("h"):
                                 req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, results_final_nb[result[0][1].name],
                                                             jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
@@ -4616,7 +4622,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                     sc, pl_in_url,
                                                                     d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                                        req.write(print_hosted_results(result[0], of, ln, req, no_records_found=True))
+                                        req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, no_records_found=True, limit=rg))
                                         req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, -963,
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                     sc, pl_in_url,
@@ -4628,7 +4634,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                     sc, pl_in_url,
                                                                     d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                                    req.write(print_hosted_results(result[0], of, ln, req))
+                                    req.write(print_hosted_results(url_and_engine=result[0], ln=ln, of=of, req=req, limit=rg))
                                     if of.startswith("h"):
                                         req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, result[0][1].name, result[1],
                                                                     jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
@@ -4641,7 +4647,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                 sc, pl_in_url,
                                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                                    req.write(print_hosted_results(timeout[0], of, ln, req, timeout=True))
+                                    req.write(print_hosted_results(url_and_engine=timeout[0], ln=ln, of=of, req=req, search_timed_out=True, limit=rg))
                                     req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[0][1].name, -963,
                                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                 sc, pl_in_url,

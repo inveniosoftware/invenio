@@ -74,6 +74,7 @@ from invenio.intbitset import intbitset
 
 from invenio.websearch_external_collections import external_collection_get_state, get_external_collection_engine
 from invenio.websearch_external_collections_utils import get_collection_id
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
@@ -2981,20 +2982,20 @@ class Template:
         out += "</td></tr></tbody></table>"
         return out
 
-    def tmpl_print_hosted_results(self, ln, infos, of=None, req=None):
+    def tmpl_print_hosted_results(self, url_and_engine, ln, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Print results of a given search engine.
         """
 
         _ = gettext_set_language(ln)
-        url = infos[0]
-        engine = infos[1]
-        name = _(engine.name)
+        #url = url_and_engine[0]
+        engine = url_and_engine[1]
+        #name = _(engine.name)
         db_id = get_collection_id(engine.name)
-        base_url = engine.base_url
+        #base_url = engine.base_url
 
         out = ""
 
-        results = engine.parser.parse_and_get_results(None, of=of, req=req, parseonly=True)
+        results = engine.parser.parse_and_get_results(None, of=of, req=req, limit=limit, parseonly=True)
 
         if len(results) != 0:
             if of == 'hb':

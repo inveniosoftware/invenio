@@ -86,7 +86,7 @@ class ExternalSearchEngine(object):
             return basic[1]
         return None
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build a URL for a specific set of search_units."""
 
         units = self.build_units(basic_search_units)
@@ -114,7 +114,7 @@ class SortedFieldsSearchEngine(ExternalSearchEngine):
         self.converter = {}
         super(SortedFieldsSearchEngine, self).__init__(configuration)
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build a search URL. Reuse the search pattern found in req only with Invenio-based search engines"""
         self.clear_fields()
         self.fill_fields(basic_search_units)
@@ -183,7 +183,7 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
             else:
                 return operator + '"' + pattern + '"'
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for a specific set of search_units."""
 
         url = super(CDSIndicoSearchEngine, self).build_search_url(basic_search_units, None, lang)
@@ -207,7 +207,7 @@ class CERNEDMSSearchEngine(SortedFieldsSearchEngine):
         self.search_url_simple = "http://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text="
         self.fields = ["author", "keyword", "abstract", "title", "reportnumber"]
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for CERN EDMS."""
         super(CERNEDMSSearchEngine, self).build_search_url(basic_search_units)
         if len(self.fields_content["default"]) > 0:
@@ -246,7 +246,7 @@ class CERNAgendaSearchEngine(ExternalSearchEngine):
         self.search_url_author = "http://agenda.cern.ch/search.php?field=speaker&search=Search&keywords="
         self.search_url_title = "http://agenda.cern.ch/search.php?field=title&search=Search&keywords="
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an url for searching on CERN Agenda. This will only work if there is only author
         or title tags."""
         if only_field(basic_search_units, "author"):
@@ -323,7 +323,7 @@ class KissSearchEngine(SortedFieldsSearchEngine):
         self.fields = self.converter.keys()
         self.parser = KISSExternalCollectionResultsParser()
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for a search."""
         super(KissSearchEngine, self).build_search_url(basic_search_units)
         url_parts = []
@@ -468,7 +468,7 @@ class AmazonSearchEngine(ExternalSearchEngine):
         self.search_url_general = "http://www.amazon.com/exec/obidos/external-search/?tag=cern&keyword="
         self.search_url_author = "http://www.amazon.com/exec/obidos/external-search/?tag=cern&field-author="
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for Amazon"""
         if only_field(basic_search_units, "author"):
             self.search_url = self.search_url_author
@@ -520,7 +520,7 @@ class NEBISSearchEngine(ExternalSearchEngine):
         self.search_url_author = "http://opac.nebis.ch/F/?func=find-b&find_code=WAU&REQUEST="
         self.search_url_title = "http://opac.nebis.ch/F/?func=find-b&find_code=WTI&REQUEST="
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for NEBIS"""
         if only_field(basic_search_units, "author"):
             self.search_url = self.search_url_author
@@ -538,7 +538,7 @@ class CDSInvenioSearchEngine(ExternalSearchEngine):
     def __init__(self, configuration):
         super(CDSInvenioSearchEngine, self).__init__(configuration)
 
-    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build a URL for an Invenio based site"""
 
         if req_args:
@@ -558,6 +558,22 @@ class CDSInvenioSearchEngine(ExternalSearchEngine):
                 search_url_params += '&jrec=' + req_args_dict['jrec'][0]
             if req_args_dict.has_key('rg'):
                 search_url_params += '&rg=' + req_args_dict['rg'][0]
+            else:
+                search_url_params += '&rg=' + str(limit)
+            if req_args_dict.has_key('d1d'):
+                search_url_params += '&d1d=' + req_args_dict['d1d'][0]
+            if req_args_dict.has_key('d1m'):
+                search_url_params += '&d1m=' + req_args_dict['d1m'][0]
+            if req_args_dict.has_key('d1y'):
+                search_url_params += '&d1y=' + req_args_dict['d1y'][0]
+            if req_args_dict.has_key('d2d'):
+                search_url_params += '&d2d=' + req_args_dict['d2d'][0]
+            if req_args_dict.has_key('d2m'):
+                search_url_params += '&d2m=' + req_args_dict['d2m'][0]
+            if req_args_dict.has_key('d2y'):
+                search_url_params += '&d2y=' + req_args_dict['d2y'][0]
+            if req_args_dict.has_key('ap'):
+                search_url_params += '&ap=' + req_args_dict['ap'][0]
             search_url_params += '&of=' + self.fetch_format
             return self.search_url + search_url_params
         else:
@@ -566,7 +582,7 @@ class CDSInvenioSearchEngine(ExternalSearchEngine):
                 return None
             request = self.combine_units(units)
             url_request = urllib.quote(request)
-            return self.search_url + url_request + '&of=' + self.fetch_format
+            return self.search_url + url_request + '&rg=' + str(limit) + '&of=' + self.fetch_format
 
     def build_search_unit_unit(self, basic):
         """Build a search string from a search unit. Reconstructs original user query"""

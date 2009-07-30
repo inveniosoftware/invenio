@@ -159,11 +159,14 @@ class RecordHTMLParser(HTMLParser):
             except:
                 return
 
-def get_as_text(record_id, ln=CFG_SITE_LANG):
+def get_as_text(record_id=0, xml_record=None, ln=CFG_SITE_LANG):
     """Return the record in a textual format"""
     _ = gettext_set_language(ln)
     out = ""
-    rec_in_hb = format_record(record_id, of="hb")
+    if record_id != 0:
+        rec_in_hb = format_record(record_id, of="hb")
+    elif xml_record:
+        rec_in_hb = format_record(0, of="hb", xml_record=xml_record)
     rec_in_hb = rec_in_hb.replace('\n', ' ')
     htparser = RecordHTMLParser()
     try:
@@ -184,4 +187,3 @@ def get_as_text(record_id, ln=CFG_SITE_LANG):
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Similar records"), "", out)
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Cited by"), "", out)
     return out.strip()
-

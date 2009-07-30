@@ -30,6 +30,8 @@ from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap, wrap_records
 from invenio.urlutils import create_html_link
 
+from invenio.search_engine import guess_primary_collection_of_a_record, get_coll_ancestors
+
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):
         """
@@ -498,15 +500,51 @@ class Template:
         return '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
 
     def tmpl_alert_email_body(self, name, url, records, pattern,
-                              catalogues, frequency):
+                              collection_list, frequency):
 
-        l = len(catalogues)
+        recids_by_collection = {}
+        for recid in records[0]:
+            primary_collection = guess_primary_collection_of_a_record(recid)
+            if primary_collection in collection_list:
+                if not recids_by_collection.has_key(primary_collection):
+                    recids_by_collection[primary_collection] = []
+                recids_by_collection[primary_collection].append(recid)
+            else:
+                ancestors = get_coll_ancestors(primary_collection)
+                ancestors.reverse()
+                nancestors = 0
+                for ancestor in ancestors:
+                    nancestors += 1
+                    if ancestor in collection_list:
+                        if not recids_by_collection.has_key(ancestor):
+                            recids_by_collection[ancestor] = []
+                        recids_by_collection[ancestor].append(recid)
+                        break
+                    elif len(ancestors) == nancestors:
+                        if not recids_by_collection.has_key('None of the above'):
+                            recids_by_collection['None of the above'] = []
+                        recids_by_collection['None of the above'].append(recid)
+
+        collection_list = [coll for coll in recids_by_collection.keys() if coll != 'None of the above']
+        for external_collection_results in records[1][0]:
+            if external_collection_results[1][0]:
+                collection_list.append(external_collection_results[0])
+
+        l = len(collection_list)
         if l == 0:
             collections = ''
         elif l == 1:
-            collections = "collection: %s\n" % catalogues[0]
+            collections = "collection: %s\n" % collection_list[0]
         else:
-            collections = "collections: %s\n" % wrap(', '.join(catalogues))
+            collections = "collections: %s\n" % wrap(', '.join(collection_list))
+
+        l = len(records[0])
+        for external_collection_results in records[1][0]:
+            l += len(external_collection_results[1][0])
+        if l == 1:
+            total = '1 record'
+        else:
+            total = '%d records' % l
 
         if pattern:
             pattern = 'pattern: %s\n' % pattern
@@ -514,13 +552,6 @@ class Template:
         frequency = {'day': 'daily',
                      'week': 'weekly',
                      'month': 'monthly'}[frequency]
-
-        l = len(records)
-        if l == 1:
-            total = '1 record'
-        else:
-            total = '%d records' % l
-
 
         body = """\
 Hello:
@@ -545,13 +576,52 @@ url: <%(url)s>
        'total': total,
        'url': url}
 
+        index = 0
 
-        for index, recid in enumerate(records[:CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL]):
-            body += "\n%i) " % (index + 1)
-            body += self.tmpl_alert_email_record(recid)
-            body += "\n"
+        for collection_recids in recids_by_collection.items():
+            if collection_recids[0] != 'None of the above':
+                body += "\nCollection: %s\n" % collection_recids[0]
+                for recid in collection_recids[1]:
+                    index += 1
+                    body += "\n%i) " % (index)
+                    body += self.tmpl_alert_email_record(recid=recid)
+                    body += "\n"
+                    if index == CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+                        break
+                if index == CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+                    break
 
-        if len(records) > CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+        if index < CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+            if recids_by_collection.has_key('None of the above'):
+                if len(recids_by_collection.keys()) > 1:
+                    body += "\nNone of the above collections:\n"
+                else:
+                    # if the uncategorized collection is the only collection then present
+                    # all the records as belonging to CFG_SITE_NAME
+                    body += "\nCollection: %s\n" % CFG_SITE_NAME
+                for recid in recids_by_collection['None of the above']:
+                    index += 1
+                    body += "\n%i) " % (index)
+                    body += self.tmpl_alert_email_record(recid=recid)
+                    body += "\n"
+                    if index == CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+                        break
+
+        if index < CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+            for external_collection_results in records[1][0]:
+                body += "\nCollection: %s\n" % external_collection_results[0]
+                for recid in external_collection_results[1][0]:
+                    index += 1
+                    body += "\n%i) " % (index)
+                    # TODO: extend function to accept xml_record!
+                    body += self.tmpl_alert_email_record(xml_record=external_collection_results[1][1][recid])
+                    body += "\n"
+                    if index == CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+                        break
+                if index == CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+                    break
+
+        if l > CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
             body += '''
 Only the first %s records were displayed.  Please consult the search
 URL given at the top of this email to see all the results.
@@ -568,9 +638,13 @@ Need human intervention?  Contact <%s>
         return body
 
 
-    def tmpl_alert_email_record(self, recid):
+    def tmpl_alert_email_record(self, recid=0, xml_record=None):
         """ Format a single record."""
 
-        out = wrap_records(get_as_text(recid))
-        out += "\nDetailed record: <%s/record/%s>" % (CFG_SITE_URL, recid)
+        if recid != 0:
+            out = wrap_records(get_as_text(record_id=recid))
+            out += "\nDetailed record: <%s/record/%s>" % (CFG_SITE_URL, recid)
+        elif xml_record:
+            out = wrap_records(get_as_text(xml_record=xml_record))
+            # TODO: add Detailed record url for external records?
         return out

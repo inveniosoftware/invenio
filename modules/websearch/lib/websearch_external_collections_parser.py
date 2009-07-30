@@ -92,17 +92,17 @@ class ExternalCollectionResultsParser(object):
         """Feed buffer with data that will be parse later."""
         self.buffer += data
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse the buffer. Set an optional output format."""
         pass
 
-    def add_html_result(self, html):
+    def add_html_result(self, html, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Add a new html code as result. The urls in the html code will be corrected."""
 
         if not html:
             return
 
-        if len(self.results) >= CFG_EXTERNAL_COLLECTION_MAXRESULTS:
+        if len(self.results) >= limit:
             return
 
         html = correct_url(html, self.host, self.path) + '\n'
@@ -142,7 +142,7 @@ class ExternalCollectionResultsParser(object):
             # self.nbrecs_regex.search(html[0]) raised the exception, as html = [None]
             return -2
 
-    def parse_and_get_results(self, data, of=None, req=None, feedonly=False, parseonly=False):
+    def parse_and_get_results(self, data, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS, feedonly=False, parseonly=False):
         """Parse given data and return results."""
 
         # parseonly = True just in case we only want to parse the data and return the results
@@ -153,7 +153,7 @@ class ExternalCollectionResultsParser(object):
         # feedonly = True just in case we just want to feed the buffer with the new data
         # ex. the data will be used only to calculate the number of results
         if not feedonly:
-            self.parse(of, req)
+            self.parse(of, req, limit)
             return self.results
 
     def buffer_decode_from(self, charset):
@@ -172,7 +172,7 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     def __init__(self, host="", path=""):
         super(CDSIndicoCollectionResutsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
         results = self.result_regex.finditer(self.buffer)
@@ -180,7 +180,7 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
             num = result.group(1)
             html = result.group(2)
 
-            self.add_html_result(num + ' ' + html  + '<br />')
+            self.add_html_result(num + ' ' + html  + '<br />', limit)
 
 class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss."""
@@ -190,7 +190,7 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www-lib.kek.jp", path="cgi-bin/"):
         super(KISSExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
         self.buffer_decode_from('Shift_JIS')
@@ -205,7 +205,7 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
             end_index = element.find('</DL>')
             if end_index != -1:
                 element = element[:end_index + 4]
-            self.add_html_result(element + '<br /><br />')
+            self.add_html_result(element + '<br /><br />', limit)
 
 class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss books."""
@@ -217,7 +217,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www-lib.kek.jp", path="cgi-bin/"):
         super(KISSBooksExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
         self.buffer_decode_from('Shift_JIS')
@@ -232,7 +232,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
 
             title_match = self.title.match(data)
             if title_match:
-                self.add_html_result(html)
+                self.add_html_result(html, limit)
 
                 num = title_match.group(1)
                 url = title_match.group(2)
@@ -245,7 +245,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
                     info = info_line_match.group(1)
                     html += info + '<br />'
 
-        self.add_html_result(html)
+        self.add_html_result(html, limit)
 
 class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Google"""
@@ -255,7 +255,7 @@ class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host = "www.google.com", path=""):
         super(GoogleExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split("<div class=g>")
         if len(elements) <= 1:
@@ -265,7 +265,7 @@ class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
             end_index = element.find('</table>')
             if end_index != -1:
                 element = element[:end_index + 8]
-            self.add_html_result(element)
+            self.add_html_result(element, limit)
 
 class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResultsParser):
     """Parser for Google Scholar."""
@@ -273,7 +273,7 @@ class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResul
     def __init__(self, host = "scholar.google.com", path=""):
         super(GoogleScholarExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split("<p class=g>")
         if len(elements) <= 1:
@@ -283,7 +283,7 @@ class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResul
             end_index = element.find('</table>')
             if end_index != -1:
                 element = element[:end_index + 8]
-            self.add_html_result(element + '<br />')
+            self.add_html_result(element + '<br />', limit)
 
 class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResultsParser):
     """Parser for Google Books."""
@@ -293,14 +293,14 @@ class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResults
     def __init__(self, host = "books.google.com", path=""):
         super(GoogleBooksExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split('<table class=rsi><tr><td class="covertd">')
         if len(elements) <= 1:
             return
 
         for element in elements[1:-1]:
-            self.add_html_result(element)
+            self.add_html_result(element, limit)
 
 class SPIRESExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for SPIRES."""
@@ -310,7 +310,7 @@ class SPIRESExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www.slac.stanford.edu", path="spires/find/hep/"):
         super(SPIRESExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split('<p>')
 
@@ -318,7 +318,7 @@ class SPIRESExternalCollectionResultsParser(ExternalCollectionResultsParser):
             return
 
         for element in elements[1:-1]:
-            self.add_html_result(element)
+            self.add_html_result(element, limit)
 
 class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for SCIRUS."""
@@ -332,7 +332,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host='www.scirus.com', path='srsapp/'):
         super(SCIRUSExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         data = self.buffer.replace('\n', ' ')
 
@@ -348,7 +348,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
                     'date' : date, 'comments' : comments, 'similar' : similar}
             else:
                 html = self.cleaning.sub("", data) + '<br />'
-            self.add_html_result(html)
+            self.add_html_result(html, limit)
 
 class CiteSeerExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for CiteSeer."""
@@ -359,10 +359,10 @@ class CiteSeerExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host='', path=''):
         super(CiteSeerExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         for element in self.result_separator.finditer(self.buffer):
-            self.add_html_result(element.group() + '<br />')
+            self.add_html_result(element.group() + '<br />', limit)
 
 class CDSInvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """HTML brief (hb) Parser for Invenio"""
@@ -376,7 +376,7 @@ class CDSInvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsPar
         self.num_results_regex = re.compile(self.num_results_regex_str)
         self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
 
-    def parse(self, of=None, req=None):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
         # the patterns :
@@ -398,7 +398,7 @@ class CDSInvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsPar
             results = level_c_pat.finditer(level_b_pat.sub('', level_a_pat.search(self.buffer).group(1)))
             for result in results:
                # each result is placed in each own table since it already has its rows and cells defined
-               self.add_html_result('<table>' + result.group(1) + '</table>')
+               self.add_html_result('<table>' + result.group(1) + '</table>', limit)
         except AttributeError:
             # in case there were no results found an Attribute error is raised
             pass
@@ -415,7 +415,7 @@ class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsPars
         self.num_results_regex = re.compile(self.num_results_regex_str)
         self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
 
-    def parse(self, of='hb', req=None):
+    def parse(self, of='hb', req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records. Format the records using the selected output format."""
 
         (recids, records) = self.parse_and_extract_records(of, req)
@@ -443,7 +443,10 @@ class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsPars
                 html = """"""
             elif of == 'xm':
                 html = records[recid]
-            self.add_html_result(html)
+            else:
+                html = None
+            if html:
+                self.add_html_result(html, limit)
 
     def parse_and_extract_records(self, of='hb', req=None):
         """Parse the buffer and return a list of the recids and a

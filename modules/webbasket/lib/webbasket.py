@@ -47,7 +47,6 @@ except ImportError:
 from invenio.websearch_external_collections_utils import get_collection_name_by_id
 from invenio.websearch_external_collections import select_hosted_search_engines
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.websearch_external_collections_searcher import external_collections_dictionary
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 
 def perform_request_display(uid,
