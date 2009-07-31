@@ -264,15 +264,18 @@ def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
     text using the provided charsets. text is supposed to be encoded in utf8.
     Returns (encoded_text, charset) where charset is the first charset
     in the sequence being able to encode text.
-    Returns (text, 'utf8') in case no charset is able to encode text.
+    Returns (text_in_utf8, 'utf8') in case no charset is able to encode text.
+
+    @note: If the input text is not in strict UTF-8, then replace any
+        non-UTF-8 chars inside it.
     """
-    encoded_text = text.decode('utf8')
+    text_in_unicode = text.decode('utf8', 'replace')
     for charset in charsets:
         try:
-            return (encoded_text.encode(charset), charset)
+            return (text_in_unicode.encode(charset), charset)
         except (UnicodeEncodeError, UnicodeDecodeError):
             pass
-    return (text, 'utf8')
+    return (text_in_unicode.encode('utf8'), 'utf8')
 
 def encode_for_xml(text):
     """Encodes special characters in a text so that it would be
