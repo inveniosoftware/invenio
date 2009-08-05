@@ -121,7 +121,8 @@ DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('referee_DEMOBOO_*', 'Book collection curator', 'deny any'),
                   ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'),
                   ('curator', 'Curator', 'deny any'),
-                  ('basketusers', 'User who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'))
+                  ('basketusers', 'Users who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'),
+                  ('submit_DEMOJRN_*', 'Users who can submit (and modify) "Atlantis Times" articles', 'deny all'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('dorian.gray@cds.cern.ch', 'referee_DEMOBOO_*'),
@@ -129,7 +130,9 @@ DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('romeo.montague@cds.cern.ch', 'restrictedpicturesviewer'),
                        ('romeo.montague@cds.cern.ch', 'thesescurator'),
                        ('juliet.capulet@cds.cern.ch', 'restrictedpicturesviewer'),
-                       ('juliet.capulet@cds.cern.ch', 'photocurator'))
+                       ('juliet.capulet@cds.cern.ch', 'photocurator'),
+                       ('romeo.montague@cds.cern.ch', 'submit_DEMOJRN_*'),
+                       ('juliet.capulet@cds.cern.ch', 'submit_DEMOJRN_*'))
 
 # users
 # list of e-mail addresses
@@ -205,7 +208,9 @@ DEF_DEMO_AUTHS = (
              ('thesescurator', 'runbibedit', -1, 0, {'collection': 'Theses'}),
              ('thesescurator', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
              ('photocurator', 'runbibedit', -1, 0, {'collection': 'Pictures'}),
-             ('referee_DEMOBOO_*', 'runbibedit', -1, 0, {'collection': 'Books'})
+             ('referee_DEMOBOO_*', 'runbibedit', -1, 0, {'collection': 'Books'}),
+             ('submit_DEMOJRN_*', 'submit', -1, 0, {'doctype': 'DEMOJRN', 'act': 'SBI'}),
+             ('submit_DEMOJRN_*', 'submit', -1, 0, {'doctype': 'DEMOJRN', 'act': 'MBI'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)
