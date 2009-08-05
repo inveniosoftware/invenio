@@ -451,23 +451,16 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
         if topic:
             id_bsk = db.create_basket(uid, new_basket_name, topic)
             bskids.append(id_bsk)
-    #it may be useful to add a warning message when no basket is selected : bskids != ['-1']
-    if len(bskids) and bskids != ['-1']:
-        # save
-        bskids = [int(bskid) for bskid in bskids]
-        for bskid in bskids:
-            if bskid != -1:
+
+    if bskids:
+        bskids = [int(bskid) for bskid in bskids if int(bskid) > 0]
+        if bskids:
+            for bskid in bskids:
                 if not(__check_user_can_perform_action(uid,
                                         bskid,
                                         CFG_WEBBASKET_SHARE_LEVELS['ADDITM'])):
                     errors.append('ERR_WEBBASKET_NO_RIGHTS')
-                    break
-        if len(errors):
-            return (body, errors, warnings)
-
-        bskids = [bskid for bskid in bskids if bskid != -1]
-
-        if bskids:
+                    return (body, errors, warnings)
             nb_modified_baskets = db.add_to_basket(uid, validated_recids, bskids)
             body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
             body_tmp, warnings_temp, errors_tmp = perform_request_display(uid,
@@ -480,7 +473,6 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
             errors += errors_tmp
             body += webbasket_templates.tmpl_back_link(referer, ln)
             return (body, warnings, errors)
-
         else:
             warnings.append('WRN_WEBBASKET_NO_BASKET_SELECTED')
             body += webbasket_templates.tmpl_warnings(warnings, ln)
