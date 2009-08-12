@@ -54,7 +54,14 @@ CFG_WEBBASKET_WARNING_MESSAGES = {
     'WRN_WEBBASKET_NO_GIVEN_TOPIC':
             '_("Please select an existing topic or create a new one")',
     'WRN_WEBBASKET_NO_BASKET_SELECTED':  '_("No basket has been selected")',
-    'WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD':  '_("Sorry, you don\'t have sufficient rights to add record #%i")'
+    'WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD':  '_("Sorry, you don\'t have sufficient rights to add record #%i")',
+    'WRN_WEBBASKET_NO_EXTERNAL_SOURCE_TITLE': '_("Please provide a title for the external source")',
+    'WRN_WEBBASKET_NO_EXTERNAL_SOURCE_DESCRIPTION': '_("Please provide a description for the external source")',
+    'WRN_WEBBASKET_NO_EXTERNAL_SOURCE_URL': '_("Please provide a url for the external source")',
+    'WRN_WEBBASKET_NO_VALID_URL_0': '_("The url you have provided is not valid")',
+    'WRN_WEBBASKET_NO_VALID_URL_3': '_("The url you have provided is not valid: There was some kind of redirection")',
+    'WRN_WEBBASKET_NO_VALID_URL_4': '_("The url you have provided is not valid: The request contains bad syntax or cannot be fulfilled")',
+    'WRN_WEBBASKET_NO_VALID_URL_5': '_("The url you have provided is not valid: The server failed to fulfil an apparently valid request")'
 }
 
 # pylint: disable-msg=C0301

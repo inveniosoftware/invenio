@@ -63,6 +63,7 @@ from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 #    - get_external_records_by_collection
 #    - store_external_records
 #    - store_external_urls
+#    - store_external_source
 #
 # 4. Group baskets
 #    - get_group_basket_infos
@@ -98,6 +99,7 @@ from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 # 9. Useful functions
 #    - __wash_count
 #    - __decompress_last
+#    - create_pseudo_record
 #
 ########################## General functions ##################################
 
@@ -286,8 +288,20 @@ def delete_basket(bskid):
     bskid = int(bskid)
     query1 = "DELETE FROM bskBASKET WHERE id=%s"
     res = run_sql(query1, (bskid,))
-    query2 = "DELETE FROM bskREC WHERE id_bskBASKET=%s"
-    run_sql(query2, (bskid,))
+    query2A = "SELECT id_bibrec_or_bskEXTREC FROM bskREC WHERE id_bskBASKET=%s"
+    ids = run_sql(query2A, (bskid,))
+    external_ids = [-id[0] for id in ids if id[0]<0]
+    if external_ids:
+        query2B = "DELETE FROM bskEXTREC WHERE %s"
+        query2C = "DELETE FROM bskEXTFMT WHERE %s"
+        sep_or = ' OR '
+        query2B %= sep_or.join(['id=%s'] * len(external_ids))
+        query2C %= sep_or.join(['id_bskEXTREC=%s'] * len(external_ids))
+        params2BC = tuple(external_ids)
+        run_sql(query2B, params2BC)
+        run_sql(query2C, params2BC)
+    query2D = "DELETE FROM bskREC WHERE id_bskBASKET=%s"
+    run_sql(query2D, (bskid,))
     query3 = "DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET=%s"
     run_sql(query3, (bskid,))
     query4 = "DELETE FROM user_bskBASKET WHERE id_bskBASKET=%s"
@@ -424,9 +438,24 @@ def move_item(bskid, recid, direction):
 
 def delete_item(bskid, recid):
     """Remove item recid from basket bskid"""
+
     if recid < 0:
-        query0 = "DELETE from bskEXTREC WHERE id=%s" % (-int(recid))
-        run_sql(query0)
+        query0A = "select count(id_bskBASKET) from bskREC where id_bibrec_or_bskEXTREC=%s" % (int(recid))
+        ncopies = run_sql(query0A)
+        if ncopies and ncopies[0][0]<=1:
+            # uncomment the following 5 lines and comment the following 2 to delete cached records
+            # only for external sources and not for external records
+            #query0B = "SELECT collection_id FROM bskEXTREC WHERE id=%s" % (-int(recid))
+            #colid = run_sql(query0B)
+            #if colid and colid[0][0]==0:
+                #query0C = "DELETE from bskEXTFMT WHERE id_bskEXTREC=%s" % (-int(recid))
+                #run_sql(query0C)
+            # the following two lines delete cached external records. We could keep them if we find
+            # a way to reuse them in case the external records are added again in the future.
+            query0D = "DELETE from bskEXTFMT WHERE id_bskEXTREC=%s" % (-int(recid))
+            run_sql(query0D)
+            query0E = "DELETE from bskEXTREC WHERE id=%s" % (-int(recid))
+            run_sql(query0E)
     query1 = "DELETE from bskREC WHERE id_bskBASKET=%s AND id_bibrec_or_bskEXTREC=%s"
     params1 = (int(bskid), int(recid))
     res = run_sql(query1, params1)
@@ -437,9 +466,9 @@ def delete_item(bskid, recid):
         run_sql(query2, params2)
     return res
 
-def add_to_basket(uid, recids=[], colid=0, bskids=[]):
+def add_to_basket(uid, recids=[], colid=0, bskids=[], es_title="", es_desc="", es_url=""):
     """Add items recids to every basket in bskids list."""
-    if len(recids) and len(bskids):
+    if (len(recids) or colid == -1) and len(bskids):
         query1 = """SELECT   id_bskBASKET,
                              max(score)
                     FROM     bskREC
@@ -480,9 +509,10 @@ def add_to_basket(uid, recids=[], colid=0, bskids=[]):
                             modification_date)
                         VALUES (%s, %s, %s, %s)"""
             now = convert_datestruct_to_datetext(localtime())
-            params = (colid, 'http://www.example.com/article/45', now, now)
+            params = (colid, es_url, now, now)
             res = run_sql(query2B, params)
-            recids = [res]
+            recids = [-res]
+            store_external_source(res, es_title, es_desc, es_url, 'hb')
 
         query2 = """INSERT IGNORE
                     INTO   bskREC
@@ -595,11 +625,27 @@ def store_external_urls(urls):
         params = (url[1], url[0])
         run_sql(query,params)
 
-def get_external_url(recid):
+def store_external_source(es_id, es_title, es_desc, es_url, of="hb"):
+    """Store formatted external sources to the database."""
+
+    if es_id and es_title and es_desc:
+        query = """INSERT
+                    INTO bskEXTFMT
+                        (id_bskEXTREC,
+                        format,
+                        last_updated,
+                        value)
+                    VALUES (%s, %s, %s, %s)"""
+        now = convert_datestruct_to_datetext(localtime())
+        params = (es_id, of, now, compress(create_pseudo_record(es_title, es_desc, es_url, of)))
+        run_sql(query,params)
+
+def get_external_colid_url(recid):
     """Get the original url for an external record."""
 
     if recid:
         query = """SELECT
+                    collection_id,
                     original_url
                     FROM bskEXTREC
                     WHERE id=%s"""
@@ -1065,3 +1111,37 @@ def __decompress_last(item):
     item = list(item)
     item[-1] = decompress(item[-1])
     return item
+
+def create_pseudo_record(es_title, es_desc, es_url, of="hb"):
+    """Return a pseudo record representation given a title and a description."""
+
+    if of == 'hb':
+        record = """
+<strong>%s</strong>
+<br />
+<small>%s
+<br />
+<strong>URL:</strong> <a class="note" target="_blank" href="%s">%s</a>
+</small>
+""" % (es_title, es_desc, es_url, prettify_url(es_url))
+        return record
+    if of == 'xm':
+        pass
+
+def prettify_url(url, char_limit=50, nb_dots=3):
+    """If the url has more characters than char_limit return a shortened version of it
+    keeping the beginning and ending and replacing the rest with dots."""
+
+    if len(url) > char_limit:
+        # let's set a minimum character limit
+        if char_limit < 5:
+            char_limit = 5
+        # let's set a maximum number of dots in relation to the character limit
+        if nb_dots > char_limit/4:
+            nb_dots = char_limit/5
+        nb_char_url = char_limit - nb_dots
+        nb_char_end = nb_char_url/4
+        nb_char_beg = nb_char_url - nb_char_end
+        return url[:nb_char_beg] + '.'*nb_dots + url[-nb_char_end:]
+    else:
+        return url

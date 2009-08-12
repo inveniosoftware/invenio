@@ -20,6 +20,8 @@
 __revision__ = "$Id$"
 
 import cgi
+from httplib import urlsplit, HTTPConnection
+from socket import getdefaulttimeout, setdefaulttimeout
 from zlib import decompress
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
@@ -410,7 +412,7 @@ def perform_request_delete_comment(uid, bskid, recid, cmtid):
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
     return errors
 
-def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
+def perform_request_add(uid, recids=[], colid=0, bskids=[], es_title='', es_desc='', es_url='', referer='',
                         new_basket_name='', new_topic_name='', create_in_topic='',
                         ln=CFG_SITE_LANG):
     """Add records to baskets
@@ -419,6 +421,9 @@ def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
     @param colid: in case of external collections, the id of the collection the records belong to
     @param bskids: list of baskets to add records to. if not provided, will return a
                    page where user can select baskets
+    @param es_title: the title of the external source
+    @param es_desc: the description of the external source
+    @param es_url: the url of the external source
     @param referer: URL of the referring page
     @param new_basket_name: add record to new basket
     @param new_topic_name: new basket goes into new topic
@@ -437,7 +442,11 @@ def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
         # local records
         for recid in recids:
             recid = int(recid)
-            if record_exists(recid) == 1:
+            if recid > 0 and record_exists(recid) == 1:
+                validated_recids.append(recid)
+            elif recid < 0:
+                # if we are copying a record, colid will always be 0 but we may still get negative recids
+                # in that case, we just skip the checking and add them directly to the validated_recids
                 validated_recids.append(recid)
 
         user_info = collect_user_info(uid)
@@ -451,11 +460,38 @@ def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
         # external records, no need to validate
         validated_recids = recids
     elif colid == -1:
-        # external url / resource.
-        # TODO: how to handle?
-        pass
+        # external source
+        es_errors = 0
+        es_warnings = []
+        if not es_title:
+            es_warnings.append('WRN_WEBBASKET_NO_EXTERNAL_SOURCE_TITLE')
+            es_errors += 1
+        if not es_desc:
+            es_warnings.append('WRN_WEBBASKET_NO_EXTERNAL_SOURCE_DESCRIPTION')
+            es_errors += 1
+        if not es_url:
+            es_warnings.append('WRN_WEBBASKET_NO_EXTERNAL_SOURCE_URL')
+            es_errors += 1
+        else:
+            (is_valid, status, reason) = url_is_valid(es_url)
+            if not is_valid:
+                if str(status).startswith('0'):
+                    es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_0')
+                if str(status).startswith('4'):
+                    es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_4')
+                if str(status).startswith('5'):
+                    es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_5')
+                es_errors += 1
+            elif not (es_url.startswith("http://") or es_url.startswith("https://")):
+                es_url = "http://" + es_url
+        if es_errors:
+            body += webbasket_templates.tmpl_warnings(es_warnings, ln)
 
-    if not(len(validated_recids)):
+    if not recids:
+        # in case there are no record ids select assume we want to add an external source to the basket
+        colid = -1
+
+    if not validated_recids and colid >= 0:
         warnings.append('WRN_WEBBASKET_NO_RECORD')
         body += webbasket_templates.tmpl_warnings(warnings, ln)
         if referer and not(referer.find(CFG_SITE_URL) == -1):
@@ -490,6 +526,9 @@ def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
                                         CFG_WEBBASKET_SHARE_LEVELS['ADDITM'])):
                     errors.append('ERR_WEBBASKET_NO_RIGHTS')
                     return (body, errors, warnings)
+            if colid==-1:
+                es_title = cgi.escape(es_title)
+                es_desc = nl2br(cgi.escape(es_desc))
             nb_modified_baskets = db.add_to_basket(uid, validated_recids, bskids)
             body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
             body_tmp, warnings_temp, errors_tmp = perform_request_display(uid,
@@ -505,6 +544,9 @@ def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
         else:
             warnings.append('WRN_WEBBASKET_NO_BASKET_SELECTED')
             body += webbasket_templates.tmpl_warnings(warnings, ln)
+    elif len(bskids) and list(set(bskids)) == ['-1']:
+        warnings.append('WRN_WEBBASKET_NO_BASKET_SELECTED')
+        body += webbasket_templates.tmpl_warnings(warnings, ln)
 
     # Display basket_selection
     personal_baskets = db.get_all_personal_baskets_names(uid)
@@ -517,6 +559,9 @@ def perform_request_add(uid, recids=[], colid=0, bskids=[], referer='',
                                         group_baskets=group_baskets,
                                         external_baskets=external_baskets,
                                         topics=topics,
+                                        es_title=es_title,
+                                        es_desc=es_desc,
+                                        es_url=es_url,
                                         referer=referer,
                                         ln=ln)
     body += webbasket_templates.tmpl_back_link(referer, ln)
@@ -953,7 +998,7 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
          'x_nb_public': external_text}
     return out
 
-## External records functions
+## External records and sources functions
 
 def format_external_records(recids, of='hb'):
     """Given a list of external records' recids, this function returns a list of tuples
@@ -968,8 +1013,9 @@ def format_external_records(recids, of='hb'):
     formatted_records = []
 
     for records in records_grouped_by_collection:
-        external_records = fetch_and_store_external_records(records, of)
-        formatted_records.extend(external_records)
+        if records[2]:
+            external_records = fetch_and_store_external_records(records, of)
+            formatted_records.extend(external_records)
 
     return tuple(formatted_records)
 
@@ -1016,3 +1062,41 @@ def fetch_and_store_external_records(records, of="hb"):
             formatted_records.append((int(id), "There was a timeout when fetching the record."))
 
     return formatted_records
+
+# Miscellaneous helping functions
+
+def url_is_valid(url, timeout=1):
+    """Returns (True, status, reason) if the url is valid or (False, status, reason) if different."""
+
+    common_errors_list = [400, 404, 500]
+    url_tuple = urlsplit(url)
+    if not url_tuple[0]:
+        url = "http://" + url
+        url_tuple =  urlsplit(url)
+    if not url_tuple[0] and not url_tuple[1]:
+        return (False, 000, "Not Valid")
+    # HTTPConnection had the timeout parameter introduced in python 2.6
+    # for the older versions we have to get and set the default timeout
+    #old_timeout = getdefaulttimeout()
+    #setdefaulttimeout(timeout)
+    conn = HTTPConnection(url_tuple[1])
+    #setdefaulttimeout(old_timeout)
+    try:
+        conn.request("GET", url_tuple[2])
+    except:
+        return (False, 000, "Not Valid")
+    response = conn.getresponse()
+    status = response.status
+    reason = response.reason
+    if str(status).startswith('1') or str(status).startswith('2') or str(status).startswith('3'):
+        return (True, status, reason)
+    elif str(status).startswith('4') or str(status).startswith('5'):
+        if status in common_errors_list:
+            return (False, status, reason)
+        else:
+            return (True, status, reason)
+
+def nl2br(text):
+    """Replace newlines (\n) found in text with line breaks (<br />."""
+
+    return '<br />\n'.join(text.split('\n'))

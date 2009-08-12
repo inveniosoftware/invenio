@@ -622,7 +622,7 @@ class Template:
   <td class="bskcontentcol" colspan="2">
     %(content)s
     <hr />"""
-        external_url = ""
+        external_colid_url = 0
         if view_comments:
             if nb_cmt > 0:
                 out += """
@@ -632,8 +632,8 @@ class Template:
             if item[0] > 0:
                 out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a> - '
             else:
-                external_url = db.get_external_url(item[0])
-                if external_url and external_url[0][0]:
+                external_colid_url = db.get_external_colid_url(item[0])
+                if external_colid_url and external_colid_url[0][0] and external_colid_url[0][1]:
                     out += '<a class="moreinfo" href="%(ext_url)s">%(detailed_record_label)s</a> - '
             out += '\n<a class="moreinfo" href="%(siteurl)s/yourbaskets/display_item?'\
                    'bskid=%(bskid)s&amp;recid=%(recid)i&amp;'\
@@ -644,11 +644,11 @@ class Template:
             if item[0] > 0:
                 out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a>'
             else:
-                external_url = db.get_external_url(item[0])
-                if external_url and external_url[0][0]:
+                external_colid_url = db.get_external_colid_url(item[0])
+                if external_colid_url and external_colid_url[0][0] and external_colid_url[0][1]:
                     out += '<a class="moreinfo" href="%(ext_url)s">%(detailed_record_label)s</a>'
-        if external_url:
-            ext_url = external_url[0][0]
+        if external_colid_url and external_colid_url[0][0] and external_colid_url[0][1]:
+            ext_url = external_colid_url[0][1]
         else:
             ext_url = ""
         out += """
@@ -1129,6 +1129,26 @@ class Template:
               'label': _("Create new basket")}
         return out
 
+    ############################ external sources ###########################
+
+    def tmpl_es_add_box(self, es_title="", es_desc="", es_url="", ln=CFG_SITE_LANG):
+        """Adding external sources template"""
+
+        _ = gettext_set_language(ln)
+        out = """
+          <tr>
+            <td style="padding: 10 5 0 5;">%s</td>
+            <td style="padding: 10 5 0 0;"><input type="text" name="es_title" size="75" maxlength="100" value="%s" /></td>
+          </tr>
+          <tr>
+            <td style="padding: 10 5 0 5; vertical-align: top;">%s</td>
+            <td style="padding: 10 5 0 0;"><textarea name="es_desc" rows="3" cols="90">%s</textarea></td>
+          </tr>
+          <tr>
+            <td style="padding: 10 5 0 5;">%s</td>
+            <td style="padding: 10 5 0 0;"><input type="text" name="es_url" size="90" value="%s" /></td>
+          </tr>""" % (_("Title"), es_title, _("Description"), es_desc, _("URL"), es_url)
+        return out
 
     ########################## functions on baskets #########################
 
@@ -1136,7 +1156,7 @@ class Template:
                  personal_baskets,
                  group_baskets,
                  external_baskets,
-                 topics,
+                 topics, es_title, es_desc, es_url,
                  referer, ln=CFG_SITE_LANG):
         """ returns HTML for the basket selection form when adding new records
         @param recids: list of record ids
@@ -1212,6 +1232,16 @@ class Template:
                                               _("%i baskets") % len(external_baskets),
                                               external_html)
         create = self.tmpl_create_box(topics=topics, ln=ln)
+        if colid == -1:
+            es_html_form = self.tmpl_es_add_box(es_title=es_title, es_desc=es_desc, es_url=es_url, ln=ln)
+            es_field = self.__tmpl_basket_box(CFG_SITE_URL + '/img/webbasket_world.png',
+                                              _('External source'),
+                                              '',
+                                              es_html_form)
+            form_label = _("Adding external sources these baskets")
+        else:
+            es_field = ''
+            form_label =  _("Adding %i records to these baskets") % len(recids)
         out_hidden_recids = ""
         for recid in recids:
             out_hidden_recids += """<input type="hidden" name="recid" value="%s" />""" % recid
@@ -1226,8 +1256,11 @@ class Template:
   <input type="hidden" name="colid" value="%(colid)s" />
   <table style="width:100%%;">
     <tr>
-    <td style="width:50%%;vertical-align:top;">%(field1)s</td>
-    <td style="width: 50%%;vertical-align:top;">%(field2)s</td>
+      <td colspan="2" style="width:100%%;vertical-align:top;">%(external_source)s</td>
+    </tr>
+    <tr>
+      <td style="width:50%%;vertical-align:top;">%(field1)s</td>
+      <td style="width: 50%%;vertical-align:top;">%(field2)s</td>
     </tr>
     <tr>
       <td style="vertical-align:top;">%(field3)s</td>
@@ -1243,7 +1276,8 @@ class Template:
               'referer': referer,
               'out_hidden_recids': out_hidden_recids,
               'colid': colid,
-              'label': _("Adding %i records to these baskets") % len(recids),
+              'label': form_label,
+              'external_source': es_field,
               'field1': fields[0],
               'field2': fields[1],
               'field3': fields[2],
