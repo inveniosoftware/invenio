@@ -356,7 +356,7 @@ class PluginContainer(object):
                 self._plugin_map[plugin_name]['enabled'] is True:
             return self._plugin_map[plugin_name]['plugin']
         else:
-            raise KeyError('"%s" does not exists or is not correctly enabled')
+            raise KeyError('"%s" does not exists or is not correctly enabled' % plugin_name)
 
     def __contains__(self, plugin_name):
         """
@@ -632,3 +632,106 @@ def check_signature(object_name, reference_object, other_object):
         raise InvenioPluginContainerError('Error in checking signature for'
             ' "%s" as defined at "%s" (line %s): %s' %
             (object_name, sourcefile, sourceline, err))
+
+
+def create_enhanced_plugin_builder(compulsory_objects=None, optional_objects=None, other_data=None):
+    """
+    Creates a plugin_builder function suitable to extract some specific
+    objects (either compulsory or optional) and other simpler data
+
+    >>> def dummy_needed_funct1(foo, bar):
+    ...     pass
+    >>> class dummy_needed_class1:
+    ...     def __init__(self, baz):
+    ...         pass
+    >>> def dummy_optional_funct2(boo):
+    ...     pass
+    >>> create_enhanced_plugin_builder(
+    ...    compulsory_objects={
+    ...         'needed_funct1' : dummy_needed_funct1,
+    ...         'needed_class1' : dummy_needed_class1
+    ...     },
+    ...     optional_objects={
+    ...         'optional_funct2' : dummy_optional_funct2,
+    ...     },
+    ...     other_data={
+    ...         'CFG_SOME_DATA' : (str, ''),
+    ...         'CFG_SOME_INT' : (int, 0),
+    ...     })
+    <function plugin_builder at 0xb7812064>
+
+    @param compulsory_objects: map of name of an object to look for inside
+        the C{plugin_code} and a I{signature} for a class or callable. Every
+        name specified in this map B{must exists} in the plugin_code, otherwise
+        the plugin will fail to load.
+    @type compulsory_objects: dict
+    @param optional_objects: map of name of an object to look for inside
+        the C{plugin_code} and a I{signature} for a class or callable. Every
+        name specified in this map must B{can exists} in the plugin_code.
+    @type optional_objects: dict
+    @param other_data: map of other simple data that can be loaded from
+        the plugin_code. The map has the same format of the C{content}
+        parameter of L{invenio.webinterface_handler.wash_urlargd}.
+    @type other_data: dict
+    @return: a I{plugin_builder} function that can be used with the
+        C{PluginContainer} constructor. Such function will build the plugin
+        in the form of a map, where every key is one of the keys inside
+        the three maps provided as parameters and the corresponding value
+        is the expected class or callable or simple data.
+    """
+    from invenio.webinterface_handler import wash_urlargd
+    def plugin_builder(plugin_name, plugin_code):
+        """
+        Enhanced plugin_builder created by L{create_enhanced_plugin_builder}.
+
+        @param plugin_name: the name of the plugin.
+        @type plugin_name: string
+        @param plugin_code: the code of the module as just read from
+            filesystem.
+        @type plugin_code: module
+        @return: the plugin in the form of a map.
+        """
+        plugin = {}
+
+        if compulsory_objects:
+            for object_name, object_signature in compulsory_objects.iteritems():
+                the_object = getattr(plugin_code, object_name, None)
+                if the_object is None:
+                    raise InvenioPluginContainerError('Plugin "%s" does not '
+                        'contain compulsory object "%s"' % (plugin_name,
+                        object_name))
+                try:
+                    check_signature(object_name, the_object, object_signature)
+                except InvenioPluginContainerError, err:
+                    raise InvenioPluginContainerError('Plugin "%s" contains '
+                        'object "%s" with a wrong signature: %s' % (plugin_name,
+                        object_name, err))
+                plugin[object_name] = the_object
+
+        if optional_objects:
+            for object_name, object_signature in optional_objects.iteritems():
+                the_object = getattr(plugin_code, object_name, None)
+                if the_object is not None:
+                    try:
+                        check_signature(object_name, the_object, object_signature)
+                    except InvenioPluginContainerError, err:
+                        raise InvenioPluginContainerError('Plugin "%s" contains '
+                            'object "%s" with a wrong signature: %s' % (plugin_name,
+                            object_name, err))
+                    plugin[object_name] = the_object
+
+        if other_data:
+            the_other_data = {}
+            for data_name, (data_type, data_default) in other_data.iteritems():
+                the_other_data[data_name] = getattr(plugin_code, data_name, data_default)
+
+            try:
+                the_other_data = wash_urlargd(the_other_data, other_data)
+            except Exception, err:
+                raise InvenioPluginContainerError('Plugin "%s" contains other '
+                    'data with problems: %s' % (plugin_name, err))
+
+            plugin.update(the_other_data)
+        return plugin
+
+    return plugin_builder
