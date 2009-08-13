@@ -45,7 +45,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     know that key.
     eg:
     if key in ('-n', '--number'):
-        self.options['number'] = value
+        task_set_option('number', value)
         return True
     return False
     """
