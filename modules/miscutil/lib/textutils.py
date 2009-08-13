@@ -73,6 +73,15 @@ CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
     'important' : {
         'tab_num' : 1,
     },
+    'ascii' : {
+        'horiz_sep' : (u'├', u'─', u'┤'),
+        'border' : (u'┌', u'─', u'┐', u'│ ', u' │', u'└', u'─', u'┘'),
+    },
+    'ascii_double' : {
+        'horiz_sep' : (u'╠', u'═', u'╣'),
+        'border' : (u'╔', u'═', u'╗', u'║ ', u' ║', u'╚', u'═', u'╝'),
+    }
+
 }
 
 def indent_text(text,
@@ -125,6 +134,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     parameters:
         @param horiz_sep: a string that is repeated in order to produce a
             separator row between the title and the body (if needed)
+            or a tuple of three characters in the form (l, c, r)
         @param max_col: the maximum number of coulmns used by the box
             (including indentation)
         @param min_col: the symmetrical minimum number of columns
@@ -222,7 +232,10 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     bottom_border = border[5] \
         + (border[6] * mid_bottom_border_len)[:mid_bottom_border_len] \
         + border[7]
-    horiz_line = border[3] + (horiz_sep * max_col)[:max_col] + border[4]
+    if type(horiz_sep) is tuple and len(horiz_sep) == 3:
+        horiz_line = horiz_sep[0] + (horiz_sep[1] * (max_col + 2))[:(max_col + 2)] + horiz_sep[2]
+    else:
+        horiz_line = border[3] + (horiz_sep * max_col)[:max_col] + border[4]
 
     title_rows = [tab_str + border[3] + row
         + ' ' * (max_col - len(row)) + border[4] for row in title_rows]
