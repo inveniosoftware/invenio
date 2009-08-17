@@ -339,6 +339,10 @@ class Template:
                 else:
                     notification = _("no")
 
+                # we clean up the HH:MM part of lastrun, since it is always 00:00
+                lastrun = alert['lastrun'].split(',')[0]
+                created = alert['created'].split(',')[0]
+
                 out += """<tr>
                               <td style="font-style: italic">#%(index)d</td>
                               <td style="font-weight: bold; text-wrap:none;">%(alertname)s</td>
@@ -360,8 +364,8 @@ class Template:
                     'notification' : notification,
                     'basketname' : alert['basketname'] and cgi.escape(alert['basketname']) \
                                                        or "- " + _("no basket") + " -",
-                    'lastrun' : alert['lastrun'],
-                    'created' : alert['created'],
+                    'lastrun' : lastrun,
+                    'created' : created,
                     'textargs' : alert['textargs'],
                     'queryid' : alert['queryid'],
                     'basketid' : alert['basketid'],
