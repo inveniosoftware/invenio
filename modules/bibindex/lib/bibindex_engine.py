@@ -470,7 +470,7 @@ def get_nothing_from_phrase(phrase, stemming_language=None):
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Atomically swap reindexed temporary table with the original one.
     Delete the now-old one."""
-    write_message("Swapping re-indexing tables for id %s" % index_id, verbose=2)
+    write_message("Putting new tmp index tables for id %s into production" % index_id)
     run_sql(
         "RENAME TABLE " +
         "idxWORD%02dR TO old_idxWORD%02dR," % (index_id, index_id) +
@@ -482,13 +482,13 @@ def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
         "idxPHRASE%02dF TO old_idxPHRASE%02dF," % (index_id, index_id) +
         "%sidxPHRASE%02dF TO idxPHRASE%02dF;" % (reindex_prefix, index_id, index_id)
     )
-    write_message("Dropping old re-indexed tables for id %s" % index_id, verbose=2)
+    write_message("Dropping old index tables for id %s" % index_id)
     run_sql("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id)
     )
 
 def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Create reindexing temporary tables."""
-    write_message("Creating new re-indexing tables for id %s" % index_id, verbose=2)
+    write_message("Creating new tmp index tables for id %s" % index_id)
     res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxWORD%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term varchar(50) default NULL,
