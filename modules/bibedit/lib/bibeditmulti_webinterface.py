@@ -29,6 +29,8 @@ if sys.hexversion < 0x2060000:
         # Okay, no Ajax app will be possible, but continue anyway,
         # since this package is only recommended, not mandatory.
         pass
+else:
+    import json
 
 from invenio.bibedit_utils import json_unicode_to_utf8
 

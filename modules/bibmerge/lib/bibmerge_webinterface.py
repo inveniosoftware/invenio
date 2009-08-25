@@ -30,6 +30,8 @@ if sys.hexversion < 0x2060000:
         # Okay, no Ajax app will be possible, but continue anyway,
         # since this package is only recommended, not mandatory.
         pass
+else:
+    import json
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL

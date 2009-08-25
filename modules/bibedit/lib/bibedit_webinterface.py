@@ -32,6 +32,7 @@ if sys.hexversion < 0x2060000:
         # since this package is only recommended, not mandatory.
         simplejson_available = False
 else:
+    import json
     simplejson_available = True
 
 from invenio.access_control_engine import acc_authorize_action
