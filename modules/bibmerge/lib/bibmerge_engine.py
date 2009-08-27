@@ -25,15 +25,20 @@ from invenio.config import CFG_SITE_URL
 from invenio.bibmerge_merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
                                     add_subfield, replace_subfield, \
-                                    delete_subfield
-from invenio.search_engine import print_record, perform_request_search
+                                    delete_subfield, copy_R2_to_R1, merge_record
+from invenio.search_engine import print_record, perform_request_search, \
+                                  get_fieldvalues
 from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_cache_file_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
-    update_cache_file_contents, get_bibrecord
+    update_cache_file_contents, get_bibrecord, _get_file_path, \
+    get_record_revision_ids, revision_format_valid_p, split_revid, \
+    get_marcxml_of_revision_id
+from invenio.htmlutils import remove_html_markup
 from invenio.search_engine import record_exists, search_pattern
-from invenio.bibrecord import create_record
+from invenio.bibrecord import create_record, record_xml_output, record_add_field
+from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 
 import invenio.template
 bibmerge_templates = invenio.template.load('bibmerge')
@@ -53,26 +58,72 @@ def perform_request_init():
 
     return body, errors, warnings
 
-def perform_record_compare(recid1, recid2):
-    """First comparison of two records."""
-    rec1 = create_record(print_record(recid1, 'xm'))[0]
-    rec2 = create_record(print_record(recid2, 'xm'))[0]
-    return bibmerge_templates.BM_html_all_diff(rec1, rec2)
+def perform_request_ajax(req, uid, data):
+    """Ajax request dispatcher.\
+    """
+    requestType = data['requestType']
 
-def perform_candidate_record_search(query):
-    """Handle search requests."""
-    search_results = perform_request_search( p=query )
-    max_results = 1000
-    htmlresults = ""
-    if len(search_results) <= max_results:
-        for recid in search_results:
-            htmlresults += "\n<option>%s</option>" % recid
+    if requestType in ('getRecordCompare', 'submit', 'cancel', 'recCopy', \
+           'recMerge', 'recMergeNC'):
+        return perform_request_record(requestType, uid, data)
 
-    return { "results": htmlresults,
-             "resultsLen": len(search_results),
-             "resultsMaxLen": max_results }
+    elif requestType in ('getFieldGroup', 'getFieldGroupDiff', \
+           'mergeFieldGroup', 'mergeNCFieldGroup', 'replaceField', 'addField', \
+           'deleteField', 'mergeField'):
+        return perform_request_update_record(requestType, uid, data)
 
-def perform_request_record(req, requestType, recid1, recid2, uid):
+    elif requestType in ('deleteSubfield', 'addSubfield', 'replaceSubfield',  \
+           'diffSubfield'):
+        return perform_small_request_update_record(requestType, uid, data)
+
+    elif requestType == "searchCandidates" or requestType == "searchRevisions":
+        return perform_candidate_record_search(requestType, data)
+
+    else:
+        return { 'resultCode': 1, 'resultText': 'Error unknown' }
+
+def perform_candidate_record_search(requestType, data):
+    """Handle search requests.
+    """
+    max_results = 999
+    too_many = False
+    result = {
+        'resultCode': 0,
+        'resultText': ''
+        }
+    if requestType == "searchCandidates":
+        recids = perform_request_search( p=data['query'] )
+        if len(recids) > max_results:
+            too_many = True
+        else:
+            captions = [ search_result_info(x) for x in recids ]
+            alternative_titles = [ remove_html_markup(print_record(x, "hs")) for x in recids ]
+            search_results = [recids, captions, alternative_titles]
+    elif requestType == "searchRevisions":
+        revisions = get_record_revision_ids( data['recID1'] )
+        captions = [ split_revid(x, 'datetext')[1] for x in revisions ]
+        search_results = [revisions, captions]
+
+    if too_many == True:
+        result['resultCode'] = 1
+        result['resultText'] = 'Too many results'
+    else:
+        result['results'] = search_results
+        result['resultText'] = '%s results' % len(search_results[0])
+
+    return result
+
+def search_result_info(recid):
+    """Return report number of a record or if it doen't exist return the recid
+    itself.
+    """
+    report_numbers = get_fieldvalues(recid, '037__a')
+    if len(report_numbers) == 0:
+        return "#"+str(recid)
+    else:
+        return report_numbers[0]
+
+def perform_request_record(requestType, uid, data):
     """Handle 'major' record related requests.
     Handle retrieving, submitting or cancelling the merging session.
     """
@@ -81,65 +132,66 @@ def perform_request_record(req, requestType, recid1, recid2, uid):
         'resultCode': 0,
         'resultText': ''
         }
+    recid1 = data["recID1"]
+    record1 = _get_record(recid1, uid, result)
+    if result['resultCode'] != 0: #if record not accessible return error information
+        return result
 
-    if requestType == 'getRecordCompare':
-        record1, result = get_record(recid1, uid, result)
-        if result['resultCode'] != 0:
-            return result
-        record2 = get_bibrecord(recid2)
-        if result['resultCode'] != 0:
-            return result
-        result['resultHtml'] = bibmerge_templates.BM_html_all_diff(record1, record2)
-        result['resultText'] = 'Records compared'
+    if requestType == 'submit':
+        if data.has_key('duplicate'):
+            recid2 = data['duplicate']
+            record2 = _get_record_slave(recid2, result, 'recid', uid)
+            if result['resultCode'] != 0: #return in case of error
+                return result
+            # mark record2 as deleted
+            record_add_field(record2, '980', ' ', ' ', '', [('c', 'DELETED')])
+            # mark record2 as duplicate of record1
+            record_add_field(record2, '970', ' ', ' ', '', [('d', str(recid1))])
+            #submit record2
+            xml_record = record_xml_output(record2)
+            save_xml_record(recid2, uid, xml_record)
 
-    elif requestType == 'submit':
+        #submit record1
         save_xml_record(recid1, uid)
         result['resultText'] = 'Record submitted'
+        return result
 
     elif requestType == 'cancel':
         delete_cache_file(recid1, uid)
         result['resultText'] = 'Cancelled'
+        return result
+
+    recid2 = data["recID2"]
+    mode = data['record2Mode']
+    record2 = _get_record_slave(recid2, result, mode, uid)
+    if result['resultCode'] != 0: #if record not accessible return error information
+        return result
+
+    if requestType == 'getRecordCompare':
+        result['resultHtml'] = bibmerge_templates.BM_html_all_diff(record1, record2)
+        result['resultText'] = 'Records compared'
+
+    elif requestType == 'recCopy':
+        copy_R2_to_R1(record1, record2)
+        result['resultHtml'] = bibmerge_templates.BM_html_all_diff(record1, record2)
+        result['resultText'] = 'Record copied'
+
+    elif requestType == 'recMerge':
+        merge_record(record1, record2, merge_conflicting_fields=True)
+        result['resultHtml'] = bibmerge_templates.BM_html_all_diff(record1, record2)
+        result['resultText'] = 'Records merged'
+
+    elif requestType == 'recMergeNC':
+        merge_record(record1, record2, merge_conflicting_fields=False)
+        result['resultHtml'] = bibmerge_templates.BM_html_all_diff(record1, record2)
+        result['resultText'] = 'Records merged'
+
     else:
         result['resultCode'], result['resultText'] = 1, 'Wrong request type'
 
     return result
 
-def get_record(recid, uid, result, fresh_record=False):
-    record = {}
-    mtime = None
-    cache_dirty = None
-    record_status = record_exists(recid)
-    existing_cache = cache_exists(recid, uid)
-    if record_status == 0:
-        result['resultCode'], result['resultText'] = 1, 'Non-existent record: %s' % recid
-    elif record_status == -1:
-        result['resultCode'], result['resultText'] = 1, 'Deleted record: %s' % recid
-    elif not existing_cache and record_locked_by_other_user(recid, uid):
-        result['resultCode'], result['resultText'] = 1, 'Record %s locked by user' % recid
-    elif existing_cache and cache_expired(recid, uid) and \
-        record_locked_by_other_user(recid, uid):
-        result['resultCode'], result['resultText'] = 1, 'Record %s locked by user' % recid
-    elif record_locked_by_queue(recid):
-        result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
-    else:
-        if fresh_record:
-            delete_cache_file(recid, uid)
-            existing_cache = False
-        if not existing_cache:
-            record_revision, record = create_cache_file(recid, uid)
-            mtime = get_cache_mtime(recid, uid)
-            cache_dirty = False
-        else:
-            cache_dirty, record_revision, record = \
-                 get_cache_file_contents(recid, uid)
-            touch_cache_file(recid, uid)
-            mtime = get_cache_mtime(recid, uid)
-            if not latest_record_revision(recid, record_revision):
-                result['cacheOutdated'] = True
-        result['resultCode'], result['resultText'], result['cacheDirty'], result['cacheMTime'] = 0, 'Record OK', cache_dirty, mtime
-    return record, result
-
-def perform_request_update_record(requestType, recid1, recid2, uid, data):
+def perform_request_update_record(requestType, uid, data):
     """Handle record update requests for actions on a field level.
     Handle merging, adding, or replacing of fields.
     """
@@ -147,8 +199,13 @@ def perform_request_update_record(requestType, recid1, recid2, uid, data):
         'resultCode': 0,
         'resultText': ''
         }
+    recid1 = data["recID1"]
+    recid2 = data["recID2"]
     cache_dirty, rec_revision, record1 = get_cache_file_contents(recid1, uid) #TODO: check mtime, existence
-    record2 = get_bibrecord(recid2) #TODO: replace with get_slave_rec
+    mode = data['record2Mode']
+    record2 = _get_record_slave(recid2, result, mode, uid)
+    if result['resultCode'] != 0: #if record not accessible return error information
+        return result
 
     if requestType == 'getFieldGroup':
         result['resultHtml'] = bibmerge_templates.BM_html_field_group(record1, record2, data['fieldTag'])
@@ -209,7 +266,7 @@ def perform_request_update_record(requestType, recid1, recid2, uid, data):
     update_cache_file_contents(recid1, uid, rec_revision, record1)
     return result
 
-def perform_small_request_update_record(requestType, data, uid):
+def perform_small_request_update_record(requestType, uid, data):
     """Handle record update requests for actions on a subfield level.
     Handle adding, replacing or deleting of subfields.
     """
@@ -221,7 +278,10 @@ def perform_small_request_update_record(requestType, data, uid):
     recid1 = data["recID1"]
     recid2 = data["recID2"]
     cache_dirty, rec_revision, record1 = get_cache_file_contents(recid1, uid) #TODO: check mtime, existence
-    record2 = get_bibrecord(recid2) #TODO: replace with get_slave_rec
+    mode = data['record2Mode']
+    record2 = _get_record_slave(recid2, result, mode, uid)
+    if result['resultCode'] != 0: #if record not accessible return error information
+        return result
 
     ftag, findex1 = _field_info(data['fieldCode1'])
     fnum = ftag[:3]
@@ -245,6 +305,88 @@ def perform_small_request_update_record(requestType, data, uid):
     update_cache_file_contents(recid1, uid, rec_revision, record1)
     return result
 
+def _get_record(recid, uid, result, fresh_record=False):
+    """Retrieve record structure.
+    """
+    record = None
+    mtime = None
+    cache_dirty = None
+    record_status = record_exists(recid)
+    existing_cache = cache_exists(recid, uid)
+    if record_status == 0:
+        result['resultCode'], result['resultText'] = 1, 'Non-existent record: %s' % recid
+    elif record_status == -1:
+        result['resultCode'], result['resultText'] = 1, 'Deleted record: %s' % recid
+    elif not existing_cache and record_locked_by_other_user(recid, uid):
+        result['resultCode'], result['resultText'] = 1, 'Record %s locked by user' % recid
+    elif existing_cache and cache_expired(recid, uid) and \
+        record_locked_by_other_user(recid, uid):
+        result['resultCode'], result['resultText'] = 1, 'Record %s locked by user' % recid
+    elif record_locked_by_queue(recid):
+        result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
+    else:
+        if fresh_record:
+            delete_cache_file(recid, uid)
+            existing_cache = False
+        if not existing_cache:
+            record_revision, record = create_cache_file(recid, uid)
+            mtime = get_cache_mtime(recid, uid)
+            cache_dirty = False
+        else:
+            cache_dirty, record_revision, record = \
+                 get_cache_file_contents(recid, uid)
+            touch_cache_file(recid, uid)
+            mtime = get_cache_mtime(recid, uid)
+            if not latest_record_revision(recid, record_revision):
+                result['cacheOutdated'] = True
+        result['resultCode'], result['resultText'], result['cacheDirty'], result['cacheMTime'] = 0, 'Record OK', cache_dirty, mtime
+    return record
+
+def _get_record_slave(recid, result, mode=None, uid=None):
+    """Check if record exists and return it in dictionary format.
+       If any kind of error occurs returns None.
+       If mode=='revision' then recid parameter is considered as revid."""
+    record = None
+    if recid == 'none':
+        mode = 'none'
+    if mode == 'recid':
+        record_status = record_exists(recid)
+        #check for errors
+        if record_status == 0:
+            result['resultCode'], result['resultText'] = 1, 'Non-existent record: %s' % recid
+        elif record_status == -1:
+            result['resultCode'], result['resultText'] = 1, 'Deleted record: %s' % recid
+        elif record_locked_by_queue(recid):
+            result['resultCode'], result['resultText'] = 1, 'Record %s locked by queue' % recid
+        else:
+            record = create_record( print_record(recid, 'xm') )[0]
+
+    elif mode == 'tmpfile':
+        file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
+                                       CFG_BIBEDIT_TO_MERGE_SUFFIX)
+        if not os.path.isfile(file_path): #check if file doesn't exist
+            result['resultCode'], result['resultText'] = 1, 'Temporary file doesnt exist'
+        else: #open file
+            tmpfile = open(file_path, 'r')
+            record = create_record( tmpfile.read() )[0]
+            tmpfile.close()
+
+    elif mode == 'revision':
+        if revision_format_valid_p(recid):
+            marcxml = get_marcxml_of_revision_id(recid)
+            if marcxml:
+                record = create_record(marcxml)[0]
+            else:
+                result['resultCode'], result['resultText'] = 1, 'The specified revision does not exist'
+        else:
+            result['resultCode'], result['resultText'] = 1, 'Invalid revision id'
+
+    elif mode == 'none':
+        return {}
+
+    else:
+        result['resultCode'], result['resultText'] = 1, 'Invalid record mode for record2'
+    return record
 
 def _field_info(fieldIdCode):
     """Returns a tuple: (field-tag, field-index)

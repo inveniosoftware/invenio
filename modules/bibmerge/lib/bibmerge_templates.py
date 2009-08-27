@@ -37,54 +37,115 @@ class Template:
         panel = """
 <div id="bibMergePanel">
 
-  <div>
-    <table>
-    <tr>
-    <td width="80px">Record1:</td>
-    <td> <input type="text" class="bibMergeRecNumInput" id="bibMergeRecInput1"></input> </td>
-    </tr>
-    <tr>
-    <td width="80px">Record2:</td>
-    <td> <input type="text" class="bibMergeRecNumInput" id="bibMergeRecInput2"></input> </td>
-    </tr>
-    <tr>
-    <td colspan="2"> <button type="button" id="bibMergeBtnCompare">Compare</button> </td>
-    </tr>
-    <tr>
-    <td width="80px">Method:</td>
-    <td id="bibMergeMethodSelect">
-      <select>
-      <option>(none)</option>
-      <option>Search</option>
-      <option>Revisions</option>
-      </select>
-    </td>
-    </tr>
-    </table>
+  <div id="bibMergeMessage">
   </div>
-  <div id="bibMergeSearchPanel">
+
+  <div class="bibMergeMenuSection" id="bibMergeMenuSectionSelectRecords">
+    <div class="bibMergeMenuSectionHeader">
+      <img class="bibMergeImgCompressMenuSelection" src="/img/bullet_toggle_minus.png" />
+      Select records
+    </div>
     <table>
-    <tr>
-    <td> <input type="text" id="bibMergeSearchInput"></input> </td>
-    <td> <a href="#" class="bibMergeImgClickable" id="bibMergeBtnSearch">
-           <img src="/img/search.png" /> </a>
-    </td>
-    </tr>
-    </table>
-    <select id="bibMergeSelectList" size="4">
-    </select>
-  </div>
-  <div id="bibMergeCommands">
-    <table>
-    <tr>
-    <td> <button type="button" id="bibMergeBtnSubmit">Submit</button> </td>
-    <td> <button type="button" id="bibMergeBtnCancel">Cancel</button> </td>
-    </tr>
+      <col width="62px"></col>
+      <col width="110px"></col>
+      <tr>
+      <td>Record1:</td>
+      <td> <input type="text" class="bibMergeRecNumInput" id="bibMergeRecInput1"></input> </td>
+      </tr>
+      <tr>
+      <td>Record2:</td>
+      <td> <input type="text" class="bibMergeRecNumInput" id="bibMergeRecInput2"></input> </td>
+      </tr>
     </table>
   </div>
 
-  <div id="bibMergeMessage">
+  <div class="bibMergeMenuSection" id="bibMergeMenuSectionCandidates">
+    <div class="bibMergeMenuSectionHeader">
+      <img class="bibMergeImgCompressMenuSelection" src="/img/bullet_toggle_minus.png" />
+      Candidates
+    </div>
+    <table>
+      <col width="32px"></col>
+      <col width="70px"></col>
+      <col width="30px"></col>
+      <col width="40px"></col>
+      <tr>
+      <td colspan="4"> <a id="bibMergeSelectSearch" href="#">Search</a> / <a id="bibMergeSelectDedupe" href="#">Dedupe</a> / <a id="bibMergeSelectRevisions" href="#">Revisions</a> </td>
+      </tr>
+      <tr id="bibMergeSearchRow">
+      <td colspan="3"> <input type="text" id="bibMergeSearchInput"></input> </td>
+      <td> <a href="#" class="bibMergeImgClickable" id="bibMergeBtnSearch" title="search candidate records">
+           <img src="/img/search.png" /> </a>
+      </td>
+      </tr>
+      <tr id="bibMergeSelectListRow">
+      <td colspan="4">
+        <select id="bibMergeSelectList" size="4">
+        </select></td>
+      </tr>
+      <tr>
+      <td style="text-align:center;"> <button type="button" id="bibMergeGetPrev">&lt</button> </td>
+      <td id="bibMergeResultIndex" style="text-align:center;">-/-</td>
+      <td style="text-align:center;"> <button type="button" id="bibMergeGetNext">&gt</button> </td>
+      <td> </td>
+      </tr>
+    </table>
   </div>
+  
+  <div class="bibMergeMenuSection" id="bibMergeMenuSectionActions">
+    <div class="bibMergeMenuSectionHeader">
+      <img class="bibMergeImgCompressMenuSelection" src="/img/bullet_toggle_minus.png" />
+      Actions
+    </div>
+    <table>
+      <col width="20px"></col>
+      <col width="152px"></col>
+      <tr>
+      <td> <a id="bibMergeRecCopy" class="bibMergeImgClickable" href="#" title="Copy R2 to R1"><img src="/img/move.png" /></a> </td>
+      <td>Copy record</td>
+      </tr>
+      <tr>
+      <td> <a id="bibMergeRecMerge" class="bibMergeImgClickable" href="#" title="Merge R1 with R2"><img src="/img/merge.png" /></a>
+      </td>
+      <td>Merge</td>
+      </tr>
+      <tr>
+      <td> <a id="bibMergeRecMergeNC" class="bibMergeImgClickable" href="#" title="Merge R1 with R2 but only non-conflicting fields"><img src="/img/mergeNC.png" /></a> </td>
+      <td>Merge non-conflicting</td>
+      </tr>
+      <tr>
+      <td colspan="2"> <a id="bibMergeLinkToBibEdit1" href="#" title="Record editor for master record">Edit master record</a> </td>
+      </tr>
+      <tr>
+      <td colspan="2"> <a id="bibMergeLinkToBibEdit2" href="#" title="Record editor for slave record">Edit slave record</a> </td>
+      </tr>
+    </table>
+  </div>
+  
+  <div class="bibMergeMenuSection" id="bibMergeMenuSectionSubmission">
+    <div class="bibMergeMenuSectionHeader">
+      <img class="bibMergeImgCompressMenuSelection" src="/img/bullet_toggle_minus.png" />
+      Submission
+    </div>
+    <table>
+      <col width="72px"></col>
+      <col width="10px"></col>
+      <col width="90px"></col>
+      <tr>
+      <td> <button type="button" id="bibMergeBtnCancel">Cancel</button> </td>
+      <td colspan="2">  </td>
+      </tr>
+      <tr>
+      <td colspan="3"><br /></td>
+      </tr>
+      <tr>
+      <td> <button type="button" id="bibMergeBtnSubmit">Submit</button> </td>
+      <td> <input type="checkbox" id="bibMergeDupeCheckbox"></input> </td>
+      <td>candidate record is duplicate</td>
+      </tr>
+    </table>
+  </div>
+
 </div>"""
         return panel
 
@@ -207,7 +268,7 @@ def BM_html_field_group_div(tagnum, ind1, ind2, rec1, rec2, show_diffs, fdiff_li
     result = """
 <div id="bibMergeFGroup-%s" class="bibMergeFieldGroupDiv">
   <div class="bibMergeFieldGroupHeaderDiv">
-    <a href="#" class="bibMergeHeaderFieldnum">%s</a> <a class="bibMergeFieldGroupRefresh" href="#"><img src="/img/refresh.png" /></a> <a class="bibMergeFieldGroupMerge" href="#"><img src="/img/merge.png" /></a> <a class="bibMergeFieldGroupMergeNC" href="#"><img src="/img/mergeNC.png" /></a>
+    <a href="#" class="bibMergeHeaderFieldnum">%s</a> <a class="bibMergeFieldGroupRefresh" href="#" title="refresh fields"><img src="/img/refresh.png" /></a> <a class="bibMergeFieldGroupMerge" href="#" title="merge fields"><img src="/img/merge.png" /></a> <a class="bibMergeFieldGroupMergeNC" href="#" title="merge non-conflicting fields"><img src="/img/mergeNC.png" /></a>
   </div>
   <table class="bibMergeFieldTable">
     <col span="1" class="bibMergeColSubfieldTag"/>
@@ -254,12 +315,12 @@ def BM_html_field_header(ftag, flist1, findex1, flist2, findex2, show_diffs, sfd
       <td></td>
       <td %(id1)s class="bibMergeColHeaderLeft">
         <span style="float:left;">%(tagname)s</span>
-        <a class="bibMergeFieldMerge" href="#"> <img src="/img/merge-small.png" /> </a>
-        <a class="bibMergeFieldDelete" href="#"> <img src="/img/delete-big.png" /> </a> </td>
+        <a class="bibMergeFieldMerge" href="#" title="merge subfields"> <img src="/img/merge-small.png" /> </a>
+        <a class="bibMergeFieldDelete" href="#" title="delete field"> <img src="/img/delete-big.png" /> </a> </td>
       <td></td>
       <td %(id2)s class="bibMergeColHeaderRight">
-        <a class="bibMergeFieldAdd" href="#"> <img src="/img/add.png" /> </a>
-        <a class="bibMergeFieldReplace" href="#"> <img src="/img/replace.png" /> </a>
+        <a class="bibMergeFieldAdd" href="#" title="add field"> <img src="/img/add.png" /> </a>
+        <a class="bibMergeFieldReplace" href="#" title="replace field"> <img src="/img/replace.png" /> </a>
         <span style="float:right;">%(tagname)s</span> </td>
       <td></td>
     </tr>
@@ -325,9 +386,9 @@ def BM_html_subfield(ftag, sftag, value1, value2, score, findex1, sfindex1, find
     <tr>
       <td class="%s">$%s</td>
       <td><div>%s</div></td>
-      <td><a class="bibMergeSubfieldDelete" href="#"> <img src="/img/delete-small.png" /> </a><a class="bibMergeSubfieldReplace" href="#"> <img src="/img/move.png" /> </a><a class="bibMergeSubfieldAdd" href="#"> <img src="/img/add-small.png" /> </a></td>
+      <td><a class="bibMergeSubfieldDelete" href="#" title="delete subfield"> <img src="/img/delete-small.png" /> </a><a class="bibMergeSubfieldReplace" href="#" title="move subfield"> <img src="/img/move.png" /> </a><a class="bibMergeSubfieldAdd" href="#" title="add subfield"> <img src="/img/add-small.png" /> </a></td>
       <td><div>%s</div></td>
-      <td><a class="bibMergeFieldGroupDiff" href="#"><img src="/img/diff.png" /></a></td>
+      <td><a class="bibMergeFieldGroupDiff" href="#" title="show differences"><img src="/img/diff.png" /></a></td>
     </tr>""" % (similarity_class, sftag, value1, value2)
 
 def BM_field_id(record_position, ftag, findex): #record_position = 1 | 2

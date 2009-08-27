@@ -19,11 +19,13 @@
 
 var gRecID1 = null;
 var gRecID2 = null;
-var gSelectedSubfield = null;
-var gSelectRecordMode = 0; //O:simple, 1:search, 2:revisions
+var gRecord2Mode = 'recid'; //'recid', 'file', 'revision'
 
-var gSearchResults = null;
-var gSearchResultsIndex = 0;
+var gResultListMode = 'search'; //null, 'search', 'revisions'
+var gSearchResults = [[], [], []];
+var gSearchResultsIndex = -1;
+var gRevisions = [[], []];
+var gRevisionsIndex = -1;
 
 var gHash;
 var gHASH_CHECK_INTERVAL = 150;
@@ -34,11 +36,7 @@ $(document).ready( function(){
   initAJAX();
   initPanel();
   initContent();
-//  initStateFromHash();
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
-//  defaultBehaviour();
-//  $(document).bind('keydow.parent()n', 'Ctrl+f1', copySubfield);
-//  $(document).bind('keydown', 'Ctrl+f2', pasteSubfield);
 });
 
 function showMessage(msgType, message, timeToHide) {
@@ -47,12 +45,13 @@ function showMessage(msgType, message, timeToHide) {
   $('#bibMergeMessage').removeClass();
   if (msgType == 'LoadingMsg') {
     message = message + '  <img src="/img/loading.gif" />';
+    $('#bibMergeMessage').addClass('warning');
   }
   else if (msgType == 'OKMsg') {
-    $('#bibMergeMessage').addClass('bibMergeMessageOK');
+    $('#bibMergeMessage').addClass('warninggreen');
   }
   else if (msgType == 'ErrorMsg') {
-    $('#bibMergeMessage').addClass('bibMergeMessageError');
+    $('#bibMergeMessage').addClass('warningred');
   }
   //$('#bibMergeMessage').html(message).show('drop','',500);
   $('#bibMergeMessage').html(message).show();
@@ -71,11 +70,24 @@ function hideMessage(timeout) {
     $('#bibMergeMessage').removeClass().hide().fadeOut();
 }
 
-function isValidRecid(recid) {
+function isValidRecid1(recid) {
   var recnum = parseInt(recid);
-  if (isNaN(recnum) || recnum < 1)
+  if (isNaN(recnum) || recnum < 1 || recid.indexOf('.')>0)
     return false;
   return true;
+}
+
+function getRecid2Mode(recid) {
+  if (isValidRecid1(recid))
+    return 'recid';
+  else if ( isRevisionID(recid) )
+    return 'revision';
+  else if (recid=='tmp')
+    return 'tmpfile';
+  else if (recid=='none')
+    return 'none';
+  else
+    return false;
 }
 
 function initStateFromHash() {
@@ -88,9 +100,8 @@ function initStateFromHash() {
   }
   var parsedHash = deserializeHash(gHash);
 
-  if (parsedHash.recid1 && isValidRecid(parsedHash.recid1)==true && parsedHash.recid2 && isValidRecid(parsedHash.recid2)==true) {
+  if (parsedHash.recid1 && isValidRecid1(parsedHash.recid1)==true && parsedHash.recid2 && getRecid2Mode(parsedHash.recid2)!=false) {
     ajaxGetRecordCompare(parsedHash.recid1, parsedHash.recid2);
-    //ajaxGetRecordsFullHtml(parsedHash.recid1, parsedHash.recid2);
     return;
   }
   // if wrong parameters where given in the url:
@@ -191,6 +202,7 @@ function onclickSubfieldDiff() {
       requestType: 'diffSubfield',
       recID1: gRecID1,
       recID2: gRecID2,
+      record2Mode: gRecord2Mode,
       fieldCode1: sfinfo.field1id,
       fieldCode2: sfinfo.field2id,
       sfindex1: sfinfo.sfindex1,
@@ -220,6 +232,7 @@ function onclickSubfieldDelete() {
       requestType: 'deleteSubfield',
       recID1: gRecID1,
       recID2: gRecID2,
+      record2Mode: gRecord2Mode,
       fieldCode1: sfinfo.field1id,
       fieldCode2: sfinfo.field2id,
       sfindex1: sfinfo.sfindex1,
@@ -249,6 +262,7 @@ function onclickSubfieldReplace() {
       requestType: 'replaceSubfield',
       recID1: gRecID1,
       recID2: gRecID2,
+      record2Mode: gRecord2Mode,
       fieldCode1: sfinfo.field1id,
       fieldCode2: sfinfo.field2id,
       sfindex1: sfinfo.sfindex1,
@@ -285,6 +299,7 @@ function onclickSubfieldAdd() {
       requestType: 'addSubfield',
       recID1: gRecID1,
       recID2: gRecID2,
+      record2Mode: gRecord2Mode,
       fieldCode1: sfinfo.field1id,
       fieldCode2: sfinfo.field2id,
       sfindex1: sfinfo.sfindex1,
@@ -313,6 +328,7 @@ function onclickFieldMerge() {
     requestType: 'mergeField',
     recID1: gRecID1,
     recID2: gRecID2,
+    record2Mode: gRecord2Mode,
     fieldTag: ftag,
     fieldCode1: fieldID1,
     fieldCode2: fieldID2
@@ -339,6 +355,7 @@ function onclickFieldDelete() {
     requestType: 'deleteField',
     recID1: gRecID1,
     recID2: gRecID2,
+    record2Mode: gRecord2Mode,
     fieldTag: ftag,
     fieldCode1: fieldID1,
     fieldCode2: fieldID2
@@ -365,6 +382,7 @@ function onclickFieldAdd() {
     requestType: 'addField',
     recID1: gRecID1,
     recID2: gRecID2,
+    record2Mode: gRecord2Mode,
     fieldTag: ftag,
     fieldCode1: fieldID1,
     fieldCode2: fieldID2
@@ -390,6 +408,7 @@ function onclickFieldReplace() {
     requestType: 'replaceField',
     recID1: gRecID1,
     recID2: gRecID2,
+    record2Mode: gRecord2Mode,
     fieldTag: ftag,
     fieldCode1: fieldID1,
     fieldCode2: fieldID2
@@ -418,6 +437,7 @@ function onclickFieldGroupMerge() {
     requestType: mergeType,
     recID1: gRecID1,
     recID2: gRecID2,
+    record2Mode: gRecord2Mode,
     fieldTag: ftag
   };
   showMessage('LoadingMsg', 'Merging...');
@@ -444,6 +464,7 @@ function onclickFieldGroupRefresh() {
     requestType: refType,
     recID1: gRecID1,
     recID2: gRecID2,
+    record2Mode: gRecord2Mode,
     fieldTag: ftag
   };
   showMessage('LoadingMsg', 'Please wait...');
@@ -471,30 +492,318 @@ function initFieldGroupHeaders(selector) {
 }
 
 function initPanel() {
-  //deactivatePanel();
+  $('#bibMergeRecInput1').focus();
   $('#bibMergeMessage').hide();
-  $('#bibMergeSearchPanel').hide();
-  $('#bibMergeBtnCompare').click(onclickCompareButton);
+  onclickSelectSearch();
+  $('#bibMergeSelectSearch').click(onclickSelectSearch);
+  $('#bibMergeSelectDedupe').click(onclickSelectDedupe);
+  $('#bibMergeSelectRevisions').click(onclickSelectRevisions);
+  $('#bibMergeGetPrev').click(onclickGetPrev);
+  $('#bibMergeGetNext').click(onclickGetNext);
+  $('#bibMergeBtnCompare').click(compareRecords);
   $('#bibMergeBtnSubmit').click(onclickSubmitButton);
   $('#bibMergeBtnCancel').click(onclickCancelButton);
   $('#bibMergeBtnSearch').click(onclickSearchButton);
-  $('#bibMergeMethodSelect').change(onchangeMethodSelect);
+  $('#bibMergeRecCopy').click(onclickRecCopy);
+  $('#bibMergeRecMerge').click(onclickRecMerge);
+  $('#bibMergeRecMergeNC').click(onclickRecMergeNC);
+  $('#bibMergeLinkToBibEdit1').click(onclickLinkToBibEdit1);
+  $('#bibMergeLinkToBibEdit2').click(onclickLinkToBibEdit2);
+  $('.bibMergeMenuSectionHeader').toggle(menuSectionHeaderClose, menuSectionHeaderOpen);
+//  $('#bibMergeMethodSelect').change(onchangeMethodSelect);
   onchangeMethodSelect();
-  $('#bibMergeSelectList option').live('click', onclickSearchResult);
+  $('#bibMergeSelectListRow select option').live('click', onclickSearchResult);
   // Initialize menu positioning (poll for scrolling).
   setInterval(positionMenu, 250);
+  $('#bibMergeRecInput1').keypress( function(event) {
+    if (event.keyCode == 13) //on press 'enter'
+      $('#bibMergeRecInput2').focus();
+  });
+  $('#bibMergeRecInput2').keypress( function(event) {
+    if (event.keyCode == 13) //on press 'enter'
+      compareRecords();
+  });
+  $('#bibMergeSearchInput').keypress( function(event) {
+    if (event.keyCode == 13) //on press 'enter'
+      $('#bibMergeBtnSearch').click();
+  });
+  $('#bibMergeMenuSectionCandidates div.bibMergeMenuSectionHeader').click();
+  $('#bibMergeMenuSectionActions div.bibMergeMenuSectionHeader').click();
+}
+function menuSectionHeaderOpen() {
+  $(this).parents('div.bibMergeMenuSection').find('table').show();
+  $(this).find('img').attr('src', "/img/bullet_toggle_minus.png");
+}
+function menuSectionHeaderClose() {
+  $(this).parents('div.bibMergeMenuSection').find('table').hide();
+  $(this).find('img').attr('src', "/img/bullet_toggle_plus.png");
+}
+
+function onclickRecCopy() {
+  var answer = confirm("Do you want to replace all fields of record1 with those of record2?");
+  if (!answer)
+    return false;
+
+  var _data = {
+    requestType: 'recCopy',
+    recID1: gRecID1,
+    recID2: gRecID2,
+    record2Mode: gRecord2Mode
+  };
+  showMessage('LoadingMsg', 'Copying record2 to record1');
+  ajaxRequest(_data, function(html){
+    $('#bibMergeContent').html(html);
+    initFieldGroupHeaders('.bibMergeHeaderFieldnum'); //initialize all of them
+  });
+  return false;
+}
+function onclickRecMerge() {
+  var answer = confirm("Do you want to merge fields of record1 and record2 into record1?");
+  if (!answer)
+    return false;
+
+  var _data = {
+    requestType: 'recMerge',
+    recID1: gRecID1,
+    recID2: gRecID2,
+    record2Mode: gRecord2Mode
+  };
+  showMessage('LoadingMsg', 'Merging record2 with record1');
+  ajaxRequest(_data, function(html){
+    $('#bibMergeContent').html(html);
+    initFieldGroupHeaders('.bibMergeHeaderFieldnum'); //initialize all of them
+  });
+  return false;
+}
+
+function onclickRecMergeNC() {
+  var answer = confirm("Do you want to merge non-conflicting fields of record1 and record2 into record1?");
+  if (!answer)
+    return false;
+
+  var _data = {
+    requestType: 'recMergeNC',
+    recID1: gRecID1,
+    recID2: gRecID2,
+    record2Mode: gRecord2Mode
+  };
+  showMessage('LoadingMsg', 'Merging record2 with record1');
+  ajaxRequest(_data, function(html){
+    $('#bibMergeContent').html(html);
+    initFieldGroupHeaders('.bibMergeHeaderFieldnum'); //initialize all of them
+  });
+  return false;
+}
+
+function buildSelectList(mode) {
+  var _list = null;
+  var _tmp;
+  var _optionsHtml = "";
+  if (mode=='forSearch') {
+    _list = gSearchResults;
+    for (var i=0, n=_list[0].length; i<n; i++)
+      _optionsHtml += "<option title=\""+ _list[2][i] +"\">"+ _list[1][i] +"</option>\n";
+  }
+  else {
+    _list = gRevisions;
+    for (var i=0, n=_list[0].length; i<n; i++)
+      _optionsHtml += "<option>"+ _list[1][i] +"</option>\n";
+  }
+  $('#bibMergeSelectListRow select').html(_optionsHtml);
+}
+
+function managePrevNextButtons(action) {
+  var _index;
+  var _list;
+  // take values from the correct global variable
+  if (gResultListMode == 'search') {
+    _index = gSearchResultsIndex;
+    _list = gSearchResults[0];
+  }
+  else if (gResultListMode == 'revisions') {
+    _index = gRevisionsIndex;
+    _list = gRevisions[0];
+  }
+  // perform requested action
+  if (action == 'hide') {
+    $('#bibMergeGetPrev').hide();
+    $('#bibMergeResultIndex').hide();
+    $('#bibMergeGetNext').hide();
+  }
+  else if (action == 'show') {
+    var _indexstr = '-';
+    if (_index >= 0)
+      _indexstr = _index+1;
+    $('#bibMergeResultIndex').html( _indexstr+'/'+_list.length);
+
+    $('#bibMergeGetPrev').show();
+    $('#bibMergeResultIndex').show();
+    $('#bibMergeGetNext').show();
+  }
+  else if (action == 'next') {
+    if (_index+1 < _list.length) {
+      _index++;
+      $('#bibMergeResultIndex').html( _index+1+'/'+_list.length);
+      $('#bibMergeRecInput2').val( _list[_index] );
+      $('#bibMergeSelectList option:eq('+ _index +')').attr('selected', 'selected');
+      compareRecords();
+    }
+    else
+      showMessage('ErrorMsg', 'Reached the end of list of candidate items', 6000);
+  }
+  else if (action == 'prev') {
+    if (_index-1 >= 0) {
+      _index--;
+      $('#bibMergeResultIndex').html( _index+1+'/'+_list.length);
+      $('#bibMergeRecInput2').val( _list[_index] );
+      $('#bibMergeSelectList option:eq('+ _index +')').attr('selected', 'selected');
+      compareRecords();
+    }
+    else
+      showMessage('ErrorMsg', 'Reached the end of list of candidate items', 6000);
+  }
+  //update the correct global variable
+  if (gResultListMode == 'search')
+    gSearchResultsIndex = _index;
+  else if (gResultListMode == 'revisions')
+    gRevisionsIndex = _index;
+}
+
+function ajaxRequestRevisions() {
+  var recid = gRecID1;
+  if (recid == null)
+    if ($('#bibMergeRecInput1').attr('value') != "")
+      recid = $('#bibMergeRecInput1').attr('value');
+    else {
+      showMessage('ErrorMsg', 'Select a record to get the revisions from', 6000);
+      return;
+    }
+
+  var _data = {
+    requestType: 'searchRevisions',
+    recID1: recid
+  };
+  showMessage('LoadingMsg', 'Retrieving revisions...');
+  $.ajax({
+    data: { jsondata: JSON.stringify(_data) },
+    success: function(json){
+      if (json['resultCode'] != 0){
+        showMessage('ErrorMsg', json['resultText'], 6000);
+      }
+      else {
+        gRevisions = json['results'];
+        gRevisionsIndex = -1;
+        buildSelectList('forRevisions');
+        managePrevNextButtons('show');
+        if (gRevisions.length == 0)
+          showMessage('ErrorMsg', 'No revisions found', 6000);
+        else
+          showMessage('OKMsg', json['resultText'], 6000);
+      }
+    }
+  });
+}
+
+function onclickSearchButton() {
+  var _query = $('#bibMergeSearchInput').attr('value');
+  var _data = {
+    requestType: 'searchCandidates',
+    query: _query
+  };
+  $.ajax({
+    data: {
+      jsondata: JSON.stringify(_data)
+    },
+    dataType: 'json',
+    success: function(json) {
+      if (json['resultCode'] != 0){
+        showMessage('ErrorMsg', json['resultText'], 6000);
+      }
+      else {
+        gSearchResults = json['results'];
+        gSearchResultsIndex = -1;
+        buildSelectList('forSearch');
+        managePrevNextButtons('show');
+        if (gSearchResults.length == 0)
+          showMessage('ErrorMsg', 'No results found', 6000);
+        else
+          showMessage('OKMsg', json['resultText'], 6000);
+      }
+    }
+  });
+  return false; //for the link not to be followed
+}
+function onclickGetPrev() {
+  managePrevNextButtons('prev');
+  return false;
+}
+function onclickGetNext() {
+  managePrevNextButtons('next');
+  return false;
+}
+function onclickSelectSearch() {
+  $('.bibMergeSelectListSelected').removeClass();
+  $('#bibMergeSelectSearch').addClass('bibMergeSelectListSelected');
+  $('#bibMergeSearchRow').show();
+  $('#bibMergeSelectListRow').show();
+  buildSelectList('forSearch');
+  gResultListMode = 'search';
+  managePrevNextButtons('show');
+  return false;
+}
+function onclickSelectDedupe() {
+  onclickSelectClose();
+  notImplemented();
+  return false;
+}
+function onclickSelectRevisions() {
+  $('.bibMergeSelectListSelected').removeClass();
+  $('#bibMergeSelectRevisions').addClass('bibMergeSelectListSelected');
+  $('#bibMergeSearchRow').hide();
+  $('#bibMergeSelectListRow').show();
+  //if list is empty or first result doesn't start with recid1
+  if (gRevisions.length==0 || gRevisions[0].indexOf(gRecID1+'.')==-1) {
+    ajaxRequestRevisions();
+  }
+  buildSelectList('forRevisions');
+  gResultListMode = 'revisions';
+  managePrevNextButtons('show');
+  return false;
+}
+function onclickSelectClose() {
+  $('.bibMergeSelectListSelected').removeClass();
+  $('#bibMergeSearchRow').hide();
+  $('#bibMergeSelectListRow').hide();
+  gResultListMode = null;
+  managePrevNextButtons('hide');
+  return false;
 }
 
 function onclickSearchResult() {
-  var rec = $(this).val(); //get recid from option tag
-  $('#bibMergeRecInput2').val(rec);
+  //find index of selected option
+  var _index = 0;
+  var currOpt = $(this).prev('option');
+  while(currOpt.html()!=null) {
+    _index++;
+    currOpt = currOpt.prev('option');
+  }
+  //set the value of record2 input field
+  if (gResultListMode == 'search') {
+    $('#bibMergeRecInput2').val( gSearchResults[0][_index] );
+    gSearchResultsIndex = _index;
+  }
+  else if (gResultListMode == 'revisions') {
+    $('#bibMergeRecInput2').val( gRevisions[0][_index] );
+    gRevisionsIndex = _index;
+  }
+  managePrevNextButtons('show');
+  compareRecords();
 }
 
 function onchangeMethodSelect() {
   option = $("#bibMergeMethodSelect :selected").val();
   switch(option) {
   case "(none)":
-    //ajaxGetRecordsFullHtml();
     $("#bibMergeSearchPanel").hide();
     break;
   case "Search":
@@ -504,34 +813,74 @@ function onchangeMethodSelect() {
     break;
   }
 }
-function onclickCompareButton() {
-  option = $("#bibMergeMethodSelect :selected").val();
-  switch(option) {
-  case "(none)":
-  case "Search":
-    var recid1 = $('#bibMergeRecInput1').attr('value');
-    var recid2 = $('#bibMergeRecInput2').attr('value');
-    ajaxGetRecordCompare(recid1, recid2);
-    //ajaxGetRecordsFullHtml(recid1, recid2);
-    break;
-  case "Revisions":
-    break;
+function compareRecords() {
+  var recid1 = $('#bibMergeRecInput1').attr('value');
+  var recid2 = $('#bibMergeRecInput2').attr('value');
+  if (recid2 == "")
+    recid2 = 'none';
+  ajaxGetRecordCompare(recid1, recid2);
+}
+function ajaxGetRecordCompare(_recid1, _recid2) {
+  // validity check
+  if (!isValidRecid1(_recid1)) {
+    showMessage('ErrorMsg', 'Invalid record1', 6000);
+    return;
   }
+  var _mode = getRecid2Mode(_recid2);
+  if (_mode == false) {
+    showMessage('ErrorMsg', 'Invalid record2', 6000);
+    return;
+  }
+  //ajax request
+  var _data = {
+    requestType: 'getRecordCompare',
+    recID1: _recid1,
+    recID2: _recid2,
+    record2Mode: _mode
+  };
+  showMessage('LoadingMsg', 'Please wait...');
+  panelDisabled(true);
+  ajaxRequest(_data, function(html) {
+    $('#bibMergeContent').html(html);
+    $('#bibMergeRecInput1').val(_recid1);
+    $('#bibMergeRecInput2').val(_recid2);
+    changeAndSerializeHash({recid1: _recid1, recid2: _recid2});
+    gRecID1 = _recid1;
+    gRecID2 = _recid2;
+    initFieldGroupHeaders('.bibMergeHeaderFieldnum'); //initialize all of them
+    panelDisabled(false);
+  });
+}
+function isRevisionID(str) {
+  if (str.indexOf('.') > -1) {
+    var _array = str.split('.');
+    if (_array.length==2 && !isNaN(_array[0]) && !isNaN(_array[1]) && _array[1].length==14)
+      return true;
+  }
+  return false;
 }
 function onclickSubmitButton() {
+  var checkbox = $('#bibMergeDupeCheckbox').attr('checked');
+
   var _data = {
     requestType: 'submit',
-    recID1: gRecID1,
-    recID2: gRecID2
+    recID1: gRecID1
   };
+  if (checkbox == true)
+    _data['duplicate'] = gRecID2;
+
   showMessage('LoadingMsg', 'Submitting...');
-  ajaxRequest(_data, function(html){ } );
+  ajaxRequest(_data, function(html){
+    window.location.hash = '';
+  });
+
+  if (checkbox == true)
+    $('#bibMergeDupeCheckbox').attr('checked', false);
 }
 function onclickCancelButton() {
   var _data = {
     requestType: 'cancel',
-    recID1: gRecID1,
-    recID2: gRecID2
+    recID1: gRecID1
   };
   showMessage('LoadingMsg', 'Cancelling...');
   ajaxRequest(_data, function(html){
@@ -552,48 +901,6 @@ function ajaxRequest(data, onSuccessFunc){
       }
     }
   });
-}
-function ajaxGetRecordCompare(_recid1, _recid2) {
-  var _data = {
-    requestType: 'getRecordCompare',
-    recID1: _recid1,
-    recID2: _recid2
-  };
-  showMessage('LoadingMsg', 'Please wait...');
-  ajaxRequest(_data, function(html) {
-    $('#bibMergeContent').html(html);
-    $('#bibMergeRecInput1').val(_recid1);
-    $('#bibMergeRecInput2').val(_recid2);
-    changeAndSerializeHash({recid1: _recid1, recid2: _recid2});
-    gRecID1 = _recid1;
-    gRecID2 = _recid2;
-    initFieldGroupHeaders(".bibMergeHeaderFieldnum"); //initialize all of them
-  });
-}
-
-function onclickSearchButton() {
-  var _query = $('#bibMergeSearchInput').attr('value');
-  var _data = {
-    requestType: 'searchCanditates',
-    query: _query
-  };
-  $.ajax({
-    data: {
-      jsondata: JSON.stringify(_data)
-    },
-    dataType: 'json',
-    success: function(json) {
-      if (json['resultsLen'] == 0)
-        showMessage('ErrorMsg', "Search: No matches found.", 6000);
-      else if (json['resultsLen'] <= json['resultsMaxLen']) {
-        $('#bibMergeSelectList').html( json['results'] );
-        showMessage('OKMsg', "Search: " + json['resultsLen'] + " results found.", 6000);
-      }
-      else
-        showMessage('ErrorMsg', "Search: Too many results found.", 6000);
-    }
-  });
-  return false; //for the link not to be followed
 }
 
 function initAJAX() {
@@ -632,12 +939,34 @@ function notImplemented() {
   showMessage('ErrorMsg', 'Please ask the developer to hurry up and implement this feature!', 6000);
   return false;
 }
-
 function onError(XHR, textStatus, errorThrown) {
+  panelDisabled(false);
   $('#bibMergeContent').html('Request completed with status ' + textStatus
    + '\nResult: ' + XHR.responseText
    + '\nError: ' + errorThrown);
 }
 function getFieldTag(fieldGroupDiv) {
-	return fieldGroupDiv.children(":first-child").children(":first-child").text();
+  return fieldGroupDiv.children(":first-child").children(":first-child").text();
+}
+
+function onclickLinkToBibEdit1() {
+  if (gHash!='' && gRecID1!=null)
+    window.location = '/record/edit/#state=edit&recid='+gRecID1;
+  else
+    showMessage('ErrorMsg', 'A valid record id must be selected', 6000);
+  return false;
+}
+function onclickLinkToBibEdit2() {
+  if (gHash!='' && gRecord2Mode=='recid' && gRecID2!=null)
+    window.location = '/record/edit/#state=edit&recid='+gRecID2;
+  else
+    showMessage('ErrorMsg', 'A valid record id must be selected', 6000);
+  return false;
+}
+
+function panelDisabled(disabled) {
+  if (disabled == true)
+    $('#bibMergePanel').find('button, input, optgroup, option, select, textarea').attr('disabled', true);
+  else
+    $('#bibMergePanel').find('button, input, optgroup, option, select, textarea').removeAttr('disabled');
 }

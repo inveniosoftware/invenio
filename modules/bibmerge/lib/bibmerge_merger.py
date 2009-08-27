@@ -27,13 +27,14 @@ from invenio.bibmerge_differ import record_field_diff, match_subfields, \
 
 from copy import deepcopy
 
-def merge_record(rec1, rec2):
+def merge_record(rec1, rec2, merge_conflicting_fields=False):
     """Merges all non-conflicting fields from 'rec2' to 'rec1'
     @param rec1: First record (a record dictionary structure)
     @param rec2: Second record (a record dictionary structure)
     """
     for fnum in rec2:
-        merge_field_group(rec1, rec2, fnum)
+        if fnum[:2] != "00": #if it's not a controlfield
+            merge_field_group(rec1, rec2, fnum, merge_conflicting_fields=merge_conflicting_fields)
 
 def merge_field_group(rec1, rec2, fnum, ind1='', ind2='', merge_conflicting_fields=False):
     """Merges non-conflicting fields from 'rec2' to 'rec1' for a specific tag.
@@ -51,7 +52,12 @@ def merge_field_group(rec1, rec2, fnum, ind1='', ind2='', merge_conflicting_fiel
     ### check if there is no field in rec2 to be merged in rec1
     if not record_has_field(rec2, fnum):
         return
-    fields2 = record_get_field_instances(rec2, fnum, ind1, ind2)
+
+    ### get fields of rec2
+    if merging_all_indicators:
+        fields2 = record_get_field_instances(rec2, fnum, '%', '%')
+    else:
+        fields2 = record_get_field_instances(rec2, fnum, ind1, ind2)
     if len(fields2)==0:
         return
 
@@ -132,8 +138,6 @@ def _combine_diffs(alldiffs):
     """Takes all diffs of a field-tag which are separated by indicators and
     combine them in one list in correct index order."""
     diff = []
-    from pprint import pprint
-    pprint(alldiffs)
     for d in alldiffs:
         diff.extend( d[1] )
     return diff
@@ -289,3 +293,12 @@ def add_subfield(rec1, rec2, fnum, findex1, findex2, sfindex1, sfindex2):
     subfields1 = rec1[fnum][findex1][0]
     subfields1[sfindex1:sfindex1] = [ subfield_to_insert ]
 
+def copy_R2_to_R1(rec1, rec2):
+    """Copies contents of R2 to R1 apart from the controlfields."""
+    tmprec = deepcopy(rec1)
+    for fnum in tmprec:
+         if fnum[:2] != '00': #if it's not a control field delete it from rec1
+             del rec1[fnum]
+    for fnum in rec2:
+         if fnum[:2] != '00': #if it's not a control field add it to rec2
+             rec1[fnum] = rec2[fnum]

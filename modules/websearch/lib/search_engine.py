@@ -2649,6 +2649,7 @@ def record_exists(recID):
     out = 0
     res = run_sql("SELECT id FROM bibrec WHERE id=%s", (recID,), 1)
     if res:
+        recID = int(recID)
         # record exists; now check whether it isn't marked as deleted:
         dbcollids = get_fieldvalues(recID, "980__%")
         if ("DELETED" in dbcollids) or (CFG_CERN_SITE and "DUMMY" in dbcollids):
