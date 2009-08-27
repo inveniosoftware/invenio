@@ -711,16 +711,18 @@ function onNewRecordClick(event){
   event.preventDefault();
 }
 
-function getRecord(recID){
+function getRecord(recID, onSuccess){
   /*
    * Get a record.
    */
   // Temporary store the record ID by attaching it to the onGetRecordSuccess
   // function.
+  if (onSuccess == undefined)
+    onSuccess = onGetRecordSuccess;
   changeAndSerializeHash({state: 'edit', recid: recID});
   createReq({recID: recID, requestType: 'getRecord', deleteRecordCache:
     getRecord.deleteRecordCache, clonedRecord: getRecord.clonedRecord},
-    onGetRecordSuccess);
+    onSuccess);
   getRecord.deleteRecordCache = false;
   getRecord.clonedRecord = false;
 }
@@ -781,6 +783,15 @@ function onGetRecordSuccess(json){
       gCLONED_RECORD_COLOR_FADE_DURATION);
   updateStatus('report', gRESULT_CODES[json['resultCode']]);
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
+}
+
+function onGetTemplateSuccess(json) {
+  onGetRecordSuccess(json);
+  $("td:contains('VOLATILE:')").each( function(i) {
+    $(this).addClass("bibEditVolatileSubfield");
+    // remove the word 'VOLATILE:' from the beginning
+    $(this).text( $(this).text().substring(9) );
+  });
 }
 
 function onSubmitClick(){
@@ -896,7 +907,7 @@ function bindNewRecordHandlers(){
       var templateNo = this.id.split('_')[1];
       createReq({requestType: 'newRecord', newType: 'template',
 	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
-	  getRecord(json['newRecID']);
+	  getRecord(json['newRecID'], onGetTemplateSuccess);
       });
       event.preventDefault();
     });
@@ -1451,6 +1462,31 @@ function onContentClick(cell){
   /*
    * Handle click on editable content fields.
    */
+  // Check if subfield is volatile subfield from a template
+  if ( $(cell).hasClass('bibEditVolatileSubfield') ){
+    // remove the volatile value
+    var tmpArray = $(cell).attr('id').split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2],
+      subfieldIndex = tmpArray[3];
+    gRecord[tag][fieldPosition][0][subfieldIndex][1] = '';
+    var subfieldCode = gRecord[tag][fieldPosition][0][subfieldIndex][0];
+    updateStatus('updating');
+    // Create Ajax request.
+    var data = {
+      recID: gRecID,
+      requestType: 'modifyContent',
+      tag: tag,
+      fieldPosition: fieldPosition,
+      subfieldIndex: subfieldIndex,
+      subfieldCode: subfieldCode,
+      value: ''
+    };
+    createReq(data, function(json){
+      updateStatus('report', gRESULT_CODES[json['resultCode']]);
+    });
+    // remove volatile-subfield class
+    $(cell).removeClass('bibEditVolatileSubfield');
+  }
   if (!$(cell).hasClass('edit_area')){
     // Add event handler for content editing.
     $(cell).addClass('edit_area').removeAttr('onclick').editable(

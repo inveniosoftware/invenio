@@ -1555,6 +1555,9 @@ input.hyperlinkformSubmitButton {
 #bibEditTable .bibEditSelected {
   background: lightblue;
 }
+#bibEditTable .bibEditVolatileSubfield {
+  color: grey;
+}
 #bibEditTable td {
   padding: 1px 1px;
   font-size: 0.8em;
