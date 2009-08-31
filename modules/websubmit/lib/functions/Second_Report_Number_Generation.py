@@ -116,6 +116,11 @@ def Second_Report_Number_Generation(parameters, curdir, form, user_info=None):
           <PA>file*[re]:name_of_file [regular expression to match]</PA> -->
               Include all the lines of a file (in curdir), matching [re]
               separated by - (dash) char.
+       @param 2nd_nb_length: (string) the number of digits for the
+        report number. Eg: '3' for XXX-YYYY-025 or '4' for
+        XXX-YYYY-0025. If more are needed (all available digits have
+        been used), the length is automatically extended. Choose 1 to
+        never have leading zeros. Default length: 3.
        @return: (string) - empty string.
        @Exceptions raised: InvenioWebSubmitFunctionError - upon unexpected
         error.
@@ -168,6 +173,13 @@ def Second_Report_Number_Generation(parameters, curdir, form, user_info=None):
     ############
     ## Get parameter values and sanitize them:
     ############
+    ############
+    ## Report number length
+    ############
+    new_nb_length = 3
+    if parameters.has_key('2nd_nb_length') and \
+           parameters['2nd_nb_length'].isdigit():
+        new_nb_length = int(parameters['2nd_nb_length'])
     ############
     ## Category file name - when category is included in the new report number
     ############
@@ -325,7 +337,7 @@ def Second_Report_Number_Generation(parameters, curdir, form, user_info=None):
     ## Test to see whether the second report number file already exists:
     if not os.path.exists("%s/%s" % (curdir, new_rn_filename)):
         ## The new report number file doesn't exist. Create it.
-        new_rn = Create_Reference(counter_path, new_rn_format)
+        new_rn = Create_Reference(counter_path, new_rn_format, new_nb_length)
         new_rn = re.compile('\s').sub('', new_rn)
         ## Write it to file:
         # The file edsrn is created in the submission directory, and it stores the report number
@@ -360,7 +372,7 @@ def Second_Report_Number_Generation(parameters, curdir, form, user_info=None):
 
 ## Create_Reference function below actually creates the reference number:
 
-def Create_Reference(counter_path, ref_format):
+def Create_Reference(counter_path, ref_format, nb_length):
     """From the counter-file for this document submission, get the next
        reference number and create the reference.
     """
@@ -430,6 +442,6 @@ def Create_Reference(counter_path, ref_format):
         fp.write(str(id))
         fp.close()
     ## create final value
-    reference = "%s-%03d" % (ref_format, id)
+    reference = ("%s-%0" + str(nb_length) + "d") % (ref_format, id)
     ## Return the report number prelude with the id concatenated on at the end
     return reference

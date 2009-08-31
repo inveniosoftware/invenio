@@ -58,9 +58,23 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
                                     separated by - (dash) char .
                    yeargen: if "AUTO", current year, else the year is
                               extracted from the file [yeargen]
+
+                   nblength: the number of digits for the report
+                             number. Eg: '3' for XXX-YYYY-025 or '4'
+                             for XXX-YYYY-0025. If more are needed
+                             (all available digits have been used),
+                             the length is automatically
+                             extended. Choose 1 to never have leading
+                             zeros. Default length: 3.
     """
     global doctype, access, act, dir, rn
     # The program must automatically generate the report number
+
+    # What is the length of the generated report number?
+    nb_length = 3
+    if parameters.has_key('nblength') and parameters['nblength'].isdigit():
+        nb_length = int(parameters['nblength'])
+
     # Generate Year
     if parameters['autorngen'] == "Y":
         if parameters['yeargen'] == "AUTO":
@@ -136,7 +150,7 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
                 rn = oldrn
                 return ""
         # create it
-        rn = Create_Reference(counter_path, rn_format)
+        rn = Create_Reference(counter_path, rn_format, nb_length)
         rn = rn.replace("\n", "")
         rn = rn.replace("\r", "")
         rn = rn.replace("\015", "")
@@ -165,7 +179,7 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
 
 
 
-def Create_Reference(counter_path, ref_format):
+def Create_Reference(counter_path, ref_format, nb_length):
     """From the counter-file for this document submission, get the next
        reference number and create the reference.
     """
@@ -235,6 +249,6 @@ def Create_Reference(counter_path, ref_format):
         fp.write(str(id))
         fp.close()
     ## create final value
-    reference = "%s-%03d" % (ref_format,id)
+    reference = ("%s-%0" + str(nb_length) + "d") % (ref_format,id)
     ## Return the report number prelude with the id concatenated on at the end
     return reference

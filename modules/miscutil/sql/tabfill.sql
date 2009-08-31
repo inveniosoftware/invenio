@@ -441,6 +441,7 @@ INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','rnin');
 INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','counterpath');
 INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','rnformat');
 INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','yeargen');
+INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','nblength');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Approval_Request_to_Referee','categ_file_appreq');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Approval_Request_to_Referee','categ_rnseek_appreq');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Approval_Request_to_Referee','edsrn');
@@ -509,6 +510,7 @@ INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_format'
 INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_yeargen');
 INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rncateg_file');
 INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_counterpath');
+INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_nb_length');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','file_to_be_stamped');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_template');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_template_vars');
