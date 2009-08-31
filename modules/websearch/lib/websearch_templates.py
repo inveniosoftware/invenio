@@ -2839,9 +2839,11 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """</table>
-               <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />
+               <br />
+               <input type="hidden" name="colid" value="0" />
+               <input class="formbutton" type="submit" name="action" value="%(basket)s" />
                </form>""" % {
-                 'basket' : _("ADD TO BASKET")
+                 'basket' : _("Add To Basket")
                  }
 
         return out
@@ -3021,7 +3023,7 @@ class Template:
                 out += """</table>
                        <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />
                        </form>""" % {
-                         'basket' : _("ADD TO BASKET")
+                         'basket' : _("Add To Basket")
                          }
         else:
             if of == 'hb':

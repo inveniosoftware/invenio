@@ -721,7 +721,7 @@ subcollections.
 simple tool to check and control the consistency of the external collections
 the user has defined. External collections exist both in their own database
 table as well in a user defined configuration file. This tool will check the
-consistency between the two and report back to the user giving him or her the
+consistency between the two and report back to the user giving them the
 option to fix any potential inconsistencies.
 
 

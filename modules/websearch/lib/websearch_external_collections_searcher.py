@@ -550,10 +550,14 @@ class CDSInvenioSearchEngine(ExternalSearchEngine):
                 search_url_recids = conjunction.join(['recid:%s'] * len(req_args))
                 params = tuple(req_args)
                 search_url_recids %= params
-                req_args = "p=" + search_url_recids
+                # TODO: "rg" here should be the naximum limit of items to be
+                # added to a basket at once. Create a static variable for that.
+                req_args = "p=" + search_url_recids + "&rg=" + str(100)
             req_args_dict = cgi.parse_qs(req_args)
             if req_args_dict.has_key('p'):
                 search_url_params += urllib.quote(req_args_dict['p'][0])
+            if req_args_dict.has_key('f'):
+                search_url_params += '&f=' + req_args_dict['f'][0]
             if req_args_dict.has_key('jrec'):
                 search_url_params += '&jrec=' + req_args_dict['jrec'][0]
             if req_args_dict.has_key('rg'):

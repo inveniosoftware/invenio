@@ -27,8 +27,7 @@ CFG_WEBBASKET_SHARE_LEVELS = {'READITM': 'RI',
                               'ADDITM': 'AI',
                               'DELCMT': 'DC',
                               'DELITM': 'DI',
-                              'MANAGE': 'MA'
-                              }
+                              'MANAGE': 'MA'}
 
 CFG_WEBBASKET_SHARE_LEVELS_ORDERED = [CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                                       CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
@@ -38,38 +37,58 @@ CFG_WEBBASKET_SHARE_LEVELS_ORDERED = [CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                                       CFG_WEBBASKET_SHARE_LEVELS['DELITM'],
                                       CFG_WEBBASKET_SHARE_LEVELS['MANAGE']]
 
-CFG_WEBBASKET_CATEGORIES = {'PRIVATE':  'P',
-                            'GROUP':    'G',
-                            'EXTERNAL': 'E'}
+CFG_WEBBASKET_CATEGORIES = {'PRIVATE':      'P',
+                            'GROUP':        'G',
+                            'EXTERNAL':     'E',
+                            'ALLPUBLIC':    'A'}
 
-CFG_WEBBASKET_ACTIONS = {'DELETE': 'delete',
-                         'UP': 'moveup',
-                         'DOWN': 'movedown',
-                         'COPY': 'copy'}
+CFG_WEBBASKET_ACTIONS = {'DELETE':  'delete',
+                         'UP':      'moveup',
+                         'DOWN':    'movedown',
+                         'COPY':    'copy'}
 
 
 CFG_WEBBASKET_WARNING_MESSAGES = {
     'ERR_WEBBASKET_CMTID_INVALID': '_("%i is an invalid comment ID")',
     'WRN_WEBBASKET_NO_RECORD': '_("No records to add")',
-    'WRN_WEBBASKET_NO_GIVEN_TOPIC':
-            '_("Please select an existing topic or create a new one")',
+    'WRN_WEBBASKET_NO_GIVEN_TOPIC': '_("Please select an existing topic or create a new one")',
     'WRN_WEBBASKET_NO_BASKET_SELECTED':  '_("No basket has been selected")',
     'WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD':  '_("Sorry, you don\'t have sufficient rights to add record #%i")',
+    'WRN_WEBBASKET_NO_RIGHTS_TO_ADD_RECORDS':  '_("Some of the items were note added due to lack of sufficient rights")',
     'WRN_WEBBASKET_NO_EXTERNAL_SOURCE_TITLE': '_("Please provide a title for the external source")',
     'WRN_WEBBASKET_NO_EXTERNAL_SOURCE_DESCRIPTION': '_("Please provide a description for the external source")',
     'WRN_WEBBASKET_NO_EXTERNAL_SOURCE_URL': '_("Please provide a url for the external source")',
     'WRN_WEBBASKET_NO_VALID_URL_0': '_("The url you have provided is not valid")',
     'WRN_WEBBASKET_NO_VALID_URL_3': '_("The url you have provided is not valid: There was some kind of redirection")',
     'WRN_WEBBASKET_NO_VALID_URL_4': '_("The url you have provided is not valid: The request contains bad syntax or cannot be fulfilled")',
-    'WRN_WEBBASKET_NO_VALID_URL_5': '_("The url you have provided is not valid: The server failed to fulfil an apparently valid request")'
-}
+    'WRN_WEBBASKET_NO_VALID_URL_5': '_("The url you have provided is not valid: The server failed to fulfil an apparently valid request")',
+    'WRN_WEBBASKET_DEFAULT_TOPIC_AND_BASKET': '_("A default topic and basket have been automatically created. Edit them to rename them as you see fit.")',
+    'WRN_WEBBASKET_NO_CATEGORY': '_("You have not selected any category. The Personal baskets category has been selected by default.")',
+    'WRN_WEBBASKET_INVALID_CATEGORY': '_("The category you have selected does not exist. Please select a valid category.")',
+    'WRN_WEBBASKET_CANNOT_COMMENT': '_("Sorry, you can\'t post in this baket")',
+    'WRN_WEBBASKET_NO_RIGHTS': '_("Sorry, you don\'t have sufficient rights on this basket")',
+    'WRN_WEBBASKET_UNDEFINED_ACTION': '_("Sorry, no such action exists")',
+    'WRN_WEBBASKET_NOT_OWNER': '_("You are not owner of this basket")',
+    'WRN_WEBBASKET_RESTRICTED_ACCESS': '_("This basket is not publicly accessible")',
+    'WRN_WEBBASKET_NO_SEARCH_PATTERN': '_("Please enter a string to search for.")',
+    'WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC': '_("The selected topic does not exist or you do not have access to it.")',
+    'WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP': '_("The selected group does not exist or you do not have access to it.")',
+    'WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET': '_("The selected basket does not exist or you do not have access to it.")',
+    'WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET': '_("The selected public basket does not exist or you do not have access to it.")',
+    'WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM': '_("The selected item does not exist or you do not have access to it.")',
+    'WRN_WEBBASKET_RESTRICTED_WRITE_NOTES': '_("You do not have permission to write notes to this item.")',
+    'WRN_WEBBASKET_INCOMPLETE_NOTE': '_("You must fill in both the subject and the body of the note.")',
+    'WRN_WEBBASKET_QUOTE_INVALID_NOTE': '_("The note you are quoting does not exist or you do not have access to it.")',
+    'WRN_WEBBASKET_RETURN_TO_PUBLIC_BASKET': '_("Returning to the public basket view.")',
+    'WRN_WEBBASKET_SHOW_LIST_PUBLIC_BASKETS': '_("Please select a valid public basket from the list of public baskets.")',
+    'WRN_WEBBASKET_INVALID_ADD_TO_PARAMETERS': '_("Cannot add items to the selected basket. Invalid parameters.")',
+    }
 
 # pylint: disable-msg=C0301
 CFG_WEBBASKET_ERROR_MESSAGES = {
-    'ERR_WEBBASKET_CANNOT_COMMENT': '_("Sorry, you can\'t post in this baket")',
-    'ERR_WEBBASKET_DB_ERROR': '_("Sorry there was an error with  the database")',
-    'ERR_WEBBASKET_NO_RIGHTS': '_("Sorry, you don\'t have sufficient rights on this basket")',
-    'ERR_WEBBASKET_UNDEFINED_ACTION': '_("Sorry, no such action exists")',
-    'ERR_WEBBASKET_NOT_OWNER': '_("You are not owner of this basket")',
-    'ERR_WEBBASKET_RESTRICTED_ACCESS': '_("This basket is not publicly accessible")'
-}
+    'ERR_WEBBASKET_DB_ERROR': '_("There was an error with the database")',
+    }
+
+CFG_WEBBASKET_DIRECTORY_BOX_NUMBER_OF_COLUMNS = 3
+
+CFG_WEBBASKET_MAX_NUMBER_OF_NOTES = 100

@@ -19,6 +19,13 @@
 
 __revision__ = "$Id$"
 
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
+
 import cgi
 from httplib import urlsplit, HTTPConnection
 from socket import getdefaulttimeout, setdefaulttimeout
@@ -50,117 +57,93 @@ from invenio.websearch_external_collections_utils import get_collection_name_by_
 from invenio.websearch_external_collections import select_hosted_search_engines
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
+from invenio.search_engine import search_unit
+from invenio.htmlutils import remove_html_markup
 
-def perform_request_display(uid,
-                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                            selected_topic=0,
-                            selected_group_id=0,
-                            ln=CFG_SITE_LANG):
-    """Display all the baskets of given category, topic or group.
-    @param uid: user id
-    @param category: selected category (see webbasket_config.py)
-    @param selected_topic: # of selected topic to display baskets
-    @param selected_group_id: id of group to display baskets
+########################################
+### Display public baskets and notes ###
+########################################
+
+def perform_request_display_public(uid,
+                                   selected_bskid=0,
+                                   selected_recid=0,
+                                   optional_params={},
+                                   format='hb',
+                                   ln=CFG_SITE_LANG):
+    """return html representation of a public basket
+    @param bskid: basket id
+    @param of: format
     @param ln: language"""
-    warnings = []
-    errors = []
-    baskets_html = []
-    baskets = []
 
     _ = gettext_set_language(ln)
-    nb_groups = db.count_groups_user_member_of(uid)
-    nb_external_baskets = db.count_external_baskets(uid)
-    selectionbox = ''
-    infobox = ''
-    if category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
-        baskets = db.get_external_baskets_infos(uid)
-        if len(baskets):
-            map(list, baskets)
-        else:
-            category = CFG_WEBBASKET_CATEGORIES['PRIVATE']
-    if category == CFG_WEBBASKET_CATEGORIES['GROUP']:
-        groups = db.get_group_infos(uid)
-        if len(groups):
-            if selected_group_id == 0 and len(groups):
-                selected_group_id = groups[0][0]
-            selectionbox = webbasket_templates.tmpl_group_selection(groups,
-                                                                    selected_group_id,
-                                                                    ln)
-            baskets = db.get_group_baskets_infos(selected_group_id)
-            def adapt_group_rights(item):
-                """Suppress unused element in tuple."""
-                out = list(item)
-                if out[-1] == uid:
-                    out[-2] = CFG_WEBBASKET_SHARE_LEVELS['MANAGE']
-                return out[:-1]
-            baskets = map(adapt_group_rights, baskets)
-        else:
-            category = CFG_WEBBASKET_CATEGORIES['PRIVATE']
-    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-        topics_list = db.get_personal_topics_infos(uid)
-        if not selected_topic and len(topics_list):
-            selected_topic = 0
-        selectionbox = webbasket_templates.tmpl_topic_selection(topics_list,
-                                                                selected_topic,
-                                                                ln)
-        if selected_topic >= len(topics_list):
-            selected_topic = len(topics_list) - 1
-        if len(topics_list) > 0:
-            baskets = db.get_personal_baskets_infos(uid, topics_list[selected_topic][0])
-        else:
-            baskets = []
-        def add_manage_rights(item):
-            """ Convert a tuple to a list and add rights"""
-            out = list(item)
-            out.append(CFG_WEBBASKET_SHARE_LEVELS['MANAGE'])
-            return out
-        baskets = map(add_manage_rights, baskets)
 
-    bskids = []
-    for basket in baskets:
-        bskids.append(basket[0])
-    levels = dict(db.is_shared_to(bskids))
-    create_link = ''
-    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-        create_link = webbasket_templates.tmpl_create_basket_link(selected_topic, ln)
-    infobox = webbasket_templates.tmpl_baskets_infobox(map(lambda x: (x[0], x[1], x[2]),
-                                                           baskets),
-                                                       create_link,
-                                                       ln)
-    for (bskid, name, date_modification,
-         nb_views, nb_items, last_added, share_level) in baskets:
-        (bsk_html, bsk_e, bsk_w) = __display_basket(bskid,
-                                                    name,
-                                                    date_modification,
-                                                    nb_views,
-                                                    nb_items,
-                                                    last_added,
-                                                    share_level,
-                                                    levels[bskid],
-                                                    category,
-                                                    selected_topic,
-                                                    selected_group_id,
-                                                    ln)
-        baskets_html.append(bsk_html)
-        errors.extend(bsk_e)
-        warnings.extend(bsk_w)
+    warnings_item = []
+    warnings_basket = []
 
-    body = webbasket_templates.tmpl_display(selectionbox,
-                                            infobox,
-                                            baskets_html,
-                                            category,
-                                            nb_groups,
-                                            nb_external_baskets,
-                                            ln)
-    return (body, errors, warnings)
+    basket = db.get_public_basket_info(selected_bskid)
+    if not basket:
+        warnings = ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET']
+        (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
+        warnings.append('WRN_WEBBASKET_SHOW_LIST_PUBLIC_BASKETS')
+        warnings_html = webbasket_templates.tmpl_warnings(warnings)
+        body = warnings_html + body
+        return (body, warnings, navtrail)
+    else:
+        (bskid, basket_name, id_owner, last_update, nb_views, nb_items, recids, share_level) = basket[0]
+        if selected_recid:
+            valid_recids = eval(recids + ',')
+            if selected_recid in valid_recids:
+                (content, warnings_item) = __display_public_basket_single_item(bskid,
+                                                                          basket_name,
+                                                                          selected_recid,
+                                                                          nb_items,
+                                                                          share_level,
+                                                                          optional_params,
+                                                                          ln)
+            else:
+                warnings_item.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
+                warnings_item.append('WRN_WEBBASKET_RETURN_TO_PUBLIC_BASKET')
+                selected_recid=0
+        if not selected_recid:
+            if uid==id_owner:
+                subscription_status = 0
+            else:
+                if db.is_user_subscribed_to_basket(uid,bskid)[0][0]:
+                    subscription_status = 1
+                else:
+                    subscription_status = -1
+            (content, warnings_basket) = __display_public_basket(bskid,
+                                                          basket_name,
+                                                          last_update,
+                                                          nb_views,
+                                                          nb_items,
+                                                          share_level,
+                                                          id_owner,
+                                                          subscription_status,
+                                                          ln)
 
+    body = webbasket_templates.tmpl_display(content=content)
 
-def __display_basket(bskid, name, date_modification, nb_views,
-                     nb_items, last_added,
-                     share_level, group_sharing_level,
-                     category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                     selected_topic=0, selected_group_id=0,
-                     ln=CFG_SITE_LANG):
+    warnings = warnings_item + warnings_basket
+    warnings_html = webbasket_templates.tmpl_warnings(warnings)
+    body = warnings_html + body
+
+    navtrail = create_webbasket_navtrail(uid,
+                                         bskid=selected_bskid,
+                                         public_basket=True,
+                                         ln=ln)
+
+    return (body, warnings, navtrail)
+
+def __display_public_basket(bskid,
+                            basket_name,
+                            last_update,
+                            nb_views,
+                            nb_items,
+                            share_level,
+                            id_owner,
+                            subscription_status,
+                            ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
     @param share_level: rights user has on basket
     @param group_sharing_level: None if basket is not shared,
@@ -172,23 +155,23 @@ def __display_basket(bskid, name, date_modification, nb_views,
     @param ln: language"""
 
     _ = gettext_set_language(ln)
-    errors = []
+
     warnings = []
 
-    nb_bsk_cmts = 0
-    last_cmt = _("N/A")
+    nb_total_notes = 0
+    last_note = _("N/A")
     records = []
-    cmt_dates = []
-    date_modification = convert_datetext_to_dategui(date_modification, ln)
+    notes_dates = []
+    last_update = convert_datetext_to_dategui(last_update, ln)
 
     items = db.get_basket_content(bskid, 'hb')
     external_recids = []
 
-    for (recid, nb_cmt, last_cmt, ext_val, int_val, score) in items:
-        cmt_dates.append(convert_datetext_to_datestruct(last_cmt))
-        last_cmt = convert_datetext_to_dategui(last_cmt, ln)
-        val = ''
-        nb_bsk_cmts += nb_cmt
+    for (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) in items:
+        notes_dates.append(convert_datetext_to_datestruct(last_note))
+        last_note = convert_datetext_to_dategui(last_note, ln)
+        val = ""
+        nb_total_notes += nb_notes
         if recid < 0:
             if ext_val:
                 val = decompress(ext_val)
@@ -199,7 +182,8 @@ def __display_basket(bskid, name, date_modification, nb_views,
                 val = decompress(int_val)
             else:
                 val = format_record(recid, 'hb', on_the_fly=True)
-        records.append((recid, nb_cmt, last_cmt, val, score))
+        colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+        records.append((recid, colid, nb_notes, last_note, val, score))
 
     if external_recids:
         external_records = format_external_records(external_recids, 'hb')
@@ -209,92 +193,158 @@ def __display_basket(bskid, name, date_modification, nb_views,
                 if record[0] == -external_record[0]:
                     idx = records.index(record)
                     tuple_to_list = list(records.pop(idx))
-                    tuple_to_list[3] = external_record[1]
+                    tuple_to_list[4] = external_record[1]
                     records.insert(idx,tuple(tuple_to_list))
                     break
 
-    if len(cmt_dates) > 0:
-        last_cmt = convert_datestruct_to_dategui(max(cmt_dates), ln)
+    if notes_dates:
+        last_note = convert_datestruct_to_dategui(max(notes_dates), ln)
 
-    body = webbasket_templates.tmpl_basket(bskid,
-                                           name,
-                                           date_modification,
-                                           nb_views,
-                                           nb_items, last_added,
-                                           (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
-                                           nb_bsk_cmts, last_cmt,
-                                           group_sharing_level,
-                                           category, selected_topic, selected_group_id,
-                                           records,
-                                           ln)
-    return (body, errors, warnings)
+    body = webbasket_templates.tmpl_public_basket(bskid,
+                                                  basket_name,
+                                                  last_update,
+                                                  nb_views,
+                                                  nb_items,
+                                                  (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT'],),),
+                                                  nb_total_notes,
+                                                  last_note,
+                                                  records,
+                                                  id_owner,
+                                                  subscription_status,
+                                                  ln)
+    return (body, warnings)
 
-def perform_request_display_item(uid, bskid, recid, format='hb',
-                                 category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                                 topic=0, group_id=0, ln=CFG_SITE_LANG):
-    """Display an item of a basket of given category, topic or group.
-    @param uid: user id
-    @param bskid: basket_id
-    @param recid: record id
-    @param format: format of the record (hb, hd, etc.)
+def __display_public_basket_single_item(bskid,
+                                        basket_name,
+                                        recid,
+                                        nb_items,
+                                        share_level,
+                                        optional_params={},
+                                        ln=CFG_SITE_LANG):
+    """Private function. Display a basket giving its category and topic or group.
+    @param share_level: rights user has on basket
+    @param group_sharing_level: None if basket is not shared,
+                                0 if public basket,
+                                > 0 if shared to usergroups but not public.
     @param category: selected category (see webbasket_config.py)
-    @param topic: # of selected topic to display baskets
-    @param group_id: id of group to display baskets
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
     @param ln: language"""
-    body = ''
-    errors = []
+
+    _ = gettext_set_language(ln)
+
     warnings = []
 
-    rights = db.get_max_user_rights_on_basket(uid, bskid)
-    if not(check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
-        errors.append('ERR_WEBBASKET_NO_RIGHTS')
-        return (body, errors, warnings)
-    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-        topics_list = db.get_personal_topics_infos(uid)
-        if not topic and len(topics_list):
-            topic = 0
-        topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
-    elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
-        groups = db.get_group_infos(uid)
-        if group_id == 0 and len(groups):
-            group_id = groups[0][0]
-        topicsbox = webbasket_templates.tmpl_group_selection(groups, group_id, ln)
-    else:
-        topicsbox = ''
-    record = db.get_basket_record(bskid, recid, format)
-    comments = db.get_comments(bskid, recid)
-    group_sharing_level = None
-    levels = db.is_shared_to(bskid)
-    if len(levels):
-        group_sharing_level = levels[0][1]
-    basket = db.get_basket_general_infos(bskid)
-    if not(len(basket)):
-        errors.append('ERR_WEBBASKET_DB_ERROR')
-        return (body, errors, warnings)
-    item_html = webbasket_templates.tmpl_item(basket,
-                                              recid, record, comments,
-                                              group_sharing_level,
-                                              (check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                               check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
-                                               check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
-                                              selected_category=category, selected_topic=topic, selected_group_id=group_id,
-                                              ln=ln)
-    body = webbasket_templates.tmpl_display(topicsbox=topicsbox, baskets=[item_html],
-                                            selected_category=category,
-                                            nb_groups=db.count_groups_user_member_of(uid),
-                                            nb_external_baskets=db.count_external_baskets(uid),
-                                            ln=ln)
-    return (body, errors, warnings)
+    item = db.get_basket_item(bskid, recid, 'hb')
 
-def perform_request_write_comment(uid, bskid, recid, cmtid=0,
-                                  category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                                  topic=0, group_id=0,
-                                  ln=CFG_SITE_LANG):
-    """Display a comment writing form
+    if item:
+        (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) = item[0]
+        previous_item_recid = item[1]
+        next_item_recid = item[2]
+        item_index = item[3]
+    else:
+        # The validity of the recid and hence the item is already checked by the
+        # previous function and the appropriate warning is returned.
+        # This is just an extra check just in case we missed something.
+        # An empty body is returned.
+        body = ""
+        warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
+        return (body, warnings)
+    last_note = convert_datetext_to_dategui(last_note, ln)
+    val = ""
+    if recid < 0:
+        if ext_val:
+            val = decompress(ext_val)
+        else:
+            external_record = format_external_records(recid, 'hb')
+            val = external_record and external_record[0][1] or ""
+    else:
+        if int_val:
+            val = decompress(int_val)
+        else:
+            val = format_record(recid, 'hb', on_the_fly=True)
+    colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+    item = (recid, colid, nb_notes, last_note, val, score)
+
+    notes = db.get_notes(bskid, recid)
+
+    body = webbasket_templates.tmpl_public_basket_single_item(bskid,
+                                                              basket_name,
+                                                              nb_items,
+                                                              (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                                               check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])),
+                                                              item,
+                                                              notes,
+                                                              previous_item_recid,
+                                                              next_item_recid,
+                                                              item_index,
+                                                              optional_params,
+                                                              ln)
+    return (body, warnings)
+
+def perform_request_list_public_baskets(uid,
+                                        limit=1,
+                                        sort='name',
+                                        asc=1,
+                                        nb_views_show_p=False,
+                                        ln=CFG_SITE_LANG):
+
+    """Display list of public baskets.
+    @param limit: display baskets from the incrementally numbered 'limit' and on
+    @param sort: sort by 'name' or 'views' or 'owner' or 'date' or 'items'
+    @param asc: ascending sort or not
+    @param ln: language"""
+
+    warnings = []
+    warnings_html = ''
+
+    number_of_all_public_baskets = db.count_all_public_baskets()
+
+    limit -= 1
+    if limit < 0:
+        limit = 0
+    elif limit >= number_of_all_public_baskets:
+        limit = number_of_all_public_baskets - 1
+
+    if not nb_views_show_p and sort == 'views':
+        # TODO: Add a 'sort by views' restriction warning
+        #warnings.append('...')
+        #warnings_html += webbasket_templates.tmpl_warnings(warnings)
+        sort = "name"
+
+    all_public_baskets = db.get_list_public_baskets(limit,
+                                                    CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS,
+                                                    sort,
+                                                    asc)
+
+    body = webbasket_templates.tmpl_display_list_public_baskets(all_public_baskets,
+                                                                limit,
+                                                                number_of_all_public_baskets,
+                                                                sort,
+                                                                asc,
+                                                                nb_views_show_p,
+                                                                ln)
+
+    search_box = __create_search_box(uid=uid,
+                                     category=CFG_WEBBASKET_CATEGORIES['ALLPUBLIC'],
+                                     ln=ln)
+
+    body = webbasket_templates.tmpl_display(content=body, search_box=search_box)
+
+    body = warnings_html + body
+
+    navtrail = create_webbasket_navtrail(uid,
+                                         public_basket=True,
+                                         ln=ln)
+
+    return (body, warnings, navtrail)
+
+def perform_request_write_public_note(uid,
+                                      bskid=0,
+                                      recid=0,
+                                      cmtid=0,
+                                      ln=CFG_SITE_LANG):
+    """Display a note writing form
     @param uid: user id
     @param bskid: basket id
     @param recid: record id (comments are on a specific record in a specific basket)
@@ -304,73 +354,43 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
     @param group_id: selected group id
     @param ln: language
     """
-    body = ''
-    warnings = []
-    errors = []
-    textual_msg = '' # initial value in replies
-    html_msg = '' # initial value  in replies (if FCKeditor)
-    title = '' # initial title in replies
-    if not check_user_can_comment(uid, bskid):
-        errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
-        return (body, errors, warnings)
-    if cmtid:
-        # this is a reply to another comment
-        comment = db.get_comment(cmtid)
-        if comment:
-            # Title
-            if comment[2]:
-                title = 'Re: ' + comment[2]
 
-            # Build two msg: one mostly textual, the other one with HTML markup, for the FCKeditor.
-            textual_msg = webbasket_templates.tmpl_quote_comment_textual(comment[2], # title
-                                                                         uid,
-                                                                         comment[0], # nickname
-                                                                         comment[4], # date
-                                                                         comment[3],
-                                                                         ln)
-            html_msg = webbasket_templates.tmpl_quote_comment_html(comment[2], # title
-                                                                   uid,
-                                                                   comment[0], # nickname
-                                                                   comment[4], # date
-                                                                   comment[3],
-                                                                   ln)
-        else:
-            warning = (CFG_WEBBASKET_WARNING_MESSAGES['ERR_WEBBASKET_cmtid_INVALID'], cmtid)
-            warnings.append(warning)
-    record = db.get_basket_record(bskid, recid, 'hb')
-    # Check that user can attach file. To simplify we use the same
-    # checking as in WebComment, though it is not completely adequate.
-    user_info = collect_user_info(uid)
-    can_attach_files = check_user_can_attach_file_to_comments(user_info, recid)
-    body = webbasket_templates.tmpl_write_comment(bskid=bskid,
-                                                  recid=recid,
-                                                  cmt_title=title,
-                                                  cmt_body_textual=textual_msg,
-                                                  cmt_body_html=html_msg,
-                                                  record = record,
-                                                  selected_category=category,
-                                                  selected_topic=topic,
-                                                  selected_group_id=group_id,
-                                                  warnings=warnings,
-                                                  can_attach_files=can_attach_files)
-    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-        topics_list = db.get_personal_topics_infos(uid)
-        if not topic and len(topics_list):
-            topic = 0
-        topicsbox = webbasket_templates.tmpl_topic_selection(topics_list, topic, ln)
-    elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
-        groups = db.get_group_infos(uid)
-        if group_id == 0 and len(groups):
-            group_id = groups[0][0]
-        topicsbox = webbasket_templates.tmpl_group_selection(groups, group_id, ln)
+    optional_params = {}
+    warnings_rights = []
+    warnings_html = ""
+
+    if not can_add_notes_to_public_basket_p(bskid):
+        warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
     else:
-        topicsbox = ''
-    body = webbasket_templates.tmpl_display(topicsbox, '', [ body ], category, ln)
-    return (body, errors, warnings)
+        if cmtid and note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
+            optional_params["Add note"] = db.get_note(cmtid)
+        elif cmtid:
+            optional_params["Add note"] = ()
+            optional_params["Warnings"] = ('WRN_WEBBASKET_QUOTE_INVALID_NOTE',)
+        else:
+            optional_params["Add note"] = ()
 
-def perform_request_save_comment(uid, bskid, recid, title='', text='',
-                                 ln=CFG_SITE_LANG,
-                                 editor_type='textarea'):
+    (body, warnings, navtrail) = perform_request_display_public(uid=uid,
+                                                                selected_bskid=bskid,
+                                                                selected_recid=recid,
+                                                                optional_params=optional_params,
+                                                                format='hb',
+                                                                ln=CFG_SITE_LANG)
+
+    if not warnings:
+        body = warnings_html + body
+        warnings = warnings_rights
+
+    return (body, warnings, navtrail)
+
+def perform_request_save_public_note(uid,
+                                     bskid=0,
+                                     recid=0,
+                                     note_title="",
+                                     note_body="",
+                                     editor_type='textarea',
+                                     ln=CFG_SITE_LANG):
     """ Save a given comment if able to.
     @param uid: user id (int)
     @param bskid: basket id (int)
@@ -378,42 +398,1004 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='',
     @param title: title of comment (string)
     @param text: comment's body (string)
     @param ln: language (string)
-    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
-    @return: (errors, infos) where errors: list of errors while saving
-                                  infos: list of informations to display"""
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'"""
+
+    optional_params = {}
+    warnings_rights = []
+    warnings_html = ""
+
+    if not can_add_notes_to_public_basket_p(bskid):
+        warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
+    else:
+        if not note_title or not note_body:
+            optional_params["Incomplete note"] = (note_title, note_body)
+            optional_params["Warnings"] = ('WRN_WEBBASKET_INCOMPLETE_NOTE',)
+        else:
+            if editor_type == 'fckeditor':
+                # Here we remove the line feeds introduced by FCKeditor (they
+                # have no meaning for the user) and replace the HTML line
+                # breaks by linefeeds, so that we are close to an input that
+                # would be done without the FCKeditor. That's much better if a
+                # reply to a comment is made with a browser that does not
+                # support FCKeditor.
+                note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
+                note_body = cgi.escape(note_body, True)
+            else:
+                # TODO: instead of just ecpaping the values, use the html washer
+                # to allow basic tags.
+                note_body = cgi.escape(note_body, True)
+            if not(db.save_note(uid, bskid, recid, note_title, note_body)):
+                # TODO: warning about the DB problem
+                pass
+            else:
+                # TODO: inform about successful posting
+                pass
+
+    (body, warnings, navtrail) = perform_request_display_public(uid=uid,
+                                                                selected_bskid=bskid,
+                                                                selected_recid=recid,
+                                                                optional_params=optional_params,
+                                                                format='hb',
+                                                                ln=CFG_SITE_LANG)
+
+    if not warnings:
+        body = warnings_html + body
+        warnings = warnings_rights
+
+    return (body, warnings, navtrail)
+
+#################################
+### Display baskets and notes ###
+#################################
+
+def perform_request_display(uid,
+                            selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                            selected_topic="",
+                            selected_group_id=0,
+                            selected_bskid=0,
+                            selected_recid=0,
+                            optional_params={},
+                            format='hb',
+                            ln=CFG_SITE_LANG):
+    """Display all the baskets of given category, topic or group.
+    @param uid: user id
+    @param selected_category: selected category (see webbasket_config.py)
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
+    @param ln: language"""
+
     _ = gettext_set_language(ln)
-    errors = []
-    infos = []
+
+    warnings = []
+    warnings_html = ""
+    baskets = []
+
+    selected_basket_info = []
+    content = ""
+    search_box = ""
+
+    (selected_category, category_warnings) = wash_category(selected_category)
+    if not selected_category and category_warnings:
+        navtrail = create_webbasket_navtrail(uid, ln=ln)
+        body = webbasket_templates.tmpl_warnings(category_warnings)
+        return (body, category_warnings, navtrail)
+
+    if selected_category == CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']:
+        # TODO: Send the correct title of the page as well.
+        return perform_request_list_public_baskets(uid)
+
+    personal_info = db.get_all_personal_basket_ids_and_names_by_topic(uid)
+    personal_baskets_info = ()
+    if personal_info and selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+        if selected_topic:
+            # (A) tuples parsing check
+            valid_topic_names = [personal_info_topic[0] for personal_info_topic in personal_info]
+            if selected_topic in valid_topic_names:
+            # (B) DB check
+            #if db.is_topic_valid(uid, selected_topic):
+                personal_baskets_info = db.get_personal_baskets_info_for_topic(uid, selected_topic)
+                valid_selected_topic_p = True
+            else:
+                warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC')
+                valid_selected_topic_p = False
+                selected_topic = ""
+        else:
+            valid_selected_topic_p = True
+        if valid_selected_topic_p and selected_bskid:
+            # (A) tuples parsing check
+            if selected_topic:
+                valid_baskets = [eval(personal_info_topic[2] + ',') for personal_info_topic in personal_info
+                                 if personal_info_topic[0] == selected_topic]
+            else:
+                valid_baskets = [eval(personal_info_topic[2] + ',') for personal_info_topic in personal_info]
+            valid_bskids = []
+            for valid_basket in valid_baskets:
+                valid_bskids.extend([valid_bskid[0] for valid_bskid in valid_basket])
+            if selected_bskid in valid_bskids:
+            # (B) DB check
+            #if db.is_personal_basket_valid(uid, selected_bskid):
+                if not selected_topic:
+                    # (A) tuples parsing check
+                    valid_baskets_dict = {}
+                    for personal_info_topic in personal_info:
+                        valid_baskets_dict[personal_info_topic[0]] = eval(personal_info_topic[2] + ',')
+                    for valid_basket in valid_baskets_dict.iteritems():
+                        if selected_bskid in [valid_bskid[0] for valid_bskid in valid_basket[1]]:
+                            selected_topic = valid_basket[0]
+                            break
+                    # (B) DB check
+                    #selected_topic = db.get_basket_topic(uid, selected_bskid)
+                    personal_baskets_info = db.get_personal_baskets_info_for_topic(uid, selected_topic)
+                for personal_basket_info in personal_baskets_info:
+                    if personal_basket_info[0] == selected_bskid:
+                        selected_basket_info = list(personal_basket_info)
+                        selected_basket_info.append(CFG_WEBBASKET_SHARE_LEVELS['MANAGE'])
+                        break
+            else:
+                warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
+                selected_bskid = 0
+        else:
+            selected_bskid = 0
+
+    group_info = db.get_all_group_basket_ids_and_names_by_group(uid)
+    group_baskets_info = ()
+    selected_group_name = ""
+    if group_info and selected_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+        if selected_group_id:
+            # (A) tuples parsing check
+            valid_group_ids = [group_info_group[0] for group_info_group in group_info]
+            if selected_group_id in valid_group_ids:
+            # (B) DB check
+            #if db.is_group_valid(uid, selected_group_id):
+                group_baskets_info = db.get_group_baskets_info_for_group(selected_group_id)
+                # (A) tuples parsing
+                for group_info_group in group_info:
+                    if group_info_group[0] == selected_group_id:
+                        selected_group_name = group_info_group[1]
+                        break
+                # (B) DB
+                #selected_group_name = db.get_group_name(selected_group_id)[0][0]
+                valid_selected_group_p = True
+            else:
+                warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP')
+                selected_group_id = ""
+                valid_selected_group_p = False
+        else:
+            valid_selected_group_p = True
+        if valid_selected_group_p and selected_bskid:
+            # (A) tuples parsing check
+            if selected_group_id:
+                valid_baskets = [eval(group_info_group[3] + ',') for group_info_group in group_info
+                                 if group_info_group[0] == selected_group_id]
+            else:
+                valid_baskets = [eval(group_info_group[3] + ',') for group_info_group in group_info]
+            valid_bskids = []
+            for valid_basket in valid_baskets:
+                valid_bskids.extend([valid_bskid[0] for valid_bskid in valid_basket])
+            if selected_bskid in valid_bskids:
+            # (B) DB check
+            #if db.is_group_basket_valid(uid, selected_bskid):
+                if not selected_group_id:
+                    # (A) tuples parsing check
+                    valid_baskets_dict = {}
+                    for group_info_group in group_info:
+                        valid_baskets_dict[group_info_group[0]] = eval(group_info_group[3] + ',')
+                    for valid_basket in valid_baskets_dict.iteritems():
+                        if selected_bskid in [valid_bskid[0] for valid_bskid in valid_basket[1]]:
+                            selected_group_id = valid_basket[0]
+                            break
+                    # (B) DB check
+                    #selected_group_id = db.get_basket_group(uid, selected_bskid)
+                    # (A) tuples parsing
+                    for group_info_group in group_info:
+                        if group_info_group[0] == selected_group_id:
+                            selected_group_name = group_info_group[1]
+                            break
+                    # (B) DB
+                    #selected_group_name = db.get_group_name(selected_group_id)[0][0]
+                    group_baskets_info = db.get_group_baskets_info_for_group(selected_group_id)
+                for group_basket_info in group_baskets_info:
+                    if group_basket_info[0] == selected_bskid:
+                        selected_basket_info = list(group_basket_info)
+                        # INFO: uncomment the two following lines to give MANAGE
+                        # rights to the owner of the basket even when through
+                        # the group view of the basket.
+                        #if group_basket_info[7] == uid:
+                        #    selected_basket_info[6] = CFG_WEBBASKET_SHARE_LEVELS['MANAGE']
+                        selected_basket_info.pop(7)
+                        break
+            else:
+                warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
+                selected_bskid = 0
+        else:
+            selected_bskid = 0
+
+    public_info = db.get_all_external_basket_ids_and_names(uid)
+    if public_info and selected_category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+        if selected_bskid:
+            valid_bskids = [valid_basket[0] for valid_basket in public_info]
+            if selected_bskid in valid_bskids:
+                public_basket_info = db.get_external_basket_info(selected_bskid)
+                if public_basket_info:
+                    selected_basket_info = list(public_basket_info[0])
+            else:
+                # TODO: this is not a valid basket. Warn the user.
+                selected_bskid = 0
+
+    if not personal_info:
+        if not group_info:
+            if not public_info:
+                selected_category = CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']
+            else:
+                selected_category = CFG_WEBBASKET_CATEGORIES['EXTERNAL']
+        else:
+            selected_category = CFG_WEBBASKET_CATEGORIES['GROUP']
+
+    directory_box = webbasket_templates.tmpl_create_directory_box(selected_category,
+                                                                  selected_topic,
+                                                                  (selected_group_id, selected_group_name),
+                                                                  selected_bskid,
+                                                                  (personal_info, personal_baskets_info),
+                                                                  (group_info, group_baskets_info),
+                                                                  public_info,
+                                                                  ln)
+    
+    # TODO: Remove/Replace this bit
+    bskids = []
+    for basket in baskets:
+        bskids.append(basket[0])
+    levels = dict(db.is_shared_to(bskids))
+
+    # TODO: Remove/Replace this bit
+    #create_link = ''
+    #if selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+        #create_link = webbasket_templates.tmpl_create_basket_link(selected_topic, ln)
+
+    if selected_basket_info:
+        if selected_recid:
+            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_level) = selected_basket_info
+            (content, bsk_warnings) = __display_basket_single_item(bskid,
+                                                                   basket_name,
+                                                                   selected_recid,
+                                                                   last_update,
+                                                                   nb_views,
+                                                                   nb_items,
+                                                                   last_added,
+                                                                   share_level,
+                                                                   selected_category,
+                                                                   selected_topic,
+                                                                   selected_group_id,
+                                                                   optional_params,
+                                                                   ln)
+        else:
+            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_level) = selected_basket_info
+            (content, bsk_warnings) = __display_basket(bskid,
+                                                       basket_name,
+                                                       last_update,
+                                                       nb_views,
+                                                       nb_items,
+                                                       last_added,
+                                                       share_level,
+                                                       levels[bskid],
+                                                       selected_category,
+                                                       selected_topic,
+                                                       selected_group_id,
+                                                       ln)
+        warnings.extend(bsk_warnings)
+    else:
+        search_box = __create_search_box(uid=uid,
+                                         category=selected_category,
+                                         topic=selected_topic,
+                                         grpid=selected_group_id,
+                                         p="",
+                                         b="",
+                                         n=0,
+                                         ln=ln)
+
+    body = webbasket_templates.tmpl_display(directory_box, content, search_box)
+    body = warnings_html + body
+
+    navtrail = create_webbasket_navtrail(uid,
+                                         category=selected_category,
+                                         topic=selected_topic,
+                                         group=selected_group_id,
+                                         bskid=selected_bskid,
+                                         ln=ln)
+
+    return (body, warnings, navtrail)
+
+def __display_basket(bskid,
+                     basket_name,
+                     last_update,
+                     nb_views,
+                     nb_items,
+                     last_added,
+                     share_level,
+                     group_sharing_level,
+                     selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                     selected_topic="",
+                     selected_group_id=0,
+                     ln=CFG_SITE_LANG):
+    """Private function. Display a basket giving its category and topic or group.
+    @param share_level: rights user has on basket
+    @param group_sharing_level: None if basket is not shared,
+                                0 if public basket,
+                                > 0 if shared to usergroups but not public.
+    @param selected_category: selected category (see webbasket_config.py)
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
+    @param ln: language"""
+
+    _ = gettext_set_language(ln)
+
+    warnings = []
+
+    nb_total_notes = 0
+    last_note = _("N/A")
+    records = []
+    notes_dates = []
+    #date_modification = convert_datetext_to_dategui(date_modification, ln)
+    last_update = convert_datetext_to_dategui(last_update, ln)
+
+    items = db.get_basket_content(bskid, 'hb')
+    external_recids = []
+
+    for (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) in items:
+        notes_dates.append(convert_datetext_to_datestruct(last_note))
+        last_note = convert_datetext_to_dategui(last_note, ln)
+        val = ""
+        nb_total_notes += nb_notes
+        if recid < 0:
+            if ext_val:
+                val = decompress(ext_val)
+            else:
+                external_recids.append(recid)
+        else:
+            if int_val:
+                val = decompress(int_val)
+            else:
+                val = format_record(recid, 'hb', on_the_fly=True)
+        colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+        records.append((recid, colid, nb_notes, last_note, val, score))
+
+    if external_recids:
+        external_records = format_external_records(external_recids, 'hb')
+
+        for external_record in external_records:
+            for record in records:
+                if record[0] == -external_record[0]:
+                    idx = records.index(record)
+                    tuple_to_list = list(records.pop(idx))
+                    tuple_to_list[4] = external_record[1]
+                    records.insert(idx,tuple(tuple_to_list))
+                    break
+
+    if notes_dates:
+        last_note = convert_datestruct_to_dategui(max(notes_dates), ln)
+
+    body = webbasket_templates.tmpl_basket(bskid,
+                                           basket_name,
+                                           last_update,
+                                           nb_views,
+                                           nb_items,
+                                           last_added,
+                                           (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
+                                           nb_total_notes,
+                                           last_note,
+                                           group_sharing_level,
+                                           selected_category,
+                                           selected_topic,
+                                           selected_group_id,
+                                           records,
+                                           ln)
+    return (body, warnings)
+
+def __display_basket_single_item(bskid,
+                                 basket_name,
+                                 recid,
+                                 last_update,
+                                 nb_views,
+                                 nb_items,
+                                 last_added,
+                                 share_level,
+                                 selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                 selected_topic="",
+                                 selected_group_id=0,
+                                 optional_params={},
+                                 ln=CFG_SITE_LANG):
+    """Private function. Display a basket giving its category and topic or group.
+    @param share_level: rights user has on basket
+    @param selected_category: selected category (see webbasket_config.py)
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
+    @param ln: language"""
+
+    _ = gettext_set_language(ln)
+
+    warnings = []
+
+    nb_total_notes = 0
+    last_note = _("N/A")
+    records = []
+    notes_dates = []
+    #date_modification = convert_datetext_to_dategui(date_modification, ln)
+    last_update = convert_datetext_to_dategui(last_update, ln)
+
+    item = db.get_basket_item(bskid, recid, 'hb')
+
+    if item:
+        (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) = item[0]
+        previous_item_recid = item[1]
+        next_item_recid = item[2]
+        item_index = item[3]
+    else:
+        # TODO: Item does not exist, return the default display basket view
+        # appending a warning for the unknown item.
+        (content, bsk_warnings) = __display_basket(bskid,
+                                                   basket_name,
+                                                   last_update,
+                                                   nb_views,
+                                                   nb_items,
+                                                   last_added,
+                                                   share_level,
+                                                   {},
+                                                   selected_category,
+                                                   selected_topic,
+                                                   selected_group_id,
+                                                   ln)
+        return (content, bsk_warnings)
+
+    notes_dates.append(convert_datetext_to_datestruct(last_note))
+    last_note = convert_datetext_to_dategui(last_note, ln)
+    val = ""
+    nb_total_notes += nb_notes
+    if recid < 0:
+        if ext_val:
+            val = decompress(ext_val)
+        else:
+            external_record = format_external_records(recid, 'hb')
+            val = external_record and external_record[0][1] or ""
+    else:
+        if int_val:
+            val = decompress(int_val)
+        else:
+            val = format_record(recid, 'hb', on_the_fly=True)
+    colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+    item = (recid, colid, nb_notes, last_note, val, score)
+
+    comments = db.get_notes(bskid, recid)
+
+    if notes_dates:
+        last_note = convert_datestruct_to_dategui(max(notes_dates), ln)
+
+    body = webbasket_templates.tmpl_basket_single_item(bskid,
+                                           basket_name,
+                                           last_update,
+                                           nb_views,
+                                           nb_items,
+                                           last_added,
+                                           (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
+                                           nb_total_notes,
+                                           last_note,
+                                           selected_category,
+                                           selected_topic,
+                                           selected_group_id,
+                                           item, comments,
+                                           previous_item_recid, next_item_recid, item_index,
+                                           optional_params,
+                                           ln)
+    return (body, warnings)
+
+def perform_request_search(uid,
+                           selected_category="",
+                           selected_topic="",
+                           selected_group_id=0,
+                           p="",
+                           b="",
+                           n=0,
+                           format='hb',
+                           ln=CFG_SITE_LANG):
+    """Search the baskets...
+    @param uid: user id
+    @param category: selected category (see webbasket_config.py)
+    @param selected_topic: # of selected topic to display baskets
+    @param selected_group_id: id of group to display baskets
+    @param ln: language"""
+
+    _ = gettext_set_language(ln)
+
+    body = ""
+    warnings = []
+    warnings_html = ""
+
+    (b_category, b_topic_or_grpid, b_warnings) = wash_b_search(b)
+    # we extract the category from the washed b GET variable.
+    # if a valid category was returned we use it as the selected category.
+    if b_category:
+        selected_category = b_category
+        if selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+            selected_topic = b_topic_or_grpid
+        elif selected_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+            selected_group_id = b_topic_or_grpid
+    # if no category was returned and there were warnings it means there was a
+    # bad input, send the warning to the user and return the page.
+    elif b_warnings:
+        navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
+        body = webbasket_templates.tmpl_warnings(b_warnings)
+        return (body, b_warnings, navtrail)
+    # if no category was returned and there were no warnings it means no category
+    # was defined in the b GET variable. If the user has not defined a category
+    # either using the category GET variable it means there is no category defined
+    # whatsoever.
+    elif not selected_category:
+        selected_category = ""
+    # finally, if no category was returned but the user has defined a category
+    # using the category GET variable we extract the category after washing the
+    # variable.
+    else:
+        (selected_category, category_warnings) = wash_category(selected_category)
+        if not selected_category and category_warnings:
+            navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
+            body = webbasket_templates.tmpl_warnings(category_warnings)
+            return (body, category_warnings, navtrail)
+
+    if selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and selected_topic:
+        (selected_topic, topic_warnings) = wash_topic(uid, selected_topic)
+        if not selected_topic and topic_warnings:
+            navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
+            body = webbasket_templates.tmpl_warnings(topic_warnings)
+            return (body, topic_warnings, navtrail)
+
+    if selected_category == CFG_WEBBASKET_CATEGORIES['GROUP'] and selected_group_id:
+        (selected_group_id, group_warnings) = wash_group(uid, selected_group_id)
+        if not selected_group_id and group_warnings:
+            navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
+            body = webbasket_templates.tmpl_warnings(group_warnings)
+            return (body, group_warnings, navtrail)
+
+    # TODO: in case we pass an "action=search" GET variable we can use the
+    # following bit to warn the user he's searching for an empty search pattern.
+    #if action == "search" and not p:
+    #    warnings_html += webbasket_templates.tmpl_warnings(['WRN_WEBBASKET_NO_SEARCH_PATTERN'])
+    #    perform_search = 0
+
+    if p:
+        # Let's set some initial values
+        personal_search_results = None
+        total_no_personal_search_results = 0
+        group_search_results = None
+        total_no_group_search_results = 0
+        public_search_results = None
+        total_no_public_search_results = 0
+        all_public_search_results = None
+        total_no_all_public_search_results = 0
+        # Let's precalculate the local search resutls
+        # and the pattern for the external search results
+        local_search_results = set(search_unit(p))
+        # How strict should the pattern be? Look for the exact word
+        # (using word boundaries: \b) or is any substring enough?
+        import re
+        # not that strict:
+        # since we remove the html markup before searching for the pattern we
+        # can use a rather simple pattern here.
+        # INFO: we choose a not so strict pattern, since there are issues with
+        # word bounderies and utf-8 strings (ex. with greek that was tested)
+        pattern = re.compile(r'%s' % (re.escape(p),), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
+        #pattern = re.compile(r'%s(?!([^<]+)?>)' % (p,), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
+        # strict:
+        # since we remove the html markup before searching for the pattern we
+        # can use a rather simple pattern here.
+        #pattern = re.compile(r'\b%s\b' % (re.escape(p),), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
+        #pattern = re.compile(r'%s\b(?!([^<]+)?>)' % (p,), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
+        debug_to_file(p)
+
+        if b.startswith("P") or not b:
+            personal_search_results = {}
+            personal_items = db.get_all_items_in_user_personal_baskets(uid, selected_topic, format)
+            personal_local_items = personal_items[0]
+            personal_external_items = personal_items[1]
+
+            for local_info_per_basket in personal_local_items:
+                bskid       = local_info_per_basket[0]
+                basket_name = local_info_per_basket[1]
+                topic       = local_info_per_basket[2]
+                recid_list  = local_info_per_basket[3]
+                local_recids_per_basket = set(eval(recid_list + ','))
+                intsec = local_search_results.intersection(local_recids_per_basket)
+                if intsec:
+                    personal_search_results[bskid] = [basket_name, topic, len(intsec), list(intsec)]
+                    total_no_personal_search_results += len(intsec)
+
+            for external_info_per_basket in personal_external_items:
+                bskid       = external_info_per_basket[0]
+                basket_name = external_info_per_basket[1]
+                topic       = external_info_per_basket[2]
+                recid       = external_info_per_basket[3]
+                value       = external_info_per_basket[4]
+                text = remove_html_markup(decompress(value))
+                debug_to_file(text)
+                result = pattern.search(text)
+                if result:
+                    if personal_search_results.has_key(bskid):
+                        personal_search_results[bskid][2] += 1
+                        personal_search_results[bskid][3].append(recid)
+                    else:
+                        personal_search_results[bskid] = [basket_name, topic, 1, [recid]]
+                    total_no_personal_search_results += 1
+
+            if n:
+                personal_items_by_matching_notes = db.get_all_items_in_user_personal_baskets_by_matching_notes(uid, selected_topic, p)
+                for info_per_basket_by_matching_notes in personal_items_by_matching_notes:
+                    bskid       = info_per_basket_by_matching_notes[0]
+                    basket_name = info_per_basket_by_matching_notes[1]
+                    topic       = info_per_basket_by_matching_notes[2]
+                    recid_list  = info_per_basket_by_matching_notes[3]
+                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    if personal_search_results.has_key(bskid):
+                        no_personal_search_results_per_basket_so_far = personal_search_results[bskid][2]
+                        personal_search_results[bskid][3] = list(set(personal_search_results[bskid][3]).union(recids_per_basket_by_matching_notes))
+                        personal_search_results[bskid][2] = len(personal_search_results[bskid][3])
+                        total_no_personal_search_results += ( personal_search_results[bskid][2] - no_personal_search_results_per_basket_so_far )
+                    else:
+                        personal_search_results[bskid] = [basket_name, topic, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
+                        total_no_personal_search_results += len(recids_per_basket_by_matching_notes)
+
+        if b.startswith("G") or not b:
+            group_search_results = {}
+            group_items = db.get_all_items_in_user_group_baskets(uid, selected_group_id, format)
+            group_local_items = group_items[0]
+            group_external_items = group_items[1]
+
+            for local_info_per_basket in group_local_items:
+                bskid       = local_info_per_basket[0]
+                basket_name = local_info_per_basket[1]
+                grpid       = local_info_per_basket[2]
+                group_name  = local_info_per_basket[3]
+                recid_list  = local_info_per_basket[4]
+                local_recids_per_basket = set(eval(recid_list + ','))
+                intsec = local_search_results.intersection(local_recids_per_basket)
+                if intsec:
+                    group_search_results[bskid] = [basket_name, grpid, group_name, len(intsec), list(intsec)]
+                    total_no_group_search_results += len(intsec)
+
+            for external_info_per_basket in group_external_items:
+                bskid       = external_info_per_basket[0]
+                basket_name = external_info_per_basket[1]
+                grpid       = external_info_per_basket[2]
+                group_name  = external_info_per_basket[3]
+                recid       = external_info_per_basket[4]
+                value       = external_info_per_basket[5]
+                text = remove_html_markup(decompress(value))
+                result = pattern.search(text)
+                if result:
+                    if group_search_results.has_key(bskid):
+                        group_search_results[bskid][3] += 1
+                        group_search_results[bskid][4].append(recid)
+                    else:
+                        group_search_results[bskid] = [basket_name, grpid, group_name, 1, [recid]]
+                    total_no_group_search_results += 1
+
+            if n:
+                group_items_by_matching_notes = db.get_all_items_in_user_group_baskets_by_matching_notes(uid, selected_group_id, p)
+                for info_per_basket_by_matching_notes in group_items_by_matching_notes:
+                    bskid       = info_per_basket_by_matching_notes[0]
+                    basket_name = info_per_basket_by_matching_notes[1]
+                    grpid       = info_per_basket_by_matching_notes[2]
+                    group_name  = info_per_basket_by_matching_notes[3]
+                    recid_list  = info_per_basket_by_matching_notes[4]
+                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    if group_search_results.has_key(bskid):
+                        no_group_search_results_per_basket_so_far = group_search_results[bskid][3]
+                        group_search_results[bskid][4] = list(set(group_search_results[bskid][4]).union(recids_per_basket_by_matching_notes))
+                        group_search_results[bskid][3] = len(group_search_results[bskid][4])
+                        total_no_group_search_results += ( group_search_results[bskid][3] - no_group_search_results_per_basket_so_far )
+                    else:
+                        group_search_results[bskid] = [basket_name, grpid, group_name, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
+                        total_no_group_search_results += len(recids_per_basket_by_matching_notes)
+
+        if b.startswith("E") or not b:
+            public_search_results = {}
+            public_items = db.get_all_items_in_user_public_baskets(uid, format)
+            public_local_items = public_items[0]
+            public_external_items = public_items[1]
+
+            for local_info_per_basket in public_local_items:
+                bskid       = local_info_per_basket[0]
+                basket_name = local_info_per_basket[1]
+                recid_list  = local_info_per_basket[2]
+                local_recids_per_basket = set(eval(recid_list + ','))
+                intsec = local_search_results.intersection(local_recids_per_basket)
+                if intsec:
+                    public_search_results[bskid] = [basket_name, len(intsec), list(intsec)]
+                    total_no_public_search_results += len(intsec)
+
+            for external_info_per_basket in public_external_items:
+                bskid       = external_info_per_basket[0]
+                basket_name = external_info_per_basket[1]
+                recid       = external_info_per_basket[2]
+                value       = external_info_per_basket[3]
+                text = remove_html_markup(decompress(value))
+                result = pattern.search(text)
+                if result:
+                    if public_search_results.has_key(bskid):
+                        public_search_results[bskid][1] += 1
+                        public_search_results[bskid][2].append(recid)
+                    else:
+                        public_search_results[bskid] = [external_info_per_basket[1], 1, [recid]]
+                    total_no_public_search_results += 1
+
+            if n:
+                public_items_by_matching_notes = db.get_all_items_in_user_public_baskets_by_matching_notes(uid, p)
+                for info_per_basket_by_matching_notes in public_items_by_matching_notes:
+                    bskid       = info_per_basket_by_matching_notes[0]
+                    basket_name = info_per_basket_by_matching_notes[1]
+                    recid_list  = info_per_basket_by_matching_notes[2]
+                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    if public_search_results.has_key(bskid):
+                        no_public_search_results_per_basket_so_far = public_search_results[bskid][1]
+                        public_search_results[bskid][2] = list(set(public_search_results[bskid][2]).union(recids_per_basket_by_matching_notes))
+                        public_search_results[bskid][1] = len(public_search_results[bskid][2])
+                        total_no_public_search_results += ( public_search_results[bskid][1] - no_public_search_results_per_basket_so_far )
+                    else:
+                        public_search_results[bskid] = [basket_name, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
+                        total_no_public_search_results += len(recids_per_basket_by_matching_notes)
+
+        if b.startswith("A"):
+            all_public_search_results = {}
+            all_public_items = db.get_all_items_in_all_public_baskets(format)
+            all_public_local_items = all_public_items[0]
+            all_public_external_items = all_public_items[1]
+
+            for local_info_per_basket in all_public_local_items:
+                bskid       = local_info_per_basket[0]
+                basket_name = local_info_per_basket[1]
+                recid_list  = local_info_per_basket[2]
+                local_recids_per_basket = set(eval(recid_list + ','))
+                intsec = local_search_results.intersection(local_recids_per_basket)
+                if intsec:
+                    all_public_search_results[bskid] = [basket_name, len(intsec), list(intsec)]
+                    total_no_all_public_search_results += len(intsec)
+
+            for external_info_per_basket in all_public_external_items:
+                bskid       = external_info_per_basket[0]
+                basket_name = external_info_per_basket[1]
+                recid       = external_info_per_basket[2]
+                value       = external_info_per_basket[3]
+                text = remove_html_markup(decompress(value))
+                result = pattern.search(text)
+                if result:
+                    if all_public_search_results.has_key(bskid):
+                        all_public_search_results[bskid][1] += 1
+                        all_public_search_results[bskid][2].append(recid)
+                    else:
+                        all_public_search_results[bskid] = [external_info_per_basket[1], 1, [recid]]
+                    total_no_all_public_search_results += 1
+
+            if n:
+                all_public_items_by_matching_notes = db.get_all_items_in_all_public_baskets_by_matching_notes(p)
+                for info_per_basket_by_matching_notes in all_public_items_by_matching_notes:
+                    bskid       = info_per_basket_by_matching_notes[0]
+                    basket_name = info_per_basket_by_matching_notes[1]
+                    recid_list  = info_per_basket_by_matching_notes[2]
+                    recids_per_basket_by_matching_notes = set(eval(recid_list + ','))
+                    if all_public_search_results.has_key(bskid):
+                        no_all_public_search_results_per_basket_so_far = all_public_search_results[bskid][1]
+                        all_public_search_results[bskid][2] = list(set(all_public_search_results[bskid][2]).union(recids_per_basket_by_matching_notes))
+                        all_public_search_results[bskid][1] = len(all_public_search_results[bskid][2])
+                        total_no_all_public_search_results += ( all_public_search_results[bskid][1] - no_all_public_search_results_per_basket_so_far )
+                    else:
+                        all_public_search_results[bskid] = [basket_name, len(recids_per_basket_by_matching_notes), list(recids_per_basket_by_matching_notes)]
+                        total_no_all_public_search_results += len(recids_per_basket_by_matching_notes)
+
+        search_results_html = webbasket_templates.tmpl_search_results(personal_search_results,
+                                                                      total_no_personal_search_results,
+                                                                      group_search_results,
+                                                                      total_no_group_search_results,
+                                                                      public_search_results,
+                                                                      total_no_public_search_results,
+                                                                      all_public_search_results,
+                                                                      total_no_all_public_search_results,
+                                                                      ln)
+    else:
+        search_results_html = None
+    
+    search_box = __create_search_box(uid=uid,
+                                     category=selected_category,
+                                     topic=selected_topic,
+                                     grpid=selected_group_id,
+                                     p=p,
+                                     b=b,
+                                     n=n,
+                                     ln=ln)
+
+    body = webbasket_templates.tmpl_display(search_box=search_box,
+                                            search_results=search_results_html)
+    body = warnings_html + body
+
+    navtrail = create_webbasket_navtrail(uid,
+                                         search_baskets=True,
+                                         ln=ln)
+
+    return (body, warnings, navtrail)
+
+def perform_request_write_note(uid,
+                               category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                               topic="",
+                               group_id=0,
+                               bskid=0,
+                               recid=0,
+                               cmtid=0,
+                               ln=CFG_SITE_LANG):
+    """Display a note writing form
+    @param uid: user id
+    @param bskid: basket id
+    @param recid: record id (comments are on a specific record in a specific basket)
+    @param cmtid: if provided this comment is a reply to comment cmtid.
+    @param category: selected category
+    @param topic: selected topic
+    @param group_id: selected group id
+    @param ln: language
+    """
+
+    optional_params = {}
+    warnings_rights = []
+    warnings_html = ""
+
     if not check_user_can_comment(uid, bskid):
-        errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
-        return (errors, infos)
-
-    if editor_type == 'fckeditor':
-        # Here we remove the line feeds introduced by FCKeditor (they
-        # have no meaning for the user) and replace the HTML line
-        # breaks by linefeeds, so that we are close to an input that
-        # would be done without the FCKeditor. That's much better if a
-        # reply to a comment is made with a browser that does not
-        # support FCKeditor.
-        text = text.replace('\n', '').replace('\r', '').replace('<br />', '\n')
-
-    if not(db.save_comment(uid, bskid, recid, title, text)):
-        errors.append(('ERR_WEBBASKET_DB_ERROR'))
+        warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
     else:
-        infos.append(_('Your comment has been successfully posted'))
-    return (errors, infos)
+        if cmtid and note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
+            optional_params["Add note"] = db.get_note(cmtid)
+        elif cmtid:
+            optional_params["Add note"] = ()
+            optional_params["Warnings"] = ('WRN_WEBBASKET_QUOTE_INVALID_NOTE',)
+        else:
+            optional_params["Add note"] = ()
 
-def perform_request_delete_comment(uid, bskid, recid, cmtid):
+    (body, warnings, navtrail) = perform_request_display(uid=uid,
+                                                         selected_category=category,
+                                                         selected_topic=topic,
+                                                         selected_group_id=group_id,
+                                                         selected_bskid=bskid,
+                                                         selected_recid=recid,
+                                                         optional_params=optional_params,
+                                                         format='hb',
+                                                         ln=CFG_SITE_LANG)
+
+    if not warnings:
+        body = warnings_html + body
+        warnings = warnings_rights
+
+    return (body, warnings, navtrail)
+
+def perform_request_save_note(uid,
+                              category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                              topic="",
+                              group_id=0,
+                              bskid=0,
+                              recid=0,
+                              note_title="",
+                              note_body="",
+                              editor_type='textarea',
+                              ln=CFG_SITE_LANG):
+    """ Save a given comment if able to.
+    @param uid: user id (int)
+    @param bskid: basket id (int)
+    @param recid: record id (int)
+    @param title: title of comment (string)
+    @param text: comment's body (string)
+    @param ln: language (string)
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'"""
+
+    optional_params = {}
+    warnings_rights = []
+    warnings_html = ""
+
+    if not check_user_can_comment(uid, bskid):
+        warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
+    else:
+        if not note_title or not note_body:
+            optional_params["Incomplete note"] = (note_title, note_body)
+            optional_params["Warnings"] = ('WRN_WEBBASKET_INCOMPLETE_NOTE',)
+        else:
+            if editor_type == 'fckeditor':
+                # Here we remove the line feeds introduced by FCKeditor (they
+                # have no meaning for the user) and replace the HTML line
+                # breaks by linefeeds, so that we are close to an input that
+                # would be done without the FCKeditor. That's much better if a
+                # reply to a comment is made with a browser that does not
+                # support FCKeditor.
+                note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
+                #note_body = cgi.escape(note_body, True)
+            else:
+                # TODO: instead of just ecpaping the values, use the html washer
+                # to allow basic tags.
+                #note_body = cgi.escape(note_body, True)
+                note_body = note_body
+            if not(db.save_note(uid, bskid, recid, note_title, note_body)):
+                # TODO: warning about the DB problem
+                pass
+            else:
+                # TODO: inform about successful posting
+                pass
+
+    (body, warnings, navtrail) = perform_request_display(uid=uid,
+                                                         selected_category=category,
+                                                         selected_topic=topic,
+                                                         selected_group_id=group_id,
+                                                         selected_bskid=bskid,
+                                                         selected_recid=recid,
+                                                         optional_params=optional_params,
+                                                         format='hb',
+                                                         ln=CFG_SITE_LANG)
+
+    if not warnings:
+        body = warnings_html + body
+        warnings = warnings_rights
+
+    return (body, warnings, navtrail)
+
+def perform_request_delete_note(uid,
+                                category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                topic="",
+                                group_id=0,
+                                bskid=0,
+                                recid=0,
+                                cmtid=0,
+                                ln=CFG_SITE_LANG):
     """Delete comment cmtid on record recid for basket bskid."""
-    errors = []
-    if __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['DELCMT']):
-        db.delete_comment(bskid, recid, cmtid)
-    else:
-        errors.append('ERR_WEBBASKET_NO_RIGHTS')
-    return errors
 
-def perform_request_add(uid, recids=[], colid=0, bskids=[], es_title='', es_desc='', es_url='', referer='',
-                        new_basket_name='', new_topic_name='', create_in_topic='',
+    if not __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['DELCMT']):
+        pass
+        # TODO: add a warning here, the user cannot delete this basket's items' notes
+    else:
+        if cmtid:
+            # TODO: check here if this note exists and belongs to this bskid/recid,
+            # send a warning in case the cmtid chosen does not belong to this bskid/recid.
+            db.delete_note(bskid, recid, cmtid)
+        else:
+            # TODO: add warning, no cmtid specified
+            pass
+
+    (body, warnings, navtrail) = perform_request_display(uid=uid,
+                                                         selected_category=category,
+                                                         selected_topic=topic,
+                                                         selected_group_id=group_id,
+                                                         selected_bskid=bskid,
+                                                         selected_recid=recid,
+                                                         format='hb',
+                                                         ln=CFG_SITE_LANG)
+
+    return (body, warnings, navtrail)
+
+def perform_request_add(uid,
+                        recids=[],
+                        category='',
+                        bskid=0,
+                        colid=0,
+                        es_title='',
+                        es_desc='',
+                        es_url='',
+                        note_body='',
+                        editor_type='',
+                        b='',
+                        successful_add=False,
+                        copy=False,
+                        referer='',
                         ln=CFG_SITE_LANG):
     """Add records to baskets
     @param uid: user id
@@ -425,151 +1407,212 @@ def perform_request_add(uid, recids=[], colid=0, bskids=[], es_title='', es_desc
     @param es_desc: the description of the external source
     @param es_url: the url of the external source
     @param referer: URL of the referring page
-    @param new_basket_name: add record to new basket
-    @param new_topic_name: new basket goes into new topic
-    @param create_in_topic: # of topic to put basket into
-    @param ln: language
-    @return: (body, errors, warnings) tuple
-    """
-    body = ''
-    errors = []
+    @param ln: language"""
+
+    if successful_add:
+        body = webbasket_templates.tmpl_add(recids=recids,
+                                            category=category,
+                                            bskid=bskid,
+                                            colid=colid,
+                                            successful_add=True,
+                                            copy=copy,
+                                            referer=referer,
+                                            ln=ln)
+        warnings = []
+        navtrail = create_webbasket_navtrail(uid,
+                                             add_to_basket=True,
+                                             ln=ln)
+        return (body, warnings, navtrail)
+
     warnings = []
-    if not(type(recids) == list):
+    warnings_html = ""
+
+    if type(recids) is not list:
         recids = [recids]
 
     validated_recids = []
+
     if colid == 0:
-        # local records
+        # Local records
         for recid in recids:
             recid = int(recid)
             if recid > 0 and record_exists(recid) == 1:
                 validated_recids.append(recid)
-            elif recid < 0:
-                # if we are copying a record, colid will always be 0 but we may still get negative recids
-                # in that case, we just skip the checking and add them directly to the validated_recids
+            elif recid < 0 and copy:
+                # if we are copying a record, colid will always be 0 but we may
+                # still get negative recids when it comes to external items.
+                # In that case, we just skip the checking and add them directly
+                # to the validated_recids.
                 validated_recids.append(recid)
-
         user_info = collect_user_info(uid)
+        recids_to_remove = []
         for recid in validated_recids:
             (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
             if auth_code:
-                # User not authorized to view record
-                validated_recids.remove(recid)
+                # User is not authorized to view record.
+                # We should not remove items from the list while we parse it.
+                # Better store them in another list and in the end remove them.
+                #validated_recids.remove(recid)
+                recids_to_remove.append(recid)
                 warnings.append(('WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD', recid))
+                warnings_html = webbasket_templates.tmpl_warnings('WRN_WEBBASKET_NO_RIGHTS_TO_ADD_RECORDS', ln)
+        for recid in recids_to_remove:
+            validated_recids.remove(recid)
+
     elif colid > 0:
-        # external records, no need to validate
-        validated_recids = recids
+        # External records, no need to validate.
+        validated_recids.extend(recids)
+
     elif colid == -1:
-        # external source
-        es_errors = 0
+        # External source.
         es_warnings = []
         if not es_title:
             es_warnings.append('WRN_WEBBASKET_NO_EXTERNAL_SOURCE_TITLE')
-            es_errors += 1
         if not es_desc:
             es_warnings.append('WRN_WEBBASKET_NO_EXTERNAL_SOURCE_DESCRIPTION')
-            es_errors += 1
         if not es_url:
             es_warnings.append('WRN_WEBBASKET_NO_EXTERNAL_SOURCE_URL')
-            es_errors += 1
         else:
             (is_valid, status, reason) = url_is_valid(es_url)
             if not is_valid:
                 if str(status).startswith('0'):
                     es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_0')
-                if str(status).startswith('4'):
+                elif str(status).startswith('4'):
                     es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_4')
-                if str(status).startswith('5'):
+                elif str(status).startswith('5'):
                     es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_5')
-                es_errors += 1
             elif not (es_url.startswith("http://") or es_url.startswith("https://")):
                 es_url = "http://" + es_url
-        if es_errors:
-            body += webbasket_templates.tmpl_warnings(es_warnings, ln)
+        if es_warnings:
+            warnings.extend(es_warnings)
+            warnings_html += webbasket_templates.tmpl_warnings(es_warnings, ln)
 
-    if not recids:
-        # in case there are no record ids select assume we want to add an external source to the basket
+    if not validated_recids:
+        # in case there are no record ids select assume we want to add an
+        # external source.
         colid = -1
 
-    if not validated_recids and colid >= 0:
-        warnings.append('WRN_WEBBASKET_NO_RECORD')
-        body += webbasket_templates.tmpl_warnings(warnings, ln)
-        if referer and not(referer.find(CFG_SITE_URL) == -1):
-            body += webbasket_templates.tmpl_back_link(referer, ln)
-        return (body, errors, warnings)
+    # This part of code is under the current circumstances never ran,
+    # since if there no validated_recids, colid is set to -1.
+    # IDEA: colid should by default (i.e. when not set) be -2 and when local
+    # recids are added we should use the 0 value.
+    #if not validated_recids and colid >= 0:
+    #    warnings.append('WRN_WEBBASKET_NO_RECORD')
+    #    body += webbasket_templates.tmpl_warnings(warnings, ln)
+    #    if referer and not(referer.find(CFG_SITE_URL) == -1):
+    #        body += webbasket_templates.tmpl_back_link(referer, ln)
+    #    return (body, warnings)
 
-    if new_basket_name != '':
-        new_topic_name = new_topic_name.strip()
-        if new_topic_name:
-            topic = new_topic_name
-        elif create_in_topic != -1:
-            topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-            try:
-                topic = topics[create_in_topic]
-            except IndexError:
-                topic = ''
+    if b or (category and bskid):
+        # if b was not defined we use category and bskid to construct it.
+        if not b:
+            b = category + "_" + str(bskid)
+        f = open("/tmp/add", "w")
+        f.write(str(category) + " / " + str(bskid) + " / " + str(b) + "\n")
+        f.close()
+        # we extract the category and  the bskid from the washed b POST variable
+        # or the constracted b variable from category and bskid.
+        (category, b_bskid, b_warnings) = wash_b_add(b)
+        # if there were warnings it means there was a bad input.
+        # Send the warning to the user and return the page.
+        if b_warnings:
+            warnings.extend(b_warnings)
+            warnings_html += webbasket_templates.tmpl_warnings(b_warnings, ln)
+        if not b_warnings:
+            (bskid, b_warnings) = wash_bskid(uid, category, b_bskid)
+            if b_warnings:
+                warnings.extend(b_warnings)
+                warnings_html += webbasket_templates.tmpl_warnings(b_warnings, ln)
+                if not b_warnings:
+                    if not(__check_user_can_perform_action(uid,
+                                                           bskid,
+                                                           CFG_WEBBASKET_SHARE_LEVELS['ADDITM'])):
+                        warnings.append('WRN_WEBBASKET_NO_RIGHTS')
+                        warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_NO_RIGHTS', ln)
+        if not warnings:
+            if ( colid >= 0 and not validated_recids ) or ( colid == -1 and ( not es_title or not es_desc or not es_url ) ):
+                warnings.append('WRN_WEBBASKET_NO_RECORD')
+            if not warnings:
+                if colid==-1:
+                    es_title = es_title
+                    es_desc = nl2br(es_desc)
+                added_items = db.add_to_basket(uid, validated_recids, colid, bskid, es_title, es_desc, es_url)
+                if added_items:
+                    if note_body:
+                        if editor_type == 'fckeditor':
+                            # Here we remove the line feeds introduced by FCKeditor (they
+                            # have no meaning for the user) and replace the HTML line
+                            # breaks by linefeeds, so that we are close to an input that
+                            # would be done without the FCKeditor. That's much better if a
+                            # reply to a comment is made with a browser that does not
+                            # support FCKeditor.
+                            note_title = ''
+                            note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
+                            note_body = cgi.escape(note_body, True)
+                        else:
+                            # TODO: instead of just ecpaping the values, use the html washer
+                            # to allow basic tags.
+                            note_title = ''
+                            note_body = cgi.escape(note_body, True)
+                        for recid in added_items:
+                            if not(db.save_note(uid, bskid, recid, note_title, note_body)):
+                                # TODO: warning about the DB problem
+                                pass
+                    return perform_request_add(uid=uid,
+                                               recids=recids,
+                                               category=category,
+                                               bskid=bskid,
+                                               colid=colid,
+                                               successful_add=True,
+                                               copy=copy,
+                                               referer=referer)
+                else:
+                    # TODO: This means no items were added to any basket.
+                    # Show a warning to the user.
+                    pass
+
+    personal_basket_list = db.get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid)
+    group_basket_list = db.get_all_group_basket_ids_and_names_by_group_for_add_to_list(uid)
+    if not personal_basket_list and not group_basket_list:
+        bskid = db.create_basket(uid=uid, basket_name="Untitled basket", topic="Untitled topic")
+        if colid >= 0 and validated_recids:
+            # TODO: send an info message to the user.
+            #warnings=['WRN_WEBBASKET_DEFAULT_TOPIC_AND_BASKET',],
+            return perform_request_add(uid=uid,
+                                      recids=validated_recids,
+                                      category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                      bskid=bskid,
+                                      colid=colid,
+                                      referer=referer,
+                                      ln=ln)
         else:
-            topic = ''
-            warnings.append('WRN_WEBBASKET_NO_GIVEN_TOPIC')
-            body += webbasket_templates.tmpl_warnings(warnings, ln)
-            bskids = []
-        if topic:
-            id_bsk = db.create_basket(uid, new_basket_name, topic)
-            bskids.append(id_bsk)
+            personal_basket_list = db.get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid)
 
-    if bskids:
-        bskids = [int(bskid) for bskid in bskids if int(bskid) > 0]
-        if bskids:
-            for bskid in bskids:
-                if not(__check_user_can_perform_action(uid,
-                                        bskid,
-                                        CFG_WEBBASKET_SHARE_LEVELS['ADDITM'])):
-                    errors.append('ERR_WEBBASKET_NO_RIGHTS')
-                    return (body, errors, warnings)
-            if colid==-1:
-                es_title = cgi.escape(es_title)
-                es_desc = nl2br(cgi.escape(es_desc))
-            nb_modified_baskets = db.add_to_basket(uid, validated_recids, bskids)
-            body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
-            body_tmp, warnings_temp, errors_tmp = perform_request_display(uid,
-                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                            selected_topic=create_in_topic != -1 and create_in_topic or 0,
-                            selected_group_id=0,
-                            ln=CFG_SITE_LANG)
-            body += body_tmp
-            warnings += warnings_temp
-            errors += errors_tmp
-            body += webbasket_templates.tmpl_back_link(referer, ln)
-            return (body, warnings, errors)
-        else:
-            warnings.append('WRN_WEBBASKET_NO_BASKET_SELECTED')
-            body += webbasket_templates.tmpl_warnings(warnings, ln)
-    elif len(bskids) and list(set(bskids)) == ['-1']:
-        warnings.append('WRN_WEBBASKET_NO_BASKET_SELECTED')
-        body += webbasket_templates.tmpl_warnings(warnings, ln)
-
-    # Display basket_selection
-    personal_baskets = db.get_all_personal_baskets_names(uid)
-    group_baskets = db.get_all_group_baskets_names(uid)
-    external_baskets = db.get_all_external_baskets_names(uid)
-    topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-    body += webbasket_templates.tmpl_add(recids=validated_recids,
+    body = webbasket_templates.tmpl_add(recids=recids,
+                                        category=category,
+                                        bskid=bskid,
                                         colid=colid,
-                                        personal_baskets=personal_baskets,
-                                        group_baskets=group_baskets,
-                                        external_baskets=external_baskets,
-                                        topics=topics,
                                         es_title=es_title,
                                         es_desc=es_desc,
                                         es_url=es_url,
+                                        note_body=note_body,
+                                        personal_basket_list=personal_basket_list,
+                                        group_basket_list=group_basket_list,
+                                        copy=copy,
                                         referer=referer,
                                         ln=ln)
-    body += webbasket_templates.tmpl_back_link(referer, ln)
-    return (body, errors, warnings)
+
+    body = warnings_html + body
+
+    navtrail = create_webbasket_navtrail(uid,
+                                         add_to_basket=True,
+                                         ln=ln)
+
+    return (body, warnings, navtrail)
 
 def perform_request_delete(uid, bskid, confirmed=0,
                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                           selected_topic=0, selected_group_id=0,
+                           selected_topic="", selected_group_id=0,
                            ln=CFG_SITE_LANG):
     """Delete a given basket.
     @param uid: user id (user has to be owner of this basket)
@@ -579,23 +1622,25 @@ def perform_request_delete(uid, bskid, confirmed=0,
     @param selected_topic: topic currently displayed
     @param selected_group_id: if category is group, id of the group currently displayed
     @param ln: language"""
+
     body = ''
-    errors = []
     warnings = []
     if not(db.check_user_owns_baskets(uid, [bskid])):
-        errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
-        return (body, errors, warnings)
+        warnings.append(('WRN_WEBBASKET_NO_RIGHTS',))
+        return (body, warnings)
     if confirmed:
         success = db.delete_basket(bskid)
         if not success:
-            errors.append(('ERR_WEBBASKET_DB_ERROR',))
+            # TODO: inform the admin.
+            #errors.append(('ERR_WEBBASKET_DB_ERROR',))
+            pass
     else:
         body = webbasket_templates.tmpl_confirm_delete(bskid,
                                                        db.count_subscribers(uid, bskid),
                                                        category,
                                                        selected_topic, selected_group_id,
                                                        ln)
-    return (body, errors, warnings)
+    return (body, warnings)
 
 def delete_record(uid, bskid, recid):
     """Delete a given record in a given basket.
@@ -620,7 +1665,7 @@ def move_record(uid, bskid, recid, direction):
                                        CFG_WEBBASKET_SHARE_LEVELS['MANAGE']):
         db.move_item(bskid, recid, direction)
 
-def perform_request_edit(uid, bskid, topic=0, new_name='',
+def perform_request_edit(uid, bskid, topic="", new_name='',
                          new_topic = '', new_topic_name='',
                          groups=[], external='',
                          ln=CFG_SITE_LANG):
@@ -639,13 +1684,15 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
     @param ln: language
     """
     body = ''
-    errors = []
     warnings = []
+
+    # TODO: external rights must be washed, it can only be one of the following:
+    # NO, READITM, READCMT, ADDCMT
 
     rights = db.get_max_user_rights_on_basket(uid, bskid)
     if rights != CFG_WEBBASKET_SHARE_LEVELS['MANAGE']:
-        errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
-        return (body, errors, warnings)
+        warnings.append(('WRN_WEBBASKET_NO_RIGHTS',))
+        return (body, warnings)
     bsk_name = db.get_basket_name(bskid)
     if not(groups) and not(external) and not(new_name) and not(new_topic) and not(new_topic_name):
         # display interface
@@ -682,20 +1729,53 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
             db.rename_basket(bskid, new_name)
         if new_topic_name:
             db.move_baskets_to_topic(uid, bskid, new_topic_name)
-        elif new_topic != -1:
+        elif not (new_topic == "-1" or new_topic == topic):
             if db.check_user_owns_baskets(uid, bskid):
                 topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-                try:
-                    new_topic_name = topics[new_topic]
+                if new_topic in topics:
+                    new_topic_name = new_topic
                     db.move_baskets_to_topic(uid, bskid, new_topic_name)
-                except:
-                    errors.append(('ERR_WEBBASKET_DB_ERROR'))
+                else:
+                    # TODO: inform the admin
+                    #errors.append(('ERR_WEBBASKET_DB_ERROR'))
+                    pass
             else:
-                topic = 0
-            errors.append(('ERR_WEBBASKET_NOT_OWNER'))
-    return (body, errors, warnings)
+                topic = ""
+            warnings.append(('ERR_WEBBASKET_NOT_OWNER'))
+    return (body, warnings)
 
-def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=CFG_SITE_LANG):
+def perform_request_edit_topic(uid, topic='', new_name='', ln=CFG_SITE_LANG):
+    """Interface for editing of topic.
+    @param uid: user id (user has to have sufficient rights on this basket
+    @param topic: topic to be edited
+    @param new_name: new name of topic
+    @param ln: language
+    """
+    body = ''
+    warnings = []
+
+    #rights = db.get_max_user_rights_on_basket(uid, bskid)
+    #if rights != CFG_WEBBASKET_SHARE_LEVELS['MANAGE']:
+    #    errors.append(('ERR_WEBBASKET_NO_RIGHTS',))
+    #    return (body, errors, warnings)
+    if not(new_name):
+        # display interface
+        #display_delete = db.check_user_owns_baskets(uid, bskid)
+        #display_general = display_delete
+        #if isGuestUser(uid):
+            #display_sharing = 0
+        #else:
+            #display_sharing = 1
+        display_general = True
+        display_delete = True
+        body = webbasket_templates.tmpl_edit_topic(display_general=display_general, topic=topic,
+                                                   display_delete=display_delete, ln=ln)
+    else:
+        if cgi.escape(new_name, True) != cgi.escape(topic, True):
+            db.rename_topic(uid, topic, new_name)
+    return (body, warnings)
+
+def perform_request_add_group(uid, bskid, topic="", group_id=0, ln=CFG_SITE_LANG):
     """If group id is specified, share basket bskid to this group with
     READITM rights;
     else return a page for selection of a group.
@@ -716,127 +1796,68 @@ def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=CFG_SITE_LANG)
 
 def perform_request_create_basket(uid,
                                   new_basket_name='',
-                                  new_topic_name='', create_in_topic=-1,
-                                  topic_number=-1,
+                                  new_topic_name='', create_in_topic="-1",
+                                  topic="-1",
                                   ln=CFG_SITE_LANG):
     """if new_basket_name and topic infos are given create a basket and return topic number,
-    else return (body, errors, warnings) tuple of basket creation form.
+    else return (body, warnings) tuple of basket creation form.
     @param uid: user id (int)
     @param new_basket_name: name of the basket to create (str)
     @param new_topic_name: name of new topic to create new basket in (str)
     @param create_in_topic: identification number of topic to create new basket in (int)
-    @param topic_number: number of topic to preselect on the creation form.
+    @param topic: topic to preselect on the creation form.
     @pram ln: language
     """
-    if new_basket_name and (new_topic_name or create_in_topic != -1):
-        topics_infos = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+    if new_basket_name and (new_topic_name or create_in_topic != "-1"):
+        #topics_infos = map(lambda x: x[0], db.get_personal_topics_infos(uid))
         new_topic_name = new_topic_name.strip()
         if new_topic_name:
             topic = new_topic_name
         else:
-            try:
-                topic = topics_infos[create_in_topic]
-            except IndexError:
-                return 0
+            topic = create_in_topic
         db.create_basket(uid, new_basket_name, topic)
-        topics = map(lambda x: x[0], topics_infos)
-        try:
-            return topics.index(topic)
-        except ValueError:
-            return 0
+        #topics = map(lambda x: x[0], topics_infos)
+        return topic
     else:
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-        if topic_number in range (0, len(topics)):
-            create_in_topic = topics[topic_number]
+        if topic in topics:
+            create_in_topic = topic
         body = webbasket_templates.tmpl_create_basket(new_basket_name,
                                                       new_topic_name,
                                                       create_in_topic,
                                                       topics,
                                                       ln)
-        return (body, [], [])
-
-def perform_request_display_public(bskid=0, of='hb', ln=CFG_SITE_LANG):
-    """return html representation of a public basket
-    @param bskid: basket id
-    @param of: format
-    @param ln: language"""
-    _ = gettext_set_language(ln)
-    body = ''
-    errors = []
-    warnings = []
-    basket = db.get_public_basket_infos(bskid)
-    if of[0] == 'x':
-        items = []
-        if len(basket) == 7:
-            content = db.get_basket_content(bskid)
-            for item in content:
-                # TODO: return xml for external records too?
-                items.append(format_record(item[0], of))
-        return webbasket_templates.tmpl_xml_basket(items)
-
-    if len(basket) == 7:
-        items = db.get_basket_content(bskid)
-        external_recids = []
-        last_cmt = _("N/A")
-        records = []
-        cmt_dates = []
-        for (recid, nb_cmt, last_cmt, ext_val, int_val, score) in items:
-            cmt_dates.append(convert_datetext_to_datestruct(last_cmt))
-            last_cmt = convert_datetext_to_dategui(last_cmt, ln)
-            val = ''
-            if recid < 0:
-                if ext_val:
-                    val = decompress(ext_val)
-                else:
-                    external_recids.append(recid)
-            else:
-                if int_val:
-                    val = format_record(recid, 'hb')
-            records.append((recid, nb_cmt, last_cmt, val, score))
-
-        if external_recids:
-            external_records = format_external_records(external_recids, 'hb')
-    
-            for external_record in external_records:
-                for record in records:
-                    if record[0] == -external_record[0]:
-                        idx = records.index(record)
-                        tuple_to_list = list(records.pop(idx))
-                        tuple_to_list[3] = external_record[1]
-                        records.insert(idx,tuple(tuple_to_list))
-                        break            
-
-        body = webbasket_templates.tmpl_display_public(basket, records, ln)
-    else:
-        errors.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
-    return (body, errors, warnings)
-
-def perform_request_list_public_baskets(inf_limit=0, order=1, asc=1, ln=CFG_SITE_LANG):
-    """Display list of public baskets.
-    @param inf_limit: display baskets from inf_limit
-    @param order: 1: order by name of basket, 2: number of views, 3: owner
-    @param asc: ascending order if 1, descending if 0
-    @param ln: language
-    """
-    errors = []
-    warnings = []
-    total_baskets = db.count_public_baskets()
-    baskets = db.get_public_baskets_list(inf_limit, CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, order, asc)
-    body = webbasket_templates.tmpl_display_list_public_baskets(baskets, inf_limit, total_baskets, order, asc, ln)
-    return (body, errors, warnings)
+        return (body, [])
 
 def perform_request_subscribe(uid, bskid):
-    """subscribe to external basket bskid"""
-    errors = []
-    if db.is_public(bskid):
-        db.subscribe(uid, bskid)
+    """Subscribes user to the given public basket.
+    Returns warnings if there are any."""
+
+    warnings = []
+    if db.is_basket_public(bskid)[0][0]:
+        if not db.subscribe(uid, bskid):
+            # TODO: add a warning: the user is either the owner of the basket
+            # or is already subscribed.
+            #warnings.append('')
+            pass
     else:
-        errors.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
-    return errors
+        warnings.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
+    return warnings
 
 def perform_request_unsubscribe(uid, bskid):
-    """unsubscribe from external basket bskid"""
-    db.unsubscribe(uid, bskid)
+    """Unsubscribes user from the given public basket.
+    Returns warnings if there are any."""
+
+    warnings = []
+    if db.is_basket_public(bskid)[0][0]:
+        if not db.unsubscribe(uid, bskid):
+            # TODO: add a warning: the user is either the owner of the basket
+            # or has already unsubscribed.
+            #warnings.append('')
+            pass
+    else:
+        warnings.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
+    return warnings
 
 def check_user_can_comment(uid, bskid):
     """ Private function. check if a user can comment """
@@ -865,6 +1886,22 @@ def check_sufficient_rights(rights_user_has, rights_needed):
         out = 0
     return out
 
+def can_add_notes_to_public_basket_p(bskid):
+    """ Private function. Checks if notes can be added to the given public basket."""
+
+    min_right = CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']
+    rights = db.get_rights_on_public_basket(bskid)
+    if rights:
+        if CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights[0][0]) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_right):
+            return True
+    return False
+
+def note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
+    """Private function. Checks if the given note belongs to the given item
+    in the given basket"""
+
+    return db.note_belongs_to_item_in_basket_p(cmtid, recid, bskid)[0][0]
+
 def create_guest_warning_box(ln=CFG_SITE_LANG):
     """return a warning message about logging into system"""
     return webbasket_templates.tmpl_create_guest_warning_box(ln)
@@ -888,12 +1925,12 @@ def create_personal_baskets_selection_box(uid,
 
 def create_basket_navtrail(uid,
                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                           topic=0, group=0,
+                           topic="", group=0,
                            bskid=0, ln=CFG_SITE_LANG):
     """display navtrail for basket navigation.
     @param uid: user id (int)
     @param category: selected category (see CFG_WEBBASKET_CATEGORIES)
-    @param topic: selected topic # if personal baskets
+    @param topic: selected topic if personal baskets
     @param group: selected group id for displaying (int)
     @param bskid: basket id (int)
     @param ln: language"""
@@ -906,14 +1943,14 @@ def create_basket_navtrail(uid,
                 'category=' + category + '&amp;ln=' + ln,
                 _("Personal baskets"))
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-        if topic in range(0, len(topics)):
+        if topic in topics:
             out += ' &gt; '
             out += '<a class="navtrail" href="%s/yourbaskets/display?%s">'\
                    '%s</a>'
             out %= (CFG_SITE_URL,
                     'category=' + category + '&amp;topic=' + \
-                                  str(topic) + '&amp;ln=' + ln,
-                    cgi.escape(topics[topic]))
+                                  topic + '&amp;ln=' + ln,
+                    cgi.escape(topic))
             if bskid:
                 basket = db.get_public_basket_infos(bskid)
                 if basket:
@@ -922,7 +1959,7 @@ def create_basket_navtrail(uid,
                            '?%s">%s</a>'
                     out %= (CFG_SITE_URL,
                             'category=' + category + '&amp;topic=' + \
-                            str(topic) + '&amp;ln=' + ln + '#bsk' + str(bskid),
+                            topic + '&amp;ln=' + ln + '#bsk' + str(bskid),
                             cgi.escape(basket[1]))
 
     elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
@@ -967,10 +2004,99 @@ def create_basket_navtrail(uid,
                         cgi.escape(basket[1]))
     return out
 
-def create_infobox(infos=[]):
-    """Create an infos box. infos param should be a list of strings.
-    Return formatted infos"""
-    return webbasket_templates.tmpl_create_infobox(infos)
+def create_webbasket_navtrail(uid,
+                              category="",
+                              topic="",
+                              group=0,
+                              bskid=0,
+                              public_basket=False,
+                              search_baskets=False,
+                              add_to_basket=False,
+                              ln=CFG_SITE_LANG):
+    """Create the navtrail for navigation withing WebBasket.
+    @param uid: user id (int)
+    @param category: selected category (see CFG_WEBBASKET_CATEGORIES)
+    @param topic: selected topic (str)
+    @param group: selected group (int)
+    @param bskid: selected basket id (int)
+    @param ln: language"""
+
+    _ = gettext_set_language(ln)
+
+    out = """<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>""" % \
+          (CFG_SITE_URL, ln, _("Your Account"))
+    out += " &gt; "
+    out += """<a class="navtrail" href="%s/yourbaskets/display?ln=%s">%s</a>""" % \
+           (CFG_SITE_URL, ln, _("Your Baskets"))
+
+    if public_basket:
+        out += " &gt; "
+        out += """<a class="navtrail" href="%s/yourbaskets/list_public_baskets?ln=%s">%s</a>""" % \
+               (CFG_SITE_URL, ln, _("List of public baskets"))
+        if bskid:
+            basket = db.get_basket_name(bskid)
+            if basket:
+                out += " &gt; "
+                out += """<a class="navtrail" href="%s/yourbaskets/display_public?bskid=%i&amp;ln=%s">%s</a>""" % \
+                       (CFG_SITE_URL, bskid, ln, cgi.escape(basket))
+
+    elif search_baskets:
+        out += " &gt; "
+        out += """<a class="navtrail" href="%s/yourbaskets/search?ln=%s">%s</a>""" % \
+               (CFG_SITE_URL, ln, _("Search baskets"))
+
+    elif add_to_basket:
+        out += " &gt; "
+        out += """<a class="navtrail" href="%s/yourbaskets/add?ln=%s">%s</a>""" % \
+               (CFG_SITE_URL, ln, _("Add to basket"))
+
+    else:
+        if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
+            out += " &gt; "
+            out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;ln=%s">%s</a>""" % \
+                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], ln, _("Personal baskets"))
+            if topic:
+                topic_names = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+                if topic in topic_names:
+                    out += " &gt; "
+                    out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;ln=%s">%s</a>""" % \
+                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], cgi.escape(topic), ln, cgi.escape(topic))
+                    if bskid:
+                        basket = db.get_basket_name(bskid)
+                        if basket:
+                            out += " &gt; "
+                            out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
+                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['PRIVATE'], cgi.escape(topic), bskid, ln, cgi.escape(basket))
+
+        elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+            out += " &gt; "
+            out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;ln=%s">%s</a>""" % \
+                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], ln, _("Group baskets"))
+            if group:
+                group_names = map(lambda x: x[0] == group and x[1], db.get_group_infos(uid))
+                if group_names and group_names[0]:
+                    out += " &gt; "
+                    out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;group=%i&amp;ln=%s">%s</a>""" % \
+                           (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, ln, cgi.escape(group_names[0]))
+                    if bskid:
+                        basket = db.get_basket_name(bskid)
+                        if basket:
+                            out += " &gt; "
+                            out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
+                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, bskid, ln, cgi.escape(basket))        
+
+        elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
+            out += " &gt; "
+            out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;ln=%s">%s</a>""" % \
+                   (CFG_SITE_URL, category, ln, _("Public baskets"))
+            if bskid:
+                basket = db.get_basket_name(bskid)
+                if basket:
+                    out += " &gt; "
+                    out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
+                           (CFG_SITE_URL, category, group, bskid, ln, cgi.escape(basket))
+
+    return out
 
 def account_list_baskets(uid, ln=CFG_SITE_LANG):
     """Display baskets informations on account page"""
@@ -998,7 +2124,9 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
          'x_nb_public': external_text}
     return out
 
-## External records and sources functions
+################################
+### External items functions ###
+################################
 
 def format_external_records(recids, of='hb'):
     """Given a list of external records' recids, this function returns a list of tuples
@@ -1063,7 +2191,9 @@ def fetch_and_store_external_records(records, of="hb"):
 
     return formatted_records
 
-# Miscellaneous helping functions
+###############################
+### Miscellaneous functions ###
+###############################
 
 def url_is_valid(url, timeout=1):
     """Returns (True, status, reason) if the url is valid or (False, status, reason) if different."""
@@ -1097,6 +2227,105 @@ def url_is_valid(url, timeout=1):
             return (True, status, reason)
 
 def nl2br(text):
-    """Replace newlines (\n) found in text with line breaks (<br />."""
+    """Replace newlines (\n) found in text with line breaks (<br />)."""
 
-    return '<br />\n'.join(text.split('\n'))
+    return '<br />'.join(text.split('\n'))
+
+def wash_b_search(b):
+    """Wash the b GET variable for the search interface."""
+
+    b = b.split('_', 1)
+    b_category = b[0].upper()
+    valid_categories = CFG_WEBBASKET_CATEGORIES.values()
+    valid_categories.append('')
+    if b_category not in valid_categories:
+        return ("", "", ['WRN_WEBBASKET_INVALID_CATEGORY'])
+    if len(b) == 2:
+        if b_category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] or b_category == CFG_WEBBASKET_CATEGORIES['GROUP']:
+            return (b_category, b[1], None)
+        # TODO: send a warning when the user has sent a second argument
+        # specifying a category other than PRIVATE or GROUP
+        #else:
+            #return (b_category, "", ['WRN_WEBBASKET_'])
+    return (b_category, "", None)
+
+def wash_b_add(b):
+    """Wash the b POST variable for the add interface."""
+
+    b = b.split('_', 1)
+    b_category = b[0].upper()
+    valid_categories = (CFG_WEBBASKET_CATEGORIES['PRIVATE'], CFG_WEBBASKET_CATEGORIES['GROUP'])
+    if b_category not in valid_categories or len(b) != 2 or not b[1]:
+        return ("", "", ['WRN_WEBBASKET_INVALID_ADD_TO_PARAMETERS'])
+    return (b_category, b[1], None)
+
+def wash_category(category):
+    """Wash the category."""
+
+    category = category.upper()
+    valid_categories = CFG_WEBBASKET_CATEGORIES.values()
+    valid_categories.append('')
+    if category not in valid_categories:
+        return ("", ['WRN_WEBBASKET_INVALID_CATEGORY'])
+    return (category, None)
+
+def wash_topic(uid, topic):
+    """Wash the topic."""
+
+    if not db.is_topic_valid(uid, topic):
+        return ("", ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC'])
+    return (topic, None)
+
+def wash_group(uid, group):
+    """Wash the topic."""
+
+    if not group.isdigit() or not db.is_group_valid(uid, group):
+        return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP'])
+    return (int(group), None)
+
+def wash_bskid(uid, category, bskid):
+    """Wash the bskid based on its category. This function expectes a washed
+    category, either for personal or for group baskets."""
+
+    if not bskid.isdigit():
+        return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
+    bskid = int(bskid)
+    if category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and not db.is_personal_basket_valid(uid, bskid):
+        return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
+    if category == CFG_WEBBASKET_CATEGORIES['GROUP'] and not db.is_group_basket_valid(uid, bskid):
+        return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
+    return (bskid, None)
+
+def __create_search_box(uid,
+                        category="",
+                        topic="",
+                        grpid=0,
+                        p="",
+                        b="",
+                        n=0,
+                        ln=CFG_SITE_LANG):
+    """Private function.
+    Creates the search box and returns html code."""
+
+    topic_list = db.get_all_user_topics(uid)
+    group_list = db.get_all_user_groups(uid)
+    number_of_public_baskets = db.count_external_baskets(uid)
+
+    search_box = webbasket_templates.tmpl_create_search_box(category,
+                                                            topic,
+                                                            grpid,
+                                                            topic_list,
+                                                            group_list,
+                                                            number_of_public_baskets,
+                                                            p,
+                                                            b,
+                                                            n,
+                                                            ln=ln)
+
+    return search_box
+
+def debug_to_file(*args):
+    debug = '\n'.join(str(arg) for arg in args) + '\n'
+    f = open("/tmp/cds", 'a')
+    f.write(debug)
+    f.close()

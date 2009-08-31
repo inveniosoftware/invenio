@@ -2535,7 +2535,6 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 def perform_checkexternalcollections(colID, ln, icl=None, update="", confirm=0, callback='yes'):
     """Check the external collections for inconsistencies."""
 
-    # TODO: add documentation and define the link here
     subtitle = """<a name="7"></a>Check external collections&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#7">?</a>]""" % CFG_SITE_URL
     output  = ""
 
