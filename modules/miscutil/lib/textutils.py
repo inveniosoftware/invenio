@@ -277,11 +277,35 @@ def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
             pass
     return (text_in_unicode.encode('utf8'), 'utf8')
 
-def encode_for_xml(text):
+def encode_for_xml(text, wash=False, xml_version='1.0'):
     """Encodes special characters in a text so that it would be
     XML-compliant.
     @param text: text to encode
     @return: an encoded text"""
     text = text.replace('&', '&amp;')
     text = text.replace('<', '&lt;')
+    if wash:
+        text = wash_for_xml(text, xml_version='1.0')
     return text
+
+RE_ALLOWED_XML_1_0_CHARS = re.compile(u'[^\U00000009\U0000000A\U0000000D\U00000020-\U0000D7FF\U0000E000-\U0000FFFD\U00010000-\U0010FFFF]')
+RE_ALLOWED_XML_1_1_CHARS = re.compile(u'[^\U00000001-\U0000D7FF\U0000E000-\U0000FFFD\U00010000-\U0010FFFF]')
+def wash_for_xml(text, xml_version='1.0'):
+    """
+    Removes any character which is not in the range of allowed
+    characters for XML. The allowed characters depends on the version
+    of XML.
+
+        - XML 1.0:
+            <http://www.w3.org/TR/REC-xml/#charsets>
+        - XML 1.1:
+            <http://www.w3.org/TR/xml11/#charsets>
+
+    @param text: input string to wash.
+    @param xml_version: version of the XML for which we wash the
+        input. Value for this parameter can be '1.0' or '1.1'
+    """
+    if xml_version == '1.0':
+        return RE_ALLOWED_XML_1_0_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')
+    else:
+        return RE_ALLOWED_XML_1_1_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')

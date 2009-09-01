@@ -29,6 +29,7 @@ __revision__ = "$Id$"
 
 import os
 
+from invenio.textutils import wash_for_xml
 from invenio.config import \
      CFG_BINDIR, \
      CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
@@ -49,6 +50,10 @@ def Make_Modify_Record(parameters, curdir, form, user_info=None):
         fp.close()
     else:
         raise InvenioWebSubmitFunctionError("Cannot create database record")
+
+    # Escape XML-reserved chars and clean the unsupported ones (mainly
+    # control characters)
+    record_text = wash_for_xml(record_text)
     # First of all the &
     rectext = rectext.replace("&amp;","&")
     rectext = rectext.replace("&","&amp;")

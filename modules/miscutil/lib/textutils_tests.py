@@ -23,7 +23,10 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.textutils import wrap_text_in_a_box, guess_minimum_encoding
+from invenio.textutils import \
+     wrap_text_in_a_box, \
+     guess_minimum_encoding, \
+     wash_for_xml
 from invenio.testutils import make_test_suite, run_test_suite
 
 class GuessMinimumEncodingTest(unittest.TestCase):
@@ -33,6 +36,146 @@ class GuessMinimumEncodingTest(unittest.TestCase):
         self.assertEqual(guess_minimum_encoding('patata'), ('patata', 'ascii'))
         self.assertEqual(guess_minimum_encoding('àèéìòù'), ('\xe0\xe8\xe9\xec\xf2\xf9', 'latin1'))
         self.assertEqual(guess_minimum_encoding('Ιθάκη'), ('Ιθάκη', 'utf8'))
+
+class WashForXMLTest(unittest.TestCase):
+    """Test functions related to wash_for_xml function."""
+
+    def test_latin_characters_washing_1_0(self):
+        """textutils - washing latin characters for XML 1.0."""
+        self.assertEqual(wash_for_xml('àèéìòùÀ'), 'àèéìòùÀ')
+
+    def test_latin_characters_washing_1_1(self):
+        """textutils - washing latin characters for XML 1.1."""
+        self.assertEqual(wash_for_xml('àèéìòùÀ', xml_version='1.1'), 'àèéìòùÀ')
+
+    def test_chinese_characters_washing_1_0(self):
+        """textutils - washing chinese characters for XML 1.0."""
+        self.assertEqual(wash_for_xml('''
+        春眠暁を覚えず
+        処処に啼鳥と聞く
+        夜来風雨の声
+        花落つること
+        知んぬ多少ぞ'''), '''
+        春眠暁を覚えず
+        処処に啼鳥と聞く
+        夜来風雨の声
+        花落つること
+        知んぬ多少ぞ''')
+
+    def test_chinese_characters_washing_1_1(self):
+        """textutils - washing chinese characters for XML 1.1."""
+        self.assertEqual(wash_for_xml('''
+        春眠暁を覚えず
+        処処に啼鳥と聞く
+        夜来風雨の声
+        花落つること
+        知んぬ多少ぞ''', xml_version='1.1'), '''
+        春眠暁を覚えず
+        処処に啼鳥と聞く
+        夜来風雨の声
+        花落つること
+        知んぬ多少ぞ''')
+
+    def test_greek_characters_washing_1_0(self):
+        """textutils - washing greek characters for XML 1.0."""
+        self.assertEqual(wash_for_xml('''
+        ἄνδρα μοι ἔννεπε, μου̂σα, πολύτροπον, ὃς μάλα πολλὰ
+        πλάγχθη, ἐπεὶ Τροίης ἱερὸν πτολίεθρον ἔπερσεν:
+        πολλω̂ν δ' ἀνθρώπων ἴδεν ἄστεα καὶ νόον ἔγνω,
+        πολλὰ δ' ὅ γ' ἐν πόντῳ πάθεν ἄλγεα ὃν κατὰ θυμόν,
+        ἀρνύμενος ἥν τε ψυχὴν καὶ νόστον ἑταίρων.
+        ἀλλ' οὐδ' ὣς ἑτάρους ἐρρύσατο, ἱέμενός περ:
+        αὐτω̂ν γὰρ σφετέρῃσιν ἀτασθαλίῃσιν ὄλοντο,
+        νήπιοι, οἳ κατὰ βου̂ς  ̔Υπερίονος  ̓Ηελίοιο
+        ἤσθιον: αὐτὰρ ὁ τοι̂σιν ἀφείλετο νόστιμον ἠ̂μαρ.
+        τω̂ν ἁμόθεν γε, θεά, θύγατερ Διός, εἰπὲ καὶ ἡμι̂ν.'''), '''
+        ἄνδρα μοι ἔννεπε, μου̂σα, πολύτροπον, ὃς μάλα πολλὰ
+        πλάγχθη, ἐπεὶ Τροίης ἱερὸν πτολίεθρον ἔπερσεν:
+        πολλω̂ν δ' ἀνθρώπων ἴδεν ἄστεα καὶ νόον ἔγνω,
+        πολλὰ δ' ὅ γ' ἐν πόντῳ πάθεν ἄλγεα ὃν κατὰ θυμόν,
+        ἀρνύμενος ἥν τε ψυχὴν καὶ νόστον ἑταίρων.
+        ἀλλ' οὐδ' ὣς ἑτάρους ἐρρύσατο, ἱέμενός περ:
+        αὐτω̂ν γὰρ σφετέρῃσιν ἀτασθαλίῃσιν ὄλοντο,
+        νήπιοι, οἳ κατὰ βου̂ς  ̔Υπερίονος  ̓Ηελίοιο
+        ἤσθιον: αὐτὰρ ὁ τοι̂σιν ἀφείλετο νόστιμον ἠ̂μαρ.
+        τω̂ν ἁμόθεν γε, θεά, θύγατερ Διός, εἰπὲ καὶ ἡμι̂ν.''')
+
+    def test_greek_characters_washing_1_1(self):
+        """textutils - washing greek characters for XML 1.1."""
+        self.assertEqual(wash_for_xml('''
+        ἄνδρα μοι ἔννεπε, μου̂σα, πολύτροπον, ὃς μάλα πολλὰ
+        πλάγχθη, ἐπεὶ Τροίης ἱερὸν πτολίεθρον ἔπερσεν:
+        πολλω̂ν δ' ἀνθρώπων ἴδεν ἄστεα καὶ νόον ἔγνω,
+        πολλὰ δ' ὅ γ' ἐν πόντῳ πάθεν ἄλγεα ὃν κατὰ θυμόν,
+        ἀρνύμενος ἥν τε ψυχὴν καὶ νόστον ἑταίρων.
+        ἀλλ' οὐδ' ὣς ἑτάρους ἐρρύσατο, ἱέμενός περ:
+        αὐτω̂ν γὰρ σφετέρῃσιν ἀτασθαλίῃσιν ὄλοντο,
+        νήπιοι, οἳ κατὰ βου̂ς  ̔Υπερίονος  ̓Ηελίοιο
+        ἤσθιον: αὐτὰρ ὁ τοι̂σιν ἀφείλετο νόστιμον ἠ̂μαρ.
+        τω̂ν ἁμόθεν γε, θεά, θύγατερ Διός, εἰπὲ καὶ ἡμι̂ν.''',
+        xml_version='1.1'), '''
+        ἄνδρα μοι ἔννεπε, μου̂σα, πολύτροπον, ὃς μάλα πολλὰ
+        πλάγχθη, ἐπεὶ Τροίης ἱερὸν πτολίεθρον ἔπερσεν:
+        πολλω̂ν δ' ἀνθρώπων ἴδεν ἄστεα καὶ νόον ἔγνω,
+        πολλὰ δ' ὅ γ' ἐν πόντῳ πάθεν ἄλγεα ὃν κατὰ θυμόν,
+        ἀρνύμενος ἥν τε ψυχὴν καὶ νόστον ἑταίρων.
+        ἀλλ' οὐδ' ὣς ἑτάρους ἐρρύσατο, ἱέμενός περ:
+        αὐτω̂ν γὰρ σφετέρῃσιν ἀτασθαλίῃσιν ὄλοντο,
+        νήπιοι, οἳ κατὰ βου̂ς  ̔Υπερίονος  ̓Ηελίοιο
+        ἤσθιον: αὐτὰρ ὁ τοι̂σιν ἀφείλετο νόστιμον ἠ̂μαρ.
+        τω̂ν ἁμόθεν γε, θεά, θύγατερ Διός, εἰπὲ καὶ ἡμι̂ν.''')
+
+    def test_russian_characters_washing_1_0(self):
+        """textutils - washing greek characters for XML 1.0."""
+        self.assertEqual(wash_for_xml('''
+        В тени дерев, над чистыми водами
+        Дерновый холм вы видите ль, друзья?
+        Чуть слышно там плескает в брег струя;
+        Чуть ветерок там дышит меж листами;
+        На ветвях лира и венец...
+        Увы! друзья, сей холм - могила;
+        Здесь прах певца земля сокрыла;
+        Бедный певец!''', xml_version='1.1'), '''
+        В тени дерев, над чистыми водами
+        Дерновый холм вы видите ль, друзья?
+        Чуть слышно там плескает в брег струя;
+        Чуть ветерок там дышит меж листами;
+        На ветвях лира и венец...
+        Увы! друзья, сей холм - могила;
+        Здесь прах певца земля сокрыла;
+        Бедный певец!''')
+
+    def test_russian_characters_washing_1_1(self):
+        """textutils - washing greek characters for XML 1.1."""
+        self.assertEqual(wash_for_xml('''
+        В тени дерев, над чистыми водами
+        Дерновый холм вы видите ль, друзья?
+        Чуть слышно там плескает в брег струя;
+        Чуть ветерок там дышит меж листами;
+        На ветвях лира и венец...
+        Увы! друзья, сей холм - могила;
+        Здесь прах певца земля сокрыла;
+        Бедный певец!''', xml_version='1.1'), '''
+        В тени дерев, над чистыми водами
+        Дерновый холм вы видите ль, друзья?
+        Чуть слышно там плескает в брег струя;
+        Чуть ветерок там дышит меж листами;
+        На ветвях лира и венец...
+        Увы! друзья, сей холм - могила;
+        Здесь прах певца земля сокрыла;
+        Бедный певец!''')
+
+    def test_illegal_characters_washing_1_0(self):
+        """textutils - washing illegal characters for XML 1.0."""
+        self.assertEqual(wash_for_xml(chr(8) + chr(9) + 'some chars'), '\tsome chars')
+        self.assertEqual(wash_for_xml('$b\bar{b}$'), '$bar{b}$')
+
+    def test_illegal_characters_washing_1_1(self):
+        """textutils - washing illegal characters for XML 1.1."""
+        self.assertEqual(wash_for_xml(chr(8) + chr(9) + 'some chars',
+                                      xml_version='1.1'), '\x08\tsome chars')
+        self.assertEqual(wash_for_xml('$b\bar{b}$', xml_version='1.1'), '$b\x08ar{b}$')
+
 
 class WrapTextInABoxTest(unittest.TestCase):
     """Test functions related to wrap_text_in_a_box function."""
@@ -198,7 +341,8 @@ If you would like to try it out yourself, please feel free to download our lates
 """
         self.assertEqual(wrap_text_in_a_box(text), result)
 
-TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest)
+TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
+                             WashForXMLTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

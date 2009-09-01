@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import os
 from invenio.errorlib import register_exception
+from invenio.textutils import wash_for_xml
 from invenio.config import \
      CFG_BINDIR, \
      CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
@@ -106,6 +107,9 @@ def Make_Dummy_MARC_XML_Record(parameters, curdir, form, user_info=None):
         register_exception(req=req_obj, prefix=err_msg)
         raise InvenioWebSubmitFunctionError(err_msg)
 
+    # Escape XML-reserved chars and clean the unsupported ones (mainly
+    # control characters)
+    record_text = wash_for_xml(record_text)
     ## Replace the "&":
     record_text = record_text.replace("&amp;","&")
     record_text = record_text.replace("&","&amp;")

@@ -25,6 +25,7 @@ import os
 from os import access, R_OK, W_OK
 from invenio.config import CFG_BINDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.textutils import wash_for_xml
 
 def Convert_RecXML_to_RecALEPH(parameters, curdir, form, user_info=None):
     """Function to create an ALEPH 500 MARC record from a MARC XML record.
@@ -54,12 +55,23 @@ def Convert_RecXML_to_RecALEPH(parameters, curdir, form, user_info=None):
               """Cannot create recaleph500!""" % curdir
         raise InvenioWebSubmitFunctionError(msg)
 
+    ## Wash possible xml-invalid characters in recmysql
+    recmysql_fd = file(os.path.join(curdir, 'recmysql'), 'r')
+    recmysql = recmysql_fd.read()
+    recmysql_fd.close()
+
+    recmysql = wash_for_xml(recmysql)
+
+    recmysql_fd = file(os.path.join(curdir, 'recmysql'), 'w')
+    recmysql_fd.write(recmysql)
+    recmysql_fd.close()
+
     ## Command to perform conversion of recmysql -> recaleph500:
     convert_cmd = \
         """%(bindir)s/xmlmarc2textmarc --aleph-marc=r %(curdir)s/recmysql > """ \
         """%(curdir)s/recaleph500""" \
         % { 'bindir' : CFG_BINDIR,
-            'curdir'            : curdir,
+            'curdir' : curdir,
           }
     ## Perform the conversion of MARC XML record to ALEPH500 record:
     pipe_in, pipe_out, pipe_err = os.popen3("%s" % convert_cmd)
