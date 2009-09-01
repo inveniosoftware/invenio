@@ -227,7 +227,7 @@ def get_order_dict_from_recid_list(recids, journal_name, issue_number,
                             ordered_records[order_number] = [record]
                 else:
                     # No order? No problem! Append it at the end.
-                    if newest_first and is_new_article(record):
+                    if newest_first and is_new_article(journal_name, issue_number, record):
                         new_records_without_defined_order.append(record)
                     elif not newest_only:
                         records_without_defined_order.append(record)
