@@ -48,7 +48,7 @@ class XSSEscapingTest(unittest.TestCase):
         """htmlutils - washing of tags defining scripts (e.g. <script>)"""
         test_str = """<script>malicious_function();</script>"""
         self.assertEqual(self.washer.wash(html_buffer=test_str),
-                         'malicious_function();')
+                         '')
         self.assertEqual(self.washer.wash(html_buffer=test_str,
                                           render_unallowed_tags=True),
                          '&lt;script&gt;malicious_function();&lt;/script&gt;')
@@ -121,6 +121,21 @@ class HTMLWashingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '<b> a &lt; b &gt; c </b> &#247;')
 
+        # Remove content of <script> tags
+        test_str = '<script type="text/javacript">alert("foo")</script>bar'
+        self.assertEqual(self.washer.wash(html_buffer=test_str),
+                         'bar')
+        test_str = '<script type="text/javacript"><!--alert("foo")--></script>bar'
+        self.assertEqual(self.washer.wash(html_buffer=test_str),
+                         'bar')
+
+        # Remove content of <style> tags
+        test_str = '<style>.myclass {color:#f00}</style><span class="myclass">styled text</span>'
+        self.assertEqual(self.washer.wash(html_buffer=test_str),
+                         'styled text')
+        test_str = '<style><!-- .myclass {color:#f00} --></style><span class="myclass">styled text</span>'
+        self.assertEqual(self.washer.wash(html_buffer=test_str),
+                         'styled text')
 
 class HTMLMarkupRemovalTest(unittest.TestCase):
     """Test functions related to removing HTML markup."""

@@ -105,6 +105,7 @@ class HTMLWasher(HTMLParser):
         a.wash('Spam and <b><a href="jaVas  cRipt:xss();">poilu</a></b>')
         =>'Spam and <b><a href="">eggs</a></b>'
     """
+    silent = False
 
     def __init__(self):
         """ Constructor; initializes washer """
@@ -177,10 +178,14 @@ class HTMLWasher(HTMLParser):
                     self.result += ' %s="%s"' % \
                                      (attr, cgi.escape(value, True))
                 self.result += '&gt;'
+            elif tag == 'style' or tag == 'script':
+                # In that case we want to remove content too
+                self.silent = True
 
     def handle_data(self, data):
         """Function called for text nodes"""
-        self.result += cgi.escape(data, True)
+        if not self.silent:
+            self.result += cgi.escape(data, True)
 
     def handle_endtag(self, tag):
         """Function called for ending of tags"""
@@ -189,6 +194,9 @@ class HTMLWasher(HTMLParser):
         else:
             if self.render_unallowed_tags:
                 self.result += '&lt;/' + cgi.escape(tag) + '&gt;'
+
+        if tag == 'style' or tag == 'script':
+            self.silent = False
 
     def handle_startendtag(self, tag, attrs):
         """Function called for empty tags (e.g. <br />)"""
