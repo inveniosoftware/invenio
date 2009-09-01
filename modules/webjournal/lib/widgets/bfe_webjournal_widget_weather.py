@@ -58,6 +58,9 @@ def format(bfo, location='SZXX0008', degree_unit='c' ,
     @param weather_icon_only it 'true' display only the wheater icon (without text)
 
     """
+    if not feedparser_available:
+        return ""
+
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]
     cached_filename = "webjournal_widget_weather_%s.rss" % journal_name
