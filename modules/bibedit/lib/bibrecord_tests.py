@@ -963,6 +963,93 @@ class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
             bibrecord.record_delete_subfield_from, self.rec, "245", 999,
             field_position_global=4)
 
+
+class BibRecordDeleteSubfieldTest(unittest.TestCase):
+    """ bibrecord - testing subfield deletion """
+
+    def setUp(self):
+        """Initialize stuff"""
+        self.xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+            <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+            <subfield code="a">Doe2, John</subfield>
+            <subfield code="b">editor</subfield>
+            <subfield code="z">Skal vi danse?</subfield>
+            <subfield code="a">Doe3, Zbigniew</subfield>
+            <subfield code="d">Doe4, Joachim</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="1">
+            <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="2">
+            <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        <datafield tag="246" ind1="1" ind2="2">
+            <subfield code="c">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="246" ind1="1" ind2="2">
+            <subfield code="c">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+
+    def test_simple_removals(self):
+        """ bibrecord - delete subfield by its code"""
+        # testing a simple removals where all the fields are removed
+        rec = bibrecord.create_record(self.xml_example_record, 1, 1)[0]
+
+        bibrecord.record_delete_subfield(rec, "041", "b") # nothing should change
+        self.assertEqual(rec["041"][0][0], [("a", "eng")])
+        bibrecord.record_delete_subfield(rec, "041", "a")
+        self.assertEqual(rec["041"][0][0], [])
+
+    def test_indices_important(self):
+        """ bibrecord - delete subfield where indices are important"""
+        rec = bibrecord.create_record(self.xml_example_record, 1, 1)[0]
+        bibrecord.record_delete_subfield(rec, "245", "a", " ", "1")
+        self.assertEqual(rec["245"][0][0], [])
+        self.assertEqual(rec["245"][1][0], [("a", "On the foo and bar2")])
+        bibrecord.record_delete_subfield(rec, "245", "a", " ", "2")
+        self.assertEqual(rec["245"][1][0], [])
+
+    def test_remove_some(self):
+        """ bibrecord - delete subfield when some should be preserved and some removed"""
+        rec = bibrecord.create_record(self.xml_example_record, 1, 1)[0]
+        bibrecord.record_delete_subfield(rec, "100", "a", " ", " ")
+        self.assertEqual(rec["100"][0][0], [("b", "editor"), ("z", "Skal vi danse?"), ("d", "Doe4, Joachim")])
+
+    def test_more_fields(self):
+        """ bibrecord - delete subfield where more fits criteria"""
+        rec = bibrecord.create_record(self.xml_example_record, 1, 1)[0]
+        bibrecord.record_delete_subfield(rec, "246", "c", "1", "2")
+        self.assertEqual(rec["246"][1][0], [])
+        self.assertEqual(rec["246"][0][0], [])
+
+    def test_nonexisting_removals(self):
+        """ bibrecord - delete subfield that does not exist """
+        rec = bibrecord.create_record(self.xml_example_record, 1, 1)[0]
+        # further preparation
+        bibrecord.record_delete_subfield(rec, "100", "a", " ", " ")
+        self.assertEqual(rec["100"][0][0], [("b", "editor"), ("z", "Skal vi danse?"), ("d", "Doe4, Joachim")])
+        #the real tests begin
+        #   1) removing the subfield from an empty list of subfields
+        bibrecord.record_delete_subfield(rec, "246", "c", "1", "2")
+        self.assertEqual(rec["246"][1][0], [])
+        self.assertEqual(rec["246"][0][0], [])
+        bibrecord.record_delete_subfield(rec, "246", "8", "1", "2")
+        self.assertEqual(rec["246"][1][0], [])
+        self.assertEqual(rec["246"][0][0], [])
+        #   2) removing a subfield from a field that has some subfields but none has an appropriate code
+        bibrecord.record_delete_subfield(rec, "100", "a", " ", " ")
+        self.assertEqual(rec["100"][0][0], [("b", "editor"), ("z", "Skal vi danse?"), ("d", "Doe4, Joachim")])
+        bibrecord.record_delete_subfield(rec, "100", "e", " ", " ")
+        self.assertEqual(rec["100"][0][0], [("b", "editor"), ("z", "Skal vi danse?"), ("d", "Doe4, Joachim")])
+
+
 class BibRecordMoveSubfieldTest(unittest.TestCase):
     """ bibrecord - testing subfield moving """
 
@@ -1338,6 +1425,7 @@ TEST_SUITE = make_test_suite(
     BibRecordPrintingTest,
     BibRecordCreateFieldTest,
     BibRecordFindFieldTest,
+    BibRecordDeleteSubfieldTest
     )
 
 if __name__ == '__main__':
