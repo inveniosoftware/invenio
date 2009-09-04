@@ -235,7 +235,7 @@ function createReq(data, onSuccess, asynchronous){
     data.cacheMTime = gCacheMTime;
   // Send the request.
   $.ajax({ data: { jsondata: JSON.stringify(data) },
-           success: function(json){ 
+           success: function(json){
                       onAjaxSuccess(json, onSuccess);
                     },
            async: asynchronous
@@ -1634,7 +1634,7 @@ function onDeleteClick(event){
   $(checkedFieldBoxes).each(function(){
     var tmpArray = this.id.split('_');
     var tag = tmpArray[1], fieldPosition = tmpArray[2];
-    if (!toDelete[tag]){
+    if (!toDelete[tag]) {
       toDelete[tag] = {};
     }
     toDelete[tag][fieldPosition] = [];
@@ -1644,26 +1644,26 @@ function onDeleteClick(event){
   // Collect subfields to be deleted in toDelete.
   $(checkedSubfieldBoxes).each(function(){
     var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldPosition = tmpArray[2],
-      subfieldIndex = tmpArray[3];
-    if (!toDelete[tag]){
+    var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
+    if (!toDelete[tag]) {
       toDelete[tag] = {};
       toDelete[tag][fieldPosition] = [subfieldIndex];
     }
-    else{
+    else {
       if (!toDelete[tag][fieldPosition])
-	toDelete[tag][fieldPosition] = [subfieldIndex];
-      else if (toDelete[tag][fieldPosition].length == 0)
-	// Entire field scheduled for the deletion.
-	return;
+        toDelete[tag][fieldPosition] = [subfieldIndex];
       else
-	toDelete[tag][fieldPosition].push(subfieldIndex);
+        if (toDelete[tag][fieldPosition].length == 0)
+          // Entire field scheduled for the deletion.
+          return;
+        else
+          toDelete[tag][fieldPosition].push(subfieldIndex);
     }
   });
 
   // Assert that no protected fields are scheduled for deletion.
   var protectedField = containsProtectedField(toDelete);
-  if (protectedField){
+  if (protectedField) {
     displayAlert('alertDeleteProtectedField', [protectedField]);
     updateStatus('ready');
     return;
@@ -1681,41 +1681,46 @@ function onDeleteClick(event){
 
   // Continue local updating.
   // Parse datastructure and delete accordingly in record.
-  var fieldsToDelete, subfieldIndexesToDelete, field, subfields,
-  subfieldIndex;
-  for (var tag in toDelete){
+  var fieldsToDelete, subfieldIndexesToDelete, field, subfields, subfieldIndex;
+  for (var tag in toDelete) {
     fieldsToDelete = toDelete[tag];
-    for (var fieldPosition in fieldsToDelete){
+    // The fields should be treated in the decreasing order (during the removal, indices may change)
+    traversingOrder = [];
+    for (fieldPosition in fieldsToDelete) {
+      traversingOrder.push(fieldPosition);
+    }
+    // normal sorting will do this in a lexycographical order ! (problems if > 10 subfields
+    // function provided, allows sorting in the reversed order
+    traversingOrder = traversingOrder.sort(function(a, b){
+      return b - a;
+    });
+    for (var fieldInd in traversingOrder) {
+      fieldPosition = traversingOrder[fieldInd];
       var fieldID = tag + '_' + fieldPosition;
       subfieldIndexesToDelete = fieldsToDelete[fieldPosition];
       if (subfieldIndexesToDelete.length == 0)
-	deleteFieldFromTag(tag, fieldPosition);
-      else{
-	subfieldIndexesToDelete.sort();
-	field = gRecord[tag][fieldPosition];
-	subfields = field[0];
-	for (var j=subfieldIndexesToDelete.length-1; j>=0; j--)
-	  subfields.splice(subfieldIndexesToDelete[j], 1);
-	var rowGroup = $('#rowGroup_' + fieldID);
-	if (!reColorTable){
-	  // Color and redraw the field, if it won't be done later.
-	  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
-	  $(rowGroup).replaceWith(createField(tag, field));
-	  if (coloredRowGroup)
-	    $('#rowGroup_' + fieldID).addClass( 'bibEditFieldColored');
-	}
-	else if (!tagsToRedraw[tag])
-	  // Redraw the field if it won't be done later.
-	  $(rowGroup).replaceWith(createField(tag, field));
+        deleteFieldFromTag(tag, fieldPosition);
+      else {
+        // normal sorting will do this in a lexycographical order ! (problems if > 10 subfields
+        subfieldIndexesToDelete.sort(function(a, b){
+          return a - b;
+        });
+        field = gRecord[tag][fieldPosition];
+        subfields = field[0];
+        for (var j = subfieldIndexesToDelete.length - 1; j >= 0; j--)
+          subfields.splice(subfieldIndexesToDelete[j], 1);
+        var rowGroup = $('#rowGroup_' + fieldID);
       }
     }
+
+    redrawFields(tag);
   }
   if (reColorTable)
     // If entire fields has been deleted, redraw all fields with the same tag
     // and recolor the full table.
     for (tag in tagsToRedraw)
       redrawFields(tag);
-    reColorFields();
+  reColorFields();
 }
 
 function onMoveFieldUp(tag, fieldPosition) {

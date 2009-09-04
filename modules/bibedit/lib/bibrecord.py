@@ -601,8 +601,8 @@ def record_delete_subfield_from(rec, tag, subfield_position,
     try:
         del subfields[subfield_position]
     except IndexError:
-        raise InvenioBibRecordFieldError("No subfield has the subfield "
-            "position '%s'." % subfield_position)
+        raise InvenioBibRecordFieldError("The field does not have any subfield "
+            "in position '%s'." % subfield_position)
 
     if not subfields:
         if field_position_global is not None:

@@ -456,7 +456,10 @@ def perform_request_update_record(request_type, recid, uid, data):
             deleted_fields = 0
             deleted_subfields = 0
             for tag in to_delete:
-                for field_position_local in to_delete[tag]:
+                # Sorting the fields in a edcreasing order by the local position !
+                fieldsOrder = to_delete[tag].keys()
+                fieldsOrder.sort(lambda a,b: int(b)-int(a))
+                for field_position_local in fieldsOrder:
                     if not to_delete[tag][field_position_local]:
                         # No subfields specified - delete entire field.
                         record_delete_field(record, tag,
