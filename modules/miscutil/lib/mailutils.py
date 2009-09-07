@@ -109,7 +109,9 @@ def send_email(fromaddr,
     if copy_to_admin:
         if CFG_SITE_ADMIN_EMAIL not in toaddr:
             toaddr.append(CFG_SITE_ADMIN_EMAIL)
-    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln, charset)
+    body = forge_email(fromaddr, toaddr, subject, content, html_content,
+                       html_images, usebcc, header, footer, html_header,
+                       html_footer, ln, charset)
     if attempt_times < 1 or not toaddr:
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
         return False
@@ -126,10 +128,13 @@ def send_email(fromaddr,
             sent = True
         except (smtplib.SMTPException, socket.error):
             register_exception()
-            if (debug_level > 1):
-                log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime, sys.exc_info()[0], fromaddr, toaddr, body)
-            sleep(attempt_sleeptime)
-        attempt_times -= 1
+            if debug_level > 1:
+                log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime,
+                    sys.exc_info()[0], fromaddr, toaddr, body)
+        if not sent:
+            attempt_times -= 1
+            if attempt_times > 0: # sleep only if we shall retry again
+                sleep(attempt_sleeptime)
     if not sent:
         log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
     return sent
