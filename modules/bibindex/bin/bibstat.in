@@ -12,7 +12,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -28,6 +28,8 @@ __revision__ = "$Id$"
 try:
     import sys
     from invenio.dbquery import run_sql, get_table_status_info
+    from invenio.config import CFG_DATABASE_HOST, CFG_DATABASE_PORT, \
+                               CFG_DATABASE_NAME
     from marshal import loads,dumps
     from zlib import compress,decompress
     from string import split,translate,lower,upper
@@ -38,7 +40,7 @@ try:
     import time
     import urllib
     import signal
-    import threading 
+    import threading
     import unicodedata
     import traceback
     import cStringIO
@@ -63,8 +65,9 @@ def report_table_status(tablename):
 
 def report_on_all_bibliographic_tables():
     """Report stats for all the interesting bibliographic tables."""
-    print "%14s %17s %17s %17s" % ("TABLE", "ROWS", "DATA SIZE", "INDEX SIZE")
-    print "============== ================= ================= ================="
+    print "### 1 -  TABLE SPACE AND SIZE INFO"
+    print ''
+    print "# %12s %17s %17s %17s" % ("TABLE", "ROWS", "DATA SIZE", "INDEX SIZE")
     for i in range(0,10):
         for j in range(0,10):
             print report_table_status("bib%1d%1dx" % (i, j))
@@ -75,7 +78,7 @@ def report_on_all_bibliographic_tables():
     for i in range(0,11):
         print report_table_status("idxPHRASE%02dF" % i)
         print report_table_status("idxPHRASE%02dR" % i)
-    return     
+    return
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -86,6 +89,48 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -h, --help      \t\t Print this help.\n")
     sys.stderr.write("  -V, --version   \t\t Print version information.\n")
     sys.exit(exitcode)
+
+def report_tag_usage():
+    """Analyze bibxxx tables and report info on usage of various tags."""
+    print ''
+    print "### 2 -  TAG USAGE INFO"
+    print ''
+    print "# TAG     NB_RECORDS"
+    for i in range(0,10):
+        for j in range(0,10):
+            bibxxx = "bib%1d%1dx" % (i, j)
+            bibrec_bibxxx = 'bibrec_' + bibxxx
+            # detect all the various tags in use:
+            res = run_sql("SELECT DISTINCT(tag) FROM %s" % (bibxxx,))
+            for row in res:
+                tag = row[0]
+                # detect how many records have this tag in use:
+                res_usage = run_sql("""SELECT DISTINCT(b.id) FROM bibrec AS b,
+                                                           %s AS bb, %s AS bx
+                                            WHERE b.id=bb.id_bibrec
+                                              AND bb.id_bibxxx=bx.id
+                                              AND bx.tag=%%s
+                                        """ % (bibrec_bibxxx, bibxxx),
+                                    (tag,))
+                # print results
+                print tag, (8-len(tag))*' ', len(res_usage)
+
+def report_header():
+    """
+    Start reporting.
+    """
+    print '### BIBSTAT REPORT FOR DB %s:%s.%s RUN AT %s' % (CFG_DATABASE_HOST,
+                                                         CFG_DATABASE_PORT,
+                                                         CFG_DATABASE_NAME,
+                                                         time.asctime())
+    print ''
+
+def report_footer():
+    """
+    Stop reporting.
+    """
+    print ''
+    print '### END OF BIBSTAT REPORT'
 
 def main():
     """Report stats on the CDS Invenio bibliographic tables."""
@@ -103,7 +148,10 @@ def main():
             else:
                 usage(1)
     else:
-        report_on_all_bibliographic_tables()        
+        report_header()
+        report_on_all_bibliographic_tables()
+        report_tag_usage()
+        report_footer()
 
 if __name__ == "__main__":
     main()
