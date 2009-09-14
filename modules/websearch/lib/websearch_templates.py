@@ -2974,7 +2974,7 @@ class Template:
                               previous_url=None, next_url=None):
         """Creates XML RSS 2.0 prologue."""
         out = """<rss version="2.0"
-        xmlns:media="http://search.yahoo.com/mrss"
+        xmlns:media="http://search.yahoo.com/mrss/"
         xmlns:atom="http://www.w3.org/2005/Atom">
       <channel>
         <title>%(sitename)s</title>
