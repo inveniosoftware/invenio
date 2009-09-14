@@ -179,7 +179,7 @@ def Report_Number_Generation(parameters, curdir, form, user_info=None):
 
 
 
-def Create_Reference(counter_path, ref_format, nb_length):
+def Create_Reference(counter_path, ref_format, nb_length=3):
     """From the counter-file for this document submission, get the next
        reference number and create the reference.
     """
