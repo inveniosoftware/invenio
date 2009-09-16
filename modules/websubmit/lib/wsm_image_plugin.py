@@ -14,8 +14,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-
 """
 WebSubmit Metadata Plugin - This is a plugin to extract/update
 metadata from images.
@@ -23,35 +21,31 @@ metadata from images.
 Dependencies: Exiv2
 """
 
-try:
-    import pyexiv2
-    IMPORTED_PYEXIV_2 = True
-except ImportError, e:
-    IMPORTED_PYEXIV_2 = False
+__plugin_version__ = "WebSubmit File Metadata Plugin API 1.0"
 
-
+import base64
 import httplib
 import tempfile
+import shutil
+import pyexiv2
 from invenio.bibdocfile import decompose_file
-import base64
-
-
+from invenio.config import CFG_TMPDIR
+from invenio.websubmit_config import InvenioWebSubmitFileMetadataRuntimeError
 
 def can_read_local(inputfile):
-    """Checks if inputfile is among metadata-readable
-    file types
-    @param inputfile: (string) path to the image
+    """
+    Checks if inputfile is among metadata-readable file types
+
+    @param inputfile: path to the image
     @type inputfile: string
     @rtype: boolean
-    @return: true if extension casn be handled"""
-
-    # Check file type (0 base,1 name, 2 ext)
+    @return: True if file can be processed
+    """
+    # Check file type (0 base, 1 name, 2 ext)
     ext = decompose_file(inputfile)[2]
     return ext.lower() in ['.jpg', '.tiff', '.jpeg', 'jpe',
                            '.jfif', '.jfi', '.jif']
 
-
-# can_read_remote()
 def can_read_remote(inputfile):
     """Checks if inputfile is among metadata-readable
     file types
@@ -60,61 +54,36 @@ def can_read_remote(inputfile):
     @rtype: boolean
     @return: true if extension casn be handled"""
 
-    # Check file type (0 base,1 name, 2 ext)
+    # Check file type (0 base, 1 name, 2 ext)
     ext = decompose_file(inputfile)[2]
     return ext.lower() in ['.jpg', '.jpeg', 'jpe',
                            '.jfif', '.jfi', '.jif']
 
-# can_write_local()
 def can_write_local(inputfile):
-    """Checks if inputfile is among metadata-writable
-    file types
-    @param inputfile: (string) path to the image
+    """
+    Checks if inputfile is among metadata-writable file types
+
+    @param inputfile: path to the image
     @type inputfile: string
     @rtype: boolean
-    @return: true if extension casn be handled"""
-
-    # Check file type (0 base,1 name, 2 ext)
+    @return: True if file can be processed
+    """
+    # Check file type (0 base, 1 name, 2 ext)
     ext = decompose_file(inputfile)[2]
     return ext.lower() in ['.jpg', '.tiff', '.jpeg', 'jpe',
                            '.jfif', '.jfi', '.jif']
 
-
-def install():
-    """Asks the user to install the needed libraries in
-    order to use this plugin
+def read_metadata_local(inputfile, verbose):
     """
+    EXIF and IPTC metadata extraction and printing from images
 
-    install_message = 'Packages to install -> libexiv2-5, python-pyexiv2\n'
-    print install_message
-    return
-
-    #inst = raw_input('Proceed installing?  [y]es/[n]o : ')
-    #if inst == 'y':
-    #    os.system('sudo apt-get install libexiv2-5 python-pyexiv2')
-    #    print '\nInstallation complete\n'
-    #    return True
-    #else:
-    #    print '\nNot installing packages\n'
-    #    return False
-
-
-
-def extract_metadata(inputfile, verbose):
-    """EXIF and IPTC metadata extraction and printing from images
-       @param inputfile: path to the image
-       @type inputfile: string
-       @param verbose: verbosity
-       @type verbose: int
-       @rtype: dict (metadata_tag - (interpreted) value)
-       @return: dictionary with metadata"""
-
-    # Check that pyexiv2 has been imported/installed
-    if not IMPORTED_PYEXIV_2:
-        install()
-        raise RuntimeError, 'Missing libraries'
-
-
+    @param inputfile: path to the image
+    @type inputfile: string
+    @param verbose: verbosity
+    @type verbose: int
+    @rtype: dict
+    @return: dictionary with metadata
+    """
     # Load the image
     image = pyexiv2.Image(inputfile)
 
@@ -123,49 +92,38 @@ def extract_metadata(inputfile, verbose):
 
     image_info = {}
 
-    # EXIF metadata store and print
-    if verbose:
-        print '\nEXIF Metadata Information\n'
-
+    # EXIF metadata
     for key in image.exifKeys():
         image_info[key] = image.interpretedExifValue(key)
-        if verbose:
-            print key, ' -> ', image.interpretedExifValue(key)
 
-    # IPTC metadata store and print
-    if verbose:
-        print '\nIPTC Metadata Information\n'
+    # IPTC metadata
     for key in image.iptcKeys():
         image_info[key] = repr(image[key])
-        if verbose:
-            print key, ' -> ', repr(image[key])
-
-    if verbose:
-        print '\n'
 
     # Return the dictionary
     return image_info
 
+def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
+    """
+    EXIF and IPTC metadata writing, previous tag printing, to
+    images. If some tag not set, it is auto-added, but be a valid exif
+    or iptc tag.
 
-
-def write_metadata(inputfile, verbose, metadata_dictionary):
-    """EXIF and IPTC metadata writing, previous tag printing,
-       to images. If some tag not set, it is auto-added, but
-       be a valid exif or iptc tag.
-       @param inputfile: path to the image
-       @type inputfile: string
-       @param verbose: verbosity
-       @type verbose: int
-       @param metadata_dictionary: metadata information to update inputfile
-       @type verbose: dict
-       """
-
-
-    # Check that pyexiv2 has been imported/installed
-    if not IMPORTED_PYEXIV_2:
-        install()
-        raise RuntimeError, 'Missing libraries'
-
+    @param inputfile: path to the image
+    @type inputfile: string
+    @param outputfile: path to the resulting image
+    @type outputfile: string
+    @param verbose: verbosity
+    @type verbose: int
+    @param metadata_dictionary: metadata information to update inputfile
+    @rtype: dict
+    """
+    if inputfile != outputfile:
+        # Create copy of inputfile
+        try:
+            shutil.copy2(inputfile, outputfile)
+        except Exception, err:
+            raise InvenioWebSubmitFileMetadataRuntimeError(err)
 
     # Load the image
     image = pyexiv2.Image(inputfile)
@@ -173,86 +131,85 @@ def write_metadata(inputfile, verbose, metadata_dictionary):
     # Read the metadata
     image.readMetadata()
 
-    # EXIF metadata tag
-    if verbose:
-        print '\nEXIF Metadata Tags\n'
-
-    for key in image.exifKeys():
-        if verbose:
-            print key
-
-    # IPTC metadata
-    if verbose:
-        print '\nIPTC Metadata Tags\n'
-
-    for key in image.iptcKeys():
-        if verbose:
-            print key
-
-    if verbose:
-        print '\nMetadata dictionary:\n', metadata_dictionary
     # Main Case: Dictionary received through option -d
-    if not metadata_dictionary == {}:
+    if metadata_dictionary:
         for tag in metadata_dictionary:
             if tag in image.exifKeys() or tag in image.iptcKeys():
-                old_value = image[tag]
-                print 'Tag found'
+                # Updating
+                if verbose > 0:
+                    print "Updating %(tag)s from <%(old_value)s> to <%(new_value)s>" % \
+                          {'tag': tag,
+                           'old_value': image[tag],
+                           'new_value': metadata_dictionary[tag]}
             else:
-                old_value = 'unset'
-                print 'Tag not found'
+                # Adding
+                if verbose > 0:
+                    print "Adding %(tag)s with value <%(new_value)s>" % \
+                          {'tag': tag,
+                           'new_value': metadata_dictionary[tag]}
             try:
                 image[tag] = metadata_dictionary[tag]
-                if verbose:
-                    print 'Image[', tag, '] from <', old_value , \
-                        '> to <', image[tag], '>\n'
                 image.writeMetadata()
             except Exception:
-                print 'Tag or Value incorrect\n'
-
+                print 'Tag or Value incorrect'
 
     # Alternative way: User interaction
     else:
+        data_modified = False
         user_input = 'user_input'
+        print "Entering interactive mode. Choose what you want to do:"
         while (user_input):
-            user_input = raw_input('[w]rite / [q]uit\n')
-            if user_input == 'q':
-                break
+            if not data_modified:
+                try:
+                    user_input = raw_input('[w]rite / [q]uit\n')
+                except:
+                    print "Aborting"
+                    return
             else:
-                tag = raw_input('Tag? (Any valid Exif or Iptc Tag) ')
-                value = raw_input('Value? ')
-                if tag in image.exifKeys() or tag in image.iptcKeys():
-                    old_value = image[tag]
-                else:
-                    old_value = 'unset'
+                try:
+                    user_input = raw_input('[w]rite / [q]uit and apply / [a]bort \n')
+                except:
+                    print "Aborting"
+                    return
+
+            if user_input == 'q':
+                if not data_modified:
+                    return
+                break
+            elif user_input == 'w':
+                try:
+                    tag = raw_input('Tag to update (Any valid Exif or Iptc Tag):\n')
+                    value = raw_input('With value:\n')
+                    data_modified = True
+                except:
+                    print "Aborting"
+                    return
                 try:
                     image[tag] = value
-                    if verbose:
-                        print 'Image[', tag, '] from <', old_value , \
-                            '> to <', image[tag], '>\n'
-                    image.writeMetadata()
-                except Exception:
-                    print 'Tag or Value incorrect\n'
+                except Exception, err:
+                    print 'Tag or Value incorrect'
+            elif user_input == 'a':
+                return
+            else:
+                print "Invalid option: "
+        try:
+            image.writeMetadata()
+        except Exception, err:
+            raise InvenioWebSubmitFileMetadataRuntimeError("Could not update metadata: " + err)
 
+def read_metadata_remote(inputfile, loginpw, verbose):
+    """
+    EXIF and IPTC metadata extraction and printing from remote images
 
-
-def extract_metadata_remote(inputfile, verbose, loginpw):
-    """EXIF and IPTC metadata extraction and printing from
-       remote images
-       @param inputfile: path to the remote image
-       @type inputfile: string
-       @param verbose: verbosity
-       @type verbose: int
-       @param loginpw: user and password to access secure servers
-       @type loginpw: string
-       @rtype: dict (metadata_tag - (interpreted) value)
-       @return: dictionary with metadata"""
-
-    # Check that pyexiv2 has been imported/installed
-    if not IMPORTED_PYEXIV_2:
-        install()
-        raise RuntimeError, 'Missing libraries'
-
-
+    @param inputfile: path to the remote image
+    @type inputfile: string
+    @param verbose: verbosity
+    @type verbose: int
+    @param loginpw: credentials to access secure servers (username:password)
+    @type loginpw: string
+    @return: dictionary with metadata
+    @rtype: dict
+    """
     # Check that inputfile is an URL
     secure = False
     pos = inputfile.lower().find('http://')
@@ -260,9 +217,8 @@ def extract_metadata_remote(inputfile, verbose, loginpw):
         secure = True
         pos = inputfile.lower().find('https://')
     if pos < 0:
-        raise ValueError, "Inputfile (" + inputfile + ") is " + \
-                          "not an URL, non remote resource.\n"
-
+        raise InvenioWebSubmitFileMetadataRuntimeError("Inputfile (" + inputfile + ") is " + \
+                                                       "not an URL, nor remote resource.")
 
     # Check if there is login and password
     if loginpw != None:
@@ -276,18 +232,13 @@ def extract_metadata_remote(inputfile, verbose, loginpw):
     if verbose > 3:
         print 'URL: ', url
 
-
     # Establish headers
     if loginpw != None:
-        _headers = { "Accept": "*/*",
-             "Authorization": "Basic" + \
-             " " + base64.encodestring(userid + ':' + passwd).strip() }
-        if verbose > 3:
-            print 'HEADER WITH AUTH'
+        _headers = {"Accept": "*/*",
+                    "Authorization": "Basic " + \
+                    base64.encodestring(userid + ':' + passwd).strip()}
     else:
         _headers = {"Accept": "*/*"}
-        if verbose > 3:
-            print 'HEADER WITH NO AUTH'
 
     conn = None
 
@@ -301,7 +252,7 @@ def extract_metadata_remote(inputfile, verbose, loginpw):
                   headers = _headers)
         except Exception:
             # Cannot connect
-            print 'Could not connect\n'
+            print 'Could not connect'
     # Case HTTP
     else:
         try:
@@ -311,20 +262,28 @@ def extract_metadata_remote(inputfile, verbose, loginpw):
                   headers = _headers)
         except Exception:
             # Cannot connect
-            print 'Could not connect\n'
+            print 'Could not connect'
 
     # Get response
+    if verbose > 5:
+        print "Fetching data from remote server."
     response = conn.getresponse()
+    if verbose > 2:
+        print response.status, response.reason
+
+    if response.status == 401:
+        # Authentication required
+        raise InvenioWebSubmitFileMetadataRuntimeError("URL requires authentication. Use --loginpw option")
 
     # Read first marker from image
     data = response.read(2)
 
     # Check if it is a valid image
     if data[0:2] != '\xff\xd8':
-        raise ValueError, "URL does not brings to a valid image file.\n"
+        raise InvenioWebSubmitFileMetadataRuntimeError("URL does not brings to a valid image file.")
     else:
-        if verbose:
-            print 'Valid JPEG Standard-based image\n'
+        if verbose > 5:
+            print 'Valid JPEG Standard-based image'
 
     # Start the fake image
     path_to_fake = fake_image_init(verbose)
@@ -336,8 +295,8 @@ def extract_metadata_remote(inputfile, verbose, loginpw):
     while data[0:2] != '\xff\xdb':
         if data[0:2] == '\xff\xe1' or data[0:2] == '\xff\xed':
             marker = data
-            if verbose:
-                print 'Metadata Marker->', repr(marker), '\nGetting data\n'
+            if verbose > 5:
+                print 'Metadata Marker->', repr(marker), '\nGetting data'
             size = response.read(2)
             length = ord(size[0]) * 256 + ord(size[1])
             meta = response.read(length-2)
@@ -346,7 +305,6 @@ def extract_metadata_remote(inputfile, verbose, loginpw):
         else:
             data = response.read(2)
 
-
     # Close connection
     conn.close()
 
@@ -354,21 +312,21 @@ def extract_metadata_remote(inputfile, verbose, loginpw):
     fake_image_close(path_to_fake, verbose)
 
     # Extract metadata once fake image is done
-    return extract_metadata(path_to_fake, verbose)
-
+    return read_metadata_local(path_to_fake, verbose)
 
 def fake_image_init(verbose):
-    """Initializes the fake image
-       @param verbose: verbosity
-       @type verbose: int
-       @rtype: string
-       @return: path to fake image"""
+    """
+    Initializes the fake image
 
+    @param verbose: verbosity
+    @type verbose: int
+    @rtype: string
+    @return: path to fake image
+    """
     # Create temp file for fake image
-    (fdesc, path_to_fake) = tempfile.mkstemp(prefix='websubmit_file_metadata_')
+    (dummy, path_to_fake) = tempfile.mkstemp(prefix='wsm_image_plugin_img_',
+                                             dir=CFG_TMPDIR)
 
-    if verbose > 6:
-        print 'Writing head to fake image\n'
     # Open fake image and write head to it
     fake_image = open(path_to_fake, 'a')
     image_head = '\xff\xd8\xff\xe0\x00\x10\x4a\x46\x49\x46\x00' + \
@@ -378,17 +336,15 @@ def fake_image_init(verbose):
 
     return path_to_fake
 
-
 def fake_image_close(path_to_fake, verbose):
-    """Closes the fake image
-       @param path_to_fake: path to the fake image
-       @type path_to_fake: string
-       @param verbose: verbosity
-       @type verbose: int
-       """
+    """
+    Closes the fake image
 
-    if verbose > 6:
-        print 'Writing no metadata info to fake image\n'
+    @param path_to_fake: path to the fake image
+    @type path_to_fake: string
+    @param verbose: verbosity
+    @type verbose: int
+    """
     # Open fake image and write image structure info
     # (Huffman table[s]...) to it
     fake_image = open(path_to_fake, 'a')
@@ -418,30 +374,22 @@ def fake_image_close(path_to_fake, verbose):
     fake_image.write(image_tail)
     fake_image.close()
 
-    return
-
-
 def insert_metadata(path_to_fake, marker, size, meta, verbose):
-    """Insert metadata into the fake image
-       @param path_to_fake: path to the fake image
-       @type path_to_fake: string
-       @param marker: JPEG marker
-       @type marker: string
-       @param size: size of a JPEG block
-       @type marker: string
-       @param meta: metadata information
-       @type marker: string
-       """
+    """
+    Insert metadata into the fake image
 
-    if verbose > 6:
-        print 'Writing Metadata to fake image\n'
+    @param path_to_fake: path to the fake image
+    @type path_to_fake: string
+    @param marker: JPEG marker
+    @type marker: string
+    @param size: size of a JPEG block
+    @type size: string
+    @param meta: metadata information
+    @type meta: string
+    """
     # Metadata insertion
     fake_image = open(path_to_fake, 'a')
     fake_image.write(marker)
     fake_image.write(size)
     fake_image.write(meta)
-
     fake_image.close()
-
-
-    return

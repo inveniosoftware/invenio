@@ -16,175 +16,230 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-"""This is the metadata reader and writer module. Contains the
-proper plugin containers in order to read/write metadata from images
-or other files.
+"""
+This is the metadata reader and writer module. Contains the proper
+plugin containers in order to read/write metadata from images or other
+files.
 
 Public APIs:
-  - metadata_extract()
-  - metadata_update()
+  - read_metadata()
+  - write_metadata()
 """
 
+__required_plugin_API_version__ = "WebSubmit File Metadata Plugin API 1.0"
+
 import os, sys
+import traceback
 from optparse import OptionParser
 from invenio.pluginutils import PluginContainer
 from invenio.config import CFG_PYLIBDIR
 from invenio.bibdocfile import decompose_file
+from invenio.websubmit_config import InvenioWebSubmitFileMetadataRuntimeError
 
+def read_metadata(inputfile, force=None, remote=False,
+                  loginpw=None, verbose=0):
+    """
+    Returns metadata extracted from given file as dictionary.
 
-def plugin_builder_function(plugin_name, plugin_code):
-    """Function used to build the plugin container,
-       so it behaves as a dictionary.
-       @param parameters: plugin_name, plugin_code
-       @return: dict """
-    ret = {}
-    for funct_name in ('can_read_local',
-                       'can_read_remote',
-                       'can_write_local',
-                       'install',
-                       'extract_metadata',
-                       'write_metadata',
-                       'extract_metadata_remote'):
-        funct = getattr(plugin_code, funct_name, None)
-        if funct is not None:
-            ret[funct_name] = funct
-    return ret
+    Availability depends on input file format and installed plugins
+    (return C{TypeError} if unsupported file format).
 
-def metadata_extract(inputfile, verbose=0,
-                     force=None, remote=False, loginpw=None):
-    """EXIF and IPTC metadata extraction and printing from images
-       or other many kind of files
-       @param parameters: (string) path to the image/file
-                          (bool) verbosity
-                          (string) plugin to force
-                          (bool) remote file
-       @return: (dict) - metadata_tag - (interpreted) value"""
-
-    # Check file type (0 base,1 name, 2 ext)
+    @param inputfile: path to a file
+    @type inputfile: string
+    @param verbose: verbosity
+    @type verbose: int
+    @param force: name of plugin to use, to skip plugin auto-discovery
+    @type force: string
+    @param remote: if the file is accessed remotely or not
+    @type remote: boolean
+    @param loginpw: credentials to access secure servers (username:password)
+    @type loginpw: string
+    @return: dictionary of metadata tags as keys, and (interpreted)
+             value as value
+    @rtype: dict
+    @raise TypeError: if file format is not supported.
+    @raise RuntimeError: if required library to process file is missing.
+    @raise InvenioWebSubmitFileMetadataRuntimeError: when metadata cannot be read.
+    """
+    metadata = None
+    # Check file type (0 base, 1 name, 2 ext)
     ext = decompose_file(inputfile)[2]
-    if verbose:
+    if verbose > 5:
         print ext.lower(), 'extension to extract from'
 
-    # Plugins
+    # Load plugins
     metadata_extractor_plugins = PluginContainer(
         os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'websubmit_file_metadata_plugins', '*.py'),
-                     plugin_builder=plugin_builder_function
-        )
+                     'invenio', 'websubmit_file_metadata_plugins', 'wsm_*.py'),
+        plugin_builder=plugin_builder_function,
+        api_version=__required_plugin_API_version__)
 
-    # Case that the plugin was called with force option
-    if force:
-        i = 0
-        for key in metadata_extractor_plugins.keys():
-            if key == force:
-                break
-            else:
-                i = i + 1
-        j = 0
-        for plugin in metadata_extractor_plugins.values():
-            if i == j:
-                if remote:
-                    return plugin['extract_metadata_remote'](inputfile,
-                                                             verbose)
-                else:
-                    return plugin['extract_metadata'](inputfile, verbose)
-            else:
-                j = j + 1
-        raise TypeError, 'Incorrect plugin for this file'
-
-
-    # Loop through the plugins to find a good one for ext
-    for plugin in metadata_extractor_plugins.values():
+    # Loop through the plugins to find a good one for given file
+    for plugin_name, plugin in metadata_extractor_plugins.iteritems():
         # Local file
         if plugin.has_key('can_read_local') and \
-            plugin['can_read_local'](inputfile) and not remote:
-            return plugin['extract_metadata'](inputfile, verbose)
+            plugin['can_read_local'](inputfile) and not remote and \
+            (not force or plugin_name == force):
+            if verbose > 5:
+                print 'Using ' + plugin_name
+            fetched_metadata = plugin['read_metadata_local'](inputfile,
+                                                             verbose)
+            if not metadata:
+                metadata = fetched_metadata
+            else:
+                metadata.update(fetched_metadata)
+
         # Remote file
         elif remote and plugin.has_key('can_read_remote') and \
-            plugin['can_read_remote'](inputfile):
-            return plugin['extract_metadata_remote'](inputfile,
-                                                     verbose, loginpw)
+            plugin['can_read_remote'](inputfile) and \
+            (not force or plugin_name == force):
+            if verbose > 5:
+                print 'Using ' + plugin_name
+            fetched_metadata = plugin['read_metadata_remote'](inputfile,
+                                                              loginpw,
+                                                              verbose)
+            if not metadata:
+                metadata = fetched_metadata
+            else:
+                metadata.update(fetched_metadata)
 
+    # Return in case we have something
+    if metadata is not None:
+        return metadata
 
     # Case of no plugin found, raise
-    raise TypeError, 'Non-valid input file'
+    raise TypeError, 'Unsupported file type'
 
-def metadata_update(inputfile, verbose=0,
-                    metadata_dictionary=None, force=None):
-    """EXIF and IPTC metadata writing, if -v
-       previous tag printing, to images. If some tag not set,
-       it is auto-added, but must be a valid exif or iptc tag.
-       Now also pdf metadata updating, using pdftk tool.
-       @param parameters: (string) path to the image
-                          (bool) verbosity
-                          (dict) metadata container dictionary
-                          (string) plugin to force
-       @return: (string) - empty string for image/
-                           path to new pdf in pdf"""
+def write_metadata(inputfile, outputfile, metadata_dictionary,
+                   force=None, verbose=0):
+    """
+    Writes metadata to given file.
 
-    # Check file type (0 base,1 name, 2 ext)
+    Availability depends on input file format and installed plugins
+    (return C{TypeError} if unsupported file format).
+
+    @param inputfile: path to a file
+    @type inputfile: string
+    @param outputfile: path to the resulting file.
+    @type outputfile: string
+    @param verbose: verbosity
+    @type verbose: int
+    @param metadata_dictionary: keys and values of metadata to update.
+    @type metadata_dictionary: dict
+    @param force: name of plugin to use, to skip plugin auto-discovery
+    @type force: string
+    @return: output of the plugin
+    @rtype: string
+    @raise TypeError: if file format is not supported.
+    @raise RuntimeError: if required library to process file is missing.
+    @raise InvenioWebSubmitFileMetadataRuntimeError: when metadata cannot be updated.
+    """
+    # Check file type (0 base, 1 name, 2 ext)
     ext = decompose_file(inputfile)[2]
-    if verbose:
+    if verbose > 5:
         print ext.lower(), 'extension to write to'
 
     # Plugins
     metadata_extractor_plugins = PluginContainer(
         os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'websubmit_file_metadata_plugins', '*.py'),
-                     plugin_builder=plugin_builder_function
+                     'invenio', 'websubmit_file_metadata_plugins', 'wsm_*.py'),
+        plugin_builder=plugin_builder_function,
+        api_version=__required_plugin_API_version__
         )
-
-
-    # Case that the plugin was called with force option
-    if force:
-        i = 0
-        for key in metadata_extractor_plugins.keys():
-            if key == force:
-                break
-            else:
-                i = i + 1
-        j = 0
-        for plugin in metadata_extractor_plugins.values():
-            if i == j:
-                return plugin['write_metadata'](inputfile, verbose,
-                                                metadata_dictionary)
-            else:
-                j = j + 1
-        raise TypeError, 'Incorrect plugin for this file'
-
 
     # Loop through the plugins to find a good one to ext
-    for plugin in metadata_extractor_plugins.values():
+    for plugin_name, plugin in metadata_extractor_plugins.iteritems():
         if plugin.has_key('can_write_local') and \
-            plugin['can_write_local'](inputfile):
-            return plugin['write_metadata'](inputfile, verbose,
-                                            metadata_dictionary)
+            plugin['can_write_local'](inputfile) and \
+            (not force or plugin_name == force):
+            if verbose > 5:
+                print 'Using ' + plugin_name
+            return plugin['write_metadata_local'](inputfile,
+                                                  outputfile,
+                                                  metadata_dictionary,
+                                                  verbose)
 
     # Case of no plugin found, raise
-    raise TypeError, 'Non-valid input file'
+    raise TypeError, 'Unsupported file type'
 
-def metadata_info():
+def metadata_info(verbose=0):
     """Shows information about the available plugins"""
+    print 'Plugin APIs version: %s' % str(__required_plugin_API_version__)
 
     # Plugins
+    print 'Available plugins:'
     metadata_extractor_plugins = PluginContainer(
         os.path.join(CFG_PYLIBDIR,
-                     'invenio', 'websubmit_file_metadata_plugins', '*.py'),
-                     plugin_builder=plugin_builder_function
+                     'invenio', 'websubmit_file_metadata_plugins', 'wsm_*.py'),
+        plugin_builder=plugin_builder_function,
+        api_version=__required_plugin_API_version__
         )
-
 
     # Print each operation on each plugin
     for plugin_name, plugin_funcs in metadata_extractor_plugins.iteritems():
-        for optn in plugin_funcs:
-            print '--Plugin name: ' + plugin_name + ', operation: ' + optn
-            #print plugin_function.__doc__ + '()\n'
+        if len(plugin_funcs) > 0:
+            print '-- Name: ' + plugin_name
+            print '   Supported operation%s: ' % \
+                  (len(plugin_funcs) > 1 and 's' or '') + \
+                  ', '.join(plugin_funcs)
+
+    # Are there any unloaded plugins?
+    broken_plugins = metadata_extractor_plugins.get_broken_plugins()
+    if len(broken_plugins.keys()) > 0:
+        print 'Could not load the following plugin%s:' % \
+              (len(broken_plugins.keys()) > 1 and 's' or '')
+        for broken_plugin_name, broken_plugin_trace_info in broken_plugins.iteritems():
+            print '-- Name: ' + broken_plugin_name
+            if verbose > 5:
+                formatted_traceback = \
+                                    traceback.format_exception(broken_plugin_trace_info[0],
+                                                               broken_plugin_trace_info[1],
+                                                               broken_plugin_trace_info[2])
+                print '    ' + ''.join(formatted_traceback).replace('\n', '\n    ')
+            elif verbose > 0:
+                print '    ' + str(broken_plugin_trace_info[1])
+
+def print_metadata(metadata):
+    """
+    Pretty-prints metadata returned by the plugins to standard output.
+
+    @param metadata: object returned by the plugins when reading metadata
+    @type metadata: dict
+    """
+    if metadata:
+        max_key_length = max([len(key) for key in metadata.keys()])
+        for key, value in metadata.iteritems():
+            print key, "." * (max_key_length - len(key)), str(value)
+    else:
+        print '(No metadata)'
+
+def plugin_builder_function(plugin_name, plugin_code):
+    """
+    Internal function used to build the plugin container, so it behaves as a
+    dictionary.
+
+    @param plugin_name: plugin_name
+    @param plugin_code: plugin_code
+    @return: the plugin container
+    @rtype: dict
+    """
+    ret = {}
+    for funct_name in ('can_read_local',
+                       'can_read_remote',
+                       'can_write_local',
+                       'read_metadata_local',
+                       'write_metadata_local',
+                       'read_metadata_remote'):
+        funct = getattr(plugin_code, funct_name, None)
+        if funct is not None:
+            ret[funct_name] = funct
+    return ret
 
 def main():
-    """Manages the arguments, in order to call the proper
-    metadata handling function"""
-
+    """
+    Manages the arguments, in order to call the proper metadata
+    handling function
+    """
     def dictionary_callback(option, opt, value, parser, *args, **kwargs):
         """callback function used to get strings from command line
         of the type tag=value and push it into a dictionary
@@ -207,6 +262,9 @@ def main():
                       help="extract metadata from file", default=False)
     parser.add_option("-u", "--update", dest="update", action='store_true',
                       help="update file metadata", default=False)
+    parser.add_option("-o", "--output-file", dest="output_file",
+                      help="Place to save updated file (when --update). Default is same as input file",
+                      type="string", default=None)
     parser.add_option("-f", "--force", dest="force_plugin",
                       help="Plugin we want to be used", type="string",
                       default=None)
@@ -239,6 +297,15 @@ def main():
     if getattr(parser.values, 'metadata', None) is None:
         parser.values.metadata = {}
 
+    # Is output file specified?
+    if options.update and not options.output_file:
+        if options.verbose > 5:
+            print "Option --output-file not specified. Updating input file."
+        options.output_file = input_file
+    elif options.extract and options.output_file:
+        print "Option --output-file cannot be used with --extract."
+        print parser.get_usage()
+        sys.exit(1)
 
     # Make sure there is not extract / write / info at the same time
     if (options.extract and options.update) or \
@@ -256,27 +323,40 @@ def main():
     # Function call based on args
     if options.extract:
         try:
-            metadata_extract(input_file,
-                             options.verbose,
-                             options.force_plugin,
-                             options.remote,
-                             options.loginpw)
+            metadata = read_metadata(input_file,
+                                     options.force_plugin,
+                                     options.remote,
+                                     options.loginpw,
+                                     options.verbose)
+            print_metadata(metadata)
         except TypeError, err:
+            print err
+            return 1
+        except RuntimeError, err:
+            print err
+            return 1
+        except InvenioWebSubmitFileMetadataRuntimeError, err:
             print err
             return 1
     elif options.update:
         try:
-            metadata_update(input_file,
-                            options.verbose,
-                            options.metadata,
-                            options.force_plugin
-                            )
+            write_metadata(input_file,
+                           options.output_file,
+                           options.metadata,
+                           options.force_plugin,
+                           options.verbose)
         except TypeError, err:
+            print err
+            return 1
+        except RuntimeError, err:
+            print err
+            return 1
+        except InvenioWebSubmitFileMetadataRuntimeError, err:
             print err
             return 1
     elif options.info:
         try:
-            metadata_info()
+            metadata_info(options.verbose)
         except TypeError:
             print 'Problem retrieving plugin information\n'
             return 1
@@ -284,7 +364,6 @@ def main():
         parser.error("Incorrect number of arguments\n")
 
 
-## Start proceedings for CLI calls:
 if __name__ == "__main__":
     main()
 

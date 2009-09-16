@@ -224,3 +224,25 @@ class InvenioWebSubmitIconCreatorError(Exception):
            @return: (string)
         """
         return str(self.value)
+
+class InvenioWebSubmitFileMetadataRuntimeError(Exception):
+    """This exception should be raised by websubmit_file_metadata plugins when an
+       error is encoutered that prevents a extracting/updating a file.
+       When caught, this exception should be used to stop processing with a
+       failure signal.
+
+       Extends: Exception.
+    """
+    def __init__(self, value):
+        """Set the internal "value" attribute to that of the passed "value"
+           parameter.
+           @param value: (string) - a string to write to the log.
+        """
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        """Return oneself as a string (actually, return the contents of
+           self.value).
+           @return: (string)
+        """
+        return str(self.value)
