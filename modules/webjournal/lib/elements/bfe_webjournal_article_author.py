@@ -40,6 +40,11 @@ def format(bfo, separator, display_email='yes',
     ln = args["ln"]
     _ = gettext_set_language(ln)
 
+    try:
+        email_obfuscation_mode_int = int(str(email_obfuscation_mode))
+    except:
+        email_obfuscation_mode_int = CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE
+
     email_subject = _("About your article at %(url)s") % \
                     {'url': CFG_SITE_URL + bfo.user_info['uri']}
 
@@ -53,7 +58,7 @@ def format(bfo, separator, display_email='yes',
         if email.strip() and display_email.lower() == 'yes' :
             authors_list.append(create_html_mailto(email,
                                                    subject=email_subject,
-                                                   email_obfuscation_mode=email_obfuscation_mode))
+                                                   email_obfuscation_mode=email_obfuscation_mode_int))
         else:
             authors_list.append(author)
 
