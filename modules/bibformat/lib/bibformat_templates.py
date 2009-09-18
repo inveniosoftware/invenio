@@ -832,8 +832,8 @@ class Template:
                 row_content = ""
                 name = format_attributes['name']
                 description = format_attributes['description']
-                params = [x['name'] + '=\u0022'+x['default']+'\u0022' for x in format_attributes['params']]
-                builtin_params = [x['name'] + '=\u0022'+x['default']+'\u0022' for x in format_attributes['builtin_params']]
+                params = [x['name'] + '=\u0022'+str(x['default'])+'\u0022' for x in format_attributes['params']]
+                builtin_params = [x['name'] + '=\u0022'+str(x['default'])+'\u0022' for x in format_attributes['builtin_params']]
                 code = "<BFE_" + name + ' ' + ' '.join(builtin_params)+ ' ' + ' '.join(params) +"/>"
 
                 if line % 2:
@@ -1612,7 +1612,7 @@ class Template:
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <code>%(name)s</code> - %(description)s. ''' % param
             if param['default'] != "":
-                default = cgi.escape(param['default'])
+                default = cgi.escape(str(param['default']))
                 if default.strip() == "":
                     default = "&nbsp;"
                 out += '''
@@ -1626,7 +1626,7 @@ class Template:
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <code>%(name)s</code> - %(description)s. ''' % param
             if param['default'] != "":
-                default = cgi.escape(param['default'])
+                default = cgi.escape(str(param['default']))
                 if default.strip() == "":
                     default = "&nbsp;"
                 out += '''
@@ -2297,8 +2297,8 @@ class Template:
             format_attributes = format_element['attrs']
             name = format_attributes['name']
             #description = format_attributes['description']
-            params = [x['name'] + '="'+x['default']+'"' for x in format_attributes['params']]
-            builtin_params = [x['name'] + '="'+x['default']+'"' for x in format_attributes['builtin_params']]
+            params = [x['name'] + '="'+str(x['default'])+'"' for x in format_attributes['params']]
+            builtin_params = [x['name'] + '="'+str(x['default'])+'"' for x in format_attributes['builtin_params']]
             code = ("<BFE_" + name + ' ' + ' '.join(builtin_params)+ ' ' + ' '.join(params) +"/>").replace("'", r"\'")
             doc = self.tmpl_admin_print_format_element_documentation(ln, name, format_attributes, print_see_also=False).replace("'", r"\'")
 
