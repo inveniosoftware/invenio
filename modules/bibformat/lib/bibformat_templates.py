@@ -508,6 +508,14 @@ class Template:
         <script src="%(siteurl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
         <script type="text/javascript">
 
+        /* Ask user confirmation before leaving page */
+        var user_must_confirm_before_leaving_page = false;
+        window.onbeforeunload = confirmExit;
+        function confirmExit() {
+            if (user_must_confirm_before_leaving_page)
+                return "%(leave_editor_message)s";
+        }
+
         function getByID( id ) {
             if (document.getElementById)
                 var returnVar = document.getElementById(id);
@@ -575,7 +583,8 @@ class Template:
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
                'nb_menu_options': nb_menu_options,
-               'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL
+               'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL,
+               'leave_editor_message': _('Your modifications will not be saved.').replace('"', '\\"')
                }
 
         if not filename.endswith('.xsl'):
@@ -647,11 +656,11 @@ class Template:
         <tr><td colspan="2" id="codetd">
         %(toolbar)s
         <textarea name="code" id="code" rows="25" %(readonly)s
-        style="width:100%%">%(code)s</textarea>
+        style="width:100%%" onchange="user_must_confirm_before_leaving_page=true;">%(code)s</textarea>
         <script type="text/javascript">var edCanvas = document.getElementById('code');</script>
         </td></tr>
         <tr><td align="right" valign="top">
-        <input type="submit" class="adminbutton" name="save_action" value="Save Changes" %(disabled)s/>
+        <input type="submit" class="adminbutton" name="save_action" value="Save Changes" onclick="user_must_confirm_before_leaving_page=false;" %(disabled)s/>
         </td>
         </tr>
         </table>
