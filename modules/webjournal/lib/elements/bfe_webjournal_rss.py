@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal widget - Display the index of the lastest articles,
-                    including 'breaking news'
+including 'breaking news'.
 """
 from invenio.webjournal_utils import \
      parse_url_string, \
@@ -44,11 +44,11 @@ def format(bfo, categories, label="Subscribe by RSS",
     categories exist as sub-collections of 'cc'). The second option is
     preferred.
 
-    @param categories comma-separated list of journal categories that will be linked from this RSS. If 'all', use all. If empty, try to use current category.
-    @param label label of the RSS link
-    @param rss_icon_url if provided, display the RSS icon in front of the label
-    @param cc if provided, use as root collection for the journal, and ignore 'categories' parameter.
-    @param css_class CSS class of the RSS link.
+    @param categories: comma-separated list of journal categories that will be linked from this RSS. If 'all', use all. If empty, try to use current category.
+    @param label: label of the RSS link
+    @param rss_icon_url: if provided, display the RSS icon in front of the label
+    @param cc: if provided, use as root collection for the journal, and ignore 'categories' parameter.
+    @param css_class: CSS class of the RSS link.
     """
     args = parse_url_string(bfo.user_info['uri'])
     category_name = args["category"]

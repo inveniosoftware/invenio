@@ -50,13 +50,13 @@ def format(bfo, display_date='yes', display_issue_number='yes',
     journal has not been released, display an approximative release
     date (based on history and config)
 
-    @param display_date if 'yes', display issue date
-    @param display_issue_number if 'yes', display issue date
-    @param estimate_release_date if 'yes', display the theoretical release date
-    @param granularity <code>day</code>, <code>week</code> or <code>month</code>
-    @param group_issues_date if 'yes' and issue are grouped, display first issue date of the group
-    @display_month type of display for month: 'short' ('Jan', 'Feb', etc.) or 'long' ('January', 'February', etc.)
-    @param display_week_day Can display day of the week ('Monday', etc.). Parameter can be 'short' ('Mon', 'Tue' etc), 'long' ('Monday', 'Tuesday', etc.) or '' (no value displayed)
+    @param display_date: if 'yes', display issue date
+    @param display_issue_number: if 'yes', display issue date
+    @param estimate_release_date: if 'yes', display the theoretical release date
+    @param granularity: <code>day</code>, <code>week</code> or <code>month</code>
+    @param group_issues_date: if 'yes' and issue are grouped, display first issue date of the group
+    @param display_month: type of display for month: 'short' ('Jan', 'Feb', etc.) or 'long' ('January', 'February', etc.)
+    @param display_week_day: Can display day of the week ('Monday', etc.). Parameter can be 'short' ('Mon', 'Tue' etc), 'long' ('Monday', 'Tuesday', etc.) or '' (no value displayed)
     """
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]

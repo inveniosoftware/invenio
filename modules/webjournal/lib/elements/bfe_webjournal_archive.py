@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal Element - Prints a form that redirects to specified Bulletin
-                     issue
+issue.
 """
 import datetime
 from invenio.messages import gettext_set_language
@@ -41,8 +41,7 @@ def format(bfo, lowest_issue):
     have imported journal articles that have not been released with
     this WebJournal, and therefore not record in the database)
 
-    @param lowest_issue earliest existing issue. If not given, find
-    out by checking released issues
+    @param lowest_issue: earliest existing issue. If not given, find out by checking released issues
     """
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]

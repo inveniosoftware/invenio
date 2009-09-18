@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal Element - Creates an overview of all the articles of a
-                     certain category in one specific issue.
+certain category in one specific issue.
 """
 from invenio.bibformat_engine import BibFormatObject
 from invenio.messages import gettext_set_language
@@ -46,12 +46,12 @@ def format(bfo, new_articles_first='yes',
     use the same cache location (It would also not make sense to use
     both...).
 
-    @param new_articles_first if 'yes', display new articles before other articles
-    @param subject_to_css_class_kb knowledge base that maps 595__a to a CSS class
-    @param display_all_category_articles if yes, display all articles, whatever category is selected
-    @param display_category_title if yes, display category title (useful if display_all_category_articles is enabled)
+    @param new_articles_first: if 'yes', display new articles before other articles
+    @param subject_to_css_class_kb: knowledge base that maps 595__a to a CSS class
+    @param display_all_category_articles: if yes, display all articles, whatever category is selected
+    @param display_category_title: if yes, display category title (useful if display_all_category_articles is enabled)
 
-    @see bfe_webjournal_articles_overview.py
+    @see: bfe_webjournal_articles_overview.py
     """
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]

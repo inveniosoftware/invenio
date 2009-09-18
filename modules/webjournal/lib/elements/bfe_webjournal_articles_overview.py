@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal Element - Creates an overview of all the articles of a
-                     certain category in one specific issue.
+certain category in one specific issue.
 """
 import re
 import os
@@ -86,14 +86,14 @@ def format(bfo, number_of_featured_articles="1",
     recognize the size of images.</li>
     </ul>
 
-    @param number_of_featured_articles the max number of records with emphasized title
-    @param number_of_articles_with_image the max number of records for which their image is displayed
-    @param new_articles_first if 'yes', display new articles before other articles
-    @param image_px_width (integer) width of first image featured on this page
-    @param small_image_px_width (integer) width of small images featured on this page
-    @param subject_to_css_class_kb knowledge base that maps 595__a to a CSS class
-    @param link_image_to_article if 'yes', link image (if any) to article
-    @param image_alignment 'left', 'center' or 'right'. To help rendering in Outlook.
+    @param number_of_featured_articles: the max number of records with emphasized title
+    @param number_of_articles_with_image: the max number of records for which their image is displayed
+    @param new_articles_first: if 'yes', display new articles before other articles
+    @param image_px_width: (integer) width of first image featured on this page
+    @param small_image_px_width: (integer) width of small images featured on this page
+    @param subject_to_css_class_kb: knowledge base that maps 595__a to a CSS class
+    @param link_image_to_article: if 'yes', link image (if any) to article
+    @param image_alignment: 'left', 'center' or 'right'. To help rendering in Outlook.
     """
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]

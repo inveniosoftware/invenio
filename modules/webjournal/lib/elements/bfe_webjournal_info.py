@@ -30,7 +30,7 @@ from invenio.webjournal_utils import \
 def format(bfo, var=''):
     """
     Print several journal specific variables.
-    @param var the name of the desired variable. Can be one of: WEBJOURNAL_CSS_URL, WEBJOURNAL_NAME, WEBJOURNAL_NAME_INTL, WEBJOURNAL_CURRENT_ISSUE_NUMBER, WEBJOURNAL_ISSUE_NUMBER, WEBJOURNAL_URL
+    @param var: the name of the desired variable. Can be one of: WEBJOURNAL_CSS_URL, WEBJOURNAL_NAME, WEBJOURNAL_NAME_INTL, WEBJOURNAL_CURRENT_ISSUE_NUMBER, WEBJOURNAL_ISSUE_NUMBER, WEBJOURNAL_URL
     """
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]

@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal element - Displays vertical subnavigation menu in detailed
-                     article pages
+article pages.
 """
 from invenio.bibformat_engine import BibFormatObject
 from invenio.config import CFG_SITE_URL
@@ -36,9 +36,9 @@ def format(bfo, new_articles_first='yes',
     """
     Creates a navigation for articles in the same issue and category.
 
-    @param new_articles_first if 'yes', display new articles before other articles
-    @param subject_to_css_class_kb knowledge base that maps 595__a to a CSS class
-    @param display_all_category_articles if yes, display all articles, whatever category is selected
+    @param new_articles_first: if 'yes', display new articles before other articles
+    @param subject_to_css_class_kb: knowledge base that maps 595__a to a CSS class
+    @param display_all_category_articles: if yes, display all articles, whatever category is selected
     """
     # get variables
     args = parse_url_string(bfo.user_info['uri'])

@@ -32,9 +32,9 @@ def format(bfo, separator, display_email='yes',
     """
     Display article author(s)
 
-    @param separator separator between authors
-    @param display_email if yes, display link to authors' emails
-    @param email_obfuscation_mode how email are protected. See possible values in CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE in invenio.conf.
+    @param separator: separator between authors
+    @param display_email: if yes, display link to authors' emails
+    @param email_obfuscation_mode: how email are protected. See possible values in CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE in invenio.conf.
     """
     args = parse_url_string(bfo.user_info['uri'])
     ln = args["ln"]

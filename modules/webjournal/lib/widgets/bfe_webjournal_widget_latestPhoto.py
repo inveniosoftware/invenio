@@ -27,9 +27,9 @@ def format(bfo, collections, max_photos="3", separator="<br/>"):
     """
     Display the latest pictures from the given collection(s)
 
-    @param collections comma-separated list of collection form which photos have to be fetched
-    @param max_photos maximum number of photos to display
-    @param separator separator between photos
+    @param collections: comma-separated list of collection form which photos have to be fetched
+    @param max_photos: maximum number of photos to display
+    @param separator: separator between photos
     """
     try:
         int_max_photos = int(max_photos)

@@ -32,10 +32,10 @@ def format(bfo, category_prefix, category_suffix, separator=" | ",
     """
     Creates the main navigation menu of the journal
 
-    @param category_prefix value printed before each category
-    @param category_suffix value printed after each category
-    @param separator value printed between each category
-    @param display_all_categories if 'yes', show categories even when there is no corresponding article
+    @param category_prefix: value printed before each category
+    @param category_suffix: value printed after each category
+    @param separator: value printed between each category
+    @param display_all_categories: if 'yes', show categories even when there is no corresponding article
     """
     # Retrieve context (journal, issue and category) from URI
     args = parse_url_string(bfo.user_info['uri'])

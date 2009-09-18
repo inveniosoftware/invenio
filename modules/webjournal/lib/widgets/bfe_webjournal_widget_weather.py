@@ -52,10 +52,10 @@ def format(bfo, location='SZXX0008', degree_unit='c' ,
     """
     Display the latest weather forecast from Yahoo Weather
 
-    @param location Yahoo location code for the forecast
-    @param degree_unit Degree unit ('f'=Fahrenheit or 'c'=Celsius)
-    @param display_weather_icon if 'true', display weather icon inside the forecasts
-    @param weather_icon_only it 'true' display only the wheater icon (without text)
+    @param location: Yahoo location code for the forecast
+    @param degree_unit: Degree unit ('f'=Fahrenheit or 'c'=Celsius)
+    @param display_weather_icon: if 'true', display weather icon inside the forecasts
+    @param weather_icon_only: it 'true' display only the wheater icon (without text)
 
     """
     if not feedparser_available:

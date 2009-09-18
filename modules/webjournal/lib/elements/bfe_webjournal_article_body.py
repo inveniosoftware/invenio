@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal Element - display article body. Also has support for old
-                     CERN Bulletin articles.
+CERN Bulletin articles.
 """
 import re
 import types
@@ -32,7 +32,7 @@ def format(bfo, separator='<br/>'):
     """
     Display article body
 
-    @param separator separator between each body
+    @param separator: separator between each body
     """
     # Retrieve context (journal, issue and category) from URI
     args = parse_url_string(bfo.user_info['uri'])

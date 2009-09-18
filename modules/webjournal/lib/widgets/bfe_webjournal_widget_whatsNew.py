@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal widget - Display the index of the lastest articles,
-                    including 'breaking news'
+including 'breaking news'.
 """
 import time
 import os
@@ -45,11 +45,11 @@ def format(bfo, latest_issue_only='yes', newest_articles_only='yes',
     """
     Display the index to the newest articles (of the latest issue, or of the displayed issue)
 
-    @param latest_issue_only if 'yes', always display articles of the latest issue, even if viewing a past issue
-    @param newest_articles_only only display new articles, not those that also appeared in previous issues
-    @param link_category_headers if yes, category headers link to index page of that category
-    @param display_categories comma-separated list of categories to display. If none, display all
-    @param hide_when_only_new_records if 'yes' display new articles only if old articles exist in this issue
+    @param latest_issue_only: if 'yes', always display articles of the latest issue, even if viewing a past issue
+    @param newest_articles_only: only display new articles, not those that also appeared in previous issues
+    @param link_category_headers: if yes, category headers link to index page of that category
+    @param display_categories: comma-separated list of categories to display. If none, display all
+    @param hide_when_only_new_records: if 'yes' display new articles only if old articles exist in this issue
     """
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args["journal_name"]
