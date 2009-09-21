@@ -95,7 +95,7 @@ def report_tag_usage():
     print ''
     print "### 2 -  TAG USAGE INFO"
     print ''
-    print "# TAG     NB_RECORDS"
+    print "# TAG     NB_RECORDS\t# recID1 recID2 ... recID9 (example records)"
     for i in range(0,10):
         for j in range(0,10):
             bibxxx = "bib%1d%1dx" % (i, j)
@@ -113,7 +113,8 @@ def report_tag_usage():
                                         """ % (bibrec_bibxxx, bibxxx),
                                     (tag,))
                 # print results
-                print tag, (8-len(tag))*' ', len(res_usage)
+                print tag, (8-len(tag))*' ', len(res_usage), \
+                      '\t\t', '#', " ".join([str(row[0]) for row in res_usage[:9]])
 
 def report_header():
     """
