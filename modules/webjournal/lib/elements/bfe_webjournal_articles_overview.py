@@ -30,7 +30,7 @@ try:
 except ImportError:
     PIL_imported = False
 from invenio.bibformat_engine import BibFormatObject
-from invenio.htmlutils import HTMLWasher
+from invenio.htmlutils import HTMLWasher, remove_html_markup
 from invenio.messages import gettext_set_language
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -357,6 +357,12 @@ def _get_first_sentence_or_part(header_text):
     """
     header_text = header_text.lstrip()
     first_sentence = header_text[100:].find(".")
+    if first_sentence == -1:
+        # try question mark
+        first_sentence = header_text[100:].find("?")
+    if first_sentence == -1:
+        # try exclamation mark
+        first_sentence = header_text[100:].find("!")
     if first_sentence != -1 and first_sentence < 250:
         return "%s." % header_text[:(100+first_sentence)]
     else:
@@ -429,22 +435,34 @@ def _get_feature_text(record, language):
             try:
                 # get the first paragraph
                 header_text = match_obj.group("paragraph")
-                header_text = washer.wash(html_buffer=header_text,
-                                          allowed_tag_whitelist=[],
-                                          allowed_attribute_whitelist=[])
-                if header_text == "":
+                try:
+                    header_text = washer.wash(html_buffer=header_text,
+                                              allowed_tag_whitelist=[],
+                                              allowed_attribute_whitelist=[])
+                except:
+                    # was not able to parse correctly the HTML. Use
+                    # this safer function, but producing less good
+                    # results
+                    header_text = remove_html_markup(header_text)
+
+                if header_text.strip() == "":
                     raise Exception
                 else:
                     if len(header_text) > 250:
                         header_text = _get_first_sentence_or_part(header_text)
             except:
-                # in a last instance get the first empty space
-                article = washer.wash(article,
-                                      allowed_tag_whitelist=[],
-                                      allowed_attribute_whitelist=[])
-                header_text = _get_first_sentence_or_part(article)
-                header_text = washer.wash(html_buffer=header_text,
+                # in a last instance get the first sentence
+                try:
+                    article = washer.wash(article,
                                           allowed_tag_whitelist=[],
                                           allowed_attribute_whitelist=[])
+                except:
+                    # was not able to parse correctly the HTML. Use
+                    # this safer function, but producing less good
+                    # results
+                    article = remove_html_markup(article)
+
+                header_text = _get_first_sentence_or_part(article)
+
     return header_text
 
