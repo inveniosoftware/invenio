@@ -16355,8 +16355,8 @@
 Приют убогого чухонца; &lt;br /&gt;
 И лес, неведомый лучам&lt;br /&gt;
 В тумане спрятанного солнца, &lt;br /&gt;
-Кругом шумел. &lt;br /&gt;
-</subfield>
+Кругом шумел.
+      </subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">1833</subfield>
@@ -16422,8 +16422,8 @@
 &lt;br /&gt;
 Κι αν πτωχική την βρεις, η Ιθάκη δεν σε γέλασε. &lt;br /&gt;
 Ετσι σοφός που έγινες, με τόση πείρα, &lt;br /&gt;
-ήδη θα το κατάλαβες η Ιθάκες τι σημαίνουν. &lt;br /&gt;
-</subfield>
+ήδη θα το κατάλαβες η Ιθάκες τι σημαίνουν.
+      </subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">1911</subfield>
@@ -22483,6 +22483,48 @@
     <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_virgin_forest_image.gif</subfield>
       <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_virgin_forest_image.gif</subfield>
+    </datafield>
+  </record>
+  <record>
+    <datafield tag="041" ind1=" " ind2=" ">
+      <subfield code="a">zho</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="a">李白</subfield>
+      <subfield code="q">Li Bai</subfield>
+    </datafield>
+    <datafield tag="242" ind1=" " ind2=" ">
+      <subfield code="a">Alone Looking at the Mountain</subfield>
+      <subfield code="y">eng</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">敬亭獨坐</subfield>
+    </datafield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="a">
+&lt;!--HTML--&gt;眾鳥高飛盡&lt;br /&gt;
+孤雲去獨閒&lt;br /&gt;
+相看兩不厭&lt;br /&gt;
+唯有敬亭山
+      </subfield>
+      <subfield code="t">
+&lt;!--HTML--&gt;All the birds have flown up and gone;&lt;br /&gt;
+A lonely cloud floats leisurely by.&lt;br /&gt;
+We never tire of looking at each other -&lt;br /&gt;
+Only the mountain and I.
+      </subfield>
+    </datafield>
+    <datafield tag="909" ind1="C" ind2="0">
+      <subfield code="y">701-762</subfield>
+    </datafield>
+    <datafield tag="909" ind1="C" ind2="1">
+      <subfield code="c">2009-09-16</subfield>
+      <subfield code="l">00</subfield>
+      <subfield code="m">2009-09-16</subfield>
+      <subfield code="o">BATCH</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">POETRY</subfield>
     </datafield>
   </record>
 </collection>
