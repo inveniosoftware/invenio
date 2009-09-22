@@ -87,7 +87,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
             if not ajax_request:
                 # Do not display the introductory recID selection box to guest
                 # users (as it used to be with v0.99.0):
-                auth_code, auth_message = acc_authorize_action(req,'runbibedit')
+                auth_code, auth_message = acc_authorize_action(req, 'runbibmerge')
                 referer = '/merge/'
                 return page_not_authorized(req=req, referer=referer,
                                            text=auth_message, navtrail=navtrail)
@@ -104,14 +104,14 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
 
         if recid1 is not None:
             # Authorize access to record 1.
-            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+            auth_code, auth_message = acc_authorize_action(req, 'runbibmerge',
                 collection=guess_primary_collection_of_a_record(recid1))
             if auth_code != 0:
                 json_response.update({'resultCode': 1, 'resultText': 'No access to record %s' % recid1})
                 return json.dumps(json_response)
         if recid2 is not None:
             # Authorize access to record 2.
-            auth_code, auth_message = acc_authorize_action(req, 'runbibedit',
+            auth_code, auth_message = acc_authorize_action(req, 'runbibmerge',
                 collection=guess_primary_collection_of_a_record(recid2))
             if auth_code != 0:
                 json_response.update({'resultCode': 1, 'resultText': 'No access to record %s' % recid2})

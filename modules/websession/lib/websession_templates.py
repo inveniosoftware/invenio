@@ -1077,8 +1077,12 @@ class Template:
             for action in activities:
                 if action == "runbibedit":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/edit/">%s</a>""" % (CFG_SITE_URL, _("Run Record Editor"))
+                if action == "runbibeditmulti":
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/multiedit/">%s</a>""" % (CFG_SITE_URL, _("Run Multi-Record Editor"))
                 if action == "runbibcirculation":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
+                if action == "runbibmerge":
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/merge/">%s</a>""" % (CFG_SITE_URL, _("Run Record Merger"))
                 if action == "cfgbibformat":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
                 if action == "cfgoaiharvest":

@@ -160,6 +160,7 @@ DEF_ACTIONS = (
                ('runoairepository', 'run oairepositoryupdater task', '', 'no'),
                ('runbibedit', 'run Record Editor', 'collection', 'yes'),
                ('runbibeditmulti', 'run Multi-Record Editor', '', 'no'),
+               ('runbibmerge', 'run Record Merger', '', 'no'),
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ',    'yes'),
@@ -205,6 +206,7 @@ DEF_DEMO_AUTHS = (
              ('referee_DEMOBOO_*', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
              ('curator', 'runbibedit', -1, 1, {}),
              ('curator', 'runbibeditmulti', -1, 1, {}),
+             ('curator', 'runbibmerge', -1, 1, {}),
              ('thesescurator', 'runbibedit', -1, 0, {'collection': 'Theses'}),
              ('thesescurator', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
              ('photocurator', 'runbibedit', -1, 0, {'collection': 'Pictures'}),
@@ -214,9 +216,11 @@ DEF_DEMO_AUTHS = (
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)
-# Activities (i.e. actions) for which it exist an administrative web interface.
+# Activities (i.e. actions) for which exists an administrative web interface.
 CFG_ACC_ACTIVITIES_URLS = {
     'runbibedit' : (_("Run Record Editor"), "%s/record/edit/?ln=%%s" % CFG_SITE_URL),
+    'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/record/multiedit/?ln=%%s" % CFG_SITE_URL),
+    'runbibmerge' : (_("Run Multi-Record Editor"), "%s/record/multiedit/?ln=%%s" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgoaiharvest' : (_("Configure OAI Harvest"), "%s/admin/bibharvest/oaiharvestadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/bibharvest/oairepositoryadmin.py?ln=%%s" % CFG_SITE_URL),
