@@ -55,7 +55,11 @@ from invenio.config import \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
-     CFG_BIBINDEX_CHARS_PUNCTUATION
+     CFG_BIBINDEX_CHARS_PUNCTUATION, \
+     CFG_WEBCOMMENT_ALLOW_COMMENTS, \
+     CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+     CFG_WEBSEARCH_SHOW_COMMENT_COUNT, \
+     CFG_WEBSEARCH_SHOW_REVIEW_COUNT
 
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
@@ -64,6 +68,7 @@ from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, creat
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
+
 from invenio.intbitset import intbitset
 
 from invenio.websearch_external_collections import external_collection_get_state
@@ -89,6 +94,7 @@ def get_fieldvalues(recID, tag):
         for row in res:
             out.append(row[0])
     return out
+
 
 class Template:
 
@@ -2923,6 +2929,8 @@ class Template:
 
           - 'recID' *int* - The record id
         """
+        from invenio.webcommentadminlib import get_nb_reviews, get_nb_comments
+
         # load the right message language
         _ = gettext_set_language(ln)
 
@@ -2962,10 +2970,33 @@ class Template:
                        create_html_link(self.build_search_url(p="recid:%d" % recID,
                                                               rm="citation",
                                                               ln=ln),
-                                        {}, _("Cited by %i records") % num_timescited,
+                                        {}, num_timescited > 1 and _("Cited by %i records") % num_timescited
+                                        or _("Cited by 1 record"),
                                         {'class': "moreinfo"})
             else:
                 out+="<!--not showing citations links-->"
+
+        if CFG_WEBCOMMENT_ALLOW_COMMENTS and CFG_WEBSEARCH_SHOW_COMMENT_COUNT:
+            num_comments = get_nb_comments(recID)
+            if num_comments:
+                out += '<span class="moreinfo"> - %s</span>' % \
+                        create_html_link(CFG_SITE_URL + '/record/' + str(recID)
+                        + '/comments?ln=%s' % ln, {}, num_comments > 1 and _("%i comments")
+                        % (num_comments) or _("1 comment"),
+                        {'class': "moreinfo"})
+            else:
+                out+="<!--not showing reviews links-->"
+
+        if CFG_WEBCOMMENT_ALLOW_REVIEWS and CFG_WEBSEARCH_SHOW_REVIEW_COUNT:
+            num_reviews = get_nb_reviews(recID)
+            if num_reviews:
+                out += '<span class="moreinfo"> - %s</span>' % \
+                        create_html_link(CFG_SITE_URL + '/record/' + str(recID)
+                        + '/reviews?ln=%s' % ln, {}, num_reviews > 1 and _("%i reviews")
+                        % (num_reviews) or _("1 review"), {'class': "moreinfo"})
+            else:
+                out+="<!--not showing reviews links-->"
+
 
         out+='</div>'
         return out

@@ -40,6 +40,32 @@ def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     navtrail = navtrail + previous
     return navtrail
 
+def get_nb_reviews(recID):
+    """
+    Return number of reviews of the record recID
+    """
+    query = """SELECT count(*)
+            FROM cmtRECORDCOMMENT c
+            WHERE c.id_bibrec = %s and c.star_score > 0
+            """
+
+    res = run_sql(query, (recID,))
+
+    return res[0][0]
+
+def get_nb_comments(recID):
+    """
+    Return number of comments of the record recID
+    """
+    query = """SELECT count(*)
+            FROM cmtRECORDCOMMENT c
+            WHERE c.id_bibrec = %s and c.star_score = 0
+            """
+
+    res = run_sql(query, (recID,))
+
+    return res[0][0]
+
 def perform_request_index(ln=CFG_SITE_LANG):
     """
     """
@@ -389,3 +415,5 @@ def query_delete_comment(comID):
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     return int(res1)
+
+
