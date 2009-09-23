@@ -36,6 +36,7 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR
 from invenio.htmlutils import get_html_text_editor
 from invenio.messages import gettext_set_language
+from invenio.bibformat import format_record
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
@@ -1067,11 +1068,19 @@ class Template:
         out = '<ol>'
         if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
             if CFG_WEBCOMMENT_ALLOW_COMMENTS:
+                out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/hot?ln=%(ln)s&amp;comments=1">%(hot_cmt_label)s</a></li>' % \
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'hot_cmt_label': _("View most commented records")}
+                out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/latest?ln=%(ln)s&amp;comments=1">%(latest_cmt_label)s</a></li>' % \
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'latest_cmt_label': _("View latest commented records")}
                 out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' % \
-                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'reported_cmt_label': _("View all reported comments")}
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'reported_cmt_label': _("View all comments reported as abuse")}
             if CFG_WEBCOMMENT_ALLOW_REVIEWS:
+                out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/hot?ln=%(ln)s&amp;comments=0">%(hot_rev_label)s</a></li>' % \
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'hot_rev_label': _("View most reviewed records")}
+                out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/latest?ln=%(ln)s&amp;comments=0">%(latest_rev_label)s</a></li>' % \
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'latest_rev_label': _("View latest reviewed records")}
                 out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' % \
-                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'reported_rev_label': _("View all reviews reported as abuse")}
             out += """
                 <li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></li>
                 <li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/users?ln=%(ln)s">%(view_users)s</a></li>
@@ -1258,6 +1267,82 @@ class Template:
                 'rec_id': int(rec_id),
                 'cmt_id_label': _("Comment") + ' #' + str(cmt_id),
                 'ln': ln}
+        return out
+
+    def tmpl_admin_latest(self, ln, comment_data, comments):
+        """
+        @param comment_data: same type of tuple as that
+        which is return by webcommentadminlib.py/query_get_latest i.e.
+            tuple (nickname, uid, date_creation, body, id) if latest comments or
+            tuple (nickname, uid, date_creation, body, star_score, id) if latest reviews
+        """
+        _ = gettext_set_language(ln)
+
+        out = """
+        <ol>
+        """
+        for (cmt_tuple, meta_data) in comment_data:
+            bibrec_id = meta_data[3]
+            content = format_record(bibrec_id, "hs")
+            if not comments:
+                out += """
+                <li> %(content)s <br/> <span class="moreinfo"> <a class="moreinfo" href=%(comment_url)s> reviewed by %(user)s</a>
+                (%(stars)s) \"%(body)s\" on <i> %(date)s </i></li> </span> <br/>
+                """ % {'content': content,
+                'comment_url': CFG_SITE_URL + '/record/' + str(bibrec_id) + '/reviews',
+                'user':cmt_tuple[0] ,
+                'stars': '*' * int(cmt_tuple[4]) ,
+                'body': cmt_tuple[3][:20] + '...',
+                'date': cmt_tuple[2]}
+            else:
+                out += """
+                <li> %(content)s <br/> <span class="moreinfo"> <a class="moreinfo" href=%(comment_url)s> commented by %(user)s</a>,
+                \"%(body)s\" on <i> %(date)s </i></li> </span> <br/>
+                """ % {'content': content,
+                'comment_url': CFG_SITE_URL + '/record/' + str(bibrec_id) + '/comments',
+                'user':cmt_tuple[0] ,
+                'body': cmt_tuple[3][:20] + '...',
+                'date': cmt_tuple[2]}
+
+        out += """</ol>"""
+        return out
+
+    def tmpl_admin_hot(self, ln, comment_data, comments):
+        """
+        @param comment_data: same type of tuple as that
+        which is return by webcommentadminlib.py/query_get_hot i.e.
+            tuple (id_bibrec, date_last_comment, users, count)
+        """
+        _ = gettext_set_language(ln)
+
+        out = """
+        <ol>
+        """
+        for cmt_tuple in comment_data:
+            bibrec_id = cmt_tuple[0]
+            content = format_record(bibrec_id, "hs")
+            last_comment_date = cmt_tuple[1]
+            total_users = cmt_tuple[2]
+            total_comments = cmt_tuple[3]
+            if comments:
+                comment_url = CFG_SITE_URL + '/record/' + str(bibrec_id) + '/comments'
+                str_comment = int(total_comments) > 1  and 'comments' or 'comment'
+            else:
+                comment_url = CFG_SITE_URL + '/record/' + str(bibrec_id) + '/reviews'
+                str_comment = int(total_comments) > 1  and 'reviews' or 'review'
+            out += """
+            <li> %(content)s <br/> <span class="moreinfo"> <a class="moreinfo" href=%(comment_url)s> %(total_comments)s
+            %(str_comment)s</a>
+            (%(total_users)s %(user)s), latest on <i> %(last_comment_date)s </i></li> </span> <br/>
+            """ % {'content': content,
+            'comment_url': comment_url ,
+            'total_comments': total_comments,
+            'str_comment': str_comment,
+            'total_users': total_users,
+            'user': int(total_users) > 1 and 'users' or 'user',
+            'last_comment_date': last_comment_date}
+
+        out += """</ol>"""
         return out
 
     def tmpl_admin_comments(self, ln, uid, comID, recID, comment_data, reviews):

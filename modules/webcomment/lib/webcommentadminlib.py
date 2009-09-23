@@ -155,6 +155,38 @@ def perform_request_comments(ln=CFG_SITE_LANG, uid="", comID="", recID="", revie
                                                     comment_data=comments,
                                                     reviews=reviews)
 
+def perform_request_hot(ln=CFG_SITE_LANG, comments=1, top=10):
+    """
+    Display the list of hottest comments/reviews along with information about the comment.
+
+    @param top: Specify number of results to be shown
+    """
+    ln = wash_language(ln)
+    comments = wash_url_argument(comments, 'int')
+    top = wash_url_argument(top, 'int')
+
+    comments_retrieved = query_get_hot(comments, ln, top)
+
+    return webcomment_templates.tmpl_admin_hot(ln=ln,
+                                               comment_data=comments_retrieved,
+                                               comments=comments)
+
+def perform_request_latest(ln=CFG_SITE_LANG, comments=1, top=10):
+    """
+    Display the list of latest comments/reviews along with information about the comment.
+
+    @param top: Specify number of results to be shown
+    """
+    ln = wash_language(ln)
+    comments = wash_url_argument(comments, 'int')
+    top = wash_url_argument(top, 'int')
+
+    comments_retrieved = query_get_latest(comments, ln, top)
+
+    return webcomment_templates.tmpl_admin_latest(ln=ln,
+                                               comment_data=comments_retrieved,
+                                               comments=comments)
+
 def query_get_comments(uid, cmtID, recID, reviews, ln, abuse=False):
     """
     private function
@@ -212,6 +244,87 @@ def query_get_comments(uid, cmtID, recID, reviews, ln, abuse=False):
                                qtuple[qdict['id']],
                                qtuple[qdict['id_bibrec']],
                                qtuple[qdict['nb_abuse_reports']])
+        out_tuple = (comment_tuple, general_infos_tuple)
+        output.append(out_tuple)
+    return tuple(output)
+
+def query_get_hot(comments, ln, top):
+    """
+    private function
+    @param comments:  boolean indicating if we want to retrieve comments or reviews
+    @return: tuple (id_bibrec, date_last_comment, users, count)
+    """
+    qdict = {'id_bibrec': 0, 'date_last_comment': 1, 'users': 2, 'count': 3}
+    query = """SELECT c.id_bibrec,
+               DATE_FORMAT(max(c.date_creation), '%%Y-%%m-%%d %%H:%%i:%%S') as date_last_comment,
+               count(distinct c.id_user) as users,
+               count(*) as count
+               FROM cmtRECORDCOMMENT c
+               %s
+               GROUP BY c.id_bibrec
+               ORDER BY count(*) DESC
+               LIMIT %s
+    """
+    where_clause = "WHERE " + (comments and 'c.star_score=0' or 'c.star_score>0')
+
+    res = run_sql(query % (where_clause, top))
+
+    output = []
+    for qtuple in res:
+        general_infos_tuple = (qtuple[qdict['id_bibrec']],
+                               qtuple[qdict['date_last_comment']],
+                               qtuple[qdict['users']],
+                               qtuple[qdict['count']])
+        output.append(general_infos_tuple)
+    return tuple(output)
+
+def query_get_latest(comments, ln, top):
+    """
+    private function
+    @return tuple of comment where comment is
+    tuple (nickname, uid, date_creation, body, id) if latest comments or
+    tuple (nickname, uid, date_creation, body, star_score, id) if latest reviews
+    """
+    qdict = {'id': 0, 'id_bibrec': 1, 'uid': 2, 'date_creation': 3, 'body': 4,
+             'nb_abuse_reports': 5, 'star_score': 6, 'nickname': -1}
+    query = """SELECT c.id, c.id_bibrec, c.id_user,
+                      DATE_FORMAT(c.date_creation, '%%Y-%%m-%%d %%H:%%i:%%S'), c.body,
+                      c.nb_abuse_reports,
+                      %s
+                      u.nickname
+                      FROM cmtRECORDCOMMENT c LEFT JOIN user u
+                      ON c.id_user = u.id
+               %s
+               ORDER BY c.date_creation DESC
+               LIMIT %s
+    """
+    select_fields = not comments and 'c.star_score, ' or ''
+    where_clause = "WHERE " + (comments and 'c.star_score=0' or 'c.star_score>0')
+
+    res = run_sql(query % (select_fields, where_clause, top))
+
+    output = []
+    for qtuple in res:
+        nickname = qtuple[qdict['nickname']] or get_user_info(qtuple[qdict['uid']], ln)[2]
+        if not comments:
+            comment_tuple = (nickname,
+                             qtuple[qdict['uid']],
+                             qtuple[qdict['date_creation']],
+                             qtuple[qdict['body']],
+                             qtuple[qdict['star_score']],
+                             qtuple[qdict['id']])
+        else:
+            comment_tuple = (nickname,
+                             qtuple[qdict['uid']],
+                             qtuple[qdict['date_creation']],
+                             qtuple[qdict['body']],
+                             qtuple[qdict['id']])
+        general_infos_tuple = (nickname,
+                               qtuple[qdict['uid']],
+                               qtuple[qdict['id']],
+                               qtuple[qdict['id_bibrec']],
+                               qtuple[qdict['nb_abuse_reports']])
+
         out_tuple = (comment_tuple, general_infos_tuple)
         output.append(out_tuple)
     return tuple(output)

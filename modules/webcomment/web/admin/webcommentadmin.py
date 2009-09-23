@@ -133,8 +133,80 @@ def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0):
 
     (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
     if (auth_code != 'false'):
-        return page(title=(reviews=='0' and _("View all reported comments") or _("View all reported reviews")),
+        return page(title=(reviews=='0' and _("View all comments reported as abuse") or _("View all reviews reported as abuse")),
                     body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews, abuse=True),
+                    uid=auid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    else:
+        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
+
+def hot(req, ln=CFG_SITE_LANG, comments=1, top=10):
+    """
+    View most active comments/reviews
+    @param ln: language
+    @param comments: boolean enabled for comments, disabled for reviews
+    @param top: number of results to be shown
+    """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = getnavtrail()
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
+    navtrail_previous_links += _("WebComment Admin") + '</a>'
+
+    try:
+        auid = getUid(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
+                    language=ln,
+                    req=req)
+
+    (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
+    if (auth_code != 'false'):
+        return page(title=(comments=='0' and _("View most reviewed records") or
+                           _("View most commented records")),
+                    body=perform_request_hot(ln=ln, comments=comments, top=top),
+                    uid=auid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    else:
+        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
+
+def latest(req, ln=CFG_SITE_LANG, comments=1, top=10):
+    """
+    View latest comments/reviews
+    @param ln: language
+    @param comments: boolean enabled for comments, disabled for reviews
+    @param top: number of results to be shown
+    """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = getnavtrail()
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
+    navtrail_previous_links += _("WebComment Admin") + '</a>'
+
+    try:
+        auid = getUid(req)
+    except Error:
+        return page(title=_("Internal Error"),
+                    body = create_error_box(req, verbose=0, ln=ln),
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
+                    language=ln,
+                    req=req)
+
+    (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
+    if (auth_code != 'false'):
+        return page(title=(comments=='0' and _("View latest reviewed records") or
+                           _("View latest commented records")),
+                    body=perform_request_latest(ln=ln, comments=comments, top=top),
                     uid=auid,
                     language=ln,
                     navtrail = navtrail_previous_links,
