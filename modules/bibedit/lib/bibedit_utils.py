@@ -37,7 +37,8 @@ import time
 import zlib
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
-    CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX
+    CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
+    CFG_BIBEDIT_FIELD_TEMPLATES_PATH
 from invenio.bibedit_dblayer import get_record_last_modification_date
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
@@ -59,6 +60,8 @@ re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 re_taskid = re.compile('ID="(\d+)"')
 re_tmpl_name = re.compile('<!-- BibEdit-Template-Name: (.*) -->')
 re_tmpl_description = re.compile('<!-- BibEdit-Template-Description: (.*) -->')
+re_ftmpl_name = re.compile('<!-- BibEdit-Field-Template-Name: (.*) -->')
+re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*) -->')
 
 
 # Operations on the BibEdit cache file
@@ -300,22 +303,23 @@ def get_xml_comparison(header1, header2, xml1, xml2):
     return ''.join(difflib.unified_diff(xml1.splitlines(1),
         xml2.splitlines(1), header1, header2))
 
-
-# Record templates
-def get_record_templates():
-    """Return list of record template (filename, name, description) tuples."""
+#Templates
+def get_templates(templatesDir, tmpl_name, tmpl_description, extractContent = False):
+    """Return list of templates [filename, name, description, content*]
+       the extractContent variable indicated if the parsed content should
+       be included"""
     template_fnames = fnmatch.filter(os.listdir(
-            CFG_BIBEDIT_RECORD_TEMPLATES_PATH), '*.xml')
+            templatesDir), '*.xml')
 
     templates = []
     for fname in template_fnames:
         template_file = open('%s%s%s' % (
-                CFG_BIBEDIT_RECORD_TEMPLATES_PATH, os.sep, fname),'r')
+                templatesDir, os.sep, fname),'r')
         template = template_file.read()
         template_file.close()
         fname_stripped = os.path.splitext(fname)[0]
-        mo_name = re_tmpl_name.search(template)
-        mo_description = re_tmpl_description.search(template)
+        mo_name = tmpl_name.search(template)
+        mo_description = tmpl_description.search(template)
         if mo_name:
             name = mo_name.group(1)
         else:
@@ -324,9 +328,29 @@ def get_record_templates():
             description = mo_description.group(1)
         else:
             description = ''
-        templates.append([fname_stripped, name, description])
+        if (extractContent):
+            parsedTemplate = create_record(template)[0]
+            if parsedTemplate != None:
+                # If the template was correct
+                templates.append([fname_stripped, name, description, parsedTemplate])
+            else:
+                raise "Problem when parsing the template %s" % (fname, )
+        else:
+            templates.append([fname_stripped, name, description])
 
     return templates
+
+# Field templates
+
+def get_field_templates():
+    """Returns list of field templates [filename, name, description, content]"""
+    return get_templates(CFG_BIBEDIT_FIELD_TEMPLATES_PATH, re_ftmpl_name, re_ftmpl_description, True)
+
+# Record templates
+def get_record_templates():
+    """Return list of record template [filename, name, description]  ."""
+    return get_templates(CFG_BIBEDIT_RECORD_TEMPLATES_PATH, re_tmpl_name, re_tmpl_description, False)
+
 
 def get_record_template(name):
     """Return an XML record template."""

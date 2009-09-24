@@ -38,7 +38,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     get_cache_file_contents, get_cache_mtime, get_record_templates, \
     get_record_template, latest_record_revision, record_locked_by_other_user, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
-    update_cache_file_contents
+    update_cache_file_contents, get_field_templates
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
     record_delete_subfield_from, record_modify_controlfield, \
@@ -48,10 +48,78 @@ from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
 from invenio.search_engine import record_exists, search_pattern
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
+import sys
+if sys.hexversion < 0x2060000:
+    try:
+        import simplejson as json
+        simplejson_available = True
+    except ImportError:
+        # Okay, no Ajax app will be possible, but continue anyway,
+        # since this package is only recommended, not mandatory.
+        simplejson_available = False
+else:
+    import json
+    simplejson_available = True
 
 import invenio.template
 
 bibedit_templates = invenio.template.load('bibedit')
+
+def get_empty_fields_templates():
+    """
+    Returning the templates of empty fields :
+    - an empty data field
+    - an empty control field
+    """
+    return [{
+                "name": "Empty field",
+                "description": "The data field not containing any information filled in",
+                "tag" : "",
+                "ind1" : "",
+                "ind2" : "",
+                "subfields" : [("","")],
+                "isControlfield" : False
+            },{
+                "name" : "Empty control field",
+                "description" : "The controlfield not containing any data or tag description",
+                "isControlfield" : True,
+                "tag" : "",
+                "value" : ""
+            }]
+
+def get_available_fields_templates():
+    """
+    A method returning all the available field templates
+    Returns a list of descriptors. Each descriptor has
+    the same structure as a full field descriptor inside the
+    record
+    """
+    templates = get_field_templates()
+    result = get_empty_fields_templates()
+    for template in templates:
+        tplTag = template[3].keys()[0]
+        field = template[3][tplTag][0]
+
+        if (field[0] == []):
+        # if the field is a controlField, add different structure
+            result.append({
+                    "name" : template[1],
+                    "description" : template[2],
+                    "isControlfield" : True,
+                    "tag" : tplTag,
+                    "value" : field[3]
+                })
+        else:
+            result.append({
+                    "name": template[1],
+                    "description": template[2],
+                    "tag" : tplTag,
+                    "ind1" : field[1],
+                    "ind2" : field[2],
+                    "subfields" : field[0],
+                    "isControlfield" : False
+                    })
+    return result
 
 def perform_request_init():
     """Handle the initial request by adding menu and JavaScript to the page."""
@@ -67,6 +135,23 @@ def perform_request_init():
     protected_fields.extend(CFG_BIBEDIT_PROTECTED_FIELDS.split(','))
     history_url = '"' + CFG_SITE_URL + '/admin/bibedit/bibeditadmin.py/history"'
     cern_site = 'false'
+
+    if not simplejson_available:
+        title = 'Record Editor'
+        body = '''Sorry, the record editor cannot operate when the
+                `simplejson' module is not installed.  Please see the INSTALL
+                file.'''
+        return page(title       = title,
+                    body        = body,
+                    errors      = [],
+                    warnings    = [],
+                    uid         = uid,
+                    language    = ln,
+                    navtrail    = navtrail,
+                    lastupdated = __lastupdated__,
+                    req         = req)
+
+
     if CFG_CERN_SITE:
         cern_site = 'true'
     data = {'gRECORD_TEMPLATES': record_templates,
@@ -100,6 +185,11 @@ def perform_request_init():
         body += '    var %s = %s;\n' % (key, data[key])
     body += '    </script>\n'
 
+    # Adding the information about field templates
+    fieldTemplates = get_available_fields_templates()
+    body += "<script>\n" + \
+            "   var fieldTemplates = %s\n"%(json.dumps(fieldTemplates), ) + \
+            "</script>\n"
     # Add scripts (the ordering is NOT irrelevant).
     scripts = ['jquery.min.js', 'effects.core.min.js',
                'effects.highlight.min.js', 'jquery.autogrow.js',
@@ -160,7 +250,6 @@ def perform_request_ajax(req, recid, uid, data):
     elif request_type in ('getTickets'):
         # BibCatalog requests.
         response.update(perform_request_bibcatalog(request_type, recid, uid))
-
     return response
 
 def perform_request_search(data):

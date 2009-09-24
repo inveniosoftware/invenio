@@ -1069,10 +1069,137 @@ function onSubfieldBoxClick(box){
   }
 }
 
-function onAddFieldClick(){
-  /*
-   * Handle 'Add field' button.
-   */
+function addFieldGatherInformations(fieldTmpNo){
+  /** Gathering the information about a current form
+      returns [template_num, data]
+      This funcion saves the state of a form -> saving the template name and values only would
+      not be enough. we want to know what has been modified in last-chosen template !
+      data is in the same format as teh templates data.
+  */
+  var templateNum = $('#selectAddFieldTemplate_' + fieldTmpNo).attr("value");
+  var tag = $("#txtAddFieldTag_" + fieldTmpNo).attr("value");
+
+  // now checking if this is a controlfield ... controlfield if ind1 box is invisible
+  if ($("#txtAddFieldInd1_" + fieldTmpNo + ":visible").length == 1){
+    var ind1 = $("#txtAddFieldInd1_" + fieldTmpNo).attr("value");
+    var ind2 = $("#txtAddFieldInd2_" + fieldTmpNo).attr("value");
+    var subfieldTmpNo = $('#rowGroupAddField_' + fieldTmpNo).data('freeSubfieldTmpNo');
+    var subfields = [];
+    for (i=0;i<subfieldTmpNo;i++){
+      var subfieldCode = $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_' + i).attr("value");
+      var subfieldValue = $('#txtAddFieldValue_' + fieldTmpNo + '_' + i).attr("value");
+      subfields.push([subfieldCode, subfieldValue]);
+    }
+
+    data = {
+      "name": "nonexisting template - values taken from the field",
+      "description": "The description of a template",
+      "tag" : tag,
+      "ind1" : ind1,
+      "ind2" : ind2,
+      "subfields" : subfields,
+      "isControlfield" : false
+    };
+  } else {
+    cfValue = $("#txtAddFieldValue_" + fieldTmpNo + "_0").attr("value");
+    data = {
+      "name": "nonexisting template - values taken from the field",
+      "description": "The description of a template",
+      "tag" : tag,
+      "value" : cfValue,
+      "isControlfield" : true
+    }
+  }
+
+  return [templateNum, data];
+}
+
+function addFieldAddSubfieldEditor(jQRowGroupID, fieldTmpNo, defaultCode, defaultValue){
+  /**
+     Adding a subfield input control into the editor
+     optional parameters:
+
+     defaultCode - the subfield code that will be displayed
+     defaultValue - the value that will be displayed by default in the editor
+  */
+  var subfieldTmpNo = $(jQRowGroupID).data('freeSubfieldTmpNo');
+  $(jQRowGroupID).data('freeSubfieldTmpNo', subfieldTmpNo+1);
+
+  var addFieldRows = $(jQRowGroupID + ' tr');
+
+  $(addFieldRows).eq(addFieldRows.length-1).before(createAddFieldRow(
+    fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue));
+  $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_' + subfieldTmpNo).bind(
+    'keyup', onAddFieldChange);
+  $('#btnAddFieldRemove_' + fieldTmpNo + '_' + subfieldTmpNo).bind('click', function(){
+    $('#rowAddField_' + this.id.slice(this.id.indexOf('_')+1)).remove();
+  });
+  $('#txtAddFieldValue_' + fieldTmpNo + '_' + subfieldTmpNo).bind(
+    'focus', function(){
+      if ($(this).hasClass('bibEditVolatileSubfield')){
+        $(this).select();
+        $(this).removeClass("bibEditVolatileSubfield");
+      }
+    });
+  var contentEditorId = '#txtAddFieldValue_' + fieldTmpNo + '_' + subfieldTmpNo;
+  $(contentEditorId).bind('keyup', function(e){
+    onAddFieldValueKeyPressed(e, jQRowGroupID, fieldTmpNo, subfieldTmpNo);
+  });
+
+}
+
+function onAddFieldJumpToNextSubfield(jQRowGroupID, fieldTmpNo, subfieldTmpNo){
+  // checking, how many subfields are there and if last, submitting the form
+  var numberOfSubfields = $(jQRowGroupID).data('freeSubfieldTmpNo');
+  if (subfieldTmpNo < (numberOfSubfields - 1)){
+    var elementCode = "#txtAddFieldSubfieldCode_" + fieldTmpNo + "_" + (subfieldTmpNo + 1);
+    $(elementCode)[0].focus();
+  }
+  else{
+//    alert("submitting the form cause the last one has been left");
+    addFieldSave(fieldTmpNo);
+  }
+}
+
+function applyFieldTemplate(jQRowGroupID, formData, fieldTmpNo){
+  /** A function that applies a template
+      formNo is the number of addfield form that is treated at teh moment
+      formData is the data of the field template
+  */
+
+  // first cleaning the existing fields
+
+  $(jQRowGroupID).data('isControlfield', formData.isControlfield);
+  if (formData.isControlfield){
+    changeFieldToControlfield(fieldTmpNo);
+    $("#txtAddFieldTag_" + fieldTmpNo).attr("value", formData.tag);
+    $("#txtAddFieldInd1_" + fieldTmpNo).attr("value", '');
+    $("#txtAddFieldInd2_" + fieldTmpNo).attr("value", '');
+    $("#txtAddFieldValue_" + fieldTmpNo + "_0").attr("value", formData.value);
+  }
+  else
+  {
+    changeFieldToDatafield(fieldTmpNo);
+    var subfieldTmpNo = $(jQRowGroupID).data('freeSubfieldTmpNo');
+    $(jQRowGroupID).data('freeSubfieldTmpNo', 0);
+
+    for (i=subfieldTmpNo-1; i>=0; i--){
+      $('#rowAddField_' + fieldTmpNo + '_' + i).remove();
+    }
+
+    for (subfieldInd in formData.subfields){
+      subfield = formData.subfields[subfieldInd];
+      addFieldAddSubfieldEditor(jQRowGroupID, fieldTmpNo, subfield[0], subfield[1]);
+    }
+
+    // now changing the main field properties
+    $("#txtAddFieldTag_" + fieldTmpNo).attr("value", formData.tag);
+    $("#txtAddFieldInd1_" + fieldTmpNo).attr("value", formData.ind1);
+    $("#txtAddFieldInd2_" + fieldTmpNo).attr("value", formData.ind2);
+  }
+}
+
+function createAddFieldInterface(initialContent, initialTemplateNo){
   // Create form and scroll close to the top of the table.
   $(document).scrollTop(0);
   var fieldTmpNo = onAddFieldClick.addFieldFreeTmpNo++;
@@ -1081,59 +1208,94 @@ function onAddFieldClick(){
   var tbodyElements = $('#bibEditTable tbody');
   var insertionPoint = (tbodyElements.length >= 4) ? 3 : tbodyElements.length-1;
   $('#bibEditTable tbody').eq(insertionPoint).after(
-    createAddFieldForm(fieldTmpNo));
+    createAddFieldForm(fieldTmpNo, initialTemplateNo));
   $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
 
   // Bind event handlers.
-  $('#chkAddFieldControlfield_' + fieldTmpNo).bind('click',
-    onAddFieldControlfieldClick);
   $('#btnAddFieldAddSubfield_' + fieldTmpNo).bind('click', function(){
-    var subfieldTmpNo = $(jQRowGroupID).data('freeSubfieldTmpNo');
-    $(jQRowGroupID).data('freeSubfieldTmpNo', subfieldTmpNo+1);
-    var addFieldRows = $(jQRowGroupID + ' tr');
-    $(addFieldRows).eq(addFieldRows.length-1).before(createAddFieldRow(
-      fieldTmpNo, subfieldTmpNo));
-    $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_' + subfieldTmpNo).bind(
-      'keyup', onAddFieldChange);
-    $('#btnAddFieldRemove_' + fieldTmpNo + '_' + subfieldTmpNo).bind('click',
-      function(){
-	$('#rowAddField_' + this.id.slice(this.id.indexOf('_')+1)).remove();
-      });
+    addFieldAddSubfieldEditor(jQRowGroupID, fieldTmpNo, "", "");
   });
   $('#txtAddFieldTag_' + fieldTmpNo).bind('keyup', onAddFieldChange);
   $('#txtAddFieldInd1_' + fieldTmpNo).bind('keyup', onAddFieldChange);
   $('#txtAddFieldInd2_' + fieldTmpNo).bind('keyup', onAddFieldChange);
   $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0').bind('keyup',
 							  onAddFieldChange);
-  $('#btnAddFieldSave_' + fieldTmpNo).bind('click', onAddFieldSave);
-  $('#btnAddFieldCancel_' + fieldTmpNo).bind('click', function(){
-    $(jQRowGroupID).remove();
-    if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
-      $('#bibEditColFieldTag').css('width', '48px');
-    reColorFields();
+  $('#txtAddFieldValue_' + fieldTmpNo + '_0').bind('keyup', function (e){
+    onAddFieldValueKeyPressed(e, jQRowGroupID, fieldTmpNo, 0);
   });
-  $('#btnAddFieldClear_' + fieldTmpNo).bind('click', function(){
-    $(jQRowGroupID + ' input[type="text"]').val(''
-      ).removeClass('bibEditInputError');
-    $('#txtAddFieldTag_' + fieldTmpNo).focus();
+
+  $('#selectAddFieldTemplate_' + fieldTmpNo).bind('change', function(e){
+      value = $('#selectAddFieldTemplate_' + fieldTmpNo).attr("value");
+      applyFieldTemplate(jQRowGroupID, fieldTemplates[value], fieldTmpNo);
   });
+  $('#selectAddSimilarFields_' + fieldTmpNo).bind('click', function(e){
+    var data = addFieldGatherInformations(fieldTmpNo);
+    var numRepetitions = parseInt($('#selectAddFieldTemplateTimes_' + fieldTmpNo).attr('value'));
+    for (var i=0; i< numRepetitions; i++){
+      createAddFieldInterface(data[1], data[0]);
+    }
+  });
+
+  if (initialContent != undefined){
+    applyFieldTemplate(jQRowGroupID, initialContent , fieldTmpNo);
+  }else{
+    $(jQRowGroupID).data('isControlfield', false);
+  }
 
   reColorFields();
   $('#txtAddFieldTag_' + fieldTmpNo).focus();
   // Color the new form for a short period.
   $(jQRowGroupID).effect('highlight', {color: gNEW_ADD_FIELD_FORM_COLOR},
     gNEW_ADD_FIELD_FORM_COLOR_FADE_DURATION);
+
 }
+
+function onAddSubfieldValueKeyPressed(e, tag, fieldPosition, subfieldPosition){
+  if (e.which == 13){
+    // enter key pressed.
+    var subfieldsNum = $('#rowGroup_' + tag + '_' + fieldPosition + ' .bibEditTxtSubfieldCode').length;
+    if (subfieldPosition < (subfieldsNum - 1)){
+      //jump to the next field
+      $('#txtAddSubfieldsCode_' + tag + '_' + fieldPosition + '_' + (subfieldPosition + 1))[0].focus();
+    } else {
+      onAddSubfieldsSave(e, tag, fieldPosition);
+    }
+  }
+  if (e.which == 27){
+    // escape key pressed
+    $('#rowAddSubfields_' + tag + '_' + fieldPosition + '_' + 0).nextAll().andSelf().remove();
+  }
+}
+
+function onAddFieldValueKeyPressed(e, jQRowGroupID, fieldTmpNo, subfieldInd){
+  if (e.which == 13){
+    // enter key pressed
+    onAddFieldJumpToNextSubfield(jQRowGroupID, fieldTmpNo, subfieldInd);
+  }
+  if (e.which == 27){
+    // escape key pressed
+    $(jQRowGroupID).remove();
+    if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
+      $('#bibEditColFieldTag').css('width', '48px');
+    reColorFields();
+  }
+}
+function onAddFieldClick(){
+  /*
+   * Handle 'Add field' button.
+   */
+  createAddFieldInterface();
+}
+
 // Incrementing temporary field numbers.
 onAddFieldClick.addFieldFreeTmpNo = 100000;
 
-function onAddFieldControlfieldClick(){
-  /*
-   * Handle 'Controlfield' checkbox in add field form.
+function changeFieldToControlfield(fieldTmpNo){
+  /**
+     Switching the field to be a control field
    */
-  var fieldTmpNo = this.id.split('_')[1];
 
-  // Remove any extra rows.
+  // removing additional entries
   var addFieldRows = $('#rowGroupAddField_' + fieldTmpNo + ' tr');
   $(addFieldRows).slice(2, addFieldRows.length-1).remove();
 
@@ -1145,7 +1307,19 @@ function onAddFieldControlfieldClick(){
   // Toggle hidden fields.
   var elems = $('#txtAddFieldInd1_' + fieldTmpNo + ', #txtAddFieldInd2_' +
     fieldTmpNo + ', #txtAddFieldSubfieldCode_' + fieldTmpNo + '_0,' +
-    '#btnAddFieldAddSubfield_' + fieldTmpNo).toggle();
+    '#btnAddFieldAddSubfield_' + fieldTmpNo).hide();
+
+  $('#txtAddFieldTag_' + fieldTmpNo).focus();
+}
+
+function changeFieldToDatafield(fieldTmpNo){
+  /**
+     Switching the field to be a datafield
+   */
+  // making the elements visible
+  var elems = $('#txtAddFieldInd1_' + fieldTmpNo + ', #txtAddFieldInd2_' +
+    fieldTmpNo + ', #txtAddFieldSubfieldCode_' + fieldTmpNo + '_0,' +
+    '#btnAddFieldAddSubfield_' + fieldTmpNo).show();
 
   $('#txtAddFieldTag_' + fieldTmpNo).focus();
 }
@@ -1154,12 +1328,24 @@ function onAddFieldChange(event){
   /*
    * Validate MARC and add or remove error class.
    */
-  if (this.value.length == this.maxLength){
-    var fieldTmpNo = this.id.split('_')[1];
+
+  // first handling the case of escape key, which is a little different that others
+  var fieldTmpNo = this.id.split('_')[1];
+
+  if (event.which == 27){
+    // escape key pressed
+    var jQRowGroupID = "#rowGroupAddField_" + fieldTmpNo;
+    $(jQRowGroupID).remove();
+    if (!$('#bibEditTable > [id^=rowGroupAddField]').length)
+      $('#bibEditColFieldTag').css('width', '48px');
+    reColorFields();
+  }
+  else if (this.value.length == this.maxLength){
     var fieldType;
-    if (this.id.indexOf('Tag') != -1)
-      fieldType = ($('#chkAddFieldControlfield_' + fieldTmpNo).attr('checked')
-		  ) ? 'ControlTag' : 'Tag';
+    if (this.id.indexOf('Tag') != -1){
+      var jQRowGroupID = "#rowGroupAddField_" + fieldTmpNo;
+      fieldType = ($(jQRowGroupID).data('isControlfield')) ? 'ControlTag' : 'Tag';
+    }
     else if (this.id.indexOf('Ind1') != -1)
       fieldType = 'Indicator1';
     else if (this.id.indexOf('Ind2') != -1)
@@ -1185,7 +1371,8 @@ function onAddFieldChange(event){
 	    $(this).next().focus();
 	    break;
 	  case 'Indicator2':
-	    $(this).parent().nextAll().eq(2).children('input').focus();
+          // in case the indicator is present, we can be sure this is not a control field... so we can safely jump to the subfield code input
+          $('#txtAddFieldSubfieldCode_' + fieldTmpNo + '_0')[0].focus();
 	    break;
 	  case 'SubfieldCode':
 	    $(this).parent().next().children('input').focus();
@@ -1201,13 +1388,21 @@ function onAddFieldChange(event){
 }
 
 function onAddFieldSave(event){
+  var fieldTmpNo = this.id.split('_')[1];
+  addFieldSave(fieldTmpNo);
+}
+
+function addFieldSave(fieldTmpNo)
+{
   /*
    * Handle 'Save' button in add field form.
    */
   updateStatus('updating');
-  var fieldTmpNo = this.id.split('_')[1];
-  var controlfield = $('#chkAddFieldControlfield_' + fieldTmpNo).attr(
-		       'checked');
+
+
+  var jQRowGroupID = "#rowGroupAddField_" + fieldTmpNo;
+  var controlfield = $(jQRowGroupID).data('isControlfield');
+
   var tag = $('#txtAddFieldTag_' + fieldTmpNo).val();
   var value = $('#txtAddFieldValue_' + fieldTmpNo + '_0').val();
   var subfields = [], ind1 = ' ', ind2 = ' ';
@@ -1250,17 +1445,22 @@ function onAddFieldSave(event){
     }
     // Collect valid subfields in an array.
     var invalidOrEmptySubfields = false;
-    $('#rowGroupAddField_' + fieldTmpNo + ' .bibEditTxtSubfieldCode'
+     $('#rowGroupAddField_' + fieldTmpNo + ' .bibEditTxtSubfieldCode'
       ).each(function(){
         var subfieldTmpNo = this.id.slice(this.id.lastIndexOf('_')+1);
         var txtValue = $('#txtAddFieldValue_' + fieldTmpNo + '_' +
 	  subfieldTmpNo);
         var value = $(txtValue).val();
+        var isStillVolatile = txtValue.hasClass('bibEditVolatileSubfield');
+
         if (!$(this).hasClass('bibEditInputError')
-	  && this.value != ''
+          && this.value != ''
 	  && !$(txtValue).hasClass('bibEditInputError')
-	  && value != '')
-            subfields.push([this.value, value]);
+          && value != ''){
+            if (!isStillVolatile){
+              subfields.push([this.value, value]);
+            }
+        }
         else
           invalidOrEmptySubfields = true;
       });
@@ -1276,6 +1476,11 @@ function onAddFieldSave(event){
 	updateStatus('ready');
 	return;
       }
+    }
+
+    if (subfields[0] == undefined){
+      displayAlert('alertEmptySubfieldsList');
+      return;
     }
     var field = [subfields, ind1, ind2, '', 0];
     var fieldPosition = getFieldPositionInTag(tag, field);
@@ -1325,20 +1530,16 @@ function onAddSubfieldsClick(img){
    */
   var fieldID = img.id.slice(img.id.indexOf('_')+1);
   var jQRowGroupID = '#rowGroup_' + fieldID;
+  var tmpArray = fieldID.split('_');
+  var tag = tmpArray[0]; var fieldPosition = tmpArray[1];
   if ($('#rowAddSubfieldsControls_' + fieldID).length == 0){
     // The 'Add subfields' form does not exist for this field.
     $(jQRowGroupID).append(createAddSubfieldsForm(fieldID));
     $(jQRowGroupID).data('freeSubfieldTmpNo', 1);
     $('#txtAddSubfieldsCode_' + fieldID + '_' + 0).bind('keyup',
       onAddSubfieldsChange);
-    $('#btnAddSubfieldsSave_' + fieldID).bind('click', onAddSubfieldsSave);
-    $('#btnAddSubfieldsCancel_' + fieldID).bind('click', function(){
-	$('#rowAddSubfields_' + fieldID + '_' + 0).nextAll().andSelf().remove();
-    });
-    $('#btnAddSubfieldsClear_' + fieldID).bind('click', function(){
-      $(jQRowGroupID + ' input[type=text]').val('').removeClass(
-	'bibEditInputError');
-      $('#txtAddSubfieldsCode_' + fieldID + '_' + 0).focus();
+    $('#txtAddSubfieldsValue_' + fieldID + '_0').bind('keyup', function (e){
+      onAddSubfieldValueKeyPressed(e, tag, fieldPosition, 0);
     });
     $('#txtAddSubfieldsCode_' + fieldID + '_' + 0).focus();
   }
@@ -1353,6 +1554,9 @@ function onAddSubfieldsClick(img){
       onAddSubfieldsChange);
     $('#btnAddSubfieldsRemove_' + subfieldTmpID).bind('click', function(){
       $('#rowAddSubfields_' + subfieldTmpID).remove();
+    });
+    $('#txtAddSubfieldsValue_' + subfieldTmpID).bind('keyup', function (e){
+      onAddSubfieldValueKeyPressed(e, tag, fieldPosition, subfieldTmpNo);
     });
   }
 }
@@ -1377,13 +1581,14 @@ function onAddSubfieldsChange(event){
     $(this).removeClass('bibEditInputError');
 }
 
-function onAddSubfieldsSave(event){
+function onAddSubfieldsSave(event, tag, fieldPosition){
   /*
    * Handle 'Save' button in add subfields form.
    */
   updateStatus('updating');
-  var tmpArray = this.id.split('_');
-  var tag = tmpArray[1], fieldPosition = tmpArray[2];
+
+//  var tmpArray = this.id.split('_');
+//  var tag = tmpArray[1], fieldPosition = tmpArray[2];
   var fieldID = tag + '_' + fieldPosition;
   var subfields = [];
   var protectedSubfield = false, invalidOrEmptySubfields = false;
@@ -1794,3 +1999,5 @@ function onMoveFieldDown(tag, fieldPosition) {
     }
   }
 }
+
+

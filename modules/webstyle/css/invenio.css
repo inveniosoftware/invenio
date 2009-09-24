@@ -1683,6 +1683,16 @@ input.hyperlinkformSubmitButton {
 #bibEditMessage {
   background: rgb(250, 209, 99);
 }
+.bibEditAddFieldManipulationsBar {
+    display: table;
+}
+.bibEditAddFieldFormSelectTemplate {
+    display: table-cell;
+    width: 400px;
+}
+.bibEditAddFieldFormCreateSimilar {
+    display: table-cell;
+}
 /* end of BibEdit module */
 /* BibMerge module */
 #bibMergePanel {

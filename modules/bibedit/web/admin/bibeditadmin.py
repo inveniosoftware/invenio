@@ -40,6 +40,7 @@ def index(req, ln=CFG_SITE_LANG, recid=None, format_tag='marc',
           edit_tag=None, delete_tag=None, num_field=None, add=0, cancel=0,
           delete=0, confirm_delete=0, view_history=None, **args):
     """BibEdit Admin interface."""
+
     if view_history:
         redirect_to_url(req, 'history?ln=%s&recid=%s' % (ln, recid))
     ln = wash_language(ln)

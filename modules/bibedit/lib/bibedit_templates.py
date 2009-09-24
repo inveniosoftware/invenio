@@ -110,7 +110,6 @@ class Template:
             '            <td>%(imgAddField)s</td>\n' \
             '            <td>%(btnAddField)s</td>\n' \
             '          </tr>\n' \
-            '          <tr>\n' \
             '            <td>%(imgDeleteSelected)s</td>\n' \
             '            <td>%(btnDeleteSelected)s</td>\n' \
             '          </tr>\n' \

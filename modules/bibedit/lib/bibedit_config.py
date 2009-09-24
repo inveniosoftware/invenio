@@ -140,4 +140,6 @@ CFG_BIBEDIT_TAG_FORMAT = 'MARC'
 CFG_BIBEDIT_TO_MERGE_SUFFIX = 'merge'
 
 # CFG_BIBEDIT_RECORD_TEMPLATES_PATH - path to record template directory
+
 CFG_BIBEDIT_RECORD_TEMPLATES_PATH = "%s%sbibedit%srecord_templates" % (CFG_ETCDIR, os.sep, os.sep)
+CFG_BIBEDIT_FIELD_TEMPLATES_PATH = "%s%sbibedit%sfield_templates" % (CFG_ETCDIR, os.sep, os.sep)

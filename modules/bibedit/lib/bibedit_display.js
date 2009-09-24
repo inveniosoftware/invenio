@@ -209,10 +209,19 @@ function redrawFields(tag){
   }
 }
 
-function createAddFieldForm(fieldTmpNo){
+
+function createAddFieldForm(fieldTmpNo, fieldTemplateNo){
   /*
    * Create an 'Add field' form.
+   * fieldTmpNo - temporary field number
+   * fieldTemplateNo - a number of template that should be selected by default
    */
+
+  fieldTemplatesData = []
+  for (templatePos in fieldTemplates){
+    fieldTemplatesData.push({"value" : templatePos , "description": fieldTemplates[templatePos].name});
+  }
+
   return '' +
     '<tbody id="rowGroupAddField_' + fieldTmpNo + '">' +
       '<tr>' +
@@ -220,35 +229,54 @@ function createAddFieldForm(fieldTmpNo){
 	'<td><b>New</b></td>' +
 	'<td></td>' +
 	'<td></td>' +
+	'<td><div class="bibEditAddFieldManipulationsBar"><div class="bibEditAddFieldFormSelectTemplate">Add field: ' +
+    select('selectAddFieldTemplate_' + fieldTmpNo, fieldTemplatesData, fieldTemplateNo) +
+    '</div><div class="bibEditAddFieldFormCreateSimilar"> Add ' +
+      input('text', 'selectAddFieldTemplateTimes_' + fieldTmpNo, "addFieldAddSimilarInput", {"maxlength" : 4, "size": 1}) +
+	button('similar', 'selectAddSimilarFields_' + fieldTmpNo, "", {}) +
+        '</div></div></td>' +
 	'<td>' +
-	  'Controlfield ' + input('checkbox', 'chkAddFieldControlfield_' +
-				 fieldTmpNo) +
-        '</td>' +
-	'<td>' +
-	  img('/img/add.png', 'btnAddFieldAddSubfield_' + fieldTmpNo, '', {
+        img('/img/add.png', 'btnAddFieldAddSubfield_' + fieldTmpNo, '', {
 	    title: 'Add subfield'}) +
 	'</td>' +
       '</tr>' +
       createAddFieldRow(fieldTmpNo, 0) +
+      // adding a row used to insert at the end without repositioning the tag and indicators
       '<tr>' +
-	'<td></td>' +
-	'<td></td>' +
-	'<td></td>' +
-	'<td></td>' +
-	'<td>' +
-	  button('Save', 'btnAddFieldSave_' + fieldTmpNo, 'bibEditBtnBold') +
-	  button('Cancel', 'btnAddFieldCancel_' + fieldTmpNo, '') +
-	  button('Clear', 'btnAddFieldClear_' + fieldTmpNo, 'bibEditBtnClear') +
-	'</td>' +
-	'<td></td>' +
+      '<td></td>' +
+      '<td></td>' +
+      '<td></td>' +
+      '<td></td>' +
+      '<td>' +
+      '</td>' +
+      '<td></td>' +
       '</tr>' +
     '</tbody>';
 }
 
-function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
+function createAddFieldRow(fieldTmpNo, subfieldTmpNo, defaultCode, defaultValue){
   /*
    * Create a row in the 'Add field' form.
+   * optional parameters:
+   *   defaultCode - the subfield code displayed by default
+   *   defaultValue - the subfield value displayed by default
    */
+  var fieldCode = "";
+  var fieldValue = "";
+  if (defaultCode != undefined && defaultCode != " "){
+    fieldCode = defaultCode;
+  }
+  if (defaultValue != undefined && defaultValue != " "){
+    fieldValue = defaultValue;
+  }
+
+  var isVolatile = (defaultValue != undefined && defaultValue.substring(0, 9) == "VOLATILE:");
+  var additionalClass = "";
+  if (isVolatile){
+    additionalClass = " bibEditVolatileSubfield";
+    fieldValue = fieldValue.substring(9);
+  }
+
   var txtAddFieldTag = '', txtAddFieldInd1 = '', txtAddFieldInd2 = '',
     btnAddFieldRemove = '';
   if (subfieldTmpNo == 0){
@@ -271,11 +299,11 @@ function createAddFieldRow(fieldTmpNo, subfieldTmpNo){
       '<td></td>' +
       '<td class="bibEditCellAddSubfieldCode">' +
 	input('text', 'txtAddFieldSubfieldCode_' + fieldTmpNo + '_' +
-	  subfieldTmpNo, 'bibEditTxtSubfieldCode', {maxlength: 1}) +
+	      subfieldTmpNo, 'bibEditTxtSubfieldCode', {maxlength: 1, value: fieldCode}) +
       '</td>' +
       '<td>' +
 	input('text', 'txtAddFieldValue_' + fieldTmpNo + '_' +
-		  subfieldTmpNo, 'bibEditTxtValue') +
+	      subfieldTmpNo, 'bibEditTxtValue' + additionalClass, {value : fieldValue}) +
       '</td>' +
       '<td>' + btnAddFieldRemove + '</td>' +
     '</tr>';
@@ -293,9 +321,6 @@ function createAddSubfieldsForm(fieldID){
       '<td></td>' +
       '<td></td>' +
       '<td>' +
-	button('Save', 'btnAddSubfieldsSave_' + fieldID, 'bibEditBtnBold') +
-	button('Cancel', 'btnAddSubfieldsCancel_' + fieldID, '') +
-	button('Clear', 'btnAddSubfieldsClear_' + fieldID, 'bibEditBtnClear') +
       '</td>' +
       '<td></td>' +
     '</tr>';
@@ -517,6 +542,9 @@ function displayAlert(msgType, args){
     case 'alertAddProtectedSubfield':
       msg = 'ERROR: Cannot add protected subfield ' + args[0] + '.';
       break;
+    case 'alertEmptySubfieldsList':
+      msg = "The field has to contain at least one non-empty subfield.";
+      break;
     case 'alertDeleteProtectedField':
       msg = 'ERROR: Cannot delete protected field ' + args[0] + '.';
       break;
@@ -579,6 +607,28 @@ function input(type, id, _class, attrs){
   return '<input ' + type + id + _class + strAttrs + '/>';
 }
 
+function select(id, options, selectedOption){
+  /*
+   * Create the select input -> it has a different structure than most of the
+   * inputs
+   * options: a list of options appearing under the same id. Each option is a
+   *          dictionary describing the value associated and the description
+   *          a sample entry of the options : {value: "1", description: "option1"}
+   */
+
+  optionsHTML = "";
+
+  for (optionNr in options){
+    optionsHTML += "<option value=\"" + options[optionNr].value + "\"";
+    if (selectedOption == options[optionNr].value){
+      optionsHTML += " selected";
+    }
+    optionsHTML += ">" + options[optionNr].description + "</option>";
+  }
+  return "<select id=\"" + id + "\">" + optionsHTML + "</select>";
+
+}
+
 function escapeHTML(value){
   /*
    * Replace special characters '&', '<' and '>' with HTML-safe sequences.
@@ -589,3 +639,4 @@ function escapeHTML(value){
   value = value.replace(/>/g, '&gt;');
   return value;
 }
+

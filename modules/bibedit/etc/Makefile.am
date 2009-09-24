@@ -21,7 +21,11 @@ etc_DATA = MARC21slim.dtd refextract-journal-titles.kb refextract-report-numbers
 rectmpldir = $(etcdir)/record_templates/
 rectmpl_DATA = poem.xml
 
+fldtmpldir = $(etcdir)/field_templates/
+fldtmpl_DATA = firstauthor.xml
+
 EXTRA_DIST = $(etc_DATA) \
-             $(rectmpl_DATA)
+             $(rectmpl_DATA) \
+             $(fldtmpl_DATA)
 
 CLEANFILES = *~ *.tmp
