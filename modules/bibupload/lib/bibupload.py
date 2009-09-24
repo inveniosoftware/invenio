@@ -1595,7 +1595,7 @@ def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
                     if '%s%s%s' % (tag, ind1 == ' ' and '_' or ind1, ind2 == ' ' and '_' or ind2) in (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:5], CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG[:5]):
                         ## We don't want to append the external identifier
                         ## if it is already existing.
-                        if record_find_field(rec_old, tag, single_tuple):
+                        if record_find_field(rec_old, tag, single_tuple)[0] is not None:
                             write_message("      Not adding tag: %s ind1=%s ind2=%s subfields=%s: it's already there" % (tag, ind1, ind2, subfield_list), verbose=9)
                             continue
                     # We add the datafield to the old record
