@@ -149,7 +149,6 @@ def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
     """
     washer = HTMLWasher()
     lines = text.split(linebreak_txt)
-    print len(lines)
     output = ''
     for line in lines:
         line = line.strip()
