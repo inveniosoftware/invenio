@@ -1,3 +1,4 @@
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -66,7 +67,7 @@ from invenio.bibtask import authenticate
 from cgi import escape
 
 
-def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
+def index(req, title='', body='', subtitle='', adminarea=2, authorized=0, ln=CFG_SITE_LANG):
     """main function to show pages for webaccessadmin.
 
     1. if user not logged in and administrator, show the mustlogin page
