@@ -35,19 +35,7 @@ import os
 import gc
 import time
 
-# The following mod_python imports are done separately in a particular
-# order (util first) because I was getting sometimes publisher import
-# error when testing weird situations, preventing util from being
-# imported and leading to a traceback later.  When this happened,
-# importing util was okay, only publisher import caused troubles, so
-# that importing in special order prevents these problems.
-try:
-    from mod_python import util
-    from mod_python import apache
-    from mod_python import publisher
-except ImportError:
-    pass
-
+from invenio import webinterface_handler_wsgi_utils as apache
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import wash_language
@@ -67,16 +55,15 @@ no_lang_recognition_uris = ['/rss',
                             '/oai2d',
                             '/journal']
 
-def _debug(msg):
+def _debug(req, msg):
     if DEBUG:
-        apache.log_error(msg, apache.APLOG_WARNING)
-    return
+        req.log_error(msg)
 
 def _check_result(req, result):
     """ Check that a page handler actually wrote something, and
     properly finish the apache request."""
 
-    if result or req.bytes_sent > 0 or req.next:
+    if result or req.bytes_sent > 0:
 
         if result is None:
             result = ""
@@ -85,7 +72,7 @@ def _check_result(req, result):
 
         # unless content_type was manually set, we will attempt
         # to guess it
-        if not req._content_type_set:
+        if not req.content_type_set_p:
             # make an attempt to guess content-type
             if result[:100].strip()[:6].lower() == '<html>' \
                or result.find('</') > 0:
@@ -102,7 +89,7 @@ def _check_result(req, result):
         return apache.OK
 
     else:
-        req.log_error("mod_python.publisher: %s returned nothing." % `object`)
+        req.log_error("publisher: %s returned nothing." % `object`)
         return apache.HTTP_INTERNAL_SERVER_ERROR
 
 
@@ -154,7 +141,7 @@ class WebInterfaceDirectory(object):
         """ Locate the handler of an URI by traversing the elements of
         the path."""
 
-        _debug('traversing %r' % path)
+        _debug(req, 'traversing %r' % path)
 
         component, path = path[0], path[1:]
 
@@ -166,7 +153,7 @@ class WebInterfaceDirectory(object):
             obj = getattr(self, name)
 
         if obj is None:
-            _debug('could not resolve %s' % repr((component, path)))
+            _debug(req, 'could not resolve %s' % repr((component, path)))
             raise TraversalError()
 
         # We have found the next segment. If we know that from this
@@ -207,19 +194,11 @@ class WebInterfaceDirectory(object):
             req.content_type = "text/html; charset=UTF-8"
             raise apache.SERVER_RETURN, apache.DONE
 
-        form = util.FieldStorage(req, keep_blank_values=True)
-        try:
-            # The auto recognition will work only with with mod_python-3.3.1
-            if not form.has_key('ln') and \
-                   req.uri not in no_lang_recognition_uris:
-                ln = get_preferred_user_language(req)
-                form.add_field('ln', ln)
-        except:
-            form = dict(form)
-            if not form.has_key('ln') and \
-                   req.uri not in no_lang_recognition_uris:
-                ln = get_preferred_user_language(req)
-                form['ln'] = ln
+        form = req.form
+        if not form.has_key('ln') and \
+                req.uri not in no_lang_recognition_uris:
+            ln = get_preferred_user_language(req)
+            form.add_field('ln', ln)
         result = _check_result(req, obj(req, form))
         return result
 
@@ -237,7 +216,7 @@ class WebInterfaceDirectory(object):
                 # to fix the form posting).
                 util.redirect(req, req.uri + "/", permanent=True)
 
-        _debug('directory %r is not callable' % self)
+        _debug(req, 'directory %r is not callable' % self)
         raise TraversalError()
 
 

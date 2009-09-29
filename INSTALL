@@ -27,23 +27,22 @@ Contents
         develop on FreeBSD and Mac OS X.  Basically any Unix system
         supporting the software listed below should do.
 
-        Note that if you are using Debian "Sarge" GNU/Linux, you can
+        Note that if you are using Debian "Lenny" GNU/Linux, you can
         install most of the below-mentioned prerequisites and
         recommendations by running:
 
-          $ sudo apt-get install libapache2-mod-python2.3 python2.3-dev \
-              apache2-mpm-prefork mysql-server-4.1 mysql-client-4.1 \
-              python2.3-mysqldb python2.3-4suite python-simplejson \
-              python2.3-xml python2.3-libxml2 python2.3-libxslt1 \
+        $ sudo apt-get install python-dev apache2-mpm-prefork mysql-server \
+              mysql-client python-mysqldb python-4suite python-simplejson \
+              python-xml python-libxml2 python-libxslt1 \
               rxp gnuplot xpdf-utils gs-common antiword catdoc \
-              wv html2text ppthtml xlhtml clisp gettext
+              wv html2text ppthtml xlhtml clisp gettext libapache2-mod-wsgi
 
         You can also install the following packages:
 
-          $ sudo apt-get install python2.3-psyco sbcl cmucl
+          $ sudo apt-get install python-psyco sbcl cmucl
 
         The last three packages are not available on all Debian
-        "Sarge" GNU/Linux architectures (e.g. not on AMD64); you can
+        "Lenny" GNU/Linux architectures (e.g. not on AMD64); you can
         safely continue without them.
 
         Note that you can consult CDS Invenio wiki pages at
@@ -68,11 +67,10 @@ Contents
 
      c) Apache 2 server, with support for loading DSO modules, and
         optionally with SSL support for HTTPS-secure user
-        authentication.  Tested mainly with version 2.0.43 and above.
-        Apache 2.x is required for the mod_python module (see below).
+        authentication.
           <http://httpd.apache.org/>
 
-     d) Python v2.3 or above:
+     d) Python v2.4 or above:
           <http://python.org/>
         as well as the following Python modules:
           - (mandatory) MySQLdb (version >= 1.2.1_p2; see below)
@@ -110,9 +108,19 @@ Contents
               you are using an older version of MySQLdb, you may get
               into problems with character encoding.
 
-     e) mod_python Apache module.  Minimal required version is
-        3.3.1.
-          <http://www.modpython.org/>
+     e) mod_wsgi Apache module.
+          <http://code.google.com/p/modwsgi/>
+
+        Note: for the time being, the WSGI daemon must be run with
+              threads=1, because Invenio is not fully thread safe yet.
+              This will come later.  The Apache configuration example
+              snippets (created below) will use threads=1.
+
+        Note: if you are using Python 2.4 or earlier, then you should
+              also install the wsgiref Python module, available from:
+              <http://pypi.python.org/pypi/wsgiref/> (As of Python 2.5
+              this module is included in standard Python
+              distribution.)
 
      f) If you want to be able to extract references from PDF fulltext
         files, then you need to install pdftotext version 3 at least.
@@ -169,9 +177,9 @@ Contents
           <http://sbcl.sourceforge.net/>
 
      k) GNU gettext, a set of tools that makes it possible to
-	translate the application in multiple languages.
+        translate the application in multiple languages.
            <http://www.gnu.org/software/gettext/>
-	This is available by default on many systems.
+        This is available by default on many systems.
 
    Note that the configure script checks whether you have all the
    prerequisite software installed and that it won't let you continue
@@ -295,7 +303,7 @@ Contents
                  directory but to the prefix mentioned in this
                  configuration line.
 
-              --with-python=/opt/python/bin/python2.3
+              --with-python=/opt/python/bin/python2.4
 
                  Optionally, specify a path to some specific Python
                  binary.  This is useful if you have more than one
@@ -502,6 +510,12 @@ Contents
 
              Include /opt/cds-invenio/etc/apache/invenio-apache-vhost.conf
              Include /opt/cds-invenio/etc/apache/invenio-apache-vhost-ssl.conf
+
+          Note that you may want to tweak the generated example
+          configurations, especially with respect to the
+          WSGIDaemonProcess parameters.  E.g. increase the `processes'
+          parameter if you have lots of RAM and many concurrent users
+          accessing your site in parallel.
 
       $ sudo /path/to/apache/bin/apachectl graceful
 

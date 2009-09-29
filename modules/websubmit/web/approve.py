@@ -25,7 +25,6 @@ import time
 import types
 import re
 import urllib
-from mod_python import apache
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \

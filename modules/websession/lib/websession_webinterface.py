@@ -574,7 +574,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         lastupdated=__lastupdated__,
                         navmenuid='youraccount')
 
-        ip_address = req.connection.remote_host or req.connection.remote_ip
+        ip_address = req.remote_host or req.remote_ip
 
         if not send_email(CFG_SITE_SUPPORT_EMAIL, args['p_email'], "%s %s"
                 % (_("Password reset request for"),

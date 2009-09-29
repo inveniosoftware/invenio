@@ -24,13 +24,7 @@ Just use L{get_session} to obtain a session object (with a dictionary
 interface, which will let you store permanent information).
 """
 
-try:
-    from mod_python.Cookie import add_cookie, Cookie, get_cookie
-    from mod_python.apache import APLOG_NOTICE, AP_MPMQ_IS_THREADED, \
-        AP_MPMQ_MAX_SPARE_THREADS, _apache
-    CFG_IN_APACHE = True
-except ImportError:
-    CFG_IN_APACHE = False
+from invenio.webinterface_handler_wsgi_utils import add_cookie, Cookie, get_cookie
 
 import cPickle
 import time
@@ -38,6 +32,7 @@ import random
 import re
 import sys
 import os
+from thread import get_ident
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:
@@ -139,7 +134,7 @@ class InvenioSession(dict):
                 self.unlock() # unlock old sid
             self._sid = _new_sid(self._req)
             self.lock()                 # lock new sid
-            remote_ip = self._req.connection.remote_ip
+            remote_ip = self._req.remote_ip
             if self._req.is_https():
                 self._https_ip = remote_ip
             else:
@@ -180,29 +175,23 @@ class InvenioSession(dict):
         """
         session_dict = None
         invalid = False
-        if CFG_WEBSESSION_ENABLE_LOCKING:
-            _apache._global_lock(self._req.server, None, 0)
-        try:
-            res = run_sql("SELECT session_object FROM session "
-                          "WHERE session_key=%s", (self._sid, ))
-            if res:
-                session_dict = cPickle.loads(blob_to_string(res[0][0]))
-                remote_ip = self._req.connection.remote_ip
-                if self._req.is_https():
-                    if session_dict['_https_ip'] is not None and \
-                            session_dict['_https_ip'] != remote_ip:
-                        invalid = True
-                    else:
-                        session_dict['_https_ip'] = remote_ip
+        res = run_sql("SELECT session_object FROM session "
+                        "WHERE session_key=%s", (self._sid, ))
+        if res:
+            session_dict = cPickle.loads(blob_to_string(res[0][0]))
+            remote_ip = self._req.remote_ip
+            if self._req.is_https():
+                if session_dict['_https_ip'] is not None and \
+                        session_dict['_https_ip'] != remote_ip:
+                    invalid = True
                 else:
-                    if session_dict['_http_ip'] is not None and \
-                            session_dict['_http_ip'] != remote_ip:
-                        invalid = True
-                    else:
-                        session_dict['_http_ip'] = remote_ip
-        finally:
-            if CFG_WEBSESSION_ENABLE_LOCKING:
-                _apache._global_unlock(self._req.server, None, 0)
+                    session_dict['_https_ip'] = remote_ip
+            else:
+                if session_dict['_http_ip'] is not None and \
+                        session_dict['_http_ip'] != remote_ip:
+                    invalid = True
+                else:
+                    session_dict['_http_ip'] = remote_ip
 
         if session_dict is None:
             return 0
@@ -234,45 +223,33 @@ class InvenioSession(dict):
                     "_https_ip" : self._https_ip,
                     "_remember_me" : self._remember_me
             }
-            if CFG_WEBSESSION_ENABLE_LOCKING:
-                _apache._global_lock(self._req.server, None, 0)
-            try:
-                session_key = self._sid
-                session_object = cPickle.dumps(session_dict, -1)
-                session_expiry = time.time() + self._timeout + \
-                    CFG_WEBSESSION_ONE_DAY
-                uid = self.get('uid', -1)
-                run_sql("""
-                    INSERT session(
-                        session_key,
-                        session_expiry,
-                        session_object,
-                        uid
-                    ) VALUE(%s,
-                        %s,
-                        %s,
-                        %s
-                    ) ON DUPLICATE KEY UPDATE
-                        session_expiry=%s,
-                        session_object=%s,
-                        uid=%s
-                """, (session_key, session_expiry, session_object, uid,
-                    session_expiry, session_object, uid))
-            finally:
-                if CFG_WEBSESSION_ENABLE_LOCKING:
-                    _apache._global_unlock(self._req.server, None, 0)
+            session_key = self._sid
+            session_object = cPickle.dumps(session_dict, -1)
+            session_expiry = time.time() + self._timeout + \
+                CFG_WEBSESSION_ONE_DAY
+            uid = self.get('uid', -1)
+            run_sql("""
+                INSERT session(
+                    session_key,
+                    session_expiry,
+                    session_object,
+                    uid
+                ) VALUE(%s,
+                    %s,
+                    %s,
+                    %s
+                ) ON DUPLICATE KEY UPDATE
+                    session_expiry=%s,
+                    session_object=%s,
+                    uid=%s
+            """, (session_key, session_expiry, session_object, uid,
+                session_expiry, session_object, uid))
 
     def delete(self):
         """
         Delete the session.
         """
-        if CFG_WEBSESSION_ENABLE_LOCKING:
-            _apache._global_lock(self._req.server, None, 0)
-        try:
-            run_sql("DELETE FROM session WHERE session_key=%s", (self._sid, ))
-        finally:
-            if CFG_WEBSESSION_ENABLE_LOCKING:
-                _apache._global_unlock(self._req.server, None, 0)
+        run_sql("DELETE FROM session WHERE session_key=%s", (self._sid, ))
         self.clear()
 
     def invalidate(self):
@@ -328,9 +305,6 @@ class InvenioSession(dict):
         Lock the session.
         """
         if self._lock:
-            if CFG_WEBSESSION_ENABLE_LOCKING:
-                _apache._global_lock(self._req.server, self._sid)
-                self._req.register_cleanup(_unlock_session_cleanup, self)
             self._locked = 1
 
     def unlock(self):
@@ -338,8 +312,6 @@ class InvenioSession(dict):
         Unlock the session.
         """
         if self._lock and self._locked:
-            if CFG_WEBSESSION_ENABLE_LOCKING:
-                _apache._global_unlock(self._req.server, self._sid)
             self._locked = 0
 
     def is_new(self):
@@ -423,11 +395,7 @@ def _init_rnd():
     """
 
     # query max number of threads
-
-    if _apache.mpm_query(AP_MPMQ_IS_THREADED):
-        gennum = _apache.mpm_query(AP_MPMQ_MAX_SPARE_THREADS)
-    else:
-        gennum = 10
+    gennum = 10
 
     # make generators
     # this bit is from Python lib reference
@@ -442,9 +410,8 @@ def _init_rnd():
 
     return result
 
-if CFG_IN_APACHE:
-    _RANDOM_GENERATORS = _init_rnd()
-    _RANDOM_ITERATOR = iter(_RANDOM_GENERATORS)
+_RANDOM_GENERATORS = _init_rnd()
+_RANDOM_ITERATOR = iter(_RANDOM_GENERATORS)
 
 def _get_generator():
     """
@@ -510,7 +477,7 @@ def _new_sid(req):
     random_generator = _get_generator()
     rnd1 = random_generator.randint(0, 999999999)
     rnd2 = random_generator.randint(0, 999999999)
-    remote_ip = req.connection.remote_ip
+    remote_ip = req.remote_ip
 
     return md5("%d%d%d%d%s" % (
         the_time,

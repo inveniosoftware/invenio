@@ -25,10 +25,7 @@ import os
 import ConfigParser
 from zlib import compress,decompress
 import marshal
-try:
-    from mod_python import apache
-except ImportError:
-    pass
+from invenio import webinterface_handler_wsgi_utils as apache
 
 from invenio.config import \
      CFG_SITE_LANG, \

@@ -20,7 +20,8 @@
 __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
-from mod_python import apache
+from invenio import webinterface_handler_wsgi_utils as apache
+
 import os
 from invenio.config import CFG_SITE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \

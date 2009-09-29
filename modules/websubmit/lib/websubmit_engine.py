@@ -31,11 +31,6 @@ import re
 from urllib import quote_plus
 from cgi import escape
 
-try:
-    from mod_python import apache
-except ImportError:
-    pass
-
 from invenio.config import \
      CFG_BINDIR, \
      CFG_SITE_LANG, \

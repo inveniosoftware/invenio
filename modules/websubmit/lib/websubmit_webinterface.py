@@ -22,10 +22,6 @@ __revision__ = "$Id$"
 import os
 import time
 import cgi
-try:
-    from mod_python import apache
-except ImportError:
-    pass
 
 from urllib import unquote, urlencode
 
@@ -38,6 +34,7 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_PREFIX
+from invenio import webinterface_handler_wsgi_utils as apache
 from invenio.dbquery import run_sql
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -179,7 +176,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
                         if display_hidden or not docfile.hidden_p():
                             if not readonly:
-                                ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                                ip = str(req.remote_ip)
                                 res = doc.register_download(ip, version, format, uid)
                             try:
                                 return docfile.stream(req)
@@ -211,7 +208,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                 return stream_restricted_icon(req)
 
                         if not readonly:
-                            ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                            ip = str(req.remote_ip)
                             res = doc.register_download(ip, version, format, uid)
                         try:
                             return iconfile.stream(req)
@@ -641,7 +638,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             'mode': (str, 'U'),
             })
 
-        req.form = form
         ## Strip whitespace from beginning and end of doctype and action:
         args["doctype"] = args["doctype"].strip()
         args["act"] = args["act"].strip()

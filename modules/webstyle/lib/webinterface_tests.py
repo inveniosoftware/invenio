@@ -70,18 +70,7 @@ class _FakeReq(object):
         self.method = "GET"
         return
 
-_current_module = sys.modules.get('mod_python._apache')
-
-sys.modules['mod_python._apache'] = _FakeApache()
-
-from mod_python.util import FieldStorage
-
-if _current_module:
-    sys.modules['mod_python._apache'] = _current_module
-else:
-    del sys.modules['mod_python._apache']
-
-
+from invenio.webinterface_handler_wsgi_utils import FieldStorage
 # --------------------------------------------------
 
 from invenio import webinterface_handler

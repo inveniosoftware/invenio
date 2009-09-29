@@ -45,8 +45,7 @@ from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
      get_colID
-from invenio.urlutils import get_client_ip_address, \
-                             redirect_to_url, \
+from invenio.urlutils import redirect_to_url, \
                              make_canonical_urlargd
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -62,10 +61,7 @@ try:
 except ImportError, e:
     fckeditor_available = False
 import os
-try:
-    from mod_python import apache
-except ImportError:
-    pass
+from invenio import webinterface_handler_wsgi_utils as apache
 from invenio.bibdocfile import stream_file
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
@@ -264,7 +260,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         if not auth_code:
             can_attach_files = True
 
-        client_ip_address = get_client_ip_address(req)
+        client_ip_address = req.remote_ip
         check_warnings = []
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
         if ok:
@@ -386,7 +382,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'referer': (str, None)
                                    })
 
-        client_ip_address = get_client_ip_address(req)
+        client_ip_address = req.remote_ip
         uid = getUid(req)
 
         user_info = collect_user_info(req)
@@ -445,7 +441,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'referer': (str, None)
                                    })
 
-        client_ip_address = get_client_ip_address(req)
+        client_ip_address = req.remote_ip
         uid = getUid(req)
 
         user_info = collect_user_info(req)

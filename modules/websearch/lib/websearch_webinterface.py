@@ -25,10 +25,7 @@ import datetime
 import time
 import sys
 from urllib import quote
-try:
-    from mod_python import apache
-except ImportError:
-    pass
+from invenio import webinterface_handler_wsgi_utils as apache
 
 #maximum number of collaborating authors etc shown in GUI
 MAX_COLLAB_LIST = 10

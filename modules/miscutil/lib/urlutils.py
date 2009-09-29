@@ -29,10 +29,7 @@ from urllib import urlencode, quote_plus, quote
 from urlparse import urlparse
 from cgi import parse_qs, escape
 
-try:
-    from mod_python import apache, util
-except ImportError:
-    pass
+from invenio import webinterface_handler_wsgi_utils as apache
 
 from invenio.config import \
      CFG_SITE_LANG, \
@@ -112,31 +109,19 @@ def redirect_to_url(req, url, redirection_type=None):
     """
     if redirection_type is None:
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
-    req.err_headers_out["Location"] = url
+    req.headers_out["Location"] = url
 
     del req.headers_out["Cache-Control"]
-    req.err_headers_out["Cache-Control"] = "no-cache, private, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
-    req.err_headers_out["Pragma"] = "no-cache"
+    req.headers_out["Cache-Control"] = "no-cache, private, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
+    req.headers_out["Pragma"] = "no-cache"
 
-    if req.headers_out.has_key("Set-Cookie"):
-        cookies = req.headers_out['Set-Cookie']
-        if type(cookies) is list:
-            for cookie in cookies:
-                req.err_headers_out.add("Set-Cookie", cookie)
-        else:
-            req.err_headers_out.add("Set-Cookie", cookies)
-
-    if req.sent_bodyct:
+    if req.response_sent_p:
         raise IOError, "Cannot redirect after headers have already been sent."
 
     req.status = redirection_type
     req.write('<p>Please go to <a href="%s">here</a></p>\n' % url)
 
     raise apache.SERVER_RETURN, apache.DONE
-
-def get_client_ip_address(req):
-    """ Returns IP address as string from an apache request. """
-    return str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
 
 def get_referer(req, replace_ampersands=False):
     """ Return the referring page of a request.

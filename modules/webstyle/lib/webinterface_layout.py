@@ -30,6 +30,7 @@ __revision__ = \
 from invenio.webinterface_handler import create_handler
 from invenio.errorlib import register_exception
 from invenio.webinterface_handler import WebInterfaceDirectory
+from invenio import webinterface_handler_wsgi_utils as apache
 
 class WebInterfaceDumbPages(WebInterfaceDirectory):
     """This class implements a dumb interface to use as a fallback in case of
@@ -40,7 +41,6 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
             from invenio.webpage import page
         except ImportError:
             page = lambda *args: args[1]
-        from mod_python import apache
         req.status = apache.HTTP_INTERNAL_SERVER_ERROR
         msg = "<p>This functionality is facing a temporary failure.</p>"
         msg += "<p>The administrator has been informed about the problem.</p>"
@@ -180,7 +180,7 @@ try:
          WebInterfaceFieldExporterPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceDocumentationPages = WebInterfaceDumbPages
+    WebInterfaceFieldExporterPages = WebInterfaceDumbPages
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
@@ -232,4 +232,4 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
-handler = create_handler(WebInterfaceInvenio())
+invenio_handler = create_handler(WebInterfaceInvenio())

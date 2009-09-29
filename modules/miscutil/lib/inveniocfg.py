@@ -691,6 +691,14 @@ def cli_cmd_create_apache_conf(conf):
     from invenio.textutils import wrap_text_in_a_box
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
+    ## TODO: add here the distribution signatures of those distributions
+    ## that already provide some ports.conf configuration file.
+    for distribution_signature in ('redhat-release', 'debian_version'):
+        if os.path.exists(os.path.sep + 'etc' + os.path.sep + distribution_signature):
+            comment_out_listen_directive = '#'
+            break
+    else:
+        comment_out_listen_directive = ''
     if not os.path.exists(apache_conf_dir):
         os.mkdir(apache_conf_dir)
     apache_vhost_file = apache_conf_dir + os.sep + \
@@ -702,7 +710,9 @@ AddDefaultCharset UTF-8
 ServerSignature Off
 ServerTokens Prod
 NameVirtualHost *:80
-Listen 80
+WSGIRestrictStdout Off
+WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
+%(comment_out_listen_directive)sListen 80
 <Files *.pyc>
    deny from all
 </Files>
@@ -718,34 +728,46 @@ Listen 80
            Options FollowSymLinks MultiViews
            AllowOverride None
            Order allow,deny
-           allow from all
+           Allow from all
+        </Directory>
+        <Directory %(wsgidir)s>
+           WSGIProcessGroup invenio
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           Allow from all
         </Directory>
         ErrorLog %(logdir)s/apache.err
         LogLevel warn
         CustomLog %(logdir)s/apache.log combined
         DirectoryIndex index.en.html index.html
-        <LocationMatch "^(/+$|/index|/collection|/record|/author|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourloans|/yourgroups|/yourtickets|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl|/stats|/unapi|/exporter)">
-           SetHandler python-program
-           PythonHandler invenio.webinterface_layout
-           PythonDebug On
-        </LocationMatch>
-        <Directory %(webdir)s>
-           AddHandler python-program .py
-           PythonHandler mod_python.publisher
-           PythonDebug On
-        </Directory>
+        Alias /img/ %(webdir)s/img/
+        Alias /js/ %(webdir)s/js/
+        Alias /export/ %(webdir)s/export/
+        Alias /jsMath/ %(webdir)s/jsMath/
+        Alias /fckeditor/ %(webdir)s/fckeditor/
+        AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
+        Alias /robots.txt %(webdir)s/robots.txt
+        Alias /favicon.ico %(webdir)s/favicon.ico
+        WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
+        WSGIPassAuthorization On
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "").split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
+       'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
+       'wsgidir' : os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
+       'comment_out_listen_directive' : comment_out_listen_directive
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
 ServerTokens Prod
-Listen 443
+%(comment_out_listen_directive)sListen 443
 NameVirtualHost *:443
+WSGIRestrictStdout Off
+WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
 #SSLCertificateFile /etc/apache2/ssl/apache.pem
 SSLCertificateFile /etc/apache2/ssl/server.crt
 SSLCertificateKeyFile /etc/apache2/ssl/server.key
@@ -765,28 +787,37 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
            Options FollowSymLinks MultiViews
            AllowOverride None
            Order allow,deny
-           allow from all
+           Allow from all
+        </Directory>
+        <Directory %(wsgidir)s>
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           Allow from all
         </Directory>
         ErrorLog %(logdir)s/apache-ssl.err
         LogLevel warn
         CustomLog %(logdir)s/apache-ssl.log combined
         DirectoryIndex index.en.html index.html
-        <LocationMatch "^(/+$|/index|/collection|/record|/author|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/yourtickets|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl|/stats|/unapi|/exporter)">
-           SetHandler python-program
-           PythonHandler invenio.webinterface_layout
-           PythonDebug On
-        </LocationMatch>
-        <Directory %(webdir)s>
-           AddHandler python-program .py
-           PythonHandler mod_python.publisher
-           PythonDebug On
-        </Directory>
+        Alias /img/ %(webdir)s/img/
+        Alias /js/ %(webdir)s/js/
+        Alias /export/ %(webdir)s/export/
+        Alias /jsMath/ %(webdir)s/jsMath/
+        Alias /fckeditor/ %(webdir)s/fckeditor/
+        AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
+        Alias /robots.txt %(webdir)s/robots.txt
+        Alias /favicon.ico %(webdir)s/favicon.ico
+        WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
+        WSGIPassAuthorization On
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "").split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
+       'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
+       'wsgidir' : os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
+       'comment_out_listen_directive' : comment_out_listen_directive
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
@@ -880,29 +911,6 @@ def detect_apache_version():
             out.append("%s [%s]" % (apache_version, apache))
     return out
 
-def detect_modpython_version():
-    """
-    Try to detect mod_python version, either from mod_python import or
-    from grepping inside mod_python.so, like Apache.  Return list of
-    all found mod_python versions and paths.  Return empty list if no
-    success.
-    """
-    out = []
-    try:
-        from mod_python import version
-        out.append(version)
-    except ImportError:
-        # try to detect via looking at mod_python.so:
-        from invenio.shellutils import run_shell_command
-        version = ""
-        dummy1, cmd_out, dummy2 = run_shell_command("locate /mod_python.so")
-        for modpython in cmd_out.split("\n"):
-            modpython_version = _grep_version_from_executable(modpython,
-                                                              '^mod_python\/')
-            if modpython_version:
-                out.append("%s [%s]" % (modpython_version, modpython))
-    return out
-
 def cli_cmd_detect_system_details(conf):
     """
     Detect and print system details such as Apache/Python/MySQL
@@ -914,7 +922,6 @@ def cli_cmd_detect_system_details(conf):
     print "* Invenio version: " + conf.get("Invenio", "CFG_VERSION")
     print "* Python version: " + sys.version.replace("\n", " ")
     print "* Apache version: " + ";\n                  ".join(detect_apache_version())
-    print "* mod_python version: " + ";\n                  ".join(detect_modpython_version())
     print "* MySQLdb version: " + MySQLdb.__version__
     try:
         from invenio.dbquery import run_sql

@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import urllib
 import time
-from mod_python import apache
+from invenio import webinterface_handler_wsgi_utils as apache
 
 from invenio import oai_repository_server
 from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP
@@ -80,8 +80,8 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         if os.path.exists("%s/RTdata/RTdata" % CFG_CACHEDIR) and (argd['verb'] not in ["Identify", "ListMetadataFormats", "ListSets"]):
             time_gap = int(time.time() - os.path.getmtime("%s/RTdata/RTdata" % CFG_CACHEDIR))
             if(time_gap < CFG_OAI_SLEEP):
-                req.err_headers_out["Status-Code"] = "503"
-                req.err_headers_out["Retry-After"] = "%d" % (CFG_OAI_SLEEP - time_gap)
+                req.headers_out["Status-Code"] = "503"
+                req.headers_out["Retry-After"] = "%d" % (CFG_OAI_SLEEP - time_gap)
                 req.status = apache.HTTP_SERVICE_UNAVAILABLE
                 return "Retry after %d seconds" % (CFG_OAI_SLEEP - time_gap)
         command = "touch %s/RTdata/RTdata" % CFG_CACHEDIR

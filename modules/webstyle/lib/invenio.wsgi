@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -15,24 +16,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir=$(libdir)/python/invenio
-wsgiwebdir=$(localstatedir)/www-wsgi/
+"""
+mod_wsgi Invenio application loader.
+"""
 
-pylib_DATA = webdoc.py \
-			webdoc_tests.py \
-			webdoc_webinterface.py \
-			webpage.py \
-			template.py \
-			webstyle_templates.py \
-			webinterface_handler.py \
-			webinterface_tests.py \
-			webinterface_layout.py \
-			fckeditor_invenio_connector.py \
-			webinterface_handler_wsgi.py \
-			webinterface_handler_wsgi_utils.py
-
-wsgiweb_DATA = invenio.wsgi
-
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+from invenio.webinterface_handler_wsgi import application

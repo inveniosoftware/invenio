@@ -44,7 +44,7 @@ def get_client_info(req):
             'url'       : req.unparsed_uri,
             'time'      : convert_datestruct_to_datetext(time.localtime()),
             'browser'   : req.headers_in.has_key('User-Agent') and req.headers_in['User-Agent'] or "N/A",
-            'client_ip' : req.connection.remote_ip
+            'client_ip' : req.remote_ip
         }
     except:
         return {}

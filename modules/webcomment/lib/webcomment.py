@@ -220,7 +220,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     """ Check if a user hasn't already commented within the last seconds
     time limit: CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS
     @param recID: record id
-    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param client_ip_address: IP => use: str(req.remote_ip)
     @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     recID = wash_url_argument(recID, 'int')
@@ -249,7 +249,7 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
     """ Check if a user hasn't already reviewed within the last seconds
     time limit: CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
     @param cmt_id: comment id
-    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param client_ip_address: IP => use: str(req.remote_ip)
     @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_REVIEW']
@@ -271,7 +271,7 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
 def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
     """ Checks if a user hasn't already voted
     @param cmt_id: comment id
-    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param client_ip_address: IP => use: str(req.remote_ip)
     @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
@@ -380,7 +380,7 @@ Please go to the WebComment Admin interface %(comment_admin_link)s to delete thi
 def check_user_can_report(cmt_id, client_ip_address, uid=-1):
     """ Checks if a user hasn't already reported a comment
     @param cmt_id: comment id
-    @param client_ip_address: IP => use: str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+    @param client_ip_address: IP => use: str(req.remote_ip)
     @param uid: user id, as given by invenio.webuser.getUid(req)
     """
     cmt_id = wash_url_argument(cmt_id, 'int')

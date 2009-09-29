@@ -31,10 +31,7 @@ It also contains Apache-related user authentication stuff.
 
 __revision__ = "$Id$"
 
-try:
-    from mod_python import apache
-except ImportError:
-    pass
+from invenio import webinterface_handler_wsgi_utils as apache
 
 import cgi
 import urllib
@@ -487,7 +484,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
 
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
             address_activation_key = mail_cookie_create_mail_activation(email)
-            ip_address = req.connection.remote_host or req.connection.remote_ip
+            ip_address = req.remote_host or req.remote_ip
             try:
                 if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
                                   tmpl.tmpl_account_address_activation_email_body(email,
@@ -1017,12 +1014,12 @@ def collect_user_info(req, login_time=False, refresh=False):
                     return req._user_info
             req._user_info = user_info
             try:
-                user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
+                user_info['remote_ip'] = req.remote_ip
             except gaierror:
                 #FIXME: we should support IPV6 too. (hint for FireRole)
                 pass
             user_info['session'] = get_session(req).sid()
-            user_info['remote_host'] = req.connection.remote_host or ''
+            user_info['remote_host'] = req.remote_host or ''
             user_info['referer'] = req.headers_in.get('Referer', '')
             user_info['uri'] = req.unparsed_uri or ()
             user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
@@ -1175,7 +1172,7 @@ def http_check_credentials(req, role):
         if not authorized:
             # note that Opera supposedly doesn't like spaces around "=" below
             s = 'Basic realm="%s"' % role
-            req.err_headers_out["WWW-Authenticate"] = s
+            req.headers_out["WWW-Authenticate"] = s
             raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
         else:
             setApacheUser(req, user)

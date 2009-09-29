@@ -20,7 +20,7 @@ __lastupdated__ = "$Date$"
 
 import os
 from urllib import unquote
-from mod_python import apache
+from invenio import webinterface_handler_wsgi_utils as apache
 
 from invenio.config import \
      CFG_TMPDIR, \
@@ -264,7 +264,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         params = argd['arg'].split(',')
         if "WEBSTAT_IP" in params:
             index = params.index("WEBSTAT_IP")
-            params[index] = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+            params[index] = str(req.remote_ip)
         register_customevent(argd['id'], params)
         return redirect_to_url(req, unquote(argd['url']), apache.HTTP_MOVED_PERMANENTLY)
 

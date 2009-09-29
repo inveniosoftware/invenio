@@ -90,10 +90,7 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
 InvenioWebSearchQueryParserException, SpiresToInvenioSyntaxConverter
 
-try:
-    from mod_python import apache
-except ImportError, e:
-    pass # ignore user personalisation, needed e.g. for command-line
+from invenio import webinterface_handler_wsgi_utils as apache
 
 try:
     import invenio.template
@@ -3885,7 +3882,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             else:
                 print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose, tab=tab)
             if req and of.startswith("h"): # register detailed record page view event
-                client_ip_address = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                client_ip_address = str(req.remote_ip)
                 register_page_view_event(recid, uid, client_ip_address)
         else: # record does not exist
             if of == "id":
@@ -4305,7 +4302,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                     req.write(create_similarly_named_authors_link_box(p, ln))
             # log query:
             try:
-                id_query = log_query(req.get_remote_host(), req.args, uid)
+                id_query = log_query(req.remote_host, req.args, uid)
                 if of.startswith("h") and id_query:
                     if not of in ['hcs']:
                         # display alert/RSS teaser for non-summary formats:
