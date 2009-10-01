@@ -710,9 +710,8 @@ AddDefaultCharset UTF-8
 ServerSignature Off
 ServerTokens Prod
 NameVirtualHost *:80
-WSGIRestrictStdout Off
-WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
 %(comment_out_listen_directive)sListen 80
+WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
 </Files>
@@ -730,13 +729,6 @@ WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
            Order allow,deny
            Allow from all
         </Directory>
-        <Directory %(wsgidir)s>
-           WSGIProcessGroup invenio
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
         ErrorLog %(logdir)s/apache.err
         LogLevel warn
         CustomLog %(logdir)s/apache.log combined
@@ -749,8 +741,16 @@ WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
+        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
+        <Directory %(wsgidir)s>
+           WSGIProcessGroup invenio
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           Allow from all
+        </Directory>
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "").split('.')[0],
@@ -766,11 +766,10 @@ ServerSignature Off
 ServerTokens Prod
 %(comment_out_listen_directive)sListen 443
 NameVirtualHost *:443
-WSGIRestrictStdout Off
-WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
 #SSLCertificateFile /etc/apache2/ssl/apache.pem
 SSLCertificateFile /etc/apache2/ssl/server.crt
 SSLCertificateKeyFile /etc/apache2/ssl/server.key
+WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
 </Files>
@@ -784,12 +783,6 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
         SSLEngine on
         DocumentRoot %(webdir)s
         <Directory %(webdir)s>
-           Options FollowSymLinks MultiViews
-           AllowOverride None
-           Order allow,deny
-           Allow from all
-        </Directory>
-        <Directory %(wsgidir)s>
            Options FollowSymLinks MultiViews
            AllowOverride None
            Order allow,deny
@@ -809,6 +802,13 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
         Alias /favicon.ico %(webdir)s/favicon.ico
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
+        <Directory %(wsgidir)s>
+           WSGIProcessGroup invenio
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           Allow from all
+        </Directory>
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "").split('.')[0],
