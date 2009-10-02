@@ -379,7 +379,20 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## the req.form must be casted to dict because of Python 2.4 and earlier
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
-        return _check_result(req, module_globals[possible_handler](req, **dict(req.form)))
+        try:
+            return _check_result(req, module_globals[possible_handler](req, **dict(req.form)))
+        except TypeError, err:
+            if ("%s() got an unexpected keyword argument" % possible_handler) in str(err):
+                register_exception(req=req, prefix="Wrong GET parameter set in calling a legacy publisher handler", alert_admin=True)
+                import inspect
+                expected_args = inspect.getargspec(module_globals[possible_handler]).args
+                cleaned_form = {}
+                for arg in expected_args:
+                    if arg != 'req' and arg in req.form: # Just in case of malicious usage!
+                        cleaned_form[arg] = req.form[arg]
+                return _check_result(req, module_globals[possible_handler](req, **cleaned_form))
+            else:
+                raise
     else:
         raise SERVER_RETURN, HTTP_NOT_FOUND
 
