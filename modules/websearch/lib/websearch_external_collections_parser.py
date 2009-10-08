@@ -131,7 +131,7 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     """Parser for CDS Indico"""
 
     num_results_regex = re.compile(r'<strong>([0-9]+?)</strong> records found')
-    result_regex = re.compile(r'<tr><td valign="top" align="right" nowrap><input name="recid" type="checkbox" value="[0-9]+">\s*([0-9]+\.)\s*</td><td valign="top">(.*?)</td></tr>', re.MULTILINE + re.DOTALL)
+    result_regex = re.compile(r'<tr><td valign="top" align="right" style="white-space: nowrap;">\s*<input name="recid" type="checkbox" value="[0-9]+" \/>\s*([0-9]+\.)\s*</td><td valign="top">(.*?)<div class="moreinfo">.*?</div></td></tr>', re.MULTILINE + re.DOTALL)
 
     def __init__(self, host="", path=""):
         super(CDSIndicoCollectionResutsParser, self).__init__(host, path)
