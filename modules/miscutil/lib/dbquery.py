@@ -44,7 +44,8 @@ import sys
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
-    CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES, CFG_MISCUTIL_SQL_USE_SQLALCHEMY
+    CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES, CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
+    CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
 from invenio.errorlib import register_exception
 
 ## Set the following flag to True in order to transform warning printed
@@ -80,6 +81,12 @@ CFG_DATABASE_USER = 'cdsinvenio'
 CFG_DATABASE_PASS = 'my123p$ss'
 
 _DB_CONN = {}
+
+try:
+    _db_cache
+except NameError:
+    _db_cache = {}
+
 
 def _db_login(relogin = 0):
     """Login to the database."""
@@ -129,10 +136,28 @@ def _db_logout():
     except KeyError:
         pass
 
-try:
-    _db_cache
-except NameError:
-    _db_cache = {}
+def _db_cursor():
+    """Retrieves the db cursor - reconnects in case of need"""
+    try:
+        db = _db_login()
+        cur = db.cursor()
+        return cur
+    except OperationalError: # unexpected disconnect, bad malloc error, etc
+        # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
+        try:
+            db = _db_login(relogin = 1)
+            cur = db.cursor()
+            return cur
+        except OperationalError: # again an unexpected disconnect, bad malloc error, etc
+            raise
+    except Warning, wmsg:
+        msg = "Warning in executing query:\n%s\nwith parameters:\n%s\n%s" % (sql, param, wmsg)
+        print >> sys.stderr, msg
+        try:
+            raise Warning(msg)
+        except Warning:
+            register_exception()
+            raise
 
 def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=['bibrec']):
     """
@@ -223,26 +248,9 @@ def run_sql(sql, param=None, n=0, with_desc=0):
     if param:
         param = tuple(param)
 
-    try:
-        db = _db_login()
-        cur = db.cursor()
-        rc = cur.execute(sql, param)
-    except OperationalError: # unexpected disconnect, bad malloc error, etc
-        # FIXME: now reconnect is always forced, we may perhaps want to ping() first?
-        try:
-            db = _db_login(relogin = 1)
-            cur = db.cursor()
-            rc = cur.execute(sql, param)
-        except OperationalError: # again an unexpected disconnect, bad malloc error, etc
-            raise
-    except Warning, wmsg:
-        msg = "Warning in executing query:\n%s\nwith parameters:\n%s\n%s" % (sql, param, wmsg)
-        print >> sys.stderr, msg
-        try:
-            raise Warning(msg)
-        except Warning:
-            register_exception()
-            raise
+    cur = _db_cursor()
+    rc = cur.execute(sql, param)
+
     if string.upper(string.split(sql)[0]) in ("SELECT", "SHOW", "DESC", "DESCRIBE"):
         if n:
             recset = cur.fetchmany(n)
@@ -256,6 +264,29 @@ def run_sql(sql, param=None, n=0, with_desc=0):
         if string.upper(string.split(sql)[0]) == "INSERT":
             rc =  cur.lastrowid
         return rc
+
+def run_sql_many(query, params, limit=CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT):
+    """Run SQL on the server with PARAM.
+    This method does execute_many and is therefore more efficient than execute
+    but it has sense only with queries that affect state of a database
+    (INSERT, UPDATE). That is why the results just count number of affected rows
+
+    @param params: tuple of tuple of string params to insert in the query
+        (see notes below)
+    @param limit: query will be executed in a cycle for parameters >limit
+        (each iteration receive at most "limit" parameters)
+    @return: SQL result as provided by database
+    """
+    cur = _db_cursor()
+    i = 0
+    r = None
+    while i < len(params):
+        if r is None:
+            r = cur.executemany(query, params[i:i+limit])
+        else:
+            r += cur.executemany(query, params[i:i+limit])
+        i += limit
+    return r
 
 def blob_to_string(ablob):
     """Return string representation of ABLOB.  Useful to treat MySQL
