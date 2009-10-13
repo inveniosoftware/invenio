@@ -68,6 +68,7 @@ from invenio.htmlutils import \
      cfg_html_buffer_allowed_tag_whitelist, \
      cfg_html_buffer_allowed_attribute_whitelist
 from invenio.webuser import collect_user_info
+from invenio.bibknowledge import get_kb_mapping
 from HTMLParser import HTMLParseError
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
@@ -78,7 +79,6 @@ if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
 format_templates_cache = {}
 format_elements_cache = {}
 format_outputs_cache = {}
-kb_mappings_cache = {}
 
 html_field = '<!--HTML-->' # String indicating that field should be
                            # treated as HTML (and therefore no escaping of
@@ -1512,41 +1512,6 @@ def get_output_formats(with_attributes=False):
 
     return output_formats
 
-def get_kb_mapping(kb, string, default=""):
-    """
-    Returns the value of the string' in the knowledge base 'kb'.
-
-    If kb does not exist or string does not exist in kb, returns 'default'
-    string value.
-
-    @param kb: a knowledge base name
-    @param string: a key in a knowledge base
-    @param default: a default value if 'string' is not in 'kb'
-    @return: the value corresponding to the given string in given kb
-    """
-
-    global kb_mappings_cache
-
-    if kb_mappings_cache.has_key(kb):
-        kb_cache = kb_mappings_cache[kb]
-        if kb_cache.has_key(string):
-            value = kb_mappings_cache[kb][string]
-            if value is None:
-                return default
-            else:
-                return value
-    else:
-        # Precreate for caching this kb
-        kb_mappings_cache[kb] = {}
-
-    value = bibformat_dblayer.get_kb_mapping_value(kb, string)
-
-    kb_mappings_cache[kb][str(string)] = value
-    if value is None:
-        return default
-    else:
-        return value
-
 def resolve_format_element_filename(string):
     """
     Returns the filename of element corresponding to string
@@ -1699,12 +1664,10 @@ def clear_caches():
     Clear the caches (Output Format, Format Templates and Format Elements)
 
     """
-    global format_templates_cache, format_elements_cache , \
-           format_outputs_cache, kb_mappings_cache
+    global format_templates_cache, format_elements_cache, format_outputs_cache
     format_templates_cache = {}
     format_elements_cache = {}
     format_outputs_cache = {}
-    kb_mappings_cache = {}
 
 class BibFormatObject:
     """
@@ -1978,7 +1941,7 @@ class BibFormatObject:
         if string is None:
             return default
 
-        val = get_kb_mapping(kb, string, default)
+        val = get_kb_mapping(kb, key=string, default=default)
 
         if val is None:
             return default

@@ -72,28 +72,17 @@
 
     </ul>
 </li>
-<li><strong>5. <a href="#KBs">Configure Knowledge Bases</a></strong>
+<li><strong>5. <a href="#BibReformat">Run BibReformat</a></strong>
     <ul style="list-style-type:None">
-    <li>5.1&nbsp;&nbsp;<a href="#addKB">Add a Knowledge Base</a></li>
-    <li>5.2&nbsp;&nbsp;<a href="#removeKB">Remove a Knowledge Base</a></li>
-    <li>5.3&nbsp;&nbsp;<a href="#addMappingKB">Add a Mapping</a></li>
-    <li>5.4&nbsp;&nbsp;<a href="#removeMappingKB">Remove a Mapping</a></li>
-    <li>5.5&nbsp;&nbsp;<a href="#editMappingKB">Edit a Mapping</a></li>
-    <li>5.6&nbsp;&nbsp;<a href="#attrsKB">Edit the Attributes of a Knowledge Base</a></li>
-    <li>5.7&nbsp;&nbsp;<a href="#validityKB">Check the Dependencies a Knowledge Base</a></li>
-    </ul style="list-style-type:None">
-</li>
-<li><strong>6. <a href="#BibReformat">Run BibReformat</a></strong>
-    <ul style="list-style-type:None">
-    <li>6.1&nbsp;&nbsp;<a href="#runBibReformat">Run BibReformat</a></li>
+    <li>5.1&nbsp;&nbsp;<a href="#runBibReformat">Run BibReformat</a></li>
     </ul>
 </li>
-<li><strong>7. <a href="#Appendix">Appendix</a></strong>
+<li><strong>6. <a href="#Appendix">Appendix</a></strong>
     <ul style="list-style-type:None">
-    <li>7.1&nbsp;&nbsp;<a href="#marcNotation">MARC Notation in Formats</a></li>
-    <li>7.2&nbsp;&nbsp;<a href="#migration">Migrating from Previous BibFormat</a></li>
-    <li>7.3&nbsp;&nbsp;<a href="#integrationDreamweaver">Integrating BibFormat into Dreamweaver MX</a></li>
-    <li>7.4&nbsp;&nbsp;<a href="#faq">FAQ</a></li>
+    <li>6.1&nbsp;&nbsp;<a href="#marcNotation">MARC Notation in Formats</a></li>
+    <li>6.2&nbsp;&nbsp;<a href="#migration">Migrating from Previous BibFormat</a></li>
+    <li>6.3&nbsp;&nbsp;<a href="#integrationDreamweaver">Integrating BibFormat into Dreamweaver MX</a></li>
+    <li>6.4&nbsp;&nbsp;<a href="#faq">FAQ</a></li>
     </ul>
 </li>
 </ul>
@@ -313,7 +302,7 @@ Click on the "Add New Format Template" button at the bottom of the page. As for 
 <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bft_editor2.png" alt="Format template editor" />
 <p>The above screenshot shows the template code already filled in. It calls the <code>BFE_TITLE</code> element. If you do not know the name of the element you want to call, you can search for it using the embedded documentation search. You can try to add other elements into your template, or write some HTML formatting.</p>
 <p>When you are satisfied with your template, click on the save button, close the editor and go back to the "Only titles" output format rules editor. There select the template you have just created in the "Use by default" menu and save the ouput format and you are done. </p>
-<p>This tutorial does not cover all aspects of the management of formats (For example "Knowledge bases" or internationalization). It also does not show all the power of output formats, as the one we have created simply call a template. However you have seen enough to configure BibFormat trough the web interface. Read the sections below to learn more about it.</p>
+<p>This tutorial does not cover all aspects of the management of formats. It also does not show all the power of output formats, as the one we have created simply call a template. However you have seen enough to configure BibFormat trough the web interface. Read the sections below to learn more about it.</p>
 
 <h3><a name="administerWebFile">1.3 Administer Through the Web Interface or Through the Configuration files</a></h3>
 <p>BibFormat can be administered in two ways. The first way is to use the provided web interface. It should be the most
@@ -879,33 +868,10 @@ translated_welcome =  &#95;("Welcome")
 
     </ul></p>
 
-<h2><a name="KBs">5. Knowledge Bases</a></h2>
-   <p>Knowledge bases are a way to define easily extendable repositories of mappings. Their use is various, but their main purpose is to get, given a value, the normalized version of this value. For example you may use a knowledge base to hold a list of all ways to abbreviate the name of a journal, and map these abbreviations to the full journal name. This would be useful to get a normalized journal name accross all of your records.</p>
-   <p>The knowledge base itself offers no method to do this normalization. It is limited to the archiving of this knowledge. To benefit from the normalization you need to use a format element which is knowledge-base-aware. The element will look by iteself into the knowledge base to format a record. In that way you can extend the formatting capabilities of this element without having to modify it.</p>
-    <h3><a name="addKB">5.1 Add a Knowledge Base</a></h3>
-    <p>To add a knowledge base go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page.
-    At the bottom of the page click on the "Add New Knowledge Base" button. The knowledge base has been created and you are asked to fill in its attribute. See <a href="#attrsKB">Edit the Attributes of a Knowledge Base</a> to learn more about the attributes of knowledge bases.</p>
-    <h3><a name="removeKB">5.2 Remove a Knowledge Base</a></h3>
-    <p>To remove a knowledge base go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page. Click on the "Delete" button facing the knowledge base you want to remove and confim. The knowledge base and all the mapping it includes are removed.</p>
-    <h3><a name="addMappingKB">5.3 Add a Mapping</a></h3>
-    <p>Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base for which you want to add a mapping. Fill in the form of the "Add New Mapping" section on the left of the page with the new mapping, and click on "Add New Mapping". The mapping has been created. Alternatively you can create the mapping without its attributes, and fill them afterward (See <a href="#editMappingKB">Edit a Mapping</a>).<p/>
-    <h3><a name="removeMappingKB">5.4 Remove a Mapping</a></h3>
-    <p>Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base for which you want to remove a mapping. Click on the "Delete" button facing the mapping you want to delete.
-    <h3><a name="editMappingKB">5.5 Edit a Mapping</a></h3>
-    <p>Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base for which you want to edit a mapping. Locate the mapping in the list. You can click on the column headers to order the list by <i>Map From</i> or by <i>Map To</i> to help you find it. Once you have edited the mapping click on the corresponding "Save" button.
-    <h3><a name="attrsKB">5.6 Edit the Attributes of a Knowledge Base</a></h3>
-    Go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> administration page and click on the knowledge base you want to edit. In the top menu, click on "Knowledge Base Attributes". You can then give your knowledge base a name and a description. Finally click on the "Update Base Attributes" button.
-    <h3><a name="validityKB">5.7 Check the Dependencies a Knowledge Base</a></h3>
-    To check the dependencies of a knowledge base
-    go to the <a href="bibformatadmin.py/kb_manage">Manage Knowledge Bases</a> page, click on
-    the knowledge base you want to check, and then in the menu click on "Knowledge Base Dependencies".</p>
-    <p>The next page shows you the list of format elements that use this knowledge base.</p>
-    <p>Note that some format elements might be omitted.</p>
-
-<h2><a name="BibReformat">6. Run BibReformat</a></h2>
+<h2><a name="BibReformat">5. Run BibReformat</a></h2>
 <p>While records can be formatted on-the-fly using BibFormat, it is usually necessary to preformat the records
 in order to decrease the load of your server. To do so, use the <code>bibreformat</code> command line tool.</p>
-<h3><a name="runBibReformat">6.1 Run BibReformat</a></h3>
+<h3><a name="runBibReformat">5.1 Run BibReformat</a></h3>
 <p>The following options are available for running <code>bibreformat</code>:<p>
 <blockquote>
 <pre> Usage: bibreformat [options]
@@ -958,8 +924,8 @@ suitable for running BibReformat in a periodical daemon mode via
 BibSched. See our <a href="<CFG_SITE_URL>/help/admin/howto-run">HOWTO Run
 Your CDS Invenio Installation</a> guide for more information.</p>
 
-<h2><a name="Appendix">7. Appendix</a></h2>
-<h3><a name="marcNotation">7.1 MARC Notation in Formats</a></h3>
+<h2><a name="Appendix">6. Appendix</a></h2>
+<h3><a name="marcNotation">6.1 MARC Notation in Formats</a></h3>
 <p>The notation for accessing fields of a record are quite flexible. You can use a syntax strict regarding MARC 21, but also
   a shortcut syntax, or a syntax that can have a special meaning.</p>
   <p>The MARC syntax is the following one:
@@ -972,7 +938,7 @@ Your CDS Invenio Installation</a> guide for more information.</p>
       <li>Omit or use both indicators. You cannot specify only one indicator. If you need to use only one, use underscore <code>_</code> character for the other indicator.</li>
       <li>Use percent '<code>%</code>' instead of any character to specify all ("don't care" or wildcard character) for that character. </li>
       </ul></p>
-<h3><a name="migration">7.2 Migrating from Previous BibFormat</a></h3>
+<h3><a name="migration">6.2 Migrating from Previous BibFormat</a></h3>
 <p>The new Python BibFormat formats are not backward compatible with the previous formats. New concepts and capabilities have been introduced and some have been dropped. If you have not modified the "Formats" or modified only a
 little bit the "Behaviours" (or modified "Knowledge Bases"), then the transition will be painless and
 automatic. Otherwise you will have to manually rewrite some of the
@@ -1108,7 +1074,7 @@ To enable the migration kit in this release, you need to copy the required files
 <p>This was possible by default only in older versions of Invenio.<br/>
 To enable this functionality in this release, you need to copy the required files from an older release.
 </p>
-<h3><a name="integrationDreamweaver">7.3 Integrating BibFormat into Dreamweaver MX</a></h3>
+<h3><a name="integrationDreamweaver">6.3 Integrating BibFormat into Dreamweaver MX</a></h3>
 <p>BibFormat templates have been thought to be editable in custom HTML editors. We propose in this section
 a way to extend one particular editor, Dreamweaver.</p>
 <h4>Make Dreamweaver Recognize Format Elements in Layout View</h4>
@@ -1137,7 +1103,7 @@ of your Dreamweaver installation folder. At the end of this file, copy-paste the
   <p>Once this is done, you can <a href="bibformatadmin.py/download_dreamweaver_floater">download the floating palette</a> (if file opens in your browser instead of downloading, right-click on icon, or ctrl-click on one-button mouse, and "Save Target As...") and move the dowloaded file "<code>BibFormat_floater.html</code>" (do not rename it) into /Configuration/Floaters directory of your Dreamweaver application folder.</p>
   <p>To use the BibFormat floating panel, open Dreamweaver, and choose <code>Window &gt; Others &gt; BibFormat Elements</code>.</p>
   <p>Whenever a new version of the palette is available, you can skip the edition of file "<code>Menu.xml</code>" and just replace the old "<code>BibFormat_floater</code>" file with the new one.</p>
-<h3><a name="faq">7.4 FAQ</a></h3>
+<h3><a name="faq">6.4 FAQ</a></h3>
 
 <h4>Why do we need output formats? Wouldn't format templates be sufficient?</h4>
 <p>As you potentially have a lot of records, it is not conceivable to specify for each of them which

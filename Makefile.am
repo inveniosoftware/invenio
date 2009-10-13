@@ -325,10 +325,11 @@ update-v0.99.0-tables:
 
 update-v0.99.1-tables:
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
+	echo "RENAME TABLE fmtKNOWLEDGEBASES to knwKB;"  | ${prefix}/bin/dbexec
+	echo "RENAME TABLE fmtKNOWLEDGEBASEMAPPINGS to knwKBRVAL;"  | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc CHANGE docname docname varchar(250) COLLATE utf8_bin NOT NULL default 'file';" | ${prefix}/bin/dbexec
-	echo "CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASECOLL (kb_id mediumint(8) unsigned NOT NULL, coll_id mediumint(9), thefield text default '', expression text default '', PRIMARY KEY (kb_id)); " | ${prefix}/bin/dbexec
 	echo "ALTER TABLE collection DROP COLUMN restricted;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec

@@ -37,8 +37,7 @@ class BibFormatAdminWebPagesAvailabilityTest(unittest.TestCase):
 
         _exports = ['bibformatadmin.py/format_templates_manage',
                     'bibformatadmin.py/output_formats_manage',
-                    'bibformatadmin.py/format_elements_doc',
-                    'bibformatadmin.py/kb_manage']
+                    'bibformatadmin.py/format_elements_doc']
 
         error_messages = []
         for url in [baseurl + page for page in _exports]:

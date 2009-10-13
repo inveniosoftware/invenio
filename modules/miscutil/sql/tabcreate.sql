@@ -2715,9 +2715,9 @@ CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
   KEY action_code (action_code)
 ) TYPE=MyISAM;
 
--- tables for BibFormat:
+-- tables for BibKnowledge:
 
-CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASES (
+CREATE TABLE IF NOT EXISTS knwKB (
   id mediumint(8) unsigned NOT NULL auto_increment,
   name varchar(255) default '',
   description text default '',
@@ -2726,24 +2726,23 @@ CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASES (
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
--- a collection based knowledge base
-
-CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASECOLL (
-  kb_id mediumint(8) unsigned NOT NULL,
-  coll_id mediumint(9),
-  thefield text default '',
-  expression text default '',
-  PRIMARY KEY  (kb_id)
-) TYPE=MyISAM;
-
-
-CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASEMAPPINGS (
+CREATE TABLE IF NOT EXISTS knwKBRVAL (
   id mediumint(8) unsigned NOT NULL auto_increment,
   m_key varchar(255) NOT NULL default '',
   m_value text NOT NULL default '',
-  id_fmtKNOWLEDGEBASES mediumint(8) NOT NULL default '0',
+  id_knwKB mediumint(8) NOT NULL default '0',
   PRIMARY KEY  (id),
-  KEY id_fmtKNOWLEDGEBASES (id_fmtKNOWLEDGEBASES)
+  KEY id_knwKB (id_knwKB),
+  KEY m_key (m_key(30)),
+  KEY m_value (m_value(30))
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS knwKBDDEF (
+  id_knwKB mediumint(8) unsigned NOT NULL,
+  id_collection mediumint(9),
+  output_tag text default '',
+  search_expression text default '',
+  PRIMARY KEY  (id_knwKB)
 ) TYPE=MyISAM;
 
 -- tables for WebSubmit:
@@ -3248,7 +3247,7 @@ CREATE TABLE IF NOT EXISTS expJOB (
   output_format mediumint(12) NOT NULL default '0',
   deleted mediumint(12) NOT NULL default '0',
   lastrun datetime NOT NULL default '0000-00-00 00:00:00',
-  output_directory text, 
+  output_directory text,
   PRIMARY KEY  (id),
   UNIQUE KEY jobname (jobname)
 ) TYPE=MyISAM;
