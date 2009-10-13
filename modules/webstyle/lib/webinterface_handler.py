@@ -380,7 +380,8 @@ def wash_urlargd(form, content):
     content. Content is a dictionary containing the field names as a
     key, and a tuple (type, default) as value.
 
-    'type' can be list, str, int, tuple, or mod_python.util.Field (for
+    'type' can be list, str, int, tuple, or
+    invenio.webinterface_handler_wsgi_utils.Field (for
     file uploads).
 
     The specification automatically includes the 'ln' field, which is
@@ -427,7 +428,7 @@ def wash_urlargd(form, content):
 
         # Maybe we already have what is expected? Then don't change
         # anything.
-        if src_type is dst_type:
+        if isinstance(value, dst_type):
             result[k] = value
             continue
 
@@ -446,7 +447,7 @@ def wash_urlargd(form, content):
             result[k] = [str(value)]
 
         else:
-            raise ValueError('cannot cast form into type %r' % dst_type)
+            raise ValueError('cannot cast form value %s of type %r into type %r' % (value, src_type, dst_type))
 
     result['ln'] = wash_language(result['ln'])
 

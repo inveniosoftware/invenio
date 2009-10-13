@@ -845,3 +845,21 @@ URI: http://%(host)s%(page)s
         'actions': actions,
         }
         return out
+
+    def tmpl_error_page(self, ln=CFG_SITE_LANG, status=""):
+        """
+        Display an error page.
+
+        - status *string* - the HTTP status.
+        """
+        _ = gettext_set_language(ln)
+        out = """
+        <p>%(message)s</p>
+        <p>%(alerted)s</p>
+        <p>%(doubts)s</p>""" % {
+            'status' : status,
+            'message' : _("The server encountered an error while dealing with your request."),
+            'alerted' : _("The system administrators have been alerted."),
+            'doubts' : _("In case of doubt, please contact %(x_admin_email)s.") % {'x_admin_email' : '<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin' : CFG_SITE_SUPPORT_EMAIL}}
+        }
+        return out

@@ -36,7 +36,7 @@ from invenio.webinterface_layout import invenio_handler
 from invenio.webinterface_handler_wsgi_utils import table, FieldStorage, \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND
-from invenio.config import CFG_WEBDIR
+from invenio.config import CFG_WEBDIR, CFG_SITE_LANG
 from invenio.errorlib import register_exception
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
@@ -82,7 +82,7 @@ class SimulatedModPythonRequest(object):
         self.__headers_in = table([])
         for key, value in environ.iteritems():
             if key.startswith('HTTP_'):
-                self.__headers_in[key[len('HTTP_'):]] = value
+                self.__headers_in[key[len('HTTP_'):].replace('_', '-')] = value
         if environ.get('CONTENT_LENGTH'):
             self.__headers_in['content-length'] = environ['CONTENT_LENGTH']
         if environ.get('CONTENT_TYPE'):
@@ -322,17 +322,31 @@ def application(environ, start_response):
             status = int(str(status))
             if status not in (OK, DONE):
                 req.status = status
-                if not req.response_sent_p:
-                    start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+                req.headers_out['content-type'] = 'text/html'
+                register_exception(req=req, alert_admin=True)
+                start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+                return generate_error_page(req)
             else:
                 req.flush()
         except Exception:
             register_exception(req=req, alert_admin=True)
+            req.headers_out['content-type'] = 'text/html'
             start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+            return generate_error_page(req)
     finally:
         for (callback, data) in req.get_cleanups():
             callback(data)
     return []
+
+def generate_error_page(req):
+    """
+    Returns an iterable with the error page to be sent to the user browser.
+    """
+    from invenio.webpage import page
+    from invenio import template
+    webstyle_templates = template.load('webstyle')
+    ln = req.form.get('ln', CFG_SITE_LANG)
+    return [page(title=req.get_wsgi_status(), body=webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln), language=ln, req=req)]
 
 def is_static_path(path):
     """
