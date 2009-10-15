@@ -3371,16 +3371,16 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
 
     elif format == "hm":
         if record_exist_p == -1:
-            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"])) + "</pre>"
+            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"])) + "</pre>"
         else:
-            out += "<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot)) + "</pre>"
+            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot)) + "</pre>"
 
     elif format.startswith("h") and ot:
         ## user directly asked for some tags to be displayed only
         if record_exist_p == -1:
-            out += "<pre>" + get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"]) + "</pre>"
+            out += "\n<pre>" + get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"]) + "</pre>"
         else:
-            out += "<pre>" + get_fieldvalues_alephseq_like(recID, ot) + "</pre>"
+            out += "\n<pre>" + get_fieldvalues_alephseq_like(recID, ot) + "</pre>"
 
     elif format == "hd":
         # HTML detailed format
