@@ -996,9 +996,17 @@ def record_find_field(rec, tag, field, strict=False):
 
     return (None, None)
 
+def record_strip_empty_volatile_subfields(rec):
+    """
+    Removes unchanged volatile subfields from the record
+    """
+    for tag in rec.keys():
+        for field in rec[tag]:
+            field[0][:] = [subfield for subfield in field[0] if subfield[1][:9] != "VOLATILE:"]
+
 def record_strip_empty_fields(rec, tag=None):
     """
-    Removes empty subfields and fields from the record. If 'tag' is None only
+    Removes empty subfields and fields from the record. If 'tag' is not None, only
     a specific tag of the record will be stripped, otherwise the whole record.
 
     @param rec:  A record dictionary structure

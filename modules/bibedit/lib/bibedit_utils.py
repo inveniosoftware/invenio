@@ -41,7 +41,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
 from invenio.bibedit_dblayer import get_record_last_modification_date
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
-    record_strip_empty_fields
+    record_strip_empty_fields, record_strip_empty_volatile_subfields
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BINDIR, CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
@@ -139,8 +139,8 @@ def delete_cache_file(recid, uid):
 
 def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     """Write XML record to file. Default behaviour is to read the record from
-    a BibEdit cache file, write it back to an XML file and then pass this
-    file to BibUpload.
+    a BibEdit cache file, filter out the unchanged volatile subfields,
+    write it back to an XML file and then pass this file to BibUpload.
 
     @param xml_record - give XML as string in stead of reading cache file
     @param to_upload - pass the XML file to BibUpload
@@ -152,24 +152,31 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
         cache = get_cache_file_contents(recid, uid)
         if cache:
             record = cache[2]
-            record_strip_empty_fields(record)
+#            record_strip_empty_fields(record) # now performed for every record after removing unfilled volatile fields
             xml_record = record_xml_output(record)
             delete_cache_file(recid, uid)
-    if xml_record:
-        # Write XML file.
-        if not to_merge:
-            file_path = '%s.xml' % _get_file_path(recid, uid)
-        else:
-            file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
-                                       CFG_BIBEDIT_TO_MERGE_SUFFIX)
-        xml_file = open(file_path, 'w')
-        xml_file.write(xml_record)
-        xml_file.close()
-        if to_upload:
-            # Pass XML file to BibUpload.
-            task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r',
-                                      file_path)
-        return True
+    else:
+        record = create_record(xml_record)[0]
+
+    # clean the record from unfilled volatile fields
+    record_strip_empty_volatile_subfields(record)
+    record_strip_empty_fields(record)
+    xml_to_write = record_xml_output(record)
+
+    # Write XML file.
+    if not to_merge:
+        file_path = '%s.xml' % _get_file_path(recid, uid)
+    else:
+        file_path = '%s_%s.xml' % (_get_file_path(recid, uid),
+                                   CFG_BIBEDIT_TO_MERGE_SUFFIX)
+    xml_file = open(file_path, 'w')
+    xml_file.write(xml_to_write)
+    xml_file.close()
+    if to_upload:
+        # Pass XML file to BibUpload.
+        task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r',
+                                  file_path)
+    return True
 
 
 # Security: Locking and integrity

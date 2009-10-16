@@ -126,16 +126,21 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
   var subfieldID = fieldID + '_' + subfieldIndex;
   var boxField = '', cellFieldTagAttrs = 'class="bibEditCellField"',
     fieldTagToPrint = '',
-  cellContentClass = 'class="bibEditCellContentProtected" ',
+  cellContentClass = 'bibEditCellContentProtected',
   cellContentTitle='',
   cellContentOnClick = '';
   if (!protectedField){
     // Enable features for unprotected fields.
     if (!protectedSubfield){
-      cellContentClass = 'class="bibEditCellContent" ';
+      cellContentClass = 'bibEditCellContent';
       cellContentTitle = 'title="Click to edit" ';
       cellContentOnClick = 'onclick="onContentClick(this)" ';
     }
+  }
+  cellContentAdditionalClass = "";
+  if (subfieldValue.substring(0,9) == "VOLATILE:"){
+    subfieldValue = subfieldValue.substring(9);
+    cellContentAdditionalClass += " bibEditVolatileSubfield";
   }
   var boxSubfield = input('checkbox', 'boxSubfield_' + subfieldID,
     'bibEditBoxSubfield', {onclick: 'onSubfieldBoxClick(this)', tabindex: -1});
@@ -164,7 +169,7 @@ function createRow(tag, ind1, ind2, subfieldCode, subfieldValue, fieldID,
 	'" class="bibEditCellSubfieldTag">' +
 	subfieldTagToPrint +
       '</td>' +
-      '<td id="content_' + subfieldID + '" ' + cellContentClass +
+      '<td id="content_' + subfieldID + '" class="' + cellContentClass + cellContentAdditionalClass+ '" ' +
 	cellContentTitle + cellContentOnClick + 'tabindex="0">' +
 	subfieldValue +
       '</td>' +

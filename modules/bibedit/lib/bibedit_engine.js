@@ -787,11 +787,6 @@ function onGetRecordSuccess(json){
 
 function onGetTemplateSuccess(json) {
   onGetRecordSuccess(json);
-  $("td:contains('VOLATILE:')").each( function(i) {
-    $(this).addClass("bibEditVolatileSubfield");
-    // remove the word 'VOLATILE:' from the beginning
-    $(this).text( $(this).text().substring(9) );
-  });
 }
 
 function onSubmitClick(){
@@ -1458,71 +1453,90 @@ function onAddSubfieldsSave(event){
   }
 }
 
+function getOnContentEditSubmitFunction(cell){
+
+}
+
+function convertFieldIntoEditable(cell, shouldSelect){
+  // first we have to detach all exisiting editables ... which means detaching the event
+  editEvent = 'click';
+  $(cell).unbind(editEvent);
+
+  $(cell).editable(
+    function(value){
+      newVal = onContentChange(value, this);
+      if (newVal.substring(0,9) == "VOLATILE:"){
+        $(cell).addClass("bibEditVolatileSubfield");
+        newVal = newVal.substring(9);
+        $(cell).addClass("bibEditVolatileSubfield");
+        if (!shouldSelect){
+          // the field should start selcting all the content upon the click
+          convertFieldIntoEditable(cell, true);
+        }
+      }
+      else{
+        $(cell).removeClass("bibEditVolatileSubfield");
+        if (shouldSelect){
+          // this is a volatile field any more - clicking should not
+          // select all the content inside.
+          convertFieldIntoEditable(cell, false);
+        }
+      }
+
+      return newVal;
+    }, {
+      type: 'autogrow',
+      event: editEvent,
+      data: function(){
+        // Get the real content from the record structure (instead of
+        // from the view, where HTML entities are escaped).
+        var tmpArray = this.id.split('_');
+        var tag = tmpArray[1], fieldPosition = tmpArray[2],
+        subfieldIndex = tmpArray[3];
+        var field = gRecord[tag][fieldPosition];
+        var tmpResult = "";
+        if (subfieldIndex == undefined)
+          // Controlfield
+          tmpResult = field[3];
+        else
+          tmpResult = field[0][subfieldIndex][1];
+        if (tmpResult.substring(0,9) == "VOLATILE:"){
+          tmpResult = tmpResult.substring(9);
+        }
+        return tmpResult;
+      },
+      placeholder: '',
+      width: '100%',
+      onblur: 'submit',
+      select: shouldSelect,
+      autogrow: {
+        lineHeight: 16,
+        minHeight: 36
+      }
+    });
+}
+
 function onContentClick(cell){
   /*
    * Handle click on editable content fields.
    */
   // Check if subfield is volatile subfield from a template
+  var shouldSelect = false;
   if ( $(cell).hasClass('bibEditVolatileSubfield') ){
-    // remove the volatile value
-    var tmpArray = $(cell).attr('id').split('_');
-    var tag = tmpArray[1], fieldPosition = tmpArray[2],
-      subfieldIndex = tmpArray[3];
-    gRecord[tag][fieldPosition][0][subfieldIndex][1] = '';
-    var subfieldCode = gRecord[tag][fieldPosition][0][subfieldIndex][0];
-    updateStatus('updating');
-    // Create Ajax request.
-    var data = {
-      recID: gRecID,
-      requestType: 'modifyContent',
-      tag: tag,
-      fieldPosition: fieldPosition,
-      subfieldIndex: subfieldIndex,
-      subfieldCode: subfieldCode,
-      value: ''
-    };
-    createReq(data, function(json){
-      updateStatus('report', gRESULT_CODES[json['resultCode']]);
-    });
-    // remove volatile-subfield class
-    $(cell).removeClass('bibEditVolatileSubfield');
+    shouldSelect = true;
   }
   if (!$(cell).hasClass('edit_area')){
-    // Add event handler for content editing.
-    $(cell).addClass('edit_area').removeAttr('onclick').editable(
-      onContentChange, {
-      type: 'autogrow',
-      event: 'click',
-      data: function(){
-	// Get the real content from the record structure (in stead of
-	// from the view, where HTML entities are escaped).
-	var tmpArray = this.id.split('_');
-	var tag = tmpArray[1], fieldPosition = tmpArray[2],
-	  subfieldIndex = tmpArray[3];
-	var field = gRecord[tag][fieldPosition];
-	if (subfieldIndex == undefined)
-	  // Controlfield
-	  return field[3];
-	else
-	  return field[0][subfieldIndex][1];
-      },
-      placeholder: '',
-      width: '100%',
-      onblur: 'submit',
-      autogrow: {
-	lineHeight: 16,
-	minHeight: 36
-      }
-    });
+    $(cell).addClass('edit_area').removeAttr('onclick');
+    convertFieldIntoEditable(cell, shouldSelect);
     $(cell).trigger('click');
   }
 }
 
-function onContentChange(value){
+function onContentChange(value, th){
   /*
    * Handle 'Save' button in editable content fields.
    */
-  var tmpArray = this.id.split('_');
+  var tmpArray = th.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
   var field = gRecord[tag][fieldPosition];
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
