@@ -27,7 +27,6 @@ po/*.mo
 *.lib
 *.x86f
 modules/bibclassify/bin/bibclassify
-modules/bibclassify/bin/bibclassifyd
 modules/bibconvert/bin/bibconvert
 modules/bibedit/bin/bibedit
 modules/bibedit/bin/refextract

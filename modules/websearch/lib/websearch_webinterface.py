@@ -68,7 +68,6 @@ from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     session_param_get
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
-from invenio.bibclassify_webinterface import WebInterfaceKeywordsPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
 from invenio.webpage import page, create_error_box
@@ -354,7 +353,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.usage = self
         self.references = self
         self.holdings = WebInterfaceHoldingsPages(self.recid)
-        self.keywords = WebInterfaceKeywordsPages(self.recid)
+        self.keywords = self
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
@@ -429,7 +428,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.usage = self
         self.references = self
-        self.keywords = WebInterfaceKeywordsPages(self.recid)
+        self.keywords = self
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)

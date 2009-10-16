@@ -51,12 +51,12 @@ Example:
     python bibclassifycli.py -k etc/HEP.rdf article.pdf
     python bibclassifycli.py -k etc/HEP.rdf directory/"""
 
+import sys
+
 try:
-    import sys
     from invenio.bibclassify_cli import main
 except ImportError, e:
     print "Error: %s" % e
-    import sys
     sys.exit(1)
 
 main()

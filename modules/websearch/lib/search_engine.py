@@ -3072,7 +3072,40 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
                                                                                       ln))
+                    elif tab == 'keywords':
+                        from bibclassify_webinterface import \
+                            record_get_keywords, get_sorting_options, \
+                            generate_keywords, get_keywords_body
+                        from invenio.webinterface_handler import wash_urlargd
+                        form = req.form
+                        argd = wash_urlargd(form, {
+                            'generate': (str, 'no'),
+                            'sort': (str, 'occurrences'),
+                            'type': (str, 'tagcloud'),
+                            'numbering': (str, 'off'),
+                            })
+                        recid = recIDs[irec]
 
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
+                            tabs, ln))
+
+                        if argd['generate'] == 'yes':
+                            # The user asked to generate the keywords.
+                            keywords = generate_keywords(req, recid)
+                        else:
+                            # Get the keywords contained in the MARC.
+                            keywords = record_get_keywords(recid, argd)
+
+                        if keywords:
+                            req.write(get_sorting_options(argd, keywords))
+                        elif argd['sort'] == 'related' and not keywords:
+                            req.write('You may want to run BibIndex.')
+
+                        # Output the keywords or the generate button.
+                        get_keywords_body(keywords, req, recid, argd)
+
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
+                            tabs, ln))
                     else:
                         # Metadata tab
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -43,6 +42,7 @@ try:
     from bibclassify_config import CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, \
         CFG_BIBCLASSIFY_PARTIAL_TEXT, CFG_BIBCLASSIFY_USER_AGENT
     from bibclassify_utils import write_message, set_verbose_level
+    from bibclassify_acronym_analyzer import get_acronyms
 except ImportError, err:
     print >> sys.stderr, "Import error: %s" % err
     sys.exit(0)
@@ -60,7 +60,7 @@ _CKWS = {}
 def output_keywords_for_sources(input_sources, taxonomy, rebuild_cache=False,
     output_mode="text", output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
     match_mode="full", no_cache=False, with_author_keywords=False,
-    spires=False, verbose=None):
+    spires=False, verbose=None, only_core_tags=False, extract_acronyms=False):
     """Outputs the keywords for each source in sources."""
     if verbose is not None:
         set_verbose_level(verbose)
@@ -97,12 +97,31 @@ def output_keywords_for_sources(input_sources, taxonomy, rebuild_cache=False,
         if source:
             if output_mode == "text":
                 print "Input file: %s" % source
-            print get_keywords_from_text(text_lines,
+
+            keywords = get_keywords_from_text(text_lines,
                 output_mode=output_mode,
                 output_limit=output_limit,
                 spires=spires,
                 match_mode=match_mode,
-                with_author_keywords=with_author_keywords)
+                with_author_keywords=with_author_keywords,
+                only_core_tags=only_core_tags)
+
+            if extract_acronyms:
+                acronyms = get_acronyms("\n".join(text_lines))
+                if acronyms:
+                    acronyms_str = ["\nAcronyms:"]
+                    for acronym, expansions in acronyms.iteritems():
+                        expansions_str = ", ".join(["%s (%d)" % expansion
+                                                    for expansion in expansions])
+
+                        acronyms_str.append("%s  %s" % (acronym, expansions_str))
+                    acronyms_str = "\n".join(acronyms_str)
+                else:
+                    acronyms_str = "\nNo acronyms."
+
+                print keywords + acronyms_str + "\n"
+            else:
+                print keywords
 
 def output_keywords_for_local_file(local_file, taxonomy, rebuild_cache=False,
     output_mode="text", output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
@@ -122,12 +141,46 @@ def output_keywords_for_local_file(local_file, taxonomy, rebuild_cache=False,
         taxonomy=taxonomy,
         spires=spires,
         match_mode=match_mode,
-        with_author_keywords=with_author_keywords)
+        with_author_keywords=with_author_keywords,
+        rebuild_cache=rebuild_cache,
+        no_cache=no_cache)
+
+def get_keywords_from_local_file(local_file, taxonomy, rebuild_cache=False,
+    match_mode="full", no_cache=False, with_author_keywords=False):
+
+    text_lines = text_lines_from_local_file(local_file)
+
+    global _SKWS
+    global _CKWS
+    if not _SKWS:
+        if taxonomy is not None:
+            _SKWS, _CKWS = get_regular_expressions(taxonomy,
+                rebuild=rebuild_cache, no_cache=no_cache)
+        else:
+            write_message("ERROR: Please specify an ontology in order to "
+                "extract keywords.", stream=sys.stderr, verbose=1)
+
+    text_lines = cut_references(text_lines)
+    fulltext = normalize_fulltext("\n".join(text_lines))
+
+    author_keywords = None
+    if with_author_keywords:
+        author_keywords = get_author_keywords(_SKWS, _CKWS, fulltext)
+
+    if match_mode == "partial":
+        fulltext = _get_partial_text(fulltext)
+
+    single_keywords = get_single_keywords(_SKWS, fulltext)
+
+    composite_keywords = get_composite_keywords(_CKWS, fulltext,
+        single_keywords)
+
+    return (single_keywords, composite_keywords)
 
 def get_keywords_from_text(text_lines, taxonomy=None, output_mode="text",
     output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
     match_mode="full", no_cache=False, with_author_keywords=False,
-    rebuild_cache=False):
+    rebuild_cache=False, only_core_tags=False):
     """Returns a formatted string containing the keywords for a single
     document."""
     global _SKWS
@@ -155,11 +208,12 @@ def get_keywords_from_text(text_lines, taxonomy=None, output_mode="text",
     composite_keywords = get_composite_keywords(_CKWS, fulltext,
         single_keywords)
 
-    return _get_keywords_output(single_keywords, composite_keywords,
-        author_keywords, output_mode, output_limit, spires)
+    return _get_keywords_output(single_keywords, composite_keywords, taxonomy,
+        author_keywords, output_mode, output_limit, spires, only_core_tags)
 
-def _get_keywords_output(single_keywords, composite_keywords,
-    author_keywords=None, style="text", output_limit=0, spires=False):
+def _get_keywords_output(single_keywords, composite_keywords, taxonomy,
+    author_keywords=None, style="text", output_limit=0, spires=False,
+    only_core_tags=False):
     """Returns a formatted string representing the keywords according
     to the style chosen."""
 
@@ -167,15 +221,16 @@ def _get_keywords_output(single_keywords, composite_keywords,
     single_keywords = _filter_nostandalone(single_keywords)
 
     # Limit the number of keywords to the output limit.
-    single_keywords = _resize_single_keywords(single_keywords, output_limit)
-    composite_keywords = _resize_composite_keywords(composite_keywords,
+    single_keywords = _get_sorted_skw_matches(single_keywords, output_limit)
+    composite_keywords = _resize_ckw_matches(composite_keywords,
         output_limit)
 
     if style == "text":
         return _output_text(single_keywords, composite_keywords,
-            author_keywords, spires)
+            author_keywords, spires, only_core_tags)
     elif style == "marcxml":
-        return _output_marc(single_keywords, composite_keywords, spires)
+        return output_marc(single_keywords, composite_keywords, spires,
+        taxonomy)
     elif style == "html":
         return _output_html(single_keywords, composite_keywords, spires)
 
@@ -183,26 +238,23 @@ def _get_author_keywords_output(author_keywords):
     """Formats the output for the author keywords."""
     out = []
 
-    for keyword_string, matching_keywords in author_keywords.iteritems():
-        single_keywords = matching_keywords[0]
-        composite_keywords = matching_keywords[1]
+    out.append("\nAuthor keywords:")
 
-        kw_out  = []
+    for keyword, matches in author_keywords.items():
+        skw_matches = matches[0]
+        ckw_matches = matches[1]
+        matches_str = []
+        for ckw_match in ckw_matches:
+            matches_str.append(ckw_match[0].concept)
+        for skw_match in skw_matches.keys():
+            matches_str.append(skw_match.concept)
+        if matches_str:
+            out.append('"%s" matches "' % keyword + '", "'.join(matches_str) +
+                '".')
+        else:
+            out.append('"%s" matches no keyword.' % keyword)
 
-        if single_keywords:
-            for kw in single_keywords.keys():
-                kw_out.append(kw)
-
-        if composite_keywords > 0:
-            for kw in composite_keywords:
-                kw_out.append(kw[0])
-
-        if kw_out:
-            keyword_string += ', '.join(kw_out)
-
-        out.append(kw_out)
-
-    return out
+    return '\n'.join(out)
 
 def _get_partial_text(fulltext):
     """Returns a shortened version of the fulltext used with the partial
@@ -217,7 +269,47 @@ def _get_partial_text(fulltext):
 
     return "\n".join(partial_text)
 
-def _output_html(single_keywords, composite_keywords, spires=False):
+def _output_fieldcodes_text(skw_matches, ckw_matches):
+    """Returns the output for the field codes."""
+    fieldcodes = {}
+    output = []
+
+    for skw, _ in skw_matches:
+        for fieldcode in skw.fieldcodes:
+            fieldcodes.setdefault(fieldcode, []).append(skw.concept)
+    for ckw, _, _ in ckw_matches:
+        for fieldcode in ckw.fieldcodes:
+            fieldcodes.setdefault(fieldcode, []).append(ckw.concept)
+
+    if fieldcodes:
+        output.append('\nField codes:')
+        for fieldcode, keywords in fieldcodes.items():
+            output.append('%s: %s' % (fieldcode, ', '.join(keywords)))
+        return '\n'.join(output)
+    else:
+        return ''
+
+def _output_core_keywords_text(skw_matches, ckw_matches):
+    """Returns the output for the core tags."""
+    output, core_keywords = [], []
+
+    for skw, _ in skw_matches:
+        if skw.core:
+            core_keywords.append(skw.concept)
+    for ckw, _, _ in ckw_matches:
+        if ckw.core:
+            core_keywords.append(ckw.concept)
+
+    if core_keywords:
+        output.append("\n%d core keywords:" % len(core_keywords))
+        for core_keyword in core_keywords:
+            output.append(core_keyword)
+    else:
+        output.append("\nNo core keywords.")
+
+    return '\n'.join(output)
+
+def _output_html(skw_matches, ckw_matches, spires=False):
     """Using the counts for each of the tags, write a simple HTML page
     to standard output containing a tag cloud representation. The CSS
     describes ten levels, each of which has differing font-size's,
@@ -268,30 +360,24 @@ def _output_html(single_keywords, composite_keywords, spires=False):
 
     tags = []
 
-    max_counts = [len(single_keywords[0][1]), composite_keywords[0][1]]
+    max_counts = [len(skw_matches[0][1]), ckw_matches[0][1]]
 
     # Add the single tags
     color = "#b5b5b5"
-    for subject, spans in single_keywords:
+    for single_keyword, spans in skw_matches:
         for index, value in enumerate(level_list):
             if len(spans) <= max_counts[0] / value:
-                if spires:
-                    obj = _spires_label(subject)
-                else:
-                    obj = _SKWS[subject].concept
+                obj = single_keyword.output(spires)
                 obj = obj.replace(" ", "&#160")
                 tags.append(keyword % (index, color, obj))
                 break
 
     # Add the composite tags
     color = "#003df5"
-    for subject, count, components in composite_keywords:
+    for composite_keyword, count, components in ckw_matches:
         for index, value in enumerate(level_list):
             if count <= max_counts[1] / value:
-                if spires:
-                    obj = _spires_label(subject)
-                else:
-                    obj = _CKWS[subject].concept
+                obj = composite_keyword.output(spires)
                 obj = obj.replace(" ", "&#160")
                 tags.append(keyword % (index, color, obj))
                 break
@@ -304,154 +390,126 @@ def _output_html(single_keywords, composite_keywords, spires=False):
         tags[index] = tags[-1]
         del tags[-1]
 
-    lines.append(" " * 8 + "</div>")
-    lines.append(" " * 6 + "</tr>")
-    lines.append(" " * 4 + "</table>")
-    lines.append(" " * 2 + "</body>")
-    lines.append("</html>")
+    lines.append('        </div>\n'
+                 '      </tr>\n'
+                 '    </table>\n'
+                 '  </body>\n'
+                 '</html>')
 
     return "\n".join(lines)
 
-def _output_marc(single_keywords, composite_keywords, spires=False):
+def output_marc(skw_matches, ckw_matches, spires=False, taxonomy='HEP'):
     """Outputs the keywords in the MARCXML format."""
     marc_pattern = ('<datafield tag="653" ind1="1" ind2=" ">\n'
                     '    <subfield code="a">%s</subfield>\n'
-                    '    <subfield code="9">BibClassify/HEP</subfield>\n'
+                    '    <subfield code="n">%d</subfield>\n'
+                    '    <subfield code="9">BibClassify/%s</subfield>\n'
                     '</datafield>\n')
 
     output = []
 
-    for subject, spans in single_keywords:
-        if spires:
-            output.append(_spires_label(subject))
-        else:
-            output.append(_SKWS[subject].concept)
+    #FIXME this is really bad.
+    if type(skw_matches) is list:
+        for single_keyword, spans in skw_matches:
+            concept = single_keyword.output(spires)
+            output.append((concept, len(spans)))
+    else:
+        for single_keyword, spans in skw_matches.items():
+            concept = single_keyword.output(spires)
+            output.append((concept, len(spans)))
 
-    for subject, count, components in composite_keywords:
-        if spires:
-            output.append(_spires_label(subject))
-        else:
-            output.append(_CKWS[subject].concept)
+    for composite_keyword, count, components in ckw_matches:
+        concept = composite_keyword.output(spires)
+        output.append((concept, count))
 
-    return "".join([marc_pattern % keyword for keyword in output])
+    # Transform the taxonomy name into something readable.
+    taxonomy = os.path.basename(taxonomy)
+    if taxonomy.endswith('.rdf'):
+        taxonomy = taxonomy.rstrip('.rdf')
 
-def _output_text(single_keywords=None, composite_keywords=None,
-                author_keywords=None, spires=False):
+    return "".join([marc_pattern % (keyword, count, taxonomy)
+                    for keyword, count in output])
+
+def _output_text(skw_matches=None, ckw_matches=None, author_keywords=None,
+    spires=False, only_core_tags=False):
     """Outputs the results obtained in text format."""
     output = []
 
-    # Search and output core keywords.
-    core_keywords = [_SKWS[skw[0]].concept
-                     for skw in single_keywords
-                     if _SKWS[skw[0]].core]
-    core_keywords += [_CKWS[ckw[0]].concept
-                      for ckw in composite_keywords
-                      if _CKWS[ckw[0]].core]
-    if core_keywords:
-        output.append("\nCore keywords:")
-        for core_keyword in core_keywords:
-            output.append(core_keyword)
-
     if author_keywords is not None:
-        output.append("\nAuthor keywords:")
-        for keyword, matches in author_keywords.iteritems():
-            skws = matches[0]
-            ckws = matches[1]
-            matches_str = []
-            for ckw in ckws:
-                matches_str.append(_CKWS[ckw[0]].concept)
-            for skw in skws.keys():
-                matches_str.append(_SKWS[skw].concept)
-            if matches:
-                output.append(keyword + ' -> ' + ', '.join(matches_str))
-            else:
-                output.append(keyword)
+        output.append(_get_author_keywords_output(author_keywords))
 
-    if composite_keywords is not None:
+    if ckw_matches is not None:
         output.append("\nComposite keywords:")
-        for subject, count, components in composite_keywords:
-            if spires:
-                concept = _spires_label(subject)
-            else:
-                concept = _CKWS[subject].concept
+        for composite_keyword, count, components in ckw_matches:
+            concept = composite_keyword.output(spires)
             output.append("%d  %s %s" % (count, concept, components))
 
-    if single_keywords is not None:
+    if skw_matches is not None:
         output.append("\nSingle keywords:")
-        for subject, spans in single_keywords:
-            if spires:
-                concept = _spires_label(subject)
-            else:
-                concept = _SKWS[subject].concept
+        for single_keyword, spans in skw_matches:
+            concept = single_keyword.output(spires)
             output.append("%d  %s" % (len(spans), concept))
+
+    core_keywords = _output_core_keywords_text(skw_matches, ckw_matches)
+    if core_keywords:
+        output.append(core_keywords)
+
+    fieldcodes = _output_fieldcodes_text(skw_matches, ckw_matches)
+    if fieldcodes:
+        output.append(fieldcodes)
 
     return "\n".join(output) + "\n"
 
-def _filter_nostandalone(keywords):
+def _filter_nostandalone(kw_matches):
     """Returns a copy of the keywords data structure stripped from its
     nonstandalone components."""
-    filtered_keywords = {}
+    filtered_kw_matches = {}
 
-    for subject, spans in keywords.iteritems():
-        if not _SKWS[subject].nostandalone:
-            filtered_keywords[subject] = spans
+    for kw_match, spans in kw_matches.iteritems():
+        if not kw_match.nostandalone:
+            filtered_kw_matches[kw_match] = spans
 
-    return filtered_keywords
+    return filtered_kw_matches
 
-def _single_keywords_comparator(skw0, skw1):
-    """Compares 2 single keywords records. First compare the
-    occurrences, then the length of the word."""
-    list_comparison = cmp(len(skw1[1]), len(skw0[1]))
+def _skw_matches_comparator(skw0_matches, skw1_matches):
+    """
+    Compares 2 single keywords matches (single_keyword, spans). First
+    compare the occurrences, then the length of the word.
+    """
+    list_comparison = cmp(len(skw1_matches[1]), len(skw0_matches[1]))
     if list_comparison:
         return list_comparison
     else:
-        return cmp(len(skw1[0]), len(skw0[0]))
+        return cmp(len(skw1_matches[0].concept), len(skw0_matches[0].concept))
 
-def _composite_keywords_comparator(ckw0, ckw1):
-    """Compare 2 composite keywords records. First compare the
-    occurrences, then the length of the word, at last the component
-    counts."""
-    count_comparison = cmp(ckw1[1], ckw0[1])
+def _ckw_matches_comparator(ckw0_match, ckw1_match):
+    """
+    Compares 2 composite keywords matches (composite_keyword, spans,
+    components). First compare the occurrences, then the length of
+    the word, at last the component counts.
+    """
+    count_comparison = cmp(ckw1_match[1], ckw0_match[1])
     if count_comparison:
         return count_comparison
-    component_avg0 = sum(ckw0[2]) / len(ckw0[2])
-    component_avg1 = sum(ckw1[2]) / len(ckw1[2])
+    component_avg0 = sum(ckw0_match[2]) / len(ckw0_match[2])
+    component_avg1 = sum(ckw1_match[2]) / len(ckw1_match[2])
     component_comparison =  cmp(component_avg1, component_avg0)
     if component_comparison:
         return component_comparison
     else:
-        return cmp(len(ckw1[0]), len(ckw0[0]))
+        return cmp(len(ckw1_match[0].concept), len(ckw0_match[0].concept))
 
-def _resize_single_keywords(keywords, limit=20):
+def _get_sorted_skw_matches(skw_matches, limit=20):
     """Returns a resized version of data structures of keywords to the
     given length."""
-    keywords = list(keywords.items())
-    keywords.sort(_single_keywords_comparator)
-    return limit and keywords[:limit] or keywords
+    sorted_keywords = list(skw_matches.items())
+    sorted_keywords.sort(_skw_matches_comparator)
+    return limit and sorted_keywords[:limit] or sorted_keywords
 
-def _resize_composite_keywords(keywords, limit=20):
+def _resize_ckw_matches(keywords, limit=20):
     """Returns a resized version of the composite_keywords list."""
-    keywords.sort(_composite_keywords_comparator)
+    keywords.sort(_ckw_matches_comparator)
     return limit and keywords[:limit] or keywords
-
-def _spires_label(subject):
-    """Returns the SPIRES representation of a keyword. If the
-    spiresLabel is set, then it returns that value otherwise it replaces
-    the colon in the prefLabel by a comma."""
-    try:
-        if subject in _SKWS:
-            return _SKWS[subject].spires
-    except AttributeError:
-        # The keyword doesn't have a SPIRES label.
-        return _SKWS[subject].concept
-
-    try:
-        return _CKWS[subject].spires
-    except AttributeError:
-        # The keyword doesn't have a SPIRES label. Build "comp1, comp2".
-        components = _CKWS[subject].compositeof
-        _spires_labels = [_spires_label(component) for component in components]
-        return ", ".join(_spires_labels)
 
 if __name__ == "__main__":
     write_message("ERROR: Please use bibclassify_cli from now on.",

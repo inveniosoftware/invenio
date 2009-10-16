@@ -17,7 +17,8 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibclassify_cli.py \
+pylib_DATA = bibclassify_acronym_analyzer.py \
+             bibclassify_cli.py \
              bibclassify_config.py \
              bibclassify_daemon.py \
              bibclassify_engine.py \

@@ -73,6 +73,12 @@ _split_by_punctuation = re.compile("(\W+)")
 
 _cache_location = None
 
+single_keywords_by_subject = {}
+composite_keywords_by_subject = {}
+
+single_keywords_by_concept = {}
+composite_keywords_by_concept = {}
+
 def get_regular_expressions(ontology, rebuild=False, no_cache=False):
     """Returns a list of patterns compiled from the RDF/SKOS ontology.
     Uses cache if it exists and if the ontology hasn't changed."""
@@ -81,7 +87,7 @@ def get_regular_expressions(ontology, rebuild=False, no_cache=False):
     # relates to an existing ontology.
     ontology_names = _get_ontology_path(ontology)
     if ontology_names is not None:
-        onto_short_name, onto_long_name, onto_url = ontology_names
+        onto_long_name, onto_url = ontology_names
         onto_path = os.path.join(CFG_CACHEDIR, 'bibclassify', onto_long_name)
     else:
         write_message("ERROR: Unable to understand the ontology name "
@@ -170,26 +176,28 @@ def _download_remote_ontology(onto_url, time_difference=None):
 def _get_ontology_path(ontology):
     """Returns the path to the short ontology name."""
     if os.access(ontology, os.R_OK):
-        return (os.path.basename(ontology), ontology, None)
+        return (ontology, None)
     else:
         result = run_sql("SELECT name, location from clsMETHOD")
         for onto_short_name, onto_url in result:
             onto_long_name = os.path.basename(onto_url)
             if ontology in (onto_short_name, onto_long_name, onto_url):
-                return (onto_short_name, onto_long_name, onto_url)
+                return (onto_long_name, onto_url)
         return None
 
 class SingleKeyword:
     """A single keyword element that treats and stores information
     fields retrieved from the RDF/SKOS taxonomy."""
     def __init__(self, subject, store=None, namespace=None):
+        """Inits a SingleKeyword object with a subject string and the RDFLib
+        taxonomy object."""
         if store is None:
             self.concept = subject
             self.regex = _get_searchable_regex(basic=[subject])
             self.nostandalone = False
-            self.spires = subject
-            self.fieldcodes = None
-            self.core = None
+            self.spires = ""
+            self.fieldcodes = []
+            self.core = False
         else:
             basic_labels = []
             for label in store.objects(subject, namespace["prefLabel"]):
@@ -217,18 +225,26 @@ class SingleKeyword:
                 if note in ("nostandalone", "nonstandalone"):
                     self.nostandalone = True
 
-            spires = store.value(subject, namespace["spiresLabel"], any=True)
-            if spires is not None:
-                self.spires = str(spires)
+            self.spires = store.value(subject, namespace["spiresLabel"], any=True)
+            if self.spires is not None:
+                self.spires = str(self.spires)
 
             self.fieldcodes = []
             for code in store.objects(subject, namespace["field"]):
                 self.fieldcodes.append(str(code))
 
-            core = None
+    def output(self, spires=False):
+        """Returns the best output for the keyword."""
+        if spires:
+            if self.spires:
+                return self.spires
+            else:
+                return self.concept
+        else:
+            return self.concept
 
     def __repr__(self):
-        return "".join(["<SingleKeyword: ", self.concept, ">"])
+        return "<SingleKeyword: %s>" % self.concept
 
 class CompositeKeyword:
     """A composite keyword element that treats and stores information
@@ -253,8 +269,13 @@ class CompositeKeyword:
 
         self.compositeof = []
         component_positions.sort()
-        for position in component_positions:
-            self.compositeof.append(position[1])
+        try:
+            for position in component_positions:
+                self.compositeof.append(single_keywords_by_subject[position[1]])
+        except KeyError:
+            # One single keyword is not present in the taxonomy. This
+            # is due to an error in the taxonomy description.
+            self.compositeof = []
 
         self.core = False
         for note in map(lambda s: str(s).lower().strip(),
@@ -262,17 +283,31 @@ class CompositeKeyword:
             if note == 'core':
                 self.core = True
 
-        spires = store.value(subject, namespace["spiresLabel"], any=True)
-        if spires is not None:
-            self.spires = spires
+        self.spires = store.value(subject, namespace["spiresLabel"], any=True)
+        if self.spires is not None:
+            self.spires = self.spires
 
         self.regex = []
         for label in store.objects(subject, namespace["altLabel"]):
             pattern = _get_regex_pattern(label)
             self.regex.append(re.compile(CFG_BIBCLASSIFY_WORD_WRAP % pattern))
 
+        self.fieldcodes = []
+        for code in store.objects(subject, namespace["field"]):
+            self.fieldcodes.append(str(code))
+
+    def output(self, spires=False):
+        """Returns the best output for the keyword."""
+        if spires:
+            if self.spires:
+                return self.spires
+            else:
+                return self.concept.replace(":", ",")
+        else:
+            return self.concept
+
     def __repr__(self):
-        return "".join(["<CompositeKeyword: ", self.concept, ">"])
+        return "<CompositeKeyword: %s>" % self.concept
 
 def _build_cache(source_file, no_cache=False):
     """Builds the cached data by parsing the RDF taxonomy file or a
@@ -284,8 +319,9 @@ def _build_cache(source_file, no_cache=False):
 
     timer_start = time.clock()
 
-    single_keywords = {}
-    composite_keywords = {}
+    global single_keywords_by_subject
+    global composite_keywords_by_subject
+    single_keywords, composite_keywords = [], []
 
     try:
         write_message("INFO: Building RDFLib's conjunctive graph.",
@@ -299,7 +335,7 @@ def _build_cache(source_file, no_cache=False):
         filestream = open(source_file, "r")
         for line in filestream:
             keyword = line.strip()
-            single_keywords[keyword] = SingleKeyword(keyword)
+            single_keywords.append(SingleKeyword(keyword))
     else:
         write_message("INFO: Building cache from RDF file %s." % source_file,
             stream=sys.stderr, verbose=3)
@@ -316,9 +352,11 @@ def _build_cache(source_file, no_cache=False):
             # as NASA-subjects.rdf)
             if not store.value(subject_object[0], namespace["compositeOf"],
                 any=True):
-                strsubject = str(subject_object[0]).split("#")[-1]
-                single_keywords[strsubject] = SingleKeyword(subject_object[0],
-                    store=store, namespace=namespace)
+                skw = SingleKeyword(subject_object[0], store=store,
+                    namespace=namespace)
+                single_keywords.append(skw)
+                subject = str(subject_object[0]).split("#")[-1]
+                single_keywords_by_subject[subject] = skw
                 single_count += 1
 
         # Let's go through the composite keywords.
@@ -327,8 +365,8 @@ def _build_cache(source_file, no_cache=False):
             # Keep only the single keywords.
             if store.value(subject, namespace["compositeOf"], any=True):
                 strsubject = str(subject).split("#")[-1]
-                composite_keywords[strsubject] = CompositeKeyword(store,
-                    namespace, subject)
+                composite_keywords.append(CompositeKeyword(store,
+                    namespace, subject))
                 composite_count += 1
 
         store.close()
@@ -643,7 +681,6 @@ def check_taxonomy(taxonomy):
 
     no_prefLabel = []
     multiple_prefLabels = []
-    multiple_notes = []
     bad_notes = []
     # Subjects with no composite or compositeOf predicate
     lonely = []
@@ -677,10 +714,8 @@ def check_taxonomy(taxonomy):
 
         # Multiple or bad notes
         if note in predicates:
-            if len(predicates[note]) > 1:
-                multiple_notes.append(subject)
             bad_notes += [(subject, n) for n in predicates[note]
-                          if n != "nostandalone"]
+                          if n not in ('nostandalone', 'core')]
 
         # Bad hidden labels
         if hiddenLabel in predicates:
@@ -793,9 +828,6 @@ def check_taxonomy(taxonomy):
 
     print "\n==== WARNINGS ===="
 
-    if multiple_notes:
-        print "\nConcepts with multiple notes: %d" % len(multiple_notes)
-        print "\n".join(["   %s" % subj for subj in multiple_notes])
     if bad_notes:
         print ("\nConcepts with bad notes: %d" % len(bad_notes))
         print "\n".join(["   '%s': '%s'" % note for note in bad_notes])

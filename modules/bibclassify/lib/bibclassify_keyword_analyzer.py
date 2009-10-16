@@ -25,6 +25,7 @@ different methods for 3 different types of keywords: single keywords, composite
 keywords and author keywords.
 """
 
+import re
 import sys
 import time
 
@@ -51,13 +52,13 @@ _MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)
 def get_single_keywords(skw_db, fulltext, verbose=True):
     """Returns a dictionary of single keywords bound with the positions
     of the matches in the fulltext.
-    Format of the output dictionary is (subject: positions)."""
+    Format of the output dictionary is (single keyword: positions)."""
     timer_start = time.clock()
 
-    # Matched span -> subject
+    # Matched span -> single keyword
     records = []
 
-    for subject, single_keyword in skw_db.iteritems():
+    for single_keyword in skw_db:
         for regex in single_keyword.regex:
             for match in regex.finditer(fulltext):
                 # Modify the right index to put it on the last letter
@@ -70,19 +71,19 @@ def get_single_keywords(skw_db, fulltext, verbose=True):
 
                 add = True
                 for previous_record in records:
-                    if ((span, subject) == previous_record or
+                    if ((span, single_keyword) == previous_record or
                         _contains_span(previous_record[0], span)):
                         # Match is contained by a previous match.
                         add = False
                         break
 
                 if add:
-                    records.append((span, subject))
+                    records.append((span, single_keyword))
 
-    # List of single_keywords: {spans: subject}
+    # List of single_keywords: {spans: single keyword}
     single_keywords = {}
-    for span, subject in records:
-        single_keywords.setdefault(subject, []).append(span)
+    for span, single_keyword in records:
+        single_keywords.setdefault(single_keyword, []).append(span)
 
     if verbose:
         write_message("INFO: Matching single keywords... %d keywords found "
@@ -94,14 +95,14 @@ def get_single_keywords(skw_db, fulltext, verbose=True):
 def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
     """Returns a list of composite keywords bound with the number of
     occurrences found in the text string.
-    Format of the output list is (subject, count, component counts)."""
+    Format of the output list is (composite keyword, count, component counts)."""
     timer_start = time.clock()
 
     # Build the list of composite candidates
     ckw_list = []
     skw_as_components = []
 
-    for subject, composite in ckw_db.iteritems():
+    for composite_keyword in ckw_db:
         # Counters for the composite keyword. First count is for the
         # number of occurrences in the whole document and second count
         # is for the human defined keywords.
@@ -109,7 +110,7 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
         matched_spans = []
 
         # Check the alternative labels.
-        for regex in composite.regex:
+        for regex in composite_keyword.regex:
             for match in regex.finditer(fulltext):
                 span = list(match.span())
                 span[1] -= 1
@@ -120,7 +121,7 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
 
         # Get the single keywords locations.
         try:
-            components = ckw_db[subject].compositeof
+            components = composite_keyword.compositeof
         except AttributeError:
             print >> sys.stderr, ("Cached ontology is corrupted. Please "
                 "remove the cached ontology in your temporary file.")
@@ -164,7 +165,7 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
                     component_counts.append(0)
 
             # Store the composite keyword
-            ckw_list.append((subject, ckw_count, component_counts))
+            ckw_list.append((composite_keyword, ckw_count, component_counts))
 
     # Remove the single keywords that appear as components from the list
     # of single keywords.
@@ -208,9 +209,26 @@ def get_author_keywords(skw_db, ckw_db, fulltext):
 
     out = {}
     for kw in author_keywords:
-        kw = kw.lower()
-        matching_skw = get_single_keywords(skw_db, ' %s ' % kw, verbose=False)
-        matching_ckw = get_composite_keywords(ckw_db, ' %s ' % kw,
+        # If the author keyword is an acronym with capital letters
+        # separated by points, remove the points.
+        if re.match('([A-Z].)+$', kw):
+            kw = kw.replace('.', '')
+
+        # First try with the keyword as such, then lower it.
+        kw_with_spaces = ' %s ' % kw
+        matching_skw = get_single_keywords(skw_db, kw_with_spaces,
+            verbose=False)
+        matching_ckw = get_composite_keywords(ckw_db, kw_with_spaces,
+            matching_skw, verbose=False)
+
+        if matching_skw or matching_ckw:
+            out[kw] = (matching_skw, matching_ckw)
+            continue
+
+        lowkw = kw.lower()
+
+        matching_skw = get_single_keywords(skw_db, ' %s ' % lowkw, verbose=False)
+        matching_ckw = get_composite_keywords(ckw_db, ' %s ' % lowkw,
             matching_skw, verbose=False)
 
         out[kw] = (matching_skw, matching_ckw)

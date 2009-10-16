@@ -27,18 +27,17 @@ the method output_keywords_for_sources from bibclassify_engine.
 import getopt
 import sys
 
-try:
-    from bibclassify_engine import output_keywords_for_sources
-    from bibclassify_utils import write_message, set_verbose_level
-except ImportError, err:
-    print >> sys.stderr, "Import error: %s" % err
-    sys.exit(0)
-
 STANDALONE = False
 
 try:
+    from invenio.bibclassify_engine import output_keywords_for_sources
+    from invenio.bibclassify_utils import write_message, set_verbose_level
     from invenio.bibclassify_daemon import bibclassify_daemon
-except ImportError:
+    from invenio.bibclassify_ontology_reader import check_taxonomy
+except ImportError, err:
+    from bibclassify_engine import output_keywords_for_sources
+    from bibclassify_utils import write_message, set_verbose_level
+    from bibclassify_ontology_reader import check_taxonomy
     write_message("WARNING: Running in standalone mode.", stream=sys.stderr,
         verbose = 2)
     STANDALONE = True
@@ -72,40 +71,41 @@ def get_recids_list(recids_string):
                 for i in range(int(bounds[0]), int(bounds[1]) + 1):
                     recids[i] = None
         else:
+            # FIXME change type of exception
             raise ValueError("Format error in recids ranges.")
 
     return recids.keys()
 
 def main():
     """Main function """
-    daemon = False
+    arguments = sys.argv
+    for index, argument in enumerate(arguments):
+        if 'bibclassify' in argument:
+            break
+    arguments = arguments[index+1:]
+
+    run_as_daemon = False
 
     # Check if running in standalone or daemon mode.
-    # No arguments.
-    if len(sys.argv) == 1:
-        daemon = True
+    if not arguments:
+        run_as_daemon = True
+    elif len(arguments) == 1 and arguments[0].isdigit():
+        # Running the task with its PID number (bibsched style).
+        run_as_daemon = True
 
-    # Running the task with its PID number (bibsched style).
-    if len(sys.argv) == 2:
-        try:
-            int(sys.argv[1])
-        except ValueError:
-            daemon = False
-        else:
-            daemon = True
+    specific_daemon_options = ('-i', '--recid', '-c', '--collection', '-f')
+    for option in specific_daemon_options:
+        for arg in arguments:
+            if arg.startswith(option):
+                run_as_daemon = True
 
-    # Using an option specific to the daemon.
-    daemon_options = ('-i', '--recid', '-c', '--collection')
-    for option in daemon_options:
-        if option in sys.argv[1:]:
-            daemon = True
-
-    if daemon:
-        # DAEMON
+    if run_as_daemon:
         bibclassify_daemon()
     else:
-        # STANDALONE
-        options = _read_options(sys.argv[1:])
+        options = _read_options(arguments)
+
+        if options['check_taxonomy']:
+            check_taxonomy(options['taxonomy'])
 
         output_keywords_for_sources(options["text_files"],
             options["taxonomy"],
@@ -115,7 +115,9 @@ def main():
             output_limit=options["output_limit"],
             spires=options["spires"],
             match_mode=options["match_mode"],
-            with_author_keywords=options["with_author_keywords"])
+            with_author_keywords=options["with_author_keywords"],
+            extract_acronyms=options["extract_acronyms"],
+            only_core_tags=options["only_core_tags"])
 
 def _display_help():
     """Prints the help message for this module."""
@@ -144,6 +146,10 @@ Standalone file mode options:
                             (=full)
   --detect-author-keywords  detect keywords that are explicitely written in the
                             document
+   --extract-acronyms       outputs a list of acronyms and expansions found in
+                            the document.
+   --acronyms-file=FILE     if specified, the acronyms will be added to the
+                            content of that file
 Daemon mode options:
   -i, --recid=RECID         extract keywords for a record and store into DB
                             (=all necessary ones for pre-defined taxonomies)
@@ -195,6 +201,9 @@ def _read_options(options_string):
         "rebuild_cache": False,
         "no_cache": False,
         "with_author_keywords": False,
+        "extract_acronyms": False,
+        "acronyms_file": "",
+        "only_core_tags": False,
     }
 
     try:
@@ -202,7 +211,8 @@ def _read_options(options_string):
         long_flags = ["taxonomy=", "output-mode=", "verbose=", "spires",
             "keywords-number=", "matching-mode=", "help", "version", "file",
             "rebuild-cache", "no-limit", "no-cache", "check-taxonomy",
-            "detect-author-keywords", "id:", "collection:", "modified:" ]
+            "detect-author-keywords", "id:", "collection:", "modified:",
+            "extract-acronyms", "acronyms-file=", "only-core-tags"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Options problem: %s" % err1
@@ -219,6 +229,7 @@ def _read_options(options_string):
         "--matching-mode": "match_mode",
         "-n": "output_limit",
         "--keywords-number": "output_limit",
+        "--acronyms-file": "acronyms_file",
     }
 
     without_argument = {
@@ -229,6 +240,8 @@ def _read_options(options_string):
         "--no-cache": "no_cache",
         "--check-taxonomy": "check_taxonomy",
         "--detect-author-keywords": "with_author_keywords",
+        "--extract-acronyms": "acronyms",
+        "--only-core-tags": "only_core_tags",
     }
 
     for option, argument in opts:

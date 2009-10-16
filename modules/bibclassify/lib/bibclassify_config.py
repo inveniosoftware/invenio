@@ -171,7 +171,7 @@ CFG_BIBCLASSIFY_AUTHOR_KW_START = \
 
 CFG_BIBCLASSIFY_AUTHOR_KW_END = (
     re.compile(r"\n"),
-    re.compile(r"\."),
+    re.compile(r"\.\W"),
     re.compile(r"\sPACS"),
     re.compile(r"(?i)1[. ]*introduction\W"),
     re.compile(r"(?i)mathematics subject classification\W"),

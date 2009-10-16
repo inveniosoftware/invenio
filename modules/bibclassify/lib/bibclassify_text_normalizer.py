@@ -59,7 +59,6 @@ def normalize_fulltext(fulltext):
     fulltext = _replace_greek_characters(fulltext)
 
     washing_regex = [
-        (re.compile(r" *([,.]) *"), r"\1 "),
         # Replace non and anti with non- and anti-. This allows a better
         # detection of keywords such as nonabelian.
         (re.compile(r"(\snon)[- ](\w+)"), r"\1\2"),

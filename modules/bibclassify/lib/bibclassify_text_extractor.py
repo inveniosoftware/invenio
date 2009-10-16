@@ -52,13 +52,18 @@ def text_lines_from_local_file(document, remote=False):
             filestream = os.popen(cmd)
         else:
             filestream = open(document, "r")
-    except:
-        write_message("ERROR: Unable to read from file %s." % document,
-            stream=sys.stderr, verbose=1)
+    except IOError, ex1:
+        write_message("ERROR: Unable to read from file %s. (%s)" % (document,
+            ex1.strerror), stream=sys.stderr, verbose=1)
         return None
 
     lines = [line.decode("utf-8") for line in filestream]
     filestream.close()
+
+    if not _is_english_text('\n'.join(lines)):
+        write_message("WARNING: It seems the file '%s' is unvalid and doesn't "
+            "contain text. Please communicate this file to the CDS Invenio "
+            "team." % document, stream=sys.stderr, verbose=0)
 
     line_nb = len(lines)
     word_nb = 0
@@ -73,6 +78,30 @@ def text_lines_from_local_file(document, remote=False):
             word_nb), stream=sys.stderr, verbose=3)
 
     return lines
+
+def _is_english_text(text):
+    """
+    Checks if a text is correct english.
+    Computes the number of words in the text and compares it to the
+    expected number of words (based on an average size of words of 5.1
+    letters).
+
+    @param text_lines: the text to analyze
+    @type text_lines:  string
+    @return:           True if the text is English, False otherwise
+    @rtype:            Boolean
+    """
+    # Consider one word and one space.
+    avg_word_length = 5.1 + 1
+    expected_word_number = float(len(text)) / avg_word_length
+
+    words = [word
+             for word in re.split('\W', text)
+             if word.isalpha()]
+
+    word_number = len(words)
+
+    return word_number > .5 * expected_word_number
 
 def text_lines_from_url(url, user_agent=""):
     """Returns the fulltext of the file found at the URL."""
