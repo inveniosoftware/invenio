@@ -114,6 +114,32 @@ uninstall-jsmath-plugin:
 	@echo "** The jsMath plugin was successfully uninstalled.       **"
 	@echo "***********************************************************"
 
+install-jscalendar-plugin:
+	@echo "***********************************************************"
+	@echo "** Installing jsCalendar plugin, please wait...              **"
+	@echo "***********************************************************"
+	rm -rf /tmp/invenio-jscalendar-plugin
+	mkdir /tmp/invenio-jscalendar-plugin
+	(cd /tmp/invenio-jscalendar-plugin && \
+	wget 'http://www.dynarch.com/static/jscalendar-1.0.zip' && \
+	unzip -u jscalendar-1.0.zip && \
+	mkdir -p ${prefix}/var/www/jsCalendar && \
+	cp jscalendar-1.0/img.gif ${prefix}/var/www/jsCalendar/jsCalendar.gif && \
+	cp jscalendar-1.0/calendar.js ${prefix}/var/www/jsCalendar/ && \
+	cp jscalendar-1.0/calendar-setup.js ${prefix}/var/www/jsCalendar/ && \
+	cp jscalendar-1.0/lang/calendar-en.js ${prefix}/var/www/jsCalendar/ && \
+	cp jscalendar-1.0/calendar-blue.css ${prefix}/var/www/jsCalendar/)
+	rm -fr /tmp/invenio-jscalendar-plugin
+	@echo "***********************************************************"
+	@echo "** The jsCalendar plugin was successfully installed.     **"
+	@echo "***********************************************************"
+
+uninstall-jscalendar-plugin:
+	@rm -rvf ${prefix}/var/www/jsCalendar
+	@echo "***********************************************************"
+	@echo "** The jsCalendar plugin was successfully uninstalled.       **"
+	@echo "***********************************************************"
+
 install-jquery-plugins: uninstall-jquery-plugins
 	@echo "***********************************************************"
 	@echo "** Installing various jQuery plugins, please wait...     **"
@@ -125,6 +151,8 @@ install-jquery-plugins: uninstall-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.core.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.highlight.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
+	wget http://tablesorter.com/jquery.tablesorter.js && \
+	wget http://tablesorter.com/addons/pager/jquery.tablesorter.pager.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
 	rm jquery.autogrow-1.2.2.zip && \
@@ -140,6 +168,8 @@ uninstall-jquery-plugins:
 	rm -f effects.core.min.js && \
 	rm -f effects.highlight.min.js && \
 	rm -f jquery.jeditable.mini.js && \
+	rm -f jquery.tablesorter.js && \
+	rm -f jquery.tablesorter.pager.js && \
 	rm -f jquery.autogrow.js && \
 	rm -f json2.js && \
 	rm -f jquery.hotkeys.min.js)

@@ -24,6 +24,8 @@ BibCirculation daemon.
 __revision__ = "$Id$"
 
 import sys
+import datetime
+import time
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message
 from invenio.mailutils import send_email
@@ -31,11 +33,12 @@ import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
      CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 from invenio.search_engine import get_fieldvalues
+from invenio.bibcirculation_utils import generate_email_body
 
 
 def get_expired_loan():
     """
-    @return: all expired loans
+    @return all expired loans
     """
 
     res = run_sql("""select id_crcBORROWER, id, id_bibrec
@@ -47,7 +50,9 @@ def get_expired_loan():
 def update_expired_loan(loan_id):
     """
     Update status, number of overdue letter and date of overdue letter
-    @param id: id of crcLOAN
+
+    @param loan_id: identify the loan. Primary key of crcLOAN.
+    @type loan_id: int
     """
 
     run_sql("""update crcLOAN
@@ -57,12 +62,36 @@ def update_expired_loan(loan_id):
                where id = %s
                """, (loan_id, ))
 
-
-def send_overdue_letter(borrower_id, subject):
+def get_overdue_letters_info(loan_id):
     """
-    send an overdue letter
-    @param borrower_id: id of crcBORROWER
+    Get the number of letters and the date of the last letter
+    sent for a given loan_id.
+
+    @param loan_id: identify the loan. Primary of crcLOAN.
+    @type loan_id: int
+
+    @return number_of_letters and date of the last letter
+    """
+
+    res = run_sql("""select overdue_letter_number,
+                            DATE_FORMAT(overdue_letter_date,'%%Y-%%m-%%d')
+                       from crcLOAN
+                      where id=%s""",
+                  (loan_id, ))
+
+    return res[0]
+
+
+
+def send_overdue_letter(borrower_id, subject, content):
+    """
+    Send an overdue letter
+
+    @param borrower_id: identify the borrower. Primary key of crcBORROWER.
+    @type borrower_id: int
+
     @param subject: subject of the overdue letter
+    @type subject: string
     """
 
     to_borrower = db.get_borrower_email(borrower_id)
@@ -70,7 +99,7 @@ def send_overdue_letter(borrower_id, subject):
     send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
                toaddr=to_borrower,
                subject=subject,
-               content=CFG_BIBCIRCULATION_TEMPLATES['OVERDUE'],
+               content=content,
                header='',
                footer='',
                attempt_times=1,
@@ -78,23 +107,70 @@ def send_overdue_letter(borrower_id, subject):
                )
     return 1
 
+def send_second_recall(date_letters):
+    """
+    @param date_letters: date of the last letter.
+    @type date_letters: string
+
+    @return boolean
+    """
+    today = datetime.date.today()
+
+    time_tuple = time.strptime(date_letters, "%Y-%m-%d")
+    #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
+    tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(weeks=1)
+
+    if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
+        return True
+    else:
+        return False
+
+def send_third_recall(date_letters):
+    """
+    @param date_letters: date of the last letter.
+    @type date_letters: string
+
+    @return boolean
+    """
+    today = datetime.date.today()
+
+    time_tuple = time.strptime(date_letters, "%Y-%m-%d")
+    #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
+    tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(days=3)
+
+    if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
+        return True
+    else:
+        return False
+
 def task_run_core():
     """
     run daemon
     """
 
-    write_message("Getting expired loans ...", verbose=9)
+    #write_message("Getting expired loans ...", verbose=9)
     expired_loans = get_expired_loan()
 
-    for (borrower_id, id_loan, recid) in expired_loans:
-        title = ''.join(get_fieldvalues(recid, "245__a"))
-        subject = "OVERDUE LETTER - " + title
-        update_expired_loan(id_loan)
-        write_message("Updating information about expired loans")
-        send_overdue_letter(borrower_id, subject)
-        write_message("Sending overdue letter")
+    for (borrower_id, loan_id, recid) in expired_loans:
+        (number_of_letters, date_letters) = get_overdue_letters_info(loan_id)
 
-    write_message("Done!!")
+        if number_of_letters == 0:
+            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL1'], loan_id)
+        elif number_of_letters == 1 and send_second_recall(date_letters):
+            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL2'], loan_id)
+        elif number_of_letters == 2 and send_third_recall(date_letters):
+            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
+        else:
+            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
+
+        title = ''.join(get_fieldvalues(recid, "245__a"))
+        subject = "LOAN RECALL: " + title
+        update_expired_loan(id_loan)
+        #write_message("Updating information about expired loans")
+        send_overdue_letter(borrower_id, subject, content)
+        #write_message("Sending overdue letter")
+
+    #write_message("Done!!")
 
     return 1
 

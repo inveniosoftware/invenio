@@ -769,6 +769,7 @@ WSGIRestrictStdout Off
         Alias /js/ %(webdir)s/js/
         Alias /export/ %(webdir)s/export/
         Alias /jsMath/ %(webdir)s/jsMath/
+        Alias /jsCalendar/ %(webdir)s/jsCalendar/
         Alias /fckeditor/ %(webdir)s/fckeditor/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
@@ -832,6 +833,7 @@ WSGIRestrictStdout Off
         Alias /js/ %(webdir)s/js/
         Alias /export/ %(webdir)s/export/
         Alias /jsMath/ %(webdir)s/jsMath/
+        Alias /jsCalendar/ %(webdir)s/jsCalendar/
         Alias /fckeditor/ %(webdir)s/fckeditor/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt

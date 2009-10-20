@@ -2101,195 +2101,250 @@ text-decoration:underline;
     width: 100%;
 }
 
-
-
-/*BibCirculation CSS*/
+/* BibCirculation CSS */
 
 #bibcircmenu h2 {
-	display:none
+    display:none
 }
 #bibcircmenu ul {
-	list-style:none;
-	margin:0;
-	padding:0 0 0 4px;
+    list-style:none;
+    margin:0;
+    padding:0 0 0 4px;
 }
 #bibcircmenu {
-	clear:both;
-	width:100%;
-	border-bottom:2px solid #36c;
-	border-top:2px solid #36c;
-	height:auto;
-	padding:0;
-	position:relative;
-	padding-bottom:9px;
+    clear:both;
+    width:100%;
+    border-bottom:2px solid #36c;
+    border-top:2px solid #36c;
+    height:auto;
+    padding:0;
+    position:relative;
+    padding-bottom:9px;
 }
 #bibcircmenu ul {
-	padding-top:9px;
-	position:relative;
+    padding-top:9px;
+    position:relative;
 }
 * html #bibcircmenu ul {
-	/* Needed for ie < 7 ONLY
-	That's why the star hack is used
-	*/
-	width:99%;
+    /* Needed for ie < 7 ONLY
+       That's why the star hack is used
+       */
+    width:99%;
 }
 #bibcircmenu li.on a, #bibcircmenu li.on a:hover, #bibcircmenu li.on a:visited{
-	text-decoration:none;
-	color:#555;
+    text-decoration:none;
+    color:#555;
 }
 #bibcircmenu li {
-	display:block;
-	float:left;
-	text-decoration:none;
-	padding: 5px 5px 5px 7px;
-	height:100%;
-	padding-right:5px;
-	margin-right:10px;
-	background: transparent url(list_sep_blue.gif) no-repeat left center;
+    display:block;
+    float:left;
+    text-decoration:none;
+    padding: 5px 5px 5px 7px;
+    height:100%;
+    padding-right:5px;
+    margin-right:10px;
+    background: transparent url(list_sep_blue.gif) no-repeat left center;
 
 }
 #bibcircmenu li.hassubmenu{
-	position:relative;
+    position:relative;
 }
 #bibcircmenu li.hassubmenu a{
-	padding-right:12px;
-	background: transparent url(drop_down_menu_arrow_down.gif) no-repeat right center;
+    padding-right:12px;
+    background: transparent url(drop_down_menu_arrow_down.gif) no-repeat right center;
 }
 #bibcircmenu li.on.hassubmenu a{
-	background: transparent url(drop_down_menu_arrow_down_w.gif) no-repeat right center;
+    background: transparent url(drop_down_menu_arrow_down_w.gif) no-repeat right center;
 }
 #bibcircmenu li.on {
-	background: #eee url(list_sep_grey.gif) no-repeat left center;
-	height:100%;
+    background: #eee url(list_sep_grey.gif) no-repeat left center;
+    height:100%;
 }
 #bibcircmenu li a img {
-	vertical-align:middle;
+    vertical-align:middle;
 }
 #bibcircmenu li img{
-	border:none;
+    border:none;
 }
 #bibcircmenu li.right {
-	float:right;
-	margin-right:2px;
-	padding-right:0;
-	padding-left:0;
-	margin-left:0;
-	background-image:none;
+    float:right;
+    margin-right:2px;
+    padding-right:0;
+    padding-left:0;
+    margin-left:0;
+    background-image:none;
 }
 #bibcircmenu li a{
-	white-space:nowrap;
-	text-decoration:none;
-	margin:0;
-	padding:3px 6px;
+    white-space:nowrap;
+    text-decoration:none;
+    margin:0;
+    padding:3px 6px;
 }
 #bibcircmenu li ul.subsubmenu {
-	display:none;
-	position: absolute;
-	background-image:none;
-	top: 1em;
-	left: 0;
+    display:none;
+    position: absolute;
+    background-image:none;
+    top: 1em;
+    left: 0;
 }
 #bibcircmenu li ul.subsubmenu li {
-	display:list-item !important;
-	float: none !important;
-	position: relative;
-	border-bottom: 1px solid #36c;
-	border-left: 1px solid #36c;
-	border-right: 1px solid #36c;
-	background:#fff none;
+    background:#FFFFFF none repeat scroll 0 0;
+    border-bottom:1px solid #3366CC;
+    border-left:1px solid #3366CC;
+    border-right:1px solid #3366CC;
+    display:list-item !important;
+    float:none !important;
+    position:relative;
+    z-index:50;
 }
 #bibcircmenu li ul.subsubmenu li a, #bibcircmenu li ul.subsubmenu li a:hover, #bibcircmenu li ul.subsubmenu li a:visited{
-	background:transparent none;
-	display:block;
-	color:#36c;
+    background:transparent none;
+    display:block;
+    color:#36c;
 }
 #bibcircmenu li ul.subsubmenu li a:hover{
-	text-decoration:underline
+    text-decoration:underline
 }
 #bibcircmenu li:hover ul {
-	display:block;
-	position: absolute;
+    display:block;
+    position: absolute;
 }
 
+div.bibcircbottom {
+    clear:both;
+    width:100%;
+    border-bottom:2px solid #36c;
+    height:auto;
+    padding:0;
+    position:relative;
+    padding-bottom:9px;
+}
 
-    div.bibcircbottom {
-        clear:both;
-	width:100%;
-	border-bottom:2px solid #36c;
-	height:auto;
-	padding:0;
-	position:relative;
-	padding-bottom:9px;
+.bibcirctable {
+    font-size: 82%;
+    width:100%;
+    margin:auto;
+    max-width: 1280px;
+}
 
-        }
+.bibcirctable_contents {
+    color: #79d;
+    font-size: small;
+    width:90%;
+    margin:auto;
+    max-width: 300px;
+}
 
-        .bibcirctable {
-        color: #79d;
-        font-size: 82%;
-        width:95%;
-        margin:auto;
-        max-width: 1280px;
-        }
+.bibcirctableheader {
+    color: #79d;
+    font-size: small;
+    font-weight: bold;
+    font-variant: small-caps;
+}
 
-        .bibcirctable_contents {
-        color: #79d;
-        font-size: small;
-        width:90%;
-        margin:auto;
-        max-width: 300px;
-        }
+.bibcircwarning {
+    color: #f11010;
+}
 
-        .bibcirctableheader {
-        color: #79d;
-        font-size: small;
-        font-weight: bold;
-        font-variant: small-caps;
-        }
+.bibcircpending {
+    color: #f16f10;
+}
 
-        .bibcircwarning {
-        color: #f11010;
-        }
+.bibcircok {
+    color: #060;
+}
 
-	 .bibcircpending {
-        color: #f16f10;
-        }
+.bibcirccontent {
+    color: black;
+}
 
+.formbutton {
+    color: #fff;
+    background: #36c;
+    font-weight: bold;
+}
 
+.bibcircbutton {
+    background-color:#fff;
+    border:1px solid;
+    border-color:#cdcdcd;
+}
 
-        .bibcircok {
-        color: #060;
-        }
+.bibcircbuttonover {
+    background-color:#cadff5;
+    border:1px solid;
+    border-color:#cdcdcd;
+}
 
-        .bibcirccontent {
-        color: black;
-        }
+div.title {
+    width: 600px;
+    padding-left: 5px;
+    color: #36c;
+    font-size: 20px;
+    font-weight: bold;
+    font-variant: small-caps;
+    padding-bottom:2px;
+}
 
+div.subtitle {
+    width: 600px;
+    padding-left: 5px;
+    color: #36c;
+    font-size: 16px;
+    font-variant: small-caps;
+    padding-bottom:2px;
+}
 
-        .formbutton {
-        color: #fff;
-        background: #36c;
-        font-weight: bold;
-        }
+.bibcircnotes {
+    border-width: 0px;
+    border-spacing: 1px;
+    border-style: none;
+    border-color: #cfcfcf;
+    border-collapse: collapse;
+    background-color: white;
+}
 
- 	div.title {
-        width: 600px;
-        padding-left: 5px;
-        color: #36c;
-        font-size: 20px;
-        font-weight: bold;
-        font-variant: small-caps;
-        padding-bottom:2px;
-        }
+.bibcircnotes th {
+    border-width: 1px;
+    padding: 2px;
+    border-style: solid;
+    border-color: #cfcfcf;
+    background-color: white;
+    -moz-border-radius: 0px;
+}
 
+.bibcircnotes td {
+    border-width: 1px;
+    padding: 2px;
+    border-style: solid;
+    border-color: #cfcfcf;
+    background-color: white;
+    -moz-border-radius: 0px;
+}
 
-        div.subtitle {
-        width: 600px;
-        padding-left: 5px;
-        color: #36c;
-        font-size: 16px;
-        font-variant: small-caps;
-        padding-bottom:2px;
-        }
+.infoboxsuccess{
+    background-color: #dcfdc1;
+    padding: 20px;
+    color: #3e5e25;
+    border-collapse: collapse;
+    border: 1px solid #88d04d;
+    text-align: left;
+    width: 50%;
+}
 
+.infoboxmsg{
+    background-color: #cadff5;
+    padding: 20px;
+    color: #336598;
+    border-collapse: collapse;
+    border: 1px solid #336598;
+    text-align: left;
+    width: 50%;
+}
+
+.clear {
+    clear:both;
+    line-height:1px;
+}
 
 /* end of cds.css */
