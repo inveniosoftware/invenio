@@ -89,6 +89,9 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
        before testing.
     """
 
+    hmbuffer1 = hmbuffer1.strip()
+    hmbuffer2 = hmbuffer2.strip()
+
     # remove eventual <pre>...</pre> formatting:
     hmbuffer1 = re.sub(r'^<pre>', '', hmbuffer1)
     hmbuffer2 = re.sub(r'^<pre>', '', hmbuffer2)
