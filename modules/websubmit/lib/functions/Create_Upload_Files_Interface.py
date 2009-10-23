@@ -679,7 +679,7 @@ can_add_format_to_doctypes - the list of doctypes for which users can
     if main_bibdocfile.get_type() in can_revise_doctypes or \
            '*' in can_revise_doctypes:
         out += '''[<a href="" onclick="javascript:display_revise_panel(this, 'revise', '%(bibdocname)s', false, %(showKeepPreviousVersions)s, %(showRename)s, %(showDescription)s, %(showComment)s, '%(bibdocname)s', '%(description)s', '%(comment)s', %(showRestrictions)s, '%(restriction)s');return false;">%(revise)s</a>]
-        ''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'"),
+        ''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
                'showRename': ((main_bibdocfile.get_type() in can_rename_doctypes) or \
                               '*' in can_rename_doctypes) and \
                               'true' or 'false',
@@ -692,19 +692,19 @@ can_add_format_to_doctypes - the list of doctypes for which users can
                'showDescription': ((main_bibdocfile.get_type() in can_describe_doctypes) or \
                                    '*' in can_describe_doctypes) and \
                                 'true' or 'false',
-               'description': description and description.replace("'", "\\'") or '',
-               'comment': comment and comment.replace("'", "\\'") or '',
+               'description': description and description.replace("'", "\\'").replace('"', '&quot;') or '',
+               'comment': comment and comment.replace("'", "\\'").replace('"', '&quot;') or '',
                'showRestrictions': ((main_bibdocfile.get_type() in can_restrict_doctypes) or \
                                    '*' in can_restrict_doctypes) and \
                                 'true' or 'false',
-               'restriction': restriction,
+               'restriction': restriction.replace("'", "\\'").replace('"', '&quot;'),
                'revise': _("revise")}
 
     # Delete link
     if main_bibdocfile.get_type() in can_delete_doctypes or \
            '*' in can_delete_doctypes:
         out += '''[<a href="" onclick="if(confirm('Are you sure you want to delete %(bibdocname)s?')){document.forms[0].fileTarget.value = '%(bibdocname)s';javascript:document.forms[0].fileAction.value='delete';user_must_confirm_before_leaving_page = false;document.forms[0].submit();}return false;">%(delete)s</a>]
-        ''' % {'bibdocname': abstract_bibdoc['get_docname'],
+        ''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
                'delete': _("delete")}
     out += '''</td>'''
 
@@ -726,7 +726,7 @@ can_add_format_to_doctypes - the list of doctypes for which users can
     if main_bibdocfile.get_type() in can_add_format_to_doctypes or \
            '*' in can_add_format_to_doctypes:
         out += '''[<a href="" onclick="javascript:display_revise_panel(this, 'addFormat', '%(bibdocname)s', false, false, false, false, false, '', '', '', false, '%(restriction)s');return false;">%(add_format)s</a>]
-    </td>''' % {'bibdocname': abstract_bibdoc['get_docname'],
+    </td>''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
                 'add_format': _("add format"),
                 'restriction': restriction}
     out += '</td></tr>'
