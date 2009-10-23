@@ -1335,7 +1335,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                                 other_urls = urls[1:]
                                 assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags))
                                 for (url, format, description, comment, flags) in other_urls:
-                                    assert(_add_new_format(bibdoc, url, format, docname, description, doctype, newname, description, comment, flags))
+                                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
                 if not found_bibdoc:
                     if doctype in ('PURGE', 'DELETE', 'EXPUNGE', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE', 'REVERT'):
                         write_message("('%s', '%s', '%s') not performed because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
@@ -1343,7 +1343,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     else:
                         bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
                         for (url, format, description, comment) in urls:
-                            assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
+                            assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
             elif mode == 'append':
                 try:
                     found_bibdoc = False
