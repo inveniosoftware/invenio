@@ -397,7 +397,7 @@ be shown.
 
 <p>Note that if you want to add a new logical field or modify existing
 physical MARC tags for a logical field, you have to use the <a
-href="<CFG_SITE_URL>/admin/bibindex/">BibIndex Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py">BibIndex Admin</a> interface.
 
 <a name="3.7"></a><h3>3.7 Modify search options</h3>
 
@@ -434,7 +434,7 @@ example "subject") and then a list of possible field values must be
 entered (for example "Mathematics", "Physics", "Chemistry", "Biology",
 etc).  Note that if you want to add a new logical field or modify
 existing physical MARC tags for a logical field, you have to use the
-<a href="<CFG_SITE_URL>/admin/bibindex/">BibIndex Admin</a> interface.
+<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py">BibIndex Admin</a> interface.
 
 <a name="3.8"></a><h3>3.8 Modify sort options</h3>
 
@@ -445,7 +445,7 @@ title, year, etc) will be shown.
 
 <p>Note that if you want to add a new logical field or modify existing
 physical MARC tags for a logical field, you have to use the <a
-href="<CFG_SITE_URL>/admin/bibindex/">BibIndex Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py">BibIndex Admin</a> interface.
 
 <a name="3.9"></a><h3>3.9 Modify rank options</h3>
 
@@ -457,7 +457,7 @@ but select the method from the 'disable rank method' box.
 
 <p>Note that if you want to add new ranking method or modify existing
 ranking method, you have to use the <a
-href="<CFG_SITE_URL>/admin/bibrank/">BibRank Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibrank/bibrankadmin.py">BibRank Admin</a> interface.
 
 <a name="3.10"></a><h3>3.10 Modify output formats</h3>
 
@@ -472,7 +472,7 @@ changed using the 'move' arrows.
 
 <p>Note that if you want to add new output format ('behaviour') or
 modify existing output format, you have to use the <a
-href="<CFG_SITE_URL>/admin/bibformat/">BibFormat Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py">BibFormat Admin</a> interface.
 
 <a name="3.11"></a><h3>3.11 Configuration of related external collections</h3>
 

@@ -181,7 +181,7 @@ a typical workflow:</p>
     &quot;Picture&quot;. Then first rules matches, and format template
     <span class="formatTemplateBox">Picture HTML Detailed</span> is
     used for formatting by BibFormat.<br/>
-    You can add, remove or edit output formats <a href="bibformatadmin.py/output_formats_manage">here</a></td>
+    You can add, remove or edit output formats <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/output_formats_manage">here</a></td>
     </tr>
 
   <tr>
@@ -210,8 +210,8 @@ a typical workflow:</p>
     parameters. The value of separator will be used to separate
     authors' names and the link parameter tells if links to authors'
     websites have to be created.
-    All elements are described in the <a href="bibformatadmin.py/format_elements_doc">elements documentation</a>.<br/>
-    You can add, remove or edit format templates <a href="bibformatadmin.py/format_templates_manage">here</a>.
+    All elements are described in the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">elements documentation</a>.<br/>
+    You can add, remove or edit format templates <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">here</a>.
     <p>
     In addition to this modified HTML language, BibFormat also supports XSL stylesheets as format templates.
     Read the <a href="#xslFormatTemplate">XSL Format Templates</a> section to learn more about XSLT support for your format templates.
@@ -279,7 +279,7 @@ the format elements layer.<p>
 This format will just print the title of a record.
 </p>
 
-<p>First go to the main <a href="bibformatadmin.py">BibFormat admin page</a>.
+<p>First go to the main <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py">BibFormat admin page</a>.
 Then click on the "Manage Ouput Format" links. You will see the list of all output formats:</p>
 <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_manage.png" alt="Output formats management page"/>
 <p>This is were you can delete, create or check output formats.
@@ -335,7 +335,7 @@ inclusion in a LaTeX document.</p>
 of formatting has to be done, but not how it has to be done.</p>
 
     <h3><a name="addOutputFormat">2.1 Add an Output Format</a></h3>
-    <p>To add a new output format, go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Add New Output Format" button at the bottom of the page. The format has been created. You can then specify the attributes of the output format. See <a href="#attrsOutputFormat">Edit the Attributes of an Output Format</a> to learn more about it.<p>
+    <p>To add a new output format, go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Add New Output Format" button at the bottom of the page. The format has been created. You can then specify the attributes of the output format. See <a href="#attrsOutputFormat">Edit the Attributes of an Output Format</a> to learn more about it.<p>
     <strong>For developers and adventurers only:</strong>
     <p>Alternatively you can directly add a new output format file into the
   /etc/bibformat/outputs/ directory of your CDS Invenio installation, if you have
@@ -344,7 +344,7 @@ of formatting has to be done, but not how it has to be done.</p>
   if you want to be able to modify the rules through the web interface.</p>
 
 <h3><a name="removeOutputFormat">2.2 Remove an Output Format</a></h3>
-<p>To remove an output format, go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Delete" button facing the output format you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
+<p>To remove an output format, go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Delete" button facing the output format you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
 <strong>For developers and adventurers only:</strong>
 <p>You can directly remove an output format from the /etc/bibformat/outputs/ directory of your CDS Invenio installation.
 However you must make sure that it is removed from the tables <code>format</code> and <code>formatname</code> in the database, so that other modules know that it is not longer available.</p>
@@ -452,7 +452,7 @@ However you must make sure that it is removed from the tables <code>format</code
     without its <code>.bfo</code> extension. If you change this name, do not forget to propagate the modification in the database.</p>
     <h3><a name="dependenciesOutputFormat">2.5 Check the Dependencies an Output Format</a></h3>
     <p>To check the dependencies of an output format on format templates, format elements and tags,
-    go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page, click on
+    go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page, click on
     the output format you want to check, and then in the menu click on "Check Dependencies".</p>
     <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_check_deps.png" alt="Check Dependencies menu"/>
     <p>The next page shows you:
@@ -462,14 +462,14 @@ However you must make sure that it is removed from the tables <code>format</code
     </ul>
     Note that some Marc tags might be omitted.</p>
     <h3><a name="validityOutputFormat">2.6 Check the Validity an Output Format</a></h3>
-    <p>To check the validity of an output format, simply go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page, and look at the column 'status' for the output format you want to check. If message "Ok" is there,
+    <p>To check the validity of an output format, simply go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page, and look at the column 'status' for the output format you want to check. If message "Ok" is there,
     then no problem was found with the output format. If message 'Not Ok' is in the column, click on it to see
     the problems that have been found for the output format.</p>
 
 <h2><a name="formatTemplates">3. Format Templates</a></h2>
     <p>A format template defines how a record should be formatted. For example it specifies which fields of the record are to be displayed, in which order and with which visual attributes. Basically the format template is written in HTML, so that it is easy for anyone to edit it. BibFormat also has support for XSLT for formatting. Read more <a href="#xslFormatTemplate">about XSL format templates here</a>.</p>
     <h3><a name="addFormatTemplate">3.1 Add a Format Template</a></h3>
-    <p>To add a new format template, go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Add New Format Template" button at the bottom of the page. The format has been created. You can then specify the attributes of the format template, or ask to make a copy of an existing format.
+    <p>To add a new format template, go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Add New Format Template" button at the bottom of the page. The format has been created. You can then specify the attributes of the format template, or ask to make a copy of an existing format.
  See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about editing the attributes.<p>
     <strong>For developers and adventurers only:</strong>
     <p>Alternatively you can directly add a new format template file into the
@@ -479,13 +479,13 @@ However you must make sure that it is removed from the tables <code>format</code
   if you want to be able to modify the code and the attributes of the template through the web interface.</p>
 
     <h3><a name="removeFormatTemplate">3.2 Remove a Format Template</a></h3>
-    <p>To remove a format template, go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Delete" button facing the format template you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
+    <p>To remove a format template, go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Delete" button facing the format template you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
 <strong>For developers and adventurers only:</strong>
 <p>You can directly remove the format template from the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.</p>
     <h3><a name="codeFormatTemplate">3.3 Edit the Code of a Format Template</a></h3>
     <p>You can change the formatting of records by modifying the code of a template.
     <p>To edit the code of a format template
-    go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page. Click on
+    go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page. Click on
     the format template you want to edit to load the template editor.</p>
 
     <p>The format template editor contains three panels. The left upper panel is the code editor. This is were
@@ -523,7 +523,7 @@ However you must make sure that it is removed from the tables <code>format</code
          <li><code>default</code>: a default value printed if the record has no value for the element. In that case <code>prefix</code> and <code>suffix</code> are not printed.</li>
         </ul>
     </p>
-    <p>Some parameters are specific to elements. To get information on all available format elements you can read the <a href="bibformatadmin.py/format_elements_doc">Format Elements Documentation</a>, which is generated dynamically for all existing elements. it will show you what the element do and what parameters it can take.</p>
+    <p>Some parameters are specific to elements. To get information on all available format elements you can read the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">Format Elements Documentation</a>, which is generated dynamically for all existing elements. it will show you what the element do and what parameters it can take.</p>
     <p>While format elements looks like HTML tags, they differ in the followings ways from traditional ones:
         <ul>
         <li>A format element is a single tag: you cannot have <code>&lt;BFE_TITLE &gt;some text&lt;BFE_TITLE /&gt;</code> but only <code>&lt;BFE_TITLE /&gt;</code>.</li>
@@ -538,7 +538,7 @@ However you must make sure that it is removed from the tables <code>format</code
         templates if you did change the meaning of the MARC code schema.</p>
 
     <h4><a name="previewFormatTemplate">3.6 Preview a Format Template</a></h4>
-    <p>To preview a format template go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the format template you want to preview to open the template editor. The editor contains a preview panel at the bottom of the page.</p>
+    <p>To preview a format template go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the format template you want to preview to open the template editor. The editor contains a preview panel at the bottom of the page.</p>
     <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bft_preview.png" alt="Preview Panel"/>
     <p>Simply click on " Reload Preview" button to preview the template (you do not need to save the code before previewing).<br/>
     Use the "Language" menu to preview the template in a given language</p>
@@ -591,7 +591,7 @@ are not returned by the format elements.</p>
 
     <h3><a name="attrsFormatTemplate">3.9 Edit the Attributes of a Format Template</a></h3>
     <p>To edit the attributes of a format template
-    go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, click on
+    go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, click on
     the format template you want to edit, and then in the menu click on "Modify Template Attributes".</p>
     <p>
     A format template contains two attributes:
@@ -609,7 +609,7 @@ are not returned by the format elements.</p>
 
     <h3><a name="dependenciesFormatTemplate">3.10 Check the Dependencies of a Format Template</a></h3>
      <p>To check the dependencies of a format template
-    go to the <a href="bibformatadmin.py/format_template_manage">Manage Format Template</a> page, click on
+    go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Template</a> page, click on
     the format template you want to check, and then in the menu click on "Check Dependencies".</p>
     <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_check_deps.png" alt="Check Dependencies menu"/>
     <p>The next page shows you:
@@ -619,7 +619,7 @@ are not returned by the format elements.</p>
     </ul>
     Note that some Marc tags might be omitted.</p>
     <h3><a name="validityFormatTemplate">3.11 Check the Validity a Format Template</a></h3>
-    <p>To check the validity of a format template, simply go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, and look at the column 'status' for the format template you want to check. If message "Ok" is there,
+    <p>To check the validity of a format template, simply go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, and look at the column 'status' for the format template you want to check. If message "Ok" is there,
     then no problem was found with the template. If message 'Not Ok' is in the column, click on it to see
     the problems that have been found for the template.</p>
 
@@ -658,12 +658,12 @@ are not returned by the format elements.</p>
 
     <h3><a name="addFormatElement">4.1 Add a Format Element</a></h3>
     <p>The most typical way of adding a format element is to drop a <code>.py</code> file in the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation. See <a href="#codeFormatElement">Edit the Code of a Format Element</a> to learn how to implement an element.</p>
-    <p>The most simple way to add a format element is to add a en entry in the "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module. When BibFormat cannot find the Python format element corresponding to a given name, it looks into this table for the name and prints the value of the field declared for this name. This lightweight way of doing is straightforward but does not allow complex handling of the data (it limits to printing the value of the field, or the values of the fields if multiple fields are declared under the same label).</p>
+    <p>The most simple way to add a format element is to add a en entry in the "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module. When BibFormat cannot find the Python format element corresponding to a given name, it looks into this table for the name and prints the value of the field declared for this name. This lightweight way of doing is straightforward but does not allow complex handling of the data (it limits to printing the value of the field, or the values of the fields if multiple fields are declared under the same label).</p>
     <h3><a name="removeFormatElement">4.2 Remove a Format Element</a></h3>
     <p>To remove a Python format element simply remove the corresponding file from the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation.</p>
-    <p>To remove a format element declared in the "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module simply remove the entry from the table.</p>
+    <p>To remove a format element declared in the "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module simply remove the entry from the table.</p>
     <h3><a name="codeFormatElement">4.3 Edit the Code of a Format Element</a></h3>
-    <p>This section only applies to Python format elements. Basic format elements declared in "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" have non configurable behaviour.</p>
+    <p>This section only applies to Python format elements. Basic format elements declared in "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" have non configurable behaviour.</p>
     <p>A format element file is like any regular Python program. It has to implement a <code>format</code> function, which returns a <code>string</code> and takes at least <code>bfo</code> as first parameter (but can take as many others as needed).</p>
     <p>Here is for example the code of the "bfe_title.py" element:
 <pre>
@@ -738,7 +738,7 @@ about the possibilities offered by the <code>bfo</code>, read the <a href="<CFG_
     <p>
      You can play with a format element parameters and see the result
      of the element directly in the
-     <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>:
+     <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">format elements documentation</a>:
        for each element, under the section "See
      also", click on "Test this element". You are redirected to a page
      where you can enter a value for the parameters. A description is
@@ -850,13 +850,13 @@ translated_welcome =  &#95;("Welcome")
     </ul>
     </p>
     <h3><a name="dependenciesFormatElement">4.8 Check the Dependencies of a Format Element</a></h3>
-    <p>There are two ways to check the dependencies of a format element. The simplest way is to go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Dependencies of this element" for the element you want to check.</p>
+    <p>There are two ways to check the dependencies of a format element. The simplest way is to go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Dependencies of this element" for the element you want to check.</p>
     <p>The second method to check the dependencies of an element is through regular unix tools: for example <code>$ grep -r -i 'bfe_<i>your_element_name</i>' .</code> inside the format templates directory will tell you which templates call your element.</p>
     <h3><a name="validityFormatElement">4.9 Check the Validity of a Format Element</a></h3>
-     <p>There are two ways to check the validity of an element. The simplest one is to go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Correctness of this element" for the element you want to check.</p>
+     <p>There are two ways to check the validity of an element. The simplest one is to go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Correctness of this element" for the element you want to check.</p>
      <p>The second method to check the validity of an element is through regular Python methods: you can for example import the element in the interactive interpreter and feed it with test parameters. Notice that you will need to build a BibFormatObject instance to pass as <code>bfo</code> parameter to the <code>format</code> function of your element.</p>
     <h3><a name="browseDocFormatElement">4.10 Browse the Format Elements Documentation</a></h3>
-    <p>Go to the <a href="bibformatadmin.py/format_elements_doc">format elements documentation</a>. There is a summary of all available format elements at the top of the page. You can click on an element to go to its detailed description in the second part of the page.</p>
+    <p>Go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">format elements documentation</a>. There is a summary of all available format elements at the top of the page. You can click on an element to go to its detailed description in the second part of the page.</p>
     <p>Each detailed documentation shows you:
     <ul>
     <li>A description of what the element does.</li>
@@ -1100,7 +1100,7 @@ of your Dreamweaver installation folder. At the end of this file, copy-paste the
    &lt;menuitem name="BibFormat Elements" enabled="true" command="dw.toggleFloater('BibFormat_floater.html')" checked="dw.getFloaterVisibility('BibFormat_floater.html')" /&gt;
   </pre>
   </p>
-  <p>Once this is done, you can <a href="bibformatadmin.py/download_dreamweaver_floater">download the floating palette</a> (if file opens in your browser instead of downloading, right-click on icon, or ctrl-click on one-button mouse, and "Save Target As...") and move the dowloaded file "<code>BibFormat_floater.html</code>" (do not rename it) into /Configuration/Floaters directory of your Dreamweaver application folder.</p>
+  <p>Once this is done, you can <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/download_dreamweaver_floater">download the floating palette</a> (if file opens in your browser instead of downloading, right-click on icon, or ctrl-click on one-button mouse, and "Save Target As...") and move the dowloaded file "<code>BibFormat_floater.html</code>" (do not rename it) into /Configuration/Floaters directory of your Dreamweaver application folder.</p>
   <p>To use the BibFormat floating panel, open Dreamweaver, and choose <code>Window &gt; Others &gt; BibFormat Elements</code>.</p>
   <p>Whenever a new version of the palette is available, you can skip the edition of file "<code>Menu.xml</code>" and just replace the old "<code>BibFormat_floater</code>" file with the new one.</p>
 <h3><a name="faq">6.4 FAQ</a></h3>
@@ -1120,7 +1120,7 @@ administrator to unprotect the file if you want to edit it.</p>
 
 <h4>How can I add a format element from the web interface?</h4>
 <p>Format elements cannot be added, removed or edited through the web interface. This limitation
-has been introduced to limit the security risks caused by the upload of Pythonic files on the server. The only possibility to add a basic format element from the web interface is to add a en entry in the "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module (see <a href="#addFormatElement">Add a Format Element</a>)</p>
+has been introduced to limit the security risks caused by the upload of Pythonic files on the server. The only possibility to add a basic format element from the web interface is to add a en entry in the "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module (see <a href="#addFormatElement">Add a Format Element</a>)</p>
 
 <h4>Why are some Marc codes omitted in the "Check Dependencies" pages?</h4>
 <p>When you check the dependencies of a format, the page reminds you that

@@ -91,7 +91,7 @@ that aid the building of a semantic thesaurus can be found at the
 Furthermore, BibClassify can function on top of an extended version of SKOS,
 which includes special elements such as key chains, composite keywords and
 special annotations. The extension of the SKOS language is documented in the
-<a href="<CFG_SITE_URL>/help/hacking/bibclassify/">hacking guide</a>.</p>
+<a href="<CFG_SITE_URL>/help/hacking/bibclassify-internals">hacking guide</a>.</p>
 
 <a name="1.2"></a><h3>1.2 Keyword extraction</h3>
 
@@ -108,7 +108,7 @@ well-structured, subject thesauri expressed in the RDF/SKOS language.</p>
 
 <p>A detailed account of the phrase matching mechanisms used by BibClassify is
 included in the
-<a href="<CFG_SITE_URL>/help/hacking/bibclassify/">hacking guide</a>.</p>
+<a href="<CFG_SITE_URL>/help/hacking/bibclassify-internals">hacking guide</a>.</p>
 
 <a name="2"></a><h2>2. Running BibClassify</h2>
 

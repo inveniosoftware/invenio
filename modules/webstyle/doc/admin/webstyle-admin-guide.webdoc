@@ -375,7 +375,7 @@ The following tabs are available:
   <tr>
     <td>Usage Statistics</td>
     <td>Statistics data and graph about file downloads/views</td>
-    <td><a href="<CFG_SITE_URL>/record/10/statistics"><CFG_SITE_URL>/record/10/statistics</a></td>
+    <td><a href="<CFG_SITE_URL>/record/10/usage"><CFG_SITE_URL>/record/10/usage</a></td>
   </tr>
   <tr><td>Fulltext</td>
     <td>Link(s) to fulltext file(s)</td>
