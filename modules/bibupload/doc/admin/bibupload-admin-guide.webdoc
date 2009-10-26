@@ -168,6 +168,8 @@ input file should contain record ID in the 001 tag and the title in
 </pre>
 </p>
 
+<p>If you combine the <code>--pretend</code> parameter with the above updating modes you can actually test what would be executed without modifying the database or altering the system status.</p>
+
 <a name="3.3"></a><h3>3.3 Inserting and updating at the same time</h3>
 
 <p>Note that the insert/update modes can be combined together.  For

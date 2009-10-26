@@ -60,6 +60,7 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'file_path' : None,
         'notimechange' : 0,
         'stage_to_start_from' : 1,
+        'pretend' : False,
     },
     'bibindex' : {
         'cmd' : 'add',

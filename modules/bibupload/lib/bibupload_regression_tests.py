@@ -30,6 +30,7 @@ import os
 import time
 import sys
 from urllib2 import urlopen, HTTPError
+import pprint
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:
@@ -39,10 +40,11 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDI
      CFG_WEBSUBMIT_FILEDIR, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
-     CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
+     CFG_WEBDIR
 from invenio import bibupload
 from invenio.search_engine import print_record
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, get_table_status_info
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibdocfile import BibRecDocs
@@ -1155,7 +1157,6 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid2)
-        bibupload.wipe_out_record_from_all_tables(recid1_updated)
         if self.verbose:
             print "test_insert_the_same_sysno_record() finished"
 
@@ -1196,7 +1197,6 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
                                           self.hm_testrec1_updated), '')
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
-        bibupload.wipe_out_record_from_all_tables(recid1_updated)
         if self.verbose:
             print "test_insert_or_replace_the_same_sysno_record() finished"
 
@@ -1228,7 +1228,6 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         self.assertEqual(-1, recid2)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
-        bibupload.wipe_out_record_from_all_tables(recid2)
         if self.verbose:
             print "test_replace_nonexisting_sysno_record() finished"
 
@@ -1430,7 +1429,6 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid2)
-        bibupload.wipe_out_record_from_all_tables(recid1_updated)
         if self.verbose:
             print "test_insert_the_same_extoaiid_record() finished"
 
@@ -1469,7 +1467,6 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                                           self.hm_testrec1_updated), '')
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
-        bibupload.wipe_out_record_from_all_tables(recid1_updated)
         if self.verbose:
             print "test_insert_or_replace_the_same_extoaiid_record() finished"
 
@@ -1501,7 +1498,6 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         self.assertEqual(-1, recid2)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
-        bibupload.wipe_out_record_from_all_tables(recid2)
         if self.verbose:
             print "test_replace_nonexisting_extoaiid_record() finished"
 
@@ -1689,7 +1685,6 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid2)
-        bibupload.wipe_out_record_from_all_tables(recid1_updated)
 
     def test_insert_or_replace_the_same_oai_record(self):
         """bibupload - OAIID tag, allow to insert or replace the same OAI record"""
@@ -1724,7 +1719,6 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
                                           self.hm_testrec1_updated), '')
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
-        bibupload.wipe_out_record_from_all_tables(recid1_updated)
 
     def test_replace_nonexisting_oai_record(self):
         """bibupload - OAIID tag, refuse to replace non-existing OAI record"""
@@ -1751,7 +1745,6 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         self.assertEqual(-1, recid2)
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
-        bibupload.wipe_out_record_from_all_tables(recid2)
 
 class BibUploadIndicatorsTest(unittest.TestCase):
     """
@@ -2086,6 +2079,89 @@ class BibUploadStrongTagsTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid)
         return
 
+class BibUploadPretendTest(unittest.TestCase):
+    """
+    Testing bibupload --pretend correctness.
+    """
+    def setUp(self):
+        self.demo_data = bibupload.xml_marc_to_records(open(os.path.join(CFG_TMPDIR, 'demobibdata.xml')).read())[0]
+        self.before = self._get_tables_fingerprint()
+        task_set_task_param('pretend', True)
+        task_set_task_param('verbose', 0)
+
+    def tearDown(self):
+        task_set_task_param('pretend', False)
+
+    def _get_tables_fingerprint():
+        """
+        Take lenght and last modification time of all the tables that
+        might be touched by bibupload and return them in a nice structure.
+        """
+        fingerprint = {}
+        tables = ['bibrec', 'bibdoc', 'bibrec_bibdoc', 'bibdoc_bibdoc', 'bibfmt', 'hstDOCUMENT', 'hstRECORD']
+        for i in xrange(100):
+            tables.append('bib%02dx' % i)
+            tables.append('bibrec_bib%02dx' % i)
+        for table in tables:
+            fingerprint[table] = get_table_status_info(table)
+        return fingerprint
+    _get_tables_fingerprint = staticmethod(_get_tables_fingerprint)
+
+    def _checks_tables_fingerprints(before, after):
+        """
+        Checks differences in table_fingerprints.
+        """
+        err = True
+        for table in before.keys():
+            if before[table] != after[table]:
+                print >> sys.stderr, "Table %s has been modified: before was [%s], after was [%s]" % (table, pprint.pformat(before[table]), pprint.pformat(after[table]))
+                err = False
+        return err
+    _checks_tables_fingerprints = staticmethod(_checks_tables_fingerprints)
+
+    def test_pretend_insert(self):
+        """bibupload - pretend insert"""
+        task_set_task_param('verbose', 9)
+        bibupload.bibupload(self.demo_data, opt_mode='insert', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+    def test_pretend_correct(self):
+        """bibupload - pretend correct"""
+        bibupload.bibupload(self.demo_data, opt_mode='correct', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+    def test_pretend_replace(self):
+        """bibupload - pretend replace"""
+        bibupload.bibupload(self.demo_data, opt_mode='replace', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+    def test_pretend_append(self):
+        """bibupload - pretend append"""
+        bibupload.bibupload(self.demo_data, opt_mode='append', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+    def test_pretend_replace_or_insert(self):
+        """bibupload - pretend replace or insert"""
+        task_set_task_param('verbose', 9)
+        bibupload.bibupload(self.demo_data, opt_mode='replace_or_insert', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+    def test_pretend_holdingpen(self):
+        """bibupload - pretend holdingpen"""
+        bibupload.bibupload(self.demo_data, opt_mode='holdingpen', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+    def test_pretend_delete(self):
+        """bibupload - pretend delete"""
+        bibupload.bibupload(self.demo_data, opt_mode='delete', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+    def test_pretend_reference(self):
+        """bibupload - pretend reference"""
+        bibupload.bibupload(self.demo_data, opt_mode='reference', pretend=True)
+        self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
+
+
 class BibUploadFFTModeTest(unittest.TestCase):
     """
     Testing treatment of fulltext file transfer import mode.
@@ -2415,10 +2491,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        ## FIXME: we have introduced redirections to login page
-        ## so test to this must be added.
-        self.assertRaises(HTTPError, urlopen, testrec_expected_url)
-        self.assertRaises(HTTPError, urlopen, testrec_expected_icon)
+        self.assertEqual(urlopen(testrec_expected_icon).read(), open('%s/img/restricted.gif' % CFG_WEBDIR).read())
+        self.failUnless("This file is restricted." in urlopen(testrec_expected_url).read())
 
         bibupload.wipe_out_record_from_all_tables(recid)
 
@@ -3178,9 +3252,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
 
-        ## FIXME: we have introduced redirection to login page.
-        ## so proper test should be done.
-        self.assertRaises(StandardError, try_url_download, testrec_expected_url)
+        self.failUnless("This file is restricted." in urlopen(testrec_expected_url).read())
         self.assertEqual(compare_xmbuffers(inserted_xm,
                                           testrec_expected_xm), '')
         self.assertEqual(compare_hmbuffers(inserted_hm,
@@ -3517,6 +3589,7 @@ TEST_SUITE = make_test_suite(BibUploadInsertModeTest,
                              BibUploadControlledProvenanceTest,
                              BibUploadStrongTagsTest,
                              BibUploadFFTModeTest,
+                             BibUploadPretendTest,
                              )
 
 if __name__ == "__main__":
