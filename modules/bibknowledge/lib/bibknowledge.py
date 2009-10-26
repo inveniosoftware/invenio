@@ -23,7 +23,9 @@ Provide API-callable functions for knowledge base management (using kb's).
 
 from invenio import bibknowledge_dblayer
 from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
+from invenio.config import CFG_WEBDIR
 import os
+import os.path
 import re
 import libxml2
 import libxslt
@@ -315,7 +317,8 @@ def get_kbd_values(kbname, searchwith=""):
                 fake_exp = searchwith
             reclist = search_engine.perform_request_search(f=field, p=fake_exp, cc=collection)
     if reclist:
-        fieldvaluelist = search_engine.get_most_popular_field_values(reclist, field)
+        fieldvaluelist = search_engine.get_most_popular_field_values(reclist,
+                                                                     field)
         val_list = []
         for f in fieldvaluelist:
             (val, dummy) = f
@@ -379,7 +382,79 @@ def get_kbt_items(taxonomyfilename, templatefilename, searchwith=""):
             else:
                 if len(line) > 0:
                     ritems.append(line)
-        return ritems
+    return ritems
+
+def get_kbt_items_for_bibedit(kbtname, tag="", searchwith=""):
+    """
+    A simplifield, customized version of the function get_kbt_items.
+    Traverses an RDF document. By default returns all leaves. If
+    tag defined returns the content of that tag.
+    If searchwith defined, returns leaves that match it.
+    Warning! In order to make this faster, the matching field values
+    cannot be multi-line!
+    @param kbtname: name of the taxonony kb
+    @param tag: name of tag whose content
+    @param searchwith: a term to search with
+    """
+    #get the actual file based on the kbt name
+    kb_id = get_kb_id(kbtname)
+    if not kb_id:
+        return []
+    #get the rdf file..
+    rdfname = CFG_WEBDIR+"/kbfiles/"+str(kb_id)+".rdf"
+    if not os.path.exists(rdfname):
+        return []
+    #parse the doc with static xslt
+    styledoc = libxml2.parseDoc("""
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+
+  <xsl:output method="xml" standalone="yes" omit-xml-declaration="yes" indent="no"/>
+  <xsl:template match="rdf:RDF">
+    <foo><!--just having some tag here speeds up output by 10x-->
+    <xsl:apply-templates />
+    </foo>
+  </xsl:template>
+
+  <xsl:template match="*">
+   <!--hi><xsl:value-of select="local-name()"/></hi-->
+   <xsl:if test="local-name()='"""+tag+"""'">
+     <myout><xsl:value-of select="normalize-space(.)"/></myout>
+   </xsl:if>
+   <!--traverse down in tree!-->
+<xsl:text>
+</xsl:text>
+   <xsl:apply-templates />
+  </xsl:template>
+
+</xsl:stylesheet>
+    """)
+    style = libxslt.parseStylesheetDoc(styledoc)
+    doc = libxml2.parseFile(rdfname)
+    result = style.applyStylesheet(doc, None)
+    strres = style.saveResultToString(result)
+    style.freeStylesheet()
+    doc.freeDoc()
+    result.freeDoc()
+    ritems = []
+    if len(strres) == 0:
+        return []
+    else:
+        lines = strres.split("\n")
+        for line in lines:
+            #take only those with myout..
+            if line.count("<myout>") > 0:
+                #remove the myout tag..
+                line = line[9:]
+                line = line[:-8]
+                if searchwith:
+                    if line.count(searchwith) > 0:
+                        ritems.append(line)
+                else:
+                    ritems.append(line)
+    return ritems
+
 
 if __name__ == "__main__":
     pass
