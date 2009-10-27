@@ -117,7 +117,10 @@ class SimulatedModPythonRequest(object):
         return self.__buffer
 
     def write(self, string, flush=1):
-        self.__buffer += string
+        if isinstance(string, unicode):
+            self.__buffer += string.encode('utf8')
+        else:
+            self.__buffer += string
         if flush:
             self.flush()
 
