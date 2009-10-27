@@ -846,7 +846,7 @@ URI: http://%(host)s%(page)s
         }
         return out
 
-    def tmpl_error_page(self, ln=CFG_SITE_LANG, status=""):
+    def tmpl_error_page(self, ln=CFG_SITE_LANG, status="", admin_was_alerted=True):
         """
         Display an error page.
 
@@ -859,7 +859,7 @@ URI: http://%(host)s%(page)s
         <p>%(doubts)s</p>""" % {
             'status' : status,
             'message' : _("The server encountered an error while dealing with your request."),
-            'alerted' : _("The system administrators have been alerted."),
+            'alerted' : admin_was_alerted and _("The system administrators have been alerted.") or '',
             'doubts' : _("In case of doubt, please contact %(x_admin_email)s.") % {'x_admin_email' : '<a href="mailto:%(admin)s">%(admin)s</a>' % {'admin' : CFG_SITE_SUPPORT_EMAIL}}
         }
         return out

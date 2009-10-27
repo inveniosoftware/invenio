@@ -20,6 +20,7 @@
 
 import sys
 import os
+from fnmatch import fnmatch
 from cgi import parse_qs
 
 from wsgiref.validate import validator
@@ -36,7 +37,8 @@ from invenio.webinterface_layout import invenio_handler
 from invenio.webinterface_handler_wsgi_utils import table, FieldStorage, \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND
-from invenio.config import CFG_WEBDIR, CFG_SITE_LANG
+from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
+    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST
 from invenio.errorlib import register_exception
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
@@ -298,6 +300,24 @@ class SimulatedModPythonRequest(object):
     remote_ip = property(get_remote_ip)
     remote_host = property(get_remote_host)
 
+def alert_admin_for_server_status_p(status, referer):
+    """
+    Check the configuration variable
+    CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST to see if the exception should
+    be registered and the admin should be alerted.
+    """
+    status = str(status)
+    for pattern in CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST:
+        pattern = pattern.lower()
+        must_have_referer = False
+        if pattern.endswith('r'):
+            ## e.g. "404 r"
+            must_have_referer = True
+            pattern = pattern[:-1].strip() ## -> "404"
+        if fnmatch(status, pattern) and (not must_have_referer or referer):
+            return True
+    return False
+
 def application(environ, start_response):
     """
     Entry point for wsgi.
@@ -326,9 +346,12 @@ def application(environ, start_response):
             if status not in (OK, DONE):
                 req.status = status
                 req.headers_out['content-type'] = 'text/html'
-                register_exception(req=req, alert_admin=True)
+                admin_to_be_alerted = alert_admin_for_server_status_p(status,
+                                                  req.headers_in.get('referer'))
+                if admin_to_be_alerted:
+                    register_exception(req=req, alert_admin=True)
                 start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-                return generate_error_page(req)
+                return generate_error_page(req, admin_to_be_alerted)
             else:
                 req.flush()
         except Exception:
@@ -341,7 +364,7 @@ def application(environ, start_response):
             callback(data)
     return []
 
-def generate_error_page(req):
+def generate_error_page(req, admin_was_alerted=True):
     """
     Returns an iterable with the error page to be sent to the user browser.
     """
@@ -349,7 +372,7 @@ def generate_error_page(req):
     from invenio import template
     webstyle_templates = template.load('webstyle')
     ln = req.form.get('ln', CFG_SITE_LANG)
-    return [page(title=req.get_wsgi_status(), body=webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln), language=ln, req=req)]
+    return [page(title=req.get_wsgi_status(), body=webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted), language=ln, req=req)]
 
 def is_static_path(path):
     """
