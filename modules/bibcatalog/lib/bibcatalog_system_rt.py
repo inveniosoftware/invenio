@@ -23,14 +23,12 @@ This is a subclass of BibCatalogSystem
 """
 
 import os
-import os.path
 import invenio.webuser
 from invenio.shellutils import run_shell_command, escape_shell_arg
 from invenio.bibcatalog_system import BibCatalogSystem, get_bibcat_from_prefs
 
 from invenio.config import CFG_BIBCATALOG_SYSTEM, \
                            CFG_BIBCATALOG_SYSTEM_RT_CLI, \
-                           CFG_BIBCATALOG_SYSTEM_RT_URL, \
                            CFG_BIBCATALOG_SYSTEM_RT_URL, \
                            CFG_BIBCATALOG_QUEUES
 
@@ -63,8 +61,9 @@ class BibCatalogSystemRT(BibCatalogSystem):
         if not CFG_BIBCATALOG_SYSTEM_RT_URL:
             return "CFG_BIBCATALOG_SYSTEM_RT_URL not defined or empty"
         #construct.. split RT_URL at //
-        if CFG_BIBCATALOG_SYSTEM_RT_URL.count("http://") == 0:
-            return "CFG_BIBCATALOG__SYSTEM_RT_URL does not start with 'http://'"
+        if not CFG_BIBCATALOG_SYSTEM_RT_URL.startswith('http://') and \
+           not CFG_BIBCATALOG_SYSTEM_RT_URL.startswith('https://'):
+            return "CFG_BIBCATALOG__SYSTEM_RT_URL does not start with 'http://' or 'https://'"
         httppart, siteandpath = CFG_BIBCATALOG_SYSTEM_RT_URL.split("//")
         BIBCATALOG_RT_SERVER = httppart + "//" + rtuid + ":" + rtpw + "@" + siteandpath
         #set as env var
