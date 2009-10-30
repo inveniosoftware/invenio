@@ -142,11 +142,17 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
       + canKeepDoctypes: the list of doctypes for which users can
                          choose to keep previous versions visible when
                          revising a file (i.e. 'Keep previous version'
-                         checkbox).
+                         checkbox). See also parameter 'keepDefault'.
+                         Note that this parameter is ~ignored when
+                         revising the attributes of a file (comment,
+                         description) without uploading a new
+                         file. See also parameter
+                         Move_Uploaded_Files_to_Storage.forceFileRevision
                          Eg:
                            Main|Additional
                          ('|' separated values)
                          Use '*' for all doctypes
+
 
       + canAddFormatDoctypes: the list of doctypes for which users can
                               add new formats. If there is no value,
@@ -213,6 +219,10 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
       + keepDefault: the default behaviour for keeping or not previous
                      version of files when users cannot choose (no
                      value in canKeepDoctypes): keep (1) or not (0)
+                     Note that this parameter is ignored when revising
+                     the attributes of a file (comment, description)
+                     without uploading a new file. See also parameter
+                     Move_Uploaded_Files_to_Storage.forceFileRevision
 
       + showLinks: if we display links to files (1) when possible or
                    not (0)
@@ -368,6 +378,13 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
                 out += '<script>alert("%s");</script>' % \
                        (_("A file with format '%s' already exists. Please upload another format.") % \
                         extension).replace('"', '\\"')
+            elif '.' in file_rename  or '/' in file_rename or "\\" in file_rename or \
+                     not os.path.abspath(new_fullpath).startswith(os.path.join(curdir, 'files', 'updated')):
+                # We forbid usage of a few characters, for the good of
+                # everybody...
+                os.unlink(fullpath)
+                out += '<script>alert("%s");</script>' % \
+                       _("You are not allowed to use dot '.', slash '/', or backslash '\\\\' in file names. Choose a different name and upload your file again. In particular, note that you should not include the extension in the renaming field.").replace('"', '\\"')
             else:
                 # No conflict with file name
 
@@ -442,12 +459,32 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
                            file_target_doctype, keep_previous_files,
                            file_restriction)
 
-    elif file_action in ["add", "addFormat", "revise"]:
+    elif file_action in ["add", "addFormat"]:
         # No file found, but action involved adding file: ask user to
         # select a file
         out += """<script>
         alert("You did not specify a file. Please choose one before uploading.");
         </script>"""
+
+    elif file_action ==  "revise" and file_target != "":
+        # User has chosen to revise attributes of a file (comment,
+        # name, etc.) without revising the file itself.
+        if file_rename != file_target and \
+               file_rename in [bibdoc['get_docname'] for bibdoc \
+                               in abstract_bibdocs]:
+            # A file different from the one to revise already has
+            # the same bibdocname
+            out += '<script>alert("%s");</script>' % \
+                   (_("A file named %s already exists. Please choose another name.") % \
+                    file_rename).replace('"', '\\"')
+        else:
+            # Log
+            log_action(curdir, file_action, file_target,
+                       "", file_rename,
+                       file_description, file_comment,
+                       file_target_doctype, keep_previous_files,
+                       file_restriction)
+
 
     elif file_action == "delete" and file_target != "" and \
            ((file_target_doctype in can_delete_doctypes) or \
@@ -539,17 +576,18 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
     <table class="reviseControlBrowser">'''
     i = 0
     for bibdoc in abstract_bibdocs:
-        i += 1
-        out += create_file_row(bibdoc, can_delete_doctypes,
-                               can_rename_doctypes,
-                               can_revise_doctypes,
-                               can_describe_doctypes,
-                               can_comment_doctypes,
-                               can_keep_doctypes,
-                               can_add_format_to_doctypes, show_links,
-                               can_restrict_doctypes,
-                               even=not (i % 2),
-                               ln=ln)
+        if bibdoc['list_latest_files']:
+            i += 1
+            out += create_file_row(bibdoc, can_delete_doctypes,
+                                   can_rename_doctypes,
+                                   can_revise_doctypes,
+                                   can_describe_doctypes,
+                                   can_comment_doctypes,
+                                   can_keep_doctypes,
+                                   can_add_format_to_doctypes, show_links,
+                                   can_restrict_doctypes,
+                                   even=not (i % 2),
+                                   ln=ln)
     out += '</table>'
     if len(cleaned_doctypes) > 0:
         out += '''<a href="" onclick="javascript:display_revise_panel(this, 'add', '', true, false, %(showRename)s, true, true, '', '', '', true, '%(restriction)s');updateForm('%(defaultSelectedDoctype)s');return false;">%(add_new_file)s</a>
@@ -749,8 +787,9 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
                        applied
 
          file_path  -  the path to the file that is going to be
-                       intergrated as bibdoc, if any (should be None
-                       in case of action="delete")
+                       integrated as bibdoc, if any (should be ""
+                       in case of action="delete", or action="revise"
+                       when revising only attributes of a file)
 
             rename  -  the name used to display the bibdoc, instead of
                        the filename (can be None for no renaming)
@@ -896,6 +935,14 @@ def build_updated_files_list(bibdocs, actions, recid):
                  'get_status': file_restriction,
                  'order': order}
             abstract_bibdocs[(rename or bibdoc_name)]['updated'] = True
+        elif action == "revise" and not file_path:
+            # revision of attributes of a file (description, name,
+            # comment or restriction) but no new file.
+            abstract_bibdocs[bibdoc_name]['get_docname'] = rename or bibdoc_name
+            abstract_bibdocs[bibdoc_name]['get_status'] = file_restriction
+            set_description_and_comment(abstract_bibdocs[bibdoc_name]['list_latest_files'],
+                                        description, comment)
+            abstract_bibdocs[bibdoc_name]['updated'] = True
         elif action == "delete":
             if abstract_bibdocs.has_key(bibdoc_name):
                 del abstract_bibdocs[bibdoc_name]
@@ -1354,9 +1401,11 @@ def get_description_and_comment(bibdocfiles):
 
     description and/or comment can be None.
 
-    This function is needed since we do consider that there is a
+    This function is needed since we do consider that there is one
     comment/description per bibdoc, and not per bibdocfile as APIs
     state.
+
+    @see: set_description_and_comment
     """
     description = None
     comment = None
@@ -1373,6 +1422,23 @@ def get_description_and_comment(bibdocfiles):
         comment = all_comments[0]
 
     return (description, comment)
+
+def set_description_and_comment(abstract_bibdocfiles, description, comment):
+    """
+    Set the description and comment to the given (abstract)
+    bibdocfiles.
+
+    description and/or comment can be None.
+
+    This function is needed since we do consider that there is one
+    comment/description per bibdoc, and not per bibdocfile as APIs
+    state.
+
+    @see: get_description_and_comment
+    """
+    for bibdocfile in abstract_bibdocfiles:
+        bibdocfile.description = description
+        bibdocfile.comment = comment
 
 def read_file(curdir, filename):
     """

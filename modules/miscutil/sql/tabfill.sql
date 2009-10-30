@@ -544,6 +544,7 @@ INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','defaultFilenameD
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','maxFilesDoctypes');
 INSERT INTO sbmFUNDESC VALUES ('Move_Uploaded_Files_to_Storage','iconsize');
 INSERT INTO sbmFUNDESC VALUES ('Move_Uploaded_Files_to_Storage','createIconDoctypes');
+INSERT INTO sbmFUNDESC VALUES ('Move_Uploaded_Files_to_Storage','forceFileRevision');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
