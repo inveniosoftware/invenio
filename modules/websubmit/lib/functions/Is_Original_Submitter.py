@@ -31,10 +31,11 @@ __revision__ = "$Id$"
 
 
 import re
-
+import os
 from invenio.access_control_engine import acc_authorize_action
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
+from invenio.websubmit_functions.Shared_Functions import write_file
 
 def Is_Original_Submitter(parameters, curdir, form, user_info=None):
     global uid_email,sysno,uid
@@ -54,10 +55,14 @@ def Is_Original_Submitter(parameters, curdir, form, user_info=None):
    document.forms[0].submit();
    alert('Only the submitter of this document has the right to do this action. \\nYour login (%s) is different from the one of the submitter (%s).');
 </SCRIPT>""" % (uid_email,email))
-    elif re.search(uid_email,email,re.IGNORECASE) is None and auth_code == 0:
-        return ("""
+    elif re.search(uid_email,email, re.IGNORECASE) is None and \
+             auth_code == 0:
+        if not os.path.exists(os.path.join(curdir, 'is_original_submitter_warning')):
+            write_file(os.path.join(curdir, 'is_original_submitter_warning'), '')
+            return ("""
 <SCRIPT>
 alert('Only the submitter of this document has the right to do this action. \\nYour login (%s) is different from the one of the submitter (%s).\\n\\nAnyway, as you have a special authorization for this type of documents,\\nyou are allowed to proceed! Watch out your actions!');
 </SCRIPT>""" % (uid_email,email))
+
     return ""
 
