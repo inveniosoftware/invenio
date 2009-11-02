@@ -53,7 +53,7 @@ def Make_Modify_Record(parameters, curdir, form, user_info=None):
 
     # Escape XML-reserved chars and clean the unsupported ones (mainly
     # control characters)
-    record_text = wash_for_xml(record_text)
+    rectext = wash_for_xml(rectext)
     # First of all the &
     rectext = rectext.replace("&amp;","&")
     rectext = rectext.replace("&","&amp;")
