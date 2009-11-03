@@ -467,7 +467,7 @@ class Template:
 
         # top menu
         out = """
-                <form method="post" action="/submit" enctype="multipart/form-data" onsubmit="return tester();">
+                <form method="post" action="/submit" enctype="multipart/form-data" onsubmit="return tester();" accept-charset="UTF-8">
                 <center><table cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td class="submitHeader"><b>%(docname)s&nbsp;</b></td>
@@ -917,7 +917,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-          <form ENCTYPE="multipart/form-data" action="/submit" onsubmit="user_must_confirm_before_leaving_page=false;" method="post">
+          <form ENCTYPE="multipart/form-data" action="/submit" onsubmit="user_must_confirm_before_leaving_page=false;" method="post" accept-charset="UTF-8">
           <input type="hidden" name="nextPg" value="%(nextPg)s" />
           <input type="hidden" name="startPg" value="%(startPg)s" />
           <input type="hidden" name="access" value="%(access)s" />
