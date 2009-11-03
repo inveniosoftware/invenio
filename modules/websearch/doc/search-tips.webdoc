@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -205,7 +205,6 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-
   <en>Return records entitled exactly <em>"Higgs boson"</em> but not
       records such as <em>"Overview of Higgs boson
       production"</em>.</en>
@@ -216,6 +215,11 @@ della ricerca.</it>
       ma non i record quali <em>"Overview of Higgs boson
       production"</em>.</it>
 </lang>
+
+<br/>(Note: For some indexes such as <em>any
+field</em>, <em>title</em>, or <em>abstract</em>, there is no
+distinction between searching for double quoted and single quoted
+expressions.  Both behave the same usual way.)
 
 </td>
 </tr>

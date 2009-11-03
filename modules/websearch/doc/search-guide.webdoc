@@ -1,7 +1,7 @@
 ## -*- mode: html; coding: utf-8; -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2007, 2008, 2010, 2011 CERN.
+## Copyright (C) 2007, 2008, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -1096,6 +1096,11 @@ not be obvious upon first look.  While the latter is more similar to
 what ``phrase search'' usually means in the context of web page search
 engines, the former one is usually an order of magnitude faster if you
 know the precise values you are looking for.</p>
+
+<p>(Note: For some indexes such as <em>any
+field</em>, <em>title</em>, or <em>abstract</em>, there is no
+distinction between searching for double quoted and single quoted
+expressions.  Both behave the same usual way.)</p>
 
 <p>Another interesting searching mode besides the word and phrase
 searches is the <strong>regular expression search</strong>, introduced

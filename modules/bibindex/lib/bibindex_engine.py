@@ -34,9 +34,6 @@ from invenio.config import \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS, \
      CFG_BIBINDEX_CHARS_PUNCTUATION, \
      CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY, \
-     CFG_BIBINDEX_MIN_WORD_LENGTH, \
-     CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
-     CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
      CFG_BIBINDEX_SYNONYM_KBRS, \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
@@ -46,26 +43,27 @@ from invenio.config import \
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, \
     CFG_CHECK_MYSQL_THREADS
-from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer, \
-     BibIndexExactNameTokenizer
+from invenio.bibindex_engine_tokenizer import \
+     BibIndexFuzzyNameTokenizer, BibIndexExactNameTokenizer, \
+     BibIndexPairTokenizer, BibIndexWordTokenizer, \
+     BibIndexPhraseTokenizer
 from invenio.bibdocfile import bibdocfile_url_p, \
-     bibdocfile_url_to_bibdoc, normalize_format, \
-     download_url, guess_format_from_url, BibRecDocs
+     bibdocfile_url_to_bibdoc, \
+     download_url, BibRecDocs
 from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
 from invenio.search_engine import perform_request_search, \
-     wash_index_term, lower_index_term, get_index_stemming_language, \
+     get_index_stemming_language, \
      get_synonym_terms
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
      deserialize_via_marshal, wash_table_column_name
-from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibindex_engine_stemmer import stem
+from invenio.bibindex_engine_washer import wash_index_term
 from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
-from invenio.htmlutils import remove_html_markup, get_links_in_html_page
-from invenio.textutils import wash_for_utf8, strip_accents, remove_control_characters
+from invenio.htmlutils import get_links_in_html_page
+from invenio.textutils import remove_control_characters
 from invenio.search_engine_utils import get_fieldvalues
 
 if CFG_SOLR_URL:
@@ -373,17 +371,6 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
         write_message(message, stream=sys.stderr)
         return []
 
-latex_markup_re = re.compile(r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
-
-def remove_latex_markup(phrase):
-    ret_phrase = ''
-    index = 0
-    for match in latex_markup_re.finditer(phrase):
-        ret_phrase += phrase[index:match.start()]
-        ret_phrase += match.group('inside1') or match.group('inside2') or ''
-        index = match.end()
-    ret_phrase += phrase[index:]
-    return ret_phrase
 
 def get_nothing_from_phrase(phrase, stemming_language=None):
     """ A dump implementation of get_words_from_phrase to be used when
@@ -468,120 +455,6 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
     run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
 
-
-latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
-def get_words_from_phrase(phrase, stemming_language=None):
-    """Return list of words found in PHRASE.  Note that the phrase is
-       split into groups depending on the alphanumeric characters and
-       punctuation characters definition present in the config file.
-    """
-    words = {}
-    formulas = []
-    if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
-        phrase = remove_html_markup(phrase)
-    if CFG_BIBINDEX_REMOVE_LATEX_MARKUP:
-        formulas = latex_formula_re.findall(phrase)
-        phrase = remove_latex_markup(phrase)
-        phrase = latex_formula_re.sub(' ', phrase)
-    phrase = wash_for_utf8(phrase)
-    phrase = lower_index_term(phrase)
-    # 1st split phrase into blocks according to whitespace
-    for block in strip_accents(phrase).split():
-        # 2nd remove leading/trailing punctuation and add block:
-        block = re_block_punctuation_begin.sub("", block)
-        block = re_block_punctuation_end.sub("", block)
-        if block:
-            stemmed_block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
-            if stemmed_block:
-                words[stemmed_block] = 1
-            if re_arxiv.match(block):
-                # special case for blocks like `arXiv:1007.5048' where
-                # we would like to index the part after the colon
-                # regardless of dot or other punctuation characters:
-                words[block.split(':', 1)[1]] = 1
-            # 3rd break each block into subblocks according to punctuation and add subblocks:
-            for subblock in re_punctuation.split(block):
-                stemmed_subblock = apply_stemming_and_stopwords_and_length_check(subblock, stemming_language)
-                if stemmed_subblock:
-                    words[stemmed_subblock] = 1
-                # 4th break each subblock into alphanumeric groups and add groups:
-                for alphanumeric_group in re_separators.split(subblock):
-                    stemmed_alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
-                    if stemmed_alphanumeric_group:
-                        words[stemmed_alphanumeric_group] = 1
-    for block in formulas:
-        words[block] = 1
-    return words.keys()
-
-def get_pairs_from_phrase(phrase, stemming_language=None):
-    """Return list of words found in PHRASE.  Note that the phrase is
-       split into groups depending on the alphanumeric characters and
-       punctuation characters definition present in the config file.
-    """
-    words = {}
-    if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
-        phrase = remove_html_markup(phrase)
-    if CFG_BIBINDEX_REMOVE_LATEX_MARKUP:
-        phrase = remove_latex_markup(phrase)
-        phrase = latex_formula_re.sub(' ', phrase)
-    phrase = wash_for_utf8(phrase)
-    phrase = lower_index_term(phrase)
-    # 1st split phrase into blocks according to whitespace
-    last_word = ''
-    for block in strip_accents(phrase).split():
-        # 2nd remove leading/trailing punctuation and add block:
-        block = re_block_punctuation_begin.sub("", block)
-        block = re_block_punctuation_end.sub("", block)
-        if block:
-            if stemming_language:
-                block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
-            # 3rd break each block into subblocks according to punctuation and add subblocks:
-            for subblock in re_punctuation.split(block):
-                if stemming_language:
-                    subblock = apply_stemming_and_stopwords_and_length_check(subblock, stemming_language)
-                if subblock:
-                    # 4th break each subblock into alphanumeric groups and add groups:
-                    for alphanumeric_group in re_separators.split(subblock):
-                        if stemming_language:
-                            alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
-                        if alphanumeric_group:
-                            if last_word:
-                                words['%s %s' % (last_word, alphanumeric_group)] = 1
-                            last_word = alphanumeric_group
-    return words.keys()
-
-phrase_delimiter_re = re.compile(r'[\.:;\?\!]')
-space_cleaner_re = re.compile(r'\s+')
-def get_phrases_from_phrase(phrase, stemming_language=None):
-    """Return list of phrases found in PHRASE.  Note that the phrase is
-       split into groups depending on the alphanumeric characters and
-       punctuation characters definition present in the config file.
-    """
-    phrase = wash_for_utf8(phrase)
-    return [phrase]
-    ## Note that we don't break phrases, they are used for exact style
-    ## of searching.
-    words = {}
-    phrase = strip_accents(phrase)
-    # 1st split phrase into blocks according to whitespace
-    for block1 in phrase_delimiter_re.split(strip_accents(phrase)):
-        block1 = block1.strip()
-        if block1 and stemming_language:
-            new_words = []
-            for block2 in re_punctuation.split(block1):
-                block2 = block2.strip()
-                if block2:
-                    for block3 in block2.split():
-                        block3 = block3.strip()
-                        if block3:
-                            # Note that we don't stem phrases, they
-                            # are used for exact style of searching.
-                            new_words.append(block3)
-            block1 = ' '.join(new_words)
-        if block1:
-            words[block1] = 1
-    return words.keys()
-
 def get_fuzzy_authors_from_phrase(phrase, stemming_language=None):
     """
     Return list of fuzzy phrase-tokens suitable for storing into
@@ -619,20 +492,27 @@ def get_author_family_name_words_from_phrase(phrase, stemming_language=None):
             d_family_names_words[word] = 1
     return d_family_names_words.keys()
 
-def apply_stemming_and_stopwords_and_length_check(word, stemming_language):
-    """Return WORD after applying stemming and stopword and length checks.
-       See the config file in order to influence these.
+def get_words_from_phrase(phrase, stemming_language=None):
     """
-    # now check against stopwords:
-    if is_stopword(word):
-        return ""
-    # finally check the word length:
-    if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
-        return ""
-    # stem word, when configured so:
-    if stemming_language:
-        word = stem(word, stemming_language)
-    return word
+    Return a list of words extracted from phrase.
+    """
+    words_tokenizer = BibIndexWordTokenizer(stemming_language)
+    return words_tokenizer.tokenize(phrase)
+
+def get_phrases_from_phrase(phrase, stemming_language=None):
+    """Return list of phrases found in PHRASE.  Note that the phrase is
+       split into groups depending on the alphanumeric characters and
+       punctuation characters definition present in the config file.
+    """
+    phrase_tokenizer = BibIndexPhraseTokenizer(stemming_language)
+    return phrase_tokenizer.tokenize(phrase)
+
+def get_pairs_from_phrase(phrase, stemming_language=None):
+    """
+    Return list of oairs extracted from phrase.
+    """
+    pairs_tokenizer = BibIndexPairTokenizer(stemming_language)
+    return pairs_tokenizer.tokenize(phrase)
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."

@@ -1540,9 +1540,12 @@ class WebSearchUnicodeQueryTest(unittest.TestCase):
 
     def test_unicode_partial_phrase_query(self):
         """websearch - Unicode partial phrase query"""
+        # no hit here for example title partial phrase query due to
+        # removed difference between double-quoted and single-quoted
+        # search:
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=title%3A%27%CE%B7%27',
-                                               expected_text="[76]"))
+                                               expected_text="[]"))
 
     def test_unicode_regexp_query(self):
         """websearch - Unicode regexp query"""

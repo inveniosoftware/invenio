@@ -62,7 +62,6 @@ from invenio.config import \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
-     CFG_WEBSEARCH_WILDCARD_LIMIT, \
      CFG_WEBSEARCH_SYNONYM_KBRS, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
@@ -78,13 +77,19 @@ from invenio.config import \
      CFG_WEBSEARCH_VIEWRESTRCOLL_POLICY, \
      CFG_BIBSORT_BUCKETS
 
-from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError, InvenioWebSearchWildcardLimitError
+from invenio.search_engine_config import \
+     InvenioWebSearchUnknownCollectionError, \
+     InvenioWebSearchWildcardLimitError, \
+     CFG_WEBSEARCH_IDXPAIRS_FIELDS,\
+     CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH
 from invenio.search_engine_utils import get_fieldvalues
 from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, is_method_valid, rank_records as rank_records_bibrank
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
-from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requires_phrase_search
+from invenio.bibindex_engine_tokenizer import author_name_requires_phrase_search, \
+     BibIndexPairTokenizer
+from invenio.bibindex_engine_washer import wash_index_term, lower_index_term, wash_author_name
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
@@ -113,7 +118,7 @@ from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 
-from invenio.dbquery import run_sql, run_sql_with_limit, \
+from invenio.dbquery import run_sql, run_sql_with_limit, wash_table_column_name, \
                             get_table_update_time, Error
 from invenio.webuser import getUid, collect_user_info, session_param_set
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
@@ -1442,48 +1447,6 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
 
     return (cc, colls_out_for_display, colls_out, hosted_colls_out, debug)
 
-def wash_index_term(term, max_char_length=50, lower_term=True):
-    """
-    Return washed form of the index term TERM that would be suitable
-    for storing into idxWORD* tables.  I.e., lower the TERM if
-    LOWER_TERM is True, and truncate it safely to MAX_CHAR_LENGTH
-    UTF-8 characters (meaning, in principle, 4*MAX_CHAR_LENGTH bytes).
-
-    The function works by an internal conversion of TERM, when needed,
-    from its input Python UTF-8 binary string format into Python
-    Unicode format, and then truncating it safely to the given number
-    of UTF-8 characters, without possible mis-truncation in the middle
-    of a multi-byte UTF-8 character that could otherwise happen if we
-    would have been working with UTF-8 binary representation directly.
-
-    Note that MAX_CHAR_LENGTH corresponds to the length of the term
-    column in idxINDEX* tables.
-    """
-    if lower_term:
-        washed_term = unicode(term, 'utf-8').lower()
-    else:
-        washed_term = unicode(term, 'utf-8')
-    if len(washed_term) <= max_char_length:
-        # no need to truncate the term, because it will fit
-        # nicely even if it uses four-byte UTF-8 characters
-        return washed_term.encode('utf-8')
-    else:
-        # truncate the term in a safe position:
-        return washed_term[:max_char_length].encode('utf-8')
-
-def lower_index_term(term):
-    """
-    Return safely lowered index term TERM.  This is done by converting
-    to UTF-8 first, because standard Python lower() function is not
-    UTF-8 safe.  To be called by both the search engine and the
-    indexer when appropriate (e.g. before stemming).
-
-    In case of problems with UTF-8 compliance, this function raises
-    UnicodeDecodeError, so the client code may want to catch it.
-    """
-    return unicode(term, 'utf-8').lower().encode('utf-8')
-
-
 def get_synonym_terms(term, kbr_name, match_type):
     """
     Return list of synonyms for TERM by looking in KBR_NAME in
@@ -2163,9 +2126,17 @@ def search_unit(p, f=None, m=None, wl=0):
             return search_pattern(None, p, f, 'w')
         index_id = get_index_id_from_field(f)
         if index_id != 0:
-            hitset = search_unit_in_idxphrases(p, f, m, wl)
+            if m == 'a' and index_id in get_idxpair_field_ids():
+                #for exact match on the admin configured fields we are searching in the pair tables
+                hitset = search_unit_in_idxpairs(p, f, m, wl)
+            else:
+                hitset = search_unit_in_idxphrases(p, f, m, wl)
         else:
             hitset = search_unit_in_bibxxx(p, f, m, wl)
+            # if not hitset and m == 'a' and (p[0] != '%' and p[-1] != '%'):
+            #     #if we have no results by doing exact matching, do partial matching
+            #     #for removing the distinction between simple and double quotes
+            #     hitset = search_unit_in_bibxxx('%' + p + '%', f, m, wl)
     elif p.startswith("cited:"):
         # we are doing search by the citation count
         hitset = search_unit_by_times_cited(p[6:])
@@ -2176,6 +2147,13 @@ def search_unit(p, f=None, m=None, wl=0):
     ## merge synonym results and return total:
     hitset |= hitset_synonyms
     return hitset
+
+
+def get_idxpair_field_ids():
+    """Returns the list of ids for the fields that idxPAIRS should be used on"""
+    index_dict = dict(run_sql("SELECT name, id FROM idxINDEX"))
+    return [index_dict[field] for field in index_dict if field in CFG_WEBSEARCH_IDXPAIRS_FIELDS]
+
 
 def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
     """Searches for 'word' inside bibwordsX table for field 'f' and returns hitset of recIDs."""
@@ -2260,6 +2238,126 @@ def search_unit_in_bibwords(word, f, m=None, decompress=zlib.decompress, wl=0):
         raise InvenioWebSearchWildcardLimitError(set)
     # okay, return result set:
     return set
+
+def search_unit_in_idxpairs(p, f, type, wl=0):
+    """Searches for pair 'p' inside idxPAIR table for field 'f' and
+    returns hitset of recIDs found."""
+    limit_reached = 0 # flag for knowing if the query limit has been reached
+    do_exact_search = True # flag to know when it makes sense to try to do exact matching
+    result_set = intbitset()
+    #determine the idxPAIR table to read from
+    index_id = get_index_id_from_field(f)
+    if not index_id:
+        return intbitset()
+    stemming_language = get_index_stemming_language(index_id)
+    pairs_tokenizer = BibIndexPairTokenizer(stemming_language)
+    idxpair_table_washed = wash_table_column_name("idxPAIR%02dF" % index_id)
+
+    if p.startswith("%") and p.endswith("%"):
+        p = p[1:-1]
+    original_pattern = p
+    p = string.replace(p, '*', '%') # we now use '*' as the truncation character
+    queries_releated_vars = [] # contains tuples of (query_addons, query_params, use_query_limit)
+
+    #is it a span query?
+    ps = string.split(p, "->", 1)
+    if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
+        #so we are dealing with a span query
+        pairs_left = pairs_tokenizer.tokenize(ps[0])
+        pairs_right = pairs_tokenizer.tokenize(ps[1])
+        if not pairs_left or not pairs_right:
+            # we are not actually dealing with pairs but with words
+            return search_unit_in_bibwords(original_pattern, f, type, wl)
+        elif len(pairs_left) != len(pairs_right):
+            # it is kind of hard to know what the user actually wanted
+            # we have to do: foo bar baz -> qux xyz, so let's swith to phrase
+            return search_unit_in_idxphrases(original_pattern, f, type, wl)
+        elif len(pairs_left) > 1 and \
+                len(pairs_right) > 1 and \
+                pairs_left[:-1] != pairs_right[:-1]:
+            # again we have something like: foo bar baz -> abc xyz qux
+            # so we'd better switch to phrase
+            return search_unit_in_idxphrases(original_pattern, f, type, wl)
+        else:
+            # finally, we can treat the search using idxPairs
+            # at this step we have either: foo bar -> abc xyz
+            # or foo bar abc -> foo bar xyz
+            queries_releated_vars = [("BETWEEN %s AND %s", (pairs_left[-1], pairs_right[-1]), True)]
+            for pair in pairs_left[:-1]:# which should be equal with pairs_right[:-1]
+                queries_releated_vars.append(("= %s", (pair, ), False))
+        do_exact_search = False # no exact search for span queries
+    elif string.find(p, '%') > -1:
+        #tokenizing p will remove the '%', so we have to make sure it stays
+        replacement = 'xxxxxxxxxx' #hopefuly this will not clash with anything in the future
+        p = string.replace(p, '%', replacement)
+        pairs = pairs_tokenizer.tokenize(p)
+        if not pairs:
+            # we are not actually dealing with pairs but with words
+            return search_unit_in_bibwords(original_pattern, f, type, wl)
+        queries_releated_vars = []
+        for pair in pairs:
+            if string.find(pair, replacement) > -1:
+                pair = string.replace(pair, replacement, '%') #we replace back the % sign
+                queries_releated_vars.append(("LIKE %s", (pair, ), True))
+            else:
+                queries_releated_vars.append(("= %s", (pair, ), False))
+        do_exact_search = False
+    else:
+        #normal query
+        pairs = pairs_tokenizer.tokenize(p)
+        if not pairs:
+            # we are not actually dealing with pairs but with words
+            return search_unit_in_bibwords(original_pattern, f, type, wl)
+        queries_releated_vars = []
+        for pair in pairs:
+            queries_releated_vars.append(("= %s", (pair, ), False))
+
+    first_results = 1 # flag to know if it's the first set of results or not
+    for query_var in queries_releated_vars:
+        query_addons = query_var[0]
+        query_params = query_var[1]
+        use_query_limit = query_var[2]
+        if use_query_limit:
+            try:
+                res = run_sql_with_limit("SELECT term, hitlist FROM %s WHERE term %s" \
+                                     % (idxpair_table_washed, query_addons), query_params, wildcard_limit=wl) #kwalitee:disable=sql
+            except InvenioDbQueryWildcardLimitError, excp:
+                res = excp.res
+                limit_reached = 1 # set the limit reached flag to true
+        else:
+            res = run_sql("SELECT term, hitlist FROM %s WHERE term %s" \
+                      % (idxpair_table_washed, query_addons), query_params) #kwalitee:disable=sql
+        if not res:
+            return intbitset()
+        for pair, hitlist in res:
+            hitset_idxpairs = intbitset(hitlist)
+            if first_results:
+                result_set = hitset_idxpairs
+                first_results = 0
+            else:
+                result_set.intersection_update(hitset_idxpairs)
+     #check to see if the query limit was reached
+    if limit_reached:
+        #raise an exception, so we can print a nice message to the user
+        raise InvenioWebSearchWildcardLimitError(result_set)
+
+    # check if we need to eliminate the false positives
+    if CFG_WEBSEARCH_IDXPAIRS_EXACT_SEARCH and do_exact_search:
+        # we need to eliminate the false positives
+        idxphrase_table_washed = wash_table_column_name("idxPHRASE%02dR" % index_id)
+        not_exact_search = intbitset()
+        for recid in result_set:
+            res = run_sql("SELECT termlist FROM %s WHERE id_bibrec %s" %(idxphrase_table_washed, '=%s'), (recid, )) #kwalitee:disable=sql
+            if res:
+                termlist = deserialize_via_marshal(res[0][0])
+                if not [term for term in termlist if term.lower().find(p.lower()) > -1]:
+                    not_exact_search.add(recid)
+            else:
+                not_exact_search.add(recid)
+        # remove the recs that are false positives from the final result
+        result_set.difference_update(not_exact_search)
+    return result_set
+
 
 def search_unit_in_idxphrases(p, f, type, wl=0):
     """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
