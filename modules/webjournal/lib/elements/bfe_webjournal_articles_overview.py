@@ -140,7 +140,7 @@ def format(bfo, number_of_featured_articles="1",
         if cached_html:
             return cached_html
 
-    out = u'<table border="0" cellpadding="0" cellspacing="0">'
+    out = '<table border="0" cellpadding="0" cellspacing="0">'
     # Get the id list
     ordered_articles = get_journal_articles(journal_name,
                                             this_issue_number,
@@ -278,7 +278,7 @@ def format(bfo, number_of_featured_articles="1",
                                        link_label=img,
                                        urlargd={})
             if text != '':
-                out += u'''
+                out += '''
                         <tr><td class="article">
                            <h%(header_tag_size)s class="%(css_classes)s articleTitle" style="clear:both;">
                                <a title="link to the article" href="%(article_link)s">%(title)s</a>
@@ -290,9 +290,9 @@ def format(bfo, number_of_featured_articles="1",
                            </div>
                        </td></tr>
                     ''' % {'article_link': article_link,
-                           'title': title.decode('utf-8'),
+                           'title': title,
                            'img': img,
-                           'text': text.decode('utf-8'),
+                           'text': text,
                            'more_link': more_link,
                            'css_classes': ' '.join(css_classes),
                            'header_tag_size': header_tag_size}
@@ -306,17 +306,17 @@ def format(bfo, number_of_featured_articles="1",
                            %(img)s
                        </td></tr>
                        ''' % {'article_link': article_link,
-                              'title': title.decode('utf-8'),
+                              'title': title,
                               'more_link': more_link,
                               'img': img,
                               'css_classes': ' '.join(css_classes),
                               'header_tag_size': header_tag_size}
     out += '</table>'
     if verbose == 0 and not CFG_ACCESS_CONTROL_LEVEL_SITE == 2 :
-        cache_index_page(out.encode('utf-8'), journal_name, category_name,
+        cache_index_page(out, journal_name, category_name,
                          this_issue_number, ln)
 
-    return out.encode('utf-8')
+    return out
 
 def escape_values(bfo):
     """

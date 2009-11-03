@@ -77,12 +77,12 @@ def format(bfo, new_articles_first='yes',
         categories = get_journal_categories(journal_name,
                                             this_issue_number)
 
-    out = u''
+    out = ''
     for category_name in categories:
         if display_category_title.lower() == 'yes':
             out += '<h2>' + _(category_name) + '</h2>'
 
-        out += u'<table border="0" cellpadding="0" cellspacing="0">'
+        out += '<table border="0" cellpadding="0" cellspacing="0">'
         # Get the id list
         ordered_articles = get_journal_articles(journal_name,
                                                 this_issue_number,
@@ -142,7 +142,7 @@ def format(bfo, new_articles_first='yes',
                 text = '<br/>'.join(text)
 
 
-                out += u'''
+                out += '''
                             <tr><td class="article">
                                <h%(header_tag_size)s class="%(css_classes)s articleTitle" style="clear:both;">
                                    %(title)s
@@ -160,10 +160,10 @@ def format(bfo, new_articles_first='yes',
         out += '</table>'
 
     if verbose == 0 and not CFG_ACCESS_CONTROL_LEVEL_SITE == 2 :
-        cache_index_page(out.encode('utf-8'), journal_name, category_name,
+        cache_index_page(out, journal_name, category_name,
                          this_issue_number, ln)
 
-    return out.encode('utf-8')
+    return out
 
 def escape_values(bfo):
     """
