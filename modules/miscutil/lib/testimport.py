@@ -24,6 +24,7 @@ okay, 1 if not okay.  Useful for running during make install.
 
 __revision__ = "$Id$"
 
+import os
 import sys
 
 def deduce_site_packages_locations():
@@ -48,6 +49,7 @@ except IndexError:
     print "Usage: %s <prefix>" % sys.argv[0]
     sys.exit(1)
 
+## Firstly, check importing invenio:
 try:
     import invenio
     DUMMY = invenio # to make checkers happy
@@ -68,10 +70,27 @@ except ImportError, e:
     **    $ sudo ln -s %s/lib/python/invenio %s/invenio""" % (PREFIX, adir)
     print """\
     **
-    ** and continue with the 'make install' afterwards. **
+    ** and continue with the 'make install' afterward.  **
     **                                                  **
     ** If not, then please inspect the above error      **
     ** message and fix the problem before continuing.   **
     ******************************************************
     """
     sys.exit(1)
+
+## Secondly, check nested symlink problem that people sometimes do on
+## some OS-es when they overdo the symbolic linking:
+if os.path.exists(PREFIX + '/lib/python/invenio/invenio'):
+    print """
+    ******************************************************
+    ** NESTED SYMLINK PROBLEM?
+    ******************************************************
+    ** It seems that the following object exists:       **
+    **   %s    **
+    ** Perhaps you have made some nested symlinks in    **
+    ** the previous installation step?  Please check    **
+    ** and delete the above object.                     **
+    ******************************************************
+    """ % (PREFIX + '/lib/python/invenio/invenio')
+    sys.exit(1)
+

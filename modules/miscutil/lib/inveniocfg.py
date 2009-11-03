@@ -683,6 +683,22 @@ def cli_cmd_run_web_tests(conf):
     from invenio.testutils import build_and_run_web_test_suite
     build_and_run_web_test_suite()
 
+def _detect_ip_address():
+    """Detect IP address of this computer.  Useful for creating Apache
+    vhost conf snippet on RHEL like machines.
+
+    @return: IP address, or '*' if cannot detect
+    @rtype: string
+    @note: creates socket for real in order to detect real IP address,
+        not the loopback one.
+    """
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('cdsware.cern.ch', 0))
+        return s.getsockname()[0]
+    except:
+        return '*'
+
 def cli_cmd_create_apache_conf(conf):
     """
     Create Apache conf files for this site, keeping previous
@@ -692,14 +708,22 @@ def cli_cmd_create_apache_conf(conf):
     from invenio.textutils import wrap_text_in_a_box
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
-    ## TODO: add here the distribution signatures of those distributions
-    ## that already provide some ports.conf configuration file.
-    for distribution_signature in ('redhat-release', 'debian_version'):
-        if os.path.exists(os.path.sep + 'etc' + os.path.sep + distribution_signature):
-            comment_out_listen_directive = '#'
-            break
-    else:
-        comment_out_listen_directive = ''
+    ## Apache vhost conf file is distro specific, so analyze needs:
+    # Gentoo (and generic default):
+    listen_directive_needed = True
+    ssl_pem_directive_needed = False
+    vhost_ip_address_needed = False
+    wsgi_socket_directive_needed = False
+    # Debian:
+    if os.path.exists(os.path.sep + 'etc' + os.path.sep + 'debian_version'):
+        listen_directive_needed = False
+        ssl_pem_directive_needed = True
+    # RHEL/SLC:
+    if os.path.exists(os.path.sep + 'etc' + os.path.sep + 'redhat-release'):
+        listen_directive_needed = False
+        vhost_ip_address_needed = True
+        wsgi_socket_directive_needed = True
+    ## okay, let's create Apache vhost files:
     if not os.path.exists(apache_conf_dir):
         os.mkdir(apache_conf_dir)
     apache_vhost_file = apache_conf_dir + os.sep + \
@@ -710,8 +734,9 @@ def cli_cmd_create_apache_conf(conf):
 AddDefaultCharset UTF-8
 ServerSignature Off
 ServerTokens Prod
-NameVirtualHost *:80
-%(comment_out_listen_directive)sListen 80
+NameVirtualHost %(vhost_ip_address)s:80
+%(listen_directive)s
+%(wsgi_socket_directive)s
 WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
@@ -719,7 +744,7 @@ WSGIRestrictStdout Off
 <Files *~>
    deny from all
 </Files>
-<VirtualHost *:80>
+<VirtualHost %(vhost_ip_address)s:80>
         ServerName %(servername)s
         ServerAlias %(serveralias)s
         ServerAdmin %(serveradmin)s
@@ -759,17 +784,21 @@ WSGIRestrictStdout Off
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
-       'wsgidir' : os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
-       'comment_out_listen_directive' : comment_out_listen_directive
+       'wsgidir': os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
+       'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
+       'listen_directive': listen_directive_needed and 'Listen 80' or '#Listen 80',
+       'wsgi_socket_directive': (wsgi_socket_directive_needed and \
+                                'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
+              conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
 ServerTokens Prod
-%(comment_out_listen_directive)sListen 443
-NameVirtualHost *:443
-#SSLCertificateFile /etc/apache2/ssl/apache.pem
-SSLCertificateFile /etc/apache2/ssl/server.crt
-SSLCertificateKeyFile /etc/apache2/ssl/server.key
+%(listen_directive)s
+NameVirtualHost %(vhost_ip_address)s:443
+%(ssl_pem_directive)s
+%(ssl_crt_directive)s
+%(ssl_key_directive)s
 WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
@@ -777,7 +806,7 @@ WSGIRestrictStdout Off
 <Files *~>
    deny from all
 </Files>
-<VirtualHost *:443>
+<VirtualHost %(vhost_ip_address)s:443>
         ServerName %(servername)s
         ServerAlias %(serveralias)s
         ServerAdmin %(serveradmin)s
@@ -818,7 +847,17 @@ WSGIRestrictStdout Off
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
        'libdir' : conf.get('Invenio', 'CFG_PYLIBDIR'),
        'wsgidir' : os.path.join(conf.get('Invenio', 'CFG_PREFIX'), 'var', 'www-wsgi'),
-       'comment_out_listen_directive' : comment_out_listen_directive
+       'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
+       'listen_directive' : listen_directive_needed and 'Listen 443' or '#Listen 443',
+       'ssl_pem_directive': ssl_pem_directive_needed and \
+                            'SSLCertificateFile /etc/apache2/ssl/apache.pem' or \
+                            '#SSLCertificateFile /etc/apache2/ssl/apache.pem',
+       'ssl_crt_directive': ssl_pem_directive_needed and \
+                            '#SSLCertificateFile /etc/apache2/ssl/server.crt' or \
+                            'SSLCertificateFile /etc/apache2/ssl/server.crt',
+       'ssl_key_directive': ssl_pem_directive_needed and \
+                            '#SSLCertificateKeyFile /etc/apache2/ssl/server.key' or \
+                            'SSLCertificateKeyFile /etc/apache2/ssl/server.key',
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
@@ -827,8 +866,10 @@ WSGIRestrictStdout Off
     fdesc = open(apache_vhost_file, 'w')
     fdesc.write(apache_vhost_body)
     fdesc.close()
+    print
     print "Created file", apache_vhost_file
     # write HTTPS vhost snippet:
+    vhost_ssl_created = False
     if conf.get('Invenio', 'CFG_SITE_SECURE_URL') != \
        conf.get('Invenio', 'CFG_SITE_URL'):
         if os.path.exists(apache_vhost_ssl_file):
@@ -837,17 +878,22 @@ WSGIRestrictStdout Off
         fdesc = open(apache_vhost_ssl_file, 'w')
         fdesc.write(apache_vhost_ssl_body)
         fdesc.close()
+        vhost_ssl_created = True
         print "Created file", apache_vhost_ssl_file
 
     print wrap_text_in_a_box("""\
-Apache virtual host configurations for your site have been
-created. You can check created files and put the following
-include statements in your httpd.conf:\n
+Apache virtual host configuration file(s) for your Invenio site
+was(were) created.  Please check created file(s) and activate virtual
+host(s).  For example, you can put the following include statements in
+your httpd.conf:\n
 
 Include %s
 
-Include %s
-    """ % (apache_vhost_file, apache_vhost_ssl_file))
+%s
+
+
+Please see the INSTALL file for more details.
+    """ % (apache_vhost_file, (vhost_ssl_created and 'Include ' or '#Include ') + apache_vhost_ssl_file))
     print ">>> Apache conf files created."
 
 def cli_cmd_get(conf, varname):
