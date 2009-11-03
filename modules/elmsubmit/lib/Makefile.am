@@ -19,7 +19,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = elmsubmit.py elmsubmit_misc.py elmsubmit_config.py \
              elmsubmit_enriched2txt.py elmsubmit_EZArchive.py elmsubmit_EZEmail.py \
              elmsubmit_field_validation.py elmsubmit_filename_generator.py \
-             elmsubmit_html2txt.py elmsubmit_misc.py elmsubmit_richtext2txt.py \
+             elmsubmit_html2txt.py elmsubmit_richtext2txt.py \
              elmsubmit_generate_marc.py elmsubmit_submission_parser.py \
              myhtmlentitydefs.py mime.types.edited elmsubmit_tests.py
 
