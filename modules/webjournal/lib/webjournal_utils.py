@@ -234,19 +234,26 @@ def get_order_dict_from_recid_list(recids, journal_name, issue_number,
 
     # Append records without order at the end of the list
     if records_without_defined_order:
-        ordered_records[max(ordered_records.keys()) + 1] = records_without_defined_order
+        if ordered_records:
+            ordered_records[max(ordered_records.keys()) + 1] = records_without_defined_order
+        else:
+            ordered_records[1] = records_without_defined_order
 
     # Append new records without order at the end of the list of new
     # records
     if new_records_without_defined_order:
-        ordered_new_records[max(ordered_new_records.keys()) + 1] = new_records_without_defined_order
+        if ordered_new_records:
+            ordered_new_records[max(ordered_new_records.keys()) + 1] = new_records_without_defined_order
+        else:
+            ordered_new_records[1] = new_records_without_defined_order
 
     # Append new records at the beginning of the list of 'old'
     # records. To do so, use negative integers
     if ordered_new_records:
-        highest_new_record_order = max(ordered_new_records.keys())
-        for order, new_records in ordered_new_records.iteritems():
-            ordered_records[- highest_new_record_order + order - 1] = new_records
+        if ordered_new_records:
+            highest_new_record_order = max(ordered_new_records.keys())
+            for order, new_records in ordered_new_records.iteritems():
+                ordered_records[- highest_new_record_order + order - 1] = new_records
 
     for (order, records) in ordered_records.iteritems():
         # Reverse so that if there are several articles at same
