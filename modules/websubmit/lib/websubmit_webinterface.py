@@ -23,7 +23,7 @@ import os
 import time
 import cgi
 
-from urllib import unquote, urlencode
+from urllib import urlencode
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -74,7 +74,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
     def _lookup(self, component, path):
         # after /record/<recid>/files/ every part is used as the file
         # name
-        filename = unquote(component)
+        filename = component
 
         def getfile(req, form):
             args = wash_urlargd(form, websubmit_templates.files_default_urlargd)
