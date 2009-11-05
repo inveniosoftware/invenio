@@ -1473,8 +1473,7 @@ msgstr "No se puede editar un registro suprimido."
 
 #: modules/bibedit/lib/bibedit_templates.py:500
 msgid "There are record revisions not yet synchronized with the database."
-msgstr ""
-"Hay registros que todavía no estan sincronizados con la base de datos."
+msgstr "Hay registros que todavía no estan sincronizados con la base de datos."
 
 #: modules/bibedit/lib/bibedit_templates.py:501
 #: modules/bibedit/lib/bibedit_templates.py:510
@@ -1485,8 +1484,8 @@ msgstr "Vuélvalo a intentar."
 msgid ""
 "A new revision of this record is not yet synchronized with the database."
 msgstr ""
-"Una nueva revisión de este registro todavía no está sincronizada con "
-"la base de datos"
+"Una nueva revisión de este registro todavía no está sincronizada con la base "
+"de datos"
 
 #: modules/bibedit/lib/bibedit_templates.py:520
 msgid "Please enter the ID of the record you want to edit"
@@ -1541,8 +1540,8 @@ msgstr "No"
 msgid ""
 "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
 msgstr ""
-"Está seguro que quiere retroceder a la revisión %(revdate)s del "
-"registro #%(recid)s?"
+"Está seguro que quiere retroceder a la revisión %(revdate)s del registro #%"
+"(recid)s?"
 
 #: modules/bibedit/lib/bibedit_templates.py:566
 #, python-format
@@ -1560,8 +1559,8 @@ msgid ""
 "The new revision is being synchronized with the database and will be ready "
 "shortly."
 msgstr ""
-"La nueva revisión se está sincronizando con la base de datos y pronto "
-"estará disponible"
+"La nueva revisión se está sincronizando con la base de datos y pronto estará "
+"disponible"
 
 #: modules/bibedit/lib/bibedit_templates.py:601
 msgid "The record will be deleted as soon as the task queue is empty."
@@ -3548,10 +3547,17 @@ msgstr "Escriba su reseña"
 msgid "Add review"
 msgstr "Añada su reseña"
 
+# #-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#
+# 'la' o 'una'?
 #: modules/webcomment/lib/webcomment_templates.py:917
 #: modules/webcomment/lib/webcomment_webinterface.py:287
+#, fuzzy
 msgid "Add Review"
-msgstr "Añada su reseña"
+msgstr ""
+"#-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Añada la reseña\n"
+"#-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Añada su reseña"
 
 #: modules/webcomment/lib/webcomment_templates.py:938
 msgid "Your review was successfully added."
@@ -4085,8 +4091,8 @@ msgid ""
 "Nested or mismatched parentheses detected. Ignoring all parentheses in the "
 "query..."
 msgstr ""
-"Existen paréntesis dentro de otros o no aparejados.  Se ignorarán "
-"todos ellos en la búsqueda..."
+"Existen paréntesis dentro de otros o no aparejados.  Se ignorarán todos "
+"ellos en la búsqueda..."
 
 #: modules/websearch/lib/search_engine.py:2029
 #, python-format
@@ -4618,8 +4624,8 @@ msgid ""
 "You can consult the list of your external groups directly in the %"
 "(x_url_open)sgroups page%(x_url_close)s."
 msgstr ""
-"Puede consultar la lista de sus grupos externos directament en la "
-"%(x_url_open)spágina de los grupos%(x_url_close)s."
+"Puede consultar la lista de sus grupos externos directament en la %"
+"(x_url_open)spágina de los grupos%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:103
 msgid "External user groups"
@@ -4677,16 +4683,21 @@ msgid ""
 "If you want to change your password, please enter the old one and set the "
 "new value in the form below."
 msgstr ""
-"Si desea cambiar su contraseña, ponga nos valores antiguo y nuevo en "
-"este formulario."
+"Si desea cambiar su contraseña, ponga nos valores antiguo y nuevo en este "
+"formulario."
 
 #: modules/websession/lib/websession_templates.py:217
 msgid "Old password"
 msgstr "Contraseña antigua"
 
 #: modules/websession/lib/websession_templates.py:218
+#, fuzzy
 msgid "New password"
-msgstr "Contraseña nueva"
+msgstr ""
+"#-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Nueva contraseña\n"
+"#-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Contraseña nueva"
 
 #: modules/websession/lib/websession_templates.py:219
 #: modules/websession/lib/websession_templates.py:972
@@ -4717,8 +4728,8 @@ msgid ""
 "If you are using a lightweight CERN account you can\n"
 "                %(x_url_open)sreset the password%(x_url_close)s."
 msgstr ""
-"Si está utilizando una cuenta CERN ligera puede "
-"%(x_url_open)sreiniciar la contraseña%(x_url_close)s."
+"Si está utilizando una cuenta CERN ligera puede %(x_url_open)sreiniciar la "
+"contraseña%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:235
 #, python-format
@@ -4726,8 +4737,8 @@ msgid ""
 "You can change or reset your CERN account password by means of the %"
 "(x_url_open)sCERN account system%(x_url_close)s."
 msgstr ""
-"Puede cambiar o reiniciar la contraseña de su cuenta del CERN vía el "
-"%(x_url_open)ssistema de cuentas del CERN%(x_url_close)s."
+"Puede cambiar o reiniciar la contraseña de su cuenta del CERN vía el %"
+"(x_url_open)ssistema de cuentas del CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:249
 msgid "Edit language-related settings"
@@ -4780,10 +4791,9 @@ msgid ""
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
 msgstr ""
-"Si ha perdido la contraseña de la %(x_fmt_open)scuenta "
-"interna%(x_fmt_close)s de %(sitename)s, escriba su diercción "
-"elecrónica en este formulario para que le enviemos un enlace para "
-"reiniciar su contraseña."
+"Si ha perdido la contraseña de la %(x_fmt_open)scuenta interna%(x_fmt_close)"
+"s de %(sitename)s, escriba su diercción elecrónica en este formulario para "
+"que le enviemos un enlace para reiniciar su contraseña."
 
 #: modules/websession/lib/websession_templates.py:381
 #: modules/websession/lib/websession_templates.py:968
@@ -4801,9 +4811,9 @@ msgid ""
 "then you can recover your password through the %(x_url_open)sCERN "
 "authentication system%(x_url_close)s."
 msgstr ""
-"Si su cuenta utiliza el %(x_fmt_open)ssistema de identificación del "
-"CERN%(x_fmt_close)s, puede recuperar su contraseña a través del "
-"%(x_url_open)ssistema de autenticación del CERN%(x_url_close)s."
+"Si su cuenta utiliza el %(x_fmt_open)ssistema de identificación del CERN%"
+"(x_fmt_close)s, puede recuperar su contraseña a través del %(x_url_open)"
+"ssistema de autenticación del CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:389
 msgid ""
@@ -4963,8 +4973,8 @@ msgid ""
 "for the account \"%(x_email)s\"."
 msgstr ""
 "Alguien (possiblement usted), desde a dirección %(x_ip_address)s, ha "
-"solicitado un cambio de contraseña en %(x_sitename)s para la cuenta "
-"%(x_email)s. "
+"solicitado un cambio de contraseña en %(x_sitename)s para la cuenta %"
+"(x_email)s. "
 
 #: modules/websession/lib/websession_templates.py:644
 msgid "If you want to reset the password for this account, please go to:"
@@ -4991,8 +5001,8 @@ msgid ""
 "for the email address \"%(x_email)s\"."
 msgstr ""
 "Alguien (possiblement usted), desde a dirección %(x_ip_address)s, ha "
-"solicitado una cuenta nueva en %(x_sitename)s para la dirección de "
-"correo electrónico %(x_email)s."
+"solicitado una cuenta nueva en %(x_sitename)s para la dirección de correo "
+"electrónico %(x_email)s."
 
 #: modules/websession/lib/websession_templates.py:681
 msgid "If you want to complete this account registration, please go to:"
@@ -5002,8 +5012,8 @@ msgstr "Para completar el alta de la cuenta, vaya a:"
 #, python-format
 msgid "Okay, a password reset link has been emailed to %s."
 msgstr ""
-"El enlace para reiniciar la contraseña se ha enviado por correo "
-"electrónico a %s."
+"El enlace para reiniciar la contraseña se ha enviado por correo electrónico "
+"a %s."
 
 #: modules/websession/lib/websession_templates.py:722
 msgid "Deleting your account"
@@ -5020,9 +5030,9 @@ msgid ""
 "                %(x_fmt_open)sSSO%(x_fmt_close)s system. You can\n"
 "                %(x_url_open)slogout from SSO%(x_url_close)s, too."
 msgstr ""
-"Usted todavía está reconocido por el sistema central de "
-"%(x_fmt_open)sSSO%(x_fmt_close)s. También puede "
-"%(x_url_open)sdesconectar del SSO%(x_url_close)s."
+"Usted todavía está reconocido por el sistema central de %(x_fmt_open)sSSO%"
+"(x_fmt_close)s. También puede %(x_url_open)sdesconectar del SSO%(x_url_close)"
+"s."
 
 #: modules/websession/lib/websession_templates.py:745
 #, python-format
@@ -5039,8 +5049,8 @@ msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
 "CERN lightweight account%(x_url_close)s."
 msgstr ""
-"Si encara no dispone de una cuenta en el CERN, puede crear una "
-"%(x_url_open)scuenta CERN ligera%(x_url_close)s."
+"Si encara no dispone de una cuenta en el CERN, puede crear una %(x_url_open)"
+"scuenta CERN ligera%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:783
 #, python-format
@@ -5100,7 +5110,8 @@ msgid ""
 "Your request is valid. Please set the new desired password in the following "
 "form."
 msgstr ""
-"Su petición ha sido validada.  Escriba la nueva contraseña en este formulario."
+"Su petición ha sido validada.  Escriba la nueva contraseña en este "
+"formulario."
 
 #: modules/websession/lib/websession_templates.py:900
 msgid "Set a new password for"
@@ -5538,9 +5549,9 @@ msgid ""
 "authorization will last until %(x_expiration)s and until you close your "
 "browser if you are a guest user."
 msgstr ""
-"Ya tiene una autoritación válida para ejercer el rol de "
-"%(x_role)s. Esta autorización durará hasta %(x_expiration)s y, si "
-"usted es usuario invitado, hasta que cierre su navegador."
+"Ya tiene una autoritación válida para ejercer el rol de %(x_role)s. Esta "
+"autorización durará hasta %(x_expiration)s y, si usted es usuario invitado, "
+"hasta que cierre su navegador."
 
 #: modules/websession/lib/websession_webinterface.py:117
 msgid "You have confirmed the validity of your email address!"
@@ -5624,10 +5635,10 @@ msgid ""
 "generated password. Please clic the following button to obtain a password "
 "reset request link sent to you via email:"
 msgstr ""
-"Tenga en cuenta que si es la primera vez que está usando esta cuenta "
-"con el método de identificación interno, el sistema le ha definido una "
-"contraseña aleatoria.  Haga clic en el botón siguiente para a que le "
-"envíe, via correo electrónico, un enlace para reiniciarla:"
+"Tenga en cuenta que si es la primera vez que está usando esta cuenta con el "
+"método de identificación interno, el sistema le ha definido una contraseña "
+"aleatoria.  Haga clic en el botón siguiente para a que le envíe, via correo "
+"electrónico, un enlace para reiniciarla:"
 
 #: modules/websession/lib/websession_webinterface.py:325
 msgid "Send Password"
@@ -5763,8 +5774,8 @@ msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
 msgstr ""
-"No se puede enviar la petición de reinicialización de contraseña ya "
-"que usted está usando un sistema de autenticación externo."
+"No se puede enviar la petición de reinicialización de contraseña ya que "
+"usted está usando un sistema de autenticación externo."
 
 #: modules/websession/lib/websession_webinterface.py:516
 msgid "The entered email address does not exist in the database."
@@ -5821,16 +5832,16 @@ msgid ""
 "In order to confirm its validity, an email message containing an account "
 "activation key has been sent to the given email address."
 msgstr ""
-"Para confirmar su validez, se ha enviado un mensage a esta dirección "
-"que tiene una clave de activación de la cuenta."
+"Para confirmar su validez, se ha enviado un mensage a esta dirección que "
+"tiene una clave de activación de la cuenta."
 
 #: modules/websession/lib/websession_webinterface.py:761
 msgid ""
 "Please follow instructions presented there in order to complete the account "
 "registration process."
 msgstr ""
-"Siga las instrucciones indicadas para completar el proceso de alta de "
-"la cuenta."
+"Siga las instrucciones indicadas para completar el proceso de alta de la "
+"cuenta."
 
 #: modules/websession/lib/websession_webinterface.py:763
 msgid ""
@@ -6032,8 +6043,8 @@ msgid ""
 "You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)"
 "s."
 msgstr ""
-"Le puede interesar consultar las %(x_url_open)spágines "
-"%(x_category)s%(x_url_close)s."
+"Le puede interesar consultar las %(x_url_open)spágines %(x_category)s%"
+"(x_url_close)s."
 
 #: modules/websubmit/lib/websubmit_engine.py:186
 #: modules/websubmit/lib/websubmit_engine.py:712
@@ -6730,8 +6741,8 @@ msgid ""
 "The system has encountered an error in retrieving the list of files for this "
 "document."
 msgstr ""
-"El sistema ha encontrado un error recuperando la lista de los ficheros "
-"de este documento."
+"El sistema ha encontrado un error recuperando la lista de los ficheros de "
+"este documento."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:172
 msgid "The collection to which this file belong is restricted: "
@@ -6920,7 +6931,8 @@ msgstr ""
 #: modules/webjournal/lib/webjournal_config.py:127
 msgid "There is no format configured for this journals search page"
 msgstr ""
-"No hay ningún formato configurado para la página de búsqueda de estas revistas"
+"No hay ningún formato configurado para la página de búsqueda de estas "
+"revistas"
 
 #: modules/webjournal/lib/webjournal_config.py:162
 msgid "There is no format configured for this journals popup page"
@@ -6961,8 +6973,8 @@ msgid ""
 "It seems that there are no journals defined on this server. Please contact "
 "support if this is not right."
 msgstr ""
-"Parece ser que no hay ninguna revista definida en este "
-"servidor. Contacte con el soporte si no es así."
+"Parece ser que no hay ninguna revista definida en este servidor. Contacte "
+"con el soporte si no es así."
 
 #: modules/webjournal/lib/webjournal_config.py:330
 msgid "Select a journal on this server"
@@ -6991,8 +7003,8 @@ msgid ""
 "The configuration for the current issue seems to be empty. Try providing an "
 "issue number or check with support."
 msgstr ""
-"Parece que la configuración del número actual está vacía.  Pruebe de "
-"escoger un número en concreto o póngase en contacte amb el suporte."
+"Parece que la configuración del número actual está vacía.  Pruebe de escoger "
+"un número en concreto o póngase en contacte amb el suporte."
 
 #: modules/webjournal/lib/webjournal_config.py:387
 msgid "Issue number badly formed"
@@ -7046,8 +7058,8 @@ msgstr "Error del código de revista"
 #: modules/webjournal/lib/webjournal_config.py:576
 msgid "We could not find the id for this journal in the Database"
 msgstr ""
-"No ha sido posible encontrar el identificador interno de esta revista "
-"en la base de datos"
+"No ha sido posible encontrar el identificador interno de esta revista en la "
+"base de datos"
 
 #: modules/webjournal/lib/webjournal_config.py:607
 #: modules/webjournal/lib/webjournal_config.py:609

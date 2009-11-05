@@ -1428,8 +1428,8 @@ msgstr "Afegeix subcamp"
 msgid ""
 "Tags and values should be filled before pressing Done or Add another subfield"
 msgstr ""
-"Cal omplir les etiquetes i els valors abans de prémer Fet o Afegeix un "
-"altre subcamp"
+"Cal omplir les etiquetes i els valors abans de prémer Fet o Afegeix un altre "
+"subcamp"
 
 #: modules/bibedit/lib/bibedit_templates.py:356
 msgid "Move up"
@@ -1486,8 +1486,8 @@ msgstr "Torneu-ho a provar més tard."
 msgid ""
 "A new revision of this record is not yet synchronized with the database."
 msgstr ""
-"Una nova revisió d'aquest registre encara no està sincronitzada a la "
-"base de dades"
+"Una nova revisió d'aquest registre encara no està sincronitzada a la base de "
+"dades"
 
 #: modules/bibedit/lib/bibedit_templates.py:520
 msgid "Please enter the ID of the record you want to edit"
@@ -1542,15 +1542,14 @@ msgstr "No"
 msgid ""
 "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
 msgstr ""
-"Esteu segurs que voleu retrocedir a la revisió %(revdate)s del "
-"registre #%(recid)s?"
+"Esteu segurs que voleu retrocedir a la revisió %(revdate)s del registre #%"
+"(recid)s?"
 
 #: modules/bibedit/lib/bibedit_templates.py:566
 #, python-format
 msgid ""
 "The current version will be replaced with a copy of revision %(revdate)s"
-msgstr ""
-"La versió actual serà substituïda per una còpia de revisió %(revdate)s"
+msgstr "La versió actual serà substituïda per una còpia de revisió %(revdate)s"
 
 #: modules/bibedit/lib/bibedit_templates.py:568
 msgid "You will also lose any unsubmitted changes for this record!"
@@ -2363,7 +2362,7 @@ msgstr "Configurar de BibHarvest"
 #: modules/webaccess/lib/access_control_config.py:188
 #: modules/websession/lib/websession_templates.py:1029
 msgid "Configure OAI Repository"
-msgstr "Configurar el dipòstit OAI"
+msgstr "Configurar el dipòsit OAI"
 
 #: modules/webaccess/lib/access_control_config.py:189
 #: modules/websession/lib/websession_templates.py:1031
@@ -3558,10 +3557,17 @@ msgstr "Escriviu la vostra ressenya"
 msgid "Add review"
 msgstr "Afegiu la vostra ressenya"
 
+# #-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#
+# 'la' o 'una'?
 #: modules/webcomment/lib/webcomment_templates.py:917
 #: modules/webcomment/lib/webcomment_webinterface.py:287
+#, fuzzy
 msgid "Add Review"
-msgstr "Afegiu la vostra ressenya"
+msgstr ""
+"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Afegiu una ressenya\n"
+"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Afegiu la vostra ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:938
 msgid "Your review was successfully added."
@@ -4098,14 +4104,19 @@ msgstr ""
 "cerca..."
 
 #: modules/websearch/lib/search_engine.py:2029
-#, python-format
+#, fuzzy, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
-"No s'ha trobat cap coincidència dins la col·lecció\n %(x_collection)s. "
-"Altres col·leccions públiques han donat %(x_url_open)s%(x_nb_hits)d "
-"resultats%(x_url_close)s."
+"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"No s'ha trobat cap coincidència dins la col·lecció %(x_collection)s. Altres "
+"col·leccions públiques han donat%(x_url_open)s%(x_nb_hits)d resultats%"
+"(x_url_close)s.\n"
+"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"No s'ha trobat cap coincidència dins la col·lecció\n"
+" %(x_collection)s. Altres col·leccions públiques han donat %(x_url_open)s%"
+"(x_nb_hits)d resultats%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:2038
 msgid ""
@@ -4625,8 +4636,8 @@ msgid ""
 "You can consult the list of your external groups directly in the %"
 "(x_url_open)sgroups page%(x_url_close)s."
 msgstr ""
-"Podeu consultar la llista dels vostres grups externs directament a la "
-"%(x_url_open)spàgina dels grups%(x_url_close)s."
+"Podeu consultar la llista dels vostres grups externs directament a la %"
+"(x_url_open)spàgina dels grups%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:103
 msgid "External user groups"
@@ -4684,16 +4695,21 @@ msgid ""
 "If you want to change your password, please enter the old one and set the "
 "new value in the form below."
 msgstr ""
-"Si voleu canviar la vostra o contrasenya, poseu-hi els valors antic i "
-"nou en aquest formulari."
+"Si voleu canviar la vostra o contrasenya, poseu-hi els valors antic i nou en "
+"aquest formulari."
 
 #: modules/websession/lib/websession_templates.py:217
 msgid "Old password"
 msgstr "Contrasenya antiga"
 
 #: modules/websession/lib/websession_templates.py:218
+#, fuzzy
 msgid "New password"
-msgstr "Contrasenya nova"
+msgstr ""
+"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Nova contrasenya\n"
+"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
+"Contrasenya nova"
 
 #: modules/websession/lib/websession_templates.py:219
 #: modules/websession/lib/websession_templates.py:972
@@ -4732,8 +4748,8 @@ msgid ""
 "You can change or reset your CERN account password by means of the %"
 "(x_url_open)sCERN account system%(x_url_close)s."
 msgstr ""
-"Podeu canviar o reiniciar la contrassenya del vostre compte del CERN "
-"via el %(x_url_open)ssistema de comptes del CERN%(x_url_close)s."
+"Podeu canviar o reiniciar la contrassenya del vostre compte del CERN via el %"
+"(x_url_open)ssistema de comptes del CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:249
 msgid "Edit language-related settings"
@@ -4786,10 +4802,9 @@ msgid ""
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
 msgstr ""
-"Si heu perdut la contrassenya del %(x_fmt_open)scompte "
-"intern%(x_fmt_close)s de %(sitename)s, escriviu la vostra adreça "
-"electrònica en aquest formulari perquè us enviem un enllaç per "
-"reiniciar-la vostra contrassenya."
+"Si heu perdut la contrassenya del %(x_fmt_open)scompte intern%(x_fmt_close)s "
+"de %(sitename)s, escriviu la vostra adreça electrònica en aquest formulari "
+"perquè us enviem un enllaç per reiniciar-la vostra contrassenya."
 
 #: modules/websession/lib/websession_templates.py:381
 #: modules/websession/lib/websession_templates.py:968
@@ -4807,18 +4822,17 @@ msgid ""
 "then you can recover your password through the %(x_url_open)sCERN "
 "authentication system%(x_url_close)s."
 msgstr ""
-"Si el vostre compte utilitza el %(x_fmt_open)ssistema d'identificació "
-"del CERN%(x_fmt_close)s, podeu recuperar la vostra contrasenya a "
-"través del %(x_url_open)ssistema d'autenticació del CERN%(x_url_close)s."
+"Si el vostre compte utilitza el %(x_fmt_open)ssistema d'identificació del "
+"CERN%(x_fmt_close)s, podeu recuperar la vostra contrasenya a través del %"
+"(x_url_open)ssistema d'autenticació del CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:389
 msgid ""
 "Note that if you have been using an external login system, then we cannot do "
 "anything and you have to ask there."
 msgstr ""
-"Tingueu en compte que si heu estat utilitzant un sistema "
-"d'identificació extern, no podem fer-hi res, i els hi haurieu de "
-"demanar a ells."
+"Tingueu en compte que si heu estat utilitzant un sistema d'identificació "
+"extern, no podem fer-hi res, i els hi haurieu de demanar a ells."
 
 #: modules/websession/lib/websession_templates.py:390
 #, python-format
@@ -4971,9 +4985,8 @@ msgid ""
 "for a password reset at %(x_sitename)s\n"
 "for the account \"%(x_email)s\"."
 msgstr ""
-"Algú (possiblement vosaltres mateixos), des de l'adreça %(x_ip_address)s, "
-"ha demanat un canvi de contrasenya a %(x_sitename)s per al compte "
-"%(x_email)s."
+"Algú (possiblement vosaltres mateixos), des de l'adreça %(x_ip_address)s, ha "
+"demanat un canvi de contrasenya a %(x_sitename)s per al compte %(x_email)s."
 
 #: modules/websession/lib/websession_templates.py:644
 msgid "If you want to reset the password for this account, please go to:"
@@ -4999,9 +5012,9 @@ msgid ""
 "to register a new account at %(x_sitename)s\n"
 "for the email address \"%(x_email)s\"."
 msgstr ""
-"Algú (possiblement vosaltres mateixos), des de l'adreça "
-"%(x_ip_address)s, ha demanat donar d'alta un compte a %(x_sitename)s "
-"per l'adreça de correu electrònic %(x_email)s."
+"Algú (possiblement vosaltres mateixos), des de l'adreça %(x_ip_address)s, ha "
+"demanat donar d'alta un compte a %(x_sitename)s per l'adreça de correu "
+"electrònic %(x_email)s."
 
 #: modules/websession/lib/websession_templates.py:681
 msgid "If you want to complete this account registration, please go to:"
@@ -5029,9 +5042,9 @@ msgid ""
 "                %(x_fmt_open)sSSO%(x_fmt_close)s system. You can\n"
 "                %(x_url_open)slogout from SSO%(x_url_close)s, too."
 msgstr ""
-"Encara esteu reconeguts pel sistema central de "
-"%(x_fmt_open)sSSO%(x_fmt_close)s. També podeu "
-"%(x_url_open)sdesconnectar del SSO%(x_url_close)s."
+"Encara esteu reconeguts pel sistema central de %(x_fmt_open)sSSO%"
+"(x_fmt_close)s. També podeu %(x_url_open)sdesconnectar del SSO%(x_url_close)"
+"s."
 
 #: modules/websession/lib/websession_templates.py:745
 #, python-format
@@ -5050,8 +5063,8 @@ msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
 "CERN lightweight account%(x_url_close)s."
 msgstr ""
-"Si encara no disposeu d'un compte al CERN, podeu crear un "
-"%(x_url_open)scompte CERN lleuger%(x_url_close)s."
+"Si encara no disposeu d'un compte al CERN, podeu crear un %(x_url_open)"
+"scompte CERN lleuger%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:783
 #, python-format
@@ -5113,8 +5126,8 @@ msgid ""
 "Your request is valid. Please set the new desired password in the following "
 "form."
 msgstr ""
-"La vostra petició ha estat validada.  Escriviu la nova contrasenya en "
-"aquest formulari."
+"La vostra petició ha estat validada.  Escriviu la nova contrasenya en aquest "
+"formulari."
 
 #: modules/websession/lib/websession_templates.py:900
 msgid "Set a new password for"
@@ -5554,9 +5567,9 @@ msgid ""
 "authorization will last until %(x_expiration)s and until you close your "
 "browser if you are a guest user."
 msgstr ""
-"Ja teniu una autorització vàlida per a exercir el rol de "
-"%(x_role)s. Aquesta autorització durarà fins %(x_expiration)s i, si "
-"sou usuari convidat, fins que tanqueu el vostre navegador."
+"Ja teniu una autorització vàlida per a exercir el rol de %(x_role)s. Aquesta "
+"autorització durarà fins %(x_expiration)s i, si sou usuari convidat, fins "
+"que tanqueu el vostre navegador."
 
 #: modules/websession/lib/websession_webinterface.py:117
 msgid "You have confirmed the validity of your email address!"
@@ -5644,10 +5657,10 @@ msgid ""
 "generated password. Please clic the following button to obtain a password "
 "reset request link sent to you via email:"
 msgstr ""
-"Tingueu en compte que si és el primer cop qu esteu usant aquest compte "
-"amb el mètode d'identificació intern, el sistema us ha definit una "
-"contrasenya aleatòria.  Feu clic en el botó següent per a que s'us "
-"enviï, via correu electrònic, un enllaç per a reiniciar-la:"
+"Tingueu en compte que si és el primer cop qu esteu usant aquest compte amb "
+"el mètode d'identificació intern, el sistema us ha definit una contrasenya "
+"aleatòria.  Feu clic en el botó següent per a que s'us enviï, via correu "
+"electrònic, un enllaç per a reiniciar-la:"
 
 #: modules/websession/lib/websession_webinterface.py:325
 msgid "Send Password"
@@ -5786,8 +5799,8 @@ msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
 msgstr ""
-"No es pot enviar la petició de reinicialització de la contrasenya ja "
-"que esteu usant un sistema de autenticació extern."
+"No es pot enviar la petició de reinicialització de la contrasenya ja que "
+"esteu usant un sistema de autenticació extern."
 
 #: modules/websession/lib/websession_webinterface.py:516
 msgid "The entered email address does not exist in the database."
@@ -5845,8 +5858,8 @@ msgid ""
 "In order to confirm its validity, an email message containing an account "
 "activation key has been sent to the given email address."
 msgstr ""
-"Per a confirmar la seva validesa, s'ha enviat un missatge a aquesta "
-"adreça que té una clau d'activació del compte."
+"Per a confirmar la seva validesa, s'ha enviat un missatge a aquesta adreça "
+"que té una clau d'activació del compte."
 
 #: modules/websession/lib/websession_webinterface.py:761
 msgid ""
@@ -5903,7 +5916,8 @@ msgid ""
 "The error has been logged and will be taken in consideration as soon as "
 "possible."
 msgstr ""
-"L'error ha estat annotat i el tindrem en compte de seguida que sigui possible."
+"L'error ha estat annotat i el tindrem en compte de seguida que sigui "
+"possible."
 
 #: modules/websession/lib/websession_webinterface.py:965
 msgid "Join New Group"
@@ -6058,8 +6072,8 @@ msgid ""
 "You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)"
 "s."
 msgstr ""
-"Us pot interessar consultar les %(x_url_open)spàgines "
-"%(x_category)s%(x_url_close)s."
+"Us pot interessar consultar les %(x_url_open)spàgines %(x_category)s%"
+"(x_url_close)s."
 
 #: modules/websubmit/lib/websubmit_engine.py:186
 #: modules/websubmit/lib/websubmit_engine.py:712
@@ -6588,8 +6602,8 @@ msgstr "La petició de revisió va estar feta el primer cop el "
 #: modules/websubmit/lib/websubmit_templates.py:2445
 msgid "Last request e-mail was sent to the publication committee chair on the "
 msgstr ""
-"El darrer missatge de petició va ser enviat al cap del comitè de "
-"publicació el "
+"El darrer missatge de petició va ser enviat al cap del comitè de publicació "
+"el "
 
 #: modules/websubmit/lib/websubmit_templates.py:2404
 msgid "A referee has been selected by the publication committee on the "
@@ -6610,8 +6624,8 @@ msgid ""
 "The referee has sent his final recommendations to the publication committee "
 "on the "
 msgstr ""
-"El revisor ha enviat les seves recomanacions finals al comitè de "
-"publicació el "
+"El revisor ha enviat les seves recomanacions finals al comitè de publicació "
+"el "
 
 #: modules/websubmit/lib/websubmit_templates.py:2414
 #: modules/websubmit/lib/websubmit_templates.py:2469
@@ -6632,8 +6646,8 @@ msgid ""
 "The publication committee has sent his final recommendations to the project "
 "leader on the "
 msgstr ""
-"El comitè de publicació ha enviat les seves recomanacions finals al "
-"cap de projecte el "
+"El comitè de publicació ha enviat les seves recomanacions finals al cap de "
+"projecte el "
 
 #: modules/websubmit/lib/websubmit_templates.py:2422
 #: modules/websubmit/lib/websubmit_templates.py:2485
@@ -6675,8 +6689,7 @@ msgstr "Preneu una decissió"
 #: modules/websubmit/lib/websubmit_templates.py:2448
 msgid ""
 "An editorial board has been selected by the publication committee on the "
-msgstr ""
-"Un consell editor ha estat seleccionat pel comitè de publicació el "
+msgstr "Un consell editor ha estat seleccionat pel comitè de publicació el "
 
 #: modules/websubmit/lib/websubmit_templates.py:2450
 msgid "Add an author list"
@@ -6698,16 +6711,16 @@ msgstr "Un revisor ha estat seleccionat pel consell editor el "
 msgid ""
 "The referee has sent his final recommendations to the editorial board on the "
 msgstr ""
-"El revisor ha enviat les seves recomanacions finals al comitè de "
-"publicació el "
+"El revisor ha enviat les seves recomanacions finals al comitè de publicació "
+"el "
 
 #: modules/websubmit/lib/websubmit_templates.py:2475
 msgid ""
 "The editorial board has sent his final recommendations to the publication "
 "committee on the "
 msgstr ""
-"El consell editor ha enviat les seves recomanacions finals al comitè "
-"de publicació el "
+"El consell editor ha enviat les seves recomanacions finals al comitè de "
+"publicació el "
 
 #: modules/websubmit/lib/websubmit_templates.py:2477
 msgid "No recommendation from the editorial board yet."
@@ -6757,8 +6770,8 @@ msgid ""
 "The system has encountered an error in retrieving the list of files for this "
 "document."
 msgstr ""
-"El sistema ha trobat un error recuperant la llista dels fitxers "
-"d'aquest document."
+"El sistema ha trobat un error recuperant la llista dels fitxers d'aquest "
+"document."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:172
 msgid "The collection to which this file belong is restricted: "
@@ -6988,8 +7001,8 @@ msgid ""
 "It seems that there are no journals defined on this server. Please contact "
 "support if this is not right."
 msgstr ""
-"Sembla ser que no hi ha cap revista definida en aquest servidor. "
-"Contacteu el suport si no és cert."
+"Sembla ser que no hi ha cap revista definida en aquest servidor. Contacteu "
+"el suport si no és cert."
 
 #: modules/webjournal/lib/webjournal_config.py:330
 msgid "Select a journal on this server"
@@ -7004,8 +7017,8 @@ msgid ""
 "You did not provide an argument for a journal name. Please select the "
 "journal you want to read in the list below."
 msgstr ""
-"No heu especificat quina revista cerqueu.  Seleccioneu-ne una "
-"d'aquesta llista."
+"No heu especificat quina revista cerqueu.  Seleccioneu-ne una d'aquesta "
+"llista."
 
 #: modules/webjournal/lib/webjournal_config.py:358
 msgid "No current issue"
@@ -7020,8 +7033,8 @@ msgid ""
 "The configuration for the current issue seems to be empty. Try providing an "
 "issue number or check with support."
 msgstr ""
-"Sembla que la configuració del número actual està buida.  Proveu "
-"d'escollir un número en concret o poseu-vos en contacte amb el suport."
+"Sembla que la configuració del número actual està buida.  Proveu d'escollir "
+"un número en concret o poseu-vos en contacte amb el suport."
 
 #: modules/webjournal/lib/webjournal_config.py:387
 msgid "Issue number badly formed"
@@ -7075,8 +7088,8 @@ msgstr "Error del codi de revista"
 #: modules/webjournal/lib/webjournal_config.py:576
 msgid "We could not find the id for this journal in the Database"
 msgstr ""
-"No ha estat possible trobar l'identificador intern d'aquesta revista a "
-"la base de dades"
+"No ha estat possible trobar l'identificador intern d'aquesta revista a la "
+"base de dades"
 
 #: modules/webjournal/lib/webjournal_config.py:607
 #: modules/webjournal/lib/webjournal_config.py:609
@@ -7650,24 +7663,10 @@ msgstr "Edita els paràmetres"
 #~ msgid "No result found"
 #~ msgstr "No s'ha trobat cap cerca"
 
-
 #, fuzzy
 #~ msgid "GROUP_DELETED"
 #~ msgstr "SUPRIMIR"
 
-# Revisar:
-# correu electrònic -> correu
-# adreça electrònica -> adreça
-# fulltext (o text complert) -> document
-# editorial board? -> consell editor?
-# # -> núm?
-# download -> descàrregues, baixades?
-# Username/Email: -> Nom d'usuari?
-# Popular searches -> cerques populars o habituals?
-# Cites: cites o (millor?) citacions?
-## Segons el recull de softcatalà:
-##  e-mail - /m/ correu electrònic
-##  e-mail address - /f/ adreça electrònica
-##  mail - /m/ correu
-# «popup» it: «comparsa»
-# reature a record: destacar un registre?
+#, fuzzy
+#~ msgid "MEMBER_DELETED"
+#~ msgstr "SUPRIMIR"
