@@ -109,6 +109,7 @@ class Template:
         'pt': 'pt_BR',
         'fr': 'fr_FR',
         'it': 'it_IT',
+        'ro': 'ro_RO',
         'ru': 'ru_RU',
         'sk': 'sk_SK',
         'cs': 'cs_CZ',

@@ -112,6 +112,7 @@ def language_list_long(enabled_langs_only=True):
                           'no': 'Norsk/Bokmål',
                           'pl': 'Polski',
                           'pt': 'Português',
+                          'ro': 'Română',
                           'ru': 'Русский',
                           'sk': 'Slovensky',
                           'sv': 'Svenska',
