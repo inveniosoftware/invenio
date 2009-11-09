@@ -22,6 +22,7 @@ WebJournal widget - Display weather forecast
 import os
 import time
 import re
+import socket
 from urllib2 import urlopen
 try:
     # Try to load feedparser.  Remember for later if it was installed
@@ -111,8 +112,10 @@ def get_widget_html(yahoo_weather_rss, cached_filename, expire_time_filename, jo
     # No HTML cache? Then read locally saved feed data, and even
     # refresh it from Yahoo if it has expired.
     try:
-        weather_feed = feedparser.parse('%s/%s' % \
-                                        (CFG_CACHEDIR, cached_filename))
+        cached_rss_path = os.path.join(CFG_CACHEDIR, cached_filename)
+        assert(os.path.exists(cached_rss_path))
+        weather_feed = feedparser.parse(cached_rss_path)
+        assert(not weather_feed.bozo_exception)
     except:
         try:
             _update_feed(yahoo_weather_rss, cached_filename, expire_time_filename)
