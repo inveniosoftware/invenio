@@ -273,7 +273,7 @@ color: #6E5907;
 .headermodulebox {
    color: #fff;
    background: transparent;
-   border-collapse: collapse;
+   border-spacing: 0px;
    margin: 0px;
    padding: 0px;
 }

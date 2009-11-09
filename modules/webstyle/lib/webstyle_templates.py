@@ -306,7 +306,7 @@ template function generated it.
 %(inspect_templates_message)s
 <!-- replaced page header -->
 <div style="background-image: url(%(cssurl)s/img/header_background.gif);">
-<table class="headerbox">
+<table class="headerbox" cellspacing="0">
  <tr>
   <td class="headerboxbodylogo">
    %(sitename)s
@@ -317,10 +317,10 @@ template function generated it.
  </tr>
  <tr>
   <td class="headerboxbody" valign="bottom" align="left">
-   <table class="headermodulebox" width="100%%"><tr><td class="headermoduleboxbodyblanklast">&nbsp;</td></tr></table>
+   <table class="headermodulebox" width="100%%" cellspacing="0"><tr><td class="headermoduleboxbodyblanklast">&nbsp;</td></tr></table>
   </td>
   <td class="headerboxbody" valign="bottom" align="left">
-   <table class="headermodulebox">
+   <table class="headermodulebox" cellspacing="0">
      <tr>
        <td class="headermoduleboxbodyblank">
              &nbsp;
