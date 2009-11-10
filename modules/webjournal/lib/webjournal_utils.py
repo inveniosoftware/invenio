@@ -1004,7 +1004,7 @@ def datetime_to_issue(issue_datetime, journal_name):
         # of articles that have been imported in the system but never
         # considered as 'released' in the database. So we should still
         # try to approximate/match an issue:
-        if round(issue_day_lifetime) == 7:
+        if round(issue_day_lifetime) in [6, 7, 8]:
             # Weekly issues. We can use this information to better
             # match the issue number
             issue_nb = int(issue_datetime.strftime('%W')) # = week number
@@ -1013,7 +1013,7 @@ def datetime_to_issue(issue_datetime, journal_name):
             # divide by the lifetime of an issue: we get the
             # approximate issue_number
             issue_nb = math.ceil((int(issue_datetime.strftime('%j')) / issue_day_lifetime))
-        issue_number = ("%0" + str(nb_issues_per_year)+ "i/%i") % (issue_nb, issue_datetime.year)
+        issue_number = ("%0" + str(len(str(nb_issues_per_year)))+ "i/%i") % (issue_nb, issue_datetime.year)
         # Now check if this issue exists in the system for this
         # journal
         if not get_journal_categories(journal_name, issue_number):

@@ -30,8 +30,6 @@ from invenio.webjournal_utils import \
      compare_issues, \
      get_journal_nb_issues_per_year
 
-#CFG_LOWEST_BULLETIN_ISSUE = "34/2001"
-
 def format(bfo, lowest_issue):
     """
     Prints a form that redirects to specified journal issue
