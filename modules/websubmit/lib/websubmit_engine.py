@@ -28,6 +28,7 @@ import sys
 import time
 import types
 import re
+import pprint
 from urllib import quote_plus
 from cgi import escape
 
@@ -153,8 +154,10 @@ def interface(req,
 
     sys.stdout = req
     # get user ID:
-    uid = getUid(req)
-    uid_email = get_email(uid)
+    user_info = collect_user_info(req)
+    uid = user_info['uid']
+    uid_email = user_info['email']
+
     # variable initialisation
     t = ""
     field = []
@@ -431,6 +434,22 @@ def interface(req,
 
     full_fields = []
     values = []
+    the_globals = {
+        'doctype' : doctype,
+        'action' : action,
+        'access' : access,
+        'ln' : ln,
+        'curdir' : curdir,
+        'uid' : uid,
+        'uid_email' : uid_email,
+        'form' : form,
+        'act' : act,
+        'req' : req,
+        'user_info' : user_info,
+        'InvenioWebSubmitFunctionError' : InvenioWebSubmitFunctionError,
+        '__websubmit_in_jail__' : True,
+        '__builtins__' : globals()['__builtins__']
+    }
 
     for field_instance in form_fields:
         full_field = {}
@@ -473,8 +492,14 @@ def interface(req,
         # as the runtime functions access some global and local
         # variables.
         if full_field ['type'] == 'R':
-            co = compile (full_field ['htmlcode'].replace("\r\n","\n"), "<string>", "exec")
-            exec(co)
+            try:
+                co = compile (full_field ['htmlcode'].replace("\r\n","\n"), "<string>", "exec")
+                the_globals['text'] = ''
+                exec co in the_globals
+                text = the_globals['text']
+            except:
+                register_exception(req=req, alert_admin=True, prefix="Error in evaluating response element %s with globals %s" % (pprint.pformat(full_field), pprint.pformat(the_globals)))
+                raise
         else:
             text = websubmit_templates.tmpl_submit_field (ln = ln, field = full_field)
 
@@ -744,9 +769,6 @@ def endaction(req,
         1.
        @param mode:
     """
-
-    global rn, sysno, dismode, curdir, uid, uid_email, last_step, action_score
-
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -996,11 +1018,19 @@ def endaction(req,
         ## Handle the execution of the functions for this
         ## submission/step:
         start_time = time.time()
-        function_content = print_function_calls(req=req, doctype=doctype,
+        (function_content, last_step, action_score) = print_function_calls(
+                                                req=req,
+                                                doctype=doctype,
                                                 action=act,
                                                 step=step,
                                                 form=form,
                                                 start_time=start_time,
+                                                access=access,
+                                                curdir=curdir,
+                                                dismode=mode,
+                                                rn=rn,
+                                                last_step=last_step,
+                                                action_score=action_score,
                                                 ln=ln)
     except InvenioWebSubmitFunctionError, e:
         register_exception(req=req, alert_admin=True, prefix='doctype="%s", action="%s", step="%s", form="%s", start_time="%s"' % (doctype, act, step, form, start_time))
@@ -1382,16 +1412,8 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
 def Request_Print(m, txt):
     """The argumemts to this function are the display mode (m) and the text
        to be displayed (txt).
-       If the argument mode is 'ALL' then the text is unconditionally echoed
-       m can also take values S (Supervisor Mode) and U (User Mode). In these
-       circumstances txt is only echoed if the argument mode is the same as
-       the current mode
     """
-    global dismode
-    if m == "A" or m == dismode:
-        return txt
-    else:
-        return ""
+    return txt
 
 def Evaluate_Parameter (field, doctype):
     # Returns the literal value of the parameter. Assumes that the value is
@@ -1471,15 +1493,32 @@ def action_details (doctype, action):
     else:
         return -1
 
-def print_function_calls (req, doctype, action, step, form, start_time, ln=CFG_SITE_LANG):
+def print_function_calls (req, doctype, action, step, form, start_time, access, curdir, dismode, rn, last_step, action_score, ln=CFG_SITE_LANG):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
-    global htdocsdir,CFG_WEBSUBMIT_STORAGEDIR,access,CFG_PYLIBDIR,dismode
     user_info = collect_user_info(req)
     # load the right message language
     _ = gettext_set_language(ln)
     t = ""
-
+    ## Here follows the global protect environment.
+    the_globals = {
+        'doctype' : doctype,
+        'action' : action,
+        'step' : step,
+        'access' : access,
+        'ln' : ln,
+        'curdir' : curdir,
+        'uid' : user_info['uid'],
+        'uid_email' : user_info['email'],
+        'rn' : rn,
+        'last_step' : last_step,
+        'action_score' : action_score,
+        '__websubmit_in_jail__' : True,
+        'form' : form,
+        'user_info' : user_info,
+        '__builtins__' : globals()['__builtins__'],
+        'Request_Print': Request_Print
+    }
     ## Get the list of functions to be called
     funcs_to_call = get_functions_for_submission_step(doctype, action, step)
 
@@ -1491,95 +1530,96 @@ def print_function_calls (req, doctype, action, step, form, start_time, ln=CFG_S
         # while there are functions left...
         functions = []
         for function in funcs_to_call:
-            function_name = function[0]
-            function_score = function[1]
-            currfunction = {
-              'name' : function_name,
-              'score' : function_score,
-              'error' : 0,
-              'text' : '',
-            }
-            if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name)):
-                # import the function itself
-                #function = getattr(invenio.websubmit_functions, function_name)
-                execfile("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name), globals())
-                if not globals().has_key(function_name):
-                    currfunction['error'] = 1
-                else:
-                    function = globals()[function_name]
-                    # Evaluate the parameters, and place them in an array
-                    parameters = Get_Parameters(function_name, doctype)
-                    # Call function:
-                    log_function(curdir, "Start %s" % function_name, start_time)
-                    try:
-                        try:
-                            ## Attempt to call the function with 4 arguments:
-                            ## ("parameters", "curdir" and "form" as usual),
-                            ## and "user_info" - the dictionary of user
-                            ## information:
-                            ##
-                            ## Note: The function should always be called with
-                            ## these keyword arguments because the "TypeError"
-                            ## except clause checks for a specific mention of
-                            ## the 'user_info' keyword argument when a legacy
-                            ## function (one that accepts only 'parameters',
-                            ## 'curdir' and 'form') has been called and if
-                            ## the error string doesn't contain this,
-                            ## the TypeError will be considered as a something
-                            ## that was incorrectly handled in the function and
-                            ## will be propagated as an
-                            ## InvenioWebSubmitFunctionError instead of the
-                            ## function being called again with the legacy 3
-                            ## arguments.
-                            func_returnval = function(parameters=parameters, \
-                                                      curdir=curdir, \
-                                                      form=form, \
-                                                      user_info=user_info)
-                        except TypeError, err:
-                            ## If the error contains the string "got an
-                            ## unexpected keyword argument", it means that the
-                            ## function doesn't accept the "user_info"
-                            ## argument. Test for this:
-                            if "got an unexpected keyword argument 'user_info'" in \
-                               str(err).lower():
-                                ## As expected, the function doesn't accept
-                                ## the user_info keyword argument. Call it
-                                ## again with the legacy 3 arguments
-                                ## (parameters, curdir, form):
-                                func_returnval = \
-                                               function(parameters=parameters, \
-                                                        curdir=curdir, \
-                                                        form=form)
-                            else:
-                                ## An unexpected "TypeError" was caught.
-                                ## It looks as though the function itself didn't
-                                ## handle something correctly.
-                                ## Convert this error into an
-                                ## InvenioWebSubmitFunctionError and raise it:
-                                msg = "Unhandled TypeError caught when " \
-                                      "calling [%s] WebSubmit function: " \
-                                      "[%s]" % (function_name, str(err))
-                                raise InvenioWebSubmitFunctionError(msg)
-                    except InvenioWebSubmitFunctionWarning, err:
-                        ## There was an unexpected behaviour during the
-                        ## execution. Log the message into function's log
-                        ## and go to next function
-                        log_function(curdir, "***Warning*** from %s: %s" \
-                                     % (function_name, str(err)), start_time)
-                        ## Reset "func_returnval" to None:
-                        func_returnval = None
-                    log_function(curdir, "End %s" % function_name, start_time)
-                    if func_returnval is not None:
-                        ## Append the returned value as a string:
-                        currfunction['text'] = str(func_returnval)
+            try:
+                function_name = function[0]
+                function_score = function[1]
+                currfunction = {
+                'name' : function_name,
+                'score' : function_score,
+                'error' : 0,
+                'text' : '',
+                }
+                if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name)):
+                    # import the function itself
+                    #function = getattr(invenio.websubmit_functions, function_name)
+                    execfile("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name), the_globals)
+                    if function_name not in the_globals:
+                        currfunction['error'] = 1
                     else:
-                        ## The function the NoneType. Don't keep that value as
-                        ## the currfunction->text. Replace it with the empty
-                        ## string.
-                        currfunction['text'] = ""
-            else:
-                currfunction['error'] = 1
-            functions.append(currfunction)
+                        the_globals['function'] = the_globals[function_name]
+
+                        # Evaluate the parameters, and place them in an array
+                        the_globals['parameters'] = Get_Parameters(function_name, doctype)
+                        # Call function:
+                        log_function(curdir, "Start %s" % function_name, start_time)
+                        try:
+                            try:
+                                ## Attempt to call the function with 4 arguments:
+                                ## ("parameters", "curdir" and "form" as usual),
+                                ## and "user_info" - the dictionary of user
+                                ## information:
+                                ##
+                                ## Note: The function should always be called with
+                                ## these keyword arguments because the "TypeError"
+                                ## except clause checks for a specific mention of
+                                ## the 'user_info' keyword argument when a legacy
+                                ## function (one that accepts only 'parameters',
+                                ## 'curdir' and 'form') has been called and if
+                                ## the error string doesn't contain this,
+                                ## the TypeError will be considered as a something
+                                ## that was incorrectly handled in the function and
+                                ## will be propagated as an
+                                ## InvenioWebSubmitFunctionError instead of the
+                                ## function being called again with the legacy 3
+                                ## arguments.
+                                func_returnval = eval("function(parameters=parameters, curdir=curdir, form=form, user_info=user_info)", the_globals)
+                            except TypeError, err:
+                                ## If the error contains the string "got an
+                                ## unexpected keyword argument", it means that the
+                                ## function doesn't accept the "user_info"
+                                ## argument. Test for this:
+                                if "got an unexpected keyword argument 'user_info'" in \
+                                str(err).lower():
+                                    ## As expected, the function doesn't accept
+                                    ## the user_info keyword argument. Call it
+                                    ## again with the legacy 3 arguments
+                                    ## (parameters, curdir, form):
+                                    func_returnval = eval("function(parameters=parameters, curdir=curdir, form=form)", the_globals)
+                                else:
+                                    ## An unexpected "TypeError" was caught.
+                                    ## It looks as though the function itself didn't
+                                    ## handle something correctly.
+                                    ## Convert this error into an
+                                    ## InvenioWebSubmitFunctionError and raise it:
+                                    msg = "Unhandled TypeError caught when " \
+                                        "calling [%s] WebSubmit function: " \
+                                        "[%s]" % (function_name, str(err))
+                                    raise InvenioWebSubmitFunctionError(msg)
+                        except InvenioWebSubmitFunctionWarning, err:
+                            ## There was an unexpected behaviour during the
+                            ## execution. Log the message into function's log
+                            ## and go to next function
+                            log_function(curdir, "***Warning*** from %s: %s" \
+                                        % (function_name, str(err)), start_time)
+                            ## Reset "func_returnval" to None:
+                            func_returnval = None
+                            register_exception(req=req, alert_admin=True, prefix="Warning in executing function %s with globals %s" % (pprint.pformat(currfunction), pprint.pformat(the_globals)))
+                        log_function(curdir, "End %s" % function_name, start_time)
+                        if func_returnval is not None:
+                            ## Append the returned value as a string:
+                            currfunction['text'] = str(func_returnval)
+                        else:
+                            ## The function the NoneType. Don't keep that value as
+                            ## the currfunction->text. Replace it with the empty
+                            ## string.
+                            currfunction['text'] = ""
+                else:
+                    currfunction['error'] = 1
+                functions.append(currfunction)
+            except:
+                register_exception(req=req, alert_admin=True, prefix="Error in executing function %s with globals %s" % (pprint.pformat(currfunction), pprint.pformat(the_globals)))
+                raise
+
 
         t = websubmit_templates.tmpl_function_output(
               ln = ln,
@@ -1592,11 +1632,10 @@ def print_function_calls (req, doctype, action, step, form, start_time, ln=CFG_S
     else :
         if dismode == 'S':
             t = "<br /><br /><b>" + _("The chosen action is not supported by the document type.") + "</b>"
-    return t
+    return (t, the_globals['last_step'], the_globals['action_score'])
 
 
 def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=CFG_SITE_LANG):
-    global machine, CFG_WEBSUBMIT_STORAGEDIR, act, rn
     t = ""
     next_submissions = \
          get_submissions_at_level_X_with_score_above_N(doctype, currentlevel, action_score)

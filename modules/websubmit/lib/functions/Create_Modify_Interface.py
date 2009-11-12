@@ -35,6 +35,7 @@ __revision__ = "$Id$"
 import os
 import re
 import time
+import pprint
 
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
@@ -100,6 +101,27 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     # variables declaration
     fieldname = parameters['fieldnameMBI']
     # Path of file containing fields to modify
+
+    the_globals = {
+        'doctype' : doctype,
+        'action' : action,
+        'step' : step,
+        'access' : access,
+        'ln' : ln,
+        'curdir' : curdir,
+        'uid' : user_info['uid'],
+        'uid_email' : user_info['email'],
+        'rn' : rn,
+        'last_step' : last_step,
+        'action_score' : action_score,
+        '__websubmit_in_jail__' : True,
+        'form': form,
+        'sysno': sysno,
+        'user_info' : user_info,
+        '__builtins__' : globals()['__builtins__'],
+        'Request_Print': Request_Print
+    }
+
     if os.path.exists("%s/%s" % (curdir, fieldname)):
         fp = open( "%s/%s" % (curdir, fieldname), "r" )
         fieldstext = fp.read()
@@ -191,8 +213,18 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
             elif element_type == "D":
                 text = fidesc
             elif element_type == "R":
-                co = compile(fidesc.replace("\r\n", "\n"), "<string>", "exec")
-                exec(co)
+                try:
+                    co = compile(fidesc.replace("\r\n", "\n"), "<string>", "exec")
+                    ## Note this exec is safe WRT global variable because the
+                    ## Create_Modify_Interface has already been parsed by
+                    ## execfile within a protected environment.
+                    the_globals['text'] = ''
+                    exec co in the_globals
+                    text = the_globals['text']
+                except:
+                    msg = "Error in evaluating response element %s with globals %s" % (pprint.pformat(full_field), pprint.pformat(globals()))
+                    register_exception(req=req, alert_admin=True, prefix=msg)
+                    raise InvenioWebSubmitFunctionError(msg)
             else:
                 text = "%s: unknown field type" % field
             t = t + "<small>%s</small>" % text
