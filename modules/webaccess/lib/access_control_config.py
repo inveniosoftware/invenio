@@ -189,32 +189,32 @@ DEF_ACTIONS = (
               )
 
 # Default authorizations
-#              role          action       arglistid  optional  arguments
-DEF_AUTHS = (('basketusers', 'usebaskets', -1, 0, {}),
-             ('loanusers', 'useloans', -1, 0, {}),
-             ('groupusers', 'usegroups', -1, 0, {}),
-             ('alertusers', 'usealerts', -1, 0, {}),
-             ('messageusers', 'usemessages', -1, 0, {}),
-             ('holdingsusers', 'viewholdings', -1, 1, {}),
-             ('statisticsusers', 'viewstatistics', -1, 1, {}))
+#              role          action        arguments
+DEF_AUTHS = (('basketusers', 'usebaskets', {}),
+             ('loanusers', 'useloans', {}),
+             ('groupusers', 'usegroups', {}),
+             ('alertusers', 'usealerts', {}),
+             ('messageusers', 'usemessages', {}),
+             ('holdingsusers', 'viewholdings', {}),
+             ('statisticsusers', 'viewstatistics', {}))
 
 # Demo site authorizations
-#              role          action       arglistid  optional  arguments
+#              role          action        arguments
 DEF_DEMO_AUTHS = (
-             ('photocurator', 'runwebcoll', -1, 0, {'collection': 'Pictures'}),
-             ('restrictedpicturesviewer', 'viewrestrdoc', -1, 0, {'status': 'restricted_picture'}),
-             ('thesesviewer', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
-             ('referee_DEMOBOO_*', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
-             ('curator', 'cfgbibknowledge', 0, 0, {}),
-             ('curator', 'runbibedit', -1, 1, {}),
-             ('curator', 'runbibeditmulti', -1, 1, {}),
-             ('curator', 'runbibmerge', -1, 1, {}),
-             ('thesescurator', 'runbibedit', -1, 0, {'collection': 'Theses'}),
-             ('thesescurator', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
-             ('photocurator', 'runbibedit', -1, 0, {'collection': 'Pictures'}),
-             ('referee_DEMOBOO_*', 'runbibedit', -1, 0, {'collection': 'Books'}),
-             ('submit_DEMOJRN_*', 'submit', -1, 0, {'doctype': 'DEMOJRN', 'act': 'SBI'}),
-             ('submit_DEMOJRN_*', 'submit', -1, 0, {'doctype': 'DEMOJRN', 'act': 'MBI'})
+             ('photocurator', 'runwebcoll', {'collection': 'Pictures'}),
+             ('restrictedpicturesviewer', 'viewrestrdoc', {'status': 'restricted_picture'}),
+             ('thesesviewer', VIEWRESTRCOLL, {'collection': 'Theses'}),
+             ('referee_DEMOBOO_*', 'referee', {'doctype': 'DEMOBOO', 'categ': '*'}),
+             ('curator', 'cfgbibknowledge', {}),
+             ('curator', 'runbibedit', {}),
+             ('curator', 'runbibeditmulti', {}),
+             ('curator', 'runbibmerge', {}),
+             ('thesescurator', 'runbibedit', {'collection': 'Theses'}),
+             ('thesescurator', VIEWRESTRCOLL, {'collection': 'Theses'}),
+             ('photocurator', 'runbibedit', {'collection': 'Pictures'}),
+             ('referee_DEMOBOO_*', 'runbibedit', {'collection': 'Books'}),
+             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'SBI'}),
+             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)
