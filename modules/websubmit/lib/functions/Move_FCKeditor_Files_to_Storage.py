@@ -57,6 +57,8 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
                        parameters['input_fields'].split(',') if \
                        os.path.exists(curdir + os.sep + input_filename)]
 
+    processed_paths = []
+
     for input_filename in input_filenames:
         input_file = file(curdir + os.sep + input_filename)
         input_string = input_file.read()
@@ -92,10 +94,16 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
                                         file_type, extension)
 
             docname = build_docname(name, file_type, extension)
-            write_fft(original_location,
-                      docname,
-                      icon_location,
-                      doctype=file_type)
+            if original_location not in processed_paths:
+                # Must create an FFT only if we have not yet processed
+                # the file. This can happen if same image exists on
+                # the same page (either in two different FCKeditor
+                # instances, or twice in the HTML)
+                processed_paths.append(original_location)
+                write_fft(original_location,
+                          docname,
+                          icon_location,
+                          doctype=file_type)
             return '"' + new_url + '"'
 
         output_string = re_fckeditor_link.sub(translate_link, input_string)
