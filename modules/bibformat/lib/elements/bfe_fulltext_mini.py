@@ -103,7 +103,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         url_list = []
         for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
-        out += separator.join(url_list)
+        out += '<small>' + separator.join(url_list) + '</small>'
         out += "<br/>"
 
     if others_urls:

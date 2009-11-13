@@ -28,6 +28,15 @@ from urlparse import urlparse
 from os.path import basename
 import urllib
 
+cern_arxiv_categories = ["astro-ph", "chao-dyn", "cond-mat", "gr-qc",
+                         "hep-ex", "hep-lat", "hep-ph", "hep-th", "math-ph",
+                         "math", "nucl-ex", "nucl-th", "out", "physics",
+                         "quant-ph", "q-alg", "cs", "adap-org", "comp-gas",
+                         "chem-ph", "cs", "math", "neuro-sys", "patt-sol",
+                         "solv-int", "acc-phys", "alg-geom", "ao-sci",
+                         "atom-ph", "cmp-lg", "dg-ga", "funct-an", "mtrl-th",
+                         "plasm-ph", "q-alg", "supr-con"]
+
 def format(bfo, style, separator='; ', show_icons='no'):
     """
     This is the default format for formatting fulltext links.
@@ -157,7 +166,6 @@ def get_files(bfo):
 
     urls = bfo.fields("8564_")
     bibarchive = BibRecDocs(bfo.recID)
-    use_bibdocs_p = len(bibarchive.list_bibdocs()) > 0
 
     old_versions = False # We can provide link to older files. Will be
                          # set to True if older files are found.
@@ -183,7 +191,7 @@ def get_files(bfo):
     for complete_url in urls:
         if complete_url.has_key('u'):
             url = complete_url['u']
-            (dummy, host, path, dummy, dummy, dummy) = urlparse(url)
+            (dummy, host, path, dummy, params, dummy) = urlparse(url)
             filename = urllib.unquote(basename(path))
             name = file_strip_ext(filename)
             format = filename[len(name):]
@@ -195,17 +203,32 @@ def get_files(bfo):
                 descr = complete_url['y']
             if not url.startswith(CFG_SITE_URL): # Not a bibdoc?
                 if not descr: # For not bibdoc let's have a description
-                    if '/setlink?' in url: # Setlink (i.e. hosted on doc.cern.ch)
-                        descr = _("Fulltext") # Surely a fulltext
-                    else:
-                        # we have some generic external URL that is
-                        # not of the setlink type; so let us display
-                        # the URL in full:
-                        descr = url
-                if CFG_CERN_SITE and 'cern.ch' in host:
-                    if not use_bibdocs_p or not ('/setlink?' in url or 'cms' in host or 'documents.cern.ch' in url or 'doc.cern.ch' in url or 'preprints.cern.ch' in url):
-                        parsed_urls['cern_urls'].append((url, descr)) # Obsolete cern.ch url (we're migrating)
-                    ## if use_bibdocs_p is True file is already using bibdoc
+                    # Display the URL in full:
+                    descr = url
+                if CFG_CERN_SITE and 'cern.ch' in host and \
+                       ('/setlink?' in url or \
+                        'cms' in host or \
+                        'documents.cern.ch' in url or \
+                        'doc.cern.ch' in url or \
+                        'preprints.cern.ch' in url):
+                    url_params_dict = dict([part.split('=') for part in params.split('&')])
+                    if url_params_dict.has_key('categ') and \
+                           (url_params_dict['categ'].split('.', 1)[0] in cern_arxiv_categories) and \
+                           url_params_dict.has_key('id'):
+                        # Old arXiv links, used to be handled by
+                        # setlink. Provide direct links to arXiv
+                        for file_format, label in [('pdf', "PDF")]:#,
+                            #('ps', "PS"),
+                            #('e-print', "Source (generally TeX or LaTeX)"),
+                            #('abs', "Abstract")]:
+                            url = "http://arxiv.org/%(format)s/%(category)s/%(id)s" % \
+                                  {'format': file_format,
+                                   'category': url_params_dict['categ'],
+                                   'id': url_params_dict['id']}
+                            parsed_urls['others_urls'].append((url, "%s/%s %s" % \
+                                                               (url_params_dict['categ'],
+                                                                url_params_dict['id'],
+                                                                label)))
                 else:
                     parsed_urls['others_urls'].append((url, descr)) # external url
             else: # It's a bibdoc!
