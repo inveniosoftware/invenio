@@ -261,7 +261,7 @@ Cher Abonné,
                                                             ln))
 
     def tmpl_admin_alert_interface(self, ln, journal_name, default_subject,
-                                   default_msg, default_recipients):
+                                   default_msg, default_recipients, alert_ln):
         """
         Alert email interface.
         """
@@ -275,7 +275,7 @@ Cher Abonné,
             <p>Recipients:</p>
             <input type="text" name="recipients" value="%(default_recipients)s" size="60" />
             <p>Subject:</p>
-            <input type="text" name="subject" value="%(subject)s" readonly="readonly" size="60" />
+            <input type="text" name="subject" value="%(subject)s" size="60" />
             <p>Plain Text Message:</p>
             <textarea name="plainText" wrap="soft" rows="25" cols="80">%(plain_text)s</textarea>
             <p> <input type="checkbox" name="htmlMail" id="htmlMail" value="html" checked="checked" />
@@ -286,14 +286,15 @@ Cher Abonné,
         </form>
         </td><td valign="top">
         <p>HTML newsletter preview:</p>
-        <iframe id="htmlMailPreview" src="%(CFG_SITE_URL)s/journal/%(journal_name)s" height="600" width="600"></iframe>
+        <iframe id="htmlMailPreview" src="%(CFG_SITE_URL)s/journal/%(journal_name)s?ln=%(alert_ln)s" height="600" width="600"></iframe>
         </tr>
         </table>
         ''' % {'CFG_SITE_URL': CFG_SITE_URL,
                'journal_name': journal_name,
                'subject': default_subject,
                'plain_text': default_msg,
-               'default_recipients': default_recipients}
+               'default_recipients': default_recipients,
+               'alert_ln': alert_ln}
 
         return interface
 

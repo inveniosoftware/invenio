@@ -20,13 +20,9 @@
 __revision__ = "$Id$"
 
 import sys
-import smtplib
 import cPickle
 import re
 import os
-import MimeWriter
-import mimetools
-import cStringIO
 from urllib2 import urlopen
 
 if sys.hexversion < 0x2040000:
@@ -48,7 +44,6 @@ from invenio.mailutils import send_email
 from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalReleaseUpdateError, \
-     InvenioWebJournalIssueNotFoundDBError, \
      InvenioWebJournalNoJournalOnServerError
 from invenio.webjournal_utils import \
      get_journals_ids_and_names, \
@@ -71,7 +66,8 @@ from invenio.webjournal_utils import \
      get_journal_categories, \
      get_journal_articles, \
      get_grouped_issues, \
-     get_journal_issue_grouping
+     get_journal_issue_grouping, \
+     get_journal_languages
 from invenio.dbquery import run_sql
 from invenio.bibrecord import \
      create_record, \
@@ -391,6 +387,12 @@ def perform_request_alert(journal_name, issue,
                          even if it has already been sent.
                   ln  -  language
     """
+    # FIXME: more flexible options to choose the language of the alert
+    languages = get_journal_languages(journal_name)
+    if languages:
+        alert_ln = languages[0]
+    else:
+        alert_ln = CFG_SITE_LANG
 
     if not get_release_datetime(issue, journal_name, ln):
         # Trying to send an alert for an unreleased issue
@@ -400,10 +402,10 @@ def perform_request_alert(journal_name, issue,
         # Retrieve default message, subject and recipients, and
         # display email editor
         subject = wjt.tmpl_admin_alert_subject(journal_name,
-                                               ln,
+                                               alert_ln,
                                                issue)
         plain_text = wjt.tmpl_admin_alert_plain_text(journal_name,
-                                                     ln,
+                                                     alert_ln,
                                                      issue)
         plain_text = plain_text.encode('utf-8')
         recipients = get_journal_alert_recipient_email(journal_name)
@@ -411,7 +413,8 @@ def perform_request_alert(journal_name, issue,
                                               journal_name,
                                               subject,
                                               plain_text,
-                                              recipients)
+                                              recipients,
+                                              alert_ln)
     else:
         # User asked to send the mail
         if was_alert_sent_for_issue(issue,
@@ -429,8 +432,8 @@ def perform_request_alert(journal_name, issue,
         html_string = None
         if html_mail == "html":
             # Also send as HTML: retrieve from current issue
-            html_file = urlopen('%s/journal/%s'
-                                % (CFG_SITE_URL, journal_name))
+            html_file = urlopen('%s/journal/%s?ln=%s'
+                                % (CFG_SITE_URL, journal_name, alert_ln))
             html_string = html_file.read()
             html_file.close()
             html_string = put_css_in_file(html_string, journal_name)
