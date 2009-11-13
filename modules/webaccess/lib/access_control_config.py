@@ -165,7 +165,7 @@ DEF_ACTIONS = (
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ',    'yes'),
-               ('submit', 'use webSubmit', 'doctype,act', 'yes'),
+               ('submit', 'use webSubmit', 'doctype,act,categ', 'yes'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
                (WEBACCESSACTION, 'configure WebAccess', '', 'no'),
                (DELEGATEADDUSERROLE, 'delegate subroles inside WebAccess', 'role',          'no'),
@@ -213,8 +213,8 @@ DEF_DEMO_AUTHS = (
              ('thesescurator', VIEWRESTRCOLL, {'collection': 'Theses'}),
              ('photocurator', 'runbibedit', {'collection': 'Pictures'}),
              ('referee_DEMOBOO_*', 'runbibedit', {'collection': 'Books'}),
-             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'SBI'}),
-             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI'})
+             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'SBI', 'categ': '*'}),
+             ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI', 'categ': '*'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)

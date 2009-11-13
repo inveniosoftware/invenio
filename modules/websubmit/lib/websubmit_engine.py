@@ -307,8 +307,16 @@ def interface(req,
         fp = open(os.path.join(curdir, "SuE"), "w")
         fp.write(uid_email)
         fp.close()
+
+    if os.path.exists(os.path.join(curdir, "combo%s" % doctype)):
+        fp = open(os.path.join(curdir, "combo%s" % doctype), "r");
+        categ = fp.read()
+        fp.close()
+    else:
+        categ = req.form.get('combo%s' % doctype, '*')
+
     # is user authorized to perform this action?
-    (auth_code, auth_message) = acc_authorize_action(req, "submit", verbose=0, doctype=doctype, act=act)
+    (auth_code, auth_message) = acc_authorize_action(req, "submit", verbose=0, doctype=doctype, act=act, categ=categ)
     if acc_is_role("submit", doctype=doctype, act=act) and auth_code != 0:
         return warningMsg("""<center><font color="red">%s</font></center>""" % auth_message, req)
 
