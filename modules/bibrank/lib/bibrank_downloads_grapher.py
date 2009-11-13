@@ -64,7 +64,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         id_bibdocs &= id_existing_bibdocs
 
         history_analysis_results = ()
-        if id_bibdocs:
+        if not id_bibdocs:
             pass
         elif len(id_bibdocs) <= cfg_id_bibdoc_id_bibrec and 0 not in id_bibdocs:
             history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs))
