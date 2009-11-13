@@ -131,7 +131,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS',
                        'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES',
                        'CFG_SITE_EMERGENCY_PHONE_NUMBERS',
-                       'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST']:
+                       'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
+                       'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

@@ -59,7 +59,8 @@ from invenio.config import \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
-     CFG_WEBSEARCH_USE_ALEPH_SYSNOS
+     CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
+     CFG_WEBSEARCH_RSS_I18N_COLLECTIONS
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
@@ -987,8 +988,15 @@ def display_collection(req, c, aas, verbose, ln):
         title = ""
     # RSS:
     rssurl = CFG_SITE_URL + '/rss'
+    rssurl_params = []
     if c != CFG_SITE_NAME:
-        rssurl += '?cc=' + quote(c)
+        rssurl_params.append('cc=' + quote(c))
+    if ln != CFG_SITE_LANG and \
+           c in CFG_WEBSEARCH_RSS_I18N_COLLECTIONS:
+        rssurl_params.append('ln=' + ln)
+
+    if rssurl_params:
+        rssurl += '?' + '&amp;'.join(rssurl_params)
 
     if 'hb' in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
         metaheaderadd = """
@@ -1035,10 +1043,10 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
         default_params.update({'jrec':(int, 1),
                                'rg': (int, CFG_WEBSEARCH_INSTANT_BROWSE_RSS)})
         argd = wash_urlargd(form, default_params)
+        user_info = collect_user_info(req)
 
         for coll in argd['c'] + [argd['cc']]:
             if collection_restricted_p(coll):
-                user_info = collect_user_info(req)
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
                 if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
@@ -1103,6 +1111,8 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             req.write(rss_prologue)
             rss_body = format_records(recIDs,
                                       of='xr',
+                                      ln=argd['ln'],
+                                      user_info=user_info,
                                       record_separator="\n",
                                       req=req, epilogue="\n")
             rss_epilogue = websearch_templates.tmpl_xml_rss_epilogue() + '\n'
