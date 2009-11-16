@@ -2605,6 +2605,7 @@ class BibDocFile:
                  ln = ln,
                  recid = self.recid,
                  version = self.version,
+                 md = self.md,
                  name = self.name,
                  superformat = self.superformat,
                  subformat = self.subformat,

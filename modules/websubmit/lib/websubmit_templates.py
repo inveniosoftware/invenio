@@ -33,7 +33,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.messages import gettext_set_language
-from invenio.dateutils import convert_datetext_to_dategui
+from invenio.dateutils import convert_datetext_to_dategui, convert_datestruct_to_dategui
 from invenio.urlutils import create_html_link
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.htmlutils import escape_html
@@ -1260,7 +1260,7 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, superformat, subformat, nice_size, description):
+    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, md, superformat, subformat, nice_size, description):
         """
         Displays a file in the file list.
 
@@ -1273,6 +1273,8 @@ class Template:
           - 'name' *string* - The name of the file
 
           - 'version' *string* - The version
+
+          - 'md' *datetime* - the modification date
 
           - 'superformat' *string* - The display superformat
 
@@ -1308,11 +1310,13 @@ class Template:
                     </td>
                     <td valign="top">
                       <font size="-2" color="green">[%(nice_size)s]</font>
+                      <font size="-2"><em>%(md)s</em>
                     </td>
                     <td valign="top"><em>%(description)s</em></td>
                     </tr>""" % {
                       'link' : link,
                       'nice_size' : nice_size,
+                      'md' : convert_datestruct_to_dategui(md.timetuple(), ln),
                       'description' : cgi.escape(description),
                     }
 
