@@ -23,6 +23,10 @@ __lastupdated__ = """$Date$"""
 
 """These functions are temporaly managing roles and other authorization via
 unique urls sent by email.
+
+FIXME: This module should be refactored into a class, as there is no point
+it has to host client specific code, when each client can instead
+derive from the base class and add specific bits.
 """
 
 import sys
@@ -42,15 +46,15 @@ from cPickle import dumps, loads
 class InvenioWebAccessMailCookieError(Exception):
     pass
 
-class InvenioWebAccessMailCookieDeletedError(Exception):
+class InvenioWebAccessMailCookieDeletedError(InvenioWebAccessMailCookieError):
     pass
 
 
 _authorizations_kind = ('pw_reset', 'mail_activation', 'role', 'authorize_action',
-                        'comment_msg')
+                        'comment_msg', 'generic')
 _datetime_format = "%Y-%m-%d %H:%M:%S"
 
-def mail_cookie_create_generic(kind, params, cookie_timeout=timedelta(days=1), onetime=False):
+def mail_cookie_create_common(kind, params, cookie_timeout=timedelta(days=1), onetime=False):
     """Create a unique url to be sent via email to access this authorization
     @param kind: kind of authorization (e.g. 'pw_reset', 'mail_activation', 'role')
     @param params: whatever parameters are needed
@@ -72,14 +76,14 @@ def mail_cookie_create_role(role_name, role_timeout=timedelta(hours=3), cookie_t
     assert(acc_get_role_id(role_name) != 0)
     kind = 'role'
     params = (role_name, role_timeout)
-    return mail_cookie_create_generic(kind, params, cookie_timeout, onetime)
+    return mail_cookie_create_common(kind, params, cookie_timeout, onetime)
 
 def mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(days=1)):
     """Create a unique url to be sent via email to reset the local password."""
     kind = 'pw_reset'
     if (run_sql('SELECT email FROM user WHERE email=%s', (email, ))):
         params = email
-        return mail_cookie_create_generic(kind, params, cookie_timeout, False)
+        return mail_cookie_create_common(kind, params, cookie_timeout, False)
     else:
         raise InvenioWebAccessMailCookieError, "Email '%s' doesn't exist" % email
 
@@ -87,7 +91,7 @@ def mail_cookie_create_mail_activation(email, cookie_timeout=timedelta(days=1)):
     """Create a unique url to be sent via email to activate an email address"""
     kind = 'mail_activation'
     params = email
-    return mail_cookie_create_generic(kind, params, cookie_timeout, True)
+    return mail_cookie_create_common(kind, params, cookie_timeout, True)
 
 def mail_cookie_create_authorize_action(action_name, arguments,  cookie_timeout=timedelta(days=1)):
     """Create a cookie for a valid authorization contanin all the
@@ -95,7 +99,7 @@ def mail_cookie_create_authorize_action(action_name, arguments,  cookie_timeout=
 
     kind = 'authorize_action'
     params = (action_name, arguments)
-    return mail_cookie_create_generic(kind, params, cookie_timeout, False)
+    return mail_cookie_create_common(kind, params, cookie_timeout, False)
 
 def mail_cookie_retrieve_kind(cookie):
     """Retrieve if it exists the kind of a cookie."""
@@ -110,7 +114,7 @@ def mail_cookie_retrieve_kind(cookie):
     except StandardError:
         raise InvenioWebAccessMailCookieError, "Cookie doesn't exist"
 
-def mail_cookie_check_generic(cookie, delete=False):
+def mail_cookie_check_common(cookie, delete=False):
     """Retrieve data pointed by a cookie, returning a tuple (kind, params) or None
     if the cookie is not valid or is expired"""
     try:
@@ -139,7 +143,7 @@ def mail_cookie_check_role(cookie, uid):
     """Check a given cookie for a valid authorization to a particular role and
     temporaly add the given uid to the role specified."""
     try:
-        (kind, params) = mail_cookie_check_generic(cookie)
+        (kind, params) = mail_cookie_check_common(cookie)
         assert(kind == 'role')
         (role_name, role_timeout) = params
         role_id = acc_get_role_id(role_name)
@@ -156,7 +160,7 @@ def mail_cookie_check_pw_reset(cookie):
     a particular email address. Return the name of a valid email to reset
     it's password or None otherwise"""
     try:
-        (kind, email) = mail_cookie_check_generic(cookie)
+        (kind, email) = mail_cookie_check_common(cookie)
         assert(kind == 'pw_reset')
         return email
     except (TypeError, AssertionError, StandardError), e:
@@ -165,7 +169,7 @@ def mail_cookie_check_pw_reset(cookie):
 def mail_cookie_check_mail_activation(cookie):
     """Check a given cookie for a valid authorization to activate a particular email address."""
     try:
-        (kind, email) = mail_cookie_check_generic(cookie)
+        (kind, email) = mail_cookie_check_common(cookie)
         assert(kind == 'mail_activation')
         res = run_sql('SELECT note FROM user WHERE email=%s', (email, ))
         if res:
@@ -179,7 +183,7 @@ def mail_cookie_check_authorize_action(cookie):
     """Check a given cookie for a valid authorization contanin all the
     information to authorize an action. Well it's a meta-cookie :-)."""
     try:
-        (kind, params) = mail_cookie_check_generic(cookie)
+        (kind, params) = mail_cookie_check_common(cookie)
         assert(kind == 'authorize_action')
         return params
     except (TypeError, AssertionError), e:
@@ -188,7 +192,7 @@ def mail_cookie_check_authorize_action(cookie):
 
 def mail_cookie_delete_cookie(cookie):
     """Remove a particular cookie."""
-    mail_cookie_check_generic(cookie, delete=True)
+    mail_cookie_check_common(cookie, delete=True)
 
 
 def mail_cookie_gc():

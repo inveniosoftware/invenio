@@ -56,8 +56,8 @@ from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import \
      mail_cookie_create_authorize_action, \
-     mail_cookie_create_generic, \
-     mail_cookie_check_generic, \
+     mail_cookie_create_common, \
+     mail_cookie_check_common, \
      InvenioWebAccessMailCookieDeletedError, \
      InvenioWebAccessMailCookieError
 import invenio.template
@@ -285,7 +285,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             # Save user's value in cookie, so that these "POST"
             # parameters are not lost during login process
-            msg_cookie = mail_cookie_create_generic('comment_msg',
+            msg_cookie = mail_cookie_create_common('comment_msg',
                                                     {'msg': argd['msg'],
                                                      'note': argd['note'],
                                                      'score': argd['score'],
@@ -335,7 +335,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 # User had to login in-between, so retrieve msg
                 # from cookie
                 try:
-                    (kind, cookie_argd) = mail_cookie_check_generic(argd['cookie'],
+                    (kind, cookie_argd) = mail_cookie_check_common(argd['cookie'],
                                                                     delete=True)
 
                     argd.update(cookie_argd)
