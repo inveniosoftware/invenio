@@ -23,6 +23,8 @@ from invenio.config import CFG_CACHEDIR, CFG_SITE_LANG
 from urllib2 import urlopen
 from xml.dom import minidom
 import time
+import socket
+
 from invenio.webjournal_utils import \
      parse_url_string
 from invenio.messages import gettext_set_language
