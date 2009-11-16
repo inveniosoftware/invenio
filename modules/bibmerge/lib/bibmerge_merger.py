@@ -297,8 +297,8 @@ def copy_R2_to_R1(rec1, rec2):
     """Copies contents of R2 to R1 apart from the controlfields."""
     tmprec = deepcopy(rec1)
     for fnum in tmprec:
-         if fnum[:2] != '00': #if it's not a control field delete it from rec1
-             del rec1[fnum]
+        if fnum[:2] != '00': #if it's not a control field delete it from rec1
+            del rec1[fnum]
     for fnum in rec2:
-         if fnum[:2] != '00': #if it's not a control field add it to rec2
-             rec1[fnum] = rec2[fnum]
+        if fnum[:2] != '00': #if it's not a control field add it to rec2
+            rec1[fnum] = rec2[fnum]
