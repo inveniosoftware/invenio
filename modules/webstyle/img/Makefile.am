@@ -9,18 +9,181 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-gifsdir=$(localstatedir)/www/img
+imgdir=$(localstatedir)/www/img
 
-GIFS = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
+img_DATA = add-small.png \
+           add.png \
+           answer_bad.gif \
+           arrow_down.gif \
+           arrow_down2.png \
+           arrow_link-icon-15x11-right.gif \
+           arrow_up.gif \
+           arrow_up2.png \
+           at.gif \
+           blankicon.gif \
+           blue_gradient.gif \
+           bullet_toggle_minus.png \
+           bullet_toggle_plus.png \
+           cds.png \
+           circle_green.png \
+           circle_red.png \
+           cross_red.gif \
+           delete-big.png \
+           delete-small.png \
+           delete.png \
+           description.gif \
+           diff.png \
+           dot.gif \
+           down-trans.gif \
+           down.gif \
+           edit1.gif \
+           external-icon-light-8x8.gif \
+           feed-icon-12x12.gif \
+           file-icon-none-96x128.gif \
+           file-icon-text-12x16.gif \
+           file-icon-text-15x20.gif \
+           file-icon-text-34x48.gif \
+           file-icon-text-96x128.gif \
+           forbidden_left.gif \
+           forbidden_right.gif \
+           gradient-lightgray-1x100.gif \
+           gradient_tab-gray-1x23.gif \
+           gradient_tab_on-gray-1x23.gif \
+           group_admin.png \
+           head.gif \
+           header_background.gif \
+           help.png \
+           icon-journal_Athanasius_Kircher_Atlantis.gif \
+           icon-journal_hms_beagle.gif \
+           iconcross.gif \
+           iconeye.gif \
+           iconpen.gif \
+           indicator.gif \
+           journal-template1.gif \
+           journal-template2.gif \
+           journal-template3.gif \
+           journal-template4.gif \
+           journal_Athanasius_Kircher_Atlantis.gif \
+           journal_content.png \
+           journal_footer.png \
+           journal_footer2.png \
+           journal_header.png \
+           journal_hms_beagle.gif \
+           journal_new.png \
+           journal_virgin_forest.gif \
+           journal_water_dog.gif \
+           keep_sso_connection_alive.gif \
+           last-right-part-trans.gif \
+           left-part-topless-trans.gif \
+           left-part-trans.gif \
+           left-trans.gif \
+           left.gif \
+           line-up-trans.gif \
+           line.gif \
+           loading.gif \
+           mail-icon-12x8.gif \
+           mainmenu.gif \
+           merge-small.png \
+           merge.png \
+           mergeNC.png \
+           move.png \
+           move_from.gif \
+           move_to.gif \
+           noway.gif \
+           okay.gif \
+           out.gif \
+           paper-texture-128x128.gif \
+           paper_clip-72x72.gif \
+           r.gif \
+           rcorners-gray-1280x18.gif \
+           rcorners-gray-1280x60-folded.gif \
+           red_gradient.gif \
+           refresh.png \
+           replace.png \
+           restricted.gif \
+           right-part-topless-trans.gif \
+           right-part-trans.gif \
+           right-trans.gif \
+           right.gif \
+           rss.png \
+           sb.gif \
+           sbm_guide_accessnumber.png \
+           sbm_guide_approvals.png \
+           sbm_guide_approve_button.png \
+           sbm_guide_browse.png \
+           sbm_guide_description.png \
+           sbm_guide_login.png \
+           sbm_guide_logout.png \
+           sbm_guide_modify_button.png \
+           sbm_guide_revise_button.png \
+           sbm_guide_submissions.png \
+           sbm_guide_submit_button.png \
+           sbm_guide_subnumber.png \
+           sbm_guide_summary.png \
+           sclose.gif \
+           se.gif \
+           search.png \
+           smallbin.gif \
+           smalldown.gif \
+           smallfiles.gif \
+           smallup.gif \
+           smchk_gr.gif \
+           smchk_rd.gif \
+           sn.gif \
+           sp.gif \
+           star-icon-30x30.gif \
+           star_dot-icon-30x30.gif \
+           star_empty-icon-30x30.gif \
+           star_half-icon-30x30.gif \
+           stars-0-0.png \
+           stars-0-5.png \
+           stars-1-0.png \
+           stars-1-5.png \
+           stars-2-0.png \
+           stars-2-5.png \
+           stars-3-0.png \
+           stars-3-5.png \
+           stars-4-0.png \
+           stars-4-5.png \
+           stars-5-0.png \
+           summary.gif \
+           table.png \
+           table_add.png \
+           table_delete.png \
+           table_multiple.png \
+           table_row_delete.png \
+           table_row_insert.png \
+           table_sort.png \
+           tick.gif \
+           up.gif \
+           user-icon-1-16x16.gif \
+           user-icon-1-20x20.gif \
+           user-icon-1-24x24.gif \
+           waiting_or.gif \
+           webbasket_create.png \
+           webbasket_create_small.png \
+           webbasket_delete.png \
+           webbasket_down.png \
+           webbasket_extern.png \
+           webbasket_intern.png \
+           webbasket_move.png \
+           webbasket_ugs.png \
+           webbasket_up.png \
+           webbasket_us.png \
+           webbasket_user.png \
+           webbasket_usergroup.png \
+           webbasket_usergroup_gray.png \
+           webbasket_world.png \
+           webbasket_ws.png \
+           white_field.gif \
+           wsignout.gif
 
-gifs_DATA = $(GIFS:$(srcdir)/%=%)
-
-EXTRA_DIST = $(gifs_DATA)
+EXTRA_DIST = $(img_DATA)
 
 CLEANFILES = *~ *.tmp
