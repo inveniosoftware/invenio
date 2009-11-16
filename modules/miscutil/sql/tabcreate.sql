@@ -2536,7 +2536,7 @@ CREATE TABLE IF NOT EXISTS accACTION (
 CREATE TABLE IF NOT EXISTS accARGUMENT (
   id int(15) unsigned NOT NULL auto_increment,
   keyword varchar (32),
-  value varchar(64),
+  value varchar(255),
   PRIMARY KEY (id),
   KEY KEYVAL (keyword, value)
 ) TYPE=MyISAM;

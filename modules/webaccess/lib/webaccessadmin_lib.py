@@ -2638,8 +2638,8 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
             for key in res_keys:
                 output += '<span class="adminlabel" style="margin-left: 30px;">%s </span>\n <input class="admin_wvar" type="text" name="%s"' % (key, key)
                 try:
-                    val = keywords[key] = cleanstring_argumentvalue(keywords[key])
-                    if val: output += 'value="%s" ' % (val, )
+                    val = keywords[key] # = cleanstring_argumentvalue(keywords[key])
+                    if val: output += 'value="%s" ' % (escape(val, True), )
                     else: allkeys = 0
                 except KeyError: allkeys = 0
                 output += ' /> <br />\n'
@@ -2662,7 +2662,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                     keywords = {}
                 else:
                     for key in keys:
-                        text += '<strong>%s</strong>: %s \n' % (key, keywords[key])
+                        text += '<strong>%s</strong>: %s \n' % (escape(key), escape(keywords[key]))
 
                 output += createhiddenform(action="addauthorization",
                                         text=text,
