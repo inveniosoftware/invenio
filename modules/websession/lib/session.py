@@ -374,8 +374,7 @@ class InvenioSession(dict):
                 WHERE session_expiry<=UNIX_TIMESTAMP()
             """)
         self._req.register_cleanup(session_cleanup)
-        self._req.log_error("InvenioSession: registered database cleanup.",
-                            APLOG_NOTICE)
+        self._req.log_error("InvenioSession: registered database cleanup.")
 
     def __del__(self):
         self.unlock()
