@@ -22,21 +22,26 @@ import shutil
 import time
 
 from invenio.config import \
-     CFG_BINDIR, \
      CFG_TMPDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.bibtask import task_low_level_submission
 
 def Insert_Modify_Record(parameters, curdir, form, user_info=None):
+    """
+    Modify existing record using curdir/recmysql and BibUpload correct
+    mode.
+    """
     global rn
-    if os.path.exists("%s/recmysqlfmt" % curdir):
+    if os.path.exists(os.path.join(curdir, "recmysqlfmt")):
         recfile = "recmysqlfmt"
-    elif os.path.exists("%s/recmysql" % curdir):
+    elif os.path.exists(os.path.join(curdir, "recmysql")):
         recfile = "recmysql"
     else:
         raise InvenioWebSubmitFunctionError("Could not find record file")
-    initialfile = "%s/%s" % (curdir,recfile)
-    finalfile = "%s/%s_%s" % (CFG_TMPDIR,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
-    shutil.copy(initialfile,finalfile)
-    task_low_level_submission('bibupload', 'websubmit.Insert_Modify_Record', '-c', finalfile, '-P', '3')
+    initial_file = os.path.join(curdir, recfile)
+    final_file = os.path.join(CFG_TMPDIR, "%s_%s" % \
+                              (rn.replace('/', '_'),
+                               time.strftime("%Y-%m-%d_%H:%M:%S")))
+    shutil.copy(initial_file, final_file)
+    task_low_level_submission('bibupload', 'websubmit.Insert_Modify_Record', '-c', final_file, '-P', '3')
     return ""

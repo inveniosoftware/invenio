@@ -22,19 +22,23 @@ import time
 import shutil
 
 from invenio.config import \
-     CFG_BINDIR, \
      CFG_TMPDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.bibtask import task_low_level_submission
 
 def Insert_Record(parameters, curdir, form, user_info=None):
+    """
+    Insert record in curdir/recmysql using BibUpload.
+    """
     global rn
-    if os.path.exists("%s/recmysql" % curdir):
+    if os.path.exists(os.path.join(curdir, "recmysql")):
         recfile = "recmysql"
     else:
         raise InvenioWebSubmitFunctionError("Could not find record file")
-    initialfile = "%s/%s" % (curdir,recfile)
-    finalfile = "%s/%s_%s" % (CFG_TMPDIR,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
-    shutil.copy(initialfile,finalfile)
-    task_low_level_submission('bibupload', 'websubmit.Insert_Record', '-r', '-i', finalfile, '-P', '3')
+    initial_file = os.path.join(curdir, recfile)
+    final_file = os.path.join(CFG_TMPDIR, "%s_%s" % \
+                              (rn.replace('/', '_'),
+                               time.strftime("%Y-%m-%d_%H:%M:%S")))
+    shutil.copy(initial_file, final_file)
+    task_low_level_submission('bibupload', 'websubmit.Insert_Record', '-r', '-i', final_file, '-P', '3')
     return ""
