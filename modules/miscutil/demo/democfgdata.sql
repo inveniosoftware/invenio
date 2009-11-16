@@ -48,7 +48,7 @@ INSERT INTO collection VALUES (18,'Poetry','collection:POETRY',NULL,NULL);
 INSERT INTO collection VALUES (19,'Atlantis Times News','collection:ATLANTISTIMESNEWS',NULL,NULL);
 INSERT INTO collection VALUES (20,'Atlantis Times Arts','collection:ATLANTISTIMESARTS',NULL,NULL);
 INSERT INTO collection VALUES (21,'Atlantis Times Science','collection:ATLANTISTIMESSCIENCE',NULL,NULL);
-INSERT INTO collection VALUES (22,'Atlantis Times','',NULL,NULL);
+INSERT INTO collection VALUES (22,'Atlantis Times',NULL,NULL,NULL);
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','http://cdsware.cern.ch/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://cdsware.cern.ch/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
