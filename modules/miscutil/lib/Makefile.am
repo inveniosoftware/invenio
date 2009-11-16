@@ -54,6 +54,7 @@ noinst_DATA = testimport.py \
 EXTRA_DIST = $(pylib_DATA) \
              testimport.py \
              kwalitee.py \
+             pep8.py \
              intbitset.pyx \
              intbitset.c \
              intbitset.h \

@@ -37,13 +37,14 @@ Contents
               python-libxml2 python-libxslt1 gnuplot poppler-utils \
               gs-common antiword catdoc wv html2text ppthtml xlhtml \
               clisp gettext libapache2-mod-wsgi unzip python-numpy \
-              python-rdflib python-gnuplot
+              python-rdflib python-gnuplot python-magic pdftk \
+              html2text giflib-tools pstotext
 
         You may also want to install some of the following packages,
         if you have them available on your concrete architecture:
 
           $ sudo aptitude install rxp python-psyco sbcl cmucl \
-              pylint pychecker pyflakes python-profiler
+              pylint pychecker pyflakes python-profiler python-epydoc
 
         Moreover, you should install some Message Transfer Agent (MTA)
         such as Postfix so that CDS Invenio can email notification
@@ -104,6 +105,8 @@ Contents
              <http://www.mindrot.org/projects/py-editdist/>
           - (recommended) numpy, for citerank methods:
              <http://numpy.scipy.org/>
+          - (recommended) magic, for full-text file handling:
+             <http://www.darwinsys.com/file/>
           - (optional) 4suite, slower alternative to PyRXP and
              libxml2-python:
              <http://4suite.org/>
@@ -364,7 +367,7 @@ Contents
               $ sudo aptitude install automake1.9 autoconf
               $ aclocal-1.9
               $ automake-1.9 -a
-              $ autconf
+              $ autoconf
 
           after which you proceed with the usual configure command.)
 
@@ -414,7 +417,7 @@ Contents
           place jQuery and related plugins.  They are used for AJAX
           applications such as the record editor.
 
-          Not that `unzip' is needed when installing jquery plugins.
+          Note that `unzip' is needed when installing jquery plugins.
 
       $ make install-fckeditor-plugin  ## optional
 

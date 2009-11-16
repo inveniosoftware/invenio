@@ -23,6 +23,7 @@ pylib_DATA = bibexport.py \
              bibexport_method_fieldexporter_webinterface.py \
              bibexport_method_fieldexporter_templates.py \
              bibexport_method_fieldexporter.py \
+             bibexport_method_fieldexporter_tests.py \
              bibexport_method_fieldexporter_dblayer.py
 
 EXTRA_DIST = $(pylib_DATA)

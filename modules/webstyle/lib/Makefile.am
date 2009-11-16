@@ -19,20 +19,20 @@ pylibdir=$(libdir)/python/invenio
 wsgiwebdir=$(localstatedir)/www-wsgi/
 
 pylib_DATA = webdoc.py \
-			webdoc_tests.py \
-			webdoc_webinterface.py \
-			webpage.py \
-			template.py \
-			webstyle_templates.py \
-			webinterface_handler.py \
-			webinterface_tests.py \
-			webinterface_layout.py \
-			fckeditor_invenio_connector.py \
-			webinterface_handler_wsgi.py \
-			webinterface_handler_wsgi_utils.py
+             webdoc_tests.py \
+             webdoc_webinterface.py \
+             webpage.py \
+             template.py \
+             webstyle_templates.py \
+             webinterface_handler.py \
+             webinterface_tests.py \
+             webinterface_layout.py \
+             fckeditor_invenio_connector.py \
+             webinterface_handler_wsgi.py \
+             webinterface_handler_wsgi_utils.py
 
 wsgiweb_DATA = invenio.wsgi
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) $(wsgiweb_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
