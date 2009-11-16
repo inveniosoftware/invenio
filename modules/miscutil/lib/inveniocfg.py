@@ -709,9 +709,12 @@ def cli_cmd_create_apache_conf(conf):
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
     ## Apache vhost conf file is distro specific, so analyze needs:
-    # Gentoo (and generic default):
+    # Gentoo (and generic defaults):
     listen_directive_needed = True
     ssl_pem_directive_needed = False
+    ssl_pem_path = '/etc/apache2/ssl/apache.pem'
+    ssl_crt_path = '/etc/apache2/ssl/server.crt'
+    ssl_key_path = '/etc/apache2/ssl/server.key'
     vhost_ip_address_needed = False
     wsgi_socket_directive_needed = False
     # Debian:
@@ -721,6 +724,8 @@ def cli_cmd_create_apache_conf(conf):
     # RHEL/SLC:
     if os.path.exists(os.path.sep + 'etc' + os.path.sep + 'redhat-release'):
         listen_directive_needed = False
+        ssl_crt_path = '/etc/pki/tls/certs/localhost.crt'
+        ssl_key_path = '/etc/pki/tls/private/localhost.key'
         vhost_ip_address_needed = True
         wsgi_socket_directive_needed = True
     ## okay, let's create Apache vhost files:
@@ -850,14 +855,14 @@ WSGIRestrictStdout Off
        'vhost_ip_address': vhost_ip_address_needed and _detect_ip_address() or '*',
        'listen_directive' : listen_directive_needed and 'Listen 443' or '#Listen 443',
        'ssl_pem_directive': ssl_pem_directive_needed and \
-                            'SSLCertificateFile /etc/apache2/ssl/apache.pem' or \
-                            '#SSLCertificateFile /etc/apache2/ssl/apache.pem',
+                            'SSLCertificateFile %s' % ssl_pem_path or \
+                            '#SSLCertificateFile %s' % ssl_pem_path,
        'ssl_crt_directive': ssl_pem_directive_needed and \
-                            '#SSLCertificateFile /etc/apache2/ssl/server.crt' or \
-                            'SSLCertificateFile /etc/apache2/ssl/server.crt',
+                            '#SSLCertificateFile %s' % ssl_crt_path or \
+                            'SSLCertificateFile %s' % ssl_crt_path,
        'ssl_key_directive': ssl_pem_directive_needed and \
-                            '#SSLCertificateKeyFile /etc/apache2/ssl/server.key' or \
-                            'SSLCertificateKeyFile /etc/apache2/ssl/server.key',
+                            '#SSLCertificateKeyFile %s' % ssl_key_path or \
+                            'SSLCertificateKeyFile %s' % ssl_key_path,
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
