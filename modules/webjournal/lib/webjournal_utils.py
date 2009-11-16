@@ -990,7 +990,7 @@ def datetime_to_issue(issue_datetime, journal_name):
                         AND id_jrnJOURNAL = %s
                    ORDER BY date_released DESC LIMIT 1""",
                   (issue_datetime, journal_id))
-    if res:
+    if res and res[0][1]:
         issue_number = res[0][0]
         issue_release_date = res[0][1]
 
