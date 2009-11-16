@@ -22,7 +22,6 @@
 __revision__ = "$Id$"
 
 import cgi
-import re
 import random
 import time
 
@@ -55,11 +54,11 @@ from invenio.websearch_external_collections import \
 from invenio.websearch_external_collections_utils import \
      get_collection_descendants
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_STATES_NAME
-from invenio.bibformat_elements import bfe_references, bfe_holdings
-from invenio.bibformat_engine import BibFormatObject
+#from invenio.bibformat_elements import bfe_references
+#from invenio.bibformat_engine import BibFormatObject
 from invenio.bibdocfile import BibRecDocs
 from invenio.messages import gettext_set_language
-from invenio.bibrank_citation_searcher import get_cited_by
+#from invenio.bibrank_citation_searcher import get_cited_by
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.errorlib import register_exception

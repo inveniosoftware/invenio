@@ -1,6 +1,0 @@
-<name>Default HTML Holdings</name>
-<description>Outputs the details of a holding</description>
-
-<div style="margin-left:30px;min-height:100px;">
-<BFE_HOLDINGS default="<h2>No details...<h2>"/>
-</div>

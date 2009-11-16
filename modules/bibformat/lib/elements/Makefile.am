@@ -28,7 +28,7 @@ pylib_DATA = bfe_field.py bfe_title.py bfe_authors.py bfe_abstract.py bfe_affili
 	     bfe_bfx_engine.py bfe_creation_date.py bfe_server_info.py bfe_issn.py \
 	     bfe_client_info.py bfe_language.py bfe_record_id.py bfe_comments.py \
 	     bfe_pagination.py bfe_fulltext_mini.py bfe_year.py bfe_isbn.py \
-	     bfe_appears_in_collections.py bfe_holdings.py
+	     bfe_appears_in_collections.py
 
 tmpdir = $(prefix)/var/tmp/tests_bibformat_elements
 
