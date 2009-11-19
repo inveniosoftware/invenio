@@ -130,7 +130,14 @@ class SimulatedModPythonRequest(object):
         self.send_http_header()
         if self.__buffer:
             self.__bytes_sent += len(self.__buffer)
-            self.__write(self.__buffer)
+            try:
+                self.__write(self.__buffer)
+            except IOError, err:
+                if "failed to write data" in str(err) or "client connection closed" in str(err):
+                    ## Let's just log this expection without alerting the admin:
+                    register_exception(req=req)
+                else:
+                    raise
             self.__buffer = ''
 
     def set_content_type(self, content_type):
