@@ -915,8 +915,9 @@ class WordTable:
                 run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
                         (word, set.fastdump()))
             except Exception, e:
-                ## FIXME: This is for debugging encoding errors
-                register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=True)
+                ## We send this exception to the admin only when is not
+                ## already reparing the problem.
+                register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=(task_get_option('cmd') != 'repair'))
 
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
