@@ -27,6 +27,7 @@ __revision__ = "$Id$"
 
 ## import general modules:
 import cgi
+import cStringIO
 import copy
 import string
 import os
@@ -676,7 +677,7 @@ def page_start(req, of, cc, aas, ln, uid, title_message=None,
     "Start page according to given output format."
     _ = gettext_set_language(ln)
 
-    if not req:
+    if not req or isinstance(req, cStringIO.OutputType):
         return # we were called from CLI
 
     if not title_message:
@@ -788,7 +789,7 @@ def page_end(req, of="hb", ln=CFG_SITE_LANG):
     if of.startswith('h'):
         req.write(websearch_templates.tmpl_search_pageend(ln = ln)) # pagebody end
         req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
-    return "\n"
+    return
 
 def create_page_title_search_pattern_info(p, p1, p2, p3):
     """Create the search pattern bit for the page <title> web page
@@ -2882,7 +2883,10 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
         return
 
     # get user_info (for formatting based on user)
-    user_info = collect_user_info(req)
+    if isinstance(req, cStringIO.OutputType):
+        user_info = {}
+    else:
+        user_info = collect_user_info(req)
 
     if len(recIDs):
         nb_found = len(recIDs)
@@ -3865,7 +3869,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         recidb = idb
     # TODO deduce passed search limiting criterias (if applicable)
     pl, pl_in_url = "", "" # no limits by default
-    if action != "browse" and req and req.args: # we do not want to add options while browsing or while calling via command-line
+    if action != "browse" and req and not isinstance(req, cStringIO.OutputType) \
+           and req.args: # we do not want to add options while browsing or while calling via command-line
         fieldargs = cgi.parse_qs(req.args)
         for fieldcode in get_fieldcodes():
             if fieldargs.has_key(fieldcode):

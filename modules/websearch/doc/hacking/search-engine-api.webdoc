@@ -1,3 +1,4 @@
+
 ## -*- mode: html; coding: utf-8; -*-
 
 ## This file is part of CDS Invenio.
@@ -223,7 +224,7 @@ via both a high-level and low-level API interface.
                      (e.g. "SPIRES HEP").
           """
 
-   Examples:
+   Examples: (retrieving record IDs)
 
       >>> # import the function:
       >>> from invenio.search_engine import perform_request_search
@@ -241,6 +242,28 @@ via both a high-level and low-level API interface.
       >>> perform_request_search(p="moi", cc="Standards")
       >>> # but it does if we use alternative patterns:
       >>> perform_request_search(p="moi", cc="Standards", ap=1)
+
+   Example: (retrieving MARCXML)
+
+      >>> import cStringIO
+      >>> tmp = cStringIO.StringIO()
+      >>> perform_request_search(req=tmp, p='ellis', of='xm')
+      >>> out = tmp.getvalue()
+      >>> tmp.close()
+      >>> # `out' now contains MARCXML of 12 records found
+
+   Example: (retrieving Text MARC, certain tags only)
+
+      >>> import cStringIO
+      >>> tmp = cStringIO.StringIO()
+      >>> perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '700'])
+      >>> out = tmp.getvalue()
+      >>> tmp.close()
+      >>> print out
+      000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+      000000085 700__ $$aPorrati, Massimo
+      000000085 700__ $$aZaffaroni, A
+      000000001 100__ $$aPhotolab
 
 2. Mid-level API
 
