@@ -69,7 +69,9 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
     CFG_TMPDIR, CFG_PATH_MD5SUM, \
-    CFG_WEBSUBMIT_STORAGEDIR
+    CFG_WEBSUBMIT_STORAGEDIR, \
+    CFG_BIBDOCFILE_USE_XSENDFILE, \
+    CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY
 from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -1770,7 +1772,7 @@ class BibDocFile:
             auth_code = 0
         if auth_code == 0:
             if os.path.exists(self.fullpath):
-                if random.random() < 0.25 and calculate_md5(self.fullpath) != self.checksum:
+                if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
                 stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
                 raise apache.SERVER_RETURN, apache.DONE
@@ -1937,6 +1939,21 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             if value:
                 ret[key] = value
         return ret
+
+    if CFG_BIBDOCFILE_USE_XSENDFILE:
+        ## If XSendFile is supported by the server, let's use it.
+        if os.path.exists(fullpath):
+            req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+            req.headers_out["X-Sendfile"] = fullpath
+            if mime is None:
+                format = decompose_file(fullpath)[2]
+                (mime, encoding) = _mimes.guess_type(fullpath)
+                if mime is None:
+                    mime = "application/octet-stream"
+            req.content_type = mime
+            return ""
+        else:
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
     headers = get_normalized_headers(req.headers_in)
     if headers['if-match']:

@@ -44,7 +44,8 @@ Contents
         if you have them available on your concrete architecture:
 
           $ sudo aptitude install rxp python-psyco sbcl cmucl \
-              pylint pychecker pyflakes python-profiler python-epydoc
+              pylint pychecker pyflakes python-profiler python-epydoc \
+              libapache2-mod-xsendfile
 
         Moreover, you should install some Message Transfer Agent (MTA)
         such as Postfix so that CDS Invenio can email notification
@@ -78,8 +79,10 @@ Contents
 
      c) Apache 2 server, with support for loading DSO modules, and
         optionally with SSL support for HTTPS-secure user
-        authentication.
+        authentication, and mod_xsendfile for off-loading file
+        downloads away from Invenio processes to Apache.
           <http://httpd.apache.org/>
+          <http://tn123.ath.cx/mod_xsendfile/>
 
      d) Python v2.4 or above:
           <http://python.org/>
@@ -548,6 +551,9 @@ Contents
 
               ## enable SSL module:
               $ sudo /usr/sbin/a2enmod ssl
+
+              ## if you are using xsendfile module, enable it too:
+              $ sudo /usr/sbin/a2enmod xsendfile
 
           If you are using another operating system, you should do the
           equivalent, for example edit your system-wide httpd.conf and

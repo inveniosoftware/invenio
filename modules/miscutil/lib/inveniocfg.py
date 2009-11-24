@@ -155,6 +155,10 @@ def convert_conf_option(option_name, option_value):
         # treated elsewhere
         return
 
+    ## 3g) special cases: float
+    if option_name == 'CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY':
+        option_value = float(option_value[1:-1])
+
     ## 4) finally, return output line:
     return '%s = %s' % (option_name, option_value)
 
@@ -709,6 +713,7 @@ def cli_cmd_create_apache_conf(conf):
     from invenio.textutils import wrap_text_in_a_box
     apache_conf_dir = conf.get("Invenio", 'CFG_ETCDIR') + \
                       os.sep + 'apache'
+    xsendfile_directive_needed = int(conf.get("Invenio", 'CFG_BIBDOCFILE_USE_XSENDFILE')) != 0
     ## Apache vhost conf file is distro specific, so analyze needs:
     # Gentoo (and generic defaults):
     listen_directive_needed = True
@@ -743,6 +748,7 @@ ServerTokens Prod
 NameVirtualHost %(vhost_ip_address)s:80
 %(listen_directive)s
 %(wsgi_socket_directive)s
+%(xsendfile_directive)s
 WSGIRestrictStdout Off
 WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
 <Files *.pyc>
@@ -799,6 +805,9 @@ WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-grou
        'wsgi_socket_directive': (wsgi_socket_directive_needed and \
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
               conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
+       'xsendfile_directive' : xsendfile_directive_needed and \
+                               "XSendFile On\nXSendFileAllowAbove On" or \
+                               "#XSendFile On\n#XSendFileAllowAbove On",
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
@@ -808,6 +817,7 @@ NameVirtualHost %(vhost_ip_address)s:443
 %(ssl_pem_directive)s
 %(ssl_crt_directive)s
 %(ssl_key_directive)s
+%(xsendfile_directive)s
 WSGIRestrictStdout Off
 <Files *.pyc>
    deny from all
@@ -869,6 +879,9 @@ WSGIRestrictStdout Off
        'ssl_key_directive': ssl_pem_directive_needed and \
                             '#SSLCertificateKeyFile %s' % ssl_key_path or \
                             'SSLCertificateKeyFile %s' % ssl_key_path,
+       'xsendfile_directive' : xsendfile_directive_needed and \
+                               "XSendFile On\nXSendFileAllowAbove On" or \
+                               "#XSendFile On\n#XSendFileAllowAbove On",
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
