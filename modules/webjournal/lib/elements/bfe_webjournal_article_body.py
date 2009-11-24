@@ -27,6 +27,7 @@ from invenio.messages import gettext_set_language
 from invenio.urlutils import create_html_mailto
 from invenio.config import CFG_CERN_SITE
 from invenio.webjournal_utils import parse_url_string
+from invenio.bibformat_elements import bfe_fulltext
 
 def format(bfo, separator='<br/>'):
     """
@@ -68,7 +69,9 @@ def format(bfo, separator='<br/>'):
             year = int(bfo.fields('260__c')[0])
         except IndexError:
             year = 2000
-        if year < 2009:
+        if year < 2009 or \
+           (bfo.field('980__a').startswith('BULLETINSTAFF') and \
+            ("CERN EDS" in bfo.field('595__a'))):
             is_old_cern_bulletin_article = True
 
     header_out = ''
@@ -77,11 +80,14 @@ def format(bfo, separator='<br/>'):
         return separator.join(article)
 
     # Old CERN articles
-    if year < 2007:
+    if year < 2007 or bfo.field('980__a').startswith('BULLETINSTAFF'):
         # Really old CERN articles
         if len(article) > 0:
             # CERN-only: old CERN Bulletin articles
-            return __backward_compatible_HTML(article[0])
+            return __backward_compatible_HTML(article[0]) + \
+                   (bfo.field('980__a').startswith('BULLETINSTAFF') and \
+                    ('<br/><br/>' + bfe_fulltext.format(bfo, style="", show_icons='yes')) \
+                    or '')
         else:
             return ''
 
