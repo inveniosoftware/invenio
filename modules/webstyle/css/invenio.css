@@ -25,6 +25,7 @@ body {
    background: #fff;
    margin: 0px;
    padding: 0px;
+   font-family: sans-serif;
 }
 h1 {
    font-size: 173%;
@@ -248,27 +249,54 @@ color: #6E5907;
 
 .headerbox {
    color: #000;
-   background: transparent;
+   /*background: transparent;*/
    width: 100%;
    padding: 0px;
    margin-top: 0px;
    margin-bottom: 0px;
-   border-collapse: collapse;
+   /*border-collapse: collapse;*/
+   background-color: #E6E6FA;
+   -webkit-background-clip:padding;
+/*   background-color: #f00;*/
+}
+
+.headerlogo {
+   /*background-color: #79d;*/
+   /*background-color: #36c;*/
+   /*background-color: #369;*/
+   /*background-color: #E6E6FA;*/
+   /*background-image: url(header_background.gif);*/
 }
 .headerboxbody {
    color: #000;
-   padding: 0px;
+   padding: 5px 0px 0px 0px;
    margin: 0px;
 }
-.headerboxbodylogo {
-   width: 200px;
-   padding-left: 5px;
+.headerboxbodylogo a, .headerboxbodylogo a:visited{
+   padding-left: 40px;
+   background: transparent url(atlantis_logo_small.gif) no-repeat top left;
    color: #36c;
    font-size: 20px;
    font-weight: bold;
    font-variant: small-caps;
-   letter-spacing: 6px;
-   padding-bottom:2px;
+   letter-spacing: 3px;
+   padding-bottom: 6px;
+   float: left;
+   clear: none;
+   margin-top: 5px;
+   margin-bottom: 5px;
+   text-decoration: none;
+}
+
+.home .headerboxbodylogo a, .home .headerboxbodylogo a:visited{
+   margin-left: 5px;
+   padding-left: 90px;
+   background: transparent url(atlantis_logo.gif) no-repeat top left;
+   height: 75px;
+   line-height: 3em;
+   font-size: 26px;
+   letter-spacing: 2px;
+   text-decoration: none;
 }
 .headermodulebox {
    color: #fff;
@@ -309,6 +337,7 @@ color: #6E5907;
    font-size: x-small;
    font-weight: bold;
    text-align: center;
+   /*border-bottom: 2px solid #fff;*/
    border-left: 2px solid #36c;
    border-right: 2px solid #36c;
    border-top: 2px solid #36c;
@@ -324,46 +353,39 @@ a.header:link {
 }
 a.header:visited {
    color: #79d;
-   background: #fff;
    text-decoration: none;
    white-space: nowrap;
 }
 a.header:active {
    color: #79d;
-   background: #fff;
    text-decoration: none;
    white-space: nowrap;
 }
 a.header:hover {
    color: #36c;
-   background: #fff;
    text-decoration: underline;
    white-space: nowrap;
 }
 a.headerselected:link {
    color: #36c;
-   background: #fff;
    text-decoration: none;
    font-weight: bold;
    white-space: nowrap;
 }
 a.headerselected:visited {
    color: #36c;
-   background: #fff;
    text-decoration: none;
    font-weight: bold;
    white-space: nowrap;
 }
 a.headerselected:active {
    color: #36c;
-   background: #fff;
    text-decoration: none;
    font-weight: bold;
    white-space: nowrap;
 }
 a.headerselected:hover {
    color: #36c;
-   background: #fff;
    text-decoration: none;
    font-weight: bold;
    white-space: nowrap;
@@ -555,12 +577,19 @@ a.footer:hover {
    padding: 1px;
    margin: 5px 0px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #36c;
+   /*border-top: 1px solid #36c;*/
+}
+.home .searchbox {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.lightsearch input.formbutton{
+    font-size: medium;
 }
 .searchboxheader {
    color: #000;
-   background: #f1f1f1;
-   padding: 3px;
+   /*background: #f1f1f1;
+   padding: 3px;*/
    border-spacing: 0px;
    font-size: small;
    text-align: left;
@@ -576,11 +605,11 @@ a.footer:hover {
    padding: 1px;
    margin: 20px 20px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #36c;
+   /*border-top: 1px solid #36c;*/
 }
 .narrowsearchboxheader {
    color: #000;
-   background: #f1f1f1;
+   /*background: #f1f1f1;*/
    padding: 3px;
    border-spacing: 0px;
    font-size: small;
@@ -588,20 +617,20 @@ a.footer:hover {
 }
 .narrowsearchboxbody {
    color: #000;
-   background: #fff;
+   /*background: #fff;*/
    padding: 3px;
 }
 .focusonsearchbox {
    color: #000;
-   background: #f0f8ff;
+   /*background: #f0f8ff;*/
    padding: 1px;
    margin: 20px 20px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #36c;
+   /*border-top: 1px solid #36c;*/
 }
 .focusonsearchboxheader {
    color: #000;
-   background: #e6e6fa;
+   /*background: #e6e6fa;*/
    padding: 3px;
    border-spacing: 0px;
    font-size: small;
@@ -609,20 +638,20 @@ a.footer:hover {
 }
 .focusonsearchboxbody {
    color: #000;
-   background: #f0f8ff;
+   /*background: #f0f8ff;*/
    padding: 3px;
 }
 .searchalsosearchbox {
    color: #000;
-   background: #fffbf5;
+   /*background: #fffbf5;*/
    padding: 1px;
    margin: 20px 20px 5px 0px;
    border-collapse: collapse;
-   border-top: 1px solid #36c;
+   /*border-top: 1px solid #36c;*/
 }
 .searchalsosearchboxheader {
    color: #000;
-   background: #ffeacc;
+   /*background: #ffeacc;*/
    padding: 3px;
    border-spacing: 0px;
    font-size: small;
@@ -630,7 +659,7 @@ a.footer:hover {
 }
 .searchalsosearchboxbody {
    color: #444;
-   background: #fffbf5;
+   /*background: #fffbf5;*/
    padding: 3px;
 }
 .latestadditionsbox {
@@ -663,7 +692,7 @@ a.footer:hover {
    margin: 0px 0px 15px 0px;
    border-collapse: collapse;
    border-top: 1px solid #abb;
-   font-size: x-small;
+   font-size: small;
    width: 100%;
 }
 .portalboxheader {
@@ -673,13 +702,13 @@ a.footer:hover {
    border-spacing: 0px;
    border-bottom: 1px solid #999;
    text-align: left;
-   font-size: x-small;
+   font-size: small;
 }
 .portalboxbody {
    color: #000;
    background: #fff;
    padding: 2px;
-   font-size: x-small;
+   font-size: small;
 }
 .admin_wvar, .admin_w200, .admin_wvar_nomargin {
    color: #000;
@@ -777,6 +806,38 @@ a.google:hover {
    font-size: small;
    text-align: left;
    vertical-align: top;
+}
+.youraccountbox {
+   color: #000;
+   background: #fff;
+   padding: 1px;
+   margin: 5px 0px 5px 0px;
+   border-collapse: collapse;
+   border-top: 1px solid #fc0;
+}
+.youraccountheader {
+   color: #333;
+   background: #ffc;
+   font-weight: normal;
+   font-size: small;
+   vertical-align: top;
+   text-align: left;
+}
+.youraccountbody {
+   color: #333;
+   background: #fff;
+   padding: 0px 5px 0px 5px;
+   margin-bottom:5px;
+   font-size: small;
+   text-align: left;
+   vertical-align: top;
+}
+th.youraccountheader a:link, th.youraccountheader a:visited {
+   color:#000000;
+   text-decoration:none;
+}
+th.youraccountheader a:hover {
+   text-decoration:underline;
 }
 .adminbox {
    color: #000;
@@ -934,8 +995,10 @@ a.nearesttermsselected:hover {
 .userinfoboxbody {
    color: #039;
    padding: 5px 5px 2px 0px;
-   font-size: x-small;
+   font-size: 11px;
    font-weight: normal;
+   float: right;
+   clear: none;
 }
 a.userinfo:link {
    color: #039;
@@ -2347,4 +2410,102 @@ div.subtitle {
     line-height:1px;
 }
 
-/* end of cds.css */
+/* Rollover menus */
+
+.menu ul {
+	list-style:none;
+	margin:0;
+	padding:0 0 0 0px;
+}
+
+.menu li {
+	display:block;
+	float:left;
+	text-decoration:none;
+	padding: 7px;
+	height:100%;
+	margin-right:10px;
+	/*/*//*/
+	display : none;
+	/* */
+}
+.menu .hassubmenu{
+	position:relative;
+}
+
+.menu .hassubmenu a{
+        display: inline-block; /* Necessary on IE */
+	padding-right:12px;
+	background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;
+}
+.menu .on.hassubmenu a{
+	background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;
+}
+.menu .on {
+	height:100%;
+}
+.menu a img {
+	vertical-align:middle;
+}
+.menu img{
+	border:none;
+}
+.menu .right {
+	float:right;
+	margin-right:2px;
+	padding-right:0;
+	padding-left:0;
+	margin-left:0;
+	background-image:none;
+}
+.menu a{
+	white-space:nowrap;
+	text-decoration:none;
+	margin:0;
+	padding:0px 6px;
+}
+.menu ul.subsubmenu {
+	display:none;
+	position: absolute;
+	background-image:none;
+	top: 1em;
+	left: 0;
+        z-index: 99;
+        text-align: left;
+}
+.menu ul.subsubmenu li {
+	display:list-item !important;
+	float: none !important;
+	position: relative;
+	border-bottom: 1px solid #36c;
+	border-left: 1px solid #36c;
+	border-right: 1px solid #36c;
+	background-color:#fff;
+        background-image:none !important;
+}
+.menu ul.subsubmenu li a, .menu div ul.subsubmenu li a:hover, .menu div ul.subsubmenu li a:visited{
+	background-color:transparent;
+        background-image:none !important;
+	display:block;
+        text-transform:capitalize;
+        color: #36c;
+}
+.menu ul.subsubmenu li a:hover{
+	text-decoration:underline
+}
+.menu :hover ul {
+	display:block;
+	position: absolute;
+}
+/* Override/Customize rollover menus in some cases*/
+.menu .headermoduleboxbody .hassubmenu a{
+	/*background: transparent url(drop_down_menu_arrow_down_lb.gif) no-repeat right center;*/
+        background-image:url(drop_down_menu_arrow_down_lb.gif)
+}
+.menu .headermoduleboxbody .hassubmenu a.header:hover{
+	/*background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;*/
+        background-image:url(drop_down_menu_arrow_down_b.gif)
+}
+
+
+/* end of invenio.css */

@@ -553,12 +553,12 @@ class Template:
         """
 
         out ="""
-              <table class="searchbox" width="90%%" summary=""  >
+              <table class="youraccountbox" width="90%%" summary=""  >
                             <tr>
-                             <th class="searchboxheader"><a href="%s">%s</a></th>
+                             <th class="youraccountheader"><a href="%s">%s</a></th>
                             </tr>
                             <tr>
-                             <td class="searchboxbody">%s</td>
+                             <td class="youraccountbody">%s</td>
                             </tr>
                           </table>""" % (url, title, body)
         return out
@@ -1143,6 +1143,12 @@ class Template:
           - 'useloans' *boolean* - If loans are enabled for the user
 
           - 'usestats' *boolean* - If stats are enabled for the user
+
+        @note: with the update of CSS classes (cds.cds ->
+            invenio.css), the variables useloans etc are not used in
+            this function, since they are in the menus.  But we keep
+            them in the function signature for backwards
+            compatibility.
         """
 
         # load the right message language
@@ -1159,75 +1165,192 @@ class Template:
                      'login' : _('login')
                    }
         else:
-            out += """%(username)s ::
-               <a class="userinfo" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a> :: """ % {
+            out += """
+               <a class="userinfo" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(username)s</a> :: """ % {
                     'sitesecureurl' : CFG_SITE_SECURE_URL,
                     'ln' : ln,
-                    'account' : _("account"),
                     'username' : username
                }
-            if usemessages:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> :: """ % {
-                    'sitesecureurl' : CFG_SITE_SECURE_URL,
-                    'ln' : ln,
-                    'messages' : _('messages')
-                }
-            if useloans:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/yourloans/display?ln=%(ln)s">%(loans)s</a> ::
-                """ % {
-                     'sitesecureurl' : CFG_SITE_SECURE_URL,
-                     'ln' : ln,
-                     'loans': _("loans")
-                }
-            if usebaskets:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> :: """ % {
-                        'sitesecureurl' : CFG_SITE_SECURE_URL,
-                        'ln' : ln,
-                        'baskets' : _("baskets")
-                }
-            if usealerts:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
-                """ % {
-                        'sitesecureurl' : CFG_SITE_SECURE_URL,
-                        'ln' : ln,
-                        'alerts' : _("alerts"),
-                }
-            if usegroups:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> ::
-                """ % {
-                        'sitesecureurl' : CFG_SITE_SECURE_URL,
-                        'ln' : ln,
-                        'groups' : _("groups"),
-                    }
-            if usestats:
-                out += """<a class="userinfo" href="%(siteurl)s/stats/?ln=%(ln)s">%(stats)s</a> :: """ % {
-                        'siteurl' : CFG_SITE_URL,
-                        'ln' : ln,
-                        'stats' : _("statistics"),
-                   }
-            if submitter:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
-                         'sitesecureurl' : CFG_SITE_SECURE_URL,
-                         'ln' : ln,
-                         'submission' : _("submissions"),
-                       }
-            if referee:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a> :: """ % {
-                         'sitesecureurl' : CFG_SITE_SECURE_URL,
-                         'ln' : ln,
-                         'approvals' : _("approvals"),
-                       }
-            if admin:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/youraccount/youradminactivities?ln=%(ln)s">%(administration)s</a> :: """ % {
-                         'sitesecureurl' : CFG_SITE_SECURE_URL,
-                         'ln' : ln,
-                         'administration' : _("administration"),
-                       }
             out += """<a class="userinfo" href="%(sitesecureurl)s/youraccount/logout?ln=%(ln)s">%(logout)s</a>""" % {
                     'sitesecureurl' : CFG_SITE_SECURE_URL,
                     'ln' : ln,
                     'logout' : _("logout"),
                 }
+        return out
+
+    def tmpl_create_useractivities_menu(req, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
+        """
+        Returns the main navigation menu with actions based on user's
+        priviledges
+
+        @param ln:          The language to display the interface in
+        @type ln:           string
+        @param selected:    If the menu is currently selected
+        @type selected:     boolean
+        @param url_referer: URL of the page being displayed
+        @type url_referer:  string
+        @param guest:       If the user is guest
+        @type guest:        string
+        @param username:    The username (nickname or email)
+        @type username:     string
+        @param submitter:   If the user is submitter
+        @type submitter:    boolean
+        @param referee:     If the user is referee
+        @type referee:      boolean
+        @param admin:       If the user is admin
+        @type admin:        boolean
+        @param usebaskets:  If baskets are enabled for the user
+        @type usebaskets:   boolean
+        @param usemessages: If messages are enabled for the user
+        @type usemessages:  boolean
+        @param usealerts:   If alerts are enabled for the user
+        @type usealerts:    boolean
+        @param usegroups:   If groups are enabled for the user
+        @type usegroups:    boolean
+        @param useloans:    If loans are enabled for the user
+        @type useloans:     boolean
+        @param usestats:    If stats are enabled for the user
+        @type usestats:     boolean
+        @return: html menu of the user activities
+        @rtype: string
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = '''<div class="hassubmenu%(on)s">
+        <a hreflang="en" class="header%(selected)s" href="%(CFG_SITE_SECURE_URL)s/youraccount/display?ln=%(ln)s">%(personalize)s</a>
+        <ul class="subsubmenu" style="width: 13em;">''' % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'personalize': _("Personalize"),
+                'on': selected and " on" or '',
+                'selected': selected and "selected" or ''
+                }
+        if not guest:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/youraccount/display?ln=%(ln)s">%(account)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'account' : _('Your account')
+                }
+        if usealerts or guest:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/youralerts/list?ln=%(ln)s">%(alerts)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'alerts' : _('Your alerts')
+                }
+        if referee:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'approvals' : _('Your approvals')
+                }
+        if usebaskets or guest:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'baskets' : _('Your baskets')
+                }
+        if usegroups:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yourgroups/display?ln=%(ln)s">%(groups)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'groups' : _('Your groups')
+                }
+        if useloans:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yourloans/display?ln=%(ln)s">%(loans)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'loans' : _('Your loans')
+                }
+        if usemessages:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yourmessages/display?ln=%(ln)s">%(messages)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'messages' : _('Your messages')
+                }
+        if submitter:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/yoursubmissions.py?ln=%(ln)s">%(submissions)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'submissions' : _('Your submissions')
+                }
+        if usealerts or guest:
+            out += '<li><a href="%(CFG_SITE_SECURE_URL)s/youralerts/display?ln=%(ln)s">%(searches)s</a></li>'  % {
+                'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+                'ln' : ln,
+                'searches' : _('Your searches')
+                }
+        out += '</ul></div>'
+        return out
+
+    def tmpl_create_adminactivities_menu(req, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats, activities):
+        """
+        Returns the main navigation menu with actions based on user's
+        priviledges
+
+        @param ln:          The language to display the interface in
+        @type ln:           string
+        @param selected:    If the menu is currently selected
+        @type selected:     boolean
+        @param url_referer: URL of the page being displayed
+        @type url_referer:  string
+        @param guest:       If the user is guest
+        @type guest:        string
+        @param username:    The username (nickname or email)
+        @type username:     string
+        @param submitter:   If the user is submitter
+        @type submitter:    boolean
+        @param referee:     If the user is referee
+        @type referee:      boolean
+        @param admin:       If the user is admin
+        @type admin:        boolean
+        @param usebaskets:  If baskets are enabled for the user
+        @type usebaskets:   boolean
+        @param usemessages: If messages are enabled for the user
+        @type usemessages:  boolean
+        @param usealerts:   If alerts are enabled for the user
+        @type usealerts:    boolean
+        @param usegroups:   If groups are enabled for the user
+        @type usegroups:    boolean
+        @param useloans:    If loans are enabled for the user
+        @type useloans:     boolean
+        @param usestats:    If stats are enabled for the user
+        @type usestats:     boolean
+        @param activities: dictionary of admin activities
+        @rtype activities: dict
+        @return: html menu of the user activities
+        @rtype: string
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = ''
+        if activities:
+            out += '''<div class="hassubmenu%(on)s">
+            <a hreflang="en" class="header%(selected)s" href="%(CFG_SITE_SECURE_URL)s/youraccount/youradminactivities?ln=%(ln)s">%(admin)s</a>
+            <ul class="subsubmenu" style="width: 18em;">''' % {
+            'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
+            'ln' : ln,
+            'admin': _("Administration"),
+            'on': selected and " on" or '',
+            'selected': selected and "selected" or ''
+            }
+
+            for name in sorted(activities.iterkeys()):
+                url = activities[name]
+                out += '<li><a href="%(url)s">%(name)s</a></li>'  % {
+                    'url': url,
+                    'name': name
+                    }
+
+        if usestats:
+            out += """<li><a href="%(CFG_SITE_URL)s/stats/?ln=%(ln)s">%(stats)s</a></li>""" % {
+                'CFG_SITE_URL' : CFG_SITE_URL,
+                'ln' : ln,
+                'stats' : _("Statistics"),
+                }
+
+            out += '</ul></div>'
         return out
 
     def tmpl_warning(self, warnings, ln=CFG_SITE_LANG):

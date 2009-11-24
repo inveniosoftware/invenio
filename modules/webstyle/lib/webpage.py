@@ -29,7 +29,12 @@ from invenio.config import \
      CFG_SITE_SECURE_URL
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language
-from invenio.webuser import create_userinfobox_body, getUid, isGuestUser
+from invenio.webuser import \
+     create_userinfobox_body, \
+     create_useractivities_menu, \
+     create_adminactivities_menu, \
+     getUid, \
+     isGuestUser
 from invenio.errorlib import get_msgs_for_code_list, register_errors
 
 import invenio.template
@@ -45,14 +50,14 @@ def create_navtrailbox_body(title,
                             language=CFG_SITE_LANG):
     """Create navigation trail box body
        input: title = page title;
-              previous_links = the trail content from site title until current page (both ends exlusive).
+              previous_links = the trail content from site title until current page (both ends exclusive).
        output: text containing the navtrail
     """
 
     return webstyle_templates.tmpl_navtrailbox_body(ln = language,
                                                     title = title,
                                                     previous_links = \
-                                                      previous_links,
+                                                    previous_links,
                                                     separator = separator,
                                                     prolog = prolog,
                                                     epilog = epilog)
@@ -64,7 +69,8 @@ def page(title, body, navtrail="", description="", keywords="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
          language=CFG_SITE_LANG, verbose=1, titleprologue="",
          titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
-         navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss", show_title_p=True):
+         navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss", show_title_p=True,
+         body_css_classes=None):
 
     """page(): display CDS web page
         input: title of the page
@@ -160,6 +166,8 @@ def page(title, body, navtrail="", description="", keywords="",
                           keywords = keywords,
                           metaheaderadd = metaheaderadd,
                           userinfobox = create_userinfobox_body(req, uid, language),
+                          useractivities_menu = create_useractivities_menu(req, uid, navmenuid, language),
+                          adminactivities_menu = create_adminactivities_menu(req, uid, navmenuid, language),
                           navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
                                                                 and title or '',
                                                                 navtrail,
@@ -183,14 +191,15 @@ def page(title, body, navtrail="", description="", keywords="",
                           pagefooteradd = cdspagefooteradd,
                           navmenuid = navmenuid,
                           rssurl = rssurl,
-                          show_title_p = show_title_p)
+                          show_title_p = show_title_p,
+                          body_css_classes=body_css_classes)
 
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                    cdspageheaderadd="", language=CFG_SITE_LANG, req=None,
                    secure_page_p=0, verbose=1, navmenuid="admin",
                    navtrail_append_title_p=1, metaheaderadd="",
-                   rssurl=CFG_SITE_URL+"/rss"):
+                   rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
@@ -201,6 +210,8 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                       keywords = keywords,
                       metaheaderadd = metaheaderadd,
                       userinfobox = create_userinfobox_body(req, uid, language),
+                      useractivities_menu = create_useractivities_menu(req, uid, navmenuid, language),
+                      adminactivities_menu = create_adminactivities_menu(req, uid, navmenuid, language),
                       navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
                                                             and title or '',
                                                             navtrail,
@@ -209,7 +220,8 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                       secure_page_p = secure_page_p,
                       pageheaderadd = cdspageheaderadd,
                       navmenuid = navmenuid,
-                      rssurl = rssurl)
+                      rssurl = rssurl,
+                      body_css_classes=body_css_classes)
 
 def pagefooteronly(cdspagefooteradd="", lastupdated="",
                    language=CFG_SITE_LANG, req=None, verbose=1):

@@ -35,12 +35,15 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
      CFG_VERSION, \
-     CFG_WEBSTYLE_INSPECT_TEMPLATES
+     CFG_WEBSTYLE_INSPECT_TEMPLATES, \
+     CFG_WEBSTYLE_TEMPLATE_SKIN
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
+from invenio.webuser import collect_user_info, isUserSubmitter, \
+     isUserReferee
 from invenio import template
 websearch_templates = template.load('websearch')
 
@@ -56,7 +59,7 @@ class Template:
 
           - 'title' *string* - page title;
 
-          - 'previous_links' *string* - the trail content from site title until current page (both ends exlusive)
+          - 'previous_links' *string* - the trail content from site title until current page (both ends exclusive)
 
           - 'prolog' *string* - HTML code to prefix the navtrail item with
 
@@ -67,13 +70,19 @@ class Template:
            Output:
 
           - text containing the navtrail
+
+           Note: returns empty string for Home page. (guessed by title).
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         out = ""
-        if title != CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
+
+        if title == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
+            # return empty string for the Home page
+            return out
+        else:
             out += create_html_link(CFG_SITE_URL, {'ln': ln},
                                     _("Home"), {'class': 'navtrail'})
         if previous_links:
@@ -91,7 +100,8 @@ class Template:
         return cgi.escape(prolog) + out + cgi.escape(epilog)
 
     def tmpl_page(self, req=None, ln=CFG_SITE_LANG, description="",
-                  keywords="", userinfobox="", navtrailbox="",
+                  keywords="", userinfobox="", useractivities_menu="",
+                  adminactivities_menu="", navtrailbox="",
                   pageheaderadd="", boxlefttop="", boxlefttopadd="",
                   boxleftbottom="", boxleftbottomadd="",
                   boxrighttop="", boxrighttopadd="",
@@ -100,7 +110,7 @@ class Template:
                   body="", lastupdated=None, pagefooteradd="", uid=0,
                   secure_page_p=0, navmenuid="", metaheaderadd="",
                   rssurl=CFG_SITE_URL+"/rss",
-                  show_title_p=True):
+                  show_title_p=True, body_css_classes=None):
 
         """Creates a complete page
 
@@ -113,6 +123,10 @@ class Template:
           - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page
 
           - 'userinfobox' *string* - the HTML code for the user information box
+
+          - 'useractivities_menu' *string* - the HTML code for the user activities menu
+
+          - 'adminactivities_menu' *string* - the HTML code for the admin activities menu
 
           - 'navtrailbox' *string* - the HTML code for the navigation trail box
 
@@ -158,6 +172,8 @@ class Template:
 
           - 'show_title_p' *int* (0 or 1) - do we display the page title in the body of the page?
 
+          - 'body_css_classes' *list* - list of classes to add to the body tag
+
            Output:
 
           - HTML code of the page
@@ -173,11 +189,14 @@ class Template:
                                    keywords = keywords,
                                    metaheaderadd = metaheaderadd,
                                    userinfobox = userinfobox,
+                                   useractivities_menu = useractivities_menu,
+                                   adminactivities_menu = adminactivities_menu,
                                    navtrailbox = navtrailbox,
                                    pageheaderadd = pageheaderadd,
                                    secure_page_p = secure_page_p,
                                    navmenuid=navmenuid,
-                                   rssurl=rssurl) + """
+                                   rssurl=rssurl,
+                                   body_css_classes=body_css_classes) + """
 <div class="pagebody">
   <div class="pagebodystripeleft">
     <div class="pageboxlefttop">%(boxlefttop)s</div>
@@ -224,9 +243,10 @@ class Template:
 
     def tmpl_pageheader(self, req, ln=CFG_SITE_LANG, headertitle="",
                         description="", keywords="", userinfobox="",
+                        useractivities_menu="", adminactivities_menu="",
                         navtrailbox="", pageheaderadd="", uid=0,
                         secure_page_p=0, navmenuid="admin", metaheaderadd="",
-                        rssurl=CFG_SITE_URL+"/rss"):
+                        rssurl=CFG_SITE_URL+"/rss", body_css_classes=None):
 
         """Creates a page header
 
@@ -242,6 +262,10 @@ class Template:
 
           - 'userinfobox' *string* - the HTML code for the user information box
 
+          - 'useractivities_menu' *string* - the HTML code for the user activities menu
+
+          - 'adminactivities_menu' *string* - the HTML code for the admin activities menu
+
           - 'navtrailbox' *string* - the HTML code for the navigation trail box
 
           - 'pageheaderadd' *string* - additional page header HTML code
@@ -256,6 +280,8 @@ class Template:
 
           - 'rssurl' *string* - the url of the RSS feed for this page
 
+          - 'body_css_classes' *list* - list of classes to add to the body tag
+
            Output:
 
           - HTML code of the page headers
@@ -264,9 +290,13 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        if body_css_classes is None:
+            body_css_classes = []
+        body_css_classes.append(navmenuid)
+
         if CFG_WEBSTYLE_INSPECT_TEMPLATES:
-            inspect_templates_message = """
-<table width="100%%" cellspacing=0 cellpadding=2 border=0>
+            inspect_templates_message = '''
+<table width="100%%" cellspacing="0" cellpadding="2" border="0">
 <tr bgcolor="#aa0000">
 <td width="100%%">
 <font color="#ffffff">
@@ -281,18 +311,18 @@ template function generated it.
 </td>
 </tr>
 </table>
-"""
+'''
         else:
             inspect_templates_message = ""
 
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="%(ln_iso_639_a)s" xml:lang="%(ln_iso_639_a)s">
 <head>
  <title>%(headertitle)s - %(sitename)s</title>
  <link rev="made" href="mailto:%(sitesupportemail)s" />
- <link rel="stylesheet" href="%(cssurl)s/img/cds.css" type="text/css" />
+ <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -301,27 +331,23 @@ template function generated it.
  <meta name="keywords" content="%(keywords)s" />
  %(metaheaderadd)s
 </head>
-<body>
+<body%(body_css_classes)s lang="%(ln_iso_639_a)s">
 <div class="pageheader">
 %(inspect_templates_message)s
 <!-- replaced page header -->
-<div style="background-image: url(%(cssurl)s/img/header_background.gif);">
+<div class="headerlogo">
 <table class="headerbox" cellspacing="0">
  <tr>
-  <td class="headerboxbodylogo">
-   %(sitename)s
-  </td>
-  <td align="right" valign="top" class="userinfoboxbody">
-   %(userinfobox)s
+  <td align="right" valign="top" colspan="12">
+  <div class="userinfoboxbody">
+    %(userinfobox)s
+  </div>
+  <div class="headerboxbodylogo">
+   <a href="%(siteurl)s?ln=%(ln)s">%(sitename)s</a>
+  </div>
   </td>
  </tr>
- <tr>
-  <td class="headerboxbody" valign="bottom" align="left">
-   <table class="headermodulebox" width="100%%" cellspacing="0"><tr><td class="headermoduleboxbodyblanklast">&nbsp;</td></tr></table>
-  </td>
-  <td class="headerboxbody" valign="bottom" align="left">
-   <table class="headermodulebox" cellspacing="0">
-     <tr>
+ <tr class="menu">
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
@@ -341,7 +367,7 @@ template function generated it.
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(personalize_selected)s">
-             <a class="header%(personalize_selected)s" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>
+             %(useractivities)s
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -349,12 +375,10 @@ template function generated it.
        <td class="headermoduleboxbody%(help_selected)s">
              <a class="header%(help_selected)s" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
        </td>
+       %(adminactivities)s
        <td class="headermoduleboxbodyblanklast">
              &nbsp;
        </td>
-     </tr>
-   </table>
-  </td>
  </tr>
 </table>
 </div>
@@ -372,8 +396,10 @@ template function generated it.
           'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
+          'cssskin' : CFG_WEBSTYLE_TEMPLATE_SKIN != 'default' and '_' + CFG_WEBSTYLE_TEMPLATE_SKIN or '',
           'rssurl': rssurl,
           'ln' : ln,
+          'ln_iso_639_a' : ln.split('_', 1)[0],
           'langlink': '?ln=' + ln,
 
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
@@ -387,8 +413,13 @@ template function generated it.
 
           'userinfobox' : userinfobox,
           'navtrailbox' : navtrailbox,
+          'useractivities': useractivities_menu,
+          'adminactivities': adminactivities_menu and ('<td class="headermoduleboxbodyblank">&nbsp;</td><td class="headermoduleboxbody%(personalize_selected)s">%(adminactivities)s</td>' % \
+          {'personalize_selected': navmenuid.startswith('admin') and "selected" or "",
+          'adminactivities': adminactivities_menu}) or '<td class="headermoduleboxbodyblank">&nbsp;</td>',
 
           'pageheaderadd' : pageheaderadd,
+          'body_css_classes' : body_css_classes and ' class="%s"' % ' '.join(body_css_classes) or '',
 
           'search_selected': navmenuid == 'search' and "selected" or "",
           'submit_selected': navmenuid == 'submit' and "selected" or "",

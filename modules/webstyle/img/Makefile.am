@@ -25,6 +25,8 @@ img_DATA = add-small.png \
            arrow_link-icon-15x11-right.gif \
            arrow_up.gif \
            arrow_up2.png \
+           atlantis_logo.gif \
+           atlantis_logo_small.gif \
            at.gif \
            blankicon.gif \
            blue_gradient.gif \
@@ -42,6 +44,10 @@ img_DATA = add-small.png \
            dot.gif \
            down-trans.gif \
            down.gif \
+           drop_down_menu_arrow_down_g.gif \
+           drop_down_menu_arrow_down_b.gif \
+           drop_down_menu_arrow_down_lb.gif \
+           drop_down_menu_arrow_down_w.gif \
            edit1.gif \
            external-icon-light-8x8.gif \
            feed-icon-12x12.gif \

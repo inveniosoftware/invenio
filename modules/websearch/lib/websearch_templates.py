@@ -593,14 +593,14 @@ class Template:
                 <form name="search" action="%(siteurl)s/search" method="get">
                 %(searchfor)s
                 %(np_portalbox)s
-                <table cellspacing="0" cellpadding="0" border="0">
+                <table cellspacing="0" cellpadding="0" border="0" class="narrowandfocusonsearchbox">
                   <tr>
                     <td valign="top">%(narrowsearch)s</td>
                ''' % {
                  'siteurl' : CFG_SITE_URL,
                  'searchfor' : searchfor,
                  'np_portalbox' : np_portalbox,
-                 'narrowsearch' : narrowsearch
+                 'narrowsearch' : narrowsearch,
                }
         if focuson:
             body += """<td valign="top">""" + focuson + """</td>"""
@@ -733,10 +733,10 @@ class Template:
 
         # print commentary start:
         out += '''
-        <table>
+        <table class="searchbox lightsearch">
          <tbody>
           <tr valign="baseline">
-           <td class="searchboxbody" align="right"><input type="text" name="p" size="%(sizepattern)d" value="" /><br/>
+           <td class="searchboxbody" align="right"><input type="text" name="p" size="%(sizepattern)d" value="" class="lightsearchfield"/><br/>
              <small><small>%(example_query_html)s</small></small>
            </td>
            <td class="searchboxbody" align="left">
@@ -809,10 +809,9 @@ class Template:
         asearchurl = self.build_search_interface_url(c=collection_id,
                                                      aas=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                      ln=ln)
-
         # print commentary start:
         out += '''
-        <table class="searchbox">
+        <table class="searchbox simplesearch">
          <thead>
           <tr align="left">
            <th colspan="3" class="searchboxheader">%(header)s</th>
@@ -820,7 +819,7 @@ class Template:
          </thead>
          <tbody>
           <tr valign="baseline">
-           <td class="searchboxbody" align="left"><input type="text" name="p" size="%(sizepattern)d" value="" /></td>
+           <td class="searchboxbody" align="left"><input type="text" name="p" size="%(sizepattern)d" value="" class="simplesearchfield"/></td>
            <td class="searchboxbody" align="left">%(middle_option)s</td>
            <td class="searchboxbody" align="left">
              <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s" />
@@ -908,7 +907,7 @@ class Template:
         ssearchurl = self.build_search_interface_url(c=collection_id, aas=min(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES), ln=ln)
 
         out += '''
-        <table class="searchbox">
+        <table class="searchbox advancedsearch">
          <thead>
           <tr>
            <th class="searchboxheader" colspan="3">%(header)s</th>
@@ -917,21 +916,21 @@ class Template:
          <tbody>
           <tr valign="bottom">
             <td class="searchboxbody" style="white-space: nowrap;">
-                %(matchbox_m1)s<input type="text" name="p1" size="%(sizepattern)d" value="" />
+                %(matchbox_m1)s<input type="text" name="p1" size="%(sizepattern)d" value="" class="advancedsearchfield"/>
             </td>
             <td class="searchboxbody" style="white-space: nowrap;">%(middle_option_1)s</td>
             <td class="searchboxbody">%(andornot_op1)s</td>
           </tr>
           <tr valign="bottom">
             <td class="searchboxbody" style="white-space: nowrap;">
-                %(matchbox_m2)s<input type="text" name="p2" size="%(sizepattern)d" value="" />
+                %(matchbox_m2)s<input type="text" name="p2" size="%(sizepattern)d" value="" class="advancedsearchfield"/>
             </td>
             <td class="searchboxbody">%(middle_option_2)s</td>
             <td class="searchboxbody">%(andornot_op2)s</td>
           </tr>
           <tr valign="bottom">
             <td class="searchboxbody" style="white-space: nowrap;">
-                %(matchbox_m3)s<input type="text" name="p3" size="%(sizepattern)d" value="" />
+                %(matchbox_m3)s<input type="text" name="p3" size="%(sizepattern)d" value="" class="advancedsearchfield"/>
             </td>
             <td class="searchboxbody">%(middle_option_3)s</td>
             <td class="searchboxbody" style="white-space: nowrap;">
@@ -950,11 +949,11 @@ class Template:
         </table>
         <!-- @todo - more imports -->
         ''' % {'ln' : ln,
+               'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
                'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
                'siteurl' : CFG_SITE_URL,
                'ssearch' : create_html_link(ssearchurl, {}, _("Simple Search")),
                'header' : header,
-               'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
 
                'matchbox_m1' : self.tmpl_matchtype_box('m1', ln=ln),
                'middle_option_1' : middle_option_1,
@@ -1253,7 +1252,7 @@ class Template:
                    <thead>
                     <tr>
                      <th colspan="2" align="left" class="%(narrowsearchbox)sheader">
-                       %(title)s
+                      %(title)s
                      </th>
                     </tr>
                    </thead>
@@ -1789,7 +1788,7 @@ class Template:
                         p1, p2, p3, op1, op2, rm, p, f, coll_selects,
                         d1y, d2y, d1m, d2m, d1d, d2d, dt, sort_fields,
                         sf, so, ranks, sc, rg, formats, of, pl, jrec, ec,
-                        show_colls=True):
+                        show_colls=True, show_title=True):
 
         """
           Displays the *Nearest search terms* box
@@ -1838,8 +1837,9 @@ class Template:
 
           - 'pl' *string* - `limit to' search pattern
 
-          - show_colls *bool* - show cc_intl in page title,
-                            and propose coll selection box?
+          - show_colls *bool* - propose coll selection box?
+
+          - show_title *bool* show cc_intl in page title?
         """
 
         # load the right message language
@@ -1860,7 +1860,7 @@ class Template:
                 }, self.search_results_default_urlargd)
 
         out = ""
-        if show_colls:
+        if show_title:
             # display cc name if asked for
             out += '''
             <h1 class="headline">%(ccname)s</h1>''' % {'ccname' : cgi.escape(cc_intl),}
@@ -1883,7 +1883,7 @@ class Template:
 
             # define search box elements:
             out += '''
-            <table class="searchbox">
+            <table class="searchbox advancedsearch">
              <thead>
               <tr>
                <th colspan="3" class="searchboxheader">
@@ -1894,21 +1894,21 @@ class Template:
              <tbody>
               <tr valign="top" style="white-space:nowrap;">
                 <td class="searchboxbody">%(matchbox1)s
-                  <input type="text" name="p1" size="%(sizepattern)d" value="%(p1)s" />
+                  <input type="text" name="p1" size="%(sizepattern)d" value="%(p1)s" class="advancedsearchfield"/>
                 </td>
                 <td class="searchboxbody">%(searchwithin1)s</td>
                 <td class="searchboxbody">%(andornot1)s</td>
               </tr>
               <tr valign="top">
                 <td class="searchboxbody">%(matchbox2)s
-                  <input type="text" name="p2" size="%(sizepattern)d" value="%(p2)s" />
+                  <input type="text" name="p2" size="%(sizepattern)d" value="%(p2)s" class="advancedsearchfield"/>
                 </td>
                 <td class="searchboxbody">%(searchwithin2)s</td>
                 <td class="searchboxbody">%(andornot2)s</td>
               </tr>
               <tr valign="top">
                 <td class="searchboxbody">%(matchbox3)s
-                  <input type="text" name="p3" size="%(sizepattern)d" value="%(p3)s" />
+                  <input type="text" name="p3" size="%(sizepattern)d" value="%(p3)s" class="advancedsearchfield"/>
                 </td>
                 <td class="searchboxbody">%(searchwithin3)s</td>
                 <td class="searchboxbody"  style="white-space:nowrap;">
@@ -1976,7 +1976,7 @@ class Template:
         elif aas == 0:
             # print Simple Search form:
             out += '''
-            <table class="searchbox">
+            <table class="searchbox simplesearch">
              <thead>
               <tr>
                <th colspan="3" class="searchboxheader">
@@ -1986,7 +1986,7 @@ class Template:
              </thead>
              <tbody>
               <tr valign="top">
-                <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s" /></td>
+                <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s" class="simplesearchfield"/></td>
                 <td class="searchboxbody">%(searchwithin)s</td>
                 <td class="searchboxbody">
                   <input class="formbutton" type="submit" name="action_search" value="%(search)s" />
@@ -2046,9 +2046,9 @@ class Template:
                   'root_collection_name': CFG_SITE_NAME,
                   'search_everywhere': _("Search everywhere")}
             out += '''
-            <table>
+            <table class="searchbox lightsearch">
               <tr valign="top">
-                <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s" /></td>
+                <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s" class="lightsearchfield"/></td>
                 <td class="searchboxbody">
                   <input class="formbutton" type="submit" name="action_search" value="%(search)s" />
                 </td>
@@ -2061,6 +2061,7 @@ class Template:
             </table>
             <small>%(search_in)s</small>
             ''' % {
+              'sizepattern' : CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH,
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
@@ -2072,7 +2073,6 @@ class Template:
                                                   {}, _("Advanced Search")),
 
               'leading' : leadingtext,
-              'sizepattern' : CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH,
               'p' : cgi.escape(p, 1),
               'searchwithin' : self.tmpl_searchwithin_select(
                                   ln = ln,
@@ -2229,12 +2229,11 @@ class Template:
                                     'value' : 1,
                                     'text' : _("split by collection")
                                   }], selected = sc, css_class = 'address'),
-                  'select_of' : self.tmpl_searchwithin_select(
-                                  ln = ln,
+                  'select_of' : self.tmpl_select(
                                   fieldname = 'of',
                                   selected = of,
-                                  values = self._add_mark_to_field(value=of, fields=formats, chars=3, ln=ln)
-                                ),
+                                  values = self._add_mark_to_field(value=of, fields=formats, chars=3, ln=ln),
+                                  css_class = 'address'),
                 }
 
         ## last but not least, print end of search box:

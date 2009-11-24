@@ -17,7 +17,7 @@
 
 webdir = $(localstatedir)/www/img
 
-web_DATA = cds.css tablesorter.css
+web_DATA = invenio.css tablesorter.css
 
 EXTRA_DIST = $(web_DATA)
 

@@ -815,6 +815,108 @@ def create_userinfobox_body(req, uid, language="en"):
     except OperationalError:
         return ""
 
+def create_useractivities_menu(req, uid, navmenuid, ln="en"):
+    """Create user activities menu.
+
+    @param req: request object
+    @param uid: user id
+    @type uid: int
+    @param navmenuid: the section of the website this page belongs (search, submit, baskets, etc.)
+    @type navmenuid: string
+    @param ln: language
+    @type ln: string
+    @return: HTML menu of the user activities
+    @rtype: string
+    """
+
+    if req:
+        if req.subprocess_env.has_key('HTTPS') \
+           and req.subprocess_env['HTTPS'] == 'on':
+            url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
+        else:
+            url_referer = CFG_SITE_URL + req.unparsed_uri
+        if '/youraccount/logout' in url_referer:
+            url_referer = ''
+    else:
+        url_referer = CFG_SITE_URL
+
+    user_info = collect_user_info(req)
+
+    is_user_menu_selected = False
+    if navmenuid == 'personalize' or  \
+       navmenuid.startswith('your') and \
+       navmenuid != 'youraccount':
+        is_user_menu_selected = True
+
+    try:
+        return tmpl.tmpl_create_useractivities_menu(
+            ln=ln,
+            selected=is_user_menu_selected,
+            url_referer=url_referer,
+            guest = isGuestUser(uid),
+            username = get_nickname_or_email(uid),
+            submitter = user_info['precached_viewsubmissions'],
+            referee = user_info['precached_useapprove'],
+            admin = user_info['precached_useadmin'],
+            usebaskets = user_info['precached_usebaskets'],
+            usemessages = user_info['precached_usemessages'],
+            usealerts = user_info['precached_usealerts'],
+            usegroups = user_info['precached_usegroups'],
+            useloans = user_info['precached_useloans'],
+            usestats = user_info['precached_usestats']
+            )
+    except OperationalError:
+        return ""
+
+def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
+    """Create admin activities menu.
+
+    @param req: request object
+    @param uid: user id
+    @type uid: int
+    @param navmenuid: the section of the website this page belongs (search, submit, baskets, etc.)
+    @type navmenuid: string
+    @param ln: language
+    @type ln: string
+    @return: HTML menu of the user activities
+    @rtype: string
+    """
+
+    if req:
+        if req.subprocess_env.has_key('HTTPS') \
+           and req.subprocess_env['HTTPS'] == 'on':
+            url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
+        else:
+            url_referer = CFG_SITE_URL + req.unparsed_uri
+        if '/youraccount/logout' in url_referer:
+            url_referer = ''
+    else:
+        url_referer = CFG_SITE_URL
+
+    user_info = collect_user_info(req)
+    activities = acc_find_possible_activities(user_info, ln)
+
+    try:
+        return tmpl.tmpl_create_adminactivities_menu(
+            ln=ln,
+            selected=navmenuid == 'admin',
+            url_referer=url_referer,
+            guest = isGuestUser(uid),
+            username = get_nickname_or_email(uid),
+            submitter = user_info['precached_viewsubmissions'],
+            referee = user_info['precached_useapprove'],
+            admin = user_info['precached_useadmin'],
+            usebaskets = user_info['precached_usebaskets'],
+            usemessages = user_info['precached_usemessages'],
+            usealerts = user_info['precached_usealerts'],
+            usegroups = user_info['precached_usegroups'],
+            useloans = user_info['precached_useloans'],
+            usestats = user_info['precached_usestats'],
+            activities = activities
+            )
+    except OperationalError:
+        return ""
+
 def list_registered_users():
     """List all registered users."""
     return run_sql("SELECT id,email FROM user where email!=''")

@@ -917,10 +917,14 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
     # show collections in the search box? (not if there is only one
     # collection defined, and not if we are in light search)
     show_colls = True
+    show_title = True
     if len(collection_reclist_cache.cache.keys()) == 1 or \
            aas == -1:
         show_colls = False
+        show_title = False
 
+    if cc == CFG_SITE_NAME:
+        show_title = False
 
     return websearch_templates.tmpl_search_box(
              ln = ln,
@@ -960,6 +964,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, aas,
              jrec = jrec,
              ec = ec,
              show_colls = show_colls,
+             show_title = show_title,
            )
 
 def create_navtrail_links(cc=CFG_SITE_NAME, aas=0, ln=CFG_SITE_LANG, self_p=1, tab=''):
