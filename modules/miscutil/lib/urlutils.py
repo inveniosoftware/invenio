@@ -32,9 +32,9 @@ from cgi import parse_qs, escape
 from invenio import webinterface_handler_wsgi_utils as apache
 
 from invenio.config import \
-     CFG_SITE_LANG, \
      CFG_SITE_URL, \
      CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE
+
 
 def wash_url_argument(var, new_type):
     """
@@ -50,29 +50,29 @@ def wash_url_argument(var, new_type):
     """
     out = []
     if new_type == 'list':  # return lst
-        if type(var) is list:
+        if isinstance(var, list):
             out = var
         else:
             out = [var]
     elif new_type == 'str':  # return str
-        if type(var) is list:
+        if isinstance(var, list):
             try:
                 out = "%s" % var[0]
             except:
                 out = ""
-        elif type(var) is str:
+        elif isinstance(var, str):
             out = var
         else:
             out = "%s" % var
     elif new_type == 'int': # return int
-        if type(var) is list:
+        if isinstance(var, list):
             try:
                 out = int(var[0])
             except:
                 out = 0
-        elif type(var) is int:
+        elif isinstance(var, (int, long)):
             out = var
-        elif type(var) is str:
+        elif isinstance(var, str):
             try:
                 out = int(var)
             except:
@@ -80,16 +80,17 @@ def wash_url_argument(var, new_type):
         else:
             out = 0
     elif new_type == 'tuple': # return tuple
-        if type(var) is tuple:
+        if isinstance(var, tuple):
             out = var
         else:
-            out = (var,)
+            out = (var, )
     elif new_type == 'dict': # return dictionary
-        if type(var) is dict:
+        if isinstance(var, dict):
             out = var
         else:
-            out = {0:var}
+            out = {0: var}
     return out
+
 
 def redirect_to_url(req, url, redirection_type=None):
     """
@@ -112,26 +113,29 @@ def redirect_to_url(req, url, redirection_type=None):
     req.headers_out["Location"] = url
 
     del req.headers_out["Cache-Control"]
-    req.headers_out["Cache-Control"] = "no-cache, private, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
+    req.headers_out["Cache-Control"] = "no-cache, private, no-store, " \
+        "must-revalidate, post-check=0, pre-check=0, max-age=0"
     req.headers_out["Pragma"] = "no-cache"
 
     if req.response_sent_p:
-        raise IOError, "Cannot redirect after headers have already been sent."
+        raise IOError("Cannot redirect after headers have already been sent.")
 
     req.status = redirection_type
     req.write('<p>Please go to <a href="%s">here</a></p>\n' % url)
 
     raise apache.SERVER_RETURN, apache.DONE
 
+
 def get_referer(req, replace_ampersands=False):
     """ Return the referring page of a request.
-    Referer (wikipedia): Referer is a common misspelling of the word "referrer";
-    so common, in fact, that it made it into the official specification of HTTP.
-    When visiting a webpage, the referer or referring page is the URL of the
-    previous webpage from which a link was followed.
+    Referer (wikipedia): Referer is a common misspelling of the word
+    "referrer"; so common, in fact, that it made it into the official
+    specification of HTTP. When visiting a webpage, the referer or
+    referring page is the URL of the previous webpage from which a link was
+    followed.
     @param req: request
     @param replace_ampersands: if 1, replace & by &amp; in url
-                               (correct HTML cannot contain & characters alone).
+                               (correct HTML cannot contain & characters alone)
     """
     try:
         referer = req.headers_in['Referer']
@@ -140,6 +144,7 @@ def get_referer(req, replace_ampersands=False):
         return referer
     except KeyError:
         return ''
+
 
 def drop_default_urlargd(urlargd, default_urlargd):
     lndefault = {}
@@ -165,9 +170,10 @@ def drop_default_urlargd(urlargd, default_urlargd):
 
     return canonical
 
+
 def make_canonical_urlargd(urlargd, default_urlargd):
     """ Build up the query part of an URL from the arguments passed in
-    the 'urlargd' dictionary.  'default_urlargd' is a secondary dictionary which
+    the 'urlargd' dictionary. 'default_urlargd' is a secondary dictionary which
     contains tuples of the form (type, default value) for the query
     arguments (this is the same dictionary as the one you can pass to
     webinterface_handler.wash_urlargd).
@@ -186,7 +192,8 @@ def make_canonical_urlargd(urlargd, default_urlargd):
 
     return ''
 
-def create_html_link(urlbase, urlargd, link_label, linkattrd={},
+
+def create_html_link(urlbase, urlargd, link_label, linkattrd=None,
                      escape_urlargd=True, escape_linkattrd=True):
     """Creates a W3C compliant link.
     @param urlbase: base url (e.g. invenio.config.CFG_SITE_URL/search)
@@ -214,10 +221,11 @@ def create_html_link(urlbase, urlargd, link_label, linkattrd={},
     output += '>' + link_label + '</a>'
     return output
 
+
 def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
-                       link_label="%(email)s", linkattrd=None,
-                       escape_urlargd=True, escape_linkattrd=True,
-                       email_obfuscation_mode=CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE):
+        link_label="%(email)s", linkattrd=None,
+        escape_urlargd=True, escape_linkattrd=True,
+        email_obfuscation_mode=CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE):
 
     """Creates a W3C compliant 'mailto' link.
 
@@ -319,20 +327,24 @@ def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
         return mailto_link
     elif email_obfuscation_mode == 3:
         # Javascript-based
-        return '''<script language="JavaScript" type="text/javascript">document.write('%s'.split("").reverse().join(""))</script>''' % \
+        return '''<script language="JavaScript"''' \
+            '''type="text/javascript">''' \
+            '''document.write('%s'.split("").reverse().join(""))''' \
+            '''</script>''' % \
                mailto_link[::-1].replace("'", "\\'")
     elif email_obfuscation_mode == 4:
         # GIFs-based
         email = email.replace('.',
-                              '<img src="%s/img/dot.gif" alt=" [dot] " style="vertical-align:bottom"  />' \
-                              % CFG_SITE_URL)
+            '<img src="%s/img/dot.gif" alt=" [dot] " '
+            'style="vertical-align:bottom"  />' % CFG_SITE_URL)
         email = email.replace('@',
-                              '<img src="%s/img/at.gif" alt=" [at] " style="vertical-align:baseline" />' % \
-                              CFG_SITE_URL)
+            '<img src="%s/img/at.gif" alt=" [at] " '
+            'style="vertical-align:baseline" />' % CFG_SITE_URL)
         return email
 
     # All other cases, including mode -1:
     return ""
+
 
 def string_to_numeric_char_reference(string):
     """
@@ -343,6 +355,7 @@ def string_to_numeric_char_reference(string):
     for char in string:
         out += "&#" + str(ord(char)) + ";"
     return out
+
 
 def create_url(urlbase, urlargd, escape_urlargd=True):
     """Creates a W3C compliant URL. Output will look like this:
@@ -366,6 +379,7 @@ def create_url(urlbase, urlargd, escape_urlargd=True):
         output += separator.join(arguments)
     return output
 
+
 def same_urls_p(a, b):
     """ Compare two URLs, ignoring reorganizing of query arguments """
 
@@ -376,6 +390,7 @@ def same_urls_p(a, b):
     ub[4] = parse_qs(ub[4])
 
     return ua == ub
+
 
 def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     """Analyze `urlargs' (URL CGI GET query arguments in string form)
@@ -406,4 +421,3 @@ def urlargs_replace_text_in_arg(urlargs, regexp_argname, text_old, text_new):
     if out.startswith("&amp;"):
         out = out[5:]
     return out
-
