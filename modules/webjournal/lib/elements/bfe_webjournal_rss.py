@@ -111,14 +111,15 @@ def format(bfo, categories, label="Subscribe by RSS",
         link_label += _(label)
 
     # Build link
-    rss_url = CFG_SITE_URL + '/search?of=xr'
+    rss_url = CFG_SITE_URL + '/rss'
     if cc:
-        rss_url += '&amp;cc=' + quote(cc)
+        rss_url += '?cc=' + quote(cc)
     elif must_use_pattern:
-        rss_url += '&amp;p=' + quote(' or '.join(pattern))
+        rss_url += '?p=' + quote(' or '.join(pattern))
     else:
-        rss_url += '&amp;c=' + '&amp;c='.join([quote(coll) \
+        rss_url += '?c=' + '&amp;c='.join([quote(coll) \
                                                for coll in collections])
+    rss_url += '&amp;ln=' + ln
 
     return create_html_link(rss_url, {},
                             link_label=link_label,
