@@ -833,47 +833,31 @@ def loan_on_desk_step4(req, list_of_books, user_info,
                         navtrail=navtrail_previous_links,
                         lastupdated=__lastupdated__)
 
-    if is_borrower != 0:
-        for i in range(len(list_of_books)):
-            if note:
-                note_format = '[' + time.ctime() + '] ' + note[i] + '\n'
-            else:
-                note_format = ''
-
-            db.new_loan(is_borrower, list_of_books[i][0], list_of_books[i][1],
-                        loaned_on, due_date[i], 'on loan', 'normal', note_format)
-            db.update_item_status('on loan', list_of_books[i][1])
-
-        total_of_loans = db.get_total_of_loans()
-        number_of_pages = ceil(1.0 * total_of_loans / 25)
-        result = db.get_all_loans(1, 25)
-        title="Current loans"
-        infos.append('A new loan has been registered with success.')
-        body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                       loans_per_page=25,
-                                                       page_number=1,
-                                                       number_of_pages=number_of_pages,
-                                                       infos=infos,
-                                                       ln=ln)
-    else:
+    if is_borrower == 0:
         db.new_borrower(name, email, phone, address, mailbox, '')
         is_borrower = db.is_borrower(email)
-        for i in range(len(list_of_books)):
-            db.new_loan(is_borrower, list_of_books[i][0], list_of_books[i][1],
-                        loaned_on, due_date[i], 'on loan', 'normal', note[i])
-            db.update_item_status('on loan', list_of_books[i][1])
 
-        total_of_loans = db.get_total_of_loans()
-        number_of_pages = ceil(total_of_loans / 25)
-        result = db.get_all_loans(1, 25)
-        title="Current loans"
-        infos.append('A new loan has been registered with success.')
-        body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                       loans_per_page=25,
-                                                       page_number=1,
-                                                       number_of_pages=number_of_pages,
-                                                       infos=infos,
-                                                       ln=ln)
+    for i in range(len(list_of_books)):
+        note_format = {}
+        if note:
+            note_format[time.strftime("%Y-%m-%d %H:%M:%S")] = str(note)
+
+        db.new_loan(is_borrower, list_of_books[i][0], list_of_books[i][1],
+                    loaned_on, due_date[i], 'on loan', 'normal', note_format)
+        db.update_item_status('on loan', list_of_books[i][1])
+
+    total_of_loans = db.get_total_of_loans()
+    number_of_pages = ceil(1.0 * total_of_loans / 25)
+    result = db.get_all_loans(0, 25)
+
+    title="Current loans"
+    infos.append('A new loan has been registered with success.')
+    body = bibcirculation_templates.tmpl_all_loans(result=result,
+                                                   loans_per_page=25,
+                                                   page_number=1,
+                                                   number_of_pages=number_of_pages,
+                                                   infos=infos,
+                                                   ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -1026,7 +1010,7 @@ def register_new_loan(req, barcode, borrower_id,
 
         total_of_loans = db.get_total_of_loans()
         number_of_pages = ceil(total_of_loans / 25)
-        result = db.get_all_loans(1, 25)
+        result = db.get_all_loans(0, 25)
 
         infos.append('A new loan has been registered with success.')
 
@@ -1980,7 +1964,7 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
                 lastupdated=__lastupdated__)
 
 def get_loans_notes(req, loan_id, recid, delete_key,
-                    library_notes, ln=CFG_SITE_LANG):
+                    library_notes, back, ln=CFG_SITE_LANG):
     """
     Get loan's note(s).
 
@@ -2011,14 +1995,17 @@ def get_loans_notes(req, loan_id, recid, delete_key,
                               '</a> &gt; <a class="navtrail" ' \
                               'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
+    referer = req.headers_in.get('referer')
+
     body = bibcirculation_templates.tmpl_get_loans_notes(loans_notes=loans_notes,
                                                          loan_id=loan_id,
-                                                         recid=recid,
+                                                         recid=recid, referer=referer, back=back,
                                                          ln=ln)
     return page(title="Loan notes",
                 uid=id_user,
@@ -2300,7 +2287,6 @@ def get_item_loans_notes(req, loan_id, recid, borrower_id, add_notes, new_note, 
     body = bibcirculation_templates.tmpl_get_loans_notes(loans_notes=loans_notes,
                                                          loan_id=loan_id,
                                                          recid=recid,
-                                                         borrower_id=borrower_id,
                                                          add_notes=add_notes,
                                                          ln=ln)
     return page(title="Loan notes",
@@ -3348,7 +3334,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
 
         total_of_loans = db.get_total_of_loans()
         number_of_pages = ceil(total_of_loans / 25)
-        result = db.get_all_loans(1, 25)
+        result = db.get_all_loans(0, 25)
         title = "Current loans"
         infos.append('A new loan has been registered with success.')
         body = bibcirculation_templates.tmpl_all_loans(result=result,

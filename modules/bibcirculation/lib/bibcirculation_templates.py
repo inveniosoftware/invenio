@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import datetime
 import time
+import cgi
 
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
@@ -37,7 +38,8 @@ from invenio.bibcirculation_utils import get_book_cover, \
       book_title_from_MARC, \
       renew_loan_for_X_days, \
       get_item_info_for_search_result, \
-      all_copies_are_missing
+      all_copies_are_missing, \
+      has_copies
 
 
 _MENU_ = """
@@ -111,7 +113,7 @@ _MENU_ = """
      <li class="hassubmenu">
          <a href='#'>Loans</a>
          <ul class="subsubmenu" style="width:16.5em;">
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">On library desk</a></li>
+         <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">On library desk</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_return">Return book</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans">List of all loans</a></li>
              <li><a href='#'># - Stats</a></li>
@@ -217,8 +219,22 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        if not book_title_from_MARC(recid):
+            out = """<div align="center"
+                     <div class="infoboxmsg">
+                      This record does not exist.
+                      </div>"""
+            return out
+
+        elif not has_copies(recid):
+            out = """<div align="center"
+                     <div class="infoboxmsg">
+                      This record has no copies.
+                      </div>"""
+            return out
+
         # verify if all copies are missing
-        if all_copies_are_missing(recid):
+        elif all_copies_are_missing(recid):
 
             ill_link = """<a href='%s/record/%s/holdings/ill_request_with_recid'>ILL services</a>""" % (CFG_SITE_URL, recid)
 
@@ -230,8 +246,12 @@ class Template:
             return out
 
         # verify if there are no copies
-        if not holdings_info:
-            return _("This item has no holdings.")
+        elif not holdings_info:
+            out = """<div align="center"
+                     <div class="infoboxmsg">
+                      This item has no holdings.
+                      </div>"""
+            return out
 
         out = """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -350,7 +370,7 @@ class Template:
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom" align="center">
         </form>
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirccontent">
@@ -388,8 +408,8 @@ class Template:
              </tr>
         </table>
         <br />
-        <br \>
-        <br \>
+        <br />
+        <br />
         </form>
         </div>
         """ % (_("Back"))
@@ -506,11 +526,11 @@ class Template:
             out += """
                    <h1 class="headline">%s</h1>
                    <div class="bibcirctop">
-                   <br /> <br \>
+                   <br /> <br />
                    <table class="bibcirctable_contents">
                    <td align="center" class="bibcirccontent">%s</td>
                    </table>
-                   <br /> <br \>
+                   <br /> <br />
                    <hr>
                    <br />
                    <table class="bibcirctable">
@@ -746,7 +766,7 @@ class Template:
              <td class="bibcirccontent" width="30"><input size=2 style='border: 1px solid #cfcfcf' name="to_day" value=%(to_day)s></td>
         </tr>
         </table>
-        <br /> <br \>
+        <br /> <br />
         """
 
         out += """
@@ -760,7 +780,7 @@ class Template:
 
         </tr>
         </table>
-        <br /> <br \>
+        <br /> <br />
         </form>
         """
 
@@ -878,7 +898,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-        <br /> <br \>
+        <br /> <br />
         <table class="bibcirctable">
         <tr>
         <td class="bibcirccontent" width="30">%s</td>
@@ -887,11 +907,11 @@ class Template:
         <td class="bibcirccontent" width="30">%s<a href="%s">%s</a>%s</td>
         </tr>
         </table>
-        <br /> <br \>
+        <br /> <br />
         <table class="bibcirctable">
         <td><input type=button onClick="location.href='%s'" value='%s' class='formbutton'></td>
         </table>
-        <br /> <br \>
+        <br /> <br />
         """ % (message,
                _("You can see your loans "),
                CFG_SITE_URL + '/yourloans/display',
@@ -918,16 +938,16 @@ class Template:
 
         out += """
         <div class="bibcircbottom">
-        <br /> <br \>
+        <br /> <br />
              <table class="bibcirctable">
              <td class="bibcirccontent" width="30">%s</td>
              </table>
-             <br /> <br \>
+             <br /> <br />
              <table class="bibcirctable">
              <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
              value=%s class='formbutton'></td>
              </table>
-        <br /> <br \>
+        <br /> <br />
         </div>
         """ % (_("A new loan has been registered."),
                CFG_SITE_URL,
@@ -953,18 +973,18 @@ class Template:
         if len(result) == 0:
             out += """
             <div class="bibcircbottom">
-            <br /> <br \>            <br /> <br \>
+            <br /> <br />            <br /> <br />
             <table class="bibcirctable_contents">
                  <td class="bibcirccontent" align="center">%s</td>
             </table>
-            <br /> <br \>            <br />
+            <br /> <br />            <br />
             <table class="bibcirctable_contents">
             <td align="center">
             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
             value='%s' class='formbutton'>
             </td>
             </table>
-            <br \>
+            <br />
             </div>
             """ % (_("No more requests are pending."),
                    CFG_SITE_URL,
@@ -1110,18 +1130,18 @@ class Template:
         if len(result) == 0:
             out += """
             <div class="bibcircbottom">
-            <br /> <br \>            <br /> <br \>
+            <br /> <br />            <br /> <br />
             <table class="bibcirctable_contents">
                  <td class="bibcirccontent" align="center">%s</td>
             </table>
-            <br /> <br \>            <br />
+            <br /> <br />            <br />
             <table class="bibcirctable_contents">
             <td align="center">
             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'" value='%s'
             class='formbutton'>
             </td>
             </table>
-            <br \>
+            <br />
             </div>
             """ % (_("No more requests are waiting."),
                    CFG_SITE_URL,
@@ -1263,18 +1283,18 @@ class Template:
         if len(result) == 0:
             out += """
             <div class="bibcircbottom">
-            <br /> <br \>            <br /> <br \>
+            <br /> <br />            <br /> <br />
             <table class="bibcirctable_contents">
                  <td class="bibcirccontent" align="center">%s</td>
             </table>
-            <br /> <br \>            <br />
+            <br /> <br />            <br />
             <table class="bibcirctable_contents">
             <td align="center">
             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
             value="Back to home" class='formbutton'>
             </td>
             </table>
-            <br \>
+            <br />
             </div>
             """ % (_("No hold requests waiting."), CFG_SITE_URL)
 
@@ -1285,8 +1305,8 @@ class Template:
             out += """
             <form name="list_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request" method="get" >
             <div class="bibcircbottom">
-            <br \>
-            <br \>
+            <br />
+            <br />
              <table class="bibcirctable">
                     <tr>
                        <td class="bibcirctableheader">%s</td>
@@ -1338,9 +1358,9 @@ class Template:
                         _('Select hold request'))
 
             out += """</table>
-                  <br \>
-                  <br \>
-                  <br \>
+                  <br />
+                  <br />
+                  <br />
                   <table class="bibcirctable">
                        <tr>
                             <td>
@@ -1350,9 +1370,9 @@ class Template:
                            </tr>
                   </table>
                   </form>
-                  <br \>
-                  <br \>
-                  <br \>
+                  <br />
+                  <br />
+                  <br />
                   </div>
                   """ % (_("Back"))
 
@@ -1439,9 +1459,9 @@ class Template:
         out += """
            <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request" method="get" >
              <div class=bibcircbottom>
-             <br \>
+             <br />
              <div class="infoboxsuccess">%s</div>
-             <br \>
+             <br />
              <table class="bibcirctable">
         """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
 
@@ -1626,19 +1646,19 @@ class Template:
 
         out += """
         <div class=bibcircbottom>
-        <br \>
+        <br />
         <div class="subtitle">
         %s
         </div>
-        <br \>
+        <br />
         """ % (_("Welcome to CDS Invenio BibCirculation Admin"))
 
         out += """
-        <br \><br \>
-        <br \><br \>
-        <br \><br \>
-        <br \><br \>
-        <br \><br \>
+        <br /><br />
+        <br /><br />
+        <br /><br />
+        <br /><br />
+        <br /><br />
         </div>
         """
 
@@ -1659,7 +1679,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom>
-        <br \><br \>         <br \>
+        <br /><br />         <br />
         <form name="borrower_search" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_search_result" method="get" >
              <table class="bibcirctable">
                <tr align="center">
@@ -1675,7 +1695,7 @@ class Template:
                  <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
                </tr>
              </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr align="center">
                <td>
@@ -1687,10 +1707,10 @@ class Template:
              </tr>
         </table>
         <form>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
 
         """ % (CFG_SITE_URL,
@@ -1714,11 +1734,11 @@ class Template:
         out += """
         <div class=bibcircbottom>
         <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/item_search_result" method="get" >
-        <br \>
-        <br \>
-        <br \>
-        <input type=hidden name=start value="0">
-        <input type=hidden name=end value="10">
+        <br />
+        <br />
+        <br />
+        <input type=hidden value="0">
+        <input type=hidden value="10">
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirctableheader">Search item by
@@ -1726,15 +1746,15 @@ class Template:
               <input type="radio" name="f" value="barcode">barcode
               <input type="radio" name="f" value="author">author
               <input type="radio" name="f" value="title">title
-              <br \>
-              <br \>
+              <br />
+              <br />
             </td>
           </tr>
           <tr align="center">
           <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
                              </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td>
@@ -1746,10 +1766,10 @@ class Template:
             </td>
           </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
         <form>
 
@@ -1858,9 +1878,9 @@ class Template:
         out += """
         <div class=bibcircbottom>
         <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1" method="get" >
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
           <table class="bibcirctable">
 
             """  % (CFG_SITE_URL)
@@ -1946,8 +1966,8 @@ class Template:
 
         if result:
             out += """
-            <br \>
-            <form name="step1_form2" action="/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step2" method="get" >
+            <br />
+            <form name="step1_form2" action="/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step2" method="get">
             <table class="bibcirctable">
               <tr width="200">
                 <td align="center">
@@ -1977,9 +1997,9 @@ class Template:
             """ % (_("Select user"))
 
         out += """
-              <br \>
-              <br \>
-              <br \>
+              <br />
+              <br />
+              <br />
               </div>
               """
 
@@ -2051,7 +2071,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                       <input type=hidden name="user_info" value="%s">
@@ -2210,7 +2230,7 @@ class Template:
                        <input type=button value=%s
                        onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                        <input type=hidden name="user_info" value="%s">
@@ -2270,18 +2290,18 @@ class Template:
 
         out += """
         <div class="bibcircbottom">
-        <br \> <br \>
+        <br /> <br />
              <table class="bibcirctable">
                   <td class="bibcirccontent" width="30">%s</td>
              </table>
-             <br \> <br \>
+             <br /> <br />
              <table class="bibcirctable">
              <td>
              <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
              value='Back to home' class='formbutton'>
              </td>
              </table>
-        <br \> <br \>
+        <br /> <br />
         </div>
         """ % (_("Notification has been sent!"),
                CFG_SITE_URL)
@@ -2397,7 +2417,7 @@ class Template:
         <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_new_loan" method="get" >
              <div class=bibcircbottom>
              <input type=hidden name=borrower_id value=%s>
-             <br \>
+             <br />
                   <table class="bibcirctable">
                               <tr>
                               <td class="bibcirctableheader" width="70">%s</td>
@@ -2428,16 +2448,16 @@ class Template:
 
         out += """
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable_contents">
              <tr>
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                   </td>
              </tr>
         </table>
-        <br \>
+        <br />
         </div>
         </form>
         """ % (_("Back"),
@@ -2459,7 +2479,7 @@ class Template:
         out += """
         <form name="all_requests_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_requests" method="get" >
              <div class="bibcircbottom">
-             <br \>
+             <br />
                   <table class="bibcirctable">
                          <tr>
                               <td class="bibcirctableheader">%s</td>
@@ -2517,7 +2537,7 @@ class Template:
 
         out += """
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr>
                   <td>
@@ -2525,7 +2545,7 @@ class Template:
                   </td>
              </tr>
         </table>
-        <br \> <br \>
+        <br /> <br />
         </div>
         </form>
         """ % (_("Back"))
@@ -2621,14 +2641,14 @@ class Template:
         out += """
         </tbody>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr>
                   <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_details?recid=%s'"
                        value='%s' class='formbutton'></td>
              </tr>
         </table>
-        <br \><br \><br \>
+        <br /><br /><br />
        </div>
         </form>
         """ % (CFG_SITE_URL,
@@ -2660,7 +2680,7 @@ class Template:
 
         out += """
            <div class="bibcircbottom">
-                <br \>
+                <br />
                 <table class="bibcirctable">
                   <tr>
                      <td class="bibcirctableheader" width="10">%s</td>
@@ -2702,7 +2722,7 @@ class Template:
                      </td>
                      </tr>
               </table>
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td class="bibcirctableheader">%s</td>
@@ -2930,7 +2950,7 @@ class Template:
 
 
         out += """
-           <br \>
+           <br />
            <table class="bibcirctable">
              <tr>
                <td>
@@ -2941,9 +2961,9 @@ class Template:
                </td>
              </tr>
            </table>
-           <br \>
-           <br \>
-           <br \>
+           <br />
+           <br />
+           <br />
            </div>
 
            """ % (_("Back"))
@@ -3122,16 +3142,16 @@ class Template:
 
         out += """
            </table>
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td><input type=button value='%s'
                           onClick="history.go(-1)" class="formbutton"></td>
                 </tr>
            </table>
-           <br \>
-           <br \>
-           <br \>
+           <br />
+           <br />
+           <br />
            </div>
 
            """ % ("Back")
@@ -3220,16 +3240,16 @@ class Template:
         out += """
            </tbody>
            </table>
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td><input type=button value='%s'
                           onClick="history.go(-1)" class="formbutton"></td>
                 </tr>
            </table>
-           <br \>
-           <br \>
-           <br \>
+           <br />
+           <br />
+           <br />
            </div>
 
            """ % (_("Back"))
@@ -3313,16 +3333,16 @@ class Template:
         out += """
            </tbody>
            </table>
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td><input type=button value='%s'
                           onClick="history.go(-1)" class="formbutton"></td>
                 </tr>
            </table>
-           <br \>
-           <br \>
-           <br \>
+           <br />
+           <br />
+           <br />
            </div>
 
            """ % (_("Back"))
@@ -3343,7 +3363,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-        <br \>
+        <br />
         """
         (library_id, name, address, email, phone, notes) = library_details
 
@@ -3414,17 +3434,17 @@ class Template:
 
         out += """
            </table>
-           <br \>
-           <br \>
+           <br />
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td><input type=button value='%s'
                           onClick="history.go(-1)" class="formbutton"></td>
                 </tr>
            </table>
-           <br \>
-           <br \>
-           <br \>
+           <br />
+           <br />
+           <br />
            </div>
            """ % (_("Back"))
 
@@ -3499,7 +3519,7 @@ class Template:
             <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_notification" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
-            <br \>
+            <br />
             <table class="bibcirctable">
                  <tr>
                       <td class="bibcirctableheader">%s</td>
@@ -3557,7 +3577,7 @@ class Template:
                        value=%s class='formbutton'></td>
              </tr>
         </table> -->
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr>
             <td>
@@ -3782,7 +3802,7 @@ class Template:
                   </td>
              </tr>
         </table>
-        <br \>
+        <br />
         </div>
         """ % (CFG_SITE_URL,
                borrower_id,
@@ -3866,12 +3886,12 @@ class Template:
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                          {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                          {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                           (_("No notes")))
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                          {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                          {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                           (_("See notes")))
 
                 if notes == "":
@@ -3937,7 +3957,7 @@ class Template:
               value='%s' class='formbutton'></td>
           </tr>
         </table>
-        <br \>
+        <br />
         </div>
         </form>
 
@@ -4051,7 +4071,7 @@ class Template:
         else:
             out += """
             <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
-            <br \>
+            <br />
              <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
                     <tr>
@@ -4088,12 +4108,12 @@ class Template:
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
                                                   '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                                  {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                                  {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                   (_("see notes")))
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
                                                  '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                                 {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                                 {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                  (_("no notes")))
 
                 next_link = create_html_link(CFG_SITE_URL +
@@ -4150,7 +4170,7 @@ class Template:
             if page_number == 1:
                 out += """
                     </table>
-                    <br \>
+                    <br />
                     <table class="bibcirctable">
                     <tr>
                     <td align='center'>%s - %s -
@@ -4160,7 +4180,7 @@ class Template:
             else:
                 out += """
                     </table>
-                    <br \>
+                    <br />
                     <table class="bibcirctable">
                     <tr>
                     <td align='center'>%s - %s -
@@ -4267,7 +4287,7 @@ class Template:
                     </select>
             </td>
             <td>
-            <input type="submit" name="ok_button" value="%s" class="formbutton">
+            <input type="submit" value="%s" class="formbutton">
             </td>
             </tr>
             </table>
@@ -4304,7 +4324,7 @@ class Template:
         else:
             out += """
             <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans" method="get" >
-            <br \>
+            <br />
              <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
                     <tr>
@@ -4341,12 +4361,12 @@ class Template:
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
                                                   '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                                  {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                                  {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                   (_("see notes")))
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
                                                  '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                                 {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                                 {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                  (_("no notes")))
 
                 next_link = create_html_link(CFG_SITE_URL +
@@ -4403,7 +4423,7 @@ class Template:
             if page_number == 1:
                 out += """
                     </table>
-                    <br \>
+                    <br />
                     <table class="bibcirctable">
                     <tr>
                     <td align='center'>%s - %s -
@@ -4413,7 +4433,7 @@ class Template:
             else:
                 out += """
                     </table>
-                    <br \>
+                    <br />
                     <table class="bibcirctable">
                     <tr>
                     <td align='center'>%s - %s -
@@ -4545,7 +4565,7 @@ class Template:
 
         out += """
 
-        <br \> <br \>
+        <br /> <br />
         <table class="bibcirctable">
                <tr>
                     <td>
@@ -4555,7 +4575,7 @@ class Template:
                     </td>
                </tr>
         </table>
-        <br \> <br \>
+        <br /> <br />
         </div>
         </form>
         """ % (_("Back"),
@@ -4576,7 +4596,7 @@ class Template:
         out += _MENU_
 
         out += """
-            <br \>
+            <br />
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
             <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
@@ -4623,12 +4643,12 @@ class Template:
 
             see_notes_link = create_html_link(CFG_SITE_URL +
                                               '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                              {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                              {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                               (_("see notes")))
 
             no_notes_link = create_html_link(CFG_SITE_URL +
                                              '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                            {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                            {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                              (_("no notes")))
 
             if notes == "":
@@ -4715,7 +4735,7 @@ class Template:
                    recid)
 
             out += """
-             <br \>
+             <br />
              <table id="table_loans" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
                     <tr>
@@ -4753,7 +4773,7 @@ class Template:
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                          {'loan_id': loan_id, 'recid': recid, 'borrower_id': borrower_id, 'ln': ln},
+                                          {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                           (_("No notes")))
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
@@ -4779,10 +4799,10 @@ class Template:
                  <td align="center">
                    <SELECT style='border: 1px solid #cfcfcf' ONCHANGE="location = this.options[this.selectedIndex].value;">
                       <OPTION VALUE="">Select an action
-                      <OPTION VALUE="get_item_loans_details?borrower_id=%s&barcode=%s&loan_id=%s&recid=%s">Renew
+                      <OPTION VALUE="get_item_loans_details?barcode=%s&loan_id=%s&recid=%s">Renew
                       <OPTION VALUE="loan_return_confirm?barcode=%s">Return
-                      <OPTION VALUE="change_due_date_step1?loan_id=%s&borrower_id=%s">Change due date
-                      <OPTION VALUE="claim_book_return?borrower_id=%s&recid=%s&template=claim_return">Send recall
+                      <OPTION VALUE="change_due_date_step1?loan_id=%s">Change due date
+                      <OPTION VALUE="claim_book_return?recid=%s&template=claim_return">Send recall
                     </SELECT>
                  </td>
              </tr>
@@ -4794,14 +4814,13 @@ class Template:
                    nb_renewall, nb_overdue,
                    date_overdue, status, check_notes,
                    borrower_id, barcode, loan_id, recid,
-                   barcode, loan_id, borrower_id,
-                   borrower_id, recid,
-                   loan_id, borrower_id)
+                   barcode, loan_id, recid,
+                   loan_id)
 
         out += """
         <tbody>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr>
                   <td>
@@ -4810,9 +4829,9 @@ class Template:
                   </td>
              </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
         </div>
         </form>
         """ % (CFG_SITE_URL,
@@ -4849,7 +4868,7 @@ class Template:
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
             <input type=hidden name=request_id value=%s>
-            <br \>
+            <br />
             <table class="bibcirctable">
                  <tr>
                       <td class="bibcirctableheader">%s</td>
@@ -4915,7 +4934,7 @@ class Template:
                _("Barcode"))
 
         out += """
-              <br \>
+              <br />
               <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
                 <tr>
                   <th>%s</th>
@@ -4933,14 +4952,14 @@ class Template:
             <td>
               <input type=button value=%s onClick="history.go(-1)" class="bibcircbutton"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
-              <input type="submit" name="confirm_button" value=%s class="bibcircbutton"
+              <input type="submit"   value=%s class="bibcircbutton"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
             </td>
           </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
         </div>
         </form>
         """ % (_("Back"),
@@ -4969,8 +4988,8 @@ class Template:
             <div class="bibcircbottom">
             <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes" method="get" >
             <input type=hidden name=borrower_id value='%s'>
-            <br \>
-            <br \>
+            <br />
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -5006,7 +5025,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -5019,7 +5038,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td>
@@ -5044,9 +5063,12 @@ class Template:
 
 
     def tmpl_get_loans_notes(self, loans_notes, loan_id,
-                             recid, ln=CFG_SITE_LANG):
+                             recid, referer, back="", ln=CFG_SITE_LANG):
 
         _ = gettext_set_language(ln)
+
+        if back == "":
+            back=referer
 
         if not loans_notes:
             loans_notes = {}
@@ -5060,9 +5082,9 @@ class Template:
         out +="""
             <div class="bibcircbottom">
             <form name="loans_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes" method="get" >
-            <input type=hidden name=loan_id value='%s'>
-            <br \>
-            <br \>
+            <input type="hidden" name="loan_id" value="%s">
+            <br />
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -5082,7 +5104,7 @@ class Template:
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
                                            '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
-                                           {'delete_key': key, 'loan_id': loan_id, 'ln': ln},
+                                           {'delete_key': key, 'loan_id': loan_id, 'ln': ln, 'back': cgi.escape(back, True)},
                                            (_("[delete]")))
 
             out += """<tr class="bibcirccontent">
@@ -5090,15 +5112,16 @@ class Template:
                         <td width="400"><i>%s</i></td>
                         <td width="65" align="center">%s</td>
                       </tr>
-
                       """ % (key, loans_notes[key], delete_note)
+
+
 
         out += """
                   </table>
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -5111,23 +5134,26 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                   <td>
-                    <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                    <input type="submit" value='%s' class="formbutton">
+                    <input type=button value="%s" onClick="window.location='%s'" class="formbutton">
+                    <input type="submit" value="%s" class="formbutton">
+                    <input type="hidden" name="back" value="%s">
                   </td>
              </tr>
              </table>
-             <br \>
-             <br \>
-             <br \>
+             <br />
+             <br />
+             <br />
              </form>
              </div>
         """ % (_("Write new note"),
                _("Back"),
-               _("Confirm"))
+               cgi.escape(back,True),
+               _("Confirm"),
+               cgi.escape(back, True))
 
         return out
 
@@ -5147,7 +5173,7 @@ class Template:
         if book_info:
             out += """
               <div class="bibcircbottom">
-                <br \>
+                <br />
                 <table class="bibcirctable">
                 <tr>
                 <td class="bibcirctableheader" width="10">%s</td>
@@ -5388,7 +5414,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                   </td>
                  </tr>
                 </table>
@@ -5471,7 +5497,7 @@ class Template:
                       <tr>
                         <td>
                          <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                         <input type="submit" name="confirm_button" value=%s class="formbutton">
+                         <input type="submit"   value=%s class="formbutton">
                          <input type=hidden name=tup_infos value="%s">
                        </td>
                      </tr>
@@ -5534,7 +5560,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom>
-        <br \><br \>         <br \>
+        <br /><br />         <br />
         <form name="update_borrower_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step2" method="get" >
              <table class="bibcirctable">
                   <tr align="center">
@@ -5549,7 +5575,7 @@ class Template:
                         <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
                   </tr>
              </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr align="center">
                   <td>
@@ -5559,9 +5585,9 @@ class Template:
              </tr>
         </table>
         <form>
-        <br \><br \>
-        <br \>
-        <br \>
+        <br /><br />
+        <br />
+        <br />
         </div>
 
         """ % (CFG_SITE_URL,
@@ -5584,7 +5610,7 @@ class Template:
 
         out += """
         <div class="bibcircbottom">
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirccontent">
@@ -5592,7 +5618,7 @@ class Template:
             </td>
           </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
         """ % (len(result))
 
@@ -5612,7 +5638,7 @@ class Template:
 
         out += """
              </table>
-             <br \>
+             <br />
              """
 
         out += """
@@ -5625,8 +5651,8 @@ class Template:
              </tr>
         </table>
         <br />
-        <br \>
-        <br \>
+        <br />
+        <br />
         </form>
         </div>
         """ % (_("Back"))
@@ -5691,7 +5717,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                   </td>
                  </tr>
                 </table>
@@ -5752,7 +5778,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                        <input type=hidden name=tup_infos value="%s">
                   </td>
                  </tr>
@@ -5872,7 +5898,7 @@ class Template:
                 <tr align="center">
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                   </td>
                  </tr>
                 </table>
@@ -5932,7 +5958,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                        <input type=hidden name=tup_infos value="%s">
                   </td>
                  </tr>
@@ -6004,7 +6030,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom>
-        <br \><br \>         <br \>
+        <br /><br />         <br />
         <form name="update_library_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step2" method="get" >
              <table class="bibcirctable">
                   <tr align="center">
@@ -6019,7 +6045,7 @@ class Template:
                         <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
                   </tr>
              </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr align="center">
                   <td>
@@ -6031,9 +6057,9 @@ class Template:
              </tr>
         </table>
         <form>
-        <br \><br \>
-        <br \>
-        <br \>
+        <br /><br />
+        <br />
+        <br />
         </div>
 
         """ % (CFG_SITE_URL,
@@ -6088,7 +6114,7 @@ class Template:
 
         out += """
              </table>
-             <br \>
+             <br />
              """
 
         out += """
@@ -6099,8 +6125,8 @@ class Template:
              </tr>
         </table>
         <br />
-        <br \>
-        <br \>
+        <br />
+        <br />
         </form>
         </div>
         """ % (_("Back"))
@@ -6163,7 +6189,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -6225,7 +6251,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                        <input type=hidden name=tup_infos value="%s">
@@ -6297,9 +6323,9 @@ class Template:
         out += """
         <div class=bibcircbottom>
         <form name="add_new_copy_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step2" method="get" >
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
         <input type=hidden name=start value="0">
         <input type=hidden name=end value="10">
         <table class="bibcirctable">
@@ -6309,8 +6335,8 @@ class Template:
              <input type="radio" name="f" value="name">year
              <input type="radio" name="f" value="author">author
              <input type="radio" name="f" value="title">title
-             <br \>
-             <br \>
+             <br />
+             <br />
             </td>
            <tr align="center">
              <td>
@@ -6318,7 +6344,7 @@ class Template:
              </td>
            </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr align="center">
                <td>
@@ -6330,10 +6356,10 @@ class Template:
                </td>
              </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
         <form>
 
@@ -6433,7 +6459,7 @@ class Template:
             </script>
            <form name="add_new_copy_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step4" method="get" >
            <div class="bibcircbottom">
-                <br \>
+                <br />
                      <table class="bibcirctable">
                           <tr>
                                <td class="bibcirctableheader" width="10">%s</td>
@@ -6469,7 +6495,7 @@ class Template:
                      </tr>
               </table>
 
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td class="bibcirctableheader">%s</td>
@@ -6544,7 +6570,7 @@ class Template:
         out += """
            </tbody>
            </table>
-           <br \>
+           <br />
           <table class="bibcirctable">
                 <tr>
                      <td class="bibcirctableheader">%s</td>
@@ -6622,7 +6648,7 @@ class Template:
                     </td>
                  </tr>
                 </table>
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td>
@@ -6633,8 +6659,8 @@ class Template:
                      </td>
                 </tr>
            </table>
-           <br \>
-           <br \>
+           <br />
+           <br />
            </div>
            </form>
            """ % (_("Location"), _("Collection"), _("Description"),
@@ -6691,7 +6717,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                        <input type=hidden name=tup_infos value="%s">
@@ -6771,9 +6797,9 @@ class Template:
         out += """
         <div class=bibcircbottom>
         <form name="update_item_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step2" method="get" >
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
         <input type=hidden name=start value="0">
         <input type=hidden name=end value="10">
         <table class="bibcirctable">
@@ -6783,13 +6809,13 @@ class Template:
                     <input type="radio" name="f" value="name">year
                     <input type="radio" name="f" value="email">author
                     <input type="radio" name="f" value="email">title
-                    <br \><br \>
+                    <br /><br />
                   </td>
                 <tr align="center">
                   <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
                 </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
                <tr align="center">
                      <td>
@@ -6800,10 +6826,10 @@ class Template:
                      </td>
                     </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
         <form>
         """ % (CFG_SITE_URL)
@@ -6896,7 +6922,7 @@ class Template:
         out += """
            <form name="update_item_info_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step4" method="get" >
            <div class="bibcircbottom">
-                <br \>
+                <br />
                      <table class="bibcirctable">
                           <tr>
                                <td class="bibcirctableheader" width="10">%s</td>
@@ -6932,7 +6958,7 @@ class Template:
                      </tr>
               </table>
 
-           <br \>
+           <br />
 
            """  % (CFG_SITE_URL,
                    _("Item details"),
@@ -7000,7 +7026,7 @@ class Template:
 
         out += """
            </table>
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td>
@@ -7009,8 +7035,8 @@ class Template:
                         <input type=hidden name=recid value=%s></td>
                 </tr>
            </table>
-           <br \>
-           <br \>
+           <br />
+           <br />
            </div>
            """ % (_("Back"), recid)
 
@@ -7047,7 +7073,7 @@ class Template:
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
            <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step5" method="get" >
            <div class="bibcircbottom">
-                <br \>
+                <br />
                      <table class="bibcirctable">
                           <tr>
                                <td class="bibcirctableheader" width="10">%s</td>
@@ -7083,7 +7109,7 @@ class Template:
                </tr>
               </table>
 
-           <br \>
+           <br />
 
            """  % (CFG_SITE_URL,
                    _("Item details"),
@@ -7421,7 +7447,7 @@ class Template:
                     </td>
                  </tr>
                 </table>
-           <br \>
+           <br />
            <table class="bibcirctable">
                 <tr>
                      <td>
@@ -7432,8 +7458,8 @@ class Template:
                      </td>
                 </tr>
            </table>
-           <br \>
-           <br \>
+           <br />
+           <br />
            </div>
            </form>
            """ % (_("Back"), _("Continue"), recid)
@@ -7494,7 +7520,7 @@ class Template:
                   <td>
                        <input type=button value=%s
                          onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                         value=%s class="formbutton">
                        <input type=hidden name=tup_infos value="%s">
 
@@ -7572,7 +7598,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom>
-        <br \><br \>         <br \>
+        <br /><br />         <br />
         <form name="search_library_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/search_library_step2" method="get" >
           <table class="bibcirctable">
            <tr align="center">
@@ -7587,7 +7613,7 @@ class Template:
              <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
            </tr>
           </table>
-          <br \>
+          <br />
           <table class="bibcirctable">
              <tr align="center">
                   <td>
@@ -7598,10 +7624,10 @@ class Template:
              </tr>
         </table>
         <form>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
 
         """ % (CFG_SITE_URL,
@@ -7638,7 +7664,7 @@ class Template:
             out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom" align="center">
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirccontent">
@@ -7646,7 +7672,7 @@ class Template:
             </td>
           </tr>
         </table>
-        <br \>
+        <br />
         <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
           <th align="center">%s</th>
 
@@ -7715,8 +7741,8 @@ class Template:
             <div class="bibcircbottom">
             <form name="library_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_library_notes" method="get" >
             <input type=hidden name=library_id value='%s'>
-            <br \>
-            <br \>
+            <br />
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -7752,7 +7778,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -7765,7 +7791,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                   <td>
@@ -7822,8 +7848,8 @@ class Template:
         out +="""
             <div class="bibcircbottom">
             <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/change_due_date_step2" method="get" >
-            <br \>
-            <br \>
+            <br />
+            <br />
             <table class="bibcirctable">
              <tr>
                <td class="bibcirctableheader" width="100">%s</td>
@@ -7852,7 +7878,7 @@ class Template:
             <td width="80">%s</td> <td class="bibcirccontent">%s</td>
             </tr>
             </table>
-            <br \>
+            <br />
              """ % (CFG_SITE_URL, _("Loan information"),
                     _("Title"), book_title_from_MARC(recid),
                     _("Barcode"), barcode,
@@ -7886,7 +7912,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             """ % (_("New due date: "), _("due_date"), due_date,
                    _("jsCal"), _("due_date"), _("jsCal"))
 
@@ -7901,15 +7927,15 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                         value="%s" class="formbutton">
 
 
                   </td>
              </tr>
         </table>
-        <br \>
-        <br \>
+        <br />
+        <br />
         </form>
         </div>
         """ % (loan_id, borrower_id,
@@ -7990,7 +8016,7 @@ class Template:
             <form name="create_new_loan_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_loan_step2" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
-            <br \>
+            <br />
             <table class="bibcirctable">
                  <tr>
                       <td class="bibcirctableheader">%s</td>
@@ -8043,7 +8069,7 @@ class Template:
              """ % (_("Barcode"))
 
         out += """
-              <br \>
+              <br />
               <table class="bibcirctable">
                 <tr>
                   <td class="bibcirctableheader">%s</td>
@@ -8060,13 +8086,13 @@ class Template:
              <tr>
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                   </td>
              </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
         </div>
         </form>
         """ % (_("Back"),
@@ -8116,7 +8142,7 @@ class Template:
             <input type=hidden name=borrower_id value=%s>
             <input type=hidden name=start value="0">
             <input type=hidden name=end value="10">
-            <br \>
+            <br />
             <table class="bibcirctable">
                  <tr>
                       <td class="bibcirctableheader">%s</td>
@@ -8193,15 +8219,15 @@ class Template:
               """
 
         out += """
-              <br \>
-              <br \>
+              <br />
+              <br />
             </td>
           </tr>
           <tr align="center">
           <td><input type="text" size="50" name="p" value='%s' style='border: 1px solid #cfcfcf'></td>
                              </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td>
@@ -8219,7 +8245,7 @@ class Template:
 
         if result:
             out += """
-            <br \>
+            <br />
             <form name="form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step2" method="get" >
             <table class="bibcirctable">
               <tr width="200">
@@ -8251,9 +8277,9 @@ class Template:
                     """ % (_("Select item"), borrower_id)
 
         out += """
-              <br \>
-              <br \>
-              <br \>
+              <br />
+              <br />
+              <br />
               </form>
               </div>
               """
@@ -8429,7 +8455,7 @@ class Template:
           </tr>
         </table>
         <br />
-        <br \>
+        <br />
         </form>
         </div>
 
@@ -8454,20 +8480,20 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br />
-        <br \>
+        <br />
         <table class="bibcirctable">
         <tr>
         <td class="bibcirccontent" width="30">%s</td>
         </tr>
         </table>
         <br />
-        <br \>
+        <br />
         <table class="bibcirctable">
         <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
-        <br \>
+        <br />
         </div>
 
         """ % (_("A new request has been registered with success."),
@@ -8515,7 +8541,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class=bibcircbottom>
-        <br \>
+        <br />
           <table class="bibcirctable">
                   <tr>
                      <td class="bibcirctableheader" width="10">%s</td>
@@ -8658,7 +8684,7 @@ class Template:
 
         if result:
             out += """
-            <br \>
+            <br />
             <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step2" method="get" >
             <input type=hidden name=barcode value='%s'>
             <input type=hidden name=recid value='%s'>
@@ -8694,10 +8720,10 @@ class Template:
                   </td>
                 </tr>
               </table>
-              <br \>
-              <br \>
-              <br \>
-              <br \>
+              <br />
+              <br />
+              <br />
+              <br />
               </div>
               """
 
@@ -8785,7 +8811,7 @@ class Template:
                      </td>
                      </tr>
               </table>
-              <br \>
+              <br />
               """ % (CFG_SITE_URL, barcode,
                      recid, user_info,
                      _("Item details"),
@@ -8885,7 +8911,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -8919,20 +8945,20 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br />
-        <br \>
+        <br />
         <table class="bibcirctable">
         <tr>
         <td class="bibcirccontent" width="30">%s</td>
         </tr>
         </table>
         <br />
-        <br \>
+        <br />
         <table class="bibcirctable">
         <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
-        <br \>
+        <br />
         </div>
 
         """ % (_("A new request has been registered with success."),
@@ -8980,7 +9006,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class=bibcircbottom>
-        <br \>
+        <br />
           <table class="bibcirctable">
                   <tr>
                      <td class="bibcirctableheader" width="10">%s</td>
@@ -9123,7 +9149,7 @@ class Template:
 
         if result:
             out += """
-            <br \>
+            <br />
             <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/place_new_loan_step2" method="get" >
             <input type=hidden name=barcode value='%s'>
             <input type=hidden name=recid value='%s'>
@@ -9159,10 +9185,10 @@ class Template:
                   </td>
                 </tr>
               </table>
-              <br \>
-              <br \>
-              <br \>
-              <br \>
+              <br />
+              <br />
+              <br />
+              <br />
               </div>
               """
 
@@ -9247,7 +9273,7 @@ class Template:
                  </td>
                </tr>
               </table>
-              <br \>
+              <br />
               """ % (CFG_SITE_URL, barcode,
                      recid, email,
                      _("Item details"),
@@ -9355,7 +9381,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -9455,7 +9481,7 @@ class Template:
                      </tr>
               </table>
 
-           <br \>
+           <br />
 
            """  % (CFG_SITE_URL,
                    _("Item details"),
@@ -9589,7 +9615,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -9676,7 +9702,7 @@ class Template:
                      </td>
                      </tr>
               </table>
-              <br \>
+              <br />
               """ % (CFG_SITE_URL,
                      order_info,
                      _("Item details"),
@@ -9735,7 +9761,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                     </td>
@@ -9927,8 +9953,8 @@ class Template:
             <div class="bibcircbottom">
             <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_purchase_notes" method="get" >
             <input type=hidden name=purchase_id value='%s'>
-            <br \>
-            <br \>
+            <br />
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -9964,7 +9990,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -9977,7 +10003,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                   <td>
@@ -9987,9 +10013,9 @@ class Template:
                   </td>
              </tr>
              </table>
-             <br \>
-             <br \>
-             <br \>
+             <br />
+             <br />
+             <br />
              </form>
              </div>
         """ % (_("Write new note"),
@@ -10034,7 +10060,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class=bibcircbottom>
-        <br \>
+        <br />
           <table class="bibcirctable">
                   <tr>
                      <td class="bibcirctableheader" width="10">%s</td>
@@ -10171,7 +10197,7 @@ class Template:
 
         if result:
             out += """
-            <br \>
+            <br />
             <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_step1" method="get" >
             <input type=hidden name=recid value='%s'>
             <table class="bibcirctable">
@@ -10206,10 +10232,10 @@ class Template:
                   </td>
                 </tr>
               </table>
-              <br \>
-              <br \>
-              <br \>
-              <br \>
+              <br />
+              <br />
+              <br />
+              <br />
               </div>
               """
 
@@ -10401,7 +10427,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -10558,7 +10584,7 @@ class Template:
                         <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
                       </td>
                     </tr>
@@ -10754,7 +10780,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -10785,7 +10811,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-        <br /> <br \>
+        <br /> <br />
         <table class="bibcirctable">
         <tr>
         <td class="bibcirccontent" width="30">%s</td>
@@ -10794,11 +10820,11 @@ class Template:
         <td class="bibcirccontent" width="30">%s<a href="%s">%s</a>%s</td>
         </tr>
         </table>
-        <br /> <br \>
+        <br /> <br />
         <table class="bibcirctable">
         <td><input type=button onClick="location.href='%s'" value='%s' class='formbutton'></td>
         </table>
-        <br /> <br \>
+        <br /> <br />
         """ % (message,
                _("You can see your loans "),
                CFG_SITE_URL + '/yourloans/display',
@@ -10876,7 +10902,7 @@ class Template:
                 </table>
 
 
-           <br \>
+           <br />
 
            """  % (CFG_SITE_URL,
                    _("Item details"),
@@ -10961,7 +10987,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -11121,7 +11147,7 @@ class Template:
             <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=ill_request_id value=%s>
-                <br \>
+                <br />
                      <table class="bibcirctable">
                           <tr>
                                <td class="bibcirctableheader" width="10">%s</td>
@@ -11156,7 +11182,7 @@ class Template:
                      <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
                      </tr>
               </table>
-              <br \>
+              <br />
 
               """  % (CFG_SITE_URL,
                       ill_request_id,
@@ -12190,7 +12216,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -12245,7 +12271,7 @@ class Template:
             <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step3" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=request_info value="%s">
-                <br \>
+                <br />
                      <table class="bibcirctable">
                           <tr>
                                <td class="bibcirctableheader" width="10">%s</td>
@@ -12280,7 +12306,7 @@ class Template:
                      <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
                      </tr>
               </table>
-              <br \>
+              <br />
 
               """  % (CFG_SITE_URL,
                       request_info,
@@ -12996,7 +13022,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -13083,7 +13109,7 @@ class Template:
            <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ordered_books_details_step2" method="get" >
            <div class="bibcircbottom">
            <input type=hidden name=purchase_id value="%s">
-                <br \>
+                <br />
                      <table class="bibcirctable">
                           <tr>
                                <td class="bibcirctableheader" width="10">%s</td>
@@ -13119,7 +13145,7 @@ class Template:
                      </tr>
               </table>
 
-           <br \>
+           <br />
 
            """  % (CFG_SITE_URL,
                    purchase_id,
@@ -13309,7 +13335,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -13401,7 +13427,7 @@ class Template:
                      </td>
                      </tr>
               </table>
-              <br \>
+              <br />
               """ % (CFG_SITE_URL,
                      purchase_id, recid,
                      vendor_id, cost,
@@ -13487,7 +13513,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                     </td>
@@ -13601,7 +13627,7 @@ class Template:
                 <tr align="center">
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                   </td>
                  </tr>
                 </table>
@@ -13665,7 +13691,7 @@ class Template:
                 <tr align="center">
                   <td>
                        <input type=button value=%s onClick="history.go(-1)" class="formbutton">
-                       <input type="submit" name="confirm_button" value=%s class="formbutton">
+                       <input type="submit"   value=%s class="formbutton">
                        <input type=hidden name=tup_infos value="%s">
                   </td>
                  </tr>
@@ -13740,7 +13766,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom>
-        <br \><br \>         <br \>
+        <br /><br />         <br />
         <form name="update_vendor_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step2" method="get" >
              <table class="bibcirctable">
                   <tr align="center">
@@ -13755,7 +13781,7 @@ class Template:
                         <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
                   </tr>
              </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr align="center">
                   <td>
@@ -13767,9 +13793,9 @@ class Template:
              </tr>
         </table>
         <form>
-        <br \><br \>
-        <br \>
-        <br \>
+        <br /><br />
+        <br />
+        <br />
         </div>
 
         """ % (CFG_SITE_URL,
@@ -13828,7 +13854,7 @@ class Template:
 
         out += """
              </table>
-             <br \>
+             <br />
              """
 
         out += """
@@ -13839,8 +13865,8 @@ class Template:
              </tr>
         </table>
         <br />
-        <br \>
-        <br \>
+        <br />
+        <br />
         </form>
         </div>
         """ % (_("Back"))
@@ -13907,7 +13933,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -13973,7 +13999,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                        <input type=hidden name=tup_infos value="%s">
@@ -14048,7 +14074,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom>
-        <br \><br \>         <br \>
+        <br /><br />         <br />
         <form name="search_vendor_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/search_vendor_step2" method="get" >
           <table class="bibcirctable">
            <tr align="center">
@@ -14063,7 +14089,7 @@ class Template:
              <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
            </tr>
           </table>
-          <br \>
+          <br />
           <table class="bibcirctable">
              <tr align="center">
                   <td>
@@ -14074,10 +14100,10 @@ class Template:
              </tr>
         </table>
         <form>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
 
         """ % (CFG_SITE_URL,
@@ -14136,7 +14162,7 @@ class Template:
 
         out += """
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
              <tr align="center">
                   <td>
@@ -14145,8 +14171,8 @@ class Template:
              </tr>
         </table>
         <br />
-        <br \>
-        <br \>
+        <br />
+        <br />
         </form>
         </div>
 
@@ -14236,17 +14262,17 @@ class Template:
 
         out += """
            </table>
-           <br \>
-           <br \>
+           <br />
+           <br />
            <table class="bibcirctable">
                 <tr align="center">
                      <td><input type=button value='%s'
                           onClick="history.go(-1)" class="formbutton"></td>
                 </tr>
            </table>
-           <br \>
-           <br \>
-           <br \>
+           <br />
+           <br />
+           <br />
            </form>
            </div>
            """ % (_("Back"))
@@ -14266,8 +14292,8 @@ class Template:
         out +="""
             <div class="bibcircbottom">
             <form name="vendor_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_vendor_notes" method="get" >
-            <br \>
-            <br \>
+            <br />
+            <br />
             <table class="bibcirctable">
                   <tr>
                      <td class="bibcirctableheader">%s</td>
@@ -14315,8 +14341,8 @@ class Template:
             """ % (_("Add notes"), vendor_id)
 
         out += """
-            <br \>
-            <br \>
+            <br />
+            <br />
              <table class="bibcirctable">
              <tr>
                   <td>
@@ -14325,9 +14351,9 @@ class Template:
                   </td>
              </tr>
              </table>
-             <br \>
-             <br \>
-             <br \>
+             <br />
+             <br />
+             <br />
              </form>
              </div>
         """ % (CFG_SITE_URL,
@@ -14409,7 +14435,7 @@ class Template:
                 </table>
 
 
-           <br \>
+           <br />
 
            """  % (_("Book does not exists on CDS Invenio. Please fill the following form."),
                    CFG_SITE_URL,
@@ -14493,7 +14519,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -14732,7 +14758,7 @@ class Template:
 
         if result:
             out += """
-            <br \>
+            <br />
             <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step3" method="get" >
             <input type=hidden name=book_info value="%s">
             <table class="bibcirctable">
@@ -14768,10 +14794,10 @@ class Template:
                   </td>
                 </tr>
               </table>
-              <br \>
-              <br \>
-              <br \>
-              <br \>
+              <br />
+              <br />
+              <br />
+              <br />
               </div>
               """
 
@@ -14925,7 +14951,7 @@ class Template:
                         <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
                       </td>
                     </tr>
@@ -15050,7 +15076,7 @@ class Template:
         out += """
         </tbody>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr>
             <td>
@@ -15091,8 +15117,8 @@ class Template:
             <div class="bibcircbottom">
             <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_ill_library_notes" method="get" >
             <input type=hidden name=ill_id value='%s'>
-            <br \>
-            <br \>
+            <br />
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -15128,7 +15154,7 @@ class Template:
                   </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                 <td class="bibcirctableheader">%s</td>
@@ -15141,7 +15167,7 @@ class Template:
                 </td>
               </tr>
             </table>
-            <br \>
+            <br />
             <table class="bibcirctable">
               <tr>
                   <td>
@@ -15151,9 +15177,9 @@ class Template:
                   </td>
              </tr>
              </table>
-             <br \>
-             <br \>
-             <br \>
+             <br />
+             <br />
+             <br />
              </form>
              </div>
         """ % (_("Write new note"),
@@ -15179,18 +15205,18 @@ class Template:
         if len(result) == 0:
             out += """
             <div class="bibcircbottom">
-            <br /> <br \>            <br /> <br \>
+            <br /> <br />            <br /> <br />
             <table class="bibcirctable_contents">
                  <td class="bibcirccontent" align="center">%s</td>
             </table>
-            <br /> <br \>            <br />
+            <br /> <br />            <br />
             <table class="bibcirctable_contents">
             <td align="center">
             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
             value='%s' class='formbutton'>
             </td>
             </table>
-            <br \>
+            <br />
             </div>
             """ % (_("No more requests are pending or waiting."),
                    CFG_SITE_URL,
@@ -15351,15 +15377,15 @@ class Template:
               <input type="radio" name="f" value="barcode">barcode
               <input type="radio" name="f" value="author">author
               <input type="radio" name="f" value="title">title
-              <br \>
-              <br \>
+              <br />
+              <br />
             </td>
           </tr>
           <tr align="center">
           <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
                              </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td>
@@ -15371,10 +15397,10 @@ class Template:
             </td>
           </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
         <form>
 
@@ -15507,15 +15533,15 @@ class Template:
               <input type="radio" name="f" value="barcode">barcode
               <input type="radio" name="f" value="author">author
               <input type="radio" name="f" value="title">title
-              <br \>
-              <br \>
+              <br />
+              <br />
             </td>
           </tr>
           <tr align="center">
           <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
                              </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td>
@@ -15527,10 +15553,10 @@ class Template:
             </td>
           </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
         <form>
 
@@ -15710,7 +15736,7 @@ class Template:
                 </table>
 
 
-           <br \>
+           <br />
 
            """  % (_("Book does not exists on CDS Invenio. Please fill the following form."),
                    CFG_SITE_URL, borrower_id,
@@ -15794,7 +15820,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -15965,7 +15991,7 @@ class Template:
                         <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
                       </td>
                     </tr>
@@ -16064,7 +16090,7 @@ class Template:
                 </table>
 
 
-           <br \>
+           <br />
 
            """  % (CFG_SITE_URL,
                    _("Article details"),
@@ -16140,7 +16166,7 @@ class Template:
                        <input type=button value=%s
                         onClick="history.go(-1)" class="formbutton">
 
-                       <input type="submit" name="confirm_button"
+                       <input type="submit"
                        value=%s class="formbutton">
 
                   </td>
@@ -16370,7 +16396,7 @@ class Template:
 
         if result:
             out += """
-            <br \>
+            <br />
             <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step3" method="get" >
             <input type=hidden name=book_info value="%s">
             <table class="bibcirctable">
@@ -16406,10 +16432,10 @@ class Template:
                   </td>
                 </tr>
               </table>
-              <br \>
-              <br \>
-              <br \>
-              <br \>
+              <br />
+              <br />
+              <br />
+              <br />
               </div>
               """
 
@@ -16433,9 +16459,9 @@ class Template:
         out += """
         <div class=bibcircbottom>
         <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_search_result" method="get" >
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
         <input type=hidden name=start value="0">
         <input type=hidden name=end value="10">
         <table class="bibcirctable">
@@ -16443,15 +16469,15 @@ class Template:
             <td class="bibcirctableheader">Search ILL request by
               <input type="radio" name="f" value="title" checked>title
               <input type="radio" name="f" value="supplier">supplier
-              <br \>
-              <br \>
+              <br />
+              <br />
             </td>
           </tr>
           <tr align="center">
           <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
                              </tr>
         </table>
-        <br \>
+        <br />
         <table class="bibcirctable">
           <tr align="center">
             <td>
@@ -16463,10 +16489,10 @@ class Template:
             </td>
           </tr>
         </table>
-        <br \>
-        <br \>
-        <br \>
-        <br \>
+        <br />
+        <br />
+        <br />
+        <br />
         </div>
         <form>
 

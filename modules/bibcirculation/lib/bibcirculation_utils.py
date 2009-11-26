@@ -626,6 +626,26 @@ def all_copies_are_missing(recid):
     else:
         return False
 
+def has_copies(recid):
+    """
+    Verify if a recid is item (has copies)
+
+    @param recid: identify the record. Primary key of bibrec
+    @type recid: int
+
+    @return boolean
+    """
+
+    copies_status = db.get_copies_status(recid)
+
+    if copies_status is None:
+        return False
+    else:
+        if len(copies_status) == 0:
+            return False
+        else:
+            return True
+
 def generate_email_body(template, loan_id):
     """
     Generate the body of an email for loan recalls.

@@ -93,14 +93,9 @@ def loan_on_desk_step2(req, user_info=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step2
 
     """
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = user_info.split(',')
-    else:
-        user_info = user_info.split(',')
+
+    user_info = user_info.split(',')
+
 
     return bal.loan_on_desk_step2(req, user_info, ln)
 
@@ -109,14 +104,8 @@ def loan_on_desk_step3(req, user_info=None, barcode=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step4
 
     """
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = eval(user_info)
-    else:
-        user_info = user_info.split(',')
+
+    user_info = eval(user_info)
 
     return bal.loan_on_desk_step3(req, user_info, barcode, ln)
 
@@ -127,18 +116,14 @@ def loan_on_desk_step4(req, list_of_books=None, user_info=None, due_date=None,
 
     """
 
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = eval(user_info)
-    else:
-        user_info = user_info.split(',')
+
+    user_info = eval(user_info)
+
 
     list_of_books = eval(list_of_books)
     due_date = wash_url_argument(due_date, 'list')
-
+    
+    
     return bal.loan_on_desk_step4(req, list_of_books, user_info,
                                   due_date, note, ln)
 
@@ -321,12 +306,12 @@ def get_borrower_notes(req, borrower_id=None, delete_key=None,
                                   library_notes, ln)
 
 def get_loans_notes(req, loan_id=None, recid=None, delete_key=None,
-                    library_notes=None, ln=CFG_SITE_LANG):
+                    library_notes=None, back="", ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes
     """
     return bal.get_loans_notes(req, loan_id, recid, delete_key,
-                               library_notes, ln)
+                               library_notes, back, ln)
 
 def get_item_loans_notes(req, loan_id=None, recid=None, borrower_id=None,
                          add_notes=None, new_note=None, ln=CFG_SITE_LANG):
