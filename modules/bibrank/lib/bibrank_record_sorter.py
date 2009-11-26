@@ -228,7 +228,6 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     if verbose > 0:
         voutput = voutput+"\nElapsed time after finding: "+str(afterfind)+"\nElapsed after mapping: "+str(aftermap)
-        print string.replace(voutput, "<br />", "\n")
 
     #add stuff from here into voutput from result
     tmp = result[4]+voutput
