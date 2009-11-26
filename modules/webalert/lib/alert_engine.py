@@ -34,7 +34,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES, \
      CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES, \
-     CFG_SITE_NAME
+     CFG_SITE_NAME, \
+     CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
 from invenio.search_engine import perform_request_search, wash_colls, get_coll_sons, is_hosted_collection
 from invenio.webinterface_handler import wash_urlargd
@@ -77,33 +78,59 @@ def get_alerts(query, frequency):
 def add_records_to_basket(records, basket_id):
     """Add the given records to the given baskets"""
 
+    index = 0
+
     nrec = len(records[0])
+    index += nrec
+    if index > CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+        index = CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
     if nrec > 0:
+        nrec_to_add = nrec < index and nrec or index
         if CFG_WEBALERT_DEBUG_LEVEL > 0:
-            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, records[0])
+            print "-> adding %i records into basket %s: %s" % (nrec_to_add, basket_id, records[0][:nrec_to_add])
+            if nrec > nrec_to_add:
+                print "-> not added %i records into basket %s: %s due to maximum limit restrictions." % (nrec - nrec_to_add, basket_id, records[0][nrec_to_add:])
         try:
             if CFG_WEBALERT_DEBUG_LEVEL < 4:
                 owner_uid = get_basket_owner_id(basket_id)
-                add_to_basket(owner_uid, records[0], 0, [basket_id])
+                add_to_basket(owner_uid, records[0][:nrec_to_add], 0, basket_id)
             else:
                 print '   NOT ADDED, DEBUG LEVEL == 4'
         except Exception:
             register_exception()
-    for external_collection_results in records[1][0]:
-        nrec = len(external_collection_results[1][0])
-        if nrec > 0:
-            if CFG_WEBALERT_DEBUG_LEVEL > 0:
-                print "-> adding %s external records (collection \"%s\") into basket %s: %s" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
-            try:
-                if CFG_WEBALERT_DEBUG_LEVEL < 4:
-                    owner_uid = get_basket_owner_id(basket_id)
-                    collection_id = get_collection_id(external_collection_results[0])
-                    add_to_basket(owner_uid, external_collection_results[1][0], collection_id, [basket_id])
-                    # TBD: maybe cache here the html brief format of the external records for the baskets later?
-                else:
-                    print '   NOT ADDED, DEBUG LEVEL == 4'
-            except Exception:
-                register_exception()
+
+    if index < CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+        for external_collection_results in records[1][0]:
+            nrec = len(external_collection_results[1][0])
+            # index_tmp: the number of maximum allowed records to be added to
+            # the basket for the next collection.
+            index_tmp = CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL - index
+            index += nrec
+            if index > CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
+                index = CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
+            if nrec > 0 and index_tmp > 0:
+                nrec_to_add = nrec < index_tmp and nrec or index_tmp
+                if CFG_WEBALERT_DEBUG_LEVEL > 0:
+                    print "-> adding %s external records (collection \"%s\") into basket %s: %s" % (nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][:nrec_to_add])
+                    if nrec > nrec_to_add:
+                        print "-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec - nrec_to_add, external_collection_results[0], basket_id, external_collection_results[1][0][nrec_to_add:])
+                try:
+                    if CFG_WEBALERT_DEBUG_LEVEL < 4:
+                        owner_uid = get_basket_owner_id(basket_id)
+                        collection_id = get_collection_id(external_collection_results[0])
+                        add_to_basket(owner_uid, external_collection_results[1][0][:nrec_to_add], collection_id, basket_id)
+                        # TBD: maybe cache here the html brief format of the external records for the baskets later?
+                    else:
+                        print '   NOT ADDED, DEBUG LEVEL == 4'
+                except Exception:
+                    register_exception()
+            elif nrec > 0 and CFG_WEBALERT_DEBUG_LEVEL > 0:
+                print "-> not added %s external records (collection \"%s\") into basket %s: %s due to maximum limit restriction" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
+    elif CFG_WEBALERT_DEBUG_LEVEL > 0:
+        for external_collection_results in records[1][0]:
+            nrec = len(external_collection_results[1][0])
+            if nrec > 0:
+                print "-> not added %i external records (collection \"%s\") into basket %s: %s due to maximum limit restrictions" % (nrec, external_collection_results[0], basket_id, external_collection_results[1][0])
 
 def get_query(alert_id):
     """Returns the query for that corresponds to this alert id."""
@@ -211,7 +238,7 @@ def get_record_ids(argstr, date_from, date_until):
     washed_colls = wash_colls(cc, c, sc, 0)
     hosted_colls = washed_colls[3]
     if hosted_colls:
-        req_args = "p=%s&d1d=%s&d1m=%s&d1y=%s&d2d=%s&d2m=%s&d2y=%s&ap=%i" % (p, d1d, d1m, d1y, d2d, d2m, d2y, 0)
+        req_args = "p=%s&f=%s&d1d=%s&d1m=%s&d1y=%s&d2d=%s&d2m=%s&d2y=%s&ap=%i" % (p, f, d1d, d1m, d1y, d2d, d2m, d2y, 0)
         external_records = calculate_external_records(req_args, [p, p1, p2, p3], f, hosted_colls, CFG_EXTERNAL_COLLECTION_TIMEOUT, CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS)
     else:
         external_records = ([],[])
@@ -352,11 +379,11 @@ def process_alerts(alerts):
                 register_exception(alert_admin=True,
                                    prefix="Error when sending alert %s, %s\n." % \
                                    (repr(a), repr(argstr)))
-            # Inform the admin when external collections time out
-            if len(alerts['records'][1][1]) > 0:
-                register_exception(alert_admin=True,
-                                   prefix="External collections %s timed out when sending alert %s, %s\n." % \
-                                   (", ".join(alerts['records'][1][1]), repr(a), repr(argstr)))
+        # Inform the admin when external collections time out
+        if len(alerts['records'][1][1]) > 0:
+            register_exception(alert_admin=True,
+                               prefix="External collections %s timed out when sending alert %s, %s\n." % \
+                                      (", ".join(alerts['records'][1][1]), repr(a), repr(argstr)))
 
         update_date_lastrun(a)
 

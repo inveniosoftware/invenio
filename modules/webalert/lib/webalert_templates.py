@@ -623,9 +623,12 @@ url: <%(url)s>
 
         if l > CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL:
             body += '''
-Only the first %s records were displayed.  Please consult the search
+Only the first %s records were displayed. Please consult the search
 URL given at the top of this email to see all the results.
-''' % CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
+If this alert is also automatically adding the records to a basket,
+only the first %s records have been added.
+''' % (CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL, \
+       CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL)
 
 
         body += '''
