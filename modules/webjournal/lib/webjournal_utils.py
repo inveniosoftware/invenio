@@ -250,10 +250,9 @@ def get_order_dict_from_recid_list(recids, journal_name, issue_number,
     # Append new records at the beginning of the list of 'old'
     # records. To do so, use negative integers
     if ordered_new_records:
-        if ordered_new_records:
-            highest_new_record_order = max(ordered_new_records.keys())
-            for order, new_records in ordered_new_records.iteritems():
-                ordered_records[- highest_new_record_order + order - 1] = new_records
+        highest_new_record_order = max(ordered_new_records.keys())
+        for order, new_records in ordered_new_records.iteritems():
+            ordered_records[- highest_new_record_order + order - 1] = new_records
 
     for (order, records) in ordered_records.iteritems():
         # Reverse so that if there are several articles at same

@@ -85,8 +85,17 @@ def format(bfo, latest_issue_only='yes', newest_articles_only='yes',
     # Do we want to display new articles only if they have been added
     # to an issue that contains non-new records?
     if hide_when_only_new_records.lower() == "yes":
+        # First gather all articles in this issue
+        all_whats_new_articles = {}
+        for category in journal_categories:
+            all_whats_new_articles[category] = get_journal_articles(journal_name,
+                                                                    issue_number,
+                                                                    category,
+                                                                    newest_first=True,
+                                                                    newest_only=False)
+        # Then check if we have some articles at position > -1
         has_old_articles = False
-        for articles in whats_new_articles.values():
+        for articles in all_whats_new_articles.values():
             if len([order for order in articles.keys() if order > -1]) > 0:
                 has_old_articles = True
                 break
