@@ -28,7 +28,7 @@ if sys.hexversion < 0x2040000:
 
 import cgi
 from httplib import urlsplit, HTTPConnection
-from socket import getdefaulttimeout, setdefaulttimeout
+#from socket import getdefaulttimeout, setdefaulttimeout
 from zlib import decompress
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
@@ -40,13 +40,12 @@ from invenio.dateutils import convert_datetext_to_dategui, \
 from invenio.bibformat import format_record
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
-                                     CFG_WEBBASKET_CATEGORIES, \
-                                     CFG_WEBBASKET_WARNING_MESSAGES
+                                     CFG_WEBBASKET_CATEGORIES
 from invenio.webuser import isGuestUser, collect_user_info
 from invenio.search_engine import \
      record_exists, \
      check_user_can_view_record
-from invenio.webcomment import check_user_can_attach_file_to_comments
+#from invenio.webcomment import check_user_can_attach_file_to_comments
 import invenio.webbasket_dblayer as db
 try:
     import invenio.template
@@ -70,9 +69,11 @@ def perform_request_display_public(uid,
                                    optional_params={},
                                    format='hb',
                                    ln=CFG_SITE_LANG):
-    """return html representation of a public basket
-    @param bskid: basket id
-    @param of: format
+    """Engine for the display of a public interface. Calls the template and returns HTML.
+    @param selected_bskid: The id of the basket to be displayed (optional)
+    @param selected_recid: The id of the item to be displayed (optional)
+    @param optional_params: optional parameters to be passed, used for notes
+    @param of: display format
     @param ln: language"""
 
     _ = gettext_set_language(ln)
@@ -85,11 +86,11 @@ def perform_request_display_public(uid,
         warnings = ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET']
         (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
         warnings.append('WRN_WEBBASKET_SHOW_LIST_PUBLIC_BASKETS')
-        warnings_html = webbasket_templates.tmpl_warnings(warnings)
+        warnings_html = webbasket_templates.tmpl_warnings(warnings, ln)
         body = warnings_html + body
         return (body, warnings, navtrail)
     else:
-        (bskid, basket_name, id_owner, last_update, nb_views, nb_items, recids, share_level) = basket[0]
+        (bskid, basket_name, id_owner, last_update, nb_views, nb_items, recids, share_rights) = basket[0]
         if selected_recid:
             valid_recids = eval(recids + ',')
             if selected_recid in valid_recids:
@@ -97,18 +98,18 @@ def perform_request_display_public(uid,
                                                                           basket_name,
                                                                           selected_recid,
                                                                           nb_items,
-                                                                          share_level,
+                                                                          share_rights,
                                                                           optional_params,
                                                                           ln)
             else:
                 warnings_item.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
                 warnings_item.append('WRN_WEBBASKET_RETURN_TO_PUBLIC_BASKET')
-                selected_recid=0
+                selected_recid = 0
         if not selected_recid:
-            if uid==id_owner:
+            if uid == id_owner:
                 subscription_status = 0
             else:
-                if db.is_user_subscribed_to_basket(uid,bskid)[0][0]:
+                if db.is_user_subscribed_to_basket(uid,bskid):
                     subscription_status = 1
                 else:
                     subscription_status = -1
@@ -117,7 +118,7 @@ def perform_request_display_public(uid,
                                                           last_update,
                                                           nb_views,
                                                           nb_items,
-                                                          share_level,
+                                                          share_rights,
                                                           id_owner,
                                                           subscription_status,
                                                           ln)
@@ -125,7 +126,7 @@ def perform_request_display_public(uid,
     body = webbasket_templates.tmpl_display(content=content)
 
     warnings = warnings_item + warnings_basket
-    warnings_html = webbasket_templates.tmpl_warnings(warnings)
+    warnings_html = webbasket_templates.tmpl_warnings(warnings, ln)
     body = warnings_html + body
 
     navtrail = create_webbasket_navtrail(uid,
@@ -140,12 +141,12 @@ def __display_public_basket(bskid,
                             last_update,
                             nb_views,
                             nb_items,
-                            share_level,
+                            share_rights,
                             id_owner,
                             subscription_status,
                             ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
-    @param share_level: rights user has on basket
+    @param share_rights: rights user has on basket
     @param group_sharing_level: None if basket is not shared,
                                 0 if public basket,
                                 > 0 if shared to usergroups but not public.
@@ -194,7 +195,7 @@ def __display_public_basket(bskid,
                     idx = records.index(record)
                     tuple_to_list = list(records.pop(idx))
                     tuple_to_list[4] = external_record[1]
-                    records.insert(idx,tuple(tuple_to_list))
+                    records.insert(idx, tuple(tuple_to_list))
                     break
 
     if notes_dates:
@@ -205,7 +206,7 @@ def __display_public_basket(bskid,
                                                   last_update,
                                                   nb_views,
                                                   nb_items,
-                                                  (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT'],),),
+                                                  (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'],),),
                                                   nb_total_notes,
                                                   last_note,
                                                   records,
@@ -218,11 +219,11 @@ def __display_public_basket_single_item(bskid,
                                         basket_name,
                                         recid,
                                         nb_items,
-                                        share_level,
+                                        share_rights,
                                         optional_params={},
                                         ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
-    @param share_level: rights user has on basket
+    @param share_rights: rights user has on basket
     @param group_sharing_level: None if basket is not shared,
                                 0 if public basket,
                                 > 0 if shared to usergroups but not public.
@@ -271,8 +272,8 @@ def __display_public_basket_single_item(bskid,
     body = webbasket_templates.tmpl_public_basket_single_item(bskid,
                                                               basket_name,
                                                               nb_items,
-                                                              (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                                               check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])),
+                                                              (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                                               check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])),
                                                               item,
                                                               notes,
                                                               previous_item_recid,
@@ -309,7 +310,7 @@ def perform_request_list_public_baskets(uid,
     if not nb_views_show_p and sort == 'views':
         # TODO: Add a 'sort by views' restriction warning
         #warnings.append('...')
-        #warnings_html += webbasket_templates.tmpl_warnings(warnings)
+        #warnings_html += webbasket_templates.tmpl_warnings(warnings, ln)
         sort = "name"
 
     all_public_baskets = db.get_list_public_baskets(limit,
@@ -361,9 +362,9 @@ def perform_request_write_public_note(uid,
 
     if not can_add_notes_to_public_basket_p(bskid):
         warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
-        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights, ln)
     else:
-        if cmtid and note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
+        if cmtid and db.note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
             optional_params["Add note"] = db.get_note(cmtid)
         elif cmtid:
             optional_params["Add note"] = ()
@@ -406,7 +407,7 @@ def perform_request_save_public_note(uid,
 
     if not can_add_notes_to_public_basket_p(bskid):
         warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
-        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights, ln)
     else:
         if not note_title or not note_body:
             optional_params["Incomplete note"] = (note_title, note_body)
@@ -420,16 +421,11 @@ def perform_request_save_public_note(uid,
                 # reply to a comment is made with a browser that does not
                 # support FCKeditor.
                 note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
-                note_body = cgi.escape(note_body, True)
-            else:
-                # TODO: instead of just ecpaping the values, use the html washer
-                # to allow basic tags.
-                note_body = cgi.escape(note_body, True)
             if not(db.save_note(uid, bskid, recid, note_title, note_body)):
-                # TODO: warning about the DB problem
+                # TODO: The note could not be saved. DB problem?
                 pass
             else:
-                # TODO: inform about successful posting
+                # TODO: inform about successful annotating.
                 pass
 
     (body, warnings, navtrail) = perform_request_display_public(uid=uid,
@@ -478,7 +474,7 @@ def perform_request_display(uid,
     (selected_category, category_warnings) = wash_category(selected_category)
     if not selected_category and category_warnings:
         navtrail = create_webbasket_navtrail(uid, ln=ln)
-        body = webbasket_templates.tmpl_warnings(category_warnings)
+        body = webbasket_templates.tmpl_warnings(category_warnings, ln)
         return (body, category_warnings, navtrail)
 
     if selected_category == CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']:
@@ -498,7 +494,7 @@ def perform_request_display(uid,
                 valid_selected_topic_p = True
             else:
                 warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC')
-                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_TOPIC', ln)
                 valid_selected_topic_p = False
                 selected_topic = ""
         else:
@@ -535,7 +531,7 @@ def perform_request_display(uid,
                         break
             else:
                 warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
-                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET', ln)
                 selected_bskid = 0
         else:
             selected_bskid = 0
@@ -557,11 +553,13 @@ def perform_request_display(uid,
                         selected_group_name = group_info_group[1]
                         break
                 # (B) DB
-                #selected_group_name = db.get_group_name(selected_group_id)[0][0]
+                #selected_group_name = db.get_group_name(selected_group_id)
+                #if selected_group_name:
+                #    selected_group_name = selected_group_name[0][0]
                 valid_selected_group_p = True
             else:
                 warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP')
-                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_GROUP', ln)
                 selected_group_id = ""
                 valid_selected_group_p = False
         else:
@@ -596,7 +594,9 @@ def perform_request_display(uid,
                             selected_group_name = group_info_group[1]
                             break
                     # (B) DB
-                    #selected_group_name = db.get_group_name(selected_group_id)[0][0]
+                    #selected_group_name = db.get_group_name(selected_group_id)
+                    #if selected_group_name:
+                    #    selected_group_name = selected_group_name[0][0]
                     group_baskets_info = db.get_group_baskets_info_for_group(selected_group_id)
                 for group_basket_info in group_baskets_info:
                     if group_basket_info[0] == selected_bskid:
@@ -610,7 +610,7 @@ def perform_request_display(uid,
                         break
             else:
                 warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
-                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET', ln)
                 selected_bskid = 0
         else:
             selected_bskid = 0
@@ -618,13 +618,18 @@ def perform_request_display(uid,
     public_info = db.get_all_external_basket_ids_and_names(uid)
     if public_info and selected_category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
         if selected_bskid:
-            valid_bskids = [valid_basket[0] for valid_basket in public_info]
-            if selected_bskid in valid_bskids:
+            valid_bskids = [(valid_basket[0], valid_basket[3]) for valid_basket in public_info]
+            if (selected_bskid, 0) in valid_bskids:
                 public_basket_info = db.get_external_basket_info(selected_bskid)
                 if public_basket_info:
                     selected_basket_info = list(public_basket_info[0])
+            elif (selected_bskid, None) in valid_bskids:
+                warnings.append('WRN_WEBBASKET_FORMER_PUBLIC_BASKET')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_FORMER_PUBLIC_BASKET', ln)
+                selected_bskid = 0
             else:
-                # TODO: this is not a valid basket. Warn the user.
+                warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET')
+                warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET', ln)
                 selected_bskid = 0
 
     if not personal_info:
@@ -645,20 +650,9 @@ def perform_request_display(uid,
                                                                   public_info,
                                                                   ln)
 
-    # TODO: Remove/Replace this bit
-    bskids = []
-    for basket in baskets:
-        bskids.append(basket[0])
-    levels = dict(db.is_shared_to(bskids))
-
-    # TODO: Remove/Replace this bit
-    #create_link = ''
-    #if selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
-        #create_link = webbasket_templates.tmpl_create_basket_link(selected_topic, ln)
-
     if selected_basket_info:
         if selected_recid:
-            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_level) = selected_basket_info
+            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_rights) = selected_basket_info
             (content, bsk_warnings) = __display_basket_single_item(bskid,
                                                                    basket_name,
                                                                    selected_recid,
@@ -666,27 +660,38 @@ def perform_request_display(uid,
                                                                    nb_views,
                                                                    nb_items,
                                                                    last_added,
-                                                                   share_level,
+                                                                   share_rights,
                                                                    selected_category,
                                                                    selected_topic,
                                                                    selected_group_id,
                                                                    optional_params,
                                                                    ln)
         else:
-            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_level) = selected_basket_info
+            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_rights) = selected_basket_info
+            share_level = db.get_basket_share_level(bskid)
+            if share_level:
+                share_level = share_level[0][0]
+            else:
+                share_level = None
+            if share_level == 0:
+                nb_subscribers = db.count_public_basket_subscribers(bskid)
+            else:
+                nb_subscribers = None
             (content, bsk_warnings) = __display_basket(bskid,
                                                        basket_name,
                                                        last_update,
                                                        nb_views,
                                                        nb_items,
+                                                       nb_subscribers,
                                                        last_added,
+                                                       share_rights,
                                                        share_level,
-                                                       levels[bskid],
                                                        selected_category,
                                                        selected_topic,
                                                        selected_group_id,
                                                        ln)
         warnings.extend(bsk_warnings)
+        warnings_html += webbasket_templates.tmpl_warnings(bsk_warnings, ln)
     else:
         search_box = __create_search_box(uid=uid,
                                          category=selected_category,
@@ -714,16 +719,17 @@ def __display_basket(bskid,
                      last_update,
                      nb_views,
                      nb_items,
+                     nb_subscribers,
                      last_added,
+                     share_rights,
                      share_level,
-                     group_sharing_level,
                      selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                      selected_topic="",
                      selected_group_id=0,
                      ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
-    @param share_level: rights user has on basket
-    @param group_sharing_level: None if basket is not shared,
+    @param share_rights: rights user has on basket
+    @param share_level: None if basket is not shared,
                                 0 if public basket,
                                 > 0 if shared to usergroups but not public.
     @param selected_category: selected category (see webbasket_config.py)
@@ -772,7 +778,7 @@ def __display_basket(bskid,
                     idx = records.index(record)
                     tuple_to_list = list(records.pop(idx))
                     tuple_to_list[4] = external_record[1]
-                    records.insert(idx,tuple(tuple_to_list))
+                    records.insert(idx, tuple(tuple_to_list))
                     break
 
     if notes_dates:
@@ -783,15 +789,17 @@ def __display_basket(bskid,
                                            last_update,
                                            nb_views,
                                            nb_items,
+                                           nb_subscribers,
                                            last_added,
-                                           (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
+                                           (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
                                            nb_total_notes,
                                            last_note,
-                                           group_sharing_level,
+                                           share_level,
                                            selected_category,
                                            selected_topic,
                                            selected_group_id,
@@ -806,14 +814,14 @@ def __display_basket_single_item(bskid,
                                  nb_views,
                                  nb_items,
                                  last_added,
-                                 share_level,
+                                 share_rights,
                                  selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                  selected_topic="",
                                  selected_group_id=0,
                                  optional_params={},
                                  ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
-    @param share_level: rights user has on basket
+    @param share_rights: rights user has on basket
     @param selected_category: selected category (see webbasket_config.py)
     @param selected_topic: # of selected topic to display baskets
     @param selected_group_id: id of group to display baskets
@@ -838,20 +846,29 @@ def __display_basket_single_item(bskid,
         next_item_recid = item[2]
         item_index = item[3]
     else:
-        # TODO: Item does not exist, return the default display basket view
-        # appending a warning for the unknown item.
+        share_level = db.get_basket_share_level(bskid)
+        if share_level:
+            share_level = share_level[0][0]
+        else:
+            share_level = None
+        if share_level == 0:
+            nb_subscribers = db.count_public_basket_subscribers(bskid)
+        else:
+            nb_subscribers = None
         (content, bsk_warnings) = __display_basket(bskid,
                                                    basket_name,
                                                    last_update,
                                                    nb_views,
                                                    nb_items,
+                                                   nb_subscribers,
                                                    last_added,
+                                                   share_rights,
                                                    share_level,
-                                                   {},
                                                    selected_category,
                                                    selected_topic,
                                                    selected_group_id,
                                                    ln)
+        bsk_warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
         return (content, bsk_warnings)
 
     notes_dates.append(convert_datetext_to_datestruct(last_note))
@@ -883,10 +900,10 @@ def __display_basket_single_item(bskid,
                                            nb_views,
                                            nb_items,
                                            last_added,
-                                           (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
-                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
+                                           (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
+                                            check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
                                            nb_total_notes,
                                            last_note,
                                            selected_category,
@@ -933,7 +950,7 @@ def perform_request_search(uid,
     # bad input, send the warning to the user and return the page.
     elif b_warnings:
         navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
-        body = webbasket_templates.tmpl_warnings(b_warnings)
+        body = webbasket_templates.tmpl_warnings(b_warnings, ln)
         return (body, b_warnings, navtrail)
     # if no category was returned and there were no warnings it means no category
     # was defined in the b GET variable. If the user has not defined a category
@@ -948,27 +965,27 @@ def perform_request_search(uid,
         (selected_category, category_warnings) = wash_category(selected_category)
         if not selected_category and category_warnings:
             navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
-            body = webbasket_templates.tmpl_warnings(category_warnings)
+            body = webbasket_templates.tmpl_warnings(category_warnings, ln)
             return (body, category_warnings, navtrail)
 
     if selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and selected_topic:
         (selected_topic, topic_warnings) = wash_topic(uid, selected_topic)
         if not selected_topic and topic_warnings:
             navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
-            body = webbasket_templates.tmpl_warnings(topic_warnings)
+            body = webbasket_templates.tmpl_warnings(topic_warnings, ln)
             return (body, topic_warnings, navtrail)
 
     if selected_category == CFG_WEBBASKET_CATEGORIES['GROUP'] and selected_group_id:
         (selected_group_id, group_warnings) = wash_group(uid, selected_group_id)
         if not selected_group_id and group_warnings:
             navtrail = create_webbasket_navtrail(uid, search_baskets=True, ln=ln)
-            body = webbasket_templates.tmpl_warnings(group_warnings)
+            body = webbasket_templates.tmpl_warnings(group_warnings, ln)
             return (body, group_warnings, navtrail)
 
-    # TODO: in case we pass an "action=search" GET variable we can use the
+    # IDEA: in case we pass an "action=search" GET variable we can use the
     # following bit to warn the user he's searching for an empty search pattern.
     #if action == "search" and not p:
-    #    warnings_html += webbasket_templates.tmpl_warnings(['WRN_WEBBASKET_NO_SEARCH_PATTERN'])
+    #    warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_NO_SEARCH_PATTERN', ln)
     #    perform_search = 0
 
     if p:
@@ -1255,9 +1272,9 @@ def perform_request_write_note(uid,
 
     if not check_user_can_comment(uid, bskid):
         warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
-        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights, ln)
     else:
-        if cmtid and note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
+        if cmtid and db.note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
             optional_params["Add note"] = db.get_note(cmtid)
         elif cmtid:
             optional_params["Add note"] = ()
@@ -1306,7 +1323,7 @@ def perform_request_save_note(uid,
 
     if not check_user_can_comment(uid, bskid):
         warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
-        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights)
+        warnings_html += webbasket_templates.tmpl_warnings(warnings_rights, ln)
     else:
         if not note_title or not note_body:
             optional_params["Incomplete note"] = (note_title, note_body)
@@ -1320,17 +1337,11 @@ def perform_request_save_note(uid,
                 # reply to a comment is made with a browser that does not
                 # support FCKeditor.
                 note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
-                #note_body = cgi.escape(note_body, True)
-            else:
-                # TODO: instead of just ecpaping the values, use the html washer
-                # to allow basic tags.
-                #note_body = cgi.escape(note_body, True)
-                note_body = note_body
             if not(db.save_note(uid, bskid, recid, note_title, note_body)):
-                # TODO: warning about the DB problem
+                # TODO: The note could not be saved. DB problem?
                 pass
             else:
-                # TODO: inform about successful posting
+                # TODO: inform about successful annotating.
                 pass
 
     (body, warnings, navtrail) = perform_request_display(uid=uid,
@@ -1359,17 +1370,18 @@ def perform_request_delete_note(uid,
                                 ln=CFG_SITE_LANG):
     """Delete comment cmtid on record recid for basket bskid."""
 
+    warnings_notes = []
+    warnings_html = ""
+
     if not __check_user_can_perform_action(uid, bskid, CFG_WEBBASKET_SHARE_LEVELS['DELCMT']):
-        pass
-        # TODO: add a warning here, the user cannot delete this basket's items' notes
+        warnings_notes.append('WRN_WEBBASKET_RESTRICTED_DELETE_NOTES')
+        warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_RESTRICTED_DELETE_NOTES', ln)
     else:
-        if cmtid:
-            # TODO: check here if this note exists and belongs to this bskid/recid,
-            # send a warning in case the cmtid chosen does not belong to this bskid/recid.
+        if cmtid and db.note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
             db.delete_note(bskid, recid, cmtid)
         else:
-            # TODO: add warning, no cmtid specified
-            pass
+            warnings_notes.append('WRN_WEBBASKET_DELETE_INVALID_NOTE')
+            warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_DELETE_INVALID_NOTE', ln)
 
     (body, warnings, navtrail) = perform_request_display(uid=uid,
                                                          selected_category=category,
@@ -1379,6 +1391,9 @@ def perform_request_delete_note(uid,
                                                          selected_recid=recid,
                                                          format='hb',
                                                          ln=CFG_SITE_LANG)
+
+    body = warnings_html + body
+    warnings.extend(warnings_notes)
 
     return (body, warnings, navtrail)
 
@@ -1507,9 +1522,6 @@ def perform_request_add(uid,
         # if b was not defined we use category and bskid to construct it.
         if not b:
             b = category + "_" + str(bskid)
-        f = open("/tmp/add", "w")
-        f.write(str(category) + " / " + str(bskid) + " / " + str(b) + "\n")
-        f.close()
         # we extract the category and  the bskid from the washed b POST variable
         # or the constracted b variable from category and bskid.
         (category, b_bskid, b_warnings) = wash_b_add(b)
@@ -1533,7 +1545,7 @@ def perform_request_add(uid,
             if ( colid >= 0 and not validated_recids ) or ( colid == -1 and ( not es_title or not es_desc or not es_url ) ):
                 warnings.append('WRN_WEBBASKET_NO_RECORD')
             if not warnings:
-                if colid==-1:
+                if colid == -1:
                     es_title = es_title
                     es_desc = nl2br(es_desc)
                 added_items = db.add_to_basket(uid, validated_recids, colid, bskid, es_title, es_desc, es_url)
@@ -1548,15 +1560,11 @@ def perform_request_add(uid,
                             # support FCKeditor.
                             note_title = ''
                             note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
-                            note_body = cgi.escape(note_body, True)
                         else:
-                            # TODO: instead of just ecpaping the values, use the html washer
-                            # to allow basic tags.
                             note_title = ''
-                            note_body = cgi.escape(note_body, True)
                         for recid in added_items:
                             if not(db.save_note(uid, bskid, recid, note_title, note_body)):
-                                # TODO: warning about the DB problem
+                                # TODO: The note could not be saved. DB problem?
                                 pass
                     return perform_request_add(uid=uid,
                                                recids=recids,
@@ -1567,24 +1575,25 @@ def perform_request_add(uid,
                                                copy=copy,
                                                referer=referer)
                 else:
-                    # TODO: This means no items were added to any basket.
-                    # Show a warning to the user.
-                    pass
+                    warnings.append('WRN_WEBBASKET_INVALID_ADD_TO_PARAMETERS')
+                    warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_ADD_TO_PARAMETERS', ln)
 
     personal_basket_list = db.get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid)
     group_basket_list = db.get_all_group_basket_ids_and_names_by_group_for_add_to_list(uid)
     if not personal_basket_list and not group_basket_list:
         bskid = db.create_basket(uid=uid, basket_name="Untitled basket", topic="Untitled topic")
+        warnings.append('WRN_WEBBASKET_DEFAULT_TOPIC_AND_BASKET')
+        warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_DEFAULT_TOPIC_AND_BASKET', ln)
         if colid >= 0 and validated_recids:
-            # TODO: send an info message to the user.
-            #warnings=['WRN_WEBBASKET_DEFAULT_TOPIC_AND_BASKET',],
-            return perform_request_add(uid=uid,
-                                      recids=validated_recids,
-                                      category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                                      bskid=bskid,
-                                      colid=colid,
-                                      referer=referer,
-                                      ln=ln)
+            (body, warnings, navtrail) = perform_request_add(uid=uid,
+                                                             recids=validated_recids,
+                                                             category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                                             bskid=bskid,
+                                                             colid=colid,
+                                                             referer=referer,
+                                                             ln=ln)
+            body = warnings_html + body
+            return (body, warnings, navtrail)
         else:
             personal_basket_list = db.get_all_personal_basket_ids_and_names_by_topic_for_add_to_list(uid)
 
@@ -1629,10 +1638,8 @@ def perform_request_delete(uid, bskid, confirmed=0,
         warnings.append(('WRN_WEBBASKET_NO_RIGHTS',))
         return (body, warnings)
     if confirmed:
-        success = db.delete_basket(bskid)
-        if not success:
-            # TODO: inform the admin.
-            #errors.append(('ERR_WEBBASKET_DB_ERROR',))
+        if not db.delete_basket(bskid):
+            # TODO: The item was not deleted. DB problem?
             pass
     else:
         body = webbasket_templates.tmpl_confirm_delete(bskid,
@@ -1829,35 +1836,43 @@ def perform_request_create_basket(uid,
                                                       ln)
         return (body, [])
 
-def perform_request_subscribe(uid, bskid):
+def perform_request_subscribe(uid,
+                              bskid,
+                              ln=CFG_SITE_LANG):
     """Subscribes user to the given public basket.
-    Returns warnings if there are any."""
+    Returns warnings if there were any."""
 
     warnings = []
-    if db.is_basket_public(bskid)[0][0]:
+    warnings_html = ""
+
+    if db.is_basket_public(bskid):
         if not db.subscribe(uid, bskid):
-            # TODO: add a warning: the user is either the owner of the basket
-            # or is already subscribed.
-            #warnings.append('')
-            pass
+            warnings.append('WRN_WEBBASKET_CAN_NOT_SUBSCRIBE')
+            warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_CAN_NOT_SUBSCRIBE', ln)
     else:
-        warnings.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
-    return warnings
+        warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET')
+        warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET', ln)
 
-def perform_request_unsubscribe(uid, bskid):
+    return (warnings_html, warnings)
+
+def perform_request_unsubscribe(uid,
+                                bskid,
+                                ln=CFG_SITE_LANG):
     """Unsubscribes user from the given public basket.
-    Returns warnings if there are any."""
+    Returns warnings if there were any."""
 
     warnings = []
-    if db.is_basket_public(bskid)[0][0]:
+    warnings_html = ""
+
+    if db.is_basket_public(bskid):
         if not db.unsubscribe(uid, bskid):
-            # TODO: add a warning: the user is either the owner of the basket
-            # or has already unsubscribed.
-            #warnings.append('')
-            pass
+            warnings.append('WRN_WEBBASKET_CAN_NOT_UNSUBSCRIBE')
+            warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_CAN_NOT_UNSUBSCRIBE', ln)
     else:
-        warnings.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
-    return warnings
+        warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET')
+        warnings_html += webbasket_templates.tmpl_warnings('WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET', ln)
+
+    return (warnings_html, warnings)
 
 def check_user_can_comment(uid, bskid):
     """ Private function. check if a user can comment """
@@ -1895,12 +1910,6 @@ def can_add_notes_to_public_basket_p(bskid):
         if CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights[0][0]) >= CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_right):
             return True
     return False
-
-def note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
-    """Private function. Checks if the given note belongs to the given item
-    in the given basket"""
-
-    return db.note_belongs_to_item_in_basket_p(cmtid, recid, bskid)[0][0]
 
 def create_guest_warning_box(ln=CFG_SITE_LANG):
     """return a warning message about logging into system"""
@@ -2153,8 +2162,6 @@ def fetch_and_store_external_records(records, of="hb"):
     record."""
 
     results = []
-    parsed_results_list = []
-    parsed_results_dict = {}
     formatted_records = []
 
     ids = records[0].split(",")
@@ -2166,7 +2173,7 @@ def fetch_and_store_external_records(records, of="hb"):
     external_ids_urls = collection_engine.build_record_urls(external_ids)
     external_urls = [external_id_url[1] for external_id_url in external_ids_urls]
     external_urls_dict = {}
-    for (local_id, url) in zip(ids,external_urls):
+    for (local_id, url) in zip(ids, external_urls):
         external_urls_dict[local_id] = url
     db.store_external_urls(external_urls_dict)
 
@@ -2182,11 +2189,11 @@ def fetch_and_store_external_records(records, of="hb"):
     if finished_list[0]:
         collection_engine.parser.parse_and_get_results(results[0].data, feedonly=True)
         (parsed_results_list, parsed_results_dict) = collection_engine.parser.parse_and_extract_records(of=of)
-        for (id,external_id) in zip(ids,external_ids):
+        for (id, external_id) in zip(ids, external_ids):
             formatted_records.append((int(id), parsed_results_dict[external_id]))
         db.store_external_records(formatted_records, of)
     else:
-        for (id,external_id) in zip(ids,external_ids):
+        for (id, external_id) in zip(ids, external_ids):
             formatted_records.append((int(id), "There was a timeout when fetching the record."))
 
     return formatted_records

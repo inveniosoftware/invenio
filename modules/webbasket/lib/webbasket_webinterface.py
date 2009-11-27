@@ -26,7 +26,7 @@ import os
 from invenio.config import CFG_SITE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-                           CFG_SITE_SECURE_URL, CFG_PREFIX
+                           CFG_SITE_SECURE_URL, CFG_PREFIX, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
@@ -289,7 +289,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         redirect_to_url(req, '%s/yourbaskets/display?%s' % (CFG_SITE_URL, req.args))
 
     def display(self, req, form):
-        """Display basket"""
+        """Display basket interface."""
 
         argd = wash_urlargd(form, {'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
@@ -300,8 +300,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'bsk_to_sort': (int, 0),
                                    'sort_by_title': (str, ""),
                                    'sort_by_date': (str, ""),
-                                   'of': (str, "hb")
-                                   })
+                                   'of': (str, "hb"),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -368,7 +368,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'b': (str, ""),
                                    'n': (int, 0),
                                    'of': (str, "hb"),
-                                   'verbose': (int, 0)})
+                                   'verbose': (int, 0),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -432,8 +433,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'bskid': (int, 0),
                                    'recid': (int, 0),
                                    'cmtid': (int, 0),
-                                   'of'   : (str, '')
-                                    })
+                                   'of'   : (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
@@ -499,7 +500,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'note_body': (str, ""),
                                    'editor_type': (str, ""),
                                    'of': (str, ''),
-                                   })
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
@@ -573,8 +574,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'bskid': (int, 0),
                                    'recid': (int, 0),
                                    'cmtid': (int, 0),
-                                   'of'   : (str, '')
-                                   })
+                                   'of'   : (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -632,100 +633,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     of          = argd['of'],
                     navtrail_append_title_p = 0)
 
-    def add_DEFAULT(self, req, form):
-        """Add records to baskets.
-        @param recid: list of records to add
-        @param colid: in case of external collections, the id of the collection the records belong to
-        @param bskids: list of baskets to add records to. if not provided,
-                       will return a page where user can select baskets
-        @param referer: URL of the referring page
-        @param new_basket_name: add record to new basket
-        @param new_topic_name: new basket goes into new topic
-        @param create_in_topic: # of topic to put basket into
-        @param ln: language"""
-
-        # TODO: apply a maximum limit of items (100) that can be added to a basket
-        # at once. Also see the build_search_url function of websearch_..._searcher.py
-        # for the "rg" GET variable.
-        argd = wash_urlargd(form, {'recid': (list, []),
-                                   'colid': (int, 0),
-                                   'bskids': (list, []),
-                                   'es_title': (str, ""),
-                                   'es_desc': (str, ""),
-                                   'es_url': (str, ""),
-                                   'referer': (str, ""),
-                                   'new_basket_name': (str, ""),
-                                   'new_topic_name': (str, ""),
-                                   'create_in_topic': (str, "-1"),
-                                   "of" : (str, '')
-                                   })
-        _ = gettext_set_language(argd['ln'])
-        uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../yourbaskets/add",
-                                       navmenuid = 'yourbaskets')
-
-        if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
-                    CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/add%s" % (
-                        CFG_SITE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
-
-        user_info = collect_user_info(req)
-        if not user_info['precached_usebaskets']:
-            return page_not_authorized(req, "../", \
-                                       text = _("You are not authorized to use baskets."))
-
-        if not argd['referer']:
-            argd['referer'] = get_referer(req)
-        (body, warnings) = perform_request_add(uid=uid,
-                                               recids=argd['recid'],
-                                               colid=argd['colid'],
-                                               bskids=argd['bskids'],
-                                               es_title=argd['es_title'],
-                                               es_desc=argd['es_desc'],
-                                               es_url=argd['es_url'],
-                                               referer=argd['referer'],
-                                               new_basket_name=argd['new_basket_name'],
-                                               new_topic_name=argd['new_topic_name'],
-                                               create_in_topic=argd['create_in_topic'],
-                                               ln=argd['ln'])
-        if isGuestUser(uid):
-            body = create_guest_warning_box(argd['ln']) + body
-        if not(len(warnings)) :
-            title = _("Your Baskets")
-        else:
-            title = _("Add records to baskets")
-        navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
-                   '%s</a>'
-        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
-
-        # register event in webstat
-        basket_str = ["%s (%s)" % (get_basket_name(bskid), bskid) for bskid in argd['bskids']]
-        if user_info['email']:
-            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
-        else:
-            user_str = ""
-        try:
-            register_customevent("baskets", ["add", basket_str, user_str])
-        except:
-            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
-
-        return page(title       = title,
-                    body        = body,
-                    navtrail    = navtrail,
-                    uid         = uid,
-                    lastupdated = __lastupdated__,
-                    language    = argd['ln'],
-                    warnings    = warnings,
-                    req         = req,
-                    navmenuid   = 'yourbaskets',
-                    of          = argd['of'])
-
     def add(self, req, form):
         """Add records to baskets.
         @param recid: list of records to add
@@ -753,7 +660,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'b': (str, ""),
                                    'copy': (int, 0),
                                    'referer': (str, ""),
-                                   "of" : (str, '')})
+                                   "of" : (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -830,8 +738,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (str, ""),
                                    'group': (int, 0),
-                                   'of'   : (str, '')
-                                   })
+                                   'of'   : (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
@@ -913,7 +821,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'category': (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (str, ""),
                                    'group': (int, 0),
-                                   'of'   : (str, '')})
+                                   'of'   : (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -1010,8 +919,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'new_topic_name': (str, ""),
                                    'new_group': (str, ""),
                                    'external': (str, ""),
-                                   'of'      : (str, '')
-                                   })
+                                   'of'      : (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -1126,8 +1035,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'cancel': (str, ""),
                                    'delete': (str, ""),
                                    'new_name': (str, ""),
-                                   'of'      : (str, '')
-                                   })
+                                   'of'      : (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -1224,11 +1133,11 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         """Create basket interface"""
 
         argd = wash_urlargd(form, {'new_basket_name': (str, ""),
-                                   'new_topic_name': (str, ""),
+                                   'new_topic_name' : (str, ""),
                                    'create_in_topic': (str, "-1"),
-                                   'topic': (str, ""),
-                                   'of'          : (str, ''),
-                                   })
+                                   'topic'          : (str, ""),
+                                   'of'             : (str, ''),
+                                   'ln'             : (str, CFG_SITE_LANG)})
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -1302,7 +1211,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    'recid': (int, 0),
-                                   'of': (str, "hb")})
+                                   'of': (str, "hb"),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -1314,8 +1224,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
 
         if not argd['bskid']:
-            # TODO: bskid is 0 that means it's not set, in that case return the
-            # list of public baskets.
             (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
             title = _('List of public baskets')
 
@@ -1370,7 +1278,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'limit': (int, 1),
                                    'sort': (str, 'name'),
                                    'asc': (int, 1),
-                                   'of': (str, '')})
+                                   'of': (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -1406,7 +1315,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         """Subscribe to a basket pseudo-interface."""
 
         argd = wash_urlargd(form, {'bskid': (int, 0),
-                                    'of': (str, '')})
+                                   'of': (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
+
+        _ = gettext_set_language(argd['ln'])
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
@@ -1423,15 +1335,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        _ = gettext_set_language(argd['ln'])
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
         if not argd['bskid']:
-            # TODO: bskid is 0 that means it's not set, in that case return the
-            # list of public baskets.
             (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
             title = _('List of public baskets')
 
@@ -1440,13 +1349,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             #req.content_type = "text/xml"
             #req.send_http_header()
             #return perform_request_display_public(bskid=argd['bskid'], of=argd['of'], ln=argd['ln'])
-            warnings = perform_request_subscribe(uid, argd['bskid'])
-            # TODO: append the warnings of subscribe to the warnings of display.
+            (subscribe_warnings_html, subscribe_warnings) = perform_request_subscribe(uid, argd['bskid'], argd['ln'])
             (body, warnings, navtrail) = perform_request_display_public(uid=uid,
                                                                         selected_bskid=argd['bskid'],
                                                                         selected_recid=0,
                                                                         format=argd['of'],
                                                                         ln=argd['ln'])
+            warnings.extend(subscribe_warnings)
+            body = subscribe_warnings_html + body
             title = _('Public basket')
 
         return page(title       = title,
@@ -1465,12 +1375,16 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         """Unsubscribe from basket pseudo-interface."""
 
         argd = wash_urlargd(form, {'bskid': (int, 0),
-                                   'of': (str, '')})
+                                   'of': (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
+
+        _ = gettext_set_language(argd['ln'])
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/unsubscribe",
                                        navmenuid = 'yourbaskets')
+
         if isGuestUser(uid):
             if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
@@ -1481,15 +1395,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        _ = gettext_set_language(argd['ln'])
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
         if not argd['bskid']:
-            # TODO: bskid is 0 that means it's not set, in that case return the
-            # list of public baskets.
             (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
             title = _('List of public baskets')
 
@@ -1498,13 +1409,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             #req.content_type = "text/xml"
             #req.send_http_header()
             #return perform_request_display_public(bskid=argd['bskid'], of=argd['of'], ln=argd['ln'])
-            warnings = perform_request_unsubscribe(uid, argd['bskid'])
-            # TODO: append the warnings of subscribe to the warnings of display.
+            (unsubscribe_warnings_html, unsubscribe_warnings) = perform_request_unsubscribe(uid, argd['bskid'], argd['ln'])
             (body, warnings, navtrail) = perform_request_display_public(uid=uid,
                                                                         selected_bskid=argd['bskid'],
                                                                         selected_recid=0,
                                                                         format=argd['of'],
                                                                         ln=argd['ln'])
+            warnings.extend(unsubscribe_warnings)
+            body = unsubscribe_warnings_html + body
             title = _('Public basket')
 
         return page(title       = title,
@@ -1525,13 +1437,25 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'bskid': (int, 0),
                                    'recid': (int, 0),
                                    'cmtid': (int, 0),
-                                   'of'   : (str, '')})
+                                   'of'   : (str, ''),
+                                   'ln'   : (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
+
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/write_public_note",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/write_public_note%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:
@@ -1574,13 +1498,25 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'note_title': (str, ""),
                                    'note_body': (str, ""),
                                    'editor_type': (str, ""),
-                                   'of': (str, '')})
+                                   'of': (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
+
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/save_public_note",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/save_public_note%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         user_info = collect_user_info(req)
         if not user_info['precached_usebaskets']:

@@ -1617,11 +1617,19 @@ input,select {
    border: none;
    font-size: small;
 }
-.bskbasketfooter a, .bskbasketfooteroptions a:link, .bskbasketfooteroptions a:visited, .bskbasketfooteroptions a:active{
+.bskbasketfooteroptions a, .bskbasketfooteroptionsoptions a:link, .bskbasketfooteroptionsoptions a:visited, .bskbasketfooteroptionsoptions a:active{
    text-decoration: none;
    color: black;
 }
-.bskbasketfooter a:hover{
+.bskbasketfooteroptions a:hover{
+   text-decoration: underline;
+   color: black;
+}
+.bskbasketfootertitle a, .bskbasketfootertitleoptions a:link, .bskbasketfootertitleoptions a:visited, .bskbasketfootertitleoptions a:active{
+   text-decoration: underline;
+   color: black;
+}
+.bskbasketfootertitle a:hover{
    text-decoration: underline;
    color: black;
 }

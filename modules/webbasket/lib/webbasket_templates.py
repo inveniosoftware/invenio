@@ -52,7 +52,15 @@ class Template:
                                   (group_info, group_baskets_info),
                                   public_info,
                                   ln):
-        """EXPERIMENTAL UI"""
+        """Template for the directory-like menu.
+        @param category: the selected category
+        @param topic: the selected topic (optional)
+        @param (grpid, groupname): the id and name of the selected group (optional)
+        @param bskid: the id of the selected basket (optional)
+        @param (personal_info, personal_baskets_info): personal baskets data
+        @param (group_info, group_baskets_info): group baskets data
+        @param public_info: public baskets data
+        @param ln: language"""
 
         _ = gettext_set_language(ln)
 
@@ -299,7 +307,7 @@ class Template:
                     basket_links = ""
                     basket_links_list = []
                     for basket in baskets[:3]:
-                        # TODO: adopt the prettify_name char_limit variable according to nb_baskets
+                        # TODO: adapt the prettify_name char_limit variable according to nb_baskets
                         basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;topic=%(topic)s&amp;bskid=%(bskid)i&amp;ln=%(ln)s" title="%(title_name)s">%(basket_name)s</a>""" % \
                                       {'url': CFG_SITE_URL,
                                        'category': category,
@@ -381,7 +389,7 @@ class Template:
                     basket_links = ""
                     basket_links_list = []
                     for basket in baskets[:3]:
-                        # TODO: adopt the prettify_name char_limit variable according to nb_baskets
+                        # TODO: adapt the prettify_name char_limit variable according to nb_baskets
                         basket_link = """<a href="%(url)s/yourbaskets/display?category=%(category)s&amp;group=%(group)i&amp;bskid=%(bskid)i&amp;ln=%(ln)s" title="%(title_name)s">%(basket_name)s</a>""" % \
                                       {'url': CFG_SITE_URL,
                                        'category': category,
@@ -514,7 +522,6 @@ class Template:
                                                           number_of_public_baskets,
                                                           ln)
 
-        # TODO: write and replace the needed css classes.
         out = """
     <table cellspacing="0px" cellpadding="5px" class="bsk_search_box">
     <form name="search_baskets" action="%(action)s" method="get">
@@ -569,7 +576,7 @@ class Template:
                             all_public_search_results={},
                             total_no_all_public_search_results=0,
                             ln=CFG_SITE_LANG):
-        """"""
+        """Template for the search results."""
 
         _ = gettext_set_language(ln)
 
@@ -799,9 +806,11 @@ class Template:
                      content='',
                      search_box='',
                      search_results=''):
-        """Generic display. takes already formatted baskets (list of formatted
-        baskets), infobox and topicsbox, add tabs and returns complete
-        interface"""
+        """Template for the generic display.
+        @param directory: the directory-like menu (optional)
+        @param content: content (of a basket) (optional)
+        @param search_box: the search form (optional)
+        @param search_results: the search results (optional)"""
 
         display_items = []
 
@@ -848,28 +857,6 @@ class Template:
 
         return out
 
-    def tmpl_display_public(self,
-                     baskets=[]):
-        """Generic display. takes already formatted baskets (list of formatted
-        baskets), infobox and topicsbox, add tabs and returns complete
-        interface"""
-
-        if type(baskets) not in (list, tuple):
-            baskets = [baskets]
-
-        content = ""
-        for basket in baskets:
-            content += basket
-
-        out = """
-<div id="bskcontainer">
-
-  <div id="bskcontainercontent">%(content)s
-  </div>
-
-</div>""" % {'content': content}
-        return out
-
     def tmpl_display_list_public_baskets(self,
                                          all_public_baskets,
                                          limit,
@@ -878,9 +865,9 @@ class Template:
                                          asc,
                                          nb_views_show_p=False,
                                          ln=CFG_SITE_LANG):
-        """Display the list of public baskets.
-        @param all_public_baskets: tuple of
-            (bskid, basket_name, owner_id, nickname, date_modification, nb_views, nb_items)
+        """Template for the list of public baskets.
+        @param all_public_baskets: tuple
+                                   (bskid, basket_name, owner_id, nickname, date_modification, nb_views, nb_items)
         @param limit: display baskets from the incrementally numbered 'limit' and on
         @param number_of_all_public_baskets: the number of all the public baskets
         @param sort: 'name': sort by basket name
@@ -888,7 +875,9 @@ class Template:
                      'nickname': sort by user nickname
                      'date': sort by basket modification date
                      'items': sort by number of basket items
-        @param asc: ascending sort or not"""
+        @param asc: ascending sort or not
+        @param nb_views_show_p: show the views column or not
+        @param ln: language"""
 
         _ = gettext_set_language(ln)
         
@@ -1200,31 +1189,12 @@ class Template:
 
     ############################ external sources ###########################
 
-    def tmpl_es_add_box(self, es_title="", es_desc="", es_url="", ln=CFG_SITE_LANG):
-        """Adding external sources template"""
-
-        _ = gettext_set_language(ln)
-        out = """
-          <tr>
-            <td style="padding: 10 5 0 5;">%s</td>
-            <td style="padding: 10 5 0 0;"><input type="text" name="es_title" size="75" maxlength="100" value="%s" /></td>
-          </tr>
-          <tr>
-            <td style="padding: 10 5 0 5; vertical-align: top;">%s</td>
-            <td style="padding: 10 5 0 0;"><textarea name="es_desc" rows="3" cols="90">%s</textarea></td>
-          </tr>
-          <tr>
-            <td style="padding: 10 5 0 5;">%s</td>
-            <td style="padding: 10 5 0 0;"><input type="text" name="es_url" size="90" value="%s" /></td>
-          </tr>""" % (_("Title"), es_title, _("Description"), es_desc, _("URL"), es_url)
-        return out
-
     def tmpl_external_source_add_box(self,
                                      title="",
                                      desc="",
                                      url="",
                                      ln=CFG_SITE_LANG):
-        """Adding external source template"""
+        """Template for adding external items."""
 
         _ = gettext_set_language(ln)
 
@@ -1285,7 +1255,7 @@ class Template:
     </tr>
   </tbody>
 </table>""" % {'header_label': _('External item'),
-               'instructions_label': _('Provide a url for the external source you wish to add and fill in a title and description'),
+               'instructions_label': _('Provide a url for the external item you wish to add and fill in a title and description'),
                'title_label': _('Title'),
                'es_title': title,
                'desc_label': _('Description'),
@@ -1312,7 +1282,7 @@ class Template:
                  copy=False,
                  referer='',
                  ln=CFG_SITE_LANG):
-        """EXPERIMENTAL UI"""
+        """Template for addding items to baskets."""
 
         _ = gettext_set_language(ln)
 
@@ -1441,17 +1411,6 @@ class Template:
 </form>"""
 
         return out
-
-    def tmpl_added_to_basket(self, nb_baskets_modified=0, ln=CFG_SITE_LANG):
-        """Display message for addition of records to baskets"""
-        _ = gettext_set_language(ln)
-        if nb_baskets_modified:
-            out = _("The selected records have been successfully added to %i baskets.")
-            out %= nb_baskets_modified
-        else:
-            out = _("No records were added to the selected baskets.")
-        return '<p>' + out + '</p>'
-
 
     def tmpl_confirm_delete(self, bskid,
                             (nb_users, nb_groups, nb_alerts),
@@ -1705,13 +1664,13 @@ class Template:
                     (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['READITM'],
                      _("View records")),
                     (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['READCMT'],
-                     '... ' + _("and") + ' ' + _("view comments")),
+                     '... ' + _("and") + ' ' + _("view notes")),
                     (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'],
-                     '... ' + _("and") + ' ' + _("add comments")),
+                     '... ' + _("and") + ' ' + _("add notes")),
                     (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['ADDITM'],
                      '... ' + _("and") + ' ' + _("add records")),
                     (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['DELCMT'],
-                     '... ' + _("and") + ' ' + _("delete comments")),
+                     '... ' + _("and") + ' ' + _("delete notes")),
                     (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['DELITM'],
                      '... ' + _("and") + ' ' + _("remove records")),
                     (str(group_id) + '_' + CFG_WEBBASKET_SHARE_LEVELS['MANAGE'],
@@ -1881,7 +1840,7 @@ class Template:
 </collection>
 """ % items_xml
 
-    ############################ Baskets (New experimental UI) ###################################
+    ############################ Baskets ###################################
 
     ##################################
     ########### BASKET VIEW ##########
@@ -1892,16 +1851,24 @@ class Template:
                     name,
                     date_modification,
                     nb_views,
-                    nb_items, last_added,
-                    (user_can_view_content, user_can_edit_basket,
-                    user_can_view_comments, user_can_add_item, user_can_delete_item),
-                    nb_comments, last_comment,
-                    group_sharing_level,
+                    nb_items,
+                    nb_subscribers,
+                    last_added,
+                    (user_can_view_content,
+                     user_can_edit_basket,
+                     user_can_view_notes,
+                     user_can_add_notes,
+                     user_can_add_item,
+                     user_can_delete_item),
+                    nb_comments,
+                    last_comment,
+                    share_level,
                     selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                    selected_topic="", selected_group=0,
+                    selected_topic="",
+                    selected_group=0,
                     items=[],
                     ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket display."""
 
         out = """
 <table class="bskbasket" width="100%">"""
@@ -1909,34 +1876,37 @@ class Template:
         out += self.tmpl_basket_header(bskid,
                                        name,
                                        nb_items,
+                                       nb_subscribers,
                                        date_modification,
                                        (user_can_view_content,
                                         user_can_edit_basket,
-                                        user_can_view_comments,
+                                        user_can_view_notes,
                                         user_can_add_item,
                                         user_can_delete_item),
                                        selected_category,
                                        nb_comments,
                                        last_comment,
                                        selected_topic,
+                                       share_level,
                                        ln)
 
         out += self.tmpl_basket_footer(bskid,
                                        nb_items,
                                        (user_can_view_content,
                                         user_can_edit_basket,
-                                        user_can_view_comments,
+                                        user_can_view_notes,
                                         user_can_add_item,
                                         user_can_delete_item),
                                        selected_category,
                                        selected_topic,
-                                       group_sharing_level,
+                                       share_level,
                                        ln)
 
         out += self.tmpl_basket_content(bskid,
                                         (user_can_view_content,
                                          user_can_edit_basket,
-                                         user_can_view_comments,
+                                         user_can_view_notes,
+                                         user_can_add_notes,
                                          user_can_add_item,
                                          user_can_delete_item),
                                         selected_category,
@@ -1954,24 +1924,30 @@ class Template:
                            bskid,
                            name,
                            nb_items,
+                           nb_subscribers,
                            date_modification,
                            (user_can_view_content,
                             user_can_edit_basket,
-                            user_can_view_comments,
+                            user_can_view_notes,
                             user_can_add_item,
                             user_can_delete_item),
                            selected_category,
                            nb_comments,
                            last_comment,
                            selected_topic,
+                           share_level,
                            ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket header display."""
 
         _ = gettext_set_language(ln)
 
         optional_colspan = nb_items and user_can_view_content and ' colspan="3"' or ''
         records_field = '<br />' + str(nb_items) + ' ' + _('items')
-        comments_field = user_can_view_comments and (nb_comments and ', ' + str(nb_comments) + ' ' + 'notes' or ', no notes yet') or ''
+        comments_field = user_can_view_notes and (nb_comments and ', ' + str(nb_comments) + ' ' + _('notes') or ', ' + _('no notes yet')) or ''
+        subscribers_field = selected_category == CFG_WEBBASKET_CATEGORIES['PRIVATE'] and \
+                            share_level == 0 and \
+                            ', ' + str(nb_subscribers) + ' ' + _('subscribers') or \
+                            ''
         last_update_field = '<br />' + _('last update') + ': ' + date_modification
         if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, cgi.escape(selected_topic, True), ln)
@@ -2002,7 +1978,7 @@ class Template:
               %(name)s
               </strong>
               <small>
-              %(records_field)s%(comments_field)s
+              %(records_field)s%(comments_field)s%(subscribers_field)s
               %(last_update_field)s
               </small>
             </td>
@@ -2022,6 +1998,7 @@ class Template:
                 'nb_items': nb_items,
                 'records_field': records_field,
                 'comments_field': comments_field,
+                'subscribers_field': subscribers_field,
                 'last_update_field': last_update_field,
                 'edit_basket': edit_basket,
                 'delete_basket': delete_basket,
@@ -2035,14 +2012,14 @@ class Template:
                            nb_items,
                            (user_can_view_content,
                             user_can_edit_basket,
-                            user_can_view_comments,
+                            user_can_view_notes,
                             user_can_add_item,
                             user_can_delete_item),
                            selected_category,
                            selected_topic,
-                           group_sharing_level=None,
+                           share_level=None,
                            ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket footer display."""
 
         _ = gettext_set_language(ln)
 
@@ -2063,7 +2040,7 @@ class Template:
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
         else:
             unsubscribe = ""
-        if group_sharing_level == 0:
+        if share_level == 0:
             display_public_url = """%s/yourbaskets/display_public?bskid=%i""" % (CFG_SITE_URL, bskid)
             display_public_text = _("This basket is publicly accessible at the following address:")
             display_public = """%s<br /><a href="%s">%s</a>""" % (display_public_text, display_public_url, display_public_url)
@@ -2104,7 +2081,8 @@ class Template:
                             bskid,
                             (user_can_view_content,
                              user_can_edit_basket,
-                             user_can_view_comments,
+                             user_can_view_notes,
+                             user_can_add_notes,
                              user_can_add_item,
                              user_can_delete_item),
                             selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
@@ -2112,7 +2090,7 @@ class Template:
                             selected_group=0,
                             items=[],
                             ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket content display."""
 
         _ = gettext_set_language(ln)
         items_html = """
@@ -2146,7 +2124,8 @@ class Template:
                                                           downarrow=go_down,
                                                           copy_item=copy,
                                                           delete_item=delete,
-                                                          view_notes=user_can_view_comments,
+                                                          view_notes=user_can_view_notes,
+                                                          add_notes=user_can_add_notes,
                                                           selected_category=selected_category,
                                                           selected_topic=selected_topic,
                                                           selected_group=selected_group,
@@ -2171,21 +2150,13 @@ class Template:
                            copy_item=0,
                            delete_item=0,
                            view_notes=0,
+                           add_notes=0,
                            selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic="",
                            selected_group=0,
                            ln=CFG_SITE_LANG):
-        """
-        Display an item in a basket, along with the its options.
-        @param count: the numbered position of the item in the basket
-        @param bskid: basket id (int)
-        @param item: (record id, nb of notes, last comment date, body to display, score)
-        @param uparrow: boolen, move item up enabled/disabled
-        @param downarrow: boolen, move item down enabled/disabled
-        @param copy_item: boolen, copy item enabled/disabled
-        @param delete_item: boolen, remove item enabled/disabled
-        @param view_notes: boolen, view notes enabled/disabled
-        """
+        """Template for basket item display within the basket content."""
+
         _ = gettext_set_language(ln)
 
         (recid, colid, nb_cmt, last_cmt, val, score) = item
@@ -2300,9 +2271,10 @@ class Template:
             ## Currently no external items (records or sources) have a Detailed record link
             external_url = ""
 
-        # TODO: Also pass the add_notes parameter. If a user has the right to view the notes
-        # but not add new ones, they should not see the Add a note... link in case there are
-        # no notes for some item.
+        # TODO: If a user has the right to view the notes but not to add new ones,
+        # and there are no notes for some item an anchor to write notes will be
+        # created but with no text, hence invisible. Fix this so that no anchor
+        # is created whatsoever.
         if view_notes:
             notes = """\n<a class="moreinfo" href="%(siteurl)s/yourbaskets/%(add_and_view_notes_action)s?"""\
                     """category=%(category)s&amp;topic=%(topic)s&amp;group=%(group)i&amp;"""\
@@ -2328,7 +2300,7 @@ class Template:
                      'content': colid >= 0 and val or self.tmpl_create_pseudo_item(val),
                      'add_and_view_notes_action': nb_cmt and 'display' or 'write_note',
                      'add_and_view_notes_inline_anchor': not nb_cmt and '#note' or '',
-                     'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or _('Add a note...'),
+                     'add_and_view_notes_label': nb_cmt and _('Notes') + ' (' + str(nb_cmt) + ')' or add_notes and _('Add a note...') or '',
                      'last_cmt': last_cmt,
                      'siteurl': CFG_SITE_URL,
                      'bskid': bskid,
@@ -2372,7 +2344,7 @@ class Template:
                                 item_index=0,
                                 optional_params={},
                                 ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket's single item display."""
 
         out = """
 <table class="bskbasket" width="100%">"""
@@ -2426,7 +2398,7 @@ class Template:
                                        next_item_recid,
                                        item_index,
                                        ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket's single item header display."""
 
         _ = gettext_set_language(ln)
 
@@ -2515,7 +2487,7 @@ class Template:
                                        previous_item_recid,
                                        next_item_recid,
                                        ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket's single item footer display."""
 
         _ = gettext_set_language(ln)
 
@@ -2601,7 +2573,7 @@ class Template:
                                         index_item=0,
                                         optional_params={},
                                         ln=CFG_SITE_LANG):        
-        """"""
+        """Template for basket's single item content display."""
 
         _ = gettext_set_language(ln)
 
@@ -2702,7 +2674,7 @@ class Template:
                              notes,
                              optional_params,
                              ln=CFG_SITE_LANG):
-        """"""
+        """Template for basket's single item notes display."""
 
         _ = gettext_set_language(ln)
 
@@ -2735,14 +2707,14 @@ class Template:
                 note_title = incomplete_note[0]
                 if optional_params.has_key("Warnings"):
                     warnings = optional_params["Warnings"]
-                    warnings_html = self.tmpl_warnings(warnings)
+                    warnings_html = self.tmpl_warnings(warnings, ln)
             else:
                 note_body_html = ""
                 note_body_textual = ""
                 note_title = ""
                 if optional_params.has_key("Warnings"):
                     warnings = optional_params["Warnings"]
-                    warnings_html = self.tmpl_warnings(warnings)
+                    warnings_html = self.tmpl_warnings(warnings, ln)
             # TODO: calculate the url
             file_upload_url = ""
             action = """%s/yourbaskets/save_note?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;recid=%i&amp;ln=%s%s""" % \
@@ -2828,7 +2800,7 @@ class Template:
                 else:
                     reply_to_note = ""
                 if user_can_delete_notes:
-                    delete_note = """<a href="%s/yourbaskets/delete_note?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;recid=%i&amp;cmtid=%i&amp;ln=%s">%s</a>""" % \
+                    delete_note = """&nbsp;|&nbsp;<a href="%s/yourbaskets/delete_note?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;recid=%i&amp;cmtid=%i&amp;ln=%s">%s</a>""" % \
                                   (CFG_SITE_URL, selected_category, cgi.escape(selected_topic, True), selected_group, bskid, recid, cmtid, ln, _('Delete'))
                 else:
                     delete_note = ""
@@ -2848,9 +2820,7 @@ class Template:
                       </tr>
                       <tr>
                         <td class="bsknotescontentoptions">
-                        %(reply_to_note)s
-                        &nbsp;|&nbsp;
-                        %(delete_note)s
+                        %(reply_to_note)s%(delete_note)s
                         </td>
                       </tr>
                     </table>
@@ -2901,7 +2871,7 @@ class Template:
                            id_owner=0,
                            subscription_status=0,
                            ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket display."""
 
         out = """
 <table class="bskbasket" width="100%">"""
@@ -2943,7 +2913,7 @@ class Template:
                                   last_comment,
                                   subscription_status,
                                   ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket header display."""
 
         _ = gettext_set_language(ln)
 
@@ -3000,7 +2970,7 @@ class Template:
                                   id_owner,
                                   subscription_status,
                                   ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket footer display."""
 
         _ = gettext_set_language(ln)
 
@@ -3049,7 +3019,7 @@ class Template:
                                    (user_can_view_comments,),
                                    items=[],
                                    ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket footer display."""
 
         _ = gettext_set_language(ln)
         items_html = """
@@ -3081,13 +3051,8 @@ class Template:
                                   item,
                                   view_notes=0,
                                   ln=CFG_SITE_LANG):
-        """
-        Display an item in a basket, along with the its options.
-        @param count: the numbered position of the item in the basket
-        @param bskid: basket id (int)
-        @param item: (record id, nb of notes, last comment date, body to display, score)
-        @param view_notes: boolen, view notes enabled/disabled
-        """
+        """Template for basket item display within the basket content."""
+
         _ = gettext_set_language(ln)
 
         (recid, colid, nb_cmt, last_cmt, val, score) = item
@@ -3193,7 +3158,7 @@ class Template:
                                        item_index=0,
                                        optional_params={},
                                        ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket's single item display."""
 
         out = """
 <table class="bskbasket" width="100%">"""
@@ -3233,7 +3198,7 @@ class Template:
                                               next_item_recid,
                                               item_index,
                                               ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket's single item header display."""
 
         _ = gettext_set_language(ln)
 
@@ -3310,7 +3275,7 @@ class Template:
                                               previous_item_recid,
                                               next_item_recid,
                                               ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket's single item footer display."""
 
         _ = gettext_set_language(ln)
 
@@ -3382,7 +3347,7 @@ class Template:
                                                index_item=0,
                                                optional_params={},
                                                ln=CFG_SITE_LANG):        
-        """"""
+        """Template for public basket's single item content display."""
 
         _ = gettext_set_language(ln)
 
@@ -3459,7 +3424,7 @@ class Template:
                                     notes,
                                     optional_params,
                                     ln=CFG_SITE_LANG):
-        """"""
+        """Template for public basket's single item notes display."""
 
         _ = gettext_set_language(ln)
 
@@ -3486,19 +3451,20 @@ class Template:
             elif optional_params.has_key("Incomplete note") and optional_params['Incomplete note']:
                 incomplete_note = optional_params['Incomplete note']
                 note_body_html = incomplete_note[1]
-                # TODO: format incomplete body correctly as textual
+                # TODO: Do we need to format incomplete body correctly as textual
+                # and html as above?
                 note_body_textual = incomplete_note[1]
                 note_title = incomplete_note[0]
                 if optional_params.has_key("Warnings"):
                     warnings = optional_params["Warnings"]
-                    warnings_html = self.tmpl_warnings(warnings)
+                    warnings_html = self.tmpl_warnings(warnings, ln)
             else:
                 note_body_html = ""
                 note_body_textual = ""
                 note_title = ""
                 if optional_params.has_key("Warnings"):
                     warnings = optional_params["Warnings"]
-                    warnings_html = self.tmpl_warnings(warnings)
+                    warnings_html = self.tmpl_warnings(warnings, ln)
             # TODO: calculate the url
             file_upload_url = ""
             action = """%s/yourbaskets/save_public_note?bskid=%i&amp;recid=%i&amp;ln=%s%s""" % \
@@ -3605,7 +3571,7 @@ class Template:
                     </table>
                     <br />""" % {'inline_anchor': (not add_note_p and notes[-1][-1]==cmtid) and '<a name="note"></a>' or '',
                                  'url': CFG_SITE_URL,
-                                 'title': cmt_title and cmt_title or _('Note'),
+                                 'title': cmt_title and cgi.escape(cmt_title, True) or _('Note'),
                                  'label_author': _("by"),
                                  'label_date': _("on"),
                                  'user': cmt_nickname or cmt_uid,
@@ -3752,7 +3718,7 @@ def create_add_box_select_options(category,
                                   personal_basket_list,
                                   group_basket_list,
                                   ln):
-    """Returns an html list of options for the select form field of the search box."""
+    """Returns an html list of options for the select form field of the add box."""
 
     _ = gettext_set_language(ln)
 
@@ -3829,9 +3795,3 @@ def create_add_box_select_options(category,
                            "font-weight: normal; margin-left: 10px;"}
 
     return out
-
-def debug_to_file(*args):
-    debug = '\n'.join(str(arg) for arg in args) + '\n----------\n'
-    f = open("/tmp/cds", 'a')
-    f.write(debug)
-    f.close()
