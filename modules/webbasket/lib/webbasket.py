@@ -644,7 +644,7 @@ def perform_request_display(uid,
                                                                   (group_info, group_baskets_info),
                                                                   public_info,
                                                                   ln)
-    
+
     # TODO: Remove/Replace this bit
     bskids = []
     for basket in baskets:
@@ -1210,7 +1210,7 @@ def perform_request_search(uid,
                                                                       ln)
     else:
         search_results_html = None
-    
+
     search_box = __create_search_box(uid=uid,
                                      category=selected_category,
                                      topic=selected_topic,
@@ -2083,7 +2083,7 @@ def create_webbasket_navtrail(uid,
                         if basket:
                             out += " &gt; "
                             out += """<a class="navtrail" href="%s/yourbaskets/display?category=%s&amp;topic=%s&amp;bskid=%i&amp;ln=%s">%s</a>""" % \
-                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, bskid, ln, cgi.escape(basket))        
+                                   (CFG_SITE_URL, CFG_WEBBASKET_CATEGORIES['GROUP'], group, bskid, ln, cgi.escape(basket))
 
         elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             out += " &gt; "
