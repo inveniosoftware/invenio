@@ -94,7 +94,6 @@ def find_year(recordyear):
     for i in range(len(recordyear)-3):
         s = recordyear[i:i+4]
         if s.isalnum():
-            print s
             break
     return s
 
