@@ -48,7 +48,7 @@ def get_kb_mapping(kb_name="", key="", value="", match_type="e", default=""):
        @param key: include only lines matching this on left side in the results
        @param value: include only lines matching this on right side in the results
        @param match_type: s = substring match, e = exact match
-       @return string
+       @return a mapping
     """
     mappings = bibknowledge_dblayer.get_kb_mappings(kb_name,
                                          keylike=key, valuelike=value,

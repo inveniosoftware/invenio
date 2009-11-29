@@ -68,7 +68,7 @@ from invenio.htmlutils import \
      cfg_html_buffer_allowed_tag_whitelist, \
      cfg_html_buffer_allowed_attribute_whitelist
 from invenio.webuser import collect_user_info
-from invenio.bibknowledge import get_kb_mapping
+from invenio.bibknowledge import get_kbr_values
 from HTMLParser import HTMLParseError
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
@@ -1941,12 +1941,12 @@ class BibFormatObject:
         if string is None:
             return default
 
-        val = get_kb_mapping(kb, key=string, default=default)
+        val = get_kbr_values(kb, searchkey=string, searchtype='e')
 
-        if val is None:
+        try:
+            return val[0][0]
+        except:
             return default
-        else:
-            return val
 
 def escape_field(value, mode=0):
     """
