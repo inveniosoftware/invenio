@@ -156,6 +156,15 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=['bibrec']
     SQL commands different from SELECT.
     """
 
+    ## FIXME: The code below, checking table update times, was found
+    ## to be slow in user storm situations.  So let us rather run SQL
+    ## statement live; it seems faster to let MySQL use its own cache
+    ## than to constantly verify table update time.  Later, a proper
+    ## time-driven data cacher might be introduced here.  Or, better
+    ## yet, we can plug dedicated data cachers to every place that
+    ## called run_sql_cached.
+    return run_sql(sql, param, n, with_desc)
+
     global _db_cache
 
     if CFG_ACCESS_CONTROL_LEVEL_SITE == 3:
