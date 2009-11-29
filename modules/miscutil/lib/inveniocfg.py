@@ -744,6 +744,7 @@ NameVirtualHost %(vhost_ip_address)s:80
 %(listen_directive)s
 %(wsgi_socket_directive)s
 WSGIRestrictStdout Off
+WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
 <Files *.pyc>
    deny from all
 </Files>
@@ -774,11 +775,12 @@ WSGIRestrictStdout Off
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
         Alias /robots.txt %(webdir)s/robots.txt
         Alias /favicon.ico %(webdir)s/favicon.ico
-        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP}
+        WSGIDaemonProcess invenio processes=5 threads=1 display-name=%%{GROUP} inactivity-timeout=86400
         WSGIScriptAlias / %(wsgidir)s/invenio.wsgi
         WSGIPassAuthorization On
         <Directory %(wsgidir)s>
            WSGIProcessGroup invenio
+           WSGIApplicationGroup %%{GLOBAL}
            Options FollowSymLinks MultiViews
            AllowOverride None
            Order allow,deny
@@ -842,6 +844,7 @@ WSGIRestrictStdout Off
         WSGIPassAuthorization On
         <Directory %(wsgidir)s>
            WSGIProcessGroup invenio
+           WSGIApplicationGroup %%{GLOBAL}
            Options FollowSymLinks MultiViews
            AllowOverride None
            Order allow,deny
