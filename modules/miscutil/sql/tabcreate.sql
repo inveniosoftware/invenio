@@ -2717,6 +2717,13 @@ CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
   KEY action_code (action_code)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS cmtSUBSCRIPTION (
+  id_bibrec mediumint(8) unsigned NOT NULL,
+  id_user int(15) unsigned NOT NULL,
+  creation_time datetime NOT NULL default '0000-00-00 00:00:00',
+  KEY id_user (id_bibrec, id_user)
+) TYPE=MyISAM;
+
 -- tables for BibKnowledge:
 
 CREATE TABLE IF NOT EXISTS knwKB (

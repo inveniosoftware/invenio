@@ -23,6 +23,10 @@
 
 __revision__ = "$Id$"
 
+CFG_WEBCOMMENT_EMAIL_REPLIES_TO = \
+{'Articles': ['506__d', '506__m']
+}
+
 CFG_WEBCOMMENT_ERROR_MESSAGES = \
 {   'ERR_WEBCOMMENT_RECID_INVALID'       :  '_("%s is an invalid record ID")',
     'ERR_WEBCOMMENT_RECID_NAN'           :  '_("Record ID %s is not a number")',
@@ -60,7 +64,9 @@ CFG_WEBCOMMENT_WARNING_MESSAGES = \
     'ERR_WEBCOMMENT_RECID_INVALID': '_("Record ID %s is an invalid ID")',
     'ERR_WEBCOMMENT_RECID_NAN': '_("Record ID %s is not a number")',
     'WRN_WEBCOMMENT_TIMELIMIT': '_("You already posted a comment short ago. Please retry later")',
-    'WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE': '_("You already wrote a review for this record.")'
+    'WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE': '_("You already wrote a review for this record.")',
+    'WRN_WEBCOMMENT_SUBSCRIBED':'_("You have been subscribed to this discussion.")',
+    'WRN_WEBCOMMENT_UNSUBSCRIBED':'_("You have been unsubscribed from this discussion.")',
 }
 
 CFG_WEBCOMMENT_ACTION_CODE = {

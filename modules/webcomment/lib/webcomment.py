@@ -32,6 +32,8 @@ from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_LANG, \
                            CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
                            CFG_SITE_ADMIN_EMAIL,\
+                           CFG_SITE_SUPPORT_EMAIL,\
+                           CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
                            CFG_SITE_URL,\
                            CFG_SITE_NAME,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS,\
@@ -44,20 +46,24 @@ from invenio.config import CFG_SITE_LANG, \
 from invenio.webmessage_mailutils import \
      email_quote_txt, \
      email_quoted_txt2html
-from invenio.webuser import get_user_info
+from invenio.webuser import get_user_info, get_email, collect_user_info
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.mailutils import send_email
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
-from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
+from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
+     CFG_WEBCOMMENT_EMAIL_REPLIES_TO
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
-     check_user_can_view_record
+     check_user_can_view_record, \
+     get_all_collections_of_a_record, \
+     get_fieldvalues
 try:
     import invenio.template
     webcomment_templates = invenio.template.load('webcomment')
@@ -65,7 +71,7 @@ except:
     pass
 
 
-def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False):
+def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, subscribed=0, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False, user_is_subscribed_to_discussion=False, user_can_unsubscribe_from_discussion=False):
     """
     Returns all the comments (reviews) of a specific internal record or external basket record.
     @param recID:  record id where (internal record IDs > 0) or (external basket record IDs < -100)
@@ -85,11 +91,14 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
     @param page: results page
     @param voted: boolean, active if user voted for a review, see perform_request_vote function
     @param reported: boolean, active if user reported a certain comment/review, perform_request_report function
+    @param subscribed: int, 1 if user just subscribed to discussion, -1 if unsubscribed
     @param reviews: boolean, enabled if reviews, disabled for comments
     @param uid: the id of the user who is reading comments
     @param can_send_comments: if user can send comment or not
     @oaram can_attach_files: if user can attach file to comment or not
-    @return: html body.
+    @param user_is_subscribed_to_discussion: True if user already receives new comments by email
+    @param user_can_unsubscribe_from_discussion: True is user is allowed to unsubscribe from discussion
+    @return html body.
     """
     errors = []
     warnings = []
@@ -175,7 +184,10 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
         elif voted == 0:
             warnings.append(('WRN_WEBCOMMENT_ALREADY_VOTED',))
-
+    if subscribed == 1:
+        warnings.append(('WRN_WEBCOMMENT_SUBSCRIBED',))
+    elif subscribed == -1:
+        warnings.append(('WRN_WEBCOMMENT_UNSUBSCRIBED',))
     body = webcomment_templates.tmpl_get_comments(recID,
                                                   ln,
                                                   nb_per_page, page, last_page,
@@ -188,7 +200,11 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
                                                   total_nb_reviews=nb_reviews,
                                                   uid=uid,
                                                   can_send_comments=can_send_comments,
-                                                  can_attach_files=can_attach_files)
+                                                  can_attach_files=can_attach_files,
+                                                  user_is_subscribed_to_discussion=\
+                                                  user_is_subscribed_to_discussion,
+                                                  user_can_unsubscribe_from_discussion=\
+                                                  user_can_unsubscribe_from_discussion)
     return (body, errors, warnings)
 
 def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
@@ -628,9 +644,246 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                     VALUES ('', %s, %s, inet_aton(%s), %s, %s)"""
         params2 = (recID, uid, client_ip_address, action_time, action_code)
         run_sql(query2, params2)
+
+        # Email this comment to 'subscribers'
+        (subscribers_emails1, subscribers_emails2) = \
+                              get_users_subscribed_to_discussion(recID)
+        email_subscribers_about_new_comment(recID, reviews=reviews,
+                                            emails1=subscribers_emails1,
+                                            emails2=subscribers_emails2,
+                                            comID=res, msg=msg,
+                                            note=note, score=score,
+                                            editor_type=editor_type)
         return int(res)
 
-def calculate_start_date_old(display_since):
+def subscribe_user_to_discussion(recID, uid):
+    """
+    Subscribe a user to a discussion, so the she receives by emails
+    all new new comments for this record.
+
+    @param recID: record ID corresponding to the discussion we want to
+                  subscribe the user
+    @param uid: user id
+    """
+    query = """INSERT INTO cmtSUBSCRIPTION
+                           (id_bibrec, id_user, creation_time)
+                    VALUES (%s, %s, %s)"""
+    params = (recID, uid, convert_datestruct_to_datetext(time.localtime()))
+    try:
+        res = run_sql(query, params)
+    except:
+        return 0
+    return 1
+
+def unsubscribe_user_from_discussion(recID, uid):
+    """
+    Unsubscribe users from a discussion.
+
+    @param recID: record ID corresponding to the discussion we want to
+                  unsubscribe the user
+    @param uid: user id
+    @return 1 if successful, 0 if not
+    """
+    query = """DELETE FROM cmtSUBSCRIPTION
+                     WHERE id_bibrec=%s AND id_user=%s"""
+    params = (recID, uid)
+    try:
+        res = run_sql(query, params)
+    except:
+        return 0
+    if res > 0:
+        return 1
+    return 0
+
+def get_user_subscription_to_discussion(recID, uid):
+    """
+    Returns the type of subscription for the given user to this
+    discussion.
+    @param recID: record ID
+    @param uid: user id
+    @returns : 0 if user is not subscribed to discussion
+               1 if user is subscribed, and is allowed to unsubscribe
+               2 if user is subscribed, but cannot unsubscribe
+    """
+    user_email = get_email(uid)
+    (emails1, emails2) = get_users_subscribed_to_discussion(recID, check_authorizations=False)
+    if user_email in emails1:
+        return 1
+    elif user_email in emails2:
+        return 2
+    else:
+        return 0
+
+def get_users_subscribed_to_discussion(recID, check_authorizations=True):
+    """
+    Returns the lists of users subscribed to a given discussion.
+
+    Two lists are returned: the first one is the list of emails for
+    users who can unsubscribe from the discussion, the second list
+    contains the emails of users who cannot unsubscribe (for eg. author
+    of the document, etc).
+
+    Users appear in only one list. If a user has manually subscribed
+    to a discussion AND is an automatic recipients for updates, it
+    will only appear in the second list.
+
+    @param recID: record ID for which we want to retrieve subscribed users
+    @param check_authorizations: if True, check again if users are authorized to view comment
+    @return tuple (emails1, emails2)
+    """
+    subscribers_emails = {}
+
+    # Get users that have subscribed to this discussion
+    query = """SELECT id_user FROM cmtSUBSCRIPTION WHERE id_bibrec=%s"""
+    params = (recID,)
+    res = run_sql(query, params)
+    for row in res:
+        uid = row[0]
+        user_info = collect_user_info(uid)
+        (auth_code, auth_msg) = check_user_can_view_comments(user_info, recID)
+        if auth_code:
+            # User is no longer authorized to view comments.
+            # Delete subscription
+            unsubscribe_user_from_discussion(recID, uid)
+        else:
+            email = get_email(uid)
+            if '@' in email:
+                subscribers_emails[email] = True
+
+    # Get users automatically subscribed, based on the record metadata
+    collections = get_all_collections_of_a_record(recID)
+    primary_collection = guess_primary_collection_of_a_record(recID)
+    if primary_collection not in collections:
+        collections.append(primary_collection)
+    for collection in collections:
+        if CFG_WEBCOMMENT_EMAIL_REPLIES_TO.has_key(collection):
+            fields = CFG_WEBCOMMENT_EMAIL_REPLIES_TO[collection]
+            for field in fields:
+                emails = get_fieldvalues(recID, field)
+                for email in emails:
+                    if not '@' in email:
+                        # Is a group: add domain name
+                        subscribers_emails[email + '@' + \
+                                           CFG_SITE_SUPPORT_EMAIL.split('@')[1]] = False
+                    else:
+                        subscribers_emails[email] = False
+
+    return ([email for email, can_unsubscribe_p \
+             in subscribers_emails.iteritems() if can_unsubscribe_p],
+            [email for email, can_unsubscribe_p \
+             in subscribers_emails.iteritems() if not can_unsubscribe_p] )
+
+def email_subscribers_about_new_comment(recID, reviews, emails1,
+                                        emails2, comID, msg="",
+                                        note="", score=0,
+                                        editor_type='textarea',
+                                        ln=CFG_SITE_LANG):
+    """
+    Notify subscribers that a new comment was posted.
+    FIXME: consider recipient preference to send email in correct language.
+
+    @param recID: record id
+    @param emails1: list of emails for users who can unsubscribe from discussion
+    @param emails2: list of emails for users who cannot unsubscribe from discussion
+    @param comID: the comment id
+    @param msg: comment body
+    @param note: comment title
+    @param score: review star score
+    @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
+    @return integer >0 if successful, 0 if not
+    """
+    _ = gettext_set_language(ln)
+
+    if not emails1 and not emails2:
+        return 0
+
+    # Get title
+    titles = get_fieldvalues(recID, "245__a")
+    if not titles:
+        # usual title not found, try conference title:
+        titles = get_fieldvalues(recID, "111__a")
+
+    title = ''
+    if titles:
+        title = titles[0]
+    else:
+        title = _("Record %i") % recID
+
+    # Get report number
+    report_numbers = get_fieldvalues(recID, "037__a")
+    if not report_numbers:
+        report_numbers = get_fieldvalues(recID, "088__a")
+        if not report_numbers:
+            report_numbers = get_fieldvalues(recID, "021__a")
+
+    # Prepare email subject and body
+    if reviews:
+        email_subject = _('%(report_number)s"%(title)s" has been reviewed') % \
+                        {'report_number': report_numbers and ('[' + report_numbers[0] + '] ') or '',
+                         'title': title}
+    else:
+        email_subject = _('%(report_number)s"%(title)s" has been commented') % \
+                        {'report_number': report_numbers and ('[' + report_numbers[0] + '] ') or '',
+                         'title': title}
+
+    email_content = msg
+    if note:
+        email_content = note + email_content
+
+    # Send emails to people who can unsubscribe
+    email_header = webcomment_templates.tmpl_email_new_comment_header(recID,
+                                                                      title,
+                                                                      reviews,
+                                                                      comID,
+                                                                      report_numbers,
+                                                                      can_unsubscribe=True,
+                                                                      ln=ln)
+
+    email_footer = webcomment_templates.tmpl_email_new_comment_footer(recID,
+                                                                      title,
+                                                                      reviews,
+                                                                      comID,
+                                                                      report_numbers,
+                                                                      can_unsubscribe=True,
+                                                                      ln=ln)
+
+    res1 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
+                      toaddr=emails1,
+                      subject=email_subject,
+                      content=email_content,
+                      header=email_header,
+                      footer=email_footer,
+                      ln=ln)
+
+    # Then send email to people who have been automatically
+    # subscribed to the discussion (they cannot unsubscribe)
+    email_header = webcomment_templates.tmpl_email_new_comment_header(recID,
+                                                                      title,
+                                                                      reviews,
+                                                                      comID,
+                                                                      report_numbers,
+                                                                      can_unsubscribe=False,
+                                                                      ln=ln)
+
+    email_footer = webcomment_templates.tmpl_email_new_comment_footer(recID,
+                                                                      title,
+                                                                      reviews,
+                                                                      comID,
+                                                                      report_numbers,
+                                                                      can_unsubscribe=False,
+                                                                      ln=ln)
+
+    res2 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
+                      toaddr=emails2,
+                      subject=email_subject,
+                      content=email_content,
+                      header=email_header,
+                      footer=email_footer,
+                      ln=ln)
+
+    return res1 and res2
+
+def calculate_start_date(display_since):
     """
     Private function
     Returns the datetime of display_since argument in MYSQL datetime format
@@ -647,43 +900,6 @@ def calculate_start_date_old(display_since):
             equals 0000-00-00 00:00:00 => MySQL format
             If bad arguement given, will return datetext_default
     """
-    # time type and seconds coefficients
-    time_types = {'d':0, 'w':0, 'm':0, 'y':0}
-
-    ## verify argument
-    # argument wrong size
-    if (display_since==(None or 'all')) or (len(display_since) > 2):
-        return datetext_default
-    try:
-        nb = int(display_since[0])
-    except:
-        return datetext_default
-    if str(display_since[1]) in time_types:
-        time_type = str(display_since[1])
-    else:
-        return datetext_default
-
-    ## calculate date
-    # initialize the coef
-    if time_type == 'w':
-        time_types[time_type] = 7
-    else:
-        time_types[time_type] = 1
-
-    start_time = time.localtime()
-    start_time = (start_time[0] - nb*time_types['y'],
-                  start_time[1] - nb*time_types['m'],
-                  start_time[2] - nb*time_types['d'] - nb*time_types['w'],
-                  start_time[3],
-                  start_time[4],
-                  start_time[5],
-                  start_time[6],
-                  start_time[7],
-                  start_time[8])
-    return convert_datestruct_to_datetext(start_time)
-
-def calculate_start_date(display_since):
-
     time_types = {'d':0, 'w':0, 'm':0, 'y':0}
     today = datetime.today()
     try:
@@ -852,7 +1068,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                           comID=-1,
                                           client_ip_address=None,
                                           editor_type='textarea',
-                                          can_attach_files=False):
+                                          can_attach_files=False,
+                                          subscribe=False):
     """
     Add a comment/review or remark
     @param recID: record id
@@ -869,7 +1086,8 @@ def perform_request_add_comment_or_remark(recID=0,
     @param comID: if replying, this is the comment id of the commetn are replying to
     @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
     @param can_attach_files: if user can attach files to comments or not
-    @return: html add form if action is display or reply
+    @param subscribe: if True, subscribe user to receive new comments by email
+    @return html add form if action is display or reply
             html successful added form if action is submit
     """
     warnings = []
@@ -953,6 +1171,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                                           note=note, score=score, priority=0,
                                                           client_ip_address=client_ip_address,
                                                           editor_type=editor_type)
+                    if success > 0 and subscribe:
+                        subscribe_user_to_discussion(recID, uid)
                 else:
                     warnings.append('WRN_WEBCOMMENT_TIMELIMIT')
                     success = 1

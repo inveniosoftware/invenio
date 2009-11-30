@@ -30,6 +30,9 @@ from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_add_comment_or_remark, \
                                perform_request_vote, \
                                perform_request_report, \
+                               subscribe_user_to_discussion, \
+                               unsubscribe_user_from_discussion, \
+                               get_user_subscription_to_discussion, \
                                check_user_can_attach_file_to_comments, \
                                check_user_can_view_comments, \
                                check_user_can_send_comments
@@ -51,7 +54,12 @@ from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_config import VIEWRESTRCOLL
-from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
+from invenio.access_control_mailcookie import \
+     mail_cookie_create_authorize_action, \
+     mail_cookie_create_generic, \
+     mail_cookie_check_generic, \
+     InvenioWebAccessMailCookieDeletedError, \
+     InvenioWebAccessMailCookieError
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
@@ -67,7 +75,8 @@ from invenio.bibdocfile import stream_file
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""
 
-    _exports = ['', 'display', 'add', 'vote', 'report', 'index', 'attachments']
+    _exports = ['', 'display', 'add', 'vote', 'report', 'index', 'attachments',
+                'subscribe', 'unsubscribe']
 
     def __init__(self, recid=-1, reviews=0):
         self.recid = recid
@@ -103,7 +112,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param voted: boolean, active if user voted for a review, see vote function
         @param reported: int, active if user reported a certain comment/review, see report function
         @param reviews: boolean, enabled for reviews, disabled for comments
-        @return: the full html page.
+        @param subscribed: int, 1 if user just subscribed to discussion, -1 if unsubscribed
+        @return the full html page.
         """
 
         argd = wash_urlargd(form, {'do': (str, "od"),
@@ -112,6 +122,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'p': (int, 1),
                                    'voted': (int, -1),
                                    'reported': (int, -1),
+                                   'subscribed': (int, 0),
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -139,6 +150,17 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         if not auth_code:
             can_attach_files = True
 
+        subscription = get_user_subscription_to_discussion(self.recid, uid)
+        if subscription == 1:
+            user_is_subscribed_to_discussion = True
+            user_can_unsubscribe_from_discussion = True
+        elif subscription == 2:
+            user_is_subscribed_to_discussion = True
+            user_can_unsubscribe_from_discussion = False
+        else:
+            user_is_subscribed_to_discussion = False
+            user_can_unsubscribe_from_discussion = False
+
         check_warnings = []
 
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
@@ -151,10 +173,13 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 ln=argd['ln'],
                 voted=argd['voted'],
                 reported=argd['reported'],
+                subscribed=argd['subscribed'],
                 reviews=self.discussion,
                 uid=uid,
                 can_send_comments=can_send_comments,
-                can_attach_files=can_attach_files)
+                can_attach_files=can_attach_files,
+                user_is_subscribed_to_discussion=user_is_subscribed_to_discussion,
+                user_can_unsubscribe_from_discussion=user_can_unsubscribe_from_discussion)
 
             unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid,
@@ -226,7 +251,10 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param comid: comment id, needed for replying
         @param editor_type: the type of editor used for submitting the
                             comment: 'textarea', 'fckeditor'.
-        @return: the full html page.
+        @param subscribe: if set, subscribe user to receive email
+                          notifications when new comment are added to
+                          this discussion
+        @return the full html page.
         """
 
         argd = wash_urlargd(form, {'action': (str, "DISPLAY"),
@@ -234,7 +262,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'note': (str, ''),
                                    'score': (int, 0),
                                    'comid': (int, -1),
-                                   'editor_type':(str, ""),
+                                   'editor_type': (str, ""),
+                                   'subscribe': (str, ""),
+                                   'cookie': (str, "")
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -242,14 +272,28 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         actions = ['DISPLAY', 'REPLY', 'SUBMIT']
         uid = getUid(req)
 
+        # Is site ready to accept comments?
+        if uid == -1 or (not CFG_WEBCOMMENT_ALLOW_COMMENTS and not CFG_WEBCOMMENT_ALLOW_REVIEWS):
+            return page_not_authorized(req, "../comments/add",
+                                       navmenuid='search')
+
+        # Is user allowed to post comment?
         user_info = collect_user_info(req)
         (auth_code_1, auth_msg_1) = check_user_can_view_comments(user_info, self.recid)
         (auth_code_2, auth_msg_2) = check_user_can_send_comments(user_info, self.recid)
-        if (auth_code_1 or auth_code_2) and user_info['email'] == 'guest' and not user_info['apache_user']:
+        if isGuestUser(uid):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+            # Save user's value in cookie, so that these "POST"
+            # parameters are not lost during login process
+            msg_cookie = mail_cookie_create_generic('comment_msg',
+                                                    {'msg': argd['msg'],
+                                                     'note': argd['note'],
+                                                     'score': argd['score'],
+                                                     'editor_type': argd['editor_type']},
+                                                    onetime=True)
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
+                CFG_SITE_URL + user_info['uri'] + '&cookie=' + msg_cookie}, {})
             return redirect_to_url(req, target)
         elif (auth_code_1 or auth_code_2):
             return page_not_authorized(req, "../", \
@@ -282,60 +326,53 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if argd['action'] not in actions:
                 argd['action'] = 'DISPLAY'
 
-            # is page allowed to be viewed
-            if uid == -1 or (not CFG_WEBCOMMENT_ALLOW_COMMENTS and not CFG_WEBCOMMENT_ALLOW_REVIEWS):
-                return page_not_authorized(req, "../comments/add",
-                                           navmenuid='search')
+            subscribe = False
+            if argd['subscribe'] and \
+               get_user_subscription_to_discussion(self.recid, uid) == 0:
+                # User is not already subscribed, and asked to subscribe
+                subscribe = True
+            if not argd['msg']:
+                # User had to login in-between, so retrieve msg
+                # from cookie
+                try:
+                    (kind, cookie_argd) = mail_cookie_check_generic(argd['cookie'],
+                                                                    delete=True)
 
-            # if guest, must log in first
-            if isGuestUser(uid):
-                referer = "%s/record/%s/%s/add?ln=%s&amp;comid=%s&amp;action=%s&amp;score=%s" % (CFG_SITE_URL,
-                                                                                    self.recid,
-                                                                                    self.discussion == 1 and 'reviews' or 'comments',
-                                                                                    argd['ln'],
-                                                                                    argd['comid'],
-                                                                                    argd['action'],
-                                                                                    argd['score'])
-                msg = _("Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s first.") % {
-                          'x_url_open': '<a href="%s/youraccount/login?referer=%s">' % \
-                                        (CFG_SITE_SECURE_URL, urllib.quote(referer)),
-                          'x_url_close': '</a>'}
-                return page(title=_("Login"),
-                            body=msg,
-                            navtrail=navtrail,
-                            uid=uid,
-                            language=CFG_SITE_LANG,
-                            verbose=1,
-                            req=req,
-                            navmenuid='search')
-            # user logged in
+                    argd.update(cookie_argd)
+                except InvenioWebAccessMailCookieDeletedError, e:
+                    return redirect_to_url(req, CFG_SITE_URL + '/record/' + \
+                                           str(self.recid) + (self.discussion==1 and \
+                                                              '/reviews' or '/comments'))
+                except InvenioWebAccessMailCookieError, e:
+                    # Invalid or empty cookie: continue
+                    pass
+            (body, errors, warnings) = perform_request_add_comment_or_remark(recID=self.recid,
+                                                                             ln=argd['ln'],
+                                                                             uid=uid,
+                                                                             action=argd['action'],
+                                                                             msg=argd['msg'],
+                                                                             note=argd['note'],
+                                                                             score=argd['score'],
+                                                                             reviews=self.discussion,
+                                                                             comID=argd['comid'],
+                                                                             client_ip_address=client_ip_address,
+                                                                             editor_type=argd['editor_type'],
+                                                                             can_attach_files=can_attach_files,
+                                                                             subscribe=subscribe)
+            if self.discussion:
+                title = _("Add Review")
             else:
-                (body, errors, warnings) = perform_request_add_comment_or_remark(recID=self.recid,
-                                                                                 ln=argd['ln'],
-                                                                                 uid=uid,
-                                                                                 action=argd['action'],
-                                                                                 msg=argd['msg'],
-                                                                                 note=argd['note'],
-                                                                                 score=argd['score'],
-                                                                                 reviews=self.discussion,
-                                                                                 comID=argd['comid'],
-                                                                                 client_ip_address=client_ip_address,
-                                                                                 editor_type=argd['editor_type'],
-                                                                                 can_attach_files=can_attach_files)
-                if self.discussion:
-                    title = _("Add Review")
-                else:
-                    title = _("Add Comment")
-                return page(title=title,
-                            body=body,
-                            navtrail=navtrail,
-                            uid=uid,
-                            language=CFG_SITE_LANG,
-                            verbose=1,
-                            errors=errors,
-                            warnings=warnings,
-                            req=req,
-                            navmenuid='search')
+                title = _("Add Comment")
+            return page(title=title,
+                        body=body,
+                        navtrail=navtrail,
+                        uid=uid,
+                        language=CFG_SITE_LANG,
+                        verbose=1,
+                        errors=errors,
+                        warnings=warnings,
+                        req=req,
+                        navmenuid='search')
         # id not in range
         else:
             return page(title=_("Record Not Found"),
@@ -467,6 +504,52 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             referer %= (CFG_SITE_URL, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
+    def subscribe(self, req, form):
+        """
+        Subscribe current user to receive email notification when new
+        comments are added to current discussion.
+        """
+        argd = wash_urlargd(form, {'referer': (str, None)})
+
+        uid = getUid(req)
+
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
+        if isGuestUser(uid):
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+            target = '/youraccount/login' + \
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                CFG_SITE_URL + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg)
+
+        success = subscribe_user_to_discussion(self.recid, uid)
+        display_url = "%s/record/%s/comments/display?subscribed=%s&ln=%s" % \
+                      (CFG_SITE_URL, self.recid, str(success), argd['ln'])
+        redirect_to_url(req, display_url)
+
+    def unsubscribe(self, req, form):
+        """
+        Unsubscribe current user from current discussion.
+        """
+        argd = wash_urlargd(form, {'referer': (str, None)})
+
+        user_info = collect_user_info(req)
+        uid = getUid(req)
+
+        if isGuestUser(uid):
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+            target = '/youraccount/login' + \
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                CFG_SITE_URL + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+
+        success = unsubscribe_user_from_discussion(self.recid, uid)
+        display_url = "%s/record/%s/comments/display?subscribed=%s&ln=%s" % \
+                      (CFG_SITE_URL, self.recid, str(-success), argd['ln'])
+        redirect_to_url(req, display_url)
 
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
     """Handle upload and access to files for comments.

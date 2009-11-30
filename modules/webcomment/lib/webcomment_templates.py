@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 
 # CDS Invenio imports
 from invenio.webuser import get_user_info, isGuestUser
+from invenio.urlutils import create_html_link
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import CFG_SITE_URL, \
@@ -31,6 +32,7 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_NAME, \
                            CFG_SITE_NAME_INTL,\
+                           CFG_SITE_SUPPORT_EMAIL,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS, \
                            CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR
@@ -404,7 +406,9 @@ class Template:
                           total_nb_reviews=0,
                           nickname='', uid=-1, note='',score=5,
                           can_send_comments=False,
-                          can_attach_files=False):
+                          can_attach_files=False,
+                          user_is_subscribed_to_discussion=False,
+                          user_can_unsubscribe_from_discussion=False):
         """
         Get table of all comments
         @param recID: record id
@@ -432,6 +436,8 @@ class Template:
         @param reviews: boolean, enabled for reviews, disabled for comments
         @param can_send_comments: boolean, if user can send comments or not
         @param can_attach_files: boolean, if user can attach file to comment or not
+        @param user_is_subscribed_to_discussion: True if user already receives new comments by email
+        @param user_can_unsubscribe_from_discussion: True is user is allowed to unsubscribe from discussion
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -459,7 +465,7 @@ class Template:
             discussion = 'comments'
             comments_link = '<b>%s (%i)</b>' % (_('Comments'), total_nb_comments)
             reviews_link = '<a href="%s/record/%s/reviews/">%s</a> (%i)' % (CFG_SITE_URL, recID, _('Reviews'), total_nb_reviews)
-            add_comment_or_review = self.tmpl_add_comment_form(recID, uid, nickname, ln, note, warnings, can_attach_files=can_attach_files)
+            add_comment_or_review = self.tmpl_add_comment_form(recID, uid, nickname, ln, note, warnings, can_attach_files=can_attach_files, user_is_subscribed_to_discussion=user_is_subscribed_to_discussion)
 
         # voting links
         useful_dict =   {   'siteurl'        : CFG_SITE_URL,
@@ -677,6 +683,22 @@ class Template:
         else:
             body = warnings + body
 
+        if reviews == 0:
+            if not user_is_subscribed_to_discussion:
+                body += '<small>'
+                body += create_html_link(urlbase=CFG_SITE_URL + '/record/' + \
+                                         str(recID) + '/comments/subscribe',
+                                         urlargd={},
+                                         link_label=_('Subscribe to this discussion'))
+                body += '</small><br />'
+            elif user_can_unsubscribe_from_discussion:
+                body += '<small>'
+                body += create_html_link(urlbase=CFG_SITE_URL + '/record/' + \
+                                         str(recID) + '/comments/unsubscribe',
+                                         urlargd={},
+                                         link_label=_('Unsubscribe from this discussion'))
+                body += '</small><br />'
+
         if can_send_comments:
             body += add_comment_or_review
         else:
@@ -745,7 +767,9 @@ class Template:
         """
         red_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED',
                             'WRN_WEBCOMMENT_ALREADY_VOTED']
-        green_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_RECORDED']
+        green_text_warnings = ['WRN_WEBCOMMENT_FEEDBACK_RECORDED',
+                               'WRN_WEBCOMMENT_SUBSCRIBED',
+                               'WRN_WEBCOMMENT_UNSUBSCRIBED']
         from invenio.errorlib import get_msgs_for_code_list
         span_class = 'important'
         out = ""
@@ -771,7 +795,9 @@ class Template:
         else:
             return ""
 
-    def tmpl_add_comment_form(self, recID, uid, nickname, ln, msg, warnings, textual_msg=None, can_attach_files=False):
+    def tmpl_add_comment_form(self, recID, uid, nickname, ln, msg,
+                              warnings, textual_msg=None, can_attach_files=False,
+                              user_is_subscribed_to_discussion=False):
         """
         Add form for comments
         @param recID: record id
@@ -783,7 +809,8 @@ class Template:
                             version in case user cannot display FCKeditor
         @param warnings: list of warning tuples (warning_msg, color)
         @param can_attach_files: if user can upload attach file to record or not
-        @return: html add comment form
+        @param user_is_subscribed_to_discussion: True if user already receives new comments by email
+        @return html add comment form
         """
         _ = gettext_set_language(ln)
         link_dic =  {   'siteurl'    : CFG_SITE_URL,
@@ -827,17 +854,23 @@ class Template:
                                       file_upload_url=file_upload_url,
                                       toolbar_set = "WebComment")
 
+        subscribe_to_discussion = ''
+        if not user_is_subscribed_to_discussion:
+            # Offer to subscribe to discussion
+            subscribe_to_discussion = '<br/><small><input type="checkbox" name="subscribe" id="subscribe"/><label for="subscribe">%s</label></small>' % _("Would you like to receive email notifications when new comments are added to this page?")
+
         form = """<div><h2>%(add_comment)s</h2>
 
 %(editor)s
 <br />
-                <span class="reportabuse">%(note)s</span>
+                <span class="reportabuse">%(note)s</span> %(subscribe_to_discussion)s
                 </div>
                 """ % {'note': note,
                        'record_label': _("Article") + ":",
                        'comment_label': _("Comment") + ":",
                        'add_comment': _('Add comment'),
-                       'editor': editor}
+                       'editor': editor,
+                       'subscribe_to_discussion': subscribe_to_discussion}
         form_link = "%(siteurl)s/record/%(recID)s/comments/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="post", text=form, button='Add comment')
         return warnings + form
@@ -1585,4 +1618,72 @@ class Template:
         's4': s4,
         's5': s5
         }
+        return out
+
+    def tmpl_email_new_comment_header(self, recID, title, reviews,
+                                      comID, report_numbers,
+                                      can_unsubscribe=True,
+                                      ln=CFG_SITE_LANG):
+        """
+        Prints the email header used to notify subscribers that a new
+        comment/review was added.
+
+        @param recid: the ID of the commented/reviewed record
+        @param title: the title of the commented/reviewed record
+        @param reviews: True if it is a review, else if a comment
+        @param comID: the comment ID
+        @param report_numbers: the report number(s) of the record
+        @param can_unsubscribe: True if user can unsubscribe from alert
+        @param ln: language
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = _("Hello:") + '\n\n' + \
+              (reviews and _("The following review was sent to %(CFG_SITE_NAME)s:") or \
+               _("The following comment was sent to %(CFG_SITE_NAME)s:")) % \
+               {'CFG_SITE_NAME': CFG_SITE_NAME}
+        out += '\n(<%s>)' % (CFG_SITE_URL + '/record/' + str(recID))
+        out += '\n\n\n'
+        return out
+
+    def tmpl_email_new_comment_footer(self, recID, title, reviews,
+                                      comID, report_numbers,
+                                      can_unsubscribe=True,
+                                      ln=CFG_SITE_LANG):
+        """
+        Prints the email footer used to notify subscribers that a new
+        comment/review was added.
+
+        @param recid: the ID of the commented/reviewed record
+        @param title: the title of the commented/reviewed record
+        @param reviews: True if it is a review, else if a comment
+        @param comID: the comment ID
+        @param report_numbers: the report number(s) of the record
+        @param can_unsubscribe: True if user can unsubscribe from alert
+        @param ln: language
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = '\n\n-- \n'
+        out += _("This is an automatic message, please don't reply to it.")
+        out += '\n'
+        out += _("To post another comment, go to <%(x_url)s> instead.")  % \
+               {'x_url': CFG_SITE_URL + '/record/' + str(recID) + \
+                (reviews and '/reviews' or '/comments') + '/add'}
+        out += '\n'
+        if not reviews:
+            out += _("To specifically reply to this comment, go to <%(x_url)s>")  % \
+                   {'x_url': CFG_SITE_URL + '/record/' + str(recID) + \
+                    '/comments/add?action=REPLY&comid=' + str(comID)}
+            out += '\n'
+        if can_unsubscribe:
+            out += _("To unsubscribe from this discussion, go to <%(x_url)s>")  % \
+                   {'x_url': CFG_SITE_URL + '/record/' + str(recID) + \
+                    '/comments/unsubscribe'}
+            out += '\n'
+        out += _("For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>") % \
+               {'CFG_SITE_SUPPORT_EMAIL': CFG_SITE_SUPPORT_EMAIL}
+
         return out
