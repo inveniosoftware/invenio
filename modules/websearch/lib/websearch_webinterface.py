@@ -760,7 +760,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         elif component == 'record' and path and path[0] == 'edit':
             return WebInterfaceEditPages(), path[1:]
 
-        elif component == 'record' and path[0] == 'multiedit':
+        elif component == 'record' and path and path[0] == 'multiedit':
             return WebInterfaceMultiEditPages(), path[1:]
 
         elif component == 'record' or component == 'record-restricted':
