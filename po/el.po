@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-07-10 12:19+0200\n"
-"PO-Revision-Date: 2009-05-22 12:15+0100\n"
+"PO-Revision-Date: 2009-12-01 18:07+0100\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1417,17 +1417,16 @@ msgstr "Προβολή"
 
 #: modules/bibedit/lib/bibedit_templates.py:274
 msgid "Done"
-msgstr "Ολοκλήρωση"
+msgstr "Υποβολή"
 
 #: modules/bibedit/lib/bibedit_templates.py:275
 msgid "Add another subfield"
-msgstr "Προσθήκη επιπλέον υποπεδίου"
+msgstr "Προσθήκη Υποπεδίου"
 
 #: modules/bibedit/lib/bibedit_templates.py:282
 msgid ""
 "Tags and values should be filled before pressing Done or Add another subfield"
-msgstr ""
-"Οι τιμές των πεδίων θα πρέπει να συμπληρωθούν πρίν πατήσετε 'Ολοκλήρωση' ή 'Προσθήκη επιπλέον υποπεδίου'"
+msgstr "Οι τιμές για το νέο πεδίο πρέπει να είναι συμπληρωμένες προτού επιλέξετε Υποβολή ή Προσθήκη Υποπεδίου"
 
 #: modules/bibedit/lib/bibedit_templates.py:356
 msgid "Move up"
@@ -1460,11 +1459,11 @@ msgstr "Παρακαλώ δοκιμάστε διαφορετικό αριθμό 
 
 #: modules/bibedit/lib/bibedit_templates.py:485
 msgid "This record is currently being edited by another user."
-msgstr "Αυτή η εγγραφή επεξεργάζεται από κάποιον άλλο χρήστη."
+msgstr "Αυτή η εγγραφή επεξεργάζεται από κάποιον άλλο."
 
 #: modules/bibedit/lib/bibedit_templates.py:486
 msgid "Please try again later."
-msgstr "Παρακαλώ δοκιμάστε ξανά αργότερα."
+msgstr "Παρακαλώ δοκιμάστε ξανά, αργότερα."
 
 #: modules/bibedit/lib/bibedit_templates.py:493
 msgid "Cannot edit deleted record."
@@ -1472,22 +1471,22 @@ msgstr "Δεν είναι δυνατό να επεξεργαστείτε μια 
 
 #: modules/bibedit/lib/bibedit_templates.py:500
 msgid "There are record revisions not yet synchronized with the database."
-msgstr "Υπάρχουν αναθεωρημένες εκδόσεις της εγγραφής που δεν έχουν συγχρονιστεί με την βάση."
+msgstr "Υπάρχουν εκδόσεις της εγγραφής που δεν έχουν συγχρονιστεί με την βάση."
 
 #: modules/bibedit/lib/bibedit_templates.py:501
 #: modules/bibedit/lib/bibedit_templates.py:510
 msgid "Please try again in a few minutes."
-msgstr "Παρακαλώ δοκιμάστε ξανά αργότερα."
+msgstr "Παρακαλώ ξαναδοκιμάστε αργότερα."
 
 #: modules/bibedit/lib/bibedit_templates.py:509
 msgid ""
 "A new revision of this record is not yet synchronized with the database."
 msgstr ""
-"Η αναθεωρημένη έκδοση της εγγραφής αυτής δεν έχει συγχρονιστεί ακόμα με την βάση."
+"Η νέα έκδοση της εγγραφής αυτής δεν έχει συγχρονιστεί με την βάση."
 
 #: modules/bibedit/lib/bibedit_templates.py:520
 msgid "Please enter the ID of the record you want to edit"
-msgstr "Παρακαλώ εισάγετε το ID της εγγραφής που θέλετε να επεξεργαστείτε"
+msgstr "Παρακαλώ το ID της εγγραφής που θέλετε να επεξεργαστείτε"
 
 #: modules/bibedit/lib/bibedit_templates.py:532
 msgid ""
@@ -1538,25 +1537,25 @@ msgstr "Όχι"
 msgid ""
 "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
 msgstr ""
-"Είστε σίγουροι οτι θέλετε να επιστρέψετε στην μορφή της %(revdate)s για την εγγραφή #%(recid)s?"
+"Είστε σίγουροι οτι θέλετε να επιστρέψετε στην έκδοση %(revdate)s της εγγραφης #%(recid)s;"
 
 #: modules/bibedit/lib/bibedit_templates.py:566
 #, python-format
 msgid ""
 "The current version will be replaced with a copy of revision %(revdate)s"
 msgstr ""
-"Η τρέχουσα μορφή θα αντικατασταθεί με αυτήν της %(revdate)s"
+"Η τρέχουσα έκδοση θα αντικατασταθεί με αυτήν της έκδοσης %(revdate)s"
 
 #: modules/bibedit/lib/bibedit_templates.py:568
 msgid "You will also lose any unsubmitted changes for this record!"
-msgstr "Επίσης, θα χαθούν οποιεσδήποτε αλλαγές που έχουν γίνει, αλλά δεν εχουν υποβληθεί για την εγγραφή αυτή!"
+msgstr "Όλες οι μη υποβληθείσες αλλαγές για την εγγραφή αυτή, θα χαθούν!"
 
 #: modules/bibedit/lib/bibedit_templates.py:596
 msgid ""
 "The new revision is being synchronized with the database and will be ready "
 "shortly."
 msgstr ""
-"Γίνεται συγχρονισμός της νέας έκδοσης με την βάση και η εγγραφή θα είναι έτοιμη σύντομα."
+"Γίνεται συγχρονισμός της νέας έκδοσης με την βάση και σύντομα θα είναι διαθέσιμη."
 
 #: modules/bibedit/lib/bibedit_templates.py:601
 msgid "The record will be deleted as soon as the task queue is empty."
@@ -1595,7 +1594,7 @@ msgstr "Εγγραφή #%s"
 #: modules/bibedit/web/admin/bibeditadmin.py:185
 #, python-format
 msgid "Record #%(recid)s, revision %(revdate)s"
-msgstr "Εγγραφή #%(recid)s, αναθεώρηση %(revdate)s"
+msgstr "Εγγραφή #%(recid)s, έκδοση %(revdate)s"
 
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:430
@@ -1886,13 +1885,13 @@ msgstr "παλιότερες εκδόσεις"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #, python-format
 msgid "%(x_sitename)s link"
-msgstr "σύνδεσμος στο %(x_sitename)s"
+msgstr "σύνδεσμος στην %(x_sitename)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:96
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #, python-format
 msgid "%(x_sitename)s links"
-msgstr "σύνδεσμοι στο %(x_sitename)s"
+msgstr "σύνδεσμοι στην %(x_sitename)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:105
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
@@ -1940,11 +1939,11 @@ msgstr "Συσχετισμοί Μορφής Εξόδου %s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:371
 msgid "Delete Output Format"
-msgstr "Διαγραφή Μορφής Αποτελέσματος"
+msgstr "Διαγραφή Μορφής Εξόδου"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:417
 msgid "Cannot create output format"
-msgstr "Είναι αδύνατη η δημιουργία μορφής εξόδου"
+msgstr "Δεν είναι δυνατή η δημιουργία μορφής εξόδου"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:491
 #: modules/bibformat/web/admin/bibformatadmin.py:563
@@ -2479,7 +2478,8 @@ msgstr "άγνωστο"
 
 #: modules/webalert/lib/webalert.py:174
 msgid "You already have an alert defined for the specified query and basket."
-msgstr "Έχετε ορίσει ήδη μια ειδοποίηση για την συγκεκριμένη έρευνα και καλάθι."
+msgstr ""
+"Έχετε ορίσει ήδη μια ειδοποίηση για την συγκεκριμένη έρευνα και καλάθι."
 
 #: modules/webalert/lib/webalert.py:193 modules/webalert/lib/webalert.py:308
 msgid "The alert name cannot be empty."
@@ -3402,7 +3402,9 @@ msgstr "Γράψτε μια κριτική"
 #: modules/webcomment/lib/webcomment_templates.py:1371
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
-msgstr "Μέση βαθμολογία κριτικών: %(x_nb_score)s βασισμένη σε %(x_nb_reviews)s κριτικές"
+msgstr ""
+"Μέση βαθμολογία κριτικών: %(x_nb_score)s βασισμένη σε %(x_nb_reviews)s "
+"κριτικές"
 
 #: modules/webcomment/lib/webcomment_templates.py:251
 #, python-format
@@ -3440,7 +3442,8 @@ msgstr "Κρίθηκε από τον %(x_nickname)s στις %(x_date)s"
 #: modules/webcomment/lib/webcomment_templates.py:362
 #, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
-msgstr "%(x_nb_people)i από %(x_nb_total)i ανθρώπους βρήκαν την κριτική αυτή χρήσιμη"
+msgstr ""
+"%(x_nb_people)i από %(x_nb_total)i ανθρώπους βρήκαν την κριτική αυτή χρήσιμη"
 
 #: modules/webcomment/lib/webcomment_templates.py:445
 #: modules/webcomment/lib/webcomment_templates.py:455
@@ -3815,7 +3818,8 @@ msgstr "Το γραμματοκιβώτιο σας έχει αδειάσει."
 #: modules/webmessage/lib/webmessage.py:335
 #, python-format
 msgid "The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid."
-msgstr "Η επιλεγμένη ημ/νία (%(x_year)i/%(x_month)i/%(x_day)i) είναι λανθασμένη."
+msgstr ""
+"Η επιλεγμένη ημ/νία (%(x_year)i/%(x_month)i/%(x_day)i) είναι λανθασμένη."
 
 #: modules/webmessage/lib/webmessage.py:344
 msgid "Please enter a user name or a group name."
@@ -3877,7 +3881,7 @@ msgstr "Αποστολέας"
 
 #: modules/webmessage/lib/webmessage_templates.py:97
 msgid "No messages"
-msgstr "Δεν υπάρχουν μυνήματα"
+msgstr "Δεν υπάρχουν μηνύματα"
 
 #: modules/webmessage/lib/webmessage_templates.py:101
 msgid "No subject"
@@ -3885,7 +3889,7 @@ msgstr "[Χωρίς θέμα]"
 
 #: modules/webmessage/lib/webmessage_templates.py:147
 msgid "Write new message"
-msgstr "Σύνταξη νέου μυνήματος"
+msgstr "Σύνταξη νέου μηνύματος"
 
 #: modules/webmessage/lib/webmessage_templates.py:148
 msgid "Delete All"
@@ -3963,7 +3967,8 @@ msgstr "Είστε σίγουρος οτι θέλετε να αδειάσετε 
 #: modules/webmessage/lib/webmessage_templates.py:569
 #, python-format
 msgid "Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i"
-msgstr "Χώρος που χρησιμοποιήθηκε: %(x_nb_used)i μυνήματα από μέγιστο %(x_nb_total)i"
+msgstr ""
+"Χώρος που χρησιμοποιήθηκε: %(x_nb_used)i μηνύματα από μέγιστο %(x_nb_total)i"
 
 #: modules/webmessage/lib/webmessage_templates.py:587
 msgid "Please select one or more:"
@@ -4001,11 +4006,11 @@ msgstr "Εύρεση ομάδας"
 #: modules/webmessage/lib/webmessage_templates.py:679
 #, python-format
 msgid "You have %(x_nb_new)s new messages out of %(x_nb_total)s messages"
-msgstr "Έχετε %(x_nb_new)s νέα μυνήματα από συνόλου %(x_nb_total)s"
+msgstr "Έχετε %(x_nb_new)s νέα μηνύματα από συνόλου %(x_nb_total)s"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:363
 msgid "Read a message"
-msgstr "Ανάγνωση μυνήματος"
+msgstr "Ανάγνωση μηνύματος"
 
 #: modules/websearch/lib/search_engine.py:601
 #: modules/websearch/lib/search_engine.py:631
@@ -4151,11 +4156,14 @@ msgstr "Η εγγραφή που ζητήσατε δεν υπάρχει."
 
 #: modules/websearch/lib/search_engine.py:3945
 msgid "No match within your time limits, discarding this condition..."
-msgstr "Κανένα αποτέλεσμα στα χρονικά περιθώρια, γίνεται παράβλεψη του κριτηρίου αυτού..."
+msgstr ""
+"Κανένα αποτέλεσμα στα χρονικά περιθώρια, θα γίνει παράβλεψη του κριτηρίου "
+"αυτού..."
 
 #: modules/websearch/lib/search_engine.py:3969
 msgid "No match within your search limits, discarding this condition..."
-msgstr "Κανένα αποτέλεσμα στούς περιορισμούς έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού..."
+msgstr ""
+"Κανένα αποτέλεσμα στα όρια έρευνας, θα γίνει παράβλεψη του κριτηρίου αυτού..."
 
 #: modules/websearch/lib/websearchadminlib.py:3202
 msgid "Information"
@@ -4181,7 +4189,7 @@ msgstr "Στατιστικά χρήσης"
 #: modules/websearch/lib/websearch_templates.py:756
 #, python-format
 msgid "Search %s records for:"
-msgstr "Αναζήτηση σε %s εγγραφές για:"
+msgstr "Αναζήτηση %s εγγραφών για:"
 
 #: modules/websearch/lib/websearch_templates.py:659
 msgid "less"
@@ -4204,7 +4212,7 @@ msgstr "Παράδειγμα: %(x_sample_search_query)s"
 #: modules/websearch/lib/websearch_templates.py:1976
 #, python-format
 msgid "Search in %(x_collection_name)s"
-msgstr "Αναζήτηση σε %(x_collection_name)s"
+msgstr "Αναζήτηση στην συλλογή %(x_collection_name)s"
 
 #: modules/websearch/lib/websearch_templates.py:681
 #: modules/websearch/lib/websearch_templates.py:1980
@@ -4216,7 +4224,7 @@ msgstr "Αναζήτηση παντού"
 #: modules/websearch/lib/websearch_templates.py:1948
 #: modules/websearch/lib/websearch_templates.py:2005
 msgid "Advanced Search"
-msgstr "Σύνθετη αναζήτηση"
+msgstr "Σύνθετη Αναζήτηση"
 
 #: modules/websearch/lib/websearch_templates.py:854
 #, python-format
@@ -4284,7 +4292,7 @@ msgstr "Πρόσφατες προσθήκες:"
 #: modules/websearch/lib/websearch_templates.py:2894
 #, python-format
 msgid "Cited by %i records"
-msgstr "Παραπέμπεται από %i εγγραφές"
+msgstr "Παραπέμπεται από: %i εγγραφές"
 
 #: modules/websearch/lib/websearch_templates.py:1556
 #, python-format
@@ -4417,7 +4425,8 @@ msgstr "Πιθανόν να θέλετε να ξεκινήσετε την φυλ
 
 #: modules/websearch/lib/websearch_templates.py:3040
 msgid "Interested in being notified about new results for this query?"
-msgstr "Ενδιαφέρεστε να ενημερώνεστε για νέα αποτελέσματα σχετικά με την έρευνα αυτή;"
+msgstr ""
+"Ενδιαφέρεστε να ενημερώνεστε για νέα αποτελέσματα σχετικά με την έρευνα αυτή;"
 
 #: modules/websearch/lib/websearch_templates.py:3041
 #, python-format
@@ -4463,7 +4472,7 @@ msgstr "Συχνά χρησιμοποιούμενες λέξεις-κλειδι�
 
 #: modules/websearch/lib/websearch_templates.py:3337
 msgid "Frequent co-authors:"
-msgstr "Συχνά εμφανιζόμενοι συγγραφείς:"
+msgstr "Συχνά χρησιμοποιούμενοι συγγραφείς:"
 
 #: modules/websearch/lib/websearch_templates.py:3346
 msgid "Publishes in"
@@ -4491,19 +4500,19 @@ msgstr "Περιληπτικά αποτελέσματα παραπομπών"
 
 #: modules/websearch/lib/websearch_templates.py:3418
 msgid "Total number of citable papers analyzed:"
-msgstr "Συνολικός αριθμός δημοσιεύσεων με παραπομπές που αναλύθηκαν:"
+msgstr "Συνολικός αριθμός άρθρων που αναλύθηκαν:"
 
 #: modules/websearch/lib/websearch_templates.py:3441
 msgid "Total number of citations:"
-msgstr "Συνολικός αριθμός παραμπομπών:"
+msgstr "Συνολικός αριθμός αναφορών:"
 
 #: modules/websearch/lib/websearch_templates.py:3446
 msgid "Average citations per paper:"
-msgstr "Μέσος αριθμός παραπομπών ανά άρθρο:"
+msgstr "Μέσος αριθμός αναφορών ανά άρθρο:"
 
 #: modules/websearch/lib/websearch_templates.py:3451
 msgid "Breakdown of papers by citations:"
-msgstr "Ανάλυση των άρθρων με βάση τις παραπομπές:"
+msgstr "Ανάλυση των άρθρων με βάση τις αναφορές:"
 
 #: modules/websearch/lib/websearch_webinterface.py:420
 msgid "You are not authorized to view this area."
@@ -4521,7 +4530,8 @@ msgstr "σε"
 msgid ""
 "Haven't found what you were looking for? Try your search on other servers:"
 msgstr ""
-"Δεν βρήκατε αυτό που αναζητούσατε; Δοκιμάστε την έρευνά σας σε άλλους servers:"
+"Δεν βρήκατε αυτό που αναζητούσατε; Δοκιμάστε την έρευνά σας σε άλλους "
+"servers:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:80
 msgid "External collections results overview:"
@@ -4575,7 +4585,7 @@ msgid ""
 "(x_url_close)s first"
 msgstr ""
 "Οι χρήστες που βρίσκονται στο σύστημα σαν %(x_fmt_open)sεπισκέπτες%"
-"(x_fmt_close)s χρειάζεται πρώτα να κάνουν %(x_url_open)sεγγραφή%(x_url_close)s"
+"(x_fmt_close)s χρειάζεται πρώτα να %(x_url_open)sεγγραφούν%(x_url_close)s"
 
 #: modules/websession/lib/webaccount.py:124
 msgid "No queries found"
@@ -4659,7 +4669,7 @@ msgid ""
 "new value in the form below."
 msgstr ""
 "Εαν θέλετε να αλλάξετε τον κωδικό σας, παρακαλώ εισάγετε τον παλιό και τον "
-"νέο, στην παρακάτω φόρμα."
+"καινούριο, στην παρακάτω φόρμα."
 
 #: modules/websession/lib/websession_templates.py:217
 msgid "Old password"
@@ -5203,7 +5213,7 @@ msgstr "Λογαριασμός"
 
 #: modules/websession/lib/websession_templates.py:1099
 msgid "messages"
-msgstr "μυνήματα"
+msgstr "μηνύματα"
 
 #: modules/websession/lib/websession_templates.py:1101
 msgid "groups"
@@ -5511,8 +5521,7 @@ msgstr "    Όνομα χρήστη/Email"
 
 #: modules/websession/lib/webuser.py:721
 msgid "You can approve or reject this account request at"
-msgstr ""
-"Μπορείτε να δεχτείτε ή να απορρίψετε την αίτηση δημιουργίας λογαριασμού στο"
+msgstr "Μπορείτε να δεχτείτε ή να απορρίψετε την αίτηση δημιουργίας λογαριασμού στο"
 
 #: modules/websession/lib/websession_webinterface.py:87
 msgid "Mail Cookie Service"
@@ -5544,8 +5553,7 @@ msgstr "Έχετε επιβεβαιώσει την εγκυρότητα του e
 #: modules/websession/lib/websession_webinterface.py:120
 #: modules/websession/lib/websession_webinterface.py:130
 msgid "Please, wait for the administrator to enable your account."
-msgstr ""
-"Παρακαλώ περιμένετε ώστε ο διαχειριστής να ενεργοποιήσει τον λογαριασμό σας."
+msgstr "Παρακαλώ περιμένετε ώστε ο διαχειριστής να ενεργοποιήσει τον λογαριασμό σας."
 
 #: modules/websession/lib/websession_webinterface.py:124
 #: modules/websession/lib/websession_webinterface.py:133
@@ -6560,7 +6568,8 @@ msgstr "Το πρώτο αίτημα για αξιολόγηση έγινε στ
 #: modules/websubmit/lib/websubmit_templates.py:2401
 #: modules/websubmit/lib/websubmit_templates.py:2445
 msgid "Last request e-mail was sent to the publication committee chair on the "
-msgstr "Το τελευταίο αίτημα μέσω email στάλθηκε στην επιτροπή δημοσίευσης στις "
+msgstr ""
+"Το τελευταίο αίτημα μέσω email στάλθηκε στην επιτροπή δημοσίευσης στις "
 
 #: modules/websubmit/lib/websubmit_templates.py:2404
 msgid "A referee has been selected by the publication committee on the "
@@ -6743,7 +6752,7 @@ msgstr "Πρόσβαση στο πλήρες κείμενο"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:303
 msgid "Not enough information to retrieve the document"
-msgstr "Δεν υπάρχουν αρκετές πληροφορίες για την ανάκτηση του εγγράφου"
+msgstr "Δεν υπάρχουν αρκετές πληροφορίες για την ανάκτηση του εγγράφου."
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
@@ -7046,11 +7055,11 @@ msgstr "Δεν μπορέσαμε να βρούμε το id για αυτό το
 #: modules/webjournal/lib/webjournal_config.py:609
 #, python-format
 msgid "Category \"%(category_name)s\" not found"
-msgstr "Η κατηγορία \"%(category_name)s\" δεν βρέθηκε"
+msgstr "Η κατηγορία %(category_name)s δεν υπάρχει"
 
 #: modules/webjournal/lib/webjournal_config.py:611
 msgid "Sorry, this category does not exist for this journal."
-msgstr "Λυπάμαι, δεν υπάρχει αυτή η κατηγορία γι'αυτό το περιοδικό."
+msgstr "Λυπάμαι, η κατηγορία αυτή δεν υπάρχει για το συγκεκριμένο περιοδικό."
 
 #: modules/webjournal/web/admin/webjournaladmin.py:74
 msgid "WebJournal Admin"
@@ -7067,7 +7076,7 @@ msgstr "Ορίστε μια εγγραφή ως προτεινόμενη"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:206
 msgid "Email Alert System"
-msgstr "Σύστημα ειδοποιήσεων μέσω ηλεκτρονικού ταχυδρομείου"
+msgstr "Σύστημα ειδοποιήσεων με email"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:259
 msgid "Issue regenerated"
@@ -7075,11 +7084,11 @@ msgstr "Το συμβάν επαναδημιουργείται"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:309
 msgid "Publishing Interface"
-msgstr "Interface Δημοσιεύσεων"
+msgstr "Περιβάλλον Δημοσίευσης"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:335
 msgid "Add Journal"
-msgstr "Προσθήκη περιοδικού"
+msgstr "Προσθήκη Περιοδικού"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:337
 msgid "Edit Settings"
@@ -7195,7 +7204,7 @@ msgstr "Αλλαγή ρυθμίσεων"
 
 #, fuzzy
 #~ msgid "No Issues"
-#~ msgstr "Δεν υπάρχουν μυνήματα"
+#~ msgstr "Δεν υπάρχουν μηνύματα"
 
 #, fuzzy
 #~ msgid "Article Error"
