@@ -39,6 +39,7 @@ pylib_DATA = __init__.py \
              testutils.py \
              testutils_regression_tests.py \
              urlutils.py \
+             urlutils_tests.py \
              w3c_validator.py \
              intbitset_tests.py \
              inveniocfg.py \

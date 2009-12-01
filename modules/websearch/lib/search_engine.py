@@ -3596,45 +3596,6 @@ def log_query_info(action, p, f, colls, nb_records_found_total=-1):
         pass
     return
 
-def wash_url_argument(var, new_type):
-    """Wash list argument into 'new_type', that can be 'list',
-       'str', or 'int'.  Useful for washing mod_python passed
-       arguments, that are all lists of strings (URL args may be
-       multiple), but we sometimes want only to take the first value,
-       and sometimes to represent it as string or numerical value."""
-    out = []
-    if new_type == 'list':  # return lst
-        if type(var) is list:
-            out = var
-        else:
-            out = [var]
-    elif new_type == 'str':  # return str
-        if type(var) is list:
-            try:
-                out = "%s" % var[0]
-            except:
-                out = ""
-        elif type(var) is str:
-            out = var
-        else:
-            out = "%s" % var
-    elif new_type == 'int': # return int
-        if type(var) is list:
-            try:
-                out = string.atoi(var[0])
-            except:
-                out = 0
-        elif type(var) is int:
-            out = var
-        elif type(var) is str:
-            try:
-                out = string.atoi(var)
-            except:
-                out = 0
-        else:
-            out = 0
-    return out
-
 ### CALLABLES
 
 def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", aas=0,
@@ -4548,7 +4509,6 @@ def profile(p="", f="", c=CFG_SITE_NAME):
 #print get_collection_reclist("Theses")
 #print log(sys.stdin)
 #print search_unit_in_bibrec('2002-12-01','2002-12-12')
-#print type(wash_url_argument("-1",'int'))
 #print get_nearest_terms_in_bibxxx("ellis", "author", 5, 5)
 #print call_bibformat(68, "HB_FLY")
 #print get_fieldvalues(10, "980__a")
