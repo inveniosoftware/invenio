@@ -1405,6 +1405,49 @@ class BibRecordFindFieldTest(unittest.TestCase):
             bibrecord.record_find_field(self.rec, '037', self.field2,
             strict=False))
 
+class BibRecordSingletonTest(unittest.TestCase):
+    """ bibrecord - testing singleton removal """
+
+    def setUp(self):
+        """Initialize stuff"""
+        self.xml = """<collection>
+                       <record>
+                         <controlfield tag="001">33</controlfield>
+                         <controlfield tag="002" />
+                         <datafield tag="99" ind1=" " ind2=" "/>
+                         <datafield tag="100" ind1=" " ind2=" ">
+                           <subfield code="a" />
+                         </datafield>
+                         <datafield tag="100" ind1=" " ind2=" ">
+                           <subfield code="a">Some value</subfield>
+                         </datafield>
+                         <tagname />
+                       </record>
+                       <record />
+                      <collection>"""
+        self.rec_expected = {
+            '001': [([], ' ', ' ', '33', 1)],
+            '100': [([('a', 'Some value')], ' ', ' ', '', 2)],
+            }
+
+    def test_singleton_removal_minidom(self):
+        """bibrecord - singleton removal with minidom"""
+        rec = bibrecord.create_records(self.xml, verbose=1,
+                                       correct=1, parser='minidom')[0][0]
+        self.assertEqual(rec, self.rec_expected)
+
+    def test_singleton_removal_4suite(self):
+        """bibrecord - singleton removal with 4suite"""
+        rec = bibrecord.create_records(self.xml, verbose=1,
+                                       correct=1, parser='4suite')[0][0]
+        self.assertEqual(rec, self.rec_expected)
+
+    def test_singleton_removal_pyrxp(self):
+        """bibrecord - singleton removal with pyrxp"""
+        rec = bibrecord.create_records(self.xml, verbose=1,
+                                       correct=1, parser='pyrxp')[0][0]
+        self.assertEqual(rec, self.rec_expected)
+
 
 TEST_SUITE = make_test_suite(
     BibRecordSuccessTest,
@@ -1426,7 +1469,8 @@ TEST_SUITE = make_test_suite(
     BibRecordPrintingTest,
     BibRecordCreateFieldTest,
     BibRecordFindFieldTest,
-    BibRecordDeleteSubfieldTest
+    BibRecordDeleteSubfieldTest,
+    BibRecordSingletonTest
     )
 
 if __name__ == '__main__':
