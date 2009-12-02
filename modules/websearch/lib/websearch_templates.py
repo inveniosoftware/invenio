@@ -111,6 +111,7 @@ class Template:
         'it': 'it_IT',
         'ro': 'ro_RO',
         'ru': 'ru_RU',
+        'rw': 'rw_RW',
         'sk': 'sk_SK',
         'cs': 'cs_CZ',
         'no': 'no_NO',
