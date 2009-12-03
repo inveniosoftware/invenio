@@ -500,7 +500,7 @@ class Template:
         return '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
 
     def tmpl_alert_email_body(self, name, url, records, pattern,
-                              collection_list, frequency):
+                              collection_list, frequency, add_to_basket_p):
 
         recids_by_collection = {}
         for recid in records[0]:
@@ -625,10 +625,12 @@ url: <%(url)s>
             body += '''
 Only the first %s records were displayed. Please consult the search
 URL given at the top of this email to see all the results.
-If this alert is also automatically adding the records to a basket,
-only the first %s records have been added.
-''' % (CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL, \
-       CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL)
+''' % (CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL,)
+            if add_to_basket_p:
+                body += '''
+Only the first %s records were added to your basket. To manually add more
+records please consult the search URL as described before.
+''' % (CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL,)
 
 
         body += '''

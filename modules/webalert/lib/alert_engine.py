@@ -167,7 +167,7 @@ def email_notify(alert, records, argstr):
     frequency = alert[3]
 
     msg += webalert_templates.tmpl_alert_email_body(
-        alert[5], url, records, pattern, collections, frequency)
+        alert[5], url, records, pattern, collections, frequency, alert_use_basket_p(alert))
 
     email = get_email(alert[0])
 
