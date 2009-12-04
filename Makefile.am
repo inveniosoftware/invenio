@@ -137,7 +137,7 @@ install-jscalendar-plugin:
 uninstall-jscalendar-plugin:
 	@rm -rvf ${prefix}/var/www/jsCalendar
 	@echo "***********************************************************"
-	@echo "** The jsCalendar plugin was successfully uninstalled.       **"
+	@echo "** The jsCalendar plugin was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
 install-jquery-plugins: uninstall-jquery-plugins
@@ -151,18 +151,25 @@ install-jquery-plugins: uninstall-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.core.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.highlight.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
-	wget http://tablesorter.com/jquery.tablesorter.js && \
-	wget http://tablesorter.com/addons/pager/jquery.tablesorter.pager.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
+	wget http://tablesorter.com/jquery.tablesorter.zip && \
+	unzip jquery.tablesorter.zip && \
+	rm jquery.tablesorter.zip && \
 	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
 	rm jquery.autogrow-1.2.2.zip && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/ui.datepicker.min.js && \
 	wget http://json.org/json2.js && \
 	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js)
+	mkdir -p ${prefix}/var/www/img && \
+	(cd ${prefix}/var/www/img && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/themes/redmond/jquery-ui.css && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/demos/images/calendar.gif && \
+	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/latest/themes/redmond/images/)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
 	@echo "***********************************************************"
 
-uninstall-jquery-plugins:
+uninstall-jquery-plugins: 
 	(cd ${prefix}/var/www/js && \
 	rm -f jquery.min.js && \
 	rm -f effects.core.min.js && \
@@ -170,6 +177,7 @@ uninstall-jquery-plugins:
 	rm -f jquery.jeditable.mini.js && \
 	rm -f jquery.tablesorter.js && \
 	rm -f jquery.tablesorter.pager.js && \
+	rm -f ui.datepicker.min.js && \
 	rm -f jquery.autogrow.js && \
 	rm -f json2.js && \
 	rm -f jquery.hotkeys.min.js)

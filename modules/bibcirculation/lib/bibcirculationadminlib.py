@@ -695,6 +695,7 @@ def loan_on_desk_step3(req, user_info, barcode, ln=CFG_SITE_LANG):
     list_of_barcodes = barcode.split()
 
     for value in list_of_barcodes:
+
         recid = db.get_id_bibrec(value)
         loan_id = db.is_item_on_loan(value)
         queue = db.get_queue_request(recid)
@@ -744,6 +745,7 @@ def loan_on_desk_step3(req, user_info, barcode, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -846,16 +848,11 @@ def loan_on_desk_step4(req, list_of_books, user_info,
                     loaned_on, due_date[i], 'on loan', 'normal', note_format)
         db.update_item_status('on loan', list_of_books[i][1])
 
-    total_of_loans = db.get_total_of_loans()
-    number_of_pages = ceil(1.0 * total_of_loans / 25)
-    result = db.get_all_loans(0, 25)
+    result = db.get_all_loans()
 
     title="Current loans"
     infos.append('A new loan has been registered with success.')
     body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                   loans_per_page=25,
-                                                   page_number=1,
-                                                   number_of_pages=number_of_pages,
                                                    infos=infos,
                                                    ln=ln)
 
@@ -1008,17 +1005,12 @@ def register_new_loan(req, barcode, borrower_id,
 
         borrower_info = db.get_borrower_data(borrower_id)
 
-        total_of_loans = db.get_total_of_loans()
-        number_of_pages = ceil(total_of_loans / 25)
-        result = db.get_all_loans(0, 25)
+        result = db.get_all_loans()
 
         infos.append('A new loan has been registered with success.')
 
         title="Current loans"
         body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                   loans_per_page=25,
-                                                   page_number=1,
-                                                   number_of_pages=number_of_pages,
                                                    infos=infos,
                                                    ln=ln)
 
@@ -1706,7 +1698,7 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def all_loans(req, loans_per_page, page_number, ln=CFG_SITE_LANG):
+def all_loans(req, ln=CFG_SITE_LANG):
     """
     Display all loans.
 
@@ -1721,10 +1713,7 @@ def all_loans(req, loans_per_page, page_number, ln=CFG_SITE_LANG):
 
     infos = []
 
-    total_of_loans = db.get_total_of_loans()
-    number_of_pages = ceil(1.0 * total_of_loans / loans_per_page)
-
-    result = db.get_all_loans((page_number-1) * loans_per_page, loans_per_page)
+    result = db.get_all_loans()
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -1738,15 +1727,13 @@ def all_loans(req, loans_per_page, page_number, ln=CFG_SITE_LANG):
         return mustloginpage(req, auth_message)
 
     body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                   loans_per_page=loans_per_page,
-                                                   page_number=page_number,
-                                                   number_of_pages=number_of_pages,
                                                    infos=infos,
                                                    ln=ln)
 
     return page(title="Current loans",
                 uid=id_user,
                 req=req,
+
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -3334,13 +3321,10 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
 
         total_of_loans = db.get_total_of_loans()
         number_of_pages = ceil(total_of_loans / 25)
-        result = db.get_all_loans(0, 25)
+        result = db.get_all_loans()
         title = "Current loans"
         infos.append('A new loan has been registered with success.')
         body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                       loans_per_page=25,
-                                                       page_number=1,
-                                                       number_of_pages=number_of_pages,
                                                        infos=infos,
                                                        ln=ln)
 
@@ -3486,6 +3470,7 @@ def create_new_request_step3(req, borrower_id, barcode, recid, ln=CFG_SITE_LANG)
                 uid=id_user,
                 req=req,
                 body=body,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3748,8 +3733,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
     @return:        new request.
     """
 
-    # get borower email
-    email = user_info[2]
+    (ccid, name, email, phone, address, mailbox) = user_info
 
     # validate the period of interest given by the admin
     if validate_date_format(period_from) is False:
@@ -6189,4 +6173,3 @@ def ill_search_result(req, p, f, ln=CFG_SITE_LANG):
         ill_pattern = intbitset(perform_request_search(c=["Books", "ILL Books"], p=p))
 
         result = list(ill_pattern & tmp)
-

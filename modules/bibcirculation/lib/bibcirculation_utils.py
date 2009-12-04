@@ -209,18 +209,24 @@ def generate_new_due_date(days):
     """
 
     today = datetime.date.today()
+
     more_X_days = datetime.timedelta(days=days)
+
     tmp_date = today + more_X_days
+
     week_day = tmp_date.strftime('%A')
     due_date = tmp_date.strftime('%Y-%m-%d')
 
-    due_date_no_validated = True
+    due_date_validated = False
 
-    while due_date_no_validated:
+    while not due_date_validated:
         if week_day in CFG_BIBCIRCULATION_WORKING_DAYS and due_date not in CFG_BIBCIRCULATION_HOLIDAYS:
-            due_date_no_validated = False
+            due_date_validated = True
+
         else:
-            due_date = get_next_day(due_date).strftime('%Y-%m-%d')
+            next_day = get_next_day(due_date)
+            due_date = next_day.strftime('%Y-%m-%d')
+            week_day = next_day.strftime('%A')
 
     return due_date
 
@@ -667,4 +673,3 @@ def generate_email_body(template, loan_id):
                       book_isbn, book_editor)
 
     return out
-

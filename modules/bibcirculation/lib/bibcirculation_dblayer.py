@@ -229,14 +229,15 @@ def get_id_bibrec(barcode):
 
     @return recid or None
     """
+
     res = run_sql("""select id_bibrec
                      from crcITEM
-                     where barcode=%s""",
-                  (barcode, ))
+                     where barcode=%s
+                  """, (barcode, ))
 
-    try:
+    if res:
         return res[0][0]
-    except IndexError:
+    else:
         return None
 
 
@@ -1106,7 +1107,7 @@ def get_item_loans(recid):
 
     return res
 
-def get_all_loans(jloan, loans_per_page):
+def get_all_loans():
     """
     Get all loans.
     """
@@ -1117,19 +1118,18 @@ def get_all_loans(jloan, loans_per_page):
            bor.name,
            it.id_bibrec,
            l.barcode,
-           DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
-           DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.loaned_on,'%Y-%m-%d'),
+           DATE_FORMAT(l.due_date,'%Y-%m-%d'),
            l.number_of_renewals,
            l.overdue_letter_number,
-           DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
            l.notes,
            l.id
     from crcLOAN l, crcBORROWER bor, crcITEM it
     where l.id_crcBORROWER = bor.id
           and l.barcode=it.barcode
           and l.status='on loan' ORDER BY l.loaned_on DESC
-          limit %s, %s
-          """, (jloan, loans_per_page))
+    """)
 
     return res
 

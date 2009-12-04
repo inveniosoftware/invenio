@@ -817,10 +817,8 @@ class Template:
         more_6_months = (today + gap).strftime('%Y-%m-%d')
 
         out = """
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
         <form name="request_form" action="%s/record/%s/holdings/send" method="get" >
         <br />
@@ -834,33 +832,26 @@ class Template:
             <tr>
               <td align="right" class="bibcirctableheader" width="30">%s</td>
               <td align="center">
-                <input type="text" size="20" id="%s" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
-                <img src="/jsCalendar/jsCalendar.gif" alt="Select period from" id="%s"
-                onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                >
-                <script type="text/javascript" language='JavaScript'>
-                Calendar.setup({
-                   inputField     :    '%s',
-                   ifFormat       :    '%%Y-%%m-%%d',
-                   button	  :    '%s'
-                });
+
+                <script type="text/javascript">
+                    $(function() {
+                        $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                    });
                 </script>
+                <input type="text" size="12" id="date_picker1" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
               </td>
             </tr>
             <tr>
               <td align="right" class="bibcirctableheader" width="30">%s</td>
-              <td align="center">
-                <input type="text" size="20" id="%s" name="period_to" value="%s" style='border: 1px solid #cfcfcf'>
-                <img src="/jsCalendar/jsCalendar.gif" alt="Select period from" id="%s"
-                onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                >
-                <script type="text/javascript" language='JavaScript'>
-                Calendar.setup({
-                   inputField     :    '%s',
-                   ifFormat       :    '%%Y-%%m-%%d',
-                   button	  :    '%s'
-                });
+              <td align="center"
+
+                 <script type="text/javascript">
+                    $(function() {
+                        $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                    });
                 </script>
+                <input type="text" size="12" id="date_picker2" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
+
               </td>
             </tr>
           </table>
@@ -880,11 +871,11 @@ class Template:
           <br />
           <br />
         </form>
-        """ % (CFG_SITE_URL, recid, _("Enter your period of interest"), _("From"),
-               _("period_from"), today, _("select_from1"),
-               _("period_from"), _("select_from1"),
-               _("To"), _("period_to"), more_6_months, _("select_to1"),
-               _("period_to"), _("select_to1"), barcode, _("Back"), _("Confirm"))
+        """ % (CFG_SITE_URL, CFG_SITE_URL,
+               CFG_SITE_URL, recid,
+               _("Enter your period of interest"),
+               _("From"),CFG_SITE_URL, today, _("To"), CFG_SITE_URL, more_6_months,
+               barcode, _("Back"), _("Confirm"))
 
         return out
 
@@ -2153,10 +2144,9 @@ class Template:
                           </tr>
                 </table>
 
-                <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-                <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-                <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-                <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+                <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+
 
                 <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                 <thead>
@@ -2178,15 +2168,18 @@ class Template:
                         _("Address"), address,
                         _("Mailbox"), mailbox,
                         _("List of borrowed books"),
+                        CFG_SITE_URL,CFG_SITE_URL,
                         _("Item"), _("Barcode"),
                         _("Library"), _("Location"),
                         _("Due date"), _("Write note(s)"))
+
 
         iterator = 1
 
         for (recid, barcode, library_id, location) in list_of_books:
 
             due_date = renew_loan_for_X_days(barcode)
+
             library_name = db.get_library_name(library_id)
 
             out +="""
@@ -2195,27 +2188,20 @@ class Template:
                     <td>%s</td>
                     <td>%s</td>
                     <td>%s</td>
-                    <td>
-                       <input type="text" size="12" id="%s" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="Change due date" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
+                    <td width="230" class="bibcirccontent">
+                    <script type="text/javascript">
+                        $(function() {
+                            $("%s").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                        });
+                    </script>
+                    <input type="text" size="12" id="%s" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
+
                     </td>
                   <td width="100"><textarea name='note' rows="1" cols="40" style='border: 1px solid #cfcfcf'></textarea></td>
                 </tr>
                 """ % (book_title_from_MARC(recid), barcode,
                        library_name, location,
-                       _("due_date_" + str(iterator)), due_date,
-                       _("jsCal_" + str(iterator)),
-                       _("due_date_" + str(iterator)),
-                       _("jsCal_" + str(iterator)))
+                        "#date_picker" + str(iterator), CFG_SITE_URL ,"date_picker" + str(iterator),due_date)
 
 
             iterator += 1
@@ -3810,8 +3796,7 @@ class Template:
 
         return out
 
-    def tmpl_borrower_loans_details(self, borrower_loans, borrower_id, infos,
-                                    ln=CFG_SITE_LANG):
+    def tmpl_borrower_loans_details(self, borrower_loans, borrower_id, infos, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
@@ -3968,82 +3953,42 @@ class Template:
 
         return out
 
-    def tmpl_all_loans(self, result, loans_per_page, page_number, infos, number_of_pages, ln=CFG_SITE_LANG):
+    def tmpl_all_loans(self, result, infos, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
 
         _ = gettext_set_language(ln)
 
-        next_page = page_number + 1
-        previous_page = page_number - 1
+        #next_page = page_number + 1
+        #previous_page = page_number - 1
 
         out = self.tmpl_infobox(infos, ln)
 
         out += _MENU_
 
+
         out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="list_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+            <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
+            <style type="text/css"> @import url("/js/tablesorter/addons/pager/jquery.tablesorter.pager.css"); </style>
+
+            <script src="/js/jquery.min.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/jquery.tablesorter.js" type="text/javascript"></script>
+            <script src="/js/tablesorter/addons/pager/jquery.tablesorter.pager.js" type="text/javascript"></script>
+            <script type="text/javascript">
+            $(document).ready(function(){
+                $("#table_all_loans")
+                    .tablesorter({sortList: [[3,1], [0,0]],widthFixed: true, widgets: ['zebra']})
+                    .bind("sortStart",function(){$("#overlay").show();})
+                    .bind("sortEnd",function(){$("#overlay").hide()})
+                    .tablesorterPager({container: $("#pager"), positionFixed: false});
+            });
+            </script>
+
+            <br />
+
             <div class="bibcircbottom">
-            <br />
-            <table class="bibcirctable">
-            <tr>
-            """ % (CFG_SITE_URL)
-
-        out += """
-            <td class="bibcirctableheader" width="100">
-            loans per page
-            </td>
-            <td width="70">
-                    <select name="loans_per_page" style='border: 1px solid #cfcfcf'>
             """
-
-        if loans_per_page == '50':
-            out += """
-                   <option value=25>25</option>
-                   <option value=50 selected>50</option>
-                   <option value=100>100</option>
-                   <option value=200>200</option>
-                   """
-
-        elif loans_per_page == '100':
-            out += """
-                   <option value=25>25</option>
-                   <option value=50>50</option>
-                   <option value=100 selected>100</option>
-                   <option value=200>200</option>
-                   """
-
-        elif loans_per_page == '200':
-            out += """
-                   <option value=25>25</option>
-                   <option value=50>50</option>
-                   <option value=100>100</option>
-                   <option value=200 selected>200</option>
-                   """
-
-        else:
-            out += """
-                   <option value=25 selected>25</option>
-                   <option value=50>50</option>
-                   <option value=100>100</option>
-                   <option value=200>200</option>
-                   """
-        out += """
-                    </select>
-            </td>
-            <td>
-            <input type="submit" name="ok_button" value="%s" class="formbutton">
-            </td>
-            </tr>
-            </table>
-            <br />
-            <hr>
-            <br />
-            </form>
-
-        """ % (_("Ok"))
 
         if len(result) == 0:
             out += """
@@ -4057,10 +4002,9 @@ class Template:
                 <table class="bibcirctable">
                 <tr>
                   <td>
-                       <input type=button value='%s'
-                        onClick="history.go(-1)" class="formbutton">
+                    <input type=button value='%s' onClick="history.go(-1)" class="formbutton">
                   </td>
-                 </tr>
+                </tr>
                 </table>
                 <br />
                 <br />
@@ -4072,7 +4016,7 @@ class Template:
             out += """
             <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
             <br />
-             <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+            <table id="table_all_loans" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
                     <tr>
                        <th>%s</th>
@@ -4084,9 +4028,9 @@ class Template:
                        <th>%s</th>
                        <th>%s</th>
                        <th></th>
-                     </tr>
+                    </tr>
               </thead>
-              </tbody>
+              <tbody>
                        """% (CFG_SITE_URL,
                           _("Borrower"),
                           _("Item"),
@@ -4116,26 +4060,6 @@ class Template:
                                                  {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                  (_("no notes")))
 
-                next_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                             {'loans_per_page': loans_per_page, 'page_number': next_page, 'ln': ln},
-                                             (_("next page >>>")))
-
-                previous_link = create_html_link(CFG_SITE_URL +
-                                                 '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                                 {'loans_per_page': loans_per_page, 'page_number': previous_page, 'ln': ln},
-                                                 (_("<<< previous page")))
-
-                begin_link = create_html_link(CFG_SITE_URL +
-                                              '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                              {'loans_per_page': loans_per_page, 'page_number': 1, 'ln': ln},
-                                              (_("|<< first page")))
-
-                end_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/all_loans',
-                                            {'loans_per_page': loans_per_page, 'page_number': int(number_of_pages), 'ln': ln},
-                                            (_("last page >>|")))
-
                 if notes == "":
                     check_notes = no_notes_link
                 else:
@@ -4148,17 +4072,17 @@ class Template:
 
                 out += """
                     <tr>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s - %s</td>
-                    <td>%s</td>
-                    <td align="center">
-                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
-                       value='%s' class='bibcircbutton'></td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s</td>
+                        <td>%s - %s</td>
+                        <td>%s</td>
+                        <td align="center">
+                        <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                             value='%s' class='bibcircbutton'></td>
                     </tr>
 
                     """ % (borrower_link, title_link, barcode,
@@ -4167,55 +4091,43 @@ class Template:
                            check_notes, CFG_SITE_URL,
                            borrower_id, recid, loan_id, _("Send recall"))
 
-            if page_number == 1:
-                out += """
+
+            out+= """
+                    </tbody>
                     </table>
-                    <br />
-                    <table class="bibcirctable">
-                    <tr>
-                    <td align='center'>%s - %s -
-
-                    """ % ('|<< first page', '<<< previous page')
-
-            else:
-                out += """
-                    </table>
-                    <br />
-                    <table class="bibcirctable">
-                    <tr>
-                    <td align='center'>%s - %s -
-
-                    """ % (begin_link, previous_link)
-
-            out += """<strong>Page %s of %s</strong>""" % (page_number,
-                                                           int(number_of_pages))
-
-            if page_number == number_of_pages:
-                out += """ - %s - %s</td>
-                          </tr>
-                          </table>
-
-                          """ % ('next page >>>', 'last page >>|')
-            else:
-                out += """ - %s - %s</td>
-                          </tr>
-                          </table>
-
-                          """ % (next_link, end_link)
-
-            out += """
-                    <br />
-                    <table class="bibcirctable">
-                    <tr>
-                    <td><input type=button value='%s'
-                    onClick="history.go(-1)" class="formbutton"></td>
-                    </tr>
-                    </table>
-                    <br />
-                    <br />
-                    <br />
-                    </div>
                     </form>
+
+
+                    <div id="pager" class="pager">
+                        <form>
+                            <br />
+                            <img src="/img/sb.gif" class="first" />
+                            <img src="/img/sp.gif" class="prev" />
+                            <input type="text" class="pagedisplay" />
+                            <img src="/img/sn.gif" class="next" />
+                            <img src="/img/se.gif" class="last" />
+                            <select class="pagesize">
+                                <option value="10" selected="selected">10</option>
+                                <option value="20">20</option>
+                                <option value="30">30</option>
+                                <option value="40">40</option>
+                            </select>
+                        </form>
+                    </div>
+                    """
+            out += """
+                    <div class="back" style="position: relative; top: 5px;">
+                        <br />
+                        <table class="bibcirctable">
+                            <tr>
+                                <td><input type=button value='%s' onClick="history.go(-1)" class="formbutton"></td>
+                            </tr>
+                        </table>
+                    <br />
+                    <br />
+                    </form>
+                    </div>
+                    </div>
                     """ % (_("Back"))
 
         return out
@@ -7890,31 +7802,24 @@ class Template:
 
         out += """
 
-            <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-            <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-            <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-            <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
             <table class="bibcirctable">
               <tr align="left">
                 <td width="230" class="bibcirctableheader">%s
-                  <input type="text" size="12" id="%s" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
-                  <img src="/jsCalendar/jsCalendar.gif" alt="Change due date" id="%s"
-                  onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-
-                  <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                  </script>
+                    <script type="text/javascript">
+                        $(function(){
+                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                        });
+                    </script>
+                    <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
                 </td>
               </tr>
             </table>
             <br />
-            """ % (_("New due date: "), _("due_date"), due_date,
-                   _("jsCal"), _("due_date"), _("jsCal"))
+            """ % (CFG_SITE_URL, CFG_SITE_URL,
+                    _("New due date: "), CFG_SITE_URL, due_date)
 
 
         out += """
@@ -8381,11 +8286,8 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
-
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
         <form name="request_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step4" method="get" >
         <div class="bibcircbottom">
@@ -8402,16 +8304,14 @@ class Template:
           <tr>
             <td width="90" class="bibcirctableheader" align='right'>%s</td>
             <td align='left'>
-              <input type="text" size="12" id="%s" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
-              <img src="/jsCalendar/jsCalendar.gif" alt="Change due date" id="%s"
-              onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-              <script type="text/javascript" language='JavaScript'>
-                Calendar.setup({
-                  inputField     :    '%s',
-                  ifFormat       :    '%%Y-%%m-%%d',
-                  button	 :    '%s'
-                });
-              </script>
+
+                <script type="text/javascript">
+                    $(function(){
+                        $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                    });
+                </script>
+                <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
+
             </td>
           </tr>
         </table>
@@ -8420,26 +8320,24 @@ class Template:
           <tr>
             <td width="90" class="bibcirctableheader" align='right'>%s</td>
             <td align='left'>
-              <input type="text" size="12" id="%s" name="period_to" value="%s" style='border: 1px solid #cfcfcf'>
-              <img src="/jsCalendar/jsCalendar.gif" alt="Change due date" id="%s"
-              onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-              <script type="text/javascript" language='JavaScript'>
-                Calendar.setup({
-                  inputField     :    '%s',
-                  ifFormat       :    '%%Y-%%m-%%d',
-                  button	 :    '%s'
-                });
-              </script>
+
+                <script type="text/javascript">
+                    $(function(){
+                        $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                    });
+                </script>
+                <input type="text" size="12" id="date_picker2" name="period_to" value="%s" style='border: 1px solid #cfcfcf'>
+
             </td>
           </tr>
         </table>
         <br />
         <br />
-       """ % (CFG_SITE_URL, _("Enter the period of interest"),
-              _("From:  "), _("from"), datetime.date.today().strftime('%Y-%m-%d'),
-              _("jsCal_from"), _("from"), _("jsCal_from"),
-              _("To:  "), _("to"), (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
-              _("jsCal_to"), _("to"), _("jsCal_to"))
+       """ % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL,
+              _("Enter the period of interest"),
+              _("From:  "), CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
+              _("To:  "), CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'))
+
 
 
         out += """
@@ -8861,10 +8759,9 @@ class Template:
 
         out += """
 
-                 <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-                 <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-                 <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-                 <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+                <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+
 
                 <table class="bibcirctable">
                   <tr class="bibcirctableheader">
@@ -8875,31 +8772,27 @@ class Template:
                   <tr>
                     <th width="100">%s</th>
                     <td>
-                    <input type="text" size="12" id="%s" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
-                    <img src="/jsCalendar/jsCalendar.gif" alt="Change due date" id="%s"
-                    onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-                    <script type="text/javascript" language='JavaScript'>
-                    Calendar.setup({
-                    inputField     :    '%s',
-                    ifFormat       :    '%%Y-%%m-%%d',
-                    button         :    '%s'
+
+                    <script type="text/javascript">
+                    $(function(){
+                        $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                     });
                     </script>
+                    <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
+
                     </td>
                   </tr>
                   <tr>
                     <th width="100">%s</th>
                     <td>
-                    <input type="text" size="12" id="%s" name="period_to" value="%s" style='border: 1px solid #cfcfcf'>
-                    <img src="/jsCalendar/jsCalendar.gif" alt="Change due date" id="%s"
-                    onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-                    <script type="text/javascript" language='JavaScript'>
-                    Calendar.setup({
-                    inputField     :    '%s',
-                    ifFormat       :    '%%Y-%%m-%%d',
-                    button         :    '%s'
+
+                    <script type="text/javascript">
+                    $(function(){
+                        $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                     });
                     </script>
+                    <input type="text" size="12" id="date_picker2" name="period_to" value="%s" style='border: 1px solid #cfcfcf'>
+
                     </td>
                   </tr>
                 </table>
@@ -8921,12 +8814,11 @@ class Template:
                 <br />
                 <br />
                 </div>
-                """ % (_("Enter the period of interest"),
-                       _("From:  "), _("from"), datetime.date.today().strftime('%Y-%m-%d'),
-                       _("jsCal_from"), _("from"), _("jsCal_from"),
-                       _("To:  "), _("to"), (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
-                       _("jsCal_to"), _("to"), _("jsCal_to"),
-                       _("Back"), _("Continue"))
+                """ % (CFG_SITE_URL ,CFG_SITE_URL,
+                        _("Enter the period of interest"),
+                        _("From:  "), CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
+                        _("To:  "),  CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
+                        _("Back"), _("Continue"))
 
         return out
 
@@ -9329,10 +9221,8 @@ class Template:
 
         out += """
 
-                 <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-                 <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-                 <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-                 <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+                <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+                <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
                 <table class="bibcirctable">
                   <tr class="bibcirctableheader">
@@ -9347,16 +9237,12 @@ class Template:
                   <tr>
                     <th width="70">%s</th>
                     <td align='left'>
-                    <input type="text" size="12" id="%s" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
-                    <img src="/jsCalendar/jsCalendar.gif" alt="Change due date" id="%s"
-                    onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-                    <script type="text/javascript" language='JavaScript'>
-                    Calendar.setup({
-                    inputField     :    '%s',
-                    ifFormat       :    '%%Y-%%m-%%d',
-                    button         :    '%s'
+                    <script type="text/javascript">
+                    $(function(){
+                        $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                     });
-                    </script>
+                </script>
+                <input type="text" size="12" id="date_picker1" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
                     </td>
                   </tr>
                 </table>
@@ -9391,10 +9277,10 @@ class Template:
                 <br />
                 <br />
                 </div>
-                """ % (_("Loan information"),
-                       _("Loan date"), datetime.date.today().strftime('%Y-%m-%d'),
-                       _("Due date"), _("due_date"), renew_loan_for_X_days(barcode),
-                       _("jsCal"), _("due_date"), _("jsCal"),
+                """ % (CFG_SITE_URL, CFG_SITE_URL,
+                       _("Loan information"),
+                       _("Loan date"),  datetime.date.today().strftime('%Y-%m-%d'),
+                       _("Due date"), CFG_SITE_URL, renew_loan_for_X_days(barcode),
                        _("Write notes"), _("Back"), _("Continue"))
 
         return out
@@ -9500,10 +9386,8 @@ class Template:
 
         out += """
 
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
                 <tr>
@@ -9523,7 +9407,8 @@ class Template:
                  <td>
                    <select name="vendor_id"  style='border: 1px solid #cfcfcf'>
 
-                """ % (_("Order details"), _("Barcode"),  _("Vendor"))
+                """ % (CFG_SITE_URL, CFG_SITE_URL,
+                       _("Order details"), _("Barcode"),  _("Vendor"))
 
         for(vendor_id, name) in list_of_vendors:
             out +="""<option value ="%s">%s</option>""" % (vendor_id, name)
@@ -9555,34 +9440,26 @@ class Template:
                 </tr>
                 <tr>
                 <th width="100">%s</th>
-                <td>
-                       <input type="text" size="12" id="%s" name="order_date" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select order date" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
+                    <td>
+                        <script type="text/javascript">
+                        $(function(){
+                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                        });
+                        </script>
+                        <input type="text" size="12" id="date_picker1" name="order_date" value="%s" style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
                 <tr>
                 <th width="100">%s</th>
-                <td>
-                       <input type="text" size="12" id="%s" name="expected_date" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select order date" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
+                    <td>
+
+                       <script type="text/javascript">
+                        $(function(){
+                            $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                        });
+                        </script>
+                        <input type="text" size="12" id="date_picker2" name="expected_date" value="%s" style='border: 1px solid #cfcfcf'>
+
                     </td>
                 </tr>
                 <tr>
@@ -9590,10 +9467,9 @@ class Template:
                   <td>
                     <select name="library_id" style='border: 1px solid #cfcfcf'>
 
-                """ % (_("Price"), _("Status"), _("Order date"),
-                       _("order_date"), _("jsCal1"), _("order_date"),
-                       _("jsCal1"), _("Expected date"), _("expected_date"),
-                       _("jsCal2"), _("expected_date"), _("jsCal2"),
+                """ % (_("Price"), _("Status"),
+                       _("Order date"), CFG_SITE_URL, _("order_date"),
+                       _("Expected date"), CFG_SITE_URL, _("expected_date"),
                        _("Library"))
 
         for(library_id, name) in libraries:
@@ -10458,8 +10334,7 @@ class Template:
         (book_title, book_year, book_author,
          book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
-        (borrower_id, name, email, phone, address, mailbox) = user_info.split(',')
-
+        (borrower_id, name, email, phone, address, mailbox) = user_info
 
         _ = gettext_set_language(ln)
 
@@ -16106,14 +15981,11 @@ class Template:
                    _("ISSN"))
 
 
-
         conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -16124,33 +15996,23 @@ class Template:
                <tr>
                 <th width="150">%s</th>
                 <td>
-                       <input type="text" size="12" id="%s" name="period_of_interest_from" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
+                        <script type="text/javascript">
+                            $(function(){
+                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                            });
+                        </script>
+                        <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
                 <tr>
                 <th width="150">%s</th>
                 <td>
-                       <input type="text" size="12" id="%s" name="period_of_interest_to" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
+                        <script type="text/javascript">
+                            $(function(){
+                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                            });
+                        </script>
+                        <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
                 <tr>
@@ -16176,11 +16038,9 @@ class Template:
              <br />
              <br />
              </div>
-             """ % (_("ILL request details"), _("Period of interest - From"),
-                    _("period_of_interest_from"),
-                    _("jsCal1"), _("period_of_interest_from"), _("jsCal1"),
-                    _("Period of interest - To"), _("period_of_interest_to"),
-                    _("jsCal2"), _("period_of_interest_to"), _("jsCal2"),
+             """ % (_("ILL request details"),
+                    _("Period of interest - From"), CFG_SITE_URL, period_of_interest_from,
+                    _("Period of interest - To"), CFG_SITE_URL, period_of_interest_to,
                     _("Additional comments"),
                     _("Back"), _("Continue"))
 

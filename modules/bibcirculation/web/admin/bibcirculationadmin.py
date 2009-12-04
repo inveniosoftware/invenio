@@ -122,8 +122,8 @@ def loan_on_desk_step4(req, list_of_books=None, user_info=None, due_date=None,
 
     list_of_books = eval(list_of_books)
     due_date = wash_url_argument(due_date, 'list')
-    
-    
+
+
     return bal.loan_on_desk_step4(req, list_of_books, user_info,
                                   due_date, note, ln)
 
@@ -198,15 +198,13 @@ def all_loans_test(req, ln=CFG_SITE_LANG):
     """
     return bal.all_loans_test(req, ln)
 
-def all_loans(req, loans_per_page=25, page_number=1, ln=CFG_SITE_LANG):
+def all_loans(req,ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_loans
 
     """
-    loans_per_page = int(loans_per_page)
-    page_number = int(page_number)
 
-    return bal.all_loans(req, loans_per_page, page_number, ln)
+    return bal.all_loans(req, ln)
 
 def bor_loans_historical_overview(req, borrower_id=None, ln=CFG_SITE_LANG):
     """
@@ -563,7 +561,7 @@ def claim_book_return(req, borrower_id=None, recid=None, loan_id=None,
 
 def all_expired_loans(req, loans_per_page=25, page_number=1, ln=CFG_SITE_LANG):
     """
-    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_loans
+    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans
 
     """
     loans_per_page = int(loans_per_page)
@@ -636,14 +634,9 @@ def place_new_request_step2(req, barcode=None, recid=None, user_info=None,
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step2
     """
 
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = user_info.split(',')
-    else:
-        user_info = user_info.split(',')
+
+    user_info = eval(user_info)
+
 
     return bal.place_new_request_step2(req, barcode, recid, user_info, ln)
 
@@ -654,14 +647,9 @@ def place_new_request_step3(req, barcode=None, recid=None, user_info=None,
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step3
 
     """
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = eval(user_info)
-    else:
-        user_info = user_info.split(',')
+
+    user_info = eval(user_info)
+
 
     return bal.place_new_request_step3(req, barcode, recid, user_info, period_from,
                                        period_to, ln)
