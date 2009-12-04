@@ -4643,12 +4643,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         if hosted_colls_timeouts_timeouts:
                             for timeout in hosted_colls_timeouts_timeouts:
                                 if of.startswith("h"):
-                                    req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[0][1].name, -963,
+                                    req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[1].name, -963,
                                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                 sc, pl_in_url,
                                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
                                     req.write(print_hosted_results(url_and_engine=timeout[0], ln=ln, of=of, req=req, search_timed_out=True, limit=rg))
-                                    req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[0][1].name, -963,
+                                    req.write(print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, timeout[1].name, -963,
                                                                 jrec, rg, aas, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                                 sc, pl_in_url,
                                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
