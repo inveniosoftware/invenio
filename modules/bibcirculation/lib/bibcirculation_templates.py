@@ -62,7 +62,7 @@ _MENU_ = """
      </li>
 
      <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search">Request</a>
+        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search?redirect='yes'">Request</a>
      </li>
 
      <li>
@@ -339,8 +339,36 @@ class Template:
 
         return out
 
+    def tmpl_message_request_send_ok_cern(self, ln=CFG_SITE_LANG):
 
-    def tmpl_borrower_search_result(self, result, ln=CFG_SITE_LANG):
+        message =  "Your request has been registered and the document"\
+                              " will be sent to you via internal mail."
+
+        return message
+
+    def tmpl_message_request_send_ok_other(self, ln=CFG_SITE_LANG):
+
+        message = "Your request has been registered."
+
+        return message
+
+    def tmpl_message_request_send_fail_cern(self):
+
+        message = "It is not possible to validate your request. "\
+                              "Your office address is not available. "\
+                              "Please contact " + CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
+
+        return message
+
+    def tmpl_message_request_send_fail_other(self, ln=CFG_SITE_LANG):
+
+        message = "It is not possible to validate your request. "\
+                              "Your office address is not available. "\
+                              "Please contact " + CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
+
+        return message
+
+    def tmpl_borrower_search_result(self, result, redirect='no', ln=CFG_SITE_LANG):
         """
         When the admin features 'borrower_seach' is used, this template
         show the result.
@@ -386,8 +414,14 @@ class Template:
 
             for (borrower_id, name) in result:
 
-                borrower_link = create_html_link(CFG_SITE_URL +
+                if redirect == 'no':
+                    borrower_link = create_html_link(CFG_SITE_URL +
                                              '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             {'borrower_id': borrower_id, 'ln': ln},
+                                             (name))
+                else:
+                    borrower_link = create_html_link(CFG_SITE_URL +
+                                             '/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step1',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -1656,7 +1690,7 @@ class Template:
         return out
 
 
-    def tmpl_borrower_search(self, infos, ln=CFG_SITE_LANG):
+    def tmpl_borrower_search(self, infos, redirect='no', ln=CFG_SITE_LANG):
         """
         Template for the admin interface. Search borrower.
 
@@ -1678,6 +1712,7 @@ class Template:
                    <input type="radio" name="column" value="id">ccid
                    <input type="radio" name="column" value="name" checked>name
                    <input type="radio" name="column" value="email">email
+                   <input type="hidden" name="redirect" value="%s">
                    <br>
                    <br>
                  </td>
@@ -1705,7 +1740,7 @@ class Template:
         </div>
 
         """ % (CFG_SITE_URL,
-               _("Search borrower by"),
+               _("Search borrower by"),redirect,
                _("Back"), _("Search"))
 
 
@@ -3445,7 +3480,6 @@ class Template:
         """
 
         _ = gettext_set_language(ln)
-
 
         out = """ """
 

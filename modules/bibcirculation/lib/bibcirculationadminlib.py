@@ -38,7 +38,7 @@ from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.mailutils import send_email
 from invenio.search_engine import perform_request_search
-from invenio.urlutils import create_html_link
+from invenio.urlutils import create_html_link, redirect_to_url
 from invenio.messages import gettext_set_language
 from invenio.bibcirculation_utils import book_title_from_MARC, \
       update_status_if_expired, \
@@ -97,7 +97,7 @@ def index(req, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def borrower_search(req, empty_barcode, ln=CFG_SITE_LANG):
+def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
     """
     Page (for administrator) where is it possible to search
     for a borrower (who is on crcBORROWER table) using is name,
@@ -120,7 +120,7 @@ def borrower_search(req, empty_barcode, ln=CFG_SITE_LANG):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_borrower_search(infos=infos, ln=ln)
+    body = bibcirculation_templates.tmpl_borrower_search(infos=infos, redirect=redirect, ln=ln)
 
     return page(title="Borrower Search",
                 uid=id_user,
@@ -179,7 +179,7 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def borrower_search_result(req, column, string, ln=CFG_SITE_LANG):
+def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG):
     """
     Search a borrower and return a list with all the possible results.
 
@@ -238,9 +238,12 @@ def borrower_search_result(req, column, string, ln=CFG_SITE_LANG):
         return mustloginpage(req, auth_message)
 
     if len(result) == 1:
-        return get_borrower_details(req, result[0][0], ln)
+        if redirect=='no':
+            return get_borrower_details(req, result[0][0], ln)
+        else:
+            return create_new_request_step1(req, result[0][0])
     else:
-        body = bibcirculation_templates.tmpl_borrower_search_result(result=result, ln=ln)
+        body = bibcirculation_templates.tmpl_borrower_search_result(result=result, redirect=redirect, ln=ln)
 
         return page(title="Borrower search result",
                     uid=id_user,
@@ -768,6 +771,12 @@ def loan_on_desk_step4(req, list_of_books, user_info,
 
     @return:              new loan.
     """
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
     infos = []
 
     (_ccid, name, email, phone, address, mailbox) = user_info
@@ -848,29 +857,12 @@ def loan_on_desk_step4(req, list_of_books, user_info,
                     loaned_on, due_date[i], 'on loan', 'normal', note_format)
         db.update_item_status('on loan', list_of_books[i][1])
 
-    result = db.get_all_loans()
-
-    title="Current loans"
-    infos.append('A new loan has been registered with success.')
-    body = bibcirculation_templates.tmpl_all_loans(result=result,
-                                                   infos=infos,
-                                                   ln=ln)
-
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
+    return redirect_to_url(req, '%s/admin/bibcirculation/bibcirculationadmin.py/all_loans?msg=ok' % CFG_SITE_URL)
 
-    return page(title=title,
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
 
 def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
     """
@@ -1698,7 +1690,7 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def all_loans(req, ln=CFG_SITE_LANG):
+def all_loans(req, msg=None, ln=CFG_SITE_LANG):
     """
     Display all loans.
 
@@ -1712,6 +1704,9 @@ def all_loans(req, ln=CFG_SITE_LANG):
     """
 
     infos = []
+
+    if msg=='ok':
+        infos.append('A new loan has been registered with success.')
 
     result = db.get_all_loans()
 
@@ -3346,7 +3341,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def create_new_request_step1(req, borrower_id, p, f, search, ln=CFG_SITE_LANG):
+def create_new_request_step1(req, borrower_id, p="", f="", search=None, ln=CFG_SITE_LANG):
     """
     Create a new request from the borrower's page, step1.
 

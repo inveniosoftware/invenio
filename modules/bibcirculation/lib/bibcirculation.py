@@ -184,32 +184,22 @@ def perform_new_request(uid, recid, barcode, ln=CFG_SITE_LANG):
     return body
 
 
-def perform_new_request_send(uid, recid, period_from, period_to,
+def perform_new_request_send(uid, recid,
+                             from_year, from_month, from_day,
+                             to_year, to_month, to_day,
                              barcode, ln=CFG_SITE_LANG):
 
     """
-    Register a new request. (and a new borrower if it is necessary)
-
-    @param uid: user id
-    @type: int
-
-    @param recid: identify the record. Primary key of bibrec.
-    @type recid: int
-
-    @param period_from: period of interest - from(date)
-    @type period_from: string
-
-    @param period_to: period of interest - from(date)
-    @type period_to: string
-
-    @param barcode: identify the item. Primary key of crcITEM.
-    @type barcode: string
+    @param recid: recID - CDS Invenio record identifier
+    @param ln: language of the page
     """
+
+    request_from = get_datetext(from_year, from_month, from_day)
+    request_to = get_datetext(to_year, to_month, to_day)
 
     nb_requests = db.get_number_requests_per_copy(barcode)
     is_on_loan = db.is_item_on_loan(barcode)
 
-    # define the status of the new request
     if nb_requests == 0 and is_on_loan is not None:
         status = 'waiting'
     elif nb_requests == 0 and is_on_loan is None:
@@ -220,19 +210,12 @@ def perform_new_request_send(uid, recid, period_from, period_to,
     user = collect_user_info(uid)
     is_borrower = db.is_borrower(user['email'])
 
-    message = ''
-
-    # verify if user is already a borrower
     if is_borrower != 0:
         address = db.get_borrower_address(user['email'])
-
-        # verify if address is available
         if address != 0:
-            message = "Your request has been registered and the " \
-                      "document will be sent to you via internal mail."
 
             db.new_hold_request(is_borrower, recid, barcode,
-                                period_from, period_to, status)
+                                request_from, request_to, status)
             db.update_item_status('requested', barcode)
 
             send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
@@ -242,11 +225,13 @@ def perform_new_request_send(uid, recid, period_from, period_to,
                        attempt_times=1,
                        attempt_sleeptime=10
                        )
+            if CFG_CERN_SITE == 1:
+                message = bibcirculation_templates.tmpl_message_request_send_ok_cern(ln=ln)
+            else:
+                message = bibcirculation_templates.tmpl_message_request_send_ok_other(ln=ln)
 
         else:
             if CFG_CERN_SITE == 1:
-
-                # try to retrieve user's address from CERN LDAP
                 result = get_user_info_from_ldap(email=user['email'])
 
                 try:
@@ -254,15 +239,11 @@ def perform_new_request_send(uid, recid, period_from, period_to,
                 except KeyError:
                     ldap_address = None
 
-                # verify is address was retrieved
                 if ldap_address is not None:
                     db.add_borrower_address(ldap_address, email)
 
-                    message = "Your request has been registered and the document"\
-                              " will be sent to you via internal mail."
-
                     db.new_hold_request(is_borrower, recid, barcode,
-                                        period_from, period_to, status)
+                                        request_from, request_to, status)
 
                     db.update_item_status('requested', barcode)
 
@@ -273,14 +254,17 @@ def perform_new_request_send(uid, recid, period_from, period_to,
                                attempt_times=1,
                                attempt_sleeptime=10
                                )
+
+                    message = bibcirculation_templates.tmpl_message_request_send_ok_cern(ln=ln)
+
                 else:
-                    message = "It is not possible to validate your request. "\
-                              "Your office address is not available. "\
-                              "Please contact ... "
+                    message = bibcirculation_templates.tmpl_message_request_send_fail_cern(ln=ln)
+
+            else:
+                message = bibcirculation_templates.tmpl_message_request_send_fail_other(ln=ln)
+
 
     else:
-
-        # Get information from CERN LDAP in order to register a new borrower
         if CFG_CERN_SITE == 1:
             result = get_user_info_from_ldap(email=user['email'])
 
@@ -309,17 +293,13 @@ def perform_new_request_send(uid, recid, period_from, period_to,
             except KeyError:
                 mailbox = None
 
-            # verify address
             if address is not None:
                 db.new_borrower(name, email, phone, address, mailbox, '')
 
                 is_borrower = db.is_borrower(email)
 
-                message = "Your request has been registered and the document"\
-                          " will be sent to you via internal mail."
-
                 db.new_hold_request(is_borrower, recid, barcode,
-                                    period_from, period_to, status)
+                                    request_from, request_to, status)
 
                 db.update_item_status('requested', barcode)
 
@@ -330,15 +310,15 @@ def perform_new_request_send(uid, recid, period_from, period_to,
                            attempt_times=1,
                            attempt_sleeptime=10
                            )
+                message = bibcirculation_templates.tmpl_message_request_send_ok_cern(ln=ln)
 
             else:
-                message = "It is not possible to validate your request. "\
-                          "Your office address is not available."\
-                          " Please contact ... "
+                message = bibcirculation_templates.tmpl_message_request_send_fail_cern(ln=ln)
 
+        else:
+            message = bibcirculation_templates.tmpl_message_request_send_ok_other(ln=ln)
 
-    body = bibcirculation_templates.tmpl_new_request_send(message=message,
-                                                          ln=ln)
+    body = bibcirculation_templates.tmpl_new_request_send(message=message, ln=ln)
 
     return body
 

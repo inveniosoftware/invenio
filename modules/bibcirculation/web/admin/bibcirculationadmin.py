@@ -30,11 +30,11 @@ def index(req, ln=CFG_SITE_LANG):
     """
     return bal.index(req, ln)
 
-def borrower_search(req, empty_barcode=None, ln=CFG_SITE_LANG):
+def borrower_search(req, empty_barcode=None, redirect='no', ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/borrowers_search
     """
-    return bal.borrower_search(req, empty_barcode, ln)
+    return bal.borrower_search(req, empty_barcode, redirect=redirect, ln=ln)
 
 
 def item_search(req, ln=CFG_SITE_LANG):
@@ -198,13 +198,13 @@ def all_loans_test(req, ln=CFG_SITE_LANG):
     """
     return bal.all_loans_test(req, ln)
 
-def all_loans(req,ln=CFG_SITE_LANG):
+def all_loans(req, msg=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_loans
 
     """
 
-    return bal.all_loans(req, ln)
+    return bal.all_loans(req, msg=msg, ln=ln)
 
 def bor_loans_historical_overview(req, borrower_id=None, ln=CFG_SITE_LANG):
     """
@@ -279,12 +279,12 @@ def get_borrower_loans_details(req, recid=None, barcode=None, borrower_id=None,
                                           renewall, force, loan_id, ln)
 
 
-def borrower_search_result(req, column, string, ln=CFG_SITE_LANG):
+def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/borrower_search_result
     """
 
-    return bal.borrower_search_result(req, column, string, ln)
+    return bal.borrower_search_result(req, column, string, redirect=redirect, ln=ln)
 
 
 def associate_barcode(req, request_id=None, recid=None, borrower_id=None,
