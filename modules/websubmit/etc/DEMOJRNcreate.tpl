@@ -4,7 +4,8 @@ START::DEFP()---<record>
 100a::REPL(EOL,)::MINLW(82)---<datafield tag="100" ind1=" " ind2=" "><subfield code="a"><:DEMOJRN_AU*::DEMOJRN_AU:></subfield></datafield>
 245a::REPL(EOL,)::MINLW(82)---<datafield tag="245" ind1=" " ind2=" "><subfield code="a"><:DEMOJRN_TITLEE::DEMOJRN_TITLEE:></subfield></datafield>
 246::REPL(EOL,)::MINLW(82)---<datafield tag="246" ind1=" " ind2="1"><subfield code="a"><:DEMOJRN_TITLEF::DEMOJRN_TITLEF:></subfield></datafield>
-269::REPL(EOL,)::MINLW(84)---<datafield tag="269" ind1=" " ind2=" "><subfield code="c"><:DATE(%d,2):>/<:DATE(%m,2):>/<:DATE(%Y,4):></subfield></datafield>
+260::DEFP()---<datafield tag="260" ind1=" " ind2=" "><subfield code="c"><:DATE(%Y,4):></subfield></datafield>
+269::DEFP()---<datafield tag="269" ind1=" " ind2=" "><subfield code="c"><:DATE(%d,2):>/<:DATE(%m,2):>/<:DATE(%Y,4):></subfield></datafield>
 300::REPL(EOL,)::MINLW(82)---<datafield tag="300" ind1=" " ind2=" "></datafield>
 520::REPL(EOL,)::MINLW(82)---<datafield tag="520" ind1=" " ind2=" "><subfield code="b"><!--HTML--><:DEMOJRN_ABSE::DEMOJRN_ABSE:></subfield></datafield>
 590::REPL(EOL,)::MINLW(82)---<datafield tag="590" ind1=" " ind2=" "><subfield code="b"><!--HTML--><:DEMOJRN_ABSF::DEMOJRN_ABSF:></subfield></datafield>
