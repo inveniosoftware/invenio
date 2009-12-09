@@ -28,6 +28,9 @@ AM_INIT_AUTOMAKE([tar-ustar])
 ## the localstatedir hack below.)
 test "${prefix}" = NONE && prefix=/opt/cds-invenio
 
+## Remove eventual trailing slashes from the prefix value:
+test "${prefix%/}" != "" && prefix=${prefix%/}
+
 ## Check for install:
 AC_PROG_INSTALL
 
