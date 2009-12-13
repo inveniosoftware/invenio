@@ -134,8 +134,8 @@ class SimulatedModPythonRequest(object):
                 self.__write(self.__buffer)
             except IOError, err:
                 if "failed to write data" in str(err) or "client connection closed" in str(err):
-                    ## Let's just log this expection without alerting the admin:
-                    register_exception(req=req)
+                    ## Let's just log this exception without alerting the admin:
+                    register_exception(req=self)
                 else:
                     raise
             self.__buffer = ''
@@ -217,8 +217,12 @@ class SimulatedModPythonRequest(object):
                         self.__bytes_sent += the_len
                         self.__write(chunk[:the_len])
                         break
-        except Exception, err:
-            raise IOError(str(err))
+        except IOError, err:
+            if "failed to write data" in str(err) or "client connection closed" in str(err):
+                ## Let's just log this exception without alerting the admin:
+                register_exception(req=self)
+            else:
+                raise
         return self.__bytes_sent
 
     def set_content_length(self, content_length):
@@ -429,14 +433,15 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         try:
             return _check_result(req, module_globals[possible_handler](req, **dict(req.form)))
         except TypeError, err:
-            if ("%s() got an unexpected keyword argument" % possible_handler) in str(err):
-                register_exception(req=req, prefix="Wrong GET parameter set in calling a legacy publisher handler", alert_admin=CFG_DEVEL_SITE)
+            if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):
                 import inspect
                 expected_args = inspect.getargspec(module_globals[possible_handler])[0]
+                register_exception(req=req, prefix="Wrong GET parameter set in calling a legacy publisher handler for %s: expected_args=%s, found_args=%s" % (possible_handler, repr(expected_args), repr(req.form.keys())), alert_admin=CFG_DEVEL_SITE)
                 cleaned_form = {}
                 for arg in expected_args:
-                    if arg != 'req' and arg in req.form: # Just in case of malicious usage!
-                        cleaned_form[arg] = req.form[arg]
+                    if arg == 'req':
+                        continue
+                    cleaned_form[arg] = req.form.get(arg, None)
                 return _check_result(req, module_globals[possible_handler](req, **cleaned_form))
             else:
                 raise
