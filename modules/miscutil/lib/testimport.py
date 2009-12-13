@@ -36,6 +36,8 @@ def deduce_site_packages_locations():
     for path in sys.path:
         if path.endswith("site-packages"):
             out.append(path)
+        if path.endswith("dist-packages"):
+            out.append(path)
     if out:
         return out
     else:
