@@ -172,7 +172,7 @@ field</code> field.</p>
 <p>To index your newly created or modified documents, bibindex must be
 run periodically via bibsched.  This is achieved by the sleep option
 (-s) to bibindex.  For more information please see <a
-href="../howto/run.html">HOWTO Run</a> admin guide.</p>
+href="howto-run">HOWTO Run</a> admin guide.</p>
 
 
 <a name="4.2"></a><h3>4.2 Checking and repairing indexes</h3>
