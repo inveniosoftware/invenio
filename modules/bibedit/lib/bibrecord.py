@@ -1259,11 +1259,11 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
             # Construct the field tuple.
             field = ([], ' ', ' ', value, field_position_global)
             record.setdefault(controlfield[ATTRS]['tag'], []).append(field)
+            field_position_global += 1
         elif CFG_BIBRECORD_KEEP_SINGLETONS:
             field = ([], ' ', ' ', '', field_position_global)
             record.setdefault(controlfield[ATTRS]['tag'], []).append(field)
-
-        field_position_global += 1
+            field_position_global += 1
 
     # Consider the data fields.
     for datafield in _get_children_by_tag_name_rxp(root, 'datafield'):
