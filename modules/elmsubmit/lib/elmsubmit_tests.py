@@ -34,11 +34,24 @@ import invenio.elmsubmit_config as elmsubmit_config
 from invenio import elmsubmit
 from invenio.testutils import make_test_suite, run_test_suite
 
+if os.path.exists(os.path.join(CFG_TMPDIR,
+                  elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1'])):
+    test_case_1_file_exists = True
+else:
+    test_case_1_file_exists = False
+
+if os.path.exists(os.path.join(CFG_TMPDIR,
+                  elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2'])):
+    test_case_2_file_exists = True
+else:
+    test_case_2_file_exists = False
+
 class MarcTest(unittest.TestCase):
-    """ elmsubmit - test for saniy """
-    def test_simple_marc(self):
-        """elmsubmit - parsing simple email"""
-        try:
+    """ elmsubmit - test for sanity """
+
+    if test_case_1_file_exists:
+        def test_simple_marc(self):
+            """elmsubmit - parsing simple email"""
             f=open(os.path.join(CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1']),'r')
             email = f.read()
             f.close()
@@ -84,12 +97,9 @@ class MarcTest(unittest.TestCase):
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
 
-        except IOError:
-            self.fail("SKIPPED: the test case file does not exist; test skipped.")
-
-    def test_complex_marc(self):
-        """elmsubmit - parsing complex email with multiple fields"""
-        try:
+    if test_case_2_file_exists:
+        def test_complex_marc(self):
+            """elmsubmit - parsing complex email with multiple fields"""
             f=open(os.path.join(CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
             email = f.read()
             f.close()
@@ -175,14 +185,13 @@ class MarcTest(unittest.TestCase):
 
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
-        except IOError:
-            self.fail("SKIPPED: the test case file does not exist; test skipped.")
 
 class FileStorageTest(unittest.TestCase):
     """ testing proper storage of files """
-    def test_read_text_files(self):
-        """elmsubmit - reading text files"""
-        try:
+
+    if test_case_2_file_exists:
+        def test_read_text_files(self):
+            """elmsubmit - reading text files"""
 
             f=open(os.path.join(CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
             email = f.read()
@@ -224,13 +233,9 @@ class FileStorageTest(unittest.TestCase):
 
             y = """some attachment\n"""
             self.assertEqual(x,y)
-        except IOError:
-            self.fail("SKIPPED: the test case file does not exist; test skipped.")
 
 TEST_SUITE = make_test_suite(MarcTest,
                              FileStorageTest,)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
-
-

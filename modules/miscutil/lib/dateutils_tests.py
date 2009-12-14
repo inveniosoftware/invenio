@@ -27,6 +27,16 @@ import dateutils
 from invenio.config import CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, run_test_suite
 
+if 'en' in CFG_SITE_LANGS:
+    lang_english_configured = True
+else:
+    lang_english_configured = False
+
+if 'sk' in CFG_SITE_LANGS:
+    lang_slovak_configured = True
+else:
+    lang_slovak_configured = False
+
 class ConvertFromDateCVSTest(unittest.TestCase):
     """
     Testing conversion of CVS dates.
@@ -62,45 +72,41 @@ class ConvertIntoDateGUITest(unittest.TestCase):
     Testing conversion into dategui with various languages.
     """
 
-    def test_convert_good_to_dategui_en(self):
-        """dateutils - conversion of good text date into English GUI date"""
-        if 'en' not in CFG_SITE_LANGS:
-            self.fail("SKIPPED: English language not configured, test skipped.")
-        datetext = "2006-07-16 18:36:01"
-        dategui_en_expected = "16 Jul 2006, 18:36"
-        dategui_en = dateutils.convert_datetext_to_dategui(datetext,
-                                                           ln='en')
-        self.assertEqual(dategui_en, dategui_en_expected)
+    if lang_english_configured:
+        def test_convert_good_to_dategui_en(self):
+            """dateutils - conversion of good text date into English GUI date"""
+            datetext = "2006-07-16 18:36:01"
+            dategui_en_expected = "16 Jul 2006, 18:36"
+            dategui_en = dateutils.convert_datetext_to_dategui(datetext,
+                                                               ln='en')
+            self.assertEqual(dategui_en, dategui_en_expected)
 
-    def test_convert_good_to_dategui_sk(self):
-        """dateutils - conversion of good text date into Slovak GUI date"""
-        if 'sk' not in CFG_SITE_LANGS:
-            self.fail("SKIPPED: Slovak language not configured, test skipped.")
-        datetext = "2006-07-16 18:36:01"
-        dategui_sk_expected = "16 júl 2006, 18:36"
-        dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
-                                                           ln='sk')
-        self.assertEqual(dategui_sk, dategui_sk_expected)
+    if lang_slovak_configured:
+        def test_convert_good_to_dategui_sk(self):
+            """dateutils - conversion of good text date into Slovak GUI date"""
+            datetext = "2006-07-16 18:36:01"
+            dategui_sk_expected = "16 júl 2006, 18:36"
+            dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
+                                                               ln='sk')
+            self.assertEqual(dategui_sk, dategui_sk_expected)
 
-    def test_convert_bad_to_dategui_en(self):
-        """dateutils - conversion of bad text date into English GUI date"""
-        if 'en' not in CFG_SITE_LANGS:
-            self.fail("SKIPPED: English language not configured, test skipped.")
-        datetext = "2006-02-AA 18:36:01"
-        dategui_sk_expected = "N/A"
-        dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
-                                                           ln='en')
-        self.assertEqual(dategui_sk, dategui_sk_expected)
+    if lang_english_configured:
+        def test_convert_bad_to_dategui_en(self):
+            """dateutils - conversion of bad text date into English GUI date"""
+            datetext = "2006-02-AA 18:36:01"
+            dategui_sk_expected = "N/A"
+            dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
+                                                               ln='en')
+            self.assertEqual(dategui_sk, dategui_sk_expected)
 
-    def test_convert_bad_to_dategui_sk(self):
-        """dateutils - conversion of bad text date into Slovak GUI date"""
-        if 'sk' not in CFG_SITE_LANGS:
-            self.fail("SKIPPED: Slovak language not configured, test skipped.")
-        datetext = "2006-02-AA 18:36:01"
-        dategui_sk_expected = "nepríst."
-        dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
-                                                           ln='sk')
-        self.assertEqual(dategui_sk, dategui_sk_expected)
+    if lang_slovak_configured:
+        def test_convert_bad_to_dategui_sk(self):
+            """dateutils - conversion of bad text date into Slovak GUI date"""
+            datetext = "2006-02-AA 18:36:01"
+            dategui_sk_expected = "nepríst."
+            dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
+                                                               ln='sk')
+            self.assertEqual(dategui_sk, dategui_sk_expected)
 
 TEST_SUITE = make_test_suite(ConvertFromDateCVSTest,
                              ConvertIntoDateGUITest,)
