@@ -14,9 +14,12 @@ aclocal.m4
 TAGS
 invenio-autotools.conf
 po/POTFILES
+po/POTFILES-py
+po/POTFILES-webdoc
 po/stamp-po
 po/*.gmo
 po/*.mo
+po/*.sed
 *~
 *.pyc
 *.clisp.mem
