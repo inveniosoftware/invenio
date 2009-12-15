@@ -338,8 +338,11 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         if not fckeditor_available:
             return apache.HTTP_NOT_FOUND
 
+        if not form.has_key('type'):
+            form['type'] = 'File'
+
         if not form.has_key('NewFile') or \
-               not form.get('type', None) in \
+               not form['type'] in \
                ['File', 'Image', 'Flash', 'Media']:
             return apache.HTTP_NOT_FOUND
 

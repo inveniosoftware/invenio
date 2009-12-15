@@ -22,6 +22,7 @@ __revision__ = "$Id$"
 
 import re
 import os
+import urllib
 from invenio.bibdocfile import decompose_file
 from invenio.config import \
      CFG_SITE_URL, \
@@ -114,6 +115,11 @@ def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
 def build_url(sysno, name, file_type, extension):
     """
     Build the local URL to the file with given parameters
+
+    @param sysno: record ID
+    @name name: base name of the file
+    @param file_type: as chosen by FCKeditor: 'File', 'Image', 'Flash', 'Media'
+    @param extension: file extension, including '.'
     """
     return CFG_SITE_URL + '/record/' + str(sysno) + \
            '/files/' + build_docname(name, file_type, extension)
@@ -131,8 +137,31 @@ def build_docname(name, file_type, extension):
 
 def write_fft(file_location, docname, icon_location=None, doctype="image"):
     """
-    Append a new FFT for the record. Write the result to the FFT file on disk
+    Append a new FFT for the record. Write the result to the FFT file on disk.
+
+    May only be used for files attached with FCKeditor (i.e. URLs
+    matching re_fckeditor_link)
     """
+    if file_location.startswith(CFG_SITE_URL):
+        # FCKeditor does not url-encode filenames, and FFT does not
+        # like URLs that are not quoted. So do it now (but only for
+        # file name, in URL context!)
+        url_parts = file_location.split("/")
+        try:
+            file_location = "/".join(url_parts[:-1]) + \
+                            '/' + urllib.quote(url_parts[-1])
+        except:
+            pass
+
+    if icon_location.startswith(CFG_SITE_URL):
+        # Ditto quote file name
+        url_parts = icon_location.split("/")
+        try:
+            icon_location = "/".join(url_parts[:-1]) + \
+                            '/' + urllib.quote(url_parts[-1])
+        except:
+            pass
+
     icon_subfield = ''
     if icon_location:
         icon_subfield = '<subfield code="x">%s</subfield>' % icon_location
