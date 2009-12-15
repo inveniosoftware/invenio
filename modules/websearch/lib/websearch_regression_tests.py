@@ -792,6 +792,11 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
         self.assertEqual([1, 2, 3, 4, 5, 6, 7, 8, 9],
                          perform_request_search(recid=1, recidb=10))
 
+    def test_search_engine_python_api_ranked_by_(self):
+        """websearch - search engine Python API for citation ranking"""
+        self.assertEqual([82, 83, 87, 89],
+                perform_request_search(p='recid:81', rm='citation'))
+
 class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     """Check typical search engine Web API calls on the demo data."""
 
