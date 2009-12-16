@@ -355,9 +355,9 @@ update-v0.99.0-tables:
 
 update-v0.99.1-tables:
 	echo "RENAME TABLE oaiARCHIVE TO oaiREPOSITORY;" | ${prefix}/bin/dbexec
-	echo "RENAME TABLE fmtKNOWLEDGEBASES to knwKB;"  | ${prefix}/bin/dbexec
-	echo "RENAME TABLE fmtKNOWLEDGEBASEMAPPINGS to knwKBRVAL;"  | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	echo "INSERT INTO knwKB (id,name,description,kbtype) SELECT id,name,description,'' FROM fmtKNOWLEDGEBASES;" | ${prefix}/bin/dbexec
+	echo "INSERT INTO knwKBRVAL (id,m_key,m_value,id_knwKB) SELECT id,m_key,m_value,id_fmtKNOWLEDGEBASES FROM fmtKNOWLEDGEBASEMAPPINGS;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc CHANGE docname docname varchar(250) COLLATE utf8_bin NOT NULL default 'file';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE collection DROP COLUMN restricted;" | ${prefix}/bin/dbexec
