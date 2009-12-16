@@ -2287,6 +2287,7 @@ UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','k
 -- exporting demo:
 INSERT INTO expJOB (jobname) VALUES ('sitemap');
 INSERT INTO expJOB (jobname) VALUES ('googlescholar');
+INSERT INTO expJOB (jobname) VALUES ('marcxml');
 
 -- WebJournal demo:
 INSERT INTO jrnJOURNAL (id,name) VALUES(1,'AtlantisTimes');
