@@ -54,7 +54,7 @@ Invenio installation.
 <h3><a name="overview_css">1.1 CSS Style Sheet and Images</a></h3>
 
 <p>The most obvious modification you may want to do is the
-modification of <a href="<CFG_SITE_URL>/img/cds.css">CSS style sheet</a>.
+modification of <a href="<CFG_SITE_URL>/img/invenio.css">CSS style sheet</a>.
 You may also customize default <a href="<CFG_SITE_URL>/img/">images</a>.</p>
 
 <h3><a name="overview_page_layout">1.2 HTML Page Layout</a></h3>

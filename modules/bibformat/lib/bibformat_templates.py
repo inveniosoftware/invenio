@@ -760,7 +760,7 @@ class Template:
         <html>
         <head>
         <title>BibFormat Short Documentation of Format Elements</title>
-        <link rel="stylesheet" href="%(siteurl)s/img/cds.css">
+        <link rel="stylesheet" href="%(siteurl)s/img/invenio.css">
         <script src="%(siteurl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         </head>
