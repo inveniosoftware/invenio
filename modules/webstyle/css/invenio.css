@@ -307,7 +307,7 @@ color: #6E5907;
 }
 .headermoduleboxbody {
    color: #000;
-   background: #fff;
+   background: #f6f6fa;
    font-size: x-small;
    font-weight: bold;
    text-align: center;
@@ -318,6 +318,9 @@ color: #6E5907;
    padding: 2px 10px;
    width: 75px;
    border-bottom: 2px solid #36c;
+}
+.headermoduleboxbody:hover {
+   background: #fff;
 }
 .headermoduleboxbodyblank {
    width: 12px;
@@ -346,18 +349,17 @@ color: #6E5907;
    width: 75px;
 }
 a.header:link {
-   color: #79d;
-   background: #fff;
+   color: #68d;
    text-decoration: none;
    white-space: nowrap;
 }
 a.header:visited {
-   color: #79d;
+   color: #68d;
    text-decoration: none;
    white-space: nowrap;
 }
 a.header:active {
-   color: #79d;
+   color: #68d;
    text-decoration: none;
    white-space: nowrap;
 }
