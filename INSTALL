@@ -169,8 +169,6 @@ Contents
      h) If you have chosen to install fast XML MARC Python processors
         in the step d) above, then you have to install the parsers
         themselves:
-          - (optional) RXP:
-             <http://www.cogsci.ed.ac.uk/~richard/rxp.html>
           - (optional) 4suite:
              <http://4suite.org/>
 

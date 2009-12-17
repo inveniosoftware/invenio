@@ -1460,6 +1460,55 @@ class BibRecordSingletonTest(unittest.TestCase):
                                            correct=1, parser='pyrxp')[0][0]
             self.assertEqual(rec, self.rec_expected)
 
+class BibRecordNumCharRefTest(unittest.TestCase):
+    """ bibrecord - testing numerical character reference expansion"""
+
+    def setUp(self):
+        """Initialize stuff"""
+        self.xml = """<?xml version="1.0" encoding="UTF-8"?>
+                      <record>
+                        <controlfield tag="001">33</controlfield>
+                        <datafield tag="123" ind1=" " ind2=" ">
+                          <subfield code="a">Σ &amp; &#931;</subfield>
+                          <subfield code="a">use &amp;amp; in XML</subfield>
+                        </datafield>
+                      </record>"""
+        self.rec_expected = {
+            '001': [([], ' ', ' ', '33', 1)],
+            '123': [([('a', '\xce\xa3 & \xce\xa3'), ('a', 'use &amp; in XML'),], ' ', ' ', '', 2)],
+            }
+
+    if parser_minidom_available:
+        def test_numcharref_expansion_minidom(self):
+            """bibrecord - numcharref expansion with minidom"""
+            rec = bibrecord.create_records(self.xml, verbose=1,
+                                           correct=1, parser='minidom')[0][0]
+            self.assertEqual(rec, self.rec_expected)
+
+    if parser_4suite_available:
+        def test_numcharref_expansion_4suite(self):
+            """bibrecord - numcharref expansion with 4suite"""
+            rec = bibrecord.create_records(self.xml, verbose=1,
+                                           correct=1, parser='4suite')[0][0]
+            self.assertEqual(rec, self.rec_expected)
+
+    if parser_pyrxp_available:
+        def test_numcharref_expansion_pyrxp(self):
+            """bibrecord - but *no* numcharref expansion with pyrxp (see notes)
+
+            FIXME: pyRXP does not seem to like num char ref entities,
+            so this test is mostly left here in a TDD style in order
+            to remind us of this fact.  If we want to fix this
+            situation, then we should probably use pyRXPU that uses
+            Unicode strings internally, hence it is num char ref
+            friendly.  Maybe we should use pyRXPU by default, if
+            performance is acceptable, or maybe we should introduce a
+            flag to govern this behaviour.
+            """
+            rec = bibrecord.create_records(self.xml, verbose=1,
+                                           correct=1, parser='pyrxp')[0][0]
+            #self.assertEqual(rec, self.rec_expected)
+            self.assertEqual(rec, None)
 
 TEST_SUITE = make_test_suite(
     BibRecordSuccessTest,
@@ -1482,7 +1531,8 @@ TEST_SUITE = make_test_suite(
     BibRecordCreateFieldTest,
     BibRecordFindFieldTest,
     BibRecordDeleteSubfieldTest,
-    BibRecordSingletonTest
+    BibRecordSingletonTest,
+    BibRecordNumCharRefTest
     )
 
 if __name__ == '__main__':
