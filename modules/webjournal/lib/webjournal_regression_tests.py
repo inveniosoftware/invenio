@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import datetime
 import unittest
+import urllib
 from invenio import webjournal_utils as wju
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_LANG, \
@@ -207,7 +208,7 @@ class TimeIssueFunctions(unittest.TestCase):
         """webjournal - returns the issue corresponding to the given datetime object"""
         date_value = datetime.datetime(2009, 7, 16, 13, 39, 46, 426373)
         value = wju.datetime_to_issue(date_value, 'AtlantisTimes')
-        self.assertEqual(value, 'None')
+        self.assertEqual(value, None)
 
     def test_issue_to_datetime(self):
         """webjournal - returns the *theoretical* date of release for given issue"""
@@ -259,29 +260,29 @@ class JournalRelated(unittest.TestCase):
     def test_parse_url_string(self):
         """webjournal - parses any url string given in webjournal"""
         d = wju.parse_url_string("/journal/AtlantisTimes/2009/03/News/?ln=en")
-        self.assertEqual(d.values()[0], 'News')
-        self.assertEqual(d.values()[1], 2009)
-        self.assertEqual(d.values()[3], 'en')
-        self.assertEqual(d.values()[5], 3)
-        self.assertEqual(d.values()[7], 'AtlantisTimes')
-        self.assertEqual(d.values()[8], '03/2009')
+        self.assertEqual(d['category'], 'News')
+        self.assertEqual(d['issue_year'], 2009)
+        self.assertEqual(d['ln'], 'en')
+        self.assertEqual(d['issue_number'], 3)
+        self.assertEqual(d['journal_name'], 'AtlantisTimes')
+        self.assertEqual(d['issue'], '03/2009')
 
         d = wju.parse_url_string("/journal/AtlantisTimes/2009/03/Science?ln=en")
-        self.assertEqual(d.values()[0], 'Science')
-        self.assertEqual(d.values()[1], 2009)
-        self.assertEqual(d.values()[3], 'en')
-        self.assertEqual(d.values()[5], 3)
-        self.assertEqual(d.values()[7], 'AtlantisTimes')
-        self.assertEqual(d.values()[8], '03/2009')
+        self.assertEqual(d['category'], 'Science')
+        self.assertEqual(d['issue_year'], 2009)
+        self.assertEqual(d['ln'], 'en')
+        self.assertEqual(d['issue_number'], 3)
+        self.assertEqual(d['journal_name'], 'AtlantisTimes')
+        self.assertEqual(d['issue'], '03/2009')
 
         d = wju.parse_url_string("/journal/AtlantisTimes/2009/03/News/97?ln=en")
-        self.assertEqual(d.values()[0], 'News')
-        self.assertEqual(d.values()[1], 2009)
-        self.assertEqual(d.values()[3], 'en')
-        self.assertEqual(d.values()[5], 3)
-        self.assertEqual(d.values()[6], 97)
-        self.assertEqual(d.values()[7], 'AtlantisTimes')
-        self.assertEqual(d.values()[8], '03/2009')
+        self.assertEqual(d['category'], 'News')
+        self.assertEqual(d['issue_year'], 2009)
+        self.assertEqual(d['ln'], 'en')
+        self.assertEqual(d['issue_number'], 3)
+        self.assertEqual(d['recid'], 97)
+        self.assertEqual(d['journal_name'], 'AtlantisTimes')
+        self.assertEqual(d['issue'], '03/2009')
 
         try:
             wju.parse_url_string("/journal/fictivejournal/2009/03/News/97?ln=en")
@@ -292,7 +293,12 @@ class JournalRelated(unittest.TestCase):
 
 
 class HtmlCachingFunction(unittest.TestCase):
-    """Html cahching functions"""
+    """HTML caching functions"""
+
+    def setUp(self):
+        "Access some URL for cache to be generated"
+        urllib.urlopen(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/News')
+        urllib.urlopen(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/News/101')
 
     def test_get_index_page_from_cache(self):
         """webjournal - function to get an index page from the cache"""
@@ -307,7 +313,7 @@ class HtmlCachingFunction(unittest.TestCase):
     def test_clear_cache_for_issue(self):
         """webjournal - clears the cache of a whole issue"""
         value = wju.clear_cache_for_issue('AtlantisTimes', '03/2009')
-        self.assertEqual(value, False)
+        self.assertEqual(value, True)
 
 TEST_SUITE = make_test_suite(ArticlesRelated,
                              CategoriesRelated,

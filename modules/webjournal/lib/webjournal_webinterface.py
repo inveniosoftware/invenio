@@ -125,7 +125,6 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                 register_exception(req=req)
                 return e.user_box()
             except InvenioWebJournalNoNameError, e:
-                register_exception(req=req)
                 return e.user_box()
             try:
                 issue = wash_issue_number(ln, journal_name,
@@ -156,7 +155,6 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             if washed_journal_name != journal_name:
                 redirect_p = True
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoJournalOnServerError, e:
             register_exception(req=req)
@@ -212,7 +210,6 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalIssueNumberBadlyFormedError, e:
             register_exception(req=req)
@@ -263,7 +260,6 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
 
         html = perform_request_contact(req, ln, washed_journal_name,
@@ -287,7 +283,6 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoPopupRecordError, e:
             register_exception(req=req)
@@ -324,7 +319,6 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoCurrentIssueError, e:
             register_exception(req=req)
@@ -381,7 +375,6 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoCurrentIssueError, e:
             register_exception(req=req)
@@ -434,7 +427,6 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoCurrentIssueError, e:
             register_exception(req=req)
@@ -477,7 +469,6 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoNameError, e:
-            register_exception(req=req)
             return e.user_box()
         redirect_to_url(req, CFG_SITE_URL + \
                         '/admin/webjournal/webjournaladmin.py/administrate?journal_name=' + \

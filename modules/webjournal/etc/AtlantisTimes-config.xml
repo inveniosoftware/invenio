@@ -3,8 +3,8 @@
     <view>
         <niceName>Atlantis Times</niceName>
         <css>
-            <screen>/img/AtlantisTimes.css</screen>
-            <print>/img/AtlantisTimes.css</print>
+            <screen>img/AtlantisTimes.css</screen>
+            <print>img/AtlantisTimes.css</print>
         </css>
         <format_template>
             <index>AtlantisTimes_Index.bft</index>
