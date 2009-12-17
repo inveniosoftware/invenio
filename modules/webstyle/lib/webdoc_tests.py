@@ -97,7 +97,7 @@ class WebDocPartsTest(unittest.TestCase):
             result = transform('''
             <!-- WebDoc-Page-Title: _(Help Central)_  -->
             <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a> -->
-            <!-- WebDoc-Page-Revision: $Id$ -->
+            <!-- WebDoc-Page-Revision: $Id: help-central.webdoc,v 1.5 2008/05/26 12:52:41 jerome Exp $ -->
             <!-- WebDoc-Page-Description: A description -->''',
                                languages=[CFG_SITE_LANG])
 
@@ -111,8 +111,7 @@ class WebDocPartsTest(unittest.TestCase):
             self.assertEqual(result[0][4], '<a class="navtrail" href="%s/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a>' % CFG_SITE_URL)
 
             # Revision. Keep date & time only
-            self.assert_(result[0][5].replace('-', '/') in \
-                         '$Id$ -->')
+            self.assertEqual(result[0][5], '2008-05-26 12:52:41')
 
             # Description
             self.assertEqual(result[0][6], 'A description')

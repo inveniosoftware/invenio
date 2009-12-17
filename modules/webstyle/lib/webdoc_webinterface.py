@@ -215,5 +215,4 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
                 uid=uid,
                 language=ln,
                 req=req,
-                lastupdated=page_last_updated,
                 navmenuid=categ)

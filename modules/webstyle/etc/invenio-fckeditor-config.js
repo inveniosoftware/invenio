@@ -23,7 +23,7 @@ FCKConfig.ToolbarSets["WebComment"] = [
 ] ;
 
 
-FCKConfig.EditorAreaCSS = '/img/cds.css'
+FCKConfig.EditorAreaCSS = '/img/invenio.css'
 
 /* Though not recommended, it is much better that users gets a
    <br/> when pressing carriage return than a <p> element. Then
