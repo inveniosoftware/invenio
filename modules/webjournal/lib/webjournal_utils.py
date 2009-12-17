@@ -30,6 +30,7 @@ import math
 import urllib
 from MySQLdb import OperationalError
 from xml.dom import minidom
+from urlparse import urlparse
 
 from invenio.config import \
      CFG_ETCDIR, \
@@ -1322,7 +1323,10 @@ def parse_url_string(uri):
             'archive_search': ''}
 
     if not uri.startswith('/journal'):
-        # Mmh, incorrect context.
+        # Mmh, incorrect context. Still, keep language if available
+        url_params = urlparse(uri)[4]
+        args['ln'] = dict([part.split('=') for part in url_params.split('&') \
+                           if len(part.split('=')) == 2]).get('ln', CFG_SITE_LANG)
         return args
 
     # Take everything after journal and before first question mark
