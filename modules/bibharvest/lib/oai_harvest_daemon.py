@@ -788,7 +788,8 @@ def main():
             # verb is not given. We will continue with periodic
             # harvesting. But first check if URL parameter is given:
             # if it is, then warn directly now
-            if len(args) > 0:
+            if len(args) > 1 or \
+               (len(args) == 1 and not args[0].isdigit()):
                 usage(1, "You must specify the --verb parameter")
     except getopt.error, e:
         # So could it be that we are using different arguments? Try to
