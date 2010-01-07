@@ -1943,6 +1943,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
     if CFG_BIBDOCFILE_USE_XSENDFILE:
         ## If XSendFile is supported by the server, let's use it.
         if os.path.exists(fullpath):
+            if fullname is None:
+                fullname = os.path.basename(fullpath)
             req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
             req.headers_out["X-Sendfile"] = fullpath
             if mime is None:
