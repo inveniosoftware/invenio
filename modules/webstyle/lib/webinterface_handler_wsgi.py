@@ -430,8 +430,18 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         ## the req.form must be casted to dict because of Python 2.4 and earlier
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
+        form = dict(req.form)
+        for key, value in form.items():
+            ## FIXME: this is a backward compatibility workaround
+            ## because most of the old administration web handler
+            ## expect parameters to be of type str.
+            ## When legacy publisher will be removed all this
+            ## pain will go away anyway :-)
+            if isinstance(value, str):
+                form[key] = str(value)
+
         try:
-            return _check_result(req, module_globals[possible_handler](req, **dict(req.form)))
+            return _check_result(req, module_globals[possible_handler](req, **form))
         except TypeError, err:
             if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):
                 import inspect
@@ -441,7 +451,7 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
                 for arg in expected_args:
                     if arg == 'req':
                         continue
-                    cleaned_form[arg] = req.form.get(arg, None)
+                    cleaned_form[arg] = form.get(arg, None)
                 return _check_result(req, module_globals[possible_handler](req, **cleaned_form))
             else:
                 raise
