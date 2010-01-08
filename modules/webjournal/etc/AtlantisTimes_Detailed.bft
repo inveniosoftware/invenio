@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title><BFE_WEBJOURNAL_INFO var='WEBJOURNAL_NAME_INTL' /></title>
+<title><BFE_WEBJOURNAL_ARTICLE_TITLE suffix=" - " /><BFE_WEBJOURNAL_INFO var='WEBJOURNAL_NAME_INTL' /></title>
 <link href="<BFE_WEBJOURNAL_INFO var='WEBJOURNAL_CSS_URL' />" rel="stylesheet" type="text/css" />
 </head>
 
