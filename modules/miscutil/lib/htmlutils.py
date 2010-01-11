@@ -22,6 +22,7 @@ __revision__ = "$Id$"
 
 from HTMLParser import HTMLParser
 from invenio.config import CFG_SITE_URL
+from invenio.textutils import indent_text
 import re
 import cgi
 
@@ -383,3 +384,114 @@ def remove_html_markup(text, replacechar=' '):
     @rtype: string
     """
     return re_html.sub(replacechar, text)
+
+def create_html_tag(tag, body=None, escape_body=False, escape_attr=True, indent=0, attrs=None, **other_attrs):
+    """
+    Create an HTML tag.
+
+    This function create a full HTML tag, putting toghether an
+    optional inner body and a dictionary of attributes.
+
+        >>> print create_html_tag ("select", create_html_tag("h1",
+        ... "hello", other_attrs={'class': "foo"}))
+        <select>
+          <h1 class="foo">
+            hello
+          </h1>
+        </select>
+
+    @param tag: the tag (e.g. "select", "body", "h1"...).
+    @type tag: string
+    @param body: some text/HTML to put in the body of the tag (this
+        body will be indented WRT the tag).
+    @type body: string
+    @param escape_body: wether the body (if any) must be escaped.
+    @type escape_body: boolean
+    @param escape_attr: wether the attribute values (if any) must be
+        escaped.
+    @type escape_attr: boolean
+    @param indent: number of level of indentation for the tag.
+    @type indent: integer
+    @param attrs: map of attributes to add to the tag.
+    @type attrs: dict
+    @return: the HTML tag.
+    @rtype: string
+    """
+
+    if attrs is None:
+        attrs = {}
+    attrs.update(other_attrs)
+    out = "<%s" % tag
+    for key, value in attrs.iteritems():
+        if escape_attr:
+            value = escape_html(value, escape_quotes=True)
+        out += ' %s="%s"' % (key, value)
+    if body:
+        out += ">\n"
+        if escape_body:
+            body = escape_html(body)
+        out += indent_text(body, 1)
+        out += "</%s>" % tag
+    else:
+        out += " />"
+    out = indent_text(out, indent)
+    out = out[:-1] # Let's remove trailing new line
+    return out
+
+def create_html_select(options, selected=None, attrs=None, **other_attrs):
+    """
+    Create an HTML select box.
+
+        >>> print create_html_select(["foo", "bar"], selected="bar", name="baz")
+        <select name="baz">
+          <option selected="selected">
+            bar
+          </option>
+          <option>
+            foo
+          </option>
+        </select>
+        >>> print create_html_select({"foo": "oof", "bar": "rab"}, selected="bar", name="baz")
+        <select name="baz">
+          <option value="foo">
+            oof
+          </option>
+          <option selected="selected" value="bar">
+            rab
+          </option>
+        </select>
+
+    @param options: this can either be a sequence of strings or a map of
+        C{key->value}. In the former case, the C{select} tag will contain
+        a list of C{option} tags (in alphabetical order), where the
+        C{value} attribute is not specified. In the latter case, the
+        C{value} attribute will be set to the C{key}, while the body
+        of the C{option} will be set to C{value}.
+    @type options: sequence or map
+    @param selected: optional key/value to select by default. In case
+        a map has been used for options, C{selected} must be set to an
+        existing C{key}, otherwise it must be set to an existing
+        C{value}.
+    @type selected: string
+    @param attrs: optional attributes to create the select tag.
+    @type attrs: dict
+    @param other_attrs: other optional attributes.
+    @return: the HTML output.
+    @rtype: string
+
+    @note: the values and keys will be escaped for HTML.
+    """
+    body = []
+    try:
+        items = options.items()
+        items.sort(lambda item1, item2: cmp(item1[1], item2[1]))
+        for key, value in items:
+            option_attrs = key == selected and {"selected": "selected"} or {}
+            body.append(create_html_tag("option", body=value, escape_body=True, value=key, attrs=option_attrs))
+    except AttributeError:
+        options.sort()
+        for value in options:
+            option_attrs = value == selected and {"selected": "selected"} or {}
+            body.append(create_html_tag("option", body=value, escape_body=True, attrs=option_attrs))
+    return create_html_tag("select", body='\n'.join(body), attrs=attrs, **other_attrs)
+
