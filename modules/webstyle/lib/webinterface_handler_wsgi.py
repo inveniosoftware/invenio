@@ -445,13 +445,20 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
         except TypeError, err:
             if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):
                 import inspect
-                expected_args = inspect.getargspec(module_globals[possible_handler])[0]
+                inspected_args = inspect.getargspec(module_globals[possible_handler])
+                expected_args = list(inspected_args[0])
+                expected_defaults = list(inspected_args[3])
+                expected_args.reverse()
+                expected_defaults.reverse()
                 register_exception(req=req, prefix="Wrong GET parameter set in calling a legacy publisher handler for %s: expected_args=%s, found_args=%s" % (possible_handler, repr(expected_args), repr(req.form.keys())), alert_admin=CFG_DEVEL_SITE)
                 cleaned_form = {}
-                for arg in expected_args:
+                for index, arg in enumerate(expected_args):
                     if arg == 'req':
                         continue
-                    cleaned_form[arg] = form.get(arg, None)
+                    if index < len(expected_defaults):
+                        cleaned_form[arg] = form.get(arg, expected_defaults[index])
+                    else:
+                        cleaned_form[arg] = form.get(arg, None)
                 return _check_result(req, module_globals[possible_handler](req, **cleaned_form))
             else:
                 raise
