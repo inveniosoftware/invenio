@@ -95,7 +95,7 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
     @param reviews: boolean, enabled if reviews, disabled for comments
     @param uid: the id of the user who is reading comments
     @param can_send_comments: if user can send comment or not
-    @oaram can_attach_files: if user can attach file to comment or not
+    @param can_attach_files: if user can attach file to comment or not
     @param user_is_subscribed_to_discussion: True if user already receives new comments by email
     @param user_can_unsubscribe_from_discussion: True is user is allowed to unsubscribe from discussion
     @return html body.
@@ -264,7 +264,7 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
 def check_user_can_review(recID, client_ip_address, uid=-1):
     """ Check if a user hasn't already reviewed within the last seconds
     time limit: CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
-    @param cmt_id: comment id
+    @param recID: record ID
     @param client_ip_address: IP => use: str(req.remote_ip)
     @param uid: user id, as given by invenio.webuser.getUid(req)
     """
@@ -541,11 +541,10 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
                             nd = newest date
     @param display_since: datetime, e.g. 0000-00-00 00:00:00
     @param ranking: boolean, enabled if reviews, disabled for comments
-    @param full_reviews_p: boolean, filter out empty reviews (with score only) if False
     @return: tuple of comment where comment is
             tuple (nickname, uid, date_creation, body, id) if ranking disabled or
             tuple (nickname, uid, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
-    Note: for the moment, if no nickname, will return email address up to '@'
+            Note: for the moment, if no nickname, will return email address up to '@'
     """
     display_since = calculate_start_date(display_since)
 
@@ -701,9 +700,10 @@ def get_user_subscription_to_discussion(recID, uid):
     discussion.
     @param recID: record ID
     @param uid: user id
-    @returns : 0 if user is not subscribed to discussion
-               1 if user is subscribed, and is allowed to unsubscribe
-               2 if user is subscribed, but cannot unsubscribe
+    @return:
+               - 0 if user is not subscribed to discussion
+               - 1 if user is subscribed, and is allowed to unsubscribe
+               - 2 if user is subscribed, but cannot unsubscribe
     """
     user_email = get_email(uid)
     (emails1, emails2) = get_users_subscribed_to_discussion(recID, check_authorizations=False)
@@ -790,7 +790,8 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
     @param note: comment title
     @param score: review star score
     @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
-    @return integer >0 if successful, 0 if not
+    @rtype: bool
+    @return: True if email was sent okay, False if it was not.
     """
     _ = gettext_set_language(ln)
 
@@ -846,14 +847,15 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
                                                                       report_numbers,
                                                                       can_unsubscribe=True,
                                                                       ln=ln)
-
-    res1 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
-                      toaddr=emails1,
-                      subject=email_subject,
-                      content=email_content,
-                      header=email_header,
-                      footer=email_footer,
-                      ln=ln)
+    res1 = True
+    if emails1:
+        res1 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
+                          toaddr=emails1,
+                          subject=email_subject,
+                          content=email_content,
+                          header=email_header,
+                          footer=email_footer,
+                          ln=ln)
 
     # Then send email to people who have been automatically
     # subscribed to the discussion (they cannot unsubscribe)
@@ -872,14 +874,15 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
                                                                       report_numbers,
                                                                       can_unsubscribe=False,
                                                                       ln=ln)
-
-    res2 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
-                      toaddr=emails2,
-                      subject=email_subject,
-                      content=email_content,
-                      header=email_header,
-                      footer=email_footer,
-                      ln=ln)
+    res2 = True
+    if emails2:
+        res2 = send_email(fromaddr=CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,
+                          toaddr=emails2,
+                          subject=email_subject,
+                          content=email_content,
+                          header=email_header,
+                          footer=email_footer,
+                          ln=ln)
 
     return res1 and res2
 
@@ -972,7 +975,8 @@ def get_first_comments_or_remarks(recID=-1,
     Comments and remarks sorted by most recent date, reviews sorted by highest helpful score
     @param recID: record id
     @param ln: language
-    @param nb: number of comment/reviews or remarks to get
+    @param nb_comments: number of comment or remarks to get
+    @param nb_reviews: number of reviews or remarks to get
     @param voted: 1 if user has voted for a remark
     @param reported: 1 if user has reported a comment or review
     @return: if comment, tuple (comments, reviews) both being html of first nb comments/reviews
@@ -1087,8 +1091,9 @@ def perform_request_add_comment_or_remark(recID=0,
     @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
     @param can_attach_files: if user can attach files to comments or not
     @param subscribe: if True, subscribe user to receive new comments by email
-    @return html add form if action is display or reply
-            html successful added form if action is submit
+    @return:
+             - html add form if action is display or reply
+             - html successful added form if action is submit
     """
     warnings = []
     errors = []
