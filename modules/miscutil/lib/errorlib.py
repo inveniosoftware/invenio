@@ -105,7 +105,7 @@ def send_sms(phone_number, msg):
     if phone_number[0] != '0':
         phone_number = '00' + phone_number
     from invenio.mailutils import send_email
-    return send_email(CFG_SITE_SUPPORT_EMAIL, phone_number + '@sms.switch.ch', '', msg, header='', footer='')
+    return send_email(CFG_SITE_SUPPORT_EMAIL, phone_number + '@mail2sms.cern.ch', '', msg, header='', footer='')
 
 def register_emergency(msg, send_sms_function=send_sms):
     """Launch an emergency. This means to send sms messages to each
