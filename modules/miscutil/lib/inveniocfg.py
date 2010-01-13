@@ -514,9 +514,9 @@ mysql> GRANT ALL PRIVILEGES ON %(dbname)s.*
 mysql> QUIT
 
 
-The values printed above were detected from your configuration.
-If they are not right, then please edit your invenio.conf file
-and rerun 'inveniocfg --update-all' first.
+The values printed above were detected from your
+configuration. If they are not right, then please edit your
+invenio-local.conf file and rerun 'inveniocfg --update-all' first.
 
 
 If the problem is of different nature, then please inspect
