@@ -33,7 +33,9 @@ This stylesheet is provided only as an example of transformation.
 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:marc="http://www.loc.gov/MARC21/slim"
 xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"
-exclude-result-prefixes="marc fn">
+xmlns:dc="http://purl.org/dc/elements/1.1/"
+xmlns:dcterms="http://purl.org/dc/terms/"
+exclude-result-prefixes="marc fn dc dcterms opensearch">
 <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
 <xsl:template match="/">
 	<xsl:if test="collection">
@@ -70,14 +72,58 @@ exclude-result-prefixes="marc fn">
         <description>
                 <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_ABSTRACT print_lang=&quot;auto&quot;  separator_en=&quot; &quot;   separator_fr=&quot; &quot;  escape=&quot;4&quot; >')" />
         </description>
-        <author>
-                <xsl:value-of select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a']"/>
-        </author>
+
+	<xsl:choose>
+            <xsl:when test="contains(datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a'], '@')">
+                <!-- Email address: we can use author -->
+	         <author>
+                    <xsl:value-of select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a']"/>
+                </author>
+            </xsl:when>
+            <xsl:otherwise>
+                <dc:creator>
+                    <xsl:value-of select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a']"/>
+                </dc:creator>
+            </xsl:otherwise>
+	</xsl:choose>
+
         <pubDate>
                 <xsl:value-of select="fn:creation_date(controlfield[@tag=001], '%a, %d %b %Y %H:%M:%S GMT')"/>
         </pubDate>
         <guid>
                 <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+
         </guid>
+
+	<!-- Additionnal Dublic Core tags. Mainly used for books -->
+
+	<xsl:for-each select="datafield[@tag='020' and @ind1=' ' and @ind2=' ']">
+	  <!-- ISBN -->
+	  <xsl:if test="subfield[@code='a']">
+	    <dc:identifier>urn:ISBN:<xsl:value-of select="subfield[@code='a']"/></dc:identifier>
+	  </xsl:if>
+	</xsl:for-each>
+
+	<xsl:for-each select="datafield[@tag='022' and @ind1=' ' and @ind2=' ']">
+	  <!-- ISSN -->
+	  <xsl:if test="subfield[@code='a']">
+	    <dc:identifier>urn:ISSN:<xsl:value-of select="subfield[@code='a']"/></dc:identifier>
+	  </xsl:if>
+	</xsl:for-each>
+
+        <xsl:if test="datafield[@tag='260' and @ind1=' ' and @ind2=' ']/subfield[@code='b']">
+	  <!-- Publisher -->
+          <dc:publisher>
+            <xsl:value-of select="datafield[@tag='260' and @ind1=' ' and @ind2=' ']/subfield[@code='b']" />
+          </dc:publisher>
+        </xsl:if>
+
+        <xsl:if test="datafield[@tag='260' and @ind1=' ' and @ind2=' ']/subfield[@code='c']">
+	  <!-- Date -->
+          <dcterms:issued>
+            <xsl:value-of select="datafield[@tag='260' and @ind1=' ' and @ind2=' ']/subfield[@code='c']" />
+          </dcterms:issued>
+        </xsl:if>
+
 </xsl:template>
 </xsl:stylesheet>

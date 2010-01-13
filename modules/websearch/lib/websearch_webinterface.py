@@ -690,7 +690,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 ('', 'legacy_collection'),
                 ('search.py', 'legacy_search'),
                 'search', 'openurl', 'testsso',
-                'logout_SSO_hook']
+                'opensearchdescription', 'logout_SSO_hook']
 
     search = WebInterfaceSearchResultsPages()
     legacy_search = WebInterfaceLegacySearchPages()
@@ -827,6 +827,14 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             return redirect_to_url(req, ret_url)
         else:
             return redirect_to_url(req, CFG_SITE_URL)
+
+    def opensearchdescription(self, req, form):
+        """OpenSearch description file"""
+        req.content_type = "application/opensearchdescription+xml"
+        req.send_http_header()
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
+                                   'verbose': (int, 0) })
+        return websearch_templates.tmpl_opensearch_description(ln=argd['ln'])
 
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
@@ -1110,17 +1118,24 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                                                           m2=argd['m2'], op2=argd['op2'],
                                                           p3=argd['p3'], f3=argd['f3'],
                                                           m3=argd['m3'])
+            nb_found = len(recIDs)
             next_url = None
             if len(recIDs) >= argd['jrec'] + argd['rg']:
                 next_url = websearch_templates.build_rss_url(argd,
                                                              jrec=(argd['jrec'] + argd['rg']))
+
+            first_url = websearch_templates.build_rss_url(argd, jrec=1)
+            last_url = websearch_templates.build_rss_url(argd, jrec=nb_found-argd['rg']+1)
 
             recIDs = recIDs[-argd['jrec']:(-argd['rg']-argd['jrec']):-1]
 
             rss_prologue = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
             websearch_templates.tmpl_xml_rss_prologue(current_url=current_url,
                                                       previous_url=previous_url,
-                                                      next_url=next_url) + '\n'
+                                                      next_url=next_url,
+                                                      first_url=first_url, last_url=last_url,
+                                                      nb_found=nb_found,
+                                                      jrec=argd['jrec'], rg=argd['rg']) + '\n'
             req.write(rss_prologue)
             rss_body = format_records(recIDs,
                                       of='xr',

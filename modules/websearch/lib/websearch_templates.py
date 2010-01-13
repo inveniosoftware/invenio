@@ -51,6 +51,7 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_SITE_URL, \
      CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
@@ -255,6 +256,9 @@ class Template:
             'rft.series' : (str, ''),
     }
 
+    tmpl_opensearch_rss_url_syntax = "%(CFG_SITE_URL)s/rss?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}&amp;startIndex" % {'CFG_SITE_URL': CFG_SITE_URL}
+    tmpl_opensearch_html_url_syntax = "%(CFG_SITE_URL)s/search?p={searchTerms}&amp;jrec={startIndex}&amp;rg={count}&amp;ln={language}&amp;startIndex" % {'CFG_SITE_URL': CFG_SITE_URL}
+
     def tmpl_openurl2invenio(self, openurl_data):
         """ Return an Invenio url corresponding to a search with the data
         included in the openurl form map.
@@ -437,6 +441,36 @@ class Template:
                         'p' : 'recid:-1',
                         'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                         'of' : 'hb'}, {}))
+
+    def tmpl_opensearch_description(self, ln):
+        """ Returns the OpenSearch description file of this site.
+        """
+        _ = gettext_set_language(ln)
+        return """<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
+                       xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+<ShortName>%(short_name)s</ShortName>
+<LongName>%(long_name)s</LongName>
+<Description>%(description)s</Description>
+<InputEncoding>UTF-8</InputEncoding>
+<OutputEncoding>UTF-8</OutputEncoding>
+<Language>*</Language>
+<Contact>%(CFG_SITE_ADMIN_EMAIL)s</Contact>
+<Query role="example" searchTerms="a" />
+<Developer>Powered by CDS Invenio</Developer>
+<Url type="text/html" indexOffset="1" rel="results" template="%(html_search_syntax)s" />
+<Url type="application/rss+xml" indexOffset="1" rel="results" template="%(rss_search_syntax)s" />
+<Url type="application/opensearchdescription+xml" rel="self" template="%(CFG_SITE_URL)s/search/opensearchdescription" />
+<moz:SearchForm>%(CFG_SITE_URL)s</moz:SearchForm>
+</OpenSearchDescription>""" % \
+  {'CFG_SITE_URL': CFG_SITE_URL,
+   'short_name': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)[:16],
+   'long_name': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+   'description': (_("Search on %(x_CFG_SITE_NAME_INTL)s") % \
+   {'x_CFG_SITE_NAME_INTL': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)})[:1024],
+   'CFG_SITE_ADMIN_EMAIL': CFG_SITE_ADMIN_EMAIL,
+   'rss_search_syntax': self.tmpl_opensearch_rss_url_syntax,
+   'html_search_syntax': self.tmpl_opensearch_html_url_syntax
+   }
 
     def build_search_url(self, known_parameters={}, **kargs):
         """ Helper for generating a canonical search
@@ -3003,11 +3037,16 @@ class Template:
         return out
 
     def tmpl_xml_rss_prologue(self, current_url=None,
-                              previous_url=None, next_url=None):
+                              previous_url=None, next_url=None,
+                              first_url=None, last_url=None,
+                              nb_found=None, jrec=None, rg=None):
         """Creates XML RSS 2.0 prologue."""
         out = """<rss version="2.0"
         xmlns:media="http://search.yahoo.com/mrss/"
-        xmlns:atom="http://www.w3.org/2005/Atom">
+        xmlns:atom="http://www.w3.org/2005/Atom"
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:dcterms="http://purl.org/dc/terms/"
+        xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/">
       <channel>
         <title>%(sitename)s</title>
         <link>%(siteurl)s</link>
@@ -3017,12 +3056,15 @@ class Template:
         <category></category>
         <generator>CDS Invenio %(version)s</generator>
         <webMaster>%(sitesupportemail)s</webMaster>
-        <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s
+        <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s%(total_results)s%(start_index)s%(total_results)s
         <image>
             <url>%(siteurl)s/img/cds.png</url>
             <title>%(sitename)s</title>
             <link>%(siteurl)s</link>
         </image>
+         <url type="application/rss+xml" indexOffset="1" rel="results" template="%(search_syntax)s" />
+         <atom:link rel="search" href="%(siteurl)s/search/opensearchdescription" type="application/opensearchdescription+xml" title="Content Search" />
+
         <textInput>
           <title>Search </title>
           <description>Search this site:</description>
@@ -3032,6 +3074,7 @@ class Template:
         """ % {'sitename': CFG_SITE_NAME,
                'siteurl': CFG_SITE_URL,
                'sitelang': CFG_SITE_LANG,
+               'search_syntax': self.tmpl_opensearch_rss_url_syntax,
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime()),
                'version': CFG_VERSION,
                'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
@@ -3042,7 +3085,17 @@ class Template:
                                  '\n<atom:link rel="previous" href="%s" />' % previous_url) or '',
                'next_link': (next_url and \
                              '\n<atom:link rel="next" href="%s" />' % next_url) or '',
-               }
+               'first_link': (first_url and \
+                             '\n<atom:link rel="first" href="%s" />' % first_url) or '',
+               'last_link': (last_url and \
+                             '\n<atom:link rel="last" href="%s" />' % last_url) or '',
+               'total_results': (nb_found and \
+                             '\n<opensearch:totalResults>%i</opensearch:totalResults>' % nb_found) or '',
+               'start_index': (jrec and \
+                             '\n<opensearch:startIndex>%i</opensearch:startIndex>' % jrec) or '',
+               'total_results': (rg and \
+                             '\n<opensearch:itemsPerPage>%i</opensearch:itemsPerPage>' % rg) or '',
+        }
         return out
 
     def tmpl_xml_rss_epilogue(self):
