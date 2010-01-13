@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2009-12-14 10:06+0100\n"
-"PO-Revision-Date: 2009-12-02 15:07+0100\n"
+"PO-Revision-Date: 2010-01-12 15:07+0100\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -4173,7 +4173,7 @@ msgstr "Το μήνυμά σας έχει αποσταλεί."
 #: modules/webmessage/lib/webmessage_webinterface.py:362
 #: modules/websession/lib/websession_templates.py:603
 msgid "Your Messages"
-msgstr "Τα Μυνήματά μου"
+msgstr "Τα Μηνύματά μου"
 
 #: modules/webmessage/lib/webmessage_templates.py:86
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4518
@@ -11026,8 +11026,20 @@ msgstr "Άγνωστη Γνωσιακή Βάση"
 msgid "Delete Knowledge Base"
 msgstr "Διαγραφή Γνωσιακής Βάσης"
 
+#~ msgid "This record does not exist."
+#~ msgstr "Αυτή η εγγραφή δεν υπάρχει."
+
+#~ msgid "Please try another record ID."
+#~ msgstr "Παρακαλώ δοκιμάστε διαφορετικό αριθμό εγγραφής."
+
+#~ msgid "This record is currently being edited by another user."
+#~ msgstr "Αυτή η εγγραφή επεξεργάζεται από κάποιον άλλο χρήστη."
+
 #~ msgid "Please try again later."
 #~ msgstr "Παρακαλώ ξαναδοκιμάστε αργότερα."
+
+#~ msgid "Cannot edit deleted record."
+#~ msgstr "Δεν είναι δυνατό να επεξεργαστείτε μια διαγραμμένη εγγραφή."
 
 #~ msgid "There are record revisions not yet synchronized with the database."
 #~ msgstr ""
@@ -11047,6 +11059,21 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ "Γίνεται συγχρονισμός της νέας έκδοσης με την βάση και η εγγραφή θα είναι "
 #~ "σύντομα διαθέσιμη."
 
+#~ msgid "Record #%s"
+#~ msgstr "Εγγραφή #%s"
+
+#~ msgid "Record #%(recid)s, revision %(revdate)s"
+#~ msgstr "Εγγραφή #%(recid)s, έκδοση %(revdate)s"
+
+#~ msgid "older versions"
+#~ msgstr "παλιότερες εκδόσεις"
+
+#~ msgid "Run BibEdit"
+#~ msgstr "Εκτέλεση BibEdit"
+
+#~ msgid "Configure BibHarvest"
+#~ msgstr "Παραμετροποίηση BibHarvest"
+
 #~ msgid "View all reported comments"
 #~ msgstr "Προβολή όλων των πιθανά προσβλητικών σχολίων"
 
@@ -11056,12 +11083,34 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ msgid "Delete a specific comment/review (by ID)"
 #~ msgstr "Διαγραφή ενός συγκεκριμένου σχολίου/κριτικής (με ID)"
 
+#~ msgid "Here is comment/review %s"
+#~ msgstr "Ορίστε το σχόλιο/κριτική %s"
+
+#~ msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
+#~ msgstr ""
+#~ "Ορίστε το σχόλιο/review %(x_cmtID)s γραμμένο από τον χρήστη %(x_user)s"
+
 #~ msgid ""
 #~ "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)"
 #~ "s first."
 #~ msgstr ""
 #~ "Πριν προσθέσετε το σχόλιό σας, πρέπει να κάνετε %(x_url_open)slogin%"
 #~ "(x_url_close)s"
+
+#~ msgid "Delete Comment"
+#~ msgstr "Διαγραφή Σχολίου"
+
+#~ msgid "any collection"
+#~ msgstr "οποιαδήποτε συλλογή"
+
+#~ msgid "No words index available for"
+#~ msgstr "Δεν υπάρχει ευρετήριο λέξεων για"
+
+#~ msgid "No phrase index available for"
+#~ msgstr "Δεν υπάρχει ευρετήριο φράσεων για"
+
+#~ msgid "Publishes in"
+#~ msgstr "Δημοσιεύει στο"
 
 #~ msgid "session"
 #~ msgstr "συνεδρία"
@@ -11081,17 +11130,55 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ msgid "groups"
 #~ msgstr "ομάδες"
 
+#~ msgid "statistics"
+#~ msgstr "στατιστικά"
+
 #~ msgid "submissions"
 #~ msgstr "υποβολές"
 
 #~ msgid "approvals"
 #~ msgstr "εγκρίσεις"
 
+#~ msgid "administration"
+#~ msgstr "διαχείριση"
+
+#~ msgid ""
+#~ "Please note that if this is the first time that you are using this "
+#~ "account with the internal login method then the system has set for you a "
+#~ "randomly generated password. Please clic the following button to obtain a "
+#~ "password reset request link sent to you via email:"
+#~ msgstr ""
+#~ "Σας ενημερώνουμε οτι εάν αυτή είναι η πρώτη φορά πουχρησιμοποιείτε τον "
+#~ "λογαριασμό αυτό με την μέθοδο της εσωτερικής πιστοποίησης  τότε το "
+#~ "σύστημα έχει ορίσει για εσάς έναν τυχαίο κωδικό. Παρακαλώ πατήστε το "
+#~ "παρακάτω κουμπί για να σας σταλεί με email ένα αίτημα αλλαγής του κωδικού:"
+
+#~ msgid "Please send an error report to the Administrator."
+#~ msgstr "Παρακαλώ αποστείλατε την αναφορά σφάλματος στον Διαχειριστή."
+
+#~ msgid "Invalid parameter"
+#~ msgstr "Λανθασμένη παράμετρος"
+
+#~ msgid "Unable to find the submission directory."
+#~ msgstr "Δεν είναι δυνατόν να βρεθεί ο κατάλογος υποβολών."
+
+#~ msgid "Unable to create a directory for this submission."
+#~ msgstr "Δεν είναι δυνατόν να δημιουργηθεί κατάλογος για την υποβολή αυτή."
+
+#~ msgid "Cannot create submission directory."
+#~ msgstr "Δεν είναι δυνατόν να δημιουργηθεί κατάλογος υποβολών."
+
 #~ msgid "Unknown form field found on one of the submission pages."
 #~ msgstr "Άγνωστο πεδίο βρέθηκε σε μια από τις σελίδες υποβολής."
 
+#~ msgid "Unable to find document type."
+#~ msgstr "Δεν είναι δυνατόν να βρεθεί ο τύπος εγγράφου."
+
 #~ msgid "Reference not yet given"
 #~ msgstr "Δεν έχει δοθεί ακόμη αριθμος αναφοράς"
+
+#~ msgid "Go to general approval workflow"
+#~ msgstr "Μεταφορά σε ροή εργασίας απλής έγκρισης"
 
 #~ msgid "List of specific approvals"
 #~ msgstr "Λίστα ορισμένων εγκρίσεων"
@@ -11104,6 +11191,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 
 #~ msgid "Specific Approval and Refereeing Workflow"
 #~ msgstr "Ροή εργασίας ειδικών εγκρίσεων και αξιολογήσεων"
+
+#~ msgid "Mail %(x_url_open)sdevelopers%(x_url_close)s"
+#~ msgstr "Αποστολή email στούς %(x_url_open)sπρογραμματιστές%(x_url_close)s"
 
 #~ msgid "Internal configuration error"
 #~ msgstr "Εσωτερικό σφάλμα ρυθμίσεων"
@@ -11123,8 +11213,18 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ "Δεν υπάρχει επιλεγμένη μορφοποίηση για αυτή την αναδυόμενη σελίδα "
 #~ "περιοδικού"
 
+#~ msgid "We could not find a current issue in the Database"
+#~ msgstr "Δεν μπόρεσε να βρεθεί ένα τρέχον τεύχος στην Βάση"
+
+#~ msgid "Sorry, this category does not exist for this journal."
+#~ msgstr ""
+#~ "Λυπάμαι, η κατηγορία αυτή δεν υπάρχει για το συγκεκριμένο περιοδικό."
+
 #~ msgid "link"
 #~ msgstr "παραπομπή"
+
+#~ msgid "links"
+#~ msgstr "παραπομπές"
 
 #~ msgid "CERN %(link_or_links)s"
 #~ msgstr "CERN %(link_or_links)s"
@@ -11140,6 +11240,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 
 #~ msgid "Author collaborations"
 #~ msgstr "Συνεργασίες συγγραφέων"
+
+#~ msgid "Parameter docid missing"
+#~ msgstr "Η παράμετρος docid λείπει"
 
 #~ msgid "Please login to perform this action."
 #~ msgstr "Πρέπει να κάνετε login για να εκτελέσετε την λειτουργία αυτή."
@@ -11219,6 +11322,14 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ "(x_url_close)s."
 
 #, fuzzy
+#~ msgid "No Articles"
+#~ msgstr "Άρθρο"
+
+#, fuzzy
+#~ msgid "No Issues"
+#~ msgstr "Δεν υπάρχουν μηνύματα"
+
+#, fuzzy
 #~ msgid "Article Error"
 #~ msgstr "Άρθρο"
 
@@ -11233,6 +11344,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #, fuzzy
 #~ msgid "Successfully featured record: %s"
 #~ msgstr "η αναφορά για πιθανά προσβλητικό περιεχόμενο αποσιωπήθηκε επιτυχώς"
+
+#~ msgid "Convert"
+#~ msgstr "Μετατροπή"
 
 #~ msgid "Agenda"
 #~ msgstr "Ατζέντα"
@@ -11261,6 +11375,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ msgid "password"
 #~ msgstr "κωδικός"
 
+#~ msgid "You can login at"
+#~ msgstr "Μπορείτε να κάνετε login στο"
+
 #~ msgid "You seem to be %(x_role)s."
 #~ msgstr "Φαίνεται να είστε %(x_role)s."
 
@@ -11285,12 +11402,19 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ msgid "Login via:"
 #~ msgstr "Είσοδος μέσω:"
 
+#~ msgid "Edit parameters"
+#~ msgstr "Τροποποίηση παραμέτρων"
+
 #~ msgid "Try your search on..."
 #~ msgstr "Δοκιμάστε την έρευνά σας στο..."
 
 #, fuzzy
 #~ msgid "Timeout"
 #~ msgstr "Ώρα"
+
+#, fuzzy
+#~ msgid "See results"
+#~ msgstr "αποτελέσματα"
 
 #, fuzzy
 #~ msgid "%(num)s results found"
@@ -11310,6 +11434,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #, fuzzy
 #~ msgid "MEMBER_DELETED"
 #~ msgstr "ΔΙΑΓΡΑΦΗ"
+
+#~ msgid "Your modifications have now been submitted."
+#~ msgstr "Οι τροποποιήσεις σας έχουν υποβληθεί."
 
 #~ msgid "You can now go back to %s."
 #~ msgstr "Μπορείτε να επιστρέψετε στο %s."
@@ -11340,8 +11467,14 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ msgid "No waiting member"
 #~ msgstr "Δεν βρέθηκε χρήστης σε αναμονή"
 
+#~ msgid "Waiting members"
+#~ msgstr "Χρήστες σε αναμονή"
+
 #~ msgid "Group: <b>%s</b>"
 #~ msgstr "Ομάδα: <b>%s</b>"
+
+#~ msgid "Please select"
+#~ msgstr "Παρακαλώ επιλέξτε"
 
 #~ msgid "Please Select:"
 #~ msgstr "Παρακαλώ Επιλέξτε"
@@ -11360,6 +11493,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 
 #~ msgid "Cannot find document."
 #~ msgstr "Δεν μπορώ να βρω το έγγραφο."
+
+#~ msgid "You now have to"
+#~ msgstr "Τώρα πρέπει να"
 
 #~ msgid ""
 #~ "You first have to login before using this feature. Use the left menu to "
@@ -11509,6 +11645,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 #~ msgid "email"
 #~ msgstr "email"
 
+#~ msgid "Write a %s"
+#~ msgstr "Γράψτε μια %s"
+
 #~ msgid ""
 #~ "The record will be deleted as soon as the task queue is empty. You can "
 #~ "now go back to"
@@ -11527,6 +11666,9 @@ msgstr "Διαγραφή Γνωσιακής Βάσης"
 
 #~ msgid "(Report abuse)"
 #~ msgstr "(Αναφορά κακόβουλης χρήσης)"
+
+#~ msgid "Average review score"
+#~ msgstr "Μέσος βαθμολογία κριτικών"
 
 #~ msgid "based on %(nb_comments_total)s reviews"
 #~ msgstr "βασισμένο σε %(nb_comments_total)s κριτικές"
