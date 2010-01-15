@@ -28,6 +28,7 @@ from invenio.websubmit_functions.Shared_Functions import get_dictionary_from_str
 from invenio.errorlib import register_exception
 from invenio.config import CFG_BINDIR
 from invenio.dbquery import run_sql
+from invenio.shellutils import run_shell_command
 
 def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -162,7 +163,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
 
     # Update the MARC
     bibdocfile_bin = os.path.join(CFG_BINDIR, 'bibdocfile --yes-i-know')
-    os.system(bibdocfile_bin + " --fix-marc --recid=" + sysno)
+    run_shell_command(bibdocfile_bin + " --fix-marc --recid=%s", (str(sysno),))
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files

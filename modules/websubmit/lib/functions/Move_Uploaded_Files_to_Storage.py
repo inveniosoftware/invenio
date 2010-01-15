@@ -54,6 +54,7 @@ from invenio.websubmit_icon_creator import \
      create_icon, InvenioWebSubmitIconCreatorError
 from invenio.config import CFG_BINDIR
 from invenio.dbquery import run_sql
+from invenio.shellutils import run_shell_command
 
 def Move_Uploaded_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -126,7 +127,7 @@ def Move_Uploaded_Files_to_Storage(parameters, curdir, form, user_info=None):
 
     # Update the MARC
     bibdocfile_bin = os.path.join(CFG_BINDIR, 'bibdocfile --yes-i-know')
-    os.system(bibdocfile_bin + " --fix-marc --recid=" + str(recid))
+    run_shell_command(bibdocfile_bin + " --fix-marc --recid=%s", (str(recid),))
 
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
