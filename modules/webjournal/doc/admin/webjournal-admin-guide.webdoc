@@ -129,7 +129,7 @@ nodes:</p>
   <li>controller
     <ul><li><strong>issue_grouping</strong>: the default number of issues that are released together when grouping issue. Specify <code>1</code> if your release are not usually grouped.</li>
       <li><strong>issues_per_year</strong>: number of expected issue per year. Help to anticipate next issue dates and number</li>
-      <li><strong>hide_unreleased_issues</strong>: if all unreleased issue should be hidden to readers, type "<code>all</code>" (recommended). If only future unreleased issues must be hidden to readers, type "<code>future</code>". If  unreleased issues must always be accessible to everyone (even if displayed empty), use "<code>none</code>"</li>
+      <li><strong>hide_unreleased_issues</strong>: if all unreleased issue should be hidden to readers, type "<code>all</code>" (recommended). If only future unreleased issues must be hidden to readers, type "<code>future</code>". If  unreleased issues must always be accessible to everyone (even if displayed empty), use "<code>none</code>". Hidden issues are only visible to users who can access action "<code>cfgwebjournal</code>").</li>
       <li>marc_tags
         <ul>
           <li><strong>issue_number</strong>: <em>(not yet used. Should correspond to field containing issue number. Now hardcoded to 773__n)</em></li>
@@ -358,12 +358,12 @@ standard procedures to restrict submissions of records.</p>
 <p>You can restrict access to the issue control system by using the
 "<code>cfgwebjournal</code>" WebAccess action. This action takes the
 journal name as parameter in order to restrict access to selected
-journal(s) only. <br/>
+journal(s) only. A second parameter "<code>with_editor_rights</code>"
+must be set to "yes" in order for the authorized roles to edit apply
+changes using the interface (including sending alerts, releasing
+issues, etc.)<br/>
 
-The same action also defines if a user can see unreleased issues (if
-unreleased issues are protected). <br/>
-
-Also note that this action also lets your editors change your journal
+Note that this action also lets your editors change your journal
 configuration file (unless the file is protected on disk, which is
 recommended).
 </p>

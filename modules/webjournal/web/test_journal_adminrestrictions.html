@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost" />
+<title>test_admin_restrictions</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_admin_restrictions</td></tr>
+</thead><tbody>
+<!--Access WebJournal URL as guest-->
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py?ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/administrate?journal_name=AtlantisTimes&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/configure?action=add&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/index?journal_name=AtlantisTimes&amp;action=askDelete&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/index?journal_name=AtlantisTimes&amp;action=delete&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/configure?action=edit&amp;journal_name=AtlantisTimes&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?journal_name=AtlantisTimes&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?journal_name=AtlantisTimes&amp;action=askremove&amp;recid=7&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<!--Access WebJournal URLs in read-only mode-->
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py?ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>j123uliet</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=AtlantisTimes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Feature a Record</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Edit Configuration</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>regenerate</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>release now</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>announce now</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/configure?action=add&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/index?journal_name=AtlantisTimes&amp;action=askDelete&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/index?journal_name=AtlantisTimes&amp;action=delete&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/configure?action=edit&amp;journal_name=AtlantisTimes&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?journal_name=AtlantisTimes&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?journal_name=AtlantisTimes&amp;action=askremove&amp;recid=7&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<!--Access WebJournal URLs as fully authorized editor-->
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py?ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>balthasar</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>b123althasar</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>delete</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=AtlantisTimes</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Feature a Record</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>Edit Configuration</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>regenerate</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>release now</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextPresent</td>
+	<td>announce now</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/configure?action=add&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/index?journal_name=AtlantisTimes&amp;action=askDelete&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/configure?action=edit&amp;journal_name=AtlantisTimes&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?journal_name=AtlantisTimes&amp;ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/webjournal/webjournaladmin.py/feature_record?ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>assertTextNotPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

@@ -17,4 +17,10 @@
 
 SUBDIRS = admin
 
+testdir = $(libdir)/webtest/invenio
+
+test_DATA = test_journal_adminrestrictions.html
+
+EXTRA_DIST = $(test_DATA)
+
 CLEANFILES = *~ *.tmp

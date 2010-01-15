@@ -481,25 +481,39 @@ Cher Abonné,
 
     def tmpl_admin_administrate(self, journal_name, current_issue,
                                 current_publication, issue_list,
-                                next_issue_number, ln=CFG_SITE_LANG):
+                                next_issue_number, ln=CFG_SITE_LANG,
+                                as_editor=True):
         """
         Returns an administration interface that shows the current publication and
         supports links to all important actions.
+
+        @param as_editor: True if can make changes to the configuration. Else read-only mode.
         """
         _ = gettext_set_language(ln)
         out = ''
 
-        out += '''<table class="admin_wvar">
-        <tr><th colspan="5" class="adminheaderleft" cellspacing="0">%(menu)s</th></tr>
-        <tr>
-        <td>0.&nbsp;<small>Administrate</small>&nbsp;</td>
-        <td>1.&nbsp;<small><a href="feature_record?journal_name=%(journal_name)s">Feature a Record</a></small>&nbsp;</td>
-        <td>2.&nbsp;<small><a href="configure?action=edit&amp;journal_name=%(journal_name)s">Edit Configuration</a></small>&nbsp;</td>
-        <td>3.&nbsp;<small><a href="%(CFG_SITE_URL)s/journal/%(journal_name)s">Go to the Journal</a></small>&nbsp;</td>
-        </tr>
-        </table><br/>''' % {'journal_name': journal_name,
-                            'menu': _("Menu"),
-                            'CFG_SITE_URL': CFG_SITE_URL}
+        if as_editor:
+            admin_menu = '''<table class="admin_wvar">
+            <tr><th colspan="5" class="adminheaderleft" cellspacing="0">%(menu)s</th></tr>
+            <tr>
+            <td>0.&nbsp;<small>Administrate</small>&nbsp;</td>
+            <td>1.&nbsp;<small><a href="feature_record?journal_name=%(journal_name)s">Feature a Record</a></small>&nbsp;</td>
+            <td>2.&nbsp;<small><a href="configure?action=edit&amp;journal_name=%(journal_name)s">Edit Configuration</a></small>&nbsp;</td>
+            <td>3.&nbsp;<small><a href="%(CFG_SITE_URL)s/journal/%(journal_name)s">Go to the Journal</a></small>&nbsp;</td>
+            </tr>
+            </table><br/>'''
+        else:
+            admin_menu = '''<table class="admin_wvar">
+            <tr><th colspan="5" class="adminheaderleft" cellspacing="0">%(menu)s</th></tr>
+            <tr>
+            <td>0.&nbsp;<small>Administrate</small>&nbsp;</td>
+            <td>1.&nbsp;<small><a href="%(CFG_SITE_URL)s/journal/%(journal_name)s">Go to the Journal</a></small>&nbsp;</td>
+            </tr>
+            </table><br/>'''
+
+        out += admin_menu % {'journal_name': journal_name,
+                             'menu': _("Menu"),
+                             'CFG_SITE_URL': CFG_SITE_URL}
 
         # format the issues
         issue_boxes = []
@@ -532,18 +546,18 @@ Cher Abonné,
 
                     issue, (issue==next_issue_number) and "?" or current_publication,
 
-                    "\n".join(['<p>%s : %s <a href="%s/journal/%s/%s/%s/%s">&gt;edit</a></p>' %
+                    "\n".join(['<p>%s : %s <a href="%s/journal/%s/%s/%s/%s">&gt;view</a></p>' %
                                (item[0], item[1],
                                 CFG_SITE_URL, journal_name,
                                 issue.split('/')[1], issue.split('/')[0], item[0]) \
                                for item in articles.iteritems()]),
 
                     (not released_on) and
-                    '<em>not released</em><br/><a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">&gt;release now</a>' % (CFG_SITE_URL, journal_name) or
+                    ('<em>not released</em>' + (as_editor and '<br/><a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">&gt;release now</a>' % (CFG_SITE_URL, journal_name) or '')) or
                     'released on: %s' % released_on.strftime("%d.%m.%Y"),
 
                     (not announced_on)
-                    and '<em>not announced</em><br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;announce now</a>' % (CFG_SITE_URL, journal_name, issue) or
+                    and ('<em>not announced</em>' + (as_editor and '<br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;announce now</a>' % (CFG_SITE_URL, journal_name, issue) or '')) or
                     'announced on: %s <br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;re-announce</a>' % (announced_on.strftime("%d.%m.%Y"), CFG_SITE_URL, journal_name, issue),
 
                     CFG_SITE_URL, journal_name, issue, ln
@@ -575,7 +589,7 @@ Cher Abonné,
 
         params:
                  ln  - ln
-           journals  - list of tuples (journal_id, journal_name)
+           journals  - list of tuples (journal_info dict, as_editor)
                 msg  - message to be displayed
         """
         out = ""
@@ -590,15 +604,17 @@ Cher Abonné,
         </tr>
         '''
         color = "fff"
-        for journal_info in journals:
-            out += '''<tr style="background-color:#%(color)s">
+        for journal_info, as_editor in journals:
+            row = '''<tr style="background-color:#%(color)s">
                <td class="admintdleft"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%(journal_name)s">%(journal_name)s</a></td>
-               <td class="admintdright"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%(journal_name)s">edit</a></td>
-               <td class="admintdright"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/index?journal_name=%(journal_name)s&action=askDelete">delete</a></td>
-            </tr>''' % {'color': color,
-                        'journal_name': journal_info['journal_name'],
-                        'journal_id': journal_info['journal_id'],
-                        'CFG_SITE_URL': CFG_SITE_URL}
+               <td class="admintdright"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%(journal_name)s">edit</a></td>'''
+            if as_editor:
+                row += '<td class="admintdright"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/index?journal_name=%(journal_name)s&action=askDelete">delete</a></td>'
+            row += '</tr>'
+            out += row % {'color': color,
+                          'journal_name': journal_info['journal_name'],
+                          'journal_id': journal_info['journal_id'],
+                          'CFG_SITE_URL': CFG_SITE_URL}
             if color == 'fff':
                 color = 'EBF7FF'
             else:

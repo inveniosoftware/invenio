@@ -67,12 +67,18 @@ def index(req, ln=CFG_SITE_LANG, journal_name=None, action=""):
     except InvenioWebJournalNoNameError, e:
         register_exception(req=req)
         return e.user_box()
-    auth = acc_authorize_action(getUid(req), 'cfgwebjournal')
+    if action in ['delete', 'askDelete']:
+        # To perform these, one must be authorized
+        auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
+                                    name=journal_name, with_editor_rights='yes')
+    else:
+        auth = acc_authorize_action(getUid(req), 'cfgwebjournal')
     if auth[0] == 0:
         return page(title=_('WebJournal Admin'),
                     body=wjn.perform_index(ln=ln,
                                            journal_name=journal_name,
-                                           action=action),
+                                           action=action,
+                                           uid=getUid(req)),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -106,8 +112,13 @@ def administrate(req, journal_name, ln=CFG_SITE_LANG):
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
                                 name="%s" % journal_name)
     if auth[0] == 0:
+        as_editor = acc_authorize_action(getUid(req), 'cfgwebjournal',
+                                         name="%s" % journal_name,
+                                         with_editor_rights='yes')[0] == 0
+
         return page(title=_('Administrate %(journal_name)s' % {'journal_name':journal_name}),
-                    body=wjn.perform_administrate(ln=ln, journal_name=journal_name),
+                    body=wjn.perform_administrate(ln=ln, journal_name=journal_name,
+                                                  as_editor=as_editor),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -141,7 +152,8 @@ def feature_record(req, journal_name="", recid="", img_url="", ln=CFG_SITE_LANG,
         return e.user_box()
 
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
-                                name="%s" % journal_name)
+                                name="%s" % journal_name,
+                                with_editor_rights='yes')
     if auth[0] == 0:
         return page(title=_("Feature a record"),
                     body=wjn.perform_feature_record(ln=ln,
@@ -202,7 +214,8 @@ def alert(req, journal_name="", ln=CFG_SITE_LANG, sent="False", plainText=u"",
         return e.user_box()
 
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
-                                name="%s" % journal_name)
+                                name="%s" % journal_name,
+                                with_editor_rights='yes')
     if auth[0] == 0:
         return page(title=_("Email Alert System"),
                     body=wjn.perform_request_alert(journal_name=journal_name,
@@ -305,7 +318,8 @@ def issue_control(req, journal_name="", issue=[],
         return e.user_box()
 
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
-                                name="%s" % journal_name)
+                                name="%s" % journal_name,
+                                with_editor_rights='yes')
     if auth[0] == 0:
         return page(title=_("Publishing Interface"),
                     body=wjn.perform_request_issue_control(journal_name=journal_name,
@@ -354,7 +368,8 @@ def configure(req, journal_name=None, ln=CFG_SITE_LANG, xml_config=u'', action='
         return e.user_box()
 
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal',
-                                name="%s" % journal_name)
+                                name="%s" % journal_name,
+                                with_editor_rights='yes')
     if auth[0] == 0:
         return page(title=page_title,
                     body=wjn.perform_request_configure(journal_name=journal_name,

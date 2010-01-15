@@ -41,6 +41,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL
 from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
+from invenio.access_control_engine import acc_authorize_action
 from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalReleaseUpdateError, \
@@ -86,7 +87,7 @@ def getnavtrail(previous = ''):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_index(ln=CFG_SITE_LANG, journal_name=None, action=None):
+def perform_index(ln=CFG_SITE_LANG, journal_name=None, action=None, uid=None):
     """
     Index page
 
@@ -97,6 +98,7 @@ def perform_index(ln=CFG_SITE_LANG, journal_name=None, action=None):
         journal_name  -  the journal affected by action, if any
               action  -  one of ['', 'askDelete', _('Delete'), _('Cancel')]
                   ln  -  language
+                 uid  -  user id
     """
     _ = gettext_set_language(ln)
 
@@ -118,11 +120,21 @@ def perform_index(ln=CFG_SITE_LANG, journal_name=None, action=None):
         remove_journal(journal_name)
 
     journals = get_journals_ids_and_names()
+    # Only keep journal that user can view or edit
+    journals = [(journal_info, acc_authorize_action(uid,
+                                                    'cfgwebjournal',
+                                                    name=journal_info['journal_name'],
+                                                    with_editor_rights='yes')[0] == 0) \
+                 for journal_info in journals \
+                 if acc_authorize_action(uid,
+                                         'cfgwebjournal',
+                                         name=journal_info['journal_name'])[0] == 0]
     return wjt.tmpl_admin_index(ln=ln,
                                 journals=journals,
                                 msg=msg)
 
-def perform_administrate(ln=CFG_SITE_LANG, journal_name=None):
+def perform_administrate(ln=CFG_SITE_LANG, journal_name=None,
+                         as_editor=True):
     """
     Administration of a journal
 
@@ -132,6 +144,7 @@ def perform_administrate(ln=CFG_SITE_LANG, journal_name=None):
     Parameters:
         journal_name  -  the journal to be administrated
                   ln  -  language
+        with_editor_rights  -  True if can edit configuration. Read-only mode otherwise
     """
     if journal_name is None:
         try:
@@ -148,12 +161,14 @@ def perform_administrate(ln=CFG_SITE_LANG, journal_name=None):
                                                    ln)
     issue_list = get_grouped_issues(journal_name, current_issue)
     next_issue_number = get_next_journal_issues(issue_list[-1], journal_name, 1)
+
     return wjt.tmpl_admin_administrate(journal_name,
                                        current_issue,
                                        current_publication,
                                        issue_list,
                                        next_issue_number[0],
-                                       ln)
+                                       ln,
+                                       as_editor=as_editor)
 
 def perform_feature_record(journal_name,
                            recid,
