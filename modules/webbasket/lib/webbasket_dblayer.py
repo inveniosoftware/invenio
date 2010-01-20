@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 from zlib import decompress
 from zlib import compress
 from time import localtime
+from invenio.textutils import encode_for_xml
 
 from invenio.dbquery import run_sql
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
@@ -826,6 +827,7 @@ def add_to_basket(uid,
             params_external = (colid, es_url, now, now)
             res_external = run_sql(query_external, params_external)
             recids = [-res_external]
+            store_external_source(res_external, es_title, es_desc, es_url, 'xm')
             store_external_source(res_external, es_title, es_desc, es_url, 'hb')
 
         query_insert = """  INSERT IGNORE INTO  bskREC
@@ -918,6 +920,7 @@ def add_to_many_baskets(uid, recids=[], colid=0, bskids=[], es_title="", es_desc
             params = (colid, es_url, now, now)
             res = run_sql(query2C, params)
             recids = [-res]
+            store_external_source(res, es_title, es_desc, es_url, 'xm')
             store_external_source(res, es_title, es_desc, es_url, 'hb')
 
         query2 = """INSERT IGNORE
@@ -952,7 +955,7 @@ def add_to_many_baskets(uid, recids=[], colid=0, bskids=[], es_title="", es_desc
 def get_external_records_by_collection(recids):
     """Get the selected recids, both local and external, grouped by collection."""
 
-    if len(recids):
+    if recids:
         query = """ SELECT      GROUP_CONCAT(id),
                                 GROUP_CONCAT(external_id),
                                 collection_id
@@ -966,13 +969,34 @@ def get_external_records_by_collection(recids):
         params = tuple(recids)
         res = run_sql(query,params)
         return res
-    else:
-        return 0
+    return 0
+
+def get_external_records(recids, of="hb"):
+    """Get formatted external records from the database."""
+
+    if recids:
+        query = """ SELECT  rec.collection_id,
+                            fmt.id_bskEXTREC,
+                            fmt.value
+                    FROM    bskEXTFMT AS fmt
+                    JOIN    bskEXTREC AS rec
+                        ON  rec.id=fmt.id_bskEXTREC
+                    WHERE   format=%%s
+                    AND     ( %s )"""
+        recids = [-recid for recid in recids]
+        sep_or = ' OR '
+        query %= sep_or.join(['id_bskEXTREC=%s'] * len(recids))
+        params = [of]
+        params.extend(recids)
+        params = tuple(params)
+        res = run_sql(query,params)
+        return res
+    return ()
 
 def store_external_records(records, of="hb"):
     """Store formatted external records to the database."""
 
-    if len(records):
+    if records:
         query = """INSERT
                     INTO bskEXTFMT
                         (id_bskEXTREC,
@@ -991,7 +1015,8 @@ def store_external_records(records, of="hb"):
 def store_external_urls(ids_urls):
     """Store original urls for external records to the database."""
 
-    for id_url in ids_urls.iteritems():
+    #for id_url in ids_urls.iteritems():
+    for id_url in ids_urls:
         query = """UPDATE
                     bskEXTREC
                     SET original_url=%s
@@ -1010,10 +1035,8 @@ def store_external_source(es_id, es_title, es_desc, es_url, of="hb"):
                                  value)
                     VALUES      (%s, %s, %s, %s)"""
         now = convert_datestruct_to_datetext(localtime())
-        # old approach. The pseudo item is created and stored formatted at the db.
-        #params = (es_id, of, now, compress(create_pseudo_record(es_title, es_desc, es_url, of)))
-        # new (better) approach. The pseudo item is created and formatted at the template.
-        params = (es_id, of, now, compress('\n'.join([es_title, es_desc, es_url])))
+        value = create_pseudo_record(es_id, es_title, es_desc, es_url, of)
+        params = (es_id, of, now, compress(value))
         run_sql(query,params)
 
 def get_external_colid_and_url(recid):
@@ -2177,20 +2200,27 @@ def __decompress_last(item):
     item[-1] = decompress(item[-1])
     return item
 
-def create_pseudo_record(es_title, es_desc, es_url, of="hb"):
+def create_pseudo_record(es_id, es_title, es_desc, es_url, of="hb"):
     """Return a pseudo record representation given a title and a description."""
 
     if of == 'hb':
-        record = """<strong>%s</strong>
-<br />
-<small>%s
-<br />
-<strong>URL:</strong> <a class="note" target="_blank" href="%s">%s</a>
-</small>
-""" % (es_title, es_desc, es_url, prettify_url(es_url))
-        return record
+        record = '\n'.join([es_title, es_desc, es_url])
     if of == 'xm':
-        pass
+# In case we want to use the controlfield,
+# the -es_id must be used.
+#<controlfield tag="001">%s</controlfield>
+        record = """<record>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">%s</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">%s</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">%s</subfield>
+  </datafield>
+</record>""" % (encode_for_xml(es_title), encode_for_xml(es_desc), es_url)
+    return record
 
 def prettify_url(url, char_limit=50, nb_dots=3):
     """If the url has more characters than char_limit return a shortened version of it
@@ -2209,3 +2239,9 @@ def prettify_url(url, char_limit=50, nb_dots=3):
         return url[:nb_char_beg] + '.'*nb_dots + url[-nb_char_end:]
     else:
         return url
+
+def debug_to_file(*args):
+    debug = '\n'.join(str(arg) for arg in args) + '\n'
+    f = open("/tmp/cds.db", 'a')
+    f.write(debug)
+    f.close()

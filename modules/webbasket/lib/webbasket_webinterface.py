@@ -57,7 +57,9 @@ from invenio.webbasket import \
      perform_request_create_basket, \
      perform_request_delete, \
      wash_topic, \
-     wash_group
+     wash_group, \
+     perform_request_export_xml, \
+     page_start
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS
@@ -330,7 +332,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                              selected_group_id=argd['group'],
                                                              selected_bskid=argd['bskid'],
                                                              selected_recid=argd['recid'],
-                                                             format=argd['of'],
+                                                             of=argd['of'],
                                                              ln=argd['ln'])
 
         if isGuestUser(uid):
@@ -345,6 +347,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             register_customevent("baskets", ["display", "", user_str])
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
+        if argd['of'] == 'xm':
+            page_start(req, of=argd['of'])
+            return perform_request_export_xml(body)
 
         return page(title       = _("Display baskets"),
                     body        = body,
@@ -399,7 +405,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                             p=argd['p'],
                                                             b=argd['b'],
                                                             n=argd['n'],
-                                                            format=argd['of'],
+                                                            #format=argd['of'],
                                                             ln=argd['ln'])
 
         # register event in webstat
@@ -1238,14 +1244,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         else:
-            # TODO: Take care of XML output as shown below
-            #req.content_type = "text/xml"
-            #req.send_http_header()
-            #return perform_request_display_public(bskid=argd['bskid'], of=argd['of'], ln=argd['ln'])
             (body, warnings, navtrail) = perform_request_display_public(uid=uid,
                                                                         selected_bskid=argd['bskid'],
                                                                         selected_recid=argd['recid'],
-                                                                        format=argd['of'],
+                                                                        of=argd['of'],
                                                                         ln=argd['ln'])
             title = _('Public basket')
 
@@ -1259,6 +1261,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                 register_customevent("baskets", ["display_public", basket_str, user_str])
             except:
                 register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
+        if argd['of'] == 'xm':
+            page_start(req, of=argd['of'])
+            return perform_request_export_xml(body)
 
         return page(title       = title,
                     body        = body,

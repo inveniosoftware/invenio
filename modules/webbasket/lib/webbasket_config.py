@@ -88,6 +88,7 @@ CFG_WEBBASKET_WARNING_MESSAGES = {
     'WRN_WEBBASKET_INVALID_ADD_TO_PARAMETERS': '_("Cannot add items to the selected basket. Invalid parameters.")',
     'WRN_WEBBASKET_CAN_NOT_SUBSCRIBE': '_("You cannot subscribe to this basket, you are the either owner or you have already subscribed.")',
     'WRN_WEBBASKET_CAN_NOT_UNSUBSCRIBE': '_("You cannot unsubscribe from this basket, you are the either owner or you have already unsubscribed.")',
+    'WRN_WEBBASKET_INVALID_OUTPUT_FORMAT': '_("The selected output format is not available or is invalid.")',
     }
 
 # pylint: disable-msg=C0301

@@ -37,7 +37,9 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
-from invenio.search_engine import perform_request_search, wash_colls, get_coll_sons, is_hosted_collection
+from invenio.webbasket import format_external_records
+from invenio.search_engine import perform_request_search, wash_colls, \
+get_coll_sons, is_hosted_collection
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
 from invenio.webuser import get_email
@@ -45,8 +47,9 @@ from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
 
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
+from invenio.websearch_external_collections_config import \
+CFG_EXTERNAL_COLLECTION_TIMEOUT, \
+CFG_EXTERNAL_COLLECTION_MAXRESULTS_ALERTS
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
 from invenio.websearch_external_collections_utils import get_collection_id
 
@@ -118,8 +121,8 @@ def add_records_to_basket(records, basket_id):
                     if CFG_WEBALERT_DEBUG_LEVEL < 4:
                         owner_uid = get_basket_owner_id(basket_id)
                         collection_id = get_collection_id(external_collection_results[0])
-                        add_to_basket(owner_uid, external_collection_results[1][0][:nrec_to_add], collection_id, basket_id)
-                        # TBD: maybe cache here the html brief format of the external records for the baskets later?
+                        added_items = add_to_basket(owner_uid, external_collection_results[1][0][:nrec_to_add], collection_id, basket_id)
+                        format_external_records(added_items, of="xm")
                     else:
                         print '   NOT ADDED, DEBUG LEVEL == 4'
                 except Exception:

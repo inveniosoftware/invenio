@@ -1305,6 +1305,18 @@ input,select {
    width: 100%;
 }
 
+ul.bsk_export_as_list{
+   list-style-image: url(arrow_link-icon-15x11-right.gif) ;
+   padding-left: 1em;
+   margin:0.05em;
+}
+.bsk_export_as_list, .bsk_export_as_list a{
+   text-decoration:none;
+   color:#555;
+   font-weight:700;
+   font-size:small;
+}
+
 /*START The search box container*/
 #bskcontainersearch{
    width: 100%;

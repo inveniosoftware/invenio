@@ -607,7 +607,7 @@ class CDSInvenioSearchEngine(ExternalSearchEngine):
         recids_urls = []
         for recid in recids:
             recids_urls.append((recid, self.record_url + recid))
-        return tuple(recids_urls)
+        return recids_urls
 
 external_collections_dictionary = {}
 

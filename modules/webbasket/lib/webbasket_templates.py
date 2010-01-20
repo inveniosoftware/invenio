@@ -1867,40 +1867,46 @@ class Template:
                     selected_topic="",
                     selected_group=0,
                     items=[],
+                    of='hb',
                     ln=CFG_SITE_LANG):        
         """Template for basket display."""
 
-        out = """
+        if of != 'xm':
+            out = """
 <table class="bskbasket" width="100%">"""
+        else:
+            out = ""
 
-        out += self.tmpl_basket_header(bskid,
-                                       name,
-                                       nb_items,
-                                       nb_subscribers,
-                                       date_modification,
-                                       (user_can_view_content,
-                                        user_can_edit_basket,
-                                        user_can_view_notes,
-                                        user_can_add_item,
-                                        user_can_delete_item),
-                                       selected_category,
-                                       nb_comments,
-                                       last_comment,
-                                       selected_topic,
-                                       share_level,
-                                       ln)
+        if of != 'xm':
+            out += self.tmpl_basket_header(bskid,
+                                           name,
+                                           nb_items,
+                                           nb_subscribers,
+                                           date_modification,
+                                           (user_can_view_content,
+                                            user_can_edit_basket,
+                                            user_can_view_notes,
+                                            user_can_add_item,
+                                            user_can_delete_item),
+                                           selected_category,
+                                           nb_comments,
+                                           last_comment,
+                                           selected_topic,
+                                           share_level,
+                                           ln)
 
-        out += self.tmpl_basket_footer(bskid,
-                                       nb_items,
-                                       (user_can_view_content,
-                                        user_can_edit_basket,
-                                        user_can_view_notes,
-                                        user_can_add_item,
-                                        user_can_delete_item),
-                                       selected_category,
-                                       selected_topic,
-                                       share_level,
-                                       ln)
+        if of != 'xm':
+            out += self.tmpl_basket_footer(bskid,
+                                           nb_items,
+                                           (user_can_view_content,
+                                            user_can_edit_basket,
+                                            user_can_view_notes,
+                                            user_can_add_item,
+                                            user_can_delete_item),
+                                           selected_category,
+                                           selected_topic,
+                                           share_level,
+                                           ln)
 
         out += self.tmpl_basket_content(bskid,
                                         (user_can_view_content,
@@ -1913,10 +1919,20 @@ class Template:
                                         selected_topic,
                                         selected_group,
                                         items,
+                                        of,
                                         ln)
 
-        out += """
+        if of != 'xm':
+            out += """
 </table>"""
+
+        if of != 'xm':
+            out += self.tmpl_create_export_as_list(selected_category,
+                                                   selected_topic,
+                                                   selected_group,
+                                                   bskid,
+                                                   None,
+                                                   False)
 
         return out
 
@@ -2089,57 +2105,64 @@ class Template:
                             selected_topic="",
                             selected_group=0,
                             items=[],
+                            of='hb',
                             ln=CFG_SITE_LANG):        
         """Template for basket content display."""
 
-        _ = gettext_set_language(ln)
-        items_html = """
+        if of != 'xm':
+            _ = gettext_set_language(ln)
+            items_html = """
   <tbody>"""
-        if user_can_view_content:
-            if not(items):
-                items_html += """
+            if user_can_view_content:
+                if not(items):
+                    items_html += """
     <tr>
       <td style="text-align:center; height:100px">
       %s
       </td>
     </tr>""" % _("Basket is empty")
+                else:
+                    count = 0
+                    for item in items:
+                        count += 1
+                        copy = 1
+                        go_up = go_down = delete = 0
+                        if user_can_add_item:
+                            go_up = go_down = 1
+                            if item == items[0]:
+                                go_up = 0
+                            if item == items[-1]:
+                                go_down = 0
+                        if user_can_delete_item:
+                            delete = 1
+                        items_html += self.__tmpl_basket_item(count=count,
+                                                              bskid=bskid,
+                                                              item=item,
+                                                              uparrow=go_up,
+                                                              downarrow=go_down,
+                                                              copy_item=copy,
+                                                              delete_item=delete,
+                                                              view_notes=user_can_view_notes,
+                                                              add_notes=user_can_add_notes,
+                                                              selected_category=selected_category,
+                                                              selected_topic=selected_topic,
+                                                              selected_group=selected_group,
+                                                              ln=ln)
             else:
-                count = 0
-                for item in items:
-                    count += 1
-                    copy = 1
-                    go_up = go_down = delete = 0
-                    if user_can_add_item:
-                        go_up = go_down = 1
-                        if item == items[0]:
-                            go_up = 0
-                        if item == items[-1]:
-                            go_down = 0
-                    if user_can_delete_item:
-                        delete = 1
-                    items_html += self.__tmpl_basket_item(count=count,
-                                                          bskid=bskid,
-                                                          item=item,
-                                                          uparrow=go_up,
-                                                          downarrow=go_down,
-                                                          copy_item=copy,
-                                                          delete_item=delete,
-                                                          view_notes=user_can_view_notes,
-                                                          add_notes=user_can_add_notes,
-                                                          selected_category=selected_category,
-                                                          selected_topic=selected_topic,
-                                                          selected_group=selected_group,
-                                                          ln=ln)
-        else:
-            items_html += """
+                items_html += """
     <tr>
       <td style="text-align:center; height:100px">
       %s
       </td>
     </tr>""" % _("You do not have sufficient rights to view this basket's content.")
-        items_html += """
+            items_html += """
   </tbody>"""
-        return items_html
+            return items_html
+        else:
+            items_xml = ""
+            for item in items:
+                items_xml += item[4] + "\n"
+            return items_xml
 
     def __tmpl_basket_item(self,
                            count,
@@ -2343,47 +2366,63 @@ class Template:
                                 next_item_recid=0,
                                 item_index=0,
                                 optional_params={},
+                                of='hb',
                                 ln=CFG_SITE_LANG):        
         """Template for basket's single item display."""
 
-        out = """
+        if of != 'xm':
+            out = """
 <table class="bskbasket" width="100%">"""
+        else:
+            out = ""
 
-        out += self.tmpl_basket_single_item_header(bskid,
-                                                     name,
-                                                     nb_items,
-                                                     selected_category,
-                                                     selected_topic,
-                                                     selected_group,
-                                                     previous_item_recid,
-                                                     next_item_recid,
-                                                     item_index,
-                                                     ln)
+        if of != 'xm':
+            out += self.tmpl_basket_single_item_header(bskid,
+                                                       name,
+                                                       nb_items,
+                                                       selected_category,
+                                                       selected_topic,
+                                                       selected_group,
+                                                       previous_item_recid,
+                                                       next_item_recid,
+                                                       item_index,
+                                                       ln)
 
-        out += self.tmpl_basket_single_item_footer(bskid,
-                                                     selected_category,
-                                                     selected_topic,
-                                                     selected_group,
-                                                     previous_item_recid,
-                                                     next_item_recid,
-                                                     ln)
+        if of != 'xm':
+            out += self.tmpl_basket_single_item_footer(bskid,
+                                                       selected_category,
+                                                       selected_topic,
+                                                       selected_group,
+                                                       previous_item_recid,
+                                                       next_item_recid,
+                                                       ln)
 
         out += self.tmpl_basket_single_item_content(bskid,
-                                                      (user_can_view_content,
-                                                       user_can_view_notes,
-                                                       user_can_add_notes,
-                                                       user_can_delete_notes),
-                                                      selected_category,
-                                                      selected_topic,
-                                                      selected_group,
-                                                      item,
-                                                      comments,
-                                                      item_index,
-                                                      optional_params,
-                                                      ln)
+                                                    (user_can_view_content,
+                                                     user_can_view_notes,
+                                                     user_can_add_notes,
+                                                     user_can_delete_notes),
+                                                    selected_category,
+                                                    selected_topic,
+                                                    selected_group,
+                                                    item,
+                                                    comments,
+                                                    item_index,
+                                                    optional_params,
+                                                    of,
+                                                    ln)
 
-        out += """
+        if of != 'xm':
+            out += """
 </table>"""
+
+        if of != 'xm':
+            out += self.tmpl_create_export_as_list(selected_category,
+                                                   selected_topic,
+                                                   selected_group,
+                                                   bskid,
+                                                   item,
+                                                   False)
 
         return out
 
@@ -2572,58 +2611,60 @@ class Template:
                                         notes=(),
                                         index_item=0,
                                         optional_params={},
+                                        of='hb',
                                         ln=CFG_SITE_LANG):        
         """Template for basket's single item content display."""
 
-        _ = gettext_set_language(ln)
+        if of != 'xm':
+            _ = gettext_set_language(ln)
 
-        item_html = """
+            item_html = """
   <tbody>"""
 
-        if user_can_view_content:
-            if not item:
-                item_html += """
+            if user_can_view_content:
+                if not item:
+                    item_html += """
     <tr>
       <td style="text-align: center; height: 100px">
         %s
       </td>
     </tr>""" % _("The item you have selected does not exist.")
 
-            else:
-                (recid, colid, nb_cmt, last_cmt, val, score) = item
-
-                if recid < 0:
-                    external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
-                                         (CFG_SITE_URL, _("External item"))
                 else:
-                    external_item_img = ''
+                    (recid, colid, nb_cmt, last_cmt, val, score) = item
 
-                if user_can_view_notes:
-                    notes_html = self.__tmpl_display_notes(recid,
-                                                           bskid,
-                                                           (user_can_add_notes,
-                                                            user_can_delete_notes),
-                                                           selected_category,
-                                                           selected_topic,
-                                                           selected_group,
-                                                           notes,
-                                                           optional_params,
-                                                           ln)
-                    notes = """
+                    if recid < 0:
+                        external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
+                                             (CFG_SITE_URL, _("External item"))
+                    else:
+                        external_item_img = ''
+
+                    if user_can_view_notes:
+                        notes_html = self.__tmpl_display_notes(recid,
+                                                               bskid,
+                                                               (user_can_add_notes,
+                                                                user_can_delete_notes),
+                                                               selected_category,
+                                                               selected_topic,
+                                                               selected_group,
+                                                               notes,
+                                                               optional_params,
+                                                               ln)
+                        notes = """
           <tr>
             <td colspan="2" class="bskcontentnotes">%(notes_html)s
             </td>
           </tr>""" % {'notes_html': notes_html}
-                else:
-                    notes_msg = _("You do not have sufficient rights to view this item's notes.")
-                    notes = """
+                    else:
+                        notes_msg = _("You do not have sufficient rights to view this item's notes.")
+                        notes = """
           <tr>
             <td colspan="2" style="text-align: center; height: 50px">
               %(notes_msg)s
             </td>
           </tr>""" % {'notes_msg': notes_msg}
         
-                item_html += """
+                    item_html += """
     <tr>
       <td style="border-bottom: 1px solid #fc0;">
         <table>
@@ -2650,18 +2691,21 @@ class Template:
                 'notes': notes,
                 'ln': ln}
 
-        else:
-            item_html += """
+            else:
+                item_html += """
     <tr>
       <td style="text-align: center; height: 100px">
         %s
       </td>
     </tr>""" % _("You do not have sufficient rights to view this item.")
 
-        item_html += """
+            item_html += """
   </tbody>"""
 
-        return item_html
+            return item_html
+        else:
+           item_xml = item[4]
+           return item_xml
 
     def __tmpl_display_notes(self,
                              recid,
@@ -2870,36 +2914,49 @@ class Template:
                            items=[],
                            id_owner=0,
                            subscription_status=0,
+                           of='hb',
                            ln=CFG_SITE_LANG):        
         """Template for public basket display."""
 
-        out = """
+        if of == 'hb':
+            out = """
 <table class="bskbasket" width="100%">"""
+        else:
+            out = ""
 
-        out += self.tmpl_public_basket_header(bskid,
-                                              basket_name,
-                                              nb_items,
-                                              date_modification,
-                                              (user_can_view_comments,),
-                                              nb_comments,
-                                              last_comment,
-                                              subscription_status,
-                                              ln)
+        if of == 'hb':
+            out += self.tmpl_public_basket_header(bskid,
+                                                  basket_name,
+                                                  nb_items,
+                                                  date_modification,
+                                                  (user_can_view_comments,),
+                                                  nb_comments,
+                                                  last_comment,
+                                                  subscription_status,
+                                                  ln)
 
-        out += self.tmpl_public_basket_footer(bskid,
-                                              nb_items,
-                                              (user_can_view_comments,),
-                                              id_owner,
-                                              subscription_status,
-                                              ln)
+        if of == 'hb':
+            out += self.tmpl_public_basket_footer(bskid,
+                                                  nb_items,
+                                                  (user_can_view_comments,),
+                                                  id_owner,
+                                                  subscription_status,
+                                                  ln)
 
         out += self.tmpl_public_basket_content(bskid,
                                                (user_can_view_comments,),
                                                items,
+                                               of,
                                                ln)
 
-        out += """
+        if of == 'hb':
+            out += """
 </table>"""
+
+        if of == 'hb':
+            out += self.tmpl_create_export_as_list(bskid=bskid,
+                                                   item=None,
+                                                   public=True)
 
         return out
 
@@ -3018,32 +3075,39 @@ class Template:
                                    bskid,
                                    (user_can_view_comments,),
                                    items=[],
+                                   of='hb',
                                    ln=CFG_SITE_LANG):        
         """Template for public basket footer display."""
 
-        _ = gettext_set_language(ln)
-        items_html = """
+        if of == 'hb':
+            _ = gettext_set_language(ln)
+            items_html = """
   <tbody>"""
-        if not(items):
-            items_html += """
+            if not(items):
+                items_html += """
     <tr>
       <td style="text-align:center; height:100px">
       %s
       </td>
     </tr>""" % _("Basket is empty")
-        else:
-            count = 0
-            for item in items:
-                count += 1
-                items_html += self.__tmpl_public_basket_item(count=count,
-                                                             bskid=bskid,
-                                                             item=item,
-                                                             view_notes=user_can_view_comments,
-                                                             ln=ln)
+            else:
+                count = 0
+                for item in items:
+                    count += 1
+                    items_html += self.__tmpl_public_basket_item(count=count,
+                                                                 bskid=bskid,
+                                                                 item=item,
+                                                                 view_notes=user_can_view_comments,
+                                                                 ln=ln)
 
-        items_html += """
+            items_html += """
   </tbody>"""
-        return items_html
+            return items_html
+        elif of == 'xm':
+            items_xml = ""
+            for item in items:
+                items_xml += item[4] + "\n"
+            return items_xml
 
     def __tmpl_public_basket_item(self,
                                   count,
@@ -3157,24 +3221,30 @@ class Template:
                                        next_item_recid=0,
                                        item_index=0,
                                        optional_params={},
+                                       of='hb',
                                        ln=CFG_SITE_LANG):        
         """Template for public basket's single item display."""
 
-        out = """
+        if of == 'hb':
+            out = """
 <table class="bskbasket" width="100%">"""
+        else:
+            out = ""
 
-        out += self.tmpl_public_basket_single_item_header(bskid,
-                                                          name,
-                                                          nb_items,
-                                                          previous_item_recid,
-                                                          next_item_recid,
-                                                          item_index,
-                                                          ln=CFG_SITE_LANG)
+        if of == 'hb':
+            out += self.tmpl_public_basket_single_item_header(bskid,
+                                                              name,
+                                                              nb_items,
+                                                              previous_item_recid,
+                                                              next_item_recid,
+                                                              item_index,
+                                                              ln=CFG_SITE_LANG)
 
-        out += self.tmpl_public_basket_single_item_footer(bskid,
-                                                          previous_item_recid,
-                                                          next_item_recid,
-                                                          ln=CFG_SITE_LANG)
+        if of == 'hb':
+            out += self.tmpl_public_basket_single_item_footer(bskid,
+                                                              previous_item_recid,
+                                                              next_item_recid,
+                                                              ln=CFG_SITE_LANG)
 
         out += self.tmpl_public_basket_single_item_content(bskid,
                                                            (user_can_view_notes,
@@ -3183,10 +3253,17 @@ class Template:
                                                            notes,
                                                            item_index,
                                                            optional_params,
+                                                           of,
                                                            ln=CFG_SITE_LANG)
 
-        out += """
+        if of == 'hb':
+            out += """
 </table>"""
+
+        if of == 'hb':
+            out += self.tmpl_create_export_as_list(bskid=bskid,
+                                                   item=item,
+                                                   public=True)
 
         return out
 
@@ -3346,53 +3423,55 @@ class Template:
                                                notes=(),
                                                index_item=0,
                                                optional_params={},
+                                               of='hb',
                                                ln=CFG_SITE_LANG):        
         """Template for public basket's single item content display."""
 
-        _ = gettext_set_language(ln)
+        if of == 'hb':
+            _ = gettext_set_language(ln)
 
-        item_html = """
+            item_html = """
   <tbody>"""
 
-        if not item:
-            item_html += """
+            if not item:
+                item_html += """
     <tr>
       <td style="text-align: center; height: 100px">
         %s
       </td>
     </tr>""" % _("The item you have selected does not exist.")
 
-        else:
-            (recid, colid, nb_cmt, last_cmt, val, score) = item
-
-            if recid < 0:
-                external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
-                                    (CFG_SITE_URL, _("External item"))
             else:
-                external_item_img = ''
+                (recid, colid, nb_cmt, last_cmt, val, score) = item
 
-            if user_can_view_notes:
-                notes_html = self.__tmpl_display_public_notes(recid,
-                                                              bskid,
-                                                              (user_can_add_notes,),
-                                                              notes,
-                                                              optional_params,
-                                                              ln)
-                notes = """
+                if recid < 0:
+                    external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
+                                        (CFG_SITE_URL, _("External item"))
+                else:
+                    external_item_img = ''
+
+                if user_can_view_notes:
+                    notes_html = self.__tmpl_display_public_notes(recid,
+                                                                  bskid,
+                                                                  (user_can_add_notes,),
+                                                                  notes,
+                                                                  optional_params,
+                                                                  ln)
+                    notes = """
           <tr>
             <td colspan="2" class="bskcontentnotes">%(notes_html)s
             </td>
           </tr>""" % {'notes_html': notes_html}
-            else:
-                notes_msg = _("You do not have sufficient rights to view this item's notes.")
-                notes = """
+                else:
+                    notes_msg = _("You do not have sufficient rights to view this item's notes.")
+                    notes = """
           <tr>
             <td colspan="2" style="text-align: center; height: 50px">
               %(notes_msg)s
             </td>
           </tr>""" % {'notes_msg': notes_msg}
         
-            item_html += """
+                item_html += """
     <tr>
       <td style="border-bottom: 1px solid #fc0;">
         <table>
@@ -3412,10 +3491,14 @@ class Template:
                 'notes': notes,
                 'ln': ln}
 
-        item_html += """
+            item_html += """
   </tbody>"""
 
-        return item_html
+            return item_html
+
+        elif of == 'xm':
+            item_xml = item[4]
+            return item_xml
 
     def __tmpl_display_public_notes(self,
                                     recid,
@@ -3617,6 +3700,59 @@ class Template:
             # TODO: xml output...
             out = ""
             
+        return out
+
+    def tmpl_export_xml(self, body):
+        """Template for the xml represantation for the selected basket/items."""
+
+        out = """
+<collection xmlns="http://www.loc.gov/MARC21/slim">
+%s
+</collection>""" % (body,)
+
+        return out
+
+    def tmpl_create_export_as_list(self,
+                                   selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                                   selected_topic="",
+                                   selected_group=0,
+                                   bskid=0,
+                                   item=(),
+                                   public=False):
+        """Tamplate that creates a bullet list of export as formats for a basket or an item."""
+
+        list_of_export_as_formats = [('MARCXML', 'xm')]
+
+        recid = item and "&recid=" + str(item[0]) or ""
+
+        if not public:
+            href = "%s/yourbaskets/display?category=%s&topic=%s&group=%i&bskid=%i%s" % \
+                   (CFG_SITE_URL,
+                    selected_category,
+                    selected_topic,
+                    selected_group,
+                    bskid,
+                    recid)
+        else:
+            href = "%s/yourbaskets/display_public?bskid=%i%s" % \
+                   (CFG_SITE_URL,
+                    bskid,
+                    recid)
+
+        export_as_html = ""
+        for format in list_of_export_as_formats:
+            export_as_html += """<a style="text-decoration:underline;font-weight:normal" href="%s&of=%s">%s</a>""" % \
+                              (href, format[1], format[0])
+
+        out = """
+<div style="float:right; text-align:right;">
+  <ul class="bsk_export_as_list">
+    <li>Export as
+      %s
+    </li>
+  </ul>
+</div>""" % (export_as_html,)
+
         return out
 
 #############################################

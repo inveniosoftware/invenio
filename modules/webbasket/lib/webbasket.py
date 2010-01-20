@@ -30,6 +30,7 @@ import cgi
 from httplib import urlsplit, HTTPConnection
 #from socket import getdefaulttimeout, setdefaulttimeout
 from zlib import decompress
+import re
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
      CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
@@ -67,7 +68,7 @@ def perform_request_display_public(uid,
                                    selected_bskid=0,
                                    selected_recid=0,
                                    optional_params={},
-                                   format='hb',
+                                   of='hb',
                                    ln=CFG_SITE_LANG):
     """Engine for the display of a public interface. Calls the template and returns HTML.
     @param selected_bskid: The id of the basket to be displayed (optional)
@@ -81,8 +82,17 @@ def perform_request_display_public(uid,
     warnings_item = []
     warnings_basket = []
 
+
+    (of, of_warnings) = wash_of(of)
+    if of_warnings:
+        navtrail = create_webbasket_navtrail(uid, ln=ln)
+        body = webbasket_templates.tmpl_warnings(of_warnings, ln)
+        return (body, of_warnings, navtrail)
+
     basket = db.get_public_basket_info(selected_bskid)
     if not basket:
+        if of != 'hb':
+            return ("", None, None)
         warnings = ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_PUBLIC_BASKET']
         (body, warnings, navtrail) = perform_request_list_public_baskets(uid)
         warnings.append('WRN_WEBBASKET_SHOW_LIST_PUBLIC_BASKETS')
@@ -100,6 +110,7 @@ def perform_request_display_public(uid,
                                                                           nb_items,
                                                                           share_rights,
                                                                           optional_params,
+                                                                          of,
                                                                           ln)
             else:
                 warnings_item.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
@@ -121,20 +132,27 @@ def perform_request_display_public(uid,
                                                           share_rights,
                                                           id_owner,
                                                           subscription_status,
+                                                          of,
                                                           ln)
 
-    body = webbasket_templates.tmpl_display(content=content)
+    if of == 'hb':
+        body = webbasket_templates.tmpl_display(content=content)
+        warnings = warnings_item + warnings_basket
+        warnings_html = webbasket_templates.tmpl_warnings(warnings, ln)
+        body = warnings_html + body
+    else:
+        body = content
 
-    warnings = warnings_item + warnings_basket
-    warnings_html = webbasket_templates.tmpl_warnings(warnings, ln)
-    body = warnings_html + body
+    if of == 'hb':
+        navtrail = create_webbasket_navtrail(uid,
+                                             bskid=selected_bskid,
+                                             public_basket=True,
+                                             ln=ln)
 
-    navtrail = create_webbasket_navtrail(uid,
-                                         bskid=selected_bskid,
-                                         public_basket=True,
-                                         ln=ln)
-
-    return (body, warnings, navtrail)
+    if of == 'hb':
+        return (body, warnings, navtrail)
+    else:
+        return (body, None, None)
 
 def __display_public_basket(bskid,
                             basket_name,
@@ -144,6 +162,7 @@ def __display_public_basket(bskid,
                             share_rights,
                             id_owner,
                             subscription_status,
+                            of='hb',
                             ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
     @param share_rights: rights user has on basket
@@ -165,12 +184,13 @@ def __display_public_basket(bskid,
     notes_dates = []
     last_update = convert_datetext_to_dategui(last_update, ln)
 
-    items = db.get_basket_content(bskid, 'hb')
+    items = db.get_basket_content(bskid, of)
     external_recids = []
 
     for (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) in items:
         notes_dates.append(convert_datetext_to_datestruct(last_note))
         last_note = convert_datetext_to_dategui(last_note, ln)
+        colid = collection_id and collection_id or collection_id == 0 and -1 or 0
         val = ""
         nb_total_notes += nb_notes
         if recid < 0:
@@ -182,12 +202,11 @@ def __display_public_basket(bskid,
             if int_val:
                 val = decompress(int_val)
             else:
-                val = format_record(recid, 'hb', on_the_fly=True)
-        colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+                val = format_record(recid, of, on_the_fly=True)
         records.append((recid, colid, nb_notes, last_note, val, score))
 
     if external_recids:
-        external_records = format_external_records(external_recids, 'hb')
+        external_records = format_external_records(external_recids, of)
 
         for external_record in external_records:
             for record in records:
@@ -212,6 +231,7 @@ def __display_public_basket(bskid,
                                                   records,
                                                   id_owner,
                                                   subscription_status,
+                                                  of,
                                                   ln)
     return (body, warnings)
 
@@ -221,6 +241,7 @@ def __display_public_basket_single_item(bskid,
                                         nb_items,
                                         share_rights,
                                         optional_params={},
+                                        of='hb',
                                         ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
     @param share_rights: rights user has on basket
@@ -236,7 +257,7 @@ def __display_public_basket_single_item(bskid,
 
     warnings = []
 
-    item = db.get_basket_item(bskid, recid, 'hb')
+    item = db.get_basket_item(bskid, recid, of)
 
     if item:
         (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) = item[0]
@@ -252,19 +273,19 @@ def __display_public_basket_single_item(bskid,
         warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
         return (body, warnings)
     last_note = convert_datetext_to_dategui(last_note, ln)
+    colid = collection_id and collection_id or collection_id == 0 and -1 or 0
     val = ""
     if recid < 0:
         if ext_val:
             val = decompress(ext_val)
         else:
-            external_record = format_external_records(recid, 'hb')
+            external_record = format_external_records([recid], of)
             val = external_record and external_record[0][1] or ""
     else:
         if int_val:
             val = decompress(int_val)
         else:
-            val = format_record(recid, 'hb', on_the_fly=True)
-    colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+            val = format_record(recid, of, on_the_fly=True)
     item = (recid, colid, nb_notes, last_note, val, score)
 
     notes = db.get_notes(bskid, recid)
@@ -280,6 +301,7 @@ def __display_public_basket_single_item(bskid,
                                                               next_item_recid,
                                                               item_index,
                                                               optional_params,
+                                                              of,
                                                               ln)
     return (body, warnings)
 
@@ -376,7 +398,7 @@ def perform_request_write_public_note(uid,
                                                                 selected_bskid=bskid,
                                                                 selected_recid=recid,
                                                                 optional_params=optional_params,
-                                                                format='hb',
+                                                                of='hb',
                                                                 ln=CFG_SITE_LANG)
 
     if not warnings:
@@ -432,7 +454,7 @@ def perform_request_save_public_note(uid,
                                                                 selected_bskid=bskid,
                                                                 selected_recid=recid,
                                                                 optional_params=optional_params,
-                                                                format='hb',
+                                                                of='hb',
                                                                 ln=CFG_SITE_LANG)
 
     if not warnings:
@@ -452,7 +474,7 @@ def perform_request_display(uid,
                             selected_bskid=0,
                             selected_recid=0,
                             optional_params={},
-                            format='hb',
+                            of='hb',
                             ln=CFG_SITE_LANG):
     """Display all the baskets of given category, topic or group.
     @param uid: user id
@@ -471,13 +493,24 @@ def perform_request_display(uid,
     content = ""
     search_box = ""
 
+    (of, of_warnings) = wash_of(of)
+    if of_warnings:
+        navtrail = create_webbasket_navtrail(uid, ln=ln)
+        body = webbasket_templates.tmpl_warnings(of_warnings, ln)
+        return (body, of_warnings, navtrail)
+    
+
     (selected_category, category_warnings) = wash_category(selected_category)
     if not selected_category and category_warnings:
+        if of == 'xm':
+            return ("", None. None)
         navtrail = create_webbasket_navtrail(uid, ln=ln)
         body = webbasket_templates.tmpl_warnings(category_warnings, ln)
         return (body, category_warnings, navtrail)
 
     if selected_category == CFG_WEBBASKET_CATEGORIES['ALLPUBLIC']:
+        if of == 'xm':
+            return ("", None. None)
         # TODO: Send the correct title of the page as well.
         return perform_request_list_public_baskets(uid)
 
@@ -641,14 +674,15 @@ def perform_request_display(uid,
         else:
             selected_category = CFG_WEBBASKET_CATEGORIES['GROUP']
 
-    directory_box = webbasket_templates.tmpl_create_directory_box(selected_category,
-                                                                  selected_topic,
-                                                                  (selected_group_id, selected_group_name),
-                                                                  selected_bskid,
-                                                                  (personal_info, personal_baskets_info),
-                                                                  (group_info, group_baskets_info),
-                                                                  public_info,
-                                                                  ln)
+    if of != 'xm':
+        directory_box = webbasket_templates.tmpl_create_directory_box(selected_category,
+                                                                      selected_topic,
+                                                                      (selected_group_id, selected_group_name),
+                                                                      selected_bskid,
+                                                                      (personal_info, personal_baskets_info),
+                                                                      (group_info, group_baskets_info),
+                                                                      public_info,
+                                                                      ln)
 
     if selected_basket_info:
         if selected_recid:
@@ -665,6 +699,7 @@ def perform_request_display(uid,
                                                                    selected_topic,
                                                                    selected_group_id,
                                                                    optional_params,
+                                                                   of,
                                                                    ln)
         else:
             (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_rights) = selected_basket_info
@@ -689,30 +724,40 @@ def perform_request_display(uid,
                                                        selected_category,
                                                        selected_topic,
                                                        selected_group_id,
+                                                       of,
                                                        ln)
         warnings.extend(bsk_warnings)
-        warnings_html += webbasket_templates.tmpl_warnings(bsk_warnings, ln)
+        if of != 'xm':
+            warnings_html += webbasket_templates.tmpl_warnings(bsk_warnings, ln)
     else:
-        search_box = __create_search_box(uid=uid,
-                                         category=selected_category,
-                                         topic=selected_topic,
-                                         grpid=selected_group_id,
-                                         p="",
-                                         b="",
-                                         n=0,
-                                         ln=ln)
+        if of!= 'xm':
+            search_box = __create_search_box(uid=uid,
+                                             category=selected_category,
+                                             topic=selected_topic,
+                                             grpid=selected_group_id,
+                                             p="",
+                                             b="",
+                                             n=0,
+                                             ln=ln)
 
-    body = webbasket_templates.tmpl_display(directory_box, content, search_box)
-    body = warnings_html + body
+    if of != 'xm':
+        body = webbasket_templates.tmpl_display(directory_box, content, search_box)
+        body = warnings_html + body
+    else:
+        body = content
 
-    navtrail = create_webbasket_navtrail(uid,
-                                         category=selected_category,
-                                         topic=selected_topic,
-                                         group=selected_group_id,
-                                         bskid=selected_bskid,
-                                         ln=ln)
+    if of != 'xm':
+        navtrail = create_webbasket_navtrail(uid,
+                                             category=selected_category,
+                                             topic=selected_topic,
+                                             group=selected_group_id,
+                                             bskid=selected_bskid,
+                                             ln=ln)
 
-    return (body, warnings, navtrail)
+    if of != 'xm':
+        return (body, warnings, navtrail)
+    else:
+        return (body, None, None)
 
 def __display_basket(bskid,
                      basket_name,
@@ -726,6 +771,7 @@ def __display_basket(bskid,
                      selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                      selected_topic="",
                      selected_group_id=0,
+                     of="hb",
                      ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
     @param share_rights: rights user has on basket
@@ -748,12 +794,13 @@ def __display_basket(bskid,
     #date_modification = convert_datetext_to_dategui(date_modification, ln)
     last_update = convert_datetext_to_dategui(last_update, ln)
 
-    items = db.get_basket_content(bskid, 'hb')
+    items = db.get_basket_content(bskid, of)
     external_recids = []
 
     for (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) in items:
         notes_dates.append(convert_datetext_to_datestruct(last_note))
         last_note = convert_datetext_to_dategui(last_note, ln)
+        colid = collection_id and collection_id or collection_id == 0 and -1 or 0
         val = ""
         nb_total_notes += nb_notes
         if recid < 0:
@@ -765,12 +812,14 @@ def __display_basket(bskid,
             if int_val:
                 val = decompress(int_val)
             else:
-                val = format_record(recid, 'hb', on_the_fly=True)
-        colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+                val = format_record(recid, of, on_the_fly=True)
+        ## external item (record): colid = positive integet
+        ## external item (url): colid = -1
+        ## local item (record): colid = 0
         records.append((recid, colid, nb_notes, last_note, val, score))
 
     if external_recids:
-        external_records = format_external_records(external_recids, 'hb')
+        external_records = format_external_records(external_recids, of)
 
         for external_record in external_records:
             for record in records:
@@ -804,6 +853,7 @@ def __display_basket(bskid,
                                            selected_topic,
                                            selected_group_id,
                                            records,
+                                           of,
                                            ln)
     return (body, warnings)
 
@@ -819,6 +869,7 @@ def __display_basket_single_item(bskid,
                                  selected_topic="",
                                  selected_group_id=0,
                                  optional_params={},
+                                 of='hb',
                                  ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
     @param share_rights: rights user has on basket
@@ -838,7 +889,7 @@ def __display_basket_single_item(bskid,
     #date_modification = convert_datetext_to_dategui(date_modification, ln)
     last_update = convert_datetext_to_dategui(last_update, ln)
 
-    item = db.get_basket_item(bskid, recid, 'hb')
+    item = db.get_basket_item(bskid, recid, of)
 
     if item:
         (recid, collection_id, nb_notes, last_note, ext_val, int_val, score) = item[0]
@@ -867,26 +918,27 @@ def __display_basket_single_item(bskid,
                                                    selected_category,
                                                    selected_topic,
                                                    selected_group_id,
+                                                   of,
                                                    ln)
         bsk_warnings.append('WRN_WEBBASKET_INVALID_OR_RESTRICTED_ITEM')
         return (content, bsk_warnings)
 
     notes_dates.append(convert_datetext_to_datestruct(last_note))
     last_note = convert_datetext_to_dategui(last_note, ln)
+    colid = collection_id and collection_id or collection_id == 0 and -1 or 0
     val = ""
     nb_total_notes += nb_notes
     if recid < 0:
         if ext_val:
             val = decompress(ext_val)
         else:
-            external_record = format_external_records(recid, 'hb')
+            external_record = format_external_records([recid], of)
             val = external_record and external_record[0][1] or ""
     else:
         if int_val:
             val = decompress(int_val)
         else:
-            val = format_record(recid, 'hb', on_the_fly=True)
-    colid = collection_id and collection_id or collection_id == 0 and -1 or 0
+            val = format_record(recid, of, on_the_fly=True)
     item = (recid, colid, nb_notes, last_note, val, score)
 
     comments = db.get_notes(bskid, recid)
@@ -912,6 +964,7 @@ def __display_basket_single_item(bskid,
                                            item, comments,
                                            previous_item_recid, next_item_recid, item_index,
                                            optional_params,
+                                           of,
                                            ln)
     return (body, warnings)
 
@@ -922,7 +975,7 @@ def perform_request_search(uid,
                            p="",
                            b="",
                            n=0,
-                           format='hb',
+                           #format='xm',
                            ln=CFG_SITE_LANG):
     """Search the baskets...
     @param uid: user id
@@ -1001,9 +1054,10 @@ def perform_request_search(uid,
         # Let's precalculate the local search resutls
         # and the pattern for the external search results
         local_search_results = set(search_unit(p))
+
         # How strict should the pattern be? Look for the exact word
         # (using word boundaries: \b) or is any substring enough?
-        import re
+
         # not that strict:
         # since we remove the html markup before searching for the pattern we
         # can use a rather simple pattern here.
@@ -1011,12 +1065,24 @@ def perform_request_search(uid,
         # word bounderies and utf-8 strings (ex. with greek that was tested)
         pattern = re.compile(r'%s' % (re.escape(p),), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
         #pattern = re.compile(r'%s(?!([^<]+)?>)' % (p,), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
+
         # strict:
         # since we remove the html markup before searching for the pattern we
         # can use a rather simple pattern here.
         #pattern = re.compile(r'\b%s\b' % (re.escape(p),), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
         #pattern = re.compile(r'%s\b(?!([^<]+)?>)' % (p,), re.DOTALL + re.MULTILINE + re.IGNORECASE + re.UNICODE)
-        debug_to_file(p)
+
+        # TODO: All the external records are now saved automatically first in xml.
+        # So, the search should be done on the "xm" formatted records in the database
+        # and not the "hb" ones. (That is not the case for their comments though).
+        # Records in xml in the database are stored escaped. It's then suggested
+        # that the pattern is also escaped before we performed the search for more
+        # consistent resutls. We could also use .replace("\n", "") to clean the
+        # content (after the removal of html markup) from all the newline characters.
+        
+        # The search format for external records. This means in which format will
+        # the external records be fetched from the database to be searched then.
+        format = 'xm'
 
         if b.startswith("P") or not b:
             personal_search_results = {}
@@ -1042,6 +1108,7 @@ def perform_request_search(uid,
                 recid       = external_info_per_basket[3]
                 value       = external_info_per_basket[4]
                 text = remove_html_markup(decompress(value))
+                #text = text.replace('\n', '')
                 debug_to_file(text)
                 result = pattern.search(text)
                 if result:
@@ -1095,6 +1162,7 @@ def perform_request_search(uid,
                 recid       = external_info_per_basket[4]
                 value       = external_info_per_basket[5]
                 text = remove_html_markup(decompress(value))
+                #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
                     if group_search_results.has_key(bskid):
@@ -1144,6 +1212,7 @@ def perform_request_search(uid,
                 recid       = external_info_per_basket[2]
                 value       = external_info_per_basket[3]
                 text = remove_html_markup(decompress(value))
+                #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
                     if public_search_results.has_key(bskid):
@@ -1191,6 +1260,7 @@ def perform_request_search(uid,
                 recid       = external_info_per_basket[2]
                 value       = external_info_per_basket[3]
                 text = remove_html_markup(decompress(value))
+                #text = text.replace('\n', '')
                 result = pattern.search(text)
                 if result:
                     if all_public_search_results.has_key(bskid):
@@ -1289,7 +1359,7 @@ def perform_request_write_note(uid,
                                                          selected_bskid=bskid,
                                                          selected_recid=recid,
                                                          optional_params=optional_params,
-                                                         format='hb',
+                                                         of='hb',
                                                          ln=CFG_SITE_LANG)
 
     if not warnings:
@@ -1351,7 +1421,7 @@ def perform_request_save_note(uid,
                                                          selected_bskid=bskid,
                                                          selected_recid=recid,
                                                          optional_params=optional_params,
-                                                         format='hb',
+                                                         of='hb',
                                                          ln=CFG_SITE_LANG)
 
     if not warnings:
@@ -1389,7 +1459,7 @@ def perform_request_delete_note(uid,
                                                          selected_group_id=group_id,
                                                          selected_bskid=bskid,
                                                          selected_recid=recid,
-                                                         format='hb',
+                                                         of='hb',
                                                          ln=CFG_SITE_LANG)
 
     body = warnings_html + body
@@ -1566,6 +1636,8 @@ def perform_request_add(uid,
                             if not(db.save_note(uid, bskid, recid, note_title, note_body)):
                                 # TODO: The note could not be saved. DB problem?
                                 pass
+                    if colid > 0:
+                        format_external_records(added_items, of="xm")
                     return perform_request_add(uid=uid,
                                                recids=recids,
                                                category=category,
@@ -2133,6 +2205,19 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
          'x_nb_public': external_text}
     return out
 
+def page_start(req, of='xm'):
+    """Set the content type and send the headers for the page."""
+
+    if of == 'xm':
+        req.content_type = "text/xml"
+        req.send_http_header()
+        req.write("""<?xml version="1.0" encoding="UTF-8"?>\n""")
+
+def perform_request_export_xml(body):
+    """Export an xml representation of the selected baskets/items."""
+
+    return webbasket_templates.tmpl_export_xml(body)
+    
 ################################
 ### External items functions ###
 ################################
@@ -2142,19 +2227,47 @@ def format_external_records(recids, of='hb'):
     with each recid and the actual formatted record using the selected output format.
     It also stores the formatted record in the database for future use."""
 
-    if type(recids) is not list:
-        recids = [recids]
+    # TODO: add a returnp variable to control whether we actually want anything
+    # to be returned or not. For example when we just want to store the xml
+    # formatted records for newly added items.
+    # TODO: take care of external urls. Invent an xml format for them.
 
-    records_grouped_by_collection = db.get_external_records_by_collection(recids)
+    # NOTE: this function is meant to format external records from other
+    # libraries. It's not meant to handle custom external sources like urls
+    # submitted manually by the user. These items are directly formatted and
+    # stored by the add_to_basket database function.
 
     formatted_records = []
 
-    for records in records_grouped_by_collection:
-        if records[2]:
-            external_records = fetch_and_store_external_records(records, of)
-            formatted_records.extend(external_records)
+    if type(recids) is not list:
+        recids = [recids]
 
-    return tuple(formatted_records)
+    existing_xml_formatted_records = db.get_external_records(recids, "xm")
+    for existing_xml_formatted_record in existing_xml_formatted_records:
+        xml_record = decompress(existing_xml_formatted_record[2])
+        xml_record_id = existing_xml_formatted_record[1]
+        xml_record_colid = existing_xml_formatted_record[0]
+        recids.remove(-xml_record_id)
+        if of == "hb":
+            if xml_record_colid > 0:
+                htmlbrief_record = format_record(None, of, xml_record=xml_record)
+            formatted_records.append((xml_record_id, htmlbrief_record))
+        elif of == "xm":
+            formatted_records.append((xml_record_id, xml_record))
+
+    if formatted_records and of == "hb":
+        db.store_external_records(formatted_records, of)
+
+    records_grouped_by_collection = db.get_external_records_by_collection(recids)
+
+    if records_grouped_by_collection:
+        for records in records_grouped_by_collection:
+            colid = records[2]
+            if colid:
+                external_records = fetch_and_store_external_records(records, of)
+                formatted_records.extend(external_records)
+
+    return formatted_records
 
 def fetch_and_store_external_records(records, of="hb"):
     """Function that fetches the formatted records for one collection and stores them
@@ -2164,6 +2277,10 @@ def fetch_and_store_external_records(records, of="hb"):
     results = []
     formatted_records = []
 
+    if of == 'xm':
+        re_controlfield = re.compile(r'<controlfield\b[^>]*>.*?</controlfield>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        re_blankline = re.compile(r'\s*\n', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+
     ids = records[0].split(",")
     external_ids = records[1].split(",")
     collection_name = get_collection_name_by_id(records[2])
@@ -2172,10 +2289,11 @@ def fetch_and_store_external_records(records, of="hb"):
 
     external_ids_urls = collection_engine.build_record_urls(external_ids)
     external_urls = [external_id_url[1] for external_id_url in external_ids_urls]
-    external_urls_dict = {}
-    for (local_id, url) in zip(ids, external_urls):
-        external_urls_dict[local_id] = url
-    db.store_external_urls(external_urls_dict)
+    #external_urls_dict = {}
+    #for (local_id, url) in zip(ids, external_urls):
+        #external_urls_dict[local_id] = url
+    #db.store_external_urls(external_urls_dict)
+    db.store_external_urls(zip(ids, external_urls))
 
     url = collection_engine.build_search_url(None, req_args=external_ids)
     pagegetters = [HTTPAsyncPageGetter(url)]
@@ -2190,7 +2308,11 @@ def fetch_and_store_external_records(records, of="hb"):
         collection_engine.parser.parse_and_get_results(results[0].data, feedonly=True)
         (parsed_results_list, parsed_results_dict) = collection_engine.parser.parse_and_extract_records(of=of)
         for (id, external_id) in zip(ids, external_ids):
-            formatted_records.append((int(id), parsed_results_dict[external_id]))
+            formatted_record = parsed_results_dict[external_id]
+            if of == 'xm':
+               formatted_record = re_controlfield.sub('', formatted_record)
+               formatted_record = re_blankline.sub('\n', formatted_record)
+            formatted_records.append((int(id), formatted_record))
         db.store_external_records(formatted_records, of)
     else:
         for (id, external_id) in zip(ids, external_ids):
@@ -2302,6 +2424,15 @@ def wash_bskid(uid, category, bskid):
     if category == CFG_WEBBASKET_CATEGORIES['GROUP'] and not db.is_group_basket_valid(uid, bskid):
         return (0, ['WRN_WEBBASKET_INVALID_OR_RESTRICTED_BASKET'])
     return (bskid, None)
+
+def wash_of(of):
+    """Wash the output format"""
+
+    list_of_accepted_formats = ['hb', 'xm']
+
+    if of in list_of_accepted_formats:
+        return (of, None)
+    return ('hb', ['WRN_WEBBASKET_INVALID_OUTPUT_FORMAT'])
 
 def __create_search_box(uid,
                         category="",
