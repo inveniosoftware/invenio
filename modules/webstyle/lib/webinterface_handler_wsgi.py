@@ -360,7 +360,8 @@ def application(environ, start_response):
                                                   req.headers_in.get('referer'))
                 if admin_to_be_alerted:
                     register_exception(req=req, alert_admin=True)
-                start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+                if not req.response_sent_p:
+                    start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
                 return generate_error_page(req, admin_to_be_alerted)
             else:
                 req.flush()
@@ -368,7 +369,8 @@ def application(environ, start_response):
             register_exception(req=req, alert_admin=True)
             req.status = HTTP_INTERNAL_SERVER_ERROR
             req.headers_out['content-type'] = 'text/html'
-            start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+            if not req.response_sent_p:
+                start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
             return generate_error_page(req)
     finally:
         for (callback, data) in req.get_cleanups():
