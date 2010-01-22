@@ -100,7 +100,7 @@ def perform_request_display_public(uid,
         body = warnings_html + body
         return (body, warnings, navtrail)
     else:
-        (bskid, basket_name, id_owner, last_update, nb_views, nb_items, recids, share_rights) = basket[0]
+        (bskid, basket_name, id_owner, last_update, dummy, nb_items, recids, share_rights) = basket[0]
         if selected_recid:
             valid_recids = eval(recids + ',')
             if selected_recid in valid_recids:
@@ -127,7 +127,6 @@ def perform_request_display_public(uid,
             (content, warnings_basket) = __display_public_basket(bskid,
                                                           basket_name,
                                                           last_update,
-                                                          nb_views,
                                                           nb_items,
                                                           share_rights,
                                                           id_owner,
@@ -157,7 +156,6 @@ def perform_request_display_public(uid,
 def __display_public_basket(bskid,
                             basket_name,
                             last_update,
-                            nb_views,
                             nb_items,
                             share_rights,
                             id_owner,
@@ -223,11 +221,9 @@ def __display_public_basket(bskid,
     body = webbasket_templates.tmpl_public_basket(bskid,
                                                   basket_name,
                                                   last_update,
-                                                  nb_views,
                                                   nb_items,
                                                   (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT'],),),
                                                   nb_total_notes,
-                                                  last_note,
                                                   records,
                                                   id_owner,
                                                   subscription_status,
@@ -487,7 +483,6 @@ def perform_request_display(uid,
 
     warnings = []
     warnings_html = ""
-    baskets = []
 
     selected_basket_info = []
     content = ""
@@ -498,7 +493,7 @@ def perform_request_display(uid,
         navtrail = create_webbasket_navtrail(uid, ln=ln)
         body = webbasket_templates.tmpl_warnings(of_warnings, ln)
         return (body, of_warnings, navtrail)
-    
+
 
     (selected_category, category_warnings) = wash_category(selected_category)
     if not selected_category and category_warnings:
@@ -686,14 +681,12 @@ def perform_request_display(uid,
 
     if selected_basket_info:
         if selected_recid:
-            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_rights) = selected_basket_info
+            (bskid, basket_name, last_update, dummy, nb_items, dummy, share_rights) = selected_basket_info
             (content, bsk_warnings) = __display_basket_single_item(bskid,
                                                                    basket_name,
                                                                    selected_recid,
                                                                    last_update,
-                                                                   nb_views,
                                                                    nb_items,
-                                                                   last_added,
                                                                    share_rights,
                                                                    selected_category,
                                                                    selected_topic,
@@ -702,7 +695,7 @@ def perform_request_display(uid,
                                                                    of,
                                                                    ln)
         else:
-            (bskid, basket_name, last_update, nb_views, nb_items, last_added, share_rights) = selected_basket_info
+            (bskid, basket_name, last_update, dummy, nb_items, dummy, share_rights) = selected_basket_info
             share_level = db.get_basket_share_level(bskid)
             if share_level:
                 share_level = share_level[0][0]
@@ -715,10 +708,8 @@ def perform_request_display(uid,
             (content, bsk_warnings) = __display_basket(bskid,
                                                        basket_name,
                                                        last_update,
-                                                       nb_views,
                                                        nb_items,
                                                        nb_subscribers,
-                                                       last_added,
                                                        share_rights,
                                                        share_level,
                                                        selected_category,
@@ -736,7 +727,6 @@ def perform_request_display(uid,
                                              topic=selected_topic,
                                              grpid=selected_group_id,
                                              p="",
-                                             b="",
                                              n=0,
                                              ln=ln)
 
@@ -762,10 +752,8 @@ def perform_request_display(uid,
 def __display_basket(bskid,
                      basket_name,
                      last_update,
-                     nb_views,
                      nb_items,
                      nb_subscribers,
-                     last_added,
                      share_rights,
                      share_level,
                      selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
@@ -836,10 +824,8 @@ def __display_basket(bskid,
     body = webbasket_templates.tmpl_basket(bskid,
                                            basket_name,
                                            last_update,
-                                           nb_views,
                                            nb_items,
                                            nb_subscribers,
-                                           last_added,
                                            (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
                                             check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
                                             check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
@@ -847,7 +833,6 @@ def __display_basket(bskid,
                                             check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
                                             check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
                                            nb_total_notes,
-                                           last_note,
                                            share_level,
                                            selected_category,
                                            selected_topic,
@@ -861,9 +846,7 @@ def __display_basket_single_item(bskid,
                                  basket_name,
                                  recid,
                                  last_update,
-                                 nb_views,
                                  nb_items,
-                                 last_added,
                                  share_rights,
                                  selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                  selected_topic="",
@@ -882,9 +865,7 @@ def __display_basket_single_item(bskid,
 
     warnings = []
 
-    nb_total_notes = 0
     last_note = _("N/A")
-    records = []
     notes_dates = []
     #date_modification = convert_datetext_to_dategui(date_modification, ln)
     last_update = convert_datetext_to_dategui(last_update, ln)
@@ -909,10 +890,8 @@ def __display_basket_single_item(bskid,
         (content, bsk_warnings) = __display_basket(bskid,
                                                    basket_name,
                                                    last_update,
-                                                   nb_views,
                                                    nb_items,
                                                    nb_subscribers,
-                                                   last_added,
                                                    share_rights,
                                                    share_level,
                                                    selected_category,
@@ -927,7 +906,6 @@ def __display_basket_single_item(bskid,
     last_note = convert_datetext_to_dategui(last_note, ln)
     colid = collection_id and collection_id or collection_id == 0 and -1 or 0
     val = ""
-    nb_total_notes += nb_notes
     if recid < 0:
         if ext_val:
             val = decompress(ext_val)
@@ -948,16 +926,11 @@ def __display_basket_single_item(bskid,
 
     body = webbasket_templates.tmpl_basket_single_item(bskid,
                                            basket_name,
-                                           last_update,
-                                           nb_views,
                                            nb_items,
-                                           last_added,
                                            (check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
                                             check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
                                             check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
                                             check_sufficient_rights(share_rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
-                                           nb_total_notes,
-                                           last_note,
                                            selected_category,
                                            selected_topic,
                                            selected_group_id,
@@ -1079,7 +1052,7 @@ def perform_request_search(uid,
         # that the pattern is also escaped before we performed the search for more
         # consistent resutls. We could also use .replace("\n", "") to clean the
         # content (after the removal of html markup) from all the newline characters.
-        
+
         # The search format for external records. This means in which format will
         # the external records be fetched from the database to be searched then.
         format = 'xm'
@@ -1303,7 +1276,6 @@ def perform_request_search(uid,
                                      topic=selected_topic,
                                      grpid=selected_group_id,
                                      p=p,
-                                     b=b,
                                      n=n,
                                      ln=ln)
 
@@ -1532,7 +1504,7 @@ def perform_request_add(uid,
         user_info = collect_user_info(uid)
         recids_to_remove = []
         for recid in validated_recids:
-            (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
+            (auth_code, dummy) = check_user_can_view_record(user_info, recid)
             if auth_code:
                 # User is not authorized to view record.
                 # We should not remove items from the list while we parse it.
@@ -1558,7 +1530,7 @@ def perform_request_add(uid,
         if not es_url:
             es_warnings.append('WRN_WEBBASKET_NO_EXTERNAL_SOURCE_URL')
         else:
-            (is_valid, status, reason) = url_is_valid(es_url)
+            (is_valid, status, dummy) = url_is_valid(es_url)
             if not is_valid:
                 if str(status).startswith('0'):
                     es_warnings.append('WRN_WEBBASKET_NO_VALID_URL_0')
@@ -2217,7 +2189,7 @@ def perform_request_export_xml(body):
     """Export an xml representation of the selected baskets/items."""
 
     return webbasket_templates.tmpl_export_xml(body)
-    
+
 ################################
 ### External items functions ###
 ################################
@@ -2281,7 +2253,9 @@ def fetch_and_store_external_records(records, of="hb"):
         re_controlfield = re.compile(r'<controlfield\b[^>]*>.*?</controlfield>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
         re_blankline = re.compile(r'\s*\n', re.DOTALL + re.MULTILINE + re.IGNORECASE)
 
-    ids = records[0].split(",")
+    # the locally saved external ids
+    local_ext_ids = records[0].split(",")
+    # the locally saved original external ids
     external_ids = records[1].split(",")
     collection_name = get_collection_name_by_id(records[2])
     collection_engine_set = select_hosted_search_engines(collection_name)
@@ -2290,15 +2264,15 @@ def fetch_and_store_external_records(records, of="hb"):
     external_ids_urls = collection_engine.build_record_urls(external_ids)
     external_urls = [external_id_url[1] for external_id_url in external_ids_urls]
     #external_urls_dict = {}
-    #for (local_id, url) in zip(ids, external_urls):
+    #for (local_id, url) in zip(local_ext_ids, external_urls):
         #external_urls_dict[local_id] = url
     #db.store_external_urls(external_urls_dict)
-    db.store_external_urls(zip(ids, external_urls))
+    db.store_external_urls(zip(local_ext_ids, external_urls))
 
     url = collection_engine.build_search_url(None, req_args=external_ids)
     pagegetters = [HTTPAsyncPageGetter(url)]
 
-    def finished(pagegetter, data, time):
+    def finished(pagegetter, dummy_data, dummy_time):
         """Function to be called when a page has been downloaded."""
         results.append(pagegetter)
 
@@ -2306,17 +2280,17 @@ def fetch_and_store_external_records(records, of="hb"):
 
     if finished_list[0]:
         collection_engine.parser.parse_and_get_results(results[0].data, feedonly=True)
-        (parsed_results_list, parsed_results_dict) = collection_engine.parser.parse_and_extract_records(of=of)
-        for (id, external_id) in zip(ids, external_ids):
+        (dummy, parsed_results_dict) = collection_engine.parser.parse_and_extract_records(of=of)
+        for (local_ext_id, external_id) in zip(local_ext_ids, external_ids):
             formatted_record = parsed_results_dict[external_id]
             if of == 'xm':
-               formatted_record = re_controlfield.sub('', formatted_record)
-               formatted_record = re_blankline.sub('\n', formatted_record)
-            formatted_records.append((int(id), formatted_record))
+                formatted_record = re_controlfield.sub('', formatted_record)
+                formatted_record = re_blankline.sub('\n', formatted_record)
+            formatted_records.append((int(local_ext_id), formatted_record))
         db.store_external_records(formatted_records, of)
     else:
-        for (id, external_id) in zip(ids, external_ids):
-            formatted_records.append((int(id), "There was a timeout when fetching the record."))
+        for (local_ext_id, external_id) in zip(local_ext_ids, external_ids):
+            formatted_records.append((int(local_ext_id), "There was a timeout when fetching the record."))
 
     return formatted_records
 
@@ -2324,7 +2298,7 @@ def fetch_and_store_external_records(records, of="hb"):
 ### Miscellaneous functions ###
 ###############################
 
-def url_is_valid(url, timeout=1):
+def url_is_valid(url):
     """Returns (True, status, reason) if the url is valid or (False, status, reason) if different."""
 
     common_errors_list = [400, 404, 500]
@@ -2336,6 +2310,7 @@ def url_is_valid(url, timeout=1):
         return (False, 000, "Not Valid")
     # HTTPConnection had the timeout parameter introduced in python 2.6
     # for the older versions we have to get and set the default timeout
+    # In order to use a custom timeout pass it as an extra argument to this function
     #old_timeout = getdefaulttimeout()
     #setdefaulttimeout(timeout)
     conn = HTTPConnection(url_tuple[1])
@@ -2439,7 +2414,6 @@ def __create_search_box(uid,
                         topic="",
                         grpid=0,
                         p="",
-                        b="",
                         n=0,
                         ln=CFG_SITE_LANG):
     """Private function.
@@ -2456,7 +2430,6 @@ def __create_search_box(uid,
                                                             group_list,
                                                             number_of_public_baskets,
                                                             p,
-                                                            b,
                                                             n,
                                                             ln=ln)
 

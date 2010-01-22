@@ -38,7 +38,6 @@ from invenio.config import \
      CFG_WEBBASKET_USE_RICH_TEXT_EDITOR
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
-import invenio.webbasket_dblayer as db
 
 class Template:
     """Templating class for webbasket module"""
@@ -505,7 +504,6 @@ class Template:
                                group_list=(),
                                number_of_public_baskets=0,
                                p="",
-                               b="",
                                n=0,
                                ln=CFG_SITE_LANG):
         """EXPERIMENTAL UI"""
@@ -653,7 +651,7 @@ class Template:
         %(no_items_found_label)s
         </td>
       </tr>""" % {'no_items_found_label': _('No items found.')}
-            
+
 
         if total_no_personal_search_results:
             out += """
@@ -880,7 +878,7 @@ class Template:
         @param ln: language"""
 
         _ = gettext_set_language(ln)
-        
+
         basket_name_label = _("Public basket")
         owner_label = _("Owner")
         date_modification_label = _("Last update")
@@ -1804,7 +1802,7 @@ class Template:
             warnings = [warnings]
         if warnings:
             warnings_parsed = get_msgs_for_code_list(warnings, 'warning', ln)
-            for (warning_code, warning_text) in warnings_parsed:
+            for (dummy, warning_text) in warnings_parsed:
                 out += """
 <p class="important">%s</p>
 """ % warning_text
@@ -1850,10 +1848,8 @@ class Template:
                     bskid,
                     name,
                     date_modification,
-                    nb_views,
                     nb_items,
                     nb_subscribers,
-                    last_added,
                     (user_can_view_content,
                      user_can_edit_basket,
                      user_can_view_notes,
@@ -1861,14 +1857,13 @@ class Template:
                      user_can_add_item,
                      user_can_delete_item),
                     nb_comments,
-                    last_comment,
                     share_level,
                     selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                     selected_topic="",
                     selected_group=0,
                     items=[],
                     of='hb',
-                    ln=CFG_SITE_LANG):        
+                    ln=CFG_SITE_LANG):
         """Template for basket display."""
 
         if of != 'xm':
@@ -1885,12 +1880,9 @@ class Template:
                                            date_modification,
                                            (user_can_view_content,
                                             user_can_edit_basket,
-                                            user_can_view_notes,
-                                            user_can_add_item,
-                                            user_can_delete_item),
+                                            user_can_view_notes),
                                            selected_category,
                                            nb_comments,
-                                           last_comment,
                                            selected_topic,
                                            share_level,
                                            ln)
@@ -1899,10 +1891,7 @@ class Template:
             out += self.tmpl_basket_footer(bskid,
                                            nb_items,
                                            (user_can_view_content,
-                                            user_can_edit_basket,
-                                            user_can_view_notes,
-                                            user_can_add_item,
-                                            user_can_delete_item),
+                                            user_can_edit_basket),
                                            selected_category,
                                            selected_topic,
                                            share_level,
@@ -1910,7 +1899,6 @@ class Template:
 
         out += self.tmpl_basket_content(bskid,
                                         (user_can_view_content,
-                                         user_can_edit_basket,
                                          user_can_view_notes,
                                          user_can_add_notes,
                                          user_can_add_item,
@@ -1944,15 +1932,12 @@ class Template:
                            date_modification,
                            (user_can_view_content,
                             user_can_edit_basket,
-                            user_can_view_notes,
-                            user_can_add_item,
-                            user_can_delete_item),
+                            user_can_view_notes),
                            selected_category,
                            nb_comments,
-                           last_comment,
                            selected_topic,
                            share_level,
-                           ln=CFG_SITE_LANG):        
+                           ln=CFG_SITE_LANG):
         """Template for basket header display."""
 
         _ = gettext_set_language(ln)
@@ -2027,14 +2012,11 @@ class Template:
                            bskid,
                            nb_items,
                            (user_can_view_content,
-                            user_can_edit_basket,
-                            user_can_view_notes,
-                            user_can_add_item,
-                            user_can_delete_item),
+                            user_can_edit_basket),
                            selected_category,
                            selected_topic,
                            share_level=None,
-                           ln=CFG_SITE_LANG):        
+                           ln=CFG_SITE_LANG):
         """Template for basket footer display."""
 
         _ = gettext_set_language(ln)
@@ -2096,7 +2078,6 @@ class Template:
     def tmpl_basket_content(self,
                             bskid,
                             (user_can_view_content,
-                             user_can_edit_basket,
                              user_can_view_notes,
                              user_can_add_notes,
                              user_can_add_item,
@@ -2106,7 +2087,7 @@ class Template:
                             selected_group=0,
                             items=[],
                             of='hb',
-                            ln=CFG_SITE_LANG):        
+                            ln=CFG_SITE_LANG):
         """Template for basket content display."""
 
         if of != 'xm':
@@ -2182,7 +2163,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        (recid, colid, nb_cmt, last_cmt, val, score) = item
+        (recid, colid, nb_cmt, last_cmt, val, dummy) = item
 
         if uparrow:
             moveup_url = "%(siteurl)s/yourbaskets/modify?action=moveup&amp;bskid=%(bskid)i&amp;recid=%(recid)i"\
@@ -2347,16 +2328,11 @@ class Template:
     def tmpl_basket_single_item(self,
                                 bskid,
                                 name,
-                                date_modification,
-                                nb_views,
                                 nb_items,
-                                last_added,
                                 (user_can_view_content,
                                  user_can_view_notes,
                                  user_can_add_notes,
                                  user_can_delete_notes),
-                                nb_comments,
-                                last_comment,
                                 selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                 selected_topic="",
                                 selected_group=0,
@@ -2367,7 +2343,7 @@ class Template:
                                 item_index=0,
                                 optional_params={},
                                 of='hb',
-                                ln=CFG_SITE_LANG):        
+                                ln=CFG_SITE_LANG):
         """Template for basket's single item display."""
 
         if of != 'xm':
@@ -2436,7 +2412,7 @@ class Template:
                                        previous_item_recid,
                                        next_item_recid,
                                        item_index,
-                                       ln=CFG_SITE_LANG):        
+                                       ln=CFG_SITE_LANG):
         """Template for basket's single item header display."""
 
         _ = gettext_set_language(ln)
@@ -2525,7 +2501,7 @@ class Template:
                                        selected_group,
                                        previous_item_recid,
                                        next_item_recid,
-                                       ln=CFG_SITE_LANG):        
+                                       ln=CFG_SITE_LANG):
         """Template for basket's single item footer display."""
 
         _ = gettext_set_language(ln)
@@ -2612,7 +2588,7 @@ class Template:
                                         index_item=0,
                                         optional_params={},
                                         of='hb',
-                                        ln=CFG_SITE_LANG):        
+                                        ln=CFG_SITE_LANG):
         """Template for basket's single item content display."""
 
         if of != 'xm':
@@ -2631,7 +2607,7 @@ class Template:
     </tr>""" % _("The item you have selected does not exist.")
 
                 else:
-                    (recid, colid, nb_cmt, last_cmt, val, score) = item
+                    (recid, colid, dummy, last_cmt, val, dummy) = item
 
                     if recid < 0:
                         external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
@@ -2663,7 +2639,7 @@ class Template:
               %(notes_msg)s
             </td>
           </tr>""" % {'notes_msg': notes_msg}
-        
+
                     item_html += """
     <tr>
       <td style="border-bottom: 1px solid #fc0;">
@@ -2704,8 +2680,8 @@ class Template:
 
             return item_html
         else:
-           item_xml = item[4]
-           return item_xml
+            item_xml = item[4]
+            return item_xml
 
     def __tmpl_display_notes(self,
                              recid,
@@ -2815,7 +2791,7 @@ class Template:
             add_note = """<a href="%s">%s%s</a>""" % (add_note_url, add_note_logo, _("Add a note"))
         else:
             add_note = ""
-        
+
         notes_html = """
               <table>
                 <tr>
@@ -2837,7 +2813,7 @@ class Template:
             notes_html += """
                 <tr>
                   <td colspan="2" class="bsknotescontent">"""
-            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, cmt_priority, cmtid) in notes:
+            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid) in notes:
                 if user_can_add_notes:
                     reply_to_note = """<a href="%s/yourbaskets/write_note?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;recid=%i&amp;cmtid=%i&amp;ln=%s%s">%s</a>""" % \
                                     (CFG_SITE_URL, selected_category, cgi.escape(selected_topic, True), selected_group, bskid, recid, cmtid, ln, '#note', _('Reply'))
@@ -2906,16 +2882,14 @@ class Template:
                            bskid,
                            basket_name,
                            date_modification,
-                           nb_views,
                            nb_items,
                            (user_can_view_comments,),
                            nb_comments,
-                           last_comment,
                            items=[],
                            id_owner=0,
                            subscription_status=0,
                            of='hb',
-                           ln=CFG_SITE_LANG):        
+                           ln=CFG_SITE_LANG):
         """Template for public basket display."""
 
         if of == 'hb':
@@ -2931,14 +2905,12 @@ class Template:
                                                   date_modification,
                                                   (user_can_view_comments,),
                                                   nb_comments,
-                                                  last_comment,
                                                   subscription_status,
                                                   ln)
 
         if of == 'hb':
             out += self.tmpl_public_basket_footer(bskid,
                                                   nb_items,
-                                                  (user_can_view_comments,),
                                                   id_owner,
                                                   subscription_status,
                                                   ln)
@@ -2967,9 +2939,8 @@ class Template:
                                   date_modification,
                                   (user_can_view_comments,),
                                   nb_comments,
-                                  last_comment,
                                   subscription_status,
-                                  ln=CFG_SITE_LANG):        
+                                  ln=CFG_SITE_LANG):
         """Template for public basket header display."""
 
         _ = gettext_set_language(ln)
@@ -3023,10 +2994,9 @@ class Template:
     def tmpl_public_basket_footer(self,
                                   bskid,
                                   nb_items,
-                                  (user_can_view_comments,),
                                   id_owner,
                                   subscription_status,
-                                  ln=CFG_SITE_LANG):        
+                                  ln=CFG_SITE_LANG):
         """Template for public basket footer display."""
 
         _ = gettext_set_language(ln)
@@ -3076,7 +3046,7 @@ class Template:
                                    (user_can_view_comments,),
                                    items=[],
                                    of='hb',
-                                   ln=CFG_SITE_LANG):        
+                                   ln=CFG_SITE_LANG):
         """Template for public basket footer display."""
 
         if of == 'hb':
@@ -3119,7 +3089,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        (recid, colid, nb_cmt, last_cmt, val, score) = item
+        (recid, colid, nb_cmt, last_cmt, val, dummy) = item
 
         copy_url = "%(siteurl)s/yourbaskets/modify?action=copy&amp;bskid=%(bskid)i&amp;recid=%(recid)i&amp;ln=%(ln)s" % \
                    {'siteurl': CFG_SITE_URL,
@@ -3222,8 +3192,10 @@ class Template:
                                        item_index=0,
                                        optional_params={},
                                        of='hb',
-                                       ln=CFG_SITE_LANG):        
+                                       ln=CFG_SITE_LANG):
         """Template for public basket's single item display."""
+
+        _ = gettext_set_language(ln)
 
         if of == 'hb':
             out = """
@@ -3274,7 +3246,7 @@ class Template:
                                               previous_item_recid,
                                               next_item_recid,
                                               item_index,
-                                              ln=CFG_SITE_LANG):        
+                                              ln=CFG_SITE_LANG):
         """Template for public basket's single item header display."""
 
         _ = gettext_set_language(ln)
@@ -3351,7 +3323,7 @@ class Template:
                                               bskid,
                                               previous_item_recid,
                                               next_item_recid,
-                                              ln=CFG_SITE_LANG):        
+                                              ln=CFG_SITE_LANG):
         """Template for public basket's single item footer display."""
 
         _ = gettext_set_language(ln)
@@ -3424,7 +3396,7 @@ class Template:
                                                index_item=0,
                                                optional_params={},
                                                of='hb',
-                                               ln=CFG_SITE_LANG):        
+                                               ln=CFG_SITE_LANG):
         """Template for public basket's single item content display."""
 
         if of == 'hb':
@@ -3442,7 +3414,7 @@ class Template:
     </tr>""" % _("The item you have selected does not exist.")
 
             else:
-                (recid, colid, nb_cmt, last_cmt, val, score) = item
+                (recid, colid, dummy, dummy, val, dummy) = item
 
                 if recid < 0:
                     external_item_img = '<img src="%s/img/wb-external-item.png" alt="%s" style="vertical-align: top;" />&nbsp;' % \
@@ -3470,7 +3442,7 @@ class Template:
               %(notes_msg)s
             </td>
           </tr>""" % {'notes_msg': notes_msg}
-        
+
                 item_html += """
     <tr>
       <td style="border-bottom: 1px solid #fc0;">
@@ -3604,7 +3576,7 @@ class Template:
             add_note = """<a href="%s">%s%s</a>""" % (add_note_url, add_note_logo, _("Add a note"))
         else:
             add_note = ""
-        
+
         notes_html = """
               <table>
                 <tr>
@@ -3626,7 +3598,7 @@ class Template:
             notes_html += """
                 <tr>
                   <td colspan="2" class="bsknotescontent">"""
-            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, cmt_priority, cmtid) in notes:
+            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid) in notes:
                 if user_can_add_notes:
                     reply_to_note = """<a href="%s/yourbaskets/write_public_note?bskid=%i&amp;recid=%i&amp;cmtid=%i&amp;ln=%s%s">%s</a>""" % \
                                     (CFG_SITE_URL, bskid, recid, cmtid, ln, '#note', _('Reply'))
@@ -3699,7 +3671,7 @@ class Template:
         if of == 'xm':
             # TODO: xml output...
             out = ""
-            
+
         return out
 
     def tmpl_export_xml(self, body):

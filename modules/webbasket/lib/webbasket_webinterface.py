@@ -37,7 +37,6 @@ from invenio.webbasket import \
      perform_request_search, \
      create_guest_warning_box, \
      create_basket_navtrail, \
-     create_webbasket_navtrail, \
      create_guest_warning_box, \
      perform_request_write_note, \
      perform_request_save_note, \
@@ -152,7 +151,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
 
         # Can user view this basket & record & comment, i.e. can user
         # access its attachments?
-        uid = getUid(req)
+        #uid = getUid(req)
         user_info = collect_user_info(req)
         rights = get_max_user_rights_on_basket(argd['uid'], argd['bskid'])
 
@@ -232,7 +231,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         # 3. attach files
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, argd['recid'])
+        (auth_code, dummy) = check_user_can_attach_file_to_comments(user_info, argd['recid'])
 
         if user_info['email'] == 'guest' and not user_info['apache_user']:
             # 1. User is guest: must login prior to upload
@@ -286,7 +285,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
     attachments = WebInterfaceBasketCommentsFiles()
 
-    def index(self, req, form):
+    def index(self, req, dummy):
         """Index page."""
         redirect_to_url(req, '%s/yourbaskets/display?%s' % (CFG_SITE_URL, req.args))
 
@@ -779,7 +778,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             if argd['category'] == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
                 argd['topic'] = wash_topic(uid, argd['topic'])[0]
             elif argd['category'] == CFG_WEBBASKET_CATEGORIES['GROUP']:
-                argd['group'] = wash_topic(uid, argd['group'])[0]
+                argd['group'] = wash_group(uid, argd['group'])[0]
             url = """%s/yourbaskets/display?category=%s&topic=%s&group=%i&ln=%s""" % \
                   (CFG_SITE_URL, argd['category'], argd['topic'], argd['group'], argd['ln'])
             redirect_to_url(req, url)
@@ -1359,7 +1358,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             (body, warnings, navtrail) = perform_request_display_public(uid=uid,
                                                                         selected_bskid=argd['bskid'],
                                                                         selected_recid=0,
-                                                                        format=argd['of'],
+                                                                        of=argd['of'],
                                                                         ln=argd['ln'])
             warnings.extend(subscribe_warnings)
             body = subscribe_warnings_html + body
@@ -1419,7 +1418,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             (body, warnings, navtrail) = perform_request_display_public(uid=uid,
                                                                         selected_bskid=argd['bskid'],
                                                                         selected_recid=0,
-                                                                        format=argd['of'],
+                                                                        of=argd['of'],
                                                                         ln=argd['ln'])
             warnings.extend(unsubscribe_warnings)
             body = unsubscribe_warnings_html + body

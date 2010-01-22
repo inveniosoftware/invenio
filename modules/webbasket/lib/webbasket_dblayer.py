@@ -370,26 +370,36 @@ def move_baskets_to_topic(uid, bskids, new_topic):
     return res
 
 def delete_basket(bskid):
-    """Delete given basket. """
+    """Delete given basket."""
+
+    # TODO: check if any alerts are automaticly adding items to the given basket.
     bskid = int(bskid)
+
     query1 = "DELETE FROM bskBASKET WHERE id=%s"
     res = run_sql(query1, (bskid,))
+
     query2A = "SELECT id_bibrec_or_bskEXTREC FROM bskREC WHERE id_bskBASKET=%s"
-    ids = run_sql(query2A, (bskid,))
-    external_ids = [id[0] for id in ids if id[0]<0]
+    local_and_external_ids = run_sql(query2A, (bskid,))
+    external_ids = [local_and_external_id[0] for local_and_external_id in \
+                    local_and_external_ids if local_and_external_id[0]<0]
     for external_id in external_ids:
         delete_item(bskid=bskid, recid=external_id, update_date_modification=False)
+
     query2B = "DELETE FROM bskREC WHERE id_bskBASKET=%s"
     run_sql(query2B, (bskid,))
+
     query3 = "DELETE FROM bskRECORDCOMMENT WHERE id_bskBASKET=%s"
     run_sql(query3, (bskid,))
+
     query4 = "DELETE FROM user_bskBASKET WHERE id_bskBASKET=%s"
     run_sql(query4, (bskid,))
+
     query5 = "DELETE FROM usergroup_bskBASKET WHERE id_bskBASKET=%s"
     run_sql(query5, (bskid,))
+
     query6 = "DELETE FROM user_query_basket WHERE id_basket=%s"
     run_sql(query6, (bskid,))
-    #delete group, external and alerts
+
     return int(res)
 
 def create_basket(uid, basket_name, topic):
@@ -962,7 +972,7 @@ def get_external_records_by_collection(recids):
                     FROM        bskEXTREC
                     WHERE       %s
                     GROUP BY    collection_id"""
-    
+
         recids = [-recid for recid in recids]
         sep_or = ' OR '
         query %= sep_or.join(['id=%s'] * len(recids))
@@ -1035,7 +1045,7 @@ def store_external_source(es_id, es_title, es_desc, es_url, of="hb"):
                                  value)
                     VALUES      (%s, %s, %s, %s)"""
         now = convert_datestruct_to_datetext(localtime())
-        value = create_pseudo_record(es_id, es_title, es_desc, es_url, of)
+        value = create_pseudo_record(es_title, es_desc, es_url, of)
         params = (es_id, of, now, compress(value))
         run_sql(query,params)
 
@@ -1155,9 +1165,10 @@ def get_all_group_basket_ids_and_names_by_group_for_add_to_list(uid):
 
 def get_all_group_baskets_names(uid,
                                 min_rights=CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']):
-    """ for a given user returns every group baskets in which he can <min_rights>
-    return a list of tuples: (bskid, bsk_name, group_name)
-    """
+    """For a given user returns every group baskets in which he can <min_rights>
+    return a list of tuples: (bskid, bsk_name, group_name)."""
+
+    # TODO: This function is no longer used. Delete if necessary.
     uid = int(uid)
     try:
         min_rights_num = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(min_rights)
@@ -1180,7 +1191,7 @@ def get_all_group_baskets_names(uid,
                           ON bsk.id=ugbsk.id_bskBASKET
         WHERE %s AND NOT(ugbsk.share_level='NO')
         ORDER BY ug.name""" % where_clause
-        params = tuple([group_id for group_id, group_name in groups])
+        params = tuple([group_id for (group_id, dummy) in groups])
         params += tuple(CFG_WEBBASKET_SHARE_LEVELS_ORDERED[min_rights_num:])
         return run_sql(query, params)
     return ()
@@ -1815,10 +1826,10 @@ def count_all_public_baskets():
 
     return __wash_sql_count(res)
 
-def get_list_public_baskets(page, max, sort='name', asc=1):
+def get_list_public_baskets(page, max_number, sort='name', asc=1):
     """Return list of public baskets
     @param page: limit to baskets from number x
-    @param max: maximum number of baskets to return
+    @param max_number: maximum number of baskets to return
     @sort: 1: order by name of basket, 2: number of views, 3: owner
     @return:
     [(basket id, basket name, nb of views, uid of owner, nickname of owner)]"""
@@ -1870,7 +1881,7 @@ def get_list_public_baskets(page, max, sort='name', asc=1):
     query += """
                 LIMIT %s, %s"""
 
-    params = (page, max)
+    params = (page, max_number)
 
     res = run_sql(query, params)
 
@@ -2200,7 +2211,7 @@ def __decompress_last(item):
     item[-1] = decompress(item[-1])
     return item
 
-def create_pseudo_record(es_id, es_title, es_desc, es_url, of="hb"):
+def create_pseudo_record(es_title, es_desc, es_url, of="hb"):
     """Return a pseudo record representation given a title and a description."""
 
     if of == 'hb':
