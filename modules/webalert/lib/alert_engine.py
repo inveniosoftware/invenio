@@ -419,11 +419,11 @@ def calculate_external_records(req_args, pattern_list, field, hosted_colls, time
     """Function that returns the external records found and the potential time outs
     given a search pattern and a list of hosted collections."""
 
-    (external_search_engines, basic_search_units) = calculate_external_search_params(req_args, pattern_list, field, hosted_colls)
+    (external_search_engines, basic_search_units) = calculate_external_search_params(pattern_list, field, hosted_colls)
 
     return do_calculate_external_records(req_args, basic_search_units, external_search_engines, timeout, limit)
 
-def calculate_external_search_params(req_args, pattern_list, field, hosted_colls):
+def calculate_external_search_params(pattern_list, field, hosted_colls):
     """Function that calculates the basic search units given the search pattern.
     Also returns a set of hosted collections engines."""
 
@@ -461,7 +461,7 @@ def do_calculate_external_records(req_args, basic_search_units, external_search_
     pagegetters_list = [HTTPAsyncPageGetter(engine[0]) for engine in engines_list]
 
     # function to be run on every result
-    def finished(pagegetter, data, current_time):
+    def finished(pagegetter, data, dummy_time):
         """Function called, each time the download of a web page finish.
         Will parse and print the results of this page."""
         # each pagegetter that didn't timeout is added to this list
@@ -492,7 +492,7 @@ def calculate_desired_collection_list(c, cc, sc):
 
     # quickly create the reverse function of is_hosted_collection
     is_not_hosted_collection = lambda coll: not is_hosted_collection(coll)
-    
+
     # calculate the list of non hosted, non restricted, regular sons of cc
     washed_cc_sons = filter(is_not_hosted_collection, get_coll_sons(cc[0]))
     # clean up c removing hosted collections
