@@ -25,7 +25,6 @@ import sys
 import urllib
 
 import cgi
-import types
 
 from invenio.config import CFG_SITE_LANG
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIONS, CFG_EXTERNAL_COLLECTION_MAXRESULTS
@@ -62,6 +61,7 @@ class ExternalSearchEngine(object):
         self.parser_params = None
         self.parser = None
         self.fetch_format = ""
+        self.record_url = None
         self.selected_by_default = False
         for (name, value) in configuration.iteritems():
             setattr(self, name, value)

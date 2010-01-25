@@ -75,6 +75,7 @@ class ExternalCollectionResultsParser(object):
 
     num_results_regex = None
     nbrecs_regex = None
+    nbrecs_url = None
 
     def __init__(self, host='', path=''):
         self.buffer = ""
@@ -371,10 +372,14 @@ class CDSInvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsPar
         self.buffer = ""
         self.results = []
         self.clean()
+        self.num_results_regex_str = None
+        self.nbrecs_regex_str = None
         for (name, value) in params.iteritems():
             setattr(self, name, value)
-        self.num_results_regex = re.compile(self.num_results_regex_str)
-        self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
+        if self.num_results_regex_str:
+            self.num_results_regex = re.compile(self.num_results_regex_str)
+        if self.nbrecs_regex_str:
+            self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
 
     def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
@@ -398,7 +403,7 @@ class CDSInvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsPar
             results = level_c_pat.finditer(level_b_pat.sub('', level_a_pat.search(self.buffer).group(1)))
             for result in results:
                # each result is placed in each own table since it already has its rows and cells defined
-               self.add_html_result('<table>' + result.group(1) + '</table>', limit)
+                self.add_html_result('<table>' + result.group(1) + '</table>', limit)
         except AttributeError:
             # in case there were no results found an Attribute error is raised
             pass
@@ -410,15 +415,19 @@ class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsPars
         self.buffer = ""
         self.results = []
         self.clean()
+        self.num_results_regex_str = None
+        self.nbrecs_regex_str = None
         for (name, value) in params.iteritems():
             setattr(self, name, value)
-        self.num_results_regex = re.compile(self.num_results_regex_str)
-        self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
+        if self.num_results_regex_str:
+            self.num_results_regex = re.compile(self.num_results_regex_str)
+        if self.nbrecs_regex_str:
+            self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
 
     def parse(self, of='hb', req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records. Format the records using the selected output format."""
 
-        (recids, records) = self.parse_and_extract_records(of, req)
+        (recids, records) = self.parse_and_extract_records(of)
 
         if req and cgi.parse_qs(req.args).has_key('jrec'):
             counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
@@ -448,7 +457,7 @@ class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsPars
             if html:
                 self.add_html_result(html, limit)
 
-    def parse_and_extract_records(self, of='hb', req=None):
+    def parse_and_extract_records(self, of='hb'):
         """Parse the buffer and return a list of the recids and a
         dictionary with key:value pairs like the following
         recid:formated record with the selected output format"""
@@ -474,7 +483,7 @@ class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsPars
                     records[recid] = format_record(None, of, xml_record=xml_record)
                 elif of == 'xm':
                     records[recid] = xml_record
-            return (recids,records)
+            return (recids, records)
         except AttributeError:
             # in case there were no results found an Attribute error is raised
             return ([], {})

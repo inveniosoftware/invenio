@@ -332,8 +332,12 @@ def calculate_hosted_collections_results(req, pattern_list, field, hosted_collec
     vprint(3, 'pattern_list = ' + str(pattern_list) + ', field = ' + str(field))
 
     # firstly we calculate the search parameters, i.e. the actual hosted search engines and the basic search units
-    (hosted_search_engines, basic_search_units) = calculate_hosted_collections_search_params(
-        req, pattern_list, field, hosted_collections, verbosity_level, lang)
+    (hosted_search_engines, basic_search_units) = \
+    calculate_hosted_collections_search_params(req,
+                                               pattern_list,
+                                               field,
+                                               hosted_collections,
+                                               verbosity_level)
 
     # in case something went wrong with the above calculation just return None
     # however, once we run this function no fail should be expected here
@@ -346,8 +350,11 @@ def calculate_hosted_collections_results(req, pattern_list, field, hosted_collec
 
     vprint(3, 'end')
 
-def calculate_hosted_collections_search_params(req, pattern_list, field, hosted_collections,
-                                               verbosity_level=0, lang=CFG_SITE_LANG):
+def calculate_hosted_collections_search_params(req,
+                                               pattern_list,
+                                               field,
+                                               hosted_collections,
+                                               verbosity_level=0):
     """Calculate the searching parameters for the selected hosted collections
     i.e. the actual hosted search engines and the basic search units"""
 
@@ -460,8 +467,8 @@ def do_calculate_hosted_collections_results(req, lang, vprint, verbosity_level, 
                     )
                     break
         elif not finished:
-                ## the list contains:
-                ## * the engine itself: [search url], [engine]
-                timeout_list.append(engine)
+            ## the list contains:
+            ## * the engine itself: [search url], [engine]
+            timeout_list.append(engine)
 
     return (full_results_list, timeout_list)

@@ -145,7 +145,7 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
 def build_request(uri):
     """Build an http request for a specific url."""
 
-    scheme, host, path, params, query, fragment = urlparse.urlparse(uri)
+    scheme, host, path, params, query, dummy = urlparse.urlparse(uri)
     assert scheme == "http", "only supports HTTP requests (uri = " + uri + ")"
 
     host, port = decode_host_port(host)

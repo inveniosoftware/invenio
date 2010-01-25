@@ -1208,7 +1208,7 @@ def wash_colls(cc, c, split_colls=0, verbose=0):
                          AND ccc.name=%s AND cc.type='r'
                          AND (c.dbquery NOT LIKE 'hostedcollection:%%' OR c.dbquery IS NULL)""", (cc,))
     for row_hosted in res_hosted:
-            l_cc_nonrestricted_sons_and_nonhosted_colls.append(row_hosted[0])
+        l_cc_nonrestricted_sons_and_nonhosted_colls.append(row_hosted[0])
     l_cc_nonrestricted_sons_and_nonhosted_colls.sort()
 
     l_cc_nonrestricted_sons = []
