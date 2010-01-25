@@ -203,6 +203,7 @@ an attempt to present the actual setup of different MARC tags in use in AL500
 
                            Maja Gracco
                            1 September 2004
+                  Updated by Jocelyne Jerdelet December 2009
 
 NOTE:
 1. The abbreviations "NR" and "R" are MARC21 standards and stands for
@@ -238,8 +239,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
              It contains the MARC code for the agency whose system control
              number is present in field 001. - [ARC,CER,IEX,MAN,MMD]
 
-      [Additional field(s)/tag(s)]:
-      {Not in use in AL300}
+
 
 
 005   DATE AND TIME OF LAST TRANSACTION (NR)
@@ -248,19 +248,22 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
              It contains 16 characters that specify the date and time
              of the last record transaction. - [ARC,CER,IEX,MAN,MMD]
 
-      [Additional field(s)/tag(s):]
-      {Not in use in AL300}
-
 
 020   INTERNATIONAL STANDARD BOOK NUMBER  (R)
 
       Indicators - Both undefined
 
       Subfield Code(s)
-         $a   International Standard Book Number (NR) - [CER]
+         $a   International Standard Book Number (NR) - [CER base=2n monograph]
+         $u   International Standard Book Number - Medium (NR) - [CER base=2n monograph]]
 
-      [Additional field(s)/tag(s): IS]
-      [IS * -> 020 $a {To be used when the base is not "3n" but monograph}]
+
+021   INTERNATIONAL STANDARD NUMBER (R)
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a   International Standard Number (NR) - [CER]
 
 
 022   INTERNATIONAL STANDARD SERIAL NUMBER (R)
@@ -268,10 +271,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $a   International Standard Serial Number (NR) - [CER]
-
-      [Additional field(s)/tag(s): IS]
-      [IS * -> 022 $a {To be used when the base is "3n" periodical}]
+         $a   International Standard Serial Number (NR) - [CER base=3n periodical]
+	 $b   ISSN Support (NR) - [CER]
 
 
 024   OPEN ARCHIVES INITIATIVE (R) [CERN]
@@ -285,20 +286,14 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a    OAI - [CER]
          $p    OAI-set indicator - [CER]
 
-      [Additional field(s)/tag(s): 909CO]
-      [909CO $$a -> 0248 $a]
-      {Not in use in AL300}
-
 
 030   CODEN DESIGNATION  (R)
 
       Indicators  - Both undefined
 
       Subfield Code(s)
-         $a   CODEN  (NR) - [CER]
-
-      [Additional field(s)/tag(s): CD]
-      [CD * -> 030 $a]
+         $a   CODEN  (NR) - [CER base=3n]
+         $9   CODEN Source - [CER base=3n]
 
 
 035   SYSTEM CONTROL NUMBER  (R) [CERN]
@@ -310,15 +305,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $9   System control number: Inst. (NR) - [CER,"CERN annual report",
               "CERN ISOLDE",IEX,MAN,MMD,WAI/UDC]
 
-      [Additional field(s)/tag(s): ON,OS,SYSNO,909C0,909C6,909C7]
-      [ON $c, * -> 909C6 $c -> 035 $a; "CERN annual report" -> $9]
-      [OS $a-$z -> 035 $a; $9 {Not in use in AL300}]
-      [909C7 $i -> 035 $a; "CERN ISOLDE" -> $9]
-      [SYSNO * -> 909C0 $o -> 035 $a; $9 global-local-library as in AL300]
       NOTE:
-      [SYSNO * -> 909C0 $o -> 035 ALL but IEX/DIR]
-      [SYSNO * -> 035 $a {IEX/DIR: System number}]
-      [035 $9 {IEX/DIR: Add "PIE" into this field} {Not in use in AL300}]
+      [035 $9 inspire {record with other subject than Particle Physics to import into INSPIRE}
 
 
 037   SOURCE OF ACQUISITION  (R) [CERN]
@@ -328,9 +316,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Electronically retrievable number  (NR) - [CER,MAN,MMD]
 
-      [Additional field(s)/tag(s): ER]
-      [ER * -> 037 $a]
-
 
 041   LANGUAGE CODE  (NR)
 
@@ -338,9 +323,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Language code (NR) - [ARC,CER,IEX,MAN,MMD]
-
-      [Additional field(s)/tag(s): LN]
-      [LN * -> 041 $a]
 
 
 044   COUNTRY OF PUBLISHING/PRODUCING ENTITY CODE  (NR)
@@ -350,8 +332,13 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Country of publishing/producing entity code (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): SW]
-      [SW $$c -> 044 $a]
+
+050   LIBRARY OF CONGRESS CALL NUMBER (R)
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a   Classification number (R) - [CER]
 
 
 080   UNIVERSAL DECIMAL CLASSIFICATION NUMBER (R)
@@ -361,8 +348,22 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Universal Decimal Classification number (NR) - [CER,WAI/UDC]
 
-      [Additional field(s)/tag(s): UD]
-      [UD * -> 080 $a]
+
+082   DEWEY DECIMAL CLASSIFICATION NUMBER (R)
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a   Classification number (R) - [CER]
+
+
+084   OTHER CLASSIFICATION NUMBER (R)
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a   Classification number (R) - [CER]
+         $2   Number source (NR) - [CER]
 
 
 088   REPORT NUMBER (R) [CERN]
@@ -373,11 +374,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Report number (NR) - [ARC,CER,MAN,MMD]
          $9   CERN internal number (NR) - [CER,MMD]
 
-      [Additional field(s)/tag(s): RN,RN1,FRAME,909C0,909C1]
-      [RN * -> 088 $a]
-      [RN1 * -> 909C0 $r -> 909C1 $a -> 088 $9]
-      [FRAME * -> 909C0 $r -> 909C1 $a -> 088 $9]
-
 
 100   MAIN ENTRY--PERSONAL NAME  (NR) [CERN]
 
@@ -386,17 +382,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Personal name (NR) - [CER,MAN,MMD]
          $e   Relator term (NR) - [CER,MMD]
-         $u   Affiliation (NR) - [CER]
-         $v   Second and onwards affiliation (R) - [CER]
-
-      [Additional field(s)/tag(s): AU1,AU2]
-      [AU1 * -> 100 $a]
-      [AU2 * -> 100 $a]
-      [AU1 $$e -> 100 $e {MMD}]
-      [AU1 $$2 -> 100 $e]
-      [AU2 $$2 -> 100 $e]
-      [AU2 $$u -> 100 $u]
-      [AU2 $$v -> 100 $v]
+         $u   Affiliation (R) - [CER]
 
 
 110   MAIN ENTRY--CORPORATE NAME  (NR) [CERN]
@@ -407,13 +393,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Corporate name (NR) - [CER,IEX]
          $b   Subordinate unit (NR) - [IEX]
          $g   Acronym (NR) - [IEX]
-
-      [Additional field(s)/tag(s): ACRO,CA1,DEPT,ORG]
-      [CA1 * -> 110 $a]
-      [ORG * -> 110 $a]
-      [DEPT * -> 110 $b]
-      [ACRO * -> 110 $g]
-      Don't use this tag for base=3n use tag 931
 
 
 111   MAIN ENTRY--MEETING NAME  (NR) [CERN]
@@ -431,17 +410,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $z   Closing date (NR) - [CER]
          $9   Opening date (NR) - [CER]
 
-      [Additional field(s)/tag(s): CF]
-      [CF * -> 111 $a]
-      [CF $$p -> 111 $c]
-      [CF $$d -> 111 $d]
-      [CF $$y -> 111 $f]
-      [CF $$c -> 111 $g]
-      [CF $$n -> 111 $n]
-      [Not in use in AL300 -> 111 $w]
-      [Not in use in AL300 -> 111 $z]
-      [CF $$o -> 111 $9]
-
 
 145   MAIN TITLE STATEMENT (NR) [CERN]
 
@@ -449,8 +417,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Remainder of title (NR) - [CER]
          $b   Remainder of subtitle (NR) - [CER]
-
-      [Not in use in AL300]
 
 
 210   ABBREVIATED TITLE  (NR)
@@ -460,9 +426,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Abbreviated title (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): TI5]
-      [TI5 * -> 210 $a]
-
 
 222   KEY TITLE  (R)
 
@@ -471,7 +434,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Key title  (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s):]
+      NOTE:
       [Created automatically by the system from tag 245 {Not in use in AL300}]
 
 
@@ -480,14 +443,9 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $a   Title (NR) - [CER bas=17]
-         $b   Remainder of title  (NR) - [CER bas=17]
-         $y   Language code of translated title (NR) - [CER bas=17]
-
-      [Additional field(s)/tag(s): RT]
-      [RT * -> 242_1 $a {MMD} -> 242 $a {CER}]
-      [242_1 $b {MMD} -> 242 $b {CER}; {Not in use on AL300}]
-      [RT $$y -> 242_1 $y {MMD} -> 242 $y {CER}]
+         $a   Title (NR) - [CER bas=17,14]
+         $b   Remainder of title  (NR) - [CER bas=17,14]
+         $y   Language code of translated title (NR) - [CER bas=17,14]
 
 
 245   TITLE STATEMENT (NR)
@@ -495,19 +453,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
       Subfield Code(s)
          $a   Title (NR) - [ARC,CER,IEX,MAN,MMD]
-         $b   Remainder of title (NR) - [ARC,CER,IEX,MAN,MMD]
+         $b   Remainder of title (sub-title) (NR) - [ARC,CER,IEX,MAN,MMD]
          $k   Form (NR) - [MAN]
-
-      [Additional field(s)/tag(s): TI,TI1,TI3,TYPE]
-      [TI * -> 245 $a]
-      [TI1 * -> 245 $a]
-      [TI3 * -> 245 $a {CER base=3n}]
-      [TI $$s -> 245 $b]
-      [TI1 $$s -> 245 $b]
-      [TI3 $$f -> 245 $b {CER base=3n}]
-      [TI3 $$s -> 245 $b {CER base=3n}]
-      [TI $$s -> 245 $ b]
-      [TYPE * -> 245 $ k]
 
 
 246   VARYING FORM OF TITLE:1 (R)
@@ -522,14 +469,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $n   Number of part/section of a work (R) - [CER not base=3n]
          $p   Name of part/section of a work (R) - [CER not base=3n]
 
-      [Additional field(s)/tag(s): MRT,VO]
-      [MRT * -> 246 $a]
-      [MRT $$s -> 246 $b]
-      [MRT $$e -> 246 $g]
-      [MRT $$1 -> 246 $i]
-      [VO $$n -> 245 $n -> 246 $n]
-      [VO $$t -> 245 $p -> 246 $p]
-
 
 246   VARYING FORM OF TITLE:2 (R)
 
@@ -542,11 +481,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Title proper/short title (NR) - [CER base=3n,MAN,MMD]
          $i   Display text (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): 246_1,TI4,TIF]
-      [TI4 * -> 246_1 $a]
-      [TIF * -> 246_1 $a]
-      [TI4 $$1 -> 246_1 $i {parallel title}]
-
 
 246   VARYING FORM OF TITLE:3 (R)
 
@@ -557,13 +491,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Title proper/short title (NR) - [CER base=3n]
-         $i   Display text (NR) - [CER base=3n]
+         $i   Display text (NR) {cross reference} - [CER base=3n]
          $9   Siglum "sigle" (NR) - [CER base=3n]
-
-      [Additional field(s)/tag(s): 246_3,TI4]
-      [TI4 * -> 246_3 $a]
-      [TI4 $$1 -> 246_3 $i {cross reference}]
-      [TI4 $$g -> 246_3 $9]{"sigle"]
 
 
 250   EDITION STATEMENT (NR)
@@ -571,10 +500,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Edition statement (NR) - [CER not base=3n,IEX]
-
-      [Additional field(s)/tag(s): TI, TI1]
-      [TI $$e -> 250 $a]
-      [TI1 $$e -> 250 $a]
 
 
 260   PUBLICATION, DISTRIBUTION, ETC. (IMPRINT) (NR) [CERN]
@@ -587,12 +512,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $c   Date of publication [only year] (NR) - [ARC,CER,IEX,MAN,MMD]
          $g   Reprinted editions  (NR) - [CER base=2n,41-45]
 
-      [Additional field(s)/tag(s): IM,YR,909CY]
-      [IM $$p -> 260 $a {CER base=2n,41-45}]
-      [IM $$n -> 260 $b {CER base=2n,41-45}]
-      [IM $$d -> 260 $c]{CER base=2n,41-45}]
-      [YR * -> 909CY $a -> 260 $c {ARC,CER,IEX,MAN,MMD}]
-      [NO $$g -> 260 $g {CER base=2n,41-45}]
       NOTE: This tag is not used for base=3n [use tag 933]
 
 
@@ -605,12 +524,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $b   Name of publ. (NR) - [ARC,CER not base=2n,41-45,IEX,MAN,MMD]
          $c   Complete date (NR) - [ARC,CER not base=2n,41-45,IEX,MAN,MMD]
 
-      [Additional field(s)/tag(s):
-      {Not in use in AL300}]
+
       NOTE: Don't use the following lines for CER base=2n,41-45 !!
-      [IM $$p -> 260 $a -> 269 $a]
-      [IM $$n -> 260 $b -> 269 $b]
-      [IM $$d -> 260 $c -> 269 $c]
 
 
 270   ADDRESS (R) [CERN]
@@ -629,31 +544,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $s   City or Alternate city: Suffix (NR) - [IEX]
          $9   Telex (NR) - [CER,IEX]
 
-      [Additional field(s)/tag(s):AADDR,ADDR,ATOWN,CONT,CT,CTRY,RE,TELn,
-      TFAXn,TOWN,TOWN1]
-      [AADDR * -> 270 $a {alternate address}]
-      [ADDR * -> 270 $a {address}]
-      [CT $$a -> 270 $a]
-      [ATOWN * -> 270 $b {alternate town}]
-      [TOWN * -> 270 $b]
-      [CTRY * -> 270 $d {IEX}]
-      [ATOWN $$l -> 270 $e {alternate town: postal address}]
-      [TOWN $$l -> 270 $e]
-      [CT $$t -> 270 $k {CER}]
-      [TEL1-TEL9 $$c,a,l -> 270 $k {IEX}]
-      [CT $$f -> 270 $l {CER}]
-      [TFAX1-TFAX3 $$c,a,l -> 270 $l {IEX}]
-      [CONT $$e -> 270 $m]
-      [CT * -> 270 $m {MMD}]
-      [CT $$e -> 270 $m {CER}]
-      [CONT * -> 270 $$p]
-      [CT * -> 270 $p {IEX}]
-      [CT $$p -> 270 $p {MMD}]
-      [ATOWN $$t -> 270 $s {alternate town: suffix}]
-      [TOWN $$t -> 270 $s]
-      [RE $$z -> 270 $9 {CER}]
-      [TELEX * -> 270 $9 {IEX}]
-
 
 300   PHYSICAL DESCRIPTION  (R)
 
@@ -661,9 +551,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Pagination (NR) - [ARC,CER,MAN,MMD]
-
-      [Additional field(s)/tag(s): IM]
-      [IM $$c -> 300 $a]
+         $b   Other physical details (NR)
 
 
 310   CURRENT PUBLICATION FREQUENCY  (NR)
@@ -673,8 +561,15 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Current publication frequency (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): SW]
-      [SW $$f -> 310 $a]
+
+336 - Content Type (R)
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+	$a   Content type term (R) - [CER]
+
+      NOTE: use for SLIDES
 
 
 340   PHYSICAL MEDIUM  (R) [CERN]
@@ -687,10 +582,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $d   Information recording technique (NR) - [ARC]
          $9   CD-ROM [code concatinated]
 
-      [Additional field(s)/tag(s): ME,CDR,909CZ]
-      [ME * -> 340 $a]
-      [CDR $$a,$$c,$$m,$$n,$$p,$$t,$$w -> 909CZ $a,$c,$m,$n,$p,$t,$w -> 340 $9]
-
 
 490   SERIES STATEMENT (R)
 
@@ -700,12 +591,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Series statement (NR) - [CER]
          $v   Volume/sequential designation (NR) - [CER]
 
-      [Additional field(s)/tag(s): SR,SR1]
-      [SR * -> 490 $a]
-      [SR1 * -> 490 $a]
-      [SR $$n -> 490 $v]
-      [SR1 $$n -> 490 $v]
-
 
 500   GENERAL NOTE (R)
 
@@ -714,10 +599,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   General note (NR) - [ARC,CER,IEX,MAN,MMD]
 
-      [Additional field(s)/tag(s): NO,OB,PROG]
-      [NO * -> 500 $a]
-      [OB * -> 500 $a {MAN}]
-      [PROG * -> 500 $a {IEX} Scientific program]
       NOTE: Don't use this tag for base=3n use tag 935
 
 
@@ -730,9 +611,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $b   University (NR) - [CER base=14]
          $c   Date of year of defense - [CER base=14]
 
-      [Additional field(s)/tag(s): NO1]
-      [NO1 * -> 502 $a]
-
 
 506   RESTRICTIONS ON ACCESS NOTE (R)
 
@@ -741,11 +619,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Terms governing access (NR) - [ARC,MAN,MMD]
          $9   Local information (NR) - [ARC]
-
-      [Additional field(s)/tag(s): AV, CX]
-      [AV * -> 506 $a {ARC,MAN,MMD}]
-      [AV $$d -> 506 $a {MAN}]
-      [CX * -> 506 $a {ARC,MAN]
 
 
 518   DATE/TIME AND PLACE OF AN EVENT NOTE (R) [CERN]
@@ -759,12 +632,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $l   Lectures: length of speech (NR) - [CER]
          $r   Lectures: meeting (NR) - [CER]
 
-      [Additional field(s)/tag(s): NO1,909CC]
-      [NO1 $$d -> 909CC $ d -> 518 $d]
-      [NO1 $$g -> 909CC $ g -> 518 $g]
-      [NO1 $$h -> 909CC $ h -> 518 $h]
-      [NO1 $$l -> 909CC $ l -> 518 $l]
-      [NO1 * -> 909CC $$r -> 518 $r]
       NOTE: This tag is only in use for CER base=10-13,16,19
 
 
@@ -773,13 +640,9 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $a   Summary, etc. note  (NR) - [ARC,CER,IEX,MAN,MMD]
-         $b   Expansion of summary note (NR) - [MMD]
-
-      [Additional field(s)/tag(s): AB,RT]
-      [AB * -> 520 $a]
-      [RT * -> 520 $a {MMD/BUL} Abs. short Eng]
-      [AB * -> 520 $b {MMD/BUL} Abs. long Eng]
+         $a   Summary, etc. note  (NR) - [ARC,CER,IEX,MAN,MMD/BUL] (Abs. short Eng)
+         $b   Expansion of summary note (NR) - [MMD/BUL] (Abs. long Eng)
+         $9   number of the abstract  (NR) - [ARC,CER,IEX,MAN,MMD/BUL]
 
 
 541   IMMEDIATE SOURCE OF ACQUISITION NOTE  (R) [CER]
@@ -794,12 +657,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $h   Price paid by Bookshop [CER]
          $9   Price for the user to pay [CER]
 
-      [Additional field(s)/tag(s): OS,SI]
-      [SI * -> 541 $a]
-      [SI $$b -> 541 $d]
-      [OS * -> 541 $e]
-      [SI $$c -> 541 $f]
-
 
 546   LANGUAGE NOTE (R) [CERN]
 
@@ -809,10 +666,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Language of source (NR) - [MAN]
          $g   Target language (NR) - [MAN
 
-      [Additional field(s)/tag(s): LN,TR,919CJ]
-      [LN * -> 919CJ $a -> 546 $a]
-      [TR $$t -> 919CJ $b -> 546 $g]
-
 
 555   CUMULATIVE INDEX/FINDING AIDS NOTE (R)
 
@@ -820,9 +673,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Cumulative index/finding aids note (NR) - [CER base=3n]
-
-      [Additional field(s)/tag(s): PNO]
-      [PNO $$c -> 555 $a]
 
 
 583   ACTION NOTE  (R) [CERN]
@@ -835,12 +685,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $i   Mail; Method of action (NR) - [MAN]
          $z   Note (NR) - [CERN:ALD]
 
-      [Additional field(s)/tag(s): ACT,DDLN,MAIL,SENDC,919CG]
-      [ACT * -> 583 $a]
-      [SENDC * -> 583 $a]
-      [DDLN * -> 583 $c]
-      [MAIL * -> 919CG $a -> 583 $i]
-
 
 590   FRENCH SUMMARY NOTE (R) [CERN]
 
@@ -850,11 +694,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Summary, etc. note in French (NR) - [MMD]
          $b   Expansion of summary note in French (NR) - [MMD]
 
-      [Additional field(s)/tag(s): ABF,RTF]
-      [ABF * -> 590 $a NOT base=75]
-      [RTF * -> 590 $a only base=75]
-      [ABF * -> 590 $b only base=75]
-
 
 594   TYPE OF DOCUMENT (R) [CERN]
 
@@ -862,9 +701,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Type of document (NR) - [ARDA]
-
-      [Additional field(s)/tag(s):]
-      {Not in use in AL300}
 
 
 595   INTERNAL NOTE (R) [CERN]
@@ -877,12 +713,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $i   INSPEC number
          $s   Subject note (NR) - [MMD]
 
-      [Additional field(s)/tag(s): NI,OB]
-      [NI * -> 595 $a]
-      [OB * -> 595 $a {MMD}]
-      [NI $$d -> 595 $d]
-      [NI $$i -> 595 $i]
-      [NI $$s -> 595 $s]
       NOTE: Don't use this tag for base=3n use tag 937
 
 
@@ -893,9 +723,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   SLAC note (NR) - [CER]
 
-      [Additional field(s)/tag(s): NS]
-      [NS * -> 596 $a]
-
 
 597   OBSERVATION IN FRENCH (R) [CERN]
 
@@ -904,9 +731,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Observation in French (NR) - [MMD]
 
-      [Additional field(s)/tag(s): OBF]
-      [OBF * -> 597 $a]
-
 
 598   COPYRIGHT (R) [CERN]
 
@@ -914,9 +738,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Copyright (NR) - [MMD]
-
-      [Additional field(s)/tag(s): CR]
-      [CR * -> 598 $a]
 
 
 599   STATISTICS FOR THE CERN BOOKSHOP (R) [CERN]
@@ -928,8 +749,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $b   Total number of books sold by the Bookshop (NR) - [CER]
          $c   The values of $a minus the values of $b (NR) - [CER]
 
-      {Not in use in AL300}
-
 
 600   SUBJECT ADDED ENTRY--PERSONAL NAME (R)
 
@@ -938,10 +757,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Personal name (NR) - [ARC]
          $c   Titles and other words associated with a name (NR) - [ARC]
-
-      [Additional field(s)/tag(s): NA]
-      [NA * -> 600 $a]
-      [NA $$c -> 600 $c]
 
 
 650   SUBJECT ADDED ENTRY--TOPICAL TERM:1  (R)
@@ -956,11 +771,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Topical term or geographic name (NR) - [CER,MAN,MMD]
          $2   Source of heading or term  (NR) - [CER,MAN,MMD]
 
-      [Additional field(s)/tag(s): 65017,SU]
-      NOTE: Only 1st occurrence of SU
-      [SU * -> 65017 $a]
-      [SU $2 {Not in use in AL300}]
-
 
 650   SUBJECT ADDED ENTRY--TOPICAL TERM:2  (R)
 
@@ -974,12 +784,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Topical term or geographic name (NR) - [CER,MAN,MMD]
          $2   Source of heading or term  (NR) - [CER,MAN,MMD]
 
-      [Additional field(s)/tag(s): 65027,SU,SUA]
-      NOTE: Only 2nd occurrence of SU
-      [SU * -> 65027 $a]
-      [SUA * -> 65027 $a {MMD}]
-      [SU $2 {Not in use in AL300} {CER}]
-
 
 653   ENGLISH INDEX TERM--UNCONTROLLED:1 (R) [CERN]
 
@@ -991,11 +795,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Uncontrolled term  (NR) - [ARC,CER,MAN,MMD,WAI/UDC]
          $9   Institute of the uncontrolled term  (NR) - [CER]
-
-      [Additional field(s)/tag(s): 6531,KW]
-      [KW * -> 6531 $a {Databases (see above) CER only older records}]
-      [KW a-z -> 6531 $a {CER newer records}]
-      [KW $9 {Not in use in AL300}]
 
 
 653   FRENCH INDEX TERM--UNCONTROLLED:2 (R)
@@ -1009,10 +808,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Uncontrolled term  (NR) - [CER,WAI/UDC]
          $9   Institute of the uncontrolled term  (NR) - [CER,WAI/UDC]
 
-      [Additional field(s)/tag(s): 6532,KW6]
-      [KW6 * -> 6532 $a]
-      [KW6 $9 {Not in use in AL300}]
-
 
 690   SUBJECT INDICATOR (R) [CERN]
 
@@ -1024,13 +819,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Term (NR) - [ARC,CER,IEX,MAN,MMD]
 
-      [Additional field(s)/tag(s): 690C,IN,TYPE]
-      [IN * -> 690C $a]
-      [TYPE $$a -> 690C $a {Type of research: Accelerator} {IEX}]
-      [TYPE $$e -> 690C $a {Type of research: Experimental {IEX}]
-      [TYPE $$o -> 690C $a {Type of research: Other} {IEX}]
-      [TYPE $$t -> 690C $a {Type of research: Theoretical} {IEX}]
-
 
 691   OBSERVATION (NR)  [CERN]
 
@@ -1038,11 +826,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
           $a   Observation (NR) - [ARC,MAN]
-
-      [Additional field(s)/tag(s): OB,919C3]
-      [OB * -> 919C3 $a -> 691 $a]
-      [OB1 * -> 919C3 $a -> 691 $a {ARC}]
-      [OB2 * -> 919C3 $a -> 691 $a {ARC}]
 
 
 692   BEAM (R) [CERN]
@@ -1054,11 +837,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $i   Isotope (NR) - [CER]
          $m   Minimum intensity (NR) - [CER]
 
-      [Additional field(s)/tag(s): BEAM,909CK]
-      [BEAM $$e -> 909CK $e -> 692 $e]
-      [BEAM $$i -> 909CK $i -> 692 $i]
-      [BEAM $$m -> 909CK $m -> 692 $m]
-
 
 693   ACCELERATOR/EXPERIMENT (R) [CERN]
 
@@ -1069,13 +847,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $e   Experiment (NR) - [CER,IEX,MAN,MMD]
          $f   Facility
 
-      [Additional field(s)/tag(s): AC,ACCL,AE,EX]
-      [AC * -> 693 $a {CER,IEX base=50,MMD}]
-      [ACCL * -> 693 $a {IEX base=71}]
-      [AE $$a -> 693 $a {CER}]
-      [AE $$e -> 693 $e {CER}]
-      [EX * -> 693 $e {CER,IEX,MAN,MMD}]
-
 
 694   CLASSIFICATION TERMS (R) [CERN]
 
@@ -1084,10 +855,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Uncontrolled term (NR) - [CER]
          $9   Institute of the uncontrolled term (NR) - [CER]
-
-      [Additional field(s)/tag(s): KL]
-      [KL $a-$z -> 694 $a]
-      [KL $9 {Not in use in AL300}]
 
 
 695   THESAURUS TERMS (R) [CERN]
@@ -1098,12 +865,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Uncontrolled term  (NR) - [CER]
          $9   Institute of the uncontrolled term  (NR) - [CER]
 
-      [Additional field(s)/tag(s): KW2,TH]
-      [KW2 * -> 695 $a]
-      [KW2 $9 {Not in use in AL300}]
-      [TH $$a-$$z -> 695 $a]
-      [TH $9 {Not in use in AL300}]
-
 
 699   SUBJECT CATEGORY FOR CERN BOOKSHOP (R) [CERN]
 
@@ -1113,8 +874,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Uncontrolled term  (NR) - [CER]
          $9   Institute of the uncontrolled term  (NR) - [CER]
 
-      {Not in use in AL300}
-
 
 700   ADDED ENTRY--PERSONAL NAME (R) [CERN]
 
@@ -1123,19 +882,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Personal name (NR) - [ARC,CER,MMD]
          $e   Relator term  (NR) - [ARC,CER,MMD]
-         $u   Affiliation  (NR) - [CER,IEX,MMD]
-         $v   Affiliation  (NR) - [CER]
-
-      [Additional field(s)/tag(s): AU,AU2,AU3]
-      [AU * -> 700 $a]
-      [AU2 * -> 700 $a]
-      [AU3 * -> 700 $a]
-      [AU $$2 -> 700 $e]
-      [AU2 $$2 -> 700 $e]
-      [AU3 $$2 -> 700 $e]
-      [AU $$u -> 700 $u]
-      [AU $$i -> 700 $u {IEX}]
-      [AU $$v -> 700 $v]
+         $u   Affiliation  (R) - [CER,IEX,MMD]
 
 
 710   ADDED ENTRY--CORPORATE NAME  (R) [CERN]
@@ -1148,17 +895,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $g   Collaboration  (NR) - [CER]
          $5   CERN Paper (NR) - [CER,MAN,MMD]
          $9   CERN Work (NR) - [CER]
-
-      [Additional field(s)/tag(s): CA,CE,CO,DI,GP,909CW]
-      [CA * -> 710 $a {CER}]
-      [CE * -> 710 $a {ARC}]
-      [GP * -> 909CW $a -> 710 $b]
-      [CO * -> 710 $g]
-      [CO $$n -> 710 $g]
-      [DI * -> 710 $5 {MAN}]
-      [DI $$p -> 710 $5]
-      [DI $$w -> 710 $9]
-      Don't use this tag for base=3n use tag 532
 
 
 711   ADDED ENTRY--MEETING NAME  (R) [CERN]
@@ -1174,31 +910,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $n   Number of part/section/meeting  (NR) - [CER]
          $9   Conference opening date (NR) - [CER]
 
-      [Additional field(s)/tag(s): CF2,CF3,KF2]
-      [CF2 * -> 711 $a]
-      [CF3 * -> 711 $a]
-      [KF2 * -> 711 $a]
-      [CF2 $$p -> 711 $c]
-      [CF3 $$p -> 711 $c]
-      [KF2 $$p -> 711 $c]
-      [CF2 $$d -> 711 $d]
-      [CF3 $$d -> 711 $d]
-      [KF2 $$d -> 711 $d]
-      [CF2 $$y -> 711 $f]
-      [CF3 $$y -> 711 $f]
-      [KF2 $$y -> 711 $f]
-      [CF2 $$c -> 711 $g]
-      [CF3 $$c -> 711 $g]
-      [KF2 $$c -> 711 $g]
-      [CF2 $$n -> 711 $n]
-      [CF3 $$n -> 711 $n]
-      [KF2 $$n -> 711 $n]
-      [Not in use in AL300 -> 111 $w]
-      [Not in use in AL300 -> 111 $z]
-      [CF2 $$o -> 711 $9]
-      [CF3 $$o -> 711 $9]
-      [KF2 $$o -> 711 $9]
-
 
 720   AUTHOR AS ON DOCUMENT / AUTHOR IN ARCHIVE (R) [CERN]
 
@@ -1206,10 +917,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Personal name  (NR) - [ARC,CER]
-
-      [Additional field(s)/tag(s): PE,919C4,YAU,909CB]
-      [YAU * -> 909CB $y -> 720 $a {CER}]
-      [PE * -> 919C4 $a -> 720 $a {ARC}]
 
 
 721   TRANSLATOR (R) [CERN]
@@ -1220,10 +927,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Personal name (NR) - [MAN]
          $l   Words translated (NR) - [MAN]
 
-      [Additional field(s)/tag(s): AU,919CH]
-      [AU $$t -> 919CH $a -> 721 $a]
-      [AU $$w -> 919CH $l -> 721 $l]
-
 
 722   REVISOR (R) [CERN]
 
@@ -1231,9 +934,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Personal name (NR) - [MAN]
-
-      [Additional field(s)/tag(s): TR,919CI]
-      [TR $$r -> 919CI $a -> 722 $a]
 
 
 723   RE-READER (R) [CERN]
@@ -1245,11 +945,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $l   Words re-read (NR) - [MAN]
          $s   Language (NR) - [MAN]
 
-      [Additional field(s)/tag(s): 919CK]
-      [919CK $$a -> 723 $a]
-      [919CK $$l -> 723 $l]
-      [919CK $$s -> 723 $s]
-
 
 724   "COMPOSER" OF MINUTES (R) [CERN]
 
@@ -1260,9 +955,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $l   Words composed (NR) - [MAN]
          $s   Language (NR) - [MAN]
 
-      [Additional field(s)/tag(s)]
-      {Not in use before mid-April 2004}
-
 
 725   "TYPIST" OF MINUTES (R) [CERN]
 
@@ -1272,23 +964,16 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Personal name  (NR) - [MAN]
          $l   Words composed (NR) - [MAN]
 
-      [Additional field(s)/tag(s)]
-      {Not in use before mid-June 2004}
-
 
 770   SUPPLEMENT/SPECIAL ISSUE ENTRY  (R)
 
       Indicators - Both undefined
 
       Subfield Code(s)
+         $a   Main entry heading (NR) - [CER base=3n]
          $i   Display text (NR) - [CER base=3n]
          $t   Title   (NR) - [CER base=3n]
          $w   Record control number (R) - [CER base=3n]
-
-      [Additional field(s)/tag(s): RT]
-      [RT $$1 -> 770 $i {Has the supplement}]
-      [RT $$t -> 770 $t]
-      [RT $$w -> 770 $w]
 
 
 772   PARENT RECORD ENTRY   (R)
@@ -1296,14 +981,10 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $i   Display text (NR) - [CER base=3n]
+         $a   Main entry heading (NR) - [CER base=3n]
+         $i   Display text (NR) - [CER base=3n] {Supplement to}
          $t   Title   (NR) - [CER base=3n]
          $w   Record control number (R) - [CER base=3n]
-
-      [Additional field(s)/tag(s): RT]
-      [RT $$1 -> 772 $i {Supplement to}]
-      [RT $$t -> 772 $t]
-      [RT $$w -> 772 $w]
 
 
 773   HOST ITEM ENTRY (R) [CERN]
@@ -1320,23 +1001,16 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $v   Volume (NR) - [CER,MMD]
          $y   Year (NR) - [ARC,CER,MMD]
 
-      [Additional field(s)/tag(s): PR,909C4]
-      [The same subfield codes are used as in PR and 909C4]
-
 
 780   PRECEDING ENTRY (R)
 
       Indicators - Both undefined
 
       Subfield Code(s)
-         $i   Display text (NR) - [CER base=3n]
+         $a   Main entry heading (NR) - [CER base=3n]
+         $i   Display text (NR) - [CER base=3n] {Continues}
          $t   Title (NR) - [CER base=3n]
          $w   Record control number (R) - [CER base=3n]
-
-      [Additional field(s)/tag(s): RT]
-      [RT $$1 -> 780 $i {Continues}]
-      [RT $$t -> 780 $t]
-      [RT $$w -> 780 $w]
 
 
 785   SUCCEEDING ENTRY   (R)
@@ -1344,14 +1018,10 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $i   Display text (NR) - [CER base=3n]
+         $a   Main entry heading (NR) - [CER base=3n]
+         $i   Display text (NR) - [CER base=3n] {Continued by}
          $t   Title (NR) - [CER base=3n]
          $w   Record control number (R) - [CER base=3n]
-
-      [Additional field(s)/tag(s): RT]
-      [RT $$1 -> 785 $i {Continued by}]
-      [RT $$t -> 785 $t]
-      [RT $$w -> 785 $w]
 
 
 787   NONSPECIFIC RELATIONSHIP ENTRY   (R)
@@ -1359,14 +1029,10 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $i   Display text (NR) - [CER base=3n]
+         $a   Main entry heading (NR) - [CER base=3n]
+         $i   Display text (NR) - [CER base=3n] {other forms of relation}
          $t   Title (NR) - [CER base=3n]
          $w   Record control number (R) - [CER base=3n]
-
-      [Additional field(s)/tag(s): RT]
-      [RT $$1 -> 787 $i {other forms of relation}]
-      [RT $$t -> 787 $t]
-      [RT $$w -> 787 $w]
 
 
 852  LOCATION  (R)
@@ -1377,10 +1043,17 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
         $a   Location  (NR) - [ARC,CER,MAN,MMD]
         $c   Shelving location (NR) - [ARC,CER]
 
-     [Additional field(s)/tag(s): LO]
-     [LO * -> 852 $a {ARC,MAN}]
-     [LO $$a -> 852 $a {MMD}]
-     [LO $$b -> 852 $c {ARC,CER}]
+
+856   ELECTRONIC LOCATION AND ACCESS:1 (R)
+
+      Indicators
+      First   Access method
+         0       Email
+      Second  Relationship
+         ^       No information provided
+
+      Subfield Code(s)
+         $f - Electronic name (R) - [MAN,MMD]
 
 
 856   ELECTRONIC LOCATION AND ACCESS:1 (R)
@@ -1392,25 +1065,36 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          ^       No information provided
 
       Subfield Code(s)
-         $q   Electronic format type (NR) - [IEX,MMD]
+         $d   Path (R) - [MMD]
+         $q   Electronic format type (NR) - [IEX,MMD] {$x EDL;
+	MMD/PHO: IF .jpeg $x picture} {MMD [bases80-89][.gif] -> $x icon}
+         $s   File size (R) - [INDICO]
          $u   Uniform Resource Identifier (NR) - [ARC,CER,IEX,MAN,MMD]
          $x   Nonpublic note  (NR) - [CER,MMD]
          $y   Link text (NR) - [ARC,CER,IEX,MAN,MMD]
-
-      [Additional field(s)/tag(s): 8564,EXT,MAP,EDL,ICO]
-      [EXT $$x -> 8564 $q {$x EDL; MMD/PHO: IF .jpeg $x picture}]
-      [ICO * -> 8564 $q {MMD [bases80-89][.gif] -> $x icon}]
-      [EDL $$x -> 8564 $u {base=55, MMD}]
-      [EXT * -> 8564 $u {IEX}; $$x -> $u]
-      [MAP $$x -> 8564 $u {base=3n}]
-      [EXT $$t -> 8564 $x] {MMD}]
-      [MAP $$k -> 8564 $x {base=3n}]
-      [EDL $$n -> 8564 $y {base=55, MMD}]
-      [EXT $$n -> 8564 $y]
-      [MAP $$n -> 8564 $y {base=3n}]
+         $z   Public note (R) - [CER]
 
 
 856   ELECTRONIC LOCATION AND ACCESS:2 (R)
+
+      Indicators
+      First   Access method
+         4       HTTP
+      Second  Relationship
+         1       Version of resource
+
+      Subfield Code(s)
+         $g - Version status (NR) - [CER base=3n]
+         $m - Contact for access assistance (NR) - [CER base=3n]
+         $n - Name of location of host (NR) - [CER base=3n]
+         $u - Uniform Resource Identifier (NR) - [CER base=3n]
+         $x - Nonpublic note (NR) - [CER base=3n]
+         $y - Link text (NR) - [CER base=3n]
+         $z - Public note (NR) - [CER base=3n]
+         $3 - Materials specified (NR) - [CER base=3n]
+
+
+856   ELECTRONIC LOCATION AND ACCESS:3 (R)
 
       Indicators
       First   Access method
@@ -1423,22 +1107,32 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $x   Nonpublic note (NR) - [CER base=3n]
          $y   Link text (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): 85642,TOC]
-      [TOC $$x -> 85642 $u]
-      [TOC $$k -> 85642 $x]
-      [TOC $$n -> 85642 $y]
 
+856   ELECTRONIC LOCATION AND ACCESS:1 (R)
+
+      Indicators
+      First   Access method
+         7       Method specified in subfield $2
+      Second  Relationship
+         ^       No information provided
+
+      Subfield Code(s)
+         $2   Access method (NR) - [CER,MMD]
+         $8   Field link and sequence number (R) - [CER,MMD]
+         $d   Path (R) - [MMD]
+         $u   Uniform Resource Identifier (NR) - [CER,MMD]
+         $x   Nonpublic note  (NR) - [CER,MMD]
+         $y   Link text (NR) - [CER,MMD]
+         $z   Public note (R) - [CER,MMD]
 
 859   ELECTRONIC MAIL MESSAGE (R) [CERN]
 
       Indicators - Both undefined
 
       Subfield Code(s)
+         $a   Contact (NR) - [BUL]
          $f   E-mail address (NR) - [CER,IEX,MAN,MMD]
-
-      [Additional field(s)/tag(s): 8560,EM,EMAIL]
-      [EM * -> 8560 $f -> 859 $f]
-      [EMAIL * -> 8560 $f -> 859 $f {IEX}]
+         $x   Date (NR) - [CER]
 
 
 866   TEXTUAL HOLDINGS--BASIC BIBLIOGRAPHIC UNIT (R) [CERN]
@@ -1450,19 +1144,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $b   Library (NR) - [CER base=3n]
          $c   Collection (NR) - [CER base=3n]
          $g   Subscription status code (NR) - [CER base=3n]
-         $v   Volume (NR) - [CER base=3n]
          $x   Retention code (NR) - [CER base=3n]
          $z   Public note  (NR) - [CER base=3n]
-
-      [Additional field(s)/tag(s): HN,852]
-      [HN $$a -> 866 $a]
-      [HN $$y -> 866 $a]
-      [HN $$l -> 852 $b -> 866 $b]
-      [HN $$c -> 852 $c -> 866 $c]
-      [HN $$s -> 852 $g -> 866 $g]
-      [HN $$v -> 866 $v
-      [HN $$r -> 852 $x -> 866 $x]
-      [HN $$n -> 852 $z -> 866 $z]
 
 
 901   AFFILIATION AT CONVERSION AL300/AL500  (R) [CERN]
@@ -1470,10 +1153,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Indicators - Both undefined
 
       Subfield Code(s)
-         $u   Name of institute (NR) - [CER,MAN]
-
-      [Additional field(s)/tag(s): AF,909CA]
-      [AF * -> 909CA $$u -> 901 $u]
+         $u   Name of institute (NR) - [CER,MAN] {Now no more in use
+	for CER, but 100 $u and 700 $u}
 
 
 902   OTHER INSTITUTES  (R) [CERN]
@@ -1482,9 +1163,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Name of other institute (NR) - [CER]
-
-      [Additional field(s)/tag(s): OI,909CD]
-      [OI * -> 909CD $a  -> 902 $a]
 
 
 903   "GREY BOOK"  (R) [CERN]
@@ -1497,14 +1175,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $d   Status date (NR) - [IEX]
          $s   Status (NR) - [CER,IEX]
 
-      [Additional field(s)/tag(s): BEAM,NO1,ST,909CE]
-      [NO1  * -> 909CE $a -> 903 $a {IN= GREY BOOK; NO1=Approved...}]
-      [BEAM * -> 909CE $b -> 903 $b {IEX}]
-      [NO1  * -> 909CE $b -> 903 $b {IN= GREY BOOK; NO1=Beam...}]
-      [ST $$d -> 909CE $d -> 903 $d {IEX}]
-      [NO1  * -> 909CE $s -> 903 $s {IN= GREY BOOK; NO1=Status...}]
-      [ST * -> 909CE $s -> 903 $s {CER,IEX}]
-
 
 904   BEAMS PER SHIFT  (R) [CERN]
 
@@ -1512,9 +1182,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $s   Beams per shift  (NR) - [CER]
-
-      [Additional field(s)/tag(s): SH,909CF]
-      [SH $$s -> 909CF $s -> 904 $s]
 
 
 905   SPOKESMAN  (R) [CERN]
@@ -1529,15 +1196,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $p   Personal name (NR) - [CER,IEX]
          $q   Private address (NR) - [CER]
 
-      [Additional field(s)/tag(s): SPK,909CG]
-      [SPK $$a -> 909CG $a -> 905 $a]
-      [SPK $$p -> 909CG $k -> 905 $k]
-      [SPK $$f -> 909CG $l -> 905 $l]
-      [SPK $$e -> 909CG $m -> 905 $m]
-      [SPK $$n -> 909CG $p -> 905 $p]
-      [SPK * -> 909CG $p -> 905 $p {IEX}]
-      [SPK $$d -> 909CG $q -> 905 $q]
-
 
 906   RESPONSIBLE PERSON / REFEREE (R) [CERN]
 
@@ -1550,14 +1208,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $m   E-mail (NR) - [CER]
          $p   Personal name (NR) - [CER]
          $q   Private address (NR) - [CER]
-
-      [Additional field(s)/tag(s): RESP,909CH]
-      [RESP $$a -> 909CH $a -> 905 $a]
-      [RESP $$p -> 909CH $k -> 905 $k]
-      [RESP $$f -> 909CH $l -> 905 $l]
-      [RESP $$e -> 909CH $m -> 905 $m]
-      [RESP $$n -> 909CH $p -> 905 $p]
-      [RESP $$d -> 909CH $q -> 905 $q]
+         $u   Affiliation - [INDICO]
 
 
 907   INTC: RESOURCE COORDINATOR  (R) [CERN]
@@ -1567,9 +1218,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Personal name (NR) - [CER,IEX]
 
-      [Additional field(s)/tag(s): RESP,909CI]
-      [RESP $$r -> 909CI $a -> 907 $a]
-
 
 908   INTC: TECHNICAL COORDINATOR  (R) [CERN]
 
@@ -1577,9 +1225,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Personal name (NR) - [CER,IEX]
-
-      [Additional field(s)/tag(s): RESP,909CJ]
-      [RESP $$t -> 909CJ $a -> 908 $a]
 
 
 909   DEPUTY SPOKESMAN  (R) [CERN]
@@ -1589,9 +1234,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $d   Personal name (NR) - [IEX]
 
-      [Additional field(s)/tag(s): RESP,919C7]
-      [RESP $$d -> 919C7 $d -> 909 $d]
-
 
 910   FSGO  (R) [CERN]
 
@@ -1599,9 +1241,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $f   Personal name (NR) - [IEX]
-
-      [Additional field(s)/tag(s): RESP,919C8]
-      [RESP $$f -> 919C8 $f -> 910 $f]
+         $9   Alternate abbreviated title (NR) - [CER]
 
 
 911   GLIMOS  (R) [CERN] [CERN]
@@ -1610,9 +1250,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $g   Personal name (NR) - [IEX]
-
-      [Additional field(s)/tag(s): RESP,919C9]
-      [RESP $$g -> 919C9  -> 911 $g]
 
 
 912   REGISTRATION FOR CONFERENCE  (R) [CERN]
@@ -1627,9 +1264,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $p   Paper deadline (NR) - [CER]
          $r   Registration deadline (NR) - [CER]
 
-      [Additional field(s)/tag(s): RE,909CR]
-      [The same subfield codes are used as in RE and 909CR]
-
 
 913   CITATION  (R) [CERN]
 
@@ -1643,15 +1277,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $v   Volume (NR) - [CER]
          $y   Year (NR) - [CER]
 
-      [Additional field(s)/tag(s): CN,909C5]
-      [CN $$c -> 909C5 $c -> 913 $c]
-      [CN $$p -> 909C5 $p -> 913 $p]
-      [CN * -> 909C5 $t -> 913 $t {base=1n,n=1-3}]
-      [CN * -> 909C5 $u -> 913 $u {CER if IN=GREY BOOK}]
-      [CN * -> 909C5 $u -> 913 $u {IEX}]
-      [CN $$v -> 909C5 $v -> 913 $v
-      [CN $$y -> 909C5 $y -> 913 $y
-
 
 914   UNIVERSAL DECIMAL CLASSIFICATION  (R) [CERN]
 
@@ -1661,11 +1286,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $u   Secondary UDC number (NR) - [WAI/UDC]
          $v   Library shelving code (NR) - [WAI/UDC]
 
-      [Additional field(s)/tag(s): UD,UD2,UD3,909CU]
-      [UD2 * -> 909CU $u -> 914 $u]
-      [UD3 * -> 909CU $v -> 914 $v]
-      [UD $$s -> 909CU $v -> 914 $v]
-
 
 916   "STATUS WEEK"  (R) [CERN]
 
@@ -1674,17 +1294,10 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Acquisition of proceedings code (NR) - [CER]
          $d   Display period for books (NR) - [CER]
+         $e   Number of copies bought by CERN (ebooks) - [CER]
          $s   Status of record (NR) - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
          $w   Status week (NR) - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
          $y   Year for Annual list (NR) - [CER]
-         $z   CERN paper or CERN work (candidates for Ann. Report)(NR) - [CER]
-
-      [Additional field(s)/tag(s): DISP,SW,909CS,909CT]
-      [SW $$a -> 909CS $a -> 916 $a {NOT bas=3n}]
-      [DISP * -> 909CT $a -> 916 $d]
-      [SW $$s -> 909CS $s -> 916 $s]
-      [SW $$w -> 909CS $w -> 916 $w]
-      [SW $$y -> 909CS $y -> 916 $y]
 
 
 917   CABLE
@@ -1694,9 +1307,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Cable (NR) - [IEX]
 
-      [Additional field(s)/tag(s): CABLE,919CB]
-      [CABLE * -> 919CB $$a -> 917 $a]
-
 
 918   DEPARTMENT INDEX  (R) [CERN]
 
@@ -1704,9 +1314,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Department index (NR) - [IEX]
-
-      [Additional field(s)/tag(s): DEPTI,919CC]
-      [DEPTI * -> 919CC $a -> 918 $a]
 
 
 919   ORGANIZATION INDEX (R) [CERN]
@@ -1716,9 +1323,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Organization index (NR) - [IEX]
 
-      [Additional field(s)/tag(s): ORGI,919CD]
-      [ORGI * -> 919CD $a -> 919 $a]
-
 
 920   TOWN INDEX (R) [CERN]
 
@@ -1726,9 +1330,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Town index (NR) - [IEX]
-
-      [Additional field(s)/tag(s): TOWNI,919CE]
-      [TOWNI * -> 919CE $$a -> 920 $a]
 
 
 921   MICROCOSM: LOANS (R) [CERN]
@@ -1741,13 +1342,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $i   Borrower institute (NR) - [MMD]
          $t   Loan to (NR) - [MMD]
          $x   Exhibition name (NR) - [MMD]
-
-      [Additional field(s)/tag(s): LD,EL,ISB,LT,XI,919CL]
-      [LD $$a -> 919CL $a -> 921 $d]
-      [EL $$e -> 919CL $e -> 921 $e]
-      [ISB * -> 919CL $i -> 921 $i]
-      [LT * -> 919CL $t -> 921 $t]
-      [XI $$a -> 919CL $x -> 921 $x]
 
 
 922   MICROCOSM: PHYSICAL VALUES  (R) [CERN]
@@ -1762,14 +1356,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $p   Depth (NR) - [MMD]
          $w   Weight (NR) - [MMD]
 
-      [Additional field(s)/tag(s): DIA,HI,IA,WI,DE,WE,919CM]
-      [DIA $$a -> 919CM $d -> 922 $d]
-      [HI $$a -> 919CM $h -> 922 $h]
-      [IA * -> 919CM $i -> 922 $i]
-      [WI $$a -> 919CM $l -> 922 $l]
-      [DE $$a -> 919CM $p -> 922 $p]
-      [WE $$a -> 919CM $w -> 922 $w]
-
 
 923   PLACE OF PHOTO  (R) [CERN]
 
@@ -1779,10 +1365,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $p   Place of photo (NR) - [MMD]
          $r   Requestor (NR) - [MAN,MMD]
 
-      [Additional field(s)/tag(s): PL,REQ,919CP]
-      [PL * -> 919CP $p -> 923 $p]
-      [REQ * -> 919CP $r -> 923 $r]
-
 
 924   PHOTOLAB (R) [CERN]
 
@@ -1790,10 +1372,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   "Tirage" (NR) - [MMD]
-
-      [Additional field(s)/tag(s): TIR,919CQ]
-      [TIR * -> 919CQ $a -> 924 $a]
-      [TIR $$a -> 919CQ $a -> 924 $a]
+         $b   ?? - [MMD]
+         $t   ?? - [MMD]
 
 
 925   DATES  (R) [CERN]
@@ -1804,12 +1384,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Opening date/Date received (NR) - [ARC,MAN]
          $b   Closing date/Date completed (NR) - [ARC,MAN]
 
-      [Additional field(s)/tag(s): DA,919C0]
-      [DA $$a -> 919C0 $a -> 925 $a {ARC}]
-      [DA $$r -> 919C0 $a -> 925 $a {MAN}]
-      [DA $$b -> 919C0 $b -> 925 $b {ARC}]
-      [DA $$c -> 919C0 $b -> 925 $b {MAN}]
-
 
 926   RECIPIENT (NR) [CERN]
 
@@ -1817,9 +1391,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Personal name (NR) - [ARC,CER,MAN]
-
-      [Additional field(s)/tag(s): DEST,919C1]
-      [DEST * -> 919C1 $a -> 926 $a]
 
 
 927   FILE NUMBER (R) [CERN]
@@ -1829,9 +1400,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   File number (NR) - [ARC,MAN]
 
-      [Additional field(s)/tag(s): FN,919C2]
-      [FN * -> 919C2 $a -> 927 $a]
-
 
 928   ADDITIONAL RECIPIENT(S) (R) [CERN]
 
@@ -1839,9 +1407,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Personal name (NR) - [CER,MAN]
-
-      [Additional field(s)/tag(s):
-      {Not in use in AL300}
 
 
 929   RETENTION (R) [CERN]
@@ -1852,11 +1417,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $a   Retention (NR) - [ARC,MAN]
          $d   Retention date (NR) - [MAN]
 
-      [Additional field(s)/tag(s): RT,919C5]
-      [RT * -> 919C5 $a -> 929 $a]
-      [RT $$b -> 919C5 $d -> 929 $d {ARC}]
-      [RT $$d -> 919C5 $d -> 929 $d {MAN}]
-
 
 931   PERI: MAIN CORPORATE AUTHOR  (R) [CERN]
 
@@ -1864,9 +1424,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Corporate name (NR) - [CER base=3n]
-
-      [Additional field(s)/tag(s): CA,909CQ]
-      [CA * -> 909CQ $a -> 931 $a]
 
 
 932   PERI: ADDITIONAL CORPORATE AUTHOR (R) [CERN]
@@ -1876,9 +1433,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Corporate name (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): CA2,909CQ]
-      [CA2 * -> 909CQ $g -> 932 $a]
-
 
 933   PERI: IMPRINT (R) [CERN]
 
@@ -1887,10 +1441,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Place of publisher (NR) - [CER base=3n]
          $b   Name of publisher (NR) - [CER base=3n]
-
-      [Additional field(s)/tag(s): PIM,260,909CP]
-      [PIM $$p -> 260 $a -> 909CP $a -> 933 $a]
-      [PIM $$n -> 260 $b -> 909CP $b -> 933 $b]
 
 
 934   PERI: IMPRINT OF E-JOURNALS (R) [CERN]
@@ -1903,12 +1453,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $l   Link for publisher (NR) - [CER base=3n]
          $x   Non-public note (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): PIM2,909CM]
-      [PIM2 $$p -> 909CM $a -> 934 $a]
-      [PIM2 $$n -> 909CM $b -> 934 $b]
-      [PIM2 $$l -> 909CM $l -> 934 $l]
-      [$x not in use in AL300]
-
 
 935   PERI: USER NOTE (R) [CERN]
 
@@ -1916,9 +1460,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   User note  (NR) - [CER base=3n]
-
-      [Additional field(s)/tag(s): PNO,909CX,500]
-      [PNO $$p -> 500 $a -> 909CX $a -> 935 $a]
 
 
 936   PERI: E-J USER NOTE (R) [CERN]
@@ -1928,9 +1469,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   E-J user note  (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): PNO2,909CN]
-      [PNO2 * -> 909CN $a -> 936 $a]
-
 
 937   PERI: INTERNAL NOTE (R) - [CERN]
 
@@ -1939,11 +1477,7 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   Internal note (NR) - [CER base=3n]
          $c   Modification date (NR) - [CER base=16,58]
-         $f   E-mail (NR) - [CER base=16,58]
-
-      [Additional field(s)/tag(s): PNI,595,909CV]
-      [PNI * -> 595 $a -> 909CV $a -> 937 $a]
-
+         $s   Responsible of the modification (NR) - [CER-MMD]
 
 938   PERI: LOCAL INFORMATION (R) [CERN]
 
@@ -1955,11 +1489,16 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $i   Index (NR) - [CER base=3n]
          $p   Title status (NR) - [CER base=3n]
 
-      [Additional field(s)/tag(s): SW,909CL]
-      [SW $$a -> 909CL $a -> 938 $a]
-      [SW $$o -> 909CL $f -> 938 $f]
-      [SW $$i -> 909CL $i -> 938 $i]
-      [SW $$p -> 909CL $p -> 938 $p]
+
+939   PERI: LOCAL INFORMATION (R) [CERN]
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a  GoDirect Algorithm - [CER base=3n]
+         $d  GoDirect URL - [CER base=3n]
+         $u  GoDirect Homepage - [CER base=3n]
+         $v  GoDirect Volume - [CER base=3n]
 
 
 940   LINK TO COMPANY (R) [CERN]
@@ -1970,9 +1509,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
          $u   URL address (NR) - [CERN:BOOKSHOP,MAN]
          $y   URL note (NR) - [CERN:BOOKSHOP,MAN]
 
-      [Additional field(s)/tag(s):]
-      {Not in use in AL300}
-
 
 941   RELATED DOCUMENT NUMBER (R) [CERN]
 
@@ -1980,10 +1516,18 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Related document number (NR) - [MAN]
+         $t   Type of document (NR) - [MMD]
 
-      [Additional field(s)/tag(s):]
-      {Not in use in AL300}
 
+942   INSTITUTE LINKMAN (R) [CERN]
+
+      Indicators - Both undefined
+
+      Subfield Code(s)
+         $a ??  - [MAN]
+         $g ??  - [MAN]
+         $p ??  - [MAN]
+         $u ??  - [MAN]
 
 960   BASE (R) [CDS Invenio/MySQL]
 
@@ -2100,8 +1644,6 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
       Subfield Code(s)
          $a   System number (NR) - [ARC,CER,IEX,MAN,MMD,WAI]
 
-      {Not in use in AL300; to be added for users of MySQL}
-
 
 999   REFERENCES (R) [CERN] [CDS Invenio/MySQL]
 
@@ -2132,10 +1674,6 @@ BAS   BASE
 
          For MySQL use tag 960
 
-      [Additional field(s)/tag(s): BA]
-      [BA * -> BAS $a {used for input}]
-      [BASE * -> BAS $a {used for bath}]
-
 
 CAT   CAT (R)
 
@@ -2151,24 +1689,13 @@ CAT   CAT (R)
 
          For MySQL use tag 961
 
-      [Additional field(s)/tag(s): CATZZ]
-      [CATZZ $$a -> CAT $a]
-      [CATZZ $$b -> CAT $b]
-      [CATZZ $$d -> CAT $c]
-      [{Not in use in AL300} -> CAT $l]
-      [{Not in use in AL300} -> CAT $h
-      [CATZZ $$c -> CAT $x]
-
 
 FMT   FORMAT
 
              This field has no indicators or subfield codes.
              It contains the Scope of material [2 character code]
 
-         Not used in MySQL
-
-      {Not in use in AL300}
-
+         Not used in MySQL only in ALEPH
 
 
 ITM   ITEM (NR)
@@ -2179,8 +1706,6 @@ ITM   ITEM (NR)
          $a Owner - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
 
          For MySQL use tag 964
-
-      {Not in use in AL300}
 
 
 LKR   ALEPH Linking Field (R)
@@ -2212,7 +1737,7 @@ LKR   ALEPH Linking Field (R)
               {Only used for ARC in AL300}
          $b - sysno of the linked document record (NR) - [ARC,CER,MMD]
          $l - library where linked record is located (NR) - [ARC,CER,MMD]
-         $n - note regarding a DN (down record) link - (NR) [ARC,CER]
+         $n - note regarding a DN (down record) link - (NR) [ARC,CER]{CER base=3n}
          $m - note regarding an UP (up record) link - [not yet in use at CERN]
          $y - analytic link - year link - [not yet in use at CERN]
          $v - analytic link - volume link - [not yet in use at CERN]
@@ -2223,15 +1748,6 @@ LKR   ALEPH Linking Field (R)
 
          For MySQL use tag 962
 
-      [Additional field(s)/tag(s): 909CK]
-      [LKR $$a -> 909CK $a -> LKR $a {ARC}]
-      [LKR $$b -> 909CK $b -> LKR $b {ARC,CER,MMD}]
-      [LKR $$l -> 909CK $l -> LKR $l {ARC,CER,MMD}]
-      [LKR $$d -> 909CK $n -> LKR $n {ARC,CER}]
-      [LKR $$t -> 909CK $n -> LKR $n {CER base=3n}]
-      [LKR $$e -> 909CK $k -> LKR $k {ARC,CER}]
-      [LKR $$t -> 909CK $t -> LKR $t {CER base=3n,MMD}]
-
 
 OWN   OWNER (NR)
 
@@ -2241,8 +1757,6 @@ OWN   OWNER (NR)
          $a Owner - [ARC,CER,IEX,MAN,MMD,WAI/UDC]
 
          For MySQL use tag 963
-
-      {Not in use in AL300}
 
 
 SYS   SYSTEM NUMBER (NR)
