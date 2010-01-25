@@ -2446,6 +2446,16 @@ def guess_primary_collection_of_a_record(recID):
         res = run_sql("SELECT name FROM collection WHERE dbquery=%s", (dbquery,))
         if res:
             out = res[0][0]
+    if CFG_CERN_SITE:
+        # dirty hack for ATLAS collections at CERN:
+        if out in ('ATLAS Communications', 'ATLAS Internal Notes'):
+            for alternative_collection in ('ATLAS Communications Physics',
+                                           'ATLAS Communications General',
+                                           'ATLAS Internal Notes Physics',
+                                           'ATLAS Internal Notes General',):
+                if recID in get_collection_reclist(alternative_collection):
+                    out = alternative_collection
+                    break
     return out
 
 _re_collection_url = re.compile('/collection/(.+)')
