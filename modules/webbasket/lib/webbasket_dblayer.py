@@ -2250,9 +2250,3 @@ def prettify_url(url, char_limit=50, nb_dots=3):
         return url[:nb_char_beg] + '.'*nb_dots + url[-nb_char_end:]
     else:
         return url
-
-def debug_to_file(*args):
-    debug = '\n'.join(str(arg) for arg in args) + '\n'
-    f = open("/tmp/cds.db", 'a')
-    f.write(debug)
-    f.close()

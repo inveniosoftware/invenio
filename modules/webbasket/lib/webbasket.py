@@ -1082,7 +1082,6 @@ def perform_request_search(uid,
                 value       = external_info_per_basket[4]
                 text = remove_html_markup(decompress(value))
                 #text = text.replace('\n', '')
-                debug_to_file(text)
                 result = pattern.search(text)
                 if result:
                     if personal_search_results.has_key(bskid):
@@ -2434,9 +2433,3 @@ def __create_search_box(uid,
                                                             ln=ln)
 
     return search_box
-
-def debug_to_file(*args):
-    debug = '\n'.join(str(arg) for arg in args) + '\n'
-    f = open("/tmp/cds", 'a')
-    f.write(debug)
-    f.close()
