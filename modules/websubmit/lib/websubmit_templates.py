@@ -1414,7 +1414,7 @@ class Template:
                   <input type="hidden" name="ln" value="%(ln)s"/>
                   <table class="searchbox" width="100%%" summary="" >
                     <tr>
-                      <th class="portalboxheader"><small>%(for)s</small>&nbsp;
+                      <th class="portalboxheader">%(for)s&nbsp;
                         <select name="doctype" onchange="document.forms[0].submit();">
                           <option value="">%(alltype)s</option>
                   """ % {
@@ -1446,7 +1446,7 @@ class Template:
             if submission['docname'] != docname:
                 docname = submission['docname']
                 out += """</table>
-                          %(docname)s<br />
+                          <br/>&nbsp;<br/><h3>%(docname)s</h3>
                           <table border="0" class="searchbox" align="left" width="100%%">
                             <tr>
                               <th class="headerselected">%(action)s&nbsp;&nbsp;
@@ -1475,7 +1475,7 @@ class Template:
                          'docname' : submission['docname'],
                          'action' : _("Action"),
                          'status' : _("Status"),
-                         'id' : _("Id"),
+                         'id' : _("Subm.No."),
                          'reference' : _("Reference"),
                          'images' : CFG_SITE_URL + '/img',
                          'first' : _("First access"),
@@ -1500,21 +1500,21 @@ class Template:
                 idtext = submission['id']
 
             if operator.mod(num,2) == 0:
-                color = "#e0e0e0"
+                color = "#e2e2e2"
             else:
-                color = "#eeeeee"
+                color = "#f0f0f0"
 
             if submission['reference']:
                 reference = submission['reference']
-            else:
-                if submission['pending']:
-                    reference = submission['reference']
-                else:
+                if not submission['pending']:
+                    # record was integrated, so propose link:
                     reference = create_html_link('%s/search' % CFG_SITE_URL, {
                         'ln' : ln,
                         'p' : submission['reference'],
                         'f' : 'reportnumber'
-                    }, submission['reference'])
+                        }, submission['reference'])
+            else:
+                reference = """<font color="red">%s</font>""" % _("Reference not yet given")
 
             cdate = str(submission['cdate']).replace(" ","&nbsp;")
             mdate= str(submission['mdate']).replace(" ","&nbsp;")
@@ -1522,22 +1522,22 @@ class Template:
             out += """
                      <tr bgcolor="%(color)s">
                        <td align="center" class="mycdscell">
-                         <small>%(actname)s</small>
+                         %(actname)s
                        </td>
                        <td align="center" class="mycdscell">
-                         <small>%(status)s</small>
+                         %(status)s
                        </td>
                        <td class="mycdscell">
-                         <small>%(idtext)s</small>
+                         %(idtext)s
                        </td>
                        <td class="mycdscell">
-                         <small>&nbsp;%(reference)s</small>
+                         &nbsp;%(reference)s
                        </td>
                        <td class="mycdscell">
-                         <small>%(cdate)s</small>
+                         %(cdate)s
                        </td>
                        <td class="mycdscell">
-                         <small>%(mdate)s</small>
+                         %(mdate)s
                        </td>
                      </tr>
                    """ % {
