@@ -49,9 +49,8 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.messages import gettext_set_language
 from invenio.search_engine import \
-     guess_primary_collection_of_a_record, \
-     get_colID, \
-     create_navtrail_links, check_user_can_view_record
+     guess_primary_collection_of_a_record, get_colID, record_exists, \
+     create_navtrail_links, check_user_can_view_record, record_empty
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioWebSubmitFileError, stream_file, \
     decompose_file, propose_next_docname
@@ -98,6 +97,14 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 return page_not_authorized(req, "/record/%s" % self.recid,
                                            navmenuid='submit')
 
+            if record_exists(self.recid) < 1:
+                msg = "<p>%s</p>" % _("Requested record does not seem to exist.")
+                return warningMsg(msg, req, CFG_SITE_NAME, ln)
+
+            if record_empty(self.recid):
+                msg = "<p>%s</p>" % _("Requested record does not seem to have been integrated.")
+                return warningMsg(msg, req, CFG_SITE_NAME, ln)
+
             (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
             if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
@@ -123,7 +130,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 msg = "<p>%s</p><p>%s</p>" % (
                     _("The system has encountered an error in retrieving the list of files for this document."),
                     _("The error has been logged and will be taken in consideration as soon as possible."))
-                return print_warning(msg)
+                return warningMsg(msg, req, CFG_SITE_NAME, ln)
 
             docname = ''
             format = ''

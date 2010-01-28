@@ -2658,7 +2658,8 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
 def record_exists(recID):
     """Return 1 if record RECID exists.
        Return 0 if it doesn't exist.
-       Return -1 if it exists but is marked as deleted."""
+       Return -1 if it exists but is marked as deleted.
+    """
     out = 0
     res = run_sql("SELECT id FROM bibrec WHERE id=%s", (recID,), 1)
     if res:
@@ -2670,6 +2671,21 @@ def record_exists(recID):
         else:
             out = 1 # exists fine
     return out
+
+def record_empty(recID):
+    """
+    Is this record empty, e.g. has only 001, waiting for integration?
+
+    @param recID: the record identifier.
+    @type recID: int
+    @return: 1 if the record is empty, 0 otherwise.
+    @rtype: int
+    """
+    record = get_record(recID)
+    if record is None or len(record) < 2:
+        return 1
+    else:
+        return 0
 
 def record_public_p(recID):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.
