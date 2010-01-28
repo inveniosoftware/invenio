@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.bibformat_elements.bfe_fulltext import get_files
+from invenio.bibformat_elements.bfe_fulltext import get_files, sort_alphanumerically
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from cgi import escape
@@ -71,12 +71,18 @@ def format(bfo, style, separator='; ', show_icons='no'):
             file_icon = ''
 
         last_name = ""
-        for descr, urls in main_urls.items():
+        main_urls_keys = sort_alphanumerically(main_urls.keys())
+        for descr in main_urls_keys:
+            urls = main_urls[descr]
             out += '<div><small class="detailedRecordActions">%s:</small> ' % descr
             url_list = []
-            urls.sort(lambda (url1, name1, format1), (url2, name2, format2): url1 < url2 and -1 or url1 > url2 and 1 or 0)
-
+            ## FIXME: This is so ugly!
+            urls_dict = {}
             for url, name, format in urls:
+                urls_dict[url] = (name, format)
+            urls_dict_keys = sort_alphanumerically(urls_dict.keys())
+            for url in urls_dict_keys:
+                name, format = urls_dict[url]
                 if not name == last_name and len(main_urls) > 1:
                     print_name = "<em>%s</em> - " % name
                 else:

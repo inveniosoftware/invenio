@@ -20,6 +20,7 @@
 """
 __revision__ = "$Id$"
 
+import re
 from invenio.bibdocfile import BibRecDocs, file_strip_ext
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
@@ -84,12 +85,18 @@ def format(bfo, style, separator='; ', show_icons='no'):
 
     if main_urls:
         last_name = ""
-        for descr, urls in main_urls.items():
+        main_urls_keys = sort_alphanumerically(main_urls.keys())
+        for descr in main_urls_keys:
+            urls = main_urls[descr]
             out += "<strong>%s:</strong> " % descr
             url_list = []
-            urls.sort(lambda (url1, name1, format1), (url2, name2, format2): url1 < url2 and -1 or url1 > url2 and 1 or 0)
-
+            ## FIXME: This is so ugly!
+            urls_dict = {}
             for url, name, format in urls:
+                urls_dict[url] = (name, format)
+            urls_dict_keys = sort_alphanumerically(urls_dict.keys())
+            for url in urls_dict_keys:
+                name, format = urls_dict[url]
                 if not name == last_name and len(main_urls) > 1:
                     print_name = "<em>%s</em> - " % name
                 else:
@@ -258,3 +265,9 @@ def get_files(bfo):
                     parsed_urls['others_urls'].append((url, descr)) # Let's put it in a general other url
 
     return (parsed_urls, old_versions, additionals)
+
+_RE_SPLIT = re.compile(r"\d+|\D+")
+def sort_alphanumerically(elements):
+    elements = [([not token.isdigit() and token or int(token) for token in _RE_SPLIT.findall(element)], element) for element in elements]
+    elements.sort()
+    return [element[1] for element in elements]
