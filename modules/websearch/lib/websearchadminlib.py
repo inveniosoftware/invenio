@@ -24,6 +24,12 @@ __revision__ = "$Id$"
 import cgi
 import random
 import time
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
 
 from invenio.config import \
      CFG_CACHEDIR, \
@@ -62,7 +68,6 @@ from invenio.messages import gettext_set_language
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.errorlib import register_exception
-
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -1981,13 +1986,14 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkwebcollstatus">Webcoll Status</a></small></td>
     </tr><tr>
     <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkcollectionstatus">Collection Status</a></small></td>
-    <td>6.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
+    <td>6.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkexternalcollections">Check external collections</a></small></td>
+    <td>7.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
+    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
 
     if mtype == "":
-        fin_output += """<br /><br /><b><span class="info">For managing the collections, select an item from the menu.</span><b><br />"""
+        fin_output += """<br /><br /><b><span class="info">To manage the collections, select an item from the menu.</span><b><br />"""
 
     if mtype == "perform_addcollection" and content:
         fin_output += content
@@ -2017,6 +2023,12 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     elif mtype == "perform_checkcollectionstatus" or mtype == "perform_showall":
         fin_output += perform_checkcollectionstatus(colID, ln, callback='')
 
+    if mtype == "perform_checkexternalcollections" and content:
+        fin_output += content
+    elif mtype == "perform_checkexternalcollections" or mtype == "perform_showall":
+        fin_output += perform_checkexternalcollections(colID, ln, callback='')
+
+    body = [fin_output]
     body = [fin_output]
 
     return addadminbox('<b>Menu</b>', body)
@@ -2333,7 +2345,7 @@ def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
 def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     """Check status of the collection tables with respect to the webcoll cache."""
 
-    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#4">?</a>]""" % CFG_SITE_URL
+    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % CFG_SITE_URL
     output  = ""
 
     colID = int(colID)
@@ -2362,7 +2374,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
         pass
 
     if collection_table_update_time > collection_web_update_time:
-        output += """<br /><b><span class="info">Warning: The collections has been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br />"""
+        output += """<br /><b><span class="info">Warning: The collections have been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br />"""
 
     header = ['ID', 'Name', 'Time', 'Status', 'Progress']
     actions = []
@@ -2451,22 +2463,25 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
     from invenio.search_engine import collection_restricted_p
 
-    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % CFG_SITE_URL
+    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#6">?</a>]""" % CFG_SITE_URL
     output  = ""
 
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
     collections = run_sql("SELECT id, name, dbquery FROM collection ORDER BY id")
 
-    header = ['ID', 'Name', 'Query', 'Subcollections', 'Restricted', 'I18N', 'Status']
+    header = ['ID', 'Name', 'Query', 'Subcollections', 'Restricted', 'Hosted', 'I18N', 'Status']
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
-
 
     for (id, name, dbquery) in collections:
         reg_sons = len(get_col_tree(id, 'r'))
         vir_sons = len(get_col_tree(id, 'v'))
         status = ""
+        hosted = ""
+
+        if str(dbquery).startswith("hostedcollection:"): hosted = """<b><span class="info">Yes</span></b>"""
+        else: hosted = """<b><span class="info">No</span></b>"""
 
         langs = run_sql("SELECT ln from collectionname where id_collection=%s", (id, ))
         i8n = ""
@@ -2503,8 +2518,8 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
         if status == "":
             status = """<b><span class="info">OK</span></b>"""
-        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, id, ln, name), dbquery, subs, restricted, i8n, status])
 
+        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, id, ln, name), dbquery, subs, restricted, hosted, i8n, status])
 
     output += tupletotable(header=header, tuple=actions)
 
@@ -2514,6 +2529,139 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
     if callback:
         return perform_index(colID, ln, "perform_checkcollectionstatus", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
+def perform_checkexternalcollections(colID, ln, icl=None, update="", confirm=0, callback='yes'):
+    """Check the external collections for inconsistencies."""
+
+    subtitle = """<a name="7"></a>Check external collections&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#7">?</a>]""" % CFG_SITE_URL
+    output  = ""
+
+    colID = int(colID)
+
+    if icl:
+        if update == "add":
+            # icl : the "inconsistent list" comes as a string, it has to be converted back into a list
+            icl = eval(icl)
+            #icl = icl[1:-1].split(',')
+            for collection in icl:
+                #collection = str(collection[1:-1])
+                query_select = "SELECT name FROM externalcollection WHERE name like '%(name)s';" % {'name': collection}
+                results_select = run_sql(query_select)
+                if not results_select:
+                    query_insert = "INSERT INTO externalcollection (name) VALUES ('%(name)s');" % {'name': collection}
+                    run_sql(query_insert)
+                    output += """<br /><span class=info>New collection \"%s\" has been added to the database table \"externalcollection\".</span><br />""" % (collection)
+                else:
+                    output += """<br /><span class=info>Collection \"%s\" has already been added to the database table \"externalcollection\" or was already there.</span><br />""" % (collection)
+        elif update == "del":
+            # icl : the "inconsistent list" comes as a string, it has to be converted back into a list
+            icl = eval(icl)
+            #icl = icl[1:-1].split(',')
+            for collection in icl:
+                #collection = str(collection[1:-1])
+                query_select = "SELECT id FROM externalcollection WHERE name like '%(name)s';" % {'name': collection}
+                results_select = run_sql(query_select)
+                if results_select:
+                    query_delete = "DELETE FROM externalcollection WHERE id like '%(id)s';" % {'id': results_select[0][0]}
+                    query_delete_states = "DELETE FROM collection_externalcollection WHERE id_externalcollection like '%(id)s';" % {'id': results_select[0][0]}
+                    run_sql(query_delete)
+                    run_sql(query_delete_states)
+                    output += """<br /><span class=info>Collection \"%s\" has been deleted from the database table \"externalcollection\".</span><br />""" % (collection)
+                else:
+                    output += """<br /><span class=info>Collection \"%s\" has already been delete from the database table \"externalcollection\" or was never there.</span><br />""" % (collection)
+
+    external_collections_file = []
+    external_collections_db = []
+
+    for coll in external_collections_dictionary.values():
+        external_collections_file.append(coll.name)
+    external_collections_file.sort()
+
+    query = """SELECT name from externalcollection"""
+    results = run_sql(query)
+    for result in results:
+        external_collections_db.append(result[0])
+    external_collections_db.sort()
+
+    number_file = len(external_collections_file)
+    number_db = len(external_collections_db)
+
+    if external_collections_file == external_collections_db:
+        output += """<br /><span class="info">External collections are consistent.</span><br /><br />
+                    &nbsp;&nbsp;&nbsp;- database table \"externalcollection\" has %(number_db)s collections<br />
+                    &nbsp;&nbsp;&nbsp;- configuration file \"websearch_external_collections_config.py\" has %(number_file)s collections""" % {
+                        "number_db" : number_db,
+                        "number_file" : number_file}
+
+    elif len(external_collections_file) > len(external_collections_db):
+        external_collections_diff = list(set(external_collections_file) - set(external_collections_db))
+        external_collections_db.extend(external_collections_diff)
+        external_collections_db.sort()
+        if external_collections_file == external_collections_db:
+            output += """<br /><span class="warning">There is an inconsistency:</span><br /><br />
+                        &nbsp;&nbsp;&nbsp;- database table \"externalcollection\" has %(number_db)s collections
+                        &nbsp;(<span class="warning">missing: %(diff)s</span>)<br />
+                        &nbsp;&nbsp;&nbsp;- configuration file \"websearch_external_collections_config.py\" has %(number_file)s collections
+                        <br /><br /><a href="%(site_url)s/admin/websearch/websearchadmin.py/checkexternalcollections?colID=%(colID)s&amp;icl=%(diff)s&amp;update=add&amp;ln=%(ln)s">
+                        Click here</a> to update your database adding the missing collections. If the problem persists please check your configuration manually.""" % {
+                            "number_db" : number_db,
+                            "number_file" : number_file,
+                            "diff" : external_collections_diff,
+                            "site_url" : CFG_SITE_URL,
+                            "colID" : colID,
+                            "ln" : ln}
+        else:
+            output += """<br /><span class="warning">There is an inconsistency:</span><br /><br />
+                        &nbsp;&nbsp;&nbsp;- database table \"externalcollection\" has %(number_db)s collections<br />
+                        &nbsp;&nbsp;&nbsp;- configuration file \"websearch_external_collections_config.py\" has %(number_file)s collections
+                        <br /><br /><span class="warning">The external collections do not match.</span>
+                        <br />To fix the problem please check your configuration manually.""" % {
+                            "number_db" : number_db,
+                            "number_file" : number_file}
+
+    elif len(external_collections_file) < len(external_collections_db):
+        external_collections_diff = list(set(external_collections_db) - set(external_collections_file))
+        external_collections_file.extend(external_collections_diff)
+        external_collections_file.sort()
+        if external_collections_file == external_collections_db:
+            output += """<br /><span class="warning">There is an inconsistency:</span><br /><br />
+                        &nbsp;&nbsp;&nbsp;- database table \"externalcollection\" has %(number_db)s collections
+                        &nbsp;(<span class="warning">extra: %(diff)s</span>)<br />
+                        &nbsp;&nbsp;&nbsp;- configuration file \"websearch_external_collections_config.py\" has %(number_file)s collections
+                        <br /><br /><a href="%(site_url)s/admin/websearch/websearchadmin.py/checkexternalcollections?colID=%(colID)s&amp;icl=%(diff)s&amp;update=del&amp;ln=%(ln)s">
+                        Click here</a> to force remove the extra collections from your database (warning: use with caution!). If the problem persists please check your configuration manually.""" % {
+                            "number_db" : number_db,
+                            "number_file" : number_file,
+                            "diff" : external_collections_diff,
+                            "site_url" : CFG_SITE_URL,
+                            "colID" : colID,
+                            "ln" : ln}
+        else:
+            output += """<br /><span class="warning">There is an inconsistency:</span><br /><br />
+                        &nbsp;&nbsp;&nbsp;- database table \"externalcollection\" has %(number_db)s collections<br />
+                        &nbsp;&nbsp;&nbsp;- configuration file \"websearch_external_collections_config.py\" has %(number_file)s collections
+                        <br /><br /><span class="warning">The external collections do not match.</span>
+                        <br />To fix the problem please check your configuration manually.""" % {
+                            "number_db" : number_db,
+                            "number_file" : number_file}
+
+    else:
+        output += """<br /><span class="warning">There is an inconsistency:</span><br /><br />
+                    &nbsp;&nbsp;&nbsp;- database table \"externalcollection\" has %(number_db)s collections<br />
+                    &nbsp;&nbsp;&nbsp;- configuration file \"websearch_external_collections_config.py\" has %(number_file)s collections
+                    <br /><br /><span class="warning">The number of external collections is the same but the collections do not match.</span>
+                    <br />To fix the problem please check your configuration manually.""" % {
+                        "number_db" : number_db,
+                        "number_file" : number_file}
+
+    body = [output]
+
+    return addadminbox(subtitle, body)
+
+    if callback:
+        return perform_index(colID, ln, "perform_checkexternalcollections", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
 

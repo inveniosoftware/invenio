@@ -62,11 +62,13 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.10. <a href="#3.10">Modify output formats</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.11. <a href="#3.11">Configuration of related external collections</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.12. <a href="#3.12">Detailed record page options</a><br />
-<strong>4. <a href="#4">Webcoll Status</a></strong><br />
-<strong>5. <a href="#5">Collections Status</a></strong><br />
-<strong>6. <a href="#6">Edit Search Engine Parameters</a></strong><br />
-<strong>7. <a href="#7">Search Engine Cache</a></strong><br />
-<strong>8. <a href="#8">Additional Information</a></strong><br />
+<strong>4. <a href="#4">External and Hosted Collections</a></strong><br />
+<strong>5. <a href="#5">Webcoll Status</a></strong><br />
+<strong>6. <a href="#6">Collections Status</a></strong><br />
+<strong>7. <a href="#7">Check External Collections</a></strong><br />
+<strong>8. <a href="#8">Edit Search Engine Parameters</a></strong><br />
+<strong>9. <a href="#9">Search Engine Cache</a></strong><br />
+<strong>10. <a href="#10">Additional Information</a></strong><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -286,6 +288,9 @@ descendants may not be taken into account.  In the same way, if a
 collection doesn't have any query nor any descendants defined, then
 its contents will be empty.
 
+<p>To define an external hosted collection set up the query to begin with
+<code>hostedcollection:</code> (for more detailed information see <a href="#4">section 4</a>)
+
 <p>To remove the collection query, set the parameter empty.
 
 <a name="3.2"></a><h3>3.2 Modify access restrictions</h3>
@@ -498,6 +503,14 @@ results directly in CDS Invenio search results page.
 "<i>Apply also to daughter collections</i>" checkboxes when you apply
 your modifications.
 
+<p>Note that in case you have defined an external hosted collection and you are
+in fact configuring its related external collections there is no restriction on
+setting even itself as "<em>See also</em>", "<em>External search</em>" or
+"<em>External search checked</em>"; directly or recursively via the "<i>Apply
+also to daughter collections</i>" option. It is up entirely to the admin to
+keep a clean and consistent installation (for more detailed information see <a
+href="#4">section 4</a>).
+
 <a name="3.12"></a><h3>3.12 Detailed record page options</h3>
 
 <p>These settings let you define how the detailed view (such as <a
@@ -514,7 +527,132 @@ is especially true in the case of <i>virtual</i> collections. It is
 therefore the settings of the <i>primary collection</i> of the record
 which are applied.
 
-<a name="4"></a><h2>4. Webcoll Status</h2>
+<a name="4"></a><h2>4. External and Hosted Collections</h2>
+
+<p>External and hosted collections are a way to provide your users with
+additional sources of information. The simplest option is the
+"<em>See also</em>" one: it provides a link to the external collection listing
+the items corresponding to the user's query. Another option is to set up the
+external collection an "<em>External search [checked]</em>". This option implies
+a parser implemented for that external collection and allows the user to perform
+a parallel search on your repository and on that of the external collection. Read
+more on how to set up the above options in section <a href="#3.11">section 3.11</a>.
+Also please note that some external resourses might be under copyright restrictions.
+
+<p>Another, more advanced option, are the external hosted collections. The purpose
+of these collections is to behave just as if they were local ones. That means the
+admin should set them up as local collections and attach them to the tree. These
+collections however are not meant to store their records locally but rather to produce
+them on the fly when asked to. Once attached to the tree an external hosted collection
+appears in the search home page along with its number of records and a small graphic
+(arrow in this case) to indicate their being external.
+
+<p>The admin should define a new external collection (any of the above options)
+starting with the <code>websearch_external_collections_config.py</code> file, which
+consists basically of a python dictionary. Let us go through the process of defining
+a new external collection, starting from the dictionary:
+
+    <ul>
+
+    <li>add a new <code>key:value</code> pair to the dictionary. The key is the
+        name of the external collection (eg. Amazon Books). The value is another
+        python dictionary with the parameters of the external collection. Let's go
+        through these parameters in <code>key:value</code> pairs:<br /><br />
+
+        <ul>
+
+        <li><code>'engine':the_name_of_engine</code><br />
+            The name of the search engine (no spaces or special characters allowed
+            and its implemented python class (eg. for the 'AmazonBooks' engine the
+            corresponding class should be named AmazonBooksSearchEngine). If not
+            defined the default ExternalSearchEngine class will be used.
+
+        <li><code>'base_url':the_base_url_of_the_external_collection</code><br />
+            The base url of the external collection, used to create actual hyper
+            references to the external collection (eg. 'http://books.amazon.com/' ,
+            'http://www.amazon.com/books/').
+
+        <li><code>'search_url':the_search_url_of_the_external_collection</code><br />
+            The search url of the external collection, to which the search terms
+            will be later appended and therefore looked up (eg.
+            'http://books.amazon.com/search.php?title=' ,
+            'http://www.amazon.com/books/lookup.asp?book=').
+
+        <li><code>'parser_params':dictionary_of_the_parameters_of_the_parser</code><br />
+            The parameters to be passed to the parser. This way a parser can be
+            dynamically reused for different external collections upon defining
+            different settings. Let's go through the various parameters:<br /><br />
+
+            <ul>
+
+            <li><code>'host':the_host_of_the_external_collection</code><br />
+                The host of the external collection is used to correct the urls
+                when printing out its results (eg. 'books.amazon.com',
+                'www.amazon.com').
+
+            <li><code>'path':the_path_on_the_host_of_the_external_collection</code><br />
+                The path, along with the host of the external collection, is used
+                to correct the urls when printing out its results (eg. '',
+                'books/').
+
+            <li><code>'parser':the_actual_parser_class</code><br />
+                The actual parser class to be used by the external collection engine.
+                It should be imported at the beggining of this configuration file
+                (eg. AmazonBooksExternalCollectionResultsParser,
+                AmazonExternalCollectionResultsParser).
+
+            <li><code>'fetch_format':the_format_to_be_used_to_fetch_data</code><br />
+                Usually an abbreviated string that defines the format in which
+                the data should be fetched. The parser must be able to parse this
+                format (eg. 'hb', 'xm').
+
+            <li><code>'num_results_regex_str':the_regular_expression_for_the_number_of_results</code><br />
+                The regular expression used to calculate the returned number of
+                results when the external collection is queried (eg.
+                r'<strong>([0-9,]+?)</strong> records found'). Should preferably
+                be a python raw string.
+
+            <li><code>'num_results_regex_str':the_regular_expression_for_the_total_number_of_records</code><br />
+                The regular expression used to calculate the total number of records
+                of an external collection (eg.
+                r'Searching <strong>([0-9,]+?)</strong> records in total'). This
+                is to be used by external hosted collections that present their
+                total number of records in the search home page. Should preferably
+                be a python raw string.
+
+            <li><code>'nbrecs_url':the_url_that_provides_the_total_number_of_records</code><br />
+                The url that provides information on the total number of records
+                of an external collection (eg.
+                'http://books.amazon.com/search.php?show_all=yes'). The regular
+                expression defined above will be used on the contents of this url.
+                Again, this is to be used by external hosted collections that
+                present their total number of records in the search home page.
+
+            </ul>
+
+        </ul>
+
+    </ul>
+
+<p>Once the dictionary <code>key:value</code> pair has been added for the new
+external collection the admin should implement (or simply use if already implemented)
+the search engine python class defined for this external collection. For the
+"<em>See also</em>" option the above steps are sufficient. If the admin wants
+to enable the "<em>External search [checked]</em>" option as well a parser must
+be (or have been) implemented. Finally to set up an external hosted collection
+the admin also has to create a new local collection named exactly as the key of
+the external hosted collection's <code>key:value</code> pair in the python
+dictionary. The new local collection's query has to begin with
+<code>hostedcollection:</code> (under the current configuration it is sufficient
+for the query of any external hosted collection to just be defined as
+<code>hostedcollection:</code>) and the collection itself has to be attached to
+the tree to be visible in the search home page. Note that due to the nature of
+external hosted collections their corresponding local collections cannot have any
+other collections as sons; in other words they shouldn't have any other branches
+growing from them.
+
+
+<a name="5"></a><h2>5. Webcoll Status</h2>
 
 <p>WebColl is the daemon that normally periodically runs via <a
 href="<CFG_SITE_URL>/help/admin/bibsched-admin-guide">BibSched</a> and that updates the
@@ -529,7 +667,7 @@ shows when the collection cache was last updated and when the next
 update is scheduled.  It warns in case something suspicious was
 discovered.
 
-<a name="5"></a><h2>5. Collections Status</h2>
+<a name="6"></a><h2>6. Collections Status</h2>
 
 <p>The Collection Status menu of the WebSearch Admin interface shows
 the list of all collections and checks if there is anything wrong
@@ -559,6 +697,9 @@ subcollections.
 <dd>A restricted collection can only be accessed by users belonging to
 the Apache groups mentioned in this column.
 
+<dt><strong>Hosted</strong>
+<dd>A hosted collection is practicly an external one behaving just as if it were local.
+
 <dt><strong>I18N</strong>
 <dd>Show which languages the collection name has been translated into.
 
@@ -574,10 +715,20 @@ subcollections.
 </dl>
 </blockquote>
 
-<a name="6"></a><h2>6. Edit Search Engine Parameters</h2>
+<a name="7"></a><h2>7. Check External Collections</h2>
 
-<a name="7"></a><h2>7. Search Engine Cache</h2>
+<p>The Check External Collections menu of the WebSearch Admin interface is a
+simple tool to check and control the consistency of the external collections
+the user has defined. External collections exist both in their own database
+table as well in a user defined configuration file. This tool will check the
+consistency between the two and report back to the user giving them the
+option to fix any potential inconsistencies.
 
-<a name="8"></a><h2>8. Additional Information</h2>
+
+<a name="8"></a><h2>8. Edit Search Engine Parameters</h2>
+
+<a name="9"></a><h2>9. Search Engine Cache</h2>
+
+<a name="10"></a><h2>10. Additional Information</h2>
 
 <a href="<CFG_SITE_URL>/help/hacking/search-engine-internals">WebSearch Internals</a>

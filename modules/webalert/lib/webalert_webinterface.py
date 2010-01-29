@@ -21,14 +21,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import sys
-import time
-import zlib
-import urllib
-from invenio import webinterface_handler_wsgi_utils as apache
-
-
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME, \
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_NAME, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
 from invenio.webpage import page
 from invenio import webalert
@@ -49,7 +42,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
     _exports = ['', 'display', 'input', 'modify', 'list', 'add',
                 'update', 'remove']
 
-    def index(self, req, form):
+    def index(self, req, dummy):
         """Index page."""
         redirect_to_url(req, '%s/youralerts/list' % CFG_SITE_URL)
 

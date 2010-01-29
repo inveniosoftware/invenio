@@ -23,7 +23,6 @@
 __revision__ = "$Id$"
 
 import sys
-from copy import copy
 
 from invenio.dbquery import run_sql
 
@@ -69,6 +68,17 @@ def get_collection_id(name):
         return collections_id[name]
     else:
         return None
+
+def get_collection_name_by_id(colid):
+    """Return the name of collection with id 'id'."""
+
+    collections_id_load()
+
+    for (collection_name, collection_id) in collections_id.iteritems():
+        if collection_id == colid:
+            return collection_name
+            break
+    return None
 
 def get_collection_descendants(id_dad):
     "Returns list of all descendants of the collection having for id id_dad."

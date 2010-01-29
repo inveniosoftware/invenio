@@ -72,7 +72,9 @@ from invenio.bibrank_citation_searcher import get_cited_by_count
 
 from invenio.intbitset import intbitset
 
-from invenio.websearch_external_collections import external_collection_get_state
+from invenio.websearch_external_collections import external_collection_get_state, get_external_collection_engine
+from invenio.websearch_external_collections_utils import get_collection_id
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
 _RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 _RE_SPACES = re.compile(r"\s+")
@@ -1303,6 +1305,17 @@ class Template:
             if type == 'r':
                 if son.restricted_p() and son.restricted_p() != father.restricted_p():
                     out += """<input type="checkbox" name="c" value="%(name)s" /></td>""" % {'name' : cgi.escape(son.name) }
+                # hosted collections are checked by default only when configured so
+                elif str(son.dbquery).startswith("hostedcollection:"):
+                    external_collection_engine = get_external_collection_engine(str(son.name))
+                    if external_collection_engine and external_collection_engine.selected_by_default:
+                        out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" /></td>""" % {'name' : cgi.escape(son.name) }
+                    elif external_collection_engine and not external_collection_engine.selected_by_default:
+                        out += """<input type="checkbox" name="c" value="%(name)s" /></td>""" % {'name' : cgi.escape(son.name) }
+                    else:
+                        # strangely, the external collection engine was never found. In that case,
+                        # why was the hosted collection here in the first place?
+                        out += """<input type="checkbox" name="c" value="%(name)s" /></td>""" % {'name' : cgi.escape(son.name) }
                 else:
                     out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" /></td>""" % {'name' : cgi.escape(son.name) }
             else:
@@ -1311,6 +1324,17 @@ class Template:
                 'link': create_html_link(self.build_search_interface_url(c=son.name, ln=ln, aas=aas),
                                          {}, style_prolog + cgi.escape(son.get_name(ln)) + style_epilog),
                 'recs' : self.tmpl_nbrecs_info(son.nbrecs, ln=ln)}
+
+            # the following prints the "external collection" arrow just after the name and
+            # number of records of the hosted collection
+            # 1) we might want to make the arrow work as an anchor to the hosted collection as well.
+            # That would probably require a new separate function under invenio.urlutils
+            # 2) we might want to place the arrow between the name and the number of records of the hosted collection
+            # That would require to edit/separate the above out += ...
+            if type == 'r':
+                if str(son.dbquery).startswith("hostedcollection:"):
+                    out += """<img src="%(siteurl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/>""" % \
+                           { 'siteurl' : CFG_SITE_URL, 'name' : cgi.escape(son.name), }
 
             if son.restricted_p():
                 out += """ <small class="warning">[%(msg)s]</small> """ % { 'msg' : _("restricted") }
@@ -1323,6 +1347,13 @@ class Template:
                                                  {},
                                                  cgi.escape(grandson.get_name(ln))),
                         'nbrec' : self.tmpl_nbrecs_info(grandson.nbrecs, ln=ln)}
+                    # the following prints the "external collection" arrow just after the name and
+                    # number of records of the hosted collection
+                    # Some relatives comments have been made just above
+                    if type == 'r':
+                        if str(grandson.dbquery).startswith("hostedcollection:"):
+                            out += """<img src="%(siteurl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/>""" % \
+                                    { 'siteurl' : CFG_SITE_URL, 'name' : cgi.escape(grandson.name), }
 
             out += """</td></tr>"""
             i += 1
@@ -1405,6 +1436,21 @@ class Template:
         _ = gettext_set_language(ln)
 
         return _("This collection is restricted.  If you are authorized to access it, please click on the Search button.")
+
+    def tmpl_box_hosted_collection(self, ln):
+        """
+          Displays a box containing a *hosted collection* message
+
+        Parameters:
+
+          - 'ln' *string* - The language to display
+
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        return _("This is a hosted external collection. Please click on the Search button to see its content.")
 
     def tmpl_box_no_records(self, ln):
         """
@@ -2511,6 +2557,196 @@ class Template:
         out += "</form>"
         return out
 
+    def tmpl_print_hosted_search_info(self, ln, middle_only,
+                               collection, collection_name, collection_id,
+                               aas, sf, so, rm, rg, nb_found, of, ot, p, f, f1,
+                               f2, f3, m1, m2, m3, op1, op2, p1, p2,
+                               p3, d1y, d1m, d1d, d2y, d2m, d2d, dt,
+                               all_fieldcodes, cpu_time, pl_in_url,
+                               jrec, sc, sp):
+
+        """Prints stripe with the information on 'collection' and 'nb_found' results and CPU time.
+           Also, prints navigation links (beg/next/prev/end) inside the results set.
+           If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
+           This is suitable for displaying navigation links at the bottom of the search results page.
+
+        Parameters:
+
+          - 'ln' *string* - The language to display
+
+          - 'middle_only' *bool* - Only display parts of the interface
+
+          - 'collection' *string* - the collection name
+
+          - 'collection_name' *string* - the i18nized current collection name
+
+          - 'aas' *bool* - if we display the advanced search interface
+
+          - 'sf' *string* - the currently selected sort format
+
+          - 'so' *string* - the currently selected sort order ("a" or "d")
+
+          - 'rm' *string* - selected ranking method
+
+          - 'rg' *int* - selected results/page
+
+          - 'nb_found' *int* - number of results found
+
+          - 'of' *string* - the selected output format
+
+          - 'ot' *string* - hidden values
+
+          - 'p' *string* - Current search words
+
+          - 'f' *string* - the fields in which the search was done
+
+          - 'f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2' *strings* - the search parameters
+
+          - 'jrec' *int* - number of first record on this page
+
+          - 'd1y, d2y, d1m, d2m, d1d, d2d' *int* - the search between dates
+
+          - 'dt' *string* the dates' type (creation date, modification date)
+
+          - 'all_fieldcodes' *array* - all the available fields
+
+          - 'cpu_time' *float* - the time of the query in seconds
+
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = ""
+        # left table cells: print collection name
+        if not middle_only:
+            out += '''
+                  <a name="%(collection_id)s"></a>
+                  <form action="%(siteurl)s/search" method="get">
+                  <table class="searchresultsbox"><tr><td class="searchresultsboxheader" align="left">
+                  <strong><big>%(collection_link)s</big></strong></td>
+                  ''' % {
+                    'collection_id': collection_id,
+                    'siteurl' : CFG_SITE_URL,
+                    'collection_link': create_html_link(self.build_search_interface_url(c=collection, aas=aas, ln=ln),
+                                                        {}, cgi.escape(collection_name))
+                  }
+
+        else:
+            out += """
+                  <form action="%(siteurl)s/search" method="get"><div align="center">
+                  """ % { 'siteurl' : CFG_SITE_URL }
+
+        # middle table cell: print beg/next/prev/end arrows:
+        if not middle_only:
+            # in case we have a hosted collection that timed out do not print its number of records, as it is yet unknown
+            if nb_found != -963:
+                out += """<td class="searchresultsboxheader" align="center">
+                          %(recs_found)s &nbsp;""" % {
+                         'recs_found' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')
+                       }
+            #elif nb_found = -963:
+            #    out += """<td class="searchresultsboxheader" align="center">
+            #              %(recs_found)s &nbsp;""" % {
+            #             'recs_found' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>')
+            #           }
+        else:
+            out += "<small>"
+            # we do not care about timed out hosted collections here, because the bumber of records found will never be bigger
+            # than rg anyway, since it's negative
+            if nb_found > rg:
+                out += "" + cgi.escape(collection_name) + " : " + _("%s records found") % ('<strong>' + self.tmpl_nice_number(nb_found, ln) + '</strong>') + " &nbsp; "
+
+        if nb_found > rg: # navig.arrows are needed, since we have many hits
+
+            query = {'p': p, 'f': f,
+                     'cc': collection,
+                     'sf': sf, 'so': so,
+                     'sp': sp, 'rm': rm,
+                     'of': of, 'ot': ot,
+                     'aas': aas, 'ln': ln,
+                     'p1': p1, 'p2': p2, 'p3': p3,
+                     'f1': f1, 'f2': f2, 'f3': f3,
+                     'm1': m1, 'm2': m2, 'm3': m3,
+                     'op1': op1, 'op2': op2,
+                     'sc': 0,
+                     'd1y': d1y, 'd1m': d1m, 'd1d': d1d,
+                     'd2y': d2y, 'd2m': d2m, 'd2d': d2d,
+                     'dt': dt,
+                }
+
+            # @todo here
+            def img(gif, txt):
+                return '<img src="%(siteurl)s/img/%(gif)s.gif" alt="%(txt)s" border="0" />' % {
+                    'txt': txt, 'gif': gif, 'siteurl': CFG_SITE_URL}
+
+            if jrec-rg > 1:
+                out += create_html_link(self.build_search_url(query, jrec=1, rg=rg),
+                                        {}, img('sb', _("begin")),
+                                        {'class': 'img'})
+
+            if jrec > 1:
+                out += create_html_link(self.build_search_url(query, jrec=max(jrec-rg, 1), rg=rg),
+                                        {}, img('sp', _("previous")),
+                                        {'class': 'img'})
+
+            if jrec+rg-1 < nb_found:
+                out += "%d - %d" % (jrec, jrec+rg-1)
+            else:
+                out += "%d - %d" % (jrec, nb_found)
+
+            if nb_found >= jrec+rg:
+                out += create_html_link(self.build_search_url(query,
+                                                              jrec=jrec+rg,
+                                                              rg=rg),
+                                        {}, img('sn', _("next")),
+                                        {'class':'img'})
+
+            if nb_found >= jrec+rg+rg:
+                out += create_html_link(self.build_search_url(query,
+                                                            jrec=nb_found-rg+1,
+                                                            rg=rg),
+                                        {}, img('se', _("end")),
+                                        {'class': 'img'})
+
+
+            # still in the navigation part
+            cc = collection
+            sc = 0
+            for var in ['p', 'cc', 'f', 'sf', 'so', 'of', 'rg', 'aas', 'ln', 'p1', 'p2', 'p3', 'f1', 'f2', 'f3', 'm1', 'm2', 'm3', 'op1', 'op2', 'sc', 'd1y', 'd1m', 'd1d', 'd2y', 'd2m', 'd2d', 'dt']:
+                out += self.tmpl_input_hidden(name = var, value = vars()[var])
+            for var in ['ot', 'sp', 'rm']:
+                if vars()[var]:
+                    out += self.tmpl_input_hidden(name = var, value = vars()[var])
+            if pl_in_url:
+                fieldargs = cgi.parse_qs(pl_in_url)
+                for fieldcode in all_fieldcodes:
+                    # get_fieldcodes():
+                    if fieldargs.has_key(fieldcode):
+                        for val in fieldargs[fieldcode]:
+                            out += self.tmpl_input_hidden(name = fieldcode, value = val)
+            out += """&nbsp; %(jump)s <input type="text" name="jrec" size="4" value="%(jrec)d" />""" % {
+                     'jump' : _("jump to record:"),
+                     'jrec' : jrec,
+                   }
+
+        if not middle_only:
+            out += "</td>"
+        else:
+            out += "</small>"
+
+        # right table cell: cpu time info
+        if not middle_only:
+            if cpu_time > -1:
+                out += """<td class="searchresultsboxheader" align="right"><small>%(time)s</small>&nbsp;</td>""" % {
+                         'time' : _("Search took %s seconds.") % ('%.2f' % cpu_time),
+                       }
+            out += "</tr></table>"
+        else:
+            out += "</div>"
+        out += "</form>"
+        return out
+
     def tmpl_nice_number(self, number, ln=CFG_SITE_LANG, thousands_separator=',', max_ndigits_after_dot=None):
         """
         Return nicely printed number NUMBER in language LN using
@@ -2603,9 +2839,11 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """</table>
-               <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />
+               <br />
+               <input type="hidden" name="colid" value="0" />
+               <input class="formbutton" type="submit" name="action" value="%(basket)s" />
                </form>""" % {
-                 'basket' : _("ADD TO BASKET")
+                 'basket' : _("Add to basket")
                  }
 
         return out
@@ -2660,7 +2898,7 @@ class Template:
 
         return out
 
-    def tmpl_print_results_overview(self, ln, results_final_nb_total, cpu_time, results_final_nb, colls, ec):
+    def tmpl_print_results_overview(self, ln, results_final_nb_total, cpu_time, results_final_nb, colls, ec, hosted_colls_potential_results_p=False):
         """Prints results overview box with links to particular collections below.
 
         Parameters:
@@ -2682,6 +2920,9 @@ class Template:
           - 'url_args' *string* - The rest of the search query
 
           - 'ec' *array* - selected external collections
+
+          - 'hosted_colls_potential_results_p' *boolean* - check if there are any hosted collections searches
+                                                    that timed out during the pre-search
         """
 
         if len(colls) == 1 and not ec:
@@ -2692,27 +2933,111 @@ class Template:
         _ = gettext_set_language(ln)
 
         # first find total number of hits:
-        out = """<table class="searchresultsbox">
-                <thead><tr><th class="searchresultsboxheader">%(founds)s</th></tr></thead>
-                <tbody><tr><td class="searchresultsboxbody"> """ % {
-                'founds' : _("%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s records in %(x_nb_seconds)s seconds.") %\
-                {'x_fmt_open': '<strong>',
-                 'x_fmt_close': '</strong>',
-                 'x_nb_records': '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>',
-                 'x_nb_seconds': '%.2f' % cpu_time}
-              }
+        # if there were no hosted collections that timed out during the pre-search print out the exact number of records found
+        if not hosted_colls_potential_results_p:
+            out = """<table class="searchresultsbox">
+                    <thead><tr><th class="searchresultsboxheader">%(founds)s</th></tr></thead>
+                    <tbody><tr><td class="searchresultsboxbody"> """ % {
+                    'founds' : _("%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s records in %(x_nb_seconds)s seconds.") %\
+                    {'x_fmt_open': '<strong>',
+                     'x_fmt_close': '</strong>',
+                     'x_nb_records': '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>',
+                     'x_nb_seconds': '%.2f' % cpu_time}
+                  }
+        # if there were (only) hosted_collections that timed out during the pre-search print out a fuzzier message
+        else:
+            if results_final_nb_total == 0:
+                out = """<table class="searchresultsbox">
+                        <thead><tr><th class="searchresultsboxheader">%(founds)s</th></tr></thead>
+                        <tbody><tr><td class="searchresultsboxbody"> """ % {
+                        'founds' : _("%(x_fmt_open)sResults overview%(x_fmt_close)s") %\
+                        {'x_fmt_open': '<strong>',
+                         'x_fmt_close': '</strong>'}
+                      }
+            elif results_final_nb_total > 0:
+                out = """<table class="searchresultsbox">
+                        <thead><tr><th class="searchresultsboxheader">%(founds)s</th></tr></thead>
+                        <tbody><tr><td class="searchresultsboxbody"> """ % {
+                        'founds' : _("%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least %(x_nb_records)s records in %(x_nb_seconds)s seconds.") %\
+                        {'x_fmt_open': '<strong>',
+                         'x_fmt_close': '</strong>',
+                         'x_nb_records': '<strong>' + self.tmpl_nice_number(results_final_nb_total, ln) + '</strong>',
+                         'x_nb_seconds': '%.2f' % cpu_time}
+                      }
         # then print hits per collection:
         for coll in colls:
             if results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] > 0:
-                out += '''<strong><a href="#%(coll)s">%(coll_name)s</a></strong>,
-                      <a href="#%(coll)s">%(number)s</a><br />''' % {
-                        'coll' : coll['id'],
-                        'coll_name' : cgi.escape(coll['name']),
-                        'number' : _("%s records found") % ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')
-                      }
+                out += """
+                      <strong><a href="#%(coll)s">%(coll_name)s</a></strong>, <a href="#%(coll)s">%(number)s</a><br />""" % \
+                                      {'coll' : coll['id'],
+                                       'coll_name' : cgi.escape(coll['name']),
+                                       'number' : _("%s records found") % \
+                                       ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')}
+            # the following is used for hosted collections that have timed out,
+            # i.e. for which we don't know the exact number of results yet.
+            elif results_final_nb.has_key(coll['code']) and results_final_nb[coll['code']] == -963:
+                out += """
+                      <strong><a href="#%(coll)s">%(coll_name)s</a></strong><br />""" % \
+                                      {'coll' : coll['id'],
+                                       'coll_name' : cgi.escape(coll['name']),
+                                       'number' : _("%s records found") % \
+                                       ('<strong>' + self.tmpl_nice_number(results_final_nb[coll['code']], ln) + '</strong>')}
         out += "</td></tr></tbody></table>"
         return out
 
+    def tmpl_print_hosted_results(self, url_and_engine, ln, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Print results of a given search engine.
+        """
+
+        _ = gettext_set_language(ln)
+        #url = url_and_engine[0]
+        engine = url_and_engine[1]
+        #name = _(engine.name)
+        db_id = get_collection_id(engine.name)
+        #base_url = engine.base_url
+
+        out = ""
+
+        results = engine.parser.parse_and_get_results(None, of=of, req=req, limit=limit, parseonly=True)
+
+        if len(results) != 0:
+            if of == 'hb':
+                out += """
+                      <form action="%(siteurl)s/yourbaskets/add" method="post">
+                      <input type="hidden" name="colid" value="%(col_db_id)s" />
+                      <table>
+                      """ % {
+                        'siteurl' : CFG_SITE_URL,
+                        'col_db_id' : db_id,
+                      }
+        else:
+            if of == 'hb':
+                out += """
+                      <table>
+                      """
+
+        for result in results:
+            out += result.html.replace('>Detailed record<', '>External record<').replace('>Similar records<', '>Similar external records<')
+
+        if len(results) != 0:
+            if of == 'hb':
+                out += """</table>
+                       <br /><input class="formbutton" type="submit" name="action" value="%(basket)s" />
+                       </form>""" % {
+                         'basket' : _("Add to basket")
+                         }
+        else:
+            if of == 'hb':
+                out += """
+                      </table>
+                      """
+
+        # we have already checked if there are results or no, maybe the following if should be removed?
+        if not results:
+            if of.startswith("h"):
+                out = _('No results found...') + '<br />'
+
+        return out
 
     def tmpl_print_searchresultbox(self, header, body):
         """print a nicely formatted box for search results """

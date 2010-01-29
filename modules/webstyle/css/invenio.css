@@ -1296,41 +1296,244 @@ input,select {
    border: 0px none black;
    height: 15px;
 }
+
 /* WebBasket module */
+
 #bskcontainer{
-   float: left;
+/*   float: left;*/
    background: transparent;
+   width: 100%;
 }
-#bsktabs{
-   float: left;
-   background:transparent;
-   padding: 0px;
-   margin: 0px;
-   text-align: center;
+
+ul.bsk_export_as_list{
+   list-style-image: url(arrow_link-icon-15x11-right.gif) ;
+   padding-left: 1em;
+   margin:0.05em;
 }
-.bsktab{
-   float: left;
-   vertical-align: middle;
-   margin: 0px 20px 0px 20px;
-   padding: 4px 10px 5px 5px;
-   background-repeat: no-repeat;
-   background-position: top left;
-   background-color: #ffe;
+.bsk_export_as_list, .bsk_export_as_list a{
+   text-decoration:none;
+   color:#555;
+   font-weight:700;
+   font-size:small;
 }
-#bsktab_selected{
-   background-color: #ffc;
-   font-weight: bold;
-   border-bottom: hidden;
+
+/*START The search box container*/
+#bskcontainersearch{
+   width: 100%;
 }
-.bsktab a{
-   color: #000;
+/*END The search box container*/
+
+/*START The directory box container*/
+#bskcontainerdirectory{
+   width: 100%;
+}
+.bsk_directory_box{
+   width: 100%;
+}
+.bsk_directory_box_tabs{
+   width: 100%;
+}
+.bsk_directory_box_tab_separator{
+   width: 1px;
+   border-bottom: 1px solid #fc0;
+}
+.bsk_directory_box_tab_separator_end{
+   width: 100%;
+   border-bottom: 1px solid #fc0;
+}
+.bsk_directory_box_tab_content{
+   border: 1px solid #fc0;
+   background: #fda;
+   padding: 5px;
+   white-space: nowrap;
+}
+.bsk_directory_box_tab_content a, .bsk_directory_box_tab_content a:link, .bsk_directory_box_tab_content a:visited, .bsk_directory_box_tab_content a:active{
    text-decoration: none;
+   font-weight: bold;
+   color: #444;
 }
-.bsktab a:hover{
+.bsk_directory_box_tab_content a:hover{
    text-decoration: underline;
+   font-weight: bold;
+   color: #000;
 }
-.bsktab img{
-   margin: 0px 5px 0px 0px;
+.bsk_directory_box_tab_content_selected{
+   border-top: 1px solid #fc0;
+   border-right: 1px solid #fc0;
+   border-left: 1px solid #fc0;
+   background: #ffc;
+   padding: 5px;
+   white-space: nowrap;
+}
+.bsk_directory_box_tab_content_selected a, .bsk_directory_box_tab_content_selected a:link, .bsk_directory_box_tab_content_selected a:visited, .bsk_directory_box_tab_content_selected a:active{
+   text-decoration: none;
+   font-weight: bold;
+   color: #000;
+}
+.bsk_directory_box_tab_content_selected a:hover{
+   text-decoration: underline;
+   font-weight: bold;
+   color: #000;
+}
+.bsk_directory_box_tab_content_inactive{
+   border: 1px solid #fc0;
+   background: #ffd;
+   padding: 5px;
+   white-space: nowrap;
+   font-weight: bold;
+   color: #d3d3d3;
+}
+.bsk_directory_box_nav_tab_content{
+   width: 100%;
+   border-bottom: 1px solid #fc0;
+   border-top: 1px solid #fc0;
+   border-left: 1px solid #fc0;
+   background: #ffc;
+   padding: 5px;
+   white-space: nowrap;
+}
+.bsk_directory_box_nav_tab_content a, .bsk_directory_box_nav_tab_content a:link, .bsk_directory_box_nav_tab_content a:visited, .bsk_directory_box_nav_tab_content a:active{
+   text-decoration: none;
+   font-weight: bold;
+   color: #000;
+}
+.bsk_directory_box_nav_tab_content a:hover{
+   text-decoration: underline;
+   font-weight: bold;
+   color: #000;
+}
+.bsk_directory_box_nav_tab_options{
+   border-bottom: 1px solid #fc0;
+   border-top: 1px solid #fc0;
+   border-right: 1px solid #fc0;
+   background: #ffc;
+   padding: 5px;
+   white-space: nowrap;
+}
+.bsk_directory_box_nav_tab_options img{
+   vertical-align: middle;
+   margin-right: 3px;
+   border: none;
+}
+.bsk_directory_box_nav_tab_options a, .bsk_directory_box_nav_tab_options a:link, .bsk_directory_box_nav_tab_options a:visited, .bsk_directory_box_nav_tab_options a:active{
+   text-decoration: none;
+   color: #000;
+   font-size: small;
+}
+.bsk_directory_box_nav_tab_options a:hover{
+   text-decoration: underline;
+   color: #000;
+   font-size: small;
+}
+.bsk_directory_box_content{
+   width: 100%;
+}
+.bsk_directory_box_content_list_topics_groups{
+   width: 100%;
+   text-align: center;
+   border-left: 1px solid #fc0;
+   border-right: 1px solid #fc0;
+   border-bottom: 1px solid #fc0;
+   background: #ffc;
+   padding: 5px;
+}
+.bsk_directory_box_content_list_baskets{
+   width: 100%;
+   text-align: center;
+   border-left: 1px solid #fc0;
+   border-right: 1px solid #fc0;
+   border-bottom: 1px solid #fc0;
+   background: #fff;
+   padding: 5px;
+}
+.bsk_directory_box_content_list_cell{
+   text-align: left;
+   white-space: nowrap;
+   padding: 5px;
+   vertical-align: top;
+}
+.bsk_directory_box_content_list_cell a, .bsk_directory_box_content_list_cell a:link, .bsk_directory_box_content_list_cell a:visited, .bsk_directory_box_content_list_cell a:active{
+   text-decoration: none;
+   color: #444;
+}
+.bsk_directory_box_content_list_cell a:hover{
+   text-decoration: underline;
+   color: #000;
+}
+.bsk_directory_box_content_list_number_of{
+   color: #808080;
+}
+/*END The directory box container*/
+
+/*START List public baskets*/
+.bsk_list_public_baskets{
+   margin-bottom: 20px;
+   border-collapse: collapse;
+   border: 1px solid #fc0;
+   background-color:white;
+}
+.bsk_list_public_baskets_header{
+   background-color: #ffc;
+   padding: 10px;
+   border-bottom: 1px solid #fc0;
+   border-collapse: collapse;
+   vertical-align: top;
+   white-space: nowrap;
+   font-weight: bold;
+}
+.bsk_list_public_baskets_header a, .bsk_list_public_baskets_header a:link, .bsk_list_public_baskets_header a:visited, .bsk_list_public_baskets_header a:active{
+   text-decoration: none;
+   color: #000;
+}
+.bsk_list_public_baskets_header a:hover{
+   text-decoration: underline;
+   color: #000;
+}
+.bsk_list_public_baskets_header img{
+   border: none;
+   vertical-align: bottom;
+}
+.bsk_list_public_baskets_footer{
+   background-color: #ffc;
+   padding: 10px;
+   border-top: 1px solid #fc0;
+   border-collapse: collapse;
+   vertical-align: bottom;
+   font-size: small;
+}
+.bsk_list_public_baskets_footer a, .bsk_list_public_baskets_footer a:link, .bsk_list_public_baskets_footer a:visited, .bsk_list_public_baskets_footer a:active{
+   text-decoration: none;
+   color: #000;
+}
+.bsk_list_public_baskets_footer a:hover{
+   text-decoration: underline;
+   color: #000;
+}
+.bsk_list_public_baskets_footer img{
+   border: none;
+   vertical-align: bottom;
+}
+.bsk_list_public_baskets_basket_left{
+   padding-top: 5px;
+   padding-bottom: 5px;
+   padding-right: 15px;
+   padding-left: 10px;
+   text-align: left;
+   border-right: 1px solid #fc0;
+}
+.bsk_list_public_baskets_basket_right{
+   padding-top: 5px;
+   padding-bottom: 5px;
+   padding-right: 10px;
+   padding-left: 15px;
+   text-align: right;
+   border-right: 1px solid #fc0;
+}
+/*END List public baskets*/
+
+/*START The content container*/
+#bskcontainercontent{
+   width: 100%;
 }
 #bskcontent{
    float: left;
@@ -1339,15 +1542,9 @@ input,select {
    background: #ffe;
    border: none;
 }
-#bsktopics{
-   background-color: #ffc;
-   padding: 10px;
-   width: 100%;
-}
 .bsktopic{
    white-space: nowrap;
    font-weight: bold;
-   margin: 0px 20px 0px 20px;
 }
 .bsktopic a{
    font-weight: normal;
@@ -1355,6 +1552,18 @@ input,select {
    color: #000;
 }
 .bsktopic a:hover{
+   text-decoration: underline;
+}
+.bsktopic_{
+   white-space: nowrap;
+   font-weight: bold;
+}
+.bsktopic_ a{
+   font-weight: normal;
+   text-decoration: none;
+   color: #000;
+}
+.bsktopic_ a:hover{
    text-decoration: underline;
 }
 #bskbaskets{
@@ -1371,18 +1580,187 @@ input,select {
 }
 .bskbasketheader{
    background-color: #ffc;
-}
-.bskbasketheader td{
    padding: 5px;
    border-bottom: 1px solid #fc0;
    border-collapse: collapse;
    vertical-align: top;
 }
+.bskbasketheadertitle{
+   width: 100%;
+   border: none;
+}
+.bskbasketheaderoptions{
+   text-align: right;
+   vertical-align: top;
+   white-space: nowrap;
+   border: none;
+   font-size: small;
+}
+.bskbasketheaderoptions a, .bskbasketheaderoptions a:link, .bskbasketheaderoptions a:visited, .bskbasketheaderoptions a:active{
+   text-decoration: none;
+   color: black;
+}
+.bskbasketheaderoptions a:hover{
+   text-decoration: underline;
+   color: black;
+}
+.bskbasketheaderoptions img{
+   vertical-align: middle;
+   margin-right: 3px;
+   border: none;
+}
 .bskbasketfooter{
-   border-top: 1px solid #fc0;
    background-color: #ffc;
+   padding: 5px;
+   border-top: 1px solid #fc0;
+   border-collapse: collapse;
+   vertical-align: bottom;
+}
+.bskbasketfootertitle{
+   width: 100%;
+   border: none;
+   vertical-align: bottom;
+   text-align: left;
+}
+.bskbasketfooteroptions{
+   text-align: right;
+   vertical-align: bottom;
+   white-space: nowrap;
+   border: none;
+   font-size: small;
+}
+.bskbasketfooteroptions a, .bskbasketfooteroptionsoptions a:link, .bskbasketfooteroptionsoptions a:visited, .bskbasketfooteroptionsoptions a:active{
+   text-decoration: none;
+   color: black;
+}
+.bskbasketfooteroptions a:hover{
+   text-decoration: underline;
+   color: black;
+}
+.bskbasketfootertitle a, .bskbasketfootertitleoptions a:link, .bskbasketfootertitleoptions a:visited, .bskbasketfootertitleoptions a:active{
+   text-decoration: underline;
+   color: black;
+}
+.bskbasketfootertitle a:hover{
+   text-decoration: underline;
+   color: black;
+}
+.bskbasketfooter img{
+   vertical-align: middle;
+   margin-right: 3px;
+   border: none;
+}
+/*START Notes header, content and footer*/
+.bsknotesheadertitle{
+   width: 100%;
+   border: none;
+}
+.bsknotesheaderoptions{
+   text-align: right;
+   vertical-align: bottom;
+   white-space: nowrap;
+   border: none;
+   font-size: small;
+}
+.bsknotesheaderoptions a, .bsknotesheaderoptions a:link, .bsknotesheaderoptions a:visited, .bsknotesheaderoptions a:active{
+   text-decoration: none;
+   color: black;
+}
+.bsknotesheaderoptions a:hover{
+   text-decoration: underline;
+   color: black;
+}
+.bsknotesheaderoptions img{
+   vertical-align: middle;
+   margin-right: 3px;
+   border: none;
+}
+.bsknotesfootertitle{
+   width: 100%;
+   border: none;
+   vertical-align: top;
+   text-align: left;
+}
+.bsknotesfooteroptions{
+   text-align: right;
+   vertical-align: top;
+   white-space: nowrap;
+   border: none;
+   font-size: small;
+}
+.bsknotesfooteroptions a, .bsknotesfooteroptions a:link, .bsknotesfooteroptions a:visited, .bsknotesfooteroptions a:active{
+   text-decoration: none;
+   color: black;
+}
+.bsknotesfooteroptions a:hover{
+   text-decoration: underline;
+   color: black;
+}
+.bsknotesfooteroptions img{
+   vertical-align: middle;
+   margin-right: 3px;
+   border: none;
+}
+.bsknotescontent {
+   width: 100%;
+   padding-left: 20px;
+   padding-top: 20px;
+   padding-right: 20px;
+}
+.bsknotescontent a, .bsknotescontent a:link, .bsknotescontent a:visited, .bsknotescontent a:active{
+   text-decoration: none;
+   color: black;
+}
+.bsknotescontent a:hover{
+   text-decoration: underline;
+   color: black;
+}
+.bsknotescontent img{
+   margin-right: 3px;
+   border: none;
+}
+.bsknotescontentnote {
+   width: 100%;
+}
+.bsknotescontentaddnote {
+   width: 100%;
+}
+.bsknotescontentaddform {
+   width: 100%;
+}
+.bsknotescontenttitle {
+   width: 100%;
+   border-top: 1px solid #ddd;
+   border-left: 1px solid #ddd;
+   border-right: 1px solid #ddd;
+   font-size: small;
+}
+.bsknotescontentbody {
+   width: 100%;
+   border-bottom: 1px solid #ddd;
+   border-left: 1px solid #ddd;
+   border-right: 1px solid #ddd;
+   font-size: small;
+}
+.bsknotescontentoptions {
+   width: 100%;
+   font-size: small;
+   text-align: right;
    padding: 3px;
 }
+.bskcomment {
+   margin-bottom:20px;
+   margin-left:30px;
+   background:#F9F9F9;
+   border:1px solid #DDD;
+   font-size:small;
+   width: 90%;
+}
+.bskcommentheader {
+   background-color:#EEE;
+   padding:2px;
+}
+/*END Notes header, content and footer*/
 .bskbasketheaderactions{
    text-align: center;
    white-space: nowrap;
@@ -1398,20 +1776,34 @@ input,select {
    font-size: small;
    color: #000;
 }
-.bskbasketfooter td{
-   padding: 5px 0px 5px 0px;
+.bskcontentcount{
+   text-align: right;
+   white-space: nowrap;
+   vertical-align: top;
+   padding-top: 5px;
+   padding-left: 5px;
+   padding-bottom: 5px;
+}
+.bskcontentoptions{
+   text-align: right;
+   white-space: nowrap;
+   vertical-align: top;
+   padding-left: 5px;
+}
+.bskcontentoptions img{
+   border: none;
+   padding-right: 5px;
 }
 .bskactions{
    text-align: center;
    white-space: nowrap;
-   border-bottom: 1px solid #fc0;
 }
 .bskactions td{
    border: none;
 }
 .bskactions img{
    border: 0px;
-   margin: 2px;
+   margin: 5px;
 }
 .bskactions a{
    font-size: x-small;
@@ -1424,23 +1816,12 @@ input,select {
    text-align: right;
 }
 .bskcontentcol{
-   border-bottom: 1px solid #fc0;
-   padding: 5px;
+   padding-top: 5px;
+   padding-right: 5px;
+   width: 100%;
 }
 .bskcontentcol a{
    font-size: small;
-}
-.bskcomment {
-   margin-bottom:20px;
-   margin-left:30px;
-   background:#F9F9F9;
-   border:1px solid #DDD;
-   font-size:small;
-   width: 90%;
-}
-.bskcommentheader {
-   background-color:#EEE;
-   padding:2px;
 }
 .bsk_create_link{
    padding-top: 5px;
@@ -1457,6 +1838,7 @@ dd{
    margin-bottom: 10px;
 }
 /* end of WebBasket module */
+
 /* WebSubmit module */
 form.hyperlinkform {
    /* used in form tag for a form that should be hidden, but contains a button styled like a hyperlink */

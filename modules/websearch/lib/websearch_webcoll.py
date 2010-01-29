@@ -57,6 +57,10 @@ from invenio.bibtask import task_init, task_get_option, task_set_option, \
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
+from invenio.websearch_external_collections_searcher import external_collections_dictionary
+from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS
+
 ## global vars
 collection_house = {} # will hold collections we treat in this run of the program; a dict of {collname2, collobject1}, ...
 
@@ -122,6 +126,18 @@ def get_field(recID, tag):
         out.append(row[0])
     return out
 
+def check_nbrecs_for_all_external_collections():
+    """Check if any of the external collections have changed their total number of records, aka nbrecs.
+    Return True if any of the total numbers of records have changed and False if they're all the same."""
+    res = run_sql("SELECT name FROM collection WHERE dbquery LIKE 'hostedcollection:%';")
+    for row in res:
+        coll_name = row[0]
+        if (get_collection(coll_name)).check_nbrecs_for_external_collection():
+            write_message("External collection %s found updated." % coll_name, verbose=6)
+            return True
+    write_message("All external collections are up to date.", verbose=6)
+    return False
+
 class Collection:
     "Holds the information on collections (id,name,dbquery)."
 
@@ -130,6 +146,8 @@ class Collection:
         self.calculate_reclist_run_already = 0 # to speed things up without much refactoring
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
         self.reclist_with_nonpublic_subcolls = HitSet()
+        # used to store the temporary result of the calculation of nbrecs of an external collection
+        self.nbrecs_tmp = None
         if not name:
             self.name = CFG_SITE_NAME # by default we are working on the home page
             self.id = 1
@@ -425,6 +443,9 @@ class Collection:
         if self.restricted_p():
             return websearch_templates.tmpl_box_restricted_content(ln = ln)
 
+        if str(self.dbquery).startswith("hostedcollection:"):
+            return websearch_templates.tmpl_box_hosted_collection(ln = ln)
+
         if rg == 0:
             # do not show latest additions box
             return ""
@@ -674,7 +695,7 @@ class Collection:
 
     def calculate_reclist(self):
         """Calculate, set and return the (reclist, reclist_with_nonpublic_subcolls) tuple for given collection."""
-        if self.calculate_reclist_run_already:
+        if self.calculate_reclist_run_already or str(self.dbquery).startswith("hostedcollection:"):
             # do we have to recalculate?
             return (self.reclist, self.reclist_with_nonpublic_subcolls)
         write_message("... calculating reclist of %s" % self.name, verbose=6)
@@ -708,6 +729,49 @@ class Collection:
         self.calculate_reclist_run_already = 1
         # return the two sets:
         return (self.reclist, self.reclist_with_nonpublic_subcolls)
+
+    def calculate_nbrecs_for_external_collection(self, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT):
+        """Calculate the total number of records, aka nbrecs, for given external collection."""
+        #if self.calculate_reclist_run_already:
+            # do we have to recalculate?
+            #return self.nbrecs
+        #write_message("... calculating nbrecs of external collection %s" % self.name, verbose=6)
+        if external_collections_dictionary.has_key(self.name):
+            engine = external_collections_dictionary[self.name]
+            if engine.parser:
+                self.nbrecs_tmp = engine.parser.parse_nbrecs(timeout)
+                if self.nbrecs_tmp >= 0: return self.nbrecs_tmp
+                # the parse_nbrecs() function returns negative values for some specific cases
+                # maybe we can handle these specific cases, some warnings or something
+                # for now the total number of records remains silently the same
+                else: return self.nbrecs
+            else: write_message("External collection %s does not have a parser!" % self.name, verbose=6)
+        else: write_message("External collection %s not found!" % self.name, verbose=6)
+        return 0
+        # last but not least, update the speed-up flag:
+        #self.calculate_reclist_run_already = 1
+
+    def check_nbrecs_for_external_collection(self):
+        """Check if the external collections has changed its total number of records, aka nbrecs.
+        Rerurns True if the total number of records has changed and False if it's the same"""
+
+        write_message("*** self.nbrecs = %s / self.cal...ion = %s ***" % (str(self.nbrecs), str(self.calculate_nbrecs_for_external_collection())), verbose=6)
+        write_message("*** self.nbrecs != self.cal...ion = %s ***" % (str(self.nbrecs != self.calculate_nbrecs_for_external_collection()),), verbose=6)
+        return self.nbrecs != self.calculate_nbrecs_for_external_collection(CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS)
+
+    def set_nbrecs_for_external_collection(self):
+        """Set this external collection's total number of records, aka nbrecs"""
+
+        if self.calculate_reclist_run_already:
+            # do we have to recalculate?
+            return
+        write_message("... calculating nbrecs of external collection %s" % self.name, verbose=6)
+        if self.nbrecs_tmp:
+            self.nbrecs = self.nbrecs_tmp
+        else:
+            self.nbrecs = self.calculate_nbrecs_for_external_collection(CFG_HOSTED_COLLECTION_TIMEOUT_NBRECS)
+        # last but not least, update the speed-up flag:
+        self.calculate_reclist_run_already = 1
 
     def update_reclist(self):
         "Update the record universe for given collection; nbrecs, reclist of the collection table."
@@ -839,7 +903,6 @@ def main():
             task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
 
-
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key it checks it's meaning, eventually using the value.
     Usually it fills some key in the options dict.
@@ -881,6 +944,28 @@ def task_submit_check_options():
 
 def task_run_core():
     """ Reimplement to add the body of the task."""
+##
+## ------->--->time--->------>
+##  (-1)  |   ( 0)    |  ( 1)
+##        |     |     |
+## [T.db] |  [T.fc]   | [T.db]
+##        |     |     |
+##        |<-tol|tol->|
+##
+## the above is the compare_timestamps_with_tolerance result "diagram"
+## [T.db] stands fore the database timestamp and [T.fc] for the file cache timestamp
+## ( -1, 0, 1) stand for the returned value
+## tol stands for the tolerance in seconds
+##
+## When a record has been added or deleted from one of the collections the T.db becomes greater that the T.fc
+## and when webcoll runs it is fully ran. It recalculates the reclists and nbrecs, and since it updates the
+## collections db table it also updates the T.db. The T.fc is set as the moment the task started running thus
+## slightly before the T.db (practically the time distance between the start of the task and the last call of
+## update_reclist). Therefore when webcoll runs again, and even if no database changes have taken place in the
+## meanwhile, it fully runs (because compare_timestamps_with_tolerance returns 0). This time though, and if
+## no databases changes have taken place, the T.db remains the same while T.fc is updated and as a result if
+## webcoll runs again it will not be fully ran
+##
     task_run_start_timestamp = get_current_time_timestamp()
     colls = []
     # decide whether we need to run or not, by comparing last updated timestamps:
@@ -888,7 +973,7 @@ def task_run_core():
     write_message("Collection cache timestamp is %s." % get_cache_last_updated_timestamp(), verbose=3)
     if task_has_option("part"):
         write_message("Running cache update part %s only." % task_get_option("part"), verbose=3)
-    if task_has_option("force") or \
+    if check_nbrecs_for_all_external_collections() or task_has_option("force") or \
     compare_timestamps_with_tolerance(get_database_last_updated_timestamp(),
                                         get_cache_last_updated_timestamp(),
                                         cfg_cache_last_updated_timestamp_tolerance) >= 0:
@@ -912,7 +997,10 @@ def task_run_core():
             for coll in colls:
                 i += 1
                 write_message("%s / reclist cache update" % coll.name)
-                coll.calculate_reclist()
+                if str(coll.dbquery).startswith("hostedcollection:"):
+                    coll.set_nbrecs_for_external_collection()
+                else:
+                    coll.calculate_reclist()
                 task_sleep_now_if_required()
                 coll.update_reclist()
                 task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))

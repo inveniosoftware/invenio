@@ -67,7 +67,6 @@ from invenio.access_control_admin import acc_get_user_email
 from invenio.webmessage import perform_request_send, perform_request_write_with_search
 import invenio.webbasket_dblayer as basketdb
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, CFG_WEBBASKET_CATEGORIES, CFG_WEBBASKET_SHARE_LEVELS_ORDERED
-from invenio.webbasket import perform_request_display_item, perform_request_save_comment
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.errorlib import register_exception
 from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
@@ -81,6 +80,14 @@ CFG_WEBSUBMIT_PENDING_DIR = "%s/pending" % CFG_WEBSUBMIT_STORAGEDIR
 CFG_WEBSUBMIT_DUMMY_MARC_XML_REC = "dummy_marcxml_rec"
 CFG_WEBSUBMIT_MARC_XML_REC = "recmysql"
 
+
+def perform_request_save_comment(*args, **kwargs):
+    """
+    FIXME: this function is a dummy workaround for the obsoleted
+    function calls below.  Should get deleted at the same time as
+    them.
+    """
+    return
 
 def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body="", reply="", commentId=""):
     global uid

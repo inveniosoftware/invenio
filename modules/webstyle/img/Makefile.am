@@ -187,6 +187,29 @@ img_DATA = add-small.png \
            webbasket_usergroup_gray.png \
            webbasket_world.png \
            webbasket_ws.png \
+           wb-add-note.png \
+           wb-copy-item.png \
+           wb-create-basket.png \
+           wb-delete-basket.png \
+           wb-delete-item.png \
+           wb-edit-basket.png \
+           wb-edit-topic.png \
+           wb-external-item.png \
+           wb-go-back.png \
+           wb-move-item-down-disabled.png \
+           wb-move-item-down.png \
+           wb-move-item-up-disabled.png \
+           wb-move-item-up.png \
+           wb-next-item-disabled.png \
+           wb-next-item.png \
+           wb-notes.png \
+           wb-previous-item-disabled.png \
+           wb-previous-item.png \
+           wb-sort-asc.gif \
+           wb-sort-desc.gif \
+           wb-sort-none.gif \
+           wb-subscribe.png \
+           wb-unsubscribe.png \
            white_field.gif \
            wsignout.gif
 

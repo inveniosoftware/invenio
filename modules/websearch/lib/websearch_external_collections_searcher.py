@@ -24,6 +24,8 @@ __revision__ = "$Id$"
 import sys
 import urllib
 
+import cgi
+
 from invenio.config import CFG_SITE_LANG
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIONS, CFG_EXTERNAL_COLLECTION_MAXRESULTS
 from invenio.websearch_external_collections_parser import CDSIndicoCollectionResutsParser, \
@@ -54,11 +56,19 @@ class ExternalSearchEngine(object):
 
     def __init__(self, configuration):
         self.search_url = ""
-        self.parser = None
         self.combiner = " "
         self.name = None
+        self.parser_params = None
+        self.parser = None
+        self.fetch_format = ""
+        self.record_url = None
+        self.selected_by_default = False
         for (name, value) in configuration.iteritems():
             setattr(self, name, value)
+        if self.parser_params:
+            setattr(self, 'parser', self.parser_params['parser'](self.parser_params))
+            if 'fetch_format' in self.parser_params.keys():
+                self.fetch_format = self.parser_params['fetch_format']
 
     def build_units(self, basic_search_units):
         """ Build the research units for basic_search_units provided"""
@@ -76,8 +86,8 @@ class ExternalSearchEngine(object):
             return basic[1]
         return None
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
-        """Build an URL for a specific set of search_units."""
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Build a URL for a specific set of search_units."""
 
         units = self.build_units(basic_search_units)
         if len(units) == 0:
@@ -104,8 +114,8 @@ class SortedFieldsSearchEngine(ExternalSearchEngine):
         self.converter = {}
         super(SortedFieldsSearchEngine, self).__init__(configuration)
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
-        """Build an URL for a search."""
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Build a search URL. Reuse the search pattern found in req only with Invenio-based search engines"""
         self.clear_fields()
         self.fill_fields(basic_search_units)
 
@@ -173,10 +183,10 @@ class CDSIndicoSearchEngine(ExternalSearchEngine):
             else:
                 return operator + '"' + pattern + '"'
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for a specific set of search_units."""
 
-        url = super(CDSIndicoSearchEngine, self).build_search_url(basic_search_units, lang)
+        url = super(CDSIndicoSearchEngine, self).build_search_url(basic_search_units, None, lang)
         if not url:
             return None
 
@@ -197,7 +207,7 @@ class CERNEDMSSearchEngine(SortedFieldsSearchEngine):
         self.search_url_simple = "http://edms.cern.ch/cedar/plsql/fullsearch.doc_search?p_search_type=BASE&p_free_text="
         self.fields = ["author", "keyword", "abstract", "title", "reportnumber"]
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for CERN EDMS."""
         super(CERNEDMSSearchEngine, self).build_search_url(basic_search_units)
         if len(self.fields_content["default"]) > 0:
@@ -236,7 +246,7 @@ class CERNAgendaSearchEngine(ExternalSearchEngine):
         self.search_url_author = "http://agenda.cern.ch/search.php?field=speaker&search=Search&keywords="
         self.search_url_title = "http://agenda.cern.ch/search.php?field=title&search=Search&keywords="
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an url for searching on CERN Agenda. This will only work if there is only author
         or title tags."""
         if only_field(basic_search_units, "author"):
@@ -273,9 +283,9 @@ class GoogleSearchEngine(ExternalSearchEngine):
             else:
                 return sign + author_tag + search_unit[1]
         if search_unit[3] == "w":
-            return search_unit[0] + search_unit[1]
+            return sign + search_unit[1]
         else:
-            return search_unit[0] + '"' + search_unit[1] + '"'
+            return sign + '"' + search_unit[1] + '"'
 
 class GoogleBooksSearchEngine(GoogleSearchEngine):
     """Interface for searching on Google Books."""
@@ -313,7 +323,7 @@ class KissSearchEngine(SortedFieldsSearchEngine):
         self.fields = self.converter.keys()
         self.parser = KISSExternalCollectionResultsParser()
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for a search."""
         super(KissSearchEngine, self).build_search_url(basic_search_units)
         url_parts = []
@@ -458,7 +468,7 @@ class AmazonSearchEngine(ExternalSearchEngine):
         self.search_url_general = "http://www.amazon.com/exec/obidos/external-search/?tag=cern&keyword="
         self.search_url_author = "http://www.amazon.com/exec/obidos/external-search/?tag=cern&field-author="
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for Amazon"""
         if only_field(basic_search_units, "author"):
             self.search_url = self.search_url_author
@@ -510,7 +520,7 @@ class NEBISSearchEngine(ExternalSearchEngine):
         self.search_url_author = "http://opac.nebis.ch/F/?func=find-b&find_code=WAU&REQUEST="
         self.search_url_title = "http://opac.nebis.ch/F/?func=find-b&find_code=WTI&REQUEST="
 
-    def build_search_url(self, basic_search_units, lang=CFG_SITE_LANG):
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Build an URL for NEBIS"""
         if only_field(basic_search_units, "author"):
             self.search_url = self.search_url_author
@@ -519,6 +529,85 @@ class NEBISSearchEngine(ExternalSearchEngine):
         else:
             self.search_url = self.search_url_general
         return super(NEBISSearchEngine, self).build_search_url(basic_search_units)
+
+# Invenio based
+
+class CDSInvenioSearchEngine(ExternalSearchEngine):
+    """Generic search engine class for Invenio based sites"""
+
+    def __init__(self, configuration):
+        super(CDSInvenioSearchEngine, self).__init__(configuration)
+
+    def build_search_url(self, basic_search_units, req_args=None, lang=CFG_SITE_LANG, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Build a URL for an Invenio based site"""
+
+        if req_args:
+            search_url_params = ""
+            if type(req_args) is list:
+                # req_args is by definition a string. It is a list
+                # only when we manually pass it as a list of recids.
+                conjunction = " or "
+                search_url_recids = conjunction.join(['recid:%s'] * len(req_args))
+                params = tuple(req_args)
+                search_url_recids %= params
+                # TODO: "rg" here should be the naximum limit of items to be
+                # added to a basket at once. Create a static variable for that.
+                req_args = "p=" + search_url_recids + "&rg=" + str(100)
+            req_args_dict = cgi.parse_qs(req_args)
+            if req_args_dict.has_key('p'):
+                search_url_params += urllib.quote(req_args_dict['p'][0])
+            if req_args_dict.has_key('f'):
+                search_url_params += '&f=' + req_args_dict['f'][0]
+            if req_args_dict.has_key('jrec'):
+                search_url_params += '&jrec=' + req_args_dict['jrec'][0]
+            if req_args_dict.has_key('rg'):
+                search_url_params += '&rg=' + req_args_dict['rg'][0]
+            else:
+                search_url_params += '&rg=' + str(limit)
+            if req_args_dict.has_key('d1d'):
+                search_url_params += '&d1d=' + req_args_dict['d1d'][0]
+            if req_args_dict.has_key('d1m'):
+                search_url_params += '&d1m=' + req_args_dict['d1m'][0]
+            if req_args_dict.has_key('d1y'):
+                search_url_params += '&d1y=' + req_args_dict['d1y'][0]
+            if req_args_dict.has_key('d2d'):
+                search_url_params += '&d2d=' + req_args_dict['d2d'][0]
+            if req_args_dict.has_key('d2m'):
+                search_url_params += '&d2m=' + req_args_dict['d2m'][0]
+            if req_args_dict.has_key('d2y'):
+                search_url_params += '&d2y=' + req_args_dict['d2y'][0]
+            if req_args_dict.has_key('ap'):
+                search_url_params += '&ap=' + req_args_dict['ap'][0]
+            search_url_params += '&of=' + self.fetch_format
+            return self.search_url + search_url_params
+        else:
+            units = self.build_units(basic_search_units)
+            if len(units) == 0:
+                return None
+            request = self.combine_units(units)
+            url_request = urllib.quote(request)
+            return self.search_url + url_request + '&rg=' + str(limit) + '&of=' + self.fetch_format
+
+    def build_search_unit_unit(self, basic):
+        """Build a search string from a search unit. Reconstructs original user query"""
+
+        # TO DO: correct & improve the print out
+        # adding the semicolon in case a specific field is chosen
+        if basic[2] != "": basic[2] = basic[2] + ":"
+        # adding the single quotes in case a multi word values is searched for
+        if basic[3] == "a": basic[1] = "'" + basic[1] + "'"
+        return basic[0] + " " + basic[2] + basic[1]
+
+    def build_record_urls(self, recids):
+        """Given a list of records this function returns a dictionary with
+        recid:external_url key:value pairs"""
+
+        if type(recids) is not list:
+            recids = [recids]
+        recids_urls = []
+        for recid in recids:
+            recids_urls.append((recid, self.record_url + recid))
+        return recids_urls
 
 external_collections_dictionary = {}
 
@@ -533,4 +622,3 @@ def build_external_collections_dictionary():
             sys.stderr.write("Error : not found " + engine_name + "\n")
 
 build_external_collections_dictionary()
-

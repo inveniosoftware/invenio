@@ -2610,7 +2610,10 @@ CREATE TABLE IF NOT EXISTS bskREC (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bskEXTREC (
-  id int(15) unsigned NOT NULL default '0',
+  id int(15) unsigned NOT NULL auto_increment,
+  external_id int(15) NOT NULL default '0',
+  collection_id int(15) unsigned NOT NULL default '0',
+  original_url text,
   creation_date datetime NOT NULL default '0000-00-00 00:00:00',
   modification_date datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id)

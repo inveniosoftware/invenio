@@ -27,7 +27,13 @@ engine.
 __revision__ = "$Id$"
 
 import re
-from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+#from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
+from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
+CFG_EXTERNAL_COLLECTION_MAXRESULTS = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_MAXRESULTS
+
+from invenio.bibformat import format_record
+from invenio.websearch_external_collections_getter import fetch_url_content
+import cgi
 
 re_href = re.compile(r'<a[^>]*href="?([^">]*)"?[^>]*>', re.IGNORECASE)
 re_img = re.compile(r'<img[^>]*src="?([^">]*)"?[^>]*>', re.IGNORECASE)
@@ -68,6 +74,8 @@ class ExternalCollectionResultsParser(object):
     """Mother class for parsers."""
 
     num_results_regex = None
+    nbrecs_regex = None
+    nbrecs_url = None
 
     def __init__(self, host='', path=''):
         self.buffer = ""
@@ -85,17 +93,17 @@ class ExternalCollectionResultsParser(object):
         """Feed buffer with data that will be parse later."""
         self.buffer += data
 
-    def parse(self):
-        """Parse the buffer."""
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Parse the buffer. Set an optional output format."""
         pass
 
-    def add_html_result(self, html):
+    def add_html_result(self, html, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Add a new html code as result. The urls in the html code will be corrected."""
 
         if not html:
             return
 
-        if len(self.results) >= CFG_EXTERNAL_COLLECTION_MAXRESULTS:
+        if len(self.results) >= limit:
             return
 
         html = correct_url(html, self.host, self.path) + '\n'
@@ -112,13 +120,42 @@ class ExternalCollectionResultsParser(object):
             return int(match.group(1).replace(',', ''))
         return None
 
-    def parse_and_get_results(self, data):
-        """Parse given data and return results.
-        """
-        self.clean()
-        self.feed(data)
-        self.parse()
-        return self.results
+    def parse_nbrecs(self, timeout):
+        """Fetch and parse the contents of the nbrecs url with the nbrecs_regex to extract the total
+        number of records. This will be returned as a formated string."""
+
+        if self.nbrecs_regex is None:
+            return None
+        html = fetch_url_content([self.nbrecs_url], timeout)
+        try:
+            if len(html) == 1:
+                matches = self.nbrecs_regex.search(html[0])
+                return int(matches.group(1).replace(',', ''))
+            else: return None
+            # This last else should never occur. It means the list html has more (or less) than 1 elements,
+            # which is impossible since the fetch_url_content(url) function always returns a list with as many
+            # elements as the list's it was fed with
+        except AttributeError:
+            # This means that the pattern did not match anything, therefore the matches.group(1) raised the exception
+            return -1
+        except TypeError:
+            # This means that the pattern was ran on None instead of string or buffer, therefore the
+            # self.nbrecs_regex.search(html[0]) raised the exception, as html = [None]
+            return -2
+
+    def parse_and_get_results(self, data, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS, feedonly=False, parseonly=False):
+        """Parse given data and return results."""
+
+        # parseonly = True just in case we only want to parse the data and return the results
+        # ex. the bufffer has already been fed
+        if not parseonly:
+            self.clean()
+            self.feed(data)
+        # feedonly = True just in case we just want to feed the buffer with the new data
+        # ex. the data will be used only to calculate the number of results
+        if not feedonly:
+            self.parse(of, req, limit)
+            return self.results
 
     def buffer_decode_from(self, charset):
         """Convert the buffer to UTF-8 from the specified charset. Ignore errors."""
@@ -136,7 +173,7 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
     def __init__(self, host="", path=""):
         super(CDSIndicoCollectionResutsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
         results = self.result_regex.finditer(self.buffer)
@@ -144,7 +181,7 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
             num = result.group(1)
             html = result.group(2)
 
-            self.add_html_result(num + ' ' + html  + '<br />')
+            self.add_html_result(num + ' ' + html  + '<br />', limit)
 
 class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss."""
@@ -154,7 +191,7 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www-lib.kek.jp", path="cgi-bin/"):
         super(KISSExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
         self.buffer_decode_from('Shift_JIS')
@@ -169,7 +206,7 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
             end_index = element.find('</DL>')
             if end_index != -1:
                 element = element[:end_index + 4]
-            self.add_html_result(element + '<br /><br />')
+            self.add_html_result(element + '<br /><br />', limit)
 
 class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss books."""
@@ -181,7 +218,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www-lib.kek.jp", path="cgi-bin/"):
         super(KISSBooksExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
 
         self.buffer_decode_from('Shift_JIS')
@@ -196,7 +233,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
 
             title_match = self.title.match(data)
             if title_match:
-                self.add_html_result(html)
+                self.add_html_result(html, limit)
 
                 num = title_match.group(1)
                 url = title_match.group(2)
@@ -209,7 +246,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
                     info = info_line_match.group(1)
                     html += info + '<br />'
 
-        self.add_html_result(html)
+        self.add_html_result(html, limit)
 
 class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Google"""
@@ -219,7 +256,7 @@ class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host = "www.google.com", path=""):
         super(GoogleExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split("<div class=g>")
         if len(elements) <= 1:
@@ -229,7 +266,7 @@ class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
             end_index = element.find('</table>')
             if end_index != -1:
                 element = element[:end_index + 8]
-            self.add_html_result(element)
+            self.add_html_result(element, limit)
 
 class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResultsParser):
     """Parser for Google Scholar."""
@@ -237,7 +274,7 @@ class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResul
     def __init__(self, host = "scholar.google.com", path=""):
         super(GoogleScholarExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split("<p class=g>")
         if len(elements) <= 1:
@@ -247,7 +284,7 @@ class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResul
             end_index = element.find('</table>')
             if end_index != -1:
                 element = element[:end_index + 8]
-            self.add_html_result(element + '<br />')
+            self.add_html_result(element + '<br />', limit)
 
 class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResultsParser):
     """Parser for Google Books."""
@@ -257,14 +294,14 @@ class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResults
     def __init__(self, host = "books.google.com", path=""):
         super(GoogleBooksExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split('<table class=rsi><tr><td class="covertd">')
         if len(elements) <= 1:
             return
 
         for element in elements[1:-1]:
-            self.add_html_result(element)
+            self.add_html_result(element, limit)
 
 class SPIRESExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for SPIRES."""
@@ -274,7 +311,7 @@ class SPIRESExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host="www.slac.stanford.edu", path="spires/find/hep/"):
         super(SPIRESExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         elements = self.buffer.split('<p>')
 
@@ -282,7 +319,7 @@ class SPIRESExternalCollectionResultsParser(ExternalCollectionResultsParser):
             return
 
         for element in elements[1:-1]:
-            self.add_html_result(element)
+            self.add_html_result(element, limit)
 
 class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for SCIRUS."""
@@ -296,7 +333,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host='www.scirus.com', path='srsapp/'):
         super(SCIRUSExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         data = self.buffer.replace('\n', ' ')
 
@@ -312,7 +349,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
                     'date' : date, 'comments' : comments, 'similar' : similar}
             else:
                 html = self.cleaning.sub("", data) + '<br />'
-            self.add_html_result(html)
+            self.add_html_result(html, limit)
 
 class CiteSeerExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for CiteSeer."""
@@ -323,8 +360,130 @@ class CiteSeerExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def __init__(self, host='', path=''):
         super(CiteSeerExternalCollectionResultsParser, self).__init__(host, path)
 
-    def parse(self):
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
         """Parse buffer to extract records."""
         for element in self.result_separator.finditer(self.buffer):
-            self.add_html_result(element.group() + '<br />')
+            self.add_html_result(element.group() + '<br />', limit)
 
+class CDSInvenioHTMLExternalCollectionResultsParser(ExternalCollectionResultsParser):
+    """HTML brief (hb) Parser for Invenio"""
+
+    def __init__(self, params):
+        self.buffer = ""
+        self.results = []
+        self.clean()
+        self.num_results_regex_str = None
+        self.nbrecs_regex_str = None
+        for (name, value) in params.iteritems():
+            setattr(self, name, value)
+        if self.num_results_regex_str:
+            self.num_results_regex = re.compile(self.num_results_regex_str)
+        if self.nbrecs_regex_str:
+            self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
+
+    def parse(self, of=None, req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Parse buffer to extract records."""
+
+        # the patterns :
+        # level_a : select only the results
+        level_a_pat = re.compile(r'<form[^>]*basket[^>]*?>.*?<table>(.*?)</table>.*?</form>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        # level_b : purge html from the basket input fields
+        level_b_pat = re.compile(r'<input[^>]*?/>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        # level_c : separate the results from one another
+        level_c_pat = re.compile(r'(<tr>.*?</tr>)', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+
+        # the long way :
+        #level_a_res = level_a_pat.search(self.buffer)
+        #level_ab_res = level_a_res.group(1)
+        #level_b_res = level_b_pat.sub('', level_ab_res)
+        #level_c_res = level_c_pat.finditer(level_b_res)
+
+        # the short way :
+        try:
+            results = level_c_pat.finditer(level_b_pat.sub('', level_a_pat.search(self.buffer).group(1)))
+            for result in results:
+               # each result is placed in each own table since it already has its rows and cells defined
+                self.add_html_result('<table>' + result.group(1) + '</table>', limit)
+        except AttributeError:
+            # in case there were no results found an Attribute error is raised
+            pass
+
+class CDSInvenioXMLExternalCollectionResultsParser(ExternalCollectionResultsParser):
+    """XML (xm) parser for Invenio"""
+
+    def __init__(self, params):
+        self.buffer = ""
+        self.results = []
+        self.clean()
+        self.num_results_regex_str = None
+        self.nbrecs_regex_str = None
+        for (name, value) in params.iteritems():
+            setattr(self, name, value)
+        if self.num_results_regex_str:
+            self.num_results_regex = re.compile(self.num_results_regex_str)
+        if self.nbrecs_regex_str:
+            self.nbrecs_regex = re.compile(self.nbrecs_regex_str, re.IGNORECASE)
+
+    def parse(self, of='hb', req=None, limit=CFG_EXTERNAL_COLLECTION_MAXRESULTS):
+        """Parse buffer to extract records. Format the records using the selected output format."""
+
+        (recids, records) = self.parse_and_extract_records(of)
+
+        if req and cgi.parse_qs(req.args).has_key('jrec'):
+            counter = int(cgi.parse_qs(req.args)['jrec'][0]) - 1
+        else:
+            counter = 0
+        for recid in recids:
+            counter += 1
+            if of == 'hb':
+                html = """
+                        <tr><td valign="top" align="right" style="white-space: nowrap;">
+                        <input name="recid" type="checkbox" value="%(recid)s" />
+
+                        %(counter)s.
+
+                        </td><td valign="top">%(record)s</td></tr>
+                        """ % {'recid': recid,
+                               'counter': counter,
+                               'record': records[recid]}
+            elif of == 'hd':
+                # HTML detailed (hd) is not supported yet
+                # TODO: either disable the hd output format or print it out correctly
+                html = """"""
+            elif of == 'xm':
+                html = records[recid]
+            else:
+                html = None
+            if html:
+                self.add_html_result(html, limit)
+
+    def parse_and_extract_records(self, of='hb'):
+        """Parse the buffer and return a list of the recids and a
+        dictionary with key:value pairs like the following
+        recid:formated record with the selected output format"""
+
+        # the patterns :
+        # separate the records from one another
+        record_pat = re.compile(r'(<record.*?>.*?</record>)', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+        # extract the recid
+        recid_pat = re.compile(r'<controlfield tag="001">([0-9]+?)</controlfield>', re.DOTALL + re.MULTILINE + re.IGNORECASE)
+
+        if not of:
+            of='hb'
+
+        try:
+            results = record_pat.finditer(self.buffer)
+            records = {}
+            recids = []
+            for result in results:
+                xml_record = result.group(1)
+                recid = recid_pat.search(xml_record).group(1)
+                recids.append(recid)
+                if of != 'xm':
+                    records[recid] = format_record(None, of, xml_record=xml_record)
+                elif of == 'xm':
+                    records[recid] = xml_record
+            return (recids, records)
+        except AttributeError:
+            # in case there were no results found an Attribute error is raised
+            return ([], {})

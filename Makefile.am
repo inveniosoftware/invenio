@@ -375,5 +375,9 @@ update-v0.99.1-tables:
 	echo "UPDATE accACTION SET allowedkeywords='name,with_editor_rights' WHERE name='cfgwebjournal';" | ${prefix}/bin/dbexec
 	echo "INSERT INTO accARGUMENT(keyword,value) VALUES ('with_editor_rights','yes');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO accROLE_accACTION_accARGUMENT(id_accROLE,id_accACTION,id_accARGUMENT,argumentlistid) SELECT DISTINCT raa.id_accROLE,raa.id_accACTION,accARGUMENT.id,raa.argumentlistid FROM accROLE_accACTION_accARGUMENT as raa JOIN accACTION on id_accACTION=accACTION.id,accARGUMENT WHERE accACTION.name='cfgwebjournal' and accARGUMENT.keyword='with_editor_rights' and accARGUMENT.value='yes';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskEXTREC CHANGE id id int(15) unsigned NOT NULL auto_increment;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskEXTREC ADD external_id int(15) NOT NULL default '0';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskEXTREC ADD collection_id int(15) unsigned NOT NULL default '0';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskEXTREC ADD original_url text;" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

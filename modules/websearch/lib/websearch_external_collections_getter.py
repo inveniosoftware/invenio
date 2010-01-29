@@ -51,6 +51,9 @@ import sys
 import StringIO
 import time
 import urlparse
+#from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_TIMEOUT
+from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
+CFG_EXTERNAL_COLLECTION_TIMEOUT = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
 
 def async_download(pagegetter_list, finish_function=None, datastructure_list=None, timeout=15):
     """Download web pages asynchronously with timeout.
@@ -142,7 +145,7 @@ class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
 def build_request(uri):
     """Build an http request for a specific url."""
 
-    scheme, host, path, params, query, fragment = urlparse.urlparse(uri)
+    scheme, host, path, params, query, dummy = urlparse.urlparse(uri)
     assert scheme == "http", "only supports HTTP requests (uri = " + uri + ")"
 
     host, port = decode_host_port(host)
@@ -215,3 +218,18 @@ def check_redirected(pagegetter_list):
             else:
                 getter.done = True
         pagegetter_list[i] = getter
+
+def fetch_url_content(urls, timeout=CFG_EXTERNAL_COLLECTION_TIMEOUT):
+    """Given a list of urls this function returns a list of their contents
+    using a optional custom timeout."""
+
+    urls_content = []
+    try:
+        pagegetters_list = [HTTPAsyncPageGetter(url) for url in urls]
+    except AssertionError:
+        return [None] * len(urls)
+    async_download(pagegetters_list, None, None, timeout)
+    for i in range(len(pagegetters_list)):
+        if pagegetters_list[i].done: urls_content.append(pagegetters_list[i].data)
+        else: urls_content.append(None)
+    return urls_content
