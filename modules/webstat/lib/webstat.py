@@ -875,8 +875,8 @@ def _get_timespans(dt=None):
               dt_str,
               "month", format, "%b"),
              ("last year", "Last year",
-              to_str(dt.replace(year=dt.year-1,month=(dt.month+1) % 12)),
-              to_str(dt.replace(month=(dt.month+1) % 12)),
+              to_str(dt.replace(year=dt.year-1,month=(dt.month+1) % 12, day=1)),
+              to_str(dt.replace(month=(dt.month+1) % 12, day=1)),
               "month", format, "%b")]
 
     # Get first year as indicated by the content's in bibrec
