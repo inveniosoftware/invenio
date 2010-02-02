@@ -31,7 +31,8 @@ from invenio.config import \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
      CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
      CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
 from invenio.urlutils import make_canonical_urlargd, create_url, create_html_link
@@ -839,7 +840,11 @@ class Template:
                         {'x_url_open': '<a href="../youraccount/register?ln=' + ln + '">',
                         'x_url_close': '</a>'} + "</p>"
                 else:
-                    out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL)) + "</p>"
+                    # users cannot register accounts, so advise them
+                    # how to get one, or be silent about register
+                    # facility if account level is more than 4:
+                    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 5:
+                        out += "<p>" + _("If you don't own an account yet, please contact %s.") % ('<a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL)) + "</p>"
 
         else:
             out = "<p>%s</p>" % msg
@@ -1034,6 +1039,9 @@ class Template:
                 'register' : _("register"),
                 'explain_acc' : _("Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.") % CFG_SITE_NAME,
               }
+        else:
+            # level >=2, so users cannot register accounts
+            out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL)) + "</p>"
         return out
 
     def tmpl_account_adminactivities(self, ln, uid, guest, roles, activities):
