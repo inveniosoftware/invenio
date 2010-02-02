@@ -656,7 +656,7 @@ def get_loan_request_by_status(status):
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date
-                            FROM   crcLOANREQUEST lr,
+                     FROM   crcLOANREQUEST lr,
                             crcBORROWER bor,
                             crcITEM it,
                             crcLIBRARY lib
@@ -1107,11 +1107,38 @@ def get_item_loans(recid):
 
     return res
 
-def get_all_loans():
+def get_all_loans(limit):
     """
     Get all loans.
     """
 
+    res = run_sql(
+    """
+    SELECT bor.id,
+           bor.name,
+           it.id_bibrec,
+           l.barcode,
+           DATE_FORMAT(l.loaned_on,'%Y-%m-%d'),
+           DATE_FORMAT(l.due_date,'%Y-%m-%d'),
+           l.number_of_renewals,
+           l.overdue_letter_number,
+           DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
+           l.notes,
+           l.id
+    FROM crcLOAN l, crcBORROWER bor, crcITEM it
+    WHERE l.id_crcBORROWER = bor.id
+          and l.barcode = it.barcode
+          and l.status = 'on loan'
+    ORDER BY 5 DESC
+    LIMIT 0,%s
+    """, (limit, ))
+
+    return res
+
+def get_all_expired_loans():
+    """
+    Get all expired(overdue) loans.
+    """
     res = run_sql(
     """
     select bor.id,
@@ -1127,34 +1154,11 @@ def get_all_loans():
            l.id
     from crcLOAN l, crcBORROWER bor, crcITEM it
     where l.id_crcBORROWER = bor.id
-          and l.barcode=it.barcode
-          and l.status='on loan' ORDER BY l.loaned_on DESC
+          and l.barcode = it.barcode
+          and l.status = 'on loan'
+          and l.due_date < CURDATE()
     """)
-
-    return res
-
-def get_all_expired_loans(jloan, loans_per_page):
-    """
-    Get all expired(overdue) loans.
-    """
-    res = run_sql(
-    """
-    select bor.id,
-           bor.name,
-           it.id_bibrec,
-           l.barcode,
-           DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
-           DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
-           l.number_of_renewals,
-           l.overdue_letter_number,
-           DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
-           l.notes,
-           l.id
-    from crcLOAN l, crcBORROWER bor, crcITEM it
-    where l.id_crcBORROWER = bor.id and
-          l.barcode=it.barcode and l.status='expired'
-          limit %s, %s
-    """, (jloan, loans_per_page))
+# l.status='expired'
 
     return res
 
@@ -1623,8 +1627,8 @@ def get_libraries():
     """
 
     res = run_sql("""select id, name
-                       from crcLIBRARY
-                      where type!='external'""")
+                       from crcLIBRARY""")
+                      #where type<>'external' """)
 
     return res
 
@@ -2598,10 +2602,10 @@ def bor_ill_historical_overview(borrower_id):
     """
 
     res = run_sql("""select id, book_info, id_crcLIBRARY,
-                            DATE_FORMAT(request_date,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(expected_date,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(arrival_date,'%%Y-%%m-%%d'),
-                            DATE_FORMAT(due_date,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(request_date,'%Y-%m-%d'),
+                            DATE_FORMAT(expected_date,'%Y-%m-%d'),
+                            DATE_FORMAT(arrival_date,'%Y-%m-%d'),
+                            DATE_FORMAT(due_date,'%Y-%m-%d'),
                             status, library_notes
                        from crcILLREQUEST
                       where id_crcBORROWER=%s and status='document received, request closed'"""
@@ -2721,7 +2725,8 @@ def get_expired_loans_with_requests():
                      WHERE  it.barcode=lr.barcode AND
                             lr.barcode=l.barcode AND
                             (lr.status='pending' or lr.status='waiting') AND
-                            l.status='expired'
+                            l.status='on loan'
+                            and l.due_date < CURDATE()
                             ORDER BY lr.request_date;
                   """)
     return res

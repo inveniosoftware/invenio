@@ -116,9 +116,7 @@ def loan_on_desk_step4(req, list_of_books=None, user_info=None, due_date=None,
 
     """
 
-
     user_info = eval(user_info)
-
 
     list_of_books = eval(list_of_books)
     due_date = wash_url_argument(due_date, 'list')
@@ -559,15 +557,13 @@ def claim_book_return(req, borrower_id=None, recid=None, loan_id=None,
     """
     return bal.claim_book_return(req, borrower_id, recid, loan_id, template, ln)
 
-def all_expired_loans(req, loans_per_page=25, page_number=1, ln=CFG_SITE_LANG):
+def all_expired_loans(req, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans
 
     """
-    loans_per_page = int(loans_per_page)
-    page_number = int(page_number)
 
-    return bal.all_expired_loans(req, loans_per_page, page_number, ln)
+    return bal.all_expired_loans(req, ln)
 
 def get_waiting_requests(req, request_id=None, print_data=None,
                          ln=CFG_SITE_LANG):
@@ -634,9 +630,8 @@ def place_new_request_step2(req, barcode=None, recid=None, user_info=None,
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step2
     """
 
-
-    user_info = eval(user_info)
-
+    if user_info is not None:
+        user_info = user_info.split(',')
 
     return bal.place_new_request_step2(req, barcode, recid, user_info, ln)
 
