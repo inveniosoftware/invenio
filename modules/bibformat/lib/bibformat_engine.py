@@ -196,6 +196,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
     FMT $g, as is suitable for prestoring output formats, we
     perform un-XML-izing here in order to return HTML body only.
     """
+
     out = ""
     res = []
     if not on_the_fly:
@@ -227,12 +228,13 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
                                    on_the_fly=(on_the_fly and format == 'xm'))
 
 ##         import platform
-##         # Some problem have been found using either popen or os.system command.
+##         # Some problem have been found using either popen() or os.system().
 ##         # Here is a temporary workaround until the issue is solved.
 ##         if platform.python_compiler().find('Red Hat') > -1:
 ##             # use os.system
         (result_code, result_path) = tempfile.mkstemp()
-        command = "( %s/bibformat otype=%s )  > %s" % (CFG_BINDIR, format, result_path)
+        command = "( %s/bibformat otype=%s )  > %s" % \
+                                     (CFG_BINDIR, format, result_path)
         (xm_code, xm_path) = tempfile.mkstemp()
         xm_file = open(xm_path, "w")
         xm_file.write(xm_record)
@@ -249,7 +251,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
 ##         else:
 ##             # use popen
 ##         pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % CFG_BINDIR,
-##                                                          "otype=%s" % format],
+##                                                         "otype=%s" % format],
 ##                                                         'rw')
 ##         pipe_input.write(xm_record)
 ##         pipe_input.flush()
@@ -342,7 +344,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                 out += """\n<br/><span class="quicknote">
                 Using old BibFormat for record %s.
                 </span>""" % recID
-            return out + call_old_bibformat(recID, format=of, on_the_fly=True, verbose=verbose)
+            return out + call_old_bibformat(recID, format=of, on_the_fly=True,
+                                            verbose=verbose)
     ############################# END ##################################
 
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
@@ -449,6 +452,7 @@ def format_with_format_template(format_template_filename, bfo,
     else:
         #.xsl
         # Fetch MARCXML. On-the-fly xm if we are now formatting in xm
+
         xml_record = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
                      record_get_xml(bfo.recID, 'xm', on_the_fly=False)
 
@@ -810,6 +814,7 @@ def get_format_template(filename, with_attributes=False):
     @param with_attributes: if True, fetch the attributes (names and description) for format'
     @return: strucured content of format template
     """
+
     # Get from cache whenever possible
     global format_templates_cache
 
@@ -1358,6 +1363,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
                                                        9: errors and warnings, stop if error (debug mode ))
     @return: strucured content of output format
     """
+
     output_format = {'rules':[], 'default':""}
     filename = resolve_output_format_filename(code, verbose)
 
@@ -1737,6 +1743,7 @@ class BibFormatObject:
         @param user_info: the information of the user who will view the formatted page
         @param format: the format used for formatting this record
         """
+
         if xml_record is not None:
             # If record is given as parameter
             self.record = create_record(xml_record)[0]
@@ -1759,6 +1766,7 @@ class BibFormatObject:
         @return: the record structure as defined by BibRecord library
         """
         from invenio.search_engine import get_record
+
         # Create record if necessary
         if self.record is None:
             # on-the-fly creation if current output is xm
@@ -1881,6 +1889,7 @@ class BibFormatObject:
         @repeatable_subfields_p if True, returns the list of subfields in the dictionary
         @return: values of field tag in record
         """
+
         if self.get_record() is None:
             # Case where BibRecord could not parse object
             return []

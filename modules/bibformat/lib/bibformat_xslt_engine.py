@@ -246,6 +246,7 @@ def eval_bibformat_libxslt(ctx, recID, template_code):
             recID_int = recID
         else:
             recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
+
         bfo = BibFormatObject(recID_int)
         return format_with_format_template(None, bfo,
                                            verbose=0,

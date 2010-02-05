@@ -44,10 +44,12 @@ from invenio.errorlib import register_exception
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_PATH_PHP, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_BIBFORMAT_HIDDEN_TAGS
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT, \
      CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT
+from invenio.access_control_engine import acc_authorize_action
 try:
     import invenio.template
     websearch_templates = invenio.template.load('websearch')
@@ -58,6 +60,45 @@ import sys
 
 # Functions to format a single record
 ##
+
+def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDEN_TAGS,
+                         force_filtering=False):
+    """
+    Filter out tags specified by filter_tags from MARCXML. If the user
+    is allowed to run bibedit, then filter nothing, unless
+    force_filtering is set to True.
+
+    @param recxml: marcxml presentation of the record
+    @param user_info: user information; if None, then assume invoked via CLI with all rights
+    @param filter_tags: list of MARC tags to be filtered
+    @param force_filtering: do we force filtering regardless of user rights?
+    @return: recxml without the hidden fields
+    """
+    if force_filtering:
+        pass
+    else:
+        if user_info is None:
+            #by default
+            return recxml
+        else:
+            if (acc_authorize_action(user_info, 'runbibedit')[0] == 0):
+                #no need to filter
+                return recxml
+    #filter..
+    lines = recxml.split("\n")
+    out = ""
+    omit = False
+    for line in lines:
+        #check if this block needs to be omitted
+        for htag in filter_tags:
+            if line.count('datafield tag="'+str(htag)+'"'):
+                omit = True
+        if not omit:
+            out += line
+            out += "\n"
+        if omit and line.count('</datafield>'):
+            omit = False
+    return out
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False):
@@ -95,6 +136,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
         search_pattern = []
 
     out = ""
+
     if verbose == 9:
         out += """\n<span class="quicknote">
         Formatting record %i with output format %s.
@@ -124,6 +166,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                 out += """\n<br/><span class="quicknote">
                 Found preformatted output for record %i (cache updated on %s).
                 </span><br/>""" % (recID, last_updated)
+            if of.lower() == 'xm':
+                res = filter_hidden_fields(res, user_info)
             out += res
             return out
         else:
@@ -147,6 +191,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                                               search_pattern=search_pattern,
                                               xml_record=xml_record,
                                               user_info=user_info)
+        if of.lower() == 'xm':
+            out = filter_hidden_fields(out, user_info)
         return out
     except Exception, e:
         register_exception(prefix="An error occured while formatting record %i in %s" % \

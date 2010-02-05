@@ -61,6 +61,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
+     CFG_BIBFORMAT_HIDDEN_TAGS, \
      CFG_SITE_URL
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError
 from invenio.bibrecord import create_record
@@ -530,7 +531,7 @@ def get_words_from_pattern(pattern):
     words = {}
     for word in string.split(pattern):
         if not words.has_key(word):
-            words[word] = 1;
+            words[word] = 1
     return words.keys()
 
 def create_basic_search_units(req, p, f, m=None, of='hb'):
@@ -1732,9 +1733,29 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     basic_search_units_hitsets = []
+    #prepare hiddenfield-related..
+    myhiddens = CFG_BIBFORMAT_HIDDEN_TAGS
+    can_see_hidden = False
+    if req:
+        user_info = collect_user_info(req)
+        can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
+    if can_see_hidden:
+        myhiddens = []
+
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
+        #check that the user is allowed to search with this tag..
+        for htag in myhiddens:
+            ltag = len(htag)
+            samelenfield = bsu_f[0:ltag]
+            if samelenfield == htag:
+                #we won't show you anything, user
+                basic_search_unit_hitset = HitSet()
+                if verbose >= 9 and of.startswith("h"):
+                    print_warning(req, "Pattern %s hitlist omitted since it queries a hidden tag in %s" %
+                                  basic_search_unit_hitset, str(myhiddens))
+
         if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset))
         if len(basic_search_unit_hitset) > 0 or \
@@ -2715,14 +2736,20 @@ def get_fieldvalues(recIDs, tag, repetitive_values=True):
             out.append(row[0])
     return out
 
-def get_fieldvalues_alephseq_like(recID, tags_in):
-    """Return buffer of ALEPH sequential-like textual format with fields found in the list TAGS_IN for record RECID."""
+def get_fieldvalues_alephseq_like(recID, tags_in, can_see_hidden=False):
+    """Return buffer of ALEPH sequential-like textual format with fields found
+       in the list TAGS_IN for record RECID.
+
+       If can_see_hidden is True, just print everything.  Otherwise hide fields
+       from CFG_BIBFORMAT_HIDDEN_TAGS.
+    """
+
     out = ""
     if type(tags_in) is not list:
         tags_in = [tags_in,]
     if len(tags_in) == 1 and len(tags_in[0]) == 6:
         ## case A: one concrete subfield asked, so print its value if found
-        ##         (use with care: can false you if field has multiple occurrences)
+        ##         (use with care: can mislead if field has multiple occurrences)
         out += string.join(get_fieldvalues(recID, tags_in[0]),"\n")
     else:
         ## case B: print our "text MARC" format; works safely all the time
@@ -2773,22 +2800,31 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
             for row in res:
                 field, value, field_number = row[0], row[1], row[2]
                 ind1, ind2 = field[3], field[4]
+                printme = True
+                #check the stuff in hiddenfields
+                if not can_see_hidden:
+                    for htag in CFG_BIBFORMAT_HIDDEN_TAGS:
+                        ltag = len(htag)
+                        samelenfield = field[0:ltag]
+                        if samelenfield == htag:
+                            printme = False
                 if ind1 == "_":
                     ind1 = ""
                 if ind2 == "_":
                     ind2 = ""
                 # print field tag
-                if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                    if out:
-                        out += "\n"
-                    out += "%09d %s " % (recID, field[:5])
-                    field_number_old = field_number
-                    field_old = field
-                # print subfield value
-                if field[0:2] == "00" and field[-1:] == "_":
-                    out += value
-                else:
-                    out += "$$%s%s" % (field[-1:], value)
+                if printme:
+                    if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                        if out:
+                            out += "\n"
+                        out += "%09d %s " % (recID, field[:5])
+                        field_number_old = field_number
+                        field_old = field
+                    # print subfield value
+                    if field[0:2] == "00" and field[-1:] == "_":
+                        out += value
+                    else:
+                        out += "$$%s%s" % (field[-1:], value)
     return out
 
 def record_exists(recID):
@@ -3163,6 +3199,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
 
             # print records
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
+
             format_records(recIDs_to_print,
                            format,
                            ln=ln,
@@ -3472,11 +3509,14 @@ def get_record(recid):
 def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.decompress,
                  search_pattern=None, user_info=None, verbose=0):
     """Prints record 'recID' formatted accoding to 'format'."""
-
     if format == 'recstruct':
         return get_record(recID)
 
     _ = gettext_set_language(ln)
+
+    #check from user information if the user has the right to see hidden fields/tags in the
+    #records as well
+    can_see_hidden = (acc_authorize_action(user_info, 'runbibedit')[0] == 0)
 
     out = ""
 
@@ -3582,17 +3622,26 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                                 ind1 = " "
                             if ind2 == "_" or ind2 == "":
                                 ind2 = " "
-                            # print field tag
-                            if field_number != field_number_old or field[:-1] != field_old[:-1]:
-                                if field_number_old != -999:
-                                    out += """        </datafield>\n"""
-                                out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
-                                           (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
-                                field_number_old = field_number
-                                field_old = field
-                            # print subfield value
-                            value = encode_for_xml(value)
-                            out += """            <subfield code="%s">%s</subfield>\n""" % \
+                            # print field tag, unless hidden
+                            printme = True
+                            if not can_see_hidden:
+                                for htag in CFG_BIBFORMAT_HIDDEN_TAGS:
+                                    ltag = len(htag)
+                                    samelenfield = field[0:ltag]
+                                    if samelenfield == htag:
+                                        printme = False
+
+                            if printme:
+                                if field_number != field_number_old or field[:-1] != field_old[:-1]:
+                                    if field_number_old != -999:
+                                        out += """        </datafield>\n"""
+                                    out += """        <datafield tag="%s" ind1="%s" ind2="%s">\n""" % \
+                                               (encode_for_xml(field[0:3]), encode_for_xml(ind1), encode_for_xml(ind2))
+                                    field_number_old = field_number
+                                    field_old = field
+                                # print subfield value
+                                value = encode_for_xml(value)
+                                out += """            <subfield code="%s">%s</subfield>\n""" % \
                                    (encode_for_xml(field[-1:]), value)
 
                         # all fields/subfields printed in this run, so close the tag:
@@ -3647,22 +3696,22 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
     elif format.startswith('t'):
         ## user directly asked for some tags to be displayed only
         if record_exist_p == -1:
-            out += get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"])
+            out += get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"], can_see_hidden)
         else:
-            out += get_fieldvalues_alephseq_like(recID, ot)
+            out += get_fieldvalues_alephseq_like(recID, ot, can_see_hidden)
 
     elif format == "hm":
         if record_exist_p == -1:
-            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"])) + "</pre>"
+            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"], can_see_hidden)) + "</pre>"
         else:
-            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot)) + "</pre>"
+            out += "\n<pre>" + cgi.escape(get_fieldvalues_alephseq_like(recID, ot, can_see_hidden)) + "</pre>"
 
     elif format.startswith("h") and ot:
         ## user directly asked for some tags to be displayed only
         if record_exist_p == -1:
-            out += "\n<pre>" + get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"]) + "</pre>"
+            out += "\n<pre>" + get_fieldvalues_alephseq_like(recID, ["001", CFG_OAI_ID_FIELD, "980"], can_see_hidden) + "</pre>"
         else:
-            out += "\n<pre>" + get_fieldvalues_alephseq_like(recID, ot) + "</pre>"
+            out += "\n<pre>" + get_fieldvalues_alephseq_like(recID, ot, can_see_hidden) + "</pre>"
 
     elif format == "hd":
         # HTML detailed format
@@ -4030,8 +4079,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
     # wash output format:
     of = wash_output_format(of)
 
-    # raise an exception when trying to print out html or xml from the cli
-    if of.startswith("h") or of.startswith("x"):
+    # raise an exception when trying to print out html from the cli
+    if of.startswith("h"):
         assert req
 
     # for every search engine request asking for an HTML output, we

@@ -28,6 +28,7 @@ import unittest
 import os
 import sys
 
+from invenio import bibformat
 from invenio import bibformat_engine
 from invenio import bibformat_utils
 from invenio import bibformat_config
@@ -792,13 +793,56 @@ class FormatTest(unittest.TestCase):
         self.assert_(isinstance(result, tuple))
         self.assertEqual(result[0],'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
 
+
+class MarcFilteringTest(unittest.TestCase):
+    """ bibformat - MARC tag filtering tests"""
+
+    def setUp(self):
+        """bibformat - prepare MARC filtering tests"""
+
+        self.xml_text_4 = '''
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1="" ind2="">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe1, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1="" ind2="">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1="" ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        <datafield tag="595" ind1="" ind2="2">
+        <subfield code="a">Confidential comment</subfield>
+        </datafield>
+        <datafield tag="980" ind1="" ind2="">
+        <subfield code="a">article</subfield>
+        </datafield>
+        </record>
+        '''
+    def test_filtering(self):
+        """bibformat - filter hidden fields"""
+        newxml = bibformat.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=True)
+        numhfields = newxml.count("595")
+        self.assertEqual(numhfields, 0)
+
+
+
 TEST_SUITE = make_test_suite(FormatTemplateTest,
                              OutputFormatTest,
                              FormatElementTest,
                              PatternTest,
                              MiscTest,
                              FormatTest,
-                             EscapingAndWashingTest)
+                             EscapingAndWashingTest,
+                             MarcFilteringTest)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
