@@ -56,13 +56,13 @@ exclude-result-prefixes="marc fn dc dcterms opensearch">
 
 <xsl:template match="record">
         <title>
-                <xsl:for-each select="datafield[@tag='245' and @ind1=' ' and @ind2=' ']">
+                <xsl:for-each select="datafield[@tag='245']">
                         <xsl:value-of select="subfield[@code='a']"/>
                         <xsl:if test="subfield[@code='b']">
                                 <xsl:text>: </xsl:text><xsl:value-of select="subfield[@code='b']"/>
                         </xsl:if>
                 </xsl:for-each>
-                <xsl:for-each select="datafield[@tag='111' and @ind1=' ' and @ind2=' ']">
+                <xsl:for-each select="datafield[@tag='111']">
                         <xsl:value-of select="subfield[@code='a']"/>
                 </xsl:for-each>
         </title>
@@ -74,15 +74,15 @@ exclude-result-prefixes="marc fn dc dcterms opensearch">
         </description>
 
 	<xsl:choose>
-            <xsl:when test="contains(datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a'], '@')">
+            <xsl:when test="contains(datafield[(@tag='100' or @tag='110' or @tag='700' or @tag='710')]/subfield[@code='a'], '@')">
                 <!-- Email address: we can use author -->
 	         <author>
-                    <xsl:value-of select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a']"/>
+                    <xsl:value-of select="datafield[(@tag='100' or @tag='110' or @tag='700' or @tag='710')]/subfield[@code='a']"/>
                 </author>
             </xsl:when>
             <xsl:otherwise>
                 <dc:creator>
-                    <xsl:value-of select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a']"/>
+                    <xsl:value-of select="datafield[(@tag='100' or @tag='110' or @tag='700' or @tag='710')]/subfield[@code='a']"/>
                 </dc:creator>
             </xsl:otherwise>
 	</xsl:choose>
