@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2009-12-14 10:06+0100\n"
-"PO-Revision-Date: 2008-08-27 08:01+0200\n"
+"PO-Revision-Date: 2010-01-31 22:58+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -133,7 +133,7 @@ msgstr "resum"
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:445
 msgid "fulltext"
-msgstr "text complert"
+msgstr "text complet"
 
 #: modules/websearch/doc/search-guide.webdoc:332
 #: modules/websearch/doc/search-guide.webdoc:368
@@ -1332,7 +1332,7 @@ msgstr "Guia d'administració de WebSubmit"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_files.bft:4
 msgid "No fulltext"
-msgstr "Sense text complert"
+msgstr "Sense text complet"
 
 #: modules/websearch/doc/search-tips.webdoc:290
 #: modules/websubmit/lib/websubmit_templates.py:1125
@@ -1758,7 +1758,7 @@ msgstr "Mostra tots els %i autors"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:114
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:116
 msgid "Download fulltext"
-msgstr "Descarregar el text complert"
+msgstr "Descarregar el text complet"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:79
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:55
@@ -1790,7 +1790,7 @@ msgstr "enllaços externs"
 #: modules/bibformat/lib/elements/bfe_fulltext.py:251
 #: modules/websearch/lib/websearchadminlib.py:3229
 msgid "Fulltext"
-msgstr "Text complert"
+msgstr "Text complet"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:189
 #: modules/bibformat/web/admin/bibformatadmin.py:257
@@ -1955,7 +1955,7 @@ msgstr "no sembla una baseURL que compleixi amb OAI"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:283
 msgid "View next entries..."
-msgstr ""
+msgstr "Veure les entrades següents..."
 
 #: modules/bibharvest/lib/bibharvest_templates.py:340
 #, fuzzy
@@ -1995,7 +1995,7 @@ msgstr "vegades"
 #: modules/bibharvest/lib/bibharvest_templates.py:461
 #: modules/bibharvest/lib/oai_harvest_admin.py:107
 msgid "history"
-msgstr ""
+msgstr "historia"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:465
 #: modules/bibharvest/lib/oai_harvest_admin.py:111
@@ -2313,13 +2313,13 @@ msgstr "Necesiteu intervenció humana?  Contacteu"
 #: modules/webaccess/lib/access_control_config.py:224
 #: modules/websession/lib/websession_templates.py:1079
 msgid "Run Record Editor"
-msgstr ""
+msgstr "Executar l'editor de registres"
 
 #: modules/webaccess/lib/access_control_config.py:225
 #: modules/webaccess/lib/access_control_config.py:226
 #: modules/websession/lib/websession_templates.py:1081
 msgid "Run Multi-Record Editor"
-msgstr ""
+msgstr "Executar l'editor de múltiples registres"
 
 #: modules/webaccess/lib/access_control_config.py:227
 #, fuzzy
@@ -3494,12 +3494,12 @@ msgstr "Registre #%s"
 #: modules/webcomment/lib/webcomment.py:821
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been reviewed"
-msgstr ""
+msgstr "S'han revisat el %(report_number)s\"%(title)s\""
 
 #: modules/webcomment/lib/webcomment.py:825
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been commented"
-msgstr ""
+msgstr "S'han comentat el %(report_number)s\"%(title)s\""
 
 #: modules/webcomment/lib/webcomment_templates.py:101
 #, python-format
@@ -3685,6 +3685,8 @@ msgid ""
 "Would you like to receive email notifications when new comments are added to "
 "this page?"
 msgstr ""
+"Voldrieu rebre notificacions per correu electrònic quan s'afegeixin "
+"nous comentaris a aquesta pàgina?"
 
 #: modules/webcomment/lib/webcomment_templates.py:869
 #: modules/webcomment/lib/webcomment_templates.py:984
@@ -3816,6 +3818,8 @@ msgstr "Número del comentari:"
 #: modules/webcomment/lib/webcomment_templates.py:1172
 msgid "Or enter a record ID to list all the associated comments/reviews:"
 msgstr ""
+"O entreu el número de registre per veure tots els comentaris i "
+"ressenyes associades:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1173
 #, fuzzy
@@ -4042,36 +4046,38 @@ msgstr "Sense cap ressenya"
 #: modules/webcomment/lib/webcomment_templates.py:1643
 #, python-format
 msgid "The following review was sent to %(CFG_SITE_NAME)s:"
-msgstr ""
+msgstr "S'ha enviat aquesta ressenya a %(CFG_SITE_NAME)s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1644
 #, python-format
 msgid "The following comment was sent to %(CFG_SITE_NAME)s:"
-msgstr ""
+msgstr "S'ha enviat aquest comentari a %(CFG_SITE_NAME)s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1670
 msgid "This is an automatic message, please don't reply to it."
-msgstr ""
+msgstr "Aquest és un missatge automàtic, no el responeu."
 
 #: modules/webcomment/lib/webcomment_templates.py:1672
 #, python-format
 msgid "To post another comment, go to <%(x_url)s> instead."
-msgstr ""
+msgstr "Per publicar un altre comentari, aneu a <%(x_url)s>."
 
 #: modules/webcomment/lib/webcomment_templates.py:1677
 #, python-format
 msgid "To specifically reply to this comment, go to <%(x_url)s>"
-msgstr ""
+msgstr "Per contestar específicament a aquest comentari, aneu a <%(x_url)s>."
 
 #: modules/webcomment/lib/webcomment_templates.py:1682
 #, python-format
 msgid "To unsubscribe from this discussion, go to <%(x_url)s>"
-msgstr ""
+msgstr "Per donar-vos de baixa d'aquesta discussió, aneu a <%(x_url)s>."
 
 #: modules/webcomment/lib/webcomment_templates.py:1686
 #, python-format
 msgid "For any question, please use <%(CFG_SITE_SUPPORT_EMAIL)s>"
 msgstr ""
+"Per resoldre dubtes, poseu-vos en contacte amb "
+"<%(CFG_SITE_SUPPORT_EMAIL)s>"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:227
 #: modules/webcomment/lib/webcomment_webinterface.py:378
@@ -5586,7 +5592,7 @@ msgstr "Teniu activats els següents rols: %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:1085
 msgid "Run Record Merger"
-msgstr ""
+msgstr "Unificar registres"
 
 #: modules/websession/lib/websession_templates.py:1088
 #, fuzzy
@@ -5826,7 +5832,7 @@ msgstr "Convidar nous membres"
 #: modules/websession/lib/websession_templates.py:2052
 #, python-format
 msgid "Invitation to join \"%s\" group"
-msgstr ""
+msgstr "Invitació a unir-se al grup \"%s\""
 
 #: modules/websession/lib/websession_templates.py:2053
 #, python-format
@@ -5838,6 +5844,12 @@ msgid ""
 "\n"
 "Best regards.\n"
 msgstr ""
+"Hola,\n"
+"\n"
+"crec que podeu estar interessats en unir-vos al grup \"%s\".\n"
+"Us hi podeu unir fent clic aquí: %s.\n"
+"\n"
+"Ben cordialment,\n"
 
 #: modules/websession/lib/websession_templates.py:2066
 #, python-format
@@ -5947,6 +5959,9 @@ msgid ""
 "Warning : The password set for MySQL is the same as the default CDS-Invenio "
 "password. For security purposes, you might want to change the password."
 msgstr ""
+"Atenció: la contrasenya que heu posat per a MySQL és la mateixa que la "
+"de porta CDS-Invenio.  Per motius de seguretat, us convindria "
+"canviar-la"
 
 #: modules/websession/lib/websession_templates.py:2432
 msgid ""
@@ -5954,6 +5969,9 @@ msgid ""
 "default CDS-Invenio password. For security purposes, you might want to "
 "change the password."
 msgstr ""
+"Atenció: la contrasenya que heu posat per a la base de dades "
+"CDS-Invenio és la mateixa que la de porta CDS Invenio.  Per motius de "
+"seguretat, us convindria canviar-la"
 
 #: modules/websession/lib/websession_templates.py:2438
 msgid ""
@@ -5961,6 +5979,8 @@ msgid ""
 "empty. For security purposes, it is strongly recommended that you add a "
 "password."
 msgstr ""
+"Atenció: la contrasenya per a l'usuari admin de CDS-Invenio és buida. "
+"Per motius de seguretat, us convindria posar-ne una."
 
 #: modules/websession/lib/websession_templates.py:2444
 msgid ""
@@ -5968,16 +5988,21 @@ msgid ""
 "support@cern.ch . It is recommended that you change this to change this to "
 "your own address."
 msgstr ""
+"Atenció: l'adreça configurada per suport electrònic es "
+"cds.support@cern.ch. Val la pena canviar-la a la vostra adreça "
+"particular."
 
 #: modules/websession/lib/websession_templates.py:2450
 msgid "A newer version of CDS-Invenio is available for download. Please visit "
-msgstr ""
+msgstr "Puede bajarse una versión más reciente de CDS-Invenio.  Visite "
 
 #: modules/websession/lib/websession_templates.py:2457
 msgid ""
 "Cannot download release notes from http://cdsware.cern.ch/, please check "
 "your internet connection"
 msgstr ""
+"No és possible baixar les notes de la versió des de "
+"http://cdsware.cern.ch/.  Comproveu la vostra connexió a Internet."
 
 #: modules/websession/lib/webuser.py:152
 msgid "Database problem"
@@ -6185,6 +6210,9 @@ msgid ""
 "Note that if you have changed your email address, you will have to %"
 "(x_url_open)sreset your password%(x_url_close)s anew."
 msgstr ""
+"Tingueu en compte si heu canviat la vostra adreça, haureu de "
+"%(x_url_open)stornar a posar la vostra contrasenya%(x_url_close)s un "
+"altre cop."
 
 #: modules/websession/lib/websession_webinterface.py:396
 #: modules/websession/lib/websession_webinterface.py:832
@@ -6249,7 +6277,7 @@ msgstr "L'àlias %s ja està en ús."
 
 #: modules/websession/lib/websession_webinterface.py:424
 msgid "Users cannot edit passwords on this site."
-msgstr ""
+msgstr "En aquest lloc, els usuaris no poden editar les seves contrasenyes."
 
 #: modules/websession/lib/websession_webinterface.py:432
 msgid "Password successfully edited."
@@ -6552,7 +6580,7 @@ msgstr "El registre ha estat suprimit."
 #: modules/webstyle/lib/webstyle_templates.py:894
 #, python-format
 msgid "In case of doubt, please contact %(x_admin_email)s."
-msgstr ""
+msgstr "En cas de dubte, poseu-vos en contacte amb %(x_admin_email)s"
 
 #: modules/webstyle/lib/webdoc.py:547
 #, python-format
@@ -6679,7 +6707,7 @@ msgstr "No es pot crear el directori de lliuraments"
 #: modules/websubmit/lib/websubmit_engine.py:401
 #: modules/websubmit/lib/websubmit_engine.py:916
 msgid "No file uploaded?"
-msgstr ""
+msgstr "No heu pujat cap fitxer?"
 
 #: modules/websubmit/lib/websubmit_engine.py:425
 #: modules/websubmit/lib/websubmit_engine.py:428
@@ -6695,6 +6723,10 @@ msgid ""
 "inserted into the form</em> (e.g. by copy and pasting some text from a PDF "
 "file)."
 msgstr ""
+"S'ha trobat un error de funcionament seriós.  S'ha avisat els "
+"administradors. <br /><em>Segurament això ha estat degut a caràcters "
+"erronis insertats al formulari</em> (p. ex., copiant i enganxant algun "
+"text d'un fitxer PDF)."
 
 #: modules/websubmit/lib/websubmit_engine.py:1296
 #, fuzzy, python-format
@@ -7364,21 +7396,21 @@ msgstr "Aquest fitxer és d'accés restringit."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:185
 msgid "An error has happened in trying to stream the request file."
-msgstr ""
+msgstr "Hi ha hagut un error a l'intentar enviar el fitxer sol·licitat."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:187
 msgid ""
 "The requested file is hidden and you don't have the proper rights to access "
 "it."
-msgstr ""
+msgstr "Aquest fitxer està amagat i no teniu permís per acceder-hi."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:195
 msgid "An error has happened in trying to retrieve the corresponding icon."
-msgstr ""
+msgstr "Hi ha hagut un error a l'intentar recuperar la icona corresponent."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:217
 msgid "An error has happened in trying to stream the corresponding icon."
-msgstr ""
+msgstr "Hi ha hagut un error a l'intentar enviar la icona corresponent."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:221
 #, fuzzy
@@ -7387,11 +7419,11 @@ msgstr "El registre que sol·liciteu no existeix."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:257
 msgid "Access to Fulltext"
-msgstr "Accés al text complert"
+msgstr "Accés al text complet"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:306
 msgid "An error has happened in trying to retrieve the requested file."
-msgstr ""
+msgstr "Hi ha hagut un error a l'intentar recuperar el fitxer sol·licitat."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:308
 msgid "Not enough information to retrieve the document"
@@ -7399,7 +7431,7 @@ msgstr "No hi ha prou informació per a recuperar el document"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:316
 msgid "An error has happened in trying to retrieving the requested file."
-msgstr ""
+msgstr "Hi ha hagut un error a l'intentar recuperar el fitxer sol·licitat."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:504
 #, fuzzy
@@ -7408,15 +7440,15 @@ msgstr "No es pot enviar la petició d'error, falta el paràmetre %s."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:507
 msgid "Sorry. Cannot analyse parameter"
-msgstr ""
+msgstr "No s'ha pogut analitzar el paràmetre"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:568
 msgid "Sorry, invalid URL..."
-msgstr ""
+msgstr "URL no válido..."
 
 #: modules/websubmit/web/approve.py:65
 msgid "approve.py: cannot determine document reference"
-msgstr ""
+msgstr "approve.py: no s'ha pogut determinar la referència del document."
 
 #: modules/websubmit/web/approve.py:68
 #, fuzzy
@@ -7795,7 +7827,7 @@ msgstr "vegades"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:62
 msgid "show"
-msgstr ""
+msgstr "mostrar"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:63
 #, fuzzy
@@ -7812,19 +7844,19 @@ msgstr "No hi ha cap revista"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:86
 msgid "No seminars today"
-msgstr ""
+msgstr "Avui no hi ha seminaris"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:184
 msgid "What's on today"
-msgstr ""
+msgstr "Previst per avui"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:185
 msgid "Seminars of the week"
-msgstr ""
+msgstr "Seminaris de la setmana"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:164
 msgid "There are no new articles for the moment"
-msgstr ""
+msgstr "De moment no hi ha articles nous"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:286
 #, fuzzy
@@ -7833,20 +7865,20 @@ msgstr "Nom del cistell"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:224
 msgid "Under the CERN sky"
-msgstr ""
+msgstr "Sota el cel del CERN"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_author.py:48
 #, python-format
 msgid "About your article at %(url)s"
-msgstr ""
+msgstr "Sobre el vostre article a %(url)s"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_imprint.py:123
 msgid "Issue No."
-msgstr ""
+msgstr "Número"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:221
 msgid "Did you know?"
-msgstr ""
+msgstr "Ho savíeu?"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:255
 #, fuzzy, python-format
@@ -7874,11 +7906,11 @@ msgstr "Article"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:88
 msgid "Official News"
-msgstr ""
+msgstr "Notícies oficials"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:89
 msgid "Training and Development"
-msgstr ""
+msgstr "Formació i desenvolupament"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:90
 #, fuzzy
@@ -7887,7 +7919,7 @@ msgstr "Informacions generals"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:106
 msgid "Archive"
-msgstr ""
+msgstr "Arxiu"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:133
 #, fuzzy
@@ -7906,7 +7938,7 @@ msgstr "Seleccioneu:"
 
 #: modules/bibedit/lib/bibedit_webinterface.py:169
 msgid "Failed to create a ticket"
-msgstr ""
+msgstr "No s'ha pogut crear un ticket"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:146
 #, fuzzy
@@ -7920,7 +7952,7 @@ msgstr "Guia de Cerca"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:148
 msgid "1. Choose search criteria"
-msgstr ""
+msgstr "1. Escolliu els criteris de cerca"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:149
 msgid ""
@@ -7928,6 +7960,9 @@ msgid ""
 "changed. Use \"Search\" to see which records would have been filtered using "
 "these criteria."
 msgstr ""
+"Especifiqueu els criteris que vulgueu per filtrar els registres a "
+"canviar.  Useu «Cerca» per a veure quins registres es filtrarien amb "
+"aquests criteris."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:151
 #, fuzzy
@@ -7949,6 +7984,8 @@ msgid ""
 "Specify fields and their subfields that should be changed in every record "
 "matching the search criteria."
 msgstr ""
+"Especifiqueu els camps i subcamps a canviar per a cada registre que "
+"concordi amb els criteris de cerca."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:311
 #, fuzzy
@@ -7993,7 +8030,7 @@ msgstr "Desa"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:321
 msgid "Replace text"
-msgstr ""
+msgstr "Substitueix text"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:322
 #, fuzzy
@@ -8002,7 +8039,7 @@ msgstr "Suprimeix el comentari"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:323
 msgid "with"
-msgstr ""
+msgstr "amb"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:324
 #, fuzzy
@@ -8011,7 +8048,7 @@ msgstr "Guardar els nous valors"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:325
 msgid "value"
-msgstr ""
+msgstr "valor"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:354
 #, fuzzy
@@ -8028,7 +8065,7 @@ msgstr "%s registres trobats"
 
 #: modules/bibedit/lib/bibeditmulti_webinterface.py:114
 msgid "Multi-Record Editor"
-msgstr ""
+msgstr "Editor de múltiples registres"
 
 #: modules/bibedit/lib/bibeditold_templates.py:67
 msgid "Do you really want to delete this record?"
@@ -8074,6 +8111,8 @@ msgid ""
 "The record is locked because of unfinished upload tasks. Please try again in "
 "a few minutes."
 msgstr ""
+"El registre està bloquejat per unes tasques de càrrega que encara no "
+"han acabat.  Torneu-ho a provar en uns minuts."
 
 #: modules/bibedit/lib/bibeditold_templates.py:168
 msgid ""
@@ -8132,12 +8171,12 @@ msgstr "Mostra"
 #: modules/bibedit/lib/bibeditold_templates.py:428
 #, python-format
 msgid "(%s previous revision)"
-msgstr ""
+msgstr "(%s revisió anterior)"
 
 #: modules/bibedit/lib/bibeditold_templates.py:430
 #, python-format
 msgid "(%s previous revisions)"
-msgstr ""
+msgstr "(%s revisions anteriors)"
 
 #: modules/bibedit/lib/bibeditold_templates.py:543
 msgid "Done"
@@ -8174,11 +8213,11 @@ msgstr "Membres actuals"
 
 #: modules/bibedit/lib/bibeditold_templates.py:628
 msgid "revert to this revision"
-msgstr ""
+msgstr "recuperar aquesta revisió"
 
 #: modules/bibedit/lib/bibeditold_templates.py:716
 msgid "Comparison of:"
-msgstr ""
+msgstr "Comparació entre:"
 
 #: modules/bibedit/lib/bibeditold_templates.py:717
 #, fuzzy
@@ -8197,11 +8236,11 @@ msgstr "divisió"
 
 #: modules/bibedit/lib/bibeditold_templates.py:742
 msgid "Compare revisions"
-msgstr ""
+msgstr "Comparar revisions"
 
 #: modules/bibedit/lib/bibeditold_templates.py:743
 msgid "Revert to revision"
-msgstr ""
+msgstr "Tornar a la revisió"
 
 #: modules/bibedit/lib/bibeditold_templates.py:744
 #, fuzzy
@@ -8223,7 +8262,7 @@ msgstr "Anomena i desa"
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:118
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:443
 msgid "Export Job History"
-msgstr ""
+msgstr "Exportar l'històric de tasques"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:174
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:195
@@ -8236,7 +8275,7 @@ msgstr "Diu"
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:176
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:325
 msgid "New"
-msgstr ""
+msgstr "Nou"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:196
 #, fuzzy
@@ -8245,7 +8284,7 @@ msgstr "Darrera execució"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:256
 msgid "Frequency"
-msgstr ""
+msgstr "Freqüència"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:257
 #, fuzzy
@@ -8269,12 +8308,12 @@ msgstr "Edita els paràmetres"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:348
 msgid "Output Fields"
-msgstr ""
+msgstr "Camps de sortida"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:400
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:460
 msgid "Output fields"
-msgstr ""
+msgstr "Camps de sortida"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:438
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:605
@@ -8289,7 +8328,7 @@ msgstr "Visualitzar"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:533
 msgid "Job"
-msgstr ""
+msgstr "Tasca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:588
 #, fuzzy
@@ -8298,7 +8337,7 @@ msgstr "opcional"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:653
 msgid "All"
-msgstr ""
+msgstr "Totes"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:654
 #, fuzzy
@@ -8327,7 +8366,7 @@ msgstr "mensual"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:192
 msgid "Edit Export Job"
-msgstr ""
+msgstr "Editar la tasca d'exportació"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:239
 #, fuzzy
@@ -8336,7 +8375,7 @@ msgstr "Resultats de la cerca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:246
 msgid "Export Job Queries"
-msgstr ""
+msgstr "Exportar les cerques de la tasca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:320
 #, fuzzy
@@ -8350,7 +8389,7 @@ msgstr "Cerca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:356
 msgid "Export Job Results"
-msgstr ""
+msgstr "Exportar els resultats de la tasca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:389
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:423
@@ -8375,7 +8414,7 @@ msgstr "Més informació:"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:292
 msgid "This book is sent to you ..."
-msgstr ""
+msgstr "S'us ha enviat aquest llibre..."
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:312
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1504
@@ -8424,7 +8463,7 @@ msgstr "Edita"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15724
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15948
 msgid "ISBN"
-msgstr ""
+msgstr "ISBN"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:333
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2071
@@ -8487,7 +8526,7 @@ msgstr "Data"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:376
 msgid "List of pending hold requests"
-msgstr ""
+msgstr "Llista de peticions de reserva pendents"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:393
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1502
@@ -8530,7 +8569,7 @@ msgstr "Navegador"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14982
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15229
 msgid "Item"
-msgstr ""
+msgstr "Ítem"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:395
 #: modules/bibcirculation/lib/bibcirculation_templates.py:263
@@ -8661,7 +8700,7 @@ msgstr "No esteu autoritzats a veure aquesta àrea."
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:155
 #: modules/bibcirculation/lib/bibcirculation_templates.py:422
 msgid "Loans - historical overview"
-msgstr ""
+msgstr "Històric de préstecs"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:205
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:262
@@ -8673,12 +8712,12 @@ msgstr "No esteu autoritzats a veure aquesta àrea."
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:279
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10672
 msgid "Interlibrary loan request for books"
-msgstr ""
+msgstr "Peticions de préstec interbibliotecari de llibres"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:234
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8278
 msgid "This item has no holdings."
-msgstr ""
+msgstr "Aquest ítem no té exemplars."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:263
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1389
@@ -8735,7 +8774,7 @@ msgstr "Llista"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7862
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8302
 msgid "Loan period"
-msgstr ""
+msgstr "Període de préstec"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:265
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2481
@@ -8754,7 +8793,7 @@ msgstr "Regles"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:306
 msgid "See this book on BibCirculation"
-msgstr ""
+msgstr "Veure aquest llibre a BibCirculation"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:346
 #, fuzzy
@@ -8853,16 +8892,16 @@ msgstr "Navegador"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16159
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16473
 msgid "Back"
-msgstr ""
+msgstr "Enrere"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:417
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3930
 msgid "Renew all loans"
-msgstr ""
+msgstr "Renovar tots els préstecs"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:436
 msgid "You don't have any book on loan."
-msgstr ""
+msgstr "No teniu cap llibre en préstec."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:460
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3092
@@ -8895,7 +8934,7 @@ msgstr "Les vostres alertes"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:531
 msgid "You don't have any request (waiting or pending)."
-msgstr ""
+msgstr "No teniu cap petició (esperant o pendent)."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:534
 #: modules/bibcirculation/lib/bibcirculation_templates.py:610
@@ -8941,12 +8980,12 @@ msgstr "Ressenyes"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:712
 #: modules/bibcirculation/lib/bibcirculation_templates.py:863
 msgid "Enter your period of interest"
-msgstr ""
+msgstr "Entreu el període en el que esteu interessats"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:864
 #: modules/bibcirculation/lib/bibcirculation_templates.py:865
 msgid "period_from"
-msgstr ""
+msgstr "des de"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:864
 #: modules/bibcirculation/lib/bibcirculation_templates.py:865
@@ -8957,13 +8996,13 @@ msgstr "seleccioneu l'ususari"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:866
 #: modules/bibcirculation/lib/bibcirculation_templates.py:867
 msgid "period_to"
-msgstr ""
+msgstr "fins"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:866
 #: modules/bibcirculation/lib/bibcirculation_templates.py:867
 #, fuzzy
 msgid "select_to1"
-msgstr "Seleccioneu el tema"
+msgstr "fins"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:867
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2444
@@ -8981,7 +9020,7 @@ msgstr "Seleccioneu el tema"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14300
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15162
 msgid "Confirm"
-msgstr ""
+msgstr "Confirmar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:896
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10803
@@ -8997,7 +9036,7 @@ msgstr "aquí"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:899
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10806
 msgid "."
-msgstr ""
+msgstr "."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:932
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2364
@@ -9014,13 +9053,13 @@ msgstr "Quedent alguns documents pendents"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1224
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15300
 msgid "Associate barcode"
-msgstr ""
+msgstr "Associeu el codi de barres"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1090
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1241
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15319
 msgid "Printable format"
-msgstr ""
+msgstr "Format imprimible"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1126
 #, fuzzy
@@ -9034,7 +9073,7 @@ msgstr "Accions"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1279
 msgid "No hold requests waiting."
-msgstr ""
+msgstr "No hi ha reserves pendents."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1306
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1550
@@ -9066,6 +9105,8 @@ msgid ""
 "The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been "
 "returned with success."
 msgstr ""
+"S'ha retornat correctament l'ítem <strong>%s</strong>, amb el codi de "
+"barres <strong>%s</strong>."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1501
 #, fuzzy
@@ -9120,7 +9161,7 @@ msgstr "Data de creació"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1546
 #, python-format
 msgid "There %s request(s) on the book who has been returned."
-msgstr ""
+msgstr "Hi ha %s reserve(s) pel llibre retornat."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1547
 #, fuzzy
@@ -9135,11 +9176,11 @@ msgstr "Seleccioneu el cistell"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1600
 #, python-format
 msgid "There are no requests waiting on the item <strong>%s</strong>."
-msgstr ""
+msgstr "No hi ha reserves pendents per a l'ítem <strong>%s</strong>."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1634
 msgid "Welcome to CDS Invenio BibCirculation Admin"
-msgstr ""
+msgstr "Benvinguts a l'administració BibCirculation de CDS Invenio"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1697
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5568
@@ -9158,7 +9199,7 @@ msgstr "No s'han trobat valors."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15434
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15594
 msgid "No. Copies"
-msgstr ""
+msgstr "Exemplars"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1977
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8691
@@ -9183,7 +9224,7 @@ msgstr "Més informació:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10380
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10547
 msgid "ID"
-msgstr ""
+msgstr "Id"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2070
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2157
@@ -9236,11 +9277,11 @@ msgstr "Fet"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14919
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15959
 msgid "Mailbox"
-msgstr ""
+msgstr "Bústia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2073
 msgid "Barcode(s)"
-msgstr ""
+msgstr "Codi de barres"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2074
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2224
@@ -9273,7 +9314,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15972
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16159
 msgid "Continue"
-msgstr ""
+msgstr "Continuar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2160
 #, fuzzy
@@ -9290,12 +9331,12 @@ msgstr "Escriviu un %s"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2195
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2197
 msgid "due_date_"
-msgstr ""
+msgstr "data_"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2196
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2198
 msgid "jsCal_"
-msgstr ""
+msgstr "jsCal_"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2286
 #, fuzzy
@@ -9343,7 +9384,7 @@ msgstr "Informacions generals"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2516
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2619
 msgid "Cancel hold request"
-msgstr ""
+msgstr "Cancel·lar la reserva"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2554
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2972
@@ -9381,7 +9422,7 @@ msgstr "Hi ha %i cistells"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15941
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16272
 msgid "Item details"
-msgstr ""
+msgstr "Detalls de l'ítem"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2718
 #, fuzzy
@@ -9402,7 +9443,7 @@ msgstr "No s'ha trobat"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2919
 msgid "Add new copy"
-msgstr ""
+msgstr "Afegir una altra còpia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2920
 #, fuzzy
@@ -9411,16 +9452,16 @@ msgstr "Creeu un nou tema"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2921
 msgid "ILL request"
-msgstr ""
+msgstr "Petició de préstec interbibliotecari"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2922
 msgid "Hold requests and loans overview on"
-msgstr ""
+msgstr "Reserves i préstecs per"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2923
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2926
 msgid "Hold requests"
-msgstr ""
+msgstr "Reserves"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2923
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2924
@@ -9439,7 +9480,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3679
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3680
 msgid "More details"
-msgstr ""
+msgstr "Més detalls"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2924
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2927
@@ -9452,7 +9493,7 @@ msgstr "Els vostres préstecs"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2925
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3677
 msgid "Historical overview"
-msgstr ""
+msgstr "Visió històrica"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3060
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3811
@@ -9485,7 +9526,7 @@ msgstr "Ressenyes"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4330
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4612
 msgid "Overdue letters"
-msgstr ""
+msgstr "Cartes de reclamació"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3353
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3458
@@ -9500,7 +9541,7 @@ msgstr "Nota"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3358
 msgid "Notes about this library"
-msgstr ""
+msgstr "Notes sobre aquesta biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3406
 #, fuzzy
@@ -9532,7 +9573,7 @@ msgstr "Nombre de visualitzacions"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3463
 msgid "Notes about this borrower"
-msgstr ""
+msgstr "Notes sobre aquest lector"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3537
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4884
@@ -9544,23 +9585,23 @@ msgstr "Cistells personals"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3669
 msgid "New loan"
-msgstr ""
+msgstr "Nou préstec"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3670
 msgid "New request"
-msgstr ""
+msgstr "Nova petició"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3671
 msgid "New ILL request"
-msgstr ""
+msgstr "Nova petició de PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3672
 msgid "Notify this borrower"
-msgstr ""
+msgstr "Avisar aquest lector"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3673
 msgid "Requests, Loans and ILL overview on"
-msgstr ""
+msgstr "Reserves, préstecs i PI a"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3674
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3678
