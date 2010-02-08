@@ -20,6 +20,7 @@
 
 import sys
 import os
+import cgi
 from fnmatch import fnmatch
 from cgi import parse_qs
 
@@ -39,7 +40,7 @@ from invenio.webinterface_handler_wsgi_utils import table, FieldStorage, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
     CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST, CFG_DEVEL_SITE
-from invenio.errorlib import register_exception
+from invenio.errorlib import register_exception, get_pretty_traceback
 
 ## Static files are usually handled directly by the webserver (e.g. Apache)
 ## However in case WSGI is required to handle static files too (such
@@ -365,12 +366,16 @@ def application(environ, start_response):
                 return generate_error_page(req, admin_to_be_alerted)
             else:
                 req.flush()
-        except Exception:
+        except:
             register_exception(req=req, alert_admin=True)
-            req.status = HTTP_INTERNAL_SERVER_ERROR
-            req.headers_out['content-type'] = 'text/html'
             if not req.response_sent_p:
+                req.status = HTTP_INTERNAL_SERVER_ERROR
+                req.headers_out['content-type'] = 'text/html'
                 start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
+            if CFG_DEVEL_SITE:
+                return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
+                from cgitb import html
+                return [html(sys.exc_info())]
             return generate_error_page(req)
     finally:
         for (callback, data) in req.get_cleanups():
