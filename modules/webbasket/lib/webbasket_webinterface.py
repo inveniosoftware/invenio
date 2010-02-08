@@ -1325,7 +1325,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         """Subscribe to a basket pseudo-interface."""
 
         argd = wash_urlargd(form, {'bskid': (int, 0),
-                                   'of': (str, ''),
+                                   'of': (str, 'hb'),
                                    'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
@@ -1385,7 +1385,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         """Unsubscribe from basket pseudo-interface."""
 
         argd = wash_urlargd(form, {'bskid': (int, 0),
-                                   'of': (str, ''),
+                                   'of': (str, 'hb'),
                                    'ln': (str, CFG_SITE_LANG)})
 
         _ = gettext_set_language(argd['ln'])
