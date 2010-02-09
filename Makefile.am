@@ -148,15 +148,17 @@ install-jquery-plugins: uninstall-jquery-plugins
 	(cd ${prefix}/var/www/js && \
 	wget http://jqueryjs.googlecode.com/files/jquery-1.3.1.min.js && \
 	mv jquery-1.3.1.min.js jquery.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.core.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.highlight.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.core.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.highlight.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://tablesorter.com/jquery.tablesorter.js && \
 	wget http://tablesorter.com/addons/pager/jquery.tablesorter.pager.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
 	rm jquery.autogrow-1.2.2.zip && \
-	wget http://json.org/json2.js && \
+	wget -O json2.js.tmp http://json.org/json2.js && \
+	grep -v 'alert.*IMPORTANT: Remove this line' json2.js.tmp > json2.js && \
+	rm json2.js.tmp && \
 	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
@@ -165,8 +167,8 @@ install-jquery-plugins: uninstall-jquery-plugins
 uninstall-jquery-plugins:
 	(cd ${prefix}/var/www/js && \
 	rm -f jquery.min.js && \
-	rm -f effects.core.min.js && \
-	rm -f effects.highlight.min.js && \
+	rm -f jquery.effects.core.min.js && \
+	rm -f jquery.effects.highlight.min.js && \
 	rm -f jquery.jeditable.mini.js && \
 	rm -f jquery.tablesorter.js && \
 	rm -f jquery.tablesorter.pager.js && \
