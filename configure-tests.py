@@ -236,7 +236,6 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
-    wait_for_user("Press ENTER to continue the installation...")
 
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:
