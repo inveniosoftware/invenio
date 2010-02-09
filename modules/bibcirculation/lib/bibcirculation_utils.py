@@ -511,8 +511,9 @@ def validate_date_format(date):
     """
 
     try:
-        if time.strptime(date, "%Y-%m-%d") and compare_dates(date):
-            return True
+        if time.strptime(date, "%Y-%m-%d"):
+            if compare_dates(date):
+                return True
         else:
             return False
     except ValueError:

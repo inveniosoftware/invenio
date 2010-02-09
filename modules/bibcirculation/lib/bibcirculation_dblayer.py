@@ -1118,11 +1118,11 @@ def get_all_loans(limit):
            bor.name,
            it.id_bibrec,
            l.barcode,
-           DATE_FORMAT(l.loaned_on,'%Y-%m-%d'),
-           DATE_FORMAT(l.due_date,'%Y-%m-%d'),
+           DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
            l.number_of_renewals,
            l.overdue_letter_number,
-           DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
+           DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
            l.notes,
            l.id
     FROM crcLOAN l, crcBORROWER bor, crcITEM it
@@ -1131,7 +1131,7 @@ def get_all_loans(limit):
           and l.status = 'on loan'
     ORDER BY 5 DESC
     LIMIT 0,%s
-    """, (limit, ))
+    """, (limit,))
 
     return res
 

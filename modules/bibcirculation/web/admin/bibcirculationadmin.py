@@ -944,7 +944,11 @@ def register_ill_request_with_no_recid_step4(req, book_info=None, user_info=None
                                              ln=CFG_SITE_LANG):
     """
     """
-
+####################################
+    f=open("/tmp/book_info","w") ###
+    f.write(str(book_info)+"\n") ###
+    f.close()                    ###
+####################################
     if type(book_info) is str:
         book_info = eval(book_info)
 
@@ -1022,6 +1026,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id=None, title=N
                                                              publisher, year, edition, isbn, period_of_interest_from,
                                                              period_of_interest_to, additional_comments,
                                                              only_edition, ln)
+
 def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
     """
     """

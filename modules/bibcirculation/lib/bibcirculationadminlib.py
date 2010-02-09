@@ -3699,7 +3699,7 @@ def place_new_request_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
-                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5529,18 +5529,16 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
     create_ill_record(book_info)
 
     book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
-                 'year': year, 'edition': edition, 'isbn': isbn}
+                 'year' : year,  'edition': edition, 'isbn' : isbn}
 
     (period_of_interest_from, period_of_interest_to,
      library_notes, only_edition) = request_details
 
     (borrower_id, name, email, phone, address, mailbox) = user_info
 
+    ill_request_notes = {}
     if library_notes:
-        ill_request_notes = {}
         ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
-    else:
-        ill_request_notes = {}
 
     db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
                                     period_of_interest_to, 'pending',
@@ -5568,11 +5566,11 @@ def get_borrower_ill_details(req, borrower_id, ill_id, ln=CFG_SITE_LANG):
     """
     Display ILL details of a borrower.
 
-    @type borrower_id:  integer.
+    @type  borrower_id: integer.
     @param borrower_id: identify the borrower. It is also the primary key of
                         the table crcBORROWER.
 
-    @type ill_id:   integer.
+    @type  ill_id:  integer.
     @param ill_id:  identify the ILL request. It is also the primary key
                     of the table crcILLREQUEST.
 
@@ -5933,13 +5931,13 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_register_ill_article_request_step1(infos=infos,
-                                                                            ln=ln)
+    body = bibcirculation_templates.tmpl_register_ill_article_request_step1(infos=infos, ln=ln)
 
     return page(title="Register ILL Article request",
                 uid=id_user,
                 req=req,
                 body=body,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_URL),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -6098,13 +6096,12 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    return page(title="Register ILL request",
+    return invenio.webpage.page(title="Register ILL request",
                 uid=id_user,
                 req=req,
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
-
 
 def ill_search(req, ln=CFG_SITE_LANG):
     """

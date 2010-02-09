@@ -8093,8 +8093,6 @@ class Template:
 
                     <form name="create_new_loan_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step1" method="get" >
                     <input type=hidden name=borrower_id value=%s>
-                    <input type=hidden name=start value="0">
-                    <input type=hidden name=end value="10">
                     <table class="bibcirctable">
                         <tr align="center">
                             <td class="bibcirctableheader">Search item by
@@ -14473,15 +14471,14 @@ class Template:
              <br />
              </div>
              """ % (_("ILL request details"), _("Period of interest - From"),
-                    _("period_of_interest_from"),
-                    _("jsCal1"), _("period_of_interest_from"), _("jsCal1"),
-                    _("Period of interest - To"), _("period_of_interest_to"),
-                    _("jsCal2"), _("period_of_interest_to"), _("jsCal2"),
+                    datetime.date.today().strftime('%Y-%m-%d'),
+                    "jsCal1", "period_of_interest_from", "jsCal1",
+                    _("Period of interest - To"), (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
+                    "jsCal2", "period_of_interest_to", "jsCal2",
                     _("Additional comments"),
                     _("Borrower accepts the %s of the service in particular the return of books in due time." % (conditions_link)),
                     _("Borrower wants this edition only."),
                     _("Back"), _("Continue"))
-
 
         return out
 
@@ -14528,14 +14525,15 @@ class Template:
         <div class=bibcircbottom>
          <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step2" method="get" >
         <br />
-          <table class="bibcirctable">
-                  <tr>
-                     <td class="bibcirctableheader" width="10">%s</td>
-                  </tr>
-                </table>
+
                 <table class="bibcirctable">
                   <tr>
                     <td width="500" valign='top'>
+                       <table class="bibcirctable">
+                        <tr>
+                            <td class="bibcirctableheader" width="10">%s</td>
+                        </tr>
+                       </table>
                       <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                         <tr>
                           <th width="100">%s</th>
@@ -14594,7 +14592,7 @@ class Template:
                        <table>
                          <tr>
                            <td>
-                             <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+
                            </td>
                          </tr>
                        </table>
@@ -14612,9 +14610,10 @@ class Template:
                             _("Period of interest - From"), period_of_interest_from, period_of_interest_from,
                             _("Period of interest - To"), period_of_interest_to, period_of_interest_to,
                             _("Additional comments"), additional_comments, additional_comments,
-                            _("Only this edition."), only_edition, only_edition,
-                            str(book_cover))
+                            _("Only this edition."), only_edition, only_edition)
 
+#<img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/> ,
+                         #   str(book_cover)
         out += """
         <td valign='top' align='center'>
          <table>
@@ -14707,7 +14706,7 @@ class Template:
             <table class="bibcirctable">
               <tr width="200">
                 <td align="center">
-                  <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:40%%'>
+                  <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:80%%'>
 
             """ % (CFG_SITE_URL, book_info)
 
@@ -14767,23 +14766,23 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = """ """
-
         out += _MENU_
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class=bibcircbottom align="center">
+        <div class=bibcircbottom>
+        <form name="step3_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step4" method="get" >
         <br />
-        <br />
-         <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step4" method="get" >
-                 <table>
-                   <tr align="center">
-                     <td class="bibcirctableheader">%s</td>
-                     <input type=hidden name=book_info value="%s">
-                   </tr>
-                 </table>
-                 <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+                <table class="bibcirctable">
+                  <tr>
+                    <td width="200" valign='top'>
+                    <input type=hidden name=book_info value="%s">
+                       <table class="bibcirctable">
+                        <tr>
+                            <td class="bibcirctableheader" width="10">%s</td>
+                        </tr>
+                       </table>
+                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                         <tr>
                           <th width="100">%s</th>
                           <td>%s</td>
@@ -14814,12 +14813,11 @@ class Template:
                         </tr>
                       </table>
                       <table>
-                         <tr align="center">
+                         <tr>
                            <td class="bibcirctableheader">%s</td>
-                           <input type=hidden name=request_details value="%s">
                         </tr>
                        </table>
-                       <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+                       <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                         <tr>
                           <th width="100">%s</th>
                           <td>%s</td>
@@ -14837,55 +14835,208 @@ class Template:
                           <td>%s</td>
                         </tr>
                       </table>
-                      <table>
-                         <tr align="center">
-                           <td class="bibcirctableheader">%s</td>
-                           <input type=hidden name=user_info value="%s">
-                        </tr>
-                       </table>
-                       <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                      </table>
+                     </td>
+                     <td width="50" valign='top'>
+                       <table>
+                         <tr>
+                           <td>
 
-                      """ % (CFG_SITE_URL,
-                             _("Item details"), book_info,
-                             _("Name"), title,
-                             _("Author(s)"), authors,
-                             _("Place"), place,
-                             _("Year"), year,
-                             _("Publisher"), publisher,
-                             _("Edition"), edition,
-                             _("ISBN"), isbn,
-                             _("ILL request details"), request_details,
-                             _("Period of interest - From"), period_of_interest_from,
-                             _("Period of interest - To"), period_of_interest_to,
-                             _("Additional comments"), additional_comments,
-                             _("Only this edition"), only_edition,
-                             _("Borrower details"), user_info,
+                           </td>
+                         </tr>
+                       </table>
+                     </td>
+                     """ % (CFG_SITE_URL, book_info,
+                            _("Item details"),
+                            _("Name"), title,
+                            _("Author(s)"), authors,
+                            _("Place"), place,
+                            _("Year"), year,
+                            _("Publisher"), publisher,
+                            _("Edition"), edition,
+                            _("ISBN"), isbn,
+                            _("ILL request details"),
+                            _("Period of interest (From)"), period_of_interest_from,
+                            _("Period of interest (To)"), period_of_interest_to,
+                            _("Additional comments"), additional_comments,
+                            _("Only this edition."), only_edition)
+
+        out += """
+                    <td width="200" valign='top'>
+
+                            <table>
+                                <tr align="center">
+                                  <td class="bibcirctableheader">%s</td>
+                                  <input type=hidden name=user_info value="%s">
+                                </tr>
+                            </table>
+                            <table class="tablesorter" width="200" border="0" cellpadding="0" cellspacing="1">
+                                <tr>
+                                 <th width="100">%s</th>
+                                 <td>%s</td>
+                                </tr>
+                                <tr>
+                                 <th width="100">%s</th>
+                                 <td>%s</td>
+                                </tr>
+                                <tr>
+                                 <th width="100">%s</th>
+                                 <td>%s</td>
+                                </tr>
+                                <tr>
+                                 <th width="100">%s</th>
+                                 <td>%s</td>
+                                </tr>
+                                <tr>
+                                 <th width="100">%s</th>
+                                 <td>%s</td>
+                                </tr>
+                            </table>
+
+                    </td>
+                </tr>
+            </table>
+                      """ % (_("Borrower details"), user_info,
                              _("Name"), name,
                              _("Email"), email,
                              _("Phone"), phone,
                              _("Address"), address,
                              _("Mailbox"), mailbox)
+
+
+        #out += """
+        #<style type="text/css"> @import url("/img/tablesorter.css"); </style>
+        #<div class=bibcircbottom align="center">
+        # <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step4" method="get" >
+        # <br />
+        #    <table class="bibcirctable">
+        #        <tr>
+        #            <td width="500" valign='top'>
+        #                <table>
+        #                  <tr align="center">
+        #                    <td class="bibcirctableheader">%s</td>
+        #                    <input type=hidden name=book_info value="%s">
+        #                  </tr>
+        #                </table>
+        #                <table class="tablesorterborrower" width:100%% border="0" cellpadding="0" cellspacing="1">
+        #                    <tr width:100%%>
+        #                      <th>%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="300">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="300">%s</th>
+        #                      <td width="300">%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                </table>
+        #    """ %(CFG_SITE_URL,
+        #                     _("Item details"), book_info,
+        #                     _("Name"), title,
+        #                     _("Author(s)"), authors,
+        #                     _("Place"), place,
+        #                     _("Year"), year,
+        #                     _("Publisher"), publisher,
+        #                     _("Edition"), edition,
+        #                     _("ISBN"), isbn,)
+        #out += """
+        #                <table>
+        #                    <tr align="center">
+        #                        <td class="bibcirctableheader">%s</td>
+        #                            <input type=hidden name=request_details value="%s">
+        #                    </tr>
+        #                </table>
+        #                <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                    <tr>
+        #                      <th width="100">%s</th>
+        #                      <td>%s</td>
+        #                    </tr>
+        #                </table>
+        #            </td>
+        #            <td width="200" align='center' valign='top'>
+        #               <table>
+        #                 <tr>
+        #                   <td>
+        #
+        #                   </td>
+        #                 </tr>
+        #               </table>
+        #             </td>
+        #            <td valign='top' align='center'>
+        #
+        #                    <table>
+        #                        <tr align="center">
+        #                          <td class="bibcirctableheader">%s</td>
+        #                          <input type=hidden name=user_info value="%s">
+        #                        </tr>
+        #                    </table>
+        #                    <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+        #                        <tr>
+        #                         <th width="100">%s</th>
+        #                         <td>%s</td>
+        #                        </tr>
+        #                        <tr>
+        #                         <th width="100">%s</th>
+        #                         <td>%s</td>
+        #                        </tr>
+        #                        <tr>
+        #                         <th width="100">%s</th>
+        #                         <td>%s</td>
+        #                        </tr>
+        #                        <tr>
+        #                         <th width="100">%s</th>
+        #                         <td>%s</td>
+        #                        </tr>
+        #                        <tr>
+        #                         <th width="100">%s</th>
+        #                         <td>%s</td>
+        #                        </tr>
+        #                    </table>
+        #
+        #            </td>
+        #        </tr>
+        #    </table>
+        #              """ % (
+        #                     _("ILL request details"), request_details,
+        #                     _("Period of interest - From"), period_of_interest_from,
+        #                     _("Period of interest - To"), period_of_interest_to,
+        #                     _("Additional comments"), additional_comments,
+        #                     _("Only this edition"), only_edition,
+        #                     _("Borrower details"), user_info,
+        #                     _("Name"), name,
+        #                     _("Email"), email,
+        #                     _("Phone"), phone,
+        #                     _("Address"), address,
+        #                     _("Mailbox"), mailbox)
 
         out += """<br />
                   <table class="bibcirctable">
@@ -16096,7 +16247,7 @@ class Template:
                             $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                             });
                         </script>
-                        <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="text" size="12" id="date_picker1" name="period_of_interest_from" value="%s" style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
                 <tr>
@@ -16104,10 +16255,10 @@ class Template:
                 <td>
                         <script type="text/javascript">
                             $(function(){
-                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                            $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                             });
                         </script>
-                        <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="text" size="12" id="date_picker2" name="period_of_interest_to" value="%s" style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
                 <tr>
@@ -16133,14 +16284,14 @@ class Template:
              <br />
              <br />
              </div>
-             """ % (_("ILL request details"),
-                    _("Period of interest - From"), CFG_SITE_URL, period_of_interest_from,
-                    _("Period of interest - To"), CFG_SITE_URL, period_of_interest_to,
+             """ % (CFG_SITE_URL,CFG_SITE_URL,_("ILL request details"),
+                    _("Period of interest - From"), CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
+                    _("Period of interest - To"), CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
                     _("Additional comments"),
                     _("Back"), _("Continue"))
 
-
         return out
+
 
     def tmpl_register_ill_article_request_step2(self, article_info, request_details,
                                                 result, key, string, infos, ln):
