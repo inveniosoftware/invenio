@@ -457,7 +457,7 @@ template function generated it.
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if lastupdated:
+        if lastupdated and lastupdated != '$Date$':
             if lastupdated.startswith("$Date: ") or \
             lastupdated.startswith("$Id: "):
                 lastupdated = convert_datestruct_to_dategui(\
