@@ -62,7 +62,8 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
      CFG_BIBFORMAT_HIDDEN_TAGS, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError
 from invenio.bibrecord import create_record
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
@@ -3233,9 +3234,13 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                 # HTML brief format:
 
                 display_add_to_basket = True
-                if user_info and not user_info['precached_usebaskets']:
-                    display_add_to_basket = False
-
+                if user_info:
+                    if user_info['email'] == 'guest':
+                        if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS > 4:
+                            display_add_to_basket = False
+                    else:
+                        if not user_info['precached_usebaskets']:
+                            display_add_to_basket = False
                 req.write(websearch_templates.tmpl_record_format_htmlbrief_header(
                     ln = ln))
                 for irec in range(irec_max, irec_min, -1):
@@ -4746,7 +4751,15 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 if of.startswith("h") and id_query:
                     if not of in ['hcs']:
                         # display alert/RSS teaser for non-summary formats:
-                        display_email_alert_part = collect_user_info(req)['precached_usealerts']
+                        user_info = collect_user_info(req)
+                        display_email_alert_part = True
+                        if user_info:
+                            if user_info['email'] == 'guest':
+                                if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS > 4:
+                                    display_email_alert_part = False
+                            else:
+                                if not user_info['precached_usealerts']:
+                                    display_email_alert_part = False
                         req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, \
                                              ln=ln, display_email_alert_part=display_email_alert_part))
             except:

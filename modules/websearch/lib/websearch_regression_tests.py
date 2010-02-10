@@ -1454,6 +1454,83 @@ class WebSearchGetFieldValuesTest(unittest.TestCase):
         self.assertEqual(get_fieldvalues([17, 18], '909C1u', repetitive_values=False),
                          ['CERN'])
 
+class WebSearchAddToBasketTest(unittest.TestCase):
+    """Test of the add-to-basket presence depending on user rights."""
+
+    def test_add_to_basket_guest(self):
+        """websearch - add-to-basket facility allowed for guests"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A10',
+                                               expected_text='Add to basket'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A10',
+                                               expected_text='<input name="recid" type="checkbox" value="10" />'))
+
+    def test_add_to_basket_jekyll(self):
+        """websearch - add-to-basket facility allowed for Dr. Jekyll"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A10',
+                                               expected_text='Add to basket',
+                                               username='jekyll',
+                                               password='j123ekyll'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A10',
+                                               expected_text='<input name="recid" type="checkbox" value="10" />',
+                                               username='jekyll',
+                                               password='j123ekyll'))
+
+    def test_add_to_basket_hyde(self):
+        """websearch - add-to-basket facility denied to Mr. Hyde"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A10',
+                                               unexpected_text='Add to basket',
+                                               username='hyde',
+                                               password='h123yde'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A10',
+                                               unexpected_text='<input name="recid" type="checkbox" value="10" />',
+                                               username='hyde',
+                                               password='h123yde'))
+
+class WebSearchAlertTeaserTest(unittest.TestCase):
+    """Test of the alert teaser presence depending on user rights."""
+
+    def test_alert_teaser_guest(self):
+        """websearch - alert teaser allowed for guests"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis',
+                                               expected_link_label='email alert'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis',
+                                               expected_text='RSS feed'))
+
+    def test_alert_teaser_jekyll(self):
+        """websearch - alert teaser allowed for Dr. Jekyll"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis',
+                                               expected_text='email alert',
+                                               username='jekyll',
+                                               password='j123ekyll'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis',
+                                               expected_text='RSS feed',
+                                               username='jekyll',
+                                               password='j123ekyll'))
+
+    def test_alert_teaser_hyde(self):
+        """websearch - alert teaser allowed for Mr. Hyde"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis',
+                                               expected_text='email alert',
+                                               username='hyde',
+                                               password='h123yde'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis',
+                                               expected_text='RSS feed',
+                                               username='hyde',
+                                               password='h123yde'))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1482,7 +1559,9 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchStemmedIndexQueryTest,
                              WebSearchSummarizerTest,
                              WebSearchRecordCollectionGuessTest,
-                             WebSearchGetFieldValuesTest)
+                             WebSearchGetFieldValuesTest,
+                             WebSearchAddToBasketTest,
+                             WebSearchAlertTeaserTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
