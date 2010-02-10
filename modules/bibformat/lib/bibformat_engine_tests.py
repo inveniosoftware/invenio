@@ -832,7 +832,9 @@ class MarcFilteringTest(unittest.TestCase):
         newxml = bibformat.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=True)
         numhfields = newxml.count("595")
         self.assertEqual(numhfields, 0)
-
+        newxml = bibformat.filter_hidden_fields(self.xml_text_4, user_info=None, filter_tags=['595',], force_filtering=False)
+        numhfields = newxml.count("595")
+        self.assertEqual(numhfields, 1)
 
 
 TEST_SUITE = make_test_suite(FormatTemplateTest,
