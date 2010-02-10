@@ -967,7 +967,7 @@ class SpiresToInvenioSyntaxConverter:
         """Replaces old keyword in the query with a new keyword"""
 
         # perform case insensitive replacement with regular expression
-        regex_string = r'\b((?<=find)|(?<=and)|(?<=or)|(?<=not))\s*' + old_keyword + r'\b'
+        regex_string = r'\b((?<=find)|(?<=and)|(?<=or)|(?<=not))\s*' + old_keyword
         regular_expression = re.compile(regex_string, re.IGNORECASE)
         result = regular_expression.sub(new_keyword, query)
 

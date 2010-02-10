@@ -165,9 +165,9 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
         #test operator searching
     def test_operators(self):
-        """SPIRES search syntax - find a ellis and t colllisions"""
-        invenio_search = "author:ellis and title:collisions"
-        spires_search = "find a ellis and t collisions"
+        """SPIRES search syntax - find a ellis and t shapes"""
+        invenio_search = "author:ellis and title:shapes"
+        spires_search = "find a ellis and t shapes"
         self._compare_searches(invenio_search, spires_search)
 
     def test_parens(self):
@@ -196,7 +196,7 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
     def test_author_full_initial(self):
         """SPIRES search syntax - find a klebanov, igor r."""
-        inv_search = 'author:"klebanov, igor* r*" or author:"klebanov, i r" or author:"klebanov, ig r"'
+        inv_search = 'author:"klebanov, igor* r*" or author:"klebanov, i r" or author:"klebanov, igor"'
         spi_search = "find a klebanov, igor r."
         self._compare_searches(inv_search, spi_search)
 
@@ -208,15 +208,23 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self._compare_searches(invenio_search, spires_search)
 
     def test_combine_multiple(self):
-        """SPIRES search syntax - find a j ellis and k symmetry chiral and not title chiral"""
-        inv_search = "author:'ellis, j*' keyword:chiral  keyword:symmetry -title:chiral "
-        spi_search = "find a j ellis and k symmetry chiral and not title chiral"
+        """SPIRES search syntax - find a gattringer, c and k symmetry chiral and not title chiral"""
+        inv_search = "author:'gattringer, c*' keyword:chiral  keyword:symmetry -title:chiral "
+        spi_search = "find a c gattringer and k symmetry chiral and not title chiral"
+        self._compare_searches(inv_search, spi_search)
 
     def test_combine_multiple_or(self):
-        """SPIRES search syntax - find a j ellis and t chiral or k cross section"""
-        inv_search = "author:'ellis, j*' and (title:beyond  or (keyword:cross keyword:section))"
-        spi_search = "find a j ellis and (title beyond or k cross section)"
+        """SPIRES search syntax - find a j ellis and (t report or k cross section)"""
+        inv_search = "author:'ellis, j*' and (title:report  or (keyword:cross section))"
+        spi_search = "find a j ellis and (t report or k cross section)"
+        self._compare_searches(inv_search, spi_search)
 
+    def test_quotes(self):
+        """SPIRES search syntax - find t 'compton scattering' and a
+        brooks"""
+        inv_search = "title:'compton scattering' author:mele"
+        spi_search = "find t 'compton scattering' and a mele"
+        self._compare_searches(inv_search, spi_search)
 
 #    def test_date(self):
 #        """SPIRES search syntax - find date 1996"""
