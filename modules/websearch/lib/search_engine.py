@@ -4697,9 +4697,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 if of.startswith("h") and id_query:
                     if not of in ['hcs']:
                         # display alert/RSS teaser for non-summary formats:
-                        req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, ln=ln))
+                        display_email_alert_part = collect_user_info(req)['precached_usealerts']
+                        req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, \
+                                             ln=ln, display_email_alert_part=display_email_alert_part))
             except:
                 # do not log query if req is None (used by CLI interface)
+                raise
                 pass
             log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
 

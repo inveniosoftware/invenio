@@ -3521,12 +3521,13 @@ class Template:
                                         cgi.escape(CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)) + '</a>')}
         return out
 
-    def tmpl_alert_rss_teaser_box_for_query(self, id_query, ln):
+    def tmpl_alert_rss_teaser_box_for_query(self, id_query, ln, display_email_alert_part=True):
         """Propose teaser for setting up this query as alert or RSS feed.
 
         Parameters:
           - 'id_query' *int* - ID of the query we make teaser for
           - 'ln' *string* - The language to display
+          - 'display_email_alert_part' *bool* - whether to display email alert part
         """
 
         # load the right message language
@@ -3541,19 +3542,25 @@ class Template:
         rssurl = self.build_rss_url(argd)
         alerturl = CFG_SITE_URL + '/youralerts/input?ln=%s&amp;idq=%s' % (ln, id_query)
 
+        if display_email_alert_part:
+            msg_alert = _("""Set up a personal %(x_url1_open)semail alert%(x_url1_close)s
+                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
+                        {'x_url1_open': '<a href="%s"><img src="%s/img/mail-icon-12x8.gif" border="0" alt="" /></a> ' % (alerturl, CFG_SITE_URL) + ' <a class="google" href="%s">' % (alerturl),
+                         'x_url1_close': '</a>',
+                         'x_url2_open': '<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a> ' % (rssurl, CFG_SITE_URL) + ' <a class="google" href="%s">' % rssurl,
+                         'x_url2_close': '</a>',}
+        else:
+            msg_alert = _("""Subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
+                        {'x_url2_open': '<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a> ' % (rssurl, CFG_SITE_URL) + ' <a class="google" href="%s">' % rssurl,
+                         'x_url2_close': '</a>',}
+
         out = '''<a name="googlebox"></a>
                  <table class="googlebox"><tr><th class="googleboxheader">%(similar)s</th></tr>
                  <tr><td class="googleboxbody">%(msg_alert)s</td></tr>
                  </table>
                  ''' % {
                 'similar' : _("Interested in being notified about new results for this query?"),
-                'msg_alert': _("""Set up a personal %(x_url1_open)semail alert%(x_url1_close)s
-                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
-                        {'x_url1_open': '<a href="%s"><img src="%s/img/mail-icon-12x8.gif" border="0" alt="" /></a> ' % (alerturl, CFG_SITE_URL) + ' <a class="google" href="%s">' % (alerturl),
-                         'x_url1_close': '</a>',
-                         'x_url2_open': '<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a> ' % (rssurl, CFG_SITE_URL) + ' <a class="google" href="%s">' % rssurl,
-                         'x_url2_close': '</a>',
-                         }}
+                'msg_alert': msg_alert,}
         return out
 
     def tmpl_detailed_record_metadata(self, recID, ln, format,
