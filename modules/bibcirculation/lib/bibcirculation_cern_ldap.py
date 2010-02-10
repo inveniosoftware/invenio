@@ -22,7 +22,7 @@ try:
     import ldap
     from invenio.external_authentication_cern_wrapper import _cern_nice_soap_auth
     CFG_BIBCIRCULATION_HAS_LDAP = CFG_CERN_SITE
-except ImportError:
+except (ImportError, IOError):
     CFG_BIBCIRCULATION_HAS_LDAP = False
 
 from thread import get_ident
