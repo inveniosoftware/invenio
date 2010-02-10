@@ -3194,6 +3194,11 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                            user_info=user_info, verbose=verbose))
             elif format.startswith("hb"):
                 # HTML brief format:
+
+                display_add_to_basket = True
+                if user_info and not user_info['precached_usebaskets']:
+                    display_add_to_basket = False
+
                 req.write(websearch_templates.tmpl_record_format_htmlbrief_header(
                     ln = ln))
                 for irec in range(irec_max, irec_min, -1):
@@ -3214,9 +3219,12 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         record = record,
                         relevances_prologue = relevances_prologue,
                         relevances_epilogue = relevances_epilogue,
+                        display_add_to_basket = display_add_to_basket
                         ))
+
                 req.write(websearch_templates.tmpl_record_format_htmlbrief_footer(
-                    ln = ln))
+                    ln = ln,
+                    display_add_to_basket = display_add_to_basket))
 
             elif format.startswith("hd"):
                 # HTML detailed format:
