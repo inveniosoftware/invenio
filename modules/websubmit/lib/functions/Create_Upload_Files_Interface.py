@@ -590,11 +590,10 @@ def Create_Upload_Files_Interface(parameters, curdir, form, user_info=None):
                                    ln=ln)
     out += '</table>'
     if len(cleaned_doctypes) > 0:
-        out += '''<a href="" onclick="javascript:display_revise_panel(this, 'add', '', true, false, %(showRename)s, true, true, '', '', '', true, '%(restriction)s');updateForm('%(defaultSelectedDoctype)s');return false;">%(add_new_file)s</a>
-        ''' % {'showRename': can_name_new_files and 'true' or 'false',
-               'defaultSelectedDoctype': doctypes[0],
-               'add_new_file': _("Add new file"),
-               'restriction': len(restrictions_and_desc) > 0 and restrictions_and_desc[0][0] or ''}
+        out += '''<a href="" onclick="javascript:%(display_revise_panel)s;updateForm('%(defaultSelectedDoctype)s');return false;">%(add_new_file)s</a>)''' % \
+               {'display_revise_panel':javascript_display_revise_panel(action='add', target='', show_doctypes=True, show_keep_previous_versions=False, show_rename=can_name_new_files, show_description=True, show_comment=True, bibdocname='', description='', comment='', show_restrictions=True, restriction=len(restrictions_and_desc) > 0 and restrictions_and_desc[0][0] or ''),
+                'defaultSelectedDoctype': doctypes[0],
+                'add_new_file': _("Add new file")}
     out += '</div>'
 
     # End submission button
@@ -716,27 +715,22 @@ can_add_format_to_doctypes - the list of doctypes for which users can
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_revise_doctypes or \
            '*' in can_revise_doctypes:
-        out += '''[<a href="" onclick="javascript:display_revise_panel(this, 'revise', '%(bibdocname)s', false, %(showKeepPreviousVersions)s, %(showRename)s, %(showDescription)s, %(showComment)s, '%(bibdocname)s', '%(description)s', '%(comment)s', %(showRestrictions)s, '%(restriction)s');return false;">%(revise)s</a>]
-        ''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
-               'showRename': ((main_bibdocfile.get_type() in can_rename_doctypes) or \
-                              '*' in can_rename_doctypes) and \
-                              'true' or 'false',
-               'showKeepPreviousVersions': ((main_bibdocfile.get_type() in can_keep_doctypes) or \
-                                            '*' in can_keep_doctypes) and \
-                                            'true' or 'false',
-               'showComment': ((main_bibdocfile.get_type() in can_comment_doctypes) or \
-                               '*' in can_comment_doctypes) and \
-                               'true' or 'false',
-               'showDescription': ((main_bibdocfile.get_type() in can_describe_doctypes) or \
-                                   '*' in can_describe_doctypes) and \
-                                'true' or 'false',
-               'description': description and description.replace("'", "\\'").replace('"', '&quot;') or '',
-               'comment': comment and comment.replace("'", "\\'").replace('"', '&quot;') or '',
-               'showRestrictions': ((main_bibdocfile.get_type() in can_restrict_doctypes) or \
-                                   '*' in can_restrict_doctypes) and \
-                                'true' or 'false',
-               'restriction': restriction.replace("'", "\\'").replace('"', '&quot;'),
-               'revise': _("revise")}
+        out += '[<a href="" onclick="javascript:%(display_revise_panel)s;return false;">%(revise)s</a>]' % \
+               {'display_revise_panel': javascript_display_revise_panel(
+            action='revise',
+            target=abstract_bibdoc['get_docname'],
+            show_doctypes=False,
+            show_keep_previous_versions=(main_bibdocfile.get_type() in can_keep_doctypes) or '*' in can_keep_doctypes,
+            show_rename=(main_bibdocfile.get_type() in can_rename_doctypes) or '*' in can_rename_doctypes,
+            show_description=(main_bibdocfile.get_type() in can_describe_doctypes) or '*' in can_describe_doctypes,
+            show_comment=(main_bibdocfile.get_type() in can_comment_doctypes) or '*' in can_comment_doctypes,
+            bibdocname=abstract_bibdoc['get_docname'],
+            description=description,
+            comment=comment,
+            show_restrictions=(main_bibdocfile.get_type() in can_restrict_doctypes) or '*' in can_restrict_doctypes,
+            restriction=restriction),
+                'revise': _("revise")
+                }
 
     # Delete link
     if main_bibdocfile.get_type() in can_delete_doctypes or \
@@ -763,10 +757,21 @@ can_add_format_to_doctypes - the list of doctypes for which users can
     out += '<td class="reviseControlActionColumn">'
     if main_bibdocfile.get_type() in can_add_format_to_doctypes or \
            '*' in can_add_format_to_doctypes:
-        out += '''[<a href="" onclick="javascript:display_revise_panel(this, 'addFormat', '%(bibdocname)s', false, false, false, false, false, '', '', '', false, '%(restriction)s');return false;">%(add_format)s</a>]
-    </td>''' % {'bibdocname': abstract_bibdoc['get_docname'].replace("'", "\\'").replace('"', '&quot;'),
-                'add_format': _("add format"),
-                'restriction': restriction}
+        out += '[<a href="" onclick="javascript:%(display_revise_panel)s;return false;">%(add_format)s</a>]' % \
+               {'display_revise_panel':javascript_display_revise_panel(
+            action='addFormat',
+            target=abstract_bibdoc['get_docname'],
+            show_doctypes=False,
+            show_keep_previous_versions=False,
+            show_rename=False,
+            show_description=False,
+            show_comment=False,
+            bibdocname='',
+            description='',
+            comment='',
+            show_restrictions=False,
+            restriction=restriction),
+                'add_format':_("add format")}
     out += '</td></tr>'
 
     return out
@@ -811,6 +816,10 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
     by '---' ('---' is escaped from values 'rename', 'description',
     'comment' and 'bibdoc_name')
 
+    Newlines are also reserved, and are escaped from the input values
+    (necessary for the 'comment' field, which is the only one allowing
+    newlines from the browser)
+
     Each line starts with the time of the action in the following
     format: '2008-06-20 08:02:04 --> '
 
@@ -818,12 +827,14 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
     log_file = os.path.join(log_dir, 'bibdocactions.log')
     try:
         file_desc = open(log_file, "a+")
+        # We must escape new lines from comments in some way:
+        comment = str(comment).replace('\\', '\\\\').replace('\r\n', '\\n\\r')
         msg = action                                 + '---' + \
               bibdoc_name.replace('---', '___')      + '---' + \
               file_path                              + '---' + \
               str(rename).replace('---', '___')      + '---' + \
               str(description).replace('---', '___') + '---' + \
-              str(comment).replace('---', '___')     + '---' + \
+              comment.replace('---', '___')          + '---' + \
               doctype                                + '---' + \
               str(int(keep_previous_versions))       + '---' + \
               file_restriction + '\n'
@@ -852,6 +863,9 @@ def read_actions_log(log_dir):
             except ValueError, e:
                 # Malformed action log
                 pass
+
+            # Clean newline-escaped comment:
+            comment = comment.replace('\\n\\r', '\r\n').replace('\\\\', '\\')
 
             # Perform some checking
             if action not in allowed_actions:
@@ -1457,6 +1471,30 @@ def read_file(curdir, filename):
         content = None
 
     return content
+
+def javascript_display_revise_panel(action, target, show_doctypes, show_keep_previous_versions, show_rename, show_description, show_comment, bibdocname, description, comment, show_restrictions, restriction):
+    """
+    Returns a correctly encoded call to the javascript function to
+    display the revision panel.
+    """
+    def escape_js_string_param(input):
+        "Escape string parameter to be used in Javascript function"
+        return input.replace('\\', '\\\\').replace('\r', '\\r').replace('\n', '\\n').replace("'", "\\'").replace('"', '&quot;')
+
+    return '''display_revise_panel(this, '%(action)s', '%(target)s', %(showDoctypes)s, %(showKeepPreviousVersions)s, %(showRename)s, %(showDescription)s, %(showComment)s, '%(bibdocname)s', '%(description)s', '%(comment)s', %(showRestrictions)s, '%(restriction)s')''' % \
+           {'action': action,
+            'showDoctypes': show_doctypes and 'true' or 'false',
+            'target': escape_js_string_param(target),
+            'bibdocname': escape_js_string_param(bibdocname),
+            'showRename': show_rename and 'true' or 'false',
+            'showKeepPreviousVersions': show_keep_previous_versions and 'true' or 'false',
+            'showComment': show_comment and 'true' or 'false',
+            'showDescription': show_description and 'true' or 'false',
+            'description': description and escape_js_string_param(description) or '',
+            'comment': comment and escape_js_string_param(comment) or '',
+            'showRestrictions': show_restrictions and 'true' or 'false',
+            'restriction': escape_js_string_param(restriction)}
+
 
 ## Javascript + HTML + CSS for the web interface
 
