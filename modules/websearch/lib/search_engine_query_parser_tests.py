@@ -29,6 +29,8 @@ from invenio import search_engine_query_parser
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.search_engine import perform_request_search
 
+from invenio.config import CFG_INSPIRE_SITE
+
 class TestSearchQueryParenthesisedParser(unittest.TestCase):
     """Test parenthesis parsing."""
 
@@ -228,8 +230,11 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 #        spi_search = "find date 3/1996"
 #        self._compare_searches(inv_search, spi_search)
 
-TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, \
-                             TestSpiresToInvenioSyntaxConverter)
+TEST_SUITE = None
+if CFG_INSPIRE_SITE:
+    TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, TestSpiresToInvenioSyntaxConverter)
+else:
+    TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
