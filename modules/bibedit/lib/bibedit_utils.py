@@ -51,6 +51,7 @@ from invenio.dateutils import convert_datetext_to_dategui
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions
 from invenio.search_engine import get_fieldvalues, print_record, record_exists
+from invenio.webuser import get_user_info
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPDIR)
@@ -175,10 +176,12 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     xml_file = open(file_path, 'w')
     xml_file.write(xml_to_write)
     xml_file.close()
+
+    user_name = get_user_info(uid)[1]
     if to_upload:
         # Pass XML file to BibUpload.
         task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r',
-                                  file_path)
+                                  file_path, '-u', user_name)
     return True
 
 
