@@ -309,12 +309,12 @@ def get_loans_notes(req, loan_id=None, recid=None, delete_key=None,
     return bal.get_loans_notes(req, loan_id, recid, delete_key,
                                library_notes, back, ln)
 
-def get_item_loans_notes(req, loan_id=None, recid=None, borrower_id=None,
+def get_item_loans_notes(req, loan_id=None, recid=None,
                          add_notes=None, new_note=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_notes
     """
-    return bal.get_item_loans_notes(req, loan_id, recid, borrower_id, add_notes,
+    return bal.get_item_loans_notes(req, loan_id, recid, add_notes,
                                     new_note, ln)
 
 
@@ -713,7 +713,7 @@ def ordered_books(req, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/ordered_books
     """
 
-    return bal.ordered_books(req, ln)
+    return bal.list_ordered_books(req, ln)
 
 def get_purchase_notes(req, purchase_id=None, delete_key=None, library_notes=None, ln=CFG_SITE_LANG):
     """
@@ -777,7 +777,7 @@ def ill_request_details_step2(req, delete_key=None, ill_request_id=None, ill_sta
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2
     """
 
-    return bal.ill_request_details_step2(req, delete_key, ill_request_id, ill_status, library_id,
+    return bal.ill_request_details_step2(req, delete_key, ill_request_id, library_id,
                                          request_date, expected_date, arrival_date, due_date,
                                          return_date, status, cost, currency,
                                          barcode, library_notes, ln)
@@ -1058,4 +1058,4 @@ def ill_search_result(req, p=None, f=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/item_search_result
     """
 
-    return bal.ill_search_result(req, p, f, ln)
+    return bal.ill_search_result(p, f)

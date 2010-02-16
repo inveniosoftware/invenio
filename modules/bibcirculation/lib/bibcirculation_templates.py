@@ -28,9 +28,8 @@ import cgi
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_CERN_SITE, CFG_SITE_SECURE_URL
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 from invenio.messages import gettext_set_language
-
-
 
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_utils import get_book_cover, \
@@ -53,25 +52,25 @@ _MENU_ = """
        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py">Home</a>
       </li> -->
 
-      <li>
+    <li>
         <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Loan</a>
-     </li>
+    </li>
 
-     <li>
+    <li>
         <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_return">Return</a>
-     </li>
+    </li>
 
-     <li>
+    <li>
         <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search?redirect='yes'">Request</a>
-     </li>
+    </li>
 
-     <li>
+    <li>
         <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search">Borrowers</a>
-     </li>
+    </li>
 
 <!--
      <li class="hassubmenu">
-         <a href='#'>Borrowers</a>
+         <a href="#">Borrowers</a>
          <ul class="subsubmenu" style="width:16.5em;">
           <li><a href = "%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search">Search...</a></li>
           <li><a href = "%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_notification">Notify</a></li>
@@ -80,96 +79,96 @@ _MENU_ = """
          </ul>
         </li>
 -->
-     <li>
+    <li>
         <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/item_search">Items</a>
-     </li>
+    </li>
 <!--
      <li class="hassubmenu">
-         <a href='#'>Items</a>
-         <ul class="subsubmenu" style="width:16.5em;">
+         <a href="#">Items</a>
+        <ul class="subsubmenu" style="width:16.5em;">
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/item_search">Search...</a></li>
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/new_item">Add new item</a></li>
-         <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step1">Add new copy</a></li>
-          <li><a href='#'># - Remove</a></li>
+          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step1">Add new copy</a></li>
+          <li><a href="#"># - Remove</a></li>
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step1">Update info</a></li>
-         </ul>
+        </ul>
         </li>
 -->
 
     <li class="hassubmenu">
-         <a href='#'>Lists</a>
-         <ul class="subsubmenu" style="width:17.5em;">
+         <a href="#">Lists</a>
+        <ul class="subsubmenu" style="width:17.5em;">
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans">Last loans</a></li>
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans">Overdue loans</a></li>
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests">Items on shelf with holds</a></li>
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_waiting_requests">Items on loan with holds</a></li>
           <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_expired_loans_with_requests">Overdue loans with holds</a></li>
      <!-- <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans_test">TEST loans</a></li>
-          <li><a href='#'># - Stats</a></li> -->
-            </ul>
+          <li><a href="#"># - Stats</a></li> -->
+        </ul>
     </li>
 
 <!--
      <li class="hassubmenu">
-         <a href='#'>Loans</a>
+         <a href="#">Loans</a>
          <ul class="subsubmenu" style="width:16.5em;">
          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">On library desk</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_return">Return book</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans">List of all loans</a></li>
-             <li><a href='#'># - Stats</a></li>
+             <li><a href="#"># - Stats</a></li>
             </ul>
         </li>
 
      <li class="hassubmenu">
-         <a href='#'>Requests</a>
+         <a href="#">Requests</a>
          <ul class="subsubmenu" style="width:16.5em;">
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests">List of pending requests</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_requests">List of hold requests</a></li>
-             <li><a href='#'># - Stats</a></li>
+             <li><a href="#"># - Stats</a></li>
             </ul>
         </li>
 -->
 
-     <li class="hassubmenu">
-         <a href='#'>Libraries</a>
+    <li class="hassubmenu">
+         <a href="#">Libraries</a>
          <ul class="subsubmenu" style="width:16.5em;">
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_library_step1">Search...</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_library_step1">Add new library</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step1">Update info</a></li>
           </ul>
-        </li>
+    </li>
 
-        <li class="hassubmenu">
-         <a href='#'>Vendors</a>
-         <ul class="subsubmenu" style="width:16.5em;">
+    <li class="hassubmenu">
+         <a href="#">Vendors</a>
+        <ul class="subsubmenu" style="width:16.5em;">
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_vendor_step1">Search...</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_vendor_step1">Add new vendor</a></li>
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step1">Update info</a></li>
-          </ul>
-        </li>
+        </ul>
+    </li>
 
-        <li class="hassubmenu">
-         <a href='#'>Acquisitions</a>
-         <ul class="subsubmenu" style="width:16.5em;">
+    <li class="hassubmenu">
+         <a href="#">Acquisitions</a>
+        <ul class="subsubmenu" style="width:16.5em;">
              <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/ordered_books">Ordered books</a></li>
-            </ul>
-        </li>
+        </ul>
+    </li>
 
-        <li class="hassubmenu">
-         <a href='#'>ILL</a>
-         <ul class="subsubmenu" style="width:17.5em;">
+    <li class="hassubmenu">
+         <a href="#">ILL</a>
+        <ul class="subsubmenu" style="width:17.5em;">
             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/ill_search">Search...</a></li>
             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request">List of requests</a></li>
             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/register_ill_book_request">Register Book request</a></li>
             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/register_ill_article_request_step1">Register Article request</a></li>
-            </ul>
-        </li>
+        </ul>
+    </li>
 
     <li class="hassubmenu">
-        <a href='#'>Lists</a>
+        <a href="#">Lists</a>
         <ul class="subsubmenu" style="width:17.5em;">
             <li class="subsubmenu">
-                <a href='#'>Libraries</a>
+                <a href="#">Libraries</a>
                     <ul class="subsubmenu" style="width:16.5em;">
                         <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_library_step1">Search...</a></li>
                         <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_library_step1">Add new library</a></li>
@@ -177,7 +176,7 @@ _MENU_ = """
                     </ul>
             </li>
             <li class="hassubmenu">
-                <a href='#'>Vendors</a>
+                <a href="#">Vendors</a>
                     <ul class="subsubmenu" style="width:16.5em;">
                         <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_vendor_step1">Search...</a></li>
                         <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_vendor_step1">Add new vendor</a></li>
@@ -187,18 +186,17 @@ _MENU_ = """
         </ul>
     </li>
 
-     <li class="hassubmenu">
-         <a href='#'>Help</a>
-         <ul class="subsubmenu" style="width:16.5em;">
+    <li class="hassubmenu">
+         <a href="#">Help</a>
+        <ul class="subsubmenu" style="width:16.5em;">
           <li><a href="%(url)s/help/admin/bibcirculation-admin-guide" target="_blank">Admin guide</a></li>
              <!-- <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/help_contactsupport">Contact Support</a></li> -->
-            </ul>
-        </li>
+        </ul>
+    </li>
+    <div class="clear"></div>
+    </map>
+    </div>
 
-        <div class="clear"></div>
-        </div>
-        </map>
-        </div>
         """ % {'url': CFG_SITE_URL}
 
 
@@ -340,7 +338,7 @@ class Template:
         (auth_code, _auth_message) = is_adminuser(req)
 
         if auth_code != 0:
-           bibcirc_link = ''
+            bibcirc_link = ''
         else:
             bibcirc_link = create_html_link(CFG_SITE_URL +
                                             '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
@@ -361,21 +359,21 @@ class Template:
 
         return out
 
-    def tmpl_book_not_for_loan(self, ln=CFG_SITE_LANG):
+    def tmpl_book_not_for_loan(self):
         message = """<div align="center"
                      <div class="infoboxmsg">
                       This item is not for loan.
                       </div>"""
         return message
 
-    def tmpl_message_request_send_ok_cern(self, ln=CFG_SITE_LANG):
+    def tmpl_message_request_send_ok_cern(self):
 
         message =  "Your request has been registered and the document"\
                               " will be sent to you via internal mail."
 
         return message
 
-    def tmpl_message_request_send_ok_other(self, ln=CFG_SITE_LANG):
+    def tmpl_message_request_send_ok_other(self):
 
         message = "Your request has been registered."
 
@@ -389,7 +387,7 @@ class Template:
 
         return message
 
-    def tmpl_message_request_send_fail_other(self, ln=CFG_SITE_LANG):
+    def tmpl_message_request_send_fail_other(self):
 
         message = "It is not possible to validate your request. "\
                               "Your office address is not available. "\
@@ -861,7 +859,7 @@ class Template:
 
         return out
 
-    def tmpl_new_request2(self, uid, recid, barcode, ln=CFG_SITE_LANG):
+    def tmpl_new_request2(self, recid, barcode, ln=CFG_SITE_LANG):
         """
         This template is used when an user want to request a book. Here it is
         possible to define the 'period of interest'
@@ -1505,14 +1503,17 @@ class Template:
 
         out += """
         <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_return_confirm" method="get">
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br />
         <br />
         <br />
         <table class="bibcirctable_contents">
           <tr align="center">
-            <td class="bibcirctableheader">%s</td>
-            <td><input type="text" size=45 id="barcode" name="barcode" style='border: 1px solid #cfcfcf'></td>
+            <td class="bibcirctableheader">
+            %s
+            <input type="text" size=45 id="barcode" name="barcode" style='border: 1px solid #cfcfcf'>
+            </td>
+
           </tr>
         </table>
 
@@ -1520,7 +1521,6 @@ class Template:
                _("Barcode"))
 
         out += """
-        <br />
         <br />
         <table class="bibcirctable_contents">
           <tr align="center">
@@ -1569,14 +1569,14 @@ class Template:
 
         out += """
            <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request" method="get" >
-             <div class=bibcircbottom>
+             <div class="bibcircbottom">
              <br />
              <div class="infoboxsuccess">%s</div>
              <br />
              <table class="bibcirctable">
         """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (_book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -1756,7 +1756,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br />
         <div class="subtitle">
         %s
@@ -1789,7 +1789,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br /><br />         <br />
         <form name="borrower_search" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_search_result" method="get" >
              <table class="bibcirctable">
@@ -1844,7 +1844,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/item_search_result" method="get" >
         <br />
         <br />
@@ -1902,7 +1902,7 @@ class Template:
         out += _MENU_
 
         if len(result) == 0:
-             out += """
+            out += """
             <div class="bibcircbottom">
             <br />
             <div class="infoboxmsg">%s</div>
@@ -1988,12 +1988,12 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1" method="get" >
         <br />
         <br />
         <br />
-          <table class="bibcirctable">
+          <table class="bibcirctable" align="center">
 
             """  % (CFG_SITE_URL)
 
@@ -2001,8 +2001,7 @@ class Template:
 
             out += """
                  <tr>
-                   <td width="105" class="bibcirctableheader" align="center">Search user by
-
+                   <td class="bibcirctableheader" align="center">Search user by
                    """
 
             if key == 'email':
@@ -2029,8 +2028,7 @@ class Template:
         else:
             out += """
                  <tr>
-                   <td width="105" class="bibcirctableheader" align="center">Search borrower by
-
+                   <td align="center" class="bibcirctableheader">Search borrower by
                    """
 
             if key == 'email':
@@ -2520,7 +2518,7 @@ class Template:
 
         out += """
         <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_new_loan" method="get" >
-             <div class=bibcircbottom>
+             <div class="bibcircbottom">
              <input type=hidden name=borrower_id value=%s>
              <br />
                   <table class="bibcirctable">
@@ -3219,6 +3217,8 @@ class Template:
                             _("Returned on"),
                             _("Renewals"),
                             _("Overdue letters"))
+            (recid, barcode, library_name, location, loaned_on, due_date,
+                 returned_on, nb_renew, nb_overdueletters) = None
 
             for (recid, barcode, library_name, location, loaned_on, due_date,
                  returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
@@ -3571,10 +3571,10 @@ class Template:
 
         (borrower_id, name, email, phone, address, mailbox) = borrower
 
-        req_link = create_html_link(CFG_SITE_URL +
-                                    '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details',
-                                    {'borrower_id': borrower_id},
-                                    (_("More details")))
+        #req_link = create_html_link(CFG_SITE_URL +
+        #                            '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details',
+        #                            {'borrower_id': borrower_id},
+        #                            (_("More details")))
 
         no_notes_link = create_html_link(CFG_SITE_URL +
                                          '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes',
@@ -3586,30 +3586,30 @@ class Template:
                                           {'borrower_id': borrower_id},
                                           (_("Notes about this borrower")))
 
-        loans_link = create_html_link(CFG_SITE_URL +
-                                      '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
-                                      {'borrower_id': borrower_id},
-                                      (_("More details")))
-
-        ill_link = create_html_link(CFG_SITE_URL +
-                                    '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_ill_details',
-                                    {'borrower_id': borrower_id},
-                                    (_("More details")))
-
-        req_hist_link = create_html_link(CFG_SITE_URL +
-                                         '/admin/bibcirculation/bibcirculationadmin.py/bor_requests_historical_overview',
-                                         {'borrower_id': borrower_id},
-                                         (_("More details")))
-
-        loans_hist_link = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/bor_loans_historical_overview',
-                                           {'borrower_id': borrower_id},
-                                           (_("More details")))
-
-        ill_hist_link = create_html_link(CFG_SITE_URL +
-                                         '/admin/bibcirculation/bibcirculationadmin.py/bor_ill_historical_overview',
-                                         {'borrower_id': borrower_id},
-                                         (_("More details")))
+        #loans_link = create_html_link(CFG_SITE_URL +
+        #                              '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
+        #                              {'borrower_id': borrower_id},
+        #                              (_("More details")))
+        #
+        #ill_link = create_html_link(CFG_SITE_URL +
+        #                            '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_ill_details',
+        #                            {'borrower_id': borrower_id},
+        #                            (_("More details")))
+        #
+        #req_hist_link = create_html_link(CFG_SITE_URL +
+        #                                 '/admin/bibcirculation/bibcirculationadmin.py/bor_requests_historical_overview',
+        #                                 {'borrower_id': borrower_id},
+        #                                 (_("More details")))
+        #
+        #loans_hist_link = create_html_link(CFG_SITE_URL +
+        #                                   '/admin/bibcirculation/bibcirculationadmin.py/bor_loans_historical_overview',
+        #                                   {'borrower_id': borrower_id},
+        #                                   (_("More details")))
+        #
+        #ill_hist_link = create_html_link(CFG_SITE_URL +
+        #                                 '/admin/bibcirculation/bibcirculationadmin.py/bor_ill_historical_overview',
+        #                                 {'borrower_id': borrower_id},
+        #                                 (_("More details")))
 
         if notes == "" or str(notes) == '{}':
             check_notes = no_notes_link
@@ -3862,13 +3862,12 @@ class Template:
                _("Request option(s)"))
 
             for (recid, status, library, location, date_from, date_to, request_date, request_id) in result:
-
-                 title_link = create_html_link(CFG_SITE_URL +
+                title_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
-                 out += """
+                out += """
             <tr>
                  <td>%s</td>
                  <td>%s</td>
@@ -4241,7 +4240,6 @@ class Template:
                         </table>
                     <br />
                     <br />
-                    </form>
                     </div>
                     </div>
                     """ % (_("Back"))
@@ -4445,7 +4443,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <form name="borrower_notification" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_notification" method="get" >
-             <div class=bibcircbottom>
+             <div class="bibcircbottom">
              <input type=hidden name=borrower_id value=%s>
              <br />
                <table class="tablesortermedium" border="0" cellpadding="0" cellspacing="1">
@@ -5015,7 +5013,7 @@ class Template:
 
 
     def tmpl_get_loans_notes(self, loans_notes, loan_id,
-                             recid, referer, back="", ln=CFG_SITE_LANG):
+                             referer, back="", ln=CFG_SITE_LANG):
 
         _ = gettext_set_language(ln)
 
@@ -5511,7 +5509,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br /><br />         <br />
         <form name="update_borrower_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step2" method="get" >
              <table class="bibcirctable">
@@ -5869,7 +5867,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        (name, email, phone, address, type, notes) = tup_infos
+        (name, email, phone, address, lib_type, notes) = tup_infos
 
         out = """ """
 
@@ -5924,7 +5922,7 @@ class Template:
                        _("Email"), email,
                        _("Phone"), phone,
                        _("Address"), address,
-                       _("Type"), type,
+                       _("Type"), lib_type,
                        _("Notes"), notes,
                        _("Back"), _("Confirm"),
                        tup_infos)
@@ -5981,7 +5979,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br /><br />         <br />
         <form name="update_library_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step2" method="get" >
              <table class="bibcirctable">
@@ -6263,7 +6261,7 @@ class Template:
 
         return out
 
-    def tmpl_add_new_copy_step1(self, ln=CFG_SITE_LANG):
+    def tmpl_add_new_copy_step1(self):
         """
         @param ln: language of the page
         """
@@ -6273,7 +6271,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <form name="add_new_copy_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step2" method="get" >
         <br />
         <br />
@@ -6737,7 +6735,7 @@ class Template:
 
         return out
 
-    def tmpl_update_item_info_step1(self, ln=CFG_SITE_LANG):
+    def tmpl_update_item_info_step1(self):
         """
         @param ln: language of the page
         """
@@ -6747,7 +6745,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <form name="update_item_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step2" method="get" >
         <br />
         <br />
@@ -7549,7 +7547,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br /><br />         <br />
         <form name="search_library_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/search_library_step2" method="get" >
           <table class="bibcirctable">
@@ -8491,7 +8489,7 @@ class Template:
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br />
         <br />
                 <table class="bibcirctable">
@@ -8964,7 +8962,7 @@ class Template:
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br />
           <table class="bibcirctable">
                   <tr>
@@ -10002,7 +10000,7 @@ class Template:
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br />
           <table class="bibcirctable">
                   <tr>
@@ -10535,7 +10533,7 @@ class Template:
 
         return out
 
-        (ccid, name, email, phone, address, mailbox) = user_info.split(',')
+        (_ccid, name, email, phone, address, mailbox) = user_info.split(',')
 
 
 
@@ -10993,13 +10991,13 @@ class Template:
                   _("To"),
                   _("Option(s)"))
 
-        for (ill_request_id, borrower_id, borrower_name, library_id,
+        for (ill_request_id, _borrower_id, borrower_name, library_id,
              ill_status, period_from, period_to, book_info) in ill_req:
 
-            borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
-                                             {'borrower_id': borrower_id, 'ln': ln},
-                                             (borrower_name))
+            #borrower_link = create_html_link(CFG_SITE_URL +
+            #                                 '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+            #                                 {'borrower_id': borrower_id, 'ln': ln},
+            #                                 (borrower_name))
 
             if library_id:
                 library_name = db.get_library_name(library_id)
@@ -11069,7 +11067,7 @@ class Template:
 
         out += _MENU_
 
-        (borrower_id, borrower_name, borrower_email, borrower_mailbox,
+        (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
          period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_borrower_request
 
         #(value, currency) = cost.split()
@@ -12117,12 +12115,12 @@ class Template:
             key_array.sort()
 
             for key in key_array:
-                 delete_note = create_html_link(CFG_SITE_URL +
+                delete_note = create_html_link(CFG_SITE_URL +
                                            '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status, 'ln': ln},
                                            (_("[delete]")))
 
-                 out += """<tr class="bibcirccontent">
+                out += """<tr class="bibcirccontent">
                             <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
                             <td width="400"><i>%s</i></td>
                             <td width="65" align="center">%s</td>
@@ -12195,7 +12193,7 @@ class Template:
 
         out += _MENU_
 
-        (borrower_id, borrower_name, borrower_email, borrower_mailbox,
+        (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
          period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_borrower_request
 
         book_info = eval(book_info)
@@ -13189,7 +13187,7 @@ class Template:
                     """
 
         else:
-             out += """
+            out += """
                      <option value ="ordered">ordered</option>
                      <option value ="cancelled">cancelled</option>
                      <option value ="not arrived" selected>not arrived</option>
@@ -13707,7 +13705,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br /><br />         <br />
         <form name="update_vendor_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step2" method="get" >
              <table class="bibcirctable">
@@ -14015,7 +14013,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <br /><br />         <br />
         <form name="search_vendor_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/search_vendor_step2" method="get" >
           <table class="bibcirctable">
@@ -14515,14 +14513,14 @@ class Template:
 
         out += _MENU_
 
-        if isbn:
-            book_cover = get_book_cover(isbn)
-        else:
-            book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
+        #if isbn:
+        #    book_cover = get_book_cover(isbn)
+        #else:
+        #    book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
          <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step2" method="get" >
         <br />
 
@@ -14759,18 +14757,18 @@ class Template:
 
         (title, authors, place, publisher, year, edition, isbn) = book_info
 
-        (borrower_id, name, email, phone, address, mailbox) = user_info
+        (_borrower_id, name, email, phone, address, mailbox) = user_info
 
         (period_of_interest_from, period_of_interest_to,
          additional_comments, only_edition)= request_details
 
         _ = gettext_set_language(ln)
 
-        out += _MENU_
+        out = _MENU_
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <form name="step3_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step4" method="get" >
         <br />
                 <table class="bibcirctable">
@@ -15546,7 +15544,7 @@ class Template:
         out += _MENU_
 
         if len(result) == 0:
-             out += """
+            out += """
             <div class="bibcircbottom" align="center">
             <br />
             <div class="infoboxmsg">%s</div>
@@ -15688,7 +15686,7 @@ class Template:
 
         return out
 
-    def tmpl_register_ill_book_request_from_borrower_page_result(self, result, borrower_id, ln=CFG_SITE_LANG):
+    def tmpl_register_ill_book_request_from_borrower_page_result(self, result, ln=CFG_SITE_LANG):
         """
         @param result: book's information
         @type result: list
@@ -15706,7 +15704,7 @@ class Template:
         out += _MENU_
 
         if len(result) == 0:
-             out += """
+            out += """
             <div class="bibcircbottom" align="center">
             <br />
             <div class="infoboxmsg">%s</div>
@@ -15978,7 +15976,7 @@ class Template:
 
         (title, authors, place, publisher, year, edition, isbn) = book_info
 
-        (borrower_id, name, email, phone, address, mailbox) = user_info
+        (_borrower_id, name, email, phone, address, mailbox) = user_info
 
         (period_of_interest_from, period_of_interest_to,
          additional_comments, only_edition)= request_details
@@ -16227,7 +16225,7 @@ class Template:
                    _("ISSN"))
 
 
-        conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
+        #conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
             <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
@@ -16329,7 +16327,7 @@ class Template:
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
          <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step2" method="get" >
         <br />
           <table class="bibcirctable">
@@ -16510,7 +16508,7 @@ class Template:
                 <td align="center">
                   <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:40%%'>
 
-            """ % (CFG_SITE_URL, book_info)
+            """ % (CFG_SITE_URL, article_info)
 
             for (ccid, name, email, phone, address, mailbox) in result:
                 out += """
@@ -16563,7 +16561,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <div class=bibcircbottom>
+        <div class="bibcircbottom">
         <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_search_result" method="get" >
         <br />
         <br />

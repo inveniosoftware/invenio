@@ -26,7 +26,6 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import datetime, time
-from math import ceil
 
 # Others Invenio imports
 from invenio.config import \
@@ -192,8 +191,6 @@ def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG)
 
     @return:       list of borrowers.
     """
-
-    infos = []
 
     if string == '':
         empty_barcode = 'Empty string. Please, try again.'
@@ -996,7 +993,7 @@ def register_new_loan(req, barcode, borrower_id,
         db.update_loan_request_status(request_id, 'done')
         db.update_request_barcode(barcode, request_id)
 
-        borrower_info = db.get_borrower_data(borrower_id)
+        #borrower_info = db.get_borrower_data(borrower_id)
 
         result = db.get_all_loans(20)
 
@@ -1928,7 +1925,7 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def get_loans_notes(req, loan_id, recid, delete_key,
+def get_loans_notes(req, loan_id, delete_key,
                     library_notes, back, ln=CFG_SITE_LANG):
     """
     Get loan's note(s).
@@ -1970,7 +1967,7 @@ def get_loans_notes(req, loan_id, recid, delete_key,
 
     body = bibcirculation_templates.tmpl_get_loans_notes(loans_notes=loans_notes,
                                                          loan_id=loan_id,
-                                                         recid=recid, referer=referer, back=back,
+                                                         referer=referer, back=back,
                                                          ln=ln)
     return page(title="Loan notes",
                 uid=id_user,
@@ -2214,7 +2211,7 @@ def update_borrower_info_step5(req, tup_infos, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def get_item_loans_notes(req, loan_id, recid, borrower_id, add_notes, new_note, ln=CFG_SITE_LANG):
+def get_item_loans_notes(req, loan_id, add_notes, new_note, ln=CFG_SITE_LANG):
     """
     Get loan's notes.
 
@@ -2251,7 +2248,6 @@ def get_item_loans_notes(req, loan_id, recid, borrower_id, add_notes, new_note, 
 
     body = bibcirculation_templates.tmpl_get_loans_notes(loans_notes=loans_notes,
                                                          loan_id=loan_id,
-                                                         recid=recid,
                                                          add_notes=add_notes,
                                                          ln=ln)
     return page(title="Loan notes",
@@ -2423,13 +2419,13 @@ def add_new_library_step1(req, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 def add_new_library_step2(req, name, email, phone, address,
-                           type, notes, ln=CFG_SITE_LANG):
+                           lib_type, notes, ln=CFG_SITE_LANG):
 
     """
     Add a new Library.
     """
 
-    tup_infos = (name, email, phone, address, type, notes)
+    tup_infos = (name, email, phone, address, lib_type, notes)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -2454,8 +2450,8 @@ def add_new_library_step3(req, tup_infos, ln=CFG_SITE_LANG):
     """
     Add a new Library.
     """
-    (name, email, phone, address, type, notes) = tup_infos
-    db.add_new_library(name, email, phone, address, type, notes)
+    (name, email, phone, address, lib_type, notes) = tup_infos
+    db.add_new_library(name, email, phone, address, lib_type, notes)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -2621,7 +2617,7 @@ def update_library_info_step5(req, tup_infos, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def add_new_copy_step1(req, ln=CFG_SITE_LANG):
+def add_new_copy_step1(req):
     """
     Add a nex copy.
     """
@@ -2635,7 +2631,7 @@ def add_new_copy_step1(req, ln=CFG_SITE_LANG):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_add_new_copy_step1(ln=ln)
+    body = bibcirculation_templates.tmpl_add_new_copy_step1()
 
     return page(title="Associate copy to item",
                 uid=id_user,
@@ -2941,8 +2937,8 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
     # if item on loan and new status is available,
     # item has to be returned.
     if is_on_loan and status == 'available':
-        borrower_id = db.get_borrower_id(barcode)
-        borrower_name = db.get_borrower_name(borrower_id)
+        #borrower_id = db.get_borrower_id(barcode)
+        #borrower_name = db.get_borrower_name(borrower_id)
 
         db.update_item_status('available', barcode)
         db.update_loan_info(datetime.date.today(), 'returned', barcode)
@@ -3267,7 +3263,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
 
     notes: notes about the new loan.
     """
-    borrower_info = db.get_borrower_data(borrower_id)
+    #borrower_info = db.get_borrower_data(borrower_id)
 
     has_recid = db.get_id_bibrec(barcode)
     loan_id = db.is_item_on_loan(barcode)
@@ -3719,7 +3715,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
     @return:        new request.
     """
 
-    (ccid, name, email, phone, address, mailbox) = user_info
+    (_ccid, name, email, phone, address, mailbox) = user_info
 
     # validate the period of interest given by the admin
     if validate_date_format(period_from) is False:
@@ -4203,7 +4199,7 @@ def order_new_copy_step3(req, order_info, ln):
                 lastupdated=__lastupdated__)
 
 
-def ordered_books(req, ln):
+def list_ordered_books(req, ln):
     """
     Return the list with all ordered books.
     """
@@ -4660,7 +4656,7 @@ def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CF
 
 
 def ill_request_details_step2(req, delete_key, ill_request_id, ill_status, library_id, request_date, expected_date, arrival_date,
-                              due_date, return_date, status, cost, currency, barcode, library_notes, ln=CFG_SITE_LANG):
+                              due_date, return_date, cost, currency, barcode, library_notes, ln=CFG_SITE_LANG):
     """
     """
 
@@ -5534,7 +5530,7 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
     (period_of_interest_from, period_of_interest_to,
      library_notes, only_edition) = request_details
 
-    (borrower_id, name, email, phone, address, mailbox) = user_info
+    (borrower_id, _name, _email, _phone, _address, _mailbox) = user_info
 
     ill_request_notes = {}
     if library_notes:
@@ -5943,7 +5939,7 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
 
 
 def register_ill_article_request_step2(req, periodical_title, article_title, author, report_number,
-                                       volume, issue, page, year, issn,
+                                       volume, issue, pages, year, issn,
                                        period_of_interest_from, period_of_interest_to,
                                        additional_comments, key, string, ln=CFG_SITE_LANG):
 
@@ -5953,7 +5949,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
     if key and not string:
         infos.append('Empty string. Please, try again.')
         article_info = (periodical_title, article_title, author, report_number,
-                        volume, issue, page, year, issn)
+                        volume, issue, pages, year, issn)
         request_details = (period_of_interest_from, period_of_interest_to,
                            additional_comments)
 
@@ -6072,7 +6068,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
 
     else:
         article_info = (periodical_title, article_title, author, report_number,
-                        volume, issue, page, year, issn)
+                        volume, issue, pages, year, issn)
 
         request_details = (period_of_interest_from, period_of_interest_to,
                            additional_comments)
@@ -6128,7 +6124,7 @@ def ill_search(req, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def ill_search_result(req, p, f, ln=CFG_SITE_LANG):
+def ill_search_result(p, f):
     """
     Search an item and return a list with all the possible results. To retrieve
     the information desired, we use the method 'perform_request_search' (from
@@ -6154,3 +6150,6 @@ def ill_search_result(req, p, f, ln=CFG_SITE_LANG):
         ill_pattern = intbitset(perform_request_search(c=["Books", "ILL Books"], p=p))
 
         result = list(ill_pattern & tmp)
+
+        ### UNFINISHED ###
+        return result

@@ -37,7 +37,8 @@ from invenio.webuser import collect_user_info
 from invenio.mailutils import send_email
 from invenio.bibcirculation_utils import hold_request_mail, \
      book_title_from_MARC, \
-     make_copy_available
+     make_copy_available, \
+     create_ill_record
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 
@@ -160,7 +161,7 @@ def perform_get_pending_request(ln=CFG_SITE_LANG):
     return body
 
 
-def perform_new_request(uid, recid, barcode, ln=CFG_SITE_LANG):
+def perform_new_request(recid, barcode, ln=CFG_SITE_LANG):
     """
     Display form to be filled by the user.
 
@@ -176,8 +177,7 @@ def perform_new_request(uid, recid, barcode, ln=CFG_SITE_LANG):
     @return request form
     """
 
-    body = bibcirculation_templates.tmpl_new_request2(uid=uid,
-                                                      recid=recid,
+    body = bibcirculation_templates.tmpl_new_request2(recid=recid,
                                                       barcode=barcode,
                                                       ln=ln)
 
@@ -232,7 +232,8 @@ def perform_new_request_send(uid, recid,
 
         else:
             if CFG_CERN_SITE == 1:
-                result = get_user_info_from_ldap(email=user['email'])
+                email=user['email']
+                result = get_user_info_from_ldap(email)
 
                 try:
                     ldap_address = result['physicalDeliveryOfficeName'][0]
@@ -323,7 +324,7 @@ def perform_new_request_send(uid, recid,
     return body
 
 
-def ill_request_with_recid(recid, uid, ln=CFG_SITE_LANG):
+def ill_request_with_recid(recid, ln=CFG_SITE_LANG):
     """
     Display ILL form.
 
@@ -404,7 +405,8 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
 
             #If BibCirculation at CERN, use LDAP.
             if CFG_CERN_SITE == 1:
-                result = get_user_info_from_ldap(email=user['email'])
+                email=user['email']
+                result = get_user_info_from_ldap(email)
 
                 try:
                     ldap_address = result['physicalDeliveryOfficeName'][0]
@@ -498,7 +500,7 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
     return body
 
 
-def display_ill_form(uid, ln=CFG_SITE_LANG):
+def display_ill_form(ln=CFG_SITE_LANG):
     """
     Display ILL form
 
@@ -601,7 +603,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
 
             #If BibCirculation at CERN, use LDAP.
             if CFG_CERN_SITE == 1:
-                result = get_user_info_from_ldap(email=user['email'])
+                email=user['email']
+                result = get_user_info_from_ldap(email)
 
                 try:
                     ldap_address = result['physicalDeliveryOfficeName'][0]

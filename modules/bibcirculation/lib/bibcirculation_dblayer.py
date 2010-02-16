@@ -1565,7 +1565,7 @@ def update_borrower_info(borrower_id, name, email, phone, address, mailbox):
                           where  id=%s""",
                        (name, email, phone, address, mailbox, borrower_id)))
 
-def add_new_library(name, email, phone, address, type, notes):
+def add_new_library(name, email, phone, address, lib_type, notes):
     """
     Add a new Library.
     """
@@ -1573,7 +1573,7 @@ def add_new_library(name, email, phone, address, type, notes):
     run_sql("""insert into crcLIBRARY (name, email, phone,
                                        address, type, notes)
                            values (%s, %s, %s, %s, %s, %s)""",
-            (name, email, phone, address, type, notes))
+            (name, email, phone, address, lib_type, notes))
 
 def search_library_by_name(string):
     """
@@ -2552,7 +2552,7 @@ def get_ill_barcode(ill_request_id):
     else:
         return None
 
-def update_ill_loan_status(borrower_id, barcode, return_date, type):
+def update_ill_loan_status(borrower_id, barcode, return_date, loan_type):
     """
     """
 
@@ -2562,7 +2562,7 @@ def update_ill_loan_status(borrower_id, barcode, return_date, type):
                where id_crcBORROWER = %s
                  and barcode = %s
                  and type = %s""",
-            (return_date, borrower_id, barcode, type))
+            (return_date, borrower_id, barcode, loan_type))
 
 def get_recid(barcode):
     """
