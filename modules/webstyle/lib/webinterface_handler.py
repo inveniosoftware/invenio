@@ -33,10 +33,9 @@ import sys
 import re
 import os
 import gc
-import time
 
 from invenio import webinterface_handler_wsgi_utils as apache
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
@@ -44,24 +43,50 @@ from invenio.errorlib import register_exception
 from invenio.webuser import get_preferred_user_language, isGuestUser, \
     getUid, loginUser, update_Uid, isUserSuperAdmin, collect_user_info
 
-has_https_support = CFG_SITE_URL != CFG_SITE_SECURE_URL
+## The following variable is True if the installation make any difference
+## between HTTP Vs. HTTPS connections.
+CFG_HAS_HTTPS_SUPPORT = CFG_SITE_URL != CFG_SITE_SECURE_URL
 
-
+## Set this to True in order to log some more information.
 DEBUG = False
 
 # List of URIs for which the 'ln' argument must not be added
 # automatically
-no_lang_recognition_uris = ['/rss',
-                            '/oai2d',
-                            '/journal']
+CFG_NO_LANG_RECOGNITION_URIS = ['/rss',
+                                '/oai2d',
+                                '/journal']
+
+
+RE_SLASHES = re.compile('/+')
+RE_SPECIAL_URI = re.compile('^/record/\d+|^/collection/.+')
+
 
 def _debug(req, msg):
+    """
+    Log the message.
+
+    @param req: the request.
+    @param msg: the message.
+    @type msg: string
+    """
     if DEBUG:
         req.log_error(msg)
 
+
 def _check_result(req, result):
-    """ Check that a page handler actually wrote something, and
-    properly finish the apache request."""
+    """
+    Check that a page handler actually wrote something, and
+    properly finish the apache request.
+
+    @param req: the request.
+    @param result: the produced output.
+    @type result: string
+    @return: an apache error code
+    @rtype: int
+    @raise apache.SERVER_RETURN: in case of a HEAD request.
+    @note: that this function actually takes care of writing the result
+        to the client.
+    """
 
     if result or req.bytes_sent > 0:
 
@@ -93,14 +118,19 @@ def _check_result(req, result):
         return apache.HTTP_INTERNAL_SERVER_ERROR
 
 
-
 class TraversalError(Exception):
+    """
+    Exception raised in case of an error in parsing the URL of the request.
+    """
     pass
 
+
 class WebInterfaceDirectory(object):
-    """ A directory groups web pages, and can delegate dispatching of
+    """
+    A directory groups web pages, and can delegate dispatching of
     requests to the actual handler. This has been heavily borrowed
-    from Quixote's dispatching mechanism, with specific adaptations."""
+    from Quixote's dispatching mechanism, with specific adaptations.
+    """
 
     # Lists the valid URLs contained in this directory.
     _exports = []
@@ -159,29 +189,30 @@ class WebInterfaceDirectory(object):
         # We have found the next segment. If we know that from this
         # point our subpages are over HTTPS, do the switch.
 
-        if req.is_https() and self._force_https:
-            if not req.is_https():
-                # We need to isolate the part of the URI that is after
-                # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
-                original_parts = urlparse.urlparse(req.unparsed_uri)
-                plain_prefix_parts = urlparse.urlparse(CFG_SITE_URL)
-                secure_prefix_parts = urlparse.urlparse(CFG_SITE_SECURE_URL)
+        if CFG_HAS_HTTPS_SUPPORT and self._force_https and not req.is_https():
+            # We need to isolate the part of the URI that is after
+            # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
+            original_parts = urlparse.urlparse(req.unparsed_uri)
+            plain_prefix_parts = urlparse.urlparse(CFG_SITE_URL)
+            secure_prefix_parts = urlparse.urlparse(CFG_SITE_SECURE_URL)
 
-                # Compute the new path
-                plain_path = original_parts[2]
-                plain_path = secure_prefix_parts[2] + plain_path[len(plain_prefix_parts[2]):]
+            # Compute the new path
+            plain_path = original_parts[2]
+            plain_path = secure_prefix_parts[2] + \
+                         plain_path[len(plain_prefix_parts[2]):]
 
-                # ...and recompose the complete URL
-                final_parts = list(secure_prefix_parts)
-                final_parts[2] = plain_path
-                final_parts[-3:] = original_parts[-3:]
+            # ...and recompose the complete URL
+            final_parts = list(secure_prefix_parts)
+            final_parts[2] = plain_path
+            final_parts[-3:] = original_parts[-3:]
 
-                target = urlparse.urlunparse(final_parts)
-                redirect_to_url(req, target)
+            target = urlparse.urlunparse(final_parts)
+            redirect_to_url(req, target)
         if CFG_EXTERNAL_AUTH_USING_SSO and req.is_https() and guest_p:
-            (iden, p_un, p_pw, msgcode) = loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
+            (iden, p_un, dummy, dummy) = loginUser(req, '', '',
+                                         CFG_EXTERNAL_AUTH_USING_SSO)
             if len(iden)>0:
-                uid = update_Uid(req, p_un)
+                update_Uid(req, p_un)
                 guest_p = False
 
         # Continue the traversal. If there is a path, continue
@@ -195,8 +226,8 @@ class WebInterfaceDirectory(object):
             raise apache.SERVER_RETURN, apache.DONE
 
         form = req.form
-        if not form.has_key('ln') and \
-                req.uri not in no_lang_recognition_uris:
+        if 'ln' not in form and \
+                req.uri not in CFG_NO_LANG_RECOGNITION_URIS:
             ln = get_preferred_user_language(req)
             form.add_field('ln', ln)
         result = _check_result(req, obj(req, form))
@@ -214,21 +245,20 @@ class WebInterfaceDirectory(object):
                 # Fix missing trailing slash as a convenience, unless
                 # we are processing a form (in which case it is better
                 # to fix the form posting).
-                util.redirect(req, req.uri + "/", permanent=True)
+                redirect_to_url(req, req.uri + "/", apache.HTTP_MOVED_PERMANENTLY)
 
         _debug(req, 'directory %r is not callable' % self)
         raise TraversalError()
 
 
-re_slashes = re.compile('/+')
-re_special_uri = re.compile('^/record/\d+|^/collection/.+')
 def create_handler(root):
     """ Return a handler function that will dispatch apache requests
     through the URL layout passed in parameter."""
 
     def _profiler(req):
         """ This handler wrap the default handler with a profiler.
-        Profiling data is written into CFG_TMPDIR/invenio-profile-stats-datetime.raw, and
+        Profiling data is written into
+        CFG_TMPDIR/invenio-profile-stats-datetime.raw, and
         is displayed at the bottom of the webpage.
         To use add profile=1 to your url. To change sorting algorithm you
         can provide profile=algorithm_name. You can add more than one
@@ -270,7 +300,8 @@ def create_handler(root):
                 if sort not in required_sorts:
                     required_sorts.append(sort)
             if sys.hexversion < 0x02050000:
-                import hotshot, hotshot.stats
+                import hotshot
+                import hotshot.stats
                 pr = hotshot.Profile(filename)
                 ret = pr.runcall(_handler, req)
                 for sort_type in required_sorts:
@@ -318,7 +349,7 @@ def create_handler(root):
                 path = ['']
             else:
                 ## Let's collapse multiple slashes into a single /
-                uri = re_slashes.sub('/', uri)
+                uri = RE_SLASHES.sub('/', uri)
                 path = uri[1:].split('/')
 
             if uri.startswith('/yours') or not guest_p:
@@ -331,7 +362,7 @@ def create_handler(root):
                 req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
 
             try:
-                if req.header_only and not re_special_uri.match(req.uri):
+                if req.header_only and not RE_SPECIAL_URI.match(req.uri):
                     return root._traverse(req, path, True, guest_p)
                 else:
                     ## bibdocfile have a special treatment for HEAD
@@ -373,6 +404,7 @@ def create_handler(root):
             del gc.garbage[:]
 
     return _profiler
+
 
 def wash_urlargd(form, content):
     """
@@ -441,7 +473,7 @@ def wash_urlargd(form, content):
                 result[k] = default
 
         elif dst_type is tuple:
-            result[k] = (str(value),)
+            result[k] = (str(value), )
 
         elif dst_type is list:
             result[k] = [str(value)]
