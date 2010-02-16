@@ -35,6 +35,7 @@ from invenio import webinterface_handler_wsgi_utils as apache
 
 import cgi
 import urllib
+import urlparse
 from socket import gethostbyname, gaierror
 import os
 import crypt
@@ -881,7 +882,7 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
     @return: HTML menu of the user activities
     @rtype: string
     """
-
+    _ = gettext_set_language(ln)
     if req:
         if req.subprocess_env.has_key('HTTPS') \
            and req.subprocess_env['HTTPS'] == 'on':
@@ -895,6 +896,19 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
 
     user_info = collect_user_info(req)
     activities = acc_find_possible_activities(user_info, ln)
+
+    # For BibEdit menu item, take into consideration current record
+    # whenever possible
+    if activities.has_key(_("Run Record Editor")) and \
+           user_info['uri'].startswith('/record/'):
+        try:
+            # Get record ID and try to cast it to an int
+            current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[-1])
+
+        except:
+            pass
+        else:
+            activities[_("Run Record Editor")] = activities[_("Run Record Editor")] + '&amp;#state=edit&amp;recid=' + str(current_record_id)
 
     try:
         return tmpl.tmpl_create_adminactivities_menu(
