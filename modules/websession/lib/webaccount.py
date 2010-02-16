@@ -359,6 +359,7 @@ def create_login_page_box(referer='', apache_msg="", ln=CFG_SITE_LANG):
 
     login_referrer2msg = (
         (re.compile(r"/search"), "<p>" + _("This collection is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
+        (re.compile(r"/record/\d+/files/.+"), "<p>" + _("This file is restricted.  If you think you have right to access it, please authenticate yourself.") + "</p>"),
     )
 
     msg = ""

@@ -2415,6 +2415,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
+        ## FIXME: we have introduced redirections to login page
+        ## so test to this must be added.
         self.assertRaises(HTTPError, urlopen, testrec_expected_url)
         self.assertRaises(HTTPError, urlopen, testrec_expected_icon)
 
@@ -3176,6 +3178,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
 
+        ## FIXME: we have introduced redirection to login page.
+        ## so proper test should be done.
         self.assertRaises(StandardError, try_url_download, testrec_expected_url)
         self.assertEqual(compare_xmbuffers(inserted_xm,
                                           testrec_expected_xm), '')

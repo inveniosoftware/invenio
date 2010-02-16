@@ -961,8 +961,7 @@ class WebSearchRestrictedPicturesTest(unittest.TestCase):
     def test_restricted_pictures_guest(self):
         """websearch - restricted pictures not available to guest"""
         error_messages = test_web_page_content(CFG_SITE_URL + '/record/1/files/0106015_01.jpg',
-                                               expected_text=['This file is restricted',
-                                                              'You are not authorized'])
+                                               expected_text=['This file is restricted.  If you think you have right to access it, please authenticate yourself.'])
         if error_messages:
             self.fail(merge_error_messages(error_messages))
 

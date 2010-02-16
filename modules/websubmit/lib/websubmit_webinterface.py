@@ -105,7 +105,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 msg = "<p>%s</p>" % _("Requested record does not seem to have been integrated.")
                 return warningMsg(msg, req, CFG_SITE_NAME, ln)
 
-            (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+            (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
             if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
                 target = '/youraccount/login' + \
@@ -114,7 +114,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 return redirect_to_url(req, target)
             elif auth_code:
                 return page_not_authorized(req, "../", \
-                    text = auth_msg)
+                    text = auth_message)
 
 
             readonly = CFG_ACCESS_CONTROL_LEVEL_SITE == 1
@@ -138,6 +138,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             docname = ''
             format = ''
             version = ''
+            warn = ''
 
             if filename:
                 # We know the complete file name, guess which docid it
@@ -176,24 +177,20 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     if docname == doc.get_docname():
                         try:
                             docfile = doc.get_file(format, version)
-                            if docfile.get_status() == '':
-                                # The file is not resticted, let's check for
-                                # collection restriction then.
-                                (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
-                                if auth_code:
+                            (auth_code, auth_message) = docfile.is_restricted(req)
+                            if auth_code != 0:
+                                if get_subformat_from_format(format).startswith('icon'):
+                                    return stream_restricted_icon(req)
+                                if user_info['email'] == 'guest' and not user_info['apache_user']:
+                                    cookie = mail_cookie_create_authorize_action('viewrestrdoc', {'status' : docfile.get_status()})
+                                    target = '/youraccount/login' + \
+                                    make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
+                                        CFG_SITE_URL + user_info['uri']}, {})
+                                    redirect_to_url(req, target)
+                                else:
                                     req.status = apache.HTTP_UNAUTHORIZED
-                                    if get_subformat_from_format(format).startswith('icon'):
-                                        return stream_restricted_icon(req)
-                                    return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
-                            else:
-                                # The file is probably restricted on its own.
-                                # Let's check for proper authorization then
-                                (auth_code, auth_message) = docfile.is_restricted(req)
-                                if auth_code != 0:
-                                    req.status = apache.HTTP_UNAUTHORIZED
-                                    if get_subformat_from_format(format).startswith('icon'):
-                                        return stream_restricted_icon(req)
-                                    return warningMsg(_("This file is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
+                                    warn += print_warning(_("This file is restricted: ") + auth_message)
+                                    break
 
                             if display_hidden or not docfile.hidden_p():
                                 if not readonly:
@@ -212,11 +209,9 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
 
-            if docname and format:
+            if docname and format and not warn:
                 req.status = apache.HTTP_NOT_FOUND
-                warn = print_warning(_("Requested file does not seem to exist."))
-            else:
-                warn = ''
+                warn += print_warning(_("Requested file does not seem to exist."))
             filelist = bibarchive.display("", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
 
             t = warn + websubmit_templates.tmpl_filelist(
@@ -400,7 +395,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                     act = ""
 
         # Is user authorized to perform this action?
-        (auth_code, auth_msg) = acc_authorize_action(uid, "submit",
+        (auth_code, auth_message) = acc_authorize_action(uid, "submit",
                                                      verbose=0,
                                                      doctype=argd['doctype'],
                                                      act=action)
@@ -581,7 +576,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                          user_files_absolute_path = user_files_absolute_path)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = acc_authorize_action(user_info, 'attachsubmissionfile')
+        (auth_code, auth_message) = acc_authorize_action(user_info, 'attachsubmissionfile')
         if user_info['email'] == 'guest' and not user_info['apache_user']:
             # User is guest: must login prior to upload
             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
