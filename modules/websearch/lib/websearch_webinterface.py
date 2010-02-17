@@ -33,8 +33,9 @@ MAX_KEYWORD_LIST = 10
 MAX_VENUE_LIST = 10
 #tag constants
 AUTHOR_TAG = "100__a"
-COAUTHOR_TAG = "700__a"
 AUTHOR_INST_TAG = "100__u"
+COAUTHOR_TAG = "700__a"
+COAUTHOR_INST_TAG = "700__u"
 VENUE_TAG = "909C4p"
 KEYWORD_TAG = "6531_a"
 
@@ -75,7 +76,7 @@ from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, \
     check_user_can_view_record, collection_restricted_p, restricted_collection_cache, \
-    get_fieldvalues, get_most_popular_field_values, get_mysql_recid_from_aleph_sysno
+    get_fieldvalues, get_fieldvalues_alephseq_like, get_most_popular_field_values, get_mysql_recid_from_aleph_sysno
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -221,7 +222,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
         #get most frequent authors of these pubs
         popular_author_tuples = search_engine.get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
-        authors= []
+        authors = []
         for (auth, frequency) in popular_author_tuples:
             if len(authors) < MAX_COLLAB_LIST:
                 authors.append(auth)
@@ -304,19 +305,37 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         return search_engine.page_end(req, 'hb', ln)
 
     def get_institute_pub_dict(self, recids):
-        #return a dictionary consisting of institute -> list of publications
-        affus = [] #list of insts from the record
-        author_aff_pubs = {} #the disct to be build
+        """return a dictionary consisting of institute -> list of publications"""
+        author_aff_pubs = {} #the dictionary to be built
         for recid in recids:
             #iterate all so that we get first author's intitute
             #if this the first author OR
             #"his" institute if he is an affliate author
+            affus = [] #list of insts from the given record
             mainauthors = get_fieldvalues(recid, AUTHOR_TAG)
             mainauthor = " "
             if mainauthors:
                 mainauthor = mainauthors[0]
             if (mainauthor == self.authorname):
                 affus = get_fieldvalues(recid, AUTHOR_INST_TAG)
+            else:
+                #search for coauthors..
+                coauthor_field_lines = []
+                coauthorfield_content = get_fieldvalues_alephseq_like(recid, \
+                                        COAUTHOR_TAG[:3])
+                if coauthorfield_content:
+                    coauthor_field_lines = coauthorfield_content.split("\n")
+                for line in coauthor_field_lines:
+                    if line.count(self.authorname) > 0:
+                        #get affilitions .. the correct ones are $$+code
+                        code = COAUTHOR_INST_TAG[-1]
+                        myparts = line.split("$$")
+                        for part in myparts:
+                            if part and part[0] == code:
+                                myaff = part[1:]
+                                affus.append(myaff)
+                        break
+
             #if this is empty, add a dummy " " value
             if (affus == []):
                 affus = [" "]
@@ -792,7 +811,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             format = None
             tab = ''
             try:
-                if path[1] in ['', 'files', 'reviews', 'comments','usage',
+                if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
                                'keywords', 'multiedit', 'merge']:
                     tab = path[1]
