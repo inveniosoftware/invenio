@@ -125,7 +125,7 @@ re_logical_and = re.compile('\sand\s', re.I)
 re_logical_or = re.compile('\sor\s', re.I)
 re_logical_not = re.compile('\snot\s', re.I)
 re_operators = re.compile(r'\s([\+\-\|])\s')
-re_pattern_wildcards_at_beginning = re.compile(r'(\s)[\*\%]+')
+re_pattern_wildcards_after_spaces = re.compile(r'(\s)[\*\%]+')
 re_pattern_single_quotes = re.compile("'(.*?)'")
 re_pattern_double_quotes = re.compile("\"(.*?)\"")
 re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
@@ -1430,12 +1430,12 @@ def wash_pattern(p):
     # p = strip_accents(p) # FIXME: when available, strip accents all the time
     # add leading/trailing whitespace for the two following wildcard-sanity checking regexps:
     p = " " + p + " "
-    # get rid of wildcards at the beginning of words:
-    p = re_pattern_wildcards_at_beginning.sub("\\1", p)
     # replace spaces within quotes by __SPACE__ temporarily:
     p = re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
     p = re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
     p = re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
+    # get rid of unquoted wildcards after spaces:
+    p = re_pattern_wildcards_after_spaces.sub("\\1", p)
     # get rid of extremely short words (1-3 letters with wildcards):
     p = re_pattern_short_words.sub("\\1", p)
     # replace back __SPACE__ by spaces:
