@@ -219,6 +219,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find a j ellis and (t report or k cross section)"
         self._compare_searches(inv_search, spi_search)
 
+    def test_fin_to_find_trans(self):
+        """SPIRES search syntax - fin a ellis, j == find a ellis, j"""
+        inv_search = "find a ellis, j"
+        spi_search = "fin a ellis, j"
+        self._compare_searches(inv_search, spi_search)
+
     def test_quotes(self):
         """SPIRES search syntax - find t 'compton scattering' and a
         brooks"""

@@ -627,13 +627,21 @@ class SpiresToInvenioSyntaxConverter:
         # regular expression matching dates in general
         self._re_dates_match = self._compile_dates_regular_expression()
 
+        # for finding (and changing) a variety of different SPIRES search keywords
+        self._re_find_or_fin_at_start = re.compile('^find? .*$')
+
     def convert_query(self, query):
         """Converts the query from SPIRES syntax to Invenio syntax
 
-        Queries are assumed SPIRES queries only if they start with FIND or F"""
+        Queries are assumed SPIRES queries only if they start with FIND or FIN"""
 
-        # assume that only queries starting with FIND are SPIRES queries
-        if query.lower().startswith("find "):
+        # SPIRES syntax allows searches with 'find' or 'fin'.
+        if self._re_find_or_fin_at_start.match(query.lower()):
+
+            # Everywhere else make the assumption that all and only queries
+            # starting with 'find' are SPIRES queries.  Turn fin into find.
+            query = re.sub('^[fF][iI][nN] ', 'find ', query)
+
             # these calls are before keywords replacement becuase when keywords
             # are replaced, date keyword is replaced by specific field search
             # and the DATE keyword is not match in DATE BEFORE or DATE AFTER
