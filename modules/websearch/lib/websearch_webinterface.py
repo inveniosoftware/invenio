@@ -213,10 +213,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         #let's see what takes time..
         time1 = time.time()
         genstart = time1
-        citelist = get_author_cited_by(self.authorname)
         time2 = time.time()
-        if verbose == 9:
-            req.write("<br/>citelist generation took: "+str(time2-time1)+"<br/>")
 
         #search the publications by this author
         pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
@@ -262,7 +259,6 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         #a dict. keys: affiliations, values: lists of publications
         author_aff_pubs = self.get_institute_pub_dict(pubs)
-        authoraffs = author_aff_pubs.keys()
 
         time1 = time.time()
         if verbose == 9:
