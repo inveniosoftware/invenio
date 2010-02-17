@@ -3818,7 +3818,9 @@ class Template:
         _ = gettext_set_language(ln)
         #make a authoraff string that looks like CERN (1), Caltech (2) etc
         authoraff = ""
-        for a in aff_pubdict.keys():
+        aff_pubdict_keys = aff_pubdict.keys()
+        aff_pubdict_keys.sort(lambda x, y: cmp(len(aff_pubdict[y]), len(aff_pubdict[x])))
+        for a in aff_pubdict_keys:
             recids = "+or+".join(map(str, aff_pubdict[a]))
             print_a = a
             if (print_a == ' '):
