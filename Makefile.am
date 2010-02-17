@@ -152,6 +152,7 @@ install-jquery-plugins: uninstall-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.core.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.highlight.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
+	wget http://github.com/malsup/form/raw/master/jquery.form.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	wget http://tablesorter.com/jquery.tablesorter.zip && \
 	unzip jquery.tablesorter.zip && \
@@ -196,6 +197,7 @@ uninstall-jquery-plugins:
 	rm -f jquery.hotkeys.min.js && \
 	rm -rf jquery-treeview && \
 	rm -f jquery.ajaxPager.js && \
+	rm -f jquery.form.js && \
 	rm -f ui.core.js)
 	@echo "***********************************************************"
 	@echo "** The jquery plugins were successfully uninstalled.     **"

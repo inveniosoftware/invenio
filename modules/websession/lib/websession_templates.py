@@ -1336,7 +1336,7 @@ class Template:
         if activities:
             out += '''<div class="hassubmenu%(on)s">
             <a hreflang="en" class="header%(selected)s" href="%(CFG_SITE_SECURE_URL)s/youraccount/youradminactivities?ln=%(ln)s">%(admin)s</a>
-            <ul class="subsubmenu" style="width: 18em;">''' % {
+            <ul class="subsubmenu" style="width: 19em;">''' % {
             'CFG_SITE_SECURE_URL' : CFG_SITE_SECURE_URL,
             'ln' : ln,
             'admin': _("Administration"),

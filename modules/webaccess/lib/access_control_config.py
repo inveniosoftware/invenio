@@ -165,6 +165,7 @@ DEF_ACTIONS = (
                ('runoairepository', 'run oairepositoryupdater task', '', 'no'),
                ('runbibedit', 'run Record Editor', 'collection', 'yes'),
                ('runbibeditmulti', 'run Multi-Record Editor', '', 'no'),
+               ('runbibdocfile', 'run Document File Manager', '', 'no'),
                ('runbibmerge', 'run Record Merger', '', 'no'),
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
@@ -230,6 +231,7 @@ _ = gettext_set_language(CFG_SITE_LANG)
 CFG_ACC_ACTIVITIES_URLS = {
     'runbibedit' : (_("Run Record Editor"), "%s/record/edit/?ln=%%s" % CFG_SITE_URL),
     'runbibeditmulti' : (_("Run Multi-Record Editor"), "%s/record/multiedit/?ln=%%s" % CFG_SITE_URL),
+    'runbibdocfile' : (_("Run Document File Manager"), "%s/submit/managedocfiles?ln=%%s" % CFG_SITE_URL),
     'runbibmerge' : (_("Run Multi-Record Editor"), "%s/record/multiedit/?ln=%%s" % CFG_SITE_URL),
     'cfgbibknowledge' : (_("Configure Bibknowledge"), "%s/kb?ln=%%s" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),

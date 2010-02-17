@@ -16,7 +16,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Prints a link to BibEdit
+"""BibFormat element - Prints a link to BibDocFile
 """
 __revision__ = "$Id$"
 
@@ -28,7 +28,8 @@ from invenio.search_engine import guess_primary_collection_of_a_record
 
 def format(bfo, style):
     """
-    Prints a link to BibEdit, if authorization is granted
+    Prints a link to simple file management interface (BibDocFile), if
+    authorization is granted.
 
     @param style: the CSS style to be applied to the link.
     """
@@ -37,21 +38,18 @@ def format(bfo, style):
     out = ""
 
     user_info = bfo.user_info
-    collection = guess_primary_collection_of_a_record(bfo.recID)
     (auth_code, auth_message) = acc_authorize_action(user_info,
-                                                     'runbibedit',
-                                                     collection=collection)
+                                                     'runbibdocfile')
     if auth_code == 0:
         linkattrd = {}
         if style != '':
             linkattrd['style'] = style
 
-        out += create_html_link(CFG_SITE_URL + '/record/' + str(bfo.recID) + '/edit/',
+        out += create_html_link(CFG_SITE_URL + '/submit/managedocfiles',
                          urlargd={'ln': bfo.lang,
                                   'recid': str(bfo.recID)},
-                         link_label=_("Edit This Record"),
+                         link_label=_("Manage Files of This Record"),
                          linkattrd=linkattrd)
-
     return out
 
 def escape_values(bfo):

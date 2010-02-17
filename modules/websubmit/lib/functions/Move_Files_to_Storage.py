@@ -67,7 +67,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
     paths_and_suffixes = parameters['paths_and_suffixes']
     rename = parameters['rename']
     documenttype = parameters['documenttype']
-    iconsize = parameters['iconsize']
+    iconsizes = parameters['iconsize'].split(',')
 
     ## Create an instance of BibRecDocs for the current recid(sysno)
     bibrecdocs = BibRecDocs(sysno)
@@ -127,39 +127,53 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                     pass
                     ## Icon
                     elif documenttype == "picture":
-                        try:
-                            iconpath, iconname = create_icon({
-                                'input-file' : fullpath,
-                                'icon-scale' : iconsize,
-                                'icon-name' : None,
-                                'icon-file-format' : None,
-                                'multipage-icon' : False,
-                                'multipage-icon-delay' : 100,
-                                'verbosity' : 0,
-                            })
-                        except Exception, e:
-                            register_exception(prefix='Impossible to create icon for %s (record %s)' % (fullpath, sysno), alert_admin=True)
-                            continue
-                        iconpath = os.path.join(iconpath, iconname)
-                        docname = decompose_file(fullpath)[1]
-                        try:
-                            mybibdoc = bibrecdocs.get_bibdoc(docname)
-                        except InvenioWebSubmitFileError:
-                            mybibdoc = None
-                        if iconpath is not None and mybibdoc is not None:
-                            mybibdoc.add_icon(iconpath)
-                            ## Save the new icon filename in a text file in curdir so that
-                            ## it can be used by templates to created the recmysl
+                        has_added_default_icon_subformat_p = False
+                        for iconsize in iconsizes:
                             try:
-                                fd = open("%s/%s_ICON" % (curdir, path), "w")
-                                fd.write(os.path.basename(iconpath))
-                                fd.close()
-                            except OSError, err:
-                                msg = "Cannot store icon filename.[%s]"
-                                msg %= str(err)
-                                raise InvenioWebSubmitFunctionWarning(msg)
-                        elif mybibdoc is not None:
-                            mybibdoc.delete_icon()
+                                iconpath, iconname = create_icon({
+                                    'input-file' : fullpath,
+                                    'icon-scale' : iconsize,
+                                    'icon-name' : None,
+                                    'icon-file-format' : None,
+                                    'multipage-icon' : False,
+                                    'multipage-icon-delay' : 100,
+                                    'verbosity' : 0,
+                                })
+                            except Exception, e:
+                                register_exception(prefix='Impossible to create icon for %s (record %s)' % (fullpath, sysno), alert_admin=True)
+                                continue
+                            iconpath = os.path.join(iconpath, iconname)
+                            docname = decompose_file(fullpath)[1]
+                            try:
+                                mybibdoc = bibrecdocs.get_bibdoc(docname)
+                            except InvenioWebSubmitFileError:
+                                mybibdoc = None
+                            if iconpath is not None and mybibdoc is not None:
+                                try:
+                                    icon_suffix = iconsize.replace('>', '').replace('<', '').replace('^', '').replace('!', '')
+                                    if not has_added_default_icon_subformat_p:
+                                        mybibdoc.add_icon(iconpath)
+                                        has_added_default_icon_subformat_p = True
+                                    else:
+                                        mybibdoc.add_icon(iconpath, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + "-" + icon_suffix)
+                                    ## Save the new icon filename in a text file in curdir so that
+                                    ## it can be used by templates to created the recmysl
+                                    try:
+                                        if not has_added_default_icon_subformat_p:
+                                            fd = open("%s/%s_ICON" % (curdir, path), "w")
+                                        else:
+                                            fd = open("%s/%s_ICON_%s" % (curdir, path, iconsize + '_' + icon_suffix), "w")
+                                        fd.write(os.path.basename(iconpath))
+                                        fd.close()
+                                    except OSError, err:
+                                        msg = "Cannot store icon filename.[%s]"
+                                        msg %= str(err)
+                                        raise InvenioWebSubmitFunctionWarning(msg)
+                                except InvenioWebSubmitFileError, e:
+                                    # Most probably icon already existed.
+                                    pass
+                            elif mybibdoc is not None:
+                                mybibdoc.delete_icon()
 
     # Update the MARC
     bibdocfile_bin = os.path.join(CFG_BINDIR, 'bibdocfile --yes-i-know')

@@ -844,7 +844,7 @@ class Template:
         out += """</script>"""
         return out
 
-    def tmpl_page_do_not_leave_submission_js(self, ln):
+    def tmpl_page_do_not_leave_submission_js(self, ln, enabled=CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION):
         """
         Code to ask user confirmation when leaving the page, so that the
         submission is not interrupted by mistake.
@@ -855,6 +855,7 @@ class Template:
 
         Parameters:
         - 'ln' *string* - The language to display the interface in
+        - 'enabled' *bool* - If the check applies or not
         """
 
         # load the right message language
@@ -871,7 +872,7 @@ class Template:
             }
 
         </script>
-        ''' % (CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION and 'true' or 'false',
+        ''' % (enabled and 'true' or 'false',
                _('Your modifications will not be saved.').replace('"', '\\"'))
 
         return out

@@ -33,6 +33,7 @@ pylib_DATA = websubmit_config.py websubmit_engine.py file.py \
              websubmit_icon_creator.py \
              websubmit_file_converter.py \
              unoconv.py \
+             websubmit_managedocfiles.py \
              bibdocfile.py \
              bibdocfilecli.py \
              bibdocfile_regression_tests.py \
