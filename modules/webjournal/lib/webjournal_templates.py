@@ -248,6 +248,26 @@ Cher Abonné,
         return plain_text
     # '
 
+    def tmpl_admin_alert_header_html(self, journal_name, ln, issue):
+        """
+        Returns HTML header to be inserted into the HTML alert
+
+        @param journal_name: the journal name
+        @param ln: the current language
+        @param issue: the issue for wich the alert is sent
+        """
+        _ = gettext_set_language(ln)
+        journal_url = '%(CFG_SITE_URL)s/journal/%(journal_name)s/%(year)s/%(number)s' % \
+                      {'CFG_SITE_URL': CFG_SITE_URL,
+                       'journal_name': journal_name,
+                       'year': issue.split('/')[1],
+                       'number': issue.split('/')[0]}
+        journal_link = '<a href="%(journal_url)s">%(journal_url)s</a>' % \
+                       {'journal_url': journal_url}
+        return '<p class="htmlalertheader">' + \
+               _('If you cannot read this email please go to %(x_journal_link)s') % {'x_journal_link': journal_link} + \
+               '</p>'
+
     def tmpl_admin_alert_subject(self, journal_name, ln, issue):
         """
         Default subject for email alert of journal updates.
@@ -313,7 +333,7 @@ Cher Abonné,
             <input type="hidden" name="htmlMail" value="%(html_mail)s" />
             <input type="hidden" name="force" value="True" />
             <p><em>WARNING! </em>The email alert for the issue %(issue)s has already been
-            sent. Are you absolutely sure you want to it send it again?</p>
+            sent. Are you absolutely sure you want to send it again?</p>
             <p>Maybe you forgot to release an update issue? If so, please do this
             first <a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%(journal_name)s&amp;issue=%(issue)s">here</a>.</p>
             <p>Proceed with caution, or your subscribers will receive the alert a second time.</p>

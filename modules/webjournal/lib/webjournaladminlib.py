@@ -452,6 +452,7 @@ def perform_request_alert(journal_name, issue,
             html_string = html_file.read()
             html_file.close()
             html_string = put_css_in_file(html_string, journal_name)
+            html_string = insert_journal_link(html_string, journal_name, issue, ln)
 
         sender_email = get_journal_alert_sender_email(journal_name)
         send_email(sender_email, recipients, subject, plain_text,
@@ -823,6 +824,22 @@ def can_read_xml_config(journal_name):
     return True
 
 ######################## EMAIL HELPER FUNCTIONS ###############################
+
+def insert_journal_link(html_string, journal_name, issue, ln):
+    """
+    Insert a warning regarding HTML formatting inside mail client and
+    link to journal page just after the body of the page.
+
+    @param html_string: the HTML newsletter
+    @param journal_name: the journal name
+    @param issue: journal issue for which the alert is sent (in the form number/year)
+    @param ln: language
+    """
+    def replace_body(match_obj):
+        "Replace body with itself + header message"
+        header = wjt.tmpl_admin_alert_header_html(journal_name, ln, issue)
+        return match_obj.group() + header
+    return re.sub('<body.*?>', replace_body, html_string, 1)
 
 def put_css_in_file(html_message, journal_name):
     """

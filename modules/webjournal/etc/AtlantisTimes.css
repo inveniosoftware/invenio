@@ -326,3 +326,7 @@ a.rssLink img{
         border:none;
         padding-right:4px;
 }
+.htmlalertheader {
+        text-align:center;
+        background-color: #fff;
+}
