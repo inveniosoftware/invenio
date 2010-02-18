@@ -27,9 +27,8 @@ import unittest
 from invenio import search_engine_query_parser
 
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import create_basic_search_units
 
-from invenio.config import CFG_INSPIRE_SITE
 
 class TestSearchQueryParenthesisedParser(unittest.TestCase):
     """Test parenthesis parsing."""
@@ -142,26 +141,29 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(parser.parse_query('-"expr1" - (expr2)'),
                          ['-', '"expr1"', '-', 'expr2'])
 
+
 class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
-    """Test parsing of SPIRES data---note these test cases are written against atlantis
-    and use perform_request_search which then loads the parser
-    """
+    """Test SPIRES query parsing and translation to Invenio syntax."""
 
-    def _compare_searches(self, invenio_search_query, spires_search_query):
-        """Compare inv_search and spi_search for equivalence
-        tests that a non-trivial result is found, that the hitsets are equal
-        prints a message if both queries are parsed identically (a bonus...)
+    def _compare_searches(self, invenio_syntax, spires_syntax):
+        """Determine if two queries parse to the same search command.
+
+        For comparison of actual search results (regression testing), see the
+        tests in the Inspire module.
         """
+        #parser = search_engine_query_parser.SearchQueryParenthesisedParser()
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        result_wanted = create_basic_search_units(None, invenio_syntax, '', None)
 
-        invenio_search_result = perform_request_search(p=invenio_search_query)
-        spires_search_result = perform_request_search(p=spires_search_query)
+        #result_obtained = create_basic_search_units(None, parser.parse_query(converter.convert_query(spires_syntax)), '', None)
+        result_obtained = create_basic_search_units(None, converter.convert_query(spires_syntax), '', None)
+        #result_obtained = parser.parse_query(converter.convert_query(spires_syntax))
+        #result_wanted = parser.parse_query(invenio_syntax)
 
-        # first make sure the test is non trivial
-        self.assert_(len(spires_search_result)>0)
-
-        # make sure we have the same results
-        self.assertEqual(invenio_search_result, spires_search_result)
-
+        assert result_obtained == result_wanted, \
+                                  """SPIRES parsed as %s instead of %s""" % \
+                                  (repr(result_obtained), repr(result_wanted))
+        return
 
         #test operator searching
     def test_operators(self):
@@ -196,7 +198,7 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
     def test_author_full_initial(self):
         """SPIRES search syntax - find a klebanov, igor r."""
-        inv_search = 'author:"klebanov, igor* r*" or author:"klebanov, i r" or author:"klebanov, igor"'
+        inv_search = 'author:"klebanov, igor* r*" or author:"klebanov, i.r." or author:"klebanov, ig.r."'
         spi_search = "find a klebanov, igor r."
         self._compare_searches(inv_search, spi_search)
 
@@ -214,41 +216,32 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self._compare_searches(inv_search, spi_search)
 
     def test_combine_multiple_or(self):
-        """SPIRES search syntax - find a j ellis and (t report or k cross section)"""
-        inv_search = "author:'ellis, j*' and (title:report  or (keyword:cross section))"
-        spi_search = "find a j ellis and (t report or k cross section)"
+        """SPIRES search syntax - find a j ellis and (t report or k \"cross section\")"""
+        inv_search = 'author:"ellis, j*" and (title:report or keyword:"cross section")'
+        spi_search = 'find a j ellis and (t report or k "cross section")'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_quotes(self):
+        """SPIRES search syntax - find t 'compton scattering' and a mele"""
+        inv_search = "title:'compton scattering' and author:mele"
+        spi_search = "find t 'compton scattering' and a mele"
         self._compare_searches(inv_search, spi_search)
 
     def test_fin_to_find_trans(self):
         """SPIRES search syntax - fin a ellis, j == find a ellis, j"""
-        inv_search = "find a ellis, j"
-        spi_search = "fin a ellis, j"
-        self._compare_searches(inv_search, spi_search)
+        from invenio.search_engine import perform_request_search
+        fin_search = "fin a ellis, j"
+        fin_result = perform_request_search(p=fin_search)
+        find_search = "find a ellis, j"
+        find_result = perform_request_search(p=find_search)
+        # We don't care if results are [], as long as they're the same
+        # Uncovered corner case: parsing could be broken and also happen to
+        # return [] twice.  Unlikely though.
+        self.assertEqual(fin_result, find_result)
 
-    def test_quotes(self):
-        """SPIRES search syntax - find t 'compton scattering' and a
-        brooks"""
-        inv_search = "title:'compton scattering' author:mele"
-        spi_search = "find t 'compton scattering' and a mele"
-        self._compare_searches(inv_search, spi_search)
 
-#    def test_date(self):
-#        """SPIRES search syntax - find date 1996"""
-#        inv_search = "year:1996"
-#        spi_search = "find date 1996"
-#        self._compare_searches(inv_search, spi_search)
+TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, TestSpiresToInvenioSyntaxConverter)
 
-#    def test_month(self):
-#        """SPIRES search syntax - find date 3/1996"""
-#        inv_search = "year:'3/1996'"
-#        spi_search = "find date 3/1996"
-#        self._compare_searches(inv_search, spi_search)
-
-TEST_SUITE = None
-if CFG_INSPIRE_SITE:
-    TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, TestSpiresToInvenioSyntaxConverter)
-else:
-    TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

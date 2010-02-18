@@ -29,6 +29,10 @@ import re
 import string
 from invenio.config import CFG_INSPIRE_SITE
 
+from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
+
+QueryScanner = FNT()
+
 
 class SearchQueryParenthesisedParser:
     """Parse search queries containing parenthesis.
@@ -896,10 +900,7 @@ class SpiresToInvenioSyntaxConverter:
 
             # move current position at the end of the processed content
             current_position = match.end()
-
-        # append the content from the last match till the end
-        result = result + query[current_position : len(query)]
-
+        result += query[current_position : len(query)]
         return result
 
     def _create_author_search_pattern(self, author_name, author_middle_name, author_surname):
@@ -946,9 +947,9 @@ class SpiresToInvenioSyntaxConverter:
 
         if len(author_name) > 1:
             return AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + '" or ' +\
-                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + dot_symbol + '*" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + '.' + '*" or ' +\
                 AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + '" or ' +\
-                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + dot_symbol + '*" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '.' + '*" or ' +\
                 AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '" or ' +\
                 AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + ' *"'
 
@@ -1001,5 +1002,6 @@ class SpiresToInvenioSyntaxConverter:
                        old_keyword + r'(?P<end>[\s\(]+|$)'
         regular_expression = re.compile(regex_string, re.IGNORECASE)
         result = regular_expression.sub(r'\g<operator>' + new_keyword + r'\g<end>', query)
-        result = result.replace(": ",":")
+        result = re.sub(':\s+', ':', result)
+        #result = result.replace(": ",":")
         return result
