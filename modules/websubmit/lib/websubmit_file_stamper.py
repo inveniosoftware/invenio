@@ -1329,7 +1329,7 @@ def get_cli_options():
             else:
                 ## Invalid stamp type. Print usage message and quit.
                 usage()
-        elif opt[0] in ("-r", "--latex-template-var"):
+        elif opt[0] in ("-c", "--latex-template-var"):
             ## This is a variable to be replaced in the LaTeX template.
             ## It should take the following form:
             ##    varname=value
