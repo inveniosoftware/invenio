@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2009-12-14 10:06+0100\n"
-"PO-Revision-Date: 2010-01-31 22:58+0100\n"
+"PO-Revision-Date: 2010-02-15 23:17+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -9496,13 +9496,12 @@ msgstr "Cartas de reclamación"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9865
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14181
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15019
-#, fuzzy
 msgid "No notes"
-msgstr "Nota"
+msgstr "Sin notas"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3358
 msgid "Notes about this library"
-msgstr ""
+msgstr "Notas sobre esta biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3406
 #, fuzzy
@@ -9573,11 +9572,11 @@ msgstr "Reglas"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3676
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3680
 msgid "ILL"
-msgstr ""
+msgstr "PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3741
 msgid "Request option(s)"
-msgstr ""
+msgstr "Opciones de la petición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3850
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7859
@@ -9590,16 +9589,16 @@ msgstr "Última actualización"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5884
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5949
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3855
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4741
 msgid "Loan notes"
-msgstr ""
+msgstr "Notas de préstamo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3856
 msgid "Loans status"
-msgstr ""
+msgstr "Estado de los préstamos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3857
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4742
@@ -9624,48 +9623,45 @@ msgstr "No se han encontrado resultados."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4331
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4613
 msgid "Loan Notes"
-msgstr ""
+msgstr "Notas de préstamo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4092
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4345
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4627
 msgid "see notes"
-msgstr ""
+msgstr "ver notas"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4097
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4350
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4632
 msgid "no notes"
-msgstr ""
+msgstr "sin notas"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4102
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4355
-#, fuzzy
 msgid "next page >>>"
-msgstr "Página siguiente"
+msgstr "página siguiente >>>"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4107
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4360
-#, fuzzy
 msgid "<<< previous page"
-msgstr "Página anterior"
+msgstr "<<< página anterior"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4112
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4365
 msgid "|<< first page"
-msgstr ""
+msgstr "|<< primera página"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4117
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4370
-#, fuzzy
 msgid "last page >>|"
-msgstr "Última actualización"
+msgstr "última página >>|"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4148
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4401
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4542
 msgid "Send recall"
-msgstr ""
+msgstr "Enviar reclamación"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4489
 #, fuzzy
@@ -9690,7 +9686,7 @@ msgstr "Editor de plantillas"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4539
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4739
 msgid "Overdue letter"
-msgstr ""
+msgstr "Carta de reclamación"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4540
 #, fuzzy
@@ -9704,7 +9700,7 @@ msgstr "Notificación por correo electrónico"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4543
 msgid "Load"
-msgstr ""
+msgstr "Carga"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4563
 #, fuzzy
@@ -9726,7 +9722,7 @@ msgstr "Escriba un %s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4985
 msgid "Notes about borrower"
-msgstr ""
+msgstr "Notas sobre el lector"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4994
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5086
@@ -9809,7 +9805,7 @@ msgstr "Biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5278
 msgid "CERN Central Library"
-msgstr ""
+msgstr "Biblioteca Central del CERN"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5517
 #, fuzzy
@@ -9843,7 +9839,7 @@ msgstr "Su cuenta ha sido creada en"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6040
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7608
 msgid "Search library by"
-msgstr ""
+msgstr "Buscar biblioteca por"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6073
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7653
@@ -9860,15 +9856,15 @@ msgstr "Más información:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6492
 #, python-format
 msgid "Copies of %s"
-msgstr ""
+msgstr "Copies de %s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6565
 msgid "New copy details"
-msgstr ""
+msgstr "Detalles de la nueva copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6729
 msgid "new copy"
-msgstr ""
+msgstr "nueva copia"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6756
 #, fuzzy, python-format
@@ -9892,11 +9888,11 @@ msgstr "El registro se ha suprimido."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7635
 msgid "0 library(ies) found."
-msgstr ""
+msgstr "No se ha encontrado ninguna biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7731
 msgid "Notes about library"
-msgstr ""
+msgstr "Notas sobre la biblioteca"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7863
 #, fuzzy
@@ -9905,7 +9901,7 @@ msgstr "Rechazado"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7890
 msgid "New due date: "
-msgstr ""
+msgstr "Nueva fecha de devolución: "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7890
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7891
@@ -9914,12 +9910,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11813
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11814
 msgid "due_date"
-msgstr ""
+msgstr "fecha de devolución"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7891
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9371
 msgid "jsCal"
-msgstr ""
+msgstr "jsCal"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7916
 #, fuzzy
@@ -9929,11 +9925,11 @@ msgstr "Ayuda para el envio"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7960
 #, python-format
 msgid "The due date has been updated. New due date: %s"
-msgstr ""
+msgstr "Se ha actualizado la fecha de devolución.  Ahora es: %s"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7961
 msgid "Back borrower's loans"
-msgstr ""
+msgstr "Volver a los préstamos"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8251
 #, fuzzy
@@ -9943,44 +9939,41 @@ msgstr "Seleccionar"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8412
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8898
 msgid "Enter the period of interest"
-msgstr ""
+msgstr "Período de interés"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8413
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8899
-#, fuzzy
 msgid "From:  "
-msgstr "De:"
+msgstr "De:  "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8413
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8414
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8899
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8900
-#, fuzzy
 msgid "from"
-msgstr "De:"
+msgstr "de"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8414
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8900
 msgid "jsCal_from"
-msgstr ""
+msgstr "jsCal_from"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8415
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8901
-#, fuzzy
 msgid "To:  "
-msgstr "A:"
+msgstr "A:  "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8415
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8416
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8901
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8902
 msgid "to"
-msgstr ""
+msgstr "a"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8416
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8902
 msgid "jsCal_to"
-msgstr ""
+msgstr "jsCal_to"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8473
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8938
@@ -9994,14 +9987,14 @@ msgstr "Su cuenta ha sido creada en"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14914
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15954
 msgid "Borrower details"
-msgstr ""
+msgstr "Detalles del lector"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9500
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9748
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13158
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13453
 msgid "Order details"
-msgstr ""
+msgstr "Detalles del pedido"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9500
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9750
@@ -10031,7 +10024,7 @@ msgstr "Fecha de creación"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9568
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13271
 msgid "order_date"
-msgstr ""
+msgstr "fecha del pedido"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9568
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9569
@@ -10044,7 +10037,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15809
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16155
 msgid "jsCal1"
-msgstr ""
+msgstr "jsCal1"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9569
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9754
@@ -10063,7 +10056,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13458
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14985
 msgid "Expected date"
-msgstr ""
+msgstr "Fecha prevista"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9569
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9570
@@ -10071,7 +10064,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11497
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13272
 msgid "expected_date"
-msgstr ""
+msgstr "fecha prevista"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9570
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10769
@@ -10083,15 +10076,15 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15811
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16157
 msgid "jsCal2"
-msgstr ""
+msgstr "jsCal2"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9796
 msgid "A new purchase has been registered with success."
-msgstr ""
+msgstr "Se ha cursado correctamente una nueva compra."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9845
 msgid "Ordered date"
-msgstr ""
+msgstr "Fecha de pedido"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9894
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11068
@@ -10102,7 +10095,7 @@ msgstr "Seleccionar"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9943
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15107
 msgid "Notes about acquisition"
-msgstr ""
+msgstr "Notas sobre la adquisición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10386
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10541
@@ -10118,7 +10111,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16153
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16282
 msgid "ILL request details"
-msgstr ""
+msgstr "Detalles de la petición PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10387
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10542
@@ -10134,7 +10127,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16153
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16283
 msgid "Period of interest - From"
-msgstr ""
+msgstr "Período de interés - Desde"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10387
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10388
@@ -10149,12 +10142,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16154
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16155
 msgid "period_of_interest_from"
-msgstr ""
+msgstr "período_de_interés_desde"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10388
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11812
 msgid "jsCal3"
-msgstr ""
+msgstr "jsCal3"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10389
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10543
@@ -10170,7 +10163,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16156
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16284
 msgid "Period of interest - To"
-msgstr ""
+msgstr "Período de interés - Hasta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10389
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10390
@@ -10183,13 +10176,13 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16156
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16157
 msgid "period_of_interest_to"
-msgstr ""
+msgstr "período_de_interés_hasta"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10390
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11814
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11981
 msgid "jsCal4"
-msgstr ""
+msgstr "jsCal4"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10391
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10544
@@ -10208,17 +10201,17 @@ msgstr "Añadir comentario"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10392
 msgid "Borrower wants only this edition?"
-msgstr ""
+msgstr "Quiere solamente esta edición, el lector?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10545
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14913
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15953
 msgid "Only this edition"
-msgstr ""
+msgstr "Solamente esta edición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10609
 msgid "A new ILL request has been registered with success."
-msgstr ""
+msgstr "Se ha registrado correctamente una nueva petición PI."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10771
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10978
@@ -10226,11 +10219,13 @@ msgstr ""
 msgid ""
 "I accept the %s of the service in particular the return of books in due time."
 msgstr ""
+"Acepto los %s del servicio, en particular devolver los libros a "
+"tiempo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10772
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10979
 msgid "I want this edition only."
-msgstr ""
+msgstr "Sólo quiero esta edición."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10885
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11240
@@ -10247,12 +10242,12 @@ msgstr "Página:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11022
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14983
 msgid "Supplier"
-msgstr ""
+msgstr "Proveedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11307
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12431
 msgid "Borrower request"
-msgstr ""
+msgstr "Petición del lector"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11312
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12436
@@ -10263,7 +10258,7 @@ msgstr "Ver comentarios"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11313
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12437
 msgid "Only this edition?"
-msgstr ""
+msgstr "Sólo esta edición?"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11359
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11446
@@ -10278,7 +10273,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12842
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12945
 msgid "ILL request ID"
-msgstr ""
+msgstr "Código de petición PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11359
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11532
