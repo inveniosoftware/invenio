@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import unittest
 import os
+import re
 
 from invenio.errorlib import register_exception
 from invenio.config import CFG_SITE_URL, CFG_LOGDIR
@@ -71,6 +72,24 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
         self.failUnless('test_alert_admin_register_exception' in log_content)
         self.failUnless(text in log_content)
         self.assertEqual(1, result, "register_exception have not returned 1")
+
+    def test_password_hiding(self):
+        """errorlib - hide password in frame analysis"""
+        logname = os.path.join(CFG_LOGDIR, 'invenio.err')
+        os.rename(logname, logname + '-old')
+        try:
+            try:
+                password = 'this password should not be visible'
+                int('foo')
+            except:
+                register_exception(alert_admin=True)
+            os.rename(logname, logname + '-test')
+            data = open(logname + '-test').read()
+            self.failIf(password in data)
+            self.failUnless('<*****>' in data)
+        finally:
+            os.rename(logname + '-old', logname)
+
 
 TEST_SUITE = make_test_suite(ErrorlibWebPagesAvailabilityTest,
                              ErrorlibRegisterExceptionTest)

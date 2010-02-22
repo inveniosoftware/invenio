@@ -25,13 +25,22 @@ import traceback
 import os
 import sys
 import time
+import re
 from cStringIO import StringIO
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, CFG_CERN_SITE, CFG_SITE_EMERGENCY_PHONE_NUMBERS
+from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
+    CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, \
+    CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, \
+    CFG_CERN_SITE, CFG_SITE_EMERGENCY_PHONE_NUMBERS
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
+
+## Regular expression to match possible password related variable that should
+## be disclosed in frame analysis.
+RE_PWD = re.compile(r"pwd|_pass|passw", re.I)
+
 
 def get_client_info(req):
     """
@@ -39,15 +48,16 @@ def get_client_info(req):
     @param req: mod_python request
     """
     try:
-        return \
-        {   'host'      : req.hostname,
-            'url'       : req.unparsed_uri,
-            'time'      : convert_datestruct_to_datetext(time.localtime()),
-            'browser'   : req.headers_in.has_key('User-Agent') and req.headers_in['User-Agent'] or "N/A",
-            'client_ip' : req.remote_ip
-        }
+        return {
+            'host': req.hostname,
+            'url': req.unparsed_uri,
+            'time': convert_datestruct_to_datetext(time.localtime()),
+            'browser': 'User-Agent' in req.headers_in and \
+                          req.headers_in['User-Agent'] or "N/A",
+            'client_ip': req.remote_ip}
     except:
         return {}
+
 
 def get_pretty_wide_client_info(req):
     """Return in a pretty way all the avilable information about the current
@@ -72,26 +82,32 @@ def get_pretty_wide_client_info(req):
     else:
         return "No client information available"
 
+
 def get_tracestack():
     """
-    If an exception has been caught, return the system tracestack or else return tracestack of what is currently in the stack
+    If an exception has been caught, return the system tracestack or else
+    return tracestack of what is currently in the stack
     """
     if traceback.format_tb(sys.exc_info()[2]):
         delimiter = "\n"
-        tracestack_pretty = "Traceback: \n%s" % delimiter.join(traceback.format_tb(sys.exc_info()[2]))
+        tracestack_pretty = "Traceback: \n%s" % \
+            delimiter.join(traceback.format_tb(sys.exc_info()[2]))
     else:
-        tracestack = traceback.extract_stack()[:-1] #force traceback except for this call
-        tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
+        ## force traceback except for this call
+        tracestack = traceback.extract_stack()[:-1]
+        tracestack_pretty = "%sForced traceback (most recent call last)" % \
+                            (' '*4, )
         for trace_tuple in tracestack:
             tracestack_pretty += """
     File "%(file)s", line %(line)s, in %(function)s
-        %(text)s""" % \
-                {   'file'      : trace_tuple[0],
-                    'line'      : trace_tuple[1],
-                    'function'  : trace_tuple[2],
-                    'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
-                }
+        %(text)s""" % {
+            'file': trace_tuple[0],
+            'line': trace_tuple[1],
+            'function': trace_tuple[2],
+            'text': trace_tuple[3] is not None and \
+                    str(trace_tuple[3]) or ""}
     return tracestack_pretty
+
 
 def send_sms(phone_number, msg):
     """Send msg as an SMS to each phone number.
@@ -99,13 +115,16 @@ def send_sms(phone_number, msg):
     it should be reimplemented in your own instituition.
     """
     if not CFG_CERN_SITE:
-        raise NotImplementedError, "Implement this function with your own method"
+        raise NotImplementedError("Implement this function "
+            "with your own method")
     if phone_number[0] == '+':
         phone_number = '00' + phone_number[1:]
     if phone_number[0] != '0':
         phone_number = '00' + phone_number
     from invenio.mailutils import send_email
-    return send_email(CFG_SITE_SUPPORT_EMAIL, phone_number + '@mail2sms.cern.ch', '', msg, header='', footer='')
+    return send_email(CFG_SITE_SUPPORT_EMAIL,
+        phone_number + '@mail2sms.cern.ch', '', msg, header='', footer='')
+
 
 def register_emergency(msg, send_sms_function=send_sms):
     """Launch an emergency. This means to send sms messages to each
@@ -113,7 +132,14 @@ def register_emergency(msg, send_sms_function=send_sms):
     for phone_number in CFG_SITE_EMERGENCY_PHONE_NUMBERS:
         send_sms_function(phone_number, msg)
 
-def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_admin=False, subject=''):
+
+def register_exception(force_stack=False,
+                       stream='error',
+                       req=None,
+                       prefix='',
+                       suffix='',
+                       alert_admin=False,
+                       subject=''):
     """
     Log error exception to invenio.err and warning exception to invenio.log.
     Errors will be logged together with client information (if req is
@@ -137,7 +163,8 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
     @param suffix: a message to be printed before the exception in
     the log
 
-    @param alert_admin: wethever to send the exception to the administrator via email
+    @param alert_admin: wethever to send the exception to the administrator via
+        email
 
     @param subject: overrides the email subject
 
@@ -149,7 +176,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
         Return at most MAXLENGTH characters of VAL.  Useful for
         sanitizing dynamic variable values in the output.
         """
-        out = str(val)
+        out = repr(val)
         if len(out) > maxlength:
             out = out[:maxlength] + ' [...]'
         return out
@@ -166,7 +193,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
 
     try:
         ## Let's extract exception information
-        exc_info =  sys.exc_info()
+        exc_info = sys.exc_info()
         if exc_info[0]:
             ## We found an exception.
 
@@ -176,52 +203,82 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
 
             ## Let's record when and where and what
             www_data = "%(time)s -> %(name)s: %(value)s" % {
-                'time' : time.strftime("%Y-%m-%d %H:%M:%S"),
-                'name' : exc_name,
-                'value' : exc_value
-            }
+                'time': time.strftime("%Y-%m-%d %H:%M:%S"),
+                'name': exc_name,
+                'value': exc_value}
 
             ## Let's retrieve contextual user related info, if any
             try:
                 client_data = get_pretty_wide_client_info(req)
-            except Exception, e:
-                client_data = "Error in retrieving contextual information: %s" % e
+            except Exception, err:
+                client_data = "Error in retrieving " \
+                    "contextual information: %s" % err
 
             ## Let's extract the traceback:
             if not exc_name.startswith('Invenio') or force_stack:
-                ## We put a large traceback only if requested
-                ## or the Exception is not an Invenio one.
-                tracestack = traceback.extract_stack()[-5:-2]
-                tracestack_data = "Forced traceback (most recent call last):"
-                for trace_tuple in tracestack:
-                    tracestack_data += """
-  File "%(file)s", line %(line)s, in %(function)s
-    %(text)s""" % \
-                        {   'file'      : trace_tuple[0],
-                            'line'      : trace_tuple[1],
-                            'function'  : trace_tuple[2],
-                            'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
-                        }
+                tracestack_data_stream = StringIO()
+                tb = sys.exc_info()[2]
+                while 1:
+                    if not tb.tb_next:
+                        break
+                    tb = tb.tb_next
+                stack = []
+                f = tb.tb_frame
+                while f:
+                    stack.append(f)
+                    f = f.f_back
+                stack.reverse()
+                stack = stack[-10:] ## Let's just take the last few frames
+                traceback.print_exc(file=tracestack_data_stream)
+                print >> tracestack_data_stream, \
+                        "Locals by frame, innermost last"
+                for frame in stack:
+                    print >> tracestack_data_stream
+                    print >> tracestack_data_stream, \
+                            ">>>> Frame %s in %s at line %s" % (
+                                frame.f_code.co_name,
+                                frame.f_code.co_filename,
+                                frame.f_lineno)
+                    try:
+                        values_to_hide = []
+                        for key, value in frame.f_locals.items():
+                            ## Let's look for potential passwords
+                            if RE_PWD.search(key):
+                                values_to_hide.append(str(value))
+
+                        code = open(frame.f_code.co_filename).readlines()
+                        first_line = max(1, frame.f_lineno-3)
+                        last_line = min(len(code), frame.f_lineno+3)
+                        print >> tracestack_data_stream, "*" * 79
+                        for line in xrange(first_line, last_line+1):
+                            code_line = code[line-1].rstrip()
+                            for value in values_to_hide:
+                                ## Let's hide passwords
+                                code_line = code_line.replace(value, '<*****>')
+                            if line == frame.f_lineno:
+                                print >> tracestack_data_stream, \
+                                    "***** %4i %s" % (line, code_line)
+                            else:
+                                print >> tracestack_data_stream, \
+                                    "      %4i %s" % (line, code_line)
+                        print >> tracestack_data_stream, "*" * 79
+                    except:
+                        pass
+                    for key, value in frame.f_locals.items():
+                        print >> tracestack_data_stream, "\t%20s = " % key,
+                        if RE_PWD.search(key):
+                            ## Let's hide passwords ;-)
+                            print >> tracestack_data_stream, "<*****>"
+                            continue
+                        try:
+                            print >> tracestack_data_stream, \
+                                _truncate_dynamic_string(value)
+                        except:
+                            print >> tracestack_data_stream, \
+                                "<ERROR WHILE PRINTING VALUE>"
+                tracestack_data = tracestack_data_stream.getvalue()
             else:
-                tracestack_data = ""
-
-            ## Let's get the exception (and the traceback):
-            exception_data = StringIO()
-            traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, exception_data)
-            exception_data = exception_data.getvalue()
-            if exception_data.endswith('\n'):
-                exception_data = exception_data[:-1]
-
-            ## Let's get the values of local variables on the stack:
-            localvars_data = "\nLocal variables:\n"
-            localvars = sys.exc_info()[2].tb_frame.f_locals.keys()
-            localvars.sort()
-            for localvar in localvars:
-                localvars_data += "  %s = %s\n" % \
-                                  (localvar,
-                                   _truncate_dynamic_string(repr(sys.exc_info()[2].tb_frame.f_locals[localvar])))
-            if localvars_data.endswith('\n'):
-                localvars_data = localvars_data[:-1]
+                tracestack_data = ''
 
             ## Okay, start printing:
             log_stream = StringIO()
@@ -235,28 +292,24 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 print >> log_stream, prefix + '\n'
                 print >> email_stream, prefix + '\n'
 
-            print >> email_stream, "The following problem occurred on <%s> (CDS Invenio %s)" % (CFG_SITE_URL, CFG_VERSION)
-            print >> email_stream, "\n>>> Registered exception\n"
+            print >> email_stream, "The following problem occurred on <%s>" \
+                " (CDS Invenio %s)" % (CFG_SITE_URL, CFG_VERSION)
 
-            print >> log_stream, www_data
-            print >> email_stream, www_data
+            print >> log_stream, "\n>> %s" % www_data
+            print >> email_stream, "\n>> %s" % www_data
 
+            print >> log_stream, "\n>>> User details\n"
             print >> email_stream, "\n>>> User details\n"
 
             print >> log_stream, client_data
             print >> email_stream, client_data
 
-            print >> email_stream, "\n>>> Traceback details\n"
-
             if tracestack_data:
+                print >> log_stream, "\n>>> Traceback details\n"
+                print >> email_stream, "\n>>> Traceback details\n"
+
                 print >> log_stream, tracestack_data
                 print >> email_stream, tracestack_data
-
-            print >> log_stream, exception_data
-            print >> email_stream, exception_data
-
-            print >> log_stream, localvars_data
-            print >> email_stream, localvars_data
 
             ## If a suffix was requested let's print it
             if suffix:
@@ -277,35 +330,45 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             written_to_log = False
             try:
                 ## Let's try to write into the log.
-                open(os.path.join(CFG_LOGDIR, 'invenio.' + stream), 'a').write(log_text)
+                open(os.path.join(CFG_LOGDIR, 'invenio.' + stream), 'a').write(
+                    log_text)
                 written_to_log = True
-            finally:
-                if alert_admin or not written_to_log:
-                    ## If requested or if it's impossible to write in the log
-                    from invenio.mailutils import send_email
-                    if not subject:
-                        filename, line_no = _get_filename_and_line(exc_info)
-                        subject = 'Exception (%s:%s)' % (filename, line_no)
-                    subject = '%s at %s' % (subject, CFG_SITE_URL)
-                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject=subject, content=email_text)
+            except:
+                written_to_log = False
+
+            if alert_admin or not written_to_log:
+                ## If requested or if it's impossible to write in the log
+                from invenio.mailutils import send_email
+                if not subject:
+                    filename, line_no = _get_filename_and_line(exc_info)
+                    subject = 'Exception (%s:%s)' % (filename, line_no)
+                subject = '%s at %s' % (subject, CFG_SITE_URL)
+                send_email(
+                    CFG_SITE_ADMIN_EMAIL,
+                    CFG_SITE_ADMIN_EMAIL,
+                    subject=subject,
+                    content=email_text)
             return 1
         else:
             return 0
-    except Exception, e:
-        print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (CFG_LOGDIR + '/invenio.' + stream, e)
+    except Exception, err:
+        print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (
+            CFG_LOGDIR + '/invenio.' + stream, err)
         return 0
+
 
 def register_errors(errors_or_warnings_list, stream, req=None):
     """
     log errors to invenio.err and warnings to invenio.log
-    errors will be logged with client information (if req is given) and a tracestack
-    warnings will be logged with just the warning message
+    errors will be logged with client information (if req is given) and a
+    tracestack warnings will be logged with just the warning message
 
     @param errors_or_warnings_list: list of tuples (err_name, err_msg)
 
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
-    as the key for dict with name:  CFG_ + %(module_directory_name)s + _ERROR_MESSAGES
+    as the key for dict with name:  CFG_ + %(module_directory_name)s +
+        _ERROR_MESSAGES
 
     @param stream: 'error' or 'warning'
 
@@ -330,11 +393,13 @@ def register_errors(errors_or_warnings_list, stream, req=None):
         else:
             client_info = "No client information available"
     # check arguments
-    errors_or_warnings_list = wash_url_argument(errors_or_warnings_list, 'list')
+    errors_or_warnings_list = wash_url_argument(
+        errors_or_warnings_list, 'list')
     stream = wash_url_argument(stream, 'str')
     for etuple in errors_or_warnings_list:
         etuple = wash_url_argument(etuple, 'tuple')
-    # check stream arg for presence of [error,warning]; when none, add error and default to warning
+    # check stream arg for presence of [error,warning]; when none, add error
+    # and default to warning
     if stream == 'error':
         stream = 'err'
     elif stream == 'warning':
@@ -342,7 +407,8 @@ def register_errors(errors_or_warnings_list, stream, req=None):
     else:
         stream = 'log'
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
-        errors_or_warnings_list.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])% stream))
+        errors_or_warnings_list.append(
+            (error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])% stream))
     # update log_errors
     stream_location = os.path.join(CFG_LOGDIR, 'invenio.' + stream)
     errors = ''
@@ -354,36 +420,44 @@ def register_errors(errors_or_warnings_list, stream, req=None):
     if errors:
         errors = errors[(4*7+1):-3] # get rid of begining spaces and last '\n'
     msg = """
-%(time)s --> %(errors)s%(error_file)s""" % \
-    {   'time'          : client_info_dict and client_info_dict['time'] or time.strftime("%Y-%m-%d %H:%M:%S"),
-        'errors'        : errors,
-        'error_file'    : stream=='err' and "\n%s%s\n%s\n" % (' '*4, client_info, tracestack_pretty) or ""
-    }
+%(time)s --> %(errors)s%(error_file)s""" % {
+        'time': client_info_dict and client_info_dict['time'] or \
+                time.strftime("%Y-%m-%d %H:%M:%S"),
+        'errors': errors,
+        'error_file': stream=='err' and "\n%s%s\n%s\n" % (
+            ' '*4, client_info, tracestack_pretty) or ""}
     try:
         stream_to_write = open(stream_location, 'a+')
         stream_to_write.writelines(msg)
         stream_to_write.close()
         return_value = 1
-    except :
+    except:
         error = 'ERR_MISCUTIL_WRITE_FAILED'
-        errors_or_warnings_list.append((error, CFG_MISCUTIL_ERROR_MESSAGES[error] % stream_location))
+        errors_or_warnings_list.append(
+            (error, CFG_MISCUTIL_ERROR_MESSAGES[error] % stream_location))
         return_value = 0
     return return_value
+
 
 def get_msg_associated_to_code(err_code, stream='error'):
     """
     Returns string of code
-    @param code: error or warning code
+    @param err_code: error or warning code
+    @type err_code: string
     @param stream: 'error' or 'warning'
-    @return: tuple (err_code, formatted_message)
+    @type stream: string
+    @return: (err_code, formatted_message)
+    @rtype: tuple
     """
     err_code = wash_url_argument(err_code, 'str')
     stream = wash_url_argument(stream, 'str')
     try:
         module_directory_name = err_code.split('_')[1].lower()
         module_config = module_directory_name + '_config'
-        module_dict_name = "CFG_" + module_directory_name.upper() + "_%s_MESSAGES" % stream.upper()
-        module = __import__(module_config, globals(), locals(), [module_dict_name])
+        module_dict_name = "CFG_" + module_directory_name.upper() + \
+                           "_%s_MESSAGES" % stream.upper()
+        module = __import__(
+            module_config, globals(), locals(), [module_dict_name])
         module_dict = getattr(module, module_dict_name)
         err_msg = module_dict[err_code]
     except ImportError:
@@ -400,7 +474,7 @@ def get_msg_associated_to_code(err_code, stream='error'):
     except KeyError:
         error = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
         err_msg = CFG_MISCUTIL_ERROR_MESSAGES[error] % (err_code,
-                                                        module_config + '.' + module_dict_name)
+                  module_config + '.' + module_dict_name)
         err_code = error
     except:
         error = 'ERR_MISCUTIL_UNDEFINED_ERROR'
@@ -408,13 +482,15 @@ def get_msg_associated_to_code(err_code, stream='error'):
         err_code = error
     return (err_code, err_msg)
 
+
 def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
     """
     @param code_list: list of tuples  [(err_name, arg1, ..., argN), ...]
 
     err_name = ERR_ + %(module_directory_name)s + _ + %(error_name)s #ALL CAPS
     err_name must be stored in file:  module_directory_name + _config.py
-    as the key for dict with name:  CFG_ + %(module_directory_name)s + _ERROR_MESSAGES
+    as the key for dict with name:  CFG_ + %(module_directory_name)s +
+    _ERROR_MESSAGES
     For warnings, same thing except:
         err_name can begin with either 'ERR' or 'WRN'
         dict name ends with _warning_messages
@@ -422,8 +498,8 @@ def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
     @param stream: 'error' or 'warning'
 
     @return: list of tuples of length 2 [('ERR_...', err_msg), ...]
-            if code_list empty, will return None.
-            if errors retrieving error messages, will append an error to the list
+        if code_list empty, will return None.
+        if errors retrieving error messages, will append an error to the list
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -434,14 +510,15 @@ def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
     stream = wash_url_argument(stream, 'str')
     for code_tuple in code_list:
         if not(type(code_tuple) is tuple):
-            code_tuple = (code_tuple,)
+            code_tuple = (code_tuple, )
         nb_tuple_args = len(code_tuple) - 1
         err_code = code_tuple[0]
         if stream == 'error' and not err_code.startswith('ERR'):
             error = 'ERR_MISCUTIL_NO_ERROR_MESSAGE'
             out.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])))
             continue
-        elif stream == 'warning' and not (err_code.startswith('ERR') or err_code.startswith('WRN')):
+        elif stream == 'warning' and not (err_code.startswith('ERR') or \
+                err_code.startswith('WRN')):
             error = 'ERR_MISCUTIL_NO_WARNING_MESSAGE'
             out.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])))
             continue
@@ -460,8 +537,9 @@ def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
                 err_msg = err_msg % code_tuple[1:]
             elif nb_msg_args < nb_tuple_args:
                 err_msg = err_msg % code_tuple[1:nb_msg_args+1]
-                parsing_error =  'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
-                parsing_error_message = eval(CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
+                parsing_error = 'ERR_MISCUTIL_TOO_MANY_ARGUMENT'
+                parsing_error_message = eval(
+                    CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
                 parsing_error_message %= code_tuple[0]
             elif nb_msg_args > nb_tuple_args:
                 code_tuple = list(code_tuple)
@@ -470,11 +548,13 @@ def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
                     code_tuple = tuple(code_tuple)
                 err_msg = err_msg % code_tuple[1:]
                 parsing_error = 'ERR_MISCUTIL_TOO_FEW_ARGUMENT'
-                parsing_error_message = eval(CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
+                parsing_error_message = eval(
+                    CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
                 parsing_error_message %= code_tuple[0]
         except:
             parsing_error = 'ERR_MISCUTIL_BAD_ARGUMENT_TYPE'
-            parsing_error_message = eval(CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
+            parsing_error_message = eval(
+                CFG_MISCUTIL_ERROR_MESSAGES[parsing_error])
             parsing_error_message %= code_tuple[0]
         out.append((err_code, err_msg))
         if parsing_error:
@@ -483,13 +563,15 @@ def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
         out = None
     return out
 
+
 def send_error_report_to_admin(header, url, time_msg,
                                browser, client, error,
                                sys_error, traceback_msg):
     """
     Sends an email to the admin with client info and tracestack
     """
-    from_addr =  '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
+    from_addr = '%s Alert Engine <%s>' % (
+        CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
     to_addr = CFG_SITE_ADMIN_EMAIL
     body = """
 The following error was seen by a user and sent to you.
@@ -505,18 +587,17 @@ The following error was seen by a user and sent to you.
 %(sys_error)s
 %(traceback)s
 
-Please see the %(logdir)s/invenio.err for traceback details.""" % \
-        {   'header'    : header,
-            'url'       : url,
-            'time'      : time_msg,
-            'browser'    : browser,
-            'client'    : client,
-            'error'     : error,
-            'sys_error' : sys_error,
-            'traceback' : traceback_msg,
-            'logdir'    : CFG_LOGDIR,
-            'contact'   : "Please contact %s quoting the following information:"  % (CFG_SITE_SUPPORT_EMAIL,)
-        }
+Please see the %(logdir)s/invenio.err for traceback details.""" % {
+        'header': header,
+        'url': url,
+        'time': time_msg,
+        'browser': browser,
+        'client': client,
+        'error': error,
+        'sys_error': sys_error,
+        'traceback': traceback_msg,
+        'logdir': CFG_LOGDIR,
+        'contact': "Please contact %s quoting the following information:" %
+            (CFG_SITE_SUPPORT_EMAIL, )}
     from invenio.mailutils import send_email
     send_email(from_addr, to_addr, subject="Error notification", content=body)
-
