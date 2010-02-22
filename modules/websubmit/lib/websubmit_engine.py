@@ -47,9 +47,9 @@ from invenio.webuser import getUid, get_email, collect_user_info
 from invenio.websubmit_config import *
 from invenio.messages import gettext_set_language, wash_language
 from invenio.errorlib import register_exception
+from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
 
-
-from websubmit_dblayer import \
+from invenio.websubmit_dblayer import \
      get_storage_directory_of_action, \
      get_longname_of_doctype, \
      get_longname_of_action, \
@@ -350,6 +350,23 @@ def interface(req,
         except AssertionError:
             register_exception(req=req, prefix='curdir="%s", filename="%s"' % (curdir, filename))
             return warningMsg(_("Invalid parameters"), req, c, ln)
+
+        # Do not write reserved filenames to disk
+        if filename in CFG_RESERVED_SUBMISSION_FILENAMES:
+            # Unless there is really an element with that name in the
+            # interface, which means that admin authorized it
+            if not filename in [submission_field[3] for submission_field in get_form_fields_on_submission_page(subname, curpage)]:
+                # Still this will filter out reserved field names that
+                # might have been called by functions such as
+                # Create_Modify_Interface function in MBI step, or
+                # dynamic fields in response elements, but that is
+                # unlikely to be a problem.
+                continue
+
+        # Skip variables containing characters that are not allowed in
+        # WebSubmit elements
+        if not string_is_alphanumeric_including_underscore(filename):
+            continue
 
         # the field is an array
         if isinstance(formfields, types.ListType):
@@ -787,6 +804,9 @@ def endaction(req,
                  % { 'doctype' : quote_plus(doctype), 'ln' : ln }
         return warningMsg(wrnmsg, req)
 
+    ## Get the number of pages for this submission:
+    subname = "%s%s" % (act, doctype)
+
     ## retrieve the action and doctype data
     ## Get the submission storage directory from the DB:
     submission_dir = get_storage_directory_of_action(act)
@@ -865,6 +885,23 @@ def endaction(req,
             register_exception(req=req, prefix='curdir="%s", filename="%s"' % (curdir, filename))
             return warningMsg(_("Invalid parameters"), req, c, ln)
 
+        # Do not write reserved filenames to disk
+        if filename in CFG_RESERVED_SUBMISSION_FILENAMES:
+            # Unless there is really an element with that name in the
+            # interface, which means that admin authorized it
+            if not filename in [submission_field[3] for submission_field in get_form_fields_on_submission_page(subname, curpage)]:
+                # Still this will filter out reserved field names that
+                # might have been called by functions such as
+                # Create_Modify_Interface function in MBI step, or
+                # dynamic fields in response elements, but that is
+                # unlikely to be a problem.
+                continue
+
+        # Skip variables containing characters that are not allowed in
+        # WebSubmit elements
+        if not string_is_alphanumeric_including_underscore(filename):
+            continue
+
         # the field is an array
         if isinstance(formfields,types.ListType):
             fp = open(file_to_open, "w")
@@ -935,8 +972,6 @@ def endaction(req,
         ## Unknown action:
         return warningMsg(_("Unknown action"), req, c, ln)
 
-    ## Get the number of pages for this submission:
-    subname = "%s%s" % (act, doctype)
     num_submission_pages = get_num_pages_of_submission(subname)
     if num_submission_pages is not None:
         nbpages = num_submission_pages

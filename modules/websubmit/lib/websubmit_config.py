@@ -35,6 +35,19 @@ CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN = 0
 ## (0 == NO; 1 == YES)
 CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION = 0
 
+## List of keywords/format parameters that should not write by default
+## corresponding files in submission directory (`curdir').  Some other
+## filenames not included here are reserved too, such as those
+## containing non-alphanumeric chars (excepted underscores '_'), for
+## eg all names containing a dot ('bibdocactions.log',
+## 'performed_actions.log', etc.)
+CFG_RESERVED_SUBMISSION_FILENAMES = ['SuE',
+                                     'files',
+                                     'lastuploadedfile',
+                                     'curdir',
+                                     'function_log',
+                                     'SN']
+
 class InvenioWebSubmitFunctionError(Exception):
     """This exception should only ever be raised by WebSubmit functions.
        It will be caught and handled by the WebSubmit core itself.
