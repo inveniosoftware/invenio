@@ -49,7 +49,7 @@ def _xml_fft_creator(fft):
     """Transform an fft dictionary (made by keys url, docname, format,
     new_docname, icon, comment, description, restriction, doctype, into an xml
     string."""
-    out = '\t<datafield tag ="FFT" ind1=" " ind2=" ">\n'
+    out = '\t<datafield tag="FFT" ind1=" " ind2=" ">\n'
     out += _xml_mksubfield('url', 'a', fft)
     out += _xml_mksubfield('docname', 'n', fft)
     out += _xml_mksubfield('format', 'f', fft)
@@ -68,12 +68,14 @@ def ffts_to_xml(ffts):
     """
     out = ''
     for recid, ffts in ffts.iteritems():
+        out += '<record>\n'
+        out += '\t<controlfield tag="001">%i</controlfield>\n' % recid
         if ffts:
-            out += '<record>\n'
-            out += '\t<controlfield tag="001">%i</controlfield>\n' % recid
             for fft in ffts:
                 out += _xml_fft_creator(fft)
-            out += '</record>\n'
+        else:
+            out += '<datafield tag="FFT" ind1=" " ind2=" "></datafield>\n'
+        out += '</record>\n'
     return out
 
 def get_usage():
