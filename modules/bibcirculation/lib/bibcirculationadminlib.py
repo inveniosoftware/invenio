@@ -4600,7 +4600,6 @@ def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CF
     """
     """
 
-
     if delete_key and ill_request_id:
         library_notes = eval(db.get_ill_request_notes(ill_request_id))
         del library_notes[delete_key]
@@ -4626,8 +4625,6 @@ def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CF
     else:
         ill_req_details = db.get_ill_request_returned(ill_request_id)
 
-
-
     libraries = db.get_external_libraries()
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -4646,10 +4643,10 @@ def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CF
                                                                    ill_borrower_request=ill_borrower_request,
                                                                    ln=ln)
 
-
     return page(title="ILL request details",
                 uid=id_user,
                 req=req,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -4707,7 +4704,6 @@ def ill_request_details_step2(req, delete_key, ill_request_id, ill_status, libra
                                                                    ill_status=ill_status,
                                                                    ill_borrower_request=ill_borrower_request,
                                                                    ln=ln)
-
 
     return page(title="ILL request details",
                 uid=id_user,
@@ -5323,6 +5319,7 @@ def register_ill_request_with_no_recid_step1(req, ln=CFG_SITE_LANG):
     return page(title="Register ILL request",
                 uid=id_user,
                 req=req,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)

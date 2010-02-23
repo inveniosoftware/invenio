@@ -2602,10 +2602,10 @@ def bor_ill_historical_overview(borrower_id):
     """
 
     res = run_sql("""select id, book_info, id_crcLIBRARY,
-                            DATE_FORMAT(request_date,'%Y-%m-%d'),
-                            DATE_FORMAT(expected_date,'%Y-%m-%d'),
-                            DATE_FORMAT(arrival_date,'%Y-%m-%d'),
-                            DATE_FORMAT(due_date,'%Y-%m-%d'),
+                            DATE_FORMAT(request_date,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(expected_date,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(arrival_date,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(due_date,'%%Y-%%m-%%d'),
                             status, library_notes
                        from crcILLREQUEST
                       where id_crcBORROWER=%s and status='document received, request closed'"""

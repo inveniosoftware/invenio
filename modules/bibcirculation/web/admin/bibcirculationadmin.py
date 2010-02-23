@@ -770,16 +770,16 @@ def ill_request_details_step1(req, delete_key=None, ill_request_id=None, ill_sta
 
 def ill_request_details_step2(req, delete_key=None, ill_request_id=None, ill_status=None, library_id=None,
                               request_date=None, expected_date=None, arrival_date=None, due_date=None,
-                              return_date=None, status=None, cost=None,
+                              return_date=None, cost=None,
                               currency=None, barcode=None, library_notes=None, ln=CFG_SITE_LANG):
 
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2
     """
 
-    return bal.ill_request_details_step2(req, delete_key, ill_request_id, library_id,
+    return bal.ill_request_details_step2(req, delete_key, ill_request_id, ill_status, library_id,
                                          request_date, expected_date, arrival_date, due_date,
-                                         return_date, status, cost, currency,
+                                         return_date, cost, currency,
                                          barcode, library_notes, ln)
 
 def ill_request_details_step3(req, request_info=None, ill_status=None, ln=CFG_SITE_LANG):
@@ -944,11 +944,7 @@ def register_ill_request_with_no_recid_step4(req, book_info=None, user_info=None
                                              ln=CFG_SITE_LANG):
     """
     """
-####################################
-    f=open("/tmp/book_info","w") ###
-    f.write(str(book_info)+"\n") ###
-    f.close()                    ###
-####################################
+
     if type(book_info) is str:
         book_info = eval(book_info)
 

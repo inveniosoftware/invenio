@@ -165,28 +165,6 @@ _MENU_ = """
     </li>
 
     <li class="hassubmenu">
-        <a href="#">Lists</a>
-        <ul class="subsubmenu" style="width:17.5em;">
-            <li class="subsubmenu">
-                <a href="#">Libraries</a>
-                    <ul class="subsubmenu" style="width:16.5em;">
-                        <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_library_step1">Search...</a></li>
-                        <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_library_step1">Add new library</a></li>
-                        <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step1">Update info</a></li>
-                    </ul>
-            </li>
-            <li class="hassubmenu">
-                <a href="#">Vendors</a>
-                    <ul class="subsubmenu" style="width:16.5em;">
-                        <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_vendor_step1">Search...</a></li>
-                        <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_vendor_step1">Add new vendor</a></li>
-                        <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step1">Update info</a></li>
-                    </ul>
-            </li>
-        </ul>
-    </li>
-
-    <li class="hassubmenu">
          <a href="#">Help</a>
         <ul class="subsubmenu" style="width:16.5em;">
           <li><a href="%(url)s/help/admin/bibcirculation-admin-guide" target="_blank">Admin guide</a></li>
@@ -1585,7 +1563,7 @@ class Template:
 
         out += """
         <tr>
-             <td class="bibcirctableheader" width="100">%s</td>
+             <td class="bibcirctableheader">%s</td>
         </tr>
         </table>
         <table class="bibcirctable">
@@ -2080,7 +2058,7 @@ class Template:
             <table class="bibcirctable">
               <tr width="200">
                 <td align="center">
-                  <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:40%%'>
+                  <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:200'>
 
               """
             for (ccid, name, email, phone, address, mailbox) in result:
@@ -2134,7 +2112,7 @@ class Template:
               <br />
               <table class="bibcirctable">
                           <tr>
-                               <td class="bibcirctableheader" width="70">%s</td>
+                               <td class="bibcirctableheader">%s</td>
                           </tr>
               </table>
               <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
@@ -2226,7 +2204,7 @@ class Template:
               <input type=hidden name="list_of_books" value="%s">
               <table class="bibcirctable">
                           <tr>
-                               <td class="bibcirctableheader" width="70">%s</td>
+                               <td class="bibcirctableheader">%s</td>
                           </tr>
               </table>
               <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
@@ -2258,7 +2236,7 @@ class Template:
                 <br />
                 <table class="bibcirctable">
                           <tr>
-                               <td class="bibcirctableheader" width="70">%s</td>
+                               <td class="bibcirctableheader">%s</td>
                           </tr>
                 </table>
 
@@ -2269,12 +2247,12 @@ class Template:
                 <thead>
                  <tr>
                     <th>%s</th>
+                    <th width="65">%s</th>
+                    <th width="100">%s</th>
+                    <th width="80">%s</th>
+                    <th width="130">%s</th>
                     <th>%s</th>
-                    <th>%s</th>
-                    <th>%s</th>
-                    <th>%s</th>
-                    <th>%s</th>
-                </tr>
+                 </tr>
                 </thead>
                 <tbody>
                 """  % (CFG_SITE_URL, list_of_books, _("User information"),
@@ -2302,10 +2280,10 @@ class Template:
             out +="""
                  <tr>
                     <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td>%s</td>
-                    <td width="230" class="bibcirccontent">
+                    <td width="65">%s</td>
+                    <td width="100">%s</td>
+                    <td width="80">%s</td>
+                    <td width="130" class="bibcirccontent">
                     <script type="text/javascript">
                         $(function() {
                             $("%s").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
@@ -2314,7 +2292,7 @@ class Template:
                     <input type="text" size="12" id="%s" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
 
                     </td>
-                  <td width="100"><textarea name='note' rows="1" cols="40" style='border: 1px solid #cfcfcf'></textarea></td>
+                  <td ><textarea name='note' rows="1" cols="40" style='border: 1px solid #cfcfcf'></textarea></td>
                 </tr>
                 """ % (book_title_from_MARC(recid), barcode,
                        library_name, location,
@@ -2786,7 +2764,7 @@ class Template:
                 <br />
                 <table class="bibcirctable">
                   <tr>
-                     <td class="bibcirctableheader" width="10">%s</td>
+                     <td class="bibcirctableheader">%s</td>
                   </tr>
                 </table>
 
@@ -3698,7 +3676,7 @@ class Template:
         <br />
         <table class="bibcirctable">
           <tr>
-            <td class="bibcirctableheader" width="50">%s %s</td>
+            <td class="bibcirctableheader">%s %s</td>
           </tr>
         </table>
         <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
@@ -3739,7 +3717,7 @@ class Template:
         <br />
         <table class="bibcirctable">
           <tr>
-            <td class="bibcirctableheader" width="50">%s</td>
+            <td class="bibcirctableheader">%s</td>
           </tr>
         </table>
         <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
@@ -8903,11 +8881,7 @@ class Template:
         <div class="bibcircbottom">
         <br />
         <br />
-        <table class="bibcirctable">
-        <tr>
-        <td class="bibcirccontent" width="30">%s</td>
-        </tr>
-        </table>
+        <div class="infoboxsuccess">%s</div>
         <br />
         <br />
         <table class="bibcirctable">
@@ -11063,14 +11037,16 @@ class Template:
         """
         _ = gettext_set_language(ln)
 
-        out = """  """
+        out = _MENU_
 
-        out += _MENU_
+        out += """
+            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            """% (CFG_SITE_URL, CFG_SITE_URL)
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
          period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_borrower_request
-
-        #(value, currency) = cost.split()
 
         book_info = eval(book_info)
 
@@ -11083,15 +11059,14 @@ class Template:
                 book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
             out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=ill_request_id value=%s>
                 <br />
-                     <table class="bibcirctable">
-                          <tr>
-                               <td class="bibcirctableheader" width="10">%s</td>
-                          </tr>
+                <table class="bibcirctable">
+                    <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                    </tr>
                 </table>
                 <table class="bibcirctable">
                  <tr valign='top'>
@@ -11108,12 +11083,12 @@ class Template:
                      <tr>
                         <th width="100">%s</th>
                         <td>%s</td>
-                         </tr>
+                     </tr>
                      <tr>
                         <th width="100">%s</th>
                         <td>%s</td>
                      </tr>
-                    <tr>
+                     <tr>
                         <th width="100">%s</th>
                         <td>%s</td>
                      </tr>
@@ -11140,7 +11115,6 @@ class Template:
                       str(book_cover))
 
         except KeyError:
-
             try:
                 book_cover = get_book_cover(book_info['isbn'])
             except KeyError:
@@ -11218,11 +11192,6 @@ class Template:
 
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
-
 
         <table class="bibcirctable">
           <tr valign='top'>
@@ -11422,46 +11391,40 @@ class Template:
                      <tr>
                        <th width="150">%s</th>
                        <td class="bibcirccontent">
-                         <input type="text" size="12" id="%s" name="request_date" value="%s" style='border: 1px solid #cfcfcf'>
-                         <img src="/jsCalendar/jsCalendar.gif" alt="select request date" id="%s"
-                         onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                         >
-                         <script type="text/javascript" language='JavaScript'>
-                         Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                         </script>
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
+                        </script>
+                        <input type="text" size="10" id="date_picker1" name="request_date" value="%s" style='border: 1px solid #cfcfcf'>
+
                       </td>
                     </tr>
                     <tr>
                       <th width="150">%s</th>
                       <td class="bibcirccontent">
-                        <input type="text" size="12" id="%s" name="expected_date" value="%s" style='border: 1px solid #cfcfcf'>
-                        <img src="/jsCalendar/jsCalendar.gif" alt="select expected date" id="%s"
-                        onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                        >
-                        <script type="text/javascript" language='JavaScript'>
-                        Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
                         </script>
+                        <input type="text" size="10" id="date_picker2" name="expected_date" value="%s" style='border: 1px solid #cfcfcf'>
+
                       </td>
                     </tr>
                     <tr>
                       <th width="100">%s</th>
-                      <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
+                      <td class="bibcirccontent">
+                        <input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
                         <select name="currency"  style='border: 1px solid #cfcfcf'>
 
                         """ % (_("Request date"),
-                               _("request_date"), request_date, _("jsCal1"),
-                               _("request_date"), _("jsCal1"),
-                               _("Expected date"), _("expected_date"), expected_date,
-                               _("jsCal2"), _("expected_date"),
-                               _("jsCal2"), _("Cost"), value)
+                               CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
+                               _("Expected date"),
+                               CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=7)).strftime('%Y-%m-%d'),
+                               _("Cost"), value)
 
 
             if currency == 'EUR':
@@ -12189,9 +12152,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = """  """
-
-        out += _MENU_
+        out = _MENU_
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
          period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_borrower_request
@@ -12212,10 +12173,10 @@ class Template:
             <div class="bibcircbottom">
             <input type=hidden name=request_info value="%s">
                 <br />
-                     <table class="bibcirctable">
-                          <tr>
-                               <td class="bibcirctableheader" width="10">%s</td>
-                          </tr>
+                <table class="bibcirctable">
+                    <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                    </tr>
                 </table>
                 <table class="bibcirctable">
                  <tr valign='top'>
@@ -14318,14 +14279,14 @@ class Template:
         <br />
         <br />
           <div class="bibcircbottom" align="center">
-          <div class="infoboxmsg"><strong>%s</strong></div>
+          <div class="infoboxmsg"><strong>%s<br />%s</strong></div>
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
            <form name="display_ill_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step2" method="get">
              <table class="bibcirctable">
                   <tr align="center">
-                    <td class="bibcirctableheader" width="10">%s</td>
+                    <td class="bibcirctableheader">%s</td>
                   </tr>
                 </table>
                 <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
@@ -14376,7 +14337,7 @@ class Template:
 
            <br />
 
-           """  % (_("Book does not exists on CDS Invenio. Please fill the following form."),
+           """  % (_("Book does not exists on CDS Invenio."),_("Please fill the following form."),
                    CFG_SITE_URL,
                    _("Item details"),
                    _("Book title"),
@@ -14392,10 +14353,8 @@ class Template:
         conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -14404,40 +14363,44 @@ class Template:
              </table>
              <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
                <tr>
-                <th width="150">%s</th>
-                <td>
-                       <input type="text" size="12" id="%s" name="period_of_interest_from" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
+                <th valign="center" width="100">%s</th>
+                <td valign="center" width="250">
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
+                         </script>
+                         <input type="text" size="10" id="date_picker1" name="period_of_interest_from" value="%s" style='border: 1px solid #cfcfcf'>
+
+                    </td>
+                </tr>
+                """% (CFG_SITE_URL, CFG_SITE_URL,
+                      _("ILL request details"),
+                      _("Period of interest (From)"),
+                      CFG_SITE_URL,
+                    datetime.date.today().strftime('%Y-%m-%d'))
+
+
+
+
+        out += """
+                <tr>
+                <th valign="top" width="100">%s</th>
+                <td width="250">
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
+                         </script>
+                         <input type="text" size="10" id="date_picker2" name="period_of_interest_to" value="%s" style='border: 1px solid #cfcfcf'>
+
                     </td>
                 </tr>
                 <tr>
-                <th width="150">%s</th>
-                <td>
-                       <input type="text" size="12" id="%s" name="period_of_interest_to" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
-                    </td>
-                </tr>
-                <tr>
-                   <th valign="top" width="150">%s</th>
-                   <td><textarea name='additional_comments' rows="6" cols="30"
+                   <th valign="top" width="100">%s</th>
+                   <td width="250"><textarea name='additional_comments' rows="6" cols="34"
                    style='border: 1px solid #cfcfcf'></textarea></td>
                 </tr>
               </table>
@@ -14468,11 +14431,7 @@ class Template:
              <br />
              <br />
              </div>
-             """ % (_("ILL request details"), _("Period of interest - From"),
-                    datetime.date.today().strftime('%Y-%m-%d'),
-                    "jsCal1", "period_of_interest_from", "jsCal1",
-                    _("Period of interest - To"), (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
-                    "jsCal2", "period_of_interest_to", "jsCal2",
+             """ % (_("Period of interest (To)"),  CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
                     _("Additional comments"),
                     _("Borrower accepts the %s of the service in particular the return of books in due time." % (conditions_link)),
                     _("Borrower wants this edition only."),
@@ -14775,6 +14734,7 @@ class Template:
                   <tr>
                     <td width="200" valign='top'>
                     <input type=hidden name=book_info value="%s">
+                    <input type=hidden name=request_details value="%s">
                        <table class="bibcirctable">
                         <tr>
                             <td class="bibcirctableheader" width="10">%s</td>
@@ -14843,7 +14803,7 @@ class Template:
                          </tr>
                        </table>
                      </td>
-                     """ % (CFG_SITE_URL, book_info,
+                     """ % (CFG_SITE_URL, book_info, request_details,
                             _("Item details"),
                             _("Name"), title,
                             _("Author(s)"), authors,
@@ -14856,7 +14816,7 @@ class Template:
                             _("Period of interest (From)"), period_of_interest_from,
                             _("Period of interest (To)"), period_of_interest_to,
                             _("Additional comments"), additional_comments,
-                            _("Only this edition."), only_edition)
+                            _("Only this edition"), only_edition)
 
         out += """
                     <td width="200" valign='top'>
@@ -15501,18 +15461,16 @@ class Template:
             </td>
           </tr>
           <tr align="center">
-          <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
-                             </tr>
+            <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
+          </tr>
         </table>
         <br />
         <table class="bibcirctable">
           <tr align="center">
             <td>
-
               <input type=button value='%s'
               onClick="history.go(-1)" class="formbutton">
               <input type="submit" value='%s' class="formbutton">
-
             </td>
           </tr>
         </table>
@@ -15521,7 +15479,7 @@ class Template:
         <br />
         <br />
         </div>
-        <form>
+        </form>
 
         """ % (CFG_SITE_URL, _("Check if the book already exists on CDS Invenio,"\
                                + " before to send your ILL request."),
@@ -15539,9 +15497,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = """  """
-
-        out += _MENU_
+        out = _MENU_
 
         if len(result) == 0:
             out += """
@@ -15549,12 +15505,13 @@ class Template:
             <br />
             <div class="infoboxmsg">%s</div>
             <br />
-            """ % (_("0 item(s) found."))
+            """ % (_("0 items found."))
 
         else:
             out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
+        <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step1" method="get" >
         <br />
         <table class="bibcirctable">
           <tr align="center">
@@ -15574,7 +15531,7 @@ class Template:
             </tr>
           </thead>
           <tbody>
-        """ % (len(result), _("Title"),
+        """ % (CFG_SITE_URL,len(result), _("Title"),
                _("Author"), _("Publisher"),
                _("No. Copies"))
 
@@ -15606,15 +15563,17 @@ class Template:
             <td>
               <input type=button value='%s'
                onClick="history.go(-1)" class="formbutton">
+              <input type="submit" value='%s' class="formbutton">
             </td>
           </tr>
         </table>
         <br />
         <br />
         <br />
+        </form>
         </div>
 
-        """ % (_("Back"))
+        """ % (_("Back"), _("Proceed anyway"))
 
         return out
 
@@ -15709,7 +15668,7 @@ class Template:
             <br />
             <div class="infoboxmsg">%s</div>
             <br />
-            """ % (_("0 item(s) found."))
+            """ % (_("0 items found."))
 
         else:
             out += """
