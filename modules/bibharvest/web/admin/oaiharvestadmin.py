@@ -22,12 +22,16 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import invenio.oai_harvest_admin as oha
+import simplejson as json
 import datetime
+import math
+import urllib
 from invenio.webpage import page, create_error_box
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.bibrankadminlib import check_user
+from invenio.oai_harvest_dblayer import get_holdingpen_day_size
 
 def index(req, ln=CFG_SITE_LANG):
     """Main OAI Harvest admin page"""
@@ -314,32 +318,7 @@ def viewtasklogs(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def viewholdingpen(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
-    navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
-    try:
-        uid = getUid(req)
-    except Error, e:
-        return page(title="OAI Harvest Admin Interface - Error",
-                    body=e,
-                    uid=uid,
-                    language=ln,
-                    navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__,
-                    req=req)
-    auth = check_user(req,'cfgoaiharvest')
-    if not auth[0]:
-        return page(title="Holding Pen",
-                    body=oha.perform_request_viewholdingpen(ln=ln,
-                                                    confirm=confirm),
-                    uid=uid,
-                    language=ln,
-                    req=req,
-                    navtrail = navtrail_previous_links,
-                    lastupdated=__lastupdated__)
-    else:
-        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-def viewhprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted="0000-00-00 00:00:00"):
+def viewhprecord(req, ln=CFG_SITE_LANG, confirm=0, hpupdate_id = 0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -354,8 +333,7 @@ def viewhprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted="0
     auth = check_user(req,'cfgoaiharvest')
     if not auth[0]:
         return page(title="Holding Pen Record",
-                    body=oha.perform_request_viewhprecord(oai_id = oai_id,
-                                                          date_inserted = date_inserted,
+                    body=oha.perform_request_viewhprecord(hpupdate_id = hpupdate_id,
                                                           ln=ln,
                                                           confirm=confirm),
                     uid=uid,
@@ -365,7 +343,8 @@ def viewhprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted="0
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted="0000-00-00 00:00:00"):
+
+def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, hpupdate_id = 0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -380,8 +359,8 @@ def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted=
     auth = check_user(req,'cfgoaiharvest')
     if not auth[0]:
         return page(title="Holding Pen Record",
-                    body=oha.perform_request_accepthprecord(oai_id = oai_id,
-                                                          date_inserted = date_inserted,
+                    metaheaderadd = oha.view_holdingpen_headers(),
+                    body=oha.perform_request_accepthprecord(hpupdate_id = hpupdate_id,
                                                           ln=ln,
                                                           confirm=confirm),
                     uid=uid,
@@ -393,7 +372,7 @@ def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted=
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def delhprecord(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0, oai_id = "", date_inserted="0000-00-00 00:00:00"):
+def delhprecord(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0, hpupdate_id = 0):
     navtrail_previous_links = oha.getnavtrail(' &gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py?ln=%s">OAI Harvest Admin Interface</a> ' % (CFG_SITE_URL, ln), ln=ln)
     try:
         uid = getUid(req)
@@ -408,8 +387,7 @@ def delhprecord(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0, oai_id = "", date
     auth = check_user(req,'cfgoaiharvest')
     if not auth[0]:
         return page(title="Holding Pen Record",
-                    body=oha.perform_request_delhprecord(oai_id = oai_id,
-                                                            date_inserted = date_inserted,
+                    body=oha.perform_request_delhprecord(hpupdate_id = hpupdate_id,
                                                             ln=ln,
                                                             confirm=confirm),
                     uid=uid,
@@ -475,7 +453,7 @@ def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, confirm=0, record_id=None)
 
 
 def preview_original_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
+    navtrail_previous_links =oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
     except Error, e:
@@ -499,7 +477,7 @@ def preview_original_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = N
 
 
 def preview_harvested_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
+    navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py">OAI Harvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
     except Error, e:
@@ -525,4 +503,104 @@ def preview_harvested_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = 
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def getHoldingPenData(req, elementId):
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return "unauthorised access !"
+    auth = check_user(req,'cfgoaiharvest')
+    if auth[0]:
+        return "unauthorised access !"
+
+    elements = elementId.split("_")
+    prefix = elements[0]
+    resultHtml = None
+    additionalData = None
+
+    if len(elements) == 2:
+        filter = elements[1]
+        resultHtml =  oha.perform_request_gethpyears(elements[0], filer);
+    elif len(elements) == 3:
+        # only the year is specified
+        result = ""
+        filter = elements[2]
+        nodeYear = int(elements[1])
+        resultHtml = oha.perform_request_gethpyear(elements[0], nodeYear, filter)
+
+    elif len(elements) == 4:
+        # year and month specified
+        nodeYear = int(elements[1])
+        nodeMonth = int(elements[2])
+        filter = elements[3]
+        resultHtml = oha.perform_request_gethpmonth(elements[0], nodeYear, nodeMonth, filter)
+
+    elif len(elements) == 5:
+        # year, month and day specified - returning the entries themselves
+        nodeYear = int(elements[1])
+        nodeMonth = int(elements[2])
+        nodeDay = int(elements[3])
+        filter = elements[4]
+        daySize = get_holdingpen_day_size(nodeYear, nodeMonth, nodeDay, filter);
+        resultHtml = """<li><div id="%s_pager"></div>&nbsp;</li>""" %(elementId,)
+        resultsPerPage = 20
+        numberOfPages = math.ceil(float(daySize) / resultsPerPage)
+        pages = []
+        urlFilter = urllib.quote(filter)
+        for i in range(0, numberOfPages):
+            pages += [
+            {
+            "url": "%s/admin/bibharvest/oaiharvestadmin.py/get_entries_fragment?year=%s&month=%s&day=%s&start=%i&limit=%i&filter=%s" % (CFG_SITE_URL, nodeYear, nodeMonth, nodeDay, i * resultsPerPage, resultsPerPage, urlFilter),
+            "selector": False,
+            "type": "ajax",
+            }]
+
+        additionalData = {
+               "pagerId": elementId + "_pager",
+               "pages" : pages
+           }
+    else:
+        # nothing of the above. error
+        resultHtml = "Wrong request"
+
+    return json.dumps({"elementId": elementId, "html" : resultHtml, "additionalData" : additionalData})
+
+#        return "<li id=\"ajax_generated_li\"><span>Ajax generated position " + element_id + "</span><ul id=\"ble_ajaxgenerated_ul\"><li>element</li></ul></li>"
+
+def get_entries_fragment(req, year, month, day, start, limit, filter):
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return "unauthorised access !"
+    auth = check_user(req, 'cfgoaiharvest')
+    if not auth[0]:
+        return oha.perform_request_gethpdayfragment(int(year), int(month), int(day), int(limit), int(start), filter)
+    else:
+        return "unauthorised access !"
+
+
+
+def viewholdingpen(req, filter = "", ln=CFG_SITE_LANG):
+    navtrail_previous_links = oha.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = check_user(req, 'cfgoaiharvest')
+    if not auth[0]:
+        return page(title="Holding Pen",
+                    metaheaderadd = oha.view_holdingpen_headers(),
+                    body = oha.perform_request_view_holdingpen_tree(filter),
+                    uid = uid,
+                    language = ln,
+                    req = req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated = __lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 

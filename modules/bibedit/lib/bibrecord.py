@@ -604,9 +604,15 @@ def record_delete_subfield_from(rec, tag, subfield_position,
     try:
         del subfields[subfield_position]
     except IndexError:
-        raise InvenioBibRecordFieldError("The field does not have any subfield "
-            "in position '%s'." % subfield_position)
-
+        from invenio.xmlmarc2textmarclib import create_marc_record
+        recordMarc = create_marc_record(rec, 0, {"text-marc": 1, "aleph-marc": 0})
+        raise InvenioBibRecordFieldError("The record : %(recordCode)s does not contain the subfield "
+            "'%(subfieldIndex)s' inside the field (local: '%(fieldIndexLocal)s, global: '%(fieldIndexGlobal)s' ) of tag '%(tag)s'." % \
+            {"subfieldIndex" : subfield_position, \
+             "fieldIndexLocal" : str(field_position_local), \
+             "fieldIndexGlobal" : str(field_position_global), \
+             "tag" : tag, \
+             "recordCode" : recordMarc})
     if not subfields:
         if field_position_global is not None:
             for position, field in enumerate(rec[tag]):

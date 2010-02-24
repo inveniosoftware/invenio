@@ -314,6 +314,7 @@ function updateStatus(statusType, reporttext){
    * Update status (in the bottom of the menu).
    */
   var image, text;
+	gCurrentStatus = statusType;
   switch (statusType){
     case 'ready':
       image = img('/img/circle_green.png');

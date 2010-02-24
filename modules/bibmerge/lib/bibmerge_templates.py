@@ -91,7 +91,7 @@ class Template:
       </tr>
     </table>
   </div>
-  
+
   <div class="bibMergeMenuSection" id="bibMergeMenuSectionActions">
     <div class="bibMergeMenuSectionHeader">
       <img class="bibMergeImgCompressMenuSelection" src="/img/bullet_toggle_minus.png" />
@@ -121,7 +121,7 @@ class Template:
       </tr>
     </table>
   </div>
-  
+
   <div class="bibMergeMenuSection" id="bibMergeMenuSectionSubmission">
     <div class="bibMergeMenuSectionHeader">
       <img class="bibMergeImgCompressMenuSelection" src="/img/bullet_toggle_minus.png" />

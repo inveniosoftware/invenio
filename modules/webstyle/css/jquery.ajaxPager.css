@@ -1,0 +1,94 @@
+h3 {
+	font-family: Gill Sans, Verdana;
+    font-size: 11px;
+    line-height: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+    
+h4 {
+	font-family: times, Times New Roman, times-roman, georgia, serif;
+    color: #444;
+    margin: 0px 0px 0px;
+    padding: 0px 0px 6px 0px;
+    font-size: 35px;
+    line-height: 39px;
+    letter-spacing: -2px;
+    font-weight: bold;
+}
+    
+h5 {
+	font-family: times, Times New Roman, times-roman, georgia, serif;
+    color: #444;
+    margin: 0px 0px -10px;
+    font-size: 17px;
+    font-weight: bold;
+}
+    
+p {
+	font-family: Verdana;
+    color: #333;
+    font-size: 12px;
+    line-height: 20px;
+    margin: 0px 0px 20px;
+}
+    
+code {
+	background-color: #F6F6EF;
+    border: 1px solid #D7D6C9;
+    padding: 10px;
+    display: block;
+    font-size:13px;
+    padding:10px;
+    margin: 20px 0px;
+    white-space: pre;
+    font-family: monospace;
+}
+    
+a {
+	color: black;
+}
+    
+iframe {
+	width: 580px;
+    height: 300px;
+    border: none;
+}
+    
+.ajaxPagerPageLink,
+.ajaxPagerNextLink,
+.ajaxPagerPreviousLink,
+.ajaxPagerLastLink,
+.ajaxPagerFirstLink {
+	font-family: Verdana;
+    font-size: 13px;
+    float: left ; 
+    margin-left:5px;
+    padding: 1px 6px 2px;
+    border: 1px solid #ddd;
+    cursor: pointer;
+}
+    
+.ajaxPagerPageBreak {
+	padding: 2px 6px;
+    float: left ; 
+    margin-left:5px;
+    border: 1px solid #fff;
+}    
+
+.ajaxPagerLinks .disabled {
+	color: #ddd;
+	border-color: #f6f6f6;
+	cursor: default;
+}
+    
+.ajaxPagerLinks .ajaxPagerPageLink.current {
+	background-color: #666;
+    border-color: #666;
+    color: white;
+}
+
+.ajaxPagerLinks:after{
+	content: ""
+}

@@ -21,7 +21,9 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
+from invenio.messages import gettext_set_language
+from urllib import quote
 
 class Template:
 
@@ -36,7 +38,6 @@ class Template:
 
         imgCompressMenuSection = img('/img/bullet_toggle_minus.png',
                             'bibEditImgCompressMenuSection')
-
         recordmenu = '<div class="bibEditMenuSectionHeader">\n' \
             '          %(imgCompressMenuSection)sRecord\n' \
             '          %(imgNewRecord)s\n' \
@@ -149,6 +150,16 @@ class Template:
             'lblChecking': 'Checking status' + '...'
             }
 
+        holdingpenpanel = '<div class="bibEditMenuSectionHeader">\n' \
+                            '          %(imgCompressMenuSection)sHolding Pen\n' \
+                            '<table class="bibEditMenuMore">\n<tr><td>' \
+                            '   <div id="bibEditHoldingPenToolbar"> '  \
+                            '      <div id="bibeditHPChanges"></div>' \
+                            ' </div> </td></tr></table>' \
+                            '        </div>\n'  %{ 'imgCompressMenuSection': imgCompressMenuSection,
+                                                  }
+#                            self.holdingPenPanel(CFG_SITE_LANG)
+
         lnkhelp = img('/img/help.png', '', style='vertical-align: bottom') + \
             link('Help', href='#', onclick='window.open(' \
             '\'%s/help/admin/bibedit-admin-guide#2\', \'\', \'width=640,' \
@@ -165,10 +176,13 @@ class Template:
             '      <div class="bibEditMenuSection">\n' \
             '        %(viewmenu)s\n' \
             '      </div>\n' \
-            '      <div id="bibEditMenuSection">\n' \
+            '      <div class="bibEditMenuSection">\n' \
+            '         %(holdingpenpanel)s\n'\
+            '      </div>'\
+            '      <div class="bibEditMenuSection">\n' \
             '        %(statusarea)s\n' \
             '      </div>\n' \
-            '      <div id="bibEditMenuSection" align="right">\n' \
+            '      <div class="bibEditMenuSection" align="right">\n' \
             '        %(lnkhelp)s\n' \
             '      </div>\n' \
             '    </div>\n' % {
@@ -176,7 +190,8 @@ class Template:
                 'viewmenu': viewmenu,
                 'fieldmenu': fieldmenu,
                 'statusarea': statusarea,
-                'lnkhelp': lnkhelp
+                'lnkhelp': lnkhelp,
+                'holdingpenpanel': holdingpenpanel
                 }
 
 def img(src, _class='', **kargs):

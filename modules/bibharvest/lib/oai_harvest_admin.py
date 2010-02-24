@@ -43,11 +43,16 @@ from invenio.bibrankadminlib import \
      tupletotable, \
      createhiddenform
 from invenio.dbquery import run_sql
+
 from invenio.oai_harvest_dblayer import get_history_entries, \
      get_month_logs_size, get_history_entries_for_day, \
      get_day_logs_size, get_entry_history, get_entry_logs_size, \
-     get_holdingpen_entries, delete_holdingpen_entry, get_holdingpen_entry
-from invenio.search_engine import search_pattern
+     get_holdingpen_entries, delete_holdingpen_entry, get_holdingpen_entry, \
+     get_holdingpen_years, get_holdingpen_month, get_holdingpen_year, \
+     get_holdingpen_day_fragment, get_holdingpen_day_size, \
+     get_holdingpen_entry_details
+from invenio.search_engine import search_pattern, get_record
+
 import invenio.template
 from invenio import oai_harvest_daemon
 from invenio.xmlmarc2textmarclib import create_marc_record
@@ -1056,21 +1061,20 @@ def build_holdingpen_table(data, ln=CFG_SITE_LANG):
     for record in data:
         oai_id = record[0]
         date_inserted = record[1]
+        hpupdate_id = record[2]
         result += bibharvest_templates.tmpl_table_row_begin()
         result += bibharvest_templates.tmpl_table_output_cell(str(oai_id), cssclass = "oddtablecolumn")
         result += bibharvest_templates.tmpl_table_output_cell(str(date_inserted), cssclass = "pairtablecolumn")
         details_link = create_html_link(urlbase=oai_harvest_admin_url + \
                                         "/viewhprecord",
                                         urlargd={'ln': ln,
-                                                 'oai_id': str(oai_id),
-                                                 'date_inserted': str(date_inserted)},
+                                                 'hpupdate_id': str(hpupdate_id)},
                                         link_label=_("Compare with original"))
         result += bibharvest_templates.tmpl_table_output_cell(details_link, cssclass = "oddtablecolumn")
         delete_hp_link = create_html_link(urlbase=oai_harvest_admin_url + \
                                           "/delhprecord",
                                           urlargd={'ln': ln,
-                                                   'oai_id': str(oai_id),
-                                                   'date_inserted': str(date_inserted)},
+                                                   'hpupdate_id' : str(hpupdate_id)},
                                           link_label=_("Delete from holding pen"))
         result += bibharvest_templates.tmpl_table_output_cell(delete_hp_link, cssclass = "pairtablecolumn")
         result += bibharvest_templates.tmpl_table_row_end()
@@ -1083,32 +1087,41 @@ def perform_request_viewholdingpen(ln = CFG_SITE_LANG, confirm=0, start = 0, lim
     result += build_holdingpen_table(data, ln)
     return result
 
-def perform_request_viewhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, confirm=0):
+def perform_request_viewhprecord(hpupdate_id, ln = CFG_SITE_LANG, confirm=0):
     _ = gettext_set_language(ln)
     result = ""
-    record_id = int(search_pattern( p = oai_id, f = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
-                                        m = 'e' ).tolist()[0])
-    db_rec = get_record(record_id)
-    db_MARC = create_marc_record(db_rec[0], record_id, {"text-marc": 1, "aleph-marc": 0})
-    db_content = bibharvest_templates.tmpl_output_preformatted(db_MARC.encode("utf-8"))
-    db_label = "Database version of record" + bibharvest_templates.tmpl_print_brs(ln, 1)
-    hp_rec = create_record(get_holdingpen_entry(oai_id, date_inserted))
-    hp_MARC = create_marc_record(hp_rec[0], record_id, {"text-marc": 1, "aleph-marc": 0})
-    hp_content = bibharvest_templates.tmpl_output_preformatted(hp_MARC.encode("utf-8"))
-    hp_label = bibharvest_templates.tmpl_print_brs(ln, 2) + "Holdingpen version of record"\
-        + bibharvest_templates.tmpl_print_brs(ln, 1)
+    try:
+        (oai_id, record_id,  date_inserted, hprecord_content) = get_holdingpen_entry_details(hpupdate_id)
+    except:
+        return _("Error when retrieving the Holding Pen entry")
+    try:
+        db_rec = get_record(record_id)
+        db_MARC = create_marc_record(db_rec, record_id, {"text-marc": 1, "aleph-marc": 0})
+    #import rpdb2; rpdb2.start_embedded_debugger('password', fAllowRemote=True)
+        db_content = bibharvest_templates.tmpl_output_preformatted(db_MARC) # originally .encode("utf-8") ... does ot work
+        db_label = "Database version of record" + bibharvest_templates.tmpl_print_brs(ln, 1)
+    except:
+        return _("Error when retrieving the record")
+    try:
+        hp_rec = create_record(hprecord_content)[0]
+        hp_MARC = create_marc_record(hp_rec, record_id, {"text-marc": 1, "aleph-marc": 0})
+        hp_content = bibharvest_templates.tmpl_output_preformatted(hp_MARC) # originally .encode("utf-8") ... does ot work
+        hp_label = bibharvest_templates.tmpl_print_brs(ln, 2) + "Holdingpen version of record"\
+            + bibharvest_templates.tmpl_print_brs(ln, 1)
+    except:
+        return _("Error when formatting the Holding Pen entry. Probably it's content is broken")
     submit_link = create_html_link(urlbase=oai_harvest_admin_url + \
-                                   "/accepthprecord",
+                                       "/accepthprecord",
                                    urlargd={'ln': ln,
-                                            'oai_id': str(oai_id),
-                                            'date_inserted': str(date_inserted)},
+                                            'hpupdate_id': hpupdate_id},
                                    link_label=_("Accept Holding Pen version"))
     delete_link = create_html_link(urlbase=oai_harvest_admin_url + \
-                                   "/delhprecord",
+                                       "/delhprecord",
                                    urlargd={'ln': ln,
                                             'oai_id': str(oai_id),
                                             'date_inserted': str(date_inserted)},
                                    link_label=_("Delete from holding pen"))
+
     result = ""
     result += db_label
     result += db_content
@@ -1118,16 +1131,53 @@ def perform_request_viewhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, conf
     result += submit_link
     return result
 
-def perform_request_delhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, confirm = 0):
-    delete_holdingpen_entry(oai_id, date_inserted)
+def perform_request_delhprecord(hpupdate_id, ln = CFG_SITE_LANG, confirm = 0):
+    delete_holdingpen_entry(hpupdate_id)
     return "Record deleted from the holding pen"
 
-def perform_request_accepthprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, confirm = 0):
-    record_xml = get_holdingpen_entry(oai_id, date_inserted)
-    delete_holdingpen_entry(oai_id, date_inserted)
+def perform_request_accepthprecord(hpupdate_id, ln = CFG_SITE_LANG, confirm = 0):
+    (_, _, _, record_xml) = get_holdingpen_entry_details(hpupdate_id)
+    delete_holdingpen_entry(hpupdate_id)
     upload_record(record_xml)
+    return perform_request_view_holdingpen_tree("")
 
-    return perform_request_viewholdingpen(ln = ln, confirm = confirm, start = 0, limit = -1)
+
+# new functions for the holding pen
+
+def perform_request_gethpyears(prefix, filter):
+    years = get_holdingpen_years(filter)
+    result = ""
+    for year in years:
+        result += "<li id=\"%s_%s_%s\"><span>Year %s (%s entries)</span> <ul id=\"%s_%s_%s_ul\"></ul></li>" %(prefix, str(year[0]), filter, str(year[0]), str(year[1]), prefix, str(year[0]), filter)
+    return result
+
+def perform_request_gethpyear(prefix, year, filter):
+    months = get_holdingpen_year(year, filter)
+    result = ""
+    for month in months:
+        result += "<li id=\"%s_%s_%s_%s\"><span>%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_ul\"></ul></li>" %(prefix, year, str(month[0]), filter, year, str(month[0]), str(month[1]), prefix, year, str(month[0]), filter)
+    return result
+
+def perform_request_gethpmonth(prefix, year, month, filter):
+    days = get_holdingpen_month(year, month, filter)
+    result = ""
+    for day in days:
+        result += "<li id=\"%s_%s_%s_%s_%s\"><span>%s-%s-%s (%s entries)</span> <ul id=\"%s_%s_%s_%s_%s_ul\"></ul></li>" %(prefix, year, month, str(day[0]), filter, year, month, str(day[0]), str(day[1]), prefix, year, month, str(day[0]), filter)
+    return result
+
+def perform_request_gethpdayfragment(year, month, day, limit, start, filter):
+    data = get_holdingpen_day_fragment(year, month, day, limit, start, filter)
+    return build_holdingpen_table(data, "en")
+
+
+def view_holdingpen_headers():
+    return  bibharvest_templates.tmpl_view_holdingpen_headers()
+
+def perform_request_view_holdingpen_tree(filter):
+    return  bibharvest_templates.tmpl_view_holdingpen_body( \
+                filter, perform_request_gethpyears("holdingpencontainer", filter))
+
+
 ##################################################################
 ### Here the functions to retrieve, modify, delete and add sources
 ##################################################################

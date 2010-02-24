@@ -151,20 +151,85 @@ def get_entry_logs_size(oai_id):
     return 0
 
 def get_holdingpen_entries(start = 0, limit = 0):
-    query = "SELECT oai_id, date_inserted FROM oaiHOLDINGPEN ORDER BY date_inserted"
+    query = "SELECT oai_id, changeset_date, update_id FROM bibHOLDINGPEN ORDER BY changeset_date"
     if limit > 0 or start > 0:
         query += " LIMIT " + str(start) + "," + str(limit)
 
-    query_results = run_sql(query)
-    results = []
-    for row in query_results:
-        results.append((row[0], row[1]))
-    return results
+    return run_sql(query)
 
 def get_holdingpen_entry(oai_id, date_inserted):
-    query = "SELECT record_XML FROM oaiHOLDINGPEN WHERE date_inserted = %s AND oai_id = %s"
+    query = "SELECT changeset_xml FROM bibHOLDINGPEN WHERE changeset_date = %s AND oai_id = %s"
     return run_sql(query, (str(date_inserted), str(oai_id)))[0][0]
 
-def delete_holdingpen_entry(oai_id, date_inserted):
-    query = "DELETE FROM oaiHOLDINGPEN where oai_id = %s AND date_inserted = %s"
-    run_sql(query, (str(oai_id), str(date_inserted)))
+def delete_holdingpen_entry(hpupdate_id):
+    query = "DELETE FROM bibHOLDINGPEN WHERE changeset_id=%s"
+    run_sql(query, (hpupdate_id, ))
+
+
+
+def get_holdingpen_day_fragment(year, month, day, limit, start, filter):
+    """
+       returning the entries form the a particular day
+    """
+   # query = "SELECT oai_id, changeset_date FROM bibHOLDINGPEN WHERE year(changeset_date) = '%i' and month(changeset_date) = '%i' and day(changeset_date) = '%i' ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, start, limit)
+    filterSql = ""
+    if filter != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter, )
+    query = "SELECT oai_id, changeset_date, changeset_id FROM bibHOLDINGPEN WHERE changeset_date > '%i-%i-%i 00:00:00' and changeset_date <= '%i-%i-%i 23:59:59' %s ORDER BY changeset_date LIMIT %i, %i" % (year, month, day, year, month, day, filterSql, start, limit)
+    query_results = run_sql(query)
+    return query_results
+
+def get_holdingpen_day_size(year, month, day, filter):
+    """
+       returning the entries form the a particular day
+    """
+    filterSql = ""
+    if filter != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter, )
+    query = "SELECT count(*) FROM bibHOLDINGPEN WHERE year(changeset_date) = '%i' and month(changeset_date) = '%i' and day(changeset_date) = '%i' %s" % (year, month, day, filterSql)
+    query_results = run_sql(query)
+    return int(query_results[0][0])
+
+
+def get_holdingpen_month(year, month, filter):
+    """
+       Returning the statistics about the entries form a particular month
+    """
+    filterSql = ""
+    if filter != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter, )
+
+    query = "select day(changeset_date), count(*) from bibHOLDINGPEN where year(changeset_date) = '%i' and month(changeset_date) = '%i' %s group by day(changeset_date)" % (year, month, filterSql)
+    return run_sql(query)
+
+
+def get_holdingpen_year(year, filter):
+    """
+    Returning the statistics about the entries from a particular year
+    """
+    filterSql = ""
+    if filter != "":
+        filterSql = " and oai_id like '%%%s%%' " % (filter, )
+    query = "select month(changeset_date), count(*) from bibHOLDINGPEN where year(changeset_date) = '%i' %s group by month(changeset_date)" % (year, filterSql)
+    return run_sql(query)
+
+
+
+def get_holdingpen_years(filter):
+    """
+    Returning the particular years of records present in the holding pen
+    """
+    filterSql = ""
+    if filter != "":
+        filterSql = " where oai_id like '%%%s%%' " % (filter, )
+    query = "select year(changeset_date), count(*) changeset_date from bibHOLDINGPEN %s group by year(changeset_date)" % (filterSql,)
+    results = run_sql(query)
+    return results
+
+def get_holdingpen_entry_details(hpupdate_id):
+    """
+    Returning the detials of the Holding Pen entry, the result of this function is a tuple:
+    (oai_id, record_id,  date_inserted, content)
+    """
+    query = "SELECT oai_id, id_bibrec, changeset_date, changeset_xml FROM bibHOLDINGPEN WHERE changeset_id=%s"
+    return run_sql(query, (hpupdate_id,))[0]

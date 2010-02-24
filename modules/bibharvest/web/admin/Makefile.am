@@ -17,8 +17,14 @@
 
 webappdir = $(localstatedir)/www/admin/bibharvest
 
+
 webapp_DATA = oaiharvestadmin.py oairepositoryadmin.py
 
-EXTRA_DIST = oaiharvestadmin.py oairepositoryadmin.py
+jsdir=$(localstatedir)/www/js
+
+js_DATA = oai_harvest_admin.js
+
+EXTRA_DIST = oaiharvestadmin.py oairepositoryadmin.py  oai_harvest_admin.js
+
 
 CLEANFILES = *~ *.tmp *.pyc

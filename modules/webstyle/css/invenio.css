@@ -1959,6 +1959,7 @@ input.hyperlinkformSubmitButton {
   opacity: 0.4;
   vertical-align: bottom;
 }
+
 #bibEditContent {
   min-height: 300px;
   margin-left: 150px;
@@ -2901,5 +2902,104 @@ div.subtitle {
         background-image:url(drop_down_menu_arrow_down_b.gif)
 }
 
+.bibeditHPCorrection{
+    border-width: 1px;
+    background-color: #FAEBD7;
+    font-size: smaller;
+    border-style: groove;
+    display: inline-block;
+    border-color: RosyBrown;
+    margin:5px 3px 3px 5px;
+    padding: 2px;
+}
+
+#bibeditHPChanges{
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 150px;
+}
+
+
+.bibeditHPHiddenElement{
+    visibility: hidden;
+    display: none;
+}
+.bibeditHPPanelEntry{
+    border-width: 1px;
+    border-style: dotted;
+    display: table;
+    background-color: #feffff;
+    border-color: #cbcccc;
+    margin-bottom: 5px;
+}
+
+.bibeditHPContentPreviewBox {
+    position: absolute;
+    z-index:0;
+    border-style: dotted;
+    border-width: 1px;
+    background-color: #fefeff;
+    top: 0px;
+    height: 500px;
+    overflow: auto;
+    width: 500px;
+}
+
+.bibeditHPControl{
+    display:table-cell;
+    width:20%;
+    margin:0px;
+}
+.bibeditHPEntryNumber{
+    display: table-cell;
+    width: 80%;
+}
+
+.bibeditHPEntryDateSection{
+    font-size: smaller;
+    width: 60%;
+    margin: 0px;
+    display: table-cell;
+}
+
+.bibeditHPDetailsOpener{
+    display: table-cell;
+    width: 20%;
+}
+.bibeditHPInformationsSection{
+
+}
+
+.bibeditHPDetailsOpener{
+    display: table-cell;
+}
+
+.bibeditHPEntryControlsPanel{
+    display: table-row;
+}
+
+.bibeditHPEntryRow1{
+    display: table-row;
+}
+
+.bibeditHPEntryRow2{
+    display: table-row;
+}
+
+.bibeditHPEntryCol1{
+    display: table-cell;
+}
+
+.bibeditHPEntryCol2{
+	display: table-cell;
+	max-width: 28px;
+	min-width: 28px;
+	margin: 0px;
+}
+
+.bibeditHPPanelEntryDisabled {
+    background-color: #eeeeee;
+    color: #BBBBBB;
+}
 
 /* end of invenio.css */

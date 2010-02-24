@@ -88,6 +88,18 @@ CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY = 5000
 
 ## CFG_BIBEDIT_AJAX_RESULT_CODES - dictionary of result codes and messages used
 ## by the Ajax engine.
+
+CFG_BIBEDIT_AJAX_RESULT_CODES_REV= {
+#TODO: all the result codes should be accessible through the constants rather than
+#      a direct number ! some parts of the bibedit_engine.py are not readable because
+#      of using the numbers
+#      The dictionary is convenient at this place because it can be imported with one command
+#      unlike a number of constants
+    'editor_modifications_changed': 33,
+    'disabled_hp_changeset' : 34,
+    'wrong_cache_file_format' : 111
+}
+
 CFG_BIBEDIT_AJAX_RESULT_CODES = {
     0: '',
     1: 'Search completed',
@@ -115,6 +127,8 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     30: 'Selection deleted',
     31: 'Tickets retrieved',
     32: 'Field moved',
+    33: 'Modifications updates',
+    34: 'Disabled a changeset',
     100: 'Error: Not logged in',
     101: 'Error: Permission denied',
     102: 'Error: Non-existent record',
@@ -125,7 +139,8 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     107: 'Error: Cache file changed',
     108: 'Error: Template file missing',
     109: 'Error: Invalid template file',
-    110: 'Error: Invalid content in record'
+    110: 'Error: Invalid content in record',
+    111: 'Error: Wrong cache file format'
 }
 
 ## CFG_BIBEDIT_MAX_SEARCH_RESULTS

@@ -9,7 +9,7 @@
  *
  * CDS Invenio is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See1 the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -65,6 +65,7 @@
  *   - onMergeClick
  *   - bindNewRecordHandlers
  *   - cleanUp
+ *   - positionBibEditPanel
  *
  * 7. Editor UI
  *   - colorFields
@@ -95,6 +96,7 @@
 
 // Record data
 var gRecID = null;
+var gRecIDLoading = null;
 var gRecord = null;
 // Search results (record IDs)
 var gResultSet = null;
@@ -120,7 +122,26 @@ var gHashCheckTimerID;
 // parameter, but an internal state control mechanism).
 var gPrevState;
 var gState;
+// A current status
+var gCurrentStatus;
 
+// a global array of visible changes associated with a currently viewed record
+// This array is cleared always when a new changes set is applied... then it is used
+// for redrawing the change fields
+// The index in this array is used when referring to a particular change [ like finding an appropriate box]
+
+var gHoldingPenChanges = [];
+
+// A global variable used to avoid multiple retrieving of the same changes stored in the Holding Pen
+// this is the dictionary indexed by the HoldingPen entry identifiers and containing the javascript objects
+// representing the records
+// due to this mechanism, applying previously previewed changes, as well as previewing the change for the
+// second time, can be made much faster
+var gHoldingPenLoadedChanges = {};
+
+// The changes that have been somehow processed and should not be displayed as already processed
+
+var gDisabledHpEntries = {};
 
 /*
  * **************************** 2. Initialization ******************************
@@ -129,10 +150,10 @@ var gState;
 window.onload = function(){
   if (typeof(jQuery) == 'undefined'){
     alert('ERROR: jQuery not found!\n\n' +
-	  'The Record Editor requires jQuery, which does not appear to be ' +
-	  'installed on this server. Please alert your system ' +
-	  'administrator.\n\nInstructions on how to install jQuery and other ' +
-	  'required plug-ins can be found in CDS-Invenio\'s INSTALL file.');
+    'The Record Editor requires jQuery, which does not appear to be ' +
+    'installed on this server. Please alert your system ' +
+    'administrator.\n\nInstructions on how to install jQuery and other ' +
+    'required plug-ins can be found in CDS-Invenio\'s INSTALL file.');
     var imgError = document.createElement('img');
     imgError.setAttribute('src', '/img/circle_red.png');
     var txtError = document.createTextNode('jQuery missing');
@@ -194,10 +215,10 @@ function initMisc(){
   window.onbeforeunload = function(){
     if (gRecID && gRecordDirty)
       return '******************** WARNING ********************\n' +
-	'                  You have unsubmitted changes.\n\n' +
-	'You should go back to the page and click either:\n' +
-	' * Submit (to save your changes permanently)\n      or\n' +
-	' * Cancel (to discard your changes)';
+  '                  You have unsubmitted changes.\n\n' +
+  'You should go back to the page and click either:\n' +
+  ' * Submit (to save your changes permanently)\n      or\n' +
+  ' * Cancel (to discard your changes)';
   }
 }
 
@@ -250,8 +271,8 @@ function onAjaxError(XHR, textStatus, errorThrown){
    * Handle Ajax request errors.
    */
   alert('Request completed with status ' + textStatus
-	+ '\nResult: ' + XHR.responseText
-	+ '\nError: ' + errorThrown);
+  + '\nResult: ' + XHR.responseText
+  + '\nError: ' + errorThrown);
 }
 
 function onAjaxSuccess(json, onSuccess){
@@ -266,12 +287,13 @@ function onAjaxSuccess(json, onSuccess){
   if (resCode == 100){
     // User's session has timed out.
     gRecID = null;
+    gRecIDLoading = null;
     window.location = recID ? gSITE_URL + '/record/' + recID + '/edit/'
       : gSITE_URL + '/record/edit/';
     return;
   }
   else if ($.inArray(resCode, [101, 102, 103, 104, 105, 106, 107, 108, 109])
-	   != -1){
+     != -1){
     cleanUp(!gNavigatingRecordSet, null, null, true, true);
     if ($.inArray(resCode, [108, 109]) == -1)
       $('.headline').text('Record Editor: Record #' + recID);
@@ -297,35 +319,35 @@ function onAjaxSuccess(json, onSuccess){
       displayCacheOutdatedScreen(requestType);
       $('#lnkMergeCache').bind('click', onMergeClick);
       $('#lnkForceSubmit').bind('click', function(event){
-	onSubmitClick.force = true;
-	onSubmitClick();
-	event.preventDefault();
+  onSubmitClick.force = true;
+  onSubmitClick();
+  event.preventDefault();
       });
       $('#lnkDiscardChanges').bind('click', function(event){
-	onCancelClick();
-	event.preventDefault();
+  onCancelClick();
+  event.preventDefault();
       });
       updateStatus('error', 'Error: Record cache is outdated');
     }
     else{
       if (requestType != 'getRecord'){
-	// On getRecord requests the below actions will be performed in
-	// onGetRecordSuccess (after cleanup).
-	var cacheMTime = json['cacheMTime'];
-	if (cacheMTime)
-	  // Store new cache modification time.
-	  gCacheMTime = cacheMTime;
-	var cacheDirty = json['cacheDirty'];
-	if (cacheDirty){
-	  // Cache is dirty. Enable submit button.
-	  gRecordDirty = cacheDirty;
-	  $('#btnSubmit').removeAttr('disabled');
-	  $('#btnSubmit').css('background-color', 'lightgreen');
-	}
+  // On getRecord requests the below actions will be performed in
+  // onGetRecordSuccess (after cleanup).
+  var cacheMTime = json['cacheMTime'];
+  if (cacheMTime)
+    // Store new cache modification time.
+    gCacheMTime = cacheMTime;
+  var cacheDirty = json['cacheDirty'];
+  if (cacheDirty){
+    // Cache is dirty. Enable submit button.
+    gRecordDirty = cacheDirty;
+    $('#btnSubmit').removeAttr('disabled');
+    $('#btnSubmit').css('background-color', 'lightgreen');
+  }
       }
       if (onSuccess)
-	// No critical errors; call onSuccess function.
-	onSuccess(json);
+  // No critical errors; call onSuccess function.
+  onSuccess(json);
     }
   }
 }
@@ -357,7 +379,7 @@ function initStateFromHash(){
   if (tmpState && tmpRecID){
     // We have both state and record ID.
     if ($.inArray(tmpState, ['edit', 'submit', 'cancel', 'deleteRecord']) != -1)
-	gState = tmpState;
+  gState = tmpState;
     else
       // Invalid state, fail...
       return;
@@ -378,7 +400,7 @@ function initStateFromHash(){
     return;
 
   if (gState != gPrevState || (gState == 'edit' &&
-			       parseInt(tmpRecID) != gRecID)){
+             parseInt(tmpRecID) != gRecID)){
     // We have an actual and legal change of state. Clean up and update the
     // page.
     updateStatus('updating');
@@ -387,46 +409,46 @@ function initStateFromHash(){
       createReq({recID: gRecID, requestType: 'deleteRecordCache'});
     switch (gState){
       case 'startPage':
-	cleanUp(true, '', 'recID', true, true);
-	updateStatus('ready');
-	break;
+  cleanUp(true, '', 'recID', true, true);
+  updateStatus('ready');
+  break;
       case 'edit':
-	var recID = parseInt(tmpRecID);
-	if (isNaN(recID)){
-	  // Invalid record ID.
-	  cleanUp(true, tmpRecID, 'recID', true);
-	  $('.headline').text('Record Editor: Record #' + tmpRecID);
-	  displayMessage(102);
-	  updateStatus('error', gRESULT_CODES[102]);
-	}
-	else{
-	  cleanUp(true, recID, 'recID');
-	  getRecord(recID);
-	}
-	break;
+  var recID = parseInt(tmpRecID);
+  if (isNaN(recID)){
+    // Invalid record ID.
+    cleanUp(true, tmpRecID, 'recID', true);
+    $('.headline').text('Record Editor: Record #' + tmpRecID);
+    displayMessage(102);
+    updateStatus('error', gRESULT_CODES[102]);
+  }
+  else{
+    cleanUp(true, recID, 'recID');
+    getRecord(recID);
+  }
+  break;
       case 'newRecord':
-	cleanUp(true, '', null, null, true);
+  cleanUp(true, '', null, null, true);
         $('.headline').text('Record Editor: Create new record');
-	displayNewRecordScreen();
+  displayNewRecordScreen();
         bindNewRecordHandlers();
-	updateStatus('ready');
-	break;
+  updateStatus('ready');
+  break;
       case 'submit':
-	cleanUp(true, '', null, true);
-	$('.headline').text('Record Editor: Record #' + tmpRecID);
-	displayMessage(4);
-	updateStatus('ready');
-	break;
+  cleanUp(true, '', null, true);
+  $('.headline').text('Record Editor: Record #' + tmpRecID);
+  displayMessage(4);
+  updateStatus('ready');
+  break;
       case 'cancel':
-	cleanUp(true, '', null, true, true);
-	updateStatus('ready');
-	break;
+  cleanUp(true, '', null, true, true);
+  updateStatus('ready');
+  break;
       case 'deleteRecord':
-	cleanUp(true, '', null, true);
-      	$('.headline').text('Record Editor: Record #' + tmpRecID);
-	displayMessage(6);
-	updateStatus('ready');
-	break;
+  cleanUp(true, '', null, true);
+  $('.headline').text('Record Editor: Record #' + tmpRecID);
+  displayMessage(6);
+  updateStatus('ready');
+  break;
     }
   }
   else
@@ -549,6 +571,236 @@ function cmpFields(field1, field2){
   return 0;
 }
 
+function insertFieldToRecord(record, fieldId, ind1, ind2, subFields){
+  /**Inserting a new field on the client side and returning the position of the newly created field*/
+  newField = [subFields, ind1, ind2, '', 0];
+  if (record[fieldId] == undefined){
+    record[fieldId] = [newField]
+    return 0;
+  } else {
+    record[fieldId].push(newField);
+    return (record[fieldId].length-1);
+  }
+}
+
+function transformRecord(record){
+  /**Transforming a bibrecord to a form that is easier to compare that is a dictionary
+   * field identifier -> field indices -> fields list -> [subfields list, position in the record]
+   *
+   * The data is enriched with the positions inside the record in a following manner:
+   * each field consists of:
+   * */
+  result = {};
+  for (fieldId in record){
+    result[fieldId] = {}
+    indicesList = []; // a list of all the indices ... utilised later when determining the positions
+    for (fieldIndex in record[fieldId]){
+
+      indices =  "";
+      if (record[fieldId][fieldIndex][1] == ' '){
+        indices += "_";
+      }else{
+        indices += record[fieldId][fieldIndex][1]
+      }
+
+      if (record[fieldId][fieldIndex][2] == ' '){
+        indices += "_";
+      }else{
+        indices += record[fieldId][fieldIndex][2]
+      }
+
+      if (result[fieldId][indices] == undefined){
+        result[fieldId][indices] = []; // a future list of fields sharing the same indice
+        indicesList.push(indices);
+      }
+      result[fieldId][indices].push([record[fieldId][fieldIndex][0], 0]);
+    }
+
+    // now calculating the positions within a field identifier ( utilised on the website )
+
+    position = 0;
+
+    indices = indicesList.sort();
+    for (i in indices){
+      for (fieldInd in result[fieldId][indices[i]]){
+        result[fieldId][indices[i]][fieldInd][1] = position;
+        position ++;
+      }
+    }
+  }
+
+    return result;
+}
+
+function filterChanges(changeset){
+  /*Filtering the changes list -> removing the changes related to the fields
+   * that should never be changed */
+  unchangableTags = {"001" : true}; // a dictionary of the fields that should not be modified
+  result = [];
+  for (changeInd in changeset){
+    change = changeset[changeInd];
+    if ((change.tag == undefined) || (!(change.tag in unchangableTags))){
+      result.push(change);
+    }
+  }
+  return result;
+}
+
+///// Functions generating easy to display changes list
+
+function compareFields(fieldId, indicators, fieldPos, field1, field2){
+  result = [];
+  for (sfPos in field2){
+    if (field1[sfPos] == undefined){
+      //  adding the subfield at the end of the record can be treated in a more graceful manner
+      result.push(
+          {"change_type" : "subfield_added",
+           "tag" : fieldId,
+           "indicators" : indicators,
+           "field_position" : fieldPos,
+           "subfield_code" : field2[sfPos][0],
+           "subfield_content" : field2[sfPos][1]});
+    }
+    else
+    {
+      // the subfield exists in both the records
+      if (field1[sfPos][0] != field2[sfPos][0]){
+      //  a structural change ... we replace the entire field
+        return [{"change_type" : "field_changed",
+           "tag" : fieldId,
+           "indicators" : indicators,
+           "field_position" : fieldPos,
+           "field_content" : field2}];
+      } else
+      {
+        if (field1[sfPos][1] != field2[sfPos][1]){
+          result.push({"change_type" : "subfield_changed",
+            "tag" : fieldId,
+            "indicators" : indicators,
+            "field_position" : fieldPos,
+            "subfield_position" : sfPos,
+            "subfield_code" : field2[sfPos][0],
+            "subfield_content" : field2[sfPos][1]});
+
+        }
+      }
+    }
+  }
+
+  for (sfPos in field1){
+    if (field2[sfPos] == undefined){
+      result.push({ "change_type" : "subfield_removed",
+                "tag" : fieldId,
+                "indicators" : indicators,
+                "field_position" : fieldPos,
+                "subfield_position" : sfPos});
+        // removing the subfields from the end can be treated in a more graceful manner
+    }
+  }
+
+  return result;
+}
+
+function compareIndicators(fieldId, indicators, fields1, fields2){
+   /*a helper function allowing to compare inside one indicator
+    * excluded from compareRecords for the code clarity reason*/
+  result = []
+  for (fieldPos in fields2){
+    if (fields1[fieldPos] == undefined){
+      result.push({ "change_type" : "field_added",
+                  "tag" : fieldId,
+                  "indicators" : indicators,
+                  "field_content" : fields2[fieldPos][0]});
+    } else { // comparing the content of the subfields
+      result = result.concat(compareFields(fieldId, indicators, fields1[fieldPos][1], fields1[fieldPos][0], fields2[fieldPos][0]));
+    }
+  }
+
+  for (fieldPos in fields1){
+    if (fields2[fieldPos] == undefined){
+      fieldPosition = fields1[fieldPos][1];
+      result.push({"change_type" : "field_removed",
+             "tag" : fieldId,
+             "indicators" : indicators,
+             "field_position" : fieldPosition});
+    }
+  }
+  return result;
+}
+
+function compareRecords(record1, record2){
+  /*Compares two bibrecords, producing a list of atom changes that can be displayed
+   * to the user if for example applying the Holding Pen change*/
+   // 1) This is more convenient to have a different structure of the storage
+  r1 = transformRecord(record1);
+  r2 = transformRecord(record2);
+  result = [];
+
+  for (fieldId in r2){
+    if (r1[fieldId] == undefined){
+      for (indicators in r2[fieldId]){
+        for (field in r2[fieldId][indicators]){
+          result.push({ "change_type" : "field_added",
+                        "tag" : fieldId,
+                        "indicators" : indicators,
+                        "field_content" : r2[fieldId][indicators][field][0]});
+
+
+        }
+      }
+    }
+    else
+    {
+      for (indicators in r2[fieldId]){
+        if (r1[fieldId][indicators] == undefined){
+          for (field in r2[fieldId][indicators]){
+            result.push({"change_type" : "field_added",
+                         "tag" : fieldId,
+                         "indicators" : indicators,
+                         "field_content" : r2[fieldId][indicators][field][0]});
+
+
+          }
+        }
+        else{
+          result = result.concat(compareIndicators(fieldId, indicators,
+              r1[fieldId][indicators], r2[fieldId][indicators]));
+        }
+      }
+
+      for (indicators in r1[fieldId]){
+        if (r2[fieldId][indicators] == undefined){
+          for (fieldInd in r1[fieldId][indicators]){
+            fieldPosition = r1[fieldId][indicators][fieldInd][1];
+            result.push({ "change_type" : "field_removed",
+                 "tag" : fieldId,
+                 "field_position" : fieldPosition});
+          }
+
+        }
+      }
+
+    }
+  }
+
+  for (fieldId in r1){
+    if (r2[fieldId] == undefined){
+      for (indicators in r1[fieldId]){
+        for (field in r1[fieldId][indicators])
+        {
+          // field position has to be calculated here !!!
+          fieldPosition = r1[fieldId][indicators][field][1]; // field position inside the mark
+          result.push({"change_type" : "field_removed",
+                       "tag" : fieldId,
+                       "field_position" : fieldPosition});
+
+        }
+      }
+    }
+  }
+  return result;
+}
+
 function fieldIsProtected(MARC){
   /*
    * Determine if a MARC field is protected or part of a protected group of
@@ -580,16 +832,16 @@ function containsProtectedField(fieldData){
     for (var fieldPosition in fieldPositions){
       subfieldIndexes = fieldPositions[fieldPosition];
       if (subfieldIndexes.length == 0){
-	MARC = getMARC(tag, fieldPosition);
-	if (fieldIsProtected(MARC))
-	  return MARC;
-	}
+  MARC = getMARC(tag, fieldPosition);
+  if (fieldIsProtected(MARC))
+    return MARC;
+  }
       else{
-	for (var i=0, n=subfieldIndexes.length; i<n; i++){
-	  MARC = getMARC(tag, fieldPosition, subfieldIndexes[i]);
-	  if (fieldIsProtected(MARC))
-	    return MARC;
-	}
+  for (var i=0, n=subfieldIndexes.length; i<n; i++){
+    MARC = getMARC(tag, fieldPosition, subfieldIndexes[i]);
+    if (fieldIsProtected(MARC))
+      return MARC;
+  }
       }
     }
   }
@@ -627,26 +879,26 @@ function getFieldTag(MARC){
     else{
       // Start looking for wildcard hits.
       if (MARC.length == 3){
-	// Controlfield
-	tagName = gTAG_NAMES[MARC.substr(0, 2) + '%'];
-	if (tagName != undefined && tagName != MARC + 'x')
-	  return tagName;
+  // Controlfield
+  tagName = gTAG_NAMES[MARC.substr(0, 2) + '%'];
+  if (tagName != undefined && tagName != MARC + 'x')
+    return tagName;
       }
       else{
-	// Regular field, try finding wildcard hit by shortening expression
-	// gradually. Ignores wildcards which gives values like '27x'.
-	var term = MARC + '%', i = 5;
-	do{
-	  tagName = gTAG_NAMES[term];
-	  if (tagName != undefined){
-	    if (tagName != MARC.substr(0, i) + 'x')
-	      return tagName;
-	    break;
-	  }
-	  i--;
-	  term = MARC.substr(0, i) + '%';
-	}
-	while (i >= 3)
+  // Regular field, try finding wildcard hit by shortening expression
+  // gradually. Ignores wildcards which gives values like '27x'.
+  var term = MARC + '%', i = 5;
+  do{
+    tagName = gTAG_NAMES[term];
+    if (tagName != undefined){
+      if (tagName != MARC.substr(0, i) + 'x')
+        return tagName;
+      break;
+    }
+    i--;
+    term = MARC.substr(0, i) + '%';
+  }
+  while (i >= 3)
       }
     }
   }
@@ -660,7 +912,7 @@ function getSubfieldTag(MARC){
   if (gTagFormat == 'human'){
     var subfieldName = gTAG_NAMES[MARC];
       if (subfieldName != undefined)
-	return subfieldName;
+  return subfieldName;
   }
   return '$$' + MARC.charAt(5);
 }
@@ -720,9 +972,12 @@ function getRecord(recID, onSuccess){
   if (onSuccess == undefined)
     onSuccess = onGetRecordSuccess;
   changeAndSerializeHash({state: 'edit', recid: recID});
+  gRecIDLoading = recID;
   createReq({recID: recID, requestType: 'getRecord', deleteRecordCache:
     getRecord.deleteRecordCache, clonedRecord: getRecord.clonedRecord},
     onSuccess);
+  onHoldingPenPanelRecordIdChanged(recID) // reloading the Holding Pen toolbar
+
   getRecord.deleteRecordCache = false;
   getRecord.clonedRecord = false;
 }
@@ -740,6 +995,7 @@ function onGetRecordSuccess(json){
   cleanUp(!gNavigatingRecordSet);
   // Store record data.
   gRecID = json['recID'];
+  gRecIDLoading = null;
   $('.headline').html(
     'Record Editor: Record #<span id="spnRecID">' + gRecID + '</span>' +
     '<a href="' + gHISTORY_URL + '?recid=' + gRecID +
@@ -764,6 +1020,13 @@ function onGetRecordSuccess(json){
       event.preventDefault();
     });
   }
+
+  gHoldingPenChanges = json['pendingHpChanges'];
+  gDisabledHpEntries = json['disabledHpChanges'];
+  gHoldingPenLoadedChanges = {};
+
+  disableProcessedChanges();
+
   // Display record.
   displayRecord();
   // Activate menu record controls.
@@ -796,18 +1059,19 @@ function onSubmitClick(){
   updateStatus('updating');
   if (displayAlert('confirmSubmit')){
     createReq({recID: gRecID, requestType: 'submit',
-	       force: onSubmitClick.force}, function(json){
-		 // Submission was successful.
-		 changeAndSerializeHash({state: 'submit', recid: gRecID});
-		 var resCode = json['resultCode'];
-		 cleanUp(!gNavigatingRecordSet, '', null, true);
-		 updateStatus('report', gRESULT_CODES[resCode]);
-		 displayMessage(resCode);
-	       });
+         force: onSubmitClick.force}, function(json){
+     // Submission was successful.
+     changeAndSerializeHash({state: 'submit', recid: gRecID});
+     var resCode = json['resultCode'];
+     cleanUp(!gNavigatingRecordSet, '', null, true);
+     updateStatus('report', gRESULT_CODES[resCode]);
+     displayMessage(resCode);
+         });
     onSubmitClick.force = false;
   }
   else
     updateStatus('ready');
+  holdingPenPanelRemoveEntries(); // clearing the holding pen entries list
 }
 // Enable this flag to force the next submission even if cache is outdated.
 onSubmitClick.force = false;
@@ -817,16 +1081,24 @@ function onCancelClick(){
    * Handle 'Cancel' button (cancel editing).
    */
   updateStatus('updating');
-  if (!gRecordDirty || displayAlert('confirmCancel')){
-    createReq({recID: gRecID, requestType: 'cancel'}, function(json){
-      // Cancellation was successful.
-      changeAndSerializeHash({state: 'cancel', recid: gRecID});
-      cleanUp(!gNavigatingRecordSet, '', null, true, true);
-      updateStatus('report', gRESULT_CODES[json['resultCode']]);
-    });
-  }
-  else
-    updateStatus('ready');
+  if (!gRecordDirty || displayAlert('confirmCancel')) {
+  createReq({
+    recID: gRecID,
+    requestType: 'cancel'
+  }, function(json){
+    // Cancellation was successful.
+      changeAndSerializeHash({
+          state: 'cancel',
+          recid: gRecID
+        });
+        cleanUp(!gNavigatingRecordSet, '', null, true, true);
+        updateStatus('report', gRESULT_CODES[json['resultCode']]);
+      });
+      holdingPenPanelRemoveEntries();
+    }
+    else {
+      updateStatus('ready');
+    }
 }
 
 function onCloneRecordClick(){
@@ -901,15 +1173,15 @@ function bindNewRecordHandlers(){
       updateStatus('updating');
       var templateNo = this.id.split('_')[1];
       createReq({requestType: 'newRecord', newType: 'template',
-	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
-	  getRecord(json['newRecID'], onGetTemplateSuccess);
+  templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
+    getRecord(json['newRecID'], onGetTemplateSuccess);
       });
       event.preventDefault();
     });
 }
 
 function cleanUp(disableRecBrowser, searchPattern, searchType,
-		 focusOnSearchBox, resetHeadline){
+     focusOnSearchBox, resetHeadline){
   /*
    * Clean up display and data.
    */
@@ -943,7 +1215,25 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gSelectionMode = false;
 }
 
-
+function positionBibEditPanel(minimalPosition){
+    /*
+     * Dynamically position menu based on vertical scroll distance.
+     */
+    var newYscroll = $(document).scrollTop();
+    // Only care if there has been some major scrolling.
+    if (Math.abs(newYscroll - positionMenu.yScroll) > 10){
+      // If scroll distance is less then 200px, position menu in sufficient
+      // distance from header.
+      if (newYscroll < 200)
+        $('#bibEditMenu').animate({
+    'top': 220 - newYscroll}, 'fast');
+      // If scroll distance has crossed 200px, fix menu 50px from top.
+      else if (positionMenu.yScroll < 200 && newYscroll > 200)
+        $('#bibEditMenu').animate({
+    'top': 50}, 'fast');
+      positionMenu.yScroll = newYscroll;
+    }
+  }
 /*
  * **************************** 7. Editor UI ***********************************
  */
@@ -985,7 +1275,7 @@ function onHumanTagsClick(event){
    */
   $(this).unbind('click').attr('disabled', 'disabled');
   createReq({recID: gRecID, requestType: 'changeTagFormat',
-	     tagFormat: 'human'});
+       tagFormat: 'human'});
   gTagFormat = 'human';
   updateTags();
   $('#btnMARCTags').bind('click', onMARCTagsClick).removeAttr('disabled');
@@ -1301,7 +1591,7 @@ function changeFieldToControlfield(fieldTmpNo){
 
   // Clear all fields.
   var addFieldTextInput = $('#rowGroupAddField_' + fieldTmpNo +
-			    ' input[type=text]');
+          ' input[type=text]');
   $(addFieldTextInput).val('').removeClass('bibEditInputError');
 
   // Toggle hidden fields.
@@ -1354,13 +1644,13 @@ function onAddFieldChange(event){
       fieldType = 'SubfieldCode';
 
     var valid = (((fieldType == 'Indicator1' || fieldType == 'Indicator2')
-		  && (this.value == '_' || this.value == ' '))
-		 || validMARC(fieldType, this.value));
+      && (this.value == '_' || this.value == ' '))
+     || validMARC(fieldType, this.value));
     if (!valid && !$(this).hasClass('bibEditInputError'))
       $(this).addClass('bibEditInputError');
     else if (valid){
       if ($(this).hasClass('bibEditInputError'))
-	$(this).removeClass('bibEditInputError');
+  $(this).removeClass('bibEditInputError');
       if (event.keyCode != 9 && event.keyCode != 16){
 	switch(fieldType){
 	  case 'ControlTag':
@@ -1399,10 +1689,8 @@ function addFieldSave(fieldTmpNo)
    */
   updateStatus('updating');
 
-
   var jQRowGroupID = "#rowGroupAddField_" + fieldTmpNo;
   var controlfield = $(jQRowGroupID).data('isControlfield');
-
   var tag = $('#txtAddFieldTag_' + fieldTmpNo).val();
   var value = $('#txtAddFieldValue_' + fieldTmpNo + '_0').val();
   var subfields = [], ind1 = ' ', ind2 = ' ';
@@ -1437,8 +1725,8 @@ function addFieldSave(fieldTmpNo)
     var validInd1 = (ind1 == ' ' || validMARC('Indicator1', ind1));
     var validInd2 = (ind2 == ' ' || validMARC('Indicator2', ind2));
     if (!validMARC('Tag', tag)
-	|| !validInd1
-	|| !validInd2){
+  || !validInd1
+  || !validInd2){
       displayAlert('alertCriticalInput');
       updateStatus('ready');
       return;
@@ -1449,7 +1737,7 @@ function addFieldSave(fieldTmpNo)
       ).each(function(){
         var subfieldTmpNo = this.id.slice(this.id.lastIndexOf('_')+1);
         var txtValue = $('#txtAddFieldValue_' + fieldTmpNo + '_' +
-	  subfieldTmpNo);
+    subfieldTmpNo);
         var value = $(txtValue).val();
         var isStillVolatile = txtValue.hasClass('bibEditVolatileSubfield');
 
@@ -1467,14 +1755,14 @@ function addFieldSave(fieldTmpNo)
 
     if (invalidOrEmptySubfields){
       if (!subfields.length){
-	// No valid subfields.
-	displayAlert('alertCriticalInput');
-	updateStatus('ready');
-	return;
+  // No valid subfields.
+  displayAlert('alertCriticalInput');
+  updateStatus('ready');
+  return;
       }
       else if (!displayAlert('confirmInvalidOrEmptyInput')){
-	updateStatus('ready');
-	return;
+  updateStatus('ready');
+  return;
       }
     }
 
@@ -1521,8 +1809,9 @@ function addFieldSave(fieldTmpNo)
   var rowGroup = $('#rowGroup_' + tag + '_' + fieldPosition);
   $(document).scrollTop($(rowGroup).position().top - $(window).height()*0.5);
   $(rowGroup).effect('highlight', {color: gNEW_CONTENT_COLOR},
-		     gNEW_CONTENT_COLOR_FADE_DURATION);
+         gNEW_CONTENT_COLOR_FADE_DURATION);
 }
+
 
 function onAddSubfieldsClick(img){
   /*
@@ -1571,9 +1860,9 @@ function onAddSubfieldsChange(event){
       $(this).addClass('bibEditInputError');
     else if (valid){
       if ($(this).hasClass('bibEditInputError'))
-	$(this).removeClass('bibEditInputError');
+  $(this).removeClass('bibEditInputError');
       if (event.keyCode != 9 && event.keyCode != 16){
-	$(this).parent().next().children('input').focus();
+  $(this).parent().next().children('input').focus();
       }
     }
   }
@@ -1605,9 +1894,9 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
        subfieldTmpNo);
      var value = $(txtValue).val();
      if (!$(this).hasClass('bibEditInputError')
-	 && this.value != ''
-	 && !$(txtValue).hasClass('bibEditInputError')
-	 && value != '')
+   && this.value != ''
+   && !$(txtValue).hasClass('bibEditInputError')
+   && value != '')
        subfields.push([this.value, value]);
      else
        invalidOrEmptySubfields = true;
@@ -1658,10 +1947,6 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
   }
 }
 
-function getOnContentEditSubmitFunction(cell){
-
-}
-
 function convertFieldIntoEditable(cell, shouldSelect){
   // first we have to detach all exisiting editables ... which means detaching the event
   editEvent = 'click';
@@ -1691,6 +1976,22 @@ function convertFieldIntoEditable(cell, shouldSelect){
       return newVal;
     }, {
       type: 'autogrow',
+      callback: function(data, settings){
+        // TODO : CHECK THIS FUNCTION AFTER MERGING !!!!
+        var tmpArray = this.id.split('_');
+        var tag = tmpArray[1], fieldPosition = tmpArray[2],
+        subfieldIndex = tmpArray[3];
+
+        for (changeNum in gHoldingPenChanges){
+          change =  gHoldingPenChanges[changeNum];
+          if (change.tag == tag &&
+              change.field_position == fieldPosition &&
+              change.subfield_position != undefined &&
+              change.subfield_position == subfieldIndex){
+              addChangeControl(changeNum, true);
+          }
+        }
+      },
       event: editEvent,
       data: function(){
         // Get the real content from the record structure (instead of
@@ -1737,6 +2038,39 @@ function onContentClick(cell){
   }
 }
 
+function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, subfieldCode, value, changeNo){
+  var data = {
+    recID: gRecID,
+    requestType: 'modifyContent',
+    tag: tag,
+    fieldPosition: fieldPosition,
+    subfieldIndex: subfieldIndex,
+    subfieldCode: subfieldCode,
+    value: value,
+  };
+  if (changeNo != undefined){
+    data.changeApplied = changeNo;
+  }
+  return data;
+}
+
+function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange){
+  updateStatus('updating');
+  // Create Ajax request.
+  if (consumedChange == undefined){
+    consumedChange = -1;
+  }
+  var data =  getUpdateSubfieldValueRequestData(tag,
+                          fieldPosition,
+                          subfieldIndex,
+                          subfieldCode,
+                          value);
+
+  createReq(data, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  });
+}
+
 function onContentChange(value, th){
   /*
    * Handle 'Save' button in editable content fields.
@@ -1760,25 +2094,12 @@ function onContentChange(value, th){
     field[0][subfieldIndex][1] = value;
     var subfieldCode = field[0][subfieldIndex][0];
   }
-  updateStatus('updating');
-  // Create Ajax request.
-  var data = {
-    recID: gRecID,
-    requestType: 'modifyContent',
-    tag: tag,
-    fieldPosition: fieldPosition,
-    subfieldIndex: subfieldIndex,
-    subfieldCode: subfieldCode,
-    value: value
-  };
-  createReq(data, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  });
+
+  updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value);
 
   setTimeout('$("#content_' + tag + '_' + fieldPosition + '_' + subfieldIndex +
-    '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
-    'gNEW_CONTENT_COLOR_FADE_DURATION)', gNEW_CONTENT_HIGHLIGHT_DELAY);
-
+      '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
+      'gNEW_CONTENT_COLOR_FADE_DURATION)', gNEW_CONTENT_HIGHLIGHT_DELAY);
   // Return escaped value to display.
   return escapeHTML(value);
 }
@@ -1886,17 +2207,17 @@ function onDeleteClick(event){
     displayAlert('alertDeleteProtectedField', [protectedField]);
     updateStatus('ready');
     return;
-  }
+    }
 
-  // Create Ajax request.
-  var data = {
-    recID: gRecID,
-    requestType: 'deleteFields',
-    toDelete: toDelete
-  };
-  createReq(data, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']]);
-  });
+    // Create Ajax request.
+    var data = {
+  recID: gRecID,
+  requestType: 'deleteFields',
+  toDelete: toDelete
+    };
+    createReq(data, function(json){
+  updateStatus('report', gRESULT_CODES[json['resultCode']]);
+    });
 
   // Continue local updating.
   // Parse datastructure and delete accordingly in record.
@@ -1931,13 +2252,11 @@ function onDeleteClick(event){
         var rowGroup = $('#rowGroup_' + fieldID);
       }
     }
-
-    redrawFields(tag);
   }
-  if (reColorTable)
-    // If entire fields has been deleted, redraw all fields with the same tag
-    // and recolor the full table.
-    for (tag in tagsToRedraw)
+
+  // If entire fields has been deleted, redraw all fields with the same tag
+  // and recolor the full table.
+  for (tag in tagsToRedraw)
       redrawFields(tag);
   reColorFields();
 }

@@ -65,3 +65,16 @@ def reserve_record_id():
     """Reserve a new record ID in the bibrec table."""
     return run_sql("""INSERT INTO bibrec (creation_date, modification_date)
                        VALUES (NOW(), NOW())""")
+
+def get_related_hp_changesets(recId):
+    """
+        A function returning the changesets saved in the Holding Pen, related
+        to the given record.
+    """
+    return run_sql("""SELECT changeset_id, changeset_date FROM bibHOLDINGPEN WHERE id_bibrec='%(identifier)s' ORDER BY changeset_date""" % {"identifier" : recId})
+
+def get_hp_update_xml(changeId):
+    return run_sql("""SELECT  changeset_xml, id_bibrec from bibHOLDINGPEN where changeset_id=%s""", (str(changeId),))[0]
+
+def delete_hp_change(changeId):
+    return run_sql("""delete from bibHOLDINGPEN where changeset_id=%i""" % (changeId, ))

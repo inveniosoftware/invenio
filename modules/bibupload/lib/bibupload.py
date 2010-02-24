@@ -90,7 +90,8 @@ from invenio.bibrecord import create_records, \
                               record_delete_subfield_from, \
                               record_delete_fields, \
                               record_add_subfield_into, \
-                              record_find_field
+                              record_find_field, \
+                              record_extract_oai_id
 from invenio.search_engine import get_record
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
@@ -103,6 +104,8 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
     KEEP_OLD_VALUE, decompose_bibdocfile_url, InvenioWebSubmitFileError, \
     bibdocfile_url_p
+
+from invenio.search_engine import search_pattern
 
 #Statistic variables
 stat = {}
@@ -396,10 +399,42 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             update_database_with_metadata(original_record, rec_id, oai_rec_id)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
 
+def find_record_ids_by_oai_id(oaiId):
+    """
+    A method finding the records identifier provided the oai identifier
+    returns a list of identifiers matching a given oai identifier
+    """
+    # Is this record already in invenio (matching by oaiid)
+    recids1 = search_pattern( p = oaiId, f = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, m = 'e' ).tolist()
+    # Is this record already in invenio (matching by reportnumber i.e.
+    # particularly 037. Idea: to avoid doubbles insertions)
+    repnumber = oaiId.split(":")[-1]
+    recids2 = search_pattern(p = repnumber,
+                             f = "reportnumber",
+                             m = 'e' ).tolist()
+    # Is this record already in invenio (matching by reportnumber i.e.
+    # particularly 037. Idea:  to avoid doubbles insertions)
+    repnumber = "arXiv:" + oaiId.split(":")[-1]
+    recids3 = search_pattern(p = repnumber,
+                             f = "reportnumber",
+                             m = 'e' ).tolist()
+    # now assuring, the results are unique
+    res = {}
+    for  rid in recids1 + recids2 + recids3:
+        res[rid] = 1
+
+    return res.keys()
+
 def insert_record_into_holding_pen(record, oai_id):
-    query = "INSERT INTO oaiHOLDINGPEN (oai_id, date_inserted, record_XML) VALUES (%s, NOW(), %s)"
+    query = "INSERT INTO bibHOLDINGPEN (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"
     xml_record = record_xml_output(record)
-    run_sql(query, (oai_id, xml_record))
+    bibrec_ids = find_record_ids_by_oai_id(oai_id)  # here determining the identifier of the record
+    if len(bibrec_ids) > 0:
+        bibrec_id = bibrec_ids[0]
+    else:
+        bibrec_id = 0
+
+    run_sql(query, (oai_id, xml_record, bibrec_id))
     # record_id is logged as 0! ( We are not inserting into the main database)
     log_record_uploading(oai_id, task_get_task_param('task_id', 0), 0, 'H')
     stat['nb_holdingpen'] += 1

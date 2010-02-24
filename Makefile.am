@@ -102,6 +102,7 @@ install-jsmath-plugin:
 	rm -fr /tmp/invenio-jsmath-plugin
 	@echo "* Installing Invenio-specific jsMath config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
+
 	@echo "***********************************************************"
 	@echo "** The jsMath plugin was successfully installed.         **"
 	@echo "** Please do not forget to properly set the option       **"
@@ -161,7 +162,16 @@ install-jquery-plugins: uninstall-jquery-plugins
 	grep -v 'alert.*IMPORTANT: Remove this line' json2.js.tmp > json2.js && \
 	rm json2.js.tmp && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/ui/minified/ui.datepicker.min.js && \
-	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js)
+	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js && \
+	wget http://plugins.jquery.com/files/jquery.treeview_3.zip && \
+	unzip jquery.treeview_3.zip && \
+	rm jquery.treeview_3.zip && \
+	wget http://plugins.jquery.com/files/jquery.ajaxPager.js_5.txt && \
+	mv jquery.ajaxPager.js_5.txt jquery.ajaxPager.js && \
+	wget http://jqueryui.com/download/jquery-ui-1.7.2.custom.zip && \
+	unzip jquery-ui-1.7.2.custom.zip development-bundle/ui/ui.core.js && \
+	mv development-bundle/ui/ui.core.js ui.core.js && \
+	rm -rf development-bundle)
 	mkdir -p ${prefix}/var/www/img && \
 	(cd ${prefix}/var/www/img && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/themes/redmond/jquery-ui.css && \
@@ -183,7 +193,10 @@ uninstall-jquery-plugins:
 	rm -f jquery.autogrow.js && \
 	rm -f json2.js && \
 	rm -rf tablesorter && \
-	rm -f jquery.hotkeys.min.js)
+	rm -f jquery.hotkeys.min.js && \
+	rm -rf jquery-treeview && \
+	rm -f jquery.ajaxPager.js && \
+	rm -f ui.core.js)
 	@echo "***********************************************************"
 	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"

@@ -510,3 +510,31 @@ class Template:
                self.format_al_twodigits(datetime_obj.minute) + ":" + \
                self.format_al_twodigits(datetime_obj.second)
 
+    def tmpl_view_holdingpen_body(self, filter, content):
+        return """<div>
+    <form>
+        <label>Show entries containing :</label>
+        <input type="input" name="filter" value="%s"></input>
+        <input type="submit" value="Show"></input>
+    </form>
+    </div>
+    <ul id="holdingpencontainer"> %s </ul>""" %(filter, content, )
+
+
+    def tmpl_view_holdingpen_headers(self):
+        """
+            returning the HTML headers necessary in order to open the view holdingpen page
+        """
+        return """
+    <script type="text/javascript" src="%s/js/jquery.min.js"></script>
+    <script type="text/javascript" src="%s/js/jquery-treeview/jquery.treeview.js"></script>
+    <script type="text/javascript" src="%s/js/jquery-treeview/jquery.treeview.async.js"></script>
+    <script type="text/javascript" src="%s/js/ui.core.js"></script>
+    <script type="text/javascript" src="%s/js/jquery.ajaxPager.js"></script>
+    <link rel="stylesheet" href="%s/js/jquery-treeview/jquery.treeview.css" />
+    <link rel="stylesheet" href="%s/img/jquery.ajaxPager.css" />
+    <script type="text/javascript">
+        var serverAddress = '%s';
+    </script>
+    <script type="text/javascript" src="%s/js/oai_harvest_admin.js"> </script>
+""" % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL)

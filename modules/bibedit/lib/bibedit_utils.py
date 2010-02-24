@@ -39,7 +39,8 @@ import zlib
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
     CFG_BIBEDIT_FIELD_TEMPLATES_PATH
-from invenio.bibedit_dblayer import get_record_last_modification_date
+from invenio.bibedit_dblayer import get_record_last_modification_date, \
+    delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields
@@ -88,7 +89,7 @@ def cache_expired(recid, uid):
     """
     return get_cache_mtime(recid, uid) < int(time.time()) - CFG_BIBEDIT_TIMEOUT
 
-def create_cache_file(recid, uid, record='', cache_dirty=False):
+def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=[], disabled_hp_changes = {}):
     """Create a BibEdit cache file, and return revision and record. This will
     overwrite any existing cache the user has for this record.
 
@@ -101,7 +102,7 @@ def create_cache_file(recid, uid, record='', cache_dirty=False):
     file_path = '%s.tmp' % _get_file_path(recid, uid)
     record_revision = get_record_last_modification_date(recid)
     cache_file = open(file_path, 'w')
-    cPickle.dump([cache_dirty, record_revision, record], cache_file)
+    cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes], cache_file)
     cache_file.close()
     return record_revision, record
 
@@ -122,24 +123,29 @@ def get_cache_file_contents(recid, uid):
     """Return the contents of a BibEdit cache file."""
     cache_file = _get_cache_file(recid, uid, 'r')
     if cache_file:
-        cache_dirty, record_revision, record = cPickle.load(cache_file)
+        cache_dirty, record_revision, record, pending_changes, disabled_hp_changes = cPickle.load(cache_file)
         cache_file.close()
-        return cache_dirty, record_revision, record
+        return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes
 
-def update_cache_file_contents(recid, uid, record_revision, record):
+def update_cache_file_contents(recid, uid, record_revision, record, pending_changes, disabled_hp_changes):
     """Save updates to the record in BibEdit cache. Return file modificaton
     time.
 
     """
     cache_file = _get_cache_file(recid, uid, 'w')
     if cache_file:
-        cPickle.dump([True, record_revision, record], cache_file)
+        cPickle.dump([True, record_revision, record, pending_changes, disabled_hp_changes], cache_file)
         cache_file.close()
         return get_cache_mtime(recid, uid)
 
 def delete_cache_file(recid, uid):
     """Delete a BibEdit cache file."""
     os.remove('%s.tmp' % _get_file_path(recid, uid))
+
+
+def delete_disabled_changes(used_changes):
+    for change_id in used_changes:
+        delete_hp_change(change_id)
 
 def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
     """Write XML record to file. Default behaviour is to read the record from
@@ -156,9 +162,11 @@ def save_xml_record(recid, uid, xml_record='', to_upload=True, to_merge=False):
         cache = get_cache_file_contents(recid, uid)
         if cache:
             record = cache[2]
+            used_changes = cache[4]
 #            record_strip_empty_fields(record) # now performed for every record after removing unfilled volatile fields
             xml_record = record_xml_output(record)
             delete_cache_file(recid, uid)
+            delete_disabled_changes(used_changes)
     else:
         record = create_record(xml_record)[0]
 

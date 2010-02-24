@@ -1,3 +1,4 @@
+
 -- $Id$
 
 -- This file is part of CDS Invenio.
@@ -2278,10 +2279,15 @@ CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
   PRIMARY KEY (bibupload_task_id, oai_id, date_harvested)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS oaiHOLDINGPEN (
-       oai_id varchar(40) NOT NULL default "", -- identifier of the downloaded record
-       date_inserted datetime NOT NULL default '0000-00-00', -- when was the record inserted int oholding pen
-       record_XML TEXT NOT NULL default ""
+CREATE TABLE IF NOT EXISTS bibHOLDINGPEN (
+  changeset_id INT NOT NULL AUTO_INCREMENT, -- the identifier of the changeset stored in the holding pen
+  changeset_date datetime NOT NULL DEFAULT '0000:00:00 00:00:00', -- when was the changeset inserted
+  changeset_xml TEXT NOT NULL DEFAULT '',
+  oai_id varchar(40) NOT NULL DEFAULT '', -- OAI identifier of concerned record
+  id_bibrec mediumint(8) unsigned NOT NULL default '0', -- record ID of concerned record (filled by bibupload)
+  PRIMARY KEY (changeset_id),
+  KEY changeset_date (changeset_date),
+  KEY id_bibrec (id_bibrec)
 ) TYPE=MyISAM;
 
 -- tables for portal elements:
