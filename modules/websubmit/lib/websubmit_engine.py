@@ -1216,7 +1216,7 @@ def getCatalogueBranch(id_father, level, user_info):
     collctn_children = \
          get_collection_children_of_submission_collection(id_father)
     for child_collctn in collctn_children:
-        elem['sons'].append(getCatalogueBranch(child_collctn[0], level + 1), user_info)
+        elem['sons'].append(getCatalogueBranch(child_collctn[0], level + 1, user_info))
 
     ## Now return this branch of the built-up 'collection-tree':
     return elem
