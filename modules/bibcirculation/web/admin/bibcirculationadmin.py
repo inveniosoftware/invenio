@@ -30,11 +30,11 @@ def index(req, ln=CFG_SITE_LANG):
     """
     return bal.index(req, ln)
 
-def borrower_search(req, empty_barcode=None, ln=CFG_SITE_LANG):
+def borrower_search(req, empty_barcode=None, redirect='no', ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/borrowers_search
     """
-    return bal.borrower_search(req, empty_barcode, ln)
+    return bal.borrower_search(req, empty_barcode, redirect=redirect, ln=ln)
 
 
 def item_search(req, ln=CFG_SITE_LANG):
@@ -93,14 +93,9 @@ def loan_on_desk_step2(req, user_info=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step2
 
     """
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = user_info.split(',')
-    else:
-        user_info = user_info.split(',')
+
+    user_info = user_info.split(',')
+
 
     return bal.loan_on_desk_step2(req, user_info, ln)
 
@@ -109,14 +104,8 @@ def loan_on_desk_step3(req, user_info=None, barcode=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step4
 
     """
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = eval(user_info)
-    else:
-        user_info = user_info.split(',')
+
+    user_info = eval(user_info)
 
     return bal.loan_on_desk_step3(req, user_info, barcode, ln)
 
@@ -127,17 +116,11 @@ def loan_on_desk_step4(req, list_of_books=None, user_info=None, due_date=None,
 
     """
 
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = eval(user_info)
-    else:
-        user_info = user_info.split(',')
+    user_info = eval(user_info)
 
     list_of_books = eval(list_of_books)
     due_date = wash_url_argument(due_date, 'list')
+
 
     return bal.loan_on_desk_step4(req, list_of_books, user_info,
                                   due_date, note, ln)
@@ -213,15 +196,13 @@ def all_loans_test(req, ln=CFG_SITE_LANG):
     """
     return bal.all_loans_test(req, ln)
 
-def all_loans(req, loans_per_page=25, page_number=1, ln=CFG_SITE_LANG):
+def all_loans(req, msg=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_loans
 
     """
-    loans_per_page = int(loans_per_page)
-    page_number = int(page_number)
 
-    return bal.all_loans(req, loans_per_page, page_number, ln)
+    return bal.all_loans(req, msg=msg, ln=ln)
 
 def bor_loans_historical_overview(req, borrower_id=None, ln=CFG_SITE_LANG):
     """
@@ -296,12 +277,12 @@ def get_borrower_loans_details(req, recid=None, barcode=None, borrower_id=None,
                                           renewall, force, loan_id, ln)
 
 
-def borrower_search_result(req, column, string, ln=CFG_SITE_LANG):
+def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/borrower_search_result
     """
 
-    return bal.borrower_search_result(req, column, string, ln)
+    return bal.borrower_search_result(req, column, string, redirect=redirect, ln=ln)
 
 
 def associate_barcode(req, request_id=None, recid=None, borrower_id=None,
@@ -321,19 +302,19 @@ def get_borrower_notes(req, borrower_id=None, delete_key=None,
                                   library_notes, ln)
 
 def get_loans_notes(req, loan_id=None, recid=None, delete_key=None,
-                    library_notes=None, ln=CFG_SITE_LANG):
+                    library_notes=None, back="", ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes
     """
     return bal.get_loans_notes(req, loan_id, recid, delete_key,
-                               library_notes, ln)
+                               library_notes, back, ln)
 
-def get_item_loans_notes(req, loan_id=None, recid=None, borrower_id=None,
+def get_item_loans_notes(req, loan_id=None, recid=None,
                          add_notes=None, new_note=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_notes
     """
-    return bal.get_item_loans_notes(req, loan_id, recid, borrower_id, add_notes,
+    return bal.get_item_loans_notes(req, loan_id, recid, add_notes,
                                     new_note, ln)
 
 
@@ -576,15 +557,13 @@ def claim_book_return(req, borrower_id=None, recid=None, loan_id=None,
     """
     return bal.claim_book_return(req, borrower_id, recid, loan_id, template, ln)
 
-def all_expired_loans(req, loans_per_page=25, page_number=1, ln=CFG_SITE_LANG):
+def all_expired_loans(req, ln=CFG_SITE_LANG):
     """
-    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_loans
+    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans
 
     """
-    loans_per_page = int(loans_per_page)
-    page_number = int(page_number)
 
-    return bal.all_expired_loans(req, loans_per_page, page_number, ln)
+    return bal.all_expired_loans(req, ln)
 
 def get_waiting_requests(req, request_id=None, print_data=None,
                          ln=CFG_SITE_LANG):
@@ -651,13 +630,7 @@ def place_new_request_step2(req, barcode=None, recid=None, user_info=None,
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step2
     """
 
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = user_info.split(',')
-    else:
+    if user_info is not None:
         user_info = user_info.split(',')
 
     return bal.place_new_request_step2(req, barcode, recid, user_info, ln)
@@ -669,14 +642,9 @@ def place_new_request_step3(req, barcode=None, recid=None, user_info=None,
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step3
 
     """
-    if type(user_info) is tuple:
-        user_info = eval(user_info)
-    elif type(user_info) is list:
-        user_info = eval(user_info)
-    elif type(user_info) is str:
-        user_info = eval(user_info)
-    else:
-        user_info = user_info.split(',')
+
+    user_info = eval(user_info)
+
 
     return bal.place_new_request_step3(req, barcode, recid, user_info, period_from,
                                        period_to, ln)
@@ -745,7 +713,7 @@ def ordered_books(req, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/ordered_books
     """
 
-    return bal.ordered_books(req, ln)
+    return bal.list_ordered_books(req, ln)
 
 def get_purchase_notes(req, purchase_id=None, delete_key=None, library_notes=None, ln=CFG_SITE_LANG):
     """
@@ -802,7 +770,7 @@ def ill_request_details_step1(req, delete_key=None, ill_request_id=None, ill_sta
 
 def ill_request_details_step2(req, delete_key=None, ill_request_id=None, ill_status=None, library_id=None,
                               request_date=None, expected_date=None, arrival_date=None, due_date=None,
-                              return_date=None, status=None, cost=None,
+                              return_date=None, cost=None,
                               currency=None, barcode=None, library_notes=None, ln=CFG_SITE_LANG):
 
     """
@@ -811,7 +779,7 @@ def ill_request_details_step2(req, delete_key=None, ill_request_id=None, ill_sta
 
     return bal.ill_request_details_step2(req, delete_key, ill_request_id, ill_status, library_id,
                                          request_date, expected_date, arrival_date, due_date,
-                                         return_date, status, cost, currency,
+                                         return_date, cost, currency,
                                          barcode, library_notes, ln)
 
 def ill_request_details_step3(req, request_info=None, ill_status=None, ln=CFG_SITE_LANG):
@@ -1054,6 +1022,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id=None, title=N
                                                              publisher, year, edition, isbn, period_of_interest_from,
                                                              period_of_interest_to, additional_comments,
                                                              only_edition, ln)
+
 def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
     """
     """
@@ -1085,4 +1054,4 @@ def ill_search_result(req, p=None, f=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/item_search_result
     """
 
-    return bal.ill_search_result(req, p, f, ln)
+    return bal.ill_search_result(p, f)

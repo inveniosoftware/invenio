@@ -27,7 +27,7 @@ import sys
 import datetime
 import time
 from invenio.dbquery import run_sql
-from invenio.bibtask import task_init, write_message
+from invenio.bibtask import task_init
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
@@ -165,7 +165,7 @@ def task_run_core():
 
         title = ''.join(get_fieldvalues(recid, "245__a"))
         subject = "LOAN RECALL: " + title
-        update_expired_loan(id_loan)
+        update_expired_loan(loan_id)
         #write_message("Updating information about expired loans")
         send_overdue_letter(borrower_id, subject, content)
         #write_message("Sending overdue letter")
@@ -188,5 +188,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

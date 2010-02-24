@@ -142,7 +142,10 @@ def get_due_date_loan(recid):
                      where id_bibrec=%s and status != 'returned'
                   """, (recid, ))
 
-    return res [0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 
 def get_holdings_info_no_requests(recid):
@@ -172,7 +175,10 @@ def get_request_recid(request_id):
                       where id=%s
                   """, (request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_request_borrower_id(request_id):
     """
@@ -189,7 +195,10 @@ def get_request_borrower_id(request_id):
                       where id=%s
                   """, (request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 
 def get_request_barcode(request_id):
@@ -206,7 +215,10 @@ def get_request_barcode(request_id):
                       where id=%s
                   """, (request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_id_bibrec(barcode):
     """
@@ -217,14 +229,15 @@ def get_id_bibrec(barcode):
 
     @return recid or None
     """
+
     res = run_sql("""select id_bibrec
                      from crcITEM
-                     where barcode=%s""",
-                  (barcode, ))
+                     where barcode=%s
+                  """, (barcode, ))
 
-    try:
+    if res:
         return res[0][0]
-    except IndexError:
+    else:
         return None
 
 
@@ -306,7 +319,10 @@ def get_barcode(recid):
                      where id_bibrec=%s
                   """, (recid, ))
 
-    return res [0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_due_date(barcode):
     """
@@ -323,7 +339,10 @@ def get_due_date(barcode):
                      where barcode=%s
                   """, (barcode, ))
 
-    return res [0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_number_requests(recid):
     """
@@ -407,7 +426,10 @@ def get_borrower_email(borrower_id):
                      from crcBORROWER
                      where id=%s""", (borrower_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_next_waiting_loan_request(recid):
     """
@@ -615,7 +637,10 @@ def get_library_details(library_id):
                      where id=%s;
                      """, (library_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_loan_request_by_status(status):
     """
@@ -631,7 +656,7 @@ def get_loan_request_by_status(status):
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date
-                            FROM   crcLOANREQUEST lr,
+                     FROM   crcLOANREQUEST lr,
                             crcBORROWER bor,
                             crcITEM it,
                             crcLIBRARY lib
@@ -799,7 +824,10 @@ def get_borrower_details(borrower_id):
     res =  run_sql("""select id, name, email, phone, address, mailbox
                       from crcBORROWER
                       where id=%s""", (borrower_id, ))
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 
 def get_borrower_name(borrower_id):
@@ -811,7 +839,10 @@ def get_borrower_name(borrower_id):
                      from crcBORROWER
                      where id=%s""", (borrower_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def loan_on_desk_confirm(barcode, borrower_id):
     """
@@ -1044,7 +1075,7 @@ def new_loan(borrower_id, recid, barcode,
                                            status, type, notes)
                       values(%s, %s, %s, %s, %s, %s ,%s, %s)
                   """, (borrower_id, recid, barcode, loaned_on,
-                        due_date, status, loan_type, notes))
+                        due_date, status, loan_type, str(notes)))
 
     return res
 
@@ -1076,14 +1107,14 @@ def get_item_loans(recid):
 
     return res
 
-def get_all_loans(jloan, loans_per_page):
+def get_all_loans(limit):
     """
     Get all loans.
     """
 
     res = run_sql(
     """
-    select bor.id,
+    SELECT bor.id,
            bor.name,
            it.id_bibrec,
            l.barcode,
@@ -1094,16 +1125,17 @@ def get_all_loans(jloan, loans_per_page):
            DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
            l.notes,
            l.id
-    from crcLOAN l, crcBORROWER bor, crcITEM it
-    where l.id_crcBORROWER = bor.id
-          and l.barcode=it.barcode
-          and l.status='on loan' ORDER BY l.loaned_on DESC
-          limit %s, %s
-          """, (jloan, loans_per_page))
+    FROM crcLOAN l, crcBORROWER bor, crcITEM it
+    WHERE l.id_crcBORROWER = bor.id
+          and l.barcode = it.barcode
+          and l.status = 'on loan'
+    ORDER BY 5 DESC
+    LIMIT 0,%s
+    """, (limit,))
 
     return res
 
-def get_all_expired_loans(jloan, loans_per_page):
+def get_all_expired_loans():
     """
     Get all expired(overdue) loans.
     """
@@ -1113,18 +1145,20 @@ def get_all_expired_loans(jloan, loans_per_page):
            bor.name,
            it.id_bibrec,
            l.barcode,
-           DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
-           DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.loaned_on,'%Y-%m-%d'),
+           DATE_FORMAT(l.due_date,'%Y-%m-%d'),
            l.number_of_renewals,
            l.overdue_letter_number,
-           DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
            l.notes,
            l.id
     from crcLOAN l, crcBORROWER bor, crcITEM it
-    where l.id_crcBORROWER = bor.id and
-          l.barcode=it.barcode and l.status='expired'
-          limit %s, %s
-    """, (jloan, loans_per_page))
+    where l.id_crcBORROWER = bor.id
+          and l.barcode = it.barcode
+          and l.status = 'on loan'
+          and l.due_date < CURDATE()
+    """)
+# l.status='expired'
 
     return res
 
@@ -1295,7 +1329,10 @@ def get_loans_notes(loan_id):
                      where id=%s
                      """, (loan_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def add_new_note(new_note, borrower_id):
     """
@@ -1396,7 +1433,10 @@ def get_invenio_user_email(uid):
                      where id=%s""",
                   (uid, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_borrower_notes(borrower_id):
     """
@@ -1411,7 +1451,10 @@ def get_borrower_notes(borrower_id):
                      where id=%s""",
                   (borrower_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def update_loan_status(status, loan_id):
     """
@@ -1440,7 +1483,10 @@ def get_loan_due_date(loan_id):
                      where id = %s""",
                   (loan_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_pdf_request_data(status):
     """
@@ -1477,7 +1523,10 @@ def get_last_loan():
                             DATE_FORMAT(due_date, '%Y-%m-%d')
                      from   crcLOAN ORDER BY id DESC LIMIT 1""")
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_borrower_data(borrower_id):
     """
@@ -1495,7 +1544,10 @@ def get_borrower_data(borrower_id):
                      where  id=%s""",
                   (borrower_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def update_borrower_info(borrower_id, name, email, phone, address, mailbox):
     """
@@ -1513,7 +1565,7 @@ def update_borrower_info(borrower_id, name, email, phone, address, mailbox):
                           where  id=%s""",
                        (name, email, phone, address, mailbox, borrower_id)))
 
-def add_new_library(name, email, phone, address, type, notes):
+def add_new_library(name, email, phone, address, lib_type, notes):
     """
     Add a new Library.
     """
@@ -1521,7 +1573,7 @@ def add_new_library(name, email, phone, address, type, notes):
     run_sql("""insert into crcLIBRARY (name, email, phone,
                                        address, type, notes)
                            values (%s, %s, %s, %s, %s, %s)""",
-            (name, email, phone, address, type, notes))
+            (name, email, phone, address, lib_type, notes))
 
 def search_library_by_name(string):
     """
@@ -1575,8 +1627,8 @@ def get_libraries():
     """
 
     res = run_sql("""select id, name
-                       from crcLIBRARY
-                      where type!='external'""")
+                       from crcLIBRARY""")
+                      #where type<>'external' """)
 
     return res
 
@@ -1593,7 +1645,10 @@ def get_library_name(library_id):
                      where  id=%s""",
                   (library_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def add_new_copy(barcode, recid, library_id, collection, location, description,
                  loan_period, status):
@@ -1639,7 +1694,10 @@ def get_item_info(barcode):
                      where  it.barcode=%s and it.id_crcLIBRARY = lib.id""",
                   (barcode, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def update_item_info(barcode, library_id, collection, location, description,
                  loan_period, status):
@@ -1694,7 +1752,10 @@ def get_library_notes(library_id):
                      where  id=%s""",
                   (library_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def add_new_library_note(new_note, library_id):
     """
@@ -1775,7 +1836,10 @@ def get_requested_barcode(request_id):
                       where id=%s""",
                   (request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_borrower_recids(borrower_id):
     """
@@ -1803,7 +1867,10 @@ def get_loan_status(loan_id):
                       where id=%s""",
                   (loan_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_loan_period(barcode):
     """
@@ -1818,7 +1885,10 @@ def get_loan_period(barcode):
                       where barcode=%s""",
                   (barcode, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_loan_infos(loan_id):
     """
@@ -1838,7 +1908,10 @@ def get_loan_infos(loan_id):
                               l.id=%s""",
                    (loan_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def is_item_on_loan(barcode):
     """
@@ -1900,7 +1973,10 @@ def get_purchase_notes(purchase_id):
                      where  id=%s""",
                   (purchase_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def update_purchase_notes(purchase_id, purchase_notes):
     """
@@ -1978,7 +2054,10 @@ def get_ill_request_pending(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 
 def get_ill_request_sent(ill_request_id):
@@ -1994,7 +2073,10 @@ def get_ill_request_sent(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_ill_request_cancelled(ill_request_id):
     """
@@ -2007,7 +2089,10 @@ def get_ill_request_cancelled(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_ill_request_received(ill_request_id):
     """
@@ -2024,7 +2109,10 @@ def get_ill_request_received(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_ill_request_returned(ill_request_id):
     """
@@ -2042,7 +2130,10 @@ def get_ill_request_returned(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_ill_item_received(ill_request_id):
     """
@@ -2055,7 +2146,10 @@ def get_ill_item_received(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_ill_item_returned(ill_request_id):
     """
@@ -2071,7 +2165,10 @@ def get_ill_item_returned(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_ill_request_closed(ill_request_id):
     """
@@ -2089,7 +2186,10 @@ def get_ill_request_closed(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_ill_borrower_request(ill_request_id):
     """
@@ -2103,7 +2203,10 @@ def get_ill_borrower_request(ill_request_id):
                        from crcILLREQUEST ill, crcBORROWER bor
                       where ill.id_crcBORROWER=bor.id and ill.id=%s""", (ill_request_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_external_libraries():
     """
@@ -2238,7 +2341,10 @@ def get_order_details(purchase_id):
                        from crcPURCHASE
                       where id=%s""", (purchase_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def uptade_purchase(purchase_id, recid, vendor_id, price,
                     status, order_date, expected_date, notes):
@@ -2334,7 +2440,10 @@ def get_vendor_details(vendor_id):
                      where id=%s;
                      """, (vendor_id, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_vendor_notes(vendor_id):
     """
@@ -2349,7 +2458,10 @@ def get_vendor_notes(vendor_id):
                      where  id=%s""",
                   (vendor_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def add_new_vendor_note(new_note, vendor_id):
     """
@@ -2387,7 +2499,10 @@ def get_vendor_name(vendor_id):
                      where  id=%s""",
                   (vendor_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_ill_request_notes(ill_request_id):
     """
@@ -2398,7 +2513,10 @@ def get_ill_request_notes(ill_request_id):
                      where  id=%s""",
                   (ill_request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def update_ill_request_notes(ill_request_id, library_notes):
     """
@@ -2416,7 +2534,10 @@ def get_ill_borrower(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_ill_barcode(ill_request_id):
     """
@@ -2426,9 +2547,12 @@ def get_ill_barcode(ill_request_id):
                        from crcILLREQUEST
                       where id=%s""", (ill_request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
-def update_ill_loan_status(borrower_id, barcode, return_date, type):
+def update_ill_loan_status(borrower_id, barcode, return_date, loan_type):
     """
     """
 
@@ -2438,7 +2562,7 @@ def update_ill_loan_status(borrower_id, barcode, return_date, type):
                where id_crcBORROWER = %s
                  and barcode = %s
                  and type = %s""",
-            (return_date, borrower_id, barcode, type))
+            (return_date, borrower_id, barcode, loan_type))
 
 def get_recid(barcode):
     """
@@ -2498,7 +2622,10 @@ def get_ill_notes(ill_id):
                      where  id=%s""",
                   (ill_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def update_ill_notes(ill_id, ill_notes):
     """
@@ -2546,7 +2673,10 @@ def get_lib_location(barcode):
                       where barcode=%s""",
                   (barcode, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_barcodes(recid):
     """
@@ -2595,7 +2725,8 @@ def get_expired_loans_with_requests():
                      WHERE  it.barcode=lr.barcode AND
                             lr.barcode=l.barcode AND
                             (lr.status='pending' or lr.status='waiting') AND
-                            l.status='expired'
+                            l.status='on loan'
+                            and l.due_date < CURDATE()
                             ORDER BY lr.request_date;
                   """)
     return res
@@ -2626,7 +2757,10 @@ def get_loan_notes(loan_id):
                      where  id=%s""",
                   (loan_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def update_loan_notes(loan_id, loan_notes):
     """
@@ -2651,7 +2785,10 @@ def get_ill_book_info(ill_request_id):
                       where id=%s""",
                   (ill_request_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None
 
 def get_ill_ids():
     """
@@ -2672,7 +2809,10 @@ def get_copies_status(recid):
                       where id_bibrec=%s""",
                   (recid, ))
 
-    return res[0]
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_loan_recid(loan_id):
     """
@@ -2683,4 +2823,7 @@ def get_loan_recid(loan_id):
                       where id=%s""",
                   (loan_id, ))
 
-    return res[0][0]
+    if res:
+        return res[0][0]
+    else:
+        return None

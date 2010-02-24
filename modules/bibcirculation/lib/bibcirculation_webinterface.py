@@ -52,12 +52,9 @@ websearch_templates = invenio.template.load('websearch')
 # bibcirculation imports
 bibcirculation_templates = invenio.template.load('bibcirculation')
 from invenio.bibcirculation import perform_new_request, \
-                                   perform_new_request_send, \
                                    perform_get_holdings_information, \
                                    perform_borrower_loans, \
                                    perform_loanshistoricaloverview, \
-                                   ill_request_with_recid, \
-                                   ill_register_request_with_recid, \
                                    display_ill_form, \
                                    ill_register_request
 
@@ -67,7 +64,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
     _exports = ['', 'display', 'loanshistoricaloverview']
 
-    def index(self, req, form):
+    def index(self, req):
         """ The function called by default
         """
         redirect_to_url(req, "%s/yourloans/display?%s" % (CFG_SITE_URL,
@@ -167,7 +164,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 
     _exports = ['', 'display', 'register_request']
 
-    def index(self, req, form):
+    def index(self, req):
         """ The function called by default
         """
         redirect_to_url(req, "%s/ill/display?%s" % (CFG_SITE_URL,
@@ -204,7 +201,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use ill."))
 
-        body = display_ill_form(uid=uid, ln=argd['ln'])
+        body = display_ill_form(ln=argd['ln'])
 
         return page(title       = _("Interlibrary loan request for books"),
                     body        = body,
@@ -367,6 +364,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -389,7 +387,6 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         body = perform_new_request(recid=self.recid,
-                                   uid=uid,
                                    barcode=argd['barcode'],
                                    ln=argd['ln'])
 
@@ -456,6 +453,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               uid=uid,
                               verbose=1,
                               req=req,
+                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                               language=argd['ln'],
                               navmenuid='search',
                               navtrail_append_title_p=0) + \
@@ -465,271 +463,275 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
 
 
-
-
-    def send(self, req, form):
-        """
-        Create a new hold request.
-        """
-        argd = wash_urlargd(form, {'period_from': (str, ""),
-                                   'period_to': (str, ""),
-                                   'barcode': (str, "")
-                                   })
-
-
-        uid = getUid(req)
-
-        body = perform_new_request_send(recid=self.recid,
-                                        uid=uid,
-                                        period_from=argd['period_from'],
-                                        period_to=argd['period_to'],
-                                        barcode=argd['barcode'],
-                                        ln=argd['ln'])
-
-
-
-        _ = gettext_set_language(argd['ln'])
-
-
-        user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
-                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
-        elif auth_code:
-            return page_not_authorized(req, "../", \
-                text = auth_msg)
-
-
-
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
-        ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
-        link_ln = ''
-        if argd['ln'] != CFG_SITE_LANG:
-            link_ln = '?ln=%s' % argd['ln']
-        tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
-                 tab_id in ['holdings'],
-                 unordered_tabs[tab_id]['enabled']) \
-                for (tab_id, _order) in ordered_tabs_id
-                if unordered_tabs[tab_id]['visible'] == True]
-        top = webstyle_templates.detailed_record_container_top(self.recid,
-                                                               tabs,
-                                                               argd['ln'])
-        bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
-                                                                     tabs,
-                                                                     argd['ln'])
-
-        title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
-        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
-        navtrail += title
-        navtrail += '</a>'
-
-        return pageheaderonly(title=title,
-                              navtrail=navtrail,
-                              uid=uid,
-                              verbose=1,
-                              req=req,
-                              language=argd['ln'],
-                              navmenuid='search',
-                              navtrail_append_title_p=0) + \
-                              websearch_templates.tmpl_search_pagestart(argd['ln']) + \
-                              top + body + bottom + \
-                              websearch_templates.tmpl_search_pageend(argd['ln']) + \
-                              pagefooteronly(lastupdated=__lastupdated__,
-                                             language=argd['ln'], req=req)
-
-
-
-
-
-
-    def ill_request_with_recid(self, req, form):
-        """
-        Show ILL request form.
-        """
-
-
-        argd = wash_urlargd(form, {'ln': (str, "")})
-
-        _ = gettext_set_language(argd['ln'])
-        uid = getUid(req)
-
-        body = ill_request_with_recid(recid=self.recid,
-                                      uid=uid,
-                                      ln=argd['ln'])
-
-        uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../holdings/ill_request_with_recid",
-                                       navmenuid = 'yourbaskets')
-
-        if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
-                    CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/record/%s/holdings/ill_request_with_recid%s" % (
-                        CFG_SITE_URL,
-                        self.recid,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
-
-
-        user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
-                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
-        elif auth_code:
-            return page_not_authorized(req, "../", \
-                text = auth_msg)
+    #def send(self, req, form):
+    #    """
+    #    Create a new hold request.
+    #    """
+    #    argd = wash_urlargd(form, {'period_from': (str, ""),
+    #                               'period_to': (str, ""),
+    #                               'barcode': (str, "")
+    #                               })
+    #
+    #
+    #    uid = getUid(req)
+    #
+    #    body = perform_new_request_send(recid=self.recid,
+    #                                    uid=uid,
+    #                                    period_from=argd['period_from'],
+    #                                    period_to=argd['period_to'],
+    #                                    barcode=argd['barcode'],
+    #                                    ln=argd['ln'])
+    #
+    #def perform_new_request_send(self, uid, recid,
+    #                         from_year, from_month, from_day,
+    #                         to_year, to_month, to_day,
+    #                         barcode, ln=CFG_SITE_LANG):
+    #
+    #    _ = gettext_set_language(ln)
+    #
+    #
+    #    user_info = collect_user_info(req)
+    #    (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+    #    if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+    #        cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+    #        target = '/youraccount/login' + \
+    #                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+    #            CFG_SITE_URL + user_info['uri']}, {})
+    #        return redirect_to_url(req, target)
+    #    elif auth_code:
+    #        return page_not_authorized(req, "../", \
+    #            text = auth_msg)
+    #
+    #
+    #
+    #    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
+    #                                                self.recid,
+    #                                                ln='ln')
+    #    ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+    #    ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
+    #    link_ln = ''
+    #    if argd['ln'] != CFG_SITE_LANG:
+    #        link_ln = '?ln=%s' % ln
+    #    tabs = [(unordered_tabs[tab_id]['label'], \
+    #             '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+    #             tab_id in ['holdings'],
+    #             unordered_tabs[tab_id]['enabled']) \
+    #            for (tab_id, _order) in ordered_tabs_id
+    #            if unordered_tabs[tab_id]['visible'] == True]
+    #    top = webstyle_templates.detailed_record_container_top(self.recid,
+    #                                                           tabs,
+    #                                                           argd['ln'])
+    #    bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
+    #                                                                 tabs,
+    #                                                                 argd['ln'])
+    #
+    #    title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
+    #    navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
+    #    navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+    #    navtrail += title
+    #    navtrail += '</a>'
+    #
+    #    return pageheaderonly(title=title,
+    #                          navtrail=navtrail,
+    #                          uid=uid,
+    #                          verbose=1,
+    #                          req=req,
+    #                          metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+    #                          language=argd['ln'],
+    #                          navmenuid='search',
+    #                          navtrail_append_title_p=0) + \
+    #                          websearch_templates.tmpl_search_pagestart(argd['ln']) + \
+    #                          top + body + bottom + \
+    #                          websearch_templates.tmpl_search_pageend(argd['ln']) + \
+    #                          pagefooteronly(lastupdated=__lastupdated__,
+    #                                         language=argd['ln'], req=req)
 
 
 
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
-        ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
-        link_ln = ''
-        if argd['ln'] != CFG_SITE_LANG:
-            link_ln = '?ln=%s' % argd['ln']
-        tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
-                 tab_id in ['holdings'],
-                 unordered_tabs[tab_id]['enabled']) \
-                for (tab_id, _order) in ordered_tabs_id
-                if unordered_tabs[tab_id]['visible'] == True]
-        top = webstyle_templates.detailed_record_container_top(self.recid,
-                                                               tabs,
-                                                               argd['ln'])
-        bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
-                                                                     tabs,
-                                                                     argd['ln'])
-
-        title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
-        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
-        navtrail += title
-        navtrail += '</a>'
-
-        return pageheaderonly(title=title,
-                              navtrail=navtrail,
-                              uid=uid,
-                              verbose=1,
-                              req=req,
-                              language=argd['ln'],
-                              navmenuid='search',
-                              navtrail_append_title_p=0) + \
-                              websearch_templates.tmpl_search_pagestart(argd['ln']) + \
-                              top + body + bottom + \
-                              websearch_templates.tmpl_search_pageend(argd['ln']) + \
-                              pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
 
 
-    def ill_register_request_with_recid(self, req, form):
-        """
-        Register ILL request.
-        """
-
-        argd = wash_urlargd(form, {'ln': (str, ""),
-                                   'period_of_interest_from': (str, ""),
-                                   'period_of_interest_to': (str, ""),
-                                   'additional_comments': (str, ""),
-                                   'conditions': (str, ""),
-                                   'only_edition': (str, ""),
-                                   })
-
-        _ = gettext_set_language(argd['ln'])
-        uid = getUid(req)
-
-        body = ill_register_request_with_recid(recid=self.recid,
-                                               uid=uid,
-                                               period_of_interest_from =  argd['period_of_interest_from'],
-                                               period_of_interest_to =  argd['period_of_interest_to'],
-                                               additional_comments =  argd['additional_comments'],
-                                               conditions = argd['conditions'],
-                                               only_edition = argd['only_edition'],
-                                               ln=argd['ln'])
-
-        uid = getUid(req)
-        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../holdings/ill_request_with_recid",
-                                       navmenuid = 'yourbaskets')
-
-        if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
-                    CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/record/%s/holdings/ill_request_with_recid%s" % (
-                        CFG_SITE_URL,
-                        self.recid,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
-
-
-        user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
-                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
-        elif auth_code:
-            return page_not_authorized(req, "../", \
-                text = auth_msg)
-
-
-
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
-        ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
-        ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
-        link_ln = ''
-        if argd['ln'] != CFG_SITE_LANG:
-            link_ln = '?ln=%s' % argd['ln']
-        tabs = [(unordered_tabs[tab_id]['label'], \
-                 '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
-                 tab_id in ['holdings'],
-                 unordered_tabs[tab_id]['enabled']) \
-                for (tab_id, _order) in ordered_tabs_id
-                if unordered_tabs[tab_id]['visible'] == True]
-        top = webstyle_templates.detailed_record_container_top(self.recid,
-                                                               tabs,
-                                                               argd['ln'])
-        bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
-                                                                     tabs,
-                                                                     argd['ln'])
-
-        title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
-        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
-        navtrail += title
-        navtrail += '</a>'
-
-        return pageheaderonly(title=title,
-                              navtrail=navtrail,
-                              uid=uid,
-                              verbose=1,
-                              req=req,
-                              language=argd['ln'],
-                              navmenuid='search',
-                              navtrail_append_title_p=0) + \
-                              websearch_templates.tmpl_search_pagestart(argd['ln']) + \
-                              top + body + bottom + \
-                              websearch_templates.tmpl_search_pageend(argd['ln']) + \
-                              pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
+    #
+    #def ill_request_with_recid(self, req, form):
+    #    """
+    #    Show ILL request form.
+    #    """
+    #
+    #
+    #    argd = wash_urlargd(form, {'ln': (str, "")})
+    #
+    #    _ = gettext_set_language(argd['ln'])
+    #    uid = getUid(req)
+    #
+    #    body = ill_request_with_recid(recid=self.recid,
+    #                                  uid=uid,
+    #                                  ln=argd['ln'])
+    #
+    #    uid = getUid(req)
+    #    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+    #        return page_not_authorized(req, "../holdings/ill_request_with_recid",
+    #                                   navmenuid = 'yourbaskets')
+    #
+    #    if isGuestUser(uid):
+    #        if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+    #            return redirect_to_url(req, "%s/youraccount/login%s" % (
+    #                CFG_SITE_SECURE_URL,
+    #                    make_canonical_urlargd({
+    #                'referer' : "%s/record/%s/holdings/ill_request_with_recid%s" % (
+    #                    CFG_SITE_URL,
+    #                    self.recid,
+    #                    make_canonical_urlargd(argd, {})),
+    #                "ln" : argd['ln']}, {})))
+    #
+    #
+    #    user_info = collect_user_info(req)
+    #    (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+    #    if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+    #        cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+    #        target = '/youraccount/login' + \
+    #                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+    #            CFG_SITE_URL + user_info['uri']}, {})
+    #        return redirect_to_url(req, target)
+    #    elif auth_code:
+    #        return page_not_authorized(req, "../", \
+    #            text = auth_msg)
+    #
+    #
+    #
+    #    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
+    #                                                self.recid,
+    #                                                ln=argd['ln'])
+    #    ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+    #    ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
+    #    link_ln = ''
+    #    if argd['ln'] != CFG_SITE_LANG:
+    #        link_ln = '?ln=%s' % argd['ln']
+    #    tabs = [(unordered_tabs[tab_id]['label'], \
+    #             '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+    #             tab_id in ['holdings'],
+    #             unordered_tabs[tab_id]['enabled']) \
+    #            for (tab_id, _order) in ordered_tabs_id
+    #            if unordered_tabs[tab_id]['visible'] == True]
+    #    top = webstyle_templates.detailed_record_container_top(self.recid,
+    #                                                           tabs,
+    #                                                           argd['ln'])
+    #    bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
+    #                                                                 tabs,
+    #                                                                 argd['ln'])
+    #
+    #    title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
+    #    navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
+    #    navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+    #    navtrail += title
+    #    navtrail += '</a>'
+    #
+    #    return pageheaderonly(title=title,
+    #                          navtrail=navtrail,
+    #                          uid=uid,
+    #                          verbose=1,
+    #                          req=req,
+    #                          metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+    #                          language=argd['ln'],
+    #                          navmenuid='search',
+    #                          navtrail_append_title_p=0) + \
+    #                          websearch_templates.tmpl_search_pagestart(argd['ln']) + \
+    #                          top + body + bottom + \
+    #                          websearch_templates.tmpl_search_pageend(argd['ln']) + \
+    #                          pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
+    #
+    #
+    #def ill_register_request_with_recid(self, req, form):
+    #    """
+    #    Register ILL request.
+    #    """
+    #
+    #    argd = wash_urlargd(form, {'ln': (str, ""),
+    #                               'period_of_interest_from': (str, ""),
+    #                               'period_of_interest_to': (str, ""),
+    #                               'additional_comments': (str, ""),
+    #                               'conditions': (str, ""),
+    #                               'only_edition': (str, ""),
+    #                               })
+    #
+    #    _ = gettext_set_language(argd['ln'])
+    #    uid = getUid(req)
+    #
+    #    body = ill_register_request_with_recid(recid=self.recid,
+    #                                           uid=uid,
+    #                                           period_of_interest_from =  argd['period_of_interest_from'],
+    #                                           period_of_interest_to =  argd['period_of_interest_to'],
+    #                                           additional_comments =  argd['additional_comments'],
+    #                                           conditions = argd['conditions'],
+    #                                           only_edition = argd['only_edition'],
+    #                                           ln=argd['ln'])
+    #
+    #    uid = getUid(req)
+    #    if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+    #        return page_not_authorized(req, "../holdings/ill_request_with_recid",
+    #                                   navmenuid = 'yourbaskets')
+    #
+    #    if isGuestUser(uid):
+    #        if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+    #            return redirect_to_url(req, "%s/youraccount/login%s" % (
+    #                CFG_SITE_SECURE_URL,
+    #                    make_canonical_urlargd({
+    #                'referer' : "%s/record/%s/holdings/ill_request_with_recid%s" % (
+    #                    CFG_SITE_URL,
+    #                    self.recid,
+    #                    make_canonical_urlargd(argd, {})),
+    #                "ln" : argd['ln']}, {})))
+    #
+    #
+    #    user_info = collect_user_info(req)
+    #    (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+    #    if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+    #        cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+    #        target = '/youraccount/login' + \
+    #                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+    #            CFG_SITE_URL + user_info['uri']}, {})
+    #        return redirect_to_url(req, target)
+    #    elif auth_code:
+    #        return page_not_authorized(req, "../", \
+    #            text = auth_msg)
+    #
+    #
+    #
+    #    unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
+    #                                                self.recid,
+    #                                                ln=argd['ln'])
+    #    ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
+    #    ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
+    #    link_ln = ''
+    #    if argd['ln'] != CFG_SITE_LANG:
+    #        link_ln = '?ln=%s' % argd['ln']
+    #    tabs = [(unordered_tabs[tab_id]['label'], \
+    #             '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
+    #             tab_id in ['holdings'],
+    #             unordered_tabs[tab_id]['enabled']) \
+    #            for (tab_id, _order) in ordered_tabs_id
+    #            if unordered_tabs[tab_id]['visible'] == True]
+    #    top = webstyle_templates.detailed_record_container_top(self.recid,
+    #                                                           tabs,
+    #                                                           argd['ln'])
+    #    bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
+    #                                                                 tabs,
+    #                                                                 argd['ln'])
+    #
+    #    title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
+    #    navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
+    #    navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+    #    navtrail += title
+    #    navtrail += '</a>'
+    #
+    #    return pageheaderonly(title=title,
+    #                          navtrail=navtrail,
+    #                          uid=uid,
+    #                          verbose=1,
+    #                          req=req,
+    #                          metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+    #                          language=argd['ln'],
+    #                          navmenuid='search',
+    #                          navtrail_append_title_p=0) + \
+    #                          websearch_templates.tmpl_search_pagestart(argd['ln']) + \
+    #                          top + body + bottom + \
+    #                          websearch_templates.tmpl_search_pageend(argd['ln']) + \
+    #                          pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)

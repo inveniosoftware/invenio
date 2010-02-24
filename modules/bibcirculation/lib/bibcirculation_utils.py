@@ -209,18 +209,24 @@ def generate_new_due_date(days):
     """
 
     today = datetime.date.today()
+
     more_X_days = datetime.timedelta(days=days)
+
     tmp_date = today + more_X_days
+
     week_day = tmp_date.strftime('%A')
     due_date = tmp_date.strftime('%Y-%m-%d')
 
-    due_date_no_validated = True
+    due_date_validated = False
 
-    while due_date_no_validated:
+    while not due_date_validated:
         if week_day in CFG_BIBCIRCULATION_WORKING_DAYS and due_date not in CFG_BIBCIRCULATION_HOLIDAYS:
-            due_date_no_validated = False
+            due_date_validated = True
+
         else:
-            due_date = get_next_day(due_date).strftime('%Y-%m-%d')
+            next_day = get_next_day(due_date)
+            due_date = next_day.strftime('%Y-%m-%d')
+            week_day = next_day.strftime('%A')
 
     return due_date
 
@@ -505,8 +511,9 @@ def validate_date_format(date):
     """
 
     try:
-        if time.strptime(date, "%Y-%m-%d") and compare_dates(date):
-            return True
+        if time.strptime(date, "%Y-%m-%d"):
+            if compare_dates(date):
+                return True
         else:
             return False
     except ValueError:
@@ -626,6 +633,26 @@ def all_copies_are_missing(recid):
     else:
         return False
 
+def has_copies(recid):
+    """
+    Verify if a recid is item (has copies)
+
+    @param recid: identify the record. Primary key of bibrec
+    @type recid: int
+
+    @return boolean
+    """
+
+    copies_status = db.get_copies_status(recid)
+
+    if copies_status is None:
+        return False
+    else:
+        if len(copies_status) == 0:
+            return False
+        else:
+            return True
+
 def generate_email_body(template, loan_id):
     """
     Generate the body of an email for loan recalls.
@@ -647,4 +674,3 @@ def generate_email_body(template, loan_id):
                       book_isbn, book_editor)
 
     return out
-
