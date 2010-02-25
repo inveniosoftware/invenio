@@ -121,7 +121,12 @@ def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
 
     body = bibcirculation_templates.tmpl_borrower_search(infos=infos, redirect=redirect, ln=ln)
 
-    return page(title="Borrower Search",
+    if redirect == 'yes':
+        title="New Request"
+    else:
+        title="Borrower Search"
+
+    return page(title=title,
                 uid=id_user,
                 req=req,
                 body=body,

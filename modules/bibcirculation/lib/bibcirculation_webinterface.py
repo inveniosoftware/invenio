@@ -386,7 +386,6 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         body = perform_new_request(recid=self.recid,
-                                   uid=uid,
                                    barcode=argd['barcode'],
                                    ln=argd['ln'])
 

@@ -901,8 +901,7 @@ class Template:
               <td align="center">
                 <input type=button value='%s' onClick="history.go(-1)" class="bibcircbutton"
                 onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
-                <input type="submit" name="submit_button" value='%s' class="bibcircbutton"
-                onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
+                <input type="submit" name="submit_button" value='%s' class="formbutton">
               </td>
             </tr>
           </table>
@@ -961,22 +960,20 @@ class Template:
         """
         _ = gettext_set_language(ln)
 
-        out = """
-              """
-        out += _MENU_
+        out = _MENU_
 
         out += """
         <div class="bibcircbottom">
-        <br /> <br />
-             <table class="bibcirctable">
-             <td class="bibcirccontent" width="30">%s</td>
-             </table>
-             <br /> <br />
-             <table class="bibcirctable">
-             <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
-             value=%s class='formbutton'></td>
-             </table>
-        <br /> <br />
+            <br /> <br />
+            <table class="bibcirctable">
+            <td class="bibcirccontent" width="30">%s</td>
+            </table>
+            <br /> <br />
+            <table class="bibcirctable">
+            <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+            value=%s class='formbutton'></td>
+            </table>
+            <br /> <br />
         </div>
         """ % (_("A new loan has been registered."),
                CFG_SITE_URL,
@@ -1503,10 +1500,8 @@ class Template:
         <table class="bibcirctable_contents">
           <tr align="center">
             <td>
-              <input type="reset" name="reset_button" value=%s class="bibcircbutton"
-              onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
-              <input type="submit" name="ok_button" value=%s class="bibcircbutton"
-              onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
+              <input type="reset" name="reset_button" value=%s class="formbutton">
+              <input type="submit" name="ok_button" value=%s class="formbutton">
             </td>
           </tr>
         </table>
@@ -2042,8 +2037,7 @@ class Template:
                     <tr>
                     <td align="center">
                     <br>
-                    <input type="submit" value="Search" class="bibcircbutton"
-                    onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
+                    <input type="submit" value="Search" class="formbutton">
                     </td>
                     </tr>
 
@@ -2074,8 +2068,7 @@ class Template:
               <table class="bibcirctable">
                 <tr>
                   <td align="center">
-                    <input type="submit" value='%s' class="bibcircbutton"
-                    onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
+                    <input type="submit" value='%s' class="formbutton">
                   </td>
                 </tr>
               </table>
@@ -2559,20 +2552,20 @@ class Template:
 
         out += """
         <form name="all_requests_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_requests" method="get" >
-             <div class="bibcircbottom">
-             <br />
-                  <table class="bibcirctable">
-                         <tr>
-                              <td class="bibcirctableheader">%s</td>
-                              <td class="bibcirctableheader">%s</td>
-                              <td class="bibcirctableheader" align="center">%s</td>
-                              <td class="bibcirctableheader" align="center">%s</td>
-                              <td class="bibcirctableheader" align="center">%s</td>
-                              <td class="bibcirctableheader" align="center">%s</td>
-                              <td class="bibcirctableheader" align="center">%s</td>
-                         </tr>
+            <div class="bibcircbottom">
+                <br />
+                <table class="bibcirctable">
+                    <tr>
+                        <td class="bibcirctableheader">%s</td>
+                        <td class="bibcirctableheader">%s</td>
+                        <td class="bibcirctableheader" align="center">%s</td>
+                        <td class="bibcirctableheader" align="center">%s</td>
+                        <td class="bibcirctableheader" align="center">%s</td>
+                        <td class="bibcirctableheader" align="center">%s</td>
+                        <td class="bibcirctableheader" align="center">%s</td>
+                    </tr>
 
-         """% (CFG_SITE_URL,
+        """% (CFG_SITE_URL,
                _("Borrower"),
                _("Item"),
                _("Status"),
@@ -2794,9 +2787,7 @@ class Template:
                      </tr>
                      </table>
                       <input type=button onClick="window.open('%s/record/%s/edit')"
-                      onmouseover="this.className='bibcircbuttonover'"
-                      onmouseout="this.className='bibcircbutton'"
-                      value='%s' class="bibcircbutton">
+                      value='%s' class="formbutton">
                      </td>
                      <td>
                      <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
@@ -2920,6 +2911,7 @@ class Template:
                      </td>
                  </tr>
                  """ % (barcode, barcode, barcode)
+
             else:
                 out += """
                      <td align="center">
@@ -2941,13 +2933,13 @@ class Template:
                  <tr>
                      <td>
                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step3?recid=%s'"
-                     value='%s' onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'" class="bibcircbutton">
+                     value='%s' class="formbutton">
 
                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/order_new_copy_step1?recid=%s'"
-                     value='%s' onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'" class="bibcircbutton">
+                     value='%s' class="formbutton">
 
                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_step0?recid=%s'"
-                     value='%s' onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'" class="bibcircbutton">
+                     value='%s'class="formbutton">
                      </td>
                 </tr>
             </table>
@@ -2962,8 +2954,7 @@ class Template:
                       <th width="100">%s</th>
                       <td width="50">%s</td>
                       <td>
-                      <input type="button" value='%s' style="background: url(/img/find.png)
-                      no-repeat; width: 115px; text-align: right;"
+                      <input type="button" value='%s'
                       onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_requests_details?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
@@ -2974,8 +2965,7 @@ class Template:
                       <th width="100">%s</th>
                       <td width="50">%s</td>
                       <td>
-                      <input type="button" value='%s' style="background: url(/img/find.png)
-                      no-repeat; width: 115px; text-align: right;"
+                      <input type="button" value='%s'
                       onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_details?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
@@ -2994,8 +2984,7 @@ class Template:
                       <th width="100">%s</th>
                       <td width="50">%s</td>
                       <td>
-                      <input type="button" value='%s' style="background: url(/img/find.png)
-                      no-repeat; width: 115px; text-align: right;"
+                      <input type="button" value='%s'
                       onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_req_historical_overview?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
@@ -3006,8 +2995,7 @@ class Template:
                       <th width="100">%s</th>
                       <td width="50">%s</td>
                       <td>
-                      <input type="button" value='%s' style="background: url(/img/find.png)
-                      no-repeat; width: 115px; text-align: right;"
+                      <input type="button" value='%s'
                       onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_historical_overview?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
@@ -3036,9 +3024,7 @@ class Template:
              <tr>
                <td>
                  <input type=button value='%s'
-                 onmouseover="this.className='bibcircbuttonover'"
-                 onmouseout="this.className='bibcircbutton'"
-                 onClick="history.go(-1)" class="bibcircbutton">
+                 onClick="history.go(-1)" class="formbutton">
                </td>
              </tr>
            </table>
@@ -3663,13 +3649,12 @@ class Template:
           <tr>
             <td>
             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step2?user_info=%s,%s,%s,%s,%s,%s'"
-            value='%s' class='bibcircbutton' onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
+            value='%s' class='formbutton'>
             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step1?borrower_id=%s'"
-            value='%s' class='bibcircbutton' onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
+            value='%s' class='formbutton'>
             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_book_request_from_borrower_page?borrower_id=%s'"
-            value='%s' class='bibcircbutton' onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
-            <input type='submit' name='notify_button' value='%s' class='bibcircbutton'
-            onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'">
+            value='%s' class='formbutton'>
+            <input type='submit' name='notify_button' value='%s' class='formbutton'>
             </td>
           </tr>
         </table>
@@ -3684,8 +3669,7 @@ class Template:
             <th width="100">%s</th>
             <td width="50">%s</td>
             <td>
-              <input type="button" style="background: url(/img/find.png)
-              no-repeat; width: 115px; text-align: right;"
+              <input type="button"
               onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
@@ -3695,8 +3679,7 @@ class Template:
             <th width="100">%s</th>
             <td width="50">%s</td>
             <td>
-              <input type="button" style="background: url(/img/find.png)
-              no-repeat; width: 115px; text-align: right;"
+              <input type="button"
               onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
@@ -3706,8 +3689,7 @@ class Template:
             <th width="100">%s</th>
             <td width="50">%s</td>
             <td>
-              <input type="button" style="background: url(/img/find.png)
-              no-repeat; width: 115px; text-align: right;"
+              <input type="button"
               onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/get_borrower_ill_details?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
@@ -3725,8 +3707,7 @@ class Template:
             <th width="100">%s</th>
             <td width="50">%s</td>
             <td>
-              <input type="button" style="background: url(/img/find.png)
-              no-repeat; width: 115px; text-align: right;"
+              <input type="button"
               onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/bor_requests_historical_overview?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
@@ -3736,8 +3717,7 @@ class Template:
             <th width="100">%s</th>
             <td width="50">%s</td>
             <td>
-              <input type="button" style="background: url(/img/find.png)
-              no-repeat; width: 115px; text-align: right;"
+              <input type="button"
               onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/bor_loans_historical_overview?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
@@ -3747,8 +3727,7 @@ class Template:
             <th width="100">%s</th>
             <td width="50">%s</td>
             <td>
-              <input type="button" style="background: url(/img/find.png)
-              no-repeat; width: 115px; text-align: right;"
+              <input type="button"
               onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/bor_ill_historical_overview?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
@@ -11020,7 +10999,7 @@ class Template:
                                        libraries, ill_status, ill_borrower_request,
                                        ln=CFG_SITE_LANG):
         """
-        @param ill_request_id: identify the ILL request. Primray key of crcILLREQUEST
+        @param ill_request_id: identify the ILL request. Primary key of crcILLREQUEST
         @type ill_request_id: int
 
         @param ill_req_details: informations about a given ILL request
@@ -11189,8 +11168,6 @@ class Template:
                       book_info['isbn'],
                       str(book_cover))
 
-
-
         out += """
 
         <table class="bibcirctable">
@@ -11242,12 +11219,13 @@ class Template:
              """ % (_("Borrower request"), _("Name"), borrower_name,
                     _("Email"), borrower_email,
                     _("Mailbox"), borrower_mailbox,
-                    _("Period of interest - From"), period_from,
-                    _("Period of interest - To"), period_to,
+                    _("Period of interest (From)"), period_from,
+                    _("Period of interest (To)"), period_to,
                     _("Borrower comments"), borrower_comments or '-',
                     _("Only this edition?"), only_this_edition,
                     _("ILL request details"))
 
+#### PENDING ####
         if ill_status == 'pending':
             if not ill_req_details:
                 previous_library_notes = {}
@@ -11326,6 +11304,7 @@ class Template:
 
                       """ % (_("Library notes"))
 
+##### REQUEST SENT, NOT YET RECEIVED ##############
         elif ill_status == 'request sent, not yet received':
             (library_id, request_date, expected_date, cost, barcode, previous_notes) = ill_req_details
 
@@ -11493,7 +11472,7 @@ class Template:
 
                       """ % (_("Library notes"))
 
-        # ill_status: 'request cancelled'
+##### CANCELLED ##############
         elif ill_status == 'request cancelled':
             (library_id, request_date, expected_date, cost, barcode, previous_notes) = ill_req_details
 
@@ -11632,6 +11611,7 @@ class Template:
 
                       """ % (_("Library notes"))
 
+##### ITEM RECEIVED, DUE DATE DEFINED ##############
         elif ill_status == 'item received, due date defined':
 
             (library_id, request_date, expected_date, arrival_date, due_date, cost, barcode, previous_notes) = ill_req_details
@@ -11809,6 +11789,7 @@ class Template:
 
                       """ % (_("Library notes"))
 
+##### ITEM RETURNED ##############
         elif ill_status == 'item returned':
             (library_id, request_date, expected_date, arrival_date, due_date, return_date, cost, barcode, previous_notes) = ill_req_details
 
@@ -12108,8 +12089,6 @@ class Template:
                       """ % (_("Library notes"))
 
 
-
-
         out += """
 
              <br />
@@ -12303,11 +12282,6 @@ class Template:
 
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
-
 
         <table class="bibcirctable">
           <tr valign='top'>
