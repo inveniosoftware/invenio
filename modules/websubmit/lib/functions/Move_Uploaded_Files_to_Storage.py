@@ -271,7 +271,7 @@ def revise(file_path, bibdoc_name, rename, doctype, description,
                     # Use the one of the pending actions
                     comment = pending_bibdocs[bibdoc_name][1]
                 original_bibdoc_name = pending_bibdocs[bibdoc_name][0]
-                if not bibrecdocs.has_docname_p(original_bibdoc_name) and filepath:
+                if not bibrecdocs.has_docname_p(original_bibdoc_name) and file_path:
                     # the bibdoc did not originaly exist, so it
                     # must be added first
                     bibdoc = bibrecdocs.add_new_file(file_path,
