@@ -19,7 +19,7 @@ FCKConfig.ToolbarSets["WebComment"] = [
 ['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote'],
 ['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
 ['Link','Unlink'],
-['Image','Table','Rule','Smiley','SpecialChar']
+['Table','Rule','SpecialChar']
 ] ;
 
 

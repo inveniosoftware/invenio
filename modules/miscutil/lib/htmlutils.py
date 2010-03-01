@@ -35,10 +35,10 @@ except ImportError, e:
 cfg_html_buffer_allowed_tag_whitelist = ('a',
                                          'p', 'br', 'blockquote',
                                          'strong', 'b', 'u', 'i', 'em',
-                                         'ul', 'ol', 'li', 'sub', 'sup')
+                                         'ul', 'ol', 'li', 'sub', 'sup', 'div')
 # List of allowed attributes. Be cautious, some attributes may be risky:
 # <p style="background: url(myxss_suite.js)">
-cfg_html_buffer_allowed_attribute_whitelist = ('href', 'name')
+cfg_html_buffer_allowed_attribute_whitelist = ('href', 'name', 'class')
 
 ## precompile some often-used regexp for speed reasons:
 re_html = re.compile("(?s)<[^>]*>|&#?\w+;")

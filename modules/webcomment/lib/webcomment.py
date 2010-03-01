@@ -42,7 +42,8 @@ from invenio.config import CFG_SITE_LANG, \
                            CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
                            CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
                            CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
-                           CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
+                           CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS,\
+                           CFG_WEBCOMMENT_DEFAULT_MODERATOR
 from invenio.webmessage_mailutils import \
      email_quote_txt, \
      email_quoted_txt2html
@@ -64,6 +65,7 @@ from invenio.search_engine import \
      check_user_can_view_record, \
      get_all_collections_of_a_record, \
      get_fieldvalues
+from invenio.webcomment_washer import EmailWasher
 try:
     import invenio.template
     webcomment_templates = invenio.template.load('webcomment')
@@ -71,7 +73,7 @@ except:
     pass
 
 
-def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, subscribed=0, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False, user_is_subscribed_to_discussion=False, user_can_unsubscribe_from_discussion=False):
+def perform_request_display_comments_or_remarks(req, recID, display_order='od', display_since='all', nb_per_page=100, page=1, ln=CFG_SITE_LANG, voted=-1, reported=-1, subscribed=0, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False, user_is_subscribed_to_discussion=False, user_can_unsubscribe_from_discussion=False):
     """
     Returns all the comments (reviews) of a specific internal record or external basket record.
     @param recID:  record id where (internal record IDs > 0) or (external basket record IDs < -100)
@@ -188,7 +190,9 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
         warnings.append(('WRN_WEBCOMMENT_SUBSCRIBED',))
     elif subscribed == -1:
         warnings.append(('WRN_WEBCOMMENT_UNSUBSCRIBED',))
-    body = webcomment_templates.tmpl_get_comments(recID,
+
+    body = webcomment_templates.tmpl_get_comments(req,
+                                                  recID,
                                                   ln,
                                                   nb_per_page, page, last_page,
                                                   display_order, display_since,
@@ -306,6 +310,26 @@ def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
     res = run_sql(query, params)
     return (len(res) == 0)
 
+def get_comment_collection(cmt_id):
+    """
+    Extract the collection where the comment is written
+    """
+    query = "SELECT id_bibrec FROM cmtRECORDCOMMENT WHERE id=%s"
+    recid = run_sql(query, (cmt_id,))
+    record_primary_collection = guess_primary_collection_of_a_record(recid[0][0])
+    return record_primary_collection
+
+def get_collection_moderator(collection):
+    """
+    Get the comment moderator for a given collection
+    """
+    from invenio.access_control_engine import acc_get_authorized_emails
+
+    res =  acc_get_authorized_emails('moderatecomments', collection=collection)
+    if not res:
+        return CFG_WEBCOMMENT_DEFAULT_MODERATOR
+    return res
+
 def perform_request_report(cmt_id, client_ip_address, uid=-1):
     """
     Report a comment/review for inappropriate content.
@@ -345,7 +369,8 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
          user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
         (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
         from_addr = '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-        to_addr = CFG_SITE_ADMIN_EMAIL
+        comment_collection = get_comment_collection(cmt_id)
+        to_addr = get_collection_moderator(comment_collection)
         subject = "A comment has been reported as inappropriate by a user"
         body = '''
 The following comment has been reported a total of %(cmt_reported)s times.
@@ -366,7 +391,7 @@ Comment:    comment_id      = %(cmt_id)s
 %(cmt_body)s
 ---end body---
 
-Please go to the WebComment Admin interface %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
+Please go to the record page %(comment_admin_link)s to delete this message if necessary. A warning will be sent to the user in question.''' % \
                 {   'cfg-report_max'        : CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,
                     'nickname'              : nickname,
                     'user_email'            : user_email,
@@ -374,23 +399,24 @@ Please go to the WebComment Admin interface %(comment_admin_link)s to delete thi
                     'user_nb_abuse_reports' : user_nb_abuse_reports,
                     'user_votes'            : user_votes,
                     'votes'                 : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
-                                              "total number of positive votes\t= %s\n\t\t\t\ttotal number of negative votes\t= %s" % \
+                                              "total number of positive votes\t= %s\n\t\ttotal number of negative votes\t= %s" % \
                                               (user_votes, (user_nb_votes_total - user_votes)) or "\n",
                     'cmt_id'                : cmt_id,
                     'id_bibrec'             : id_bibrec,
                     'cmt_date'              : cmt_date,
                     'cmt_reported'          : cmt_reported,
                     'review_stuff'          : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
-                                              "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (cmt_star, cmt_title) or "",
+                                              "star score\t= %s\n\treview title\t= %s" % (cmt_star, cmt_title) or "",
                     'cmt_body'              : cmt_body,
-                    'comment_admin_link'    : CFG_SITE_URL + "/admin/webcomment/webcommentadmin.py",
+                    'comment_admin_link'    : CFG_SITE_URL + "/record/" + str(id_bibrec) + '/comments#' + str(cmt_id),
                     'user_admin_link'       : "user_admin_link" #! FIXME
                 }
 
         #FIXME to be added to email when websession module is over:
         #If you wish to ban the user, you can do so via the User Admin Panel %(user_admin_link)s.
 
-        send_email(from_addr, to_addr, subject, body)
+        for email_address in to_addr:
+            send_email(from_addr, email_address, subject, body)
     return 1
 
 def check_user_can_report(cmt_id, client_ip_address, uid=-1):
@@ -542,9 +568,9 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
     @param display_since: datetime, e.g. 0000-00-00 00:00:00
     @param ranking: boolean, enabled if reviews, disabled for comments
     @return: tuple of comment where comment is
-            tuple (nickname, uid, date_creation, body, id) if ranking disabled or
-            tuple (nickname, uid, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
-            Note: for the moment, if no nickname, will return email address up to '@'
+            tuple (nickname, uid, date_creation, body, status, id) if ranking disabled or
+            tuple (nickname, uid, date_creation, body, status, nb_votes_yes, nb_votes_total, star_score, title, id)
+    Note: for the moment, if no nickname, will return email address up to '@'
     """
     display_since = calculate_start_date(display_since)
 
@@ -572,10 +598,14 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
             display_order = order_dict['od']
     except:
         display_order = order_dict['od']
+
+    #display_order = order_dict['nd']
     query = """SELECT user.nickname,
                       cmt.id_user,
                       DATE_FORMAT(cmt.date_creation, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s'),
                       cmt.body,
+                      cmt.status,
+                      cmt.nb_abuse_reports,
                       %(ranking)s cmt.id
                FROM   %(table)s cmt LEFT JOIN user ON
                                               user.id=cmt.id_user
@@ -590,6 +620,7 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
                       'display_since' : display_since == '0000-00-00 00:00:00' and ' ' or 'AND cmt.date_creation>=\'%s\' ' % display_since}
     params = (recID, display_order)
     res = run_sql(query, params)
+
     if res:
         return res
     return ()
@@ -652,7 +683,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                             emails2=subscribers_emails2,
                                             comID=res, msg=msg,
                                             note=note, score=score,
-                                            editor_type=editor_type)
+                                            editor_type=editor_type, uid=uid)
         return int(res)
 
 def subscribe_user_to_discussion(recID, uid):
@@ -777,7 +808,7 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
                                         emails2, comID, msg="",
                                         note="", score=0,
                                         editor_type='textarea',
-                                        ln=CFG_SITE_LANG):
+                                        ln=CFG_SITE_LANG, uid=-1):
     """
     Notify subscribers that a new comment was posted.
     FIXME: consider recipient preference to send email in correct language.
@@ -827,6 +858,8 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
                         {'report_number': report_numbers and ('[' + report_numbers[0] + '] ') or '',
                          'title': title}
 
+    washer = EmailWasher()
+    msg = washer.wash(msg)
     email_content = msg
     if note:
         email_content = note + email_content
@@ -838,7 +871,8 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
                                                                       comID,
                                                                       report_numbers,
                                                                       can_unsubscribe=True,
-                                                                      ln=ln)
+                                                                      ln=ln,
+                                                                      uid=uid)
 
     email_footer = webcomment_templates.tmpl_email_new_comment_footer(recID,
                                                                       title,
@@ -865,7 +899,8 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
                                                                       comID,
                                                                       report_numbers,
                                                                       can_unsubscribe=False,
-                                                                      ln=ln)
+                                                                      ln=ln,
+                                                                      uid=uid)
 
     email_footer = webcomment_templates.tmpl_email_new_comment_footer(recID,
                                                                       title,
@@ -1184,7 +1219,7 @@ def perform_request_add_comment_or_remark(recID=0,
             if success > 0:
                 if CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL > 0:
                     notify_admin_of_new_comment(comID=success)
-                return (webcomment_templates.tmpl_add_comment_successful(recID, ln, reviews, warnings), errors, warnings)
+                return (webcomment_templates.tmpl_add_comment_successful(recID, ln, reviews, warnings, success), errors, warnings)
             else:
                 errors.append(('ERR_WEBCOMMENT_DB_INSERT_ERROR'))
         # if are warnings or if inserting comment failed, show user where warnings are
@@ -1226,13 +1261,14 @@ def notify_admin_of_new_comment(comID):
     else:
         nickname = email = last_login = "ERROR: Could not retrieve"
 
-    from invenio.search_engine import print_record
-    record = print_record(recID=id_bibrec, format='hs')
-
     review_stuff = '''
     Star score  = %s
     Title       = %s''' % (star_score, title)
 
+    washer = EmailWasher()
+    body = washer.wash(body)
+
+    record_info = webcomment_templates.tmpl_email_new_comment_admin(id_bibrec)
     out = '''
 The following %(comment_or_review)s has just been posted (%(date)s).
 
@@ -1243,40 +1279,46 @@ AUTHOR:
 
 RECORD CONCERNED:
     Record ID   = %(recID)s
-    Record      =
-<!-- start record details -->
 %(record_details)s
-<!-- end record details -->
 
 %(comment_or_review_caps)s:
     %(comment_or_review)s ID    = %(comID)s %(review_stuff)s
     Body        =
-<!-- start body -->
+<--------------->
 %(body)s
-<!-- end body -->
 
+<--------------->
 ADMIN OPTIONS:
-To delete comment go to %(siteurl)s/admin/webcomment/webcommentadmin.py/delete?comid=%(comID)s
+To moderate the %(comment_or_review)s go to %(siteurl)s/record/%(recID)s/%(comments_or_reviews)s/display?%(arguments)s
     ''' % \
         {   'comment_or_review'     : star_score >  0 and 'review' or 'comment',
             'comment_or_review_caps': star_score > 0 and 'REVIEW' or 'COMMENT',
+            'comments_or_reviews'   : star_score >  0 and 'reviews' or 'comments',
             'date'                  : date_creation,
             'nickname'              : nickname,
             'email'                 : email,
             'uid'                   : id_user,
             'recID'                 : id_bibrec,
-            'record_details'        : record,
+            'record_details'        : record_info,
             'comID'                 : comID2,
             'review_stuff'          : star_score > 0 and review_stuff or "",
             'body'                  : body.replace('<br />','\n'),
-            'siteurl'                : CFG_SITE_URL
+            'siteurl'               : CFG_SITE_URL,
+            'arguments'             : 'ln=en&do=od#%s' % comID
         }
 
     from_addr = '%s WebComment <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-    to_addr = CFG_SITE_ADMIN_EMAIL
-    subject = "A new comment/review has just been posted"
+    comment_collection = get_comment_collection(comID)
+    to_addr = get_collection_moderator(comment_collection)
 
-    send_email(from_addr, to_addr, subject, out)
+    rec_collection = guess_primary_collection_of_a_record(id_bibrec)
+    report_nums = get_fieldvalues(id_bibrec, "037__a")
+    report_nums += get_fieldvalues(id_bibrec, "088__a")
+    report_nums = ', '.join(report_nums)
+    subject = "A new comment/review has just been posted [%s|%s]" % (rec_collection, report_nums)
+
+    for email in to_addr:
+        send_email(from_addr, to_addr, subject, out)
 
 def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
     """

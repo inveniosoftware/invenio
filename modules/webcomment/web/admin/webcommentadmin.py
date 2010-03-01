@@ -28,9 +28,10 @@ from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
 from invenio.config import CFG_SITE_URL,CFG_SITE_LANG,CFG_SITE_NAME
 from invenio.dbquery import Error
-from invenio.webuser import getUid, page_not_authorized
+from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.messages import wash_language, gettext_set_language
+from invenio.access_control_engine import acc_authorize_action
 
 def index(req, ln=CFG_SITE_LANG):
     """
@@ -68,8 +69,12 @@ def index(req, ln=CFG_SITE_LANG):
 def delete(req, ln=CFG_SITE_LANG, comid="", recid="", uid="", reviews=""):
     """
     Delete a comment by giving its comment id
+    @param req: request object to obtain user information
     @param ln: language
     @param comid: comment id
+    @param recid: ID of the record containing the comment
+    @param uid: id of the user
+    @param reviews: boolean 1 if deleting a review, 0 if deleting a comment
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -94,7 +99,7 @@ def delete(req, ln=CFG_SITE_LANG, comid="", recid="", uid="", reviews=""):
                                                           recID=recid,
                                                           uid=uid,
                                                           reviews=reviews)
-        return page(title=(reviews=='1' and _("Delete Reviews") or _("Delete Comments")) +' / ' + _("Suppress abuse reports"),
+        return page(title=(reviews=='1' and _("Delete/Undelete Reviews") or _("Delete/Undelete Comments")) + _(" or Suppress abuse reports"),
                 body=body,
                 uid=uid,
                 language=ln,
@@ -106,14 +111,15 @@ def delete(req, ln=CFG_SITE_LANG, comid="", recid="", uid="", reviews=""):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-
-def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0):
+def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0, collection=""):
     """
     View reported comments, filter by either user or a specific comment (only one given at a time)
+    @param req: request object to obtain user information
     @param ln: language
     @param uid: user id
     @param comid: comment id
     @param reviews: boolean enabled for reviews, disabled for comments
+    @param collection: filter results by collection
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -134,7 +140,7 @@ def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0):
     (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
     if (auth_code != 'false'):
         return page(title=(reviews=='0' and _("View all comments reported as abuse") or _("View all reviews reported as abuse")),
-                    body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews, abuse=True),
+                    body=perform_request_comments(req, ln=ln, uid=uid, comID=comid, reviews=reviews, abuse=True, collection=collection),
                     uid=auid,
                     language=ln,
                     navtrail = navtrail_previous_links,
@@ -143,48 +149,43 @@ def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def hot(req, ln=CFG_SITE_LANG, comments=1, top=10):
+def hot(req, ln=CFG_SITE_LANG, comments=1, top=10, collection=""):
     """
     View most active comments/reviews
+    @param req: request object to obtain user information
     @param ln: language
     @param comments: boolean enabled for comments, disabled for reviews
     @param top: number of results to be shown
+    @param collection: filter results by collection
     """
     ln = wash_language(ln)
+    collection = wash_url_argument(collection, 'str')
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
     navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
     navtrail_previous_links += _("WebComment Admin") + '</a>'
 
-    try:
-        auid = getUid(req)
-    except Error:
-        return page(title=_("Internal Error"),
-                    body = create_error_box(req, verbose=0, ln=ln),
-                    description="%s - Internal Error" % CFG_SITE_NAME,
-                    keywords="%s, Internal Error" % CFG_SITE_NAME,
-                    language=ln,
-                    req=req)
-
-    (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
-    if (auth_code != 'false'):
-        return page(title=(comments=='0' and _("View most reviewed records") or
+    user_info = collect_user_info(req)
+    (auth_code, auth_msg) = acc_authorize_action(user_info, 'cfgwebcomment')
+    if auth_code:
+        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
+    return page(title=(comments=='0' and _("View most reviewed records") or
                            _("View most commented records")),
-                    body=perform_request_hot(ln=ln, comments=comments, top=top),
-                    uid=auid,
+                    body=perform_request_hot(req, ln=ln, comments=comments, top=top, collection=collection),
+                    uid=user_info['uid'],
                     language=ln,
                     navtrail = navtrail_previous_links,
                     lastupdated=__lastupdated__,
                     req=req)
-    else:
-        return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def latest(req, ln=CFG_SITE_LANG, comments=1, top=10):
+def latest(req, ln=CFG_SITE_LANG, comments=1, top=10, collection=""):
     """
     View latest comments/reviews
+    @param req: request object to obtain user information
     @param ln: language
     @param comments: boolean enabled for comments, disabled for reviews
     @param top: number of results to be shown
+    @param collection: filter results by collection
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -206,7 +207,7 @@ def latest(req, ln=CFG_SITE_LANG, comments=1, top=10):
     if (auth_code != 'false'):
         return page(title=(comments=='0' and _("View latest reviewed records") or
                            _("View latest commented records")),
-                    body=perform_request_latest(ln=ln, comments=comments, top=top),
+                    body=perform_request_latest(req=req, ln=ln, comments=comments, top=top, collection=collection),
                     uid=auid,
                     language=ln,
                     navtrail = navtrail_previous_links,
@@ -219,6 +220,7 @@ def latest(req, ln=CFG_SITE_LANG, comments=1, top=10):
 def users(req, ln=CFG_SITE_LANG):
     """
     View a list of all the users that have been reported, sorted by most reported
+    @param req: request object to obtain user information
     @param ln: language
     """
     ln = wash_language(ln)
@@ -252,8 +254,9 @@ def users(req, ln=CFG_SITE_LANG):
 
 def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
     """
-    private funciton
+    private function
     Delete a comment
+    @param req: request object to obtain user information
     @param ln: language
     @param **hidden: ids of comments to delete sent as individual variables comidX=on, where X is id
     """
@@ -284,11 +287,14 @@ def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
             except:
                 pass
         if action == 'delete':
-            body = perform_request_del_com(ln=ln, comIDs=comIDs)
+            body = perform_request_del_com_mod(ln=ln, comIDs=comIDs)
             title = _("Delete comments")
         elif action == 'unreport':
             body = suppress_abuse_report(ln=ln, comIDs=comIDs)
             title = _("Suppress abuse reports")
+        elif action == 'undelete':
+            body = perform_request_undel_com(ln=ln, comIDs=comIDs)
+            title = _("Undelete comments")
         else:
             redirect_to_url(req, CFG_SITE_URL + '/admin/webcomment/webcommentadmin.py')
         return page(title=title,
@@ -300,3 +306,71 @@ def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
                     req=req)
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
+
+def undel_com(req, ln=CFG_SITE_LANG, id=""):
+    """
+    Undelete a comment
+    @param req: request object to obtain user information
+    @param ln: language
+    @param id: comment id
+    """
+    ln = wash_language(ln)
+    user_info = collect_user_info(req)
+    referer = user_info['referer']
+    (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
+    if (auth_code != 'false'):
+        perform_request_undel_single_com(ln=ln, id=id)
+        redirect_to_url(req, referer)
+    else:
+        return page_not_authorized(req=req, text=auth_msg)
+
+def del_single_com_mod(req, ln=CFG_SITE_LANG, id=""):
+    """
+    Allow moderator to delete a single comment
+    @param req: request object to obtain user information
+    @param ln: language
+    @param id: comment id
+    """
+    ln = wash_language(ln)
+    user_info = collect_user_info(req)
+    referer = user_info['referer']
+    (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
+    if (auth_code != 'false') or check_user_is_author(user_info['uid'], id):
+        perform_request_del_single_com_mod(ln=ln, id=id)
+        redirect_to_url(req, referer)
+    else:
+        return page_not_authorized(req=req, text=auth_msg)
+
+def del_single_com_auth(req, ln=CFG_SITE_LANG, id=""):
+    """
+    Allow author to delete a single comment
+    @param req: request object to obtain user information
+    @param ln: language
+    @param id: comment id
+    """
+    ln = wash_language(ln)
+    user_info = collect_user_info(req)
+    referer = user_info['referer']
+    (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
+    if (auth_code != 'false') or check_user_is_author(user_info['uid'], id):
+        perform_request_del_single_com_auth(ln=ln, id=id)
+        redirect_to_url(req, referer)
+    else:
+        return page_not_authorized(req=req, text=auth_msg)
+
+def unreport_com(req, ln=CFG_SITE_LANG, id=""):
+    """
+    Unreport a comment
+    @param req: request object to obtain user information
+    @param ln: language
+    @param id: comment id
+    """
+    ln = wash_language(ln)
+    user_info = collect_user_info(req)
+    referer = user_info['referer']
+    (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
+    if (auth_code != 'false'):
+        perform_request_unreport_single_com(ln=ln, id=id)
+        redirect_to_url(req, referer)
+    else:
+        return page_not_authorized(req=req, text=auth_msg)

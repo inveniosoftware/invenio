@@ -1178,12 +1178,49 @@ input,select {
    background: #fff;
 }
 .commentbox {
-   color: #000;
+   /*color: #000;*/
    width: 100%;
    padding: 0px 10px 10px 10px;
    border-left: 2px solid #36c;
    margin-left: 10px;
 }
+
+/* Write comment */
+#comment-write {
+   border:1px solid #ccc;
+   margin-top:30px;
+   margin-right:50px;
+   padding:25px 20px 5px ; /* 25 20 20 */
+   position:relative;
+   clear:right;
+}
+
+#comment-write h2 {
+   background:#fff;
+   font-size:1.4em;
+   font-weight:400;
+   left:40px;
+   padding:0 5px;
+   position:absolute;
+   top:-32px;
+}
+
+#comment-write .submit-area {
+   margin:20px 0 0 -5px;
+}
+
+/* Subscribe to comment*/
+.comment-subscribe {
+    /*color:#f00;*/
+    /*font-size:0.94em;*/
+    overflow:hidden;
+    padding:7px 0 5px 5px;
+    position:relative;
+    width:95%;
+    background:#dfe6f2;
+    /*border:1px solid #ccc;*/
+}
+
 .warninggreen {
    color: #060;
    background: transparent;

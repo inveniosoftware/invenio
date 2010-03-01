@@ -42,7 +42,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-     CFG_WEBCOMMENT_ALLOW_REVIEWS
+     CFG_WEBCOMMENT_ALLOW_REVIEWS, \
+     CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -122,7 +123,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'p': (int, 1),
                                    'voted': (int, -1),
                                    'reported': (int, -1),
-                                   'subscribed': (int, 0),
+                                   'subscribed': (int, 0)
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -165,7 +166,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
         if ok:
-            (body, errors, warnings) = perform_request_display_comments_or_remarks(recID=self.recid,
+            (body, errors, warnings) = perform_request_display_comments_or_remarks(req=req, recID=self.recid,
                 display_order=argd['do'],
                 display_since=argd['ds'],
                 nb_per_page=argd['nb'],
@@ -179,7 +180,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 can_send_comments=can_send_comments,
                 can_attach_files=can_attach_files,
                 user_is_subscribed_to_discussion=user_is_subscribed_to_discussion,
-                user_can_unsubscribe_from_discussion=user_can_unsubscribe_from_discussion)
+                user_can_unsubscribe_from_discussion=user_can_unsubscribe_from_discussion
+                )
 
             unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid,
@@ -211,10 +213,21 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             navtrail += '</a>'
             navtrail += ' &gt; <a class="navtrail">%s</a>' % (self.discussion==1 and _("Reviews") or _("Comments"))
 
+            jsmathheader = ''
+            if CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS:
+                jsmathheader = """ <script type='text/javascript'>
+                                    jsMath = {
+                                        Controls: {cookie: {printwarn: 0}}
+                                    };
+                                    </script>
+                                    <script src='/jsMath/easy/invenio-jsmath.js' type='text/javascript'></script>
+                               """
+
             return pageheaderonly(title=title,
                         navtrail=navtrail,
                         uid=uid,
                         verbose=1,
+                        metaheaderadd = jsmathheader,
                         req=req,
                         language=argd['ln'],
                         navmenuid='search',
@@ -346,6 +359,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 except InvenioWebAccessMailCookieError, e:
                     # Invalid or empty cookie: continue
                     pass
+
             (body, errors, warnings) = perform_request_add_comment_or_remark(recID=self.recid,
                                                                              ln=argd['ln'],
                                                                              uid=uid,
@@ -359,6 +373,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                              editor_type=argd['editor_type'],
                                                                              can_attach_files=can_attach_files,
                                                                              subscribe=subscribe)
+
             if self.discussion:
                 title = _("Add Review")
             else:
@@ -483,7 +498,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+        if (auth_code and not user_info['apache_user']) or user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
