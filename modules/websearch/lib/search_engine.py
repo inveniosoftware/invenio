@@ -1746,16 +1746,20 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
-        #check that the user is allowed to search with this tag..
-        for htag in myhiddens:
-            ltag = len(htag)
-            samelenfield = bsu_f[0:ltag]
-            if samelenfield == htag:
-                #we won't show you anything, user
-                basic_search_unit_hitset = HitSet()
-                if verbose >= 9 and of.startswith("h"):
-                    print_warning(req, "Pattern %s hitlist omitted since it queries a hidden tag in %s" %
-                                  basic_search_unit_hitset, str(myhiddens))
+        #check that the user is allowed to search with this tag
+        #if he/she tries it
+        if bsu_f and len(bsu_f) > 1 and bsu_f[0].isdigit() and bsu_f[1].isdigit():
+            for htag in myhiddens:
+                ltag = len(htag)
+                samelenfield = bsu_f[0:ltag]
+                if samelenfield == htag: #user searches by a hidden tag
+                    #we won't show you anything..
+                    basic_search_unit_hitset = HitSet()
+                    if verbose >= 9 and of.startswith("h"):
+                        print_warning(req, "Pattern %s hitlist omitted since \
+                                            it queries in a hidden tag %s" %
+                                      (repr(bsu_p), repr(myhiddens)))
+                    display_nearest_terms_box=False #..and stop spying, too.
 
         if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset))
