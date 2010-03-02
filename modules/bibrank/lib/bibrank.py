@@ -71,11 +71,11 @@ __revision__ = "$Id$"
 
 
 import sys
-import traceback
 import ConfigParser
 
 from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
+from invenio.errorlib import register_exception
 from invenio.bibtask import task_init, write_message, task_get_option, \
     task_set_option, get_datetime, task_update_status, \
     task_sleep_now_if_required
@@ -156,7 +156,7 @@ def task_run_core():
                     % key)
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
-        traceback.print_tb(sys.exc_info()[2])
+        register_exception()
         task_update_status("ERROR")
         sys.exit(1)
 

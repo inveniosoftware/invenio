@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 import sys
 import time
 import marshal
-import traceback
 import ConfigParser
 
 from invenio.config import \
@@ -33,6 +32,7 @@ from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
+from invenio.errorlib import register_exception
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
 
 
@@ -392,8 +392,7 @@ def bibrank_engine(run):
                 raise StandardError
     except StandardError, e:
         write_message("\nException caught: %s" % e, sys.stderr)
-        if task_get_option("verbose") >= 9:
-            traceback.print_tb(sys.exc_info()[2])
+        register_exception()
         raise StandardError
 
     if task_get_option("verbose"):

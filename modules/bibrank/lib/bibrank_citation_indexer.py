@@ -24,7 +24,6 @@ import time
 import sys
 import os
 import marshal
-import traceback
 from zlib import decompress, error
 
 if sys.hexversion < 0x2040000:
@@ -983,7 +982,6 @@ def get_cit_dict(name):
             return {}
     except:
         register_exception(prefix="could not read "+name+" from db", alert_admin=True)
-        traceback.print_tb(sys.exc_info()[2])
     return dict
 
 def get_initial_author_dict():

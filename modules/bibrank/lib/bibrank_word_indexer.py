@@ -20,7 +20,6 @@ __revision__ = "$Id$"
 import sys
 import time
 import urllib
-import traceback
 import math
 import re
 import ConfigParser
@@ -366,8 +365,7 @@ class WordTable:
                     self.chk_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if task_get_option('verbose') >= 9:
-                        traceback.print_tb(sys.exc_info()[2])
+                    register_exception()
                     task_update_status("ERROR")
                     sys.exit(1)
                 write_message("%s adding records #%d-#%d started" % \
@@ -631,8 +629,7 @@ class WordTable:
                     self.fix_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if task_get_option("verbose") >= 9:
-                        traceback.print_tb(sys.exc_info()[2])
+                    register_exception()
                     task_update_status("ERROR")
                     sys.exit(1)
 
@@ -842,8 +839,6 @@ def word_index(run):
         except StandardError, e:
             register_exception(alert_admin=True)
             write_message("Exception caught: %s" % e, sys.stderr)
-            if task_get_option("verbose") >= 9:
-                traceback.print_tb(sys.exc_info()[2])
             sys.exit(1)
         wordTable.report_on_table_consistency()
     # We are done. State it in the database, close and quit

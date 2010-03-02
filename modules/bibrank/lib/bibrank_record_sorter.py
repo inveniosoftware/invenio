@@ -26,7 +26,6 @@ import time
 import math
 import re
 import ConfigParser
-import traceback
 import copy
 
 from invenio.config import \
@@ -34,6 +33,7 @@ from invenio.config import \
      CFG_ETCDIR, \
      CFG_VERSION
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
+from invenio.errorlib import register_exception
 from invenio.webpage import adderrorbox
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
@@ -214,7 +214,8 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         else:
             result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
     except Exception, e:
-        result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br /><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
+        register_exception()
+        result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br />" % (e,)]), voutput)
 
     afterfind = time.time() - starttime
 
