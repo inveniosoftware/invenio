@@ -804,8 +804,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     reference_list[rec_id] = []
 
                 if not rec_id in citation_list[thisrecid]:
-                    result[recid] += 1
-                    citation_list[recid].append(rec_id)
+                    result[thisrecid] += 1
+                    citation_list[thisrecid].append(rec_id)
                 if not thisrecid in reference_list[rec_id]:
                     reference_list[rec_id].append(thisrecid)
 
