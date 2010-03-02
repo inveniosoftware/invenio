@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2009-12-14 10:06+0100\n"
-"PO-Revision-Date: 2010-02-15 23:17+0100\n"
+"PO-Revision-Date: 2010-02-28 23:01+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1764,7 +1764,7 @@ msgstr "Descargar el texto completo"
 #: modules/bibformat/lib/elements/bfe_fulltext.py:79
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:55
 msgid "additional files"
-msgstr "ficheros adicionales"
+msgstr "archivos adicionales"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:103
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:101
@@ -1924,11 +1924,11 @@ msgstr "Véase la guía"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:81
 msgid "OAI sources currently present in the database"
-msgstr "Fuentes OAI actualmente presentes en la base de datos"
+msgstr "Servidores OAI que están actualmente en la base de datos"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:82
 msgid "No OAI sources currently present in the database"
-msgstr "No hay fuentes OAI presentes actualmente en la base de datos"
+msgstr "No hay ningún servidor OAI en la base de datos"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:92
 msgid "Next oaiharvest task"
@@ -6536,7 +6536,7 @@ msgstr ""
 #, fuzzy
 msgid "The server encountered an error while dealing with your request."
 msgstr ""
-"El sistema ha encontrado un error recuperando la lista de los ficheros de "
+"El sistema ha encontrado un error recuperando la lista de los archivos de "
 "este documento."
 
 #: modules/webstyle/lib/webstyle_templates.py:893
@@ -6674,7 +6674,7 @@ msgstr "No ha sido posible crear el directorio para los envíos."
 #: modules/websubmit/lib/websubmit_engine.py:401
 #: modules/websubmit/lib/websubmit_engine.py:916
 msgid "No file uploaded?"
-msgstr "No ha subido ningún fichero?"
+msgstr "No ha subido ningún archivo?"
 
 #: modules/websubmit/lib/websubmit_engine.py:425
 #: modules/websubmit/lib/websubmit_engine.py:428
@@ -6693,7 +6693,7 @@ msgstr ""
 "Se ha encontrado un error de funcionament serio.  Se ha avisado a los "
 "administradores. <br /><em>Segurament la causa sea que se hayan "
 "insertado caracteres erróneos en el formulario</em> (p. ej., copiando "
-"y pegando algun texto de un fichero PDF)."
+"y pegando algun texto de un archivo PDF)."
 
 #: modules/websubmit/lib/websubmit_engine.py:1296
 #, fuzzy, python-format
@@ -7349,7 +7349,7 @@ msgid ""
 "The system has encountered an error in retrieving the list of files for this "
 "document."
 msgstr ""
-"El sistema ha encontrado un error recuperando la lista de los ficheros de "
+"El sistema ha encontrado un error recuperando la lista de los archivos de "
 "este documento."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:169
@@ -7359,17 +7359,17 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:175
 msgid "This file is restricted: "
-msgstr "Este fichero es de acceso restringido."
+msgstr "Este archivo es de acceso restringido."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:185
 msgid "An error has happened in trying to stream the request file."
-msgstr "Este fichero está escondido y usted no tiene permiso para acceder a él."
+msgstr "Este archivo está escondido y usted no tiene permiso para acceder a él."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:187
 msgid ""
 "The requested file is hidden and you don't have the proper rights to access "
 "it."
-msgstr "Este fichero está escondido y usted no tiene permiso para acceder a él."
+msgstr "Este archivo está escondido y usted no tiene permiso para acceder a él."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:195
 msgid "An error has happened in trying to retrieve the corresponding icon."
@@ -7390,7 +7390,7 @@ msgstr "Acceso al texto completo"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:306
 msgid "An error has happened in trying to retrieve the requested file."
-msgstr "Ha habido un error al intentar recuperar el fichero solicitado."
+msgstr "Ha habido un error al intentar recuperar el archivo solicitado."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:308
 msgid "Not enough information to retrieve the document"
@@ -7398,7 +7398,7 @@ msgstr "Falta información para recuperar el documento"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:316
 msgid "An error has happened in trying to retrieving the requested file."
-msgstr "Ha habido un error al intentar recuperar el fichero solicitado."
+msgstr "Ha habido un error al intentar recuperar el archivo solicitado."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:504
 #, fuzzy
@@ -9393,7 +9393,7 @@ msgstr "Editar instituto"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2720
 #, fuzzy
 msgid "Additional details"
-msgstr "ficheros adicionales"
+msgstr "archivos adicionales"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2754
 #: modules/bibcirculation/lib/bibcirculation_templates.py:6515
@@ -10323,7 +10323,7 @@ msgstr "Biblioteca"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11494
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11495
 msgid "request_date"
-msgstr ""
+msgstr "fecha_de_petición"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11498
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11640
@@ -10337,7 +10337,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12952
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13176
 msgid "Cost"
-msgstr ""
+msgstr "Coste"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11671
 #, fuzzy
@@ -10352,12 +10352,12 @@ msgstr "Lista"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12949
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14986
 msgid "Arrival date"
-msgstr ""
+msgstr "Fecha de llegada"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11811
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11812
 msgid "arrival_date"
-msgstr ""
+msgstr "fecha_de_llegada"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11980
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11981
@@ -10367,11 +10367,11 @@ msgstr "Fecha de creación"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13047
 msgid "An ILL request has been updated with success."
-msgstr ""
+msgstr "Se ha actualizado la petición de PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13538
 msgid "Purchase information updated with success."
-msgstr ""
+msgstr "Se ha actualizado la información de compra."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13612
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13677
@@ -10393,7 +10393,7 @@ msgstr "Buscar en todas partes"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13813
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14121
 msgid "Vendor(s)"
-msgstr ""
+msgstr "Proveedor(es)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13920
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13987
@@ -10404,11 +10404,11 @@ msgstr "Más información:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14186
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14276
 msgid "Notes about this vendor"
-msgstr ""
+msgstr "Notas sobre este proveedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14229
 msgid "Vendor details"
-msgstr ""
+msgstr "Detalles del proveedor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14315
 #, fuzzy
@@ -10419,6 +10419,8 @@ msgstr "Añadir a los usuarios"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15715
 msgid "Book does not exists on CDS Invenio. Please fill the following form."
 msgstr ""
+"Este libro no existe en CDS Invenio.  Rellene por favor el sigüente "
+"formulario."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14417
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15718
@@ -10433,19 +10435,21 @@ msgid ""
 "Borrower accepts the %s of the service in particular the return of books in "
 "due time."
 msgstr ""
+"El lector acepta el %s del servicio, en particular devolver los libros "
+"en el plazo."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14513
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15814
 msgid "Borrower wants this edition only."
-msgstr ""
+msgstr "El lector sólo quiere esta edición."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14646
 msgid "Only this edition."
-msgstr ""
+msgstr "Sólo esta edición."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15024
 msgid "Notes about this ILL"
-msgstr ""
+msgstr "Notas sobre este PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15195
 #, fuzzy
@@ -10454,13 +10458,15 @@ msgstr "Algunos documentos están pendientes."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15381
 msgid "Check if the book already exists on CDS Invenio,"
-msgstr ""
+msgstr "Compruebe si el libro existe en CDS Invenio,"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15538
 msgid ""
 "Check if the book already exists on CDS Invenio, before to send your ILL "
 "request."
 msgstr ""
+"Compruebe si el libro existe en CDS Invenio antes de solicitar una "
+"petición de PI."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16070
 #, fuzzy
@@ -10470,7 +10476,7 @@ msgstr "Artículo"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16071
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16273
 msgid "Periodical title"
-msgstr ""
+msgstr "Título de la revista"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16072
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16274
@@ -10504,35 +10510,43 @@ msgstr "Página:"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16079
 msgid "Budget code"
-msgstr ""
+msgstr "Código de presupuesto"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16080
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16281
 msgid "ISSN"
-msgstr ""
+msgstr "ISSN"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:300
 #, python-format
 msgid ""
 "The uploaded file is too small (<%i o) and has therefore not been considered"
 msgstr ""
+"El archivo que ha subido es demasiado pequeño (<%i o) y por tanto no "
+"se ha tenido en cuenta"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:305
 #, python-format
 msgid ""
 "The uploaded file is too big (>%i o) and has therefore not been considered"
 msgstr ""
+"El archivo que ha subido es demasiado grande (>%i o) y por tanto no se "
+"ha tenido en cuenta"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:312
 msgid ""
 "The uploaded file name is too long and has therefore not been considered"
 msgstr ""
+"El nombre del archivo que ha subido es demasiado largo y por tanto no "
+"se ha tenido en cuenta"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:324
 msgid ""
 "You have already reached the maximum number of files for this type of "
 "document"
 msgstr ""
+"Ya ha llegado al máximo número de archivos para este tipo de "
+"documento"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:347
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:358
@@ -10543,15 +10557,15 @@ msgstr "El alias solicitado %s ya existe en la base de datos."
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:369
 #, python-format
 msgid "A file with format '%s' already exists. Please upload another format."
-msgstr ""
+msgstr "Ya existe un archivo con el formato '%s'.  Súbalo en otro formato."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:513
 msgid "Choose how you want to restrict access to this file."
-msgstr ""
+msgstr "Escoja cómo desea restringir el acceso a este archivo"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:529
 msgid "You can decide to hide or not previous version(s) of this file."
-msgstr ""
+msgstr "Puede decidir esconder o no versiones anteriores de este archivo."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:530
 msgid ""
@@ -10559,11 +10573,16 @@ msgid ""
 "previously uploaded are removed, since they no longer up-to-date with the "
 "new file."
 msgstr ""
+"Cuando revise un archivo, los formatos adicionales que haya subido "
+"previamente serán borrados, ya que no estarían sincronizados con el "
+"nuevo archivo."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:531
 msgid ""
 "Alternative formats uploaded for current version of this file will be removed"
 msgstr ""
+"Los formatos alternativos para la versión actual de este archivo "
+"serán borrados"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:532
 #, fuzzy
@@ -10572,7 +10591,7 @@ msgstr "versiones anteriores"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:534
 msgid "Upload"
-msgstr ""
+msgstr "Subir"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:558
 #, fuzzy
@@ -10590,6 +10609,8 @@ msgid ""
 "Having a problem revising a file? Send the revised version to %(mailto_link)"
 "s."
 msgstr ""
+"Tiene problemas revisando un archivo? Envíe la versión revisada a "
+"%(mailto_link)s."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:701
 #, fuzzy
@@ -10628,7 +10649,7 @@ msgstr "autor"
 #: modules/bibcheck/web/admin/bibcheckadmin.py:83
 #: modules/bibcheck/web/admin/bibcheckadmin.py:85
 msgid "ERROR"
-msgstr ""
+msgstr "ERROR"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:81
 #, fuzzy
@@ -10637,15 +10658,15 @@ msgstr "El usuario %s no existe"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:83
 msgid "is not a directory"
-msgstr ""
+msgstr "no és un directorio"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:85
 msgid "is not writable"
-msgstr ""
+msgstr "no tiene permiso de escritura"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:118
 msgid "Limit to knowledge bases containing string:"
-msgstr ""
+msgstr "Limitarlo a las bases de conocimiento con el texto:"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:136
 #, fuzzy
@@ -10654,7 +10675,7 @@ msgstr "suprimido correctamente"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:142
 msgid "Verify syntax"
-msgstr ""
+msgstr "Verifique la sintaxis"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:147
 #, fuzzy
@@ -10668,11 +10689,11 @@ msgstr "El usuario %s no existe"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:176
 msgid "Calling bibcheck -verify failed."
-msgstr ""
+msgstr "La invocación bibcheck -verify ha fallado."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:183
 msgid "Verify BibCheck config file"
-msgstr ""
+msgstr "Verifique el archivo de configuración de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:184
 #, fuzzy
@@ -10688,11 +10709,11 @@ msgstr "título"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:242
 msgid "Edit BibCheck config file"
-msgstr ""
+msgstr "Editar el fichero de configuración de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:271
 msgid "already exists."
-msgstr ""
+msgstr "ya existe"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:274
 #, fuzzy
@@ -10701,11 +10722,11 @@ msgstr "Escrita por"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:280
 msgid "write failed."
-msgstr ""
+msgstr "no es ha podido escribir."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:282
 msgid "Save BibCheck config file"
-msgstr ""
+msgstr "Guardar el fichero de configuración de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:316
 #, fuzzy
@@ -10719,7 +10740,7 @@ msgstr "Suprimir la cesta"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:320
 msgid "Delete BibCheck config file"
-msgstr ""
+msgstr "Eliminar el fichero de configuración de BibCheck"
 
 #: modules/bibharvest/lib/oai_repository_admin.py:153
 #: modules/bibharvest/lib/oai_repository_admin.py:258
@@ -10750,7 +10771,7 @@ msgstr "Convertir"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:151
 msgid "Never harvested"
-msgstr ""
+msgstr "Nunca recolectado"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:163
 #, fuzzy
@@ -10760,7 +10781,7 @@ msgstr "Visualización"
 #: modules/bibharvest/lib/oai_harvest_admin.py:188
 #: modules/bibharvest/lib/oai_harvest_admin.py:522
 msgid "No OAI source ID selected."
-msgstr ""
+msgstr "No ha seleccionado ningún identificador de servidor OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:274
 #: modules/bibharvest/lib/oai_harvest_admin.py:397
@@ -10769,7 +10790,7 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:463
 #: modules/bibharvest/lib/oai_harvest_admin.py:510
 msgid "Go back to the OAI sources overview"
-msgstr ""
+msgstr "Volver a la lista dels servidores OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:383
 #, fuzzy
@@ -10778,20 +10799,20 @@ msgstr "Escriba ortra vez la nueva contraseña"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:390
 msgid "Continue anyway"
-msgstr ""
+msgstr "Continuar igualmente"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:793
 msgid "Return to the month view"
-msgstr ""
+msgstr "Volver al resumen mensual"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1067
 msgid "Compare with original"
-msgstr ""
+msgstr "Comparar con el original"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1074
 #: modules/bibharvest/lib/oai_harvest_admin.py:1111
 msgid "Delete from holding pen"
-msgstr ""
+msgstr "Eliminar de la lista de espera"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1105
 #, fuzzy
@@ -10800,7 +10821,7 @@ msgstr "versiones anteriores"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:75
 msgid "Limit display to knowledge bases matching"
-msgstr ""
+msgstr "Limitar la visualización a las bases de conocimiento con el texto"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:76
 #, fuzzy
@@ -10819,23 +10840,23 @@ msgstr "Configurar BibRank"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
 msgid "Add New Taxonomy"
-msgstr ""
+msgstr "Añadir una nueva taxonomía"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:183
 msgid "This knowledge base already has a taxonomy file."
-msgstr ""
+msgstr "Esta base de conociminento ya tiene un archivo de taxonomía"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:184
 msgid "If you upload another file, the current version will be replaced."
-msgstr ""
+msgstr "Si sube otro archivo, se reemplazará la versión actual."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:186
 msgid "The current taxonomy can be accessed with this URL"
-msgstr ""
+msgstr "La taxonomía actual se puede acceder desde esta URL"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:189
 msgid "Please upload the RDF file for taxonomy"
-msgstr ""
+msgstr "Suba el fichero RDF de la taxonomía"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:224
 #, fuzzy
@@ -10848,6 +10869,9 @@ msgid ""
 "given field. The list is generated dynamically by                          "
 "searching the records using a search expression."
 msgstr ""
+"Un base de conocimiento dinámico es una lista de valores de un campo. "
+"La lista se genera dinámicamente a medida que se buscan registros a "
+"partir de un valor de búsqueda."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:229
 msgid ""
@@ -10857,12 +10881,18 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Por ejemplo: los registros tenen el camp 270__a para el nombre y la "
+"dirección de la institución del autor.  Si pone como valor de campo "
+"«270__a» y la expresión «270__a:*Paris*», creará una lista "
+"d'instituciones en París."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid ""
 "If the expression is empty, a list of all values                          in "
 "270__a will be created."
 msgstr ""
+"Si deja la expresión vacía, creará una lista con todos los valores del "
+"campo 270__a."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:236
 msgid ""
@@ -10870,12 +10900,16 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
+"Si la expresión contiene «%», como «270__a:*%*», será remplazado por "
+"el valor creado cuando se use la base de conocimiento."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:239
 msgid ""
 "You can enter a collection name if the expression                          "
 "should be evaluated in a specific collection."
 msgstr ""
+"Puede entrar un nombre de colección si la expresión se ha de evaluar "
+"en una colección específica."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:255
 #, fuzzy
@@ -10905,6 +10939,8 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
+"Aquí puede añadir nuevos mapajes a esta base y cambiar los atributos "
+"de la base."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
 #, fuzzy
@@ -10918,11 +10954,11 @@ msgstr "Opciones de búsqueda:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
 msgid "You can get a these mappings in textual format by: "
-msgstr ""
+msgstr "Puede obtener los mapajes de manera textual haciendo: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:516
 msgid "And the KBA version by:"
-msgstr ""
+msgstr "Y la versión KBA haciendo:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
 #, fuzzy
@@ -10931,15 +10967,15 @@ msgstr "Sus alertas"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:669
 msgid "The left side of the rule "
-msgstr ""
+msgstr "La parte izquierda de la regla "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:671
 msgid "The right side of the rule "
-msgstr ""
+msgstr "La parte derecha de la regla "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:672
 msgid "already appears in these knowledge bases"
-msgstr ""
+msgstr "ya aparece en estas bases de conocimiento"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:685
 #, fuzzy
@@ -10948,21 +10984,23 @@ msgstr "Seleccione una categoría"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:686
 msgid "Replace the selected rules with this rule"
-msgstr ""
+msgstr "Reemplace las reglas seleccionadas con esta regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:687
 msgid "Add this rule in the current knowledge base"
-msgstr ""
+msgstr "Añadir esta regla a la base de conocimiento actual"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:688
 msgid "Cancel: do not add this rule"
-msgstr ""
+msgstr "Cancelar: no añadir esta regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:719
 msgid ""
 "It is not possible to have two rules with the same left side in the same "
 "knowledge base."
 msgstr ""
+"No es posible tener dos reglas con la misma parte izquierda en la "
+"misma base de conocimento."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:69
 #, fuzzy
@@ -10976,7 +11014,7 @@ msgstr "Base de conocimiento %s"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:107
 msgid "upload is a file"
-msgstr ""
+msgstr "subir este fichero"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:119
 #, fuzzy
@@ -10985,7 +11023,7 @@ msgstr "No ha sido posible crear el formato de salida"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:133
 msgid "File uploaded"
-msgstr ""
+msgstr "Fichero subido"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:162
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:206
@@ -11029,11 +11067,11 @@ msgstr "Dependencias de la base de conocimiento %s"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:397
 msgid "Left side exists"
-msgstr ""
+msgstr "Ya existe la parte izquierda"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:405
 msgid "Right side exists"
-msgstr ""
+msgstr "Ya existe la parte derecha"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:578
 #, fuzzy
@@ -11047,7 +11085,7 @@ msgstr "Base de conocimiento desconocida"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:599
 msgid "There is no knowledge base with that name."
-msgstr ""
+msgstr "No existe ninguna base de conocimiento con este nombre."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:610
 #, fuzzy
@@ -11278,7 +11316,7 @@ msgstr "Suprimir la base de conocimiento"
 #~ "información de la cuenta."
 
 #~ msgid "Unable to find file."
-#~ msgstr "No ha sido posible encontrar el fichero."
+#~ msgstr "No ha sido posible encontrar el archivo."
 
 #~ msgid "Cannot find submission directory."
 #~ msgstr "No ha sido posible encontrar el directorio de los envíos."

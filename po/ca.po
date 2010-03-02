@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2009-12-14 10:06+0100\n"
-"PO-Revision-Date: 2010-02-15 23:17+0100\n"
+"PO-Revision-Date: 2010-02-28 23:01+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1923,11 +1923,11 @@ msgstr "Vegeu la guia"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:81
 msgid "OAI sources currently present in the database"
-msgstr "Fonts OAI que estan actualment a la base de dades"
+msgstr "Servidors OAI que estan actualment a la base de dades"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:82
 msgid "No OAI sources currently present in the database"
-msgstr "No hi ha fonts OAI actualment a la base de dades"
+msgstr "No hi ha cap servidor OAI a la base de dades"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:92
 msgid "Next oaiharvest task"
@@ -3668,7 +3668,7 @@ msgstr "No esteu autoritzats a veure aquesta àrea."
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
 msgstr ""
-"El vostre àlias, %s, serà el que es mostri com autor d'aquest comentari"
+"El vostre àlies, %s, serà el que es mostri com autor d'aquest comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:832
 #: modules/webcomment/lib/webcomment_templates.py:914
@@ -3677,7 +3677,7 @@ msgid ""
 "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
 "(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
-"Vigileu: encara no heu %(x_url_open)sdefinit el vostre alias%(x_url_close)s. "
+"Vigileu: encara no heu %(x_url_open)sdefinit el vostre àlies%(x_url_close)s. "
 "%(x_nickname)s s'usarà temporalment com a autor d'aquest comentari."
 
 #: modules/webcomment/lib/webcomment_templates.py:860
@@ -3702,7 +3702,7 @@ msgstr "Afegeix un comentari"
 msgid ""
 "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr ""
-"Vigileu: El vostre àlias, %s, serà el que es mostri com a autor d'aquesta "
+"Vigileu: El vostre àlies, %s, serà el que es mostri com a autor d'aquesta "
 "ressenya."
 
 #: modules/webcomment/lib/webcomment_templates.py:985
@@ -3857,7 +3857,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:156
 #: modules/websession/lib/websession_templates.py:1026
 msgid "Nickname"
-msgstr "Àlias"
+msgstr "Àlies"
 
 #: modules/webcomment/lib/webcomment_templates.py:1249
 #: modules/webcomment/lib/webcomment_templates.py:1281
@@ -5506,7 +5506,7 @@ msgstr "Heu perdut la contrasenya?"
 #: modules/websession/lib/websession_templates.py:908
 msgid "You can use your nickname or your email address to login."
 msgstr ""
-"Per a identificar-vos poseu usar el vostre àlias o la vostra adreça de "
+"Per a identificar-vos poseu usar el vostre àlies o la vostra adreça de "
 "correu elctrònic."
 
 #: modules/websession/lib/websession_templates.py:932
@@ -5536,7 +5536,7 @@ msgstr "Defineix la nova contrassenya"
 #: modules/websession/lib/websession_templates.py:980
 msgid "Please enter your email address and desired nickname and password:"
 msgstr ""
-"Introduiu la vostra adreça de correu electrònic i l'àlias i contrasenya:"
+"Introduiu la vostra adreça de correu electrònic i l'àlies i contrasenya:"
 
 #: modules/websession/lib/websession_templates.py:982
 msgid ""
@@ -6218,7 +6218,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:832
 #, python-format
 msgid "Desired nickname %s is invalid."
-msgstr "L'àlias %s no és vàlid."
+msgstr "L'àlies %s no és vàlid."
 
 #: modules/websession/lib/websession_webinterface.py:397
 #: modules/websession/lib/websession_webinterface.py:403
@@ -6273,7 +6273,7 @@ msgstr "O proveu-ho de nou."
 #: modules/websession/lib/websession_webinterface.py:415
 #, python-format
 msgid "Desired nickname %s is already in use."
-msgstr "L'àlias %s ja està en ús."
+msgstr "L'àlies %s ja està en ús."
 
 #: modules/websession/lib/websession_webinterface.py:424
 msgid "Users cannot edit passwords on this site."
@@ -6429,7 +6429,7 @@ msgstr "Ha fallat l'alta"
 #: modules/websession/lib/websession_webinterface.py:843
 #, python-format
 msgid "Desired nickname %s already exists in the database."
-msgstr "L'àlias sol·licitat %s ja existeix a la base de dades."
+msgstr "L'àlies sol·licitat %s ja existeix a la base de dades."
 
 #: modules/websession/lib/websession_webinterface.py:848
 msgid "Users cannot register themselves, only admin can register them."
@@ -6707,7 +6707,7 @@ msgstr "No es pot crear el directori de lliuraments"
 #: modules/websubmit/lib/websubmit_engine.py:401
 #: modules/websubmit/lib/websubmit_engine.py:916
 msgid "No file uploaded?"
-msgstr "No heu pujat cap fitxer?"
+msgstr "No heu penjat cap fitxer?"
 
 #: modules/websubmit/lib/websubmit_engine.py:425
 #: modules/websubmit/lib/websubmit_engine.py:428
@@ -10368,7 +10368,7 @@ msgstr "Biblioteca"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11494
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11495
 msgid "request_date"
-msgstr ""
+msgstr "data_de_petició"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11498
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11640
@@ -10382,7 +10382,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12952
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13176
 msgid "Cost"
-msgstr ""
+msgstr "Cost"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11671
 #, fuzzy
@@ -10397,12 +10397,12 @@ msgstr "Llista"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12949
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14986
 msgid "Arrival date"
-msgstr ""
+msgstr "Data d'arribada"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11811
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11812
 msgid "arrival_date"
-msgstr ""
+msgstr "data_d'arribada"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11980
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11981
@@ -10412,11 +10412,11 @@ msgstr "Data de creació"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13047
 msgid "An ILL request has been updated with success."
-msgstr ""
+msgstr "S'ha actualitzat la petició de PI."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13538
 msgid "Purchase information updated with success."
-msgstr ""
+msgstr "S'ha actualitzat la informació de compra."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13612
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13677
@@ -10438,7 +10438,7 @@ msgstr "Cercar a tot arreu"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13813
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14121
 msgid "Vendor(s)"
-msgstr ""
+msgstr "Proveïdor(s)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13920
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13987
@@ -10449,11 +10449,11 @@ msgstr "Més informació:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14186
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14276
 msgid "Notes about this vendor"
-msgstr ""
+msgstr "Notes sobre aquest proveïdor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14229
 msgid "Vendor details"
-msgstr ""
+msgstr "Detalls del proveïdor"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14315
 #, fuzzy
@@ -10464,6 +10464,8 @@ msgstr "Afegir als usuaris"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15715
 msgid "Book does not exists on CDS Invenio. Please fill the following form."
 msgstr ""
+"Aquest llibre no existeix a CDS Invenio.  Ompliu si us plau el següent "
+"formulari."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14417
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15718
@@ -10478,19 +10480,21 @@ msgid ""
 "Borrower accepts the %s of the service in particular the return of books in "
 "due time."
 msgstr ""
+"El lector accepta el %s del servei, en particular tornar els llibres "
+"en el termini."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14513
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15814
 msgid "Borrower wants this edition only."
-msgstr ""
+msgstr "El lector només vol aquesta edició."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14646
 msgid "Only this edition."
-msgstr ""
+msgstr "Només aquesta edició."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15024
 msgid "Notes about this ILL"
-msgstr ""
+msgstr "Notes sobre aquest PI"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15195
 #, fuzzy
@@ -10499,13 +10503,15 @@ msgstr "Quedent alguns documents pendents"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15381
 msgid "Check if the book already exists on CDS Invenio,"
-msgstr ""
+msgstr "Comproveu si el llibre existeix en CDS Invenio,"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15538
 msgid ""
 "Check if the book already exists on CDS Invenio, before to send your ILL "
 "request."
 msgstr ""
+"Comproveu si el llibre existeix en CDS Invenio abans de sol·licitar "
+"una petició de PI."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16070
 #, fuzzy
@@ -10515,7 +10521,7 @@ msgstr "Article"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16071
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16273
 msgid "Periodical title"
-msgstr ""
+msgstr "Títol de la revista"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16072
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16274
@@ -10549,54 +10555,64 @@ msgstr "Pàgina:"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16079
 msgid "Budget code"
-msgstr ""
+msgstr "Codi de pressupost"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16080
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16281
 msgid "ISSN"
-msgstr ""
+msgstr "ISSN"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:300
 #, python-format
 msgid ""
 "The uploaded file is too small (<%i o) and has therefore not been considered"
 msgstr ""
+"El fitxer que heu penjat és massa petit (<%i o) i per tant no s'ha "
+"tingut en compte"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:305
 #, python-format
 msgid ""
 "The uploaded file is too big (>%i o) and has therefore not been considered"
 msgstr ""
+"El fitxer que heu penjat és massa gran (>%i o) i per tant no s'ha "
+"tingut en compte"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:312
 msgid ""
 "The uploaded file name is too long and has therefore not been considered"
 msgstr ""
+"El nom del fitxer que heu penjat és massa llarg i per tant no s'ha "
+"tingut en compte"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:324
 msgid ""
 "You have already reached the maximum number of files for this type of "
 "document"
 msgstr ""
+"Ja heu arribat al màxim número de fitxers per a aquest tipus de "
+"document"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:347
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:358
 #, fuzzy, python-format
 msgid "A file named %s already exists. Please choose another name."
-msgstr "L'àlias sol·licitat %s ja existeix a la base de dades."
+msgstr "L'àlies sol·licitat %s ja existeix a la base de dades."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:369
 #, python-format
 msgid "A file with format '%s' already exists. Please upload another format."
 msgstr ""
+"Ja existeix un fitxer amb el format '%s'.  Pujeu-lo en un altre "
+"format."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:513
 msgid "Choose how you want to restrict access to this file."
-msgstr ""
+msgstr "Escolliu com voleu restringir l'accés a aquest fitxer"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:529
 msgid "You can decide to hide or not previous version(s) of this file."
-msgstr ""
+msgstr "Podeu decidir amagar o no versions anteriors d'aquest fitxer."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:530
 msgid ""
@@ -10604,11 +10620,16 @@ msgid ""
 "previously uploaded are removed, since they no longer up-to-date with the "
 "new file."
 msgstr ""
+"Quan reviseu un fitxer, els formats addicionals que hagéssiu penjat "
+"prèviament seran esborrats, ja que no estarien sincronitzats amb el "
+"nou fitxer."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:531
 msgid ""
 "Alternative formats uploaded for current version of this file will be removed"
 msgstr ""
+"Els formats alternatius per a la versió actual d'aquest fitxer seran "
+"esborrats"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:532
 #, fuzzy
@@ -10617,7 +10638,7 @@ msgstr "versions anteriors"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:534
 msgid "Upload"
-msgstr ""
+msgstr "Penjar"
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:558
 #, fuzzy
@@ -10635,6 +10656,8 @@ msgid ""
 "Having a problem revising a file? Send the revised version to %(mailto_link)"
 "s."
 msgstr ""
+"Teniu problemes revisant un fitxer? Envieu la versió revisada a "
+"%(mailto_link)s."
 
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:701
 #, fuzzy
@@ -10673,7 +10696,7 @@ msgstr "autor"
 #: modules/bibcheck/web/admin/bibcheckadmin.py:83
 #: modules/bibcheck/web/admin/bibcheckadmin.py:85
 msgid "ERROR"
-msgstr ""
+msgstr "ERROR"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:81
 #, fuzzy
@@ -10682,15 +10705,15 @@ msgstr "L'usuari %s no existeix"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:83
 msgid "is not a directory"
-msgstr ""
+msgstr "no és un directori"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:85
 msgid "is not writable"
-msgstr ""
+msgstr "no hi teniu permís d'escriptura"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:118
 msgid "Limit to knowledge bases containing string:"
-msgstr ""
+msgstr "Limitar-ho a les bases de coneixement amb el text:"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:136
 #, fuzzy
@@ -10699,7 +10722,7 @@ msgstr "suprimit correctament"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:142
 msgid "Verify syntax"
-msgstr ""
+msgstr "Verifiqueu la sintaxi"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:147
 #, fuzzy
@@ -10713,11 +10736,11 @@ msgstr "L'usuari %s no existeix"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:176
 msgid "Calling bibcheck -verify failed."
-msgstr ""
+msgstr "La invocació bibcheck -verify ha fallat."
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:183
 msgid "Verify BibCheck config file"
-msgstr ""
+msgstr "Verifiqueu el fitxer de configuració de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:184
 #, fuzzy
@@ -10733,11 +10756,11 @@ msgstr "títol"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:242
 msgid "Edit BibCheck config file"
-msgstr ""
+msgstr "Editar el fitxer de configuració de BibCheck"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:271
 msgid "already exists."
-msgstr ""
+msgstr "ja existeix"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:274
 #, fuzzy
@@ -10751,7 +10774,7 @@ msgstr "Escriviu una crítica"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:282
 msgid "Save BibCheck config file"
-msgstr ""
+msgstr "Desar el fitxer de configuració de BibCheck"
 
 # Suprimir? Temps verbal?
 #: modules/bibcheck/web/admin/bibcheckadmin.py:316
@@ -10766,7 +10789,7 @@ msgstr "Suprimeix el cistell"
 
 #: modules/bibcheck/web/admin/bibcheckadmin.py:320
 msgid "Delete BibCheck config file"
-msgstr ""
+msgstr "Suprimir el fitxer de configuració de BibCheck"
 
 #: modules/bibharvest/lib/oai_repository_admin.py:153
 #: modules/bibharvest/lib/oai_repository_admin.py:258
@@ -10797,7 +10820,7 @@ msgstr "Converteix"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:151
 msgid "Never harvested"
-msgstr ""
+msgstr "Mai recol·lectat"
 
 # Conjugació? Gerundi!?!?
 #: modules/bibharvest/lib/oai_harvest_admin.py:163
@@ -10808,7 +10831,7 @@ msgstr "Visualització"
 #: modules/bibharvest/lib/oai_harvest_admin.py:188
 #: modules/bibharvest/lib/oai_harvest_admin.py:522
 msgid "No OAI source ID selected."
-msgstr ""
+msgstr "No heu seleccionat cap identificador de servidor OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:274
 #: modules/bibharvest/lib/oai_harvest_admin.py:397
@@ -10817,7 +10840,7 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:463
 #: modules/bibharvest/lib/oai_harvest_admin.py:510
 msgid "Go back to the OAI sources overview"
-msgstr ""
+msgstr "Tornar a la llista dels servidors OAI"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:383
 #, fuzzy
@@ -10826,20 +10849,20 @@ msgstr "Escriviu un altre cop la nova contrassenya"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:390
 msgid "Continue anyway"
-msgstr ""
+msgstr "Continuar igualment"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:793
 msgid "Return to the month view"
-msgstr ""
+msgstr "Tornar al resum mensual"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1067
 msgid "Compare with original"
-msgstr ""
+msgstr "Comparar amb l'original"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1074
 #: modules/bibharvest/lib/oai_harvest_admin.py:1111
 msgid "Delete from holding pen"
-msgstr ""
+msgstr "Esborrar de la llista d'espera"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1105
 #, fuzzy
@@ -10848,7 +10871,7 @@ msgstr "versions anteriors"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:75
 msgid "Limit display to knowledge bases matching"
-msgstr ""
+msgstr "Limitar la visualització a bases de coneixement amb el text"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:76
 #, fuzzy
@@ -10867,23 +10890,23 @@ msgstr "Configurar de BibRank"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:142
 msgid "Add New Taxonomy"
-msgstr ""
+msgstr "Afegir una nova taxonomia"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:183
 msgid "This knowledge base already has a taxonomy file."
-msgstr ""
+msgstr "Aquesta base de coneixement ja té un fitxer de taxonomia"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:184
 msgid "If you upload another file, the current version will be replaced."
-msgstr ""
+msgstr "Si pengeu un altre fitxer, es reemplaçarà la versió actual."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:186
 msgid "The current taxonomy can be accessed with this URL"
-msgstr ""
+msgstr "La taxonomia actual es pot accedir des d'aquest URL"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:189
 msgid "Please upload the RDF file for taxonomy"
-msgstr ""
+msgstr "Pengeu el fitxer RDF de la taxonomia"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:224
 #, fuzzy
@@ -10896,6 +10919,9 @@ msgid ""
 "given field. The list is generated dynamically by                          "
 "searching the records using a search expression."
 msgstr ""
+"Un base de coneixement dinàmic és una llista de valors d'un camp. La "
+"llista es genera dinàmicament a mesura que es cerquen registres a "
+"partir de un valor de cerca."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:229
 msgid ""
@@ -10905,12 +10931,18 @@ msgid ""
 "'270__a:*Paris*', a list of institutes in Paris                          "
 "will be created."
 msgstr ""
+"Per example: els registres tenen el camp 270__a per al nom i l'adreça "
+"de la institució de l'autor.  Si poseu com a valor «270__a» i "
+"l'expressió «270__a:*Paris*», creareu una llista d'institucions a "
+"Paris."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:234
 msgid ""
 "If the expression is empty, a list of all values                          in "
 "270__a will be created."
 msgstr ""
+"Si deixeu l'expressió buida, creareu una llista amb tots els valors "
+"del camp 270__a."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:236
 msgid ""
@@ -10918,12 +10950,16 @@ msgid ""
 "it will be replaced by a search string when the                          "
 "knowledge base is used."
 msgstr ""
+"Si l'expressió conté «%», com ara «270__a:*%*», serà reemplaçat pel valor "
+"creat quan s'usi la base de coneixement."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:239
 msgid ""
 "You can enter a collection name if the expression                          "
 "should be evaluated in a specific collection."
 msgstr ""
+"Podeu entrar un nom de col·lecció si l'expressió s'ha d'avaluar en una "
+"col·lecció específica."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:255
 #, fuzzy
@@ -10953,6 +10989,8 @@ msgid ""
 "Here you can add new mappings to this base                         and "
 "change the base attributes."
 msgstr ""
+"Aquí hi podeu afegir nous mapatges a aquesta base i canviar els "
+"atributs de la base."
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:333
 #, fuzzy
@@ -10966,11 +11004,11 @@ msgstr "Opcions de cerca:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:514
 msgid "You can get a these mappings in textual format by: "
-msgstr ""
+msgstr "Podeu obtenir els mapatges de manera textual fent: "
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:516
 msgid "And the KBA version by:"
-msgstr ""
+msgstr "I la versió KBA fent:"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:667
 #, fuzzy
@@ -10979,15 +11017,15 @@ msgstr "Les vostres alertes"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:669
 msgid "The left side of the rule "
-msgstr ""
+msgstr "La banda esquerra de la regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:671
 msgid "The right side of the rule "
-msgstr ""
+msgstr "La banda dreta de la regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:672
 msgid "already appears in these knowledge bases"
-msgstr ""
+msgstr "ja apareix en aquestes bases de coneixement"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:685
 #, fuzzy
@@ -10996,21 +11034,23 @@ msgstr "Seleccioneu una categoria"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:686
 msgid "Replace the selected rules with this rule"
-msgstr ""
+msgstr "Reemplaçeu les regles seleccionades amb aquesta regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:687
 msgid "Add this rule in the current knowledge base"
-msgstr ""
+msgstr "Afegir aquesta regla a la base de coneixement actual"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:688
 msgid "Cancel: do not add this rule"
-msgstr ""
+msgstr "Cancelar: no afegeixis aquesta regla"
 
 #: modules/bibknowledge/lib/bibknowledge_templates.py:719
 msgid ""
 "It is not possible to have two rules with the same left side in the same "
 "knowledge base."
 msgstr ""
+"No és possible tenir dues reglas amb la mateixa banda esquerra a la "
+"mateixa base de coneixement."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:69
 #, fuzzy
@@ -11024,7 +11064,7 @@ msgstr "Base de coneixement %s"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:107
 msgid "upload is a file"
-msgstr ""
+msgstr "penjar aquest fitxer"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:119
 #, fuzzy
@@ -11033,7 +11073,7 @@ msgstr "No ha estat possible crear el format de sortida"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:133
 msgid "File uploaded"
-msgstr ""
+msgstr "Fitxer penjat"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:162
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:206
@@ -11077,11 +11117,11 @@ msgstr "Dependències de la base de coneixement %s"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:397
 msgid "Left side exists"
-msgstr ""
+msgstr "Ja existeix la banda esquerra"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:405
 msgid "Right side exists"
-msgstr ""
+msgstr "Ja existeix la banda dreta"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:578
 #, fuzzy
@@ -11095,7 +11135,7 @@ msgstr "Base de coneixement desconeguda"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:599
 msgid "There is no knowledge base with that name."
-msgstr ""
+msgstr "No existeix cap base de coneixement amb aquest nom."
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:610
 #, fuzzy
@@ -11421,7 +11461,7 @@ msgstr "Suprimeix la base de coneixement"
 
 #~ msgid ""
 #~ "Note: you currently haven't %(link_open)sdefined a nickname%(link_close)s."
-#~ msgstr "Compte: encara no heu %(link_open)sdefinit un àlias%(link_close)s."
+#~ msgstr "Compte: encara no heu %(link_open)sdefinit un àlies%(link_close)s."
 
 #~ msgid "%s will temporarly be displayed as author of this comment."
 #~ msgstr "%s es mostrarà temporalment com autor d'aquest comentari"
