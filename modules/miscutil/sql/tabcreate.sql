@@ -2708,9 +2708,11 @@ CREATE TABLE IF NOT EXISTS cmtRECORDCOMMENT (
   nb_votes_yes int(10) NOT NULL default '0',
   nb_votes_total int(10) unsigned NOT NULL default '0',
   nb_abuse_reports int(10) NOT NULL default '0',
+  status char(2) NOT NULL default 'ok',
   PRIMARY KEY  (id),
   KEY id_bibrec (id_bibrec),
-  KEY id_user (id_user)
+  KEY id_user (id_user),
+  KEY status (status)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (

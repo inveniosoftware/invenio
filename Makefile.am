@@ -403,5 +403,7 @@ update-v0.99.1-tables:
 	echo "ALTER TABLE bskEXTREC ADD external_id int(15) NOT NULL default '0';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bskEXTREC ADD collection_id int(15) unsigned NOT NULL default '0';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bskEXTREC ADD original_url text;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD status char(2) NOT NULL default 'ok';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD KEY status (status);" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

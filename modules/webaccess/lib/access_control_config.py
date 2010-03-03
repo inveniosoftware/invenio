@@ -123,7 +123,8 @@ DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('curator', 'Curator', 'deny any'),
                   ('basketusers', 'Users who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'),
                   ('submit_DEMOJRN_*', 'Users who can submit (and modify) "Atlantis Times" articles', 'deny all'),
-                  ('atlantiseditor', 'Users who can configure "Atlantis Times" journal', 'deny all'))
+                  ('atlantiseditor', 'Users who can configure "Atlantis Times" journal', 'deny all'),
+                  ('commentmoderator', 'Users who can moderate comments', 'deny all'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('dorian.gray@cds.cern.ch', 'referee_DEMOBOO_*'),
@@ -188,6 +189,7 @@ DEF_ACTIONS = (
                ('viewholdings', 'view holdings', 'collection', 'yes'),
                ('viewstatistics', 'view statistics', 'collection', 'yes'),
                ('runbibcirculation', 'run BibCirculation', '', 'no'),
+               ('moderatecomments', 'moderate comments', 'collection', 'no')
               )
 
 # Default authorizations

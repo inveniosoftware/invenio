@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>test_comment_delete_report</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_comment_delete_report</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>http://localhost/</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>romeo</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>r123omeo</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/record/1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Discussion</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>msg</td>
+	<td>Test comment</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Add comment']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Your comment was successfully added.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Back to record</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>romeo</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Test comment</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=login here</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>juliet</td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_pw</td>
+	<td>j123uliet</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/record/1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Discussion</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>msg</td>
+	<td>Another comment</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//input[@value='Add comment']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Back to record</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>//a[@href='http://pcuds30.cern.ch/admin/webcomment/webcommentadmin.py/del_single_com_auth?ln=en&amp;id=2']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Comment deleted by the author</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/admin/webcomment/webcommentadmin.py/del_single_com_auth?ln=en&amp;id=1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Authorization failure</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>/record/1/comments/display?ln=en&amp;do=od</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//a[@href='http://pcuds30.cern.ch/record/1/comments/report?ln=en&amp;comid=1&amp;do=od&amp;ds=all&amp;nb=100&amp;p=1&amp;referer=http://pcuds30.cern.ch/record/1/comments/display']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Your feedback has been recorded, many thanks</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/record/1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link=Discussion</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Report abuse</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//a[@href='http://pcuds30.cern.ch/record/1/comments/report?ln=en&amp;comid=1&amp;do=od&amp;ds=all&amp;nb=100&amp;p=1&amp;referer=http://pcuds30.cern.ch/record/1/comments/display']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>If you already have an account, please login using the form below.</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

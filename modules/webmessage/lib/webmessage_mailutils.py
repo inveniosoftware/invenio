@@ -62,6 +62,8 @@ def email_quoted_txt2html(text,
     @param linebreak_html: line separator in html (default: '<br/>')
     @return: string containing html formatted output
     """
+    washer = HTMLWasher()
+
     final_body = ""
     nb_indent = 0
     text = text.strip('\n')
@@ -84,6 +86,8 @@ def email_quoted_txt2html(text,
                 final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
         else:
             final_body += (tabs_before)*"\t"
+
+        line = washer.wash(line)
         final_body += tabs_before*"\t" + line
         final_body += linebreak_html + "\n"
         nb_indent = new_nb_indent

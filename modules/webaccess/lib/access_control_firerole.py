@@ -25,13 +25,22 @@ __lastupdated__ = """$Date$"""
 webaccess to connect user to roles using every infos about users.
 """
 
-from invenio.access_control_config import InvenioWebAccessFireroleError
-from invenio.dbquery import run_sql, blob_to_string
-from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
-        CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
 import re
 import cPickle
 from zlib import compress, decompress
+import sys
+
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set
+    # pylint: enable-msg=W0622
+
+from invenio.webgroup_dblayer import get_users_in_group, get_group_id
+from invenio.access_control_config import InvenioWebAccessFireroleError
+from invenio.dbquery import run_sql, blob_to_string
+from invenio.config import CFG_CERN_SITE
+from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
+        CFG_ACC_EMPTY_ROLE_DEFINITION_SER, CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
 
 
 # INTERFACE
@@ -146,6 +155,43 @@ def acc_firerole_suggest_apache_p(firerole_def_obj):
         return suggest_apache_p
     except Exception, msg:
         raise InvenioWebAccessFireroleError, msg
+
+def acc_firerole_extract_emails(firerole_def_obj):
+    """
+    Best effort function to extract all the possible email addresses
+    authorized by the given firerole.
+    """
+    authorized_emails = set()
+    try:
+        default_allow_p, suggest_apache_p, rules = firerole_def_obj
+        for (allow_p, not_p, field, expressions_list) in rules: # for every rule
+            if not_p:
+                continue
+            if field == 'group':
+                for reg_p, expr in expressions_list:
+                    if reg_p:
+                        continue
+                    if CFG_CERN_SITE and expr.endswith(' [CERN]'):
+                        authorized_emails.add(expr[:len(' [CERN]')].lower().strip() + '@cern.ch')
+                    emails = run_sql("SELECT user.email FROM usergroup JOIN user_usergroup ON usergroup.id=user_usergroup.id_usergroup JOIN user ON user.id=user_usergroup.id_user WHERE usergroup.name=%s", (expr, ))
+                    for email in emails:
+                        authorized_emails.add(email[0].lower().strip())
+            elif field == 'email':
+                for reg_p, expr in expressions_list:
+                    if reg_p:
+                        continue
+                    authorized_emails.add(expr.lower().strip())
+            elif field == 'uid':
+                for reg_p, expr in expressions_list:
+                    if reg_p:
+                        continue
+                    email = run_sql("SELECT email FROM user WHERE id=%s", (expr, ))
+                    if email:
+                        authorized_emails.add(email[0][0].lower().strip())
+        return authorized_emails
+    except Exception, msg:
+        raise InvenioWebAccessFireroleError, msg
+
 
 def acc_firerole_check_user(user_info, firerole_def_obj):
     """ Given a user_info dictionary, it matches the rules inside the deserializez
