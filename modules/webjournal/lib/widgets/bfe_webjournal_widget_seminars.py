@@ -31,7 +31,7 @@ from invenio.messages import gettext_set_language
 
 update_frequency = 3600 # in seconds
 
-def format(bfo, indico_seminar_xml="http://indico.cern.ch/tools/export.py?fid=1l7&amp;date=today&amp;days=1&amp;of=xml"):
+def format(bfo, indico_seminar_xml="http://indico.cern.ch/tools/export.py?fid=1l7&date=today&days=1&of=xml"):
     """
     Display the list of seminar from the given Indico XML URL
 
