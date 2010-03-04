@@ -116,6 +116,8 @@ from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_
 from invenio.websearch_external_collections_config import CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_MAXRESULTS
 
+VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
+
 ## global vars:
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
 cfg_nicely_ordered_collection_list = 0 # do we propose collection list nicely ordered or alphabetical?
@@ -179,10 +181,9 @@ class RestrictedCollectionDataCacher(DataCacher):
         def cache_filler():
             ret = []
             try:
-                viewcollid = acc_get_action_id(VIEWRESTRCOLL)
                 res = run_sql("""SELECT DISTINCT ar.value
                     FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
-                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (viewcollid,))
+                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,))
             except Exception:
                 # database problems, return empty cache
                 return []
@@ -213,6 +214,14 @@ def get_permitted_restricted_collections(user_info):
         if acc_authorize_action(user_info, 'viewrestrcoll', collection=collection)[0] == 0:
             ret.append(collection)
     return ret
+
+def get_restricted_collections_for_recid(recid):
+    """
+    Return the list of restricted collection names to which recid belongs.
+    """
+    restricted_collections = run_sql("""SELECT c.name, c.reclist FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id JOIN collection c ON ar.value=c.name WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,))
+    return [row[0] for row in restricted_collections if recid in HitSet(row[1])]
+
 
 def is_user_owner_of_record(user_info, recid):
     """
@@ -252,15 +261,16 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
-    record_primary_collection = guess_primary_collection_of_a_record(recid)
-    if collection_restricted_p(record_primary_collection):
-        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-        if auth_code == 0 or is_user_owner_of_record(user_info, recid):
-            return (0, '')
+    restricted_collections = get_restricted_collections_for_recid(recid)
+    if not restricted_collections or is_user_owner_of_record(user_info, recid):
+        return (0, '')
+    for collection in restricted_collections:
+        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
+        if auth_code == 0:
+            continue
         else:
             return (auth_code, auth_msg)
-    else:
-        return (0, '')
+    return (0, '')
 
 class IndexStemmingDataCacher(DataCacher):
     """
