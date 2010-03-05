@@ -98,7 +98,8 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV= {
     'editor_modifications_changed': 33,
     'disabled_hp_changeset' : 34,
     'wrong_cache_file_format' : 111,
-    'added_positioned_subfields' : 35
+    'added_positioned_subfields' : 35,
+    'autosuggestion_scanned' : 36
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {
@@ -131,6 +132,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     33: 'Modifications updates',
     34: 'Disabled a changeset',
     35: 'Added fields/subfields',
+    36: 'Autosuggestion scanned',
     100: 'Error: Not logged in',
     101: 'Error: Permission denied',
     102: 'Error: Non-existent record',
@@ -160,3 +162,17 @@ CFG_BIBEDIT_TO_MERGE_SUFFIX = 'merge'
 
 CFG_BIBEDIT_RECORD_TEMPLATES_PATH = "%s%sbibedit%srecord_templates" % (CFG_ETCDIR, os.sep, os.sep)
 CFG_BIBEDIT_FIELD_TEMPLATES_PATH = "%s%sbibedit%sfield_templates" % (CFG_ETCDIR, os.sep, os.sep)
+
+# CFG_BIBEDIT_AUTOSUGGEST_TAGS - for which tags the editor should try to autosuggest values
+# This is "safe" to have configured since it does not rely to a particular existing KB
+CFG_BIBEDIT_AUTOSUGGEST_TAGS = ['100__a']
+# CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS - a dictionary whose keys are tags and values kb names
+# This is better left empty when in doubt
+CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS = {} # { '65017a': 'SISC-65017a---65017a' }
+# CFG_BIBEDIT_KEYWORD_TAXONOMY - the name of the taxonomy DB that holds the taxonomy file used
+# for getting the keywords. Use only if you have a taxonomy KB.
+CFG_BIBEDIT_KEYWORD_TAXONOMY = "" #'HEP.RDF'
+#what tag is used for keywords
+CFG_BIBEDIT_KEYWORD_TAG = "" # '6531_a'
+#what label inside the RDF file contains the term
+CFG_BIBEDIT_KEYWORD_RDFLABEL = "" #'prefLabel'

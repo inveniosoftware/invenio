@@ -31,7 +31,10 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY, \
     CFG_BIBEDIT_JS_STATUS_ERROR_TIME, CFG_BIBEDIT_JS_STATUS_INFO_TIME, \
     CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY, CFG_BIBEDIT_MAX_SEARCH_RESULTS, \
-    CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV
+    CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
+    CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
+    CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
+    CFG_BIBEDIT_KEYWORD_RDFLABEL
 
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
@@ -60,6 +63,10 @@ from invenio.search_engine import record_exists, search_pattern
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
+from invenio.bibformat import format_record
+from invenio.bibmerge_differ import match_subfields, record_diff
+from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
+     get_kbt_items_for_bibedit #autosuggest
 
 import re
 import difflib
@@ -76,6 +83,8 @@ if sys.hexversion < 0x2060000:
 else:
     import json
     simplejson_available = True
+
+
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
@@ -197,7 +206,10 @@ def perform_request_init(uid, ln, req, lastupdated):
             'gNEW_CONTENT_HIGHLIGHT_DELAY':
                 CFG_BIBEDIT_JS_NEW_CONTENT_HIGHLIGHT_DELAY,
             'gTICKET_REFRESH_DELAY': CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY,
-            'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES
+            'gRESULT_CODES': CFG_BIBEDIT_AJAX_RESULT_CODES,
+            'gAUTOSUGGEST_TAGS' : CFG_BIBEDIT_AUTOSUGGEST_TAGS,
+            'gAUTOCOMPLETE_TAGS' : CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.keys(),
+            'gKEYWORD_TAG' : '"' + CFG_BIBEDIT_KEYWORD_TAG  + '"'
             }
     body += '<script type="text/javascript">\n'
     for key in data:
@@ -314,7 +326,8 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
                           'addFieldsSubfieldsOnPositions', 'modifyContent', \
                           'moveSubfield', 'deleteFields', 'moveField', \
                           'modifyField', 'otherUpdateRequest', \
-                          'disableHpChange', 'deactivateHoldingPenChangeset'):
+                          'disableHpChange', 'deactivateHoldingPenChangeset', \
+                          'autosuggest', 'autocomplete', 'autokeyword'  ):
         # Record updates.
         cacheMTime = data['cacheMTime']
         if data.has_key('hpChanges'):
@@ -949,6 +962,79 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                 response['resultCode'] = 29
             else:
                 response['resultCode'] = 30
+        elif (request_type == 'autosuggest' or \
+              request_type == 'autocomplete' or \
+              request_type == 'autokeyword' ):
+            # get the values based on which one needs to search
+            searchby = data['value']
+            #we check if the data is properly defined
+            fulltag = ''
+            if data.has_key('maintag') and data.has_key('subtag1') and \
+               data.has_key('subtag2') and data.has_key('subfieldcode'):
+                maintag = data['maintag']
+                subtag1 = data['subtag1']
+                subtag2 = data['subtag2']
+                u_subtag1 = subtag1
+                u_subtag2 = subtag2
+                if (not subtag1) or (subtag1 == ' '):
+                    u_subtag1 = '_'
+                if (not subtag2) or (subtag2 == ' '):
+                    u_subtag2 = '_'
+                subfieldcode = data['subfieldcode']
+                fulltag = maintag+u_subtag1+u_subtag2+subfieldcode
+            if (request_type == 'autokeyword'):
+                #call the keyword-form-ontology function
+                if fulltag and searchby:
+                    items = get_kbt_items_for_bibedit(CFG_BIBEDIT_KEYWORD_TAXONOMY, \
+                            CFG_BIBEDIT_KEYWORD_RDFLABEL, searchby)
+                    response['autokeyword'] = items
+            if (request_type == 'autosuggest'):
+                #call knowledge base function to put the suggestions in an array..
+                if fulltag and searchby and len(searchby) > 3:
+                    suggest_values = get_kbd_values_for_bibedit(fulltag, "", searchby)
+                    #remove ..
+                    new_suggest_vals = []
+                    for sugg in suggest_values:
+                        if sugg.startswith(searchby):
+                            new_suggest_vals.append(sugg)
+                    response['autosuggest'] = new_suggest_vals
+            if (request_type == 'autocomplete'):
+                #call the values function with the correct kb_name
+                if CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.has_key(fulltag):
+                    kbname = CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS[fulltag]
+                    #check if the seachby field has semicolons. Take all
+                    #the semicolon-separated items..
+                    items = []
+                    vals = []
+                    if searchby:
+                        if searchby.rfind(';'):
+                            items = searchby.split(';')
+                        else:
+                            items = [searchby.strip()]
+                    for item in items:
+                        item = item.strip()
+                        kbrvals = get_kbr_values(kbname, item, '', 'e') #we want an exact match
+                        if kbrvals and kbrvals[0]: #add the found val into vals
+                            vals.append(kbrvals[0])
+                    #check that the values are not already contained in other
+                    #instances of this field
+                    record_revision, record = get_cache_file_contents(recid, uid)[1:]
+                    xml_rec = print_rec(record)
+                    record, status_code, dummy_errors = create_record(xml_rec)
+                    existing_values = []
+                    if (status_code != 0):
+                        existing_values = record_get_field_values(record,
+                                                                  maintag,
+                                                                  subtag1,
+                                                                  subtag2,
+                                                                  subfieldcode)
+                    #get the new values.. i.e. vals not in existing
+                    new_vals = vals
+                    for val in new_vals:
+                        if val in existing_values:
+                            new_vals.remove(val)
+                    response['autocomplete'] = new_vals
+            response['resultCode'] = 33
         response['cacheMTime'], response['cacheDirty'] = \
             update_cache_file_contents(recid, uid, record_revision, record, \
                                        pending_changes, \
@@ -987,7 +1073,7 @@ def perform_request_bibcatalog(request_type, recid, uid):
                 #put ticket header and tickets links in the box
                 t_url_str = "<strong>Tickets</strong><br/>" + t_url_str + \
                     "<br/>" + '<a href="new_ticket?recid=' + str(recid) + \
-                    '>[new ticket]<a>'
+                    '>[new ticket]</a>'
                 response['tickets'] = t_url_str
                 #add a new ticket link
             else:

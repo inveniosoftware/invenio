@@ -2105,6 +2105,7 @@ input.hyperlinkformSubmitButton {
 #bibEditMessage {
   background: rgb(250, 209, 99);
 }
+
 .bibEditAddFieldManipulationsBar {
     display: table;
 }
@@ -2114,6 +2115,25 @@ input.hyperlinkformSubmitButton {
 }
 .bibEditAddFieldFormCreateSimilar {
     display: table-cell;
+}
+
+.bibeditscrollArea {
+width: 200px;
+height: 75px;
+padding-left: 5px;
+padding-right: 5px;
+border-color: #6699CC;
+border-width: 1px;
+border-style: solid;
+float: left;
+overflow: auto;
+}
+.bibeditscrollArea ul {
+margin-top: 0px;
+margin-bottom: 0px;
+list-style: none;
+margin-left: 0;
+padding-left: 0;
 }
 /* end of BibEdit module */
 /* BibMerge module */
