@@ -447,7 +447,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg,\
@@ -616,7 +616,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
                             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
-                            return redirect_to_url(req, target)
+                            return redirect_to_url(req, target, norobot=True)
                     elif auth_code:
                         return page_not_authorized(req, "../", \
                             text = auth_msg,\
@@ -633,7 +633,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                             make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
-                    return redirect_to_url(req, target)
+                    return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
                         text = auth_msg,\
@@ -673,7 +673,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                             make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
-                    return redirect_to_url(req, target)
+                    return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
                         text = auth_msg,\
@@ -899,7 +899,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         # Apache authentication stuff
         if argd['realm']:
             http_check_credentials(req, argd['realm'])
-            return redirect_to_url(req, argd['referer'] or '%s/youraccount/youradminactivities' % CFG_SITE_SECURE_URL)
+            return redirect_to_url(req, argd['referer'] or '%s/youraccount/youradminactivities' % CFG_SITE_SECURE_URL, norobot=True)
 
         del argd['referer']
         del argd['realm']
@@ -1126,7 +1126,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                             make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
-                    return redirect_to_url(req, target)
+                    return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
                         text = auth_msg,\
@@ -1274,7 +1274,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg,\

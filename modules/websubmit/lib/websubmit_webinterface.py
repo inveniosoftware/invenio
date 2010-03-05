@@ -111,7 +111,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
                     CFG_SITE_URL + user_info['uri']}, {})
-                return redirect_to_url(req, target)
+                return redirect_to_url(req, target, norobot=True)
             elif auth_code:
                 return page_not_authorized(req, "../", \
                     text = auth_message)
@@ -860,7 +860,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
                     CFG_SITE_SECURE_URL,
                         make_canonical_urlargd({
-                    'referer' : CFG_SITE_URL + req.unparsed_uri, 'ln' : args['ln']}, {})))
+                    'referer' : CFG_SITE_URL + req.unparsed_uri, 'ln' : args['ln']}, {})), norobot=True)
 
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
                 return page_not_authorized(req, "../submit",

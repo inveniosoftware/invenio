@@ -92,7 +92,7 @@ def wash_url_argument(var, new_type):
     return out
 
 
-def redirect_to_url(req, url, redirection_type=None):
+def redirect_to_url(req, url, redirection_type=None, norobot=False):
     """
     Redirect current page to url.
     @param req: request as received from apache
@@ -106,7 +106,9 @@ def redirect_to_url(req, url, redirection_type=None):
           apache.HTTP_USE_PROXY                    = 305
           apache.HTTP_TEMPORARY_REDIRECT           = 307
     The default is apache.HTTP_TEMPORARY_REDIRECT
-    Please see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3
+    @param norobot: wether to instruct crawlers and robots such as GoogleBot
+        not to index past this point.
+    @see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3
     """
     if redirection_type is None:
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
@@ -116,6 +118,9 @@ def redirect_to_url(req, url, redirection_type=None):
     req.headers_out["Cache-Control"] = "no-cache, private, no-store, " \
         "must-revalidate, post-check=0, pre-check=0, max-age=0"
     req.headers_out["Pragma"] = "no-cache"
+
+    if norobot:
+        req.headers_out["X-Robots-Tag"] = "noarchive, nosnippet, noindex, nocache"
 
     if req.response_sent_p:
         raise IOError("Cannot redirect after headers have already been sent.")

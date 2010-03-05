@@ -94,7 +94,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                     'referer' : "%s/yourloans/display%s" % (
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    "ln" : argd['ln']}, {})), norobot=True)
 
         _ = gettext_set_language(argd['ln'])
 
@@ -137,7 +137,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                     'referer' : "%s/yourloans/loanshistoricaloverview%s" % (
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    "ln" : argd['ln']}, {})), norobot=True)
 
         _ = gettext_set_language(argd['ln'])
 
@@ -192,7 +192,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                     'referer' : "%s/ill/display%s" % (
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    "ln" : argd['ln']}, {})), norobot=True)
 
         _ = gettext_set_language(argd['ln'])
 
@@ -249,7 +249,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                     'referer' : "%s/ill/register_request%s" % (
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    "ln" : argd['ln']}, {})), norobot=True)
 
         _ = gettext_set_language(argd['ln'])
 
@@ -326,7 +326,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
@@ -404,7 +404,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                         CFG_SITE_URL,
                         self.recid,
                         make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
+                    "ln" : argd['ln']}, {})), norobot=True)
 
 
         user_info = collect_user_info(req)
@@ -414,7 +414,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)

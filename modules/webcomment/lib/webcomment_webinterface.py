@@ -136,7 +136,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
@@ -308,7 +308,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri'] + '&cookie=' + msg_cookie}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif (auth_code_1 or auth_code_2):
             return page_not_authorized(req, "../", \
                 text = auth_msg_1 + auth_msg_2)
@@ -446,7 +446,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
@@ -505,7 +505,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
@@ -537,7 +537,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
@@ -561,7 +561,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
 
         success = unsubscribe_user_from_discussion(self.recid, uid)
         display_url = "%s/record/%s/comments/display?subscribed=%s&ln=%s" % \
@@ -632,7 +632,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
-            return redirect_to_url(req, target)
+            return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
