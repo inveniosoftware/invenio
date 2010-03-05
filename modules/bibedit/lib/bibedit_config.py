@@ -97,9 +97,9 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV= {
 #      unlike a number of constants
     'editor_modifications_changed': 33,
     'disabled_hp_changeset' : 34,
-    'wrong_cache_file_format' : 111,
     'added_positioned_subfields' : 35,
-    'autosuggestion_scanned' : 36
+    'autosuggestion_scanned' : 36,
+    'wrong_cache_file_format' : 111
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {

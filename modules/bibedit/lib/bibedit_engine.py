@@ -326,8 +326,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
                           'addFieldsSubfieldsOnPositions', 'modifyContent', \
                           'moveSubfield', 'deleteFields', 'moveField', \
                           'modifyField', 'otherUpdateRequest', \
-                          'disableHpChange', 'deactivateHoldingPenChangeset', \
-                          'autosuggest', 'autocomplete', 'autokeyword'  ):
+                          'disableHpChange', 'deactivateHoldingPenChangeset'):
         # Record updates.
         cacheMTime = data['cacheMTime']
         if data.has_key('hpChanges'):
@@ -339,6 +338,9 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
                                                       uid, cacheMTime, data, \
                                                       hpChanges, undo_redo, \
                                                       isBulk))
+    elif request_type in ('autosuggest', 'autocomplete', 'autokeyword'):
+       response.update(perform_request_autocomplete(request_type, recid, uid, \
+                                                    data))
 
     elif request_type in ('getTickets', ):
         # BibCatalog requests.
@@ -962,86 +964,100 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                 response['resultCode'] = 29
             else:
                 response['resultCode'] = 30
-        elif (request_type == 'autosuggest' or \
-              request_type == 'autocomplete' or \
-              request_type == 'autokeyword' ):
-            # get the values based on which one needs to search
-            searchby = data['value']
-            #we check if the data is properly defined
-            fulltag = ''
-            if data.has_key('maintag') and data.has_key('subtag1') and \
-               data.has_key('subtag2') and data.has_key('subfieldcode'):
-                maintag = data['maintag']
-                subtag1 = data['subtag1']
-                subtag2 = data['subtag2']
-                u_subtag1 = subtag1
-                u_subtag2 = subtag2
-                if (not subtag1) or (subtag1 == ' '):
-                    u_subtag1 = '_'
-                if (not subtag2) or (subtag2 == ' '):
-                    u_subtag2 = '_'
-                subfieldcode = data['subfieldcode']
-                fulltag = maintag+u_subtag1+u_subtag2+subfieldcode
-            if (request_type == 'autokeyword'):
-                #call the keyword-form-ontology function
-                if fulltag and searchby:
-                    items = get_kbt_items_for_bibedit(CFG_BIBEDIT_KEYWORD_TAXONOMY, \
-                            CFG_BIBEDIT_KEYWORD_RDFLABEL, searchby)
-                    response['autokeyword'] = items
-            if (request_type == 'autosuggest'):
-                #call knowledge base function to put the suggestions in an array..
-                if fulltag and searchby and len(searchby) > 3:
-                    suggest_values = get_kbd_values_for_bibedit(fulltag, "", searchby)
-                    #remove ..
-                    new_suggest_vals = []
-                    for sugg in suggest_values:
-                        if sugg.startswith(searchby):
-                            new_suggest_vals.append(sugg)
-                    response['autosuggest'] = new_suggest_vals
-            if (request_type == 'autocomplete'):
-                #call the values function with the correct kb_name
-                if CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.has_key(fulltag):
-                    kbname = CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS[fulltag]
-                    #check if the seachby field has semicolons. Take all
-                    #the semicolon-separated items..
-                    items = []
-                    vals = []
-                    if searchby:
-                        if searchby.rfind(';'):
-                            items = searchby.split(';')
-                        else:
-                            items = [searchby.strip()]
-                    for item in items:
-                        item = item.strip()
-                        kbrvals = get_kbr_values(kbname, item, '', 'e') #we want an exact match
-                        if kbrvals and kbrvals[0]: #add the found val into vals
-                            vals.append(kbrvals[0])
-                    #check that the values are not already contained in other
-                    #instances of this field
-                    record_revision, record = get_cache_file_contents(recid, uid)[1:]
-                    xml_rec = print_rec(record)
-                    record, status_code, dummy_errors = create_record(xml_rec)
-                    existing_values = []
-                    if (status_code != 0):
-                        existing_values = record_get_field_values(record,
-                                                                  maintag,
-                                                                  subtag1,
-                                                                  subtag2,
-                                                                  subfieldcode)
-                    #get the new values.. i.e. vals not in existing
-                    new_vals = vals
-                    for val in new_vals:
-                        if val in existing_values:
-                            new_vals.remove(val)
-                    response['autocomplete'] = new_vals
-            response['resultCode'] = 33
         response['cacheMTime'], response['cacheDirty'] = \
-            update_cache_file_contents(recid, uid, record_revision, record, \
+            update_cache_file_contents(recid, uid, record_revision, 
+                                       record, \
                                        pending_changes, \
                                        deactivated_hp_changes, \
                                        undo_list, redo_list), \
             True
 
+    return response
+
+def perform_request_autocomplete(request_type, recid, uid, data):
+    """
+    Perfrom an AJAX request associated with the retrieval of autocomplete
+    data.
+    
+    Arguments:
+        request_type: Type of the currently served request
+        recid: the identifer of the record
+        uid: The identifier of the user being currently logged in
+        data: The request data containing possibly important additional
+              arguments
+    """
+    response = {}
+    # get the values based on which one needs to search
+    searchby = data['value']
+        #we check if the data is properly defined
+    fulltag = ''
+    if data.has_key('maintag') and data.has_key('subtag1') and \
+            data.has_key('subtag2') and data.has_key('subfieldcode'):
+        maintag = data['maintag']
+        subtag1 = data['subtag1']
+        subtag2 = data['subtag2']
+        u_subtag1 = subtag1
+        u_subtag2 = subtag2
+        if (not subtag1) or (subtag1 == ' '):
+            u_subtag1 = '_'
+        if (not subtag2) or (subtag2 == ' '):
+            u_subtag2 = '_'
+        subfieldcode = data['subfieldcode']
+        fulltag = maintag+u_subtag1+u_subtag2+subfieldcode
+    if (request_type == 'autokeyword'):
+        #call the keyword-form-ontology function
+        if fulltag and searchby:
+            items = get_kbt_items_for_bibedit(CFG_BIBEDIT_KEYWORD_TAXONOMY, \
+                                              CFG_BIBEDIT_KEYWORD_RDFLABEL, \
+                                              searchby)
+            response['autokeyword'] = items
+    if (request_type == 'autosuggest'):
+        #call knowledge base function to put the suggestions in an array..
+        if fulltag and searchby and len(searchby) > 3:
+            suggest_values = get_kbd_values_for_bibedit(fulltag, "", searchby)
+            #remove ..
+            new_suggest_vals = []
+            for sugg in suggest_values:
+                if sugg.startswith(searchby):
+                    new_suggest_vals.append(sugg)
+            response['autosuggest'] = new_suggest_vals
+    if (request_type == 'autocomplete'):
+        #call the values function with the correct kb_name
+        if CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS.has_key(fulltag):
+            kbname = CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS[fulltag]
+            #check if the seachby field has semicolons. Take all
+            #the semicolon-separated items..
+            items = []
+            vals = []
+            if searchby:
+                if searchby.rfind(';'):
+                    items = searchby.split(';')
+                else:
+                    items = [searchby.strip()]
+            for item in items:
+                item = item.strip()
+                kbrvals = get_kbr_values(kbname, item, '', 'e') #we want an exact match
+                if kbrvals and kbrvals[0]: #add the found val into vals
+                    vals.append(kbrvals[0])
+            #check that the values are not already contained in other
+            #instances of this field
+            record_revision, record = get_cache_file_contents(recid, uid)[1:]
+            xml_rec = print_rec(record)
+            record, status_code, dummy_errors = create_record(xml_rec)
+            existing_values = []
+            if (status_code != 0):
+                existing_values = record_get_field_values(record,
+                                                          maintag,
+                                                          subtag1,
+                                                          subtag2,
+                                                          subfieldcode)
+            #get the new values.. i.e. vals not in existing
+            new_vals = vals
+            for val in new_vals:
+                if val in existing_values:
+                    new_vals.remove(val)
+            response['autocomplete'] = new_vals
+    response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['autosuggestion_scanned']
     return response
 
 def perform_request_bibcatalog(request_type, recid, uid):
