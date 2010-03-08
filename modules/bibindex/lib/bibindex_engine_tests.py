@@ -27,6 +27,7 @@ import unittest
 from invenio import bibindex_engine
 from invenio.testutils import make_test_suite, run_test_suite
 
+
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
 
@@ -35,6 +36,7 @@ class TestListSetOperations(unittest.TestCase):
         self.assertEqual([1, 2, 3, 4],
                          bibindex_engine.list_union([1, 2, 3],
                                                     [1, 3, 4]))
+
 
 class TestWashIndexTerm(unittest.TestCase):
     """Test for washing index terms, useful for both searching and indexing."""
@@ -57,10 +59,36 @@ class TestWashIndexTerm(unittest.TestCase):
     def test_wash_index_term_unicode(self):
         """bibindex engine - wash index term, unicode"""
         self.assertEqual("ελληνικό αλφάβητο",
-                         bibindex_engine.wash_index_term("Ελληνικό αλφάβητο"))
+          bibindex_engine.wash_index_term("Ελληνικό αλφάβητο"))
+
+
+class TestGetWordsFromDateTag(unittest.TestCase):
+    """Test for getting words for date-like tag."""
+
+    def test_dateindex_yyyy(self):
+        """bibindex engine - index date-like tag, yyyy"""
+        self.assertEqual(["2010"],
+                         bibindex_engine.get_words_from_date_tag("2010"))
+
+    def test_dateindex_yyyy_mm(self):
+        """bibindex engine - index date-like tag, yyyy-mm"""
+        self.assertEqual(["2010-03", "2010"],
+                         bibindex_engine.get_words_from_date_tag("2010-03"))
+
+    def test_dateindex_yyyy_mm_dd(self):
+        """bibindex engine - index date-like tag, yyyy-mm-dd"""
+        self.assertEqual(["2010-03-08", "2010", "2010-03", ],
+                         bibindex_engine.get_words_from_date_tag("2010-03-08"))
+
+    def test_dateindex_freetext(self):
+        """bibindex engine - index date-like tag, yyyy-mm-dd"""
+        self.assertEqual(["dd", "mon", "yyyy"],
+          bibindex_engine.get_words_from_date_tag("dd mon yyyy"))
+
 
 TEST_SUITE = make_test_suite(TestListSetOperations,
-                             TestWashIndexTerm,)
+                             TestWashIndexTerm,
+                             TestGetWordsFromDateTag)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

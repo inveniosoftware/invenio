@@ -264,6 +264,22 @@ def get_words_from_journal_tag(recID, tag):
     # return list of words and pubinfos:
     return lwords
 
+def get_words_from_date_tag(datestring, stemming_language=None):
+    """
+    Special procedure to index words from tags storing date-like
+    information in format YYYY or YYYY-MM or YYYY-MM-DD.  Namely, we
+    are indexing word-terms YYYY, YYYY-MM, YYYY-MM-DD, but never
+    standalone MM or DD.
+    """
+    out = []
+    for dateword in datestring.split():
+        # maybe there are whitespaces, so break these too
+        out.append(dateword)
+        parts = dateword.split('-')
+        for nb in range(1,len(parts)):
+            out.append("-".join(parts[:nb]))
+    return out
+
 def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
@@ -673,7 +689,7 @@ def split_ranges(parse_string):
 
 def get_word_tables(tables):
     """ Given a list of table names it return a list of tuples
-    (index_id, index_tags).
+    (index_id, index_name, index_tags).
     If tables is empty it returns the whole list."""
     wordTables = []
     if tables:
@@ -681,13 +697,13 @@ def get_word_tables(tables):
         for index in indexes:
             index_id = get_index_id_from_index_name(index)
             if index_id:
-                wordTables.append((index_id, get_index_tags(index)))
+                wordTables.append((index_id, index, get_index_tags(index)))
             else:
                 write_message("Error: There is no %s words table." % index, sys.stderr)
     else:
         for index in get_all_indexes():
             index_id = get_index_id_from_index_name(index)
-            wordTables.append((index_id, get_index_tags(index)))
+            wordTables.append((index_id, index, get_index_tags(index)))
     return wordTables
 
 def get_date_range(var):
@@ -1475,8 +1491,12 @@ def task_run_core():
 
     if task_get_option("cmd") == "check":
         wordTables = get_word_tables(task_get_option("windex"))
-        for index_id, index_tags in wordTables:
-            wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
+        for index_id, index_name, index_tags in wordTables:
+            if index_name == 'year' and CFG_INSPIRE_SITE:
+                fnc_get_words_from_phrase = get_words_from_date_tag
+            else:
+                fnc_get_words_from_phrase = get_words_from_phrase
+            wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', fnc_get_words_from_phrase, {'8564_u': get_words_from_fulltext})
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
@@ -1485,7 +1505,7 @@ def task_run_core():
 
     if task_get_option("cmd") == "check":
         wordTables = get_word_tables(task_get_option("windex"))
-        for index_id, index_tags in wordTables:
+        for index_id, index_name, index_tags in wordTables:
             wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
@@ -1495,12 +1515,17 @@ def task_run_core():
 
     # Let's work on single words!
     wordTables = get_word_tables(task_get_option("windex"))
-    for index_id, index_tags in wordTables:
+    for index_id, index_name, index_tags in wordTables:
         reindex_prefix = ""
         if task_get_option("reindex"):
             reindex_prefix = "tmp_"
             init_temporary_reindex_tables(index_id, reindex_prefix)
-        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
+        if index_name == 'year' and CFG_INSPIRE_SITE:
+            fnc_get_words_from_phrase = get_words_from_date_tag
+        else:
+            fnc_get_words_from_phrase = get_words_from_phrase
+        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxWORD%02dF',
+                              fnc_get_words_from_phrase, {'8564_u': get_words_from_fulltext})
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
