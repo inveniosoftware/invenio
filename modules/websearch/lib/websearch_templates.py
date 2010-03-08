@@ -37,6 +37,7 @@ from invenio.config import \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_WEBSEARCH_SPLIT_BY_COLLECTION, \
+     CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
      CFG_BIBRANK_SHOW_READING_STATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
@@ -136,7 +137,7 @@ class Template:
         'cc': (str, CFG_SITE_NAME),
         'c': (list, []),
         'p': (str, ""), 'f': (str, ""),
-        'rg': (int, 10),
+        'rg': (int, CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS),
         'sf': (str, ""),
         'so': (str, "d"),
         'sp': (str, ""),
