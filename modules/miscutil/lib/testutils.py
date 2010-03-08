@@ -186,6 +186,7 @@ def test_web_page_content(url,
     except ImportError:
         return ['ERROR: Cannot import mechanize.']
     browser = mechanize.Browser()
+    browser.set_handle_robots(False) # ignore robots.txt, since we test gently
     try:
         # firstly login:
         if username == "guest":
