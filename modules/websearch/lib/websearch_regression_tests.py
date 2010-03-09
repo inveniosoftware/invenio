@@ -792,10 +792,26 @@ class WebSearchSearchEnginePythonAPITest(unittest.TestCase):
         self.assertEqual([1, 2, 3, 4, 5, 6, 7, 8, 9],
                          perform_request_search(recid=1, recidb=10))
 
-    def test_search_engine_python_api_ranked_by_(self):
+    def test_search_engine_python_api_ranked_by_citation(self):
         """websearch - search engine Python API for citation ranking"""
         self.assertEqual([82, 83, 87, 89],
                 perform_request_search(p='recid:81', rm='citation'))
+
+    def test_search_engine_python_api_textmarc(self):
+        """websearch - search engine Python API for Text MARC output"""
+        # we are testing example from /help/hacking/search-engine-api
+        import cStringIO
+        tmp = cStringIO.StringIO()
+        perform_request_search(req=tmp, p='higgs', of='tm', ot=['100', '700'])
+        out = tmp.getvalue()
+        tmp.close()
+        self.assertEqual(out, """\
+000000085 100__ $$aGirardello, L$$uINFN$$uUniversita di Milano-Bicocca
+000000085 700__ $$aPorrati, Massimo
+000000085 700__ $$aZaffaroni, A
+000000001 100__ $$aPhotolab
+""")
+
 
 class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     """Check typical search engine Web API calls on the demo data."""

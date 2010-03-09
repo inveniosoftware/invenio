@@ -4769,7 +4769,6 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                                              ln=ln, display_email_alert_part=display_email_alert_part))
             except:
                 # do not log query if req is None (used by CLI interface)
-                raise
                 pass
             log_query_info("ss", p, f, colls_to_search, results_final_nb_total)
 
