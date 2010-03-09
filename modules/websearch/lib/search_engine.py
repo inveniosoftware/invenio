@@ -46,6 +46,7 @@ if sys.hexversion < 0x2040000:
 ## import CDS Invenio stuff:
 from invenio.config import \
      CFG_CERN_SITE, \
+     CFG_INSPIRE_SITE, \
      CFG_OAI_ID_FIELD, \
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBSEARCH_CALL_BIBFORMAT, \
@@ -70,6 +71,7 @@ from invenio.bibrecord import create_record, record_get_field_instances
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
+from invenio.bibindex_engine_tokenizer import wash_author_name, author_name_requires_phrase_search
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 from invenio.bibrank_downloads_grapher import create_download_history_graph_and_box
@@ -592,6 +594,10 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         if f and p[0] == '"' and p[-1] == '"':
             ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
             opfts.append(['+', p[1:-1], f, 'a'])
+        elif (f == 'author' or f == 'exactauthor') and author_name_requires_phrase_search(p):
+            ## B1 - do we search in author, and does 'p' contain space/comma/dot/etc?
+            ## => doing washed ACC search
+            opfts.append(['+', p, f, 'a'])
         elif f and p[0] == "'" and p[-1] == "'":
             ## B0bis - does 'p' start and end by single quote, and is 'f' defined? => doing ACC search
             opfts.append(['+', '%' + p[1:-1] + '%', f, 'a'])
@@ -2020,6 +2026,9 @@ def search_unit_in_idxphrases(p, f, type):
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
+    # special washing for fuzzy author index:
+    if f == 'author' or f == 'exactauthor':
+        p = wash_author_name(p)
     # deduce in which idxPHRASE table we will search:
     idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
     if f:
@@ -2403,6 +2412,8 @@ def get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above):
        for the given pattern p in the given field idxPHRASE table,
        regardless of collection.
        Return list of [phrase1, phrase2, ... , phrase_n]."""
+    if CFG_INSPIRE_SITE and index_id == 3: # FIXME: workaround due to new fuzzy index
+        return [p,]
     idxphraseX = "idxPHRASE%02dF" % index_id
     res_above = run_sql("SELECT term FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above))
     res_above = map(lambda x: x[0], res_above)

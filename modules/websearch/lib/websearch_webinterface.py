@@ -62,7 +62,8 @@ from invenio.config import \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
-     CFG_WEBSEARCH_RSS_I18N_COLLECTIONS
+     CFG_WEBSEARCH_RSS_I18N_COLLECTIONS, \
+     CFG_INSPIRE_SITE
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
@@ -217,7 +218,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         time2 = time.time()
 
         #search the publications by this author
-        pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
+        pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="exactauthor")
         #get most frequent authors of these pubs
         popular_author_tuples = search_engine.get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
         authors = []
@@ -287,7 +288,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                     citedbylist, kwtuples, authors, vtuples, ln)
         time1 = time.time()
         #cited-by summary
-        out = summarize_records(intbitset(pubs), 'hcs', ln, self.authorname, 'author', req)
+        out = summarize_records(intbitset(pubs), 'hcs', ln, self.authorname, 'exactauthor', req)
 
         time2 = time.time()
         if verbose == 9:

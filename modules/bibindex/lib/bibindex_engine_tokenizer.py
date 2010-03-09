@@ -25,6 +25,26 @@ on the input string as tokens suitable for word or phrase indexing.
 
 import re
 
+re_pattern_fuzzy_author_dots = re.compile(r'[\.\-]+')
+re_pattern_fuzzy_author_spaces = re.compile(r'\s+')
+re_pattern_fuzzy_author_trigger = re.compile(r'[\s\,\.\-]')
+
+def wash_author_name(p):
+    """
+    Wash author name suitable for author searching.  Notably, replace
+    dots and hyphens with spaces, and collapse spaces.
+    """
+    out = re_pattern_fuzzy_author_dots.sub(" ", p)
+    return re_pattern_fuzzy_author_spaces.sub(" ", out)
+
+def author_name_requires_phrase_search(p):
+    """
+    Detect whether author query pattern p requires phrase search.
+    Notably, look for presence of spaces and commas.
+    """
+    if re_pattern_fuzzy_author_trigger.search(p):
+        return True
+    return False
 
 class BibIndexTokenizer(object):
     """Base class for the tokenizers
@@ -88,6 +108,17 @@ class BibIndexTokenizer(object):
         @rtype: list of string
         """
         raise NotImplementedError
+
+class BibIndexExactNameTokenizer(BibIndexTokenizer):
+    """
+    Human name exact tokenizer.
+    """
+
+    def tokenize(self, s):
+        """
+        Main API.
+        """
+        return [wash_author_name(s)]
 
 class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
     """Human name tokenizer.

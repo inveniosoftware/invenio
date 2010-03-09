@@ -48,6 +48,7 @@ INSERT INTO field VALUES (17,'coden','coden');
 INSERT INTO field VALUES (19,'journal','journal');
 INSERT INTO field VALUES (20,'collaboration','collaboration');
 INSERT INTO field VALUES (21,'affiliation','affiliation');
+INSERT INTO field VALUES (22,'exact author','exactauthor');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
@@ -182,6 +183,8 @@ INSERT INTO field_tag VALUES (19,131,100);
 INSERT INTO field_tag VALUES (20,132,100);
 INSERT INTO field_tag VALUES (21,133,100);
 INSERT INTO field_tag VALUES (21,134,90);
+INSERT INTO field_tag VALUES (22,1,100);
+INSERT INTO field_tag VALUES (22,2,90);
 
 INSERT INTO format VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -204,8 +207,8 @@ INSERT INTO format VALUES (18,'HTML citesummary','hcs', 'HTML cite summary forma
 INSERT INTO format VALUES (19,'RefWorks','xw', 'RefWorks.', 'text/xml', 1);
 INSERT INTO format VALUES (20,'MODS', 'xo', 'Metadata Object Description Schema', 'application/xml', 1);
 
-INSERT INTO tag VALUES (1,'first author','100__%');
-INSERT INTO tag VALUES (2,'additional author','700__%');
+INSERT INTO tag VALUES (1,'first author name','100__a');
+INSERT INTO tag VALUES (2,'additional author name','700__a');
 INSERT INTO tag VALUES (3,'main title','245__%');
 INSERT INTO tag VALUES (4,'additional title','246__%');
 INSERT INTO tag VALUES (5,'abstract','520__%');
@@ -342,7 +345,7 @@ INSERT INTO tag VALUES (134,'additional author affiliation','700__u');
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (3,'abstract','This index contains words/phrases from abstract fields.','0000-00-00 00:00:00', '');
-INSERT INTO idxINDEX VALUES (4,'author','This index contains words/phrases from author fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (4,'author','This index contains fuzzy words/phrases from author fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (5,'keyword','This index contains words/phrases from keyword fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (6,'reference','This index contains words/phrases from references fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (7,'reportnumber','This index contains words/phrases from report numbers fields.','0000-00-00 00:00:00', '');
@@ -352,6 +355,7 @@ INSERT INTO idxINDEX VALUES (10,'year','This index contains words/phrases from y
 INSERT INTO idxINDEX VALUES (11,'journal','This index contains words/phrases from journal publication information fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (12,'collaboration','This index contains words/phrases from collaboration name fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (13,'affiliation','This index contains words/phrases from institutional affiliation fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (14,'exactauthor','This index contains exact words/phrases from author fields.','0000-00-00 00:00:00', '');
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
@@ -366,6 +370,7 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (10,12);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (11,19);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (12,20);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (13,21);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (14,22);
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');

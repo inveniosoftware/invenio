@@ -43,6 +43,8 @@ from invenio.config import \
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, CONV_PROGRAMS, CONV_PROGRAMS_HELPERS, \
     CFG_CHECK_MYSQL_THREADS
+from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer, \
+     BibIndexExactNameTokenizer
 from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, \
      decompose_bibdocfile_url
 from invenio.search_engine import perform_request_search, strip_accents, \
@@ -613,6 +615,21 @@ def get_phrases_from_phrase(phrase, stemming_language=None):
             words[block1] = 1
     return words.keys()
 
+def get_fuzzy_authors_from_phrase(phrase, stemming_language=None):
+    """
+    Return list of fuzzy phrase-tokens suitable for storing into
+    author phrase index.
+    """
+    author_tokenizer = BibIndexFuzzyNameTokenizer()
+    return author_tokenizer.tokenize(phrase)
+
+def get_exact_authors_from_phrase(phrase, stemming_language=None):
+    """
+    Return list of exact phrase-tokens suitable for storing into
+    exact author phrase index.
+    """
+    author_tokenizer = BibIndexExactNameTokenizer()
+    return author_tokenizer.tokenize(phrase)
 
 def apply_stemming_and_stopwords_and_length_check(word, stemming_language):
     """Return WORD after applying stemming and stopword and length checks.
@@ -1496,7 +1513,9 @@ def task_run_core():
                 fnc_get_words_from_phrase = get_words_from_date_tag
             else:
                 fnc_get_words_from_phrase = get_words_from_phrase
-            wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', fnc_get_words_from_phrase, {'8564_u': get_words_from_fulltext})
+            wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF',
+                                  fnc_get_words_from_phrase,
+                                  {'8564_u': get_words_from_fulltext})
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
@@ -1506,7 +1525,15 @@ def task_run_core():
     if task_get_option("cmd") == "check":
         wordTables = get_word_tables(task_get_option("windex"))
         for index_id, index_name, index_tags in wordTables:
-            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+            if index_name == 'author':
+                fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
+            elif index_name == 'exactauthor':
+                fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
+            else:
+                fnc_get_phrases_from_phrase = get_phrases_from_phrase
+            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF',
+                                  fnc_get_phrases_from_phrase,
+                                  {'8564_u': get_nothing_from_phrase}, False)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
@@ -1581,7 +1608,15 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
 
         # Let's work on phrases now
-        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+        if index_name == 'author':
+            fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
+        elif index_name == 'exactauthor':
+            fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
+        else:
+            fnc_get_phrases_from_phrase = get_phrases_from_phrase
+        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxPHRASE%02dF',
+                              fnc_get_phrases_from_phrase,
+                              {'8564_u': get_nothing_from_phrase}, False)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:

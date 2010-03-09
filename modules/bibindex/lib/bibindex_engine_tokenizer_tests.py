@@ -277,7 +277,37 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         self.assertEqual(output, anticipated)
 
 
-TEST_SUITE = make_test_suite(TestFuzzyNameTokenizerScanning, TestFuzzyNameTokenizerTokens)
+
+class TestExactNameTokenizer(unittest.TestCase):
+    """Test exact author name tokenizer."""
+
+    def setUp(self):
+        """setup"""
+        self.tokenizer = tokenizer_lib.BibIndexExactNameTokenizer()
+
+    def test_exact_author_name_tokenizer_bare(self):
+        """BibIndexExactNameTokenizer - bare name"""
+        self.assertEqual(self.tokenizer.tokenize('John Doe'),
+                         ['John Doe'])
+
+    def test_exact_author_name_tokenizer_dots(self):
+        """BibIndexExactNameTokenizer - name with dots"""
+        self.assertEqual(self.tokenizer.tokenize('J. Doe'),
+                         ['J Doe'])
+        self.assertEqual(self.tokenizer.tokenize('J.R. Doe'),
+                         ['J R Doe'])
+        self.assertEqual(self.tokenizer.tokenize('J. R. Doe'),
+                         ['J R Doe'])
+
+    def test_exact_author_name_tokenizer_hyphens(self):
+        """BibIndexExactNameTokenizer - name with hyphens"""
+        self.assertEqual(self.tokenizer.tokenize('Doe, Jean-Pierre'),
+                         ['Doe, Jean Pierre'])
+
+
+TEST_SUITE = make_test_suite(TestFuzzyNameTokenizerScanning,
+                             TestFuzzyNameTokenizerTokens,
+                             TestExactNameTokenizer,)
 
 
 if __name__ == '__main__':

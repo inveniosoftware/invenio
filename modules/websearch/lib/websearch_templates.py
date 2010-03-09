@@ -3835,7 +3835,7 @@ class Template:
 
         # print papers:
         searchstr = create_html_link(self.build_search_url(p=authorname,
-                                     f='author'),
+                                     f='exactauthor'),
                                      {}, "All papers ("+str(len(pubs))+")",)
         line1 = "<strong>" + _("Papers:") + "</strong>"
         line2 = searchstr
@@ -3864,7 +3864,7 @@ class Template:
         colls = collsd.keys()
         colls.sort(lambda x, y: cmp(collsd[y], collsd[x])) # sort by number of papers
         for coll in colls:
-            line2 += "<br>" + create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
+            line2 += "<br>" + create_html_link(self.build_search_url(p='exactauthor:"' + authorname + '" ' + \
                                                                      'collection:' + coll),
                                                    {}, coll + " ("+str(collsd[coll])+")",)
         banner = self.tmpl_print_searchresultbox(line1, line2)
@@ -3889,7 +3889,7 @@ class Template:
                     keywstr += '<br>'
                 #create a link in author=x, keyword=y
                 searchstr = create_html_link(self.build_search_url(
-                                                p='author:"' + authorname + '" ' +
+                                                p='exactauthor:"' + authorname + '" ' +
                                                   'keyword:"' + kw + '"'),
                                                 {}, kw+" ("+str(freq)+")",)
                 keywstr = keywstr+" "+searchstr
@@ -3911,8 +3911,8 @@ class Template:
                 cUP = c.upper()
                 authornameUP = authorname.upper()
                 if not cUP == authornameUP:
-                    commpubs = intbitset(pubs) & intbitset(perform_request_search(p="author:\"%s\" author:\"%s\"" % (authorname, c)))
-                    collabstr = collabstr + create_html_link(self.build_search_url(p='author:"' + authorname + '" author:"' + c + '"' ),
+                    commpubs = intbitset(pubs) & intbitset(perform_request_search(p="exactauthor:\"%s\" exactauthor:\"%s\"" % (authorname, c)))
+                    collabstr = collabstr + create_html_link(self.build_search_url(p='exactauthor:"' + authorname + '" exactauthor:"' + c + '"' ),
                                                               {}, c + " (" + str(len(commpubs)) + ")",)
         else: collabstr += 'None'
         banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent co-authors:") + "</strong>", collabstr)
@@ -3925,7 +3925,7 @@ class Template:
         #    pubinfo = ""
         #    for t in vtuples:
         #        (journal, num) = t
-        #        pubinfo += create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
+        #        pubinfo += create_html_link(self.build_search_url(p='exactauthor:"' + authorname + '" ' + \
         #                                                          'journal:"' + journal + '"'),
         #                                           {}, journal + " ("+str(num)+")<br/>")
         #    banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequently publishes in:") + "<strong>", pubinfo)
