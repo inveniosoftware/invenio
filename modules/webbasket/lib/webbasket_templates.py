@@ -887,39 +887,39 @@ class Template:
 
         if sort == "name":
             if asc:
-                basket_name_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-asc.gif" />"""
+                basket_name_sort_img = """<img src="%s/img/wb-sort-asc.gif" />""" % (CFG_SITE_URL,)
             else:
-                basket_name_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-desc.gif" />"""
+                basket_name_sort_img = """<img src="%s/img/wb-sort-desc.gif" />""" % (CFG_SITE_URL,)
         else:
-            basket_name_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-none.gif" />"""
+            basket_name_sort_img = """<img src="%s/img/wb-sort-none.gif" />""" % (CFG_SITE_URL,)
         if sort == "owner":
             if asc:
-                owner_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-asc.gif" />"""
+                owner_sort_img = """<img src="%s/img/wb-sort-asc.gif" />""" % (CFG_SITE_URL,)
             else:
-                owner_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-desc.gif" />"""
+                owner_sort_img = """<img src="%s/img/wb-sort-desc.gif" />""" % (CFG_SITE_URL,)
         else:
-            owner_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-none.gif" />"""
+            owner_sort_img = """<img src="%s/img/wb-sort-none.gif" />""" % (CFG_SITE_URL,)
         if sort == "date":
             if asc:
-                date_modification_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-asc.gif" />"""
+                date_modification_sort_img = """<img src="%s/img/wb-sort-asc.gif" />""" % (CFG_SITE_URL,)
             else:
-                date_modification_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-desc.gif" />"""
+                date_modification_sort_img = """<img src="%s/img/wb-sort-desc.gif" />""" % (CFG_SITE_URL,)
         else:
-            date_modification_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-none.gif" />"""
+            date_modification_sort_img = """<img src="%s/img/wb-sort-none.gif" />""" % (CFG_SITE_URL,)
         if sort == "items":
             if asc:
-                nb_items_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-asc.gif" />"""
+                nb_items_sort_img = """<img src="%s/img/wb-sort-asc.gif" />""" % (CFG_SITE_URL,)
             else:
-                nb_items_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-desc.gif" />"""
+                nb_items_sort_img = """<img src="%s/img/wb-sort-desc.gif" />""" % (CFG_SITE_URL,)
         else:
-            nb_items_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-none.gif" />"""
+            nb_items_sort_img = """<img src="%s/img/wb-sort-none.gif" />""" % (CFG_SITE_URL,)
         if sort == "views":
             if asc:
-                nb_views_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-asc.gif" />"""
+                nb_views_sort_img = """<img src="%s/img/wb-sort-asc.gif" />""" % (CFG_SITE_URL,)
             else:
-                nb_views_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-desc.gif" />"""
+                nb_views_sort_img = """<img src="%s/img/wb-sort-desc.gif" />""" % (CFG_SITE_URL,)
         else:
-            nb_views_sort_img = """<img src="http://pcuds36.cern.ch/img/wb-sort-none.gif" />"""
+            nb_views_sort_img = """<img src="%s/img/wb-sort-none.gif" />""" % (CFG_SITE_URL,)
 
         basket_name_sort = """<a href="%s/yourbaskets/list_public_baskets?limit=%i&amp;sort=name&amp;asc=%i&amp;ln=%s">%s</a>""" % \
                            (CFG_SITE_URL, limit, not(asc), ln, basket_name_sort_img)
@@ -1952,10 +1952,10 @@ class Template:
         last_update_field = '<br />' + _('last update') + ': ' + date_modification
         if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, cgi.escape(selected_topic, True), ln)
-            edit_basket_logo = """<img src="http://pcuds36.cern.ch/img/wb-edit-basket.png" />"""
+            edit_basket_logo = """<img src="%s/img/wb-edit-basket.png" />""" % (CFG_SITE_URL,)
             edit_basket = """<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
             delete_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;delete=1&amp;ln=%s""" % (CFG_SITE_URL, bskid, cgi.escape(selected_topic, True), ln)
-            delete_basket_logo = """<img src="http://pcuds36.cern.ch/img/wb-delete-basket.png" />"""
+            delete_basket_logo = """<img src="%s/img/wb-delete-basket.png" />""" % (CFG_SITE_URL,)
             delete_basket = """<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
         else:
             #edit_basket = """<small>%s</small>""" % (_("You cannot edit this basket"),)
@@ -1964,7 +1964,7 @@ class Template:
             delete_basket = ""
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="http://pcuds36.cern.ch/img/wb-unsubscribe.png" />"""
+            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
         else:
             unsubscribe = ""
@@ -2024,17 +2024,17 @@ class Template:
         optional_colspan = nb_items and user_can_view_content and ' colspan="3"' or ''
         if user_can_edit_basket:
             edit_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;ln=%s""" % (CFG_SITE_URL, bskid, selected_topic, ln)
-            edit_basket_logo = """<img src="http://pcuds36.cern.ch/img/wb-edit-basket.png" />"""
+            edit_basket_logo = """<img src="%s/img/wb-edit-basket.png" />""" % (CFG_SITE_URL,)
             edit_basket = """<a href="%s">%s%s</a>""" % (edit_basket_url, edit_basket_logo, _("Edit basket"))
             delete_basket_url = """%s/yourbaskets/edit?bskid=%i&amp;topic=%s&amp;delete=1&amp;ln=%s""" % (CFG_SITE_URL, bskid, selected_topic, ln)
-            delete_basket_logo = """<img src="http://pcuds36.cern.ch/img/wb-delete-basket.png" />"""
+            delete_basket_logo = """<img src="%s/img/wb-delete-basket.png" />""" % (CFG_SITE_URL,)
             delete_basket = """<a href="%s">%s%s</a>""" % (delete_basket_url, delete_basket_logo, _("Delete basket"))
         else:
             edit_basket = ""
             delete_basket = ""
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="http://pcuds36.cern.ch/img/wb-unsubscribe.png" />"""
+            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
             unsubscribe = """&nbsp;&nbsp;\n<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
         else:
             unsubscribe = ""
@@ -2428,10 +2428,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item-disabled.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -2443,10 +2443,10 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item-disabled.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;ln=%s""" % \
@@ -2456,7 +2456,7 @@ class Template:
                        selected_group,
                        bskid,
                        ln)
-        go_back_logo = """<img src="http://pcuds36.cern.ch/img/wb-go-back.png" />"""
+        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -2515,10 +2515,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item-disabled.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -2530,10 +2530,10 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item-disabled.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;ln=%s""" % \
@@ -2543,7 +2543,7 @@ class Template:
                        selected_group,
                        bskid,
                        ln)
-        go_back_logo = """<img src="http://pcuds36.cern.ch/img/wb-go-back.png" />"""
+        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -2787,7 +2787,7 @@ class Template:
         if user_can_add_notes and not add_note_p:
             add_note_url = """%s/yourbaskets/write_note?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;recid=%i&amp;ln=%s%s""" % \
                            (CFG_SITE_URL, selected_category, selected_topic, selected_group, bskid, recid, ln, '#note')
-            add_note_logo = """<img src="http://pcuds36.cern.ch/img/wb-add-note.png" />"""
+            add_note_logo = """<img src="%s/img/wb-add-note.png" />""" % (CFG_SITE_URL,)
             add_note = """<a href="%s">%s%s</a>""" % (add_note_url, add_note_logo, _("Add a note"))
         else:
             add_note = ""
@@ -2952,10 +2952,10 @@ class Template:
 
         if subscription_status:
             subscribe_url = """%s/yourbaskets/subscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            subscribe_logo = """<img src="http://pcuds36.cern.ch/img/wb-subscribe.png" />"""
+            subscribe_logo = """<img src="%s/img/wb-subscribe.png" />""" % (CFG_SITE_URL,)
             subscribe = """<a href="%s">%s%s</a>""" % (subscribe_url, subscribe_logo, _("Subscribe to basket"))
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="http://pcuds36.cern.ch/img/wb-unsubscribe.png" />"""
+            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
             unsubscribe = """<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
 
         out = """
@@ -3005,10 +3005,10 @@ class Template:
 
         if subscription_status:
             subscribe_url = """%s/yourbaskets/subscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            subscribe_logo = """<img src="http://pcuds36.cern.ch/img/wb-subscribe.png" />"""
+            subscribe_logo = """<img src="%s/img/wb-subscribe.png" />""" % (CFG_SITE_URL,)
             subscribe = """<a href="%s">%s%s</a>""" % (subscribe_url, subscribe_logo, _("Subscribe to basket"))
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
-            unsubscribe_logo = """<img src="http://pcuds36.cern.ch/img/wb-unsubscribe.png" />"""
+            unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
             unsubscribe = """<a href="%s">%s%s</a>""" % (unsubscribe_url, unsubscribe_logo, _("Unsubscribe from basket"))
             (uid, nickname, display_name) = get_user_info(id_owner)
             display_owner_url = """%s/yourmessages/write?msg_to=%s""" % (CFG_SITE_URL, nickname or str(uid))
@@ -3259,10 +3259,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item-disabled.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -3271,17 +3271,17 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item-disabled.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display_public?bskid=%i&amp;ln=%s""" % \
                       (CFG_SITE_URL,
                        bskid,
                        ln)
-        go_back_logo = """<img src="http://pcuds36.cern.ch/img/wb-go-back.png" />"""
+        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -3334,10 +3334,10 @@ class Template:
                                  bskid,
                                  previous_item_recid,
                                  ln)
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item.png" />""" % (CFG_SITE_URL,)
             previous_item = """<a href="%s">%s%s</a>""" % (previous_item_url, previous_item_logo, _("Previous item"))
         else:
-            previous_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-previous-item-disabled.png" />"""
+            previous_item_logo = """<img src="%s/img/wb-previous-item-disabled.png" />""" % (CFG_SITE_URL,)
             previous_item = """%s%s""" % (previous_item_logo, _("Previous item"))
 
         if next_item_recid:
@@ -3346,17 +3346,17 @@ class Template:
                              bskid,
                              next_item_recid,
                              ln)
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item.png" />""" % (CFG_SITE_URL,)
             next_item = """<a href="%s">%s%s</a>""" % (next_item_url, next_item_logo, _("Next item"))
         else:
-            next_item_logo = """<img src="http://pcuds36.cern.ch/img/wb-next-item-disabled.png" />"""
+            next_item_logo = """<img src="%s/img/wb-next-item-disabled.png" />""" % (CFG_SITE_URL,)
             next_item = """%s%s""" % (next_item_logo, _("Next item"))
 
         go_back_url = """%s/yourbaskets/display_public?bskid=%i&amp;ln=%s""" % \
                       (CFG_SITE_URL,
                        bskid,
                        ln)
-        go_back_logo = """<img src="http://pcuds36.cern.ch/img/wb-go-back.png" />"""
+        go_back_logo = """<img src="%s/img/wb-go-back.png" />""" % (CFG_SITE_URL,)
         go_back = """<a href="%s">%s%s</a>""" % (go_back_url, go_back_logo, _("Return to basket"))
 
         out = """
@@ -3572,7 +3572,7 @@ class Template:
         if user_can_add_notes and not add_note_p:
             add_note_url = """%s/yourbaskets/write_public_note?bskid=%i&amp;recid=%i&amp;ln=%s%s""" % \
                            (CFG_SITE_URL, bskid, recid, ln, '#note')
-            add_note_logo = """<img src="http://pcuds36.cern.ch/img/wb-add-note.png" />"""
+            add_note_logo = """<img src="%s/img/wb-add-note.png" />""" % (CFG_SITE_URL,)
             add_note = """<a href="%s">%s%s</a>""" % (add_note_url, add_note_logo, _("Add a note"))
         else:
             add_note = ""
