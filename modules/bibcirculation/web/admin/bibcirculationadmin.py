@@ -415,6 +415,18 @@ def update_library_info_step5(req, tup_infos, ln=CFG_SITE_LANG):
 
     return bal.update_library_info_step5(req, tup_infos, ln)
 
+def new_book_step1(req,ln=CFG_SITE_LANG):
+    """
+    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/new_book_step1
+    """
+    return bal.new_book_step1(req, ln)
+
+def new_book_step2(req,ln=CFG_SITE_LANG):
+    """
+    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/new_book_step2
+    """
+    return bal.new_book_step2(req, ln)
+
 def add_new_copy_step1(req, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step1
@@ -1013,6 +1025,16 @@ def register_ill_article_request_step2(req, periodical_title=None, article_title
                                                   volume, issue, page, year, issn,
                                                   period_of_interest_from, period_of_interest_to,
                                                   additional_comments, key, string, ln)
+
+def register_ill_article_request_step3(req, book_info, user_info, request_details, ln=CFG_SITE_LANG):
+
+    book_info = eval(book_info)
+
+    request_details = eval(request_details)
+
+    user_info = user_info.split(',')
+
+    return bal.register_ill_article_request_step3(req, book_info, user_info, request_details, ln)
 
 def ill_search(req, ln=CFG_SITE_LANG):
     """

@@ -2622,9 +2622,53 @@ def update_library_info_step5(req, tup_infos, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
+def new_book_step1(req,ln):
+    """
+    Add a new book.
+    """
+    navtrail_previous_links = '<a class="navtrail"' \
+                              ' href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_new_book_step1(ln)
+
+    return page(title="Order New Book",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def new_book_step2(req,ln):
+    """
+    Add a new book.
+    """
+    navtrail_previous_links = '<a class="navtrail"' \
+                              ' href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_new_book_step2(ln)
+
+    return page(title="Order New Book",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
 def add_new_copy_step1(req):
     """
-    Add a nex copy.
+    Add a new copy.
     """
 
     navtrail_previous_links = '<a class="navtrail"' \
@@ -4132,6 +4176,7 @@ def order_new_copy_step1(req, recid, ln):
     return page(title="Order new copy",
                 uid=id_user,
                 req=req,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -4182,10 +4227,10 @@ def order_new_copy_step3(req, order_info, ln):
     db.order_new_copy(recid, vendor_id, order_date, cost_format,
                       status, str(purchase_notes), expected_date)
 
-    db.add_new_copy(barcode, recid, library_id, '', '',
-                    'expected: %s' % expected_date, '', status)
+    #db.add_new_copy(barcode, recid, library_id, '', '',
+    #                'expected: %s' % expected_date, '', status)
 
-    body = bibcirculation_templates.tmpl_order_new_copy_step3(ln=ln)
+    body = list_ordered_books(req,ln) #bibcirculation_templates.tmpl_order_new_copy_step3(ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -4871,6 +4916,7 @@ def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
     return page(title="Ordered book details",
                 uid=id_user,
                 req=req,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -4915,7 +4961,9 @@ def ordered_books_details_step3(req, purchase_id, recid, vendor_id,
     """
 
     purchase_notes = eval(purchase_notes)
-    purchase_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+    library_notes = library_notes.strip(' \n\t')
+    if (len(library_notes)) is not 0:
+        purchase_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
 
     cost_format = cost + ' ' + currency
 
@@ -4931,7 +4979,8 @@ def ordered_books_details_step3(req, purchase_id, recid, vendor_id,
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_ordered_book_details_step3(ln=ln)
+    #body = bibcirculation_templates.tmpl_ordered_book_details_step3(ln=ln)
+    body = list_ordered_books(req,ln)
 
 
     return page(title="Ordered book details",
@@ -5336,7 +5385,9 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
     """
     """
     infos = []
-
+    book_info = (title, authors, place, publisher, year, edition, isbn)
+    request_details = (period_of_interest_from, period_of_interest_to,
+                           additional_comments, only_edition)
     if key and not string:
         infos.append('Empty string. Please, try again.')
         book_info = (title, authors, place, publisher, year, edition, isbn)
@@ -5522,6 +5573,10 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
 
     """
     """
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     (title, authors, place, publisher, year, edition, isbn) = book_info
     create_ill_record(book_info)
@@ -5546,19 +5601,7 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
-
-    body = bibcirculation_templates.tmpl_register_ill_request_step3(ln=ln)
-
-    return page(title="Register ILL request",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
+    return list_ill_request(req, ln)
 
 def get_borrower_ill_details(req, borrower_id, ill_id, ln=CFG_SITE_LANG):
     """
@@ -6100,6 +6143,45 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
+
+def register_ill_article_request_step3(req, book_info, user_info, request_details, ln):
+
+    """
+    """
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    (_periodical_title, title, authors, _report_number, _volume, _issue, _page, year, issn) = book_info
+
+    info = (title, authors, "", "", year, "", issn)
+
+    create_ill_record(info)
+
+    book_info = {'title': title, 'authors': authors, 'place': "", 'publisher': "",
+                 'year' : year,  'edition': "", 'isbn' : issn}
+
+    (period_of_interest_from, period_of_interest_to,
+     library_notes) = request_details
+
+    only_edition = ""
+
+    (borrower_id, _name, _email, _phone, _address, _mailbox) = user_info
+
+    ill_request_notes = {}
+    if library_notes:
+        ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+
+    db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
+                                    period_of_interest_to, 'pending',
+                                    str(ill_request_notes), only_edition)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    return list_ill_request(req, ln)
 
 def ill_search(req, ln=CFG_SITE_LANG):
     """

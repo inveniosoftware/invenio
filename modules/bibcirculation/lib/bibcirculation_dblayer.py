@@ -240,7 +240,6 @@ def get_id_bibrec(barcode):
     else:
         return None
 
-
 def update_item_status(status, barcode):
     """
     Update the status of an item (using the barcode).
@@ -1937,7 +1936,7 @@ def order_new_copy(recid, vendor_id, order_date, cost,
                    status, notes, expected_date):
 
     """
-    Register a new copy who has been ordered.
+    Register a new copy that has been ordered.
     """
 
     run_sql("""insert into crcPURCHASE(id_bibrec, id_crcVENDOR, ordered_date, price,
@@ -1945,7 +1944,6 @@ def order_new_copy(recid, vendor_id, order_date, cost,
                            values (%s, %s, %s, %s, %s, %s, %s)""",
                                     (recid, vendor_id, order_date, cost,
                                      status, notes, expected_date))
-
 
 def get_ordered_books():
     """
