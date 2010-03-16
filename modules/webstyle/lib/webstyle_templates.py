@@ -695,7 +695,8 @@ URI: http://%(host)s%(page)s
     def detailed_record_container_top(self, recid, tabs, ln=CFG_SITE_LANG,
                                       show_similar_rec_p=True,
                                       creationdate=None,
-                                      modificationdate=None, show_short_rec_p=True):
+                                      modificationdate=None, show_short_rec_p=True,
+                                      citationnum=-1, referencenum=-1):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -703,13 +704,15 @@ URI: http://%(host)s%(page)s
 
            Parameters:
 
-         - recid *int* - the id of the displayed record
-         - tabs ** - the tabs displayed at the top of the box.
-         - ln *string* - the language of the page in which the box is displayed
-         - show_similar_rec_p *bool* print 'similar records' link in the box
-         - creationdate *string* - the creation date of the displayed record
-         - modificationdate *string* - the last modification date of the displayed record
-         - show_short_rec_p *boolean* - prints a very short version of the record as reminder.
+        @param recid: int - the id of the displayed record
+        @param tabs: ** - the tabs displayed at the top of the box.
+        @param ln: *string* - the language of the page in which the box is displayed
+        @param show_similar_rec_p: *bool* print 'similar records' link in the box
+        @param creationdate: *string* - the creation date of the displayed record
+        @param modificationdate: *string* - the last modification date of the displayed record
+        @param show_short_rec_p: *boolean* - prints a very short version of the record as reminder.
+        @param citationnum: show (this) number of citations in the citations tab
+        @param referencenum: show (this) number of references in the references tab
         """
         # If no tabs, returns nothing
         if len(tabs) <= 1:
@@ -723,6 +726,11 @@ URI: http://%(host)s%(page)s
         if len(tabs) > 1:
             first_tab = True
             for (label, url, selected, enabled) in tabs:
+                addnum = ""
+                if (citationnum > -1) and url.count("/citation") == 1:
+                    addnum = "(" + str(citationnum) + ")"
+                if (referencenum > -1) and url.count("/references") == 1:
+                    addnum = "(" + str(referencenum) + ")"
                 css_class = []
                 if selected:
                     css_class.append('on')
@@ -733,14 +741,16 @@ URI: http://%(host)s%(page)s
                     css_class.append('disabled')
                 css_class = ' class="%s"' % ' '.join(css_class)
                 if not enabled:
-                    out_tabs += '<li%(class)s><a>%(label)s</a></li>' % \
+                    out_tabs += '<li%(class)s><a>%(label)s %(addnum)s</a></li>' % \
                                 {'class':css_class,
-                                 'label':label}
+                                 'label':label,
+                                 'addnum':addnum}
                 else:
-                    out_tabs += '<li%(class)s><a href="%(url)s">%(label)s</a></li>' % \
+                    out_tabs += '<li%(class)s><a href="%(url)s">%(label)s %(addnum)s </a></li>' % \
                                 {'class':css_class,
                                  'url':url,
-                                 'label':label}
+                                 'label':label,
+                                 'addnum':addnum}
         if out_tabs != '':
             out_tabs = '''        <div class="detailedrecordtabs">
             <div>

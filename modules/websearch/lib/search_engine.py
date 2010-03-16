@@ -66,7 +66,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
 from invenio.search_engine_config import InvenioWebSearchUnknownCollectionError
-from invenio.bibrecord import create_record
+from invenio.bibrecord import create_record, record_get_field_instances
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -89,7 +89,7 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
-from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
+from invenio.bibrank_citation_searcher import get_cited_by_count, calculate_cited_by_list, \
     calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
@@ -3280,13 +3280,28 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                             recIDs[irec], ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
                     ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+
                     link_ln = ''
+
                     if ln != CFG_SITE_LANG:
                         link_ln = '?ln=%s' % ln
                     if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
                         recid_to_display = get_fieldvalues(recIDs[irec], CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG)[0]
                     else:
                         recid_to_display = recIDs[irec]
+
+                    citedbynum = 0 #num of citations, to be shown in the cit tab
+                    references = -1 #num of references
+
+                    citedbynum = get_cited_by_count(recid_to_display)
+                    reftag = ""
+                    reftags = get_field_tags("reference")
+                    if reftags:
+                        reftag = reftags[0]
+                    tmprec = get_record(recid_to_display)
+                    if reftag and len(reftag) > 4:
+                        references = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
+
                     tabs = [(unordered_tabs[tab_id]['label'], \
                              '%s/record/%s/%s%s' % (CFG_SITE_URL, recid_to_display, tab_id, link_ln), \
                              tab_id == tab,
@@ -3294,12 +3309,13 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             for (tab_id, order) in ordered_tabs_id
                             if unordered_tabs[tab_id]['visible'] == True]
 
-                    content = ''
                     # load content
                     if tab == 'usage':
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
-                                                                                   tabs,
-                                                                                   ln))
+                                                     tabs,
+                                                     ln,
+                                                     citationnum=citedbynum,
+                                                     referencenum=references))
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
                         downloadsimilarity = None
                         downloadhistory = None
@@ -3323,15 +3339,14 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                     elif tab == 'citations':
                         recid = recIDs[irec]
                         req.write(webstyle_templates.detailed_record_container_top(recid,
-                                                                                   tabs,
-                                                                                   ln))
+                                                     tabs,
+                                                     ln,
+                                                     citationnum=citedbynum,
+                                                     referencenum=references))
                         req.write(websearch_templates.tmpl_detailed_record_citations_prologue(recid, ln))
 
                         # Citing
-                        citinglist = []
-                        r = calculate_cited_by_list(recid)
-                        if r:
-                            citinglist = r
+                        citinglist = calculate_cited_by_list(recid)
                         req.write(websearch_templates.tmpl_detailed_record_citations_citing_list(recid,
                                                                                        ln,
                                                                                        citinglist=citinglist))
@@ -3347,13 +3362,14 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         req.write(websearch_templates.tmpl_detailed_record_citations_co_citing(recid,
                                                                                                ln,
                                                                                                cociting=cociting))
-                        # Citation history
+                        # Citation history, if needed
                         citationhistory = None
-                        if r:
+                        if citinglist:
                             citationhistory = create_citation_history_graph_and_box(recid, ln)
                         #debug
                         if verbose > 3:
-                            print_warning(req, "Citation graph debug: "+str(len(citationhistory)))
+                            print_warning(req, "Citation graph debug: " + \
+                                          str(len(citationhistory)))
 
                         req.write(websearch_templates.tmpl_detailed_record_citations_citation_history(recid, ln, citationhistory))
                         req.write(websearch_templates.tmpl_detailed_record_citations_epilogue(recid, ln))
@@ -3362,8 +3378,11 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                                                       ln))
                     elif tab == 'references':
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
-                                                                                   tabs,
-                                                                                   ln))
+                                                     tabs,
+                                                     ln,
+                                                     citationnum=citedbynum,
+                                                     referencenum=references))
+
                         req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose))
                         req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
                                                                                       tabs,
@@ -3383,7 +3402,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         recid = recIDs[irec]
 
                         req.write(webstyle_templates.detailed_record_container_top(recid,
-                            tabs, ln))
+                            tabs, ln, citationnum=citedbynum, referencenum=references))
 
                         if argd['generate'] == 'yes':
                             # The user asked to generate the keywords.
@@ -3405,9 +3424,11 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                     else:
                         # Metadata tab
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
-                                                                                   tabs,
-                                                                                   ln,
-                                                                                   show_short_rec_p=False))
+                                                     tabs,
+                                                     ln,
+                                                     show_short_rec_p=False,
+                                                     citationnum=citedbynum, referencenum=references))
+
                         creationdate = None
                         modificationdate = None
                         if record_exists(recIDs[irec]) == 1:
