@@ -407,21 +407,21 @@ class SpiresToInvenioSyntaxConverter:
     # SPIRES keyword : Invenio keyword or field
     _SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS = {
         # affiliation
-            ' affiliation ' : ' 700__u:',
-            ' affil ' : ' 700__u:',
-            ' aff ' : ' 700__u:',
-            ' af ' : ' 700__u:',
-            ' institution ' : ' 700__u:',
-            ' inst ' : ' 700__u:',
+            ' affiliation ' : ' affiliation:',
+            ' affil ' : ' affiliation:',
+            ' aff ' : ' affiliation:',
+            ' af ' : ' affiliation:',
+            ' institution ' : ' affiliation:',
+            ' inst ' : ' affiliation:',
         # any field
             ' any ' : ' anyfield:',
         # bulletin
-            ' bb ' : ' 037__a:',
-            ' bbn ' : ' 037__a:',
-            ' bull ' : ' 037__a:',
-            ' bulletin-bd ' : ' 037__a:',
-            ' bulletin-bd-no ' : ' 037__a:',
-            ' eprint ' : ' 037__a:',
+            ' bb ' : ' reportnumber:',
+            ' bbn ' : ' reportnumber:',
+            ' bull ' : ' reportnumber:',
+            ' bulletin-bd ' : ' reportnumber:',
+            ' bulletin-bd-no ' : ' reportnumber:',
+            ' eprint ' : ' reportnumber:',
         # citation / reference
             ' c ' : ' reference:',
             ' citation ' : ' reference:',
@@ -429,9 +429,9 @@ class SpiresToInvenioSyntaxConverter:
             ' jour-vol-page ' : ' reference:',
             ' jvp ' : ' reference:',
         # collaboration
-            ' collaboration ' : ' 710__g:',
-            ' collab-name ' : ' 710__g:',
-            ' cn ' : ' 710__g:',
+            ' collaboration ' : ' collaboration:',
+            ' collab-name ' : ' collaboration:',
+            ' cn ' : ' collaboration:',
         # conference number
             ' conf-number ' : ' 111__g:',
             ' cnum ' : ' 111__g:',
@@ -523,9 +523,25 @@ class SpiresToInvenioSyntaxConverter:
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords
 
+
         # category
-            ' arx ' : ' ',
-            ' category ' : ' ',
+            ' arx ' : ' 037__c:',
+            ' category ' : ' 037__c:',
+        # primarch
+            ' parx ' : ' 037__c:',
+            ' primarch ' : ' 037__c:',
+        # texkey
+            ' texkey ' : ' 035__z:',
+        # type code
+            ' tc ' : ' 690C_a:',
+            ' ty ' : ' 690C_a:',
+            ' type ' : ' 690C_a:',
+            ' type-code ' : ' 690C_a',
+        # field code
+            ' f ' : ' 65017a:',
+            ' fc ' : ' 65017a:',
+            ' field ' : ' 65017a:',
+            ' field-code ' : ' 65017a:',
         # coden
             ' bc ' : ' ',
             ' browse-only-indx ' : ' ',
@@ -535,27 +551,16 @@ class SpiresToInvenioSyntaxConverter:
             ' e ' : ' ',
             ' energy ' : ' ',
             ' energyrange-code ' : ' ',
-        # exact author
-            ' ea ' : ' ',
-            ' exact-author ' : ' ',
-        # exact expression number
+        # exact experiment number
             ' ee ' : ' ',
             ' exact-exp ' : ' ',
             ' exact-expno ' : ' ',
-        # field code
-            ' f ' : ' ',
-            ' fc ' : ' ',
-            ' field ' : ' ',
-            ' field-code ' : ' ',
         # hidden note
             ' hidden-note ' : ' ',
             ' hn ' : ' ',
         # ppf
             ' ppf ' : ' ',
             ' ppflist ' : ' ',
-        # primarch
-            ' parx ' : ' ',
-            ' primarch ' : ' ',
         # slac topics
             ' ppfa ' : ' ',
             ' slac-topics ' : ' ',
@@ -564,13 +569,6 @@ class SpiresToInvenioSyntaxConverter:
         # test index
             ' test ' : ' ',
             ' testindex ' : ' ',
-        # texkey
-            ' texkey ' : ' ',
-        # type code
-            ' tc ' : ' ',
-            ' ty ' : ' ',
-            ' type ' : ' ',
-            ' type-code ' : ' '
         }
 
     def __init__(self):
