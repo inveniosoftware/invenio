@@ -20,6 +20,7 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import CFG_SITE_NAME
+from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message, txt2html
 
 # FIXME: cannot import Request_Print(), is defined in websubmit_engine.py
 
@@ -46,4 +47,5 @@ def Print_Success(parameters, curdir, form, user_info=None):
         t=t+Request_Print("A",  "It will soon appear on our server.<br /><br />\n")
     t=t+Request_Print("A",  "Thank you for using %s!" % CFG_SITE_NAME)
     t=t+Request_Print("A",  "<br /><br /><br /><br />")
+    t += txt2html(get_nice_bibsched_related_message(curdir))
     return t

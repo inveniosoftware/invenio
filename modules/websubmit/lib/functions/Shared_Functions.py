@@ -18,15 +18,22 @@
 
 __revision__ = "$Id$"
 
+import re
+import os
+import cgi
+
 from invenio.config import \
      CFG_PATH_CONVERT, \
      CFG_PATH_GUNZIP, \
-     CFG_PATH_GZIP
+     CFG_PATH_GZIP, \
+     CFG_CERN_SITE, \
+     CFG_SITE_LANG
 from invenio.bibdocfile import decompose_file
 from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
-import re
-import os
+from invenio.dbquery import run_sql
+from invenio.bibsched import server_pid
+from invenio.messages import gettext_set_language
 
 def createRelatedFormats(fullpath, overwrite=True):
     """Given a fullpath, this function extracts the file's extension and
@@ -177,3 +184,34 @@ def write_file(filename, filedata):
     of.write(filedata)
     of.close()
     return ""
+
+def get_nice_bibsched_related_message(curdir, ln=CFG_SITE_LANG):
+    """
+    @return: a message suitable to display to the user, explaining the current
+        status of the system.
+    @rtype: string
+    """
+    bibupload_id = ParamFromFile(os.path.join(curdir, 'bibupload_id'))
+    if not bibupload_id:
+        ## No BibUpload scheduled? Then we don't care about bibsched
+        return ""
+    ## Let's get an estimate about how many processes are waiting in the queue.
+    ## Our bibupload might be somewhere in it, but it's not really so important
+    ## WRT informing the user.
+    _ = gettext_set_language(ln)
+    res = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE (status='WAITING' AND runtime<=NOW()) OR status='SLEEPING'")
+    pre = _("Note that your submission as been inserted into the bibliographic task queue and is waiting for execution.\n")
+    if server_pid():
+        ## BibSched is up and running
+        msg = _("The task queue is currently running in automatic mode, and there are currently %s tasks waiting to be executed. Your record should be available within a few minutes and searchable within an hour or thereabouts.\n") % (len(res))
+    else:
+        msg = _("Because of a human intervention or a temporary problem, the task queue is currently set to the manual mode. Your submission is well registered but may take longer than usual before it is fully integrated and searchable.\n")
+
+    return pre + msg
+
+def txt2html(msg):
+    """Transform newlines into paragraphs."""
+    rows = msg.split('\n')
+    rows = [cgi.escape(row) for row in rows]
+    rows = "<p>" + "</p><p>".join(rows) + "</p>"
+    return rows

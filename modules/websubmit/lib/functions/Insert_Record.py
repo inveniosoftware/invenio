@@ -40,5 +40,6 @@ def Insert_Record(parameters, curdir, form, user_info=None):
                               (rn.replace('/', '_'),
                                time.strftime("%Y-%m-%d_%H:%M:%S")))
     shutil.copy(initial_file, final_file)
-    task_low_level_submission('bibupload', 'websubmit.Insert_Record', '-r', '-i', final_file, '-P', '3')
+    bibupload_id = task_low_level_submission('bibupload', 'websubmit.Insert_Record', '-r', '-i', final_file, '-P', '3')
+    open(os.path.join(curdir, 'bibupload_id'), 'w').write(str(bibupload_id))
     return ""
