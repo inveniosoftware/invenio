@@ -37,7 +37,8 @@ AUTHOR_INST_TAG = "100__u"
 COAUTHOR_TAG = "700__a"
 COAUTHOR_INST_TAG = "700__u"
 VENUE_TAG = "909C4p"
-KEYWORD_TAG = "6531_a"
+KEYWORD_TAG = "695__a"
+FKEYWORD_TAG = "6531_a"
 
 if sys.hexversion < 0x2040000:
     # pylint: disable-msg=W0622
@@ -236,7 +237,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
 
         #and keywords
-        kwtuples = search_engine.get_most_popular_field_values(pubs, (KEYWORD_TAG))
+        kwtuples = search_engine.get_most_popular_field_values(pubs, (KEYWORD_TAG, FKEYWORD_TAG), count_repetitive_values=False)
         time1 = time.time()
         if verbose == 9:
             req.write("<br/>keywords: "+str(time1-time2)+"<br/>")

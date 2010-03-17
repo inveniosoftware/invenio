@@ -4940,6 +4940,7 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
         tags = (tags,)
     ## find values to count:
     vals_to_count = []
+    displaytmp = {}
     if count_repetitive_values:
         # counting technique A: can look up many records at once: (very fast)
         for tag in tags:
@@ -4955,7 +4956,8 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
             # (even across various tags, so need to unify again):
             dtmp = {}
             for val in vals_in_rec:
-                dtmp[val] = 1
+                dtmp[val.lower()] = 1
+                displaytmp[val.lower()] = val
             vals_in_rec = dtmp.keys()
             vals_to_count.extend(vals_in_rec)
     ## are we to exclude some of found values?
@@ -4970,7 +4972,12 @@ def get_most_popular_field_values(recids, tags, exclude_values=None, count_repet
     vals = valuefreqdict.keys()
     vals.sort(_get_most_popular_field_values_helper_sorter)
     for val in vals:
-        out += (val, valuefreqdict[val]),
+        tmpdisplv = ''
+        if displaytmp.has_key(val):
+            tmpdisplv = displaytmp[val]
+        else:
+            tmpdisplv = val
+        out += (tmpdisplv, valuefreqdict[val]),
     return out
 
 def profile(p="", f="", c=CFG_SITE_NAME):

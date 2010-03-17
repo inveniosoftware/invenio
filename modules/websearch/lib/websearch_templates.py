@@ -3833,51 +3833,6 @@ class Template:
         #print a "general" banner about the author
         req.write("<h1>" + authorname + "</h1>")
 
-        #print affiliations
-        line1 = "<strong>" + _("Affiliations:") + "</strong>"
-        line2 = authoraff
-        req.write(self.tmpl_print_searchresultbox(line1, line2))
-
-        # print frequent keywords:
-        keywstr = ""
-        if (kwtuples):
-            for (kw, freq) in kwtuples:
-                if keywstr:
-                    keywstr += '<br>'
-                #create a link in author=x, keyword=y
-                searchstr = create_html_link(self.build_search_url(
-                                                p='author:"' + authorname + '" ' +
-                                                  'keyword:"' + kw + '"'),
-                                                {}, kw+" ("+str(freq)+")",)
-                keywstr = keywstr+" "+searchstr
-            banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent keywords:") + "</strong>", keywstr)
-            req.write(banner)
-
-        # print frequent co-authors:
-        collabstr = ""
-        if (authors):
-            for c in authors:
-                c = c.strip()
-                if collabstr:
-                    collabstr += '<br>'
-                #do not add this person him/herself in the list
-                if not c == authorname:
-                    commpubs = intbitset(pubs) & intbitset(perform_request_search(p="author:\"%s\" author:\"%s\"" % (authorname, c)))
-                    collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+" ("+str(len(commpubs))+")</a>"
-            banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent co-authors:") + "</strong>", collabstr)
-            req.write(banner)
-
-        # print frequently publishes in journals:
-        if (vtuples):
-            pubinfo = ""
-            for t in vtuples:
-                (journal, num) = t
-                pubinfo += create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
-                                                                  'journal:"' + journal + '"'),
-                                                   {}, journal + " ("+str(num)+")<br/>")
-            banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequently publishes in:") + "<strong>", pubinfo)
-            req.write(banner)
-
         # print papers:
         searchstr = create_html_link(self.build_search_url(p=authorname,
                                      f='author'),
@@ -3887,7 +3842,6 @@ class Template:
         if num_downloads:
             line2 + " ("+_("downloaded")+" "
             line2 += str(num_downloads)+" "+_("times")+")"
-        from invenio.search_engine import perform_request_search
         if CFG_INSPIRE_SITE:
             CFG_COLLS = ['Book',
                          'Conference',
@@ -3902,15 +3856,82 @@ class Template:
             CFG_COLLS = ['Article',
                          'Book',
                          'Preprint',]
+        collsd = {}
         for coll in CFG_COLLS:
-            collsearch = intbitset(pubs) & intbitset(perform_request_search(p="collection:"+coll))
-            if len(collsearch) > 0:
-                num = len(collsearch)
-                line2 += "<br>" + create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
-                                                                         'collection:' + coll),
-                                                   {}, coll + " ("+str(num)+")",)
+            coll_num_papers = len(intbitset(pubs) & intbitset(perform_request_search(p="collection:"+coll)))
+            if coll_num_papers:
+                collsd[coll] =  coll_num_papers
+        colls = collsd.keys()
+        colls.sort(lambda x, y: cmp(collsd[y], collsd[x])) # sort by number of papers
+        for coll in colls:
+            line2 += "<br>" + create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
+                                                                     'collection:' + coll),
+                                                   {}, coll + " ("+str(collsd[coll])+")",)
         banner = self.tmpl_print_searchresultbox(line1, line2)
+
+
+        req.write("<table width=80%><tr valign=top><td>")
         req.write(banner)
+        req.write("</td><td>&nbsp;</td>")
+
+        #print affiliations
+        line1 = "<strong>" + _("Affiliations:") + "</strong>"
+        line2 = authoraff
+        req.write("<td>")
+        req.write(self.tmpl_print_searchresultbox(line1, line2))
+        req.write("</td></tr>")
+
+        # print frequent keywords:
+        keywstr = ""
+        if (kwtuples):
+            for (kw, freq) in kwtuples:
+                if keywstr:
+                    keywstr += '<br>'
+                #create a link in author=x, keyword=y
+                searchstr = create_html_link(self.build_search_url(
+                                                p='author:"' + authorname + '" ' +
+                                                  'keyword:"' + kw + '"'),
+                                                {}, kw+" ("+str(freq)+")",)
+                keywstr = keywstr+" "+searchstr
+        else: keywstr += 'No Keywords found'
+        banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent keywords:") + "</strong>", keywstr)
+        req.write("<tr valign=top><td>")
+        req.write(banner)
+        req.write("</td><td>&nbsp;</td>")
+
+
+        # print frequent co-authors:
+        collabstr = ""
+        if (authors):
+            for c in authors:
+                c = c.strip()
+                if collabstr:
+                    collabstr += '<br>'
+                #do not add this person him/herself in the list
+                cUP = c.upper()
+                authornameUP = authorname.upper()
+                if not cUP == authornameUP:
+                    commpubs = intbitset(pubs) & intbitset(perform_request_search(p="author:\"%s\" author:\"%s\"" % (authorname, c)))
+                    collabstr = collabstr + create_html_link(self.build_search_url(p='author:"' + authorname + '" author:"' + c + '"' ),
+                                                              {}, c + " (" + str(len(commpubs)) + ")",)
+        else: collabstr += 'None'
+        banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent co-authors:") + "</strong>", collabstr)
+        req.write("<td>")
+        req.write(banner)
+        req.write("</td></tr></table>")
+
+        # print frequently publishes in journals:
+        #if (vtuples):
+        #    pubinfo = ""
+        #    for t in vtuples:
+        #        (journal, num) = t
+        #        pubinfo += create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
+        #                                                          'journal:"' + journal + '"'),
+        #                                           {}, journal + " ("+str(num)+")<br/>")
+        #    banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequently publishes in:") + "<strong>", pubinfo)
+        #    req.write(banner)
+
+
 
         # print citations:
         if len(citedbylist):
