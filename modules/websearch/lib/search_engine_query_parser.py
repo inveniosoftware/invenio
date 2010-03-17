@@ -26,7 +26,9 @@ __lastupdated__ = """$Date$"""
 __revision__ = "$Id$"
 
 import re
+import string
 from invenio.config import CFG_INSPIRE_SITE
+
 
 class SearchQueryParenthesisedParser:
     """Parse search queries containing parenthesis.
@@ -398,177 +400,177 @@ class SpiresToInvenioSyntaxConverter:
     """
 
     # Constants defining fields
-    _DATE_ADDED_FIELD = ' 961__x:'
-    _DATE_UPDATED_FIELD = ' 961__c:' # FIXME: define and use dateupdate:
-    _DATE_FIELD = ' 269__c:'
+    _DATE_ADDED_FIELD = '961__x:'
+    _DATE_UPDATED_FIELD = '961__c:' # FIXME: define and use dateupdate:
+    _DATE_FIELD = '269__c:'
 
     # Dictionary containing the matches between SPIRES keywords
     # and their corresponding Invenio keywords or fields
     # SPIRES keyword : Invenio keyword or field
     _SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS = {
         # affiliation
-            ' affiliation ' : ' affiliation:',
-            ' affil ' : ' affiliation:',
-            ' aff ' : ' affiliation:',
-            ' af ' : ' affiliation:',
-            ' institution ' : ' affiliation:',
-            ' inst ' : ' affiliation:',
+        'affiliation' : 'affiliation:',
+        'affil' : 'affiliation:',
+        'aff' : 'affiliation:',
+        'af' : 'affiliation:',
+        'institution' : 'affiliation:',
+        'inst' : 'affiliation:',
         # any field
-            ' any ' : ' anyfield:',
+        'any' : 'anyfield:',
         # bulletin
-            ' bb ' : ' reportnumber:',
-            ' bbn ' : ' reportnumber:',
-            ' bull ' : ' reportnumber:',
-            ' bulletin-bd ' : ' reportnumber:',
-            ' bulletin-bd-no ' : ' reportnumber:',
-            ' eprint ' : ' reportnumber:',
+        'bb' : 'reportnumber:',
+        'bbn' : 'reportnumber:',
+        'bull' : 'reportnumber:',
+        'bulletin-bd' : 'reportnumber:',
+        'bulletin-bd-no' : 'reportnumber:',
+        'eprint' : 'reportnumber:',
         # citation / reference
-            ' c ' : ' reference:',
-            ' citation ' : ' reference:',
-            ' cited ' : ' reference:',
-            ' jour-vol-page ' : ' reference:',
-            ' jvp ' : ' reference:',
+        'c' : 'reference:',
+        'citation' : 'reference:',
+        'cited' : 'reference:',
+        'jour-vol-page' : 'reference:',
+        'jvp' : 'reference:',
         # collaboration
-            ' collaboration ' : ' collaboration:',
-            ' collab-name ' : ' collaboration:',
-            ' cn ' : ' collaboration:',
+        'collaboration' : 'collaboration:',
+        'collab-name' : 'collaboration:',
+        'cn' : 'collaboration:',
         # conference number
-            ' conf-number ' : ' 111__g:',
-            ' cnum ' : ' 111__g:',
+        'conf-number' : '111__g:',
+        'cnum' : '111__g:',
         # country
-            ' cc ' : ' 044__a:',
-            ' country ' : ' 044__a:',
+        'cc' : '044__a:',
+        'country' : '044__a:',
         # date
-            ' date ' : _DATE_FIELD,
-            ' d ' : _DATE_FIELD,
+        'date': _DATE_FIELD,
+        'd': _DATE_FIELD,
         # date added
-            ' date-added ' : _DATE_ADDED_FIELD,
-            ' dadd ' : _DATE_ADDED_FIELD,
-            ' da ' : _DATE_ADDED_FIELD,
+        'date-added': _DATE_ADDED_FIELD,
+        'dadd': _DATE_ADDED_FIELD,
+        'da': _DATE_ADDED_FIELD,
         # date updated
-            ' date-updated ' : _DATE_UPDATED_FIELD,
-            ' dupd ' : _DATE_UPDATED_FIELD,
-            ' du ' : _DATE_UPDATED_FIELD,
+        'date-updated': _DATE_UPDATED_FIELD,
+        'dupd': _DATE_UPDATED_FIELD,
+        'du': _DATE_UPDATED_FIELD,
         # first author
-            ' fa ' : ' 100__a:',
-            ' first-author ' : ' 100__a:',
+        'fa' : '100__a:',
+        'first-author' : '100__a:',
         # author
-            ' a ':' author:',
-            ' au ':' author:',
-            ' author ':' author:',
-            ' name ':' author:',
+        'a' : 'author:',
+        'au' : 'author:',
+        'author' : 'author:',
+        'name' : 'author:',
         # exact author
         # this is not a real keyword match. It is pseudo keyword that
         # will be replaced later with author search
-            ' ea ':' exactauthor:',
-            ' exact-author ':' exactauthor:',
+        'ea' : 'exactauthor:',
+        'exact-author' : 'exactauthor:',
         # experiment
-            ' exp ' : ' experiment:',
-            ' experiment ' : ' experiment:',
-            ' expno ' : ' experiment:',
-            ' sd ' : ' experiment:',
-            ' se ' : ' experiment:',
+        'exp' : 'experiment:',
+        'experiment' : 'experiment:',
+        'expno' : 'experiment:',
+        'sd' : 'experiment:',
+        'se' : 'experiment:',
         # journal
-            ' journal ' : ' journal:',
-            ' j ' : ' journal:',
-            ' published_in ' : ' journal:',
-            ' spicite ' : ' journal:',
-            ' vol ' : ' journal:',
+        'journal' : 'journal:',
+        'j' : 'journal:',
+        'published_in' : 'journal:',
+        'spicite' : 'journal:',
+        'vol' : 'journal:',
         # journal page
-            ' journal-page ' : ' 773__c:',
-            ' jp ' : ' 773__c:',
+        'journal-page' : '773__c:',
+        'jp' : '773__c:',
         # journal year
-            ' journal-year ' : ' 773__y:',
-            ' jy ' : ' 773__y:',
+        'journal-year' : '773__y:',
+        'jy' : '773__y:',
         # key
-            ' key ' : ' 970__a:',
-            ' irn ' : ' 970__a:',
-            ' record ' : ' 970__a:',
-            ' document ' : ' 970__a:',
-            ' documents ' : ' 970__a:',
+        'key' : '970__a:',
+        'irn' : '970__a:',
+        'record' : '970__a:',
+        'document' : '970__a:',
+        'documents' : '970__a:',
         # keywords
-            ' k ' : ' keyword:',
-            ' keywords ' : ' keyword:',
+        'k' : 'keyword:',
+        'keywords' : 'keyword:',
         # note
-            ' note ' : ' 500__a:',
-            ' n ' : ' 500__a:',
+        'note' : '500__a:',
+        'n' : '500__a:',
         # old title
-            ' old-title ' : ' 246__a:',
-            ' old-t ' : ' 246__a:',
-            ' ex-ti ' : ' 246__a:',
-            ' et ' : ' 246__a:',
+        'old-title' : '246__a:',
+        'old-t' : '246__a:',
+        'ex-ti' : '246__a:',
+        'et' : '246__a:',
         # ppf subject
-            ' ppf-subject ' : ' 650__a:',
-            ' ps ' : ' 650__a:',
-            ' scl ' : ' 650__a:',
-            ' status ' : ' 650__a:',
+        'ppf-subject' : '650__a:',
+        'ps' : '650__a:',
+        'scl' : '650__a:',
+        'status' : '650__a:',
         # report number
-            ' r ' : ' reportnumber:',
-            ' rn ' : ' reportnumber:',
-            ' rept ' : ' reportnumber:',
-            ' report ' : ' reportnumber:',
-            ' report-num ' : ' reportnumber:',
+        'r' : 'reportnumber:',
+        'rn' : 'reportnumber:',
+        'rept' : 'reportnumber:',
+        'report' : 'reportnumber:',
+        'report-num' : 'reportnumber:',
         # title
-            ' t ' : ' title:',
-            ' ti ' : ' title:',
-            ' title ' : ' title:',
-            ' with-language ' : ' title:',
+        't' : 'title:',
+        'ti' : 'title:',
+        'title' : 'title:',
+        'with-language' : 'title:',
         # topic
-            ' topic ' : ' 653__a:',
-            ' tp ' : ' 653__a:',
-            ' hep-topic ' : ' 653__a:',
-            ' desy-keyword ' : ' 653__a:',
-            ' dk ' : ' 653__a:',
+        'topic' : '653__a:',
+        'tp' : '653__a:',
+        'hep-topic' : '653__a:',
+        'desy-keyword' : '653__a:',
+        'dk' : '653__a:',
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords
 
 
         # category
-            ' arx ' : ' 037__c:',
-            ' category ' : ' 037__c:',
+        'arx' : '037__c:',
+        'category' : '037__c:',
         # primarch
-            ' parx ' : ' 037__c:',
-            ' primarch ' : ' 037__c:',
+        'parx' : '037__c:',
+        'primarch' : '037__c:',
         # texkey
-            ' texkey ' : ' 035__z:',
+        'texkey' : '035__z:',
         # type code
-            ' tc ' : ' 690C_a:',
-            ' ty ' : ' 690C_a:',
-            ' type ' : ' 690C_a:',
-            ' type-code ' : ' 690C_a',
+        'tc' : '690C_a:',
+        'ty' : '690C_a:',
+        'type' : '690C_a:',
+        'type-code' : '690C_a',
         # field code
-            ' f ' : ' 65017a:',
-            ' fc ' : ' 65017a:',
-            ' field ' : ' 65017a:',
-            ' field-code ' : ' 65017a:',
+        'f' : '65017a:',
+        'fc' : '65017a:',
+        'field' : '65017a:',
+        'field-code' : '65017a:',
         # coden
-            ' bc ' : ' ',
-            ' browse-only-indx ' : ' ',
-            ' coden ' : ' ',
-            ' journal-coden ' : ' ',
+        'bc' : '',
+        'browse-only-indx' : '',
+        'coden' : '',
+        'journal-coden' : '',
         # energy
-            ' e ' : ' ',
-            ' energy ' : ' ',
-            ' energyrange-code ' : ' ',
+        'e' : '',
+        'energy' : '',
+        'energyrange-code' : '',
         # exact experiment number
-            ' ee ' : ' ',
-            ' exact-exp ' : ' ',
-            ' exact-expno ' : ' ',
+        'ee' : '',
+        'exact-exp' : '',
+        'exact-expno' : '',
         # hidden note
-            ' hidden-note ' : ' ',
-            ' hn ' : ' ',
+        'hidden-note' : '',
+        'hn' : '',
         # ppf
-            ' ppf ' : ' ',
-            ' ppflist ' : ' ',
+        'ppf' : '',
+        'ppflist' : '',
         # slac topics
-            ' ppfa ' : ' ',
-            ' slac-topics ' : ' ',
-            ' special-topics ' : ' ',
-            ' stp ' : ' ',
+        'ppfa' : '',
+        'slac-topics' : '',
+        'special-topics' : '',
+        'stp' : '',
         # test index
-            ' test ' : ' ',
-            ' testindex ' : ' ',
+        'test' : '',
+        'testindex' : '',
         }
 
     def __init__(self):
@@ -611,7 +613,7 @@ class SpiresToInvenioSyntaxConverter:
         # are searched)and the operator preceding the term. In case that the
         # names of the groups defined in the expression are changed, the
         # chagned should be reflected in the code that use it.
-        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:)(?P<search_content>.*?\b)(?= and | or | not |$)', re.IGNORECASE)
+        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:)(?P<search_content>.*?(\b|\'|\"|\/))(?= and | or | not |$)', re.IGNORECASE)
 
         # regular expression used to split string by white space as separator
         self._re_split_pattern = re.compile(r'\s*')
@@ -627,6 +629,13 @@ class SpiresToInvenioSyntaxConverter:
 
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_find_or_fin_at_start = re.compile('^find? .*$')
+
+        # patterns for subbing out spaces within quotes temporarily
+        self._re_pattern_single_quotes = re.compile("'(.*?)'")
+        self._re_pattern_double_quotes = re.compile("\"(.*?)\"")
+        self._re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
+        self._re_pattern_space = re.compile("__SPACE__")
+
 
     def convert_query(self, query):
         """Converts the query from SPIRES syntax to Invenio syntax
@@ -808,9 +817,12 @@ class SpiresToInvenioSyntaxConverter:
 
         If a search term is followed by several words e.g.
         author: ellis or title:THESE THREE WORDS it is exoanded to
-        author: ellis or title:THESE or title:THREE or title:WORDS.
+        author:ellis or (title: THESE and title:THREE...)
 
-        For a combining operator is used the operator befor the search term
+
+        For a combining operator "and" is used though FIXME this is not
+        correct, it should really be calculated by boolean expansion of parens.
+
 
         Not all the search terms are expanded this way, but only a short
         list of them"""
@@ -821,16 +833,30 @@ class SpiresToInvenioSyntaxConverter:
             combine_operator = match.group('combine_operator')
             search_content = match.group('search_content').strip()
 
-            for word in self._re_split_pattern.split(search_content):
-                if combine_operator.lower() == 'find':
-                    result = 'find ' + search_term + word
-                    combine_operator = 'and'
-                else:
-                    result =  result + ' ' + combine_operator + ' ' + search_term + word
+
+            # replace spaces within quotes by __SPACE__ temporarily:
+            search_content = self._re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", search_content)
+            search_content = self._re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", search_content)
+            search_content = self._re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", search_content)
+
+            words = self._re_split_pattern.split(search_content)
+            if len(words) > 1:
+                #FIXME this will break if it happens to be nested.
+                result = combine_operator + ' (' + search_term + words[0]
+                for word in words[1:]:
+                    result =  result + ' and ' + search_term + word
+                result = result + ') '
+            else:
+                result = combine_operator + ' ' + search_term + words[0]
+
+            # replace back __SPACE__ by spaces:
+            result = self._re_pattern_space.sub(" ", result)
             return result.strip()
 
         query = self._re_search_term_pattern_match.sub(create_replacement_pattern, query)
         return query
+
+        return result
 
     def _convert_spires_truncation_to_invenio_truncation(self, query):
         """Replace SPIRES truncation symbol # with invenio trancation symbol *"""
@@ -965,16 +991,18 @@ class SpiresToInvenioSyntaxConverter:
         corresponding Invenio keywords"""
 
         for spires_keyword, invenio_keyword in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.iteritems():
-            query = self._replace_keyword(query, spires_keyword, invenio_keyword)
+            query = self._replace_keyword(query, spires_keyword,\
+                                          invenio_keyword)
 
         return query
 
     def _replace_keyword(self, query, old_keyword, new_keyword):
         """Replaces old keyword in the query with a new keyword"""
-
         # perform case insensitive replacement with regular expression
-        regex_string = r'\b((?<=find)|(?<=and)|(?<=or)|(?<=not))\s*' + old_keyword
-        regular_expression = re.compile(regex_string, re.IGNORECASE)
-        result = regular_expression.sub(new_keyword, query)
 
+        regex_string = r'\b(?P<operator>(find|and|or|not)\b[\s\(]*)' + \
+                       old_keyword + r'(?P<end>[\s\(]+|$)'
+        regular_expression = re.compile(regex_string, re.IGNORECASE)
+        result = regular_expression.sub(r'\g<operator>' + new_keyword + r'\g<end>', query)
+        result = result.replace(": ",":")
         return result
