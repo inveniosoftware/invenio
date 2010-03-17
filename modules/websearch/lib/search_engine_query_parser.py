@@ -140,13 +140,13 @@ class SearchQueryParenthesisedParser:
 
         return query
 
-    def _replace_word_case_insensitive(self, str, old_word, new_word):
-        """Returns a copy of string str where all occurrences of old_word
+    def _replace_word_case_insensitive(self, input_string, old_word, new_word):
+        """Returns a copy of string input_string where all occurrences of old_word
         are replaced by new_word"""
 
         regular_expression = re.compile('\\b'+old_word+'\\b', re.IGNORECASE)
 
-        result = regular_expression.sub(new_word, str)
+        result = regular_expression.sub(new_word, input_string)
 
         return result
 
@@ -848,15 +848,12 @@ class SpiresToInvenioSyntaxConverter:
                 result = result + ') '
             else:
                 result = combine_operator + ' ' + search_term + words[0]
-
             # replace back __SPACE__ by spaces:
             result = self._re_pattern_space.sub(" ", result)
             return result.strip()
 
         query = self._re_search_term_pattern_match.sub(create_replacement_pattern, query)
         return query
-
-        return result
 
     def _convert_spires_truncation_to_invenio_truncation(self, query):
         """Replace SPIRES truncation symbol # with invenio trancation symbol *"""
