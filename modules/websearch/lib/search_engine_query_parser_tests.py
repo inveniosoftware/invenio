@@ -151,14 +151,29 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         For comparison of actual search results (regression testing), see the
         tests in the Inspire module.
         """
-        #parser = search_engine_query_parser.SearchQueryParenthesisedParser()
+        parser = search_engine_query_parser.SearchQueryParenthesisedParser()
         converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
-        result_wanted = create_basic_search_units(None, invenio_syntax, '', None)
 
-        #result_obtained = create_basic_search_units(None, parser.parse_query(converter.convert_query(spires_syntax)), '', None)
-        result_obtained = create_basic_search_units(None, converter.convert_query(spires_syntax), '', None)
-        #result_obtained = parser.parse_query(converter.convert_query(spires_syntax))
-        #result_wanted = parser.parse_query(invenio_syntax)
+        parsed_query = parser.parse_query(converter.convert_query(spires_syntax))
+        #parse_query removes any parens that convert_query added, but then
+        #we have to rejoin the list it returns and create basic searches
+
+        result_obtained = create_basic_search_units(
+            None,
+            ' '.join(parsed_query).replace('+ ',''),
+            '',
+            None
+            )
+
+        # incase the desired result has parens
+        parsed_wanted = parser.parse_query(invenio_syntax)
+        result_wanted = create_basic_search_units(
+            None,
+            ' '.join(parsed_wanted).replace('+ ',''),
+            '',
+            None)
+
+
 
         assert result_obtained == result_wanted, \
                                   """SPIRES parsed as %s instead of %s""" % \
@@ -172,9 +187,9 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spires_search = "find a ellis and t shapes"
         self._compare_searches(invenio_search, spires_search)
 
-    def test_parens(self):
+    def test_nots(self):
         """SPIRES search syntax - find a ellis and not t hadronic and not t collisions"""
-        invenio_search = "author:ellis and not (title:hadronic or title:collisions)"
+        invenio_search = "author:ellis and not title:hadronic and not title:collisions"
         spires_search = "find a ellis and not t hadronic and not t collisions "
         self._compare_searches(invenio_search, spires_search)
 
@@ -211,8 +226,8 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
     def test_combine_multiple(self):
         """SPIRES search syntax - find a gattringer, c and k symmetry chiral and not title chiral"""
-        inv_search = "author:'gattringer, c*' keyword:chiral  keyword:symmetry -title:chiral "
-        spi_search = "find a c gattringer and k symmetry chiral and not title chiral"
+        inv_search = 'author:"gattringer, c*" keyword:chiral  keyword:symmetry -title:chiral'
+        spi_search = "find a c gattringer and k chiral symmetry and not title chiral"
         self._compare_searches(inv_search, spi_search)
 
     def test_combine_multiple_or(self):

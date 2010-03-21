@@ -21,10 +21,6 @@
 
 """CDS Invenio Search Engine query parsers."""
 
-__lastupdated__ = """$Date$"""
-
-__revision__ = "$Id$"
-
 import re
 import string
 from invenio.config import CFG_INSPIRE_SITE
@@ -968,8 +964,12 @@ class SpiresToInvenioSyntaxConverter:
             cleanable_content = query[current_position : match.start()]
             cleanable_content = self._replace_all_spires_keywords_in_string(cleanable_content)
 
-            # get the content in the quotas
-            quoted_content = match.group(0)
+            # get the content in the quotes (group one matches double
+            # quotes, group 2 singles)
+            if match.group(1):
+                quoted_content = match.group(1)
+            elif match.group(2):
+                quoted_content = match.group(2)
 
             # append the processed content to the result
             result = result + cleanable_content + quoted_content
@@ -1003,5 +1003,4 @@ class SpiresToInvenioSyntaxConverter:
         regular_expression = re.compile(regex_string, re.IGNORECASE)
         result = regular_expression.sub(r'\g<operator>' + new_keyword + r'\g<end>', query)
         result = re.sub(':\s+', ':', result)
-        #result = result.replace(": ",":")
         return result
