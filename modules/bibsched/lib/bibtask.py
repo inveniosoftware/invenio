@@ -269,6 +269,7 @@ def task_init(
         "priority" : 0,
         "runtime_limit" : None,
         "profile" : [],
+        "post-process": [],
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
@@ -405,7 +406,8 @@ def _task_build_params(
                 "priority=",
                 "name=",
                 "limit=",
-                "profile="
+                "profile=",
+                "post-process="
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
@@ -434,6 +436,9 @@ def _task_build_params(
                 _TASK_PARAMS["runtime_limit"] = parse_runtime_limit(opt[1])
             elif opt[0] in ("--profile", ):
                 _TASK_PARAMS["profile"] += opt[1].split(',')
+            elif opt[0] in ("--post-process"):
+                _TASK_PARAMS["post-process"] += [opt[1]];
+
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -696,6 +701,7 @@ def _task_run(task_run_fnc):
     False in case of errors.
     Return True in case of success and False in case of failure."""
 
+    from invenio.bibtasklet import _TASKLETS
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
     check_running_process_user()
     try:
@@ -789,6 +795,18 @@ def _task_run(task_run_fnc):
             write_message("Task #%d finished. [%s]" % (_TASK_PARAMS['task_id'], task_status))
         ## Removing the pid
         os.remove(pidfile_name)
+
+    #Lets call the post-process tasklets
+    if task_get_task_param("post-process"):
+
+        split = re.compile(r"(bst_.*)\[(.*)\]")
+        for tasklet in task_get_task_param("post-process") :
+            re.search(r"\[.*\]", tasklet)
+            if not(split.match(tasklet)): # wrong syntax
+                _usage(1, "Bib_takslet bad syntax")
+
+            aux_tasklet = split.match(tasklet)
+            _TASKLETS[aux_tasklet.group(1)](**eval("dict(%s)" % (aux_tasklet.group(2))))
     return True
 
 def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
@@ -819,6 +837,8 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -v, --verbose=LEVEL\tVerbose level (0=min,"
         " 1=default, 9=max).\n")
     sys.stderr.write("      --profile=STATS\tPrint profile information. STATS is a comma-separated\n\t\t\tlist of desired output stats (calls, cumulative,\n\t\t\tfile, line, module, name, nfl, pcalls, stdname, time).\n")
+    sys.stderr.write("  --post-process=BIB_TASKLET_NAME[parameters]\tPostprocesses the specified bibtasklet with the given parameters BETWEEN SQUARE BRACKETS.\n")
+    sys.stderr.write("\t\t\tExample:--post-process \"bst_send_email[fromaddr='foo@xxx.com', toaddr='bar@xxx.com', subject='hello', content='hellp']\" -v9\n")
     if description:
         sys.stderr.write(description)
     sys.exit(exitcode)
