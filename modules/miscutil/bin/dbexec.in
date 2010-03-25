@@ -30,20 +30,27 @@ CFG_DATABASE_NAME='cdsinvenio'
 CFG_DATABASE_USER='cdsinvenio'
 CFG_DATABASE_PASS='my123p$ss'
 
-# is help called?
+## is help called?
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "Usage: $0"
     echo "General options:"
     echo " -h, --help            Print this help."
     echo " -V, --version         Print version information."
+    echo " -i, --interactive     Bring inteactive SQL REPL. (default=batch-execute)"
     exit 0
 fi
 
-# is version called?
+## is version called?
 if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
     echo $VERSION
     exit 0
 fi
 
-## okay, call MySQL client:
-$MYSQL -B --default-character-set="utf8" --host="$CFG_DATABASE_HOST" --port="$CFG_DATABASE_PORT" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME
+## interactive mode asked for?
+if [ "$1" = "-i" ] || [ "$1" = "--interactive" ]; then
+    $MYSQL --default-character-set="utf8" --host="$CFG_DATABASE_HOST" --port="$CFG_DATABASE_PORT" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME
+else
+    $MYSQL -B --default-character-set="utf8" --host="$CFG_DATABASE_HOST" --port="$CFG_DATABASE_PORT" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME
+fi
+
+## end of file
