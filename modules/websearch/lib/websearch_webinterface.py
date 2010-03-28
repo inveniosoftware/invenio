@@ -39,6 +39,25 @@ COAUTHOR_INST_TAG = "700__u"
 VENUE_TAG = "909C4p"
 KEYWORD_TAG = "695__a"
 FKEYWORD_TAG = "6531_a"
+CFG_INSPIRE_UNWANTED_KEYWORDS_START= ['talk',
+                                      'conference',
+                                      'conference proceedings',
+                                      'numerical calculations',
+                                      'experimental results',
+                                      'review',
+                                      'bibliography',
+                                      'upper limit',
+                                      'lower limit',
+                                      'tables',
+                                      'search for',
+                                      'on-shell',
+                                      'off-shell',
+                                      'formula',
+                                      'lectures',
+                                      'book',
+                                      'thesis']
+CFG_INSPIRE_UNWANTED_KEYWORDS_MIDDLE = ['GeV',
+                                        '((']
 
 if sys.hexversion < 0x2040000:
     # pylint: disable-msg=W0622
@@ -239,6 +258,23 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         #and keywords
         kwtuples = search_engine.get_most_popular_field_values(pubs, (KEYWORD_TAG, FKEYWORD_TAG), count_repetitive_values=False)
+        if CFG_INSPIRE_SITE:
+            # filter kw tuples against unwanted keywords:
+            kwtuples_filtered = ()
+            for (kw, num) in kwtuples:
+                kwlower = kw.lower()
+                kwlower_unwanted = False
+                for unwanted_keyword in CFG_INSPIRE_UNWANTED_KEYWORDS_START:
+                    if kwlower.startswith(unwanted_keyword):
+                        kwlower_unwanted = True  # unwanted keyword found
+                        break
+                for unwanted_keyword in CFG_INSPIRE_UNWANTED_KEYWORDS_MIDDLE:
+                    if unwanted_keyword in kwlower:
+                        kwlower_unwanted = True  # unwanted keyword found
+                        break
+                if not kwlower_unwanted:
+                    kwtuples_filtered += ((kw, num),)
+            kwtuples = kwtuples_filtered
         time1 = time.time()
         if verbose == 9:
             req.write("<br/>keywords: "+str(time1-time2)+"<br/>")
