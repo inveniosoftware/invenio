@@ -49,6 +49,8 @@ INSERT INTO field VALUES (19,'journal','journal');
 INSERT INTO field VALUES (20,'collaboration','collaboration');
 INSERT INTO field VALUES (21,'affiliation','affiliation');
 INSERT INTO field VALUES (22,'exact author','exactauthor');
+INSERT INTO field VALUES (23,'date created','datecreated');
+INSERT INTO field VALUES (24,'date modified','datemodified');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
