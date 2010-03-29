@@ -100,10 +100,10 @@ internals, its API, etc.</dd>
 <dd>Describes how to customize WebDoc files, etc.</dd>
 
 <dt><a href="websubmit-internals">WebSubmit Internals</a></dt>
-<dd>Describes the internal tools available in WebSubmit.</dd>
+<dd>Describes information useful to understand the document submission internals.</dd>
 
-<dt><a href="bibsched-bibtask">Bibliographic Task Howto</a></dt>
-<dd>Describes how to customize create a new Bibliographic Task.</dd>
+<dt><a href="bibsched-internals">BibSched Internals</a></dt>
+<dd>Describes information useful to understand the bibliographic task scheduler internals.</dd>
 
 
 </dl>

@@ -17,8 +17,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-<!-- WebDoc-Page-Title: Fulltext manipulation API -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="websubmit-internals">WebSubmit Internals</a> -->
+<!-- WebDoc-Page-Title: BibDocFile API -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="<CFG_SITE_URL>/help/hacking/websubmit-internals">WebSubmit Internals</a> -->
+<!-- WebDoc-Page-Navbar-Select: hacking-websubmit-bibdocfile -->
 
 <p>The BibDocFile library handles every interaction relation between records and related fulltext document files.</p>
 

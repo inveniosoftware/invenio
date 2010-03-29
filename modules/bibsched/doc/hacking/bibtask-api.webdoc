@@ -17,7 +17,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibTask -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="<CFG_SITE_URL>/help/hacking/bibsched-bibtask">BibSched BibTask</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="<CFG_SITE_URL>/help/hacking/bibsched-internals">BibSched Internals</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Introduction</h2>

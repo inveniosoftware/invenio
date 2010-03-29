@@ -26,8 +26,8 @@ the WebSubmit internals.
 
 <blockquote>
  <dl>
-  <dt><a href="websubmit-bibdocfile">Fulltext manipulation API</a> </dt>
-  <dd>Explains how to manipulate fulltext files within CDS Invenio.</dd>
+  <dt><a href="bibdocfile-api">BibDocFile API</a></dt>
+  <dd>Explains the fulltext document management library.</dd>
 
   <dt><a href="websubmit-file-converter">Conversion tools</a> </dt>
   <dd>Explains how to convert from a file format to an other, and how to perform OCR.</dd>
@@ -38,4 +38,5 @@ the WebSubmit internals.
   <dt><a href="websubmit-icon-creator">Icon creation tools</a> </dt>
   <dd>Explains how to create icons from fulltextes.</dd>
  </dl>
+</dl>
 </blockquote>

@@ -17,8 +17,8 @@
 
 webdoclibdir = $(libdir)/webdoc/invenio/hacking
 
-webdoclib_DATA = \
-	bibsched-bibtask.webdoc
+webdoclib_DATA = bibsched-internals.webdoc \
+                 bibtask-api.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
