@@ -23,8 +23,8 @@
 
 import re
 import string
-from invenio.config import CFG_INSPIRE_SITE
 
+from invenio.config import CFG_INSPIRE_SITE
 from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
 
 QueryScanner = FNT()
@@ -587,21 +587,7 @@ class SpiresToInvenioSyntaxConverter:
         self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
 
         # regular expression that matches author patterns
-        # the groups defined in this regular expression are used in the method
-        # _convert_spires_author_search_to_invenio_author_search(...) In case
-        # of changing them, correct also the code in this method
-        self._re_author_match = re.compile(
-            # author:ellis, jacqueline
-            r'\bauthor:\s*(?P<surname1>\w+),\s*(?P<name1>\w{3,})\b(?= and | or | not |$)' + '|' + \
-            # author:jacqueline ellis
-            r'\bauthor:\s*(?P<name2>\w+)\s+(?!and |or |not )(?P<surname2>\w+)\b(?= and | or | not |$)' + '|' +\
-            # author:ellis, j.
-            r'\bauthor:\s*(?P<surname3>\w+),\s*(?P<name3>\w{1,2})\b\.?(?= and | or | not |$)' + '|' +\
-            # author: ellis, j. r.
-            r'\bauthor:\s*(?P<surname4>\w+),\s*(?P<name4>\w+)\b\.?\s+(?!and |or |not )(?P<middle_name4>\w+)\b\.?' + '|' +\
-            # author j. r. ellis
-            r'\bauthor:\s*(?P<name5>\w+)\b\.?\s+(?!and |or |not )(?P<middle_name5>\w+)\b\.?\s+(?!and |or |not )(?P<surname5>\w+)\b\.?',
-            re.IGNORECASE)
+        self._re_author_match = re.compile("author:\s*(?P<name>.+?)\s*(?=and|or|not|$)")
 
         # regular expression that matches exact author patterns
         # the group defined in this regular expression is used in method
@@ -875,37 +861,35 @@ class SpiresToInvenioSyntaxConverter:
 
     def _convert_spires_author_search_to_invenio_author_search(self, query):
         """Converts SPIRES search patterns for authors to search patterns in invenio
-        that give similar results to the spires search."""
+        that give similar results to the spires search.
+        """
 
         # result of the replacement
-        result = ""
+        result = ''
         current_position = 0
 
         for match in self._re_author_match.finditer(query):
+            result += query[current_position : match.start() ]
+            scanned_name = QueryScanner.scan(match.group('name'))
+            result += self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name) + ' '
 
-            result = result + query[current_position : match.start()]
-
-            # the regular expression where these group names are defined is in
-            # the method _compile_regular_expressions()
-            result = result + \
-                self._create_author_search_pattern(match.group('name1'), None, match.group('surname1')) + \
-                self._create_author_search_pattern(match.group('name2'), None, match.group('surname2')) + \
-                self._create_author_search_pattern(match.group('name3'), None, match.group('surname3')) + \
-                self._create_author_search_pattern(match.group('name4'), match.group('middle_name4'), match.group('surname4')) + \
-                self._create_author_search_pattern(match.group('name5'), match.group('middle_name5'), match.group('surname5'))
-
-            # move current position at the end of the processed content
             current_position = match.end()
+
         result += query[current_position : len(query)]
         return result
 
-    def _create_author_search_pattern(self, author_name, author_middle_name, author_surname):
-        """Creates search patter for author by given author's name and surname.
-
-        When the pattern is executed in invenio search, it produces results
-        similar to the results of SPIRES search engine."""
+    def _create_author_search_pattern_from_fuzzy_name_dict(self, fuzzy_name):
+        """Creates an invenio search pattern for an author from a fuzzy name dict"""
 
         AUTHOR_KEYWORD = 'author:'
+        author_name = ""
+        author_middle_name = ""
+        author_surname = ""
+        if len(fuzzy_name['nonlastnames']) > 0:
+            author_name = fuzzy_name['nonlastnames'][0]
+        if len(fuzzy_name['nonlastnames']) > 1:
+            author_middle_name = fuzzy_name['nonlastnames'][1]
+        author_surname = ' '.join(fuzzy_name['lastnames'])
 
         # we expect to have at least surname
         if author_surname == '' or author_surname == None:
