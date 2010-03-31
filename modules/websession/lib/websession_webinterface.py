@@ -152,10 +152,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(args['ln'])
 
-        email = mail_cookie_check_pw_reset(args['k'])
+        title = _('Reset password')
         reset_key = args['k']
 
-        title = _('Reset password')
+        try:
+            email = mail_cookie_check_pw_reset(reset_key)
+        except InvenioWebAccessMailCookieDeletedError:
+            return page(title=title, req=req, body=_("This request for resetting a password has already been used."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'])
+        except InvenioWebAccessMailCookieError:
+            return webuser.page_not_authorized(req, "../youraccount/access",
+                text=_("This request for resetting a password is not valid or"
+                " is expired."), navmenuid='youraccount')
 
         if email is None or CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 3:
             return webuser.page_not_authorized(req, "../youraccount/resetpassword",
