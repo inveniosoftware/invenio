@@ -403,6 +403,10 @@ class SpiresToInvenioSyntaxConverter:
     _DATE_UPDATED_FIELD = '961__c:' # FIXME: define and use dateupdate:
     _DATE_FIELD = '269__c:'
 
+    _A_TAG = 'author:'
+    _EA_TAG = 'exactauthor:'
+
+
     # Dictionary containing the matches between SPIRES keywords
     # and their corresponding Invenio keywords or fields
     # SPIRES keyword : Invenio keyword or field
@@ -585,14 +589,17 @@ class SpiresToInvenioSyntaxConverter:
         # taking in mind if they are escaped.
         self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
 
+        # for matching cases where kw needs distributing
+        self._re_distribute_keywords = re.compile(r'\b(?P<keyword>\S*:)(?P<content>.+?)\s*(?P<combination>and not | and | or | not )\s*(?P<last_content>[^:]*?)(?= and not | and | or | not |$)', re.IGNORECASE)
+
         # regular expression that matches author patterns
-        self._re_author_match = re.compile("author:\s*(?P<name>.+?)\s*(?=and|or|not|$)")
+        self._re_author_match = re.compile(r'\bauthor:\s*(?P<name>.+?)\s*(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression that matches exact author patterns
         # the group defined in this regular expression is used in method
         # _convert_spires_exact_author_search_to_invenio_author_search(...)
         # in case of changes correct also the code in this method
-        self._re_exact_author_match = re.compile(r'\bexactauthor:(?P<author_name>.*?\b)(?= and | or | not |$)', re.IGNORECASE)
+        self._re_exact_author_match = re.compile(r'\bexactauthor:(?P<author_name>[^\'\"].*?[^\'\"]\b)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression that matches search term, its conent (words that
         # are searched)and the operator preceding the term. In case that the
@@ -627,6 +634,9 @@ class SpiresToInvenioSyntaxConverter:
 
         Queries are assumed SPIRES queries only if they start with FIND or FIN"""
 
+        # allow users to use "f" only...
+        query = re.sub('^[fF] ', 'find ', query)
+
         # SPIRES syntax allows searches with 'find' or 'fin'.
         if self._re_find_or_fin_at_start.match(query.lower()):
 
@@ -643,6 +653,7 @@ class SpiresToInvenioSyntaxConverter:
             # call to _replace_spires_keywords_with_invenio_keywords should be at the
             # beginning because the next methods use the result of the replacement
             query = self._replace_spires_keywords_with_invenio_keywords(query)
+            query = self._distribute_keywords_across_combinations(query)
 
             query = self._convert_dates(query)
             query = self._convert_spires_author_search_to_invenio_author_search(query)
@@ -852,7 +863,7 @@ class SpiresToInvenioSyntaxConverter:
         def create_replacement_pattern(match):
             # the regular expression where this group name is defined is in
             # the method _compile_regular_expressions()
-            return 'author:"' + match.group('author_name') + '"'
+            return self._EA_TAG + '"' + match.group('author_name') + '"'
 
         query = self._re_exact_author_match.sub(create_replacement_pattern, query)
 
@@ -866,30 +877,30 @@ class SpiresToInvenioSyntaxConverter:
         # result of the replacement
         result = ''
         current_position = 0
-
         for match in self._re_author_match.finditer(query):
             result += query[current_position : match.start() ]
             scanned_name = QueryScanner.scan(match.group('name'))
-            result += self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name) + ' '
-
+            author_atoms = self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name)
+            if author_atoms.find(' ') == -1:
+                result += author_atoms + ' '
+            else:
+                result += '(' + author_atoms + ') '
             current_position = match.end()
-
         result += query[current_position : len(query)]
         return result
 
     def _create_author_search_pattern_from_fuzzy_name_dict(self, fuzzy_name):
         """Creates an invenio search pattern for an author from a fuzzy name dict"""
 
-        A_TAG = 'author:'
-        EA_TAG = 'exactauthor:'
-
         author_name = ''
         author_middle_name = ''
         author_surname = ''
         if len(fuzzy_name['nonlastnames']) > 0:
             author_name = fuzzy_name['nonlastnames'][0]
-        if len(fuzzy_name['nonlastnames']) > 1:
+        if len(fuzzy_name['nonlastnames']) == 2:
             author_middle_name = fuzzy_name['nonlastnames'][1]
+        if len(fuzzy_name['nonlastnames']) > 2:
+            author_middle_name = ' '.join(fuzzy_name['nonlastnames'][1:])
         author_surname = ' '.join(fuzzy_name['lastnames'])
 
         NAME_IS_INITIAL = (len(author_name) == 1)
@@ -902,11 +913,11 @@ class SpiresToInvenioSyntaxConverter:
         # ellis ---> "author:ellis"
         #if author_name == '' or author_name == None:
         if not author_name:
-            return A_TAG + author_surname
+            return self._A_TAG + author_surname
 
         # ellis, j ---> "ellis, j*"
-        if NAME_IS_INITIAL:
-            return A_TAG + '"' + author_surname + ', ' + author_name + '*"'
+        if NAME_IS_INITIAL and not author_middle_name:
+            return self._A_TAG + '"' + author_surname + ', ' + author_name + '*"'
 
         # if there is middle name we expect to have also name and surname
         # ellis, j. r. ---> ellis, j* r*
@@ -914,22 +925,21 @@ class SpiresToInvenioSyntaxConverter:
         # ellis, john r. ---> ellis, j* r* or ellis, j. r. or ellis, jo. r.
         # ellis, john r. ---> author:ellis, j* r* or exactauthor:ellis, j r or exactauthor:ellis jo r
         if author_middle_name:
-            search_pattern = A_TAG + '"' + author_surname + ', ' + author_name + '.*' + ' ' + author_middle_name + '.*"'
+            search_pattern = self._A_TAG + '"' + author_surname + ', ' + author_name + '*' + ' ' + author_middle_name.replace(" ","* ") + '*"'
             if NAME_IS_NOT_INITIAL:
-                not_quite_length = len(author_name) - 1
-                for i in range(1,not_quite_length):
-                    search_pattern += EA_TAG + "\"%s, %s %s\"" % (author_surname, author_name[0:i], author_middle_name)
-                    if i < not_quite_length:
-                        search_pattern += ' or '
+                for i in range(1,len(author_name)):
+                    search_pattern += ' or ' + self._EA_TAG + "\"%s, %s %s\"" % (author_surname, author_name[0:i], author_middle_name)
             return search_pattern
 
         # ellis, jacqueline ---> "ellis, jacqueline" or "ellis, j.*" or "ellis, j" or "ellis, ja.*" or "ellis, ja" or "ellis, jacqueline *"
         # in case we don't use SPIRES data, the ending dot is ommited.
+        search_pattern = self._A_TAG + '"' + author_surname + ', ' + author_name + '*"'
         if NAME_IS_NOT_INITIAL:
-            return A_TAG + '"' + author_surname + ', ' + author_name + '.*" or ' +\
-                   EA_TAG + '"' + author_surname + ', ' + author_name[0] + '" or ' +\
-                   EA_TAG + '"' + author_surname + ', ' + author_name[0:2] + '" or ' +\
-                   A_TAG + '"' + author_surname + ', ' + author_name + ' .*"'
+            for i in range(1,len(author_name)):
+                search_pattern += ' or ' + self._EA_TAG + "\"%s, %s\"" % (author_surname, author_name[0:i])
+
+        return search_pattern
+
 
     def _replace_spires_keywords_with_invenio_keywords(self, query):
         """Replaces SPIRES keywords that have directly
@@ -986,3 +996,15 @@ class SpiresToInvenioSyntaxConverter:
         result = regular_expression.sub(r'\g<operator>' + new_keyword + r'\g<end>', query)
         result = re.sub(':\s+', ':', result)
         return result
+
+    def _distribute_keywords_across_combinations(self, query):
+        # method used for replacement with regular expression
+
+        def create_replacement_pattern(match):
+            # the regular expression where this group name is defined is in
+            # the method _compile_regular_expressions()
+            return match.group('keyword') + ' ' + match.group('content') + \
+                   ' ' +  match.group('combination') + ' ' + match.group('keyword') + ' ' + match.group('last_content')
+
+        query = self._re_distribute_keywords.sub(create_replacement_pattern, query)
+        return query

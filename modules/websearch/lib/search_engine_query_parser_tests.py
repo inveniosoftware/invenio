@@ -190,13 +190,25 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
     def test_nots(self):
         """SPIRES search syntax - find a ellis and not t hadronic and not t collisions"""
         invenio_search = "author:ellis and not title:hadronic and not title:collisions"
-        spires_search = "find a ellis and not t hadronic and not t collisions "
+        spires_search = "find a ellis and not t hadronic and not t collisions"
+        self._compare_searches(invenio_search, spires_search)
+
+    def test_author_simplest(self):
+        """SPIRES search syntax - find a ellis"""
+        invenio_search = 'author:ellis'
+        spires_search = 'find a ellis'
         self._compare_searches(invenio_search, spires_search)
 
     def test_author_simple(self):
         """SPIRES search syntax - find a ellis, j"""
         invenio_search = 'author:"ellis, j*"'
         spires_search = 'find a ellis, j'
+        self._compare_searches(invenio_search, spires_search)
+
+    def test_exactauthor_simple(self):
+        """SPIRES search syntax - find ea ellis, j"""
+        invenio_search = 'exactauthor:"ellis, j"'
+        spires_search = 'find ea ellis, j'
         self._compare_searches(invenio_search, spires_search)
 
     def test_author_reverse(self):
@@ -211,16 +223,28 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = 'find a a m polyakov'
         self._compare_searches(inv_search, spi_search)
 
+    def test_author_many_initials(self):
+        """SPIRES search syntax - find a p d q bach"""
+        inv_search = 'author:"bach, p* d* q*"'
+        spi_search = 'find a p d q bach'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_author_many_lastnames(self):
+        """SPIRES search syntax - find a alvarez gaume, j r r"""
+        inv_search = 'author:"alvarez gaume, j* r* r*"'
+        spi_search = 'find a alvarez gaume, j r r'
+        self._compare_searches(inv_search, spi_search)
+
     def test_author_full_initial(self):
         """SPIRES search syntax - find a klebanov, ig.r."""
-        inv_search = 'author:"klebanov, ig* r*" or author:"klebanov, i.r." or author:"klebanov, ig.r."'
+        inv_search = 'author:"klebanov, ig* r*" or exactauthor:"klebanov, i r"'
         spi_search = "find a klebanov, ig.r."
         self._compare_searches(inv_search, spi_search)
 
 
     def test_author_full_first(self):
         """SPIRES search syntax - find a ellis, john"""
-        invenio_search = 'author:"ellis, john" or author:"ellis, j.*" or author:"ellis, j" or author:"ellis, jo.*" or author:"ellis, jo" or author:"ellis, john *"'
+        invenio_search = 'author:"ellis, john*" or exactauthor:"ellis, j" or exactauthor:"ellis, jo" or exactauthor:"ellis, joh"'
         spires_search = 'find a ellis, john'
         self._compare_searches(invenio_search, spires_search)
 
@@ -254,6 +278,12 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         # return [] twice.  Unlikely though.
         self.assertEqual(fin_result, find_result)
 
+    def test_distribution_of_search_terms(self):
+        """ SPIRES search syntax - find t this and not that ->title:this and not title:that"""
+
+        spi_search = "find t this and not that"
+        inv_search = "title:this and not title:that"
+        self._compare_searches(inv_search, spi_search)
 
 TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, TestSpiresToInvenioSyntaxConverter)
 
