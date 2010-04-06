@@ -1229,6 +1229,8 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
         return
 
     write_message("BibSched queue status report for %s:" % gethostname())
+    mode = server_pid() and "AUTOMATIC" or "MANUAL"
+    write_message("BibSched queue running mode: %s" % mode)
     if status is None:
         report_about_processes('Running', since, tasks)
         report_about_processes('Waiting', since, tasks)
