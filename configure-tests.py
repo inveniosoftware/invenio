@@ -237,6 +237,25 @@ except ImportError, msg:
     *****************************************************
     """ % msg
 
+try:
+    import reportlab
+except ImportError, msg:
+    print """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that reportlab module is not really        **
+    ** required, but we recommend it you want to       **
+    ** enrich PDF with OCR information.                **
+    **                                                 **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
+    *****************************************************
+    """ % msg
+    wait_for_user("Press ENTER to continue the installation...")
+
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:
     print """

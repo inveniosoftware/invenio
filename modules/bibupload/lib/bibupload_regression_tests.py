@@ -2981,7 +2981,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
             % {'siteurl': CFG_SITE_URL}
 
         # insert test record:
-        task_set_task_param('verbose', 0)
+        task_set_task_param('verbose', 9)
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
 
@@ -2996,7 +2996,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
         test_to_correct = test_to_correct.replace('123456789',
                                                           str(recid))
         # correct test record with new FFT:
-        task_set_task_param('verbose', 0)
+        task_set_task_param('verbose', 9)
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload(recs[0], opt_mode='append')
 
@@ -3279,7 +3279,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
         testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
-        task_set_task_param('verbose', 0)
+        task_set_task_param('verbose', 9)
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         # replace test buffers with real recid of inserted test record:
@@ -3294,12 +3294,12 @@ class BibUploadFFTModeTest(unittest.TestCase):
         test_to_revert = test_to_revert.replace('123456789',
                                                           str(recid))
         # correct test record with new FFT:
-        task_set_task_param('verbose', 0)
+        task_set_task_param('verbose', 9)
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload(recs[0], opt_mode='correct')
 
         # revert test record with new FFT:
-        task_set_task_param('verbose', 0)
+        task_set_task_param('verbose', 9)
         recs = bibupload.xml_marc_to_records(test_to_revert)
         bibupload.bibupload(recs[0], opt_mode='correct')
 

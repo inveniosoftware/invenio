@@ -236,6 +236,21 @@ uninstall-fckeditor-plugin:
 	@echo "** The FCKeditor plugin was successfully uninstalled.    **"
 	@echo "***********************************************************"
 
+install-pdfa-helper-files:
+	@echo "***********************************************************"
+	@echo "** Installing PDF/A helper files, please wait...         **"
+	@echo "***********************************************************"
+	wget 'http://cdsware.cern.ch/download/invenio-demo-site-files/ISOCoatedsb.icc' -O ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
+	@echo "***********************************************************"
+	@echo "** The PDF/A helper files were successfully installed.   **"
+	@echo "***********************************************************"
+
+uninstall-pdfa-helper-files:
+	rm -f ${prefix}/etc/websubmit/file_converter_templates/ISOCoatedsb.icc
+	@echo "***********************************************************"
+	@echo "** The PDF/A helper files were successfully uninstalled. **"
+	@echo "***********************************************************"
+
 update-v0.3.0-tables update-v0.3.1-tables:
 	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE rnkMETHODNAME CHANGE id_rnkMETHOD id_rnkMETHOD mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
@@ -384,6 +399,7 @@ update-v0.99.1-tables:
 	echo "INSERT INTO knwKBRVAL (id,m_key,m_value,id_knwKB) SELECT id,m_key,m_value,id_fmtKNOWLEDGEBASES FROM fmtKNOWLEDGEBASEMAPPINGS;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc CHANGE docname docname varchar(250) COLLATE utf8_bin NOT NULL default 'file';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibdoc ADD COLUMN text_extraction_date datetime NOT NULL default '0000-00-00';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE collection DROP COLUMN restricted;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec

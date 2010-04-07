@@ -420,7 +420,6 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Replace_Single_File_Approval','Stamp 
 INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Uploaded_Files','Stamp some of the files that were uploaded during a submission.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Test_Status','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Update_Approval_DB',NULL);
-INSERT INTO sbmALLFUNCDESCR VALUES ('Upload_Files','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('User_is_Record_Owner_or_Curator','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Files_to_Storage','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Make_Dummy_MARC_XML_Record','');
@@ -500,10 +499,6 @@ INSERT INTO sbmFUNDESC VALUES ('Send_SRV_Mail','emailFile');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Submitter','emailFile');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Submitter','edsrn');
 INSERT INTO sbmFUNDESC VALUES ('Mail_Submitter','newrnin');
-INSERT INTO sbmFUNDESC VALUES ('Upload_Files','maxsize');
-INSERT INTO sbmFUNDESC VALUES ('Upload_Files','minsize');
-INSERT INTO sbmFUNDESC VALUES ('Upload_Files','iconsize');
-INSERT INTO sbmFUNDESC VALUES ('Upload_Files','type');
 INSERT INTO sbmFUNDESC VALUES ('Make_Record','sourceTemplate');
 INSERT INTO sbmFUNDESC VALUES ('Make_Record','createTemplate');
 INSERT INTO sbmFUNDESC VALUES ('Print_Success','edsrn');

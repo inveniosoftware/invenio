@@ -43,7 +43,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
-from invenio.webuser import getUid, page_not_authorized, collect_user_info, isGuestUser
+from invenio.webuser import getUid, page_not_authorized, collect_user_info, isGuestUser, isUserSuperAdmin
 from invenio.websubmit_config import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
@@ -89,7 +89,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             user_info = collect_user_info(req)
 
             verbose = args['verbose']
-            if verbose >= 1 and acc_authorize_action(user_info, 'fulltext')[0] != 0:
+            if verbose >= 1 and isUserSuperAdmin(user_info):
                 # Only SuperUser can see all the details!
                 verbose = 0
 
@@ -161,7 +161,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 if version != 'all':
                     version = ''
 
-            display_hidden = acc_authorize_action(user_info, 'fulltext')[0] == 0
+            display_hidden = isUserSuperAdmin(user_info)
 
             if version != 'all':
                 # search this filename in the complete list of files
@@ -169,6 +169,31 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     if docname == doc.get_docname():
                         try:
                             docfile = doc.get_file(format, version)
+                            if docfile.get_status() == '':
+                                # The file is not resticted, let's check for
+                                # collection restriction then.
+                                (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
+                                if auth_code:
+                                    return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
+                            else:
+                                # The file is probably restricted on its own.
+                                # Let's check for proper authorization then
+                                (auth_code, auth_message) = docfile.is_restricted(req)
+                                if auth_code != 0:
+                                    return warningMsg(_("This file is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
+
+                            if display_hidden or not docfile.hidden_p():
+                                if not readonly:
+                                    ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                                    res = doc.register_download(ip, version, format, uid)
+                                try:
+                                    return docfile.stream(req)
+                                except InvenioWebSubmitFileError, msg:
+                                    register_exception(req=req, alert_admin=True)
+                                    return warningMsg(_("An error has happened in trying to stream the request file."), req, CFG_SITE_NAME, ln)
+                            else:
+                                warn = print_warning(_("The requested file is hidden and you don't have the proper rights to access it."))
+
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
 

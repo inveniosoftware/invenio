@@ -37,7 +37,7 @@ __revision__ = "$Id$"
 
 
 import getopt, sys, re, os, time, shutil, tempfile
-from invenio.config import CFG_PATH_DISTILLER, CFG_PATH_GFILE
+from invenio.config import CFG_PATH_PS2PDF, CFG_PATH_GFILE
 from invenio.errorlib import register_exception
 from invenio.config import CFG_TMPDIR
 from invenio.config import CFG_ETCDIR
@@ -935,7 +935,7 @@ def apply_stamp_to_file(path_workingdir,
         ## Build the distilling command:
         cmd_distill = """%(distiller)s %(ps-file-path)s """ \
                       """%(pdf-file-path)s 2>/dev/null""" % \
-                      { 'distiller'     : CFG_PATH_DISTILLER,
+                      { 'distiller'     : CFG_PATH_PS2PDF,
                         'ps-file-path'  : escape_shell_arg("%s/%s" % \
                                                           (path_workingdir, \
                                                            subject_file)),

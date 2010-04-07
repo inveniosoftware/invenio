@@ -347,7 +347,8 @@ def Stamp_Replace_Single_File_Approval(parameters, \
                                              % (stamped_file_path_only, \
                                                 stamped_file_name), \
                                                 name_file_to_stamp, \
-                                                comment=file_comment)
+                                                comment=file_comment, \
+                                                flags=('STAMPED', ))
         except InvenioWebSubmitFileError:
             ## Unable to revise the file with the newly stamped version.
             wrn_msg = "Warning in Stamp_Replace_Single_File_Approval: " \

@@ -26,36 +26,9 @@ __revision__ = \
 
 ## configuration parameters read from the general config file:
 from invenio.config import \
-     CFG_VERSION, CFG_SITE_NAME,\
-     CFG_PATH_PDFTOTEXT, \
-     CFG_PATH_PSTOTEXT, \
-     CFG_PATH_PSTOASCII, \
-     CFG_PATH_ANTIWORD, \
-     CFG_PATH_CATDOC, \
-     CFG_PATH_WVTEXT, \
-     CFG_PATH_PPTHTML, \
-     CFG_PATH_XLHTML, \
-     CFG_PATH_HTMLTOTEXT, \
-     CFG_PATH_GZIP
-
+     CFG_VERSION, CFG_SITE_NAME
 ## version number:
 BIBINDEX_ENGINE_VERSION = "CDS Invenio/%s bibindex/%s" % (CFG_VERSION, CFG_VERSION)
-
-## programs used to convert fulltext files to text:
-CONV_PROGRAMS = { ### PS switched off at the moment, since PDF is faster
-    #"ps": [CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],
-    #"ps.gz": [CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],
-    "pdf": [CFG_PATH_PDFTOTEXT, CFG_PATH_PSTOTEXT, CFG_PATH_PSTOASCII],
-    "doc": [CFG_PATH_ANTIWORD, CFG_PATH_CATDOC, CFG_PATH_WVTEXT],
-    "ppt": [CFG_PATH_PPTHTML],
-    "xls": [CFG_PATH_XLHTML],
-    "htm": [CFG_PATH_HTMLTOTEXT],
-    "html": [CFG_PATH_HTMLTOTEXT],}
-
-## helper programs used if the above programs convert only to html or
-## other intermediate file formats:
-CONV_PROGRAMS_HELPERS =  {"html": CFG_PATH_HTMLTOTEXT,
-                          "gz": CFG_PATH_GZIP}
 
 ## safety parameters concerning DB thread-multiplication problem:
 CFG_CHECK_MYSQL_THREADS = 0 # to check or not to check the problem?

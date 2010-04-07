@@ -48,6 +48,33 @@ CFG_RESERVED_SUBMISSION_FILENAMES = ['SuE',
                                      'function_log',
                                      'SN']
 
+## CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM -- a comma-separated
+## list of document extensions in decrescent order of preference
+## to suggest what is considered the best format to extract text from.
+CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM = ('txt', 'html', 'xml', 'odt', 'doc', 'docx', 'djvu', 'pdf', 'ps', 'ps.gz')
+
+## CFG_WEBSUBMIT_DESIRED_CONVERSIONS -- a dictionary having as keys
+## a format and as values the corresponding list of desired converted
+## formats.
+CFG_WEBSUBMIT_DESIRED_CONVERSIONS = {
+    'pdf' : ('ps.gz', ),
+    'ps.gz' : ('pdf', ),
+    'djvu' : ('ps.gz', 'pdf'),
+    'docx' : ('doc', 'odt', 'pdf', 'ps.gz'),
+    'doc' : ('odt', 'pdf', 'ps.gz'),
+    'rtf' : ('pdf', 'odt', 'ps.gz'),
+    'odt' : ('pdf', 'doc', 'ps.gz'),
+    'pptx' : ('ppt', 'odp', 'pdf', 'ps.gz'),
+    'ppt' : ('odp', 'pdf', 'ps.gz'),
+    'odp' : ('pdf', 'ppt', 'ps.gz'),
+    'xlsx' : ('xls', 'ods', 'csv'),
+    'xls' : ('ods', 'csv'),
+    'ods' : ('xls', 'csv'),
+    'tiff' : ('pdf', 'ps.gz'),
+    'tif' : ('pdf', 'ps.gz')
+}
+
+
 class InvenioWebSubmitFunctionError(Exception):
     """This exception should only ever be raised by WebSubmit functions.
        It will be caught and handled by the WebSubmit core itself.

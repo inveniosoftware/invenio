@@ -126,6 +126,16 @@ Function icon set, and (iii) the activity indicator icon.
 <http://wefunction.com/2008/07/function-free-icon-set/>
 <http://www.badeziner.com/2008/05/04/120-free-ajax-activity-indicator-gif-icons/>
 
+The unoconv.py script has been adapted from UNOCONV by Dag Wieers.
+<http://dag.wieers.com/home-made/unoconv/>
+
+PDFA_def.ps has been adapted from the GPL distribution of GhostScript.
+<http://ghostscript.com/>
+
+The ISOCoatedsb.icc ICC profile has been retrieved from the European Color
+Initiative.
+<http://www.eci.org/>
+
 The PEP8 conformance checking script (pep8.py) was written by Johann
 C. Rocholl <johann@browsershots.org>.  The pep8.py version included
 with CDS Invenio was downloaded from
@@ -136,5 +146,4 @@ The asyncproc module to manage asynchronous processes with timeout support
 was written by Thomas Bellman <bellman@lysator.liu.se>.  The asyncproc.py
 version included with CDS Invenio was downloaded from
 <http://www.lysator.liu.se/~bellman/download/asyncproc.py> on 2009-07-13.
-
 - end of file -

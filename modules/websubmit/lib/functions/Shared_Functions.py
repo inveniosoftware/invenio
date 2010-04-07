@@ -19,12 +19,12 @@
 __revision__ = "$Id$"
 
 from invenio.config import \
-     CFG_PATH_ACROREAD, \
      CFG_PATH_CONVERT, \
-     CFG_PATH_DISTILLER, \
      CFG_PATH_GUNZIP, \
      CFG_PATH_GZIP
 from invenio.bibdocfile import decompose_file
+from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError
+from invenio.websubmit_config import InvenioWebSubmitFunctionError
 import re
 import os
 
@@ -39,35 +39,41 @@ def createRelatedFormats(fullpath, overwrite=True):
     basedir, filename, extension = decompose_file(fullpath)
     extension = extension.lower()
     if extension == ".pdf":
-        if overwrite == True or \
+        if overwrite or \
                not os.path.exists("%s/%s.ps" % (basedir, filename)):
             # Create PostScript
-            os.system("%s -toPostScript %s" % (CFG_PATH_ACROREAD, fullpath))
-        if overwrite == True or \
+            try:
+                convert_file(fullpath, "%s/%s.ps" % (basedir, filename))
+                createdpaths.append("%s/%s.ps" % (basedir, filename))
+            except InvenioWebSubmitFileConverterError:
+                pass
+        if overwrite or \
                not os.path.exists("%s/%s.ps.gz" % (basedir, filename)):
             if os.path.exists("%s/%s.ps" % (basedir, filename)):
                 os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
                 createdpaths.append("%s/%s.ps.gz" % (basedir, filename))
     if extension == ".ps":
-        if overwrite == True or \
+        if overwrite or \
                not os.path.exists("%s/%s.pdf" % (basedir, filename)):
             # Create PDF
-            os.system("%s %s %s/%s.pdf" % (CFG_PATH_DISTILLER, fullpath, \
-                                           basedir, filename))
-            if os.path.exists("%s/%s.pdf" % (basedir, filename)):
+            try:
+                convert_file(fullpath, "%s/%s.pdf" % (basedir, filename))
                 createdpaths.append("%s/%s.pdf" % (basedir, filename))
+            except InvenioWebSubmitFileConverterError:
+                pass
     if extension == ".ps.gz":
-        if overwrite == True or \
+        if overwrite or \
                not os.path.exists("%s/%s.ps" % (basedir, filename)):
             #gunzip file
             os.system("%s %s" % (CFG_PATH_GUNZIP, fullpath))
-        if overwrite == True or \
+        if overwrite or \
                not os.path.exists("%s/%s.pdf" % (basedir, filename)):
             # Create PDF
-            os.system("%s %s/%s.ps %s/%s.pdf" % (CFG_PATH_DISTILLER, basedir, \
-                                                 filename, basedir, filename))
-            if os.path.exists("%s/%s.pdf" % (basedir, filename)):
+            try:
+                convert_file("%s/%s.ps" % (basedir, filename), "%s/%s.pdf" % (basedir, filename))
                 createdpaths.append("%s/%s.pdf" % (basedir, filename))
+            except InvenioWebSubmitFileConverterError:
+                pass
         #gzip file
         if not os.path.exists("%s/%s.ps.gz" % (basedir, filename)):
             os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))

@@ -299,7 +299,7 @@ class WebSearchTestCollections(unittest.TestCase):
                 args = {'as': aas}
                 browser.open(make_url('/collection/Preprints', **args))
 
-                for jrec in (11, 21, 11, 27):
+                for jrec in (11, 21, 11, 28):
                     args = {'jrec': jrec, 'cc': 'Preprints'}
                     if aas:
                         args['as'] = aas
@@ -1087,7 +1087,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1',
-                                               expected_text="[hep-th/9809057]"))
+                                               expected_text="[TESLA-FEL-99-07]"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
@@ -1099,7 +1099,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, descending field"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1&sf=reportnumber&so=d',
-                                               expected_text=" [SCAN-9605071]"))
+                                               expected_text=" [TESLA-FEL-99-07]"))
 
     def test_sort_results_sort_pattern(self):
         """websearch - search results sorting, preferential sort pattern"""
@@ -1340,7 +1340,7 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
         """websearch - query for special terms, (U(1) OR SL(2,Z))"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=%28U%281%29+OR+SL%282%2CZ%29%29',
-                                               expected_text="[57, 79, 80, 88]"))
+                                               expected_text="[57, 79, 88]"))
 
 class WebSearchJournalQueryTest(unittest.TestCase):
     """Test of the search results for journal pubinfo queries."""
@@ -1383,13 +1383,13 @@ class WebSearchSummarizerTest(unittest.TestCase):
     def test_most_popular_field_values_singletag(self):
         """websearch - most popular field values, simple tag"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('PREPRINT', 36), ('ARTICLE', 27), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7), ('POETRY', 2), ('REPORT', 2)),
+        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7), ('POETRY', 2), ('REPORT', 2),  ('ATLANTISTIMESNEWS', 1)),
                          get_most_popular_field_values(range(0,100), '980__a'))
 
     def test_most_popular_field_values_singletag_multiexclusion(self):
         """websearch - most popular field values, simple tag, multiple exclusions"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('PREPRINT', 36), ('ARTICLE', 27), ('BOOK', 14), ('REPORT', 2)),
+        self.assertEqual((('PREPRINT', 37), ('ARTICLE', 28), ('BOOK', 14), ('REPORT', 2), ('ATLANTISTIMESNEWS', 1)),
                          get_most_popular_field_values(range(0,100), '980__a', ('THESIS', 'PICTURE', 'POETRY')))
 
     def test_most_popular_field_values_multitag(self):

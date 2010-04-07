@@ -1,5 +1,4 @@
-#!/usr/bin/python
-
+# -*- coding: utf-8 -*-
 ### This program is free software; you can redistribute it and/or modify
 ### it under the terms of the GNU General Public License as published by
 ### the Free Software Foundation; version 2 only
@@ -20,35 +19,40 @@ global unopath
 
 ### The first thing we ought to do is find a suitable OpenOffice installation
 ### with a compatible pyuno library that we can import.
-extrapaths = glob.glob('/usr/lib*/openoffice*/program') + \
-             glob.glob('/usr/lib*/ooo*/program') + \
-             glob.glob('/opt/openoffice*/program') + \
-             glob.glob('C:\\Program Files\\OpenOffice.org *\\program\\') + \
-             [ '/Applications/NeoOffice.app/Contents/program', '/usr/bin' ]
-for unopath in extrapaths:
-    if os.path.exists(os.path.join(unopath, "pyuno.so")):
-        filename = "pyuno.so"
-    elif os.path.exists(os.path.join(unopath, "pyuno.dll")):
-        filename = "pyuno.dll"
-    else:
-        continue
-    sys.path.append(unopath)
-    try:
-        import uno, unohelper
-        break
-    except ImportError, e:
-        sys.path.remove(unopath)
-        print >>sys.stderr, e
-        print >>sys.stderr, "WARNING: We found %s in %s, but could not import it." % (filename, unopath)
-        continue
-else:
-    print >>sys.stderr, "unoconv: Cannot find the pyuno.so library in sys.path and known paths."
-    print >>sys.stderr, "ERROR: Please locate this library and send your feedback to: <tools@lists.rpmforge.net>."
-    sys.exit(1)
+### BEG Invenio customizations
+#extrapaths = glob.glob('/usr/lib*/openoffice*/program') + \
+             #glob.glob('/usr/lib*/ooo*/program') + \
+             #glob.glob('/opt/openoffice*/program') + \
+             #glob.glob('C:\\Program Files\\OpenOffice.org *\\program\\') + \
+             #[ '/Applications/NeoOffice.app/Contents/program', '/usr/bin' ]
+#for unopath in extrapaths:
+    #if os.path.exists(os.path.join(unopath, "pyuno.so")):
+        #filename = "pyuno.so"
+    #elif os.path.exists(os.path.join(unopath, "pyuno.dll")):
+        #filename = "pyuno.dll"
+    #else:
+        #continue
+    #sys.path.append(unopath)
+    #try:
+        #import uno, unohelper
+        #break
+    #except ImportError, e:
+        #sys.path.remove(unopath)
+        #print >>sys.stderr, e
+        #print >>sys.stderr, "WARNING: We found %s in %s, but could not import it." % (filename, unopath)
+        #continue
+#else:
+    #print >>sys.stderr, "unoconv: Cannot find the pyuno.so library in sys.path and known paths."
+    #print >>sys.stderr, "ERROR: Please locate this library and send your feedback to: <tools@lists.rpmforge.net>."
+    #sys.exit(1)
 
-### Export an environment that OpenOffice is pleased to work with
-os.environ['LD_LIBRARY_PATH'] = '%s' % unopath
-os.environ['PATH'] = '%s:' % unopath + os.environ['PATH']
+#### Export an environment that OpenOffice is pleased to work with
+#os.environ['LD_LIBRARY_PATH'] = '%s' % unopath
+#os.environ['PATH'] = '%s:' % unopath + os.environ['PATH']
+
+import uno, unohelper
+### END Invenio customizations
+
 
 ### Now that we have found a working pyuno library, let's import some classes
 from com.sun.star.beans import PropertyValue
@@ -273,12 +277,13 @@ class Options:
         self.filenames = []
         self.pipe = None
         self.outputpath = None
+        self.outputfile = None ### Invenio customizations
 
 
         ### Get options from the commandline
         try:
             opts, args = getopt.getopt (args, 'c:d:f:hi:Llo:p:s:T:t:v',
-                ['connection=', 'doctype=', 'format=', 'help', 'listener', 'outputpath=', 'pipe=', 'port=', 'server=', 'timeout=', 'show', 'stdout', 'verbose', 'version'] )
+                ['connection=', 'doctype=', 'format=', 'help', 'listener', 'outputpath=', 'pipe=', 'port=', 'server=', 'timeout=', 'show', 'stdout', 'verbose', 'version', 'outputfile='] )
         except getopt.error, exc:
             print 'unoconv: %s, try unoconv -h for a list of all the options' % str(exc)
             sys.exit(255)
@@ -301,6 +306,8 @@ class Options:
                 self.listener = True
             elif opt in ['-o', '--outputpath']:
                 self.outputpath = arg
+            elif opt in ['--outputfile']:  ### Invenio customizations
+                self.outputfile = arg      ### Invenio customizations
             elif opt in ['-p', '--port']:
                 self.port = arg
             elif opt in ['-s', '--server']:
@@ -510,23 +517,42 @@ class Convertor:
 #            pageSize = Size()
 #            pageSize.Width=1480
 #            pageSize.Height=3354
-#            standard.setPropertyValue('Size', pageSize) 
+#            standard.setPropertyValue('Size', pageSize)
 
             error(1, "Selected output format: %s" % outputfmt)
             error(1, "Selected ooffice filter: %s" % outputfmt.filter)
             error(1, "Used doctype: %s" % outputfmt.doctype)
 
-            ### Write outputfile
-            outputprops = (
-                    PropertyValue( "FilterName", 0, outputfmt.filter, 0),
-                    PropertyValue( "Overwrite", 0, True, 0 ),
-#                    PropertyValue( "Size", 0, "A3", 0 ),
-                    PropertyValue( "OutputStream", 0, OutputStream(), 0 ),
-                   )
+####            ### Write outputfile
+####            outputprops = (
+####                    PropertyValue( "FilterName", 0, outputfmt.filter, 0),
+####                    PropertyValue( "Overwrite", 0, True, 0 ),
+#####                    PropertyValue( "Size", 0, "A3", 0 ),
+####                    PropertyValue( "OutputStream", 0, OutputStream(), 0 ),
+####                   )
+
+            ### BEG Invenio customizations
+            outputprops = [
+                    PropertyValue( "FilterName" , 0, outputfmt.filter , 0 ),
+                    PropertyValue( "Overwrite" , 0, True , 0 ),
+                    PropertyValue( "OutputStream", 0, OutputStream(), 0),
+                   ]
+            if outputfmt.filter == 'Text (encoded)':
+                ## To enable UTF-8
+                outputprops.append(PropertyValue( "FilterFlags", 0, "UTF8, LF", 0))
+            elif outputfmt.filter == 'writer_pdf_Export':
+                ## To enable PDF/A
+                outputprops.append(PropertyValue( "SelectPdfVersion", 0, 1, 0))
+
+            outputprops = tuple(outputprops)
+            ### END Invenio customizations
 
             if not op.stdout:
                 (outputfn, ext) = os.path.splitext(inputfn)
-                if not op.outputpath:
+                ### BEG Invenio customizations
+                if op.outputfile:
+                    outputfn = op.outputfile
+                elif not op.outputpath: ### END Invenio customizations
                     outputfn = outputfn + '.' + outputfmt.extension
                 else:
                     outputfn = os.path.join(op.outputpath, os.path.basename(outputfn) + '.' + outputfmt.extension)

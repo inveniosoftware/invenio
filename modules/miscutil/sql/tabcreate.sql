@@ -2509,6 +2509,7 @@ CREATE TABLE IF NOT EXISTS bibdoc (
   docname varchar(250) COLLATE utf8_bin NOT NULL default 'file',
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
+  text_extraction_date datetime NOT NULL default '0000-00-00',
   more_info mediumblob NULL default NULL,
   PRIMARY KEY  (id),
   KEY docname (docname),

@@ -78,13 +78,13 @@ class BibRankWordSimilarityRankingTest(unittest.TestCase):
         """bibrank - search results ranked by word similarity"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id',
-                                               expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 18, 9, 14, 15]"))
+                                               expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 9, 14, 18, 15]"))
 
     def test_similar_records_link(self):
         """bibrank - 'Similar records' link"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A77&rm=wrd&of=id',
-                                               expected_text="[84, 95, 85, 77]"))
+                                               expected_text="[84, 96, 95, 85, 77]"))
 
 class BibRankCitationRankingTest(unittest.TestCase):
     """Check BibRank citation ranking tools."""

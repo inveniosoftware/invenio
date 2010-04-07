@@ -45,7 +45,7 @@ __revision__ = "$Id$"
 import os.path, sys, getopt, shutil, tempfile, re
 from invenio.config import \
      CFG_TMPDIR, \
-     CFG_PATH_DISTILLER, \
+     CFG_PATH_PS2PDF, \
      CFG_PATH_PDFTK, \
      CFG_PATH_CONVERT
 from invenio.shellutils import escape_shell_arg
@@ -194,7 +194,7 @@ def build_icon(path_workingdir,
         ## Build the distilling command:
         cmd_distill = """%(distiller)s %(ps-file-path)s """ \
                       """%(pdf-file-path)s 2>/dev/null""" % \
-                      { 'distiller'     : CFG_PATH_DISTILLER,
+                      { 'distiller'     : CFG_PATH_PS2PDF,
                         'ps-file-path'  : escape_shell_arg("%s/%s" % \
                                                           (path_workingdir, \
                                                            source_filename)),

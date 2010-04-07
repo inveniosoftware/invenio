@@ -35,14 +35,21 @@ from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     get_format_from_url, KEEP_OLD_VALUE
 from invenio.intbitset import intbitset
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import perform_request_search, search_unit
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_low_level_submission
 from invenio.textutils import encode_for_xml
+from invenio.websubmit_file_converter import can_perform_ocr
 
 def _xml_mksubfield(key, subfield, fft):
     return fft.get(key, None) and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(fft[key])) or ''
+
+def _xml_mksubfields(key, subfield, fft):
+    ret = ""
+    for value in fft.get(key, []):
+        ret += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(value))
+    return ret
 
 def _xml_fft_creator(fft):
     """Transform an fft dictionary (made by keys url, docname, format,
@@ -58,7 +65,7 @@ def _xml_fft_creator(fft):
     out += _xml_mksubfield('comment', 'z', fft)
     out += _xml_mksubfield('restriction', 'r', fft)
     out += _xml_mksubfield('icon', 'x', fft)
-    out += _xml_mksubfield('options', 'o', fft)
+    out += _xml_mksubfields('options', 'o', fft)
     out += '\t</datafield>\n'
     return out
 
@@ -96,6 +103,7 @@ _actions = [('get-info', 'print all the informations about the record/bibdoc/fil
             ('get-history', 'print the document history'),
             ('delete', 'delete the specified docname'),
             ('undelete', 'undelete the specified docname'),
+            ('list-available-flags', 'list the available flags that can be used when revising/appending a file'),
             #'purge',
             #'expunge',
             ('check-md5', 'check md5 checksum validity of files'),
@@ -105,7 +113,10 @@ _actions = [('get-info', 'print all the informations about the record/bibdoc/fil
             ('fix-all', 'fix inconsistences in filesystem vs database vs MARC'),
             ('fix-marc', 'synchronize MARC after filesystem/database'),
             ('fix-format', 'fix format related inconsistences'),
-            ('fix-duplicate-docnames', 'fix duplicate docnames associated with the same record')]
+            ('fix-duplicate-docnames', 'fix duplicate docnames associated with the same record'),
+            ('textify', 'extract the text, to allow for indexing'),
+            ('textify-with-ocr', 'extract the text to allow for indexing (and using OCR if possible)')]
+
 
 _actions_with_parameter = {
     #'set-doctype' : 'doctype',
@@ -163,6 +174,7 @@ revise them with the next release of CDS Invenio.""", 'WARNING')
     query_options.add_option('--description', dest='description', help='specify a description')
     query_options.add_option('--comment', dest='comment', help='specify a comment')
     query_options.add_option('--restriction', dest='restriction', help='specify a restriction tag')
+    query_options.add_option('--force', dest='force', help='force an action even when it\'s not necessary e.g. textify on an already textified bibdoc.', action='store_true', default=False)
 
     parser.add_option_group(query_options)
     action_options = OptionGroup(parser, 'Actions')
@@ -377,7 +389,7 @@ def cli_revise(recid=None, docid=None, docname=None, new_docname=None, doctype=N
         'doctype' : doctype
     }
     if hide_previous:
-        fft['options'] = 'HIDE_PREVIOUS'
+        fft['options'] = 'PERFORM_HIDE_PREVIOUS'
     ffts = {recid : [fft]}
     return bibupload_ffts(ffts, append=False)
 
@@ -388,6 +400,29 @@ def cli_get_history(docid_set):
         history = bibdoc.get_history()
         for row in history:
             print_info(bibdoc.get_recid(), docid, row)
+
+def cli_textify(docid_set, perform_ocr=False, force=False):
+    """Extract text to let indexing on fulltext be possible."""
+    if perform_ocr:
+        if not can_perform_ocr():
+            print >> sys.stderr, "WARNING: OCR requested but OCR is not possible"
+            perform_ocr = False
+    if perform_ocr:
+        additional = ' using OCR (this might take some time)'
+    else:
+        additional = ''
+    for docid in docid_set:
+        bibdoc = BibDoc(docid)
+        print 'Extracting text for docid %s%s...' % (docid, additional),
+        sys.stdout.flush()
+        if force or not bibdoc.has_text(require_up_to_date=True):
+            try:
+                bibdoc.extract_text(perform_ocr=perform_ocr)
+                print "DONE"
+            except InvenioWebSubmitFileError, e:
+                print >> sys.stderr, "WARNING: %s" % e
+        else:
+            print "not needed"
 
 def cli_fix_all(recid_set):
     """Fix all the records of a recid_set."""
@@ -615,7 +650,19 @@ def cli_assert_docname(options):
 
 def get_all_recids():
     """Return all the existing recids."""
-    return intbitset(run_sql('select id from bibrec'))
+    return intbitset(run_sql('select id from bibrec')) - search_unit(p='DELETED', f='collection', m='e')
+
+def cli_list_available_flags():
+    """
+    Return the available flags that can be associated with a docname.
+    """
+    print "Available flags:", ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS)
+
+def cli_list_available_flags():
+    """
+    Return the available flags that can be associated with a docname.
+    """
+    print "Available flags:", ', '.join(CFG_BIBDOCFILE_AVAILABLE_FLAGS)
 
 def main():
     parser = prepare_option_parser()
@@ -652,8 +699,14 @@ def main():
             cli_check_duplicate_docnames(recid_set)
         elif options.action == 'check-format':
             cli_check_format(recid_set)
+        elif options.action == 'list-available-flags':
+            cli_list_available_flags()
         elif options.action == 'undelete':
             cli_undelete(recid_set, options.docname or '*', options.restriction or '')
+        elif options.action == 'textify':
+            cli_textify(docid_set, force=options.force)
+        elif options.action == 'textify-with-ocr':
+            cli_textify(docid_set, perform_ocr=True, force=options.force)
         elif options.append_path:
             if cli_assert_recid(options):
                 res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
