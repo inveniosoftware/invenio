@@ -293,80 +293,80 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
 
     @return: the HTML markup of the editor
     """
-
-    def remove_line_breaks(text):
-        """
-        Remove line breaks from input, including unicode 'line
-        separator', 'paragraph separator', and 'next line' characters.
-        """
-        return unicode(text, 'utf-8').replace('\f', '').replace('\n', '').replace('\r', '').replace(u'\xe2\x80\xa8', '').replace(u'\xe2\x80\xa9', '').replace(u'\xc2\x85', '').encode('utf-8')
-
-##     NOTE that the FCKeditor is instantiated using the Python interface
-##     provided with the editor, which must have access to the
-##     os.environ['HTTP_USER_AGENT'] variable to check if user's browser
-##     is compatible with the editor. This value is set in the
-##     webinterface_handler file.
-
     if textual_content is None:
         textual_content = content
 
     editor = ''
-    textarea = '<textarea %(id)s name="%(name)s" style="width:%(width)s;height:%(height)s">%(content)s</textarea>' \
-                     % {'content': textual_content,
+
+    if enabled and fckeditor_available:
+        # Prepare upload path settings
+        if file_upload_url is not None:
+            file_upload_script = '''
+            oFCKeditor.Config["LinkUploadURL"] = '%(file_upload_url)s';
+            oFCKeditor.Config["ImageUploadURL"] = '%(file_upload_url)s%%3Ftype%%3DImage';
+            oFCKeditor.Config["FlashUploadURL"] = '%(file_upload_url)s%%3Ftype%%3DFlash';
+            oFCKeditor.Config["MediaUploadURL"] = '%(file_upload_url)s%%3Ftype%%3DMedia';
+            oFCKeditor.Config["LinkUpload"] = true;
+            oFCKeditor.Config["ImageUpload"] = true;
+            oFCKeditor.Config["FlashUpload"] = true;
+            ''' % {'file_upload_url': file_upload_url}
+        else:
+            file_upload_script = '''
+            oFCKeditor.Config["LinkUpload"] = false;
+            oFCKeditor.Config["ImageUpload"] = false;
+            oFCKeditor.Config["FlashUpload"] = false;
+            '''
+
+        # Prepare code to instantiate an editor
+        editor += '''
+        <script type="text/javascript" src="%(CFG_SITE_URL)s/fckeditor/fckeditor.js"></script>
+        <input type="hidden" name="editor_type" id="%(name)seditortype" value="textarea" />
+        <textarea id="%(id)s" name="%(name)s" style="width:%(width)s;height:%(height)s">%(textual_content)s</textarea>
+        <textarea id="%(id)shtmlvalue" name="%(name)shtmlvalue" style="display:None;width:%(width)s;height:%(height)s">%(html_content)s</textarea>
+        <script type="text/javascript">
+          var oFCKeditor = new FCKeditor('%(name)s', '%(width)s', '%(height)s', '%(toolbar)s') ;
+          oFCKeditor.BasePath = "/fckeditor/" ;
+          oFCKeditor.Config["CustomConfigurationsPath"] = '%(custom_configurations_path)s';
+          /* Set paths to upload files */
+          %(file_upload_script)s
+          /* Disable browsing on the server, which would not work anyway */
+          oFCKeditor.Config["LinkBrowser"] = false;
+          oFCKeditor.Config["ImageBrowser"] = false;
+          oFCKeditor.Config["FlashBrowser"] = false;
+
+          oFCKeditor.ReplaceTextarea() ;
+
+          function FCKeditor_OnComplete( editorInstance )
+          {
+            /* If FCKeditor was correctly loaded, display the nice HTML representation */
+            var oEditor = FCKeditorAPI.GetInstance('%(name)s');
+            var html_editor = document.getElementById('%(id)shtmlvalue');
+            oEditor.SetHTML(html_editor.value);
+            var editor_type_field = document.getElementById('%(name)seditortype');
+            editor_type_field.value = 'fckeditor';
+          }
+
+        </script>
+        ''' % \
+          {'textual_content': cgi.escape(textual_content),
+           'html_content': content,
+           'width': width,
+           'height': height,
+           'name': name,
+           'id': id or name,
+           'custom_configurations_path': custom_configurations_path,
+           'toolbar': toolbar_set,
+           'file_upload_script': file_upload_script,
+           'CFG_SITE_URL': CFG_SITE_URL}
+
+    else:
+        # FCKedior is not installed
+        textarea = '<textarea %(id)s name="%(name)s" style="width:%(width)s;height:%(height)s">%(content)s</textarea>' \
+                     % {'content': cgi.escape(textual_content),
                         'width': width,
                         'height': height,
                         'name': name,
                         'id': id and ('id="%s"' % id) or ''}
-
-    if enabled and fckeditor_available:
-        oFCKeditor = fckeditor.FCKeditor(name)
-        oFCKeditor.BasePath = '/fckeditor/'
-        oFCKeditor.Config["CustomConfigurationsPath"] = custom_configurations_path
-
-        if file_upload_url is not None:
-            oFCKeditor.Config["LinkUploadURL"] = file_upload_url
-            oFCKeditor.Config["ImageUploadURL"] = file_upload_url + '%3Ftype%3DImage'
-            oFCKeditor.Config["FlashUploadURL"] = file_upload_url + '%3Ftype%3DFlash'
-            oFCKeditor.Config["MediaUploadURL"] = file_upload_url + '%3Ftype%3DMedia'
-
-            oFCKeditor.Config["LinkUpload"] = 'true'
-            oFCKeditor.Config["ImageUpload"] = 'true'
-            oFCKeditor.Config["FlashUpload"] = 'true'
-        else:
-            oFCKeditor.Config["LinkUpload"] = 'false'
-            oFCKeditor.Config["ImageUpload"] = 'false'
-            oFCKeditor.Config["FlashUpload"] = 'false'
-
-        # In any case, disable browsing on the server
-        oFCKeditor.Config["LinkBrowser"] = 'false'
-        oFCKeditor.Config["ImageBrowser"] = 'false'
-        oFCKeditor.Config["FlashBrowser"] = 'false'
-
-        # Set the toolbar
-        oFCKeditor.ToolbarSet = toolbar_set
-        #toolbar_set_js_repr = repr(toolbar_set) + ';'
-        #oFCKeditor.Config["ToolbarSets"] = {}
-        #oFCKeditor.Config['ToolbarSets["Default"]'] = toolbar_set_js_repr
-
-        oFCKeditor.Value = content
-        oFCKeditor.Height = height
-        oFCKeditor.Width = width
-        if oFCKeditor.IsCompatible():
-            # Browser seems compatible
-            editor += '<script language="JavaScript" type="text/javascript">'
-            editor += "document.write('" + remove_line_breaks(oFCKeditor.Create()) + "');"
-            editor += "document.write('<input type=\"hidden\" name=\"editor_type\" value=\"fckeditor\" />');"
-            editor += '</script>'
-            # In case javascript is disabled
-            editor += '<noscript>' + textarea + \
-                      '<input type="hidden" name="editor_type" value="textarea" /></noscript>'
-        else:
-            # Browser is not compatible
-            editor = textarea
-            editor += '<input type="hidden" name="editor_type" value="textarea" />'
-    else:
-        # FCKedior is not installed
-        editor = textarea
         editor += '<input type="hidden" name="editor_type" value="textarea" />'
 
     return editor

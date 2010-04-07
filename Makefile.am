@@ -219,7 +219,7 @@ install-fckeditor-plugin:
 	find ${prefix}/lib/python/invenio/fckeditor -type d -exec touch {}/__init__.py \; && \
 	find ${prefix}/var/www/fckeditor/ -depth -name '_*' -exec rm -rf {} \; && \
 	rm -r ${prefix}/var/www/fckeditor/editor/filemanager/connectors && \
-	find ${prefix}/var/www/fckeditor/fckeditor* -maxdepth 0 -exec rm -r {} \; && \
+	find ${prefix}/var/www/fckeditor/fckeditor* -maxdepth 0 ! -name "fckeditor.js" -exec rm -r {} \; && \
 	rm -fr /tmp/invenio-fckeditor-plugin
 	@echo "* Installing Invenio-specific FCKeditor config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)

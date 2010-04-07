@@ -339,3 +339,9 @@ def nice_size(size):
                 unit = 'GB'
     return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=2), unit)
 
+def remove_line_breaks(text):
+    """
+    Remove line breaks from input, including unicode 'line
+    separator', 'paragraph separator', and 'next line' characters.
+    """
+    return unicode(text, 'utf-8').replace('\f', '').replace('\n', '').replace('\r', '').replace(u'\xe2\x80\xa8', '').replace(u'\xe2\x80\xa9', '').replace(u'\xc2\x85', '').encode('utf-8')
