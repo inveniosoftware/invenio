@@ -926,7 +926,7 @@ class BibRecDocs:
                     bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, flags=flags)
                     self.build_bibdoc_list()
                 else:
-                    raise e
+                    raise
         return bibdoc
 
     def add_new_version(self, fullpath, docname=None, description=None, comment=None, format=None, flags=None):

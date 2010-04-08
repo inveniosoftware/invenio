@@ -119,8 +119,8 @@ def try_url_download(url):
         open_url = urlopen(url)
         open_url.read()
     except Exception, e:
-        raise e, "Downloading %s is impossible because of %s" \
-            % (url, str(e))
+        raise StandardError("Downloading %s is impossible because of %s"
+            % (url, str(e)))
     return True
 
 class BibUploadInsertModeTest(unittest.TestCase):

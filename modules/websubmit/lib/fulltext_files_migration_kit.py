@@ -77,7 +77,7 @@ def backup_tables(drop=False):
     except OperationalError, e:
         if not drop:
             return False
-        raise e
+        raise
     return True
 
 def check_yes():
