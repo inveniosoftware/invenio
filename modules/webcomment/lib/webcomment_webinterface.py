@@ -302,7 +302,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                     {'msg': argd['msg'],
                                                      'note': argd['note'],
                                                      'score': argd['score'],
-                                                     'editor_type': argd['editor_type']},
+                                                     'editor_type': argd['editor_type'],
+                                                     'subscribe': argd['subscribe']},
                                                     onetime=True)
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
@@ -339,11 +340,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if argd['action'] not in actions:
                 argd['action'] = 'DISPLAY'
 
-            subscribe = False
-            if argd['subscribe'] and \
-               get_user_subscription_to_discussion(self.recid, uid) == 0:
-                # User is not already subscribed, and asked to subscribe
-                subscribe = True
             if not argd['msg']:
                 # User had to login in-between, so retrieve msg
                 # from cookie
@@ -359,6 +355,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 except InvenioWebAccessMailCookieError, e:
                     # Invalid or empty cookie: continue
                     pass
+
+            subscribe = False
+            if argd['subscribe'] and \
+               get_user_subscription_to_discussion(self.recid, uid) == 0:
+                # User is not already subscribed, and asked to subscribe
+                subscribe = True
 
             (body, errors, warnings) = perform_request_add_comment_or_remark(recID=self.recid,
                                                                              ln=argd['ln'],
