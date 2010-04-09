@@ -135,6 +135,7 @@ function initHotkeys(){
 	event.preventDefault();
       }
   });
+
   // Toggle 'selection mode'.
   $(document).bind('keydown', {combi: 's', disableInInput: true}, onKeyS);
   // Edit focused subfield.
@@ -172,6 +173,22 @@ function initHotkeys(){
   $(document).bind('keydown', {combi: 'ctrl+shift+e'}, onKeyCtrlShiftE);
   // Remove subfield from form.
   $(document).bind('keydown', {combi: 'ctrl+shift+d'}, onKeyCtrlShiftD);
+
+/*
+  // copy paste events
+  $(document).bind('keydown', {combi: 'alt+c', disableInInput: true},
+                   function(event){
+                     onPerformCopy();
+                   });
+  $(document).bind('keydown', {combi: 'alt+v', disableInInput: true},
+                   function(event){
+                     onPerformPaste();
+                   });
+  $(document).bind('keydown', {combi: 'alt+x', disableInInput: true},
+    function(event){
+      alert("Cut operation");
+    });
+      */
 }
 
 function onKeyS(event){

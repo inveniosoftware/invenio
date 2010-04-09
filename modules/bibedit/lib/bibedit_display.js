@@ -186,6 +186,10 @@ function redrawFields(tag, skipAddFileds){
    * Redraw all fields for a given tag.
    * skipAddFileds - forces to skip drawing the controls corresponding to the
    * change of adding a field
+   *
+   * WARNING: if we have added two (or more) fields with completely new tags a, b
+   * where a > b in the lexicographical order, redrawFields(b) has to be executed before
+   * redrawFields(a)
    */
   var rowGroup = $('#rowGroup_' + tag + '_0'), prevRowGroup;
   if (rowGroup.length){
@@ -196,7 +200,8 @@ function redrawFields(tag, skipAddFileds){
   else{
     // New tag. Determine previous sibling.
     var prevTag = getPreviousTag(tag);
-    prevRowGroup = $('#rowGroup_' + prevTag + '_0');
+    var lastIndex = gRecord[prevTag].length - 1;
+    prevRowGroup = $('#rowGroup_' + prevTag + '_' + lastIndex);
   }
 
   // Redraw all fields and append to table.

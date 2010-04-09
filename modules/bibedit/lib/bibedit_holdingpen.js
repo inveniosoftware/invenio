@@ -777,7 +777,7 @@ function onAcceptAllChanges(){
 
   var data = {
       recID: gRecID,
-      requestType: "applyHoldingPenBulkUpdates",
+      requestType: "applyBulkUpdates",
       value: [changesAddModify, changesRemove]
   }
 

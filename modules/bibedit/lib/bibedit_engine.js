@@ -168,7 +168,7 @@ window.onload = function(){
     var cellIndicator = document.getElementById('cellIndicator');
     cellIndicator.replaceChild(imgError, cellIndicator.firstChild);
     var cellStatus = document.getElementById('cellStatus');
-    cellStatus.replaceChild(txtError, cellStatus.firstChild);
+    cellStatus.replaceChild(txtError, cellStatus.firstChild)
   }
 };
 
@@ -183,6 +183,10 @@ $(function(){
   initStateFromHash();
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
   initHotkeys();
+  initClipboardLibrary();
+  /*attaching the clipboard events ...*/
+  $(document).bind("copy", onPerformCopy);
+  $(document).bind("paste", onPerformPaste);
 });
 
 
@@ -2565,4 +2569,184 @@ function updateRevisionsHistory(){
     $('#' + result['compareImgId']).bind("click", getCompareClickedHandler(result["revisionID"]));
     $('#' + result['revertImgId']).bind("click", getRevertClickedHandler(result["revisionID"]));
   }
+}
+
+function encodeXml(str){
+    var resultString = "";
+    for (var i=0;i<str.length;i++){
+        var c = str.charAt(i);
+        switch (c){
+        case '<':
+            resultString += "&lt;";
+            break;
+        case '>':
+            resultString += "&gt;";
+            break;
+        case '&':
+            resultString += "&amp;";
+            break;
+        case '"':
+            resultString += "&quot;";
+            break;
+        case "'":
+            resultString += "&apos;";
+            break;
+        default:
+            resultString += c;
+        }
+    }
+    return resultString;
+}
+
+function getSelectionMarcXml(){
+  /*Gets the MARC XML of the current editor selection*/
+
+  var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked'); // interesting only for the controlfields
+                                                                       //  where no subfields are
+  var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
+
+  // now constructing the interesting data
+
+  var selectionNormal = {}; // a dictionary of identifiers taht have appeared already
+
+  var selectionControlFields = [];
+
+  var selectedFields = []; // a list of fields already selected
+  var currentField = null; // a curently edited field
+
+  // Collect subfields to be deleted in toDelete.
+  var normalFieldsXml = "";
+  var controlFieldsXml = "";
+
+  $(checkedSubfieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
+    if (currentField == null || currentField.tag != tag || currentField.position != fieldPosition){
+      if (currentField != null){
+        var newPos = selectedFields.length;
+        selectedFields[newPos] = currentField;
+        normalFieldsXml += "</datafield>"
+      }
+      // creating an empty field
+      currentField={};
+      currentField.subfields = [];
+      currentField.tag = tag;
+      currentField.position = fieldPosition;
+      currentField.ind1 = gRecord[tag][fieldPosition][1];
+      currentField.ind2 = gRecord[tag][fieldPosition][2];
+      currentField.isControlField = false;
+      selectionNormal[tag] = true;
+      normalFieldsXml += "<datafield tag=\"" + currentField.tag + "\" ind1=\"" +
+          currentField.ind1 + "\" ind2=\"" + currentField.ind2 + "\">";
+    }
+
+    // appending a current subfield
+    var newPos = currentField.subfields.length;
+    subfield = gRecord[tag][fieldPosition][0][subfieldIndex];
+    currentField.subfields[newPos] = subfield;
+      normalFieldsXml += "<subfield code=\"" + subfield[0] + "\">" + encodeXml(subfield[1]) + "</subfield>";
+  });
+
+  if (currentField != null){
+    var newPos = selectedFields.length;
+    selectedFields[newPos] = currentField;
+    normalFieldsXml += "</datafield>";
+  }
+
+  // now extending by the control fields (they did not appear earlier)
+  $(checkedFieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2];
+    if (selectionNormal[tag] == undefined){
+       // we have a control field ! otherwise, the field has been already utilised
+      currentField = {};
+      currentField.tag = tag;
+      currentField.value = gRecord[tag][fieldPosition][3]
+      var newPos = selectionControlFields.length;
+      selectionControlFields[newPos] = currentField;
+      controlFieldsXml += "<controlfield tag=\"" + currentField.tag + "\">" + currentField.value+ "</controlfield>";
+    }
+  });
+
+  return "<record>" + controlFieldsXml + normalFieldsXml + "</record>";
+
+}
+
+function onPerformCopy(){
+  /** The handler performing the copy operation
+   */
+  if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
+    /*we do not want to perform this in case we are in an ordinary text area*/
+    return;
+  }
+  var valueToCopy = getSelectionMarcXml();
+  clipboardCopyValue(valueToCopy);
+}
+
+function onPerformPaste(){
+  /* Performing the paste operation -> retriexing the MARC XML from the clipboard,
+     decoding and applying the code to the
+
+     According to the default behaviour, the fields are appended as last of the same kind
+   */
+
+  if (document.activeElement.type == "textarea" || document.activeElement.type == "text"){
+    /*we do not want to perform this in case we are in an ordinary text area*/
+    return;
+  }
+
+  var clipboardContent = clipboardPasteValue();
+
+  var record = null;
+  try{
+    record = decodeMarcXMLRecord(clipboardContent);
+  } catch (err){
+    alert("Error when parsing XML occured ... " + err.mesage);
+  }
+
+  var changesAdd = []; // the ajax requests for all the fields
+
+  for (tag in record){
+    if (gRecord[tag] == undefined){
+      gRecord[tag] = [];
+    }
+    // now appending the fields
+    for (fieldInd in record[tag]){
+      newPos = gRecord[tag].length;
+      gRecord[tag][newPos] = record[tag][fieldInd];
+      // enqueue ajax add field request
+      changesAdd.push({
+        recID: gRecID,
+        requestType: "addField",
+        controlfield : record[tag][fieldInd][0].length == 0,
+        fieldPosition : newPos,
+        tag: tag,
+        ind1: record[tag][fieldInd][1],
+        ind2: record[tag][fieldInd][2],
+        subfields: record[tag][fieldInd][0],
+        value: record[tag][fieldInd][3]
+      });
+    }
+  }
+  // now sending the Ajax Request
+
+  // the data of an Ajax request -> a bulk add Field request
+  var ajaxRequestData = {
+      recID: gRecID,
+      requestType: "applyBulkUpdates",
+      value: [changesAdd]
+  }
+  createReq(ajaxRequestData, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']])});
+
+  // tags have to be redrawn in the increasing order
+  tags = [];
+  for (tag in record){
+    tags.push(tag);
+  }
+  tags.sort();
+  for (tagInd in tags){
+      redrawFields(tags[tagInd]);
+  }
+  reColorFields();
 }

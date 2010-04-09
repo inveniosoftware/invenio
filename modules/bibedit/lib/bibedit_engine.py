@@ -38,7 +38,6 @@ from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_record_last_modification_date, get_record_revision_author, \
     get_marcxml_of_record_revision, delete_related_holdingpen_changes
 
-
 from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_bibrecord, \
     get_cache_file_contents, get_cache_mtime, get_record_templates, \
@@ -213,7 +212,8 @@ def perform_request_init(uid, ln, req, lastupdated):
                'jquery.effects.highlight.min.js', 'jquery.autogrow.js',
                'jquery.jeditable.mini.js', 'jquery.hotkeys.min.js', 'json2.js',
                'bibedit_display.js', 'bibedit_engine.js', 'bibedit_keys.js',
-               'bibedit_menu.js', 'bibedit_holdingpen.js']
+               'bibedit_menu.js', 'bibedit_holdingpen.js', 'marcxml.js',
+               'bibedit_clipboard.js']
 
     for script in scripts:
         body += '    <script type="text/javascript" src="%s/js/%s">' \
@@ -327,10 +327,10 @@ def perform_request_ajax(req, recid, uid, data):
     elif request_type in ('getHoldingPenUpdateDetails', 'deleteHoldingPenChangeset'):
         updateId = data['changesetNumber']
         response.update(perform_request_holdingpen(request_type, recid, updateId))
-    elif request_type in ('applyHoldingPenBulkUpdates'):
+    elif request_type in ('applyBulkUpdates'):
         changes = data['value']
         cacheMTime = data['cacheMTime']
-        response.update(perform_bulk_request_holdingpen(recid, uid, changes, cacheMTime, data))
+        response.update(perform_bulk_request(recid, uid, changes, cacheMTime))
     return response
 
 def perform_request_search(data):
@@ -387,7 +387,7 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         delete_hp_change(changeId);
     return response
 
-def perform_bulk_request_holdingpen(recId, uid, changes, cacheMTime, data):
+def perform_bulk_request(recId, uid, changes, cacheMTime):
     """
         A method performing an AJAX call corresponding to a large number of operations
         intended to be applied together
@@ -409,9 +409,14 @@ def perform_bulk_request_holdingpen(recId, uid, changes, cacheMTime, data):
             requestType = change["requestType"]
             if  requestType in ('addField', 'addSubfields', 'modifyContent',
                           'moveSubfield', 'deleteFields', 'moveField', 'modifyField'):
-                #import rpdb2; rpdb2.start_embedded_debugger('somepassword', fAllowRemote = True)
+#                import rpdb2; rpdb2.start_embedded_debugger('somepassword', fAllowRemote = True)
 
-                lastResponse = perform_request_update_record(requestType, recId, uid, cacheMTime, change, -1, True)
+                if change.has_key('changeApplied'):
+                    hpChangeApplied = int(change['changeApplied']) # a number of the change currently visulaiosed in the interface that has been applied by this request ( to be removed )
+                else:
+                    hpChangeApplied = -1
+                lastResponse = perform_request_update_record(requestType, recId, uid, cacheMTime, change, hpChangeApplied, isBulk = True)
+
                 cacheMTime  = lastResponse['cacheMTime'] # Next call has to use this modification time
 
     result = lastResponse
@@ -683,8 +688,8 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, ch
     of fields or subfields. Possible common error situations:
     - Missing cache file
     - Cache file modified in other editor
-
     """
+
     response = {}
 
     if not cache_exists(recid, uid):
