@@ -53,7 +53,7 @@ from invenio.search_engine import \
      create_navtrail_links, check_user_can_view_record, record_empty
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioWebSubmitFileError, stream_file, \
-    decompose_file, propose_next_docname
+    decompose_file, propose_next_docname, get_subformat_from_format
 from invenio.errorlib import register_exception
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 import invenio.template
@@ -148,11 +148,15 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 format = filename[len(docname):]
                 if format and format[0] != '.':
                     format = '.' + format
+                if args['subformat']:
+                    format += ';%s' % args['subformat']
             else:
                 docname = args['docname']
 
             if not format:
                 format = args['format']
+                if args['subformat']:
+                    format += ';%s' % args['subformat']
 
             if not version:
                 version = args['version']
@@ -177,85 +181,38 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                 # collection restriction then.
                                 (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
                                 if auth_code:
+                                    req.status = apache.HTTP_UNAUTHORIZED
+                                    if get_subformat_from_format(format).startswith('icon'):
+                                        return stream_restricted_icon(req)
                                     return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
                             else:
                                 # The file is probably restricted on its own.
                                 # Let's check for proper authorization then
                                 (auth_code, auth_message) = docfile.is_restricted(req)
                                 if auth_code != 0:
+                                    req.status = apache.HTTP_UNAUTHORIZED
+                                    if get_subformat_from_format(format).startswith('icon'):
+                                        return stream_restricted_icon(req)
                                     return warningMsg(_("This file is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
 
                             if display_hidden or not docfile.hidden_p():
                                 if not readonly:
-                                    ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                                    ip = str(req.remote_ip)
                                     res = doc.register_download(ip, version, format, uid)
                                 try:
                                     return docfile.stream(req)
                                 except InvenioWebSubmitFileError, msg:
                                     register_exception(req=req, alert_admin=True)
+                                    req.status = apache.HTTP_INTERNAL_SERVER_ERROR
                                     return warningMsg(_("An error has happened in trying to stream the request file."), req, CFG_SITE_NAME, ln)
                             else:
+                                req.status = apache.HTTP_UNAUTHORIZED
                                 warn = print_warning(_("The requested file is hidden and you don't have the proper rights to access it."))
 
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
 
-                        if docfile.get_status() == '':
-                            # The file is not resticted, let's check for
-                            # collection restriction then.
-                            (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
-                            if auth_code:
-                                return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
-                        else:
-                            # The file is probably restricted on its own.
-                            # Let's check for proper authorization then
-                            (auth_code, auth_message) = docfile.is_restricted(req)
-                            if auth_code != 0:
-                                return warningMsg(_("This file is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
-
-                        if display_hidden or not docfile.hidden_p():
-                            if not readonly:
-                                ip = str(req.remote_ip)
-                                res = doc.register_download(ip, version, format, uid)
-                            try:
-                                return docfile.stream(req)
-                            except InvenioWebSubmitFileError, msg:
-                                register_exception(req=req, alert_admin=True)
-                                return warningMsg(_("An error has happened in trying to stream the request file."), req, CFG_SITE_NAME, ln)
-                        else:
-                            warn = print_warning(_("The requested file is hidden and you don't have the proper rights to access it."))
-
-                    elif doc.get_icon() is not None and doc.get_icon().docname == file_strip_ext(filename):
-                        icon = doc.get_icon()
-                        try:
-                            iconfile = icon.get_file(format, version)
-                        except InvenioWebSubmitFileError, msg:
-                            register_exception(req=req, alert_admin=True)
-                            return warningMsg(_("An error has happened in trying to retrieve the corresponding icon."), req, CFG_SITE_NAME, ln)
-
-                        if iconfile.get_status() == '':
-                            # The file is not resticted, let's check for
-                            # collection restriction then.
-                            (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
-                            if auth_code:
-                                return stream_restricted_icon(req)
-                        else:
-                            # The file is probably restricted on its own.
-                            # Let's check for proper authorization then
-                            (auth_code, auth_message) = iconfile.is_restricted(req)
-                            if auth_code != 0:
-                                return stream_restricted_icon(req)
-
-                        if not readonly:
-                            ip = str(req.remote_ip)
-                            res = doc.register_download(ip, version, format, uid)
-                        try:
-                            return iconfile.stream(req)
-                        except InvenioWebSubmitFileError, msg:
-                            register_exception(req=req, alert_admin=True)
-                            return warningMsg(_("An error has happened in trying to stream the corresponding icon."), req, CFG_SITE_NAME, ln)
-
-            if docname and format and display_hidden:
+            if docname and format:
                 req.status = apache.HTTP_NOT_FOUND
                 warn = print_warning(_("Requested file does not seem to exist."))
             else:

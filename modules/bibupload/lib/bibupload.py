@@ -953,18 +953,14 @@ def synchronize_8564(rec_id, record, record_had_FFT):
             ret[url] = {'u' : url}
             description = afile.get_description()
             comment = afile.get_comment()
+            subformat = afile.get_subformat()
             if description:
                 ret[url]['y'] = description
             if comment:
                 ret[url]['z'] = comment
+            if subformat:
+                ret[url]['x'] = subformat
 
-        for bibdoc in bibrecdocs.list_bibdocs():
-            icon = bibdoc.get_icon()
-            if icon:
-                icon = icon.list_all_files()
-                if icon:
-                    url = icon[0].get_url()
-                    ret[url] = {'q' : url, 'x' : 'icon'}
         return ret
 
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
@@ -1074,31 +1070,6 @@ def elaborate_fft_tags(record, rec_id, mode):
             raise
         return True
 
-    def _add_new_icon(bibdoc, url, restriction):
-        """Adds a new icon to an existing bibdoc, replacing the previous one if it exists. If url is empty, just remove the current icon."""
-        if not url:
-            bibdoc.delete_icon()
-        else:
-            try:
-                path = urllib2.urlparse.urlsplit(url)[2]
-                filename = os.path.split(path)[-1]
-                format = filename[len(file_strip_ext(filename)):]
-                tmpurl = download_url(url, format)
-                try:
-                    try:
-                        icondoc = bibdoc.add_icon(tmpurl, 'icon-%s' % bibdoc.get_docname())
-                        if restriction and restriction != KEEP_OLD_VALUE:
-                            icondoc.set_status(restriction)
-                    except StandardError, e:
-                        write_message("('%s', '%s') icon not added because '%s'." % (url, format, e), stream=sys.stderr)
-                        raise
-                finally:
-                    os.remove(tmpurl)
-            except Exception, e:
-                write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
-                raise
-        return True
-
     if mode == 'delete':
         raise StandardError('FFT tag specified but bibupload executed in --delete mode')
 
@@ -1183,11 +1154,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     except StandardError, e:
                         raise StandardError, "fft '%s' specifies in $x an icon ('%s') with problems: %s" % (fft, icon, e)
             else:
-                if mode == 'correct' and doctype != 'FIX-MARC':
-                    ## See comment on description
-                    icon = ''
-                else:
-                    icon = KEEP_OLD_VALUE
+                icon = ''
 
             # Let's discover the comment
             comment = field_get_subfield_values(fft, 'z')
@@ -1223,15 +1190,13 @@ def elaborate_fft_tags(record, rec_id, mode):
                     raise StandardError, "fft '%s' specifies a non available flag: %s" % (fft, flag)
 
             if docs.has_key(name): # new format considered
-                (doctype2, newname2, restriction2, icon2, version2, urls) = docs[name]
+                (doctype2, newname2, restriction2, version2, urls) = docs[name]
                 if doctype2 != doctype:
                     raise StandardError, "fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name)
                 if newname2 != newname:
                     raise StandardError, "fft '%s' specifies a different newname from previous fft with docname '%s'" % (str(fft), name)
                 if restriction2 != restriction:
                     raise StandardError, "fft '%s' specifies a different restriction from previous fft with docname '%s'" % (str(fft), name)
-                if icon2 != icon:
-                    raise StandardError, "fft '%x' specifies a different icon than the previous fft with docname '%s'" % (str(fft), name)
                 if version2 != version:
                     raise StandardError, "fft '%x' specifies a different version than the previous fft with docname '%s'" % (str(fft), name)
                 for (url2, format2, description2, comment2, flags2) in urls:
@@ -1239,11 +1204,17 @@ def elaborate_fft_tags(record, rec_id, mode):
                         raise StandardError, "fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, format, name)
                 if url or format:
                     urls.append((url, format, description, comment, flags))
+                if icon:
+                    urls.append((icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, flags))
             else:
                 if url or format:
-                    docs[name] = (doctype, newname, restriction, icon, version, [(url, format, description, comment, flags)])
+                    docs[name] = (doctype, newname, restriction, version, [(url, format, description, comment, flags)])
+                    if icon:
+                        docs[name][4].append((icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, flags))
+                elif icon:
+                    docs[name] = (doctype, newname, restriction, version, [(icon, icon[len(file_strip_ext(icon)):] + ';icon', description, comment, flags)])
                 else:
-                    docs[name] = (doctype, newname, restriction, icon, version, [])
+                    docs[name] = (doctype, newname, restriction, version, [])
 
         write_message('Result of FFT analysis:\n\tDocs: %s' % (docs,), verbose=9)
 
@@ -1258,8 +1229,8 @@ def elaborate_fft_tags(record, rec_id, mode):
                 bibdoc.delete()
             bibrecdocs.build_bibdoc_list()
 
-        for docname, (doctype, newname, restriction, icon, version, urls) in docs.iteritems():
-            write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', icon: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, icon, urls, mode), verbose=9)
+        for docname, (doctype, newname, restriction, version, urls) in docs.iteritems():
+            write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, urls, mode), verbose=9)
             if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.get_bibdoc_names():
                     write_message("('%s', '%s') not inserted because docname already exists." % (newname, urls), stream=sys.stderr)
@@ -1272,8 +1243,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                     raise StandardError
                 for (url, format, description, comment, flags) in urls:
                     assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
-                if icon and not icon == KEEP_OLD_VALUE:
-                    assert(_add_new_icon(bibdoc, icon, restriction))
             elif mode == 'replace_or_insert': # to be thought as correct_or_insert
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
@@ -1281,9 +1250,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
-                                    icon = bibdoc.get_icon()
-                                    if icon:
-                                        icon.change_name('icon-%s' % newname)
                                 except StandardError, e:
                                     write_message(e, stream=sys.stderr)
                                     raise
@@ -1323,14 +1289,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                                 assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags))
                                 for (url, format, description, comment, flags) in other_urls:
                                     assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
-                        if icon != KEEP_OLD_VALUE:
-                            assert(_add_new_icon(bibdoc, icon, restriction))
                 if not found_bibdoc:
                     bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
                     for (url, format, description, comment, flags) in urls:
                         assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
-                    if icon and not icon == KEEP_OLD_VALUE:
-                        assert(_add_new_icon(bibdoc, icon, restriction))
             elif mode == 'correct':
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
@@ -1338,9 +1300,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
-                                    icon = bibdoc.get_icon()
-                                    if icon:
-                                        icon.change_name('icon-%s' % newname)
                                 except StandardError, e:
                                     write_message('Error in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
                                     raise
@@ -1377,8 +1336,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                                 assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment, first_flags))
                                 for (url, format, description, comment, flags) in other_urls:
                                     assert(_add_new_format(bibdoc, url, format, docname, description, doctype, newname, description, comment, flags))
-                        if icon != KEEP_OLD_VALUE:
-                            _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
                     if doctype in ('PURGE', 'DELETE', 'EXPUNGE', 'FIX-ALL', 'FIX-MARC', 'DELETE-FILE', 'REVERT'):
                         write_message("('%s', '%s', '%s') not performed because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
@@ -1387,8 +1344,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                         bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
                         for (url, format, description, comment) in urls:
                             assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
-                        if icon and not icon == KEEP_OLD_VALUE:
-                            assert(_add_new_icon(bibdoc, icon, restriction))
             elif mode == 'append':
                 try:
                     found_bibdoc = False
@@ -1397,16 +1352,12 @@ def elaborate_fft_tags(record, rec_id, mode):
                             found_bibdoc = True
                             for (url, format, description, comment, flags) in urls:
                                 assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
-                            if icon not in ('', KEEP_OLD_VALUE):
-                                assert(_add_new_icon(bibdoc, icon, restriction))
                     if not found_bibdoc:
                         try:
                             bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
                             bibdoc.set_status(restriction)
                             for (url, format, description, comment, flags) in urls:
                                 assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment, flags))
-                            if icon and not icon == KEEP_OLD_VALUE:
-                                assert(_add_new_icon(bibdoc, icon, restriction))
                         except Exception, e:
                             register_exception()
                             write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)

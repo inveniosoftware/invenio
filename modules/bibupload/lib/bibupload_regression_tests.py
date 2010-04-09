@@ -29,7 +29,7 @@ import datetime
 import os
 import time
 import sys
-from urllib2 import urlopen
+from urllib2 import urlopen, HTTPError
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:
@@ -119,7 +119,7 @@ def try_url_download(url):
         open_url = urlopen(url)
         open_url.read()
     except Exception, e:
-        raise StandardError, "Downloading %s is impossible because of %s" \
+        raise e, "Downloading %s is impossible because of %s" \
             % (url, str(e))
     return True
 
@@ -2378,7 +2378,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="q">%(siteurl)s/record/123456789/files/icon-cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
@@ -2388,11 +2388,11 @@ class BibUploadFFTModeTest(unittest.TestCase):
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
-        8564_ $$q%(siteurl)s/record/123456789/files/icon-cds.gif$$xicon
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif?subformat=icon$$xicon
         """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
             % {'siteurl': CFG_SITE_URL}
-        testrec_expected_icon = "%(siteurl)s/record/123456789/files/icon-cds.gif" \
+        testrec_expected_icon = "%(siteurl)s/record/123456789/files/cds.gif?subformat=icon" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_task_param('verbose', 0)
@@ -2415,12 +2415,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
 
-        open_url = urlopen(testrec_expected_url)
-        self.failUnless("This file is restricted" in open_url.read())
+        self.assertRaises(HTTPError, urlopen, testrec_expected_url)
+        self.assertRaises(HTTPError, urlopen, testrec_expected_icon)
 
-        open_icon = urlopen(testrec_expected_icon)
-        restricted_icon = urlopen("%s/img/restricted.gif" % CFG_SITE_URL)
-        self.failUnless(open_icon.read() == restricted_icon.read())
         bibupload.wipe_out_record_from_all_tables(recid)
 
     def test_simple_fft_insert_with_icon(self):
@@ -2451,7 +2448,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="q">%(siteurl)s/record/123456789/files/icon-cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
@@ -2461,11 +2458,11 @@ class BibUploadFFTModeTest(unittest.TestCase):
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
         8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
-        8564_ $$q%(siteurl)s/record/123456789/files/icon-cds.gif$$xicon
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif?subformat=icon$$xicon
         """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
             % {'siteurl': CFG_SITE_URL}
-        testrec_expected_icon = "%(siteurl)s/record/123456789/files/icon-cds.gif" \
+        testrec_expected_icon = "%(siteurl)s/record/123456789/files/cds.gif?subformat=icon" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_task_param('verbose', 0)
@@ -3043,7 +3040,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="q">%(siteurl)s/record/123456789/files/icon-cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif?subformat=icon</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
@@ -3052,9 +3049,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$q%(siteurl)s/record/123456789/files/icon-cds.gif$$xicon
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif?subformat=icon$$xicon
         """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/icon-cds.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif?subformat=icon" \
             % {'siteurl': CFG_SITE_URL}
 
         # insert test record:
@@ -3179,7 +3176,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
 
-        self.failUnless(try_url_download(testrec_expected_url))
+        self.assertRaises(StandardError, try_url_download, testrec_expected_url)
         self.assertEqual(compare_xmbuffers(inserted_xm,
                                           testrec_expected_xm), '')
         self.assertEqual(compare_hmbuffers(inserted_hm,

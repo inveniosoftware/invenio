@@ -19,6 +19,8 @@
 
 __revision__ = "$Id$"
 
+import re
+
 ## test:
 test = "FALSE"
 
@@ -73,6 +75,20 @@ CFG_WEBSUBMIT_DESIRED_CONVERSIONS = {
     'tiff' : ('pdf', 'ps.gz'),
     'tif' : ('pdf', 'ps.gz')
 }
+
+## CFG_WEBSUBMIT_ICON_SUBFORMAT_RE -- a subformat is an Invenio concept to give
+## file formats more semantic. For example "foo.gif;icon" has ".gif;icon"
+## 'format', ".gif" 'superformat' and "icon" 'subformat'. That means that this
+## particular format/instance of the "foo" document, not only is a ".gif" but
+## is in the shape of an "icon", i.e. most probably it will be low-resolution.
+## This configuration variable let the administrator to decide which implicit
+## convention will be used to know which formats will be meant to be used
+## as an icon.
+CFG_WEBSUBMIT_ICON_SUBFORMAT_RE = re.compile(r"icon.*")
+
+## CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT -- this is the default subformat used
+## when creating new icons.
+CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT = "icon"
 
 
 class InvenioWebSubmitFunctionError(Exception):

@@ -121,7 +121,7 @@ In order for the script to go further they need to be removed.""", style='import
                 print wrap_text_in_a_box("INTERRUPTED", style='conclusion')
                 sys.exit(1)
             print "Backing up database tables (after dropping previous backup)",
-            backup_tables()
+            backup_tables(drop=True)
             print "-> OK"
         else:
             print "-> OK"

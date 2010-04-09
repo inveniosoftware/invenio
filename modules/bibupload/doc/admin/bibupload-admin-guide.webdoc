@@ -329,12 +329,6 @@ correcting, please use the KEEP-OLD-VALUE special keyword with the
 desired $d and $z subfield.
 </p>
 
-<p>In order to add an icon representing a document, you must use a $x
-subfields. All the FFT for different format of the document must have
-then the same $x subfield. You can use KEEP-OLD-VALUE in order to keep
-the previous icon when correcting.
-</p>
-
 <p>The $r subfield can contain a keyword that can be use to restrict
 the given document. The same keyword must be specified for all the
 format of a given document. The keyword will be used as the status

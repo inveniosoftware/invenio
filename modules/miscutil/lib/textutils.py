@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import sys
 import re
 import textwrap
+import invenio.template
 
 CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
     '__DEFAULT' : {
@@ -317,3 +318,24 @@ def wash_for_xml(text, xml_version='1.0'):
         return RE_ALLOWED_XML_1_0_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')
     else:
         return RE_ALLOWED_XML_1_1_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')
+
+def nice_size(size):
+    """
+    @param size: the size.
+    @type size: int
+    @return: a nicely printed size.
+    @rtype: string
+    """
+    websearch_templates = invenio.template.load('websearch')
+    unit = 'B'
+    if size > 1024:
+        size /= 1024.0
+        unit = 'KB'
+        if size > 1024:
+            size /= 1024.0
+            unit = 'MB'
+            if size > 1024:
+                size /= 1024.0
+                unit = 'GB'
+    return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=2), unit)
+

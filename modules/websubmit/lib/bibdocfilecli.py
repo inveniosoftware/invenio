@@ -59,7 +59,7 @@ def _xml_mksubfields(key, subfield, fft):
 
 def _xml_fft_creator(fft):
     """Transform an fft dictionary (made by keys url, docname, format,
-    new_docname, icon, comment, description, restriction, doctype, into an xml
+    new_docname, comment, description, restriction, doctype, into an xml
     string."""
     debug('Input FFT structure: %s' % fft)
     out = '\t<datafield tag ="FFT" ind1=" " ind2=" ">\n'
@@ -71,7 +71,6 @@ def _xml_fft_creator(fft):
     out += _xml_mksubfield('description', 'd', fft)
     out += _xml_mksubfield('comment', 'z', fft)
     out += _xml_mksubfield('restriction', 'r', fft)
-    out += _xml_mksubfield('icon', 'x', fft)
     out += _xml_mksubfields('options', 'o', fft)
     out += _xml_mksubfield('version', 'v', fft)
     out += '\t</datafield>\n'
@@ -297,16 +296,6 @@ def cli2docid(options, recids=None, docids=None):
     else:
         raise StandardError, "No docids matched"
 
-def cli2icon(options):
-    """Return a good value for the icon."""
-    icon = getattr(options, 'set_icon', None)
-    if icon is None:
-        icon = KEEP_OLD_VALUE
-    elif icon:
-        icon = clean_url(icon)
-        check_valid_url(icon)
-    return icon
-
 def cli2description(options):
     """Return a good value for the description."""
     description = getattr(options, 'set_description', None)
@@ -502,8 +491,6 @@ Examples:
     parser.add_option_group(housekeeping_options)
 
     experimental_options = OptionGroup(parser, 'Experimental options (do not expect to find them in the next release)')
-    experimental_options.add_option('--set-icon', dest='set_icon', help='attache the specified icon to the matched documents', metavar='URL/PATH')
-    experimental_options.add_option("--unset-icon", action="store_const", const='', dest="set_icon", help="remove any icon on the matched documents")
     experimental_options.add_option('--textify', dest='action', action='store_const', const='textify', help='extract text from matched documents and store it for later indexing')
     experimental_options.add_option('--with-ocr', dest='perform_ocr', action='store_true', default=False, help='when used with --textify, wether to perform OCR')
     parser.add_option_group(experimental_options)
@@ -517,7 +504,7 @@ def print_info(recid, docid, info):
     """Nicely print info about a recid, docid pair."""
     print '%i:%i:%s' % (recid, docid, info)
 
-def bibupload_ffts(ffts, append=False):
+def bibupload_ffts(ffts, append=False, debug=False):
     """Given an ffts dictionary it creates the xml and submit it."""
     xml = ffts_to_xml(ffts)
     if xml:
@@ -528,11 +515,17 @@ def bibupload_ffts(ffts, append=False):
         os.chmod(tmp_file_name, 0644)
         if append:
             wait_for_user("This will be appended via BibUpload")
-            task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2')
+            if debug:
+                task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2', '-v9')
+            else:
+                task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2', '-v9')
             print "BibUpload append submitted with id %s" % task
         else:
             wait_for_user("This will be corrected via BibUpload")
-            task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name, '-N', 'FFT', '-S2')
+            if debug:
+                task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name, '-N', 'FFT', '-S2', '-v9')
+            else:
+                task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file_name, '-N', 'FFT', '-S2')
             print "BibUpload correct submitted with id %s" % task
     else:
         print >> sys.stderr, "WARNING: no MARC to upload."
@@ -561,9 +554,6 @@ def cli_append(options, append_path):
     description = getattr(options, 'comment', None)
     restriction = getattr(options, 'restriction', None)
     doctype = getattr(options, 'doctype', None) or 'Main'
-    icon = cli2icon(options)
-    if icon == KEEP_OLD_VALUE:
-        icon = None
     docname = cli2docname(options, url=append_path)
     if not docname:
         raise OptionValueError, 'Not enough information to retrieve a valid docname'
@@ -576,7 +566,6 @@ def cli_append(options, append_path):
         'description' : description,
         'restriction' : restriction,
         'doctype' : doctype,
-        'icon' : icon,
         'format' : format,
         'url' : url
     }]}
@@ -594,7 +583,6 @@ def cli_revise(options, revise_path):
         raise OptionValueError, 'Not enough information to retrieve a valid docname'
     format = cli2format(options, revise_path)
     doctype = cli2doctype(options)
-    icon = cli2icon(options)
     url = clean_url(revise_path)
     new_docname = getattr(options, 'new_docname', None)
     check_valid_url(url)
@@ -605,7 +593,6 @@ def cli_revise(options, revise_path):
         'description' : description,
         'restriction' : restriction,
         'doctype' : doctype,
-        'icon' : icon,
         'format' : format,
         'url' : url,
         'options' : hide_previous and ['PERFORM_HIDE_PREVIOUS'] or None
@@ -679,16 +666,6 @@ def cli_rename(options):
     docname = bibdoc.get_docname()
     recid = bibdoc.get_recid()
     ffts = {recid : [{'docname' : docname, 'new_docname' : new_docname}]}
-    return bibupload_ffts(ffts, append=False)
-
-def cli_set_icon(options):
-    """Rename a docname within a recid."""
-    docid = cli2docid(options)
-    bibdoc = BibDoc(docid)
-    docname = bibdoc.get_docname()
-    recid = bibdoc.get_recid()
-    icon = cli2icon(options)
-    ffts = {recid : [{'docname' : docname, 'icon' : icon}]}
     return bibupload_ffts(ffts, append=False)
 
 def cli_fix_all(options):
@@ -799,14 +776,12 @@ def cli_delete(options):
     ffts = {}
     for docid in cli_docids_iterator(options):
         bibdoc = BibDoc(docid)
-        if not bibdoc.icon_p():
-            ## Icons are indirectly deleted with the relative bibdoc.
-            docname = bibdoc.get_docname()
-            recid = bibdoc.get_recid()
-            if recid not in ffts:
-                ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
-            else:
-                ffts[recid].append({'docname' : docname, 'doctype' : 'DELETE'})
+        docname = bibdoc.get_docname()
+        recid = bibdoc.get_recid()
+        if recid not in ffts:
+            ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
+        else:
+            ffts[recid].append({'docname' : docname, 'doctype' : 'DELETE'})
     return bibupload_ffts(ffts)
 
 def cli_delete_file(options):
@@ -1023,7 +998,7 @@ def cli_unhide(options):
                 this_format = bibdocfile.get_format()
                 if this_version in versions:
                     if docid not in documents_to_be_unhidden:
-                        documents_to_be_hidden[docid] = []
+                        documents_to_be_unhidden[docid] = []
                     documents_to_be_unhidden[docid].append((this_version, this_format))
                     to_be_fixed.add(recid)
                     print '%s (docid: %s, recid: %s) will be unhidden' % (bibdocfile.get_full_name(), docid, recid)
@@ -1052,8 +1027,6 @@ def main():
                 cli_set_batch(options)
             elif getattr(options, 'new_docname', None):
                 cli_rename(options)
-            elif getattr(options, 'set_icon', None) is not None:
-                cli_set_icon(options)
             else:
                 print >> sys.stderr, "ERROR: no action specified"
                 sys.exit(1)

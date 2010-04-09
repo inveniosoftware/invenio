@@ -48,7 +48,8 @@ class Template:
         'version': (str, ""), # version "" means "latest"
         'docname': (str, ""), # the docname (optional)
         'format' : (str, ""), # the format
-        'verbose' : (int, 0) # the verbosity
+        'verbose' : (int, 0), # the verbosity
+        'subformat' : (str, ""), # the subformat
         }
 
 
@@ -1259,7 +1260,7 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, format, size, description):
+    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, superformat, subformat, nice_size, description):
         """
         Displays a file in the file list.
 
@@ -1273,9 +1274,11 @@ class Template:
 
           - 'version' *string* - The version
 
-          - 'format' *string* - The display format
+          - 'superformat' *string* - The display superformat
 
-          - 'size' *string* - The size of the file
+          - 'subformat' *string* - The display subformat
+
+          - 'nice_size' *string* - The nice_size of the file
 
           - 'description' *string* - The description that might have been associated
           to the particular file
@@ -1284,26 +1287,32 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        urlbase = '%s/record/%s/files/%s' % (
+            CFG_SITE_URL,
+            recid,
+            '%s%s' % (name, superformat))
+
+        urlargd = {'version' : version}
+        if subformat:
+            urlargd['subformat'] = subformat
+
+        link_label = '%s%s' % (name, superformat)
+        if subformat:
+            link_label += ' (%s)' % subformat
+
+        link = create_html_link(urlbase, urlargd, cgi.escape(link_label))
+
         return """<tr>
                     <td valign="top">
-                      <small><a href="%(siteurl)s/record/%(recid)s/files/%(quoted_name)s%(quoted_format)s?version=%(version)s">
-                        %(name)s%(format)s
-                      </a></small>
+                      <small>%(link)s</small>
                     </td>
                     <td valign="top">
-                      <font size="-2" color="green">[%(size)s&nbsp;B]</font>
+                      <font size="-2" color="green">[%(nice_size)s]</font>
                     </td>
                     <td valign="top"><em>%(description)s</em></td>
                     </tr>""" % {
-                      'siteurl' : CFG_SITE_URL,
-                      'recid' : recid,
-                      'quoted_name' : urllib.quote(name),
-                      'name' : cgi.escape(name),
-                      'version' : version,
-                      'name' : cgi.escape(name),
-                      'quoted_format' : urllib.quote(format),
-                      'format' : cgi.escape(format),
-                      'size' : size,
+                      'link' : link,
+                      'nice_size' : nice_size,
                       'description' : cgi.escape(description),
                     }
 

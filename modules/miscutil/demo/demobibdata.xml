@@ -37,8 +37,11 @@
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0106015_01.jpg</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/0106015_01.gif</subfield>
-      <subfield code="r">restricted_picture</subfield>
+    </datafield>
+    <datafield tag="FFT" ind1=" " ind2=" ">
+        <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0106015_01.gif</subfield>
+        <subfield code="f">.gif;icon</subfield>
+        <subfield code="r">restricted_picture</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="o">0003717PHOPHO</subfield>

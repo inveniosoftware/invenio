@@ -26,8 +26,8 @@ from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibdocfile import BibRecDocs#, BibDoc, BibDocFile
 from invenio.config import \
         CFG_SITE_URL, \
-	CFG_PREFIX, \
-	CFG_WEBSUBMIT_FILEDIR
+        CFG_PREFIX, \
+        CFG_WEBSUBMIT_FILEDIR
 
 
 
@@ -44,7 +44,7 @@ class BibRecDocsTest(unittest.TestCase):
         my_added_bibdoc = my_bibrecdoc.get_bibdoc('file')
         #add bibdocfile in empty bibdoc
         my_added_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.gif', \
-        description= 'added in empty bibdoc', comment=None, format=None, hide_previous_versions=False)
+        description= 'added in empty bibdoc', comment=None, format=None, flags=['PERFORM_HIDE_PREVIOUS'])
         #propose unique docname
         self.assertEqual(my_bibrecdoc.propose_unique_docname('file'), 'file_2')
         #has docname
@@ -58,9 +58,9 @@ class BibRecDocsTest(unittest.TestCase):
         self.assertEqual(my_bibrecdoc.get_bibdoc_names('Main')[0], '0104007_02')
         self.assertEqual(my_bibrecdoc.get_bibdoc_names('Main')[1],'img_test')
         #get total size
-        self.assertEqual(my_bibrecdoc.get_total_size(), 1628647)
+        self.assertEqual(my_bibrecdoc.get_total_size(), 1647591)
         #get total size latest version
-        self.assertEqual(my_bibrecdoc.get_total_size_latest_version(), 1628647)
+        self.assertEqual(my_bibrecdoc.get_total_size_latest_version(), 1647591)
         #display
         value = my_bibrecdoc.display(docname='img_test', version='', doctype='', ln='en', verbose=0, display_hidden=True)
         self.assert_("<small><b>Main</b>" in value)
@@ -69,15 +69,18 @@ class BibRecDocsTest(unittest.TestCase):
         self.assert_('/record/2/files/img_test.jpg</subfield>' in value)
         #check duplicate docnames
         self.assertEqual(my_bibrecdoc.check_duplicate_docnames(), True)
+
+    def tearDown(self):
+        my_bibrecdoc = BibRecDocs(2)
         #delete
         my_bibrecdoc.delete_bibdoc('img_test')
-
+        my_bibrecdoc.delete_bibdoc('file')
 
 class BibDocsTest(unittest.TestCase):
     """regression tests about BibDocs"""
 
     def test_BibDocs(self):
-        """bibdocfile - Bibdocs functions"""
+        """bibdocfile - BibDocs functions"""
         #add file
         my_bibrecdoc = BibRecDocs(2)
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg')
@@ -105,7 +108,7 @@ class BibDocsTest(unittest.TestCase):
         #get file number
         self.assertEqual(my_new_bibdoc.get_file_number(), 1)
         #add file new version
-        my_new_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', description= 'the new version', comment=None, format=None, hide_previous_versions=False)
+        my_new_bibdoc.add_file_new_version(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', description= 'the new version', comment=None, format=None, flags=["PERFORM_HIDE_PREVIOUS"])
         self.assertEqual(my_new_bibdoc.list_versions(), [1, 2])
         #revert
         my_new_bibdoc.revert(1)
@@ -155,7 +158,7 @@ class BibDocsTest(unittest.TestCase):
         #hidden?
         self.assertEqual(my_new_bibdoc.hidden_p('.jpg', version=1), False)
         #hide
-        my_new_bibdoc.set_hidden(True, '.jpg', version=1)
+        my_new_bibdoc.set_flag('HIDDEN', '.jpg', version=1)
         #hidden?
         self.assertEqual(my_new_bibdoc.hidden_p('.jpg', version=1), True)
         #add and get icon
@@ -166,22 +169,24 @@ class BibDocsTest(unittest.TestCase):
         my_new_bibdoc.delete_icon()
         #get icon
         self.assertEqual(my_new_bibdoc.get_icon(), None)
-        #icon_p
-        self.assertEqual(my_new_bibdoc.icon_p(), False)
         #delete
         my_new_bibdoc.delete()
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
         #undelete
         my_new_bibdoc.undelete(previous_status='')
+
+    def tearDown(self):
+        my_bibrecdoc = BibRecDocs(2)
         #delete
-        my_bibrecdoc.delete_bibdoc('new-name')
+        my_bibrecdoc.delete_bibdoc('img_test')
+        my_bibrecdoc.delete_bibdoc('new_name')
 
 
 class BibDocFilesTest(unittest.TestCase):
     """regression tests about BibDocFiles"""
 
     def test_BibDocFiles(self):
-        """bibdocfile - BibdocFiles functions """
+        """bibdocfile - BibDocFile functions """
         #add bibdoc
         my_bibrecdoc = BibRecDocs(2)
         my_bibrecdoc.add_new_file(CFG_PREFIX + '/lib/webtest/invenio/test.jpg', 'Main', 'img_test', False, 'test add new file', 'test', '.jpg')

@@ -38,7 +38,7 @@ pylib_DATA = websubmit_config.py websubmit_engine.py file.py \
              bibdocfile_regression_tests.py \
              hocrlib.py
 
-noinst_DATA = fulltext_files_migration_kit.py
+noinst_DATA = fulltext_files_migration_kit.py icon_migration_kit.py
 
 EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
 

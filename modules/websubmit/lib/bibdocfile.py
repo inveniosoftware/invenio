@@ -88,6 +88,8 @@ from invenio.errorlib import register_exception
 from invenio.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml
+from invenio.urlutils import create_url
+from invenio.textutils import nice_size
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR,\
@@ -98,7 +100,9 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBSUBMIT_STORAGEDIR, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
     CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY
-#from invenio.bibformat import format_record
+from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, \
+    CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
+from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 websearch_templates = invenio.template.load('websearch')
@@ -112,7 +116,7 @@ CFG_BIBDOCFILE_MD5_THRESHOLD = 256 * 1024
 #: chunks loaded by the Python MD5 algorithm.
 CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
 
-#: wether to normalize e.g. ".JPEG" and ".jpg" into .jpeg.
+#: whether to normalize e.g. ".JPEG" and ".jpg" into .jpeg.
 CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION = False
 
 #: flags that can be associated to files.
@@ -185,7 +189,7 @@ class InvenioWebSubmitFileError(Exception):
     """
     pass
 
-def file_strip_ext(afile, skip_version=False, only_known_extensions=False):
+def file_strip_ext(afile, skip_version=False, only_known_extensions=False, allow_subformat=True):
     """
     Strip in the best way the extension from a filename.
 
@@ -200,18 +204,25 @@ def file_strip_ext(afile, skip_version=False, only_known_extensions=False):
     >>> file_strip_ext("foo.buz;1", skip_version=False,
     ... only_known_extensions=True)
     'foo.buz;1'
+    >>> file_strip_ext("foo.gif;icon")
+    'foo'
+    >>> file_strip_ext("foo.gif:icon", allow_subformat=False)
+    'foo.gif:icon'
 
     @param afile: the path/name of a file.
     @type afile: string
-    @param skip_version: wether to skip a trailing ";version".
+    @param skip_version: whether to skip a trailing ";version".
     @type skip_version: bool
-    @param only_known_extensions: wether to strip out only known extensions or
+    @param only_known_extensions: whether to strip out only known extensions or
         to consider as extension anything that follows a dot.
     @type only_known_extensions: bool
+    @param allow_subformat: whether to consider also subformats as part of
+        the extension.
+    @type allow_subformat: bool
     @return: the name/path without the extension (and version).
     @rtype: string
     """
-    if skip_version:
+    if skip_version or allow_subformat:
         afile = afile.split(';')[0]
     nextfile = _extensions.sub('', afile)
     if nextfile == afile and not only_known_extensions:
@@ -221,15 +232,23 @@ def file_strip_ext(afile, skip_version=False, only_known_extensions=False):
         nextfile = _extensions.sub('', afile)
     return nextfile
 
-def normalize_format(format):
+def normalize_format(format, allow_subformat=True):
     """
     Normalize the format, e.g. by adding a dot in front.
 
     @param format: the format/extension to be normalized.
     @type format: string
+    @param allow_subformat: whether to consider also subformats as part of
+        the extension.
+    @type allow_subformat: bool
     @return: the normalized format.
     @rtype; string
     """
+    if allow_subformat:
+        subformat = format[format.rfind(';'):]
+        format = format[:format.rfind(';')]
+    else:
+        subformat = ''
     if format and format[0] != '.':
         format = '.' + format
     if CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION:
@@ -240,7 +259,7 @@ def normalize_format(format):
             '.htm' : '.html',
             '.tif' : '.tiff'
         }.get(format, format)
-    return format
+    return format + subformat
 
 def guess_format_from_url(url):
     """
@@ -275,7 +294,7 @@ def guess_format_from_url(url):
         try:
             magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME]
             mimetype = magic_cookie.file(url)
-            ext = _mimes.guess_extension(content_type)
+            ext = _mimes.guess_extension(mimetype)
             if ext:
                 return normalize_format(ext)
         except Exception:
@@ -346,7 +365,8 @@ def normalize_version(version):
             return ''
     return str(version)
 
-def decompose_file(afile, skip_version=False, only_known_extensions=False):
+def decompose_file(afile, skip_version=False, only_known_extensions=False,
+        allow_subformat=True):
     """
     Decompose a file/path into its components dirname, basename and extension.
 
@@ -359,11 +379,14 @@ def decompose_file(afile, skip_version=False, only_known_extensions=False):
 
     @param afile: the path/name of a file.
     @type afile: string
-    @param skip_version: wether to skip a trailing ";version".
+    @param skip_version: whether to skip a trailing ";version".
     @type skip_version: bool
-    @param only_known_extensions: wether to strip out only known extensions or
+    @param only_known_extensions: whether to strip out only known extensions or
         to consider as extension anything that follows a dot.
     @type only_known_extensions: bool
+    @param allow_subformat: whether to consider also subformats as part of
+        the extension.
+    @type allow_subformat: bool
     @return: a tuple with the directory name, the docname and extension.
     @rtype: (dirname, docname, extension)
 
@@ -379,7 +402,10 @@ def decompose_file(afile, skip_version=False, only_known_extensions=False):
             pass
     basename = os.path.basename(afile)
     dirname = afile[:-len(basename)-1]
-    base = file_strip_ext(basename, only_known_extensions=only_known_extensions)
+    base = file_strip_ext(
+        basename,
+        only_known_extensions=only_known_extensions,
+        allow_subformat=allow_subformat)
     extension = basename[len(base) + 1:]
     if extension:
         extension = '.' + extension
@@ -412,6 +438,34 @@ def decompose_file_with_version(afile):
         extension = '.' + extension
     return (dirname, base, extension, version)
 
+def get_subformat_from_format(format):
+    """
+    @return the subformat if any.
+    @rtype: string
+    >>> get_superformat_from_format('foo;bar')
+    'bar'
+    >>> get_superformat_from_format('foo')
+    ''
+    """
+    try:
+        return format[format.rindex(';') + 1:]
+    except ValueError:
+        return ''
+
+def get_superformat_from_format(format):
+    """
+    @return the superformat if any.
+    @rtype: string
+
+    >>> get_superformat_from_format('foo;bar')
+    'foo'
+    >>> get_superformat_from_format('foo')
+    'foo'
+    """
+    try:
+        return format[:format.rindex(';')]
+    except ValueError:
+        return format
 
 def propose_next_docname(docname):
     """
@@ -447,10 +501,10 @@ class BibRecDocs:
 
     @param recid: the record identifier.
     @type recid: integer
-    @param deleted_too: wether to consider deleted documents as normal
+    @param deleted_too: whether to consider deleted documents as normal
         documents (useful when trying to recover deleted information).
     @type deleted_too: bool
-    @param human_readable: wether numbers should be printed in human readable
+    @param human_readable: whether numbers should be printed in human readable
         format (e.g. 2048 bytes -> 2Kb)
     @ivar id: the record identifier as passed to the constructor.
     @type id: integer
@@ -538,16 +592,6 @@ class BibRecDocs:
             if comment:
                 out += '\t\t<subfield code="z">%s</subfield>\n' % encode_for_xml(comment)
             out += '\t</datafield>\n'
-
-        for bibdoc in self.bibdocs:
-            icon = bibdoc.get_icon()
-            if icon:
-                icon = icon.list_all_files()
-                if icon:
-                    out += '\t<datafield tag="856" ind1="4" ind2=" ">\n'
-                    out += '\t\t<subfield code="q">%s</subfield>\n' % encode_for_xml(icon[0].get_url())
-                    out += '\t\t<subfield code="x">icon</subfield>\n'
-                    out += '\t</datafield>\n'
 
         return out
 
@@ -690,8 +734,7 @@ class BibRecDocs:
         @raise InvenioWebSubmitFileError: if at least one format in C{docname2}
             already exists in C{docname1}. (In this case the two bibdocs are
             preserved)
-        @note: comments and descriptions are also copied and if C{docname2} has
-            an icon and C{docname1} has not, the icon is imported.
+        @note: comments and descriptions are also copied.
         @note: if C{docname2} has a I{restriction}(i.e. if the I{status} is
             set) and C{docname1} doesn't, the restriction is imported.
         """
@@ -703,13 +746,6 @@ class BibRecDocs:
             format = bibdocfile.get_format()
             if bibdoc1.format_already_exists_p(format):
                 raise InvenioWebSubmitFileError('Format %s already exists in bibdoc %s of record %s. It\'s impossible to merge bibdoc %s into it.' % (format, docname1, self.id, docname2))
-
-        ## Importing Icon if needed.
-        icon1 = bibdoc1.get_icon()
-        icon2 = bibdoc2.get_icon()
-        if icon2 is not None and icon1 is None:
-            icon = icon2.list_latest_files()[0]
-            bibdoc1.add_icon(icon.get_full_path(), format=icon.get_format())
 
         ## Importing restriction if needed.
         restriction1 = bibdoc1.get_status()
@@ -998,7 +1034,7 @@ class BibRecDocs:
         @type ln: string
         @param verbose: if greater than 0, includes debug information.
         @type verbose: integer
-        @param display_hidden: wether to include hidden files as well.
+        @param display_hidden: whether to include hidden files as well.
         @type display_hidden: bool
         @return: the formatted representation.
         @rtype: HTML string
@@ -1315,7 +1351,7 @@ class BibDoc:
     @type docname: string
     @param doctype: the document type (used when instanciating a new document).
     @type doctype: string
-    @param human_readable: wether sizes should be represented in a human
+    @param human_readable: whether sizes should be represented in a human
         readable format.
     @type human_readable: bool
     @raise InvenioWebSubmitFileError: in case of error.
@@ -1459,9 +1495,6 @@ class BibDoc:
             out += '%s:%i:::total size all files=%s\n' % (self.recid or '', self.id, self.get_total_size())
         for docfile in self.docfiles:
             out += str(docfile)
-        icon = self.get_icon()
-        if icon:
-            out += str(self.get_icon())
         return out
 
     def format_already_exists_p(self, format):
@@ -1508,7 +1541,7 @@ class BibDoc:
         @param version: the version of the document for which text is required.
             If not specified the text will be retrieved from the last version.
         @type version: integer
-        @param perform_ocr: wether to perform OCR.
+        @param perform_ocr: whether to perform OCR.
         @type perform_ocr: bool
         @param ln: a two letter language code to give as a hint to the OCR
             procedure.
@@ -1817,73 +1850,64 @@ class BibDoc:
                 self.set_description(global_description, format, version)
         self._build_file_list('init')
 
-    def get_icon(self):
+    def get_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE):
         """
-        @return: the bibdoc corresponding to the icon of this document, or
+        @param subformat_re: by default the convention is that
+            L{CFG_WEBSUBMIT_ICON_SUBFORMAT_RE} is used as a subformat indicator to
+            mean that a particular format is to be used as an icon.
+            Specifiy a different subformat if you need to use a different
+            convention.
+        @type subformat_re: compiled regular expression
+        @return: the bibdocfile corresponding to the icon of this document, or
             None if any icon exists for this document.
-        @rtype: BibDoc
+        @rtype: BibDocFile
+        @warning: before I{subformat} were introduced this method was
+            returning a BibDoc, while now is returning a BibDocFile. Check
+            if your client code is compatible with this.
         """
-        if self.related_files.has_key('Icon'):
-            return self.related_files['Icon'][0]
-        else:
-            return None
+        for docfile in self.list_latest_files():
+            if subformat_re.match(docfile.get_subformat()):
+                return docfile
+        return None
 
-    def add_icon(self, filename, basename=None, format=None):
+    def add_icon(self, filename, format=None, subformat=CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT):
         """
         Attaches icon to this document.
 
         @param filename: the local filesystem path to the icon.
         @type filename: string
-        @param basename: an optional name for the icon. If not specified
-            "icon-" followed by this document name will be used.
-        @type basename: string
         @param format: an optional format for the icon. If not specified it
             will be calculated after the filesystem path.
         @type format: string
-        @return: the icon bibdoc
-        @rtype: BibDoc
+        @param subformat: by default the convention is that
+            CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT is used as a subformat indicator to
+            mean that a particular format is to be used as an icon.
+            Specifiy a different subformat if you need to use a different
+            convention.
+        @type subformat: string
         @raise InvenioWebSubmitFileError: in case of errors.
         """
         #first check if an icon already exists
-        existing_icon = self.get_icon()
-        if existing_icon is not None:
-            existing_icon.delete()
-        #then add the new one
-        if basename is None:
-            basename = 'icon-%s' % self.docname
-        if format is None:
+        if not format:
             format = decompose_file(filename)[2]
-        newicon = BibDoc(doctype='Icon', docname=basename, human_readable=self.human_readable)
-        newicon.add_file_new_version(filename, format=format)
-        try:
-            try:
-                old_umask = os.umask(022)
-                recid_fd = open("%s/.docid" % newicon.get_base_dir(), "w")
-                recid_fd.write(str(self.id))
-                recid_fd.close()
-                type_fd = open("%s/.type" % newicon.get_base_dir(), "w")
-                type_fd.write(str(self.doctype))
-                type_fd.close()
-                os.umask(old_umask)
-                run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')", (self.id, newicon.get_id(),))
-            except Exception, e:
-                register_exception()
-                raise InvenioWebSubmitFileError, "Encountered an exception while writing .docid and .doctype for folder '%s': '%s'" % (newicon.get_base_dir(), e)
-        finally:
-            Md5Folder(newicon.basedir).update()
-            self.touch()
-            self._build_related_file_list()
-        return newicon
+        if subformat:
+            format += ";%s" % subformat
 
-    def delete_icon(self):
+        self.add_file_new_format(filename, format=format)
+
+    def delete_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE):
         """
+        @param subformat_re: by default the convention is that
+            L{CFG_WEBSUBMIT_ICON_SUBFORMAT_RE} is used as a subformat indicator to
+            mean that a particular format is to be used as an icon.
+            Specifiy a different subformat if you need to use a different
+            convention.
+        @type subformat: compiled regular expression
         Removes the icon attached to the document if it exists.
         """
-        existing_icon = self.get_icon()
-        if existing_icon is not None:
-            existing_icon.delete()
-        self.touch()
-        self._build_related_file_list()
+        for docfile in self.list_latest_files():
+            if subformat_re.match(docfile.get_subformat()):
+                self.delete_file(docfile.get_format(), docfile.get_version())
 
     def display(self, version="", ln=CFG_SITE_LANG, display_hidden=True):
         """
@@ -1894,7 +1918,7 @@ class BibDoc:
         @type version: string (integer or 'all')
         @param ln: the language code.
         @type ln: string
-        @param display_hidden: wether to include hidden files as well.
+        @param display_hidden: whether to include hidden files as well.
         @type display_hidden: bool
         @return: the formatted representation.
         @rtype: HTML string
@@ -1907,11 +1931,9 @@ class BibDoc:
             docfiles = self.list_version_files(version, list_hidden=display_hidden)
         else:
             docfiles = self.list_latest_files(list_hidden=display_hidden)
-        existing_icon = self.get_icon()
-        if existing_icon is not None:
-            existing_icon = existing_icon.list_all_files()[0]
-            imageurl = "%s/record/%s/files/%s" % \
-                (CFG_SITE_URL, self.recid, urllib.quote(existing_icon.get_full_name()))
+        icon = self.get_icon()
+        if icon:
+            imageurl = icon.get_url()
         else:
             imageurl = "%s/img/smallfiles.gif" % CFG_SITE_URL
 
@@ -2124,15 +2146,7 @@ class BibDoc:
         """
         if version is None:
             version = self.get_latest_version()
-        return self.more_info.hidden_p(format, version)
-
-    def icon_p(self):
-        """
-        @return: True if this document is an icon attached to another
-        document.
-        @rtype: bool
-        """
-        return run_sql("SELECT count(id_bibdoc2) FROM bibdoc_bibdoc WHERE id_bibdoc2=%s AND type='Icon'", (self.id, ))[0][0] > 0
+        return self.more_info.has_flag('HIDDEN', format, version)
 
     def get_docname(self):
         """
@@ -2226,6 +2240,13 @@ class BibDoc:
 
         for docfile in docfiles:
             if (docfile.get_format()==format or not format):
+                return docfile
+
+        ## Let's skip the subformat specification and consider just the
+        ## superformat
+        superformat = get_superformat_from_format(format)
+        for docfile in docfiles:
+            if get_superformat_from_format(docfile.get_format()) == superformat:
                 return docfile
         raise InvenioWebSubmitFileError, "No file called '%s' of format '%s', version '%s'" % (self.docname, format, version)
 
@@ -2429,6 +2450,7 @@ class BibDoc:
     def _build_related_file_list(self):
         """Lists all files attached to the bibdoc. This function should be
         called everytime the bibdoc is modified within e.g. its icon.
+        @deprecated: use subformats instead.
         """
         self.related_files = {}
         res = run_sql("SELECT ln.id_bibdoc2,ln.type,bibdoc.status FROM "
@@ -2517,12 +2539,14 @@ class BibDocFile:
         self.human_readable = human_readable
         self.description = more_info.get_description(format, version)
         self.format = normalize_format(format)
+        self.superformat = get_superformat_from_format(self.format)
+        self.subformat = get_subformat_from_format(self.format)
         if format == "":
             self.mime = "application/octet-stream"
             self.encoding = ""
             self.fullname = name
         else:
-            self.fullname = "%s%s" % (name, self.format)
+            self.fullname = "%s%s" % (name, self.superformat)
             (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
             if self.mime is None:
                 self.mime = "application/octet-stream"
@@ -2538,8 +2562,12 @@ class BibDocFile:
             self.cd = self.md
         self.name = name
         self.dir = os.path.dirname(fullpath)
-        self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, urllib.quote(self.name), urllib.quote(self.format))
-        self.fullurl = '%s?version=%s' % (self.url, self.version)
+        if self.subformat:
+            self.url = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {'subformat' : self.subformat})
+            self.fullurl = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {'subformat' : self.subformat, 'version' : self.version})
+        else:
+            self.url = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {})
+            self.fullurl = create_url('%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.superformat), {'version' : self.version})
         self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         self.magic = None
 
@@ -2550,6 +2578,7 @@ class BibDocFile:
         out = '%s:%s:%s:%s:fullpath=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullpath)
         out += '%s:%s:%s:%s:fullname=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullname)
         out += '%s:%s:%s:%s:name=%s\n' % (self.recid, self.docid, self.version, self.format, self.name)
+        out += '%s:%s:%s:%s:subformat=%s\n' % (self.recid, self.docid, self.version, self.format, get_subformat_from_format(self.format))
         out += '%s:%s:%s:%s:status=%s\n' % (self.recid, self.docid, self.version, self.format, self.status)
         out += '%s:%s:%s:%s:checksum=%s\n' % (self.recid, self.docid, self.version, self.format, self.checksum)
         if self.human_readable:
@@ -2577,8 +2606,9 @@ class BibDocFile:
                  recid = self.recid,
                  version = self.version,
                  name = self.name,
-                 format = self.format,
-                 size = self.size,
+                 superformat = self.superformat,
+                 subformat = self.subformat,
+                 nice_size = nice_size(self.size),
                  description = self.description or ''
                )
 
@@ -2590,6 +2620,19 @@ class BibDocFile:
             return (1, 'File has ben deleted')
         else:
             return (0, '')
+
+    def is_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE):
+        """
+        @param subformat_re: by default the convention is that
+            L{CFG_WEBSUBMIT_ICON_SUBFORMAT_RE} is used as a subformat indicator to
+            mean that a particular format is to be used as an icon.
+            Specifiy a different subformat if you need to use a different
+            convention.
+        @type subformat: compiled regular expression
+        @return: True if this file is an icon.
+        @rtype: bool
+        """
+        return bool(subformat_re.match(self.subformat))
 
     def hidden_p(self):
         return self.hidden
@@ -2617,6 +2660,12 @@ class BibDocFile:
 
     def get_format(self):
         return self.format
+
+    def get_subformat(self):
+        return self.subformat
+
+    def get_superformat(self):
+        return self.superformat
 
     def get_size(self):
         return self.size
@@ -2674,7 +2723,7 @@ class BibDocFile:
             if os.path.exists(self.fullpath):
                 if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-                stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
+                stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
                 raise apache.SERVER_RETURN, apache.DONE
             else:
                 req.status = apache.HTTP_NOT_FOUND
@@ -2867,7 +2916,6 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         if fullname is None:
             fullname = os.path.basename(fullpath)
         if mime is None:
-            format = decompose_file(fullpath)[2]
             (mime, encoding) = _mimes.guess_type(fullpath)
             if mime is None:
                 mime = "application/octet-stream"
@@ -2936,13 +2984,9 @@ def list_versions_from_array(docfiles):
     for docfile in docfiles:
         if not docfile.get_version() in versions:
             versions.append(docfile.get_version())
+    versions.sort()
+    versions.reverse()
     return versions
-
-def order_files_with_version(docfile1, docfile2):
-    """order docfile objects according to their version"""
-    version1 = docfile1.get_version()
-    version2 = docfile2.get_version()
-    return cmp(version2, version1)
 
 def _make_base_dir(docid):
     """Given a docid it returns the complete path that should host its files."""
@@ -3182,20 +3226,6 @@ def decompose_bibdocfile_very_old_url(url):
             raise InvenioWebSubmitFileError('%s has no params to correspond to a bibdocfile.' % url)
     else:
         raise InvenioWebSubmitFileError('%s is not a valid very old bibdocfile url' % url)
-
-def nice_size(size):
-    """Return a nicely printed size in kilo."""
-    unit = 'B'
-    if size > 1024:
-        size /= 1024.0
-        unit = 'KB'
-        if size > 1024:
-            size /= 1024.0
-            unit = 'MB'
-            if size > 1024:
-                size /= 1024.0
-                unit = 'GB'
-    return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=2), unit)
 
 def get_docname_from_url(url):
     """Return a potential docname given a url"""

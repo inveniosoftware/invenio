@@ -227,6 +227,7 @@ Contents
       $ make install-jsmath-plugin     ## optional
       $ make install-jquery-plugins    ## optional
       $ make install-fckeditor-plugin  ## optional
+      $ make install-pdfa-helper-files ## optional
 
 1b. Configuration
 -----------------
@@ -438,6 +439,12 @@ Contents
 
           Note that in order to enable the editor you have to set the
           CFG_WEBCOMMENT_USE_FCKEDITOR to True.
+
+      $ make install-pdfa-helper-files ## optional
+
+          This will automatically download and install in the proper
+          place the helper files needed to create PDF/A files out of
+          existing PDF files.
 
 2b. Configuration
 -----------------
