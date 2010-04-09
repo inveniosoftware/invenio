@@ -56,7 +56,9 @@ class CitationDictsDataCacher(DataCacher):
             return alldicts
 
         def timestamp_verifier():
-            return get_table_update_time('rnkCITATIONDATA')
+            res = run_sql("""SELECT DATE_FORMAT(last_updated, '%Y-%m-%d %H:%i:%s')
+                              FROM rnkMETHOD WHERE name='citation'""")
+            return res[0][0]
 
         DataCacher.__init__(self, cache_filler, timestamp_verifier)
 

@@ -86,13 +86,16 @@ def single_tag_rank_method_repair_exec():
 def citation_exec(rank_method_code, name, config):
     """Rank method for citation analysis"""
     #first check if this is a specific task
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if task_get_option("cmd") == "print-missing":
         num = task_get_option("num")
         print_missing(num)
-    dict = get_citation_weight(rank_method_code, config)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    if dict: intoDB(dict, date, rank_method_code)
-    else: write_message("no need to update the indexes for citations")
+    else:
+        dict = get_citation_weight(rank_method_code, config)
+        if dict:
+            intoDB(dict, begin_date, rank_method_code)
+        else:
+            write_message("no need to update the indexes for citations")
 
 def download_weight_filtering_user(run):
     return bibrank_engine(run)
@@ -107,53 +110,52 @@ def download_weight_filtering_user_exec (rank_method_code, name, config):
     """Ranking by number of downloads per User.
     Only one full Text Download is taken in account for one
     specific userIP address"""
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     time1 = time.time()
     dic = fromDB(rank_method_code)
     last_updated = get_lastupdated(rank_method_code)
     keys = new_downloads_to_index(last_updated)
     filter_downloads_per_hour(keys, last_updated)
     dic = get_download_weight_filtering_user(dic, keys)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    intoDB(dic, date, rank_method_code)
+    intoDB(dic, begin_date, rank_method_code)
     time2 = time.time()
     return {"time":time2-time1}
 
 def download_weight_total_exec(rank_method_code, name, config):
     """rankink by total number of downloads without check the user ip
     if users downloads 3 time the same full text document it has to be count as 3 downloads"""
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     time1 = time.time()
     dic = fromDB(rank_method_code)
     last_updated = get_lastupdated(rank_method_code)
     keys = new_downloads_to_index(last_updated)
     filter_downloads_per_hour(keys, last_updated)
     dic = get_download_weight_total(dic, keys)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    intoDB(dic, date, rank_method_code)
+    intoDB(dic, begin_date, rank_method_code)
     time2 = time.time()
     return {"time":time2-time1}
 
 def file_similarity_by_times_downloaded_exec(rank_method_code, name, config):
     """update dictionnary {recid:[(recid, nb page similarity), ()..]}"""
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     time1 = time.time()
     dic = fromDB(rank_method_code)
     last_updated = get_lastupdated(rank_method_code)
     keys = new_downloads_to_index(last_updated)
     filter_downloads_per_hour(keys, last_updated)
     dic = get_file_similarity_by_times_downloaded(dic, keys)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    intoDB(dic, date, rank_method_code)
+    intoDB(dic, begin_date, rank_method_code)
     time2 = time.time()
     return {"time":time2-time1}
 
 def single_tag_rank_method_exec(rank_method_code, name, config):
     """Creating the rank method data"""
-    startCreate = time.time()
+    begin_date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     rnkset = {}
     rnkset_old = fromDB(rank_method_code)
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     rnkset_new = single_tag_rank(config)
     rnkset = union_dicts(rnkset_old, rnkset_new)
-    intoDB(rnkset, date, rank_method_code)
+    intoDB(rnkset, begin_date, rank_method_code)
 
 def single_tag_rank(config):
     """Connect the given tag with the data from the kb file given"""
@@ -250,7 +252,7 @@ def del_recids(rank_method_code, range_rec):
                     del rec_dict[i]
         write_message("New size: %s" % len(rec_dict))
         date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        intoDB(rec_dict, date, rank_method_code)
+        intoDB(rec_dict, begin_date, rank_method_code)
     else:
         write_message("Create before deleting!")
 

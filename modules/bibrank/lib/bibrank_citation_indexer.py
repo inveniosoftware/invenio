@@ -963,8 +963,6 @@ def insert_into_cit_db(dic, name):
                      (name,s))
         run_sql("UPDATE rnkCITATIONDATA SET last_updated = %s where object_name = %s",
                (ndate,name))
-        #finally, update the rnkmethod table.
-        run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (ndate, 'citation'))
     except:
         register_exception(prefix="could not write "+name+" into db", alert_admin=True)
 
