@@ -38,10 +38,12 @@ import os
 from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
-     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS
+     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS, \
+     CFG_PATH_PDFTOTEXT
 from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
 from invenio.textutils import encode_for_xml
+from invenio.shellutils import run_shell_command
 
 def highlight(text, keywords=None, prefix_tag='<strong>', suffix_tag="</strong>"):
     """
@@ -573,17 +575,13 @@ def get_pdf_snippets(recID, patterns,
     for bdf in BibRecDocs(recID).list_latest_files():
         if bdf.get_format() == '.pdf':
             path = bdf.get_path() # to print filesystem path to PDF
-            #print "path: " + path
+            break # stop at the first PDF file
 
     if path != "":
         pathTxt = path.replace(".pdf", ".TMP.txt")
         pathTxt = pathTxt.split(';')[0]
         if not os.path.exists(pathTxt):
-            # shell interprets ';' Python does not
-            cmd = "pdftotext \"" + path + "\" " + pathTxt
-            #print "cmd: " + cmd
-            #print "result: "
-            #print os.popen(cmd)
+            run_shell_command(CFG_PATH_PDFTOTEXT + " %s %s", [path, pathTxt])
         if os.path.exists(pathTxt):
             return get_text_snippets(pathTxt, patterns, nb_words_around, max_snippets)
         else:
@@ -608,17 +606,17 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets):
     words_left = max_snippets * (nb_words_around * 2 + 1)
     # Assuming that there will be at least one word per line we can produce the
     # big snippets like this
-    cmd = "grep -i -A" + str(nb_words_around) + " -B" + str(nb_words_around)
-    cmd += " -m" + str(max_snippets) + " "
+    cmd = "grep -i -A%s -B%s -m%s"
+    cmdargs = [str(nb_words_around), str(nb_words_around), str(max_snippets)]
     for p in patterns:
-        cmd += "-e " + p + " "
-    # ';' does not exist in the text file path
-    cmd += textfile_path
-    #print "cmd: " + cmd
-    output = os.popen(cmd)
+        cmd += " -e %s"
+        cmdargs.append(p)
+    cmd += " %s"
+    cmdargs.append(textfile_path)
+    (dummy1, output, dummy2) = run_shell_command(cmd, cmdargs)
 
     result = []
-    big_snippets = output.read(-1).split("--")
+    big_snippets = output.split("--")
 
     # cut the snippets to match the nb_words_around parameter precisely:
     for s in big_snippets:
