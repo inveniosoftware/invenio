@@ -57,6 +57,7 @@ from invenio.config import \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
      CFG_WEBSEARCH_DEF_RECORDS_IN_GROUPS, \
+     CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
      CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
@@ -3937,17 +3938,29 @@ def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, us
     BibFormat will decide by itself if old or new BibFormat must be used.
     """
 
+    from invenio.bibformat_utils import get_pdf_snippets
+
     keywords = []
     if search_pattern is not None:
         units = create_basic_search_units(None, str(search_pattern), None)
         keywords = [unit[1] for unit in units if unit[0] != '-']
 
-    return format_record(recID,
+    out = format_record(recID,
                          of=format,
                          ln=ln,
                          search_pattern=keywords,
                          user_info=user_info,
                          verbose=verbose)
+
+    if 'fulltext' in user_info['uri'] and CFG_WEBSEARCH_FULLTEXT_SNIPPETS:
+        # check snippets only if URL contains fulltext
+        # FIXME: make it work for CLI too, via new function arg
+        if keywords:
+            snippets = get_pdf_snippets(recID, keywords)
+            if snippets:
+                out += snippets
+
+    return out
 
 def log_query(hostname, query_args, uid=-1):
     """
