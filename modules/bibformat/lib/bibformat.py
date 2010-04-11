@@ -50,11 +50,6 @@ from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT, \
      CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT
 from invenio.access_control_engine import acc_authorize_action
-try:
-    import invenio.template
-    websearch_templates = invenio.template.load('websearch')
-except:
-    pass
 import getopt
 import sys
 
@@ -199,6 +194,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                            (recID, of),
                            alert_admin=True)
         #Failsafe execution mode
+        import invenio.template
+        websearch_templates = invenio.template.load('websearch')
         if verbose == 9:
             out += """\n<br/><span class="quicknote">
             An error occured while formatting record %i. (%s)

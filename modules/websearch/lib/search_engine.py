@@ -3952,7 +3952,8 @@ def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, us
                          user_info=user_info,
                          verbose=verbose)
 
-    if 'fulltext' in user_info['uri'] and CFG_WEBSEARCH_FULLTEXT_SNIPPETS:
+    if CFG_WEBSEARCH_FULLTEXT_SNIPPETS and user_info and \
+           'fulltext' in user_info['uri']:
         # check snippets only if URL contains fulltext
         # FIXME: make it work for CLI too, via new function arg
         if keywords:
