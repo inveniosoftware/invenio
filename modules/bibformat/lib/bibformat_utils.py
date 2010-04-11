@@ -646,7 +646,7 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words):
         ret = False
         lower_case = word.lower()
         for p in patterns:
-            if lower_case.startswith(str(p)):
+            if lower_case.startswith(str(p).lower()):
                 ret = True
                 break
         return ret
