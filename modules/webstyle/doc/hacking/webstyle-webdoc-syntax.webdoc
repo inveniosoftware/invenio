@@ -166,17 +166,18 @@ header and footer:</p>
 
 <table class="list">
 	<tr><th>directive</th><th>description</th></tr>
-	<tr><td><code>&lt;-- WebDoc-Page-Title: &#95;(My Title)&#95; --></td><td>Title of the page. It will be embedded in <code>&lt;h1></code> tag at the beginning of the page, as well as in the <code>&lt;title></code> tag of the header. Also used in the breadcrumb of the page ("navtrail")</td></tr>
-	<tr class="blue"><td><code>&lt;-- WebDoc-Page-Navtrail: &lt;a class="navtrail" href="&lt;CFG_SITE_URL>/help/hacking">Hacking CDS Invenio&lt;/a> &amp;gt; &lt;a class="navtrail" href="webstyle-internals">WebStyle Internals&lt;/a> --></code></td><td>Specified the breadcrumb of the page.</td></tr>
-	<tr><td><code>&lt;-- WebDoc-Page-Keywords: some keywords --></code></td><td>Keywords that will appear in the <code>&lt;meta name="keyword"/></code> tag of the page.</td></tr>
-	<tr class="blue"><td><code>&lt;-- WebDoc-Page-Description: a page description --></code></td><td>A description that will appear in the <code>&lt;meta name="description"/></code> tag of the page.</td></tr>
-	<tr><td><code>&lt;-- WebDoc-Page-Revision: $Id$ --></code></td><td>The version of the file (typically for CVS keyword expansion).</td></tr>
+	<tr><td><code>&lt;!-- WebDoc-Page-Title: &#95;(My Title)&#95; --></td><td>Title of the page. It will be embedded in <code>&lt;h1></code> tag at the beginning of the page, as well as in the <code>&lt;title></code> tag of the header. Also used in the breadcrumb of the page ("navtrail")</td></tr>
+	<tr class="blue"><td><code>&lt;!-- WebDoc-Page-Navtrail: &lt;a class="navtrail" href="&lt;CFG_SITE_URL>/help/hacking">Hacking CDS Invenio&lt;/a> &amp;gt; &lt;a class="navtrail" href="webstyle-internals">WebStyle Internals&lt;/a> --></code></td><td>Specified the breadcrumb of the page.</td></tr>
+	<tr><td><code>&lt;!-- WebDoc-Page-Keywords: some keywords --></code></td><td>Keywords that will appear in the <code>&lt;meta name="keyword"/></code> tag of the page.</td></tr>
+	<tr class="blue"><td><code>&lt;!-- WebDoc-Page-Description: a page description --></code></td><td>A description that will appear in the <code>&lt;meta name="description"/></code> tag of the page.</td></tr>
+	<tr><td><code>&lt;!-- WebDoc-Page-Revision: $Id$ --></code></td><td>The version of the file (typically for CVS keyword expansion).</td></tr>
 </table>
 
 <h3><a name="wellformdness">5. Well-formdness of WebDoc files</a></h3>
 
-<p>WebDoc files must be well-formed XML files. Failing to fulfill this
-requirement might lead to unexpected results.</p>
+<p>WebDoc files must be well-formed XML files (except for the
+variables specified in section 2). Failing to fulfill this requirement
+might lead to unexpected results.</p>
 
 <p>Please make sure that the produced output is XHTML valid.</p>
 
