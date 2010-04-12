@@ -42,6 +42,7 @@ from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
 from invenio.webuser import get_preferred_user_language, isGuestUser, \
     getUid, loginUser, update_Uid, isUserSuperAdmin, collect_user_info
+from invenio.webinterface_handler_wsgi_utils import StringField, Field
 
 ## The following variable is True if the installation make any difference
 ## between HTTP Vs. HTTPS connections.
@@ -412,7 +413,7 @@ def wash_urlargd(form, content):
     content. Content is a dictionary containing the field names as a
     key, and a tuple (type, default) as value.
 
-    'type' can be list, str, int, tuple, or
+    'type' can be list, str, invenio.webinterface_handler_wsgi_utils.StringField, int, tuple, or
     invenio.webinterface_handler_wsgi_utils.Field (for
     file uploads).
 
@@ -461,7 +462,10 @@ def wash_urlargd(form, content):
         # Maybe we already have what is expected? Then don't change
         # anything.
         if isinstance(value, dst_type):
-            result[k] = value
+            if isinstance(value, StringField):
+                result[k] = str(value)
+            else:
+                result[k] = value
             continue
 
         # Since we got here, 'value' is sure to be a single symbol,
