@@ -27,7 +27,7 @@
 
    2. Read each create_ line from the cfg file, for each line, read the
       source(s) from either database, file or www by calling get_from_source().
-      Convert between naming conventions if source for convertion data is given.
+      Convert between naming conventions if source for conversion data is given.
 
    3. Merge into one file, repeat 2. until last source is read.
 

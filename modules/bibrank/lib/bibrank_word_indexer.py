@@ -341,8 +341,8 @@ class WordTable:
                        (starting_time, rank_method_code,))
 
     def add_recIDs(self, recIDs):
-        """Fetches records which id in the recIDs range list and adds
-        them to the wordTable.  The recIDs range list is of the form:
+        """Fetches records which id in the recIDs arange list and adds
+        them to the wordTable.  The recIDs arange list is of the form:
         [[i1_low,i1_high],[i2_low,i2_high], ..., [iN_low,iN_high]].
         """
         global chunksize
@@ -350,16 +350,16 @@ class WordTable:
         records_done = 0
         records_to_go = 0
 
-        for range in recIDs:
-            records_to_go = records_to_go + range[1] - range[0] + 1
+        for arange in recIDs:
+            records_to_go = records_to_go + arange[1] - arange[0] + 1
 
         time_started = time.time() # will measure profile time
-        for range in recIDs:
-            i_low = range[0]
+        for arange in recIDs:
+            i_low = arange[0]
             chunksize_count = 0
-            while i_low <= range[1]:
+            while i_low <= arange[1]:
                 # calculate chunk group of recIDs and treat it:
-                i_high = min(i_low+task_get_option("flush")-flush_count-1,range[1])
+                i_high = min(i_low+task_get_option("flush")-flush_count-1,arange[1])
                 i_high = min(i_low+chunksize-chunksize_count-1, i_high)
                 try:
                     self.chk_recID_range(i_low, i_high)
@@ -420,12 +420,12 @@ class WordTable:
         query += " ORDER BY b.id ASC"""
         res = run_sql(query)
 
-        list = create_range_list(res)
-        if not list:
+        alist = create_range_list([row[0] for row in res])
+        if not alist:
             write_message( "No new records added. %s is up to date" % self.tablename)
         else:
-            self.add_recIDs(list)
-        return list
+            self.add_recIDs(alist)
+        return alist
 
 
     def add_recID_range(self, recID1, recID2):
@@ -608,7 +608,7 @@ class WordTable:
         query = """SELECT id_bibrec FROM %sR WHERE type <> 'CURRENT' ORDER BY id_bibrec""" \
                 % (self.tablename[:-1])
         res = run_sql(query)
-        recIDs = create_range_list(res)
+        recIDs = create_range_list([row[0] for row in res])
 
         flush_count = 0
         records_done = 0

@@ -825,23 +825,20 @@ def log_action(log_dir, action, bibdoc_name, file_path, rename,
 
     """
     log_file = os.path.join(log_dir, 'bibdocactions.log')
-    try:
-        file_desc = open(log_file, "a+")
-        # We must escape new lines from comments in some way:
-        comment = str(comment).replace('\\', '\\\\').replace('\r\n', '\\n\\r')
-        msg = action                                 + '---' + \
-              bibdoc_name.replace('---', '___')      + '---' + \
-              file_path                              + '---' + \
-              str(rename).replace('---', '___')      + '---' + \
-              str(description).replace('---', '___') + '---' + \
-              comment.replace('---', '___')          + '---' + \
-              doctype                                + '---' + \
-              str(int(keep_previous_versions))       + '---' + \
-              file_restriction + '\n'
-        file_desc.write("%s --> %s" %(time.strftime("%Y-%m-%d %H:%M:%S"), msg))
-        file_desc.close()
-    except Exception ,e:
-        raise e
+    file_desc = open(log_file, "a+")
+    # We must escape new lines from comments in some way:
+    comment = str(comment).replace('\\', '\\\\').replace('\r\n', '\\n\\r')
+    msg = action                                 + '---' + \
+            bibdoc_name.replace('---', '___')      + '---' + \
+            file_path                              + '---' + \
+            str(rename).replace('---', '___')      + '---' + \
+            str(description).replace('---', '___') + '---' + \
+            comment.replace('---', '___')          + '---' + \
+            doctype                                + '---' + \
+            str(int(keep_previous_versions))       + '---' + \
+            file_restriction + '\n'
+    file_desc.write("%s --> %s" %(time.strftime("%Y-%m-%d %H:%M:%S"), msg))
+    file_desc.close()
 
 def read_actions_log(log_dir):
     """

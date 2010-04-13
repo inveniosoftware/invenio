@@ -42,6 +42,10 @@ you might have into CDS Invenio.
 <dd>Describes how to run your CDS Invenio installation and how to take
 care of its normal operation day by day.
 
+<dt><a href="howto-fulltext">HOWTO Manage Fulltext Files</a>
+
+<dd>Describes how to manipulate fulltext files within your CDS Invenio
+installation.
 </dl>
 </blockquote>
 

@@ -22,8 +22,13 @@
 __revision__ = "$Id$"
 
 import unittest
+import time
+import os
 
-from invenio.shellutils import escape_shell_arg, run_shell_command
+from invenio.config import CFG_TMPDIR
+
+from invenio.shellutils import escape_shell_arg, run_shell_command, \
+    run_process_with_timeout, Timeout
 from invenio.testutils import make_test_suite, run_test_suite
 
 class EscapeShellArgTest(unittest.TestCase):
@@ -109,8 +114,36 @@ class RunShellCommandTest(unittest.TestCase):
         self.assertRaises(TypeError, run_shell_command,
                           "echo %s %s %s", ("hello", "world",))
 
+class RunProcessWithTimeoutTest(unittest.TestCase):
+    """Testing of running a process with timeout."""
+    def setUp(self):
+        self.script_path = os.path.join(CFG_TMPDIR, 'test_sleeping.sh')
+        script = open(self.script_path, 'w')
+        print >> script, "#!/bin/sh"
+        print >> script, "date"
+        print >> script, "sleep $1"
+        print >> script, "date"
+        script.close()
+        os.chmod(self.script_path, 0700)
+
+    def tearDown(self):
+        os.remove(self.script_path)
+
+    def test_run_cmd_timeout(self):
+        """shellutils - running simple command with expiring timeout"""
+        t1 = time.time()
+        self.assertRaises(Timeout, run_process_with_timeout, (self.script_path, '15'), timeout=5)
+        self.failUnless(time.time() - t1 < 7)
+
+    def test_run_cmd_no_timeout(self):
+        """shellutils - running simple command with non expiring timeout"""
+        t1 = time.time()
+        self.assertEqual(3, len(run_process_with_timeout((self.script_path, '5'), timeout=15)[1].split('\n')))
+        self.failUnless(time.time() - t1 < 7)
+
 TEST_SUITE = make_test_suite(EscapeShellArgTest,
-                             RunShellCommandTest,)
+                             RunShellCommandTest,
+                             RunProcessWithTimeoutTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

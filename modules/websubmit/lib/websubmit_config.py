@@ -19,6 +19,8 @@
 
 __revision__ = "$Id$"
 
+import re
+
 ## test:
 test = "FALSE"
 
@@ -47,6 +49,47 @@ CFG_RESERVED_SUBMISSION_FILENAMES = ['SuE',
                                      'curdir',
                                      'function_log',
                                      'SN']
+
+## CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM -- a comma-separated
+## list of document extensions in decrescent order of preference
+## to suggest what is considered the best format to extract text from.
+CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM = ('txt', 'html', 'xml', 'odt', 'doc', 'docx', 'djvu', 'pdf', 'ps', 'ps.gz')
+
+## CFG_WEBSUBMIT_DESIRED_CONVERSIONS -- a dictionary having as keys
+## a format and as values the corresponding list of desired converted
+## formats.
+CFG_WEBSUBMIT_DESIRED_CONVERSIONS = {
+    'pdf' : ('ps.gz', ),
+    'ps.gz' : ('pdf', ),
+    'djvu' : ('ps.gz', 'pdf'),
+    'docx' : ('doc', 'odt', 'pdf', 'ps.gz'),
+    'doc' : ('odt', 'pdf', 'ps.gz'),
+    'rtf' : ('pdf', 'odt', 'ps.gz'),
+    'odt' : ('pdf', 'doc', 'ps.gz'),
+    'pptx' : ('ppt', 'odp', 'pdf', 'ps.gz'),
+    'ppt' : ('odp', 'pdf', 'ps.gz'),
+    'odp' : ('pdf', 'ppt', 'ps.gz'),
+    'xlsx' : ('xls', 'ods', 'csv'),
+    'xls' : ('ods', 'csv'),
+    'ods' : ('xls', 'csv'),
+    'tiff' : ('pdf', 'ps.gz'),
+    'tif' : ('pdf', 'ps.gz')
+}
+
+## CFG_WEBSUBMIT_ICON_SUBFORMAT_RE -- a subformat is an Invenio concept to give
+## file formats more semantic. For example "foo.gif;icon" has ".gif;icon"
+## 'format', ".gif" 'superformat' and "icon" 'subformat'. That means that this
+## particular format/instance of the "foo" document, not only is a ".gif" but
+## is in the shape of an "icon", i.e. most probably it will be low-resolution.
+## This configuration variable let the administrator to decide which implicit
+## convention will be used to know which formats will be meant to be used
+## as an icon.
+CFG_WEBSUBMIT_ICON_SUBFORMAT_RE = re.compile(r"icon.*")
+
+## CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT -- this is the default subformat used
+## when creating new icons.
+CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT = "icon"
+
 
 class InvenioWebSubmitFunctionError(Exception):
     """This exception should only ever be raised by WebSubmit functions.

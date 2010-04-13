@@ -76,7 +76,6 @@ pylib_DATA = __init__.py \
              Stamp_Uploaded_Files.py \
              Test_Status.py \
              Update_Approval_DB.py \
-             Upload_Files.py \
              User_is_Record_Owner_or_Curator.py \
              Shared_Functions.py \
              Move_Files_to_Storage.py \

@@ -1982,6 +1982,216 @@ CREATE TABLE IF NOT EXISTS idxWORD14R (
   PRIMARY KEY (id_bibrec,type)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPAIR01F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR01R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR02F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR02R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR03F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR03R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR04F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR04R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR05F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR05R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR06F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR06R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR07F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR07R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR08F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR08R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR09F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR09R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR10F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR10R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR11F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR11R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR12F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR12R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR13F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR13R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR14F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR14R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2509,6 +2719,7 @@ CREATE TABLE IF NOT EXISTS bibdoc (
   docname varchar(250) COLLATE utf8_bin NOT NULL default 'file',
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
+  text_extraction_date datetime NOT NULL default '0000-00-00',
   more_info mediumblob NULL default NULL,
   PRIMARY KEY  (id),
   KEY docname (docname),

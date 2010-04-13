@@ -98,7 +98,7 @@ def bibrankgkb(config):
             temp = get_from_source(cfg[0], (cfg[1], cfg[2]))
         i = i + 1
 
-        #If a convertion file is given, the names will be converted to the correct convention
+        #If a conversion file is given, the names will be converted to the correct convention
         if len(conv) != 0:
             if opts_dict["verbose"] >= 9:
                 write_message("Converting between naming conventions given.")

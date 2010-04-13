@@ -31,13 +31,14 @@ Options to finish your installation:
    --create-tables          create DB tables for Invenio
    --load-webstat-conf      load the WebStat configuration
    --drop-tables            drop DB tables of Invenio
+   --check-openoffice-dir   check for correctly set up of openoffice temporary directory
 
 Options to set up and test a demo site:
    --create-demo-site       create demo site
    --load-demo-records      load demo records
    --remove-demo-records    remove demo records, keeping demo site
    --drop-demo-site         drop demo site configurations too
-   --run-unit-tests         run unit test suite (needs deme site)
+   --run-unit-tests         run unit test suite (needs demo site)
    --run-regression-tests   run regression test suite (needs demo site)
    --run-web-tests          run web tests in a browser (needs demo site, Firefox, Selenium IDE)
 
@@ -108,17 +109,22 @@ def convert_conf_option(option_name, option_value):
         except ValueError:
             option_value = '"' + option_value + '"'
 
-    ## 3a) special cases: regexps
+    ## 3a) special cases: chars regexps
     if option_name in ['CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS',
                        'CFG_BIBINDEX_CHARS_PUNCTUATION']:
         option_value = 'r"[' + option_value[1:-1] + ']"'
+
+    ## 3abis) special cases: real regexps
+    if option_name in ['CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES',
+                       'CFG_BIBINDEX_SPLASH_PAGES']:
+        option_value = 'r"' + option_value[1:-1] + '"'
 
     ## 3b) special cases: True, False, None
     if option_value in ['"True"', '"False"', '"None"']:
         option_value = option_value[1:-1]
 
     ## 3c) special cases: dicts
-    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT', ]:
+    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT']:
         option_value = option_value[1:-1]
 
     ## 3d) special cases: comma-separated lists
@@ -483,6 +489,58 @@ def cli_cmd_reset_fieldnames(conf):
 
     print ">>> I18N field names reset successfully."
 
+def cli_check_openoffice_dir(conf):
+    """
+    If OpenOffice.org integration is enabled, checks whether the system is
+    properly configured.
+    """
+    from invenio.textutils import wrap_text_in_a_box
+    from invenio.websubmit_file_converter import check_openoffice_tmpdir, \
+        InvenioWebSubmitFileConverterError, CFG_OPENOFFICE_TMPDIR
+    from invenio.config import CFG_OPENOFFICE_USER, \
+        CFG_PATH_OPENOFFICE_PYTHON, \
+        CFG_OPENOFFICE_SERVER_HOST, \
+        CFG_BIBSCHED_PROCESS_USER
+    from invenio.bibtask import guess_apache_process_user, \
+        check_running_process_user
+    check_running_process_user()
+    print ">>> Checking if OpenOffice is correctly integrated...",
+    if CFG_OPENOFFICE_SERVER_HOST:
+        try:
+            check_openoffice_tmpdir()
+        except InvenioWebSubmitFileConverterError, err:
+            print wrap_text_in_a_box("""\
+OpenOffice.org can't properly create files in the OpenOffice.org temporary
+directory %(tmpdir)s, as the user %(nobody)s (as configured in
+CFG_OPENOFFICE_USER invenio(-local).conf variable): %(err)s.
+
+
+In your /etc/sudoers file, you should authorize the %(apache)s user to run
+ %(python)s as %(nobody)s user as in:
+
+
+%(apache)s localhost=(%(nobody)s) NOPASSWD: %(python)s
+
+
+You should then run the following commands:
+
+
+$ sudo mkdir -p %(tmpdir)s
+
+$ sudo chown %(nobody)s %(tmpdir)s
+
+$ sudo chmod 755 %(tmpdir)s""" % {
+            'tmpdir' : CFG_OPENOFFICE_TMPDIR,
+            'nobody' : CFG_OPENOFFICE_USER,
+            'err' : err,
+            'apache' : CFG_BIBSCHED_PROCESS_USER or guess_apache_process_user(),
+            'python' : CFG_PATH_OPENOFFICE_PYTHON
+            })
+            sys.exit(1)
+        print "ok"
+    else:
+        print "OpenOffice.org integration not enabled"
+
 def test_db_connection():
     """
     Test DB connection, and if fails, advise user how to set it up.
@@ -632,6 +690,8 @@ def cli_cmd_load_demo_records(conf):
     run_sql("TRUNCATE schTASK")
     for cmd in ["%s/bin/bibupload -u admin -i %s/var/tmp/demobibdata.xml" % (CFG_PREFIX, CFG_PREFIX),
                 "%s/bin/bibupload 1" % CFG_PREFIX,
+                "%s/bin/bibdocfile --textify --with-ocr --recid 97" % CFG_PREFIX,
+                "%s/bin/bibdocfile --textify --all" % CFG_PREFIX,
                 "%s/bin/bibindex -u admin" % CFG_PREFIX,
                 "%s/bin/bibindex 2" % CFG_PREFIX,
                 "%s/bin/bibreformat -u admin -o HB" % CFG_PREFIX,
@@ -1090,6 +1150,9 @@ def main():
                 done = True
             elif opt == '--drop-tables':
                 cli_cmd_drop_tables(conf)
+                done = True
+            elif opt == '--check-openoffice-dir':
+                cli_check_openoffice_dir(conf)
                 done = True
             elif opt == '--create-demo-site':
                 cli_cmd_create_demo_site(conf)

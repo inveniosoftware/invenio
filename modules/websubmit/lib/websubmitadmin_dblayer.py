@@ -696,7 +696,7 @@ def regulate_score_of_all_functions_in_step_to_ascending_multiples_of_10_for_sub
         except InvenioWebSubmitAdminWarningDeleteFailed, e:
             ## unable to delete some or all functions
             ## pass the exception back up to the caller
-            raise e
+            raise
 
         ## re-insert them with the correct scores
         i = 10
@@ -2227,7 +2227,7 @@ def insert_function_into_submission_at_step_and_score_then_regulate_scores_of_fu
                   """ Some functions may have been lost - please check."""\
                   % (function, "%s%s" % (action, doctype), step, score, step)
             raise InvenioWebSubmitAdminWarningInsertFailed(msg)
-        raise e
+        raise
 
     ## try to regulate the scores of the functions in the step that the new function was just inserted into:
     try:

@@ -18,7 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """BibFormat element - Print photos of the record (if bibdoc file)
 """
-from invenio.bibdocfile import BibRecDocs
+
+import cgi
+from invenio.bibdocfile import BibRecDocs, get_subformat_from_format
 
 def format(bfo, separator=" ", style='', print_links='yes'):
     """
@@ -37,13 +39,21 @@ def format(bfo, separator=" ", style='', print_links='yes'):
     photos = []
     bibarchive = BibRecDocs(bfo.recID)
     for doc in bibarchive.list_bibdocs():
-        if doc.get_icon() is not None:
-            original_url = doc.list_latest_files()[0].get_url()
-            icon_url = doc.get_icon().list_latest_files()[0].get_url()
+        found_url = ''
+        found_icon = ''
+        for docfile in doc.list_latest_files():
+            if docfile.is_icon():
+                if not found_icon:
+                    found_icon = docfile.get_url()
+            else:
+                if not found_url:
+                    found_url = docfile.get_url()
+
+        if found_icon:
             name = doc.get_docname()
-            img = '<img src="%s" alt="%s" style="%s">' % (icon_url, name, style)
+            img = '<img src="%s" alt="%s" style="%s">' % (cgi.escape(found_icon, True), cgi.escape(name, True), cgi.escape(style, True))
             if print_links.lower() == 'yes':
-                img = '<a href="%s">%s</a>' % (original_url, img)
+                img = '<a href="%s">%s</a>' % (cgi.escape(found_url, True), img)
             photos.append(img)
 
     return separator.join(photos)

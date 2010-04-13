@@ -567,25 +567,16 @@ def get_pdf_snippets(recID, patterns,
     """
     from invenio.bibdocfile import BibRecDocs
 
-    path = pathTxt = ""
-    # After integration of Sam's branch, we shall use:
-    # for bd in BibRecDocs(recID).list_bibdocs():
-    #    text = bd.get_text()
-    # For the time being:
-    for bdf in BibRecDocs(recID).list_latest_files():
-        if bdf.get_format() == '.pdf':
-            path = bdf.get_path() # to print filesystem path to PDF
-            break # stop at the first PDF file
+    text_path = ""
+    for bd in BibRecDocs(recID).list_bibdocs():
+        if bd.get_text():
+            text_path = bd.get_text_path()
+            break # stop at the first good PDF textable file
 
-    if path != "":
-        pathTxt = path.replace(".pdf", ".TMP.txt")
-        pathTxt = pathTxt.split(';')[0]
-        if not os.path.exists(pathTxt):
-            run_shell_command(CFG_PATH_PDFTOTEXT + " %s %s", [path, pathTxt])
-        if os.path.exists(pathTxt):
-            return get_text_snippets(pathTxt, patterns, nb_words_around, max_snippets)
-        else:
-            return ""
+    if text_path:
+        return get_text_snippets(text_path, patterns, nb_words_around, max_snippets)
+    else:
+        return ""
 
 def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets):
     """

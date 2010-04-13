@@ -99,8 +99,8 @@ internals, its API, etc.</dd>
 <dt><a href="webstyle-internals">WebStyle Internals</a></dt>
 <dd>Describes how to customize WebDoc files, etc.</dd>
 
-<dt><a href="websubmit-bibdocfile">WebSubmit BibDocFile</a></dt>
-<dd>Describes the fulltext document management library.</dd>
+<dt><a href="websubmit-internals">WebSubmit Internals</a></dt>
+<dd>Describes the internal tools available in WebSubmit.</dd>
 
 <dt><a href="bibsched-bibtask">Bibliographic Task Howto</a></dt>
 <dd>Describes how to customize create a new Bibliographic Task.</dd>

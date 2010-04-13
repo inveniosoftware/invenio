@@ -485,7 +485,7 @@ kb_5 = url_%s
 &nbsp;##to a common kb file.
 &nbsp;##So this means that:
 &nbsp;##create_0: Load from file in variable kb_1 without converting
-&nbsp;##create_1: Load from file in variable kb_2 using convertion from file kb_2_filter
+&nbsp;##create_1: Load from file in variable kb_2 using conversion from file kb_2_filter
 &nbsp;##create_3: Load from www using url in variable kb_5 and regular expression in url_regexp
 &nbsp;##create_4: Load from database using sql statements in kb_4 and kb_5
 create_0 = ,, ,,file,,%(kb_1)s
@@ -496,8 +496,8 @@ create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
 </blockquote>
 
 <p>When you have found a source for the data, created the configuration file, it may be necessary to
-create an convertion file, but this depends on the conversions used in the available data versus
-the convertion used in your CDS Invenio installation.</p>
+create an conversion file, but this depends on the conversions used in the available data versus
+the conversion used in your CDS Invenio installation.</p>
 <p>The available data may look like this:</p>
 <blockquote>
 <pre>
@@ -510,7 +510,7 @@ COLLOID SURFACE A---1.98
 Colloids Surf., A---1.98
 </pre>
 </blockquote>
-<p>By using a convertion file like:</p>
+<p>By using a conversion file like:</p>
 <blockquote>
 <pre>
 COLLOID SURFACE A---Colloids Surf., A

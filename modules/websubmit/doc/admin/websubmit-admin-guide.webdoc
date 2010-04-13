@@ -2204,7 +2204,8 @@ def Get_Report_Number (parameters,curdir,form):
         The subdirectory g0 is used to split the documents accross the filesystem.  The CFG_FILE_DIR_SIZE variable from
         invenio.conf determines how many documents will be stored under one subdirectory.<br/><br/>
         Several files may be stored under the same document directory: they are the different formats and versions of the
-        same document. Versions are indicated by a string of the form ";1.0" concatenated to the name of the file.
+        same document. Versions are indicated by a string of the form ";1.0" concatenated to the name of the file.<br/><br/>
+        Please see the <href="/help/admin/howto-fulltext">HOWTO Manage Fulltext Files</a> for more information on the administrative command line tools available to manipulate fulltext files.
     </blockquote>
 
 

@@ -17,11 +17,10 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-<!-- WebDoc-Page-Title: BibDocFile API -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
-<!-- WebDoc-Page-Navbar-Select: hacking-websubmit-bibdocfile -->
+<!-- WebDoc-Page-Title: Fulltext manipulation API -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="websubmit-internals">WebSubmit Internals</a> -->
 
-<p>BibDocFile library handles every interaction relation between records and related fulltext document files.</p>
+<p>The BibDocFile library handles every interaction relation between records and related fulltext document files.</p>
 
 <h2>Nomenclature</h2>
 <p>
@@ -34,11 +33,11 @@
 </dl>
 </p>
 
-<h2>API</h2>
-<p>Given a <tt>record_id</tt>, BibRecDocs(record_id) will be an object useful to represent all the bibdocs connected to a record.</p>
+<h2>Python API</h2>
+<p>Given a <tt>record_id</tt>, <tt>BibRecDocs(record_id)</tt> will be an object useful to represent all the bibdocs connected to a record.</p>
 
-<p>Given a <tt>record_id</tt> and a <tt>docname</tt> or a <tt>document_id</tt>, BibDoc(recid=record_id, docname=docname) or BibDoc(docid=document_id) will be an object useful to represent all the possible version and formats of a document connected to a record.</p>
+<p>Given a <tt>record_id</tt> and a <tt>docname</tt> or a <tt>document_id</tt>, <tt>BibDoc(recid=record_id, docname=docname)</tt> or <tt>BibDoc(docid=document_id)</tt> will be an object useful to represent all the possible version and formats of a document connected to a record.</p>
 
-<p>By properly querying BibRecDocs and BibDoc you can obtain a BibDocFile. This is an object representing all the possible details related a single physical file, like a comment, a description, the path, the related URL, the size, the format, the version, the checksum, the protection...</p>
+<p>By properly querying <tt>BibRecDocs</tt> and <tt>BibDoc</tt> you can obtain a <tt>BibDocFile</tt>. This is an object representing all the possible details related a single physical file, like a comment, a description, the path, the related URL, the size, the format, the version, the checksum, the protection...</p>
 
-<p>Please refer to bibdocfile.py for a complete and up-to-date description of the API.</p>
+<p>See <a href="http://cdsware.cern.ch/invenio/code-browser/invenio.bibdocfile-module.html">bibdocfile API</a> for a complete API description.</p>

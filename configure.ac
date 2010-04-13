@@ -20,7 +20,7 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.90.20100319, cds.support@cern.ch)
+AC_INIT(cds-invenio, 0.99.90.20100413, cds.support@cern.ch)
 AM_INIT_AUTOMAKE([tar-ustar])
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
@@ -68,6 +68,32 @@ else
    fi
 fi
 
+## Check for OpenOffice.org Python binary:
+AC_MSG_CHECKING(for OpenOffice.org Python binary)
+AC_ARG_WITH(openoffice-python, AC_HELP_STRING([--with-openoffice-python], [path to a specific OpenOffice.org Python binary (optional)]), OPENOFFICE_PYTHON=`which ${withval}`)
+
+if test -z "$OPENOFFICE_PYTHON"; then
+   OPENOFFICE_PYTHON=`locate -n 1 -r "o.*office/program/python$"`
+   OPENOFFICE_PYTHON="$PYTHON $OPENOFFICE_PYTHON"
+   if test -n "$OPENOFFICE_PYTHON" && ($OPENOFFICE_PYTHON -c "import uno" 2> /dev/null); then
+      AC_MSG_RESULT($OPENOFFICE_PYTHON)
+   else
+      AC_MSG_WARN([
+      You have not specified the path ot the OpenOffice.org Python binary.
+      OpenOffice.org and Microsoft Office document conversion and fulltext indexing
+      will not be available.  We recommend you to install OpenOffice.org first
+      and to rerun the configure script. OpenOffice.org is available from
+      <http://www.openoffice.org/>.])
+   fi
+elif ($OPENOFFICE_PYTHON -c "import uno" 2> /dev/null); then
+   AC_MSG_RESULT($OPENOFFICE_PYTHON)
+else
+   AC_MSG_ERROR([
+   The specified OpenOffice.org Python binary is not correctly configured.
+   Please specify the correct path to the specific OpenOffice Python binary
+   (OpenOffice.org is available from <http://www.openoffice.org/>).])
+fi
+
 ## Check for Python version and modules:
 AC_MSG_CHECKING(for required Python modules)
 $PYTHON ${srcdir}/configure-tests.py
@@ -78,18 +104,6 @@ AC_MSG_RESULT(found)
 
 ## Check for PHP:
 AC_PATH_PROG(PHP, php)
-
-## Check for Acrobat Reader:
-AC_PATH_PROG(ACROREAD, acroread)
-if test -z "$ACROREAD"; then
-   AC_MSG_WARN([
-   Acrobat Reader was not found in your PATH.  It is used in
-   the WebSubmit module for automatic conversion of submitted documents.
-   You can continue without it but you will miss some CDS Invenio
-   functionality.  We recommend you to install it first and to rerun
-   the configure script.  Acrobat Reader is available from
-   <http://www.adobe.com/products/acrobat/readstep.html>.])
-fi
 
 ## Check for gzip:
 AC_PATH_PROG(GZIP, gzip)
@@ -162,6 +176,30 @@ if test -z "$PS2PDF"; then
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
 fi
 
+## Check for tiff2pdf:
+AC_PATH_PROG(TIFF2PDF, tiff2pdf)
+if test -z "$TIFF2PDF"; then
+   AC_MSG_WARN([
+   tiff2pdf was not found in your PATH.  It is used in
+   the WebSubmit module to convert submitted TIFF file into PDF.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  tiff2pdf is available from
+   <http://www.remotesensing.org/libtiff/>.])
+fi
+
+## Check for gs:
+AC_PATH_PROG(GS, gs)
+if test -z "$GS"; then
+   AC_MSG_WARN([
+   gs was not found in your PATH.  It is used in
+   the WebSubmit module to convert submitted PostScripts into PDF.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  gs is available from
+   <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
+fi
+
 ## Check for pdftotext:
 AC_PATH_PROG(PDFTOTEXT, pdftotext)
 if test -z "$PDFTOTEXT"; then
@@ -170,6 +208,18 @@ if test -z "$PDFTOTEXT"; then
    of PDF files.
    You can continue without it but you may miss fulltext searching capability
    of CDS Invenio.  We recomend you to install it first and to rerun the configure
+   script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
+   ])
+fi
+
+## Check for pdftotext:
+AC_PATH_PROG(PDFINFO, pdfinfo)
+if test -z "$PDFINFO"; then
+   AC_MSG_WARN([
+   pdfinfo was not found in your PATH.  It is used for gathering information on
+   PDF files.
+   You can continue without it but you may miss this feature of CDS Invenio.
+   We recomend you to install it first and to rerun the configure
    script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
    ])
 fi
@@ -197,15 +247,80 @@ if test -z "$PDF2PS"; then
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
 fi
 
+## Check for pdftops:
+AC_PATH_PROG(PDFTOPS, pdftops)
+if test -z "$PDFTOPS"; then
+   AC_MSG_WARN([
+   pdftops was not found in your PATH.  It is used in
+   the WebSubmit module to convert submitted PDFs into PostScript.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  pdftops is available from
+   <http://poppler.freedesktop.org/>.])
+fi
+
+## Check for pdfopt:
+AC_PATH_PROG(PDFOPT, pdfopt)
+if test -z "$PDFOPT"; then
+   AC_MSG_WARN([
+   pdfopt was not found in your PATH.  It is used in
+   the WebSubmit module to linearized submitted PDFs.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  pdfopt is available from
+   <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
+fi
+
+## Check for pdfimages:
+AC_PATH_PROG(PDFTOPPM, pdftoppm)
+if test -z "$PDFTOPPM"; then
+   AC_MSG_WARN([
+   pdftoppm was not found in your PATH.  It is used in
+   the WebSubmit module to extract images from PDFs for OCR.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  pdftoppm is available from
+   <http://poppler.freedesktop.org/>.])
+fi
+
+## Check for pdfimages:
+AC_PATH_PROG(PAMFILE, pdftoppm)
+if test -z "$PAMFILE"; then
+   AC_MSG_WARN([
+   pamfile was not found in your PATH.  It is used in
+   the WebSubmit module to retrieve the size of images extracted from PDFs
+   for OCR.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  pamfile is available as part of the netpbm utilities
+   from:
+   <http://netpbm.sourceforge.net/>.])
+fi
+
+## Check for ocroscript:
+AC_PATH_PROG(OCROSCRIPT, ocroscript)
+if test -z "$OCROSCRIPT"; then
+   AC_MSG_WARN([
+   If you plan to run OCR on your PDFs, then please install
+   ocroscript now.  Otherwise you can safely continue.  You have also an
+   option to install ocroscript later and edit invenio-local.conf to let
+   CDS Invenio know the path to ocroscript.
+   ocroscript is available as part of OCROpus from
+   <http://code.google.com/p/ocropus/>.
+   NOTE: Since OCROpus is being actively developed and its api is continuosly
+   changing, please install relase 0.3.1])
+fi
+
 ## Check for pstotext:
 AC_PATH_PROG(PSTOTEXT, pstotext)
 if test -z "$PSTOTEXT"; then
    AC_MSG_WARN([
    pstotext was not found in your PATH.  It is used for the fulltext indexation
    of PDF and PostScript files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   Please install pstotext.  Otherwise you can safely continue.  You have also an
+   option to install pstotext later and edit invenio-local.conf to let
+   CDS Invenio know the path to pstotext.
+   pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
 
@@ -215,94 +330,49 @@ if test -z "$PSTOASCII"; then
    AC_MSG_WARN([
    ps2ascii was not found in your PATH.  It is used for the fulltext indexation
    of PostScript files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
+   Please install ps2ascii.  Otherwise you can safely continue.  You have also an
+   option to install ps2ascii later and edit invenio-local.conf to let
+   CDS Invenio know the path to ps2ascii.
+   ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
 
-## Check for antiword:
-AC_PATH_PROG(ANTIWORD, antiword)
-if test -z "$ANTIWORD"; then
+## Check for any2djvu:
+AC_PATH_PROG(ANY2DJVU, any2djvu)
+if test -z "$ANY2DJVU"; then
    AC_MSG_WARN([
-   antiword was not found in your PATH.  It is used for the fulltext indexation
-   of Microsoft Word files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  antiword is available from <http://www.winfield.demon.nl/index.html>.
-   ])
+   any2djvu was not found in your PATH.  It is used in
+   the WebSubmit module to convert documents to DJVU.
+   Please install any2djvu.  Otherwise you can safely continue.  You have also an
+   option to install any2djvu later and edit invenio-local.conf to let
+   CDS Invenio know the path to any2djvu.
+   any2djvu is available from
+   <http://djvu.sourceforge.net/>.])
 fi
 
-## Check for catdoc:
-AC_PATH_PROG(CATDOC, catdoc)
-if test -z "$CATDOC"; then
+## Check for DJVUPS:
+AC_PATH_PROG(DJVUPS, djvups)
+if test -z "$DJVUPS"; then
    AC_MSG_WARN([
-   catdoc was not found in your PATH.  It is used for the fulltext indexation
-   of Microsoft Word files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  catdoc is available from <http://www.ice.ru/~vitus/catdoc/index.html>.
-   ])
+   djvups was not found in your PATH.  It is used in
+   the WebSubmit module to convert documents from DJVU.
+   Please install djvups.  Otherwise you can safely continue.  You have also an
+   option to install djvups later and edit invenio-local.conf to let
+   CDS Invenio know the path to djvups.
+   djvups is available from
+   <http://djvu.sourceforge.net/>.])
 fi
 
-## Check for wvText:
-AC_PATH_PROG(WVTEXT, wvText)
-if test -z "$WVTEXT"; then
+## Check for DJVUTXT:
+AC_PATH_PROG(DJVUTXT, djvutxt)
+if test -z "$DJVUTXT"; then
    AC_MSG_WARN([
-   wvText was not found in your PATH.  It is used for the fulltext indexation
-   of Microsoft Word files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  wvText is available from <http://sourceforge.net/projects/wvware>.
-   ])
-fi
-
-## Check for ppthtml:
-AC_PATH_PROG(PPTHTML, ppthtml)
-if test -z "$PPTHTML"; then
-   AC_MSG_WARN([
-   ppthtml was found in your PATH. It is used for the fulltext indexation
-   of Microsoft PowerPoint files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  ppthtml is available from <http://www.xlhtml.org/>.
-   ])
-fi
-
-## Check for xlhtml:
-AC_PATH_PROG(XLHTML, xlhtml)
-if test -z "$XLHTML"; then
-   AC_MSG_WARN([
-   xlhtml was found in your PATH. It is used for the fulltext indexation
-   of Microsoft Excel files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  xlhtml is available from <http://chicago.sourceforge.net/xlhtml/>.
-   ])
-fi
-
-## Check for html2text:
-AC_PATH_PROG(HTMLTOTEXT, html2text)
-if test -z "$HTMLTOTEXT"; then
-   AC_MSG_WARN([
-   html2text was found in your PATH. It is used for the fulltext indexation
-   of Microsoft PowerPoint and Excel files.
-   You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
-   script.  html2text is available from <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>.
-   ])
-fi
-
-## Check for Giftext:
-AC_PATH_PROG(GIFTEXT, giftext)
-if test -z "$GIFTEXT"; then
-   AC_MSG_WARN([
-   Giftext was not found in your PATH.  It is used in
-   the WebSubmit module to create an icon from a submitted picture.
+   djvutxt was not found in your PATH.  It is used in
+   the WebSubmit module to extract text from DJVU documents.
    You can continue without it but you will miss some CDS Invenio
    functionality.  We recommend you to install it first and to rerun
-   the configure script.  Giftext is available from
-   <http://prtr-13.ucsc.edu/~badger/software/libungif/getting.shtml>.])
+   the configure script.  djvutxt is available from
+   <http://djvu.sourceforge.net/>.])
 fi
 
 ## Check for file:
@@ -403,41 +473,41 @@ fi
 
 ## Substitute variables:
 AC_SUBST(VERSION)
+AC_SUBST(OPENOFFICE_PYTHON)
 AC_SUBST(MYSQL)
-AC_SUBST(PHP)
 AC_SUBST(PYTHON)
-AC_SUBST(CLIDIR)
+AC_SUBST(GZIP)
+AC_SUBST(GUNZIP)
+AC_SUBST(TAR)
+AC_SUBST(WGET)
+AC_SUBST(MD5SUM)
+AC_SUBST(PS2PDF)
+AC_SUBST(GS)
 AC_SUBST(PDFTOTEXT)
 AC_SUBST(PDFTK)
 AC_SUBST(PDF2PS)
+AC_SUBST(PDFTOPS)
+AC_SUBST(PDFOPT)
+AC_SUBST(PDFTOPPM)
+AC_SUBST(OCROSCRIPT)
 AC_SUBST(PSTOTEXT)
 AC_SUBST(PSTOASCII)
-AC_SUBST(ANTIWORD)
-AC_SUBST(CATDOC)
-AC_SUBST(WVTEXT)
-AC_SUBST(PPTHTML)
-AC_SUBST(XLHTML)
-AC_SUBST(HTMLTOTEXT)
-AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
-AC_SUBST(CACHEDIR)
+AC_SUBST(ANY2DJVU)
+AC_SUBST(DJVUPS)
+AC_SUBST(DJVUTXT)
+AC_SUBST(FILE)
+AC_SUBST(CONVERT)
+AC_SUBST(GNUPLOT)
 AC_SUBST(CLISP)
 AC_SUBST(CMUCL)
 AC_SUBST(SBCL)
-AC_SUBST(GNUPLOT)
-AC_SUBST(DJPEG)
-AC_SUBST(CONVERT)
-AC_SUBST(GIFTEXT)
-AC_SUBST(JPEGSIZE)
-AC_SUBST(PNMSCALE)
-AC_SUBST(PPMQUANT)
-AC_SUBST(PPMTOGIF)
-AC_SUBST(GIFINTER)
-AC_SUBST(GIFRSIZE)
+AC_SUBST(CACHEDIR)
+AC_SUBST(localstatedir, `eval echo "${localstatedir}"`)
 
 ## Define output files:
 AC_CONFIG_FILES([config.nice  \
 	  Makefile \
-          po/Makefile.in \
+	  po/Makefile.in \
 	  config/Makefile \
 	  config/invenio-autotools.conf \
 	  modules/Makefile \

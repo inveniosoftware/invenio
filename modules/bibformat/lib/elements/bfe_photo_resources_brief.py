@@ -30,9 +30,9 @@ def format(bfo):
     out = ""
     for resource in resources:
 
-        if resource.get("x", "") == "icon" and resource.get("u", "") == "":
+        if resource.get("x", "") == "icon":
             out += '<a href="'+CFG_SITE_URL+'/record/'+bfo.control_field("001")+ \
-                   '?ln='+ bfo.lang + '"><img src="' + resource.get("q", "").replace(" ","") \
+                   '?ln='+ bfo.lang + '"><img src="' + resource.get("u", "").replace(" ","") \
                    + '" alt="" border="0"/></a>'
 
     return out

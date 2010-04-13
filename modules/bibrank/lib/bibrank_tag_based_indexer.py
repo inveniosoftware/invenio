@@ -34,6 +34,7 @@ from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.errorlib import register_exception
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
+from invenio.bibindex_engine import create_range_list
 
 
 options = {}
@@ -435,10 +436,10 @@ def add_recIDs_by_date(rank_method_code, dates=""):
         res = run_sql(query, (dates[0], dates[1]))
     else:
         res = run_sql(query, (dates[0], ))
-    list = create_range_list(res)
-    if not list:
+    alist = create_range_list([row[0] for row in res])
+    if not alist:
         write_message("No new records added since last time method was run")
-    return list
+    return alist
 
 def getName(rank_method_code, ln=CFG_SITE_LANG, type='ln'):
     """Returns the name of the method if it exists"""
@@ -458,24 +459,6 @@ def getName(rank_method_code, ln=CFG_SITE_LANG, type='ln'):
     except Exception, e:
         write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
         raise Exception
-
-def create_range_list(res):
-    """Creates a range list from a recID select query result contained
-    in res. The result is expected to have ascending numerical order."""
-    if not res:
-        return []
-    row = res[0]
-    if not row:
-        return []
-    else:
-        range_list = [[row[0], row[0]]]
-    for row in res[1:]:
-        id = row[0]
-        if id == range_list[-1][1] + 1:
-            range_list[-1][1] = id
-        else:
-            range_list.append([id, id])
-    return range_list
 
 def single_tag_rank_method(run):
     return bibrank_engine(run)
