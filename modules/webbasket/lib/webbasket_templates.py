@@ -626,7 +626,7 @@ class Template:
                     out += """
       <tr>
         <td>
-        <a href="#%(all_public_baskets_name)s">%(all_public_baskets_label)s</a>: %(no_all_public_search_results)i %(items_found_label)s
+        <a href="#%(all_public_baskets_name)s">%(all_public_baskets_label)s</a>: %(items_found_label)s
         </td>
       </tr>""" % {'all_public_baskets_label': _('All public baskets'),
                   'all_public_baskets_name': "A",
@@ -1297,8 +1297,8 @@ class Template:
         note_editor = get_html_text_editor(name="note_body",
                                            content=note_body,
                                            textual_content=note_body,
-                                           width="480px",
-                                           height="100px",
+                                           width="600px",
+                                           height="110px",
                                            enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
                                            toolbar_set="WebComment")
 
@@ -2723,7 +2723,7 @@ class Template:
                                           content=note_body_html,
                                           textual_content=note_body_textual,
                                           width="99%",
-                                          height="100px",
+                                          height="160px",
                                           enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
                                           file_upload_url=file_upload_url,
                                           toolbar_set="WebComment")
@@ -2744,6 +2744,7 @@ class Template:
                             <br />
                             %(editor)s
                             </p>
+                            <input type="hidden" name="reply_to" value="%(reply_to)s" />
                             <p align="left">
                             <input type="submit" class="formbutton" value="%(submit_label)s" />
                             <input type="button" class="nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='%(cancel)s'" />
@@ -2758,7 +2759,8 @@ class Template:
                                    'note_title': note_title,
                                    'editor': editor,
                                    'add_a_note_label': _('Add a note'),
-                                   'submit_label': _('Add note')}
+                                   'submit_label': _('Add note'),
+                                   'reply_to': optional_params.get("Reply to")}
 
         notes_icon = '<img src="%s/img/wb-notes.png" style="vertical-align: top;" />&nbsp;' % (CFG_SITE_URL,)
 
@@ -2791,7 +2793,16 @@ class Template:
             notes_html += """
                 <tr>
                   <td colspan="2" class="bsknotescontent">"""
-            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid) in notes:
+            thread_history = [0]
+            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid, reply_to) in notes:
+                if reply_to not in thread_history:
+                    # Going one level down in the thread
+                    thread_history.append(reply_to)
+                    depth = thread_history.index(reply_to)
+                else:
+                    depth = thread_history.index(reply_to)
+                    thread_history = thread_history[:depth + 1]
+                notes_html += '<div style="margin-left:%spx">' % (depth*20)
                 if user_can_add_notes:
                     reply_to_note = """<a href="%s/yourbaskets/write_note?category=%s&amp;topic=%s&amp;group=%i&amp;bskid=%i&amp;recid=%i&amp;cmtid=%i&amp;ln=%s%s">%s</a>""" % \
                                     (CFG_SITE_URL, selected_category, cgi.escape(selected_topic, True), selected_group, bskid, recid, cmtid, ln, '#note', _('Reply'))
@@ -2835,6 +2846,7 @@ class Template:
                                  'body': email_quoted_txt2html(escape_email_quoted_text(cmt_body)),
                                  'reply_to_note': reply_to_note,
                                  'delete_note': delete_note}
+                notes_html += '</div>'
             if add_note_p:
                 notes_html += add_note_html
             notes_html += """
@@ -3534,6 +3546,7 @@ class Template:
                             <br />
                             %(editor)s
                             </p>
+                            <input type="hidden" name="reply_to" value="%(reply_to)s" />
                             <p align="right">
                             <input type="submit" class="formbutton" value="%(submit_label)s" />
                             <input type="button" class="nonsubmitbutton" value="%(cancel_label)s" onClick="window.location='%(cancel)s'" />
@@ -3548,7 +3561,8 @@ class Template:
                                    'note_title': note_title,
                                    'editor': editor,
                                    'add_a_note_label': _('Add a note'),
-                                   'submit_label': _('Add note')}
+                                   'submit_label': _('Add note'),
+                                   'reply_to': optional_params.get("Reply to")}
 
         notes_icon = '<img src="%s/img/wb-notes.png" style="vertical-align: top;" />&nbsp;' % (CFG_SITE_URL,)
 
@@ -3581,7 +3595,16 @@ class Template:
             notes_html += """
                 <tr>
                   <td colspan="2" class="bsknotescontent">"""
-            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid) in notes:
+            thread_history = [0]
+            for (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, dummy, cmtid, reply_to) in notes:
+                if reply_to not in thread_history:
+                    # Going one level down in the thread
+                    thread_history.append(reply_to)
+                    depth = thread_history.index(reply_to)
+                else:
+                    depth = thread_history.index(reply_to)
+                    thread_history = thread_history[:depth + 1]
+                notes_html += '<div style="margin-left:%spx">' % (depth*20)
                 if user_can_add_notes:
                     reply_to_note = """<a href="%s/yourbaskets/write_public_note?bskid=%i&amp;recid=%i&amp;cmtid=%i&amp;ln=%s%s">%s</a>""" % \
                                     (CFG_SITE_URL, bskid, recid, cmtid, ln, '#note', _('Reply'))
@@ -3620,6 +3643,7 @@ class Template:
 
                                  'body': email_quoted_txt2html(escape_email_quoted_text(cmt_body)),
                                  'reply_to_note': reply_to_note}
+                notes_html += '</div>'
             if add_note_p:
                 notes_html += add_note_html
             notes_html += """

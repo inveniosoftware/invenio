@@ -124,7 +124,8 @@ DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('basketusers', 'Users who can use baskets', 'deny email "hyde@cds.cern.ch"\nallow any'),
                   ('submit_DEMOJRN_*', 'Users who can submit (and modify) "Atlantis Times" articles', 'deny all'),
                   ('atlantiseditor', 'Users who can configure "Atlantis Times" journal', 'deny all'),
-                  ('commentmoderator', 'Users who can moderate comments', 'deny all'))
+                  ('commentmoderator', 'Users who can moderate comments', 'deny all'),
+                  ('poetrycommentreader', 'Users who can view comments in Poetry collection', 'deny all'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('dorian.gray@cds.cern.ch', 'referee_DEMOBOO_*'),
@@ -135,7 +136,8 @@ DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('juliet.capulet@cds.cern.ch', 'photocurator'),
                        ('romeo.montague@cds.cern.ch', 'submit_DEMOJRN_*'),
                        ('juliet.capulet@cds.cern.ch', 'submit_DEMOJRN_*'),
-                       ('balthasar.montague@cds.cern.ch', 'atlantiseditor'))
+                       ('balthasar.montague@cds.cern.ch', 'atlantiseditor'),
+                       ('romeo.montague@cds.cern.ch', 'poetrycommentreader'))
 
 # users
 # list of e-mail addresses
@@ -173,6 +175,7 @@ DEF_ACTIONS = (
                ('referee', 'referee document type doctype/category categ', 'doctype,categ',    'yes'),
                ('submit', 'use webSubmit', 'doctype,act,categ', 'yes'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
+               ('viewrestrcomment', 'view restricted comment', 'status', 'no'),
                (WEBACCESSACTION, 'configure WebAccess', '', 'no'),
                (DELEGATEADDUSERROLE, 'delegate subroles inside WebAccess', 'role',          'no'),
                (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
@@ -224,7 +227,8 @@ DEF_DEMO_AUTHS = (
              ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI', 'categ': '*'}),
              ('submit_DEMOJRN_*', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'no'}),
              ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
-             ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'})
+             ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'}),
+             ('poetrycommentreader', 'viewcomment', {'collection': 'Poetry'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)

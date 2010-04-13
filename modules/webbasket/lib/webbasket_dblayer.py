@@ -27,9 +27,11 @@ from time import localtime
 from invenio.textutils import encode_for_xml
 
 from invenio.dbquery import run_sql
+from invenio.webcomment import get_reply_order_cache_data
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_ACTIONS, \
-                                     CFG_WEBBASKET_SHARE_LEVELS_ORDERED
+                                     CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
+                                     CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
@@ -2061,7 +2063,8 @@ def get_notes(bskid, recid):
            bskcmt.body,
            DATE_FORMAT(bskcmt.date_creation, '%%Y-%%m-%%d %%H:%%i:%%s'),
            bskcmt.priority,
-           bskcmt.id
+           bskcmt.id,
+           bskcmt.in_reply_to_id_bskRECORDCOMMENT
 
     FROM   bskRECORDCOMMENT bskcmt LEFT JOIN user
                                    ON (bskcmt.id_user=user.id)
@@ -2069,7 +2072,7 @@ def get_notes(bskid, recid):
     WHERE  bskcmt.id_bskBASKET=%s AND
            bskcmt.id_bibrec_or_bskEXTREC=%s
 
-    ORDER BY bskcmt.date_creation
+    ORDER BY bskcmt.reply_order_cached_data
     """
     bskid = int(bskid)
     recid = int(recid)
@@ -2101,14 +2104,31 @@ def get_note(cmtid):
         return res[0]
     return out
 
-def save_note(uid, bskid, recid, title, body):
+def save_note(uid, bskid, recid, title, body, reply_to=None):
     """Save then given note (title, body) on the given item in the given basket."""
+    if reply_to and CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH >= 0:
+        # Check that we have not reached max depth
+        note_ancestors = get_note_ancestors(reply_to)
+        if len(note_ancestors) >= CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH:
+            if CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH == 0:
+                reply_to = None
+            else:
+                reply_to = note_ancestors[CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH - 1]
+
     date = convert_datestruct_to_datetext(localtime())
     res = run_sql("""INSERT INTO bskRECORDCOMMENT (id_user, id_bskBASKET,
-                       id_bibrec_or_bskEXTREC, title, body, date_creation)
-                     VALUES (%s, %s, %s, %s, %s, %s)""",
-                  (int(uid), int(bskid), int(recid), title, body, date))
+                       id_bibrec_or_bskEXTREC, title, body, date_creation, in_reply_to_id_bskRECORDCOMMENT)
+                     VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                  (int(uid), int(bskid), int(recid), title, body, date, reply_to or 0))
     if res:
+        new_comid = int(res)
+        parent_reply_order = run_sql("""SELECT reply_order_cached_data from bskRECORDCOMMENT where id=%s""", (reply_to,))
+        if not parent_reply_order or parent_reply_order[0][0] is None:
+            parent_reply_order = ''
+        else:
+            parent_reply_order = parent_reply_order[0][0]
+        run_sql("""UPDATE bskRECORDCOMMENT SET reply_order_cached_data=%s WHERE id=%s""",
+                (parent_reply_order + get_reply_order_cache_data(new_comid), new_comid))
         return int(res)
     return 0
 
@@ -2124,6 +2144,38 @@ def delete_note(bskid, recid, cmtid):
     params = (int(bskid), int(recid), int(cmtid))
 
     run_sql(query, params)
+
+def get_note_ancestors(cmtid, depth=None):
+    """
+    Returns the list of ancestors of the given note, ordered from
+    oldest to newest ("top-down": direct parent of cmtid is at last position),
+    up to given depth
+
+    @param cmtid: the ID of the note for which we want to retrieve ancestors
+    @type cmtid: int
+    @param depth: the maximum of levels up from the given note we
+                  want to retrieve ancestors. None for no limit, 1 for
+                  direct parent only, etc.
+    @type depth: int
+    @return the list of ancestors
+    @rtype: list
+    """
+    if depth == 0:
+        return []
+
+    res = run_sql("SELECT in_reply_to_id_bskRECORDCOMMENT FROM bskRECORDCOMMENT WHERE id=%s", (cmtid,))
+    if res:
+        parent_cmtid = res[0][0]
+        if parent_cmtid == 0:
+            return []
+        parent_ancestors = []
+        if depth:
+            depth -= 1
+        parent_ancestors = get_note_ancestors(parent_cmtid, depth)
+        parent_ancestors.append(parent_cmtid)
+        return parent_ancestors
+    else:
+        return []
 
 def note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
     """Returns 1 (True) if the given note (cmtid) belongs to the given item

@@ -155,6 +155,7 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://github.com/malsup/form/raw/master/jquery.form.js && \
+	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	wget http://tablesorter.com/jquery.tablesorter.zip && \
 	wget http://www.uploadify.com/_files/jquery.uploadify-v2.1.0.zip && \
@@ -197,6 +198,7 @@ uninstall-jquery-plugins:
 	rm -f jquery.min.js && \
 	rm -f jquery.effects.core.min.js && \
 	rm -f jquery.effects.highlight.min.js && \
+	rm -f jquery.MultiFile.pack.js && \
 	rm -f jquery.jeditable.mini.js && \
 	rm -f jquery.tablesorter.js && \
 	rm -f jquery.tablesorter.pager.js && \
@@ -487,5 +489,17 @@ update-v0.99.1-tables:
 	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','switch_file');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','switch_file');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','paths_and_restrictions');" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD round_name varchar(255) NOT NULL default ''" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD restriction varchar(50) NOT NULL default ''" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD in_reply_to_id_cmtRECORDCOMMENT int(15) unsigned NOT NULL default '0'" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD KEY in_reply_to_id_cmtRECORDCOMMENT (in_reply_to_id_cmtRECORDCOMMENT);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskRECORDCOMMENT ADD in_reply_to_id_bskRECORDCOMMENT int(15) unsigned NOT NULL default '0'" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskRECORDCOMMENT ADD KEY in_reply_to_id_bskRECORDCOMMENT (in_reply_to_id_bskRECORDCOMMENT);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD reply_order_cached_data blob NULL default NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskRECORDCOMMENT ADD reply_order_cached_data blob NULL default NULL;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE cmtRECORDCOMMENT ADD INDEX (reply_order_cached_data(40));" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bskRECORDCOMMENT ADD INDEX (reply_order_cached_data(40));" | ${prefix}/bin/dbexec
+	echo -e 'from invenio.webcommentadminlib import migrate_comments_populate_threads_index;\
+	migrate_comments_populate_threads_index()' | $(PYTHON)
 
 CLEANFILES = *~ *.pyc *.tmp

@@ -47,6 +47,14 @@ CFG_WEBBASKET_ACTIONS = {'DELETE':  'delete',
                          'DOWN':    'movedown',
                          'COPY':    'copy'}
 
+# Specify how many levels of indentation discussions can be.  This can
+# be used to ensure that discussions will not go into deep levels of
+# nesting if users don't understand the difference between "reply to
+# comment" and "add comment". When the depth is reached, any "reply to
+# comment" is conceptually converted to a "reply to thread"
+# (i.e. reply to this parent's comment). Use -1 for no limit, 0 for
+# unthreaded (flat) discussions.
+CFG_WEBBASKET_MAX_COMMENT_THREAD_DEPTH = 1
 
 CFG_WEBBASKET_WARNING_MESSAGES = {
     'ERR_WEBBASKET_CMTID_INVALID': '_("%i is an invalid comment ID")',

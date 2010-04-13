@@ -23,9 +23,45 @@
 
 __revision__ = "$Id$"
 
+# Which field of the record define email addresses that should be
+# notified of newly submitted comments, and for which collection.
 CFG_WEBCOMMENT_EMAIL_REPLIES_TO = \
 {'Articles': ['506__d', '506__m']
 }
+
+# Which field of the record define the restriction (must be linked to
+# WebAccess 'viewrestrcomment') to apply to newly submitted comments,
+# and for which collection.
+CFG_WEBCOMMENT_RESTRICTION_DATAFIELD = \
+{'Articles': '5061_a',
+ 'Pictures': '5061_a',
+ 'Theses': '5061_a',
+}
+
+# Which field of the record define the current round of comment for
+# which collection?
+CFG_WEBCOMMENT_ROUND_DATAFIELD = \
+{'Articles': '562__c',
+ 'Pictures': '562__c'
+}
+
+# Max file size per attached file, in bytes.
+# Choose 0 if you don't want to limit the size
+CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024
+
+# Maxium number of files that can be attached per comment.
+# Choose 0 if you don't want to limit the number of files.
+# File uploads can be restricted with action "attachcommentfile".
+CFG_WEBCOMMENT_MAX_ATTACHED_FILES = 5
+
+# Specify how many levels of indentation discussions can be.  This can
+# be used to ensure that discussions will not go into deep levels of
+# nesting if users don't understand the difference between "reply to
+# comment" and "add comment". When the depth is reached, any "reply to
+# comment" is conceptually converted to a "reply to thread"
+# (i.e. reply to this parent's comment). Use -1 for no limit, 0 for
+# unthreaded (flat) discussions.
+CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = 1
 
 CFG_WEBCOMMENT_ERROR_MESSAGES = \
 {   'ERR_WEBCOMMENT_RECID_INVALID'       :  '_("%s is an invalid record ID")',
@@ -66,7 +102,8 @@ CFG_WEBCOMMENT_WARNING_MESSAGES = \
     'WRN_WEBCOMMENT_TIMELIMIT': '_("You already posted a comment short ago. Please retry later")',
     'WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE': '_("You already wrote a review for this record.")',
     'WRN_WEBCOMMENT_SUBSCRIBED':'_("You have been subscribed to this discussion. From now on, you will receive an email whenever a new comment is posted.")',
-    'WRN_WEBCOMMENT_UNSUBSCRIBED':'_("You have been unsubscribed from this discussion.")'
+    'WRN_WEBCOMMENT_UNSUBSCRIBED':'_("You have been unsubscribed from this discussion.")',
+    'WRN_WEBCOMMENT_MAX_FILE_SIZE_REACHED': '_("The size of file \\"%s\\" (%s) is larger than maximum allowed file size (%s). Select files again.")'
 }
 
 CFG_WEBCOMMENT_ACTION_CODE = {

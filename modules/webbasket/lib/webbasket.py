@@ -384,6 +384,7 @@ def perform_request_write_public_note(uid,
     else:
         if cmtid and db.note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
             optional_params["Add note"] = db.get_note(cmtid)
+            optional_params["Reply to"] = cmtid
         elif cmtid:
             optional_params["Add note"] = ()
             optional_params["Warnings"] = ('WRN_WEBBASKET_QUOTE_INVALID_NOTE',)
@@ -409,7 +410,8 @@ def perform_request_save_public_note(uid,
                                      note_title="",
                                      note_body="",
                                      editor_type='textarea',
-                                     ln=CFG_SITE_LANG):
+                                     ln=CFG_SITE_LANG,
+                                     reply_to=None):
     """ Save a given comment if able to.
     @param uid: user id (int)
     @param bskid: basket id (int)
@@ -417,8 +419,9 @@ def perform_request_save_public_note(uid,
     @param title: title of comment (string)
     @param text: comment's body (string)
     @param ln: language (string)
-    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'"""
-
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
+    @param reply_to: the id of the comment we are replying to
+    """
     optional_params = {}
     warnings_rights = []
     warnings_html = ""
@@ -427,7 +430,7 @@ def perform_request_save_public_note(uid,
         warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
         warnings_html += webbasket_templates.tmpl_warnings(warnings_rights, ln)
     else:
-        if not note_title or not note_body:
+        if not note_title or not note_body: # FIXME: improve check when fckeditor
             optional_params["Incomplete note"] = (note_title, note_body)
             optional_params["Warnings"] = ('WRN_WEBBASKET_INCOMPLETE_NOTE',)
         else:
@@ -439,7 +442,7 @@ def perform_request_save_public_note(uid,
                 # reply to a comment is made with a browser that does not
                 # support FCKeditor.
                 note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
-            if not(db.save_note(uid, bskid, recid, note_title, note_body)):
+            if not(db.save_note(uid, bskid, recid, note_title, note_body, reply_to)):
                 # TODO: The note could not be saved. DB problem?
                 pass
             else:
@@ -1317,6 +1320,7 @@ def perform_request_write_note(uid,
     else:
         if cmtid and db.note_belongs_to_item_in_basket_p(cmtid, recid, bskid):
             optional_params["Add note"] = db.get_note(cmtid)
+            optional_params["Reply to"] = cmtid
         elif cmtid:
             optional_params["Add note"] = ()
             optional_params["Warnings"] = ('WRN_WEBBASKET_QUOTE_INVALID_NOTE',)
@@ -1348,7 +1352,8 @@ def perform_request_save_note(uid,
                               note_title="",
                               note_body="",
                               editor_type='textarea',
-                              ln=CFG_SITE_LANG):
+                              ln=CFG_SITE_LANG,
+                              reply_to=None):
     """ Save a given comment if able to.
     @param uid: user id (int)
     @param bskid: basket id (int)
@@ -1356,8 +1361,9 @@ def perform_request_save_note(uid,
     @param title: title of comment (string)
     @param text: comment's body (string)
     @param ln: language (string)
-    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'"""
-
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
+    @param reply_to: the id of the comment we are replying to
+    """
     optional_params = {}
     warnings_rights = []
     warnings_html = ""
@@ -1366,7 +1372,9 @@ def perform_request_save_note(uid,
         warnings_rights = ['WRN_WEBBASKET_RESTRICTED_WRITE_NOTES']
         warnings_html += webbasket_templates.tmpl_warnings(warnings_rights, ln)
     else:
-        if not note_title or not note_body:
+        if not note_title or \
+           ((not note_body and editor_type != 'fckeditor') or \
+            (not remove_html_markup(note_body, '').replace('\n', '').replace('\r', '').strip() and editor_type == 'fckeditor')):
             optional_params["Incomplete note"] = (note_title, note_body)
             optional_params["Warnings"] = ('WRN_WEBBASKET_INCOMPLETE_NOTE',)
         else:
@@ -1378,7 +1386,7 @@ def perform_request_save_note(uid,
                 # reply to a comment is made with a browser that does not
                 # support FCKeditor.
                 note_body = note_body.replace('\n', '').replace('\r', '').replace('<br />', '\n')
-            if not(db.save_note(uid, bskid, recid, note_title, note_body)):
+            if not(db.save_note(uid, bskid, recid, note_title, note_body, reply_to)):
                 # TODO: The note could not be saved. DB problem?
                 pass
             else:
@@ -1591,7 +1599,9 @@ def perform_request_add(uid,
                     es_desc = nl2br(es_desc)
                 added_items = db.add_to_basket(uid, validated_recids, colid, bskid, es_title, es_desc, es_url)
                 if added_items:
-                    if note_body:
+                    if (note_body and editor_type != 'fckeditor') or \
+                           (editor_type == 'fckeditor' and \
+                            remove_html_markup(note_body, '').replace('\n', '').replace('\r', '').strip()):
                         if editor_type == 'fckeditor':
                             # Here we remove the line feeds introduced by FCKeditor (they
                             # have no meaning for the user) and replace the HTML line
@@ -1604,7 +1614,7 @@ def perform_request_add(uid,
                         else:
                             note_title = ''
                         for recid in added_items:
-                            if not(db.save_note(uid, bskid, recid, note_title, note_body)):
+                            if not(db.save_note(uid, bskid, recid, note_title, note_body, reply_to=None)):
                                 # TODO: The note could not be saved. DB problem?
                                 pass
                     if colid > 0:

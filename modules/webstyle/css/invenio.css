@@ -1874,6 +1874,20 @@ ul.bsk_export_as_list{
 dd{
    margin-bottom: 10px;
 }
+.cmtsubround {
+   margin: 5px 15px 5px;
+   border-bottom: 1px dashed #bbb;
+}
+.cmtfilesblock{
+   background-color:#f5f5f5;
+   border-top:1px solid #eee;
+   padding:2px;
+}
+.cmtfilesblock a{
+   background:url(file-icon-text-12x16.gif) no-repeat;
+   padding-left: 14px;
+   margin-left: 2px;
+}
 /* end of WebBasket module */
 
 /* WebSubmit module */

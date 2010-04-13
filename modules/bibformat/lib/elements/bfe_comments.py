@@ -42,7 +42,8 @@ def format(bfo, nbReviews='all', nbComments='all'):
                                                         nb_comments=nb_comments,
                                                         nb_reviews=nb_reviews,
                                                         voted=-1,
-                                                        reported=-1)
+                                                        reported=-1,
+                                                        user_info=bfo.user_info)
 
 
     return comments + reviews

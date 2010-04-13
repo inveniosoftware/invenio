@@ -25,6 +25,7 @@ __lastupdated__ = """$Date$"""
 __revision__ = """$Id$"""
 
 import urllib
+import cgi
 from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks, \
                                perform_request_add_comment_or_remark, \
@@ -35,9 +36,11 @@ from invenio.webcomment import check_recID_is_in_range, \
                                get_user_subscription_to_discussion, \
                                check_user_can_attach_file_to_comments, \
                                check_user_can_view_comments, \
-                               check_user_can_send_comments
+                               check_user_can_send_comments, \
+                               check_user_can_view_comment
 from invenio.config import \
      CFG_PREFIX, \
+     CFG_TMPDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
@@ -51,6 +54,7 @@ from invenio.search_engine import create_navtrail_links, \
      get_colID
 from invenio.urlutils import redirect_to_url, \
                              make_canonical_urlargd
+from invenio.errorlib import register_exception
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
@@ -61,6 +65,9 @@ from invenio.access_control_mailcookie import \
      mail_cookie_check_common, \
      InvenioWebAccessMailCookieDeletedError, \
      InvenioWebAccessMailCookieError
+from invenio.webcomment_config import \
+     CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE, \
+     CFG_WEBCOMMENT_MAX_ATTACHED_FILES
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
@@ -71,7 +78,10 @@ except ImportError, e:
     fckeditor_available = False
 import os
 from invenio import webinterface_handler_config as apache
-from invenio.bibdocfile import stream_file
+from invenio.bibdocfile import \
+     stream_file, \
+     decompose_file, \
+     propose_next_docname
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""
@@ -123,7 +133,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'p': (int, 1),
                                    'voted': (int, -1),
                                    'reported': (int, -1),
-                                   'subscribed': (int, 0)
+                                   'subscribed': (int, 0),
+                                   'cmtgrp': (list, ["latest"]) # 'latest' is now a reserved group/round name
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -148,7 +159,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         can_attach_files = False
         (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
-        if not auth_code:
+        if not auth_code and (user_info['email'] != 'guest' or user_info['apache_user']):
             can_attach_files = True
 
         subscription = get_user_subscription_to_discussion(self.recid, uid)
@@ -161,6 +172,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         else:
             user_is_subscribed_to_discussion = False
             user_can_unsubscribe_from_discussion = False
+
+        #display_comment_rounds = [cmtgrp for cmtgrp in argd['cmtgrp'] if cmtgrp.isdigit() or cmtgrp == "all" or cmtgrp == "-1"]
+        display_comment_rounds = argd['cmtgrp']
 
         check_warnings = []
 
@@ -180,7 +194,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 can_send_comments=can_send_comments,
                 can_attach_files=can_attach_files,
                 user_is_subscribed_to_discussion=user_is_subscribed_to_discussion,
-                user_can_unsubscribe_from_discussion=user_can_unsubscribe_from_discussion
+                user_can_unsubscribe_from_discussion=user_can_unsubscribe_from_discussion,
+                display_comment_rounds=display_comment_rounds
                 )
 
             unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
@@ -222,12 +237,17 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                     </script>
                                     <script src='/jsMath/easy/invenio-jsmath.js' type='text/javascript'></script>
                                """
+            jqueryheader = '''
+            <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
+            <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
+            ''' % {'CFG_SITE_URL': CFG_SITE_URL}
+
 
             return pageheaderonly(title=title,
                         navtrail=navtrail,
                         uid=uid,
                         verbose=1,
-                        metaheaderadd = jsmathheader,
+                        metaheaderadd = jsmathheader + jqueryheader,
                         req=req,
                         language=argd['ln'],
                         navmenuid='search',
@@ -269,7 +289,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                           this discussion
         @return the full html page.
         """
-
         argd = wash_urlargd(form, {'action': (str, "DISPLAY"),
                                    'msg': (str, ""),
                                    'note': (str, ''),
@@ -279,7 +298,6 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'subscribe': (str, ""),
                                    'cookie': (str, "")
                                    })
-
         _ = gettext_set_language(argd['ln'])
 
         actions = ['DISPLAY', 'REPLY', 'SUBMIT']
@@ -313,10 +331,77 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                 text = auth_msg_1 + auth_msg_2)
 
+        user_info = collect_user_info(req)
         can_attach_files = False
         (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
-        if not auth_code:
+        if not auth_code and (user_info['email'] != 'guest' or user_info['apache_user']):
             can_attach_files = True
+
+        warning_msgs = []
+        added_files = {}
+        if can_attach_files:
+            # User is allowed to attach files. Process the files
+            file_too_big = False
+            formfields = form.get('commentattachment[]', [])
+            if not hasattr(formfields, "__getitem__"): # A single file was uploaded
+                formfields = [formfields]
+            for formfield in formfields[:CFG_WEBCOMMENT_MAX_ATTACHED_FILES]:
+                if hasattr(formfield, "filename") and formfield.filename:
+                    filename = formfield.filename
+                    dir_to_open = os.path.join(CFG_TMPDIR, 'webcomment', str(uid))
+                    try:
+                        assert(dir_to_open.startswith(CFG_TMPDIR))
+                    except AssertionError:
+                        register_exception(req=req,
+                                           prefix='User #%s tried to upload file to forbidden location: %s' \
+                                           % (uid, dir_to_open))
+
+                    if not os.path.exists(dir_to_open):
+                        try:
+                            os.makedirs(dir_to_open)
+                        except:
+                            register_exception(req=req, alert_admin=True)
+
+                    ## Before saving the file to disc, wash the filename (in particular
+                    ## washing away UNIX and Windows (e.g. DFS) paths):
+                    filename = os.path.basename(filename.split('\\')[-1])
+                    filename = filename.strip()
+                    if filename != "":
+                        # Check that file does not already exist
+                        n = 1
+                        while os.path.exists(os.path.join(dir_to_open, filename)):
+                            basedir, name, extension = decompose_file(filename)
+                            new_name = propose_next_docname(name)
+                            filename = new_name + extension
+
+                        fp = open(os.path.join(dir_to_open, filename), "w")
+                        # FIXME: temporary, waiting for wsgi handler to be
+                        # fixed. Once done, read chunk by chunk
+##                         while formfield.file:
+##                             fp.write(formfield.file.read(10240))
+                        fp.write(formfield.file.read())
+                        fp.close()
+                        # Isn't this file too big?
+                        file_size = os.path.getsize(os.path.join(dir_to_open, filename))
+                        if CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE > 0 and \
+                               file_size > CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE:
+                            os.remove(os.path.join(dir_to_open, filename))
+                            # One file is too big: record that,
+                            # dismiss all uploaded files and re-ask to
+                            # upload again
+                            file_too_big = True
+                            warning_msgs.append(('WRN_WEBCOMMENT_MAX_FILE_SIZE_REACHED', cgi.escape(filename), str(file_size/1024) + 'KB', str(CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE/1024) + 'KB'))
+                        else:
+                            added_files[filename] = os.path.join(dir_to_open, filename)
+
+            if file_too_big:
+                # One file was too big. Removed all uploaded filed
+                for filepath in added_files.items():
+                    try:
+                        os.remove(filepath)
+                    except:
+                        # File was already removed or does not exist?
+                        pass
 
         client_ip_address = req.remote_ip
         check_warnings = []
@@ -375,12 +460,20 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                              editor_type=argd['editor_type'],
                                                                              can_attach_files=can_attach_files,
                                                                              subscribe=subscribe,
-                                                                             req=req)
+                                                                             req=req,
+                                                                             attached_files=added_files,
+                                                                             warnings=warning_msgs)
 
             if self.discussion:
                 title = _("Add Review")
             else:
                 title = _("Add Comment")
+
+            jqueryheader = '''
+            <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
+            <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
+            ''' % {'CFG_SITE_URL': CFG_SITE_URL}
+
             return page(title=title,
                         body=body,
                         navtrail=navtrail,
@@ -390,7 +483,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         errors=errors,
                         warnings=warnings,
                         req=req,
-                        navmenuid='search')
+                        navmenuid='search',
+                        metaheaderadd=jqueryheader)
         # id not in range
         else:
             return page(title=_("Record Not Found"),
@@ -570,12 +664,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         redirect_to_url(req, display_url)
 
 class WebInterfaceCommentsFiles(WebInterfaceDirectory):
-    """Handle upload and access to files for comments.
+    """Handle <strike>upload and </strike> access to files for comments.
 
-       The upload is currently only available through the FCKeditor.
+       <strike>The upload is currently only available through the FCKeditor.</strike>
     """
 
-    _exports = ['put'] # 'get' is handled by _lookup(..)
+    #_exports = ['put'] # 'get' is handled by _lookup(..)
 
     def __init__(self, recid=-1, reviews=0):
         self.recid = recid
@@ -583,28 +677,22 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
 
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs (for getting
-        and putting attachments) Eg:
-        /record/5953/comments/attachments/get/652/file/myfile.pdf
-        /record/5953/comments/attachments/get/550/image/myfigure.png
+        <strike>and putting attachments</strike>) Eg:
+        CFG_SITE_URL/record/5953/comments/attachments/get/652/myfile.pdf
         """
-        if component == 'get' and len(path) > 2:
+        if component == 'get' and len(path) > 1:
 
-            uid = path[0] # uid of the submitter
+            comid = path[0] # comment ID
 
-            file_type = path[1] # file, image, flash or media (as
-                                # defined by FCKeditor)
+            file_name = '/'.join(path[1:]) # the filename
 
-            if file_type in ['file', 'image', 'flash', 'media']:
-                file_name = '/'.join(path[2:]) # the filename
+            def answer_get(req, form):
+                """Accessing files attached to comments."""
+                form['file'] = file_name
+                form['comid'] = comid
+                return self._get(req, form)
 
-                def answer_get(req, form):
-                    """Accessing files attached to comments."""
-                    form['file'] = file_name
-                    form['type'] = file_type
-                    form['uid'] = uid
-                    return self._get(req, form)
-
-                return answer_get, []
+            return answer_get, []
 
         # All other cases: file not found
         return None, []
@@ -613,20 +701,20 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         """
         Returns a file attached to a comment.
 
-        A file is attached to a comment, by a user (who is the author
-        of the comment), and is of a certain type (file, image,
-        etc). Therefore these 3 values are part of the URL. Eg:
-        CFG_SITE_URL/record/5953/comments/attachments/get/652/file/myfile.pdf
+        Example:
+        CFG_SITE_URL/record/5953/comments/attachments/get/652/myfile.pdf
+        where 652 is the comment ID
         """
         argd = wash_urlargd(form, {'file': (str, None),
-                                   'type': (str, None),
-                                   'uid': (int, 0)})
+                                   'comid': (int, 0)})
 
         # Can user view this record, i.e. can user access its
         # attachments?
         uid = getUid(req)
 
         user_info = collect_user_info(req)
+        # Check that user can view record, and its comments (protected
+        # with action "viewcomment")
         (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
@@ -636,14 +724,27 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
-                text = auth_msg)
+                                       text = auth_msg)
+
+        # Check that user can view this particular comment, protected
+        # using its own restriction
+        (auth_code, auth_msg) = check_user_can_view_comment(user_info, argd['comid'])
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+            target = '/youraccount/login' + \
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                CFG_SITE_URL + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                                       text = auth_msg)
 
         if not argd['file'] is None:
             # Prepare path to file on disk. Normalize the path so that
             # ../ and other dangerous components are removed.
             path = os.path.abspath('/opt/cds-invenio/var/data/comments/' + \
-                                   str(self.recid) + '/'  + str(argd['uid']) + \
-                                   '/' + argd['type'] + '/' + argd['file'])
+                                   str(self.recid) + '/'  + str(argd['comid']) + \
+                                   '/' + argd['file'])
 
             # Check that we are really accessing attachements
             # directory, for the declared record.
@@ -653,54 +754,54 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
                 return stream_file(req, path)
 
         # Send error 404 in all other cases
-        return(apache.HTTP_NOT_FOUND)
+        return apache.HTTP_NOT_FOUND
 
-    def put(self, req, form):
-        """
-        Process requests received from FCKeditor to upload files, etc.
-        """
-        if not fckeditor_available:
-            return
+##     def put(self, req, form):
+##         """
+##         Process requests received from FCKeditor to upload files, etc.
+##         """
+##         if not fckeditor_available:
+##             return
 
-        uid = getUid(req)
+##         uid = getUid(req)
 
-        # URL where the file can be fetched after upload
-        user_files_path = '%(CFG_SITE_URL)s/record/%(recid)i/comments/attachments/get/%(uid)s' % \
-                          {'uid': uid,
-                           'recid': self.recid,
-                           'CFG_SITE_URL': CFG_SITE_URL}
-        # Path to directory where uploaded files are saved
-        user_files_absolute_path = '%(CFG_PREFIX)s/var/data/comments/%(recid)s/%(uid)s' % \
-                                   {'uid': uid,
-                                    'recid': self.recid,
-                                    'CFG_PREFIX': CFG_PREFIX}
-        # Create a Connector instance to handle the request
-        conn = FCKeditorConnectorInvenio(form, recid=self.recid, uid=uid,
-                                         allowed_commands=['QuickUpload'],
-                                         allowed_types = ['File', 'Image', 'Flash', 'Media'],
-                                         user_files_path = user_files_path,
-                                         user_files_absolute_path = user_files_absolute_path)
+##         # URL where the file can be fetched after upload
+##         user_files_path = '%(CFG_SITE_URL)s/record/%(recid)i/comments/attachments/get/%(uid)s' % \
+##                           {'uid': uid,
+##                            'recid': self.recid,
+##                            'CFG_SITE_URL': CFG_SITE_URL}
+##         # Path to directory where uploaded files are saved
+##         user_files_absolute_path = '%(CFG_PREFIX)s/var/data/comments/%(recid)s/%(uid)s' % \
+##                                    {'uid': uid,
+##                                     'recid': self.recid,
+##                                     'CFG_PREFIX': CFG_PREFIX}
+##         # Create a Connector instance to handle the request
+##         conn = FCKeditorConnectorInvenio(form, recid=self.recid, uid=uid,
+##                                          allowed_commands=['QuickUpload'],
+##                                          allowed_types = ['File', 'Image', 'Flash', 'Media'],
+##                                          user_files_path = user_files_path,
+##                                          user_files_absolute_path = user_files_absolute_path)
 
-        # Check that user can upload attachments for comments.
-        user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
-        if user_info['email'] == 'guest' and not user_info['apache_user']:
-            # User is guest: must login prior to upload
-            data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
-        elif auth_code:
-            # User cannot submit
-            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
-        else:
-            # Process the upload and get the response
-            data = conn.doResponse()
+##         # Check that user can upload attachments for comments.
+##         user_info = collect_user_info(req)
+##         (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
+##         if user_info['email'] == 'guest' and not user_info['apache_user']:
+##             # User is guest: must login prior to upload
+##             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
+##         elif auth_code:
+##             # User cannot submit
+##             data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
+##         else:
+##             # Process the upload and get the response
+##             data = conn.doResponse()
 
-        # Transform the headers into something ok for mod_python
-        for header in conn.headers:
-            if not header is None:
-                if header[0] == 'Content-Type':
-                    req.content_type = header[1]
-                else:
-                    req.headers_out[header[0]] = header[1]
-        # Send our response
-        req.send_http_header()
-        req.write(data)
+##         # Transform the headers into something ok for mod_python
+##         for header in conn.headers:
+##             if not header is None:
+##                 if header[0] == 'Content-Type':
+##                     req.content_type = header[1]
+##                 else:
+##                     req.headers_out[header[0]] = header[1]
+##         # Send our response
+##         req.send_http_header()
+##         req.write(data)

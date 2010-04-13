@@ -24,26 +24,28 @@ __revision__ = "$Id$"
 # non CDS Invenio imports:
 import time
 import math
+import os
 from datetime import datetime, timedelta
 
 # CDS Invenio imports:
 
 from invenio.dbquery import run_sql
-from invenio.config import CFG_SITE_LANG, \
-                           CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
-                           CFG_SITE_ADMIN_EMAIL,\
-                           CFG_SITE_SUPPORT_EMAIL,\
-                           CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
-                           CFG_SITE_URL,\
-                           CFG_SITE_NAME,\
-                           CFG_WEBCOMMENT_ALLOW_REVIEWS,\
-                           CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
-                           CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-                           CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
-                           CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
-                           CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
-                           CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS,\
-                           CFG_WEBCOMMENT_DEFAULT_MODERATOR
+from invenio.config import CFG_PREFIX, \
+     CFG_SITE_LANG, \
+     CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
+     CFG_SITE_ADMIN_EMAIL,\
+     CFG_SITE_SUPPORT_EMAIL,\
+     CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
+     CFG_SITE_URL,\
+     CFG_SITE_NAME,\
+     CFG_WEBCOMMENT_ALLOW_REVIEWS,\
+     CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
+     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+     CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
+     CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
+     CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
+     CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS,\
+     CFG_WEBCOMMENT_DEFAULT_MODERATOR
 from invenio.webmessage_mailutils import \
      email_quote_txt, \
      email_quoted_txt2html
@@ -54,9 +56,11 @@ from invenio.dateutils import convert_datetext_to_dategui, \
 from invenio.mailutils import send_email
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
-from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
-     CFG_WEBCOMMENT_EMAIL_REPLIES_TO
+     CFG_WEBCOMMENT_EMAIL_REPLIES_TO, \
+     CFG_WEBCOMMENT_ROUND_DATAFIELD, \
+     CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
+     CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
@@ -73,7 +77,7 @@ except:
     pass
 
 
-def perform_request_display_comments_or_remarks(req, recID, display_order='od', display_since='all', nb_per_page=100, page=1, ln=CFG_SITE_LANG, voted=-1, reported=-1, subscribed=0, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False, user_is_subscribed_to_discussion=False, user_can_unsubscribe_from_discussion=False):
+def perform_request_display_comments_or_remarks(req, recID, display_order='od', display_since='all', nb_per_page=100, page=1, ln=CFG_SITE_LANG, voted=-1, reported=-1, subscribed=0, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False, user_is_subscribed_to_discussion=False, user_can_unsubscribe_from_discussion=False, display_comment_rounds=None):
     """
     Returns all the comments (reviews) of a specific internal record or external basket record.
     @param recID:  record id where (internal record IDs > 0) or (external basket record IDs < -100)
@@ -123,8 +127,9 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     if not(valid):
         return (error_body, errors, warnings)
     # Query the database and filter results
-    res = query_retrieve_comments_or_remarks(recID, display_order, display_since, reviews)
-    res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews)
+    user_info = collect_user_info(uid)
+    res = query_retrieve_comments_or_remarks(recID, display_order, display_since, reviews, user_info=user_info)
+    res2 = query_retrieve_comments_or_remarks(recID, display_order, display_since, not reviews, user_info=user_info)
 
     nb_res = len(res)
     if reviews:
@@ -150,6 +155,9 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
         if display_order not in ['od', 'nd']:
             display_order = 'od'
             warnings.append(('WRN_WEBCOMMENT_INVALID_DISPLAY_ORDER',))
+
+    if not display_comment_rounds:
+        display_comment_rounds = []
 
     # filter results according to page and number of reults per page
     if nb_per_page > 0:
@@ -191,13 +199,25 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
     elif subscribed == -1:
         warnings.append(('WRN_WEBCOMMENT_UNSUBSCRIBED',))
 
+    grouped_comments = group_comments_by_round(res, reviews)
+
+    # Clean list of comments round names
+    if not display_comment_rounds:
+        display_comment_rounds = []
+    elif 'all' in display_comment_rounds:
+        display_comment_rounds = [cmtgrp[0] for cmtgrp in grouped_comments]
+    elif 'latest' in display_comment_rounds:
+        if grouped_comments:
+            display_comment_rounds.append(grouped_comments[-1][0])
+        display_comment_rounds.remove('latest')
+
     body = webcomment_templates.tmpl_get_comments(req,
                                                   recID,
                                                   ln,
                                                   nb_per_page, page, last_page,
                                                   display_order, display_since,
                                                   CFG_WEBCOMMENT_ALLOW_REVIEWS,
-                                                  res, nb_comments, avg_score,
+                                                  grouped_comments, nb_comments, avg_score,
                                                   warnings,
                                                   border=0,
                                                   reviews=reviews,
@@ -208,7 +228,8 @@ def perform_request_display_comments_or_remarks(req, recID, display_order='od', 
                                                   user_is_subscribed_to_discussion=\
                                                   user_is_subscribed_to_discussion,
                                                   user_can_unsubscribe_from_discussion=\
-                                                  user_can_unsubscribe_from_discussion)
+                                                  user_can_unsubscribe_from_discussion,
+                                                  display_comment_rounds=display_comment_rounds)
     return (body, errors, warnings)
 
 def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
@@ -363,7 +384,9 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
          cmt_star,
          cmt_vote, cmt_nb_votes_total,
          cmt_title,
-         cmt_reported) = query_get_comment(cmt_id)
+         cmt_reported,
+         round_name,
+         restriction) = query_get_comment(cmt_id)
         (user_nb_abuse_reports,
          user_votes,
          user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
@@ -484,7 +507,7 @@ def query_get_comment(comID):
     """
     Get all fields of a comment
     @param comID: comment id
-    @return: tuple (comID, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports)
+    @return: tuple (comID, id_bibrec, id_user, body, date_creation, star_score, nb_votes_yes, nb_votes_total, title, nb_abuse_reports, round_name, restriction)
             if none found return ()
     """
     query1 = """SELECT id,
@@ -496,7 +519,9 @@ def query_get_comment(comID):
                        nb_votes_yes,
                        nb_votes_total,
                        title,
-                       nb_abuse_reports
+                       nb_abuse_reports,
+                       round_name,
+                       restriction
                 FROM cmtRECORDCOMMENT
                 WHERE id=%s"""
     params1 = (comID,)
@@ -552,8 +577,8 @@ def query_record_useful_review(comID, value):
     res2 = run_sql(query2, params2)
     return int(res2)
 
-def query_retrieve_comments_or_remarks (recID, display_order='od', display_since='0000-00-00 00:00:00',
-                                        ranking=0):
+def query_retrieve_comments_or_remarks(recID, display_order='od', display_since='0000-00-00 00:00:00',
+                                       ranking=0, limit='all', user_info=None):
     """
     Private function
     Retrieve tuple of comments or remarks from the database
@@ -566,6 +591,7 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
                             nd = newest date
     @param display_since: datetime, e.g. 0000-00-00 00:00:00
     @param ranking: boolean, enabled if reviews, disabled for comments
+    @param limit: number of comments/review to return
     @return: tuple of comment where comment is
             tuple (nickname, uid, date_creation, body, status, id) if ranking disabled or
             tuple (nickname, uid, date_creation, body, status, nb_votes_yes, nb_votes_total, star_score, title, id)
@@ -577,8 +603,8 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
                         'lh'   : "cmt.nb_votes_yes/(cmt.nb_votes_total+1) ASC, cmt.date_creation ASC ",
                         'ls'   : "cmt.star_score ASC, cmt.date_creation DESC ",
                         'hs'   : "cmt.star_score DESC, cmt.date_creation DESC ",
-                        'od'   : "cmt.date_creation ASC ",
-                        'nd'   : "cmt.date_creation DESC "
+                        'nd'   : "cmt.reply_order_cached_data DESC ",
+                        'od'   : "cmt.reply_order_cached_data ASC "
                     }
 
     # Ranking only done for comments and when allowed
@@ -605,29 +631,130 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
                       cmt.body,
                       cmt.status,
                       cmt.nb_abuse_reports,
-                      %(ranking)s cmt.id
-               FROM   %(table)s cmt LEFT JOIN user ON
+                      %(ranking)s cmt.id,
+                      cmt.round_name,
+                      cmt.restriction,
+                      %(reply_to_column)s
+               FROM   cmtRECORDCOMMENT cmt LEFT JOIN user ON
                                               user.id=cmt.id_user
-               WHERE %(id_bibrec)s=%%s
+               WHERE cmt.id_bibrec=%%s
                %(ranking_only)s
                %(display_since)s
-               ORDER BY %%s
+               ORDER BY %(display_order)s
                """ % {'ranking'       : ranking and ' cmt.nb_votes_yes, cmt.nb_votes_total, cmt.star_score, cmt.title, ' or '',
                       'ranking_only'  : ranking and ' AND cmt.star_score>0 ' or ' AND cmt.star_score=0 ',
-                      'id_bibrec'     : recID > 0 and 'cmt.id_bibrec' or 'cmt.id_bibrec_or_bskEXTREC',
-                      'table'         : recID > 0 and 'cmtRECORDCOMMENT' or 'bskRECORDCOMMENT',
-                      'display_since' : display_since == '0000-00-00 00:00:00' and ' ' or 'AND cmt.date_creation>=\'%s\' ' % display_since}
-    params = (recID, display_order)
+#                      'id_bibrec'     : recID > 0 and 'cmt.id_bibrec' or 'cmt.id_bibrec_or_bskEXTREC',
+#                      'table'         : recID > 0 and 'cmtRECORDCOMMENT' or 'bskRECORDCOMMENT',
+                      'display_since' : display_since == '0000-00-00 00:00:00' and ' ' or 'AND cmt.date_creation>=\'%s\' ' % display_since,
+               'display_order': display_order,
+               'reply_to_column':  recID > 0 and 'cmt.in_reply_to_id_cmtRECORDCOMMENT' or 'cmt.in_reply_to_id_bskRECORDCOMMENT'}
+    params = (recID,)
     res = run_sql(query, params)
+#    return res
 
-    if res:
-        return res
+    new_limit = limit
+    comments_list = []
+    for row in res:
+        restriction = (ranking and row[12] or row[8])
+        if user_info and check_user_can_view_comment(user_info, None, restriction)[0] != 0:
+            # User cannot view comment. Look further
+            continue
+        comments_list.append(row)
+        if limit.isdigit():
+            new_limit -= 1
+            if limit < 1:
+                break
+
+    if comments_list:
+        if limit.isdigit():
+            return comments_list[:limit]
+        else:
+            return comments_list
     return ()
+
+## def get_comment_children(comID):
+##     """
+##     Returns the list of children (i.e. direct descendants) ordered by time of addition.
+
+##     @param comID: the ID of the comment for which we want to retrieve children
+##     @type comID: int
+##     @return the list of children
+##     @rtype: list
+##     """
+##     res = run_sql("SELECT id FROM cmtRECORDCOMMENT WHERE in_reply_to_id_cmtRECORDCOMMENT=%s", (comID,))
+##     return [row[0] for row in res]
+
+## def get_comment_descendants(comID, depth=None):
+##     """
+##     Returns the list of descendants of the given comment, orderd from
+##     oldest to newest ("top-down"), down to depth specified as parameter.
+
+##     @param comID: the ID of the comment for which we want to retrieve descendant
+##     @type comID: int
+##     @param depth: the max depth down to which we want to retrieve
+##                   descendants. Specify None for no limit, 1 for direct
+##                   children only, etc.
+##     @return the list of ancestors
+##     @rtype: list(tuple(comment ID, descendants comments IDs))
+##     """
+##     if depth == 0:
+##         return (comID, [])
+
+##     res = run_sql("SELECT id FROM cmtRECORDCOMMENT WHERE in_reply_to_id_cmtRECORDCOMMENT=%s", (comID,))
+##     if res:
+##         children_comID = [row[0] for row in res]
+##         children_descendants = []
+##         if depth:
+##             depth -= 1
+##         children_descendants = [get_comment_descendants(child_comID, depth) for child_comID in children_comID]
+##         return (comID, children_descendants)
+##     else:
+##         return (comID, [])
+
+def get_comment_ancestors(comID, depth=None):
+    """
+    Returns the list of ancestors of the given comment, ordered from
+    oldest to newest ("top-down": direct parent of comID is at last position),
+    up to given depth
+
+    @param comID: the ID of the comment for which we want to retrieve ancestors
+    @type comID: int
+    @param depth: the maximum of levels up from the given comment we
+                  want to retrieve ancestors. None for no limit, 1 for
+                  direct parent only, etc.
+    @type depth: int
+    @return the list of ancestors
+    @rtype: list
+    """
+    if depth == 0:
+        return []
+
+    res = run_sql("SELECT in_reply_to_id_cmtRECORDCOMMENT FROM cmtRECORDCOMMENT WHERE id=%s", (comID,))
+    if res:
+        parent_comID = res[0][0]
+        if parent_comID == 0:
+            return []
+        parent_ancestors = []
+        if depth:
+            depth -= 1
+        parent_ancestors = get_comment_ancestors(parent_comID, depth)
+        parent_ancestors.append(parent_comID)
+        return parent_ancestors
+    else:
+        return []
+
+def get_reply_order_cache_data(comid):
+    """
+    Prepare a representation of the comment ID given as parameter so
+    that it is suitable for byte ordering in MySQL.
+    """
+    return "%s%s%s%s" % (chr((comid >> 24) % 256), chr((comid >> 16) % 256),
+                         chr((comid >> 8) % 256), chr(comid % 256))
 
 def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                 note="", score=0, priority=0,
                                 client_ip_address='', editor_type='textarea',
-                                req=None):
+                                req=None, reply_to=None, attached_files=None):
     """
     Private function
     Insert a comment/review or remarkinto the database
@@ -639,6 +766,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     @param priority: remark priority #!FIXME
     @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
     @param req: request object. If provided, email notification are sent after we reply to user request.
+    @param reply_to: the id of the comment we are replying to with this inserted comment.
     @return: integer >0 representing id if successful, integer 0 if not
     """
     current_date = calculate_start_date('0d')
@@ -648,7 +776,21 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     #change general unicode back to utf-8
     msg = msg.encode('utf-8')
     note = note.encode('utf-8')
-
+    (restriction, round_name) = get_record_status(recID)
+    if attached_files is None:
+        attached_files = {}
+    if reply_to and CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH >= 0:
+        # Check that we have not reached max depth
+        comment_ancestors = get_comment_ancestors(reply_to)
+        if len(comment_ancestors) >= CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH:
+            if CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH == 0:
+                reply_to = None
+            else:
+                reply_to = comment_ancestors[CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH - 1]
+        # Inherit restriction and group/round of 'parent'
+        comment = query_get_comment(reply_to)
+        if comment:
+            (round_name, restriction) = comment[10:12]
     if editor_type == 'fckeditor':
         # Here we remove the line feeds introduced by FCKeditor (they
         # have no meaning for the user) and replace the HTML line
@@ -663,11 +805,24 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                            date_creation,
                                            star_score,
                                            nb_votes_total,
-                                           title)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-    params = (recID, uid, msg, current_date, score, 0, note)
+                                           title,
+                                           round_name,
+                                           restriction,
+                                           in_reply_to_id_cmtRECORDCOMMENT)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"""
+    params = (recID, uid, msg, current_date, score, 0, note, round_name, restriction, reply_to or 0)
     res = run_sql(query, params)
     if res:
+        new_comid = int(res)
+        move_attached_files_to_storage(attached_files, recID, new_comid)
+        parent_reply_order = run_sql("""SELECT reply_order_cached_data from cmtRECORDCOMMENT where id=%s""", (reply_to,))
+        if not parent_reply_order or parent_reply_order[0][0] is None:
+            # This is not a reply, but a first 0-level comment
+            parent_reply_order = ''
+        else:
+            parent_reply_order = parent_reply_order[0][0]
+        run_sql("""UPDATE cmtRECORDCOMMENT SET reply_order_cached_data=%s WHERE id=%s""",
+                (parent_reply_order + get_reply_order_cache_data(new_comid), new_comid))
         action_code = CFG_WEBCOMMENT_ACTION_CODE[reviews and 'ADD_REVIEW' or 'ADD_COMMENT']
         action_time = convert_datestruct_to_datetext(time.localtime())
         query2 = """INSERT INTO cmtACTIONHISTORY  (id_cmtRECORDCOMMENT,
@@ -704,6 +859,40 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
             notify_subscribers_callback(data)
 
     return int(res)
+
+def move_attached_files_to_storage(attached_files, recID, comid):
+    """
+    Move the files that were just attached to a new comment to their
+    final location.
+
+    @param attached_files: the mappings of desired filename to attach
+                           and path where to find the original file
+    @type attached_files: dict {filename, filepath}
+    @param recID: the record ID to which we attach the files
+    @param comid: the comment ID to which we attach the files
+    """
+    for filename, filepath in attached_files.iteritems():
+        os.renames(filepath,
+                   os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
+                                str(recID), str(comid), filename))
+
+def get_attached_files(recid, comid):
+    """
+    Returns a list with tuples (filename, filepath, fileurl)
+
+    @param recid: the recid to which the comment belong
+    @param comid: the commment id for which we want to retrieve files
+    """
+    base_dir = os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
+                            str(recid), str(comid))
+    if os.path.isdir(base_dir):
+        filenames = os.listdir(base_dir)
+        return [(filename, os.path.join(CFG_PREFIX, 'var', 'data', 'comments',
+                                        str(recid), str(comid), filename),
+                 CFG_SITE_URL + '/record/' + str(recid) + '/comments/attachments/get/' + str(comid) + '/' + filename) \
+                for filename in filenames]
+    else:
+        return []
 
 def subscribe_user_to_discussion(recID, uid):
     """
@@ -939,6 +1128,44 @@ def email_subscribers_about_new_comment(recID, reviews, emails1,
 
     return res1 and res2
 
+def get_record_status(recid):
+    """
+    Returns the current status of the record, i.e. current restriction to apply for newly submitted
+    comments, and current commenting round.
+
+    The restriction to apply can be found in the record metadata, in
+    field(s) defined by config CFG_WEBCOMMENT_RESTRICTION_DATAFIELD. The restriction is empty string ""
+    in cases where the restriction has not explicitely been set, even
+    if the record itself is restricted.
+
+    @param recid: the record id
+    @type recid: int
+    @return tuple(restriction, round_name), where 'restriction' is empty string when no restriction applies
+    @rtype (string, int)
+    """
+    # Retrieve record collections
+    collections = get_all_collections_of_a_record(recid)
+    primary_collection = guess_primary_collection_of_a_record(recid)
+    if primary_collection not in collections:
+        collections.append(primary_collection)
+    # And find the first one (last one) that matches the configuration
+    collections_with_commenting_rounds = [coll for coll in collections if coll in CFG_WEBCOMMENT_ROUND_DATAFIELD.keys()]
+    collections_with_restriction = [coll for coll in collections if coll in CFG_WEBCOMMENT_RESTRICTION_DATAFIELD.keys()]
+
+    commenting_round = ""
+    if collections_with_commenting_rounds:
+        commenting_rounds = get_fieldvalues(recid, CFG_WEBCOMMENT_ROUND_DATAFIELD.get(collections_with_commenting_rounds[-1], ""))
+        if commenting_rounds:
+            commenting_round = commenting_rounds[0]
+
+    restriction = ""
+    if collections_with_restriction:
+        restrictions = get_fieldvalues(recid, CFG_WEBCOMMENT_RESTRICTION_DATAFIELD.get(collections_with_restriction[-1], ""))
+        if restrictions:
+            restriction = restrictions[0]
+
+    return (restriction, commenting_round)
+
 def calculate_start_date(display_since):
     """
     Private function
@@ -962,7 +1189,7 @@ def calculate_start_date(display_since):
         nb = int(display_since[:-1])
     except:
         return datetext_default
-    if (display_since==(None or 'all')):
+    if display_since in [None, 'all']:
         return datetext_default
     if str(display_since[-1]) in time_types:
         time_type = str(display_since[-1])
@@ -1021,7 +1248,8 @@ def get_first_comments_or_remarks(recID=-1,
                                   nb_comments='all',
                                   nb_reviews='all',
                                   voted=-1,
-                                  reported=-1):
+                                  reported=-1,
+                                  user_info=None):
     """
     Gets nb number comments/reviews or remarks.
     In the case of comments, will get both comments and reviews
@@ -1045,7 +1273,8 @@ def get_first_comments_or_remarks(recID=-1,
         return ()
     if recID >= 1: #comment or review. NB: suppressed reference to basket (handled in webbasket)
         if CFG_WEBCOMMENT_ALLOW_REVIEWS:
-            res_reviews = query_retrieve_comments_or_remarks(recID=recID, display_order="hh", ranking=1)
+            res_reviews = query_retrieve_comments_or_remarks(recID=recID, display_order="hh", ranking=1,
+                                                             limit=nb_comments, user_info=user_info)
             nb_res_reviews = len(res_reviews)
             ## check nb argument
             if type(nb_reviews) is int and nb_reviews < len(res_reviews):
@@ -1053,7 +1282,8 @@ def get_first_comments_or_remarks(recID=-1,
             else:
                 first_res_reviews = res_reviews
         if CFG_WEBCOMMENT_ALLOW_COMMENTS:
-            res_comments = query_retrieve_comments_or_remarks(recID=recID, display_order="od", ranking=0)
+            res_comments = query_retrieve_comments_or_remarks(recID=recID, display_order="od", ranking=0,
+                                                              limit=nb_reviews, user_info=user_info)
             nb_res_comments = len(res_comments)
             ## check nb argument
             if type(nb_comments) is int and nb_comments < len(res_comments):
@@ -1071,7 +1301,8 @@ def get_first_comments_or_remarks(recID=-1,
         elif reported == 0:
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
         if CFG_WEBCOMMENT_ALLOW_COMMENTS: # normal comments
-            comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, first_res_comments, nb_res_comments, warnings)
+            grouped_comments = group_comments_by_round(first_res_comments, ranking=0)
+            comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, grouped_comments, nb_res_comments, warnings)
         if CFG_WEBCOMMENT_ALLOW_REVIEWS: # ranked comments
             #calculate average score
             avg_score = calculate_avg_score(res_reviews)
@@ -1079,11 +1310,27 @@ def get_first_comments_or_remarks(recID=-1,
                 warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
             elif voted == 0:
                 warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-            reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, first_res_reviews, nb_res_reviews, avg_score, warnings)
+            grouped_reviews = group_comments_by_round(first_res_reviews, ranking=0)
+            reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, grouped_reviews, nb_res_reviews, avg_score, warnings)
         return (comments, reviews)
     # remark
     else:
         return(webcomment_templates.tmpl_get_first_remarks(first_res_comments, ln, nb_res_comments), None)
+
+def group_comments_by_round(comments, ranking=0):
+    """
+    Group comments by the round to which they belong
+    """
+    comment_rounds = {}
+    ordered_comment_round_names = []
+    for comment in comments:
+        comment_round_name = ranking and comment[11] or comment[7]
+        if not comment_rounds.has_key(comment_round_name):
+            comment_rounds[comment_round_name] = []
+            ordered_comment_round_names.append(comment_round_name)
+        comment_rounds[comment_round_name].append(comment)
+    return [(comment_round_name, comment_rounds[comment_round_name]) \
+            for comment_round_name in ordered_comment_round_names]
 
 def calculate_avg_score(res):
     """
@@ -1127,7 +1374,10 @@ def perform_request_add_comment_or_remark(recID=0,
                                           editor_type='textarea',
                                           can_attach_files=False,
                                           subscribe=False,
-                                          req=None):
+                                          req=None,
+                                          attached_files=None,
+                                          warnings=None,
+                                          errors=None):
     """
     Add a comment/review or remark
     @param recID: record id
@@ -1146,12 +1396,18 @@ def perform_request_add_comment_or_remark(recID=0,
     @param can_attach_files: if user can attach files to comments or not
     @param subscribe: if True, subscribe user to receive new comments by email
     @param req: request object. Used to register callback to send email notification
+    @param attached_files: newly attached files to this comment, mapping filename to filepath
+    @type attached_files: dict
+    @param warning_msgs: list of standard warnings that should be considered
+    @param errors_msgs: list of standard errors that should be considered
     @return:
              - html add form if action is display or reply
              - html successful added form if action is submit
     """
-    warnings = []
-    errors = []
+    if warnings is None:
+        warnings = []
+    if errors is None:
+        errors = []
 
     actions = ['DISPLAY', 'REPLY', 'SUBMIT']
     _ = gettext_set_language(ln)
@@ -1161,6 +1417,9 @@ def perform_request_add_comment_or_remark(recID=0,
     if uid <= 0:
         errors.append(('ERR_WEBCOMMENT_UID_INVALID', uid))
         return ('', errors, warnings)
+
+    if attached_files is None:
+        attached_files = {}
 
     user_contact_info = query_get_user_contact_info(uid)
     nickname = ''
@@ -1201,7 +1460,7 @@ def perform_request_add_comment_or_remark(recID=0,
                         textual_msg += "\n\n"
                         textual_msg += comment[3]
                         textual_msg = email_quote_txt(text=textual_msg)
-            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, textual_msg, can_attach_files=can_attach_files), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, textual_msg, can_attach_files=can_attach_files, reply_to=comID), errors, warnings)
         else:
             errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
 
@@ -1222,7 +1481,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                                           note=note, score=score, priority=0,
                                                           client_ip_address=client_ip_address,
                                                           editor_type=editor_type,
-                                                          req=req)
+                                                          req=req,
+                                                          reply_to=comID)
                 else:
                     warnings.append('WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE')
                     success = 1
@@ -1232,7 +1492,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                                           note=note, score=score, priority=0,
                                                           client_ip_address=client_ip_address,
                                                           editor_type=editor_type,
-                                                          req=req)
+                                                          req=req,
+                                                          reply_to=comID, attached_files=attached_files)
                     if success > 0 and subscribe:
                         subscribe_user_to_discussion(recID, uid)
                 else:
@@ -1272,7 +1533,7 @@ def notify_admin_of_new_comment(comID):
          date_creation,
          star_score, nb_votes_yes, nb_votes_total,
          title,
-         nb_abuse_reports) = comment
+         nb_abuse_reports, round_name, restriction) = comment
     else:
         return
     user_info = query_get_user_contact_info(id_user)
@@ -1301,6 +1562,7 @@ AUTHOR:
 
 RECORD CONCERNED:
     Record ID   = %(recID)s
+    URL         = <%(siteurl)s/record/%(recID)s/%(comments_or_reviews)s/>
 %(record_details)s
 
 %(comment_or_review_caps)s:
@@ -1434,6 +1696,7 @@ def get_mini_reviews(recid, ln=CFG_SITE_LANG):
 def check_user_can_view_comments(user_info, recid):
     """Check if the user is authorized to view comments for given
     recid.
+
     Returns the same type as acc_authorize_action
     """
     # Check user can view the record itself first
@@ -1446,6 +1709,26 @@ def check_user_can_view_comments(user_info, recid):
     ## for this collection?
     record_primary_collection = guess_primary_collection_of_a_record(recid)
     return acc_authorize_action(user_info, 'viewcomment', authorized_if_no_roles=True, collection=record_primary_collection)
+
+def check_user_can_view_comment(user_info, comid, restriction=None):
+    """Check if the user is authorized to view a particular comment,
+    given the comment restriction. Note that this function does not
+    check if the record itself is restricted to the user, which would
+    mean that the user should not see the comment.
+
+    You can omit 'comid' if you already know the 'restriction'
+
+    @param user_info: the user info object
+    @param comid: the comment id of that we want to check
+    @param restriction: the restriction applied to given comment (if known. Otherwise retrieved automatically)
+
+    @return: the same type as acc_authorize_action
+    """
+    if restriction is None:
+        restriction = query_get_comment(comid)[11]
+    if restriction == "":
+        return  (0, '')
+    return acc_authorize_action(user_info, 'viewrestrcomment', status=restriction)
 
 def check_user_can_send_comments(user_info, recid):
     """Check if the user is authorized to comment the given
@@ -1468,4 +1751,4 @@ def check_user_can_attach_file_to_comments(user_info, recid):
     ## First can we find an authorization for this case action, for
     ## this collection?
     record_primary_collection = guess_primary_collection_of_a_record(recid)
-    return acc_authorize_action(user_info, 'attachcommentfile', authorized_if_no_roles=True, collection=record_primary_collection)
+    return acc_authorize_action(user_info, 'attachcommentfile', authorized_if_no_roles=False, collection=record_primary_collection)

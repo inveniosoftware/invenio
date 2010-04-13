@@ -324,6 +324,9 @@
     <datafield tag="260" ind1=" " ind2=" ">
       <subfield code="c">1962</subfield>
     </datafield>
+    <datafield tag="506" ind1="1" ind2=" ">
+      <subfield code="a">jekyll_only</subfield>
+    </datafield>
     <datafield tag="520" ind1=" " ind2=" ">
       <subfield code="a">In 1962, CERN hosted the 11th International Conference on High Energy Physics. Among the distinguished visitors were eight Nobel prizewinners.Left to right: Cecil F. Powell, Isidor I. Rabi, Werner Heisenberg, Edwin M. McMillan, Emile Segre, Tsung Dao Lee, Chen Ning Yang and Robert Hofstadter.</subfield>
     </datafield>
@@ -7537,6 +7540,9 @@
     </datafield>
     <datafield tag="502" ind1=" " ind2=" ">
       <subfield code="a">Thesis : Calif. Univ. Berkeley</subfield>
+    </datafield>
+    <datafield tag="506" ind1="1" ind2=" ">
+      <subfield code="a">montague_only</subfield>
     </datafield>
     <datafield tag="650" ind1="1" ind2="7">
       <subfield code="2">SzGeCERN</subfield>

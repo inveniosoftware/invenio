@@ -21,13 +21,42 @@
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
+<style type="text/css">
+<!--
+.guidecommentbox {
+   float:left;
+   clear:both;
+   font-size:small;
+   margin-bottom:12px
+}
+.guidecommentboxcontent {
+   border:1px solid #000;
+   padding:1px;
+}
+.guidecommentboxaction {
+   text-decoration:underline;
+   text-align:right;
+}
+
+-->
+</style>
+
 <h2>Contents</h2>
 
 <strong>1. <a href="#1">Overview</a></strong><br />
-<strong>2. <a href="#2">Managing webcomment</a></strong><br />
+<strong>2. <a href="#2">Managing WebComment</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1<a href="#2.1"> Viewing comments/review information</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.2<a href="#2.2"> Configuring moderator per collection</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.3<a href="#2.3"> Enabling LaTeX/JSMath in comments</a><br />
+<strong>3. <a href="#3">Configuring WebComment</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1<a href="#3.1"> Configuring moderator per collection</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2<a href="#3.2"> Enabling LaTeX/JSMath in comments</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3<a href="#3.3"> Configuring threading</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4<a href="#3.4"> Configuring commenting rounds</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5<a href="#3.5"> Configuring restrictions</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5.1<a href="#3.5.1"> Record-level restrictions</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5.2<a href="#3.5.2"> Discussion-level restrictions</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5.3<a href="#3.5.3"> Comment-level restrictions</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.6<a href="#3.6"> Configuring file attachments</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.7<a href="#3.7"> Configuring email notifications</a><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 <p>
@@ -49,7 +78,9 @@ to the most commented/reviewed records and latest comments/reviews posted.
 related to the collections the user is authorized to.
 </p>
 
-<a name="2.2"></a><h3>2.2 Configuring moderator per collection</h3>
+<a name="3"></a><h2>3. Configuring WebComment</h2>
+
+<a name="3.1"></a><h3>3.1 Configuring moderator per collection</h3>
 
 <p>Configuration to specify which user is moderator of a given collection
 is done through WebAccess administration interface.</p>
@@ -65,10 +96,351 @@ is done through WebAccess administration interface.</p>
          the steps above and write * as the collection argument. </li>
 </ul>
 
-<a name="2.3"></a><h3>2.3 Enabling LaTeX/JSMath in comments</h3>
+<a name="3.2"></a><h3>3.2 Enabling LaTeX/JSMath in comments</h3>
 
 <p>
 It is possible to enable LaTeX rendering in comments with the JSMath module. In order to do that,
  it is necessary to set the following directive in the invenio configuration file:
 <pre>CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS = 1</pre>
+</p>
+
+<a name="3.3"></a><h3>3.3 Configuring threading</h3>
+
+<p>
+Replies to comments can be organized in threads. It is possible to
+configure the maximum depth of the threads with
+the <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH</code> variable in
+the <code>webcomment_config.py</code> file. <br/>
+Set <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = -1</code> to not limit the depth.<br/>
+Set <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = 0</code> for a "flat" discussion.<br/>
+Set <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = 1</code> for one-level deep threads (<b>default</b>)<br/>
+etc..
+</p>
+
+<p>
+The main advantage of setting a maximum depth is to not enter into
+deep, meaningless indentations when users might not understand the
+concept of threads, and mix the "reply to" and "add comment"
+actions. When <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH</code> is reacched,
+the level of discussion becomes a "flat" discussion.
+</p>
+<p>
+
+For example, with <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH = 1</code>, replies
+to comments would go through to the following states:
+
+<table style="text-align:center">
+<tr><td>State 1</td><td></td><td>State 2</td><td></td><td>State 3</td><td></td><td>State 4</td></tr>
+<tr><td valign="top">
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 1
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 2
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+</td>
+<td style="padding:40px" valign="top">
+<pre>
+Reply to
+Comment 1
+-------->
+</pre>
+</td>
+<td valign="top">
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 1
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox" style="margin-left:20px">
+<div class="guidecommentboxcontent">
+<b>Comment 3</b>
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 2
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+</td>
+<td style="padding:40px" valign="top">
+<pre style="margin-top:30px">
+Reply to
+Comment 3
+-------->
+</pre>
+</td>
+<td valign="top">
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 1
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox" style="margin-left:20px">
+<div class="guidecommentboxcontent">
+Comment 3
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox" style="margin-left:20px">
+<div class="guidecommentboxcontent">
+<b>Comment 4</b>
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 2
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+</td>
+<td style="padding:40px" valign="top">
+<pre style="margin-top:60px">
+Reply to
+Comment 3
+-------->
+</pre>
+</td>
+<td valign="top">
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 1
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox" style="margin-left:20px">
+<div class="guidecommentboxcontent">
+Comment 3
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox" style="margin-left:20px">
+<div class="guidecommentboxcontent">
+Comment 4
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox" style="margin-left:20px">
+<div class="guidecommentboxcontent">
+<b>Comment 5</b>
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Comment 2
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+</td></tr>
+</table>
+
+</p>
+
+<a name="3.4"></a><h3>3.4 Configuring commenting rounds</h3>
+
+<p>You can configure WebComment to group comments according to
+the status of the commented record. This enables the creation of
+commenting <em>rounds</em>, so that comments belonging
+to the same round are grouped together, and comments belonging
+to past rounds are less prominently displayed.
+</p>
+
+<p>
+For example, let's say that a collaboration is commenting a draft
+document: once a new revision of the document is uploaded by the
+author, the already existing comments are grouped together and moved
+to archive. The discussion page will then appear empty, and a new
+commenting round can start.<br/>
+
+The past commenting rounds are still visible as small individual
+links at the top of the discussion. A click on one of these links
+reveals the comments belonging to this group/round. It is then also possible
+to continue replying to comments submitted during this past round,
+though it is not possible to add a new comment (not a reply).
+</p>
+
+<table>
+<tr>
+<td valign="top">
+<span style="text-decoration:underline;font-size:small"> &gt;Comments for revision 1</span><br/>
+<span style="text-decoration:underline;font-size:small"> &gt;Comments for revision 2</span><br/>
+<span style="text-decoration:underline;font-size:small"> v Comments for revision 3</span><br/><br/>
+
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Great paper. Check typo line 12.
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Are you sure that figure 5 is ok?
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+
+<div class="guidecommentbox">
+<div class="guidecommentboxcontent">
+Please include the standard logo.
+</div>
+<div class="guidecommentboxaction">Reply to</div>
+</div>
+</td>
+<td valign="top" style="padding:40px" >
+<pre style="margin-top:10px">
+New revision
+   of file
+------------>
+</pre>
+</td>
+<td valign="top">
+<span style="text-decoration:underline;font-size:small"> &gt;Comments for revision 1</span><br/>
+<span style="text-decoration:underline;font-size:small"> &gt;Comments for revision 2</span><br/>
+<span style="text-decoration:underline;font-size:small"> &gt; Comments for revision 3</span><br/>
+<span style="text-decoration:underline;font-size:small"> v Comments for revision 4</span><br/><br/>
+<p style="text-align:center"><em>(blank)</em></p
+</td>
+</tr>
+</table>
+
+
+<p>
+In order to know what is the current round, the MARC metadata of the
+commented record must specify the name of the current group to which new
+comments have to be attached. The MARC field specifying the round "name"
+can be configured with
+the <code>CFG_WEBCOMMENT_ROUND_DATAFIELD</code> of
+the <code>webcomment_config.py</code> file. There you can set the MARC code
+that contains the round name, for each collection you want to enable rounds.
+</p>
+
+<p>Note that whatever the current round is, a reply to a
+comment will always belong to the round of the parent.</p>
+
+<p>
+<em>How to modify the MARC field with the round name?</em>:
+this is up to the admin of the system, but it would typically be done
+by a WebSubmit submission. This field might already exists if you
+store a revision number in your metadata, or date, etc.
+</p>
+
+<p>
+<em>How to restrict commenting rounds?</em>: you can combine rounds
+with the comment-level restrictions documented in
+section <a href="#2.6.3">Comment-level restrictions</a>, which uses a
+similar mechanism to protect comments.
+</p>
+
+<a name="3.5"></a><h3>3.5 Configuring restrictions</h3>
+
+Comments restrictions can be configured at several levels, detailed in
+the next sections. Note that restrictions applied to comments also
+apply to the files attached to comments.
+
+<a name="3.5.1"></a><h4>3.5.1 Record-level restrictions</h4>
+
+<p>
+When a record is restricted via its collection
+(<code>viewrestrcoll</code> WebAccess action), the comments submitted
+for this record are restricted to users who can view the record.
+</p>
+
+<a name="3.5.2"></a><h4>3.5.2 Discussion-level restrictions</h4>
+<p>
+Discussion pages can be restricted with the WebAccess <code>viewcomment</code>
+and <code>sendcomment</code> actions. This let you define who can read or send
+comments in particular collections.
+</p>
+
+<a name="3.5.3"></a><h4>3.5.3 Comment-level restrictions</h4>
+<p>
+Restrictions can be applied at the level of individual records. When
+submitting a comment, WebComment checks in the record metadata if some
+restriction should be applied. The field where WebComment is looking
+for restrictions can be configured in the
+the <code>CFG_WEBCOMMENT_RESTRICTION_DATAFIELD</code> of
+the <code>webcomment_config.py</code> file. There you can define for each
+collection the MARC code containing the restriction information.
+</p>
+<p>
+For the restriction to be applied, an authorisation for
+the <code>viewrestrcomment</code> WebAccess action must be set up.
+The "status" parameter of the <code>viewrestrcomment</code> must match
+the value in the MARC metadata. This lets you define different
+restrictions based on the value in the metadata.
+</p>
+
+<p>Note that whatever the status of the record is, a reply to a
+comment always inherits the restriction of the parent.</p>
+
+<em>How to modify the MARC field with the restriction?</em>:
+this is up to the admin of the system, but it would typically be done by
+a WebSubmit submission.
+</p>
+
+
+<a name="3.6"></a><h3>3.6 Configuring file attachments</h3>
+
+<p>
+WebComment allows authorized users to attach files to submitted
+comments.  This is only available to logged in users, who have been
+authorized via the <code>attachcommentfile</code> WebAccess action. By
+default no user (except admin) can attach files.</p>
+
+<p>
+In addition, you can configure the maximum number of allowed attachments with the
+<code>CFG_WEBCOMMENT_MAX_ATTACHED_FILES</code> (default 5) variable of
+the the <code>webcomment_config.py</code>
+file. Set <code>CFG_WEBCOMMENT_MAX_ATTACHED_FILES = 0</code> for
+unlimited number of files.<br/>
+Note that this is only applicable only if you installed the jQuery plugins
+with <code>make install-jquery-plugins</code>.
+</p>
+
+<p>
+You can set up the maximum size (in bytes) of attachments with
+the <code>CFG_WEBCOMMENT_MAX_ATTACHMENT_SIZE</code> variable of the
+the <code>webcomment_config.py</code> file.
+</p>
+
+<a name="3.7"></a><h3>3.7 Configuring email notifications</h3>
+
+<p>
+WebComment allows users to subscribe to discussions directly from the
+web interface. In addition you can set up automatic notifications that
+don't require the users to subscribe. The main use case for this is to
+notify the author that a new comment has been submitted on her
+document.
+</p>
+
+<p>
+WebComment checks for automatic notifications of comments in the MARC
+record.  It specifically looks for emails in fields defined by
+the <code>CFG_WEBCOMMENT_EMAIL_REPLIES_TO</code> variable of the
+the <code>webcomment_config.py</code> file. There you can define
+the fields to look for for specific collections.
 </p>

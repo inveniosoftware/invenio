@@ -186,7 +186,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
                 return stream_file(req, path)
 
         # Send error 404 in all other cases
-        return(apache.HTTP_NOT_FOUND)
+        return apache.HTTP_NOT_FOUND
 
     def _put(self, req, form):
         """
@@ -510,7 +510,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'note_body': (str, ""),
                                    'editor_type': (str, ""),
                                    'of': (str, ''),
-                                   'ln': (str, CFG_SITE_LANG)})
+                                   'ln': (str, CFG_SITE_LANG),
+                                   'reply_to': (int, 0)})
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
@@ -542,7 +543,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                note_title=argd['note_title'],
                                                                note_body=argd['note_body'],
                                                                editor_type=argd['editor_type'],
-                                                               ln=argd['ln'])
+                                                               ln=argd['ln'],
+                                                               reply_to=argd['reply_to'])
 
         # TODO: do not stat event if save was not succussful
         # register event in webstat
@@ -1509,7 +1511,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'note_body': (str, ""),
                                    'editor_type': (str, ""),
                                    'of': (str, ''),
-                                   'ln': (str, CFG_SITE_LANG)})
+                                   'ln': (str, CFG_SITE_LANG),
+                                   'reply_to': (str, 0)})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -1539,7 +1542,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                                                       note_title=argd['note_title'],
                                                                       note_body=argd['note_body'],
                                                                       editor_type=argd['editor_type'],
-                                                                      ln=argd['ln'])
+                                                                      ln=argd['ln'],
+                                                                      reply_to=argd['reply_to'])
 
         # TODO: do not stat event if save was not succussful
         # register event in webstat

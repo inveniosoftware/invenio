@@ -2966,10 +2966,14 @@ CREATE TABLE IF NOT EXISTS bskRECORDCOMMENT (
   body text NOT NULL,
   date_creation datetime NOT NULL default '0000-00-00 00:00:00',
   priority int(15) NOT NULL default '0',
+  in_reply_to_id_bskRECORDCOMMENT int(15) unsigned NOT NULL default '0',
+  reply_order_cached_data blob NULL default NULL,
   PRIMARY KEY  (id),
   KEY id_bskBASKET (id_bskBASKET),
   KEY id_bibrec_or_bskEXTREC (id_bibrec_or_bskEXTREC),
-  KEY date_creation (date_creation)
+  KEY date_creation (date_creation),
+  KEY in_reply_to_id_bskRECORDCOMMENT (in_reply_to_id_bskRECORDCOMMENT),
+  INDEX (reply_order_cached_data(40))
 ) TYPE=MyISAM;
 
 -- tables for messaging system
@@ -3010,10 +3014,16 @@ CREATE TABLE IF NOT EXISTS cmtRECORDCOMMENT (
   nb_votes_total int(10) unsigned NOT NULL default '0',
   nb_abuse_reports int(10) NOT NULL default '0',
   status char(2) NOT NULL default 'ok',
+  round_name varchar(255) NOT NULL default '',
+  restriction varchar(50) NOT NULL default '',
+  in_reply_to_id_cmtRECORDCOMMENT int(15) unsigned NOT NULL default '0',
+  reply_order_cached_data blob NULL default NULL,
   PRIMARY KEY  (id),
   KEY id_bibrec (id_bibrec),
   KEY id_user (id_user),
-  KEY status (status)
+  KEY status (status),
+  KEY in_reply_to_id_cmtRECORDCOMMENT (in_reply_to_id_cmtRECORDCOMMENT),
+  INDEX (reply_order_cached_data(40))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
