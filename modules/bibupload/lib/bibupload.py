@@ -947,7 +947,7 @@ def synchronize_8564(rec_id, record, record_had_FFT):
         """
         ret = {}
         bibrecdocs = BibRecDocs(rec_id)
-        latest_files = bibrecdocs.list_latest_files()
+        latest_files = bibrecdocs.list_latest_files(list_hidden=False)
         for afile in latest_files:
             url = afile.get_url()
             ret[url] = {'u' : url}

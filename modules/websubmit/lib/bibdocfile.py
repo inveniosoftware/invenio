@@ -1850,7 +1850,7 @@ class BibDoc:
                 self.set_description(global_description, format, version)
         self._build_file_list('init')
 
-    def get_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE):
+    def get_icon(self, subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, display_hidden=True):
         """
         @param subformat_re: by default the convention is that
             L{CFG_WEBSUBMIT_ICON_SUBFORMAT_RE} is used as a subformat indicator to
@@ -1865,7 +1865,7 @@ class BibDoc:
             returning a BibDoc, while now is returning a BibDocFile. Check
             if your client code is compatible with this.
         """
-        for docfile in self.list_latest_files():
+        for docfile in self.list_latest_files(list_hidden=display_hidden):
             if subformat_re.match(docfile.get_subformat()):
                 return docfile
         return None
@@ -1931,7 +1931,7 @@ class BibDoc:
             docfiles = self.list_version_files(version, list_hidden=display_hidden)
         else:
             docfiles = self.list_latest_files(list_hidden=display_hidden)
-        icon = self.get_icon()
+        icon = self.get_icon(display_hidden=display_hidden)
         if icon:
             imageurl = icon.get_url()
         else:
@@ -1951,14 +1951,16 @@ class BibDoc:
                     currversion['content'].append(docfile.display(ln = ln))
             versions.append(currversion)
 
-        t = websubmit_templates.tmpl_bibdoc_filelist(
-              ln = ln,
-              versions = versions,
-              imageurl = imageurl,
-              docname = self.docname,
-              recid = self.recid
-            )
-        return t
+        if versions:
+            return websubmit_templates.tmpl_bibdoc_filelist(
+                ln = ln,
+                versions = versions,
+                imageurl = imageurl,
+                docname = self.docname,
+                recid = self.recid
+                )
+        else:
+            return ""
 
     def change_name(self, newname):
         """
