@@ -574,7 +574,14 @@ def get_pdf_snippets(recID, patterns,
             break # stop at the first good PDF textable file
 
     if text_path:
-        return get_text_snippets(text_path, patterns, nb_words_around, max_snippets)
+        out = get_text_snippets(text_path, patterns, nb_words_around, max_snippets)
+        if len(out) < 15:
+            # no hit, so check stemmed versions:
+            from invenio.bibindex_engine_stemmer import stem
+            stemmed_patterns = [stem(p, 'en') for p in patterns]
+            print stemmed_patterns
+            out = get_text_snippets(text_path, stemmed_patterns, nb_words_around, max_snippets)
+        return out
     else:
         return ""
 
@@ -585,8 +592,7 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets):
     engine: using " ... " between snippets.
     For empty patterns it returns ""
     The idea is to first produce big snippets with grep and narrow them
-    TODO: - compare stem versions instead of using startswith()
-          - distinguish the beginning of sentences and try to make the snippets
+    TODO: - distinguish the beginning of sentences and try to make the snippets
           start there
     """
 
