@@ -152,7 +152,7 @@ def _get_weather_from_cache(journal_name):
     Try to get the weather information from cache. Return False if
     cache does not exist
     """
-    cache_path = os.path.realpath('%s/webjournal/%s/weather.html' % \
+    cache_path = os.path.abspath('%s/webjournal/%s/weather.html' % \
                                   (CFG_CACHEDIR,
                                    journal_name))
     if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
@@ -180,7 +180,7 @@ def cache_weather(html, journal_name):
     Caches the weather box for 30 minutes.
     """
     if not CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
-        cache_path = os.path.realpath('%s/webjournal/%s/weather.html' % \
+        cache_path = os.path.abspath('%s/webjournal/%s/weather.html' % \
                                       (CFG_CACHEDIR,
                                        journal_name))
         if cache_path.startswith(CFG_CACHEDIR + '/webjournal'):

@@ -220,7 +220,7 @@ def _get_whatsNew_from_cache(journal_name, issue, ln):
     """
     Try to get the "whats new" box from cache.
     """
-    cache_path = os.path.realpath('%s/webjournal/%s/%s_whatsNew_%s.html' % \
+    cache_path = os.path.abspath('%s/webjournal/%s/%s_whatsNew_%s.html' % \
                                   (CFG_CACHEDIR,
                                    journal_name,
                                    issue.replace('/','_'),
@@ -260,7 +260,7 @@ def cache_whatsNew(html, journal_name, issue, ln):
     caches the whats new box for 30 minutes.
     """
     if not CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
-        cache_path = os.path.realpath('%s/webjournal/%s/%s_whatsNew_%s.html' % \
+        cache_path = os.path.abspath('%s/webjournal/%s/%s_whatsNew_%s.html' % \
                                       (CFG_CACHEDIR,
                                        journal_name,
                                        issue.replace('/','_'),
