@@ -54,7 +54,7 @@ def _xml_mksubfield(key, subfield, fft):
 def _xml_mksubfields(key, subfield, fft):
     ret = ""
     for value in fft.get(key, []):
-        ret += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(string(value)))
+        ret += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(str(value)))
     return ret
 
 def _xml_fft_creator(fft):
@@ -560,6 +560,11 @@ def cli_append(options, append_path):
     format = cli2format(options, append_path)
     url = clean_url(append_path)
     check_valid_url(url)
+    bibrecdocs = BibRecDocs(recid)
+    if bibrecdocs.has_docname_p(docname) and bibrecdocs.get_bibdoc(docname).format_already_exists_p(format):
+        new_docname = bibrecdocs.propose_unique_docname(docname)
+        wait_for_user("WARNING: a document with name %s and format %s already exists for recid %s. A new document with name %s will be created instead." % (repr(docname), repr(format), repr(recid), repr(new_docname)))
+        docname = new_docname
     ffts = {recid: [{
         'docname' : docname,
         'comment' : comment,
