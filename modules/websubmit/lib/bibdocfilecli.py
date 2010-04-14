@@ -466,7 +466,7 @@ Examples:
     parser.add_option_group(setting_information_options)
 
     revising_options = OptionGroup(parser, 'Action for revising content')
-    revising_options.add_option("--append", dest='append_path', help='specify the URL/path of the file that will appended to the bibdoc', metavar='PATH/URL')
+    revising_options.add_option("--append", dest='append_path', help='specify the URL/path of the file that will appended to the bibdoc (implies --with-empty-recs=yes)', metavar='PATH/URL')
     revising_options.add_option("--revise", dest='revise_path', help='specify the URL/path of the file that will revise the bibdoc', metavar='PATH/URL')
     revising_options.add_option("--revert", dest='action', action='store_const', const='revert', help='reverts a document to the specified version')
     revising_options.add_option("--delete", action='store_const', const='delete', dest='action', help='soft-delete the matched documents (applies to all revisions and formats)')
@@ -518,7 +518,7 @@ def bibupload_ffts(ffts, append=False, debug=False):
             if debug:
                 task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2', '-v9')
             else:
-                task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2', '-v9')
+                task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file_name, '-N', 'FFT', '-S2')
             print "BibUpload append submitted with id %s" % task
         else:
             wait_for_user("This will be corrected via BibUpload")
@@ -1031,6 +1031,8 @@ def main():
                 print >> sys.stderr, "ERROR: no action specified"
                 sys.exit(1)
         elif getattr(options, 'append_path', None):
+            options.empty_recs = 'yes'
+            options.empty_docs = 'yes'
             cli_append(options, getattr(options, 'append_path', None))
         elif getattr(options, 'revise_path', None):
             cli_revise(options, getattr(options, 'revise_path', None))
