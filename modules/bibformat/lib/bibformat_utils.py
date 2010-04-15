@@ -568,20 +568,28 @@ def get_pdf_snippets(recID, patterns,
     from invenio.bibdocfile import BibRecDocs
 
     text_path = ""
+    text_path_courtesy = ""
     for bd in BibRecDocs(recID).list_bibdocs():
         if bd.get_text():
             text_path = bd.get_text_path()
+            text_path_courtesy = bd.get_status()
             break # stop at the first good PDF textable file
 
     if text_path:
         out = get_text_snippets(text_path, patterns, nb_words_around, max_snippets)
-        if len(out) < 15:
+        if not out:
             # no hit, so check stemmed versions:
             from invenio.bibindex_engine_stemmer import stem
             stemmed_patterns = [stem(p, 'en') for p in patterns]
             print stemmed_patterns
             out = get_text_snippets(text_path, stemmed_patterns, nb_words_around, max_snippets)
-        return out
+        if out:
+            out_courtesy = ""
+            if text_path_courtesy:
+                out_courtesy = '<strong>Snippets courtesy of ' + text_path_courtesy + '</strong><br>'
+            return """<div class="snippetbox">%s%s</div>""" % (out_courtesy, out)
+        else:
+            return ""
     else:
         return ""
 
@@ -627,10 +635,11 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets):
     # combine snippets
     out = ""
     for snippet in result:
-        if out != "" and snippet != "":
-	    out += " ... "
-        out += highlight(snippet, patterns)
-    return "<div>" + out + "</div>"
+        if snippet:
+            if out:
+                out += "<br>"
+            out += "..." + highlight(snippet, patterns) + "..."
+    return out
 
 def cut_out_snippet(text, patterns, nb_words_around, max_words):
     # the snippet can include many occurances of the patterns if they are not

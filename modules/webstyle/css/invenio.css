@@ -3039,4 +3039,11 @@ div.subtitle {
     color: #BBBBBB;
 }
 
+.snippetbox {
+    margin-left:10px;
+    color: #000000;
+    background: #cccccc;
+    border: solid 1px #000000;
+}
+
 /* end of invenio.css */
