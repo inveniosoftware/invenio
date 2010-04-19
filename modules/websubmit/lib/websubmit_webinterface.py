@@ -179,7 +179,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             docfile = doc.get_file(format, version)
                             (auth_code, auth_message) = docfile.is_restricted(req)
                             if auth_code != 0:
-                                if get_subformat_from_format(format).startswith('icon'):
+                                if CFG_WEBSUBMIT_ICON_SUBFORMAT_RE.match(get_subformat_from_format(format)):
                                     return stream_restricted_icon(req)
                                 if user_info['email'] == 'guest' and not user_info['apache_user']:
                                     cookie = mail_cookie_create_authorize_action('viewrestrdoc', {'status' : docfile.get_status()})
