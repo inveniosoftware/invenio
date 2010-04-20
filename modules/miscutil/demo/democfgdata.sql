@@ -986,7 +986,7 @@ INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,4,'DEMOPIC_KW','<br /><br />Keywords
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,5,'DEMOPIC_DESCR','<br /><br />Picture Description:<br />','O','Picture Description','','2007-09-13','2007-09-13',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,6,'DEMOPIC_ADD_RN','<br /><br />Your picture will be given a reference number automatically.<br /> However, if the picture has other reference numbers, please enter them here:<br /><i>(one per line)</i><br />','O','Additional Reference Numbers','','2007-09-13','2007-09-13',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,7,'DEMOPIC_NOTE','<br /><br />Additional Comments or Notes about the Picture:<br />','O','Picture Notes or Comments','','2007-09-13','2007-09-13',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,8,'DEMOPIC_FILE','<br /><br /><span style=\"color: red;\">*</span>Enter the full path to the source picture-file to upload:<br />','M','Picture File','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,8,'Upload_Photos','<br /><br /><span style=\"color: red;\">*</span>Select the photo(s) to upload:<br />','M','Picture File','','2007-09-13','2007-09-13',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,9,'DEMOPIC_FINISH','<br /><br /></td></tr></table>','O','','','2007-09-13','2007-09-13',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,1,'DEMOPIC_RN','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Modify a picture\'s bibliographic information:</b><br /><br /><span style=\'color: red;\'>*</span>Picture Reference Number:&nbsp;&nbsp;','M','Reference Number','','2007-10-04','2007-10-04',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,2,'DEMOPIC_CHANGE','<br /><br /><span style=\"color: red;\">*</span>Choose the fields to be modified:<br />','M','Fields to Modify','','2007-10-04','2007-10-04',NULL,NULL);
@@ -1079,7 +1079,7 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_ADD_RN',NULL,'088__a','T',NULL,4,30,NU
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_NOTE',NULL,'500__a','T',NULL,6,60,NULL,NULL,NULL,'2007-09-13','2007-09-13','<br /><br />Additional Comments or Notes about the Picture:<br />',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_FILE',NULL,'','F',40,NULL,NULL,NULL,NULL,NULL,'2007-09-13','2007-09-13',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_FINISH',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"finish submission\" onclick=\"finish();\" />\r\n</div>','2007-09-13','2007-09-13',NULL,NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_CHANGE',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOPIC_CHANGE[]\" size=\"8\" multiple>\r\n <option value=\"Select:\">Select:</option>\r\n <option value=\"DEMOPIC_TITLE\">Title</option>\r\n <option value=\"DEMOPIC_PHOTOG\">Photographer(s)</option>\r\n <option value=\"DEMOPIC_DATE\">Picture Date</option>\r\n <option value=\"DEMOPIC_KW\">Keywords</option>\r\n <option value=\"DEMOPIC_DESCR\">Picture Description</option>\r\n <option value=\"DEMOPIC_ADD_RN\">Picture Reference Numbers</option>\r\n <option value=\"DEMOPIC_NOTE\">Notes or Comments</option>\r\n</select>','2007-10-04','2007-10-04',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_CHANGE',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOPIC_CHANGE[]\" size=\"8\" multiple>\r\n <option value=\"Select:\">Select:</option>\r\n <option value=\"DEMOPIC_TITLE\">Title</option>\r\n <option value=\"DEMOPIC_PHOTOG\">Photographer(s)</option>\r\n <option value=\"DEMOPIC_DATE\">Picture Date</option>\r\n <option value=\"DEMOPIC_KW\">Keywords</option>\r\n <option value=\"DEMOPIC_DESCR\">Picture Description</option>\r\n <option value=\"DEMOPIC_ADD_RN\">Picture Reference Numbers</option>\r\n <option value=\"DEMOPIC_NOTE\">Notes or Comments</option>\r\n <option value=\"Upload_Photos\">Pictures</option>\r\n</select>','2007-10-04','2007-10-04',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_RN',NULL,'037__a','I',30,NULL,NULL,NULL,'DEMO-PICTURE-<COMBO>-<YYYY>-???',NULL,'2007-10-04','2007-10-04',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2007-10-04','2007-10-04',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_REP',NULL,'088__a','T',NULL,4,30,NULL,NULL,NULL,'2008-03-02','2008-03-02','<br />Other Report Numbers (one per line):',NULL,0);
@@ -1160,9 +1160,9 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOJRN_CATEG',NULL,'','R',NULL,NULL,NULL,NULL
 
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Mail_Submitter',70,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Print_Success',60,1);
-INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Insert_Record',50,1);
-INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Make_Record',40,1);
-INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Move_Files_to_Storage',30,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Move_Photos_to_Storage',50,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Insert_Record',40,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Make_Record',20,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Report_Number_Generation',20,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Move_to_Done',80,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPIC','Create_Recid',10,1);
@@ -1175,9 +1175,10 @@ INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Get_Recid',20,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Is_Original_Submitter',30,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Make_Modify_Record',40,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Insert_Modify_Record',50,2);
-INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Print_Success_MBI',60,2);
-INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Send_Modify_Mail',70,2);
-INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Move_to_Done',80,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Move_Photos_to_Storage',60,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Print_Success_MBI',70,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Send_Modify_Mail',80,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPIC','Move_to_Done',90,2);
 INSERT INTO sbmFUNCTIONS VALUES ('SRV','DEMOPIC','Create_Upload_Files_Interface',40,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SRV','DEMOPIC','Is_Original_Submitter',30,1);
 INSERT INTO sbmFUNCTIONS VALUES ('SRV','DEMOPIC','Get_Recid',20,1);

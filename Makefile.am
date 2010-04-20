@@ -141,7 +141,7 @@ uninstall-jscalendar-plugin:
 	@echo "** The jsCalendar plugin was successfully uninstalled.   **"
 	@echo "***********************************************************"
 
-install-jquery-plugins: uninstall-jquery-plugins
+install-jquery-plugins: install-jquery-plugins
 	@echo "***********************************************************"
 	@echo "** Installing various jQuery plugins, please wait...     **"
 	@echo "***********************************************************"
@@ -151,12 +151,20 @@ install-jquery-plugins: uninstall-jquery-plugins
 	mv jquery-1.3.1.min.js jquery.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.core.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.highlight.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/ui/minified/ui.slider.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/ui/minified/ui.sortable.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://github.com/malsup/form/raw/master/jquery.form.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	wget http://tablesorter.com/jquery.tablesorter.zip && \
+	wget http://www.uploadify.com/_files/jquery.uploadify-v2.1.0.zip && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
+	unzip -u jquery.uploadify-v2.1.0.zip -d uploadify && \
+	mv uploadify/swfobject.js ./ && \
+	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
+	mv uploadify/jquery.uploadify.v2.1.0.min.js ./jquery.uploadify.min.js && \
+	rm jquery.uploadify-v2.1.0.zip && rm -r uploadify && \
 	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
 	rm jquery.autogrow-1.2.2.zip && \
 	wget -O json2.js.tmp http://json.org/json2.js && \
@@ -175,6 +183,7 @@ install-jquery-plugins: uninstall-jquery-plugins
 	rm -rf development-bundle)
 	mkdir -p ${prefix}/var/www/img && \
 	(cd ${prefix}/var/www/img && \
+	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.2/themes/base/ && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/themes/redmond/jquery-ui.css && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/demos/images/calendar.gif && \
 	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.7.2/themes/redmond/images/)
@@ -193,12 +202,18 @@ uninstall-jquery-plugins:
 	rm -f ui.datepicker.min.js && \
 	rm -f jquery.autogrow.js && \
 	rm -f json2.js && \
+	rm -f jquery.uploadify.min.js && \
+	rm -f jquery.ui.slider.min.js && \
+	rm -f jquery.ui.sortable.min.js && \
 	rm -rf tablesorter && \
 	rm -f jquery.hotkeys.min.js && \
 	rm -rf jquery-treeview && \
 	rm -f jquery.ajaxPager.js && \
 	rm -f jquery.form.js && \
 	rm -f ui.core.js)
+	rm -f ui.core.js) && \
+	(cd ${prefix}/var/www/img && \
+	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla)
 	@echo "***********************************************************"
 	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"

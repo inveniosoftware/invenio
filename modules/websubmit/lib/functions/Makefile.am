@@ -82,7 +82,8 @@ pylib_DATA = __init__.py \
              Move_FCKeditor_Files_to_Storage.py \
              Create_Upload_Files_Interface.py \
              Move_Uploaded_Files_to_Storage.py \
-             Move_Revised_Files_to_Storage.py
+             Move_Revised_Files_to_Storage.py \
+             Move_Photos_to_Storage.py
 
 EXTRA_DIST = $(pylib_DATA)
 

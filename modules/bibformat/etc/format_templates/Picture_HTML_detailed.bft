@@ -46,7 +46,7 @@ suffix_fr='</small></p>'
 </td>
 
 <td valign="top">
-<BFE_PHOTOS prefix='<span class="blocknote">Resources</span><br />' />
+<BFE_PHOTOS style="border:1px solid #bbb;padding:3px;margin:1px;" prefix='<span class="blocknote">Resources</span><br />' />
 </td>
 
 </tr>
