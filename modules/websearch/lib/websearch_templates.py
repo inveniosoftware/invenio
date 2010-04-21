@@ -3982,7 +3982,7 @@ class Template:
                         p = searchfield + ':' + searchpattern
                 link_url += quote(p)
             if colldef:
-                link_url += ' ' + quote(colldef)
+                link_url += '%20AND%20' + quote(colldef)
             link_url += '&amp;rm=citation';
             link_text = self.tmpl_nice_number(d_total_recs[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
@@ -4020,9 +4020,9 @@ class Template:
                         p = searchfield + ':"' + searchpattern + '"'
                     else:
                         p = searchfield + ':' + searchpattern
-                link_url += quote(p) + ' '
+                link_url += quote(p) + '%20AND%20'
             if colldef:
-                link_url += quote(colldef) + ' '
+                link_url += quote(colldef) + '%20AND%20'
             if low == 0 and high == 0:
                 link_url += quote('cited:0')
             else:
