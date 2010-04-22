@@ -112,6 +112,7 @@ def format(bfo, latest_issue_only='yes', newest_articles_only='yes',
         html_articles_in_category = u""
         # Generate the list of articles in this category
         order_numbers = articles_in_category.keys()
+        order_numbers.sort()
         for order in order_numbers:
             articles = articles_in_category[order]
             for recid in articles:
