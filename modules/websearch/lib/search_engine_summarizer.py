@@ -77,13 +77,16 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
         d_recid_citers = {}
         d_total_cites = {}
         d_avg_cites = {}
+        d_recid_citecount_l = {}
         for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
             d_total_cites[coll] = 0
             d_avg_cites[coll] = 0
+            d_recid_citecount_l[coll] = []
             d_recid_citers[coll] =  get_cited_by_list(d_recids[coll])
             for recid, lciters in d_recid_citers[coll]:
                 if lciters:
                     d_total_cites[coll] += len(lciters)
+                    d_recid_citecount_l[coll].append((recid, len(lciters)))
             if d_total_cites[coll] != 0:
                 d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
         req.write(websearch_templates.tmpl_citesummary_overview(d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln))
@@ -101,7 +104,26 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
                         d_cites[coll] += 1
             req.write(websearch_templates.tmpl_citesummary_breakdown_by_fame(d_cites, low, high, fame, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln))
 
-        # 4) hcs epilogue:
+        # 4) hcs calculate h index
+        d_h_factors = {}
+        def comparator(x, y):
+            if x[1] > y[1]:
+                return -1
+            elif x[1] == y[1]:
+                return 0
+            else: return +1
+        for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
+            d_h_factors[coll] = 0
+            d_recid_citecount_l[coll].sort(cmp=comparator)
+            #req.write(repr(d_recid_citecount_l[coll])) # DEBUG
+            for citecount in d_recid_citecount_l[coll]:
+                d_h_factors[coll] += 1
+                if d_h_factors[coll] > citecount[1]:
+                    d_h_factors[coll] -= 1
+                    break
+        req.write(websearch_templates.tmpl_citesummary_h_index(d_h_factors, CFG_CITESUMMARY_COLLECTIONS, ln))
+
+        # 5) hcs epilogue:
         req.write(websearch_templates.tmpl_citesummary_epilogue(ln))
         return ''
 

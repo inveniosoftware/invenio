@@ -4031,6 +4031,21 @@ class Template:
         out += '</tr>'
         return out
 
+    def tmpl_citesummary_h_index(self, d_h_factors, l_colls, ln=CFG_SITE_LANG):
+        """HTML citesummary format, h factor output. A part of the HCS suite."""
+        _ = gettext_set_language(ln)
+        out = "<tr><td></td></tr><tr><td><strong>%(msg_additional)s</strong> <small><small>[<a href=\"%(help_url)s\">?</a>]</small></small></td></tr>" % \
+              {'msg_additional': _("Additional Citation Metrics"),
+               'help_url': CFG_SITE_URL+'/help/citation-metrics',}
+        out += '<tr><td>h-index <small><small>[<a href="'
+        # use ? help linking in the style of oai_repository_admin.py
+        out += '%s">'% (CFG_SITE_URL+'/help/citation-metrics#citesummary_h-index')
+        out += '?</a>]</small></small></td>'
+        for coll, colldef in l_colls:
+            out += '<td align="right">%s</td>' % self.tmpl_nice_number(d_h_factors[coll], ln)
+        out += '</tr>'
+        return out
+
     def tmpl_citesummary_epilogue(self, ln=CFG_SITE_LANG):
         """HTML citesummary format, epilogue. A part of HCS format suite."""
         _ = gettext_set_language(ln)

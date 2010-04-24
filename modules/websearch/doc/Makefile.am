@@ -21,7 +21,8 @@ webdoclibdir = $(libdir)/webdoc/invenio/help
 
 webdoclib_DATA = \
 	search-tips.webdoc \
-	search-guide.webdoc
+	search-guide.webdoc \
+	citation-metrics.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
