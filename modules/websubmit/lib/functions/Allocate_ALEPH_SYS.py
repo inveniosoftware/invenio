@@ -40,7 +40,8 @@ CFG_MAX_AGE_LOCKFILE = 300 ## (300 seconds is the maximum age that we allow for 
 CFG_LEGAL_ALEPH_DATABASES = ["CER", "IEX", "MAN", "MMD"]
 
 def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
-    """Get the next available ALEPH SYS from the counter file, and allocate it as the
+    """
+       Get the next available ALEPH SYS from the counter file, and allocate it as the
        SYS for this record. Increment the counterby one.
        ALEPH SYS allocation works in "slots" of free numbers. For example,
        000425201 -> 000634452 for a given database may be available.

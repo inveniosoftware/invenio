@@ -34,6 +34,11 @@ from invenio.config import \
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_to_Done(parameters, curdir, form, user_info=None):
+    """
+    This function moves the existing submission directory to the
+    /opt/cds-invenio/var/data/submit/storage/done directory.
+    Then it tars and gzips the directory.
+    """
     global rn
     data = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir)
     dir = data.group(1)

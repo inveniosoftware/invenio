@@ -33,50 +33,63 @@ from invenio.mailutils import send_email
 CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL)
 
 def Mail_New_Record_Notification(parameters, curdir, form, user_info=None):
-    """This function sends a mail giving notification about the submission
-       of a new item to the relevant recipients, including:
-         + The record's Submitter(s);
-         + The site ADMIN;
-         + The record-type's "managers" (signified by the "submit_managers"
+    """
+    This function sends a mail giving notification about the submission
+    of a new item to the relevant recipients, including:
+       + The record's Submitter(s);
+       + The site ADMIN;
+       + The record-type's "managers" (signified by the "submit_managers"
            parameter);
-       The mail contains details of the new item's reference number(s), its
-       title and its author(s). It also contains a link to the item in the
-       CDS Invenio repository.
 
-       @param parameters: (dictionary) - contains the following parameter
-        strings used by this function:
+    The mail contains details of the new item's reference number(s), its
+    title and its author(s). It also contains a link to the item in the
+    CDS Invenio repository.
+
+    @param parameters: (dictionary) - contains the following parameter
+         strings used by this function:
+
           + item_status: (string) - the status of the new item. It can be
             either "ADDED" (in which case the new item has been integrated
             into the repository), or "APPROVAL" (in which case the item is
             awaiting a referee's approval before being integrated into the
             repository, and the mail should state this fact);
+
           + mail_submitters: (string) - a flag containing "Y" or "N" (defaulting
             to "Y"). Determines whether or not the notification mail will be
             sent to the submitters;
+
           + item_managers:    (string) - a comma-separated list of email
             addresses, each of which corresponds to a "manager" for the class
             of item that has been submitted. These managers will receive the
             notification message sent by this function;
+
           + author_file: (string) - the name of a file that contains the names
             of the item's authors (one author per line);
+
           + title_file:  (string) - the name of a file that contains the title
             of the new item;
+
           + owners_file: (string) - the name of a file that contains the email
             addresses of the "owners" of the submitted item. I.e. those who
             will be classed as "submitters" of the item and will therefore
             have modification rights over it. The mail will be sent to these
             people. There should be one email-address per line in this file;
+
           + rn_file1: (string) - the name of the the file containing the item's
             principal reference number;
+
           + rn_file2: (string) - the name of the file containing the item's
             additional reference number(s) (e.g. sometimes two reference numbers
             are allocated during the submission process;
+
        @param curdir: (string) - the current submission's working directory. All
         files containing data related to the submission are stored here and
         therefore all of the files referred to in the "parameters" dictionary
         are considered to be within "curdir";
+
        @param form: (string) - a dictionary-like structure containing the fields
         that were present in the WebSubmit submission form;
+
        @return: (string) - an empty string;
     """
     global sysno ## (I'm really sorry for that! :-O )

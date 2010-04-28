@@ -28,7 +28,9 @@ from invenio.bibtask import task_low_level_submission
 
 def Insert_Record(parameters, curdir, form, user_info=None):
     """
-    Insert record in curdir/recmysql using BibUpload.
+    Insert record in curdir/recmysql using BibUpload.  The file must
+    therefore already have been created prior to this execution of
+    this function, for eg. using "Make_Record".
     """
     global rn
     if os.path.exists(os.path.join(curdir, "recmysql")):

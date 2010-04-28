@@ -46,24 +46,25 @@ CFG_MSG_USER_NOT_AUTHORIZED = """
 </SCRIPT>"""
 
 def User_is_Record_Owner_or_Curator(parameters, curdir, form, user_info=None):
-    """In certain actions of some WebSubmit submissions, it may be not be
-       desirable to allow all users to have a carte blanche to modify
-       records in a collection as they see fit.
-       For example, we may say that a user is allowed to modify a document
-       ONLY if they are listed in the record as an "owner"/"submitter", or
-       if listed in WebAccess as a "curator" for the given document type
-       collection.
-       This function therefore checks whether the user has the rights to
-       carry out a given action on a document type either by being listed in
-       the record or explicitly via WebAccess.
-       If the user has permission, the function ends silently. If not, it
-       will raise an InvenioWebSubmitFunctionStop, informing the user that
-       they don't have rights and sending them back to the submission web
-       form.
-       @parameters: None.
-       @return: Empty string.
-       @Exceptions raised: InvenioWebSubmitFunctionStop when user is denied
-        permission to work with the record.
+    """
+    In certain actions of some WebSubmit submissions, it may be not be
+    desirable to allow all users to have a carte blanche to modify
+    records in a collection as they see fit.
+    For example, we may say that a user is allowed to modify a document
+    ONLY if they are listed in the record as an "owner"/"submitter", or
+    if listed in WebAccess as a "curator" for the given document type
+    collection.
+    This function therefore checks whether the user has the rights to
+    carry out a given action on a document type either by being listed in
+    the record or explicitly via WebAccess.
+    If the user has permission, the function ends silently. If not, it
+    will raise an InvenioWebSubmitFunctionStop, informing the user that
+    they don't have rights and sending them back to the submission web
+    form.
+    @parameters: None.
+    @return: Empty string.
+    @Exceptions raised: InvenioWebSubmitFunctionStop when user is denied
+                permission to work with the record.
     """
     global sysno
     ## Get the document type and action from the form. They can be used to

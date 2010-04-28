@@ -41,6 +41,25 @@ from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
 def Send_Modify_Mail (parameters, curdir, form, user_info=None):
+    """
+    This function sends an email to warn people a document has been
+    modified and the user his modifications have been taken into
+    account..
+
+    Parameters:
+
+       * addressesMBI: email addresses of the people who will receive
+                       this email (comma separated list).
+
+       * fieldnameMBI: name of the file containing the modified
+                       fields.
+
+       * sourceDoc: Long name for the type of document. This name will
+                    be displayed in the mail.
+
+       * emailfile: name of the file in which the email of the modifier
+                    will be found.
+    """
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     global sysno,rn
     if parameters['emailFile'] is not None and parameters['emailFile']!= "" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):

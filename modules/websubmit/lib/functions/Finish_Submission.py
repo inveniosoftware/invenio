@@ -29,6 +29,15 @@ __revision__ = "$Id$"
    ##
 
 def Finish_Submission(parameters, curdir, form, user_info=None):
+    """
+    This function stops the data treatment process even if further
+    steps exist. This is used for example in the approval action. In
+    the first step, the program determines whether the user approved
+    or rejected the document (see CaseEDS function description). Then
+    depending on the result, it executes step 2 or step 3. If it
+    executes step 2, then it should continue with step 3 if nothing
+    stopped it. The Finish_Submission function plays this role.
+    """
     global last_step,action_score
     last_step = 1
     action_score = -1

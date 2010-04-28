@@ -32,7 +32,8 @@ re_fckeditor_link = re.compile('"' + CFG_SITE_URL + \
                                r'/submit/getattachedfile/(?P<uid>\d+)/(?P<type>(image|file|media|flash))/(?P<filename>.*?)"')
 
 def Move_FCKeditor_Files_to_Storage(parameters, curdir, form, user_info=None):
-    """Moves the files uploaded via the FCKeditor that are linked to
+    """
+    Moves the files uploaded via the FCKeditor that are linked to
     the given field. Replace these links with URLs 'local' to the
     record (recid/files/).
 

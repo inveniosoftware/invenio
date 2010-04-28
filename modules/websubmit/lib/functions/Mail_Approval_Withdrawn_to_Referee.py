@@ -50,34 +50,38 @@ def Mail_Approval_Withdrawn_to_Referee(parameters, \
                                        curdir, \
                                        form, \
                                        user_info=None):
-    """This function sends an email to the referee of a document informing
-       him/her that the request for its approval has been withdrawn.
-       @param categ_file_withd: (string) - some document types are
-        separated into different categories, each of which has its own
-        referee(s).
-        In such document types, it's necessary to know the document-
-        type's category in order to choose the referee.
-        This parameter provides a means by which the category information
-        can be extracted from a file in the current submission's working
-        directory. It should therefore be a filename.
-       @param categ_rnseek_withd: (string) - some document types are
-        separated into different categories, each of which has its own
-        referee(s).
-        In such document types, it's necessary to know the document-
-        type's category in order to choose the referee.
-        This parameter provides a means by which the category information
-        can be extracted from the document's reference number.
-        It is infact a string that will be compiled into a regexp and
-        an attempt will be made to match it agains the document's reference
-        number starting from the left-most position.
-        The only pre-requisite is that the segment in which the category is
-        sought should be indicated with <CATEGORY>.
-        Thus, an example might be as follows:
-           ATL(-COM)?-<CATEGORY>-.+
-        This would allow "PHYS" in the following reference number to be
-        recognised as the category:
-           ATL-COM-PHYS-2008-001
-       @return: (string) - empty string.
+    """
+    This function sends an email to the referee of a document informing
+    him/her that the request for its approval has been withdrawn.
+
+    @param categ_file_withd: (string) - some document types are
+           separated into different categories, each of which has its own
+           referee(s).
+           In such document types, it's necessary to know the document-
+           type's category in order to choose the referee.
+           This parameter provides a means by which the category information
+           can be extracted from a file in the current submission's working
+           directory. It should therefore be a filename.
+
+    @param categ_rnseek_withd: (string) - some document types are
+           separated into different categories, each of which has its own
+           referee(s).
+           In such document types, it's necessary to know the document-
+           type's category in order to choose the referee.
+           This parameter provides a means by which the category information
+           can be extracted from the document's reference number.
+           It is infact a string that will be compiled into a regexp and
+           an attempt will be made to match it agains the document's reference
+           number starting from the left-most position.
+           The only pre-requisite is that the segment in which the category is
+           sought should be indicated with <CATEGORY>.
+           Thus, an example might be as follows:
+              ATL(-COM)?-<CATEGORY>-.+
+           This would allow "PHYS" in the following reference number to be
+           recognised as the category:
+              ATL-COM-PHYS-2008-001
+
+    @return: (string) - empty string.
     """
     ## Get the reference number (as global rn - sorry!) and the document type:
     global sysno, rn

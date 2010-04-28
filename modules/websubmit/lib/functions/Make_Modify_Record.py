@@ -36,6 +36,22 @@ from invenio.config import \
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Make_Modify_Record(parameters, curdir, form, user_info=None):
+    """
+    This function creates the record file formatted for a direct
+    insertion in the documents database. It uses the BibConvert tool.
+
+    The main difference between all the Make_..._Record functions are
+    the parameters.  As its name says, this particular function should
+    be used for the modification of a record. (MBI- Modify Record
+    action).
+
+    Parameters:
+
+       * modifyTemplate: Name of bibconvert's configuration file used
+                         for creating the mysql record.
+
+       * sourceTemplate: Name of bibconvert's source file.
+    """
     # Get rid of "invisible" white spaces
     source = parameters['sourceTemplate'].replace(" ","")
     modify = parameters['modifyTemplate'].replace(" ","")

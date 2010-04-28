@@ -28,12 +28,16 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.textutils import wash_for_xml
 
 def Convert_RecXML_to_RecALEPH_DELETE(parameters, curdir, form, user_info=None):
-    """Function to create an ALEPH 500 MARC DELETE record from a MARC XML
+    """
+       Function to create an ALEPH 500 MARC DELETE record from a MARC XML
        record.
+
        This function depends upon the following:
+
          * "recmysql" is a file that already exists in the working
             submission directory. I.e. "Make_Record" has already been called and
             the MARC XML record created.
+
          * "recmysql" must contain an ALEPH 500 SYS in the field "970__a". That
             is to say, the function "Allocate_ALEPH_SYS" should have been called
             and an ALEPH 500 SYS allocated to this record.
@@ -45,6 +49,7 @@ def Convert_RecXML_to_RecALEPH_DELETE(parameters, curdir, form, user_info=None):
        function will use the "xmlmarc2textmarc" tool to convert that record into
        the ALEPH MARC record. The record will then be written into the file
        "recaleph500" in the current working submission directory.
+
        @parameters: None
        @return: (string) - Empty string.
     """

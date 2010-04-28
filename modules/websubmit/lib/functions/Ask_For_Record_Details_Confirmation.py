@@ -60,7 +60,12 @@ def Ask_For_Record_Details_Confirmation(parameters, \
                                         curdir, \
                                         form, \
                                         user_info=None):
-    """Given the "recid" (001) of a record, retrieve the basic metadata
+    """
+       Display the details of a record on which some operation is to be carried
+       out and prompt for the user's confirmation that it is the correct record.
+       Upon the clicking of the confirmation button, augment step by one.
+
+       Given the "recid" (001) of a record, retrieve the basic metadata
        (title, report-number(s) and author(s)) and display them in the
        user's browser along with a prompt asking them to confirm that
        it is indeed the record that they expected to see.

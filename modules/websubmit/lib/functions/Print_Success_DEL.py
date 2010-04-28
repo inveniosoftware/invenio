@@ -24,6 +24,10 @@ __revision__ = "$Id$"
    ## PARAMETERS:    -
 
 def Print_Success_DEL(parameters, curdir, form, user_info=None):
+    """
+    Simply display a message stating that the document was
+    successfully deleted.
+    """
     global rn
     t="<br /><br /><b>Document %s was successfully deleted.</b>" % rn
     return t

@@ -38,6 +38,12 @@ from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.websubmit_functions.Shared_Functions import write_file
 
 def Is_Original_Submitter(parameters, curdir, form, user_info=None):
+    """
+    This function compares the current logged in user email with the
+    email of the original submitter of the record. If it is the same
+    (or if the current user has superuser rights), we go on. If it
+    differs, an error message is issued.
+    """
     global uid_email,sysno,uid
     doctype = form['doctype']
     act = form['act']

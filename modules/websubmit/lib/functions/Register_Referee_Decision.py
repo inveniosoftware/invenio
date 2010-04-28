@@ -31,13 +31,15 @@ from invenio.websubmit_dblayer import get_simple_approval_status, \
                                       update_approval_request_status
 
 def Register_Referee_Decision(parameters, curdir, form, user_info=None):
-    """A referee may either "accept" or "reject" a refereed document.
-       The referee's decision is stored in a file in the submission's working
-       directory and it is this function's job to read the contents of that
-       file and update the status of the document's entry in the approvals
-       table (sbmAPPROVAL) to be either "accepted" or "rejected" depending
-       upon the referee's decision.
-       @param decision_file: (string) - the name of the file in which the
+    """
+    A referee may either "accept" or "reject" a refereed document.
+    The referee's decision is stored in a file in the submission's working
+    directory and it is this function's job to read the contents of that
+    file and update the status of the document's entry in the approvals
+    table (sbmAPPROVAL) to be either "accepted" or "rejected" depending
+    upon the referee's decision.
+
+    @param decision_file: (string) - the name of the file in which the
         referee's decision is to be found.
         NOTE: A referee's decision _MUST_ be either "accept" or "reject".
               If not, an InvenioWebSubmitFunctionError will be raised.
@@ -47,11 +49,13 @@ def Register_Referee_Decision(parameters, curdir, form, user_info=None):
               (This is because it's not appropriate to approve a document
               that has already been approved or rejected, has been
               withdrawn, etc.)
-       @return: empty string.
-       @Exceptions raised: InvenioWebSubmitFunctionError on unexpected error.
-                           InvenioWebSubmitFunctionStop in the case where the
-                            approval should be stopped for whatever reason.
-                            (E.g. when it has already been approved.)
+
+    @return: empty string.
+
+    @Exceptions raised: InvenioWebSubmitFunctionError on unexpected error.
+                        InvenioWebSubmitFunctionStop in the case where the
+                        approval should be stopped for whatever reason.
+                        (E.g. when it has already been approved.)
     """
     global rn
     doctype = form['doctype']

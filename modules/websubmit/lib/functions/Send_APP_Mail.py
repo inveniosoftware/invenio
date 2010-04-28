@@ -56,6 +56,32 @@ else:
     CFG_WEBSUBMIT_RECORD_OWNER_EMAIL = "8560_f"
 
 def Send_APP_Mail (parameters, curdir, form, user_info=None):
+    """
+    This function send an email informing the original submitter of a
+    document that the referee has approved/ rejected the document. The
+    email is also sent to the referee for checking.
+
+    Parameters:
+
+       * addressesAPP: email addresses of the people who will receive
+         this email (comma separated list). this parameter may contain
+         the <CATEG> string. In which case the variable computed from
+         the [categformatAFP] parameter replaces this string.
+         eg.: "<CATEG>-email@cern.ch"
+
+       * categformatAPP contains a regular expression used to compute
+         the category of the document given the reference of the
+         document.
+         eg.: if [categformatAFP]="TEST-<CATEG>-.*" and the reference
+         of the document is "TEST-CATEGORY1-2001-001", then the computed
+         category equals "CATEGORY1"
+
+       * newrnin: Name of the file containing the 2nd reference of the
+                  approved document (if any).
+
+       * edsrn: Name of the file containing the reference of the
+                approved document.
+    """
     global titlevalue,authorvalue,sysno,rn
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     doctype = form['doctype']

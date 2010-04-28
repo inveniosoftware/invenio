@@ -1473,13 +1473,31 @@ def _functionedit_display_function_details(errors, warnings, funcname, user_msg=
         this_function_parameters = get_function_parameters(function=funcname)
         ## get all function parameters in WebSubmit:
         all_function_parameters = get_distinct_paramname_all_websubmit_function_parameters()
+
+        ## get the docstring of the function. Remove leading empty
+        ## lines and remove unnecessary leading whitespaces
+        docstring = None
+        try:
+            websubmit_function = __import__('invenio.websubmit_functions.%s' % funcname,
+                                            globals(), locals(), [funcname])
+            if hasattr(websubmit_function, funcname) and getattr(websubmit_function, funcname).__doc__:
+                docstring = getattr(websubmit_function, funcname).__doc__
+        except Exception, e:
+            docstring = '''<span style="color:#f00;font-weight:700">Function documentation could
+            not be loaded</span>.<br/>Please check function definition. Error was:<br/>%s''' % str(e)
+
+        if docstring:
+            docstring = '<pre style="max-height:500px;overflow: auto;">' + _format_function_docstring(docstring) + '</pre>'
+
         body = websubmitadmin_templates.tmpl_display_addfunctionform(funcname=funcname,
                                                                      funcdescr=funcdescr,
                                                                      func_parameters=this_function_parameters,
                                                                      all_websubmit_func_parameters=all_function_parameters,
                                                                      perform_act="functionedit",
-                                                                     user_msg=user_msg
+                                                                     user_msg=user_msg,
+                                                                     func_docstring = docstring
                                                                     )
+
     else:
         ## Either no rows, or more than one row for function: log error, and display all functions
         ## TODO : LOGGING
@@ -1495,6 +1513,44 @@ def _functionedit_display_function_details(errors, warnings, funcname, user_msg=
             ## LOG MESSAGE
         body = websubmitadmin_templates.tmpl_display_allfunctions(all_functions, user_msg=user_msg)
     return (title, body)
+
+def _format_function_docstring(docstring):
+    """
+    Remove unnecessary leading and trailing empty lines, as well as
+    meaningless leading and trailing whitespaces on every lines
+
+    @param docstring: the input docstring to format
+    @type docstring: string
+    @return: a formatted docstring
+    @rtype: string
+    """
+    def count_leading_whitespaces(line):
+        "Count enumber of leading whitespaces"
+        line_length = len(line)
+        pos = 0
+        while pos < line_length and line[pos] == " ":
+            pos += 1
+        return pos
+
+    new_docstring_list = []
+    min_nb_leading_whitespace = len(docstring) # this is really the max possible
+
+    # First count min number of leading whitespaces of all lines. Also
+    # remove leading empty lines.
+    docstring_has_started_p = False
+    for line in docstring.splitlines():
+        if docstring_has_started_p or line.strip():
+            # A non-empty line has been found, or an emtpy line after
+            # the beginning of some text was found
+            docstring_has_started_p = True
+            new_docstring_list.append(line)
+            if line.strip():
+                # If line has some meaningful char, count leading whitespaces
+                line_nb_spaces = count_leading_whitespaces(line)
+                if line_nb_spaces < min_nb_leading_whitespace:
+                    min_nb_leading_whitespace = line_nb_spaces
+
+    return '\n'.join([line[min_nb_leading_whitespace:] for line in new_docstring_list]).rstrip()
 
 def _functionedit_update_description(errors, warnings, funcname, funcdescr):
     """Perform an update of the description for a given function.

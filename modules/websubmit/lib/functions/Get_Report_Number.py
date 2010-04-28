@@ -31,6 +31,17 @@ import os
 import re
 
 def Get_Report_Number(parameters, curdir, form, user_info=None):
+    """
+    This function gets the value contained in the [edsrn] file and
+    stores it in the 'rn' global variable.
+
+    Parameters:
+
+        * edsrn: Name of the file which stores the reference.  This
+                 value depends on the web form configuration you
+                 did. It should contain the name of the form element
+                 used for storing the reference of the document.
+    """
     global rn
 
     #Path of file containing report number

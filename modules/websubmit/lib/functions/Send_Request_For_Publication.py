@@ -15,17 +15,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-   ## Description:   function Send_Approval_Request
-   ##                This function sends an email to the referee asking him/her
-   ##             to approve/reject a document
-   ## Author:         T.Baron
-   ## PARAMETERS:    directory: parameter to the link manager program
-   ##                addressesDAM: address of the referee(s)
-   ##             categformatDAM: variable needed to extract the category
-   ##                        of the document and use it to derive the
-   ##                address.
-   ##             authorfile: name of the file containing the author list
-   ##             titleFile: name of the file containing the title
 
 import os
 import re

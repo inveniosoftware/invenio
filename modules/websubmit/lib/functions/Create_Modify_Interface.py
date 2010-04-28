@@ -17,18 +17,6 @@
 """
 This is the Create_Modify_Interface function (along with its helpers).
 It is used by WebSubmit for the "Modify Bibliographic Information" action.
-
-Create_Modify_Interface expects the following parameters:
-    * "fieldnameMBI" - the name of a text file in the submission working directory
-        that contains a list of the names of the WebSubmit fields to include in the
-        Modification interface.
-        These field names are separated by "\n" or "+".
-
-Given the list of WebSubmit fields to be included in the modification interface,
-the values for each field are retrieved for the given record (by way of each WebSubmit field
-being configured with a MARC Code in the WebSubmit database).
-An HTML FORM is then created. This form  allows a user to modify certain field values for
-a record.
 """
 __revision__ = "$Id$"
 
@@ -93,8 +81,26 @@ def Create_Modify_Interface_transform_date(fld_val):
 
 
 def Create_Modify_Interface(parameters, curdir, form, user_info=None):
-    """Create an interface for the modification of a document, based on the fields that the user has
-       chosen to modify
+    """
+    Create an interface for the modification of a document, based on
+    the fields that the user has chosen to modify.
+
+    Create_Modify_Interface expects the following parameters:
+
+       * "fieldnameMBI" - the name of a text file in the submission
+        working directory that contains a list of the names of the
+        WebSubmit fields to include in the Modification interface.
+        These field names are separated by"\n" or "+".
+
+    Given the list of WebSubmit fields to be included in the
+    modification interface, the values for each field are retrieved
+    for the given record (by way of each WebSubmit field being
+    configured with a MARC Code in the WebSubmit database).  An HTML
+    FORM is then created. This form allows a user to modify certain
+    field values for a record.
+
+    The file referenced by "fieldnameMBI" is usually generated from a
+    multiple select form field)
     """
     global sysno,rn
     t = ""

@@ -47,21 +47,29 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
 
     There is only one instance of all possible extension(pdf, gz...) in each part
     otherwise we may encount problems when renaming files.
-    +parameters['rename']: if given, all the files in curdir/files are renamed.
-     parameters['rename'] is of the form: <PA>elemfilename[re]</PA>* where re is
-     an regexp to select(using re.sub) what part of the elem file has
-     to be selected.e.g <PA>file:TEST_FILE_RN</PA>
-    +parameters['documenttype']: if given, other formats are created.
-     It has 2 possible values: - if "picture" icon in gif format is created
-                               - if "fulltext" ps, gz .... formats are created
-    +parameters['paths_and_suffixes']: directories to look into and corresponding
-    suffix to add to every file inside. It must have the same structure as a
-     python dictionnary of the following form
-     {'FrenchAbstract':'french', 'EnglishAbstract':''}
-     The keys are the file input element name from the form <=> directories in curdir/files
-     The values associated are the suffixes which will be added to all the files
-     in e.g. curdir/files/FrenchAbstract
-    +parameters['iconsize'] need only if "icon" is selected in parameters['documenttype']
+
+    + parameters['rename']: if given, all the files in curdir/files
+      are renamed.  parameters['rename'] is of the form:
+      <PA>elemfilename[re]</PA>* where re is an regexp to select(using
+      re.sub) what part of the elem file has to be selected.
+      e.g: <PA>file:TEST_FILE_RN</PA>
+
+    + parameters['documenttype']: if given, other formats are created.
+      It has 2 possible values: - if "picture" icon in gif format is created
+                                - if "fulltext" ps, gz .... formats are created
+
+    + parameters['paths_and_suffixes']: directories to look into and
+      corresponding suffix to add to every file inside. It must have
+      the same structure as a python dictionnary of the following form
+      {'FrenchAbstract':'french', 'EnglishAbstract':''}
+
+      The keys are the file input element name from the form <=>
+      directories in curdir/files The values associated are the
+      suffixes which will be added to all the files in
+      e.g. curdir/files/FrenchAbstract
+
+    + parameters['iconsize'] need only if 'icon' is selected in
+    parameters['documenttype']
     """
     global sysno
     paths_and_suffixes = parameters['paths_and_suffixes']

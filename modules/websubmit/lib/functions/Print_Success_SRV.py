@@ -24,6 +24,11 @@ __revision__ = "$Id$"
    ## PARAMETERS:    -
 
 def Print_Success_SRV(parameters, curdir, form, user_info=None):
+    """
+    This function simply displays a text on the screen, telling the
+    user the revision went fine. To be used in the Submit New File
+    (SRV) action.
+    """
     global rn
     t="<br /><br /><b>Document %s was successfully revised.</b>" % rn
     return t

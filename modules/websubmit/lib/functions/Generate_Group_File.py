@@ -23,18 +23,27 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionError
 CFG_WEBSUBMIT_GROUP_FILE_NAME = "Group"
 
 def Generate_Group_File(parameters, curdir, form, user_info=None):
-    """Generates a group file for use with publiline
-       @param parameters: (dictionary) - must contain:
-          + group_name: (string) - the id of the Group for use in the
-            complex approval refereeing workflow
-       @param curdir: (string) - the current submission's working
-        directory.
-       @param form: (dictionary) - form fields.
-       @param user_info: (dictionary) - various information about the
-        submitting user (includes the apache req object).
-       @return: (string) - empty string.
-       @Exceptions raised: InvenioWebSubmitFunctionError when an
-        unexpected error is encountered.
+    """
+    Generates a group file (stored in 'curdir/Group') for use with
+    publiline.
+
+    @param parameters: (dictionary) - must contain:
+                      + group_name: (string) - the id of the Group for
+                      use in the complex approval refereeing workflow
+
+    @param curdir: (string) - the current submission's working
+    directory.
+
+    @param form: (dictionary) - form fields.
+
+    @param user_info: (dictionary) - various information about the
+                                     submitting user (includes the
+                                     apache req object).
+
+    @return: (string) - empty string.
+
+    @Exceptions raised: InvenioWebSubmitFunctionError when an
+                        unexpected error is encountered.
     """
     try:
         group_file = open("%s/%s" % (curdir, CFG_WEBSUBMIT_GROUP_FILE_NAME), "w")

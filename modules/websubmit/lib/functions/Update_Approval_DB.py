@@ -31,6 +31,21 @@ import time
 from invenio.dbquery import run_sql
 
 def Update_Approval_DB(parameters, curdir, form, user_info=None):
+    """
+    This function updates the approval database when a document has
+    just been approved or rejected. It uses the [categformatDAM]
+    parameter to compute the category of the document.  Must be called
+    after the Get_Report_Number function.
+
+    Parameters:
+
+       * categformatDAM: It contains the regular expression which
+                         allows the retrieval of the category from the
+                         reference number.
+                         Eg: if [categformatDAM]="TEST-<CATEG>-.*" and
+                         the reference is "TEST-CATEG1-2001-001" then
+                         the category will be recognized as "CATEG1".
+    """
     global rn
     doctype = form['doctype']
     act = form['act']

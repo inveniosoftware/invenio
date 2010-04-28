@@ -22,6 +22,9 @@ import os
 from invenio.dbquery import run_sql
 
 def Create_Recid(parameters, curdir, form, user_info=None):
+    """
+    Reserves a record ID and store under 'curdir/SN'
+    """
     global sysno
     if not os.path.exists("%s/SN" % curdir):
         recid = run_sql("insert into bibrec (creation_date,modification_date) values(NOW(),NOW())")

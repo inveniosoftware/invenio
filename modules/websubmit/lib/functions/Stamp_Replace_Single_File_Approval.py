@@ -36,18 +36,22 @@ def Stamp_Replace_Single_File_Approval(parameters, \
                                        curdir, \
                                        form, \
                                        user_info=None):
-    """This function is intended to be called when a document has been
-       approved and needs to be stamped.
-       The function should be used when there is ONLY ONE file to be
-       stamped after approval (for example, the "main file").
-       The name of the file to be stamped should be known and should be stored
-       in a file in the submission's working directory (without the extension).
-       Generally, this will work our fine as the main file is named after the
-       report number of the document, this will be stored in the report number
-       file.
-       @param parameters: (dictionary) - must contain:
+    """
+    This function is intended to be called when a document has been
+    approved and needs to be stamped.
+    The function should be used when there is ONLY ONE file to be
+    stamped after approval (for example, the "main file").
+    The name of the file to be stamped should be known and should be stored
+    in a file in the submission's working directory (without the extension).
+    Generally, this will work our fine as the main file is named after the
+    report number of the document, this will be stored in the report number
+    file.
+
+    @param parameters: (dictionary) - must contain:
+
          + latex_template: (string) - the name of the LaTeX template that
             should be used for the creation of the stamp.
+
          + latex_template_vars: (string) - a string-ified dictionary of
             variables to be replaced in the LaTeX template and the values
             (or names of files in curdir containing the values) with which to
@@ -56,14 +60,17 @@ def Stamp_Replace_Single_File_Approval(parameters, \
                { 'TITLE' : 'DEMOTHESIS_TITLE',
                  'DATE'  : 'DEMOTHESIS_DATE'
                }
+
          + file_to_be_stamped: (string) - this is the name of a file in the
             submission's working directory that contains the name of the
             bibdocfile that is to be stamped.
+
          + new_file_name: (string) - this is the name of a file in the
             submission's working directory that contains the name that is to
             be given to the file after it has been stamped. If empty, or if
             that file doesn't exist, the file will not be renamed after
             stamping.
+
          + stamp: (string) - the type of stamp to be applied to the file.
             should be one of:
               + first (only the first page is stamped);

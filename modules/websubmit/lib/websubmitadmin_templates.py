@@ -938,12 +938,14 @@ class Template:
                                      func_parameters=None,
                                      all_websubmit_func_parameters=None,
                                      perform_act="functionadd",
-                                     user_msg=""):
+                                     user_msg="",
+                                     func_docstring=None):
         """Display web form used to add a new function to Websubmit.
            @param funcname: Value of the "function" (unique function name) parameter
            @param chdesc: Value of the "description" (function textual description) parameter
            @param perform_act: action for form (minus websubmitadmin base url)
            @param user_msg: Any message to be displayed on screen, such as a status report for the last task, etc.
+           @param func_docstring: the docstring of the displayed function (or error message if function could not be loaded). None if no docstring
            @return: HTML page body.
         """
         if type(func_parameters) not in (list, tuple):
@@ -988,7 +990,15 @@ class Template:
          <tr>
           <td width="20%%"><span class="adminlabel">Function Description:</span></td>
           <td width="80%%"><input type="text" size="90" name="funcdescr" value="%(func_descr)s" />
-         </tr>""" % {'func_descr' : cgi.escape(funcdescr, 1)}
+         </tr>
+         """ % {'func_descr' : cgi.escape(funcdescr, 1)}
+        if func_docstring:
+            body_content += """
+         <tr>
+          <td width="20%%" valign="top"><span class="adminlabel">Function Documentation:</span></td>
+          <td width="80%%">%(func_docstring)s</td>
+        </tr>
+         """ % {'func_docstring': func_docstring}
         body_content += """
          <tr>
           <td width="20%%" colspan="2">&nbsp;</td>

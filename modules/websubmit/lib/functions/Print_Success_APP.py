@@ -30,15 +30,23 @@ from invenio.errorlib import register_exception
 def Print_Success_APP(parameters, curdir, form, user_info=None):
     """Return a message to be displayed by the referee's browser after (s)he
        has refereed an item.
+
        @param parameters: (dictionary) - parameters needed by this function.
+
         Contains:
+
           + decision_file: (string) - the name of the file in which the
                            referee's decision is stored.
+
           + newrnin: (string) - the name of the file in which the
                                 new report number is stored.
+
        @param curdir: (string) - the current submission's working directory.
+
        @param form: (dictionary) - submitted form values.
+
        @param user_info: (dictionary) - information about the user.
+
        @return: (string) - a message to be displayed by the user's browser.
     """
     global rn  ## Unfortunately, it's necessary to use the magic "rn" global:

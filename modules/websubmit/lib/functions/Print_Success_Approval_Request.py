@@ -23,11 +23,13 @@
 __revision__ = "$Id$"
 
 def Print_Success_Approval_Request(parameters, curdir, form, user_info=None):
-    """This function creates a "success message" that is to be shown to the
-       user to indicate that their approval request has successfully been
-       registered.
-       @parameters: None.
-       @return: (string) - the "success" message for the user.
+    """
+    This function creates a "success message" that is to be shown to the
+    user to indicate that their approval request has successfully been
+    registered.
+
+    @parameters: None.
+    @return: (string) - the "success" message for the user.
     """
     text = """<br />
 <div>

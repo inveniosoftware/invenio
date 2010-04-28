@@ -57,18 +57,22 @@ alert('Multiple documents with the report number [%s] have been found.\\n""" \
 
 
 def Get_Recid(parameters, curdir, form, user_info=None):
-    """Given the report number of a record (the global "rn"), retrieve the
-       "recid" (001).
-       The function first of all checks for the existence of the file "SN" in
-       the current submission's working directory. If it exists, it is read in
-       and used as the "recid".
-       Otherwise, this function will contact the database in order to obtain the
-       recid of a record.
+    """
+    Given the report number of a record (the global "rn"), retrieve the
+    "recid" (001).
+    The function first of all checks for the existence of the file "SN" in
+    the current submission's working directory. If it exists, it is read in
+    and used as the "recid".
+    Otherwise, this function will contact the database in order to obtain the
+    recid of a record.
 
-       The function depends upon the global value "rn" having been set. It will
-       use this value when searching for a record. Note: If "rn" is empty, the
-       search for the document will not be conducted.
-       Exceptions raised:
+    Unless file curdir/SN exists, the function depends upon the global
+    value 'rn' having been set (for eg. by calling Get_Report_Number'
+    prior to this function) It will use this value when searching for
+    a record. Note: If 'rn' is empty, the search for the document will
+    not be conducted.
+
+    Exceptions raised:
         + InvenioWebSubmitFunctionError:
                           - if unable to open curdir/SN for reading;
                           - if unable to open curdir/SN for writing;

@@ -30,6 +30,11 @@ from invenio.config import CFG_WEBSUBMIT_STORAGEDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_to_Pending(parameters, curdir, form, user_info=None):
+    """
+    This function moves the existing submission directory to the
+    /opt/cds-invenio/var/data/submit/storage/pending directory. It is
+    used to store temporarily this data until it is approved or...
+    """
     global rn
     doctype = form['doctype']
     PENDIR = "%s/pending/%s" % (CFG_WEBSUBMIT_STORAGEDIR,doctype)

@@ -27,10 +27,14 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionWarning, \
 import os.path, shutil, re
 
 def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
-    """Stamp certain files that have been uploaded during a submission.
-       @param parameters: (dictionary) - must contain:
+    """
+    Stamp certain files that have been uploaded during a submission.
+
+    @param parameters: (dictionary) - must contain:
+
          + latex_template: (string) - the name of the LaTeX template that
             should be used for the creation of the stamp.
+
          + latex_template_vars: (string) - a string-ified dictionary of
             variables to be replaced in the LaTeX template and the values
             (or names of files in curdir containing the values) with which to
@@ -43,16 +47,18 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
             should be stamped: This is a comma-separated list of directory
             names. E.g.:
                DEMOTHESIS_MAIN,DEMOTHESIS_ADDITIONAL
+
          + stamp: (string) - the type of stamp to be applied to the files.
             should be one of:
               + first (only the first page is stamped);
               + all (all pages are stamped);
               + coverpage (a separate cover-page is added to the file as a
                  first page);
-       If all goes according to plan, for each directory in which files are to
-       be stamped, the original, unstamped files should be found in a
-       directory 'files_before_stamping/DIRNAME', and the stamped versions
-       should be found under 'files/DIRNAME'. E.g., for DEMOTHESIS_Main:
+
+    If all goes according to plan, for each directory in which files are to
+    be stamped, the original, unstamped files should be found in a
+    directory 'files_before_stamping/DIRNAME', and the stamped versions
+    should be found under 'files/DIRNAME'. E.g., for DEMOTHESIS_Main:
          - Unstamped: files_before_stamping/DEMOTHESIS_Main
          - Stamped:   files/DEMOTHESIS_Main
     """

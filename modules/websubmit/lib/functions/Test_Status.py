@@ -28,6 +28,13 @@ from invenio.dbquery import run_sql
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
 def Test_Status(parameters, curdir, form, user_info=None):
+    """
+    This function checks whether the considered document has been
+    requested for approval and is still waiting for approval. It also
+    checks whether the password stored in file 'password' of the
+    submission directory corresponds to the password associated with
+    the document.
+    """
     global rn
     res = run_sql("SELECT status, access FROM sbmAPPROVAL WHERE rn=%s", (rn,))
     if len(res) == 0:

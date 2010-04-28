@@ -49,7 +49,34 @@ from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 from invenio.websubmit_functions.Shared_Functions import get_nice_bibsched_related_message
 
-def Mail_Submitter (parameters, curdir, form, user_info=None):
+def Mail_Submitter(parameters, curdir, form, user_info=None):
+    """
+    This function send an email to the submitter to warn him the
+    document he has just submitted has been correctly received.
+
+    Parameters:
+
+      * authorfile: Name of the file containing the authors of the
+                    document
+
+      * titleFile: Name of the file containing the title of the
+                   document
+
+      * emailFile: Name of the file containing the email of the
+                   submitter of the document
+
+      * status: Depending on the value of this parameter, the function
+                adds an additional text to the email.  This parameter
+                can be one of: ADDED: The file has been integrated in
+                the database.  APPROVAL: The file has been sent for
+                approval to a referee.  or can stay empty.
+
+      * edsrn: Name of the file containing the reference of the
+               document
+
+      * newrnin: Name of the file containing the 2nd reference of the
+                 document (if any)
+    """
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     # retrieve report number
     edsrn = parameters['edsrn']

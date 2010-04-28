@@ -22,5 +22,8 @@ import os
 from invenio.config import CFG_BINDIR
 
 def Format_Record(parameters, curdir, form, user_info=None):
+    """
+    Deprecated
+    """
     os.system("%s/bibformat < %s/recmysql > %s/recmysqlfmt" % (CFG_BINDIR,curdir,curdir))
     return ""

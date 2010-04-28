@@ -17,13 +17,6 @@
 
 __revision__ = "$Id$"
 
-   ## Description:   function Update_Approval_DB
-   ##                This function updates the approval database with the
-   ##             decision of the referee
-   ## Author:         T.Baron
-   ## PARAMETERS:    categformatDAM: variable used to compute the category
-   ##                                of the document from its reference
-
 import os
 import re
 import time
@@ -32,6 +25,12 @@ from invenio.dbquery import run_sql
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
 def Check_Group(parameters, curdir, form, user_info=None):
+    """
+    Check that a group exists.
+    Read from file "/curdir/Group"
+
+    If the group does not exist, switch to page 1, step 0
+    """
     #Path of file containing group
     if os.path.exists("%s/%s" % (curdir,'Group')):
         fp = open("%s/%s" % (curdir,'Group'),"r")

@@ -40,6 +40,31 @@ emailvalue = ""
 authorvalue = ""
 
 def Get_Info(parameters, curdir, form, user_info=None):
+    """
+    This function tries to retrieve in the 'pending' directory or
+    directly in the documents database, some information about the
+    document: title, original submitter's email and author(s).  If found,
+    this information is stored in 3 global variables: $emailvalue,
+    $titlevalue, $authorvalue to be used in other functions.  If not
+    found, an error message is displayed.
+
+    Parameters:
+
+         * authorFile: Name of the file in which the author may be
+                       found if the document has not yet been
+                       integrated (in this case it is still in the
+                       'pending' directory).
+
+         * emailFile: Name of the file in which the email of the
+                      riginal submitter may be found if the document
+                      has not yet been integrated (in this case it is
+                      still in the 'pending' directory).
+
+         * titleFile: Name of the file in which the title may be found
+                      if the document has not yet been integrated (in
+                      this case it is still in the 'pending'
+                      directory).
+    """
     global titlevalue,emailvalue,authorvalue,rn
     doctype = form['doctype']
     titlefile = parameters["titleFile"]

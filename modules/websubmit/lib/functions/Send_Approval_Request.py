@@ -43,6 +43,38 @@ from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
 def Send_Approval_Request (parameters, curdir, form, user_info=None):
+    """
+    This function sends an email to the referee in order to start the
+    simple approval process.  This function is very CERN-specific and
+    should be changed in case of external use.  Must be called after
+    the Get_Report_Number function.
+
+    Parameters:
+
+       * addressesDAM: email addresses of the people who will receive
+                       this email (comma separated list). this
+                       parameter may contain the <CATEG> string. In
+                       which case the variable computed from the
+                       [categformatDAM] parameter replaces this
+                       string.
+                       eg.:"<CATEG>-email@cern.ch"
+
+       * categformatDAM: contains a regular expression used to compute
+                         the category of the document given the
+                         reference of the document.
+
+                         eg.: if [categformatAFP]="TEST-<CATEG>-.*"
+                         and the reference of the document is
+                         "TEST-CATEGORY1-2001-001", then the computed
+                         category equals "CATEGORY1"
+
+       * authorfile: name of the file in which the authors are stored
+
+       * titlefile: name of the file in which the title is stored.
+
+       * directory: parameter used to create the URL to access the
+                    files.
+    """
     global rn,sysno
     # variables declaration
     doctype = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir).group(2)

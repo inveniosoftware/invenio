@@ -32,32 +32,42 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionError
 CFG_WEBSUBMIT_DUMMY_XML_NAME = "dummy_marcxml_rec"
 
 def Make_Dummy_MARC_XML_Record(parameters, curdir, form, user_info=None):
-    """Make a dummy MARC XML record and store it in a submission's working-
-       directory.
-       This dummy record is not intended to be inserted into the Invenio
-       repository. Rather, it is intended as a way for other submission-
-       related functionalities to have access to the data submitted without
-       necessarily having to know the names of the files in which the
-       values were stored.
-       An example could be the publiline service: by using a dummy record
-       in the submission's directory in would be able to access an item's
-       information (e.g. title, etc) without having to know the name of the
-       title file, etc.
-       Another use for the dummy record could be, for example, creating a
-       preview of the submitted record information with bibconvert.
-       @param parameters: (dictionary) - must contain:
+    """
+    Make a dummy MARC XML record and store it in a submission's working-
+    directory.
+    This dummy record is not intended to be inserted into the Invenio
+    repository. Rather, it is intended as a way for other submission-
+    related functionalities to have access to the data submitted without
+    necessarily having to know the names of the files in which the
+    values were stored.
+    An example could be the publiline service: by using a dummy record
+    in the submission's directory in would be able to access an item's
+    information (e.g. title, etc) without having to know the name of the
+    title file, etc.
+    Another use for the dummy record could be, for example, creating a
+    preview of the submitted record information with bibconvert.
+
+    @param parameters: (dictionary) - must contain:
+
           + dummyrec_source_tpl: (string) - the name of the bibconvert
             source template used for the creation of the dummy record.
+
           + dummyrec_create_tpl: (string) - the name of the bibconvert
             create template used for the creation of the dummy record.
-       @param curdir: (string) - the current submission's working
-        directory.
-       @param form: (dictionary) - form fields.
-       @param user_info: (dictionary) - various information about the
-        submitting user (includes the apache req object).
-       @return: (string) - empty string.
-       @Exceptions raised: InvenioWebSubmitFunctionError when an
-        unexpected error is encountered.
+
+    @param curdir: (string) - the current submission's working
+                              directory.
+
+    @param form: (dictionary) - form fields.
+
+    @param user_info: (dictionary) - various information about the
+                                     submitting user (includes the
+                                     apache req object).
+
+    @return: (string) - empty string.
+
+    @Exceptions raised: InvenioWebSubmitFunctionError when an
+                        unexpected error is encountered.
     """
     ## Get the apache request object from user_info: (we may use it for
     ## error reporting)

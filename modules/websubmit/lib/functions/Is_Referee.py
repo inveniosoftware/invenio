@@ -23,6 +23,10 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
 def Is_Referee(parameters, curdir, form, user_info=None):
+    """
+    This function checks whether the currently logged user is a
+    referee for this document.
+    """
     global uid_email,sysno,rn,uid
     doctype = form['doctype']
     # Get document category
