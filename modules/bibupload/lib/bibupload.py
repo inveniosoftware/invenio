@@ -413,7 +413,7 @@ def find_record_ids_by_oai_id(oaiId):
     returns a list of identifiers matching a given oai identifier
     """
     # Is this record already in invenio (matching by oaiid)
-    recids1 = search_pattern( p = oaiId, f = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, m = 'e' ).tolist()
+    recids1 = search_pattern(p=oaiId, f=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, m='e').tolist()
     # Is this record already in invenio (matching by reportnumber i.e.
     # particularly 037. Idea: to avoid doubbles insertions)
     repnumber = oaiId.split(":")[-1]
@@ -574,23 +574,22 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
             instances = record_get_field_instances(record, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
             write_message('   recid %s -> instances "%s"' % (id_bibrec, instances), verbose=9)
             for instance in instances:
-                provenance = field_get_subfield_values(instance, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5])
-                write_message('   recid %s -> provenance "%s"' % (id_bibrec, provenance), verbose=9)
-                provenance = provenance and provenance[0] or None
-                if provenance is None:
-                    if extoaisrc is None:
-                        write_message('Found recid %s for extoaiid="%s"' % (id_bibrec, extoaiid), verbose=9)
-                        ret.add(id_bibrec)
-                        break
-                    else:
-                        raise Error('Found recid %s for extoaiid="%s" that doesn\'t specify any provenance, while input record does.' % (id_bibrec, extoaiid))
-                else:
-                    if extoaiid is None:
-                        raise Error('Found recid %s for extoaiid="%s" that specifies as provenance "%s", while input record does not specify any provenance.' % (id_bibrec, extoaiid, provenance))
-                    elif provenance == extoaisrc:
+                this_extoaisrc = field_get_subfield_values(instance, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5])
+                this_extoaisrc = this_extoaisrc and this_extoaisrc[0] or None
+                this_extoaiid = field_get_subfield_values(instance, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5])
+                this_extoaiid = this_extoaiid and this_extoaiid[0] or None
+                write_message("        this_extoaisrc -> %s, this_extoaiid -> %s" % (this_extoaisrc, this_extoaiid), verbose=9)
+                if this_extoaiid == extoaiid:
+                    write_message('   recid %s -> provenance "%s"' % (id_bibrec, this_extoaisrc), verbose=9)
+                    if this_extoaisrc == extoaisrc:
                         write_message('Found recid %s for extoaiid="%s" with provenance="%s"' % (id_bibrec, extoaiid, extoaisrc), verbose=9)
                         ret.add(id_bibrec)
                         break
+                    if this_extoaisrc is None:
+                        write_message('WARNING: Found recid %s for extoaiid="%s" that doesn\'t specify any provenance, while input record does.' % (id_bibrec, extoaiid), stream=sys.stderr)
+                    if extoaisrc is None:
+                        write_message('WARNING: Found recid %s for extoaiid="%s" that specify a provenance (%s), while input record does not have a provenance.' % (id_bibrec, extoaiid, this_extoaisrc), stream=sys.stderr)
+
         return ret
     except Error, error:
         write_message("   Error during find_records_from_extoaiid(): %s "
@@ -1779,62 +1778,6 @@ def delete_bibrec_bibxxx(record, id_bibrec, pretend=False):
                 except Error, error:
                     write_message("   Error during the delete_bibrec_bibxxx function : %s " % error, verbose=1, stream=sys.stderr)
 
-def wipe_out_record_from_all_tables(recid):
-    """
-    Wipe out completely the record and all its traces of RECID from
-    the database (bibrec, bibrec_bibxxx, bibxxx, bibfmt).  Useful for
-    the time being for test cases.
-    """
-    # delete all the linked bibdocs
-    for bibdoc in BibRecDocs(recid).list_bibdocs():
-        bibdoc.expunge()
-    # delete from bibrec:
-    run_sql("DELETE FROM bibrec WHERE id=%s", (recid,))
-    # delete from bibrec_bibxxx:
-    for i in range(0, 10):
-        for j in range(0, 10):
-            run_sql("DELETE FROM %(bibrec_bibxxx)s WHERE id_bibrec=%%s" % \
-                    {'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)},
-                    (recid,))
-    # delete all unused bibxxx values:
-    for i in range(0, 10):
-        for j in range(0, 10):
-            run_sql("DELETE %(bibxxx)s FROM %(bibxxx)s " \
-                    " LEFT JOIN %(bibrec_bibxxx)s " \
-                    " ON %(bibxxx)s.id=%(bibrec_bibxxx)s.id_bibxxx " \
-                    " WHERE %(bibrec_bibxxx)s.id_bibrec IS NULL" % \
-                    {'bibxxx': "bib%i%ix" % (i, j),
-                     'bibrec_bibxxx': "bibrec_bib%i%ix" % (i, j)})
-    # delete from bibfmt:
-    run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s", (recid,))
-    # delete from bibrec_bibdoc:
-    run_sql("DELETE FROM bibrec_bibdoc WHERE id_bibrec=%s", (recid,))
-    return
-
-def delete_bibdoc(id_bibrec, pretend=False):
-    """Delete document from bibdoc which correspond to the bibrec id given in parameter"""
-    query = """UPDATE bibdoc SET status='DELETED'
-                WHERE id IN (SELECT id_bibdoc FROM bibrec_bibdoc
-                              WHERE id_bibrec=%s)"""
-    params = (id_bibrec,)
-    try:
-        if not pretend:
-            run_sql(query, params)
-    except Error, error:
-        write_message("   Error during the delete_bibdoc function : %s " % error,
-                      verbose=1, stream=sys.stderr)
-
-def delete_bibrec_bibdoc(id_bibrec, pretend=False):
-    """Delete the bibrec record from the table bibrec_bibdoc given in parameter"""
-    # delete all the records with proper id_bibrec
-    query = """DELETE FROM bibrec_bibdoc WHERE id_bibrec=%s"""
-    params = (id_bibrec,)
-    try:
-        if not pretend:
-            run_sql(query, params)
-    except Error, error:
-        write_message("   Error during the delete_bibrec_bibdoc function : %s " % error,
-                      verbose=1, stream=sys.stderr)
 def main():
     """Main that construct all the bibtask."""
     task_init(authorization_action='runbibupload',

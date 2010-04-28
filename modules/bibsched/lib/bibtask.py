@@ -175,6 +175,37 @@ def task_low_level_submission(name, user, *argv):
         raise
     return task_id
 
+
+def setup_loggers(task_id=None):
+    """Sets up the logging system."""
+    logger = logging.getLogger()
+    for handler in logger.handlers:
+        ## Let's clean the handlers in case some piece of code has already
+        ## fired any write_message, i.e. any call to debug, info, etc.
+        ## which triggered a call to logging.basicConfig()
+        logger.removeHandler(handler)
+    formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
+    if task_id is not None:
+        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _task_params['task_id']), 'a', 1*1024*1024, 10)
+        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a', 1*1024*1024, 10)
+        log_logger.setFormatter(formatter)
+        log_logger.setLevel(logging.DEBUG)
+        err_logger.setFormatter(formatter)
+        err_logger.setLevel(logging.WARNING)
+        logger.addHandler(err_logger)
+        logger.addHandler(log_logger)
+    stdout_logger = logging.StreamHandler(sys.stdout)
+    stdout_logger.setFormatter(formatter)
+    stdout_logger.setLevel(logging.DEBUG)
+    stderr_logger = logging.StreamHandler(sys.stderr)
+    stderr_logger.setFormatter(formatter)
+    stderr_logger.setLevel(logging.WARNING)
+    logger.addHandler(stderr_logger)
+    logger.addHandler(stdout_logger)
+    logger.setLevel(logging.INFO)
+    return logger
+
+
 def task_init(
     authorization_action="",
     authorization_msg="",
@@ -226,32 +257,7 @@ def task_init(
     else:
         argv = sys.argv
 
-    ## Setting up the logging system
-    logger = logging.getLogger()
-    for handler in logger.handlers:
-        ## Let's clean the handlers in case some piece of code has already
-        ## fired any write_message, i.e. any call to debug, info, etc.
-        ## which triggered a call to logging.basicConfig()
-        logger.removeHandler(handler)
-    formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
-    if _task_params.get('task_id'):
-        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _task_params['task_id']), 'a', 1*1024*1024, 10)
-        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a', 1*1024*1024, 10)
-        log_logger.setFormatter(formatter)
-        log_logger.setLevel(logging.DEBUG)
-        err_logger.setFormatter(formatter)
-        err_logger.setLevel(logging.WARNING)
-        logger.addHandler(err_logger)
-        logger.addHandler(log_logger)
-    stdout_logger = logging.StreamHandler(sys.stdout)
-    stdout_logger.setFormatter(formatter)
-    stdout_logger.setLevel(logging.DEBUG)
-    stderr_logger = logging.StreamHandler(sys.stderr)
-    stderr_logger.setFormatter(formatter)
-    stderr_logger.setLevel(logging.WARNING)
-    logger.addHandler(stderr_logger)
-    logger.addHandler(stdout_logger)
-    logger.setLevel(logging.INFO)
+    setup_loggers(_task_params.get('task_id'))
 
     if type(argv) is dict:
         # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
