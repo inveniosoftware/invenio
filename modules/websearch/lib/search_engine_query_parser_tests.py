@@ -33,112 +33,151 @@ from invenio.search_engine import create_basic_search_units
 class TestSearchQueryParenthesisedParser(unittest.TestCase):
     """Test parenthesis parsing."""
 
-    def test_parse_query(self):
-        """parenthesised search query parser - queries with parentheses"""
-        parser = search_engine_query_parser.SearchQueryParenthesisedParser()
+    def setUp(self):
+        self.parser = search_engine_query_parser.SearchQueryParenthesisedParser()
 
-        # test if normal queries are parsed
-        self.assertEqual(parser.parse_query('expr1'),
+    def test_sqpp_atom(self):
+        """SearchQueryParenthesisedParser - expr1"""
+        self.assertEqual(self.parser.parse_query('expr1'),
                          ['+', 'expr1'])
 
-        self.assertEqual(parser.parse_query('(expr1)'),
+    def test_sqpp_parened_atom(self):
+        """SearchQueryParenthesisedParser - (expr1)"""
+        self.assertEqual(self.parser.parse_query('(expr1)'),
                          ['+', 'expr1'])
 
-        self.assertEqual(parser.parse_query("expr1 - (expr2)"),
+    def test_sqpp_expr1_minus_expr2(self):
+        """SearchQueryParenthesisedParser - (expr1 - (expr2)"""
+        self.assertEqual(self.parser.parse_query("expr1 - (expr2)"),
                          ['+', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(parser.parse_query("+ expr1 - (expr2)"),
+    def test_sqpp_plus_expr1_minus_paren_expr2(self):
+        """SearchQueryParenthesisedParser - + expr1 - (expr2)"""
+        self.assertEqual(self.parser.parse_query("+ expr1 - (expr2)"),
                          ['+', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(parser.parse_query("expr1 (expr2)"),
+    def test_sqpp_expr1_paren_expr2(self):
+        """SearchQueryParenthesisedParser - expr1 (expr2)"""
+        self.assertEqual(self.parser.parse_query("expr1 (expr2)"),
                          ['+', 'expr1', '+', 'expr2'])
 
-        self.assertEqual(['+', 'expr1', '-', 'expr2'],
-                         parser.parse_query("(expr1) - expr2"))
-
-        self.assertEqual(parser.parse_query("(expr1)-(expr2)"),
+    def test_sqpp_paren_expr1_minus_expr2(self):
+        """SearchQueryParenthesisedParser - (expr1) - expr2"""
+        self.assertEqual(self.parser.parse_query("(expr1) - expr2"),
                          ['+', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(parser.parse_query("-(expr1)-(expr2)"),
+    def test_sqpp_paren_expr1_minus_paren_expr2(self):
+        """SearchQueryParenthesisedParser - (expr1)-(expr2)"""
+        self.assertEqual(self.parser.parse_query("(expr1)-(expr2)"),
+                         ['+', 'expr1', '-', 'expr2'])
+
+    def test_sqpp_minus_paren_expr1_minus_paren_expr2(self):
+        """SearchQueryParenthesisedParser - -(expr1)-(expr2)"""
+        self.assertEqual(self.parser.parse_query("-(expr1)-(expr2)"),
                          ['-', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(parser.parse_query('(expr1) - expr2 + (expr3) | expr4'),
-                         ['+', 'expr1', '-', 'expr2', '+', 'expr3', '|', 'expr4'])
-
-        self.assertEqual(parser.parse_query('(expr1) - expr2 + (expr3)'),
+    def test_sqpp_paren_expr1_minus_expr2_and_paren_expr3(self):
+        """SearchQueryParenthesisedParser - (expr1) - expr2 + (expr3)"""
+        self.assertEqual(self.parser.parse_query('(expr1) - expr2 + (expr3)'),
                          ['+', 'expr1', '-', 'expr2', '+', 'expr3'])
 
-        self.assertEqual(parser.parse_query('(expr1) - expr2 + (expr3 | expr4) | "expr5 + expr6"'),
-                         ['+', 'expr1', '-', 'expr2', '+', 'expr3 | expr4', '|', '"expr5 + expr6"'])
-        # test special cases - parentheses after quotas
-        self.assertEqual(parser.parse_query('"expr1" (expr2) expr3'),
-                         ['+', '"expr1"', '+', 'expr2', '+', 'expr3'])
-        # test parsing of queries with missing operators.
-        # in this case default operator + should be included on place of the missing one
-        self.assertEqual(parser.parse_query('(expr1) expr2 (expr3) | expr4'),
-                         ['+', 'expr1', '+', 'expr2', '+', 'expr3', '|', 'expr4'])
-
-    def test_parsing_of_nested_or_mismatched_parentheses(self):
-        """parenthesised search query parser - queries containing nested or mismatched parentheses"""
-
-        parser = search_engine_query_parser.SearchQueryParenthesisedParser()
-
-        # test nested parentheses - they are not supported
-        self.failUnlessRaises(search_engine_query_parser.InvenioWebSearchQueryParserException,
-                              parser.parse_query,"((expr))")
-        # test mismatched parentheses
-        self.failUnlessRaises(search_engine_query_parser.InvenioWebSearchQueryParserException,
-                              parser.parse_query,"(expr")
-
-    def test_parsing_of_and_or_and_not_operators(self):
-        """parenthesised search query parser - queries containing AND, OR, NOT operators"""
-
-        parser = search_engine_query_parser.SearchQueryParenthesisedParser()
-
-        self.assertEqual(parser.parse_query('(expr1) not expr2 and (expr3) or expr4'),
+    def test_sqpp_paren_expr1_minus_expr2_and_paren_expr3_or_expr4(self):
+        """SearchQueryParenthesisedParser - (expr1) - expr2 + (expr3) | expr4"""
+        self.assertEqual(self.parser.parse_query('(expr1) - expr2 + (expr3) | expr4'),
                          ['+', 'expr1', '-', 'expr2', '+', 'expr3', '|', 'expr4'])
 
-        self.assertEqual(parser.parse_query('(expr1) not expr2 | "expressions not in and quotes | (are) not - parsed " - (expr3) or expr4'),
+    def test_sqpp_paren_expr1_minus_expr2_and_paren_expr3_or_expr4_or_quoted_expr5_and_expr6(self):
+        """SearchQueryParenthesisedParser - (expr1) - expr2 + (expr3) | expr4 | \"expr5 + expr6\""""
+        self.assertEqual(self.parser.parse_query('(expr1) - expr2 + (expr3 | expr4) | "expr5 + expr6"'),
+                         ['+', 'expr1', '-', 'expr2', '+', 'expr3 | expr4', '|', '"expr5 + expr6"'])
+
+    def test_sqpp_quoted_expr1_and_paren_expr2_and_expr3(self):
+        """SearchQueryParenthesisedParser - \"expr1\" (expr2) expr3"""
+        # test special cases - parentheses after quotas
+        self.assertEqual(self.parser.parse_query('"expr1" (expr2) expr3'),
+                         ['+', '"expr1"', '+', 'expr2', '+', 'expr3'])
+
+    def test_sqpp_paren_expr1_expr2_paren_expr3_or_expr4(self):
+        """SearchQueryParenthesisedParser - (expr1) expr2 (expr3) | expr4"""
+        # test parsing of queries with missing operators.
+        # in this case default operator + should be included on place of the missing one
+        self.assertEqual(self.parser.parse_query('(expr1) expr2 (expr3) | expr4'),
+                         ['+', 'expr1', '+', 'expr2', '+', 'expr3', '|', 'expr4'])
+
+    def test_sqpp_nested_paren_failure(self):
+        """SearchQueryParenthesisedParser - Nested parentheses should raise an exception"""
+        # test nested parentheses - they are not supported (yet)
+        self.failUnlessRaises(search_engine_query_parser.InvenioWebSearchQueryParserException,
+                              self.parser.parse_query,"((expr))")
+
+    def test_sqpp_paren_open_only_failure(self):
+        """SearchQueryParenthesisedParser - Parentheses that only open should raise an exception"""
+        self.failUnlessRaises(search_engine_query_parser.InvenioWebSearchQueryParserException,
+                              self.parser.parse_query,"(expr")
+
+    def test_sqpp_paren_close_only_failure(self):
+        """SearchQueryParenthesisedParser - Parentheses that only close should raise an exception"""
+        self.failUnlessRaises(search_engine_query_parser.InvenioWebSearchQueryParserException,
+                              self.parser.parse_query,"expr)")
+
+    def test_sqpp_paren_expr1_not_expr2_and_paren_expr3_or_expr4_WORDS(self):
+        """SearchQueryParenthesisedParser - (expr1) not expr2 and (expr3) or expr4"""
+        self.assertEqual(self.parser.parse_query('(expr1) not expr2 and (expr3) or expr4'),
+                         ['+', 'expr1', '-', 'expr2', '+', 'expr3', '|', 'expr4'])
+
+    def test_sqpp_paren_expr1_not_expr2_or_quoted_string_not_expr3_or_expr4WORDS(self):
+        """SearchQueryParenthesisedParser - (expr1) not expr2 | "expressions not in and quotes | (are) not - parsed " - (expr3) or expr4"""
+        self.assertEqual(self.parser.parse_query('(expr1) not expr2 | "expressions not in and quotes | (are) not - parsed " - (expr3) or expr4'),
                          ['+', 'expr1', '-', 'expr2 | "expressions not in and quotes | (are) not - parsed "', '-', 'expr3', '|', 'expr4'])
 
-        self.assertEqual(parser.parse_query('expr1 \\" expr2 and(expr3) not expr4 \\" and (expr5)'),
+    def test_sqpp_expr1_escaped_quoted_expr2_and_paren_expr3_not_expr4_WORDS(self):
+        """SearchQueryParenthesisedParser - expr1 \\" expr2 and(expr3) not expr4 \\" and (expr5)"""
+        self.assertEqual(self.parser.parse_query('expr1 \\" expr2 and(expr3) not expr4 \\" and (expr5)'),
                          ['+', 'expr1 \\" expr2', '+', 'expr3', '-', 'expr4 \\"', '+', 'expr5'])
 
-        self.assertEqual(parser.parse_query('(expr1 and expr2) or expr3'),
+    def test_sqpp_paren_expr1_and_expr2_or_expr3_WORDS(self):
+        """SearchQueryParenthesisedParser - (expr1 and expr2) or expr3"""
+        self.assertEqual(self.parser.parse_query('(expr1 and expr2) or expr3'),
                          ['+', 'expr1 + expr2','|', 'expr3'])
 
-        self.assertEqual(parser.parse_query('(expr1 and expr2) or expr3'),
-                         parser.parse_query('(expr1 + expr2) | expr3'))
+    def test_sqpp_paren_expr1_and_expr2_or_expr3_WORDS_equiv(self):
+        """SearchQueryParenthesisedParser - (expr1 and expr2) or expr3 == (expr1 + expr2) | expr3"""
+        self.assertEqual(self.parser.parse_query('(expr1 and expr2) or expr3'),
+                         self.parser.parse_query('(expr1 + expr2) | expr3'))
 
-        self.assertEqual(parser.parse_query('(expr1 and expr2) or expr3'),
-                         parser.parse_query('(expr1 + expr2) or expr3'))
+    def test_sqpp_paren_expr1_and_expr2_or_expr3_WORDS_equiv_SYMBOLS(self):
+        """SearchQueryParenthesisedParser - (expr1 and expr2) or expr3 == (expr1 + expr2) or expr3"""
+        self.assertEqual(self.parser.parse_query('(expr1 and expr2) or expr3'),
+                         self.parser.parse_query('(expr1 + expr2) or expr3'))
 
-    def test_parsing_of_quotes(self):
-        """parenthesised search query parser - queries containing single and double quotes"""
-
-        parser = search_engine_query_parser.SearchQueryParenthesisedParser()
-
-        #The content inside quotes should not be parsed
-
-        # test double quotes
-        self.assertEqual(parser.parse_query('(expr1) - expr2 | "expressions - in + quotes | (are) not - parsed " - (expr3) | expr4'),
+    def test_sqpp_double_quotes(self):
+        """SearchQueryParenthesisedParser - Test double quotes"""
+        self.assertEqual(self.parser.parse_query('(expr1) - expr2 | "expressions - in + quotes | (are) not - parsed " - (expr3) | expr4'),
                          ['+', 'expr1', '-', 'expr2 | "expressions - in + quotes | (are) not - parsed "', '-', 'expr3', '|', 'expr4'])
-        # test single quotes
-        self.assertEqual(parser.parse_query("(expr1) - expr2 | 'expressions - in + quotes | (are) not - parsed ' - (expr3) | expr4"),
+
+    def test_sqpp_single_quotes(self):
+        """SearchQueryParenthesisedParser - Test single quotes"""
+        self.assertEqual(self.parser.parse_query("(expr1) - expr2 | 'expressions - in + quotes | (are) not - parsed ' - (expr3) | expr4"),
                          ['+', 'expr1', '-', "expr2 | 'expressions - in + quotes | (are) not - parsed '", '-', 'expr3', '|', 'expr4'])
 
-        # test escaping quotes
-        # escaping single quotes
-        self.assertEqual(parser.parse_query("expr1 \\' expr2 +(expr3) -expr4 \\' + (expr5)"),
+    def test_sqpp_escape_single_quotes(self):
+        """SearchQueryParenthesisedParser - Test escaping single quotes"""
+        self.assertEqual(self.parser.parse_query("expr1 \\' expr2 +(expr3) -expr4 \\' + (expr5)"),
                          ['+', "expr1 \\' expr2", '+', 'expr3', '-', "expr4 \\'", '+', 'expr5'])
-        # escaping double quotes
-        self.assertEqual(parser.parse_query('expr1 \\" expr2 +(expr3) -expr4 \\" + (expr5)'),
+
+    def test_sqpp_escape_double_quotes(self):
+        """SearchQueryParenthesisedParser - Test escaping double quotes"""
+        self.assertEqual(self.parser.parse_query('expr1 \\" expr2 +(expr3) -expr4 \\" + (expr5)'),
                          ['+', 'expr1 \\" expr2', '+', 'expr3', '-', 'expr4 \\"', '+', 'expr5'])
 
-        # test parsing of quotes in the beginning of the query
-        self.assertEqual(parser.parse_query('"expr1" - (expr2)'),
+    def test_sqpp_beginning_double_quotes(self):
+        """SearchQueryParenthesisedParser - Test parsing double quotes at beginning"""
+        self.assertEqual(self.parser.parse_query('"expr1" - (expr2)'),
                          ['+', '"expr1"', '-', 'expr2'])
-        self.assertEqual(parser.parse_query('-"expr1" - (expr2)'),
+
+    def test_sqpp_beginning_double_quotes_negated(self):
+        """SearchQueryParenthesisedParser - Test parsing negated double quotes at beginning"""
+        self.assertEqual(self.parser.parse_query('-"expr1" - (expr2)'),
                          ['-', '"expr1"', '-', 'expr2'])
 
 

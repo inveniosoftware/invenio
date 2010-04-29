@@ -26,7 +26,7 @@ import string
 
 from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
 
-QueryScanner = FNT()
+NameScanner = FNT()
 
 
 class SearchQueryParenthesisedParser:
@@ -46,59 +46,52 @@ class SearchQueryParenthesisedParser:
     In case of error: Exception is raised
     """
 
-    # string containing the query that will be parsed
-    _query = ""
-    # operators before and after the current pattern matched during parsing
-    _preceding_operator = ""
-    _preceding_operator_position = -1
-
-    _following_operator = ""
-    _following_operator_position = -1
-    # indexes in the parsed query of beginning and end of currently parsed pattern
-    _pattern_beginning = 0
-    _pattern_end = 0
-    # list of parsed patterns and operators
-    _patterns = []
-    # flag indicating if processed symbols are inside parenthesis
-    _inside_parentheses = False
     # all operator symbols recognized in expression
     _operators = ['+', '|', '-']
-    # default operator if operator is missing between patterns
-    _DEFAULT_OPERATOR = '+'
 
     # error messages
     _error_message_mismatched_parentheses = "Mismatched parenthesis."
     _error_message_nested_parentheses_not_supported = "Nested parenthesis are currently not supported."
 
-    def __init__(self):
+    def __init__(self, default_operator='+'):
         """Initialize the state of the parser"""
-        self._init_parsing()
 
-    def _init_parsing(self, query=""):
-        """Initialize variables before parsing """
+        # default operator to be used if operator is missing between patterns
+        self._DEFAULT_OPERATOR = default_operator
 
-        self._compile_regular_expressions()
+        self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
 
-        # clean the query replacing some of the content e.g. replace 'AND' with '+'
-        query = self._clean_query(query)
-        self._query = query
-
+        self._query = ''
+        # list of parsed patterns and operators
         self._patterns = []
+        # indexes in the parsed query of beginning and end of currently parsed pattern
         self._pattern_beginning = 0
         self._pattern_end = 0
 
-        self._clear_preceding_operator()
-        self._clear_following_operator()
+        # operators before and after the current pattern matched during parsing
+        _preceding_operator = ""
+        _preceding_operator_position = -1
 
+        _following_operator = ""
+        _following_operator_position = -1
+
+        # flag indicating if processed symbols are inside parenthesis
         self._inside_parentheses = False
 
-    def _compile_regular_expressions(self):
-        """Compiles some of the regular expressions that are used in the class
-        for higher performance."""
+        # all operator symbols recognized in expression
+        _operators = ['+', '|', '-']
+        #print "\n__init__ called!" # FIXME: why can't operator be defined local?
 
-        # regular expression that matches the contents in single and double quotes
-        # taking in mind if they are escaped.
-        self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
+    def _reset_parse_state(self):
+        """Clean up state from any previous parse operations."""
+
+        # FIXME: Can this be done away with?  Is parse_query overly stateful?
+        self._patterns = []
+        self._pattern_beginning = 0
+        self._pattern_end = 0
+        self._clear_preceding_operator()
+        self._clear_following_operator()
+        self._inside_parentheses = False
 
     def _clean_query(self, query):
         """Clean the query performing replacement of AND, OR, NOT operators with their
@@ -133,21 +126,9 @@ class SearchQueryParenthesisedParser:
         """Replaces some of the content of the query with equivalent content
         (e.g. replace 'AND' operator with '+' operator) for easier processing after that."""
 
-        query = self._replace_word_case_insensitive(query, "not", "-")
-        query = self._replace_word_case_insensitive(query, "and", "+")
-        query = self._replace_word_case_insensitive(query, "or", "|")
-
+        for word, symbol in (('not', '-'), ('and', '+'), ('or', '|')):
+            query = re.sub('(?i)\\b'+word+'\\b', symbol, query)
         return query
-
-    def _replace_word_case_insensitive(self, input_string, old_word, new_word):
-        """Returns a copy of string input_string where all occurrences of old_word
-        are replaced by new_word"""
-
-        regular_expression = re.compile('\\b'+old_word+'\\b', re.IGNORECASE)
-
-        result = regular_expression.sub(new_word, input_string)
-
-        return result
 
     def parse_query(self, query=""):
         """Parses the query and generates as an output a list of values
@@ -164,7 +145,11 @@ class SearchQueryParenthesisedParser:
             # we add the default operator in front of the query
             return [self._DEFAULT_OPERATOR, query]
 
-        self._init_parsing(query)
+        # clean the query replacing some of the content e.g. replace 'AND' with '+'
+        query = self._clean_query(query)
+        self._query = query
+
+        self._reset_parse_state()
         # flag indicating if we are inside quotes
         inside_quotes = False
         # used for detecting escape sequences. Contains previously processed character.
@@ -213,7 +198,7 @@ class SearchQueryParenthesisedParser:
 
         # check for mismatched parentheses
         if self._inside_parentheses:
-            self._raise_error(self._error_message_mismatched_parentheses)
+            raise InvenioWebSearchQueryParserException("Mismatched parenthesis.")
 
         return self._patterns
 
@@ -232,7 +217,7 @@ class SearchQueryParenthesisedParser:
 
         # check if we are already inside parentheses
         if self._inside_parentheses:
-            self._raise_error(self._error_message_nested_parentheses_not_supported)
+            raise InvenioWebSearchQueryParserException("Nested parentheses currently unsupported.")
 
         # both operators preceding and following the pattern before parenthesis
         # are known and also the pattern itself so append them to the result list.
@@ -252,7 +237,7 @@ class SearchQueryParenthesisedParser:
 
         # check if we are inside parentheses
         if not self._inside_parentheses:
-            self._raise_error(self._error_message_mismatched_parentheses)
+            raise InvenioWebSearchQueryParserException("Mismatched parenthesis.")
 
         # append the pattern between the parentheses
         self._append_pattern()
@@ -383,15 +368,13 @@ class SearchQueryParenthesisedParser:
         # after the value is cleaned the position is also cleaned. We accept -1 for cleaned value.
         self._following_operator_position = -1
 
-    def _raise_error(self, error_message_text):
-        """Raises an exception with the specified error message"""
-        raise InvenioWebSearchQueryParserException(error_message_text)
 
 class InvenioWebSearchQueryParserException(Exception):
     """Exception for parsing errors."""
     def __init__(self, message):
         """Initialization."""
         self.message = message
+
 
 class SpiresToInvenioSyntaxConverter:
     """Converts queries defined with SPIRES search syntax into queries
@@ -879,7 +862,7 @@ class SpiresToInvenioSyntaxConverter:
         current_position = 0
         for match in self._re_author_match.finditer(query):
             result += query[current_position : match.start() ]
-            scanned_name = QueryScanner.scan(match.group('name'))
+            scanned_name = NameScanner.scan(match.group('name'))
             author_atoms = self._create_author_search_pattern_from_fuzzy_name_dict(scanned_name)
             if author_atoms.find(' ') == -1:
                 result += author_atoms + ' '
