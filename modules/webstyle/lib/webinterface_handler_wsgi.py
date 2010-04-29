@@ -372,17 +372,19 @@ def application(environ, start_response):
                 req.status = HTTP_INTERNAL_SERVER_ERROR
                 req.headers_out['content-type'] = 'text/html'
                 start_response(req.get_wsgi_status(), req.get_low_level_headers(), sys.exc_info())
-            if CFG_DEVEL_SITE:
-                return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
-                from cgitb import html
-                return [html(sys.exc_info())]
-            return generate_error_page(req)
+                if CFG_DEVEL_SITE:
+                    return ["<pre>%s</pre>" % cgi.escape(get_pretty_traceback(req=req, exc_info=sys.exc_info()))]
+                    from cgitb import html
+                    return [html(sys.exc_info())]
+                return generate_error_page(req)
+            else:
+                return generate_error_page(req, page_already_started=True)
     finally:
         for (callback, data) in req.get_cleanups():
             callback(data)
     return []
 
-def generate_error_page(req, admin_was_alerted=True):
+def generate_error_page(req, admin_was_alerted=True, page_already_started=False):
     """
     Returns an iterable with the error page to be sent to the user browser.
     """
@@ -390,7 +392,10 @@ def generate_error_page(req, admin_was_alerted=True):
     from invenio import template
     webstyle_templates = template.load('webstyle')
     ln = req.form.get('ln', CFG_SITE_LANG)
-    return [page(title=req.get_wsgi_status(), body=webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted), language=ln, req=req)]
+    if page_already_started:
+        return [webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted)]
+    else:
+        return [page(title=req.get_wsgi_status(), body=webstyle_templates.tmpl_error_page(status=req.get_wsgi_status(), ln=ln, admin_was_alerted=admin_was_alerted), language=ln, req=req)]
 
 def is_static_path(path):
     """
