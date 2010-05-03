@@ -231,6 +231,12 @@ function redrawFields(tag, skipAddFileds){
 
 /// rendering the field content
 function removeAddFieldControl(changeNo){
+  /** A function removing the interface element associated with the Add Field
+      Holding Pen change
+
+      Arguments:
+        changeNo: a number of the change, the control is associated with
+   */
   $("#changeBox_" + changeNo).remove();
 }
 
@@ -376,10 +382,20 @@ function addFieldAddedControl(changeNo){
   $('#bibEditContent').append(content);
 }
 
+function removeAllChangeControls(){
+  /** Removing all the change controls from the interface
+   */
+  $(".bibeditHPCorrection").remove();
+}
+
 function addChangeControl(changeNum, skipAddedField){
-  // creates a web controls responsible for applying a particular change
-  // changeNum is the number of the change - it is the same as the index in gHoldingPenChanges
-  //    global array
+  /** creates a web controls responsible for applying a particular change
+      changeNum is the number of the change - it is the same as the index
+      in gHoldingPenChanges global array */
+
+  if (gHoldingPenChanges[changeNum].applied_change === true){
+    return;
+  }
   changeType = gHoldingPenChanges[changeNum]["change_type"];
   if ( changeType == "field_added" && skipAddedField != true){
     addFieldAddedControl(changeNum);
@@ -401,14 +417,13 @@ function addChangeControl(changeNum, skipAddedField){
   }
 }
 
-
 /// the functions for creating the previews
 
 function createFieldPreviewCore(tag, indicators, subfields){
-  /** A function creating a viewable preview of the records*/
+  /** A function creating a HTML preview of the record part */
 
   headerData = tag + indicators + "&nbsp;&nbsp;&nbsp;";
-  result = "";
+  var result = "";
 
   for (subfield in subfields){
     result += "<tr><td>"
@@ -424,7 +439,7 @@ function createFieldPreviewCore(tag, indicators, subfields){
 }
 
 function createFieldPreview(tag, indicators, subfields){
-  /*Creating a preview of a single field*/
+  /** Creating a preview of a single field*/
   return "<table>" + createFieldPreviewCore(tag, indicators, subfields) + "</table>";
 }
 
@@ -541,7 +556,7 @@ function createHoldingPenPanelEntry(changesetNumber, changesetDatetime){
 
 function createGeneralControlsPanel(){
   /** Generating a panel that allows to perform global operations on the previewed changes*/
-  result = "<div id=\"bibeditHoldinPenGC\">";
+  result = "<div id=\"bibeditHoldingPenGC\">";
   result += "<button onClick=\"onAcceptAllChanges();\">Apply all the changes</button>";
   result += "<button onClick=\"onRejectAllChanges();\"> Reject all the changes</button>";
   result += "</div>";
@@ -753,6 +768,9 @@ function displayMessage(msgCode, keepContent, args){
       msg = 'The record contains invalid content. Remove the invalid content ' +
   'and resubmit the record.<br />' +
   'Errors: <b>' + args[0] + '</b><br /><br />';
+      break;
+    case 111:
+      msg = 'Internal error. Cache file format is incorrect. Try to open the record again';
       break;
     default:
       msg = 'Result code: <b>' + msgCode + '</b>';
@@ -1033,6 +1051,7 @@ function displayRevisionHistoryEntry(recId, revisionId){
     "revertImgId" : revertImgId
   };
 }
+
 
 function escapeHTML(value){
   /*

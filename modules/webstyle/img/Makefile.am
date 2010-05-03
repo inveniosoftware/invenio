@@ -68,6 +68,8 @@ img_DATA = add-small.png \
            icon-journal_Athanasius_Kircher_Atlantis.gif \
            icon-journal_hms_beagle.gif \
            iconcross.gif \
+           iconcross2.gif \
+           plus_orange.png \
            iconeye.gif \
            iconpen.gif \
            indicator.gif \

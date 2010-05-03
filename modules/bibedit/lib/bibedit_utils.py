@@ -66,6 +66,13 @@ re_tmpl_description = re.compile('<!-- BibEdit-Template-Description: (.*) -->')
 re_ftmpl_name = re.compile('<!-- BibEdit-Field-Template-Name: (.*) -->')
 re_ftmpl_description = re.compile('<!-- BibEdit-Field-Template-Description: (.*) -->')
 
+# Helper functions
+
+def assert_undo_redo_lists_correctness(undo_list, redo_list):
+    for undoItem in undo_list:
+        assert undoItem != None;
+    for redoItem in redo_list:
+        assert redoItem != None;
 
 # Operations on the BibEdit cache file
 def cache_exists(recid, uid):
@@ -90,9 +97,10 @@ def cache_expired(recid, uid):
     """
     return get_cache_mtime(recid, uid) < int(time.time()) - CFG_BIBEDIT_TIMEOUT
 
-def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=[], disabled_hp_changes = {}):
+def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=[], disabled_hp_changes = {}, undo_list = [], redo_list=[]):
     """Create a BibEdit cache file, and return revision and record. This will
     overwrite any existing cache the user has for this record.
+datetime.
 
     """
     if not record:
@@ -103,7 +111,8 @@ def create_cache_file(recid, uid, record='', cache_dirty=False, pending_changes=
     file_path = '%s.tmp' % _get_file_path(recid, uid)
     record_revision = get_record_last_modification_date(recid)
     cache_file = open(file_path, 'w')
-    cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes], cache_file)
+    assert_undo_redo_lists_correctness(undo_list, redo_list);
+    cPickle.dump([cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
     cache_file.close()
     return record_revision, record
 
@@ -124,18 +133,21 @@ def get_cache_file_contents(recid, uid):
     """Return the contents of a BibEdit cache file."""
     cache_file = _get_cache_file(recid, uid, 'r')
     if cache_file:
-        cache_dirty, record_revision, record, pending_changes, disabled_hp_changes = cPickle.load(cache_file)
+        cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list = cPickle.load(cache_file)
         cache_file.close()
-        return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes
+        assert_undo_redo_lists_correctness(undo_list, redo_list);
 
-def update_cache_file_contents(recid, uid, record_revision, record, pending_changes, disabled_hp_changes):
+        return cache_dirty, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list
+
+def update_cache_file_contents(recid, uid, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list):
     """Save updates to the record in BibEdit cache. Return file modificaton
     time.
 
     """
     cache_file = _get_cache_file(recid, uid, 'w')
     if cache_file:
-        cPickle.dump([True, record_revision, record, pending_changes, disabled_hp_changes], cache_file)
+        assert_undo_redo_lists_correctness(undo_list, redo_list);
+        cPickle.dump([True, record_revision, record, pending_changes, disabled_hp_changes, undo_list, redo_list], cache_file)
         cache_file.close()
         return get_cache_mtime(recid, uid)
 

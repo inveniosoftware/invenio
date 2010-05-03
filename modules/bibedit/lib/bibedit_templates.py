@@ -162,6 +162,26 @@ class Template:
             'imgCompressMenuSection': imgCompressMenuSection,
             }
 
+        undoredosection =  '<div class="bibEditMenuSectionHeader">\n' \
+            '            %(imgCompressMenuSection)sUndo/Redo\n' \
+            '          </div>\n<table>' \
+            '          <tr class="bibEditMenuMore"><td>' \
+            '          <div class="bibEditURMenuSection">\n' \
+            '             <div class="bibEditURDetailsSection" id="bibEditURUndoListLayer">\n' \
+            '                 <div class="bibEditURButtonLayer"><button id="btnUndo">&lt;</button></div>\n' \
+            '                 <div id="undoOperationVisualisationField" class="bibEditHiddenElement bibEditURPreviewBox">\n' \
+            '                     <div id="undoOperationVisualisationFieldContent"></div>\n' \
+            '                 </div>\n' \
+            '             </div>' \
+            '             <div class="bibEditURDetailsSection" id="bibEditURRedoListLayer">\n' \
+            '                 <div class="bibEditURButtonLayer"><button id="btnRedo">&gt;</button></div>' \
+            '                 <div id="redoOperationVisualisationField" class="bibEditHiddenElement bibEditURPreviewBox">\n' \
+            '                     <div id="redoOperationVisualisationFieldContent"></div>' \
+            '                 </div>\n' \
+            '             </div>\n' \
+            '          </div></td></tr></table>\n' % { \
+            'imgCompressMenuSection': imgCompressMenuSection }
+
         statusarea = '<table>\n' \
             '          <tr>\n' \
             '            <td id="cellIndicator">%(imgIndicator)s</td>\n' \
@@ -201,6 +221,9 @@ class Template:
             '         %(holdingpenpanel)s\n'\
             '      </div>'\
             '      <div class="bibEditMenuSection">\n' \
+            '        %(undoredosection)s\n' \
+            '      </div>\n' \
+            '      <div class="bibEditMenuSection">\n' \
             '        %(historymenu)s\n' \
             '      </div>\n' \
             '      <div id="bibEditMenuSection">\n' \
@@ -216,7 +239,8 @@ class Template:
                 'statusarea': statusarea,
                 'lnkhelp': lnkhelp,
                 'holdingpenpanel': holdingpenpanel,
-                'historymenu': historymenu
+                'historymenu': historymenu,
+                'undoredosection': undoredosection
                 }
 
     def history_comparebox(self, ln, revdate, revdate_cmp, comparison):

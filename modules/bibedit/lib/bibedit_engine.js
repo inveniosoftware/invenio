@@ -9,7 +9,7 @@
  *
  * CDS Invenio is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or  FITNESS FOR A PARTICULAR PURPOSE.  See1 the GNU
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -150,7 +150,10 @@ var gDisabledHpEntries = {};
 var gReadOnlyMode = false;
 
 // revisions history
-var gRecRevisionHistory = []
+var gRecRevisionHistory = [];
+
+var gUndoList = []; // list of possible undo operations
+var gRedoList = []; // list of possible redo operations
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -161,14 +164,14 @@ window.onload = function(){
     'The Record Editor requires jQuery, which does not appear to be ' +
     'installed on this server. Please alert your system ' +
     'administrator.\n\nInstructions on how to install jQuery and other ' +
-    'required plug-ins can be found in CDS-Invenio\'s INSTALL file.');
+    "required plug-ins can be found in CDS-Invenio's INSTALL file.");
     var imgError = document.createElement('img');
     imgError.setAttribute('src', '/img/circle_red.png');
     var txtError = document.createTextNode('jQuery missing');
     var cellIndicator = document.getElementById('cellIndicator');
     cellIndicator.replaceChild(imgError, cellIndicator.firstChild);
     var cellStatus = document.getElementById('cellStatus');
-    cellStatus.replaceChild(txtError, cellStatus.firstChild)
+    cellStatus.replaceChild(txtError, cellStatus.firstChild);
   }
 };
 
@@ -184,9 +187,7 @@ $(function(){
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
   initHotkeys();
   initClipboardLibrary();
-  /*attaching the clipboard events ...*/
-  $(document).bind("copy", onPerformCopy);
-  $(document).bind("paste", onPerformPaste);
+  initClipboard()
 });
 
 
@@ -195,7 +196,7 @@ function failInReadOnly(){
     dialog is displayed and true returned.
     If bibEdit is in read/write mode, false is returned
    */
-  if (gReadOnlyMode == true){
+  if (gReadOnlyMode === true){
     alert("It is impossible to perform this operation in the Read/Only mode. Please switch to Read-write mode before trying again");
     return true;
   }
@@ -211,14 +212,15 @@ function initJeditable(){
   $.editable.addInputType('autogrow', {
     element: function(settings, original){
       var textarea = $('<textarea>');
-      if (settings.rows)
+      if (settings.rows){
         textarea.attr('rows', settings.rows);
-      else
+      } else {
         textarea.height(settings.height);
-      if (settings.cols)
+      } if (settings.cols) {
         textarea.attr('cols', settings.cols);
-      else
+      } else {
         textarea.width(settings.width);
+      }
       $(this).append(textarea);
       return(textarea);
     },
@@ -226,6 +228,12 @@ function initJeditable(){
       $('textarea', this).autogrow(settings.autogrow);
     }
   });
+}
+
+function initClipboard(){
+  // attaching the events -> handlers are stored in bibedit_engine.js file
+  $(document).bind("copy", onPerformCopy);
+  $(document).bind("paste", onPerformPaste);
 }
 
 function initMisc(){
@@ -240,13 +248,14 @@ function initMisc(){
 
   // Warn user if BibEdit is being closed while a record is open.
   window.onbeforeunload = function(){
-    if (gRecID && gRecordDirty)
+    if (gRecID && gRecordDirty){
       return '******************** WARNING ********************\n' +
-  '                  You have unsubmitted changes.\n\n' +
-  'You should go back to the page and click either:\n' +
-  ' * Submit (to save your changes permanently)\n      or\n' +
-  ' * Cancel (to discard your changes)';
-  }
+             '                  You have unsubmitted changes.\n\n' +
+             'You should go back to the page and click either:\n' +
+             ' * Submit (to save your changes permanently)\n      or\n' +
+             ' * Cancel (to discard your changes)';
+    }
+  };
 }
 
 
@@ -259,7 +268,7 @@ function initAjax(){
    * Initialize Ajax.
    */
   $.ajaxSetup(
-    { cache: false,
+    {cache: false,
       dataType: 'json',
       error: onAjaxError,
       type: 'POST',
@@ -272,17 +281,19 @@ function createReq(data, onSuccess, asynchronous){
   /*
    * Create Ajax request.
    */
-  if (asynchronous == undefined)
+  if (asynchronous == undefined){
     asynchronous = true;
+  }
   // Include and increment transaction ID.
   var tID = createReq.transactionID++;
   createReq.transactions[tID] = data['requestType'];
   data.ID = tID;
   // Include cache modification time if we have it.
-  if (gCacheMTime)
+  if (gCacheMTime){
     data.cacheMTime = gCacheMTime;
+  }
   // Send the request.
-  $.ajax({ data: { jsondata: JSON.stringify(data) },
+  $.ajax({data: {jsondata: JSON.stringify(data)},
            success: function(json){
                       onAjaxSuccess(json, onSuccess);
                     },
@@ -293,13 +304,31 @@ function createReq(data, onSuccess, asynchronous){
 createReq.transactionID = 0;
 createReq.transactions = [];
 
+function createBulkReq(reqsData, onSuccess, optArgs){
+  /* optArgs is a disctionary containning the optional arguments
+     possible keys include:
+       asynchronous : if the request should be asynchronous
+       undoRedo : handler for the undo operation
+  */
+    // creating a bulk request ... the cache timestamp is not saved
+
+    var data = { 'requestType' : 'applyBulkUpdates',
+                 'requestsData' : reqsData,
+                 'recID' : gRecID};
+    if (optArgs.undoRedo != undefined){
+        data.undoRedo = optArgs.undoRedo;
+    }
+
+    createReq(data, onSuccess, optArgs.asynchronous);
+}
+
 function onAjaxError(XHR, textStatus, errorThrown){
   /*
    * Handle Ajax request errors.
    */
-  alert('Request completed with status ' + textStatus
-  + '\nResult: ' + XHR.responseText
-  + '\nError: ' + errorThrown);
+  alert('Request completed with status ' + textStatus +
+    '\nResult: ' + XHR.responseText +
+    '\nError: ' + errorThrown);
 }
 
 function onAjaxSuccess(json, onSuccess){
@@ -741,12 +770,11 @@ function compareFields(fieldId, indicators, fieldPos, field1, field2){
 
   for (sfPos in field1){
     if (field2[sfPos] == undefined){
-      result.push({ "change_type" : "subfield_removed",
+      result.push({"change_type" : "subfield_removed",
                 "tag" : fieldId,
                 "indicators" : indicators,
                 "field_position" : fieldPos,
                 "subfield_position" : sfPos});
-        // removing the subfields from the end can be treated in a more graceful manner
     }
   }
 
@@ -759,7 +787,7 @@ function compareIndicators(fieldId, indicators, fields1, fields2){
   result = []
   for (fieldPos in fields2){
     if (fields1[fieldPos] == undefined){
-      result.push({ "change_type" : "field_added",
+      result.push({"change_type" : "field_added",
                   "tag" : fieldId,
                   "indicators" : indicators,
                   "field_content" : fields2[fieldPos][0]});
@@ -792,7 +820,7 @@ function compareRecords(record1, record2){
     if (r1[fieldId] == undefined){
       for (indicators in r2[fieldId]){
         for (field in r2[fieldId][indicators]){
-          result.push({ "change_type" : "field_added",
+          result.push({"change_type" : "field_added",
                         "tag" : fieldId,
                         "indicators" : indicators,
                         "field_content" : r2[fieldId][indicators][field][0]});
@@ -824,7 +852,7 @@ function compareRecords(record1, record2){
         if (r2[fieldId][indicators] == undefined){
           for (fieldInd in r1[fieldId][indicators]){
             fieldPosition = r1[fieldId][indicators][fieldInd][1];
-            result.push({ "change_type" : "field_removed",
+            result.push({"change_type" : "field_removed",
                  "tag" : fieldId,
                  "field_position" : fieldPosition});
           }
@@ -984,8 +1012,8 @@ validMARC.reControlTag = /00[1-9A-Za-z]{1}/;
 validMARC.reTag = /(0([1-9A-Z][0-9A-Z])|0([1-9a-z][0-9a-z]))|(([1-9A-Z][0-9A-Z]{2})|([1-9a-z][0-9a-z]{2}))/;
 validMARC.reIndicator1 = /[\da-z]{1}/;
 validMARC.reIndicator2 = /[\da-z]{1}/;
-validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
-
+//validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-./:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
+validMARC.reSubfieldCode = /[\da-z!&quot;#$%&amp;'()*+,-.\/:;&lt;=&gt;?{}_^`~\[\]\\]{1}/;
 
 /*
  * **************************** 6. Record UI ***********************************
@@ -1005,8 +1033,9 @@ function onNewRecordClick(event){
   }
   else
     // If the record is unchanged, erase the cache.
-    if (gReadOnlyMode == false)
+    if (gReadOnlyMode == false){
       createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  }
   changeAndSerializeHash({state: 'newRecord'});
   cleanUp(true, '');
   $('.headline').text('Record Editor: Create new record');
@@ -1055,7 +1084,7 @@ function getRecord(recID, recRev, onSuccess){
   resetBibeditState();
   createReq(reqData, onSuccess);
 
-  onHoldingPenPanelRecordIdChanged(recID) // reloading the Holding Pen toolbar
+  onHoldingPenPanelRecordIdChanged(recID); // reloading the Holding Pen toolbar
   getRecord.deleteRecordCache = false;
   getRecord.clonedRecord = false;
 }
@@ -1109,7 +1138,12 @@ function onGetRecordSuccess(json){
   gDisabledHpEntries = json['disabledHpChanges'];
   gHoldingPenLoadedChanges = {};
 
-  disableProcessedChanges();
+  adjustHPChangesetsActivity();
+
+  // updating the undo/redo lists
+  gUndoList = json['undoList'];
+  gRedoList = json['redoList'];
+  updateUrView();
 
   // Display record.
   displayRecord();
@@ -1137,6 +1171,8 @@ function onGetRecordSuccess(json){
       gCLONED_RECORD_COLOR_FADE_DURATION);
   updateStatus('report', gRESULT_CODES[json['resultCode']]);
   updateRevisionsHistory();
+  adjustGeneralHPControlsVisibility();
+
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
 
 }
@@ -1162,10 +1198,10 @@ function onSubmitClick(){
       resetBibeditState()
     });
     onSubmitClick.force = false;
+    resetBibeditState();
   }
   else
     updateStatus('ready');
-  holdingPenPanelRemoveEntries(); // clearing the holding pen entries list
 }
 
 // Enable this flag to force the next submission even if cache is outdated.
@@ -1190,6 +1226,17 @@ function onCancelClick(){
         updateStatus('report', gRESULT_CODES[json['resultCode']]);
       });
       holdingPenPanelRemoveEntries();
+      gUndoList = [];
+      gRedoList = [];
+      gReadOnlyMode = false;
+      gRecRevisionHistory = [];
+      gHoldingPenLoadedChanges = [];
+      gHoldingPenChanges = [];
+      // making the changes visible
+      updateInterfaceAccordingToMode();
+      updateRevisionsHistory();
+      updateUrView();
+
     }
     else {
       updateStatus('ready');
@@ -1548,7 +1595,6 @@ function onAddFieldJumpToNextSubfield(jQRowGroupID, fieldTmpNo, subfieldTmpNo){
     $(elementCode)[0].focus();
   }
   else{
-//    alert("submitting the form cause the last one has been left");
     addFieldSave(fieldTmpNo);
   }
 }
@@ -1878,6 +1924,16 @@ function addFieldSave(fieldTmpNo)
     var fieldPosition = getFieldPositionInTag(tag, field);
   }
 
+  // adding an undo handler
+  var undoHandler = prepareUndoHandlerAddField(tag,
+                                               ind1,
+                                               ind2,
+                                               fieldPosition,
+                                               subfields,
+                                               controlfield,
+                                               value);
+  addUndoOperation(undoHandler);
+
   // Create Ajax request.
   var data = {
     recID: gRecID,
@@ -1888,7 +1944,8 @@ function addFieldSave(fieldTmpNo)
     ind1: ind1,
     ind2: ind2,
     subfields: subfields,
-    value: value
+    value: value,
+    undoRedo: undHoandler
   };
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
@@ -1924,7 +1981,7 @@ function onAddSubfieldsClick(img){
   var fieldID = img.id.slice(img.id.indexOf('_')+1);
   var jQRowGroupID = '#rowGroup_' + fieldID;
   var tmpArray = fieldID.split('_');
-  var tag = tmpArray[0]; var fieldPosition = tmpArray[1];
+  var tag = tmpArray[0];var fieldPosition = tmpArray[1];
   if ($('#rowAddSubfieldsControls_' + fieldID).length == 0){
     // The 'Add subfields' form does not exist for this field.
     $(jQRowGroupID).append(createAddSubfieldsForm(fieldID));
@@ -2018,13 +2075,17 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
   }
 
   if (!subfields.length == 0){
+     // creating the undo/redo handler
+    var urHandler = prepareUndoHandlerAddSubfields(tag, fieldPosition, subfields);
+    addUndoOperation(urHandler);
     // Create Ajax request
     var data = {
       recID: gRecID,
       requestType: 'addSubfields',
       tag: tag,
       fieldPosition: fieldPosition,
-      subfields: subfields
+      subfields: subfields,
+      undoRedo: urHandler
     };
     createReq(data, function(json){
       updateStatus('report', gRESULT_CODES[json['resultCode']]);
@@ -2052,6 +2113,10 @@ function onAddSubfieldsSave(event, tag, fieldPosition){
 }
 
 function convertFieldIntoEditable(cell, shouldSelect){
+  // chacking if the clicked field is still present int the DOM structure ... if not, we have just removed the element
+  if ($(cell).parent().parent().parent()[0] == undefined){
+    return;
+  }
   // first we have to detach all exisiting editables ... which means detaching the event
   editEvent = 'click';
   $(cell).unbind(editEvent);
@@ -2081,7 +2146,6 @@ function convertFieldIntoEditable(cell, shouldSelect){
     }, {
       type: 'autogrow',
       callback: function(data, settings){
-        // TODO : CHECK THIS FUNCTION AFTER MERGING !!!!
         var tmpArray = this.id.split('_');
         var tag = tmpArray[1], fieldPosition = tmpArray[2],
         subfieldIndex = tmpArray[3];
@@ -2142,7 +2206,7 @@ function onContentClick(cell){
   }
 }
 
-function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, subfieldCode, value, changeNo){
+function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, subfieldCode, value, changeNo, undoDescriptor, restoreChange){
   var data = {
     recID: gRecID,
     requestType: 'modifyContent',
@@ -2150,25 +2214,31 @@ function getUpdateSubfieldValueRequestData(tag, fieldPosition, subfieldIndex, su
     fieldPosition: fieldPosition,
     subfieldIndex: subfieldIndex,
     subfieldCode: subfieldCode,
-    value: value,
+    value: value
   };
-  if (changeNo != undefined){
-    data.changeApplied = changeNo;
+  if (changeNo != undefined && changeNo != -1){
+    data.hpChanges = {toDisable: [changeNo]};
+  }
+  if (undoDescriptor != undefined && undoDescriptor != null){
+    data.undoRedo = undoDescriptor;
   }
   return data;
 }
 
-function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange){
+function updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, consumedChange, undoDescriptor){
   updateStatus('updating');
-  // Create Ajax request.
-  if (consumedChange == undefined){
+  // Create Ajax request for simple updating the subfield value
+  if (consumedChange == undefined || consumedChange == null){
     consumedChange = -1;
   }
-  var data =  getUpdateSubfieldValueRequestData(tag,
-                          fieldPosition,
-                          subfieldIndex,
-                          subfieldCode,
-                          value);
+
+  var data = getUpdateSubfieldValueRequestData(tag,
+                                               fieldPosition,
+                                               subfieldIndex,
+                                               subfieldCode,
+                                               value,
+                                               consumedChange,
+                                               undoDescriptor);
 
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
@@ -2185,11 +2255,13 @@ function onContentChange(value, th){
   var tmpArray = th.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
   var field = gRecord[tag][fieldPosition];
+  var oldValue = "";
   value = value.replace(/\n/g, ' '); // Replace newlines with spaces.
   if (subfieldIndex == undefined){
     // Controlfield
     if (field[3] == value)
       return escapeHTML(value);
+    oldValue = field[3];
     field[3] = value;
     subfieldIndex = null;
     var subfieldCode = null;
@@ -2198,17 +2270,32 @@ function onContentChange(value, th){
     if (field[0][subfieldIndex][1] == value)
       return escapeHTML(value);
     // Regular field
+    oldValue = field[0][subfieldIndex][1];
     field[0][subfieldIndex][1] = value;
     var subfieldCode = field[0][subfieldIndex][0];
   }
 
-  updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value);
+  // setting the undo/redo handler
+  var newValue = escapeHTML(value);
+  var code = gRecord[tag][fieldPosition][0][subfieldIndex][0];
+  urHandler = prepareUndoHandlerChangeSubfield(tag,
+                                               fieldPosition,
+                                               subfieldIndex,
+                                               oldValue,
+                                               newValue,
+                                               code, code);
+  addUndoOperation(urHandler);
+
+  // generating the Ajax request
+
+  updateSubfieldValue(tag, fieldPosition, subfieldIndex, subfieldCode, value, null, urHandler);
 
   setTimeout('$("#content_' + tag + '_' + fieldPosition + '_' + subfieldIndex +
       '").effect("highlight", {color: gNEW_CONTENT_COLOR}, ' +
       'gNEW_CONTENT_COLOR_FADE_DURATION)', gNEW_CONTENT_HIGHLIGHT_DELAY);
+
   // Return escaped value to display.
-  return escapeHTML(value);
+  return newValue;
 }
 
 function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
@@ -2219,159 +2306,57 @@ function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
     return;
   }
   updateStatus('updating');
-  var fieldID = tag + '_' + fieldPosition;
-  var field = gRecord[tag][fieldPosition];
-  var subfields = field[0];
-  var newSubfieldIndex;
+
   // Check if moving is possible
   if (type == 'up') {
-    newSubfieldIndex = parseInt(subfieldIndex) - 1;
-    if (newSubfieldIndex < 0) {
+    if ( (parseInt(subfieldIndex) - 1 )< 0) {
       updateStatus('ready', '');
       return;
     }
   }
   else {
-    newSubfieldIndex = parseInt(subfieldIndex) + 1;
-    if (newSubfieldIndex >= gRecord[tag][fieldPosition][0].length) {
+    if ((parseInt(subfieldIndex) + 1) >= gRecord[tag][fieldPosition][0].length) {
       updateStatus('ready', '');
       return;
     }
   }
-  // Create Ajax request.
-  var data = {
-    recID: gRecID,
-    requestType: 'moveSubfield',
-    tag: tag,
-    fieldPosition: fieldPosition,
-    subfieldIndex: subfieldIndex,
-    newSubfieldIndex: newSubfieldIndex
-  };
-  createReq(data, function(json){
+  // creating the undoRedo Hanglers
+  var undoHandler = prepareUndoHandlerMoveSubfields(tag, parseInt(fieldPosition), parseInt(subfieldIndex), type);
+  addUndoOperation(undoHandler);
+
+  var ajaxData = performMoveSubfield(tag, fieldPosition, subfieldIndex, type, undoHandler);
+  createReq(ajaxData, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
   }, false);
-  // Continue local updating.
-  var subfieldToSwap = subfields[newSubfieldIndex];
-  subfields[newSubfieldIndex] = subfields[subfieldIndex];
-  subfields[subfieldIndex] = subfieldToSwap;
-  var rowGroup = $('#rowGroup_' + fieldID);
-  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
-  $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
-  if (coloredRowGroup)
-    $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
-  $('#boxSubfield_'+fieldID+'_'+newSubfieldIndex).click();
+
 }
 
 function onDeleteClick(event){
   /*
    * Handle 'Delete selected' button or delete hotkeys.
    */
-  // Find all checked checkboxes.
   if (failInReadOnly()){
     return;
   }
-  var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked');
-  var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
-  if (!checkedFieldBoxes.length && !checkedSubfieldBoxes.length)
-    // No fields selected for deletion.
-    return;
   updateStatus('updating');
-  // toDelete is the complete datastructure of fields and subfields to delete.
-  var toDelete = {};
-  // tagsToRedraw is a list of tags that needs to be redrawn (to update element
-  // IDs).
-  var tagsToRedraw = [];
-  // reColorTable is true if any field are completely deleted.
-  var reColorTable = false;
-  // Collect fields to be deleted in toDelete.
-  $(checkedFieldBoxes).each(function(){
-    var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldPosition = tmpArray[2];
-    if (!toDelete[tag]) {
-      toDelete[tag] = {};
-    }
-    toDelete[tag][fieldPosition] = [];
-    tagsToRedraw[tag] = true;
-    reColorTable = true;
-  });
-  // Collect subfields to be deleted in toDelete.
-  $(checkedSubfieldBoxes).each(function(){
-    var tmpArray = this.id.split('_');
-    var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
-    if (!toDelete[tag]) {
-      toDelete[tag] = {};
-      toDelete[tag][fieldPosition] = [subfieldIndex];
-    }
-    else {
-      if (!toDelete[tag][fieldPosition])
-        toDelete[tag][fieldPosition] = [subfieldIndex];
-      else
-        if (toDelete[tag][fieldPosition].length == 0)
-          // Entire field scheduled for the deletion.
-          return;
-        else
-          toDelete[tag][fieldPosition].push(subfieldIndex);
-    }
-  });
 
+  var toDelete = getSelectedFields();
   // Assert that no protected fields are scheduled for deletion.
   var protectedField = containsProtectedField(toDelete);
   if (protectedField) {
     displayAlert('alertDeleteProtectedField', [protectedField]);
     updateStatus('ready');
     return;
-    }
-
-    // Create Ajax request.
-    var data = {
-  recID: gRecID,
-  requestType: 'deleteFields',
-  toDelete: toDelete
-    };
-    createReq(data, function(json){
-  updateStatus('report', gRESULT_CODES[json['resultCode']]);
-    });
-
-  // Continue local updating.
-  // Parse datastructure and delete accordingly in record.
-  var fieldsToDelete, subfieldIndexesToDelete, field, subfields, subfieldIndex;
-  for (var tag in toDelete) {
-    fieldsToDelete = toDelete[tag];
-    // The fields should be treated in the decreasing order (during the removal, indices may change)
-    traversingOrder = [];
-    for (fieldPosition in fieldsToDelete) {
-      traversingOrder.push(fieldPosition);
-    }
-    // normal sorting will do this in a lexycographical order ! (problems if > 10 subfields
-    // function provided, allows sorting in the reversed order
-    traversingOrder = traversingOrder.sort(function(a, b){
-      return b - a;
-    });
-    for (var fieldInd in traversingOrder) {
-      fieldPosition = traversingOrder[fieldInd];
-      var fieldID = tag + '_' + fieldPosition;
-      subfieldIndexesToDelete = fieldsToDelete[fieldPosition];
-      if (subfieldIndexesToDelete.length == 0)
-        deleteFieldFromTag(tag, fieldPosition);
-      else {
-        // normal sorting will do this in a lexycographical order ! (problems if > 10 subfields
-        subfieldIndexesToDelete.sort(function(a, b){
-          return a - b;
-        });
-        field = gRecord[tag][fieldPosition];
-        subfields = field[0];
-        for (var j = subfieldIndexesToDelete.length - 1; j >= 0; j--)
-          subfields.splice(subfieldIndexesToDelete[j], 1);
-        var rowGroup = $('#rowGroup_' + fieldID);
-      }
-    }
   }
+    // register the undo Handler
+  var urHandler = prepareUndoHandlerDeleteFields(toDelete);
+  addUndoOperation(urHandler);
+  var ajaxData = deleteFields(toDelete, urHandler);
 
-  // If entire fields has been deleted, redraw all fields with the same tag
-  // and recolor the full table.
-  for (tag in tagsToRedraw)
-      redrawFields(tag);
-  reColorFields();
+ createReq(ajaxData, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  });
+
 }
 
 function onMoveFieldUp(tag, fieldPosition) {
@@ -2384,24 +2369,12 @@ function onMoveFieldUp(tag, fieldPosition) {
     var prevField = gRecord[tag][fieldPosition-1];
     // check if the previous field has the same indicators
     if ( cmpFields(thisField, prevField) == 0 ) {
-      // Create Ajax request.
-      var data = {
-        recID: gRecID,
-        requestType: 'moveField',
-        tag: tag,
-        fieldPosition: fieldPosition,
-        direction: 'up'
-      };
-      createReq(data, function(json){
+      var undoHandler = prepareUndoHandlerMoveField(tag, fieldPosition, "up");
+      addUndoOperation(undoHandler);
+      var ajaxData = performMoveField(tag, fieldPosition, "up", undoHandler);
+      createReq(ajaxData, function(json){
         updateStatus('report', gRESULT_CODES[json['resultCode']]);
       }, false);
-      //continue updating locally
-      gRecord[tag][fieldPosition] = prevField;
-      gRecord[tag][fieldPosition-1] = thisField;
-      $('tbody#rowGroup_'+tag+'_'+(fieldPosition-1)).replaceWith( createField(tag, thisField, fieldPosition-1) );
-      $('tbody#rowGroup_'+tag+'_'+fieldPosition).replaceWith( createField(tag, prevField, fieldPosition) );
-      reColorFields();
-      $('#boxField_'+tag+'_'+(fieldPosition-1)).click();
     }
   }
 }
@@ -2416,29 +2389,17 @@ function onMoveFieldDown(tag, fieldPosition) {
     var nextField = gRecord[tag][fieldPosition+1];
     // check if the next field has the same indicators
     if ( cmpFields(thisField, nextField) == 0 ) {
-      // Create Ajax request.
-      var data = {
-        recID: gRecID,
-        requestType: 'moveField',
-        tag: tag,
-        fieldPosition: fieldPosition,
-        direction: 'down'
-      };
-      createReq(data, function(json){
+      var undoHandler = prepareUndoHandlerMoveField(tag, fieldPosition, "down");
+      addUndoOperation(undoHandler);
+      var ajaxData = performMoveField(tag, fieldPosition, "down", undoHandler);
+      createReq(ajaxData, function(json){
         updateStatus('report', gRESULT_CODES[json['resultCode']]);
       }, false);
-      //continue updating locally
-      gRecord[tag][fieldPosition] = nextField;
-      gRecord[tag][fieldPosition+1] = thisField;
-      $('tbody#rowGroup_'+tag+'_'+(fieldPosition+1)).replaceWith( createField(tag, thisField, fieldPosition+1) );
-      $('tbody#rowGroup_'+tag+'_'+fieldPosition).replaceWith( createField(tag, nextField, fieldPosition) );
-      reColorFields();
-      $('#boxField_'+tag+'_'+(fieldPosition+1)).click();
     }
   }
 }
 
-// read-only mode related function
+
 
 function updateInterfaceAccordingToMode(){
   /* updates the user interface (in particular the activity of menu buttons)
@@ -2503,9 +2464,9 @@ function onSwitchReadOnlyMode(){
 function getCompareClickedHandler(revisionId){
   return function(e){
     //document.location = "/record/merge/#recid1=" + gRecID + "&recid2=" + gRecID + "." + revisionId;
-    comparisonUrl = "/record/edit/compare_revisions?recid=" +
+    var comparisonUrl = "/record/edit/compare_revisions?recid=" +
       gRecID + "&rev1=" + gRecRev + "&rev2=" + revisionId;
-    newWindow = window.open(comparisonUrl);
+    var newWindow = window.open(comparisonUrl);
     newWindow.focus();
     return false;
   };
@@ -2705,6 +2666,7 @@ function onPerformPaste(){
   }
 
   var changesAdd = []; // the ajax requests for all the fields
+  var undoHandlers = [];
 
   for (tag in record){
     if (gRecord[tag] == undefined){
@@ -2715,10 +2677,17 @@ function onPerformPaste(){
       newPos = gRecord[tag].length;
       gRecord[tag][newPos] = record[tag][fieldInd];
       // enqueue ajax add field request
+
+      isControlfield = record[tag][fieldInd][0].length == 0;
+      ind1 = record[tag][fieldInd][1];
+      ind2 = record[tag][fieldInd][2];
+      subfields = record[tag][fieldInd][0];
+      value: record[tag][fieldInd][3]; // in case of a control field
+
       changesAdd.push({
         recID: gRecID,
         requestType: "addField",
-        controlfield : record[tag][fieldInd][0].length == 0,
+        controlfield : isControlfield,
         fieldPosition : newPos,
         tag: tag,
         ind1: record[tag][fieldInd][1],
@@ -2726,20 +2695,26 @@ function onPerformPaste(){
         subfields: record[tag][fieldInd][0],
         value: record[tag][fieldInd][3]
       });
+
+      undoHandler = prepareUndoHandlerAddField(
+          tag, ind1, ind2, newPos, subfields, isControlfield, value);
+      undoHandlers.push(undoHandler);
     }
   }
-  // now sending the Ajax Request
 
-  // the data of an Ajax request -> a bulk add Field request
-  var ajaxRequestData = {
-      recID: gRecID,
-      requestType: "applyBulkUpdates",
-      value: [changesAdd]
-  }
-  createReq(ajaxRequestData, function(json){
-    updateStatus('report', gRESULT_CODES[json['resultCode']])});
+  undoHandlers.reverse();
+  var undoHandler = prepareUndoHandlerBulkOperation(undoHandlers, "paste");
+  addUndoOperation(undoHandler);
+  // now sending the Ajax Request
+  var optArgs = {
+      undoRedo: undoHandler
+  };
+
+  createBulkReq(changesAdd, function(json){
+      updateStatus('report', gRESULT_CODES[json['resultCode']])}, optArgs);
 
   // tags have to be redrawn in the increasing order
+
   tags = [];
   for (tag in record){
     tags.push(tag);
@@ -2749,4 +2724,1313 @@ function onPerformPaste(){
       redrawFields(tags[tagInd]);
   }
   reColorFields();
+}
+function addUndoOperation(operation){
+  gUndoList.push(operation);
+  invalidateRedo();
+  updateUrView();
+}
+
+function invalidateRedo(){
+  /** Invalidates the redo list - after some modification*/
+  gRedoList = [];
+}
+
+function adjustUndoRedoBtnsActivity(){
+  /** Making the undo/redo buttons active/inactive according to the needs
+   */
+  if (gUndoList.length > 0){
+    $("#btnUndo").addAttribute("disabled", "");
+  }
+  else{
+    $("#btnUndo").removeAttr("disabled");
+  }
+
+  if (gRedoList.length > 0){
+    $("#btnRedo").addAttribute("disabled", "");
+  }
+  else{
+    $("#btnRedo").removeAttr("disabled");
+  }
+}
+
+
+function undoMany(number){
+  /** A function undoing many operations from the undo list
+
+      Arguments:
+        number: number of operations to undo
+   */
+
+  var undoOperations = []
+  for (i=0;i<number;i++){
+    undoOperations.push(getUndoOperation());
+  }
+  performUndoOperations(undoOperations);
+  updateUrView();
+}
+
+function prepareUndoHandlerEmpty(){
+  /** Creating an empty undo/redo handler - might be useful in some cases
+      when undo operation is required but should not be registered
+  */
+  return {
+    operation_type: "no_operation"
+  };
+}
+
+function prepareUndoHandlerAddField(tag, ind1, ind2, fieldPosition, subfields,
+                                    isControlField, value ){
+  /** A function creating an undo handler for the operation of affing a new
+      field
+
+    Arguments:
+      tag:            tag of the field
+      ind1:           first indicator (a single character string)
+      ind2:           second indicator (a single character string)
+      fieldPosition:  a position of the field among other fields with the same
+                      tag and possibly different indicators)
+      subFields:      a list of fields subfields. each subfield is decribed by
+                      a pair: [code, value]
+      isControlField: a boolean value indicating if the field is a control field
+      value:          a value of a control field. (important in case of passing
+                      iscontrolField equal true)
+  */
+
+  var result = {};
+  result.operation_type = "add_field";
+  result.newSubfields = subfields;
+  result.tag = tag;
+  result.ind1 = ind1;
+  result.ind2 = ind2;
+  result.fieldPosition = fieldPosition;
+  result.isControlField = isControlField;
+  if (isControlField){
+    // value == false means that we are dealing with a control field
+    result.value = value;
+  } else{
+    result.subfields = subfields;
+  }
+
+  return result;
+}
+
+function prepareUndoHandlerVisualizeChangeset(changesetNumber, changesListBefore, changesListAfter){
+  var result = {};
+  result.operation_type = "visualize_hp_changeset";
+  result.changesetNumber = changesetNumber;
+  result.oldChangesList = changesListBefore;
+  result.newChangesList = changesListAfter;
+  return result;
+}
+
+function prepareUndoHandlerApplyHPChange(changeHandler, changeNo){
+  /** changeHandler - handler to the original undo/redo handler associated with the action
+   */
+  var result = {};
+  result.operation_type = "apply_hp_change";
+  result.handler = changeHandler;
+  result.changeNo = changeNo;
+  result.changeType = gHoldingPenChanges[changeNo].change_type;
+  return result;
+}
+
+function prepareUndoHandlerApplyHPChanges(changeHandlers, changesBefore){
+  /** Producing the undo/redo handler associated with application of
+      more than one HoldingPen change
+
+      Arguments:
+        changeHandlers - a list od undo/redo handlers associated with subsequent changes.
+        changesBefore = a list of Holding Pen changes before the operation
+   */
+
+  var result = {};
+  result.operation_type = "apply_hp_changes";
+  result.handlers = changeHandlers;
+  result.changesBefore = changesBefore;
+  return result;
+}
+
+function prepareUndoHandlerRemoveAllHPChanges(hpChanges){
+  /** A function preparing the undo handler associated with the
+      removal of all the Holding Pen changes present in teh interface */
+  var result = {};
+  result.operation_type = "remove_all_hp_changes";
+  result.old_changes_list = hpChanges;
+  return result;
+}
+
+function prepareUndoHandlerBulkOperation(undoHandlers, handlerTitle){
+  /*
+    Preapring an und/redo handler allowing to treat the bulk operations
+    ( like for example in case of pasting fields )
+    arguments:
+      undoHandlers : handlers of separate operations from the bulk
+      handlerTitle : a message to be displayed in the undo menu
+  */
+  var result = {};
+
+  result.operation_type = "bulk_operation";
+  result.handlers = undoHandlers;
+  result.title = handlerTitle;
+
+  return result;
+}
+
+function urPerformAddSubfields(tag, fieldPosition, subfields, isUndo){
+    var ajaxData = {
+      recID: gRecID,
+      requestType: 'addSubfields',
+      tag: tag,
+      fieldPosition: fieldPosition,
+      subfields: subfields,
+      undoRedo: (isUndo ? "undo": "redo")
+    };
+
+    gRecord[tag][fieldPosition][0] = gRecord[tag][fieldPosition][0].concat(subfields);
+    redrawFields(tag);
+    reColorFields();
+
+    return ajaxData;
+}
+
+function performModifyHPChanges(changesList, isUndo){
+  /** Undoing or redoing the operation of modifying the changeset
+   */
+  // first local updates
+  gHoldingPenChanges = changesList;
+  refreshChangesControls();
+  var result = prepareOtherUpdateRequest(isUndo);
+  result.undoRedo = isUndo ? "undo" : "redo";
+  result.hpChanges = {toOverride: changesList};
+  return result;
+}
+
+function hideUndoPreview(){
+  $("#undoOperationVisualisationField").addClass("bibEditHiddenElement");
+  // clearing the selection !
+  $(".bibEditURDescEntrySelected").removeClass("bibEditURDescEntrySelected");
+}
+
+function getRedoOperation(){
+  // getting the operation to be redoed
+  currentElement = gRedoList[0];
+  gRedoList.splice(0, 1);
+  gUndoList.push(currentElement);
+  return currentElement;
+}
+
+function getUndoOperation(){
+  // getting the operation to be undoe
+  currentElement = gUndoList[gUndoList.length - 1];
+  gUndoList.splice(gUndoList.length - 1, 1);
+  gRedoList.splice(0, 0, currentElement);
+  return currentElement;
+}
+
+function setAllUnselected(){
+  // make all the fields and subfields deselected
+  setSelectionStatusAll(false);
+}
+
+function setSelectionStatusAll(status){
+  // Changing the selection status for all the fields
+  subfieldBoxes = $('.bibEditBoxSubfield');
+  subfieldBoxes.each(function(e){
+    if (subfieldBoxes[e].checked != status){
+      subfieldBoxes[e].click();
+    }
+  });
+}
+
+function prepareApplyAllHPChangesHandler(){
+    // a container for many undo/redo operations in the same time
+    throw 'To implement';
+}
+
+
+/*** Handlers for specific operations*/
+
+function renderURList(list, idPrefix, isInverted){
+  // rendering the view of undo/redo list into a human-readible HTML
+  // list -> an undo or redo list
+  // idPrefix -> te prefix of the DOM identifier
+
+  var result = "";
+  var isPair = false;
+  var helperCnt = 0;
+
+  var iterationBeginning = list.length - 1;
+  var iterationJump = -1;
+  var iterationEnd = -1;
+
+  if (isInverted === true){
+    iterationBeginning = 0;
+    iterationJump = 1;
+    iterationEnd = list.length;
+  }
+
+  for (entryInd = iterationBeginning ; entryInd != iterationEnd ; entryInd += iterationJump){
+      result += "<div class=\"" + (isPair ? "bibEditURPairRow" : "bibEditUROddRow" )+ " bibEditURDescEntry\" id=\"" + idPrefix + "_" + helperCnt + "\">";
+      result += getHumanReadableUREntry(list[entryInd]);
+      result += "</div>";
+      isPair = ! isPair;
+      helperCnt += 1;
+  }
+  result += "";
+  return result;
+}
+
+function prepareApplyHPChangeHandler(){
+    // A handler for HoldingPen change application/rejection
+    throw 'to implement';
+}
+
+function processURUntil(entry){
+  // Executing the bulk undo/redo
+  var idParts = $(entry).attr("id").split("_");
+  var index = parseInt(idParts[1]);
+
+  if (idParts[0] == "undo"){
+    undoMany(index+1);
+  }
+  else{
+    redoMany(index+1);
+  }
+}
+
+function prepareUndoHandlerChangeSubfield(tag, fieldPos, subfieldPos, oldVal, newVal, oldCode, newCode){
+  var result = {};
+  result.operation_type = "change_content";
+  result.tag = tag;
+  result.oldVal = oldVal;
+  result.newVal = newVal;
+  result.oldCode = oldCode;
+  result.newCode = newCode;
+  result.fieldPos = fieldPos;
+  result.subfieldPos = subfieldPos;
+  return result;
+}
+
+function setAllSelected(){
+  // make all the fields and subfields selected
+  setSelectionStatusAll(true);
+}
+
+function showUndoPreview(){
+  $("#undoOperationVisualisationField").removeClass("bibEditHiddenElement");
+}
+
+function prepareUndoHandlerMoveSubfields(tag, fieldPosition, subfieldPosition, direction){
+  var result = {};
+  result.operation_type = "move_subfield";
+  result.tag = tag;
+  result.field_position = fieldPosition;
+  result.subfield_position = subfieldPosition;
+  result.direction = direction;
+  return result;
+}
+// Handlers to implement:
+
+function setFieldUnselected(tag, fieldPos){
+  // unselect a given field
+  setSelectionStatusField(tag, fieldPos, false);
+}
+
+function urPerformRemoveField(tag, position, isUndo){
+  var toDeleteData = {};
+  var toDeleteTmp = {};
+  toDeleteTmp[position] = [];
+  toDeleteData[tag] =  toDeleteTmp;
+
+  // first preparing the data of Ajax request
+
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'deleteFields',
+    toDelete: toDeleteData,
+    undoRedo: (isUndo ? "undo": "redo")
+  };
+
+  // updating the local model
+  gRecord[tag].splice(position,1);
+  if (gRecord[tag] == []){
+    gRecord[tag] = undefined;
+  }
+  redrawFields(tag);
+  reColorFields();
+
+  return ajaxData;
+}
+
+function prepareOtherUpdateRequest(isUndo){
+  return {
+    requestType : 'otherUpdateRequest',
+    recID : gRecID,
+      undoRedo: ((isUndo === true) ? "undo" : "redo"),
+    hpChanges: {}
+  };
+}
+
+function performUndoApplyHpChanges(subRequests, oldChanges){
+  /**
+   Arguemnts:
+     subRequests - subrequests performing the appropriate undo operations
+   */
+
+  // removing all teh undo/redo informations as they should be passed globally
+  for (ind in subRequests){
+      subRequests[ind].undoRedo = undefined;
+  }
+//  var gHoldingPenChanges
+  return {
+    requestType: 'applyBulkUpdates',
+    undoRedo: "undo",
+    requestsData: subRequests,
+    hpChanges: {toOverride: oldChanges}
+  };
+}
+
+function performBulkOperation(subHandlers, isUndo){
+  /**
+   return the bulk operation
+   Arguments:
+     subReqs : requests performing the sub-operations
+     isUndo - is current request undo or redo ?
+   */
+  var subReqs = [];
+  if (isUndo === true){
+    subReqs = preparePerformUndoOperations(subHandlers);
+  } else {
+    // We can not simply assign and revers as the original would be modified
+    var handlers = [];
+    for (handlerInd = subHandlers.length -1; handlerInd >= 0; handlerInd--){
+      handlers.push(subHandlers[handlerInd]);
+    }
+    subReqs = preparePerformRedoOperations(handlers);
+  }
+
+  for (ind in subReqs){
+    subReqs[ind].undoRedo = undefined;
+  }
+
+  return {
+    requestType: 'applyBulkUpdates',
+    undoRedo: (isUndo === true ? "undo" : "redo"),
+    requestsData: subReqs,
+    hpChanges: {}
+  };
+}
+
+function preparePerformRedoOperations(operations){
+  /** Redos an operation passed as an argument */
+  var ajaxRequestsData = [];
+  for (operationInd in operations){
+    var operation = operations[operationInd];
+    var ajaxData = {};
+    var isMultiple = false; // is the current decription a list of descriptors ?
+    switch (operation.operation_type){
+    case "no_operation":
+      ajaxData = prepareOtherUpdateRequest(false);
+      break;
+    case "change_content":
+      ajaxData = urPerformChangeSubfieldContent(operation.tag,
+                                     operation.fieldPos,
+                                     operation.subfieldPos,
+                                     operation.newCode,
+                                     operation.newVal,
+                                     false);
+      break;
+    case "add_field":
+      ajaxData = urPerformAddField(operation.isControlField,
+                        operation.fieldPosition,
+                        operation.tag,
+                        operation.ind1,
+                        operation.ind2,
+                        operation.subfields,
+                        operation.value,
+                        false);
+      break;
+     case "add_subfields":
+       ajaxData = urPerformAddSubfields(operation.tag,
+                             operation.fieldPosition,
+                             operation.newSubfields,
+                             false);
+       break;
+
+    case "delete_fields":
+      ajaxData = urPerformDeletePositionedFieldsSubfields(operation.toDelete, false);
+      break;
+
+    case "move_field":
+      ajaxData = performMoveField(operation.tag, operation.field_position, operation.direction , false);
+      break;
+    case "move_subfield":
+      ajaxData = performMoveSubfield(operation.tag, operation.field_position, operation.subfield_position, operation.direction, false);
+      break;
+    case "bulk_operation":
+      ajaxData = performBulkOperation(operation.handlers, false);
+      break;
+    case "apply_hp_change":
+      removeViewedChange(operation.changeNo); // we redo the change application so the change itself gets removed
+      ajaxData = preparePerformRedoOperations([operation.handler]);
+      ajaxData[0].hpChange = {};
+      ajaxData[0].hpChange.toDisable = [operation.changeNo]; // reactivate this change
+      isMultiple = true;
+      break;
+
+    case "apply_hp_changes":
+      // in this case many changes are applied at once and the list of changes is completely overriden
+      ajaxData = performUndoApplyHpChanges();
+    case "change_field":
+      ajaxData = urPerformChangeField(operation.tag, operation.fieldPos,
+                                      operation.newInd1, operation.newInd2,
+                                      operation.newSubfields,
+                                      operation.newIsControlField,
+                                      operation.oldValue , false);
+      break;
+    case "visualize_hp_changeset":
+      ajaxData = prepareVisualizeChangeset(operation.changesetNumber,
+        operation.newChangesList, "redo");
+      break;
+    case "remove_all_hp_changes":
+      ajaxData = performModifyHPChanges([], false);
+      break;
+
+    default:
+      alert("Error: wrong operation to redo");
+      break;
+    }
+    // now dealing with the results
+    if (isMultiple){
+      // in this case we have to merge lists rather than include inside
+      for (elInd in ajaxData){
+        ajaxRequestsData.push(ajaxData[elInd]);
+      }
+    }
+    else{
+      ajaxRequestsData.push(ajaxData);
+    }
+  }
+  return ajaxRequestsData;
+}
+
+function performRedoOperations(operations){
+  ajaxRequestsData = preparePerformRedoOperations(operations);
+  // now submitting the bulk request
+  var optArgs = {
+//      undoRedo: "redo"
+  };
+
+  createBulkReq(ajaxRequestsData, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  }, optArgs);
+}
+
+function prepareUndoHandlerDeleteFields(toDelete){
+  /*Creating Undo/Redo handler for the operation of removal of fields and/or subfields
+    Arguments: toDelete - indicates fields and subfields scheduled to be deleted.
+      this argument should have a following structure:
+      {
+        "fields" : { tag: {fieldsPosition: field_structure_similar_to_on_from_gRecord}}
+        "subfields" : {tag: { fieldPosition: { subfieldPosition: [code, value]}}}
+      }
+  */
+  var result = {};
+  result.operation_type = "delete_fields";
+  result.toDelete = toDelete;
+  return result;
+}
+
+function setSubfieldUnselected(tag, fieldPos, subfieldPos){
+ // unseelcting a subfield
+  setSelectionStatusSubfield(tag, fieldPos, subfieldPos, false);
+}
+
+
+function prepareUndoHandlerAddSubfields(tag, fieldPosition, subfields){
+  /**
+    tag : tag of the field inside which the fields should be added
+    fieldPosition: position of the field
+    subfields: new subfields to be added. This argument should be a list
+      of lists representing a single subfield. Each subfield is represented
+      by a list, containing 2 elements. [subfield_code, subfield_value]
+  */
+  var result = {};
+  result.operation_type = "add_subfields";
+  result.tag = tag;
+  result.fieldPosition = fieldPosition;
+  result.newSubfields = subfields;
+  return result;
+}
+
+function setFieldSelected(tag, fieldPos){
+  // select a given field
+  setSelectionStatusField(tag, fieldPos, true);
+}
+
+function redoMany(number){
+  // redoing an indicated number of operations
+  var redoOperations = [];
+  for (i=0;i<number;i++){
+    redoOperations.push(getRedoOperation());
+  }
+  performRedoOperations(redoOperations);
+  updateUrView();
+}
+function urPerformAddField(controlfield, fieldPosition, tag, ind1, ind2, subfields, value, isUndo){
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'addField',
+    controlfield: controlfield,
+    fieldPosition: fieldPosition,
+    tag: tag,
+    ind1: ind1,
+    ind2: ind2,
+    subfields: subfields,
+    value: value,
+    undoRedo: (isUndo? "undo": "redo")
+  };
+
+//  createReq(data, function(json){
+//    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+//  });
+
+  // updating the local situation
+  if (gRecord[tag] == undefined){
+    gRecord[tag] = [];
+  }
+  var newField = [(controlfield ? [] : subfields), ind1, ind2,
+                  (controlfield ? value: ""), 0];
+  gRecord[tag].splice(fieldPosition, 0, newField);
+  redrawFields(tag);
+  reColorFields();
+
+  return ajaxData;
+}
+
+function urPerformRemoveSubfields(tag, fieldPosition, subfields, isUndo){
+  var toDelete = {};
+  toDelete[tag] = {};
+  toDelete[tag][fieldPosition] = []
+  var startingPosition = gRecord[tag][fieldPosition][0].length - subfields.length;
+  for (var i=startingPosition; i<gRecord[tag][fieldPosition][0].length ; i++){
+    toDelete[tag][fieldPosition].push(i);
+  }
+
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'deleteFields',
+    toDelete: toDelete,
+    undoRedo: (isUndo ? "undo": "redo")
+  };
+
+//  createReq(data, function(json){
+//    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+//  });
+  // modifying the client-side interface
+  gRecord[tag][fieldPosition][0].splice( gRecord[tag][fieldPosition][0].length - subfields.length, subfields.length);
+  redrawFields(tag);
+  reColorFields();
+
+  return ajaxData;
+}
+
+function updateUrView(){
+  /*Updating the information box in the bibEdit menu
+    (What are the current undo/redo handlers*/
+  $('#undoOperationVisualisationFieldContent')[0].innerHTML = (gUndoList.length == 0) ? "(empty)" :
+        renderURList(gUndoList, "undo");
+//        gUndoList[gUndoList.length - 1].operation_type;
+  $('#redoOperationVisualisationFieldContent')[0].innerHTML = (gRedoList.length == 0) ? "(empty)" :
+        renderURList(gRedoList, "redo", true);
+
+  // now attaching the events ... the function is uniform for all the elements present inside the document
+
+    var urEntries = $('.bibEditURDescEntry');
+    urEntries.each(function(index){
+        $(urEntries[index]).bind("mouseover", function (e){
+          $(urEntries[index]).find(".bibEditURDescEntryDetails").removeClass("bibEditHiddenElement");
+            urMarkSelectedUntil(urEntries[index]);
+        });
+        $(urEntries[index]).bind("mouseout", function(e){
+          $(urEntries[index]).find(".bibEditURDescEntryDetails").addClass("bibEditHiddenElement");
+        });
+        $(urEntries[index]).bind("click", function(e){
+            processURUntil(urEntries[index]);
+        });
+    });
+}
+
+function performMoveSubfield(tag, fieldPosition, subfieldIndex, direction, undoRedo){
+  var newSubfieldIndex = parseInt(subfieldIndex) + (direction == "up" ? -1 : 1);
+  var fieldID = tag + '_' + fieldPosition;
+  var field = gRecord[tag][fieldPosition];
+  var subfields = field[0];
+
+  // Create Ajax request.
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'moveSubfield',
+    tag: tag,
+    fieldPosition: fieldPosition,
+    subfieldIndex: subfieldIndex,
+    newSubfieldIndex: newSubfieldIndex,
+    undoRedo: (undoRedo == true) ?  "undo" : ((undoRedo == false) ?  "redo" : undoRedo)
+  };
+
+  // Continue local updating.
+  var subfieldToSwap = subfields[newSubfieldIndex];
+  subfields[newSubfieldIndex] = subfields[subfieldIndex];
+  subfields[subfieldIndex] = subfieldToSwap;
+  var rowGroup = $('#rowGroup_' + fieldID);
+  var coloredRowGroup = $(rowGroup).hasClass('bibEditFieldColored');
+  $(rowGroup).replaceWith(createField(tag, field, fieldPosition));
+  if (coloredRowGroup)
+    $('#rowGroup_' + fieldID).addClass('bibEditFieldColored');
+
+  // taking care of having only the new subfield position selected
+  setAllUnselected();
+  setSubfieldSelected(tag, fieldPosition, newSubfieldIndex);
+
+  return ajaxData;
+}
+
+function onRedo(evt){
+  if (gRedoList.length <= 0){
+    alert("No Redo operations to process");
+    return;
+  }
+  redoMany(1);
+}
+
+// functions related to the automatic field selection/unseletion
+
+function hideRedoPreview(){
+  $("#redoOperationVisualisationField").addClass("bibEditHiddenElement");
+  // clearing the selection !
+  $(".bibEditURDescEntrySelected").removeClass("bibEditURDescEntrySelected");
+}
+
+function urPerformAddPositionedFieldsSubfields(toAdd, isUndo){
+  return createFields(toAdd, isUndo);
+}
+
+function setSubfieldSelected(tag, fieldPos, subfieldPos){
+  // selecting a subfield
+  setSelectionStatusSubfield(tag, fieldPos, subfieldPos, true);
+}
+
+function getHumanReadableUREntry(handler){
+  // rendering a human readable description of an undo/redo operation
+  // handler : the u/r handler to render
+  var operationDescription;
+
+  switch (handler.operation_type){
+    case "move_field":
+      operationDescription = "move field";
+      break;
+    case "move_field":
+      operationDescription = "change field";
+      break;
+    case "move_subfield":
+      operationDescription = "move subfield";
+      break;
+    case "change_content":
+      operationDescription = "edit subfield";
+      break;
+    case "add_field":
+      operationDescription = "add field";
+      break;
+    case "add_subfields":
+      operationDescription = "add field";
+      break;
+    case "delete_fields":
+      operationDescription = "delete";
+      break;
+    case "bulk_operation":
+      operationDescription = handler.title;
+      break;
+    case "apply_hp_change":
+      operationDescription = "holding pen";
+      break;
+    case "visualize_hp_changeset":
+      operationDescription = "show changes";
+      break;
+    case "remove_all_hp_changes":
+      operationDescription = "remove changes";
+      break;
+    default:
+      operationDescription = "unknown operation";
+      break;
+  }
+
+  // now rendering parameters of the handler
+  var readableDescriptors = {
+    'tag' : 'tag',
+    'operation_type' : false,
+    'field_position' : 'field position',
+    'subfield_position' : 'subfield position',
+    'newVal' : 'new value',
+    'oldVal' : 'old value',
+    'fieldPos' : 'field position',
+    'toDelete' : false,
+    'handlers' : false
+  };
+
+  var handlerDetails = '<table>';
+
+  for (characteristic in handler){
+    if (readableDescriptors[characteristic] != false){
+      var characteristicString = characteristic;
+      if (readableDescriptors[characteristic] != undefined){
+          characteristicString = readableDescriptors[characteristic];
+      }
+      handlerDetails += '<tr><td class="bibEditURDescChar">'
+        + characteristicString + ':</td><td>' + handler[characteristic]  + '</td></tr>';
+    }
+  }
+
+  handlerDetails += '</table>';
+  // now generating the final result
+  return '<div class="bibEditURDescHeader">'
+    + operationDescription + '</div><div class="bibEditURDescEntryDetails bibEditHiddenElement">'
+    + handlerDetails + '</div>';
+}
+
+function urMarkSelectedUntil(entry){
+    // marking all the detailed entries, until a given one as selected
+    //  these entries have the same prefix but a smaller number
+    var identifierParts = $(entry).attr("id").split("_");
+    var position = parseInt(identifierParts[1]);
+    var potentialElements = $(".bibEditURDescEntry");
+    potentialElements.each(function(index){
+        var curIdentifierParts = $(potentialElements[index]).attr("id").split("_");
+        if ((curIdentifierParts[0] == identifierParts[0]) && (parseInt(curIdentifierParts[1]) <= position)){
+           $(potentialElements[index]).addClass("bibEditURDescEntrySelected");
+        }
+        else {
+           $(potentialElements[index]).removeClass("bibEditURDescEntrySelected");
+        }
+    });
+}
+
+function onUndo(evt){
+  if (gUndoList.length <= 0){
+    alert("No Undo operations to process");
+    return;
+  }
+  undoMany(1);
+}
+
+function preparePerformUndoOperations(operations){
+  /** Undos an operation passed as an argument */
+  var ajaxRequestsData = [];
+  for (operationInd in operations){
+    var operation = operations[operationInd];
+    var action = null;
+    var actionData = null;
+    var ajaxData = {};
+    var isMultiple = false; // is the current oepration handler a list
+      // of operations rather than a single op ?
+
+    switch (operation.operation_type){
+    case "no_operation":
+      ajaxData = prepareOtherUpdateRequest(true);
+      break;
+    case "change_content":
+      ajaxData = urPerformChangeSubfieldContent(operation.tag,
+                                     operation.fieldPos,
+                                     operation.subfieldPos,
+                                     operation.oldCode,
+                                     operation.oldVal,
+                                     true);
+      break;
+    case "add_field":
+      ajaxData = urPerformRemoveField(operation.tag,
+                            operation.fieldPosition,
+                                              true);
+      break;
+    case "add_subfields":
+      ajaxData = urPerformRemoveSubfields(operation.tag,
+                               operation.fieldPosition,
+                               operation.newSubfields,
+                               true);
+      break;
+
+    case "delete_fields":
+      ajaxData = urPerformAddPositionedFieldsSubfields(operation.toDelete, true);
+      break;
+
+    case "move_field":
+      var newDirection = "up";
+      var newPosition = operation.field_position + 1;
+      if (operation.direction == "up"){
+        newDirection = "down";
+        newPosition = operation.field_position - 1;
+      }
+
+      ajaxData = performMoveField(operation.tag, newPosition, newDirection, true);
+      break;
+    case "move_subfield":
+
+      var newDirection = "up";
+      var newPosition = operation.subfield_position + 1;
+      if (operation.direction == "up"){
+        newDirection = "down";
+        newPosition = operation.subfield_position - 1;
+      }
+      ajaxData = performMoveSubfield(operation.tag, operation.field_position,
+        newPosition, newDirection, true);
+      break;
+    case "bulk_operation":
+      ajaxData = performBulkOperation(operation.handlers, true);
+      break;
+    case "apply_hp_change":
+      ajaxData = preparePerformUndoOperations([operation.handler]);
+      ajaxData[0]["hpChange"] = {};
+      ajaxData[0]["hpChange"]["toEnable"] = [operation.changeNo]; // reactivate
+      isMultiple = true;
+      revertViewedChange(operation.changeNo);
+      break;
+    case "visualize_hp_changeset":
+      ajaxData = prepareUndoVisualizeChangeset(operation.changesetNumber,
+        operation.oldChangesList);
+      break;
+    case "change_field":
+      ajaxData = urPerformChangeField(operation.tag, operation.fieldPos,
+                                      operation.oldInd1, operation.oldInd2,
+                                      operation.oldSubfields,
+                                      operation.oldIsControlField,
+                                      operation.oldValue , true);
+      break;
+    case "remove_all_hp_changes":
+      ajaxData = performModifyHPChanges(operation.old_changes_list, true);
+      break;
+    default:
+      alert("Error: wrong operation to undo");
+    }
+
+    if (isMultiple){
+      // in this case we have to merge lists rather than include inside
+      for (elInd in ajaxData){
+        ajaxRequestsData.push(ajaxData[elInd]);
+      }
+    }
+    else{
+      ajaxRequestsData.push(ajaxData);
+    }
+  }
+
+  return ajaxRequestsData;
+}
+
+function performUndoOperations(operations){
+  var ajaxRequestsData = preparePerformUndoOperations(operations);
+  // now submitting the ajax request
+  var optArgs={
+//    undoRedo: "undo"
+  };
+
+  createBulkReq(ajaxRequestsData, function(json){
+    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  }, optArgs);
+}
+
+function prepareUndoHandlerMoveField(tag, fieldPosition, direction){
+  var result = {};
+  result.tag = tag;
+  result.operation_type = "move_field";
+  result.field_position = fieldPosition;
+  result.direction = direction;
+  return result;
+}
+
+function prepareUndoHandlerChangeField(tag, fieldPos,
+  oldInd1, oldInd2, oldSubfields, oldIsControlField, oldValue,
+  newInd1, newInd2, newSubfields, newIsControlField, newValue){
+  /** Function building a handler allowing to undo the operation of
+      changing the field structure.
+
+      Changing can happen only if tag and position remain the same,
+      Otherwise we deal with removal and adding of a field
+
+      Arguments:
+        tag - tag of a field
+        fieldPos - position of a field
+
+        oldInd1, oldInd2 - indices of the old field
+        oldSubfields - subfields present int the old structure
+        oldIsControlField - a boolean value indicating if the field
+                            is a control field
+        oldValue - a value before change in case of field being a control field.
+                   if the field is normal field, this should be equal ""
+
+        newInd1, newInd2, newSubfields, newIsControlField, newValue -
+           Similar parameters describing new structure of a field
+  */
+  var result = {};
+  result.operation_type = "change_field";
+  result.tag = tag;
+  result.fieldPos = fieldPos;
+  result.oldInd1 = oldInd1;
+  result.oldInd2 = oldInd2;
+  result.oldSubfields = oldSubfields;
+  result.oldIsControlField = oldIsControlField;
+  result.oldValue = oldValue;
+  result.newInd1 = newInd1;
+  result.newInd2 = newInd2;
+  result.newSubfields = newSubfields;
+  result.newIsControlField = newIsControlField;
+  result.newValue = newValue;
+
+  return result;
+}
+
+function showRedoPreview(){
+  $("#redoOperationVisualisationField").removeClass("bibEditHiddenElement");
+}
+
+function deleteFields(toDeleteStruct, undoRedo){
+  // a function deleting the specified fields on both client and server sides
+  //
+  // toDeleteFields : a structure describing fields and subfields to delete
+  //   this structure is the same as for the function createFields
+
+  var toDelete = {};
+
+  // first we convert the data into a different format, loosing the informations about
+  //   subfields of entirely removed fields
+
+  // first the entirely deleted fields
+  for (tag in toDeleteStruct.fields){
+    if (toDelete[tag] == undefined){
+      toDelete[tag] = {};
+    }
+    for (fieldPos in toDeleteStruct.fields[tag]){
+      toDelete[tag][fieldPos] = [];
+    }
+  }
+
+  for (tag in toDeleteStruct.subfields){
+    if (toDelete[tag] == undefined){
+      toDelete[tag] = {};
+    }
+    for (fieldPos in toDeleteStruct.subfields[tag]){
+      toDelete[tag][fieldPos] = [];
+      for (subfieldPos in toDeleteStruct.subfields[tag][fieldPos]){
+        toDelete[tag][fieldPos].push(subfieldPos);
+      }
+    }
+  }
+
+  var tagsToRedraw = [];
+
+  // reColorTable is true if any field are completely deleted.
+  var reColorTable = false;
+
+  // first we have to encode all the data in a single dictionary
+
+  // Create Ajax request.
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'deleteFields',
+    toDelete: toDelete,
+    undoRedo: (undoRedo == true) ? "undo" : ((undoRedo == false) ? "redo" : undoRedo)
+  };
+
+  // Continue local updating.
+  // Parse data structure and delete accordingly in record.
+  var fieldsToDelete, subfieldIndexesToDelete, field, subfields, subfieldIndex;
+  for (var tag in toDelete) {
+    tagsToRedraw.push(tag);
+    fieldsToDelete = toDelete[tag];
+    // The fields should be treated in the decreasing order (during the removal, indices may change)
+    traversingOrder = [];
+    for (fieldPosition in fieldsToDelete) {
+      traversingOrder.push(fieldPosition);
+    }
+    // normal sorting will do this in a lexycographical order ! (problems if > 10 subfields
+    // function provided, allows sorting in the reversed order
+    var traversingOrder = traversingOrder.sort(function(a, b){
+      return b - a;
+    });
+
+    for (var fieldInd in traversingOrder) {
+      var fieldPosition = traversingOrder[fieldInd];
+      var fieldID = tag + '_' + fieldPosition;
+      subfieldIndexesToDelete = fieldsToDelete[fieldPosition];
+      if (subfieldIndexesToDelete.length == 0)
+        deleteFieldFromTag(tag, fieldPosition);
+      else {
+        // normal sorting will do this in a lexycographical order ! (problems if > 10 subfields
+        subfieldIndexesToDelete.sort(function(a, b){
+          return a - b;
+        });
+        field = gRecord[tag][fieldPosition];
+        subfields = field[0];
+        for (var j = subfieldIndexesToDelete.length - 1; j >= 0; j--){
+          subfields.splice(subfieldIndexesToDelete[j], 1);
+        }
+      }
+    }
+  }
+
+  // If entire fields has been deleted, redraw all fields with the same tag
+  // and recolor the full table.
+  for (tag in tagsToRedraw)
+      redrawFields(tagsToRedraw[tag]);
+  reColorFields();
+
+  return ajaxData;
+}
+
+function getSelectedFields(){
+  /** Function returning a list of selected fields
+    Returns all the fields and subfields that are slected.
+    The structure of a result is following:
+    {
+      "fields" : { tag: {fieldsPosition: field_structure_similar_to_on_from_gRecord}}
+      "subfields" : {tag: { fieldPosition: { subfieldPosition: [code, value]}}}
+    }
+  */
+  var selectedFields = {};
+  var selectedSubfields = {};
+
+  var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked');
+  var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
+
+  if (!checkedFieldBoxes.length && !checkedSubfieldBoxes.length)
+    // No fields selected
+    return;
+
+  // Collect fields to be deleted in toDelete.
+  $(checkedFieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2];
+    if (!selectedFields[tag]) {
+      selectedFields[tag] = {};
+    }
+    selectedFields[tag][fieldPosition] = gRecord[tag][fieldPosition];
+  });
+
+  // Collect subfields to be deleted in toDelete.
+  $(checkedSubfieldBoxes).each(function(){
+    var tmpArray = this.id.split('_');
+    var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
+    if (selectedFields[tag] == undefined || selectedFields[tag][fieldPosition] == undefined){
+      // this field has not been selected entirely, we can proceed with processing subfield slection
+      if (!selectedSubfields[tag]) {
+        selectedSubfields[tag] = {};
+        selectedSubfields[tag][fieldPosition] = {};
+        selectedSubfields[tag][fieldPosition][subfieldIndex] =
+          gRecord[tag][fieldPosition][0][subfieldIndex];
+      }
+      else {
+        if (!selectedSubfields[tag][fieldPosition])
+          selectedSubfields[tag][fieldPosition] = {};
+        selectedSubfields[tag][fieldPosition][subfieldIndex] =
+          gRecord[tag][fieldPosition][0][subfieldIndex];
+      }
+    } else {
+      // this subfield is a part of entirely selected field... we have already included the information about subfields
+    }
+  });
+  var result={};
+  result.fields = selectedFields;
+  result.subfields = selectedSubfields;
+  return result;
+}
+
+function urPerformChangeSubfieldContent(tag, fieldPos, subfieldPos, code, val, isUndo){
+  // changing the server side model
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'modifyContent',
+    tag: tag,
+    fieldPosition: fieldPos,
+    subfieldIndex: subfieldPos,
+    subfieldCode: code,
+    value: val,
+    undoRedo: (isUndo ? "undo": "redo")
+  };
+//  createReq(data, function(json){
+//    updateStatus('report', gRESULT_CODES[json['resultCode']]);
+//  });
+
+  // changing the model
+  gRecord[tag][fieldPos][0][subfieldPos][0] = code;
+  gRecord[tag][fieldPos][0][subfieldPos][1] = val;
+
+  // changing the display .... what if being edited right now ?
+  redrawFields(tag);
+  reColorFields();
+
+  return ajaxData;
+}
+
+
+function performChangeField(tag, fieldPos, ind1, ind2, subFields, isControlfield,
+  value, undoRedo){
+  /** Function changing the field structure and generating an appropriate AJAX
+      request handler
+      Arguments:
+        tag, fieldPos, ind1, ind2, subFields, isControlfield, value - standard
+          values describing a field. tag, fieldPos are used to locate the field
+          instance (which has to exist) and its content is modified accordingly.
+        undoRedo - a undoRedo Handler or one of the words "undo"/"redo"
+   */
+  var ajaxData = {
+    recID: gRecID,
+    requestType: "modifyField",
+    controlfield : isControlfield,
+    fieldPosition : fieldPos,
+    ind1: ind1,
+    ind2: ind2,
+    tag: tag,
+    subFields: subFields,
+    undoRedo : undoRedo,
+    hpChanges: {}
+  }
+
+  // local changes
+  gRecord[tag][fieldPos][0] = subFields;
+  gRecord[tag][fieldPos][1] = ind1;
+  gRecord[tag][fieldPos][2] = ind2;
+  gRecord[tag][fieldPos][3] = value;
+  redrawFields(tag);
+  reColorFields();
+
+  return ajaxData;
+}
+
+function urPerformChangeField(tag, fieldPos, ind1, ind2, subFields,
+  isControlfield, value, isUndo){
+  /**
+   */
+  return performChangeField(tag, fieldPos, ind1, ind2, subFields,
+    isControlfield, value, (isUndo ? "undo" : "redo"));
+}
+
+function performMoveField(tag, oldFieldPosition, direction, undoRedo){
+  var newFieldPosition = oldFieldPosition + (direction == "up" ? -1 : 1);
+  // Create Ajax request.
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'moveField',
+    tag: tag,
+    fieldPosition: oldFieldPosition,
+    direction: direction,
+    undoRedo: (undoRedo == true) ? "undo" : ((undoRedo == false) ? "redo" : undoRedo)
+  };
+
+  //continue updating locally
+  var currentField = gRecord[tag][oldFieldPosition];
+  gRecord[tag][oldFieldPosition] = gRecord[tag][newFieldPosition];
+  gRecord[tag][newFieldPosition] = currentField;
+
+  $('tbody#rowGroup_'+tag+'_'+(newFieldPosition)).replaceWith(
+      createField(tag, gRecord[tag][newFieldPosition], newFieldPosition));
+  $('tbody#rowGroup_'+tag+'_'+oldFieldPosition).replaceWith(
+      createField(tag, gRecord[tag][oldFieldPosition], oldFieldPosition));
+
+  reColorFields();
+
+  // Now taking care of having the new field selected and the rest unselected
+  setAllUnselected();
+  setFieldSelected(tag, newFieldPosition);
+//$('#boxField_'+tag+'_'+(newFieldPosition)).click();
+  return ajaxData;
+}
+
+function setSelectionStatusField(tag, fieldPos, status){
+  var fieldCheckbox = $('#boxField_' + tag + '_' + fieldPos);
+  var subfieldCheckboxes = $('#rowGroup_' + tag + '_' + fieldPos + ' .bibEditBoxSubfield');
+
+  fieldCheckbox.each(function(ind){
+      if (fieldCheckbox[ind].checked != status)
+      {
+          fieldCheckbox[ind].click();
+      }
+  });
+}
+
+function urPerformDeletePositionedFieldsSubfields(toDelete, isUndo){
+  return deleteFields(toDelete, isUndo);
+}
+
+/** General Undo/Redo treatment lists */
+
+function setSelectionStatusSubfield(tag, fieldPos, subfieldPos, status){
+  var subfieldCheckbox = $('#boxSubfield_' + tag + '_' + fieldPos + '_' + subfieldPos);
+  if (subfieldCheckbox[0].checked != status)
+  {
+      subfieldCheckbox[0].click();
+  }
+}
+
+function createFields(toCreateFields, isUndo){
+  // a function adding fields.
+  // toCreateFields : a structure describing fields and subfields to create
+  //   this structure is the same as for the function deleteFields
+
+  // 1) Preparing the AJAX request
+  var tagsToRedraw = {}
+  var ajaxData = {
+    recID: gRecID,
+    requestType: 'addFieldsSubfieldsOnPositions',
+    fieldsToAdd: toCreateFields.fields,
+    subfieldsToAdd: toCreateFields.subfields
+  };
+
+  if (isUndo != undefined){
+    ajaxData['undoRedo'] = (isUndo ? "undo": "redo");
+  }
+
+  // 2) local processing -> creating the fields locally
+  //   - first creating the missing fields so all the subsequent field indices are correcr
+  for (tag in toCreateFields.fields){
+    if (gRecord[tag] == undefined){
+      gRecord[tag] = [];
+    }
+    tagsToRedraw[tag] = true;
+    var fieldIndices = [];
+    for (fieldPos in toCreateFields.fields[tag]){
+      fieldIndices.push(fieldPos);
+    }
+    fieldIndices.sort(); // we have to add fields in the increasing order
+      for (indInd in fieldIndices){
+        var fieldIndexToAdd = fieldIndices[indInd]; // index of the field index to add in the indices array
+        var newField = toCreateFields.fields[tag][fieldIndexToAdd];
+        gRecord[tag].splice(fieldIndexToAdd, 0, newField);
+      }
+  }
+
+  //   - now appending the remaining subfields
+
+  for (tag in toCreateFields.subfields){
+    tagsToRedraw[tag] = true;
+    for (fieldPos in toCreateFields.subfields[tag]){
+      var subfieldPositions = [];
+      for (subfieldPos in toCreateFields.subfields[tag][fieldPos]){
+        subfieldPositions.push(subfieldPos);
+      }
+      subfieldPositions.sort();
+      for (subfieldInd in subfieldPositions){
+        subfieldPosition = subfieldPositions[subfieldInd];
+        gRecord[tag][fieldPos][0].splice(
+          subfieldPosition, 0,
+          toCreateFields.subfields[tag][fieldPos][subfieldPosition]);
+      }
+    }
+  }
+
+  // - redrawint the affected tags
+
+  for (tag in tagsToRedraw){
+   redrawFields(tag);
+  }
+  reColorFields();
+
+  return ajaxData;
 }

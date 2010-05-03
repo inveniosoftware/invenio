@@ -26,7 +26,6 @@ var localClipboardContent = "";
 
 function initClipboardLibrary(){
   /** Initialisation of the clipboard - creating an appropriate entry*/
-
   // building the DOM elements
   var layer = document.createElement('div');
   var iframe = document.createElement('iframe');

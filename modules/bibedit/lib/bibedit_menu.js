@@ -55,6 +55,13 @@ function initMenu(){
     compressMenuSection);
   // Focus on record selection box.
   $('#txtSearchPattern').focus();
+  // Initialise the handlers for undo/redo buttons
+  $('#bibEditURUndoListLayer').bind("mouseover", showUndoPreview);
+  $('#bibEditURUndoListLayer').bind("mouseout", hideUndoPreview);
+  $('#bibEditURRedoListLayer').bind("mouseover", showRedoPreview);
+  $('#bibEditURRedoListLayer').bind("mouseout", hideRedoPreview);
+  $('#btnUndo').bind('click', onUndo);
+  $('#btnRedo').bind('click', onRedo);
   // Initialize menu positioning (poll for scrolling).
   setInterval(positionMenu, gCHECK_SCROLL_INTERVAL);
   $('#btnSwitchReadOnly').bind('click', onSwitchReadOnlyMode);
@@ -353,6 +360,7 @@ function updateStatus(statusType, reporttext){
     default:
       image = '';
       text = '';
+      break;
   }
   $('#cellIndicator').html(image);
   $('#cellStatus').html(text);

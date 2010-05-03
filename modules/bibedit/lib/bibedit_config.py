@@ -97,7 +97,8 @@ CFG_BIBEDIT_AJAX_RESULT_CODES_REV= {
 #      unlike a number of constants
     'editor_modifications_changed': 33,
     'disabled_hp_changeset' : 34,
-    'wrong_cache_file_format' : 111
+    'wrong_cache_file_format' : 111,
+    'added_positioned_subfields' : 35
 }
 
 CFG_BIBEDIT_AJAX_RESULT_CODES = {
@@ -129,6 +130,7 @@ CFG_BIBEDIT_AJAX_RESULT_CODES = {
     32: 'Field moved',
     33: 'Modifications updates',
     34: 'Disabled a changeset',
+    35: 'Added fields/subfields',
     100: 'Error: Not logged in',
     101: 'Error: Permission denied',
     102: 'Error: Non-existent record',

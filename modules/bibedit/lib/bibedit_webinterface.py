@@ -176,7 +176,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         rev2 = argd['rev2']
         ln = argd['ln']
 
-        body, errors, warnings = perform_request_compare(req, ln, recid, rev1, rev2)
+        body, errors, warnings = perform_request_compare(ln, recid, rev1, rev2)
 
         return page(title = _("Comparing two record revisions"),
                     body =  body,

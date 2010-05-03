@@ -173,22 +173,10 @@ function initHotkeys(){
   $(document).bind('keydown', {combi: 'ctrl+shift+e'}, onKeyCtrlShiftE);
   // Remove subfield from form.
   $(document).bind('keydown', {combi: 'ctrl+shift+d'}, onKeyCtrlShiftD);
+  // Binding the undo/redo operations
 
-/*
-  // copy paste events
-  $(document).bind('keydown', {combi: 'alt+c', disableInInput: true},
-                   function(event){
-                     onPerformCopy();
-                   });
-  $(document).bind('keydown', {combi: 'alt+v', disableInInput: true},
-                   function(event){
-                     onPerformPaste();
-                   });
-  $(document).bind('keydown', {combi: 'alt+x', disableInInput: true},
-    function(event){
-      alert("Cut operation");
-    });
-      */
+  $(document).bind('keydown', {combi: 'ctrl+shift+z'}, onUndo);
+  $(document).bind('keydown', {combi: 'ctrl+shift+y'}, onRedo);
 }
 
 function onKeyS(event){
