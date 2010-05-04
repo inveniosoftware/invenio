@@ -15,11 +15,10 @@ FCKConfig.ToolbarSets["WebComment"] = [
 ['PasteText','PasteWord'],
 ['Undo','Redo','-','RemoveFormat'],
 '/',
-['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript', '-','TextColor'],
+['Bold','Italic','Underline','StrikeThrough','-','Subscript','Superscript'],
 ['OrderedList','UnorderedList','-','Outdent','Indent','Blockquote'],
-['JustifyLeft','JustifyCenter','JustifyRight','JustifyFull'],
 ['Link','Unlink'],
-['Table','Rule','SpecialChar']
+['SpecialChar']
 ] ;
 
 

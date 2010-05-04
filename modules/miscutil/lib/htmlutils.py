@@ -35,7 +35,7 @@ except ImportError, e:
 cfg_html_buffer_allowed_tag_whitelist = ('a',
                                          'p', 'br', 'blockquote',
                                          'strong', 'b', 'u', 'i', 'em',
-                                         'ul', 'ol', 'li', 'sub', 'sup', 'div')
+                                         'ul', 'ol', 'li', 'sub', 'sup', 'div', 'strike')
 # List of allowed attributes. Be cautious, some attributes may be risky:
 # <p style="background: url(myxss_suite.js)">
 cfg_html_buffer_allowed_attribute_whitelist = ('href', 'name', 'class')

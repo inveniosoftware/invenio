@@ -1,13 +1,5 @@
-from invenio.htmlutils import HTMLWasher
-
-# List of allowed tags (tags that won't create any XSS risk)
-cfg_html_buffer_allowed_tag_whitelist = ('a',
-                                         'p', 'br', 'blockquote',
-                                         'strong', 'b', 'u', 'i', 'em',
-                                         'ul', 'ol', 'li', 'sub', 'sup', 'div')
-# List of allowed attributes. Be cautious, some attributes may be risky:
-# <p style="background: url(myxss_suite.js)">
-cfg_html_buffer_allowed_attribute_whitelist = ('href', 'name', 'class')
+from invenio.htmlutils import HTMLWasher, cfg_html_buffer_allowed_tag_whitelist,\
+                              cfg_html_buffer_allowed_attribute_whitelist
 
 class EmailWasher(HTMLWasher):
     """
