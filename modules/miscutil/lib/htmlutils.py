@@ -367,6 +367,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
                         'height': height,
                         'name': name,
                         'id': id and ('id="%s"' % id) or ''}
+        editor += textarea
         editor += '<input type="hidden" name="editor_type" value="textarea" />'
 
     return editor
