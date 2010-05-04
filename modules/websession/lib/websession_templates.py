@@ -1665,7 +1665,7 @@ class Template:
                                       group_description,
                                       join_policy,
                                       act_type="create",
-                                      grpID="",
+                                      grpID=None,
                                       warnings=[],
                                       ln=CFG_SITE_LANG):
         """
@@ -1677,7 +1677,7 @@ class Template:
         - 'group_description' *string* - description of the group
         - 'join_policy' *string* - join policy
         - 'act_type' *string* - info about action : create or edit(update)
-        - 'grpID' *string* - ID of the group(not null in case of group editing)
+        - 'grpID' *int* - ID of the group(not None in case of group editing)
         - 'warnings' *list* - Display warning if values are not correct
 
         """
@@ -1699,7 +1699,7 @@ class Template:
             label = _('Edit group %s') % cgi.escape(group_name)
             delete_text = """<input type="submit" value="%s" class="formbutton" name="%s" />"""
             delete_text %= (_("Delete group"),"delete")
-            if grpID != "":
+            if grpID is not None:
                 hidden_id = """<input type="hidden" name="grpID" value="%s" />"""
                 hidden_id %= grpID
 
@@ -1906,7 +1906,7 @@ class Template:
         Parameters:
 
         - 'ln' *string* - The language to display the interface in
-        - 'grpID *string* - ID of the group
+        - 'grpID *int* - ID of the group
         - 'group_name' *string* - Name of the group
         - 'members' *list* - List of the current members
         - 'pending_members' *list* - List of the waiting members
@@ -2181,6 +2181,7 @@ Best regards.
     def tmpl_confirm_delete(self, grpID, ln=CFG_SITE_LANG):
         """
         display a confirm message when deleting a group
+        @param grpID *int* - ID of the group
         @param ln: language
         @return: html output
         """
@@ -2220,6 +2221,7 @@ Best regards.
     def tmpl_confirm_leave(self, uid, grpID, ln=CFG_SITE_LANG):
         """
         display a confirm message
+        @param grpID *int* - ID of the group
         @param ln: language
         @return: html output
         """
@@ -2346,13 +2348,13 @@ Best regards.
         """
         return message content for joining group
         - 'group_name' *string* - name of the group
-        - 'grpID' *string* - ID of the group
+        - 'grpID' *int* - ID of the group
         - 'ln' *string* - The language to display the interface in
         """
         _ = gettext_set_language(ln)
         subject = _("Group %s: New membership request") % group_name
-        url = CFG_SITE_URL + "/yourgroups/members?grpID=%i&ln=%s"
-        url %= (int(grpID), ln)
+        url = CFG_SITE_URL + "/yourgroups/members?grpID=%s&ln=%s"
+        url %= (grpID, ln)
         # FIXME: which user?  We should show his nickname.
         body = (_("A user wants to join the group %s.") % group_name) + '<br />'
         body += _("Please %(x_url_open)saccept or reject%(x_url_close)s this user's request.") % {'x_url_open': '<a href="' + url + '">',

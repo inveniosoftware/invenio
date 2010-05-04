@@ -257,10 +257,11 @@ def perform_request_join_group(uid,
     warnings = []
     errors = []
     infos = []
+
     if "-1" in grpID:
-        grpID.remove("-1")
+        grpID = filter(lambda x: x != '-1', grpID)
     if len(grpID)==1 :
-        grpID = grpID[0]
+        grpID = int(grpID[0])
         # test if user is already member or pending
         status = db.get_user_status(uid, grpID)
         if status:
@@ -353,7 +354,7 @@ def perform_request_leave_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     warnings = []
     errors = []
     infos = []
-    if not grpID == "-1":
+    if not grpID == -1:
         if confirmed:
             db.leave_group(grpID, uid)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["LEAVE_GROUP"])
@@ -443,7 +444,7 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
             grpID,
             warnings=warnings,
             ln=ln)
-    elif (group_name_available and group_name_available[0][0]!= int(grpID)):
+    elif (group_name_available and group_name_available[0][0]!= grpID):
         warnings.append('WRN_WEBSESSION_GROUP_NAME_EXISTS')
         (body, errors, warnings) = perform_request_edit_group(uid,
             grpID,

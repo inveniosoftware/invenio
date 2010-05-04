@@ -1089,7 +1089,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         @return: the compose page Leave group
         """
 
-        argd = wash_urlargd(form, {'grpID':(str, ""),
+        argd = wash_urlargd(form, {'grpID':(int, 0),
                                    'group_name':(str, ""),
                                    'leave_button':(str, ""),
                                    'cancel':(str, ""),
@@ -1145,7 +1145,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
         @param ln: language
         @return: the main page displaying all the groups
         """
-        argd = wash_urlargd(form, {'grpID': (str, ""),
+        argd = wash_urlargd(form, {'grpID': (int, 0),
                                    'update': (str, ""),
                                    'cancel': (str, ""),
                                    'delete': (str, ""),

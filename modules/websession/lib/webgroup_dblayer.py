@@ -260,7 +260,6 @@ def get_group_infos(grpID):
     """Get group infos."""
     query = """SELECT id,name,description,join_policy,login_method FROM usergroup
                 WHERE id = %s"""
-    grpID = int(grpID)
     res = run_sql(query, (grpID, ))
     return res
 
@@ -293,7 +292,6 @@ def get_user_status(uid, grpID):
                 WHERE id_user = %s
                 AND id_usergroup=%s"""
     uid = int(uid)
-    grpID = int(grpID)
     res = run_sql(query, (uid, grpID))
     return res
 
@@ -324,7 +322,6 @@ def delete_member(grpID, member_id):
     query = """DELETE FROM user_usergroup
                WHERE id_usergroup = %s
                AND id_user = %s"""
-    grpID = int(grpID)
     member_id = int(member_id)
     res = run_sql(query, (grpID, member_id))
     return res
@@ -335,7 +332,6 @@ def delete_group_and_members(grpID):
     query = """DELETE FROM usergroup
                WHERE id = %s
                """
-    grpID = int(grpID)
     res = run_sql(query, (grpID,))
     query = """DELETE FROM user_usergroup
                WHERE id_usergroup = %s
@@ -360,7 +356,6 @@ def leave_group(grpID, uid):
     query = """DELETE FROM user_usergroup
                WHERE id_usergroup=%s
                AND id_user=%s"""
-    grpID = int(grpID)
     uid = int(uid)
     res = run_sql(query, (grpID, uid))
     return res
@@ -424,7 +419,6 @@ def get_all_users():
 def get_users_in_group(grpID):
     """@return: all uids of users belonging to group grpID"""
 
-    grpID = int(grpID)
     query = """SELECT id_user
                FROM user_usergroup
                WHERE id_usergroup = %s
