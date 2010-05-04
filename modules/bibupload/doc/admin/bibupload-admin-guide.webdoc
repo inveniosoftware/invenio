@@ -30,6 +30,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Inserting and updating at the same time</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Updating preformatted output formats</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Uploading fulltext files</a><br />
+<strong>4. <a href="#4">Batch Uploader</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.1">Web interface - Cataloguers</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.2">Web interface - Robots</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2. <a href="#4.3">Daemon mode</a><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -349,3 +353,56 @@ pointing to locally stored files are recreated on the basis of the
 full-text files connected to the record.  Thus, if you whish to update
 some 8564 tag pointing to a locally managed file, the only way to
 perform this is through the FFT tag, not by editing 8564 directly.<p>
+
+<a name="4"></a><h2>4. Batch Uploader</h2>
+<a name="4.1"></a><h3>4.1 Web interface - Cataloguers</h3>
+<p>The batchuploader web interface can be used either to upload metadata files or documents. Opposed to daemon mode, actions will be executed only once.</p>
+
+<p>The available upload history displays metadata and document uploads using the web interface, not daemon mode.</p>
+
+<a name="4.2"></a><h3>4.2 Web interface - Robots</h3>
+<p>If it is needed to use the batch upload function from within command line, this can be achieved with a curl call, like:
+<blockquote>
+<pre>
+$ curl -F 'file=@localfile.xml' -F 'mode=-i' http://cdsweb.cern.ch/batchuploader/robotupload -A invenio_webupload
+<pre>
+</blockquote></p>
+
+<p>This service provides (client, file) checking to assure the records are put into a collection the client has rights to.<br />
+To configure this permissions, check <tt>CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS</tt> variable in the configuration file.<br />
+The allowed user agents can also be defined using the <tt>CFG_BATCHUPLOADER_WEB_ROBOT_AGENT</tt> variable.</p>
+
+<a name="4.3"></a><h3>4.2 Daemon mode</h3>
+
+<p>The batchuploader daemon mode is intended to be a bibsched task for document or metadata upload. The parent directory where the daemon will look for folders <tt>metadata</tt> and <tt>documents</tt> must be specified in the invenio configuration file.</p>
+<p>An example of how directories should be arranged, considering that invenio was installed in folder <tt>/opt/cds-invenio</tt> would be:
+<pre>
+     /opt/cds-invenio/var/batchupload
+            /opt/cds-invenio/var/batchupload/documents
+                    /opt/cds-invenio/var/batchupload/documents/append
+                    /opt/cds-invenio/var/batchupload/documents/revise
+            /opt/cds-invenio/var/batchupload/metadata
+                    /opt/cds-invenio/var/batchupload/metadata/append
+                    /opt/cds-invenio/var/batchupload/metadata/correct
+                    /opt/cds-invenio/var/batchupload/metadata/insert
+                    /opt/cds-invenio/var/batchupload/metadata/replace
+</pre>
+</p>
+<p>When running the batchuploader daemon there are two possible execution modes:
+
+<pre>
+        -m,   --metadata    Look for metadata files in folders insert, append, correct and replace.
+                            All files are uploaded and then moved to the corresponding DONE folder.
+        -d,   --documents   Look for documents in folders append and revise. Uploaded files are then
+                            moved to DONE folders if possible.
+</pre>
+By default, metadata mode is used.</p>
+
+<p>An example of invocation would be:
+<blockquote>
+<pre>
+$ batchuploader --documents
+<pre>
+</blockquote></p>
+
+It is possible to program batch uploader to run periodically. Read the <a href='howto-run'>Howto-run guide</a> to see how.

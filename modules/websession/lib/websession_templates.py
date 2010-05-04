@@ -1112,6 +1112,8 @@ class Template:
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSearch"))
                 if action == "cfgwebsubmit":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
+                if action == "runbatchuploader":
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/batchuploader/metadata?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
             if tmp_out:
                 out += _("Here are some interesting web admin links for you:") + tmp_out
 

@@ -3351,6 +3351,20 @@ CREATE TABLE IF NOT EXISTS hstTASK (
   KEY priority (priority)
 ) TYPE=MyISAM;
 
+-- Batch Upload History
+
+CREATE TABLE IF NOT EXISTS hstBATCHUPLOAD (
+  id int(15) unsigned NOT NULL auto_increment,
+  user varchar(50) NOT NULL,
+  submitdate datetime NOT NULL,
+  filename varchar(255) NOT NULL,
+  execdate datetime NOT NULL,
+  id_schTASK int(15) unsigned NOT NULL,
+  batch_mode varchar(15) NOT NULL,
+  PRIMARY KEY (id),
+  KEY user (user)
+) TYPE=MyISAM;
+
 -- External collections
 
 CREATE TABLE IF NOT EXISTS collection_externalcollection (

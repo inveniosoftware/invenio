@@ -124,7 +124,7 @@ def convert_conf_option(option_name, option_value):
         option_value = option_value[1:-1]
 
     ## 3c) special cases: dicts
-    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT']:
+    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT', 'CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS']:
         option_value = option_value[1:-1]
 
     ## 3d) special cases: comma-separated lists
@@ -140,7 +140,9 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES',
                        'CFG_SITE_EMERGENCY_PHONE_NUMBERS',
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
-                       'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS']:
+                       'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
+                       'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',
+                       'CFG_BATCHUPLOADER_WEB_ROBOT_AGENT']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

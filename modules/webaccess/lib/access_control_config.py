@@ -191,7 +191,8 @@ DEF_ACTIONS = (
                ('viewholdings', 'view holdings', 'collection', 'yes'),
                ('viewstatistics', 'view statistics', 'collection', 'yes'),
                ('runbibcirculation', 'run BibCirculation', '', 'no'),
-               ('moderatecomments', 'moderate comments', 'collection', 'no')
+               ('moderatecomments', 'moderate comments', 'collection', 'no'),
+               ('runbatchuploader', 'run batchuploader', 'collection', 'yes')
               )
 
 # Default authorizations
@@ -222,7 +223,8 @@ DEF_DEMO_AUTHS = (
              ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'SBI', 'categ': '*'}),
              ('submit_DEMOJRN_*', 'submit', {'doctype': 'DEMOJRN', 'act': 'MBI', 'categ': '*'}),
              ('submit_DEMOJRN_*', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'no'}),
-             ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'})
+             ('atlantiseditor', 'cfgwebjournal', {'name': 'AtlantisTimes', 'with_editor_rights': 'yes'}),
+             ('referee_DEMOBOO_*', 'runbatchuploader', {'collection': 'Books'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)

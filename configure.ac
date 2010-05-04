@@ -20,7 +20,7 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.90.20100413, cds.support@cern.ch)
+AC_INIT(cds-invenio, 0.99.90.20100504, cds.support@cern.ch)
 AM_INIT_AUTOMAKE([tar-ustar])
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
@@ -647,6 +647,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibupload/Makefile \
 	  modules/bibupload/bin/Makefile \
 	  modules/bibupload/bin/bibupload \
+	  modules/bibupload/bin/batchuploader \
 	  modules/bibupload/doc/Makefile \
 	  modules/bibupload/doc/admin/Makefile \
 	  modules/bibupload/doc/hacking/Makefile \

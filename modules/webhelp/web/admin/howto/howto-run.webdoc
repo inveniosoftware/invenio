@@ -85,8 +85,18 @@ $ dbdump -s20h -L '22:00-06:00' -o/opt2/mysql-backups -n10
 </blockquote>
 </p>
 
-Please consult the sections below for more details about these
-housekeeping tasks.
+<p>Please consult the sections below for more details about these
+housekeeping tasks.</p>
+
+<p>There is also the possibility to setup the batch uploader daemon
+to run periodically, looking for new documents or metadata files
+to upload:
+<blockquote>
+<pre>
+$ batchuploader --documents -s20m
+$ batchuploader --metadata -s20m
+</pre>
+</blockquote>
 </p>
 
 <h2>Monitoring periodical daemon tasks</h2>
