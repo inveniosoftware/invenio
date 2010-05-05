@@ -37,12 +37,12 @@ class XSSEscapingTest(unittest.TestCase):
 
     def test_forbidden_formatting_tags(self):
         """htmlutils - washing of tags altering formatting of a page (e.g. </html>)"""
-        test_str = """</html></body></div></pre>"""
+        test_str = """</html></body></pre>"""
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '')
         self.assertEqual(self.washer.wash(html_buffer=test_str,
                                           render_unallowed_tags=True),
-                         '&lt;/html&gt;&lt;/body&gt;&lt;/div&gt;&lt;/pre&gt;')
+                         '&lt;/html&gt;&lt;/body&gt;&lt;/pre&gt;')
 
     def test_forbidden_script_tags(self):
         """htmlutils - washing of tags defining scripts (e.g. <script>)"""
