@@ -84,6 +84,7 @@ class ExternalAuthSSO(ExternalAuth):
     def __init__(self, enforce_external_nicknames=False):
         """Initialize stuff here"""
         ExternalAuth.__init__(self, enforce_external_nicknames)
+        self.egroup_cache = None
 
 
     def auth_user(self, username, password, req=None):
@@ -121,19 +122,7 @@ class ExternalAuthSSO(ExternalAuth):
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """
-        if req:
-            req.add_common_vars()
-            if req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE):
-                groups = req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE].split(CFG_EXTERNAL_AUTH_SSO_GROUPS_SEPARATOR)
-                # Filtering out uncomfortable groups
-                groups = [group for group in groups if group not in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS]
-                for regexp in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE:
-                    for group in groups:
-                        if regexp.match(group):
-                            groups.remove(group)
-                return dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
-                                or x + ' (Group)'), groups))
-        return {}
+        return self._fetch_egroups(req)
 
     def fetch_user_nickname(self, username, password=None, req=None):
         """Given a username and a password, returns the right nickname belonging
@@ -148,6 +137,25 @@ class ExternalAuthSSO(ExternalAuth):
         else:
             return None
 
+    def _fetch_egroups(self, req=None):
+        if self.egroup_cache is not None:
+            return self.egroup_cache
+        elif req:
+            req.add_common_vars()
+            if req.subprocess_env.has_key(CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE):
+                groups = req.subprocess_env[CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE].split(CFG_EXTERNAL_AUTH_SSO_GROUPS_SEPARATOR)
+                # Filtering out uncomfortable groups
+                groups = [group for group in groups if group not in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS]
+                for regexp in CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE:
+                    for group in groups:
+                        if regexp.match(group):
+                            groups.remove(group)
+                self.egroup_cache = dict(map(lambda x: (x, '@' in x and x + ' (Mailing list)' \
+                                or x + ' (Group)'), groups))
+                return self.egroup_cache
+        return {}
+
+
     def _fetch_particular_preferences(self, req=None):
         """This hidden method is there to be overwritten in order to get some
         particular value from non standard variables.
@@ -157,10 +165,8 @@ class ExternalAuthSSO(ExternalAuth):
             req.add_common_vars()
             if req.subprocess_env.has_key('HTTP_SHIB_AUTHENTICATION_METHOD'):
                 ret['authmethod'] = req.subprocess_env['HTTP_SHIB_AUTHENTICATION_METHOD']
-            ret['external'] = '1'
-            if req.subprocess_env.has_key('HTTP_ADFS_PERSONID'):
-                if not int(req.subprocess_env['HTTP_ADFS_PERSONID']) == -1:
-                    ret['external'] = '0'
+            egroups = self._fetch_egroups(req)
+            ret['external'] = 'CERN External Users' in egroups and '1' or '0'
             return ret
         return {}
 
