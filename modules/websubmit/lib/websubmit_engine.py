@@ -1616,6 +1616,12 @@ def print_function_calls (req, doctype, action, step, form, start_time, access, 
                 else:
                     currfunction['error'] = 1
                 functions.append(currfunction)
+            except InvenioWebSubmitFunctionStop, err:
+                ## The submission asked to stop execution. This is
+                ## ok. Do not alert admin, and raise exception further
+                log_function(curdir, "***Stop*** from %s: %s" \
+                             % (function_name, str(err)), start_time)
+                raise
             except:
                 register_exception(req=req, alert_admin=True, prefix="Error in executing function %s with globals %s" % (pprint.pformat(currfunction), pprint.pformat(the_globals)))
                 raise
