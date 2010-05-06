@@ -843,6 +843,10 @@ function displayAlert(msgType, args){
       msg = 'Submit your changes to this record?\n\n';
       popUpType = 'confirm';
       break;
+    case 'confirmRevert':
+      msg = 'Are you sure, you want to revert to this record revision?\n\n';
+      popUpType = 'confirm';
+      break;
     case 'confirmCancel':
       msg = 'You have unsubmitted changes to this record.\n\n' +
   'Discard your changes?';
@@ -963,6 +967,66 @@ function select(id, options, selectedOption){
   }
   return "<select id=\"" + id + "\">" + optionsHTML + "</select>";
 
+}
+
+function getRevisionDate(revisionTs){
+  var result = {};
+  result.year = revisionTs.substr(0,4);
+  result.month = revisionTs.substr(4,2);
+  result.day = revisionTs.substr(6,2);
+  result.hour = revisionTs.substr(8,2);
+  result.minute = revisionTs.substr(10,2);
+  result.second = revisionTs.substr(12,2);
+  return result;
+}
+
+function formatDateTime(dt){
+  return dt.year + '.' + dt.month + '.' + dt.day +
+    ' ' + dt.hour + ':' + dt.minute + ':' + dt.second;
+}
+
+function displayRevisionHistoryEntry(recId, revisionId){
+  var entryClass = (revisionId == gRecRev) ?
+    "bibEditRevHistorySelectedEntry" : "bibEditRevHistoryEntry";
+  var timeString = formatDateTime(getRevisionDate(revisionId));
+
+/*  var additionalAttrs = {};
+  if (revisionId == gRecRev){
+    additionalAttrs.disabled = "disabled"
+  }
+  additionalAttrs.title = "Merge with the newest revision";
+  */
+
+  compareButtonId = 'btnCompareRevision_' + revisionId;
+
+  mergeImgId = 'imgMergeWithNewest_' + revisionId;
+  compareImgId = 'imgCompareWithCurrent_' + revisionId;
+  revertImgId = 'imgRevert_' + revisionId;
+
+  var mergeUrl = '/record/merge#recid1=' + recId + '&recid2=' + recId + '.' + revisionId;
+  var mergeWithNewestControl = '<a href="' + mergeUrl +
+    '" title="Merge with the newest revision" class="bibEditRevHistoryLink">' +
+    img('/img/merge-small.png', mergeImgId, 'bibEditRevHistoryLinkImg') + '</a>';
+
+  var compareWithCurrentControl =
+    '<a href="#" title="Compare with currently viewed version" class="bibEditRevHistoryLink">' +
+    img('/img/compare.png', compareImgId, 'bibEditRevHistoryLinkImg') + '</a>';
+
+  var revertToRevisionControl = '<a href="#" title="Revert to this revision" class="bibEditRevHistoryLink">' +
+    img('/img/replace.png', revertImgId, 'bibEditRevHistoryLinkImg') +
+    '</a>';
+
+  var resultHTML = '<div class="' + entryClass + '">\n' +
+    '<div class="bibEditRevHistoryEntryContent" id="bibEditRevHistoryEntry_' +
+    revisionId+ '">' + timeString +
+    '</div><div class="bibEditRevHistoryEntryControls"><div style="display:table-row;">' +
+    mergeWithNewestControl + compareWithCurrentControl + revertToRevisionControl + "</div></div></div>\n";
+
+  return {
+    "HTML" : resultHTML,
+    "compareImgId" : compareImgId,
+    "revertImgId" : revertImgId
+  };
 }
 
 function escapeHTML(value){

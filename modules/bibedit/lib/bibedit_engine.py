@@ -32,27 +32,39 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_JS_STATUS_ERROR_TIME, CFG_BIBEDIT_JS_STATUS_INFO_TIME, \
     CFG_BIBEDIT_JS_TICKET_REFRESH_DELAY, CFG_BIBEDIT_MAX_SEARCH_RESULTS, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV
+
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
-    get_related_hp_changesets, get_hp_update_xml, delete_hp_change
+    get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
+    get_record_last_modification_date, get_record_revision_author, \
+    get_marcxml_of_record_revision, delete_related_holdingpen_changes
+
+
 from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_bibrecord, \
     get_cache_file_contents, get_cache_mtime, get_record_templates, \
     get_record_template, latest_record_revision, record_locked_by_other_user, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
-    update_cache_file_contents, get_field_templates
+    update_cache_file_contents, get_field_templates, get_marcxml_of_revision, \
+    revision_to_timestamp, timestamp_to_revision, \
+    get_record_revision_timestamps, record_revision_exists
+
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
-    record_delete_subfield_from, record_modify_controlfield, \
+    record_delete_subfield_from, \
     record_modify_subfield, record_move_subfield, record_extract_oai_id,  \
-    record_get_field_values, create_field, record_replace_field, record_move_fields
+    create_field, record_replace_field, record_move_fields, \
+    record_get_subfields, record_modify_controlfield
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
-    CFG_SITE_URL, CFG_SITE_LANG
+    CFG_SITE_URL
 from invenio.search_engine import record_exists, search_pattern, get_record
 from invenio.webuser import session_param_get, session_param_set
 from invenio.bibcatalog import bibcatalog_system
 from invenio.bibformat import format_record
-from invenio.bibmerge_differ import match_subfields, record_diff
+from invenio.webpage import page
 
+import re
+import difflib
+import zlib
 import sys
 if sys.hexversion < 0x2060000:
     try:
@@ -68,6 +80,8 @@ else:
 
 import invenio.template
 bibedit_templates = invenio.template.load('bibedit')
+
+re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 def get_empty_fields_templates():
     """
@@ -125,7 +139,7 @@ def get_available_fields_templates():
                     })
     return result
 
-def perform_request_init():
+def perform_request_init(uid, ln, req, lastupdated):
     """Handle the initial request by adding menu and JavaScript to the page."""
     errors   = []
     warnings = []
@@ -151,8 +165,8 @@ def perform_request_init():
                     warnings    = [],
                     uid         = uid,
                     language    = ln,
-                    navtrail    = navtrail,
-                    lastupdated = __lastupdated__,
+                    navtrail    = "",
+                    lastupdated = lastupdated,
                     req         = req)
 
 
@@ -214,6 +228,49 @@ def perform_request_init():
 
     return body, errors, warnings
 
+def get_xml_comparison(header1, header2, xml1, xml2):
+    """
+    Return diffs of two MARCXML records.
+    """
+    return "".join(difflib.unified_diff(xml1.splitlines(1),
+        xml2.splitlines(1), header1, header2))
+
+def get_marcxml_of_revision_id(recid, revid):
+    """
+    Return MARCXML string with corresponding to revision REVID
+    (=RECID.REVDATE) of a record.  Return empty string if revision
+    does not exist.
+    """
+    res = ""
+    job_date = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(revid).groups()
+    tmp_res = get_marcxml_of_record_revision(recid, job_date)
+    if tmp_res:
+        for row in tmp_res:
+            res += zlib.decompress(row[0]) + "\n"
+    return res
+
+def perform_request_compare(req, ln, recid, rev1, rev2):
+    """Handle a request for comparing two records"""
+    body = ""
+    errors = []
+    warnings = []
+
+    if (not record_revision_exists(recid, rev1)) or (not record_revision_exists(recid, rev2)):
+        body = "The requested record revision does not exist !"
+    else:
+        xml1 = get_marcxml_of_revision_id(recid, rev1)
+        xml2 = get_marcxml_of_revision_id(recid, rev2)
+        fullrevid1 = "%i.%s" %(recid, rev1)
+        fullrevid2 = "%i.%s" %(recid, rev2)
+        comparison = bibedit_templates.clean_value(
+            get_xml_comparison(fullrevid1, fullrevid2, xml1, xml2),
+            'text').replace('\n', '<br />\n           ')
+        job_date1 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev1).groups()
+        job_date2 = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(rev2).groups()
+        body += bibedit_templates.history_comparebox(ln, job_date1,
+                                                 job_date2, comparison)
+    return body, errors, warnings
+
 def perform_request_newticket(recid, uid):
     """create a new ticket with this record's number
     @param recid: record id
@@ -244,7 +301,7 @@ def perform_request_ajax(req, recid, uid, data):
         # User related requests.
         response.update(perform_request_user(req, request_type, recid, data))
     elif request_type in ('getRecord', 'submit', 'cancel', 'newRecord',
-        'deleteRecord', 'deleteRecordCache', 'prepareRecordMerge'):
+        'deleteRecord', 'deleteRecordCache', 'prepareRecordMerge', 'revert'):
         # 'Major' record related requests.
         response.update(perform_request_record(req, request_type, recid, uid,
                                                data))
@@ -411,7 +468,6 @@ def perform_request_record(req, request_type, recid, uid, data):
             record_add_field(record, '001', controlfield_value=str(new_recid))
             create_cache_file(new_recid, uid, record, True)
             response['resultCode'], response['newRecID'] = 8, new_recid
-
     elif request_type == 'getRecord':
         # Fetch the record. Possible error situations:
         # - Non-existing record
@@ -423,16 +479,22 @@ def perform_request_record(req, request_type, recid, uid, data):
         # cacheOutdated will be set to True in the response.
         record_status = record_exists(recid)
         existing_cache = cache_exists(recid, uid)
+        read_only_mode = False
+        if data.has_key("inReadOnlyMode"):
+            read_only_mode = data['inReadOnlyMode']
+
         if record_status == 0:
             response['resultCode'] = 102
         elif record_status == -1:
             response['resultCode'] = 103
-        elif not existing_cache and record_locked_by_other_user(recid, uid):
-            response['resultCode'] = 104
-        elif existing_cache and cache_expired(recid, uid) and \
+        elif not read_only_mode and not existing_cache and \
                 record_locked_by_other_user(recid, uid):
             response['resultCode'] = 104
-        elif record_locked_by_queue(recid):
+        elif not read_only_mode and existing_cache and \
+                cache_expired(recid, uid) and \
+                record_locked_by_other_user(recid, uid):
+            response['resultCode'] = 104
+        elif not read_only_mode and record_locked_by_queue(recid):
             response['resultCode'] = 105
         else:
             if data.get('deleteRecordCache'):
@@ -440,7 +502,23 @@ def perform_request_record(req, request_type, recid, uid, data):
                 existing_cache = False
                 pending_changes = []
                 disabled_hp_changes = {}
-            if not existing_cache:
+            if read_only_mode:
+                if data.has_key('recordRevision'):
+                    record_revision_ts = data['recordRevision']
+                    record_xml = get_marcxml_of_revision(recid, record_revision_ts)
+                    record = create_record(record_xml)[0]
+                    record_revision = timestamp_to_revision(record_revision_ts)
+                    pending_changes = []
+                    disabled_hp_changes = {}
+                else:
+                    # a normal cacheless retrieval of a record
+                    record = get_bibrecord(recid)
+                    record_revision = get_record_last_modification_date(recid)
+                    pending_changes = []
+                    disabled_hp_changes = {}
+                cache_dirty = False
+                mtime = 0
+            elif not existing_cache:
                 record_revision, record = create_cache_file(recid, uid)
                 mtime = get_cache_mtime(recid, uid)
                 pending_changes = []
@@ -465,9 +543,19 @@ def perform_request_record(req, request_type, recid, uid, data):
                 response['resultCode'] = 9
             else:
                 response['resultCode'] = 3
-            response['cacheDirty'], response['record'], \
-                response['cacheMTime'], response['pendingHpChanges'] , response['disabledHpChanges'] = \
-                cache_dirty, record, mtime, pending_changes, disabled_hp_changes
+
+            revision_author = get_record_revision_author(recid, record_revision)
+            last_revision_ts = revision_to_timestamp(get_record_last_modification_date(recid))
+            revisions_history = get_record_revision_timestamps(recid)
+
+            response['cacheDirty'], response['record'], response['cacheMTime'],\
+                response['recordRevision'], response['revisionAuthor'], \
+                response['lastRevision'], response['revisionsHistory'], \
+                response['inReadOnlyMode'], response['pendingHpChanges'], \
+                response['disabledHpChanges'] = cache_dirty, record, mtime, \
+                revision_to_timestamp(record_revision), revision_author, \
+                last_revision_ts, revisions_history, read_only_mode, pending_changes, \
+                disabled_hp_changes
             # Set tag format from user's session settings.
             try:
                 tagformat_settings = session_param_get(req, 'bibedit_tagformat')
@@ -510,6 +598,14 @@ def perform_request_record(req, request_type, recid, uid, data):
                     response['resultCode'] = 4
             except:
                 response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV['wrong_cache_file_format']
+    elif request_type == 'revert':
+        revId = data['revId']
+        job_date = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(revId).groups()
+        revision_xml = get_marcxml_of_revision(recid, job_date)
+        save_xml_record(recid, uid, revision_xml)
+        if (cache_exists(recid, uid)):
+            delete_cache_file(recid, uid)
+        response['resultCode'] = 4
 
     elif request_type == 'cancel':
         # Cancel editing by deleting the cache file. Possible error situations:
@@ -549,7 +645,7 @@ def perform_request_record(req, request_type, recid, uid, data):
             record_add_field(record, '980', ' ', ' ', '', [('c', 'DELETED')])
             update_cache_file_contents(recid, uid, record_revision, record, pending_changes, desactivated_hp_changes)
             save_xml_record(recid, uid)
-            delete_related_holdingpen_changes(rec_id, True) # we don't need any changes related to a deleted record
+            delete_related_holdingpen_changes(recid) # we don't need any changes related to a deleted record
             response['resultCode'] = 10
 
     elif request_type == 'deleteRecordCache':
@@ -661,11 +757,8 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, ch
                     int(data['subfieldIndex']),
                     field_position_local=field_position_local)
             else:
-                fields = record_get_subfields(record, data['tag'], \
-                    field_position_local = data['fieldPosition'])
-
-                #record_modify_controlfield(record, ,
-                #    field_position_local=field_position_local)
+                record_modify_controlfield(record, data['tag'], data["value"],
+                  field_position_local=field_position_local)
             response['resultCode'] = 24
 
         elif request_type == 'moveSubfield':
@@ -753,3 +846,4 @@ def perform_request_bibcatalog(request_type, recid, uid):
         response['resultCode'] = 31
 
     return response
+

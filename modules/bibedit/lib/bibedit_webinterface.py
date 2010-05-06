@@ -37,7 +37,7 @@ else:
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_ajax, perform_request_init, \
-    perform_request_newticket
+    perform_request_newticket, perform_request_compare
 from invenio.bibedit_utils import json_unicode_to_utf8
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.messages import gettext_set_language
@@ -54,7 +54,7 @@ navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
 class WebInterfaceEditPages(WebInterfaceDirectory):
     """Defines the set of /edit pages."""
 
-    _exports = ['', 'new_ticket']
+    _exports = ['', 'new_ticket', 'compare_revisions']
 
     def __init__(self, recid=None):
         """Initialize."""
@@ -121,8 +121,8 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         elif self.recid:
             # Handle RESTful calls from logged in users by redirecting to
             # generic URL.
-            redirect_to_url(req, '%s/record/edit/#state=edit&recid=%s' % (
-                    CFG_SITE_URL, self.recid))
+            redirect_to_url(req, '%s/record/edit/#state=edit&recid=%s&recrev=%s' % (
+                    CFG_SITE_URL, self.recid, "sampleValue"))
 
         elif recid is not None:
             json_response.update({'recID': recid})
@@ -136,7 +136,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
         # Handle request.
         if not ajax_request:
             # Show BibEdit start page.
-            body, errors, warnings = perform_request_init()
+            body, errors, warnings = perform_request_init(uid, ln, req, __lastupdated__)
             title = 'Record Editor'
             return page(title       = title,
                         body        = body,
@@ -152,6 +152,41 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             json_response.update(perform_request_ajax(req, recid, uid,
                                                       json_data))
             return json.dumps(json_response)
+
+    def compare_revisions(self, req, form):
+        """Handle the compare revisions request"""
+        argd = wash_urlargd(form, { \
+                'ln': (str, CFG_SITE_LANG), \
+                'rev1' : (str, ''), \
+                'rev2' : (str, ''), \
+                'recid': (int, 0)})
+
+        ln = argd['ln']
+        uid = getUid(req)
+        _ = gettext_set_language(ln)
+
+        # Checking if currently logged user has permission to perform this request
+
+        auth_code, auth_message = acc_authorize_action(req, 'runbibedit')
+        if auth_code != 0:
+            return page_not_authorized(req=req, referer="/edit",
+                                       text=auth_message, navtrail=navtrail)
+        recid = argd['recid']
+        rev1 = argd['rev1']
+        rev2 = argd['rev2']
+        ln = argd['ln']
+
+        body, errors, warnings = perform_request_compare(req, ln, recid, rev1, rev2)
+
+        return page(title = _("Comparing two record revisions"),
+                    body =  body,
+                    errors = errors,
+                    warnings = warnings,
+                    uid = uid,
+                    language = ln,
+                    navtrail    = navtrail,
+                    lastupdated = __lastupdated__,
+                    req         = req)
 
     def new_ticket(self, req, form):
         """handle a edit/new_ticket request"""

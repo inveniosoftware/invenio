@@ -201,7 +201,13 @@ def perform_request_update_record(requestType, uid, data):
         }
     recid1 = data["recID1"]
     recid2 = data["recID2"]
-    cache_dirty, rec_revision, record1 = get_cache_file_contents(recid1, uid) #TODO: check mtime, existence
+    record_content = get_cache_file_contents(recid1, uid)
+    cache_dirty = record_content[0]
+    rec_revision = record_content[1]
+    record1 = record_content[2]
+    pending_changes = record_content[3]
+    disabled_hp_changes = record_content[4]
+
     mode = data['record2Mode']
     record2 = _get_record_slave(recid2, result, mode, uid)
     if result['resultCode'] != 0: #if record not accessible return error information
@@ -262,8 +268,7 @@ def perform_request_update_record(requestType, uid, data):
 
     result['resultHtml'] = bibmerge_templates.BM_html_field_group(record1, record2, data['fieldTag'])
     result['resultText'] = resultText
-
-    update_cache_file_contents(recid1, uid, rec_revision, record1)
+    update_cache_file_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes )
     return result
 
 def perform_small_request_update_record(requestType, uid, data):
@@ -277,7 +282,13 @@ def perform_small_request_update_record(requestType, uid, data):
         }
     recid1 = data["recID1"]
     recid2 = data["recID2"]
-    cache_dirty, rec_revision, record1 = get_cache_file_contents(recid1, uid) #TODO: check mtime, existence
+    cache_content = get_cache_file_contents(recid1, uid) #TODO: check mtime, existence
+    cache_dirty = cache_content[0]
+    rec_revision = cache_content[1] 
+    record1 = cache_content[2]
+    pending_changes = cache_content[3]
+    disabled_hp_changes = cache_content[4]
+
     mode = data['record2Mode']
     record2 = _get_record_slave(recid2, result, mode, uid)
     if result['resultCode'] != 0: #if record not accessible return error information
@@ -302,7 +313,7 @@ def perform_small_request_update_record(requestType, uid, data):
         result['resultHtml'] = bibmerge_templates.BM_html_subfield_row_diffed(record1, record2, fnum, findex1, findex2, sfindex1, sfindex2)
         result['resultText'] = 'Subfields diffed'
 
-    update_cache_file_contents(recid1, uid, rec_revision, record1)
+    update_cache_file_contents(recid1, uid, rec_revision, record1, pending_changes, disabled_hp_changes)
     return result
 
 def _get_record(recid, uid, result, fresh_record=False):
@@ -333,7 +344,7 @@ def _get_record(recid, uid, result, fresh_record=False):
             mtime = get_cache_mtime(recid, uid)
             cache_dirty = False
         else:
-            cache_dirty, record_revision, record = \
+            cache_dirty, record_revision, record, _, _ = \
                  get_cache_file_contents(recid, uid)
             touch_cache_file(recid, uid)
             mtime = get_cache_mtime(recid, uid)

@@ -9,7 +9,7 @@
  *
  * CDS Invenio is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See1 the GNU
+ * MERCHANTABILITY or  FITNESS FOR A PARTICULAR PURPOSE.  See1 the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -97,6 +97,9 @@
 // Record data
 var gRecID = null;
 var gRecIDLoading = null;
+var gRecRev = null;
+var gRecRevAuthor = null;
+var gRecLatestRev = null;
 var gRecord = null;
 // Search results (record IDs)
 var gResultSet = null;
@@ -143,6 +146,11 @@ var gHoldingPenLoadedChanges = {};
 
 var gDisabledHpEntries = {};
 
+// is the read-only mode enabled ?
+var gReadOnlyMode = false;
+
+// revisions history
+var gRecRevisionHistory = []
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -176,6 +184,21 @@ $(function(){
   gHashCheckTimerID = setInterval(initStateFromHash, gHASH_CHECK_INTERVAL);
   initHotkeys();
 });
+
+
+function failInReadOnly(){
+  /** Function checking if the current BibEdit mode is read-only. In sucha a case, a warning
+    dialog is displayed and true returned.
+    If bibEdit is in read/write mode, false is returned
+   */
+  if (gReadOnlyMode == true){
+    alert("It is impossible to perform this operation in the Read/Only mode. Please switch to Read-write mode before trying again");
+    return true;
+  }
+  else{
+    return false;
+  }
+}
 
 function initJeditable(){
   /* Initialize Jeditable with the Autogrow extension. Used for in-place
@@ -352,6 +375,20 @@ function onAjaxSuccess(json, onSuccess){
   }
 }
 
+function resetBibeditState(){
+  /** A function clearing the state of the bibEdit (all the panels content)
+  */
+  gHoldingPenLoadedChanges = {};
+  gHoldingPenChanges = [];
+  gDisabledHpEntries = {};
+  gReadOnlyMode = false;
+  gRecRevisionHistory = [];
+
+  updateRevisionsHistory();
+  updateInterfaceAccordingToMode();
+  updateRevisionsHistory();
+  holdingPenPanelRemoveEntries();
+}
 
 /*
  * **************************** 4. Hash management *****************************
@@ -374,6 +411,8 @@ function initStateFromHash(){
   gPrevState = gState;
   var tmpState = gHashParsed.state;
   var tmpRecID = gHashParsed.recid;
+  var tmpRecRev = gHashParsed.recrev;
+  var tmpReadOnlyMode = gHashParsed.romode;
 
   // Find out which internal state the new hash leaves us with
   if (tmpState && tmpRecID){
@@ -399,56 +438,65 @@ function initStateFromHash(){
     // Invalid hash, fail...
     return;
 
-  if (gState != gPrevState || (gState == 'edit' &&
-             parseInt(tmpRecID) != gRecID)){
+  if (gState != gPrevState
+    || (gState == 'edit' && parseInt(tmpRecID) != gRecID) || // different record number
+    (tmpRecRev != undefined && tmpRecRev != gRecRev) // different revision
+    || (tmpRecRev == undefined && gRecRev != gRecLatestRev) // latest revision requested but another open
+    || (tmpReadOnlyMode != gReadOnlyMode)){ // switched between read-only and read-write modes
+
     // We have an actual and legal change of state. Clean up and update the
     // page.
     updateStatus('updating');
-    if (gRecID && !gRecordDirty)
+    if (gRecID && !gRecordDirty && !tmpReadOnlyMode)
       // If the record is unchanged, delete the cache.
       createReq({recID: gRecID, requestType: 'deleteRecordCache'});
     switch (gState){
       case 'startPage':
-  cleanUp(true, '', 'recID', true, true);
-  updateStatus('ready');
-  break;
+        cleanUp(true, '', 'recID', true, true);
+        updateStatus('ready');
+        break;
       case 'edit':
-  var recID = parseInt(tmpRecID);
-  if (isNaN(recID)){
-    // Invalid record ID.
-    cleanUp(true, tmpRecID, 'recID', true);
-    $('.headline').text('Record Editor: Record #' + tmpRecID);
-    displayMessage(102);
-    updateStatus('error', gRESULT_CODES[102]);
-  }
-  else{
-    cleanUp(true, recID, 'recID');
-    getRecord(recID);
-  }
-  break;
-      case 'newRecord':
-  cleanUp(true, '', null, null, true);
-        $('.headline').text('Record Editor: Create new record');
-  displayNewRecordScreen();
-        bindNewRecordHandlers();
-  updateStatus('ready');
-  break;
-      case 'submit':
-  cleanUp(true, '', null, true);
-  $('.headline').text('Record Editor: Record #' + tmpRecID);
-  displayMessage(4);
-  updateStatus('ready');
-  break;
-      case 'cancel':
-  cleanUp(true, '', null, true, true);
-  updateStatus('ready');
-  break;
-      case 'deleteRecord':
-  cleanUp(true, '', null, true);
-  $('.headline').text('Record Editor: Record #' + tmpRecID);
-  displayMessage(6);
-  updateStatus('ready');
-  break;
+        var recID = parseInt(tmpRecID);
+        if (isNaN(recID)){
+          // Invalid record ID.
+          cleanUp(true, tmpRecID, 'recID', true);
+          $('.headline').text('Record Editor: Record #' + tmpRecID);
+          displayMessage(102);
+          updateStatus('error', gRESULT_CODES[102]);
+        }
+        else{
+          cleanUp(true, recID, 'recID');
+          gReadOnlyMode = tmpReadOnlyMode;
+            if (tmpRecRev != undefined && tmpRecRev != 0){
+              getRecord(recID, tmpRecRev);
+            } else {
+              getRecord(recID);
+            }
+        }
+      break;
+    case 'newRecord':
+      cleanUp(true, '', null, null, true);
+      $('.headline').text('Record Editor: Create new record');
+      displayNewRecordScreen();
+      bindNewRecordHandlers();
+      updateStatus('ready');
+      break;
+    case 'submit':
+      cleanUp(true, '', null, true);
+      $('.headline').text('Record Editor: Record #' + tmpRecID);
+      displayMessage(4);
+      updateStatus('ready');
+      break;
+    case 'cancel':
+      cleanUp(true, '', null, true, true);
+      updateStatus('ready');
+      break;
+    case 'deleteRecord':
+      cleanUp(true, '', null, true);
+      $('.headline').text('Record Editor: Record #' + tmpRecID);
+      displayMessage(6);
+      updateStatus('ready');
+        break;
     }
   }
   else
@@ -953,7 +1001,8 @@ function onNewRecordClick(event){
   }
   else
     // If the record is unchanged, erase the cache.
-    createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+    if (gReadOnlyMode == false)
+      createReq({recID: gRecID, requestType: 'deleteRecordCache'});
   changeAndSerializeHash({state: 'newRecord'});
   cleanUp(true, '');
   $('.headline').text('Record Editor: Create new record');
@@ -963,21 +1012,46 @@ function onNewRecordClick(event){
   event.preventDefault();
 }
 
-function getRecord(recID, onSuccess){
-  /*
-   * Get a record.
+function getRecord(recID, recRev, onSuccess){
+  /* A function retrieving the bibliographic record, using an AJAX request.
+   *
+   * recID : the identifier of a record to be retrieved from the server
+   * recRev : the revision of the record to be retrieved (0 or undefined
+   *          means retrieving the newest version )
+   * onSuccess : The callback to be executed upon retrieval. The default
+   *             callback loads the retrieved record into the bibEdit user
+   *             interface
    */
+
   // Temporary store the record ID by attaching it to the onGetRecordSuccess
   // function.
   if (onSuccess == undefined)
     onSuccess = onGetRecordSuccess;
-  changeAndSerializeHash({state: 'edit', recid: recID});
-  gRecIDLoading = recID;
-  createReq({recID: recID, requestType: 'getRecord', deleteRecordCache:
-    getRecord.deleteRecordCache, clonedRecord: getRecord.clonedRecord},
-    onSuccess);
-  onHoldingPenPanelRecordIdChanged(recID) // reloading the Holding Pen toolbar
+  if (recRev != undefined && recRev != 0){
+    changeAndSerializeHash({state: 'edit', recid: recID, recrev: recRev});
+  }
+  else{
+    changeAndSerializeHash({state: 'edit', recid: recID});
+  }
 
+  gRecIDLoading = recID;
+
+  reqData = {recID: recID,
+             requestType: 'getRecord',
+             deleteRecordCache:
+             getRecord.deleteRecordCache,
+             clonedRecord: getRecord.clonedRecord,
+             inReadOnlyMode: gReadOnlyMode};
+
+  if (recRev != undefined && recRev != 0){
+    reqData.recordRevision = recRev;
+    reqData.inReadOnlyMode = true;
+  }
+
+  resetBibeditState();
+  createReq(reqData, onSuccess);
+
+  onHoldingPenPanelRecordIdChanged(recID) // reloading the Holding Pen toolbar
   getRecord.deleteRecordCache = false;
   getRecord.clonedRecord = false;
 }
@@ -996,16 +1070,22 @@ function onGetRecordSuccess(json){
   // Store record data.
   gRecID = json['recID'];
   gRecIDLoading = null;
+  gRecRev = json['recordRevision'];
+  gRecRevAuthor = json['revisionAuthor'];
+
+  var revDt = formatDateTime(getRevisionDate(gRecRev));
+  var recordRevInfo = "record revision: " + revDt;
+  var revAuthorString = gRecRevAuthor;
+
   $('.headline').html(
     'Record Editor: Record #<span id="spnRecID">' + gRecID + '</span>' +
-    '<a href="' + gHISTORY_URL + '?recid=' + gRecID +
-    '" style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
-    '(view history)' +
-    '</a>').css('white-space', 'nowrap');
+    '<div style="margin-left: 5px; font-size: 0.5em; color: #36c;">' +
+    recordRevInfo + ' ' + revAuthorString + '</div>').css('white-space', 'nowrap');
   gRecord = json['record'];
   gTagFormat = json['tagFormat'];
   gRecordDirty = json['cacheDirty'];
   gCacheMTime = json['cacheMTime'];
+
   if (json['cacheOutdated']){
     // User had an existing outdated cache.
     displayCacheOutdatedScreen('getRecord');
@@ -1031,6 +1111,13 @@ function onGetRecordSuccess(json){
   displayRecord();
   // Activate menu record controls.
   activateRecordMenu();
+  // the current mode should is indicated by the result from the server
+  gReadOnlyMode = (json['inReadOnlyMode'] != undefined) ? json['inReadOnlyMode'] : false;
+  gRecLatestRev = (json['latestRevision'] != undefined) ? json['latestRevision'] : null;
+  gRecRevisionHistory = (json['revisionsHistory'] != undefined) ? json['revisionsHistory'] : null;
+
+  updateInterfaceAccordingToMode();
+
   if (gRecordDirty){
     $('#btnSubmit').removeAttr('disabled');
     $('#btnSubmit').css('background-color', 'lightgreen');
@@ -1045,7 +1132,9 @@ function onGetRecordSuccess(json){
     $('#spnRecID').effect('highlight', {color: gCLONED_RECORD_COLOR},
       gCLONED_RECORD_COLOR_FADE_DURATION);
   updateStatus('report', gRESULT_CODES[json['resultCode']]);
+  updateRevisionsHistory();
   createReq({recID: gRecID, requestType: 'getTickets'}, onGetTicketsSuccess);
+
 }
 
 function onGetTemplateSuccess(json) {
@@ -1060,19 +1149,21 @@ function onSubmitClick(){
   if (displayAlert('confirmSubmit')){
     createReq({recID: gRecID, requestType: 'submit',
          force: onSubmitClick.force}, function(json){
-     // Submission was successful.
-     changeAndSerializeHash({state: 'submit', recid: gRecID});
-     var resCode = json['resultCode'];
-     cleanUp(!gNavigatingRecordSet, '', null, true);
-     updateStatus('report', gRESULT_CODES[resCode]);
-     displayMessage(resCode);
-         });
+       // Submission was successful.
+      changeAndSerializeHash({state: 'submit', recid: gRecID});
+      var resCode = json['resultCode'];
+      cleanUp(!gNavigatingRecordSet, '', null, true);
+      updateStatus('report', gRESULT_CODES[resCode]);
+      displayMessage(resCode);
+      resetBibeditState()
+    });
     onSubmitClick.force = false;
   }
   else
     updateStatus('ready');
   holdingPenPanelRemoveEntries(); // clearing the holding pen entries list
 }
+
 // Enable this flag to force the next submission even if cache is outdated.
 onSubmitClick.force = false;
 
@@ -1133,6 +1224,8 @@ function onDeleteRecordClick(){
       changeAndSerializeHash({state: 'deleteRecord', recid: gRecID});
       cleanUp(!gNavigatingRecordSet, '', null, true);
       var resCode = json['resultCode'];
+      // now cleaning the interface - removing holding pen entries and record history
+      resetBibeditState();
       updateStatus('report', gRESULT_CODES[resCode]);
       displayMessage(resCode);
     });
@@ -1173,8 +1266,8 @@ function bindNewRecordHandlers(){
       updateStatus('updating');
       var templateNo = this.id.split('_')[1];
       createReq({requestType: 'newRecord', newType: 'template',
-  templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
-    getRecord(json['newRecID'], onGetTemplateSuccess);
+	templateFilename: gRECORD_TEMPLATES[templateNo][0]}, function(json){
+	  getRecord(json['newRecID'], 0, onGetTemplateSuccess); // recRev = 0 -> current revision
       });
       event.preventDefault();
     });
@@ -1213,6 +1306,9 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gRecordDirty = false;
   gCacheMTime = null;
   gSelectionMode = false;
+  gReadOnlyMode = false;
+  gHoldingPenLoadedChanges = null;
+  gHoldingPenChanges = null;
 }
 
 function positionBibEditPanel(minimalPosition){
@@ -1314,9 +1410,11 @@ function onFieldBoxClick(box){
   var rowGroup = $('#rowGroup_' + box.id.slice(box.id.indexOf('_')+1));
   if (box.checked){
     $(rowGroup).find('td[id^=content]').andSelf().addClass('bibEditSelected');
-    $('#btnDeleteSelected').removeAttr('disabled');
+    if (gReadOnlyMode == false){
+      $('#btnDeleteSelected').removeAttr('disabled');
+    }
   }
-    else{
+  else{
     $(rowGroup).find('td[id^=content]').andSelf().removeClass(
       'bibEditSelected');
     if (!$('.bibEditSelected').length)
@@ -1574,6 +1672,8 @@ function onAddFieldClick(){
   /*
    * Handle 'Add field' button.
    */
+  if (failInReadOnly())
+    return;
   createAddFieldInterface();
 }
 
@@ -2075,6 +2175,9 @@ function onContentChange(value, th){
   /*
    * Handle 'Save' button in editable content fields.
    */
+  if (failInReadOnly()){
+    return;
+  }
   var tmpArray = th.id.split('_');
   var tag = tmpArray[1], fieldPosition = tmpArray[2], subfieldIndex = tmpArray[3];
   var field = gRecord[tag][fieldPosition];
@@ -2108,6 +2211,9 @@ function onMoveSubfieldClick(type, tag, fieldPosition, subfieldIndex){
   /*
    * Handle subfield moving arrows.
    */
+  if (failInReadOnly()){
+    return;
+  }
   updateStatus('updating');
   var fieldID = tag + '_' + fieldPosition;
   var field = gRecord[tag][fieldPosition];
@@ -2157,6 +2263,9 @@ function onDeleteClick(event){
    * Handle 'Delete selected' button or delete hotkeys.
    */
   // Find all checked checkboxes.
+  if (failInReadOnly()){
+    return;
+  }
   var checkedFieldBoxes = $('input[class="bibEditBoxField"]:checked');
   var checkedSubfieldBoxes = $('input[class="bibEditBoxSubfield"]:checked');
   if (!checkedFieldBoxes.length && !checkedSubfieldBoxes.length)
@@ -2262,6 +2371,9 @@ function onDeleteClick(event){
 }
 
 function onMoveFieldUp(tag, fieldPosition) {
+  if (failInReadOnly()){
+    return;
+  }
   fieldPosition = parseInt(fieldPosition);
   var thisField = gRecord[tag][fieldPosition];
   if (fieldPosition > 0) {
@@ -2291,6 +2403,9 @@ function onMoveFieldUp(tag, fieldPosition) {
 }
 
 function onMoveFieldDown(tag, fieldPosition) {
+  if (failInReadOnly()){
+    return;
+  }
   fieldPosition = parseInt(fieldPosition);
   var thisField = gRecord[tag][fieldPosition];
   if (fieldPosition < gRecord[tag].length-1) {
@@ -2319,4 +2434,135 @@ function onMoveFieldDown(tag, fieldPosition) {
   }
 }
 
+// read-only mode related function
 
+function updateInterfaceAccordingToMode(){
+  /* updates the user interface (in particular the activity of menu buttons)
+     accordingly to the surrent operation mode of BibEdit.
+   */
+  // updating the switch button caption
+  if (gReadOnlyMode){
+    deactivateRecordMenu();
+    $('#btnSwitchReadOnly').attr("innerHTML", "R/W");
+  } else {
+    activateRecordMenu();
+    $('#btnSwitchReadOnly').attr("innerHTML", "Read-only");
+  }
+}
+
+function switchToReadOnlyMode(){
+  // Moving to the read only mode with BibEdit
+
+  if (gRecordDirty == true){
+    alert("Please submit the record or cancel your changes before going to the read-only mode ");
+    return false;
+  }
+  gReadOnlyMode = true;
+  createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+  gCacheMTime = 0;
+
+  updateInterfaceAccordingToMode();
+}
+
+function canSwitchToReadWriteMode(){
+  /*A function determining if at current moment, it is possible to switch to the read/write mode*/
+  // If the revision is not the newest -> return false
+  return true;
+}
+
+function switchToReadWriteMode(){
+  // swtching to a normal editing mode of BibEdit
+  if (!canSwitchToReadWriteMode()){
+    alert("It is not possible to switch to the editing mode at the moment");
+    return false;
+  }
+
+  gReadOnlyMode = false;
+  // reading the record as if it was just opened
+  getRecord(gRecID);
+  updateInterfaceAccordingToMode();
+}
+
+
+function onSwitchReadOnlyMode(){
+  // an event habdler being executed when user clicks on the switch to read only mode button
+  if (gReadOnlyMode){
+    switchToReadWriteMode();
+  } else {
+    switchToReadOnlyMode();
+  }
+}
+
+
+// functions handling the revisions history
+
+function getCompareClickedHandler(revisionId){
+  return function(e){
+    //document.location = "/record/merge/#recid1=" + gRecID + "&recid2=" + gRecID + "." + revisionId;
+    comparisonUrl = "/record/edit/compare_revisions?recid=" +
+      gRecID + "&rev1=" + gRecRev + "&rev2=" + revisionId;
+    newWindow = window.open(comparisonUrl);
+    newWindow.focus();
+    return false;
+  };
+}
+
+function onRevertClick(revisionId){
+  /*
+   * Handle 'Revert' button (submit record).
+   */
+  updateStatus('updating');
+  if (displayAlert('confirmRevert')){
+    createReq({recID: gRecID, revId: revisionId, requestType: 'revert',
+         force: onSubmitClick.force}, function(json){
+    // Submission was successful.
+      changeAndSerializeHash({state: 'submit', recid: gRecID});
+      var resCode = json['resultCode'];
+      cleanUp(!gNavigatingRecordSet, '', null, true);
+      updateStatus('report', gRESULT_CODES[resCode]);
+      displayMessage(resCode);
+      // clear the list of record revisions
+      resetBibeditState()
+    });
+    onSubmitClick.force = false;
+  }
+  else
+    updateStatus('ready');
+  holdingPenPanelRemoveEntries(); // clearing the holding pen entries list
+}
+
+function getRevertClickedHandler(revisionId){
+  return function(e){
+      onRevertClick(revisionId);
+      return false;
+  };
+}
+
+function updateRevisionsHistory(){
+  if (gRecRevisionHistory == null){
+      return;
+  }
+
+  var result = "";
+  var results = [];
+  for (revInd in  gRecRevisionHistory){
+    tmpResult = displayRevisionHistoryEntry(gRecID, gRecRevisionHistory[revInd]);
+    tmpResult["revisionID"] = gRecRevisionHistory[revInd];
+    results.push(tmpResult);
+    result += tmpResult["HTML"];
+  }
+
+  $("#bibEditRevisionsHistory").attr("innerHTML", result);
+  $(".bibEditRevHistoryEntryContent").bind("click", function(evt){
+    var revision = $(this)[0].id.split("_")[1];
+    updateStatus('updating');
+    getRecord(gRecID, revision);
+  });
+
+  /*Attaching the actions on user interface*/
+  for (resultInd in results){
+    result = results[resultInd];
+    $('#' + result['compareImgId']).bind("click", getCompareClickedHandler(result["revisionID"]));
+    $('#' + result['revertImgId']).bind("click", getRevertClickedHandler(result["revisionID"]));
+  }
+}

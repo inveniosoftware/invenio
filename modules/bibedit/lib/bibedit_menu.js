@@ -57,6 +57,7 @@ function initMenu(){
   $('#txtSearchPattern').focus();
   // Initialize menu positioning (poll for scrolling).
   setInterval(positionMenu, gCHECK_SCROLL_INTERVAL);
+  $('#btnSwitchReadOnly').bind('click', onSwitchReadOnlyMode);
 }
 
 function positionMenu(){
@@ -169,22 +170,26 @@ function onSearchClick(event){
   var searchType = $('#sctSearchType').val();
   if (searchType == 'recID'){
     // Record ID - do some basic validation.
-    var recID = parseInt(searchPattern);
-    if (gRecID == recID){
+    var searchPatternParts = searchPattern.split(".");
+    var recID = parseInt(searchPatternParts[0]);
+    var recRev = searchPatternParts[1];
+
+    if (gRecID == recID && recRev == gRecRev){
       // We are already editing this record.
       updateStatus('ready');
       return;
     }
-    if (gRecordDirty){
+    if (gRecordDirty && gReadOnlyMode == false){
       // Warn of unsubmitted changes.
       if (!displayAlert('confirmLeavingChangedRecord')){
 	updateStatus('ready');
 	return;
       }
     }
-    else if (gRecID)
+    else if (gRecID && gReadOnlyMode == false)
       // If the record is unchanged, delete the cache.
       createReq({recID: gRecID, requestType: 'deleteRecordCache'});
+
     gNavigatingRecordSet = false;
     if (isNaN(recID)){
       // Invalid record ID.
@@ -196,8 +201,14 @@ function onSearchClick(event){
     }
     else{
       // Get the record.
-      $('#txtSearchPattern').val(recID);
-      getRecord(recID);
+      if (recRev == undefined){
+        $('#txtSearchPattern').val(recID);
+        getRecord(recID);
+      } else {
+        recRev = recRev.replace(/\s+$/, '');
+        $('#txtSearchPattern').val(recID + "." + recRev);
+        getRecord(recID, recRev);
+      }
     }
   }
   else if (searchPattern.replace(/\s*/g, '')){

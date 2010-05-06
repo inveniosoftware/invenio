@@ -337,6 +337,9 @@ function holdingPenPanelApplyChangeSet(changesNum){
    * applying a changeset consists of adding the proposal
    * buttons in appropriate fields and removing the Holding Pen entry
    */
+  if (failInReadOnly()){
+    return;
+  }
   disableChangesetControls(changesNum);
   if (gHoldingPenLoadedChanges[changesNum] == undefined){
     createReq({
@@ -493,6 +496,9 @@ function prepareSubfieldChangedRequest(changeNo){
 
 function applySubfieldChanged(changeNo){
   /** Function applying the change of changing the subfield content  */
+  if (failInReadOnly()){
+    return;
+  }
   if (gCurrentStatus == "ready") {
     fieldId = gHoldingPenChanges[changeNo]["tag"];
     fieldPos = gHoldingPenChanges[changeNo]["field_position"];
@@ -507,6 +513,9 @@ function applySubfieldChanged(changeNo){
 
 function applySubfieldRemoved(changeNo){
   /** Function applying the change of removing the subfield */
+  if (failInReadOnly()){
+    return;
+  }
   if (gCurrentStatus == "ready") {
     data = prepareSubfieldRemovedRequest(changeNo);
     createReq(data, function(json){
@@ -519,6 +528,9 @@ function applySubfieldRemoved(changeNo){
 
 function applyFieldRemoved(changeNo){
   /** Function applying the change of removing the field */
+  if (failInReadOnly()){
+    return;
+  }
   if (gCurrentStatus == "ready") {
     fieldId = gHoldingPenChanges[changeNo]["tag"];
     indicators = gHoldingPenChanges[changeNo]["indicators"];
@@ -551,6 +563,9 @@ function applyFieldRemoved(changeNo){
 
 function applySubfieldAdded(changeNo){
   /** Function applying the change of adding the subfield */
+  if (failInReadOnly()){
+    return;
+  }
   if (gCurrentStatus == "ready") {
     data = prepareSubfieldAddedRequest(changeNo);
     createReq(data, function(json){
@@ -563,6 +578,9 @@ function applySubfieldAdded(changeNo){
 
 function applyFieldChanged(changeNumber){
   /** Function applying the change of changing the field content */
+  if (failInReadOnly()){
+    return;
+  }
   if (gCurrentStatus == "ready") {
     data = prepareFieldChangedRequest(changeNumber);
     createReq(data, function(json){
@@ -575,6 +593,9 @@ function applyFieldChanged(changeNumber){
 
 function applyFieldAdded(changeNo){
   /** Function applying the change of adding the field */
+  if (failInReadOnly()){
+    return;
+  }
   if (gCurrentStatus == "ready") {
     var data = prepareFieldAddedRequest(changeNo);
 

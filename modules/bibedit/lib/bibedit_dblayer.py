@@ -37,8 +37,8 @@ def get_bibupload_task_opts(task_ids):
     """Return a list with all set options for list of task IDs TASK_IDS."""
     res = []
     for task_id in task_ids:
-        res.append(run_sql("SELECT arguments FROM schTASK WHERE id=%s" %
-                           task_id))
+        res.append(run_sql("SELECT arguments FROM schTASK WHERE id=%s", 
+                           (task_id, )))
     return res
 
 def get_marcxml_of_record_revision(recid, job_date):
@@ -54,12 +54,11 @@ def get_record_revisions(recid):
     return run_sql("""SELECT id_bibrec,
                              DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
                         FROM hstRECORD WHERE id_bibrec=%s
-                    ORDER BY job_date DESC""" % recid)
+                    ORDER BY job_date DESC""", (recid, ))
 
 def get_record_last_modification_date(recid):
     """Return last modification date, as timetuple, of record RECID."""
-    return run_sql('SELECT modification_date FROM bibrec WHERE id=%s' %
-                   recid)[0][0].timetuple()
+    return run_sql("SELECT max(job_date) FROM hstRECORD WHERE id_bibrec=%s", (recid, ))[0][0].timetuple();
 
 def reserve_record_id():
     """Reserve a new record ID in the bibrec table."""
@@ -77,4 +76,24 @@ def get_hp_update_xml(changeId):
     return run_sql("""SELECT  changeset_xml, id_bibrec from bibHOLDINGPEN where changeset_id=%s""", (str(changeId),))[0]
 
 def delete_hp_change(changeId):
-    return run_sql("""delete from bibHOLDINGPEN where changeset_id=%i""" % (changeId, ))
+    return run_sql("""DELETE from bibHOLDINGPEN where changeset_id=%d""", (changeId, ))
+
+def delete_related_holdingpen_changes(recId):
+    return run_sql("""DELETE FROM bibHOLDINGPEN where id_bibrec=%s""", (recId, ))
+
+def get_record_revision_author(recid, td):
+    """
+    Returns the author of a specific record revision
+    """
+    # obtaining job date from the recvision identifier
+    try:
+        datestring = "%04i-%02i-%02i %02i:%02i:%02i" % (td.tm_year, td.tm_mon, td.tm_mday, \
+                                                            td.tm_hour, td.tm_min, td.tm_sec)
+        query_string = """SELECT job_person from hstRECORD where id_bibrec=%(id_bibrec)s and job_date='%(job_date)s'""" % {
+            "id_bibrec" : recid,
+            "job_date" : datestring
+            }
+        result = run_sql(query_string)
+        return result[0]
+    except:
+        return ""

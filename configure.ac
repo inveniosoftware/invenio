@@ -558,7 +558,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibedit/etc/Makefile \
 	  modules/bibedit/lib/Makefile \
 	  modules/bibedit/web/Makefile \
-	  modules/bibedit/web/admin/Makefile \
 	  modules/bibexport/Makefile \
 	  modules/bibexport/bin/Makefile \
 	  modules/bibexport/bin/bibexport \

@@ -35,6 +35,7 @@ import os
 import re
 import time
 import zlib
+from datetime import datetime
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
@@ -264,6 +265,34 @@ def json_unicode_to_utf8(data):
 
 
 # History/revisions
+
+def revision_to_timestamp(td):
+    """
+    Converts the revision date to the timestamp
+    """
+    return "%04i%02i%02i%02i%02i%02i" % (td.tm_year, td.tm_mon, td.tm_mday, \
+                                         td.tm_hour, td.tm_min, td.tm_sec)
+
+def timestamp_to_revision(timestamp):
+    """
+    Converts the timestamp to a correct revision date
+    """
+    year = int(timestamp[0:4])
+    month = int(timestamp[4:6])
+    day = int(timestamp[6:8])
+    hour = int(timestamp[8:10])
+    minute = int(timestamp[10:12])
+    second = int(timestamp[12:14])
+    return datetime(year, month, day, hour, minute, second).timetuple()
+
+def get_record_revision_timestamps(recid):
+    """return list of timestamps describing teh revisions of a given record"""
+    rev_ids = get_record_revision_ids(recid)
+    result = []
+    for rev_id in rev_ids:
+        result.append(rev_id.split(".")[1])
+    return result
+
 def get_record_revision_ids(recid):
     """Return list of all record revision IDs.
     Return revision IDs in chronologically decreasing order (latest first).
@@ -275,23 +304,36 @@ def get_record_revision_ids(recid):
         res.append('%s.%s' % (row[0], row[1]))
     return res
 
+def get_marcxml_of_revision(recid, revid):
+    """Return MARCXML string of revision.
+    Return empty string if revision does not exist. REVID should be a string.
+    """
+    res = ''
+    tmp_res = get_marcxml_of_record_revision(recid, revid)
+    if tmp_res:
+        for row in tmp_res:
+            res += zlib.decompress(row[0]) + '\n'
+    return res;
+
 def get_marcxml_of_revision_id(revid):
     """Return MARCXML string of revision.
     Return empty string if revision does not exist. REVID should be a string.
 
     """
-    res = ''
     recid, job_date = split_revid(revid, 'datetext')
-    tmp_res = get_marcxml_of_record_revision(recid, job_date)
-    if tmp_res:
-        for row in tmp_res:
-            res += zlib.decompress(row[0]) + '\n'
-    return res
+    return get_marcxml_of_revision(recid, job_date);
 
 def revision_format_valid_p(revid):
     """Test validity of revision ID format (=RECID.REVDATE)."""
     if re_revid_split.match(revid):
         return True
+    return False
+
+def record_revision_exists(recid, revid):
+    results = get_record_revisions(recid)
+    for res in results:
+        if res[1] == revid:
+            return True
     return False
 
 def split_revid(revid, dateformat=''):
@@ -308,6 +350,7 @@ def split_revid(revid, dateformat=''):
         elif dateformat == 'dategui':
             revdate = convert_datetext_to_dategui(datetext, secs=True)
     return recid, revdate
+
 
 def get_xml_comparison(header1, header2, xml1, xml2):
     """Return diff of two MARCXML records."""

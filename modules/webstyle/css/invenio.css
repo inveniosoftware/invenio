@@ -3046,4 +3046,37 @@ div.subtitle {
     border: solid 1px #000000;
 }
 
+.bibEditRevHistorySelectedEntry{
+    background-color: #cccccc;
+    display: table-row;
+}
+
+.bibEditRevHistoryEntry{
+    background-color: #efefef;
+    display: table-row;
+}
+
+.bibEditRevHistoryEntryContent{
+    display: table-cell;
+    font-size: 80%;
+}
+
+.bibEditRevHistoryEntryControls{
+    display: table-cell;
+}
+
+.bibEditRevHistoryLink{
+    display: table-cell;
+    border-style: none;
+}
+
+.bibEditRevHistoryLinkImg{
+    border-width: 0px;
+    border-style: none;
+}
+.bibEditRevHistoryMenuSection{
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
 /* end of invenio.css */
