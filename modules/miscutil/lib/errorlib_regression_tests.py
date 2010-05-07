@@ -24,8 +24,10 @@ __revision__ = "$Id$"
 import unittest
 import os
 import re
+import sys
 
-from invenio.errorlib import register_exception
+from invenio.dbquery import run_sql
+from invenio.errorlib import register_exception, get_pretty_traceback, find_all_values_to_hide
 from invenio.config import CFG_SITE_URL, CFG_LOGDIR
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
@@ -75,20 +77,39 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
 
     def test_password_hiding(self):
         """errorlib - hide password in frame analysis"""
-        logname = os.path.join(CFG_LOGDIR, 'invenio.err')
-        os.rename(logname, logname + '-old')
         try:
-            try:
-                password = 'this password should not be visible'
-                int('foo')
-            except:
-                register_exception(alert_admin=True)
-            os.rename(logname, logname + '-test')
-            data = open(logname + '-test').read()
-            self.failIf(password in data)
-            self.failUnless('<*****>' in data)
-        finally:
-            os.rename(logname + '-old', logname)
+            password = 'this password should not be visible'
+            int('foo')
+        except:
+            output = get_pretty_traceback(exc_info=sys.exc_info(), force_stack=True)
+        self.failIf(password in output, output)
+        self.failUnless('<*****>' in output, output)
+
+    def test_dbquery_password_hiding(self):
+        """errorlib - hide dbquery password in frame analysis"""
+        from invenio.dbquery import connect
+        kwargs = {'host': 'foo', 'port': 123, 'db': 'baz', 'user': 'qoox', 'passwd': '123', 'use_unicode': False, 'charset': 'utf8'}
+        try:
+            connect(**kwargs)
+        except:
+            output = get_pretty_traceback(exc_info=sys.exc_info(), force_stack=True)
+        self.failIf('123' in output, output)
+        self.failUnless('<*****>' in output, output)
+
+    def test_nested_password_hiding(self):
+        """errorlib - hide password nested in dictionary in frame analysis"""
+        try:
+            foo = {
+                'bar' : 'baz',
+                'qoox' : {
+                    'blibpwdblob' : '1234'
+                }
+            }
+            int(foo)
+        except:
+            output = get_pretty_traceback(exc_info=sys.exc_info(), force_stack=True)
+        self.failIf('1234' in output, output)
+        self.failUnless('<*****>' in output, output)
 
 
 TEST_SUITE = make_test_suite(ErrorlibWebPagesAvailabilityTest,

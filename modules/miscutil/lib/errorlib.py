@@ -39,7 +39,7 @@ from invenio.dateutils import convert_datestruct_to_datetext
 
 ## Regular expression to match possible password related variable that should
 ## be disclosed in frame analysis.
-RE_PWD = re.compile(r"pwd|_pass|passw", re.I)
+RE_PWD = re.compile(r"pwd|pass", re.I)
 
 
 def get_client_info(req):
@@ -132,6 +132,25 @@ def register_emergency(msg, send_sms_function=send_sms):
     for phone_number in CFG_SITE_EMERGENCY_PHONE_NUMBERS:
         send_sms_function(phone_number, msg)
 
+def find_all_values_to_hide(local_variables, analyzed_stack=None):
+    """Return all the potential password to hyde."""
+    ## Let's add at least the DB password.
+    if analyzed_stack is None:
+        from invenio.dbquery import CFG_DATABASE_PASS
+        ret = set([CFG_DATABASE_PASS])
+        analyzed_stack = set()
+    else:
+        ret = set()
+    for key, value in local_variables.iteritems():
+        if id(value) in analyzed_stack:
+            ## Let's avoid loops
+            continue
+        analyzed_stack.add(id(value))
+        if RE_PWD.search(key):
+            ret.add(str(value))
+        if isinstance(value, dict):
+            ret |= find_all_values_to_hide(value, analyzed_stack)
+    return ret
 
 def get_pretty_traceback(req=None, exc_info=None, force_stack=True):
     """
@@ -178,6 +197,7 @@ def get_pretty_traceback(req=None, exc_info=None, force_stack=True):
             traceback.print_exc(file=tracestack_data_stream)
             print >> tracestack_data_stream, \
                     "Locals by frame, innermost last"
+            values_to_hide = set()
             for frame in stack:
                 print >> tracestack_data_stream
                 print >> tracestack_data_stream, \
@@ -186,11 +206,7 @@ def get_pretty_traceback(req=None, exc_info=None, force_stack=True):
                             frame.f_code.co_filename,
                             frame.f_lineno)
                 try:
-                    values_to_hide = []
-                    for key, value in frame.f_locals.items():
-                        ## Let's look for potential passwords
-                        if RE_PWD.search(key):
-                            values_to_hide.append(str(value))
+                    values_to_hide |= find_all_values_to_hide(frame.f_locals)
 
                     code = open(frame.f_code.co_filename).readlines()
                     first_line = max(1, frame.f_lineno-3)
@@ -212,10 +228,9 @@ def get_pretty_traceback(req=None, exc_info=None, force_stack=True):
                     pass
                 for key, value in frame.f_locals.items():
                     print >> tracestack_data_stream, "\t%20s = " % key,
-                    if RE_PWD.search(key):
-                        ## Let's hide passwords ;-)
-                        print >> tracestack_data_stream, "<*****>"
-                        continue
+                    for to_hide in values_to_hide:
+                        ## Let's hide passwords
+                        value = repr(value).replace(to_hide, '<*****>')
                     try:
                         print >> tracestack_data_stream, \
                             _truncate_dynamic_string(value)
