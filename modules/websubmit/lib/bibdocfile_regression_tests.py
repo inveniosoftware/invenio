@@ -162,7 +162,7 @@ class BibDocsTest(unittest.TestCase):
         #hidden?
         self.assertEqual(my_new_bibdoc.hidden_p('.jpg', version=1), True)
         #add and get icon
-        my_new_bibdoc.add_icon( CFG_PREFIX + '/lib/webtest/invenio/icon-test.gif', basename=None, format=None)
+        my_new_bibdoc.add_icon( CFG_PREFIX + '/lib/webtest/invenio/icon-test.gif')
         value =  my_bibrecdoc.list_bibdocs()[1]
         self.assertEqual(value.get_icon(), my_new_bibdoc.get_icon())
         #delete icon
