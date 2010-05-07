@@ -88,7 +88,7 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
     def test_dbquery_password_hiding(self):
         """errorlib - hide dbquery password in frame analysis"""
         from invenio.dbquery import connect
-        kwargs = {'host': 'foo', 'port': 123, 'db': 'baz', 'user': 'qoox', 'passwd': '123', 'use_unicode': False, 'charset': 'utf8'}
+        kwargs = {'host': 'foo', 'port': 999, 'db': 'baz', 'user': 'qoox', 'passwd': '123', 'use_unicode': False, 'charset': 'utf8'}
         try:
             connect(**kwargs)
         except:
