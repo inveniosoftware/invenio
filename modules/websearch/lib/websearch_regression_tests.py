@@ -985,7 +985,7 @@ class WebSearchRestrictedPicturesTest(unittest.TestCase):
                                                expected_text=['This file is restricted',
                                                               'You are not authorized'])
         if error_messages:
-            self.fail(merge_error_messages(error_messages))
+            self.failUnless("HTTP Error 401: Unauthorized" in merge_error_messages(error_messages))
 
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""
