@@ -58,13 +58,13 @@ def guess_is_OCR_needed(input_file, ln='en'):
     """
     output_file = convert_file(input_file, format='.txt', perform_ocr=False)
 
-def convert_file(input_file, output_file=None, format=None, **params):
+def convert_file(input_file, output_file=None, output_format=None, **params):
     """
     Convert files from one format to another.
     @param input_file [string] the path to an existing file
     @param output_file [string] the path to the desired ouput. (if None a
         temporary file is generated)
-    @param format [string] the desired format (if None it is taken from
+    @param output_format [string] the desired format (if None it is taken from
         output_file)
     @param params other paramaters to pass to the particular converter
     @return [string] the final output_file

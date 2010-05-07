@@ -296,7 +296,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             for url in urls:
                 format = guess_format_from_url(url)
                 tmpdoc = download_url(url, format)
-                tmptext = convert_file(tmpdoc, format='.txt')
+                tmptext = convert_file(tmpdoc, output_format='.txt')
                 os.remove(tmpdoc)
                 text = open(tmptext).read()
                 os.remove(tmptext)
