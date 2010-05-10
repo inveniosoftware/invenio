@@ -151,8 +151,8 @@ install-jquery-plugins: install-jquery-plugins
 	mv jquery-1.3.1.min.js jquery.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.core.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.highlight.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/ui/minified/ui.slider.min.js && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/ui/minified/ui.sortable.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.slider.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://github.com/malsup/form/raw/master/jquery.form.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
@@ -170,23 +170,24 @@ install-jquery-plugins: install-jquery-plugins
 	wget -O json2.js.tmp http://json.org/json2.js && \
 	grep -v 'alert.*IMPORTANT: Remove this line' json2.js.tmp > json2.js && \
 	rm json2.js.tmp && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/ui/minified/ui.datepicker.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
 	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js && \
 	wget http://plugins.jquery.com/files/jquery.treeview_3.zip && \
 	unzip jquery.treeview_3.zip && \
 	rm jquery.treeview_3.zip && \
 	wget http://plugins.jquery.com/files/jquery.ajaxPager.js_5.txt && \
 	mv jquery.ajaxPager.js_5.txt jquery.ajaxPager.js && \
-	wget http://jqueryui.com/download/jquery-ui-1.7.2.custom.zip && \
-	unzip jquery-ui-1.7.2.custom.zip development-bundle/ui/ui.core.js && \
+	wget http://jqueryui.com/download/jquery-ui-1.7.3.custom.zip && \
+	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js && \
 	mv development-bundle/ui/ui.core.js ui.core.js && \
-	rm -rf development-bundle)
+	rm -rf development-bundle && \
+	rm jquery-ui-1.7.3.custom.zip)
 	mkdir -p ${prefix}/var/www/img && \
 	(cd ${prefix}/var/www/img && \
-	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.2/themes/base/ && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/themes/redmond/jquery-ui.css && \
-	wget http://jquery-ui.googlecode.com/svn/tags/1.7.2/demos/images/calendar.gif && \
-	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.7.2/themes/redmond/images/)
+	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/base/ && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/jquery-ui.css && \
+	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/demos/images/calendar.gif && \
+	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/images/)
 	@echo "***********************************************************"
 	@echo "** The jQuery plugins were successfully installed.       **"
 	@echo "***********************************************************"
@@ -210,7 +211,6 @@ uninstall-jquery-plugins:
 	rm -rf jquery-treeview && \
 	rm -f jquery.ajaxPager.js && \
 	rm -f jquery.form.js && \
-	rm -f ui.core.js)
 	rm -f ui.core.js) && \
 	(cd ${prefix}/var/www/img && \
 	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla)
