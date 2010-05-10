@@ -694,12 +694,11 @@ def subscribe_user_to_discussion(recID, uid):
                   subscribe the user
     @param uid: user id
     """
-    query = """INSERT INTO cmtSUBSCRIPTION
-                           (id_bibrec, id_user, creation_time)
+    query = """INSERT INTO cmtSUBSCRIPTION (id_bibrec, id_user, creation_time)
                     VALUES (%s, %s, %s)"""
     params = (recID, uid, convert_datestruct_to_datetext(time.localtime()))
     try:
-        res = run_sql(query, params)
+        run_sql(query, params)
     except:
         return 0
     return 1

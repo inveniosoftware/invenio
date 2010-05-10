@@ -594,7 +594,7 @@ class BibUploadDeleteModeTest(GenericBibUploadTest):
         self.assertEqual(compare_xmbuffers(inserted_xm, self.testrec1_xm), '')
         self.assertEqual(compare_hmbuffers(inserted_hm, self.testrec1_hm), '')
         # Checking dumb text is in bibxxx
-        self.failUnless(run_sql("SELECT * from bibrec_bib88x WHERE id_bibrec=%s", (recid, )))
+        self.failUnless(run_sql("SELECT id_bibrec from bibrec_bib88x WHERE id_bibrec=%s", (recid, )))
 
     def test_record_tags_deletion(self):
         """bibupload - delete mode, deleting specific tags"""
@@ -607,7 +607,7 @@ class BibUploadDeleteModeTest(GenericBibUploadTest):
         self.assertEqual(compare_xmbuffers(corrected_xm, self.testrec1_corrected_xm), '')
         self.assertEqual(compare_hmbuffers(corrected_hm, self.testrec1_corrected_hm), '')
         # Checking dumb text is no more in bibxxx
-        self.failIf(run_sql("SELECT * from bibrec_bib88x WHERE id_bibrec=%s", (recid, )))
+        self.failIf(run_sql("SELECT id_bibrec from bibrec_bib88x WHERE id_bibrec=%s", (recid, )))
         # clean up after ourselves:
 
 class BibUploadReplaceModeTest(GenericBibUploadTest):

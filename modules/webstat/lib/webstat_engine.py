@@ -307,7 +307,7 @@ def get_customevent_dump(args):
         # Get all the event arguments and creation times
         tbl_name = get_customevent_table(id)
         col_names = get_customevent_args(id)
-        sql_query = ["SELECT * FROM %s WHERE creation_time > '%s'" % (tbl_name, lower)]
+        sql_query = ["SELECT * FROM %s WHERE creation_time > '%s'" % (tbl_name, lower)] # Note: SELECT * technique is okay here
         sql_query.append("AND creation_time < '%s'" % upper)
         sql_param = []
         for col_bool, col_title, col_content in args['cols'+i]:

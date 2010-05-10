@@ -809,11 +809,10 @@ def add_to_basket(uid,
             #existing_recids = [ids[1] for ids in res_existing]
             #new_recids = list(set(recids)-set(existing_recids))
             if new_recids:
-                query_new = """ INSERT INTO bskEXTREC
-                                            (external_id,
-                                             collection_id,
-                                             creation_date,
-                                             modification_date)
+                query_new = """ INSERT INTO bskEXTREC (external_id,
+                                                       collection_id,
+                                                       creation_date,
+                                                       modification_date)
                                 VALUES """
                 now = convert_datestruct_to_datetext(localtime())
                 records = ["(%s, %s, %s, %s)"] * len(new_recids)
@@ -827,11 +826,10 @@ def add_to_basket(uid,
             else:
                 recids = [-int(recid) for recid in existing_ids]
         elif colid < 0:
-            query_external = """INSERT INTO bskEXTREC
-                                            (collection_id,
-                                             original_url,
-                                             creation_date,
-                                             modification_date)
+            query_external = """INSERT INTO bskEXTREC (collection_id,
+                                                       original_url,
+                                                       creation_date,
+                                                       modification_date)
                                 VALUES      (%s, %s, %s, %s)"""
             now = convert_datestruct_to_datetext(localtime())
             params_external = (colid, es_url, now, now)
@@ -1918,9 +1916,8 @@ def subscribe(uid, bskid):
         # The user is either the owner of the basket or is already subscribed.
         return False
     else:
-        query2 = """INSERT INTO user_bskBASKET
-                                (id_user, id_bskBASKET)
-                    VALUES      (%s, %s)"""
+        query2 = """INSERT INTO user_bskBASKET (id_user, id_bskBASKET)
+                                   VALUES      (%s, %s)"""
 
         params2 = (uid, bskid)
 

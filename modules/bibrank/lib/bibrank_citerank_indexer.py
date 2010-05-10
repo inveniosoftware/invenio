@@ -243,13 +243,13 @@ def get_dates_from_db(dict_of_ids):
     dict_of_dates = {}
     for recid in dict_of_ids:
         dict_of_dates[recid] = 0
-    query1 = "select * from bib26x where tag='260__c';"
+    query1 = "select id,tag,value from bib26x where tag='260__c';"
     date_list = run_sql(query1)
     date_dict = {}
     for item in date_list:
         date_dict[int(item[0])] = item[2]
     pattern = re.compile('.*(\d{4}).*')
-    query2 = "select * from bibrec_bib26x;"
+    query2 = "select id_bibrec,id_bibxxx,field_number from bibrec_bib26x;"
     date_list = run_sql(query2)
     for item in date_list:
         recid = int(item[0])
@@ -266,12 +266,12 @@ def get_dates_from_db(dict_of_ids):
     for recid in dict_of_dates:
         if dict_of_dates[recid] == 0:
             not_covered.append(recid)
-    query3 = "select * from bib96x where tag='961__x';"
+    query3 = "select id,tag,value from bib96x where tag='961__x';"
     date_list = run_sql(query3)
     date_dict = {}
     for item in date_list:
         date_dict[int(item[0])] = item[2]
-    query4 = "select * from bibrec_bib96x;"
+    query4 = "select id_bibrec,id_bibxxx,field_number from bibrec_bib96x;"
     date_list = run_sql(query4)
     for item in date_list:
         recid = int(item[0])
