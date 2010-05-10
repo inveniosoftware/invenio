@@ -30,7 +30,8 @@ __revision__ = \
 from invenio.webinterface_handler import create_handler
 from invenio.errorlib import register_exception
 from invenio.webinterface_handler import WebInterfaceDirectory
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
+from invenio.config import CFG_DEVEL_SITE
 
 class WebInterfaceDumbPages(WebInterfaceDirectory):
     """This class implements a dumb interface to use as a fallback in case of
@@ -195,6 +196,16 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceDocumentationPages = WebInterfaceDumbPages
 
+if CFG_DEVEL_SITE:
+    try:
+        from invenio.httptest_webinterface import WebInterfaceHTTPTestPages
+    except:
+        register_exception(alert_admin=True, subject='EMERGENCY')
+        WebInterfaceHTTPTestPages = WebInterfaceDumbPages
+    test_exports = ['httptest']
+else:
+    test_exports = []
+
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
@@ -222,10 +233,12 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'exporter',
         'kb',
         'batchuploader'
-        ]
+        ] + test_exports
 
     def __init__(self):
         self.getfile = websubmit_legacy_getfile
+        if CFG_DEVEL_SITE:
+            self.httptest = WebInterfaceHTTPTestPages()
 
     author = WebInterfaceAuthorPages()
     submit = WebInterfaceSubmitPages()

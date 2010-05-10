@@ -24,12 +24,15 @@ pylib_DATA = webdoc.py \
              webpage.py \
              template.py \
              webstyle_templates.py \
+             webstyle_regression_tests.py \
              webinterface_handler.py \
              webinterface_tests.py \
              webinterface_layout.py \
              fckeditor_invenio_connector.py \
              webinterface_handler_wsgi.py \
-             webinterface_handler_wsgi_utils.py
+             webinterface_handler_wsgi_utils.py \
+             webinterface_handler_config.py \
+             httptest_webinterface.py
 
 wsgiweb_DATA = invenio.wsgi
 

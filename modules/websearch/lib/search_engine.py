@@ -103,7 +103,7 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
 InvenioWebSearchQueryParserException, SpiresToInvenioSyntaxConverter
 
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 
 try:
     import invenio.template

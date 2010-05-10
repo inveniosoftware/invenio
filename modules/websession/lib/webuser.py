@@ -31,7 +31,7 @@ It also contains Apache-related user authentication stuff.
 
 __revision__ = "$Id$"
 
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 
 import cgi
 import urllib

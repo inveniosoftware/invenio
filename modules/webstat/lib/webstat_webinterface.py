@@ -20,7 +20,7 @@ __lastupdated__ = "$Date$"
 
 import os
 from urllib import unquote
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 
 from invenio.config import \
      CFG_TMPDIR, \

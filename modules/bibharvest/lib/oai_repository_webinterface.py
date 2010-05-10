@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import urllib
 import time
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 
 from invenio import oai_repository_server
 from invenio.config import CFG_CACHEDIR, CFG_OAI_SLEEP

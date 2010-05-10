@@ -1663,11 +1663,10 @@ def wash_form_parameters(form, abstract_bibdocs, can_keep_doctypes,
                     # If file already exists, it means that it was
                     # handled by WebSubmit
                     fp = file(file_path, "wb")
-                    # FIXME: temporary, waiting for wsgi handler to be
-                    # fixed. Once done, read chunk by chunk
-                    fp.write(form_file.read())
-##                     while form_file:
-##                         fp.write(form_file.read(10240))
+                    chunk = form_file.read(10240)
+                    while chunk:
+                        fp.write(chunk)
+                        chunk = form_file.read(10240)
                     fp.close()
                     fp = open(os.path.join(working_dir, "lastuploadedfile"), "w")
                     fp.write(file_name)

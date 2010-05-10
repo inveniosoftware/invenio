@@ -29,7 +29,7 @@ from urllib import urlencode, quote_plus, quote
 from urlparse import urlparse
 from cgi import parse_qs, escape
 
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 
 from invenio.config import \
      CFG_SITE_URL, \

@@ -34,7 +34,7 @@ import re
 import os
 import gc
 
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import wash_language

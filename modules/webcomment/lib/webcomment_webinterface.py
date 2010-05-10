@@ -70,7 +70,7 @@ try:
 except ImportError, e:
     fckeditor_available = False
 import os
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 from invenio.bibdocfile import stream_file
 
 class WebInterfaceCommentsPages(WebInterfaceDirectory):

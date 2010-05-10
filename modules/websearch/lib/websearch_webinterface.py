@@ -25,7 +25,7 @@ import datetime
 import time
 import sys
 from urllib import quote
-from invenio import webinterface_handler_wsgi_utils as apache
+from invenio import webinterface_handler_config as apache
 
 #maximum number of collaborating authors etc shown in GUI
 MAX_COLLAB_LIST = 10
@@ -742,25 +742,11 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
     _exports = [('index.py', 'legacy_collection'),
                 ('', 'legacy_collection'),
                 ('search.py', 'legacy_search'),
-                'search', 'openurl', 'testsso',
+                'search', 'openurl',
                 'opensearchdescription', 'logout_SSO_hook']
 
     search = WebInterfaceSearchResultsPages()
     legacy_search = WebInterfaceLegacySearchPages()
-
-    def testsso(self, req, form):
-        """ For testing single sign-on """
-        req.add_common_vars()
-        sso_env = {}
-        for var, value in req.subprocess_env.iteritems():
-            if var.startswith('HTTP_ADFS_'):
-                sso_env[var] = value
-        out = "<HTML><HEAD><TITLE>SSO test</TITLE</HEAD>"
-        out += "<BODY><TABLE>"
-        for var, value in sso_env.iteritems():
-            out += "<TR><TD><STRONG>%s</STRONG></TD><TD>%s</TD></TR>" % (var, value)
-        out += "</TABLE></BODY></HTML>"
-        return out
 
     def logout_SSO_hook(self, req, form):
         """Script triggered by the display of the centralized SSO logout

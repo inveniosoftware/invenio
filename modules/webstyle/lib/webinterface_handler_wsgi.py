@@ -35,7 +35,8 @@ if __name__ != "__main__":
     sys.stdout = sys.stderr
 
 from invenio.webinterface_layout import invenio_handler
-from invenio.webinterface_handler_wsgi_utils import table, FieldStorage, \
+from invenio.webinterface_handler_wsgi_utils import table, FieldStorage
+from invenio.webinterface_handler_config import \
     HTTP_STATUS_MAP, SERVER_RETURN, OK, DONE, \
     HTTP_NOT_FOUND, HTTP_INTERNAL_SERVER_ERROR
 from invenio.config import CFG_WEBDIR, CFG_SITE_LANG, \
@@ -104,10 +105,13 @@ class SimulatedModPythonRequest(object):
         # This must be done to avoid a bug in cgi.FieldStorage
         self.__environ.setdefault('QUERY_STRING', '')
         fs = FieldStorage(self, keep_blank_values=1)
-        new_input = InputProcessed()
-        post_form = (new_input, input, fs)
-        self.__environ['wsgi.post_form'] = post_form
-        self.__environ['wsgi.input'] = new_input
+        if fs.wsgi_input_consumed:
+            new_input = InputProcessed()
+            post_form = (new_input, input, fs)
+            self.__environ['wsgi.post_form'] = post_form
+            self.__environ['wsgi.input'] = new_input
+        else:
+            post_form = (None, None, fs)
         return fs
 
     def get_response_sent_p(self):
