@@ -183,6 +183,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
     except OSError:
         # Directory exists
         pass
+
     for docfile in files:
         if os.path.isfile(os.path.join(folder, docfile)):
             info[0] += 1
@@ -201,15 +202,19 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                 rec_id = str(list(rec_id)[0])
             rec_info = BibRecDocs(rec_id)
             if rec_info.bibdocs:
-                attached_files = rec_info.bibdocs[0].list_all_files()
-                file_md5 = md5(open(os.path.join(folder, docfile), "rb").read()).hexdigest()
-                for attached_file in attached_files:
-                    if attached_file.checksum == file_md5:
-                        errors.append((docfile, err_desc[3]))
-                        continue
-                    elif attached_file.fullname == docfile:
-                        errors.append((docfile, err_desc[4]))
-                        continue
+                for bibdoc in rec_info.bibdocs:
+                    attached_files = bibdoc.list_all_files()
+                    file_md5 = md5(open(os.path.join(folder, docfile), "rb").read()).hexdigest()
+                    num_errors = len(errors)
+                    for attached_file in attached_files:
+                        if attached_file.checksum == file_md5:
+                            errors.append((docfile, err_desc[3]))
+                            break
+                        elif attached_file.fullname == docfile:
+                            errors.append((docfile, err_desc[4]))
+                            break
+                if len(errors) > num_errors:
+                    continue
             tempfile.tempdir = CFG_TMPDIR
             # Move document to be uploaded to temporary folder
             tmp_file = tempfile.mktemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension)
@@ -357,6 +362,7 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
     from invenio.bibrecord import create_records
 
     recs = create_records(metafile, 0, 0)
+    user_info = collect_user_info(req)
 
     filename_tag980_values = _detect_980_values_from_marcxml_file(recs)
     for filename_tag980_value in filename_tag980_values:
@@ -371,9 +377,11 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_tag980_value)
             if auth_code != 0:
-                return (auth_code, auth_message)
+                error_msg = "The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_tag980_value)
+                return (auth_code, error_msg)
 
     filename_rec_id_collections = _detect_collections_from_marcxml_file(recs)
+
     for filename_rec_id_collection in filename_rec_id_collections:
         if not webupload:
             if not filename_rec_id_collection in CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS[client_ip]:
@@ -381,7 +389,8 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_rec_id_collection)
             if auth_code != 0:
-                return (auth_code, auth_message)
+                error_msg = "The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_rec_id_collection)
+                return (auth_code, error_msg)
     if not webupload:
         return True
     else:

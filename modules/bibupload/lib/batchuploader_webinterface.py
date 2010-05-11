@@ -94,14 +94,16 @@ def user_authorization(req):
     if user_info['email'] == 'guest':
         auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
         referer = '/batchuploader/'
+        error_msg = "Guests are not authorized to run batchuploader"
         return page_not_authorized(req=req, referer=referer,
-                                   text=auth_message, navmenuid="batchuploader")
+                                   text=error_msg, navmenuid="batchuploader")
     else:
         auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
         if auth_code != 0:
             referer = '/batchuploader/'
+            error_msg = "The user '%s' is not authorized to run batchuploader" % (user_info['nickname'])
             return page_not_authorized(req=req, referer=referer,
-                                       text=auth_message, navmenuid="batchuploader")
+                                       text=error_msg, navmenuid="batchuploader")
 
 
 class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
