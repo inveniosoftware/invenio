@@ -33,7 +33,7 @@ Main function: migrate_v071_baskets()
 
 __revision__ = "$Id$"
 
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, real_escape_string
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS
 
 import sys
@@ -277,9 +277,9 @@ def __import_baskets(default_topic_name="Imported baskets",
                 print "#########################"
 
             return "(%i,'%s',%i,'%s')" % (int(bskid),
-                                          escape_string(name),
+                                          real_escape_string(name),
                                           int(id_owner),
-                                          escape_string(date_modification))
+                                          real_escape_string(date_modification))
         values = reduce(lambda x, y: x + ',' + y, map(basket_updater, baskets))
         query2 = "INSERT INTO bskBASKET (id, name, id_owner, date_modification) VALUES %s"
         run_sql(query2 % values)
@@ -323,7 +323,7 @@ def __import_records():
     def records_updater(record):
         (bskid, id_owner, id_record, order, date_modification) = record
         return "(%i,%i,%i,%i,'%s')" % (int(id_record), int(bskid), int(id_owner),
-                                       int(order), escape_string(date_modification))
+                                       int(order), real_escape_string(date_modification))
 
     query2 = """INSERT INTO bskREC (id_bibrec_or_bskEXTREC, id_bskBASKET,
                   id_user_who_added_item, score, date_added)

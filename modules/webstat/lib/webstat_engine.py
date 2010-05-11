@@ -22,7 +22,7 @@ import calendar, commands, datetime, time, os, cPickle
 from invenio.config import CFG_TMPDIR, CFG_SITE_URL
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, wash_table_column_name
 
 WEBSTAT_SESSION_LENGTH = 48*60*60 # seconds
 WEBSTAT_GRAPH_TOKENS = '-=#+@$%&XOSKEHBC'
@@ -256,11 +256,11 @@ def get_customevent_trend(args):
             continue
         if col_content:
             if col_bool == "and" or col_bool == "":
-                sql_query.append("AND `%s`" % escape_string(col_title))
+                sql_query.append("AND %s" % wash_table_column_name(col_title))
             elif col_bool == "or":
-                sql_query.append("OR `%s`" % escape_string(col_title))
+                sql_query.append("OR %s" % wash_table_column_name(col_title))
             elif col_bool == "and_not":
-                sql_query.append("AND NOT `%s`" % escape_string(col_title))
+                sql_query.append("AND NOT %s" % wash_table_column_name(col_title))
             else:
                 continue
             sql_query.append(" LIKE %s")
@@ -314,11 +314,11 @@ def get_customevent_dump(args):
             if not col_title in col_names: continue
             if col_content:
                 if col_bool == "and" or col_bool == "":
-                    sql_query.append("AND `%s`" % escape_string(col_title))
+                    sql_query.append("AND %s" % wash_table_column_name(col_title))
                 elif col_bool == "or":
-                    sql_query.append("OR `%s`" % escape_string(col_title))
+                    sql_query.append("OR %s" % wash_table_column_name(col_title))
                 elif col_bool == "and_not":
-                    sql_query.append("AND NOT `%s`" % escape_string(col_title))
+                    sql_query.append("AND NOT %s" % wash_table_column_name(col_title))
                 else:
                     continue
                 sql_query.append(" LIKE %s")

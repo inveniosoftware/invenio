@@ -29,7 +29,6 @@ __revision__ = "$Id$"
 
 # dbquery clients can import these from here:
 # pylint: disable-msg=W0611
-from MySQLdb import escape_string
 from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     DatabaseError, OperationalError, IntegrityError, \
                     InternalError, NotSupportedError, \
@@ -38,6 +37,7 @@ import warnings
 import string
 import time
 import marshal
+import re
 import sys
 from zlib import compress, decompress
 from thread import get_ident
@@ -421,3 +421,34 @@ try:
     psyco.bind(deserialize_via_marshal)
 except StandardError, e:
     pass
+
+def wash_table_column_name(colname):
+    """
+    Evaluate table-column name to see if it is clean.
+    This function accepts only names containing [a-zA-Z0-9_].
+
+    @param colname: The string to be checked
+    @type colname: str
+
+    @return: colname if test passed
+    @rtype: str
+
+    @raise Exception: Raises an exception if colname is invalid.
+    """
+    if re.search('[^\w]', colname):
+        raise Exception('The table column %s is not valid.' % repr(colname))
+    return colname
+
+def real_escape_string(unescaped_string):
+    """
+    Escapes special characters in the unescaped string for use in a DB query.
+
+    @param unescaped_string: The string to be escaped
+    @type unescaped_string: str
+
+    @return: Returns the escaped string
+    @rtype: str
+    """
+    connection_object = _db_login()
+    escaped_string = connection_object.escape_string(unescaped_string)
+    return escaped_string

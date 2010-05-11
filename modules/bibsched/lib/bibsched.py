@@ -43,7 +43,7 @@ from invenio.config import \
      CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE, \
      CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, \
      CFG_SITE_URL
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, real_escape_string
 from invenio.textutils import wrap_text_in_a_box
 from invenio.errorlib import register_exception, register_emergency
 
@@ -127,7 +127,7 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
 
     date = get_datetime(since)
 
-    status_query = 'status in (%s)' % ','.join([repr(escape_string(status)) for status in statuses])
+    status_query = 'status in (%s)' % ','.join([repr(real_escape_string(status)) for status in statuses])
 
     for task in tasks:
         if task in CFG_BIBSCHED_GC_TASKS_TO_REMOVE:
@@ -1202,7 +1202,7 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
             task_query = ''
         else:
             task_query = 'AND proc IN (%s)' % (
-                ','.join([repr(escape_string(task)) for task in tasks]))
+                ','.join([repr(real_escape_string(task)) for task in tasks]))
         if since is None:
             since_query = ''
         else:

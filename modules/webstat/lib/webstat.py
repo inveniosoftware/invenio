@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_LANG
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
 from invenio.search_engine import get_alphabetically_ordered_collection_list
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, wash_table_column_name
 from invenio.bibsched import is_task_scheduled, get_task_ids_by_descending_date, get_task_options
 
 # Imports handling key events
@@ -171,9 +171,9 @@ def create_customevent(id=None, name=None, cols=[]):
     sql_query.append("id MEDIUMINT unsigned NOT NULL auto_increment,")
     sql_query.append("creation_time TIMESTAMP DEFAULT NOW(),")
     for argument in cols:
-        arg = escape_string(argument)
-        sql_query.append("`%s` MEDIUMTEXT NULL," % arg)
-        sql_query.append("INDEX `%s` (`%s`(50))," % (arg, arg))
+        arg = wash_table_column_name(argument)
+        sql_query.append("%s MEDIUMTEXT NULL," % arg)
+        sql_query.append("INDEX %s (%s(50))," % (arg, arg))
     sql_query.append("PRIMARY KEY (id))")
     sql_str = ' '.join(sql_query)
     run_sql(sql_str)

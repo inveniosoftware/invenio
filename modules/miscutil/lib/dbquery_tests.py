@@ -83,9 +83,25 @@ class TableUpdateTimesTest(unittest.TestCase):
                          ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L))
         dbquery.run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
 
-TEST_SUITE = make_test_suite(TableUpdateTimesTest,)
+class WashTableColumnNameTest(unittest.TestCase):
+    """Test if wash_table_column_name and real_escape_string evaluates correctly."""
+
+    def test_wash_table_column_name(self):
+       """dbquery - wash table column name"""
+       testcase_error = "foo ; bar"
+       testcase_ok = "foo_bar"
+       self.assertRaises(Exception, dbquery.wash_table_column_name, testcase_error)
+       self.assertEqual(testcase_ok, dbquery.wash_table_column_name(testcase_ok))
+
+    def test_real_escape_string(self):
+        """dbquery - real escape string"""
+        testcase_ok = "Programmer"
+        testcase_injection = "' OR ''='"
+        self.assertEqual(dbquery.real_escape_string(testcase_ok), testcase_ok)
+        self.assertNotEqual(dbquery.real_escape_string(testcase_injection), testcase_injection)
+
+
+TEST_SUITE = make_test_suite(TableUpdateTimesTest, WashTableColumnNameTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
-
-
