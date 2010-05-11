@@ -64,7 +64,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
     _exports = ['', 'display', 'loanshistoricaloverview']
 
-    def index(self, req):
+    def index(self, req, form):
         """ The function called by default
         """
         redirect_to_url(req, "%s/yourloans/display?%s" % (CFG_SITE_URL,
@@ -164,7 +164,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 
     _exports = ['', 'display', 'register_request']
 
-    def index(self, req):
+    def index(self, req, form):
         """ The function called by default
         """
         redirect_to_url(req, "%s/ill/display?%s" % (CFG_SITE_URL,
