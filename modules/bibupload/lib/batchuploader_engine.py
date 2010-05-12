@@ -161,8 +161,12 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             2 - No records match that file name
             3 - File already exists
     """
+    import sys
+    if sys.hexversion < 0x2060000:
+        from md5 import md5
+    else:
+        from hashlib import md5
     from invenio.bibdocfile import BibRecDocs, file_strip_ext
-    from md5 import md5
     import shutil
     from invenio.search_engine import perform_request_search, \
                                       guess_collection_of_a_record
