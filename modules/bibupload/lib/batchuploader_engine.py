@@ -35,11 +35,11 @@ from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_LOGDIR, \
                             CFG_OAI_ID_FIELD, CFG_BATCHUPLOADER_DAEMON_DIR, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS, \
                             CFG_BATCHUPLOADER_WEB_ROBOT_AGENT, \
-                            CFG_PREFIX
+                            CFG_PREFIX, CFG_SITE_LANG
 from invenio.webinterface_handler_wsgi_utils import Field
 from invenio.textutils import encode_for_xml
 from invenio.bibtask import task_low_level_submission
-
+from invenio.messages import gettext_set_language
 
 PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
                         '--insert', '--replace', '--correct', '--append']
@@ -104,7 +104,7 @@ def cli_upload(req, file_content=None, mode=None):
     _log(msg)
     return _write(req, msg)
 
-def metadata_upload(req, metafile=None, mode=None, exec_date=None, exec_time=None, metafilename=None):
+def metadata_upload(req, metafile=None, mode=None, exec_date=None, exec_time=None, metafilename=None, ln=CFG_SITE_LANG):
     """
     Metadata web upload service. Get upload parameters and exec bibupload for the given file.
     Finally, write upload history.
@@ -128,7 +128,7 @@ def metadata_upload(req, metafile=None, mode=None, exec_date=None, exec_time=Non
     filedesc.close()
 
     # check if this client can run this file:
-    allow = _check_client_can_submit_file(req=req, metafile=metafile, webupload=1)
+    allow = _check_client_can_submit_file(req=req, metafile=metafile, webupload=1, ln=ln)
     if allow[0] != 0:
         return (allow[0], allow[1])
 
@@ -148,7 +148,7 @@ def metadata_upload(req, metafile=None, mode=None, exec_date=None, exec_time=Non
             or time.strftime("%Y-%m-%d %H:%M:%S"), str(jobid), ))
     return (0, "Task %s queued" % str(jobid))
 
-def document_upload(req=None, folder="", matching="", mode="", exec_date="", exec_time=""):
+def document_upload(req=None, folder="", matching="", mode="", exec_date="", exec_time="", ln=CFG_SITE_LANG):
     """ Take files from the given directory and upload them with the appropiate mode.
     @parameters:
         + folder: Folder where the files to upload are stored
@@ -170,6 +170,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
     import shutil
     from invenio.search_engine import perform_request_search, \
                                       guess_collection_of_a_record
+    _ = gettext_set_language(ln)
     errors = []
     info = [0, []] # Number of files read, name of the files
     try:
@@ -177,9 +178,9 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
     except OSError, error:
         errors.append(("", error))
         return errors, info
-    err_desc = {1: "More than one possible recID, ambiguous behaviour", 2: "No records match that file name",
-                3: "File already exists", 4: "A file with the same name and format already exists",
-                5: "No rights to upload to collection '%s'"}
+    err_desc = {1: _("More than one possible recID, ambiguous behaviour"), 2: _("No records match that file name"),
+                3: _("File already exists"), 4: _("A file with the same name and format already exists"),
+                5: _("No rights to upload to collection '%s'")}
     # Create directory DONE/ if doesn't exist
     folder = (folder[-1] == "/") and folder or (folder + "/")
     files_done_dir = folder + "DONE/"
@@ -362,7 +363,7 @@ def _check_client_useragent(req):
         return True
     return False
 
-def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload=0):
+def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload=0, ln=CFG_SITE_LANG):
     """
     Is this client able to upload such a FILENAME?
     check 980 $a values and collection tags in the file to see if they are among the
@@ -372,6 +373,7 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
     """
     from invenio.bibrecord import create_records
 
+    _ = gettext_set_language(ln)
     recs = create_records(metafile, 0, 0)
     user_info = collect_user_info(req)
 
@@ -388,7 +390,7 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_tag980_value)
             if auth_code != 0:
-                error_msg = "The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_tag980_value)
+                error_msg = _("The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_tag980_value))
                 return (auth_code, error_msg)
 
     filename_rec_id_collections = _detect_collections_from_marcxml_file(recs)
@@ -400,7 +402,7 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_rec_id_collection)
             if auth_code != 0:
-                error_msg = "The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_rec_id_collection)
+                error_msg = _("The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_rec_id_collection))
                 return (auth_code, error_msg)
     if not webupload:
         return True
@@ -447,22 +449,22 @@ def _detect_collections_from_marcxml_file(recs):
     for rec, dummy1, dummy2 in recs:
         if rec:
             for tag001 in record_get_field_values(rec, '001'):
-                collection = guess_collection_of_a_record(tag001)
+                collection = guess_collection_of_a_record(int(tag001))
                 dbcollids[collection] = 1
             for tag_sysno in record_get_field_values(rec, tag=sysno_tag[:3],
                 ind1=sysno_tag[3], ind2=sysno_tag[4], code=sysno_tag[5]):
                     record = find_record_from_sysno(tag_sysno)
-                    collection = guess_collection_of_a_record(record)
+                    collection = guess_collection_of_a_record(int(record))
                     dbcollids[collection] = 1
             for tag_oaiid in record_get_field_values(rec, tag=oaiid_tag[:3],
                 ind1=oaiid_tag[3], ind2=oaiid_tag[4], code=oaiid_tag[5]):
                     record = find_records_from_extoaiid(tag_oaiid)
-                    collection = guess_collection_of_a_record(record)
+                    collection = guess_collection_of_a_record(int(record))
                     dbcollids[collection] = 1
             for tag_oai in record_get_field_values(rec, tag=oai_tag[0:3],
                 ind1=oai_tag[3], ind2=oai_tag[4], code=oai_tag[5]):
                     record = find_record_from_oaiid(tag_oai)
-                    collection = guess_collection_of_a_record(record)
+                    collection = guess_collection_of_a_record(int(record))
                     dbcollids[collection] = 1
     return dbcollids.keys()
 

@@ -88,20 +88,21 @@ def check_file(name):
         return 1
     return 0
 
-def user_authorization(req):
+def user_authorization(req, ln):
     """ Check user authorization to visit page """
+    _ = gettext_set_language(ln)
     user_info = collect_user_info(req)
     if user_info['email'] == 'guest':
         auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
         referer = '/batchuploader/'
-        error_msg = "Guests are not authorized to run batchuploader"
+        error_msg = _("Guests are not authorized to run batchuploader")
         return page_not_authorized(req=req, referer=referer,
                                    text=error_msg, navmenuid="batchuploader")
     else:
         auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
         if auth_code != 0:
             referer = '/batchuploader/'
-            error_msg = "The user '%s' is not authorized to run batchuploader" % (user_info['nickname'])
+            error_msg = _("The user '%s' is not authorized to run batchuploader" % (user_info['nickname']))
             return page_not_authorized(req=req, referer=referer,
                                        text=error_msg, navmenuid="batchuploader")
 
@@ -124,7 +125,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                     'submit_time': (str, "hh:mm:ss")})
         _ = gettext_set_language(argd['ln'])
 
-        not_authorized = user_authorization(req)
+        not_authorized = user_authorization(req, argd['ln'])
         if not_authorized:
             return not_authorized
         uid = getUid(req)
@@ -149,7 +150,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                     })
         _ = gettext_set_language(argd['ln'])
 
-        not_authorized = user_authorization(req)
+        not_authorized = user_authorization(req, argd['ln'])
         if not_authorized:
             return not_authorized
         uid = getUid(req)
@@ -177,7 +178,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                    'submit_time': (str, "")})
         _ = gettext_set_language(argd['ln'])
 
-        not_authorized = user_authorization(req)
+        not_authorized = user_authorization(req, argd['ln'])
         if not_authorized:
             return not_authorized
         #Check if input fields are correct, if not, redirect to upload form
@@ -204,7 +205,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
             redirect_to_url(req, "%s/batchuploader/documents?error=4&mode=%s&docfolder=%s&matching=%s&submit_time=%s"
                             % (CFG_SITE_URL, argd['mode'], argd['docfolder'], argd['matching'], argd['submit_time']))
 
-        errors, info = document_upload(req, argd['docfolder'], argd['matching'], argd['mode'], date, time)
+        errors, info = document_upload(req, argd['docfolder'], argd['matching'], argd['mode'], date, time, argd['ln'])
 
         body = batchuploader_templates.tmpl_display_menu(argd['ln'])
         uid = getUid(req)
@@ -243,7 +244,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
                                    'filename': (str, None)})
         _ = gettext_set_language(argd['ln'])
 
-        not_authorized = user_authorization(req)
+        not_authorized = user_authorization(req, argd['ln'])
         if not_authorized:
             return not_authorized
         #Check if input fields are correct, if not, redirect to upload form
@@ -279,7 +280,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         #Function where bibupload queues the file
         auth_code, auth_message = metadata_upload(req,
                                   argd['metafile'], argd['mode'].split()[0],
-                                  date, time, argd['filename'])
+                                  date, time, argd['filename'], argd['ln'])
 
         if auth_code != 0:
             referer = '/batchuploader/'
@@ -306,7 +307,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {})
         _ = gettext_set_language(argd['ln'])
 
-        not_authorized = user_authorization(req)
+        not_authorized = user_authorization(req, argd['ln'])
         if not_authorized:
             return not_authorized
         uploaded_meta_files = get_user_metadata_uploads(req)
@@ -330,7 +331,7 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {})
         _ = gettext_set_language(argd['ln'])
 
-        not_authorized = user_authorization(req)
+        not_authorized = user_authorization(req, argd['ln'])
         if not_authorized:
             return not_authorized
         docs = get_daemon_doc_files()
