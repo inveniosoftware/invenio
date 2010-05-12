@@ -22,7 +22,11 @@ webdoclib_DATA = \
 	bibrank-api.webdoc \
 	bibrank-bibrankgkb.webdoc \
 	bibrank-word-similarity.webdoc \
-	bibrank-single-tag-rank.webdoc
+	bibrank-single-tag-rank.webdoc \
+	bibrank-citation-t.webdoc \
+	bibrank-pagerank-c.webdoc \
+	bibrank-pagerank-t.webdoc
+
 
 EXTRA_DIST = $(webdoclib_DATA)
 

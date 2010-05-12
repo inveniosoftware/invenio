@@ -38,7 +38,10 @@
 <strong>5.<a href="#brm">BibRank Methods</a></strong><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.1.<a href="#str">Single tag rank method</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.2.<a href="#wrd">Word Similarity/Similar Records</a><br/>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.3.<a href="#cmb">Combined method</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.3.<a href="#tdcc">Time-dependent citation counts</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.4.<a href="#lbr">Link-based ranking</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.5.<a href="#tdlbr">Time-dependent link-based ranking</a><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5.6.<a href="#cmb">Combined method</a><br/>
 <strong>6.<a href="#bt">bibrankgkb Tool</a></strong><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.1.<a href="#cli2">Command Line Interface</a><br/>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;6.2.<a href="#ubt">Using bibrankgkb</a><br/>
@@ -382,7 +385,41 @@ default_min_relevance = 75
 <p>Tip: When executing a search using a ranking method, you can add "verbose=1" to the list of parameteres
 in the URL to see which terms have been used in the ranking.</p>
 
-<a name="cmb"></a><h3>5.3 Combine method</h3>
+<a name="tdcc"></a><h3>5.3 Time-dependent citation counts</h3>
+<p>This ranking method is an extension of the well known "rank by number of citation" method. The difference is that the citations are weighted differently,
+based on their publication year. In this way, we can weight more the newly acquired citations, rather than treating them in the same way as older ones.
+By doing this, rather than just counting the citations, we can identify highly cited publications that are currently of interest for the scientific community.
+</p>
+<p>
+The different weighting is controlled by the time-decay factor. This factor can have values between 0 and 1. With a time-decay factor of 0 the algorithm will
+behave as the classical "rank by number of citations". With a time-decay factor of 1, the algorithm will take into consideration only the citations that come
+from documents published in the current year.  The time-decay parameter can be adjusted in the configuration file. In order for the algorithm to run, the
+appropriate tags for the publication year and the creation date of a document, need to be set.</p>
+<p>Please take a look in the configuration file for further explanations.</p>
+
+<a name="lbr"></a><h3>5.4 Link-based ranking</h3>
+<p>This ranking method is an extension of the well known pagerank method. Unlike ranking by number of citations, where all the citations are weighed equally,
+the link-based ranking weights each citation based on its importance. A high rank for a publication means not necessary that it has been cited a lot, but that
+it has been cited by other high ranked publications. In this way it can identify a large number of modestly cited publications that contain important results
+for the scientific community. In other words, it associates each publication with an "all-time achievement" rank.     
+</p>
+<p>
+In the case of an incomplete citation graph (a lot of citations missing from the repository), the link-based ranking can cause "artificial inflation" of some
+of the weights, thus creating errors in ranking. In order to correct this, we advise the use of the external citations (by setting the "use_external_citations"
+parameter to "yes"). This will assure the correct propagation of the weight through the network. We use the term of "external links" to denote all the citations
+that are missing from the database, and  "internal links" to denote all the citations available in the database.  The algorithm can be adjusted by changing the
+values of the two main parameters (ext_alpha and ext_beta).</p>
+<p>For more details, please consult the configuration file.</p>
+
+<a name="tdlbr"></a><h3>5.5 Time-dependent link-based ranking</h3>
+<p>This method combines the previous two methods. Its purpose is to highlight important publications that are currently of interest for the scientific community.
+This method is not really suited to repositories that allow cycles in their citation graph. Even the bibliographic data sets can allow cycles due to certain
+inconsistencies in the publication dates or in the listing of references. Since some of the publications are not dated, the identification/removal of the cycles
+can produce a high computational overhead. Because of this and of the link-based ranking which iteratively propagates the weight in the graph, when a strong time
+decay factor is used, the newly published documents that are part of a cycle accumulate artificial weight, resulting in an inexact ranking.</p>
+<p>For more details, please consult the configuration file.</p>
+
+<a name="cmb"></a><h3>5.6 Combine method</h3>
 <p>The 'Combine method' is running each method mentioned in the config file and adding the score together
 based on the importance of the method given by the percentage.</p>
 <b>Example</b>

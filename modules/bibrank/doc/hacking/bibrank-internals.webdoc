@@ -36,6 +36,28 @@ Journal Impact Factor or similar methods.</dd>
 <dd>Ex. of use: Ranking based on the importance of words in the whole<br />
 collection and in a single record. Explains how the ranking data is calculated.</dd>
 </dt>
+
+<dt>
+    <a href="bibrank-citation-t">Time-dependent Citation Counts</a>
+    <dd>
+        Explains the algorithm behind the time-dependent citation counts ranking method.
+    </dd>
+</dt>
+
+<dt>
+    <a href="bibrank-pagerank-c">Link-based Ranking with/without External Citations</a>
+    <dd>
+        Explains the algorithm behind the link-based ranking method.
+    </dd>
+</dt>
+
+<dt>
+    <a href="bibrank-pagerank-t">Time-dependent Link-based Ranking Method</a>
+    <dd>
+        Explains the algorithm behind the time-dependent link-based ranking method.
+    </dd>
+</dt>
+
 <dt><a href="bibrank-api">Bibrank Record Sorter API</a>
 <dd>How to call the Bibrank Record Sorter library from your python programs if necessary.</dd></dt>
 <dt><a href="bibrank-bibrankgkb">Create knowledgebase files (bibrankgkb)</a> <dd>Explains how to create knowledgebase files using the bibrankgkb tool</dd></dt>

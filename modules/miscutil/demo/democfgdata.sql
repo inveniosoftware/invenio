@@ -1487,7 +1487,16 @@ INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (3,'citation','0000-00-00 00:00:00');
-INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,3,90);
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,3,80);
+
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (4,'citerank_citation_t','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,4,70);
+
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (5,'citerank_pagerank_c','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,5,60);
+
+INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (6,'citerank_pagerank_t','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,6,50);
 
 INSERT INTO externalcollection (id, name) VALUES (1, 'Amazon');
 INSERT INTO externalcollection (id, name) VALUES (2, 'CERN EDMS');

@@ -45,6 +45,7 @@ from invenio.dbquery import run_sql, serialize_via_marshal
 from invenio.bibtask import write_message
 from invenio.config import CFG_ETCDIR
 
+
 def get_citations_from_file(filename):
     """gets the citation data (who cites who) from a file and returns
     - a dictionary of type x:{x1,x2..},
@@ -55,7 +56,7 @@ def get_citations_from_file(filename):
     dict_of_ids = {}
     count = 0
     try:
-        citation_file = open(filename,"r")
+        citation_file = open(filename, "r")
     except StandardError:
         write_message("Cannot find file: %s" % filename, sys.stderr)
         raise StandardError
@@ -80,6 +81,7 @@ def get_citations_from_file(filename):
         %str(dict_of_ids), verbose=9)
     write_message("Citations: %s" % str(cit), verbose=9)
     return cit, dict_of_ids
+
 
 def get_citations_from_db():
     """gets the citation data (who cites who) from the rnkCITATIONDATA table,
@@ -107,7 +109,7 @@ def get_citations_from_db():
                     if value not in dict_of_ids:
                         dict_of_ids[value] = count
                         count += 1
-            write_message ("Citation data collected\
+            write_message("Citation data collected\
 from rnkCITATIONDATA", verbose=2)
             write_message("Ids and recids corespondace: %s" \
                 % str(dict_of_ids), verbose=9)
@@ -121,7 +123,8 @@ from rnkCITATIONDATA table", verbose=1)
 from rnkCITATIONDATA table", verbose=1)
     return {}, {}
 
-def construct_ref_array (cit, dict_of_ids, len_):
+
+def construct_ref_array(cit, dict_of_ids, len_):
     """returns an array with the number of references that each recid has """
     ref = array((), int32)
     ref = zeros(len_, int32)
@@ -133,6 +136,7 @@ def construct_ref_array (cit, dict_of_ids, len_):
 of references for each paper.", verbose=5)
     return ref
 
+
 def get_external_links_from_file(filename, ref, dict_of_ids):
     """returns a dictionary containing the number of
     external links for each recid
@@ -140,7 +144,7 @@ def get_external_links_from_file(filename, ref, dict_of_ids):
     ext_links = {}
     #format: ext_links[dict_of_ids[recid]]=number of total external links
     try:
-        external_file = open(filename,"r")
+        external_file = open(filename, "r")
     except StandardError:
         write_message("Cannot find file: %s" % filename, sys.stderr)
         raise StandardError
@@ -155,7 +159,8 @@ def get_external_links_from_file(filename, ref, dict_of_ids):
     write_message("External link information extracted", verbose=2)
     return ext_links
 
-def get_external_links_from_db(ref, dict_of_ids, reference_indicator):
+
+def get_external_links_from_db_old(ref, dict_of_ids, reference_indicator):
     """returns a dictionary containing the number of
     external links for each recid
     external link=citation that is not in our database """
@@ -175,9 +180,45 @@ def get_external_links_from_db(ref, dict_of_ids, reference_indicator):
                 ext_links[dict_of_ids[recid]] = 0
         else:
             ext_links[dict_of_ids[recid]] = 0
-    write_message ("External link information extracted", verbose=2)
+    write_message("External link information extracted", verbose=2)
     write_message("External links: %s" % str(ext_links), verbose=9)
     return ext_links
+
+
+def get_external_links_from_db(ref, dict_of_ids, reference_indicator):
+    """returns a dictionary containing the number of
+    external links for each recid
+    external link=citation that is not in our database """
+    ext_links = {}
+    dict_all_ref = {}
+    for recid in dict_of_ids:
+        dict_all_ref[recid] = 0
+        ext_links[dict_of_ids[recid]] = 0
+    reference_db_id = reference_indicator[0:2]
+    reference_tag_regex = reference_indicator + "[a-z]"
+    tag_list = run_sql("select id from bib" + reference_db_id + \
+                         "x where tag RLIKE %s", (reference_tag_regex, ))
+    tag_set = set()
+    for tag in tag_list:
+        tag_set.add(tag[0])
+    ref_list = run_sql("select id_bibrec, id_bibxxx, field_number from \
+                       bibrec_bib" + reference_db_id + "x group by \
+                       id_bibrec, field_number")
+    for item in ref_list:
+        recid = int(item[0])
+        id_bib = int(item[1])
+        if recid in dict_of_ids and id_bib in tag_set:
+            dict_all_ref[recid] += 1
+    for recid in dict_of_ids:
+        total_links = dict_all_ref[recid]
+        internal_links = ref[dict_of_ids[recid]]
+        ext_links[dict_of_ids[recid]] = total_links - internal_links
+        if ext_links[dict_of_ids[recid]] < 0:
+            ext_links[dict_of_ids[recid]] = 0
+    write_message("External link information extracted", verbose=2)
+    write_message("External links: %s" % str(ext_links), verbose=9)
+    return ext_links
+
 
 def avg_ext_links_with_0(ext_links):
     """returns the average number of external links per paper
@@ -190,6 +231,7 @@ def avg_ext_links_with_0(ext_links):
 papers with 0 external links) is: %s" % str(avg_ext), verbose=3)
     return avg_ext
 
+
 def avg_ext_links_without_0(ext_links):
     """returns the average number of external links per paper
     excluding in the counting the papers with 0 external links"""
@@ -200,9 +242,10 @@ def avg_ext_links_without_0(ext_links):
             count += 1
             total += ext_links[item]
     avg_ext = total/count
-    write_message ("The average number of external links per paper (excluding \
+    write_message("The average number of external links per paper (excluding \
 papers with 0 external links) is: %s" % str(avg_ext), verbose=3)
     return avg_ext
+
 
 def leaves(ref):
     """returns the number of papers that do not cite any other paper"""
@@ -210,9 +253,10 @@ def leaves(ref):
     for i in ref:
         if i == 0:
             nr_of_leaves += 1
-    write_message ("The number of papers that do not cite \
+    write_message("The number of papers that do not cite \
 any other papers: %s" % str(leaves), verbose=3)
     return nr_of_leaves
+
 
 def get_dates_from_file(filename, dict_of_ids):
     """Returns the year of the publication for each paper.
@@ -220,7 +264,7 @@ def get_dates_from_file(filename, dict_of_ids):
     dates = {}
     # the format is: dates[dict_of_ids[recid]] = year
     try:
-        dates_file = open(filename,"r")
+        dates_file = open(filename, "r")
     except StandardError:
         write_message("Cannot find file: %s" % filename, sys.stderr)
         raise StandardError
@@ -234,23 +278,27 @@ def get_dates_from_file(filename, dict_of_ids):
     write_message("Dates dictionary %s" % str(dates), verbose=9)
     return dates
 
-def get_dates_from_db(dict_of_ids):
+
+def get_dates_from_db(dict_of_ids, publication_year_tag, creation_date_tag):
     """Returns the year of the publication for each paper.
     In case the year is not in the db, the year of the submission is taken"""
-    current_year =  int(datetime.datetime.now().strftime("%Y"))
+    current_year = int(datetime.datetime.now().strftime("%Y"))
+    publication_year_db_id = publication_year_tag[0:2]
+    creation_date_db_id = creation_date_tag[0:2]
     total = 0
     count = 0
     dict_of_dates = {}
     for recid in dict_of_ids:
         dict_of_dates[recid] = 0
-    query1 = "select id,tag,value from bib26x where tag='260__c';"
-    date_list = run_sql(query1)
+    date_list = run_sql("select id, tag, value from bib" + \
+                        publication_year_db_id + "x where tag=%s", \
+                        (publication_year_tag, ))
     date_dict = {}
     for item in date_list:
         date_dict[int(item[0])] = item[2]
     pattern = re.compile('.*(\d{4}).*')
-    query2 = "select id_bibrec,id_bibxxx,field_number from bibrec_bib26x;"
-    date_list = run_sql(query2)
+    date_list = run_sql("select id_bibrec, id_bibxxx, field_number \
+                        from bibrec_bib" + publication_year_db_id +"x")
     for item in date_list:
         recid = int(item[0])
         id_ = int(item[1])
@@ -259,20 +307,21 @@ def get_dates_from_db(dict_of_ids):
             if reg:
                 date = int(reg.group(1))
                 if date > 1000 and date <= current_year:
-                    dict_of_dates[recid] =  date
+                    dict_of_dates[recid] = date
                     total += date
                     count += 1
     not_covered = []
     for recid in dict_of_dates:
         if dict_of_dates[recid] == 0:
             not_covered.append(recid)
-    query3 = "select id,tag,value from bib96x where tag='961__x';"
-    date_list = run_sql(query3)
+    date_list = run_sql("select id, tag, value from bib" + \
+                        creation_date_db_id + "x where tag=%s", \
+                        (creation_date_tag, ))
     date_dict = {}
     for item in date_list:
         date_dict[int(item[0])] = item[2]
-    query4 = "select id_bibrec,id_bibxxx,field_number from bibrec_bib96x;"
-    date_list = run_sql(query4)
+    date_list = run_sql("select id_bibrec, id_bibxxx, field_number \
+                        from bibrec_bib" + creation_date_db_id + "x")
     for item in date_list:
         recid = int(item[0])
         id_ = int(item[1])
@@ -293,6 +342,7 @@ def get_dates_from_db(dict_of_ids):
     write_message("Dates dictionary %s" % str(dates), verbose=9)
     return dates
 
+
 def construct_sparse_matrix(cit, ref, dict_of_ids, len_, damping_factor):
     """returns several structures needed in the calculation
     of the PAGERANK method using this structures, we don't need
@@ -311,6 +361,7 @@ def construct_sparse_matrix(cit, ref, dict_of_ids, len_, damping_factor):
     write_message("Sparse information calculated", verbose=3)
     return sparse, semi_sparse, semi_sparse_coeficient
 
+
 def construct_sparse_matrix_ext(cit, ref, ext_links, dict_of_ids, alpha, beta):
     """if x doesn't cite anyone: cites everyone : 1/len_ -- should be used!
     returns several structures needed in the calculation
@@ -318,10 +369,9 @@ def construct_sparse_matrix_ext(cit, ref, ext_links, dict_of_ids, alpha, beta):
     len_ = len(dict_of_ids)
     sparse = {}
     semi_sparse = {}
-    for i in range(len_):
-        sparse[i+1, 0] = alpha/(len_)
     sparse[0, 0] = 1.0 - alpha
     for j in range(len_):
+        sparse[j+1, 0] = alpha/(len_)
         if j not in ext_links:
             sparse[0, j+1] = beta/(len_ + beta)
         else:
@@ -351,6 +401,7 @@ def construct_sparse_matrix_ext(cit, ref, ext_links, dict_of_ids, alpha, beta):
     write_message("Sparse information calculated", verbose=3)
     return sparse, semi_sparse
 
+
 def construct_sparse_matrix_time(cit, ref, dict_of_ids, \
          damping_factor, date_coef):
     """returns several structures needed in the calculation of the PAGERANK_time
@@ -371,6 +422,7 @@ def construct_sparse_matrix_time(cit, ref, dict_of_ids, \
     write_message("Sparse information calculated", verbose=3)
     return sparse, semi_sparse, semi_sparse_coeficient
 
+
 def statistics_on_sparse(sparse):
     """returns the number of papers that cite themselves"""
     count_diag = 0
@@ -381,11 +433,11 @@ def statistics_on_sparse(sparse):
         str(count_diag), verbose=3)
     return count_diag
 
+
 def pagerank(conv_threshold, check_point, len_, sparse, \
             semi_sparse, semi_sparse_coef):
     """the core function of the PAGERANK method
     returns an array with the ranks coresponding to each recid"""
-    weights_old = array((), float32)
     weights_old = ones((len_), float32) # initial weights
     weights_new = array((), float32)
     converged = False
@@ -405,7 +457,7 @@ def pagerank(conv_threshold, check_point, len_, sparse, \
             if step == check_point - 1:
                 diff = weights_new - weights_old
                 difference = sqrt(dot(diff, diff))/len_
-                write_message( "Finished step: %s, %s " \
+                write_message("Finished step: %s, %s " \
                         %(str(check_point*(nr_of_check_points-1) + step), \
                             str(difference)), verbose=5)
             weights_old = weights_new.copy()
@@ -415,7 +467,8 @@ The threshold was %s" % (str(nr_of_check_points), str(difference)),\
              verbose=2)
     return weights_old
 
-def pagerank_ext( conv_threshold, check_point, len_, sparse, semi_sparse):
+
+def pagerank_ext(conv_threshold, check_point, len_, sparse, semi_sparse):
     """the core function of the PAGERANK_EXT method
     returns an array with the ranks coresponding to each recid"""
     weights_old = array((), float32)
@@ -437,7 +490,7 @@ def pagerank_ext( conv_threshold, check_point, len_, sparse, semi_sparse):
             if step == check_point - 1:
                 diff = weights_new - weights_old
                 difference = sqrt(dot(diff, diff))/len_
-                write_message( "Finished step: %s, %s " \
+                write_message("Finished step: %s, %s " \
                     % (str(check_point*(nr_of_check_points-1) + step), \
                         str(difference)), verbose=5)
             weights_old = weights_new.copy()
@@ -447,6 +500,7 @@ The threshold was %s" % (str(nr_of_check_points), \
             str(difference)), verbose=2)
     #return weights_old[1:len_]/(len_ - weights_old[0])
     return weights_old[1:len_]
+
 
 def pagerank_time(conv_threshold, check_point, len_, \
         sparse, semi_sparse, semi_sparse_coeficient, date_coef):
@@ -477,7 +531,7 @@ def pagerank_time(conv_threshold, check_point, len_, \
             if step == check_point - 1:
                 diff = weights_new - weights_old
                 difference = sqrt(dot(diff, diff))/len_
-                write_message( "Finished step: %s, %s " \
+                write_message("Finished step: %s, %s " \
                     % (str(check_point*(nr_of_check_points-1) + step), \
                     str(difference)), verbose=5)
             weights_old = weights_new.copy()
@@ -486,6 +540,7 @@ def pagerank_time(conv_threshold, check_point, len_, \
 The threshold was %s" % (str(nr_of_check_points), \
         str(difference)), verbose=2)
     return weights_old
+
 
 def citation_rank_time(cit, dict_of_ids, date_coef, dates, decimals):
     """returns a dictionary recid:weight based on the total number of
@@ -503,16 +558,18 @@ def citation_rank_time(cit, dict_of_ids, date_coef, dates, decimals):
     write_message("Citation rank calculated", verbose=2)
     return dict_of_ranks
 
+
 def get_ranks(weights, dict_of_ids, mult, dates, decimals):
     """returns a dictionary recid:value, where value is the weight of the
     recid paper; the second order is the reverse time order,
     from recent to past"""
     dict_of_ranks = {}
     for item in dict_of_ids:
-        dict_of_ranks[item] = round(weights[dict_of_ids[item]]* mult, decimals) \
+        dict_of_ranks[item] = round(weights[dict_of_ids[item]]* mult, decimals)\
           + dates[dict_of_ids[item]]* pow(10, 0-4-decimals)
         #dict_of_ranks[item] = weights[dict_of_ids[item]]
     return dict_of_ranks
+
 
 def sort_weights(dict_of_ranks):
     """sorts the recids based on weights(first order)
@@ -521,11 +578,24 @@ def sort_weights(dict_of_ranks):
 cmp(dict_of_ranks[y], dict_of_ranks[x]))
     return ranks_by_citations
 
+
+def normalize_weights(dict_of_ranks):
+    """the weights should be normalized to 100, so they woun't be
+    different from the weights from other ranking methods"""
+    max_weight = 0.0
+    for recid in dict_of_ranks:
+        weight = dict_of_ranks[recid]
+        if weight > max_weight:
+            max_weight = weight
+    for recid in dict_of_ranks:
+        dict_of_ranks[recid] = round(dict_of_ranks[recid] * 100.0/max_weight, 3)
+
+
 def write_first_ranks_to_file(ranks_by_citations, dict_of_ranks, \
         nr_of_ranks, filename):
     """Writes the first n results of the ranking method into a file"""
     try:
-        ranks_file = open(filename,"w")
+        ranks_file = open(filename, "w")
     except StandardError:
         write_message("Problems with file: %s" % filename, sys.stderr)
         raise StandardError
@@ -536,10 +606,12 @@ def write_first_ranks_to_file(ranks_by_citations, dict_of_ranks, \
     write_message("The first %s pairs recid:rank in the ranking order \
 are written into this file: %s" % (nr_of_ranks, filename), verbose=2)
 
+
 def del_rank_method_data(rank_method_code):
     """Delete the data for a rank method from rnkMETHODDATA table"""
-    id_ = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code,))
+    id_ = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
     run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id_[0][0], ))
+
 
 def into_db(dict_of_ranks, rank_method_code):
     """Writes into the rnkMETHODDATA table the ranking results"""
@@ -549,11 +621,12 @@ def into_db(dict_of_ranks, rank_method_code):
     serialized_data = serialize_via_marshal(dict_of_ranks)
     method_id_str = str(method_id[0][0])
     run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) \
-        VALUES (%s,%s)",(method_id_str, serialized_data,))
+        VALUES(%s, %s) ", (method_id_str, serialized_data, ))
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", \
         (date, rank_method_code))
     write_message("Finished writing the ranks into rnkMETHOD table", verbose=5)
+
 
 def run_pagerank(cit, dict_of_ids, len_, ref, damping_factor, \
             conv_threshold, check_point, dates):
@@ -566,10 +639,11 @@ def run_pagerank(cit, dict_of_ids, len_, ref, damping_factor, \
     dict_of_ranks = get_ranks(weights, dict_of_ids, 1, dates, 2)
     return dict_of_ranks
 
+
 def run_pagerank_ext(cit, dict_of_ids, ref, ext_links, \
                         conv_threshold, check_point, alpha, beta, dates):
     """returns the final form of the ranks when using pagerank_ext method"""
-    write_message( "Running the PageRank with external links method", verbose=5)
+    write_message("Running the PageRank with external links method", verbose=5)
     len_ = len(dict_of_ids)
     sparse, semi_sparse = construct_sparse_matrix_ext(cit, ref, \
         ext_links, dict_of_ids, alpha, beta)
@@ -577,6 +651,7 @@ def run_pagerank_ext(cit, dict_of_ids, ref, ext_links, \
         len_ + 1, sparse, semi_sparse)
     dict_of_ranks = get_ranks(weights, dict_of_ids, 1, dates, 2)
     return dict_of_ranks
+
 
 def run_pagerank_time(cit, dict_of_ids, len_, ref, damping_factor, \
                         conv_threshold, check_point, date_coef, dates):
@@ -591,12 +666,14 @@ def run_pagerank_time(cit, dict_of_ids, len_, ref, damping_factor, \
     dict_of_ranks = get_ranks(weights, dict_of_ids, 100000, dates, 2)
     return dict_of_ranks
 
+
 def run_citation_rank_time(cit, dict_of_ids, date_coef, dates):
     """returns the final form of the ranks when using citation count
     as function of time method"""
     write_message("Running the citation rank with time decay method", verbose=5)
     dict_of_ranks = citation_rank_time(cit, dict_of_ids, date_coef, dates, 2)
     return dict_of_ranks
+
 
 def spearman_rank_correlation_coef(rank1, rank2, len_):
     """rank1 and rank2 are arrays containing the recids in the ranking order
@@ -605,8 +682,9 @@ def spearman_rank_correlation_coef(rank1, rank2, len_):
     total = 0
     for i in range(len_):
         rank_value = rank2.index(rank1[i])
-        total += ( i - rank_value)*( i - rank_value)
+        total += (i - rank_value)*(i - rank_value)
     return 1 - (6.0 * total) / (len_*(len_*len_ - 1))
+
 
 def remove_loops(cit, dates, dict_of_ids):
     """when using time decay, new papers that are part of a loop
@@ -630,15 +708,17 @@ def remove_loops(cit, dates, dict_of_ids):
     write_message("Simple loops removed", verbose=5)
     return new_cit
 
+
 def calculate_time_weights(len_, time_decay, dates):
     """calculates the time coeficients for each paper"""
-    current_year =  int(datetime.datetime.now().strftime("%Y"))
+    current_year = int(datetime.datetime.now().strftime("%Y"))
     date_coef = {}
     for j in range(len_):
         date_coef[j] = exp(time_decay*(dates[j] - current_year))
     write_message("Time weights calculated", verbose=5)
     write_message("Time weights: %s" % str(date_coef), verbose=9)
     return date_coef
+
 
 def get_dates(function, config, dict_of_ids):
     """returns a dictionary containing the year of
@@ -648,9 +728,25 @@ def get_dates(function, config, dict_of_ids):
         dates = get_dates_from_file(file_for_dates, dict_of_ids)
     except (ConfigParser.NoOptionError, StandardError), err:
         write_message("If you want to read the dates from file set up the \
-'file_for_dates' variable in the config file [%s]" %err,  verbose=3)
-        dates = get_dates_from_db(dict_of_ids)
+'file_for_dates' variable in the config file [%s]" %err, verbose=3)
+    try:
+        publication_year_tag = config.get(function, "publication_year_tag")
+        dummy = int(publication_year_tag[0:3])
+    except (ConfigParser.NoOptionError, StandardError):
+        write_message("You need to set up correctly the publication_year_tag \
+                      in the cfg file", sys.stderr)
+        raise Exception
+    try:
+        creation_date_tag = config.get(function, "creation_date_tag")
+        dummy = int(creation_date_tag[0:3])
+    except (ConfigParser.NoOptionError, StandardError):
+        write_message("You need to set up correctly the creation_date_tag \
+                      in the cfg file", sys.stderr)
+        raise Exception
+    dates = get_dates_from_db(dict_of_ids, publication_year_tag, \
+                              creation_date_tag)
     return dates
+
 
 def citerank(rank_method_code):
     """new ranking method based on the citation graph"""
@@ -696,7 +792,7 @@ the file_for_citations parameter in the config file [%s]" %err, verbose=2)
             run_citation_rank_time(cit, dict_of_ids, date_coef, dates)
     else:
         try:
-            conv_threshold  = float(config.get(function, "conv_threshold"))
+            conv_threshold = float(config.get(function, "conv_threshold"))
             check_point = int(config.get(function, "check_point"))
             damping_factor = float(config.get(function, "damping_factor"))
             write_message("Parameters: d = %s, conv_threshold = %s, \
@@ -717,11 +813,12 @@ str(conv_threshold), str(check_point)), verbose=5)
             if use_ext_cit == "yes":
                 try:
                     ext_citation_file = config.get(function, "ext_citation_file")
-                    ext_links = get_external_links_from_file\
-                     (ext_citation_file, ref, dict_of_ids)
+                    ext_links = get_external_links_from_file(ext_citation_file,
+                                                             ref, dict_of_ids)
                 except (ConfigParser.NoOptionError, StandardError):
-                    write_message("If you want to read the external citation data \
-from file set up the ext_citation_file parameter in the config. file", verbose=3)
+                    write_message("If you want to read the external citation \
+data from file set up the ext_citation_file parameter in the config. file", \
+verbose=3)
                     try:
                         reference_tag = config.get(function, "ext_reference_tag")
                         dummy = int(reference_tag[0:3])
@@ -731,14 +828,15 @@ reference_tag in the cfg file", sys.stderr)
                         raise Exception
                     ext_links = get_external_links_from_db(ref, \
                             dict_of_ids, reference_tag)
-                avg  = avg_ext_links_with_0(ext_links)
-                if avg < 1:
-                    write_message("This method can't be ran. There is not enough \
-information about the external citation. Hint: check the reference tag", sys.stderr)
-                    raise Exception
-                avg_ext_links_without_0(ext_links)
+                    avg = avg_ext_links_with_0(ext_links)
+                    if avg < 1:
+                        write_message("This method can't be ran. There is not \
+enough information about the external citation. Hint: check the reference tag", \
+sys.stderr)
+                        raise Exception
+                    avg_ext_links_without_0(ext_links)
                 try:
-                    alpha  = float(config.get(function, "ext_alpha"))
+                    alpha = float(config.get(function, "ext_alpha"))
                     beta = float(config.get(function, "ext_beta"))
                 except (ConfigParser.NoOptionError, StandardError), err:
                     write_message("Exception: %s" % err, sys.stderr)
@@ -751,7 +849,8 @@ information about the external citation. Hint: check the reference tag", sys.std
         elif method == "pagerank_time":
             try:
                 time_decay = float(config.get(function, "time_decay"))
-                write_message("Parameter: time_decay = %s" %str(time_decay), verbose=5)
+                write_message("Parameter: time_decay = %s" \
+                              %str(time_decay), verbose=5)
             except (ConfigParser.NoOptionError, StandardError), err:
                 write_message("Exception: %s" % err, sys.stderr)
                 raise Exception
@@ -781,5 +880,5 @@ Please check the ranking_method parameter in the config. file.", sys.stderr)
         write_message("If you want the ranks to be printed in a file you have \
 to set output_ranks_to_filename and output_rank_limit \
 parameters in the configuration file", verbose=3)
+    normalize_weights(dict_of_ranks)
     into_db(dict_of_ranks, rank_method_code)
-
