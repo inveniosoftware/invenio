@@ -164,8 +164,8 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
     from invenio.bibdocfile import BibRecDocs, file_strip_ext
     from md5 import md5
     import shutil
-    from invenio.search_engine import perform_request_search
-
+    from invenio.search_engine import perform_request_search, \
+                                      guess_collection_of_a_record
     errors = []
     info = [0, []] # Number of files read, name of the files
     try:
@@ -174,16 +174,16 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
         errors.append(("", error))
         return errors, info
     err_desc = {1: "More than one possible recID, ambiguous behaviour", 2: "No records match that file name",
-                3: "File already exists", 4: "A file with the same name and format already exists"}
+                3: "File already exists", 4: "A file with the same name and format already exists",
+                5: "No rights to upload to collection '%s'"}
     # Create directory DONE/ if doesn't exist
     folder = (folder[-1] == "/") and folder or (folder + "/")
     files_done_dir = folder + "DONE/"
     try:
         os.mkdir(files_done_dir)
     except OSError:
-        # Directory exists
+        # Directory exists or no write permission
         pass
-
     for docfile in files:
         if os.path.isfile(os.path.join(folder, docfile)):
             info[0] += 1
@@ -215,6 +215,13 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
                             break
                 if len(errors) > num_errors:
                     continue
+            # Check if user has rights to upload file
+            file_collection = guess_collection_of_a_record(int(rec_id))
+            auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=file_collection)
+            if auth_code != 0:
+                error_msg = err_desc[5] % file_collection
+                errors.append((docfile, error_msg))
+                continue
             tempfile.tempdir = CFG_TMPDIR
             # Move document to be uploaded to temporary folder
             tmp_file = tempfile.mktemp(prefix=identifier + "_" + time.strftime("%Y%m%d%H%M%S", time.localtime()) + "_", suffix=extension)
