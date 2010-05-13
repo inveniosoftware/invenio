@@ -27,6 +27,7 @@ po/*.sed
 *.sbcl.core
 *.fas
 *.fasl
+*.sse2f
 *.lib
 *.x86f
 modules/bibclassify/bin/bibclassify
