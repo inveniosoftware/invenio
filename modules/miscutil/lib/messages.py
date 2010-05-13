@@ -107,6 +107,7 @@ def language_list_long(enabled_langs_only=True):
                           'hr': 'Hrvatski',
                           'gl': 'Galego',
                           'it': 'Italiano',
+                          'ka': 'ქართული',
                           'rw': 'Kinyarwanda',
                           'hu': 'Magyar',
                           'ja': '日本語',
