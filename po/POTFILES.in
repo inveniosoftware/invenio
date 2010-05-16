@@ -57,7 +57,6 @@ modules/bibedit/lib/bibrecord.py
 modules/bibedit/lib/bibrecord_tests.py
 modules/bibedit/lib/refextract_config.py
 modules/bibedit/lib/refextract.py
-modules/bibedit/web/admin/bibeditadmin.py
 modules/bibformat/bin/bibreformat.in
 modules/bibformat/lib/bibformat_engine_tests.py
 modules/bibformat/lib/bibformat_templates.py
@@ -65,6 +64,8 @@ modules/bibformat/lib/bibformatadminlib.py
 modules/bibformat/lib/elements/bfe_authors.py
 modules/bibformat/lib/elements/bfe_fulltext.py
 modules/bibformat/lib/elements/bfe_fulltext_mini.py
+modules/bibformat/lib/elements/bfe_edit_files.py
+modules/bibformat/lib/elements/bfe_edit_record.py
 modules/bibformat/web/admin/bibformatadmin.py
 modules/bibharvest/bin/oaiharvest.in
 modules/bibharvest/lib/bibharvest_templates.py
@@ -99,6 +100,8 @@ modules/bibrank/lib/bibrank_word_indexer.py
 modules/bibrank/web/admin/bibrankadmin.py
 modules/bibsched/bin/bibsched.in
 modules/bibsched/bin/bibtaskex.in
+modules/bibupload/lib/batchuploader_templates.py
+modules/bibupload/lib/batchuploader_webinterface.py
 modules/elmsubmit/bin/elmsubmit.in
 modules/elmsubmit/lib/elmsubmit_enriched2txt.py
 modules/elmsubmit/lib/elmsubmit_EZArchive.py
@@ -182,6 +185,7 @@ modules/webstyle/lib/webdoc.py
 modules/webstyle/lib/webdoc_tests.py
 modules/webstyle/lib/webdoc_webinterface.py
 modules/websubmit/lib/file.py
+modules/websubmit/lib/websubmit_managedocfiles.py
 modules/websubmit/lib/functions/Add_Files.py
 modules/websubmit/lib/functions/CaseEDS.py
 modules/websubmit/lib/functions/Create_Modify_Interface.py
@@ -213,9 +217,9 @@ modules/websubmit/lib/functions/Send_APP_Mail.py
 modules/websubmit/lib/functions/Send_Approval_Request.py
 modules/websubmit/lib/functions/Send_Modify_Mail.py
 modules/websubmit/lib/functions/Send_SRV_Mail.py
+modules/websubmit/lib/functions/Shared_Functions.py
 modules/websubmit/lib/functions/Test_Status.py
 modules/websubmit/lib/functions/Update_Approval_DB.py
-modules/websubmit/lib/functions/Upload_Files.py
 modules/websubmit/lib/websubmit_config.py
 modules/websubmit/lib/websubmit_engine.py
 modules/websubmit/lib/websubmit_templates.py
@@ -247,8 +251,6 @@ modules/bibedit/lib/bibedit_webinterface.py
 modules/bibedit/lib/bibeditmulti_templates.py
 modules/bibedit/lib/bibedit_utils.py
 modules/bibedit/lib/bibeditmulti_webinterface.py
-modules/bibedit/lib/bibeditold_utils.py
-modules/bibedit/lib/bibeditold_templates.py
 modules/bibexport/lib/bibexport_method_fieldexporter_templates.py
 modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py
 modules/bibexport/lib/bibexport_method_fieldexporter.py
