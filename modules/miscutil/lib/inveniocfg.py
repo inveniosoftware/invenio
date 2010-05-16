@@ -818,7 +818,7 @@ NameVirtualHost %(vhost_ip_address)s:80
 %(wsgi_socket_directive)s
 %(xsendfile_directive)s
 WSGIRestrictStdout Off
-WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
+#WSGIImportScript %(wsgidir)s/invenio.wsgi process-group=invenio application-group=%%{GLOBAL}
 <Files *.pyc>
    deny from all
 </Files>
