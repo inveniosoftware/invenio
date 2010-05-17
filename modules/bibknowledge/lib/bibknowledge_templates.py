@@ -188,14 +188,14 @@ class Template:
         else:
             out += _("Please upload the RDF file for taxonomy")+" "+kb_name
         out += """
-             <br/>
-             <form enctype="multipart/form-data" method="post"
-                   action="kb/upload">
-             <input type="file" name="file"/>
-             <input type="hidden", name="kb", value="%(kb_id)s"/>
-             <input type="submit" name="submit" value="Upload"/>
-             </form>
-             """ % { 'kb_id': kb_id }
+          <br/>
+          <!-- enctype="multipart/form-data"-->
+          <form method="post" action="kb/upload" name="upload" enctype="multipart/form-data">
+          <input style="display:none;" name="kb", value="%(kb_id)s"/>
+          <input type="file" name="file"/>
+          <input type="submit" name="submit" value="Upload"/>
+          </form>
+          """ % { 'kb_id': kb_id }
         return out
 
 

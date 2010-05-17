@@ -144,6 +144,11 @@ function initHotkeys(){
   // Save content and jump to next content field.
   $(document).bind('keydown', {combi: 'tab'},
 		   onKeyTab);
+
+  // Lauch autosuggest
+  $(document).bind('keydown', {combi: 'ctrl+shift+a'}, function (event)  { onAutosuggest(event); } );
+  $(document).bind('keydown', {combi: 'ctrl+9'}, function (event)  { onAutosuggest(event); } );
+
   // Save content and jump to previous content field.
   $(document).bind('keydown', {combi: 'shift+tab'},
 		   onKeyTab);
@@ -229,7 +234,8 @@ function onKeyTab(event){
   if (event.target.nodeName == 'TEXTAREA'){
     var contentCells = $('.bibEditCellContent');
     var cell = $(event.target).parent().parent();
-    $(event.target).parent().submit();
+    var foo = $(event.target).parent();
+    foo.submit();
     if (!event.shiftKey)
       $(contentCells).eq($(contentCells).index(cell)+1).trigger('click');
     else
