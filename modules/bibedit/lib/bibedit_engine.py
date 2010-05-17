@@ -56,7 +56,7 @@ from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_delete_subfield_from, \
     record_modify_subfield, record_move_subfield, \
     create_field, record_replace_field, record_move_fields, \
-    record_modify_controlfield
+    record_modify_controlfield, record_get_field_values
 from invenio.config import CFG_BIBEDIT_PROTECTED_FIELDS, CFG_CERN_SITE, \
     CFG_SITE_URL
 from invenio.search_engine import record_exists, search_pattern
@@ -339,8 +339,8 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
                                                       hpChanges, undo_redo, \
                                                       isBulk))
     elif request_type in ('autosuggest', 'autocomplete', 'autokeyword'):
-       response.update(perform_request_autocomplete(request_type, recid, uid, \
-                                                    data))
+        response.update(perform_request_autocomplete(request_type, recid, uid, \
+                                                     data))
 
     elif request_type in ('getTickets', ):
         # BibCatalog requests.
@@ -965,7 +965,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
             else:
                 response['resultCode'] = 30
         response['cacheMTime'], response['cacheDirty'] = \
-            update_cache_file_contents(recid, uid, record_revision, 
+            update_cache_file_contents(recid, uid, record_revision,
                                        record, \
                                        pending_changes, \
                                        deactivated_hp_changes, \
@@ -978,7 +978,7 @@ def perform_request_autocomplete(request_type, recid, uid, data):
     """
     Perfrom an AJAX request associated with the retrieval of autocomplete
     data.
-    
+
     Arguments:
         request_type: Type of the currently served request
         recid: the identifer of the record
@@ -1041,7 +1041,7 @@ def perform_request_autocomplete(request_type, recid, uid, data):
                     vals.append(kbrvals[0])
             #check that the values are not already contained in other
             #instances of this field
-            record_revision, record = get_cache_file_contents(recid, uid)[1:]
+            record = get_cache_file_contents(recid, uid)[2]
             xml_rec = print_rec(record)
             record, status_code, dummy_errors = create_record(xml_rec)
             existing_values = []
