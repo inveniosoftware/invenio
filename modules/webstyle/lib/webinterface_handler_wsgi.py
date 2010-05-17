@@ -111,7 +111,8 @@ class SimulatedModPythonRequest(object):
             self.__environ['wsgi.post_form'] = post_form
             self.__environ['wsgi.input'] = new_input
         else:
-            post_form = (None, None, fs)
+            post_form = (input, None, fs)
+            self.__environ['wsgi.post_form'] = post_form
         return fs
 
     def get_response_sent_p(self):

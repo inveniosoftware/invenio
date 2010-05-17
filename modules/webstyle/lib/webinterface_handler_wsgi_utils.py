@@ -446,7 +446,7 @@ class FieldStorage:
         #
 
         self.list = FieldList()
-        self.wsgi_input_consumed = False
+        self.wsgi_input_consumed = True
 
         # always process GET-style parameters
         if req.args:
@@ -478,6 +478,7 @@ class FieldStorage:
 
         if not ctype.startswith("multipart/"):
             # we don't understand this content-type
+            self.wsgi_input_consumed = False
             return
 
         # figure out boundary
@@ -599,7 +600,6 @@ class FieldStorage:
             field.disposition_options = disp_options
             field.headers = headers
             self.list.append(field)
-        self.wsgi_input_consumed = True
 
     def add_field(self, key, value):
         """Insert a field as key/value pair"""
