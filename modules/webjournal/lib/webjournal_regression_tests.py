@@ -38,7 +38,7 @@ class ArticlesRelated(unittest.TestCase):
         article = wju.is_new_article('AtlantisTimes', '03/2009', 99)
         self.assertEqual(article, False)
 
-        article = wju.is_new_article('AtlantisTimes', '03/2009', 101)
+        article = wju.is_new_article('AtlantisTimes', '03/2009', 103)
         self.assertEqual(article, True)
 
 
@@ -298,7 +298,7 @@ class HtmlCachingFunction(unittest.TestCase):
     def setUp(self):
         "Access some URL for cache to be generated"
         urllib.urlopen(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/News')
-        urllib.urlopen(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/News/101')
+        urllib.urlopen(CFG_SITE_URL + '/journal/AtlantisTimes/2009/03/News/103')
 
     def test_get_index_page_from_cache(self):
         """webjournal - function to get an index page from the cache"""
@@ -307,7 +307,7 @@ class HtmlCachingFunction(unittest.TestCase):
 
     def test_get_article_page_from_cache(self):
         """webjournal - gets an article view of a journal from cache"""
-        value = wju.get_article_page_from_cache('AtlantisTimes', 'News', 101, '03/2009', 'en')
+        value = wju.get_article_page_from_cache('AtlantisTimes', 'News', 103, '03/2009', 'en')
         assert("April 14th, 1832.—Leaving Socêgo, we rode to another estate on the Rio Macâe" in value)
 
     def test_clear_cache_for_issue(self):

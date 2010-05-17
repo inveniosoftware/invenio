@@ -80,10 +80,9 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
                 #no need to filter
                 return recxml
     #filter..
-    lines = recxml.split("\n")
     out = ""
     omit = False
-    for line in lines:
+    for line in recxml.splitlines(True):
         #check if this block needs to be omitted
         for htag in filter_tags:
             if line.count('datafield tag="'+str(htag)+'"'):

@@ -1514,7 +1514,6 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln):
     """
     Gets an article view of a journal from cache.
     False if not in cache.
-    FIXME:NOT USED?
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
