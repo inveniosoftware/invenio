@@ -23,48 +23,50 @@ BibClassify keyword analyser.
 This module contains methods to extract keywords from texts. It provides 3
 different methods for 3 different types of keywords: single keywords, composite
 keywords and author keywords.
+
+This module is STANDALONE safe
 """
+
+try:
+    import psyco
+    psyco.full()
+except:
+    pass
 
 import re
 import sys
 import time
 
-try:
-    from bibclassify_config import CFG_BIBCLASSIFY_VALID_SEPARATORS, \
-        CFG_BIBCLASSIFY_AUTHOR_KW_START, \
-        CFG_BIBCLASSIFY_AUTHOR_KW_END, \
-        CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION
-    from bibclassify_utils import write_message
-except ImportError, err:
-    print >> sys.stderr, "Error: %s" % err
-    sys.exit(1)
-
-# Retrieve the custom configuration if it exists.
-try:
-    from bibclassify_config_local import *
-except ImportError:
-    # No local configuration was found.
-    pass
+import bibclassify_config as bconfig
+log = bconfig.get_logger("bibclassify.keyword_analyzer")
 
 _MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)
-    for _separator in CFG_BIBCLASSIFY_VALID_SEPARATORS])
+    for _separator in bconfig.CFG_BIBCLASSIFY_VALID_SEPARATORS])
 
-def get_single_keywords(skw_db, fulltext, verbose=True):
-    """Returns a dictionary of single keywords bound with the positions
-    of the matches in the fulltext.
-    Format of the output dictionary is (single keyword: positions)."""
+
+# XXX - rebuild this whole thing
+def get_single_keywords(skw_db, fulltext):
+    """Find single keywords in the fulltext
+    @var skw_db: list of KeywordToken objects
+    @var fulltext: string, which will be searched
+    @return : dictionary of matches in a format {
+            <keyword object>, [[position, position...], ],
+            ..
+            }
+    """
     timer_start = time.clock()
 
-    # Matched span -> single keyword
+    # single keyword -> [spans]
     records = []
 
-    for single_keyword in skw_db:
+    for single_keyword in skw_db.values():
         for regex in single_keyword.regex:
             for match in regex.finditer(fulltext):
                 # Modify the right index to put it on the last letter
                 # of the word.
                 span = (match.span()[0], match.span()[1] - 1)
 
+                # FIXME: expensive!!!
                 # Remove the previous records contained by this span
                 records = [record for record in records
                                   if not _contains_span(span, record[0])]
@@ -80,36 +82,48 @@ def get_single_keywords(skw_db, fulltext, verbose=True):
                 if add:
                     records.append((span, single_keyword))
 
+    # TODO - change to the requested format (I will return to it later)
+
     # List of single_keywords: {spans: single keyword}
     single_keywords = {}
     for span, single_keyword in records:
-        single_keywords.setdefault(single_keyword, []).append(span)
+        single_keywords.setdefault(single_keyword, [[]])
+        single_keywords[single_keyword][0].append(span)
 
-    if verbose:
-        write_message("INFO: Matching single keywords... %d keywords found "
+
+    log.info("Matching single keywords... %d keywords found "
             "in %.1f sec." % (len(single_keywords), time.clock() - timer_start),
-            stream=sys.stderr, verbose=3)
+            )
+
 
     return single_keywords
 
-def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
+# XXX - rebuild this whole thing
+def get_composite_keywords(ckw_db, fulltext, skw_spans):
     """Returns a list of composite keywords bound with the number of
     occurrences found in the text string.
-    Format of the output list is (composite keyword, count, component counts)."""
+    @var ckw_db: list of KewordToken objects (they are supposed to be composite ones)
+    @var fulltext: string to search in
+    @skw_spans: dictionary of already identified single keywords
+    @return : dictionary of matches in a format {
+            <keyword object>, [[position, position...], [info_about_matches] ],
+            ..
+            }"""
     timer_start = time.clock()
 
     # Build the list of composite candidates
-    ckw_list = []
+    ckw_out = {}
     skw_as_components = []
 
-    for composite_keyword in ckw_db:
+    for composite_keyword in ckw_db.values():
         # Counters for the composite keyword. First count is for the
         # number of occurrences in the whole document and second count
         # is for the human defined keywords.
         ckw_count = 0
         matched_spans = []
 
-        # Check the alternative labels.
+        # First search in the fulltext using the regex pattern of the whole
+        # composite keyword (including the alternative labels)
         for regex in composite_keyword.regex:
             for match in regex.finditer(fulltext):
                 span = list(match.span())
@@ -123,35 +137,48 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
         try:
             components = composite_keyword.compositeof
         except AttributeError:
-            print >> sys.stderr, ("Cached ontology is corrupted. Please "
+            print log.error("Cached ontology is corrupted. Please "
                 "remove the cached ontology in your temporary file.")
-            sys.exit(1)
+            raise Exception('Cached ontology is corrupted')
+
+        spans = []
         try:
-            spans = [skw_spans[component] for component in components]
+            spans = [skw_spans[component][0] for component in components]
         except KeyError:
-            # The keyword components are not to be found in the text.
-            # This is not a dramatic exception and we can safely ignore
-            # it.
-            pass
-        else:
-            ckw_spans = []
-            for index in range(len(spans) - 1):
-                if ckw_spans:
-                    previous_spans = ckw_spans
-                else:
-                    previous_spans = spans[index]
+            # Some of the keyword components are not to be found in the text.
+            # Therefore we cannot continue because the match is incomplete.
+            continue
 
-                ckw_spans = []
-                for new_span in [(span0, span1) for span0 in previous_spans
-                                                for span1 in spans[index + 1]]:
-                    span = _get_ckw_span(fulltext, new_span)
-                    if span is not None:
-                        ckw_spans.append(span)
 
-            for span in [span for span in ckw_spans
-                              if not span in matched_spans]:
-                ckw_count += 1
-                matched_spans.append(span)
+        ckw_spans = []
+        for index in range(len(spans) - 1):
+            len_ckw = len(ckw_spans)
+            if ckw_spans: # cause ckw_spans include the previous
+                previous_spans = ckw_spans
+            else:
+                previous_spans = spans[index]
+
+            for new_span in [(span0, span1) for span0 in previous_spans
+                                            for span1 in spans[index + 1]]:
+                span = _get_ckw_span(fulltext, new_span)
+                if span is not None:
+                    ckw_spans.append(span)
+
+            # the spans must be overlapping to be included
+            if index > 0 and ckw_spans:
+                _ckw_spans = []
+                for _span in ckw_spans[len_ckw:]: # new spans
+                    for _span2 in ckw_spans[:len_ckw]:
+                        s = _span_overlapping(_span, _span2)
+                        if s:
+                            _ckw_spans.append(s)
+                ckw_spans = _ckw_spans
+
+
+        for span in [span for span in ckw_spans
+                          if not span in matched_spans]:
+            ckw_count += 1
+            matched_spans.append(span)
 
         if ckw_count:
             # Gather the component counts.
@@ -160,12 +187,12 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
                 skw_as_components.append(component)
                 # Get the single keyword count.
                 try:
-                    component_counts.append(len(skw_spans[component]))
+                    component_counts.append(len(skw_spans[component][0]))
                 except KeyError:
                     component_counts.append(0)
 
             # Store the composite keyword
-            ckw_list.append((composite_keyword, ckw_count, component_counts))
+            ckw_out[composite_keyword] = [matched_spans, component_counts]
 
     # Remove the single keywords that appear as components from the list
     # of single keywords.
@@ -175,39 +202,77 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans, verbose=True):
         except KeyError:
             pass
 
-    if verbose:
-        write_message("INFO: Matching composite keywords... %d keywords found "
-            "in %.1f sec." % (len(ckw_list), time.clock() - timer_start),
-            stream=sys.stderr, verbose=3)
+    # Remove the composite keywords that are fully present in
+    # longer composite keywords
+    _ckw_base = filter(lambda x: len(x.compositeof) == 2, ckw_out.keys())
+    _ckw_extended = sorted(filter(lambda x: len(x.compositeof) > 2, ckw_out.keys()), key=lambda x: len(x.compositeof))
+    if _ckw_extended:
+        max_len = len(_ckw_extended[-1].compositeof)
+        candidates = []
+        for kw1 in _ckw_base:
+            s1 = set(kw1.compositeof)
+            for kw2 in _ckw_extended:
+                s2 = set(kw2.compositeof)
+                if s1.issubset(s2):
+                    candidates.append((kw1, kw2))
+                    #break  # don't stop because this keyword may be
+                            # partly contained by kw_x and kw_y
+        for i in range(len(_ckw_extended)):
+            kw1 = _ckw_extended[i]
+            s1 = set(kw1.compositeof)
+            for ii in range(i+1, len(_ckw_extended)):
+                kw2 = _ckw_extended[ii]
+                s2 = set(kw2.compositeof)
+                if s1.issubset(s2):
+                    candidates.append((kw1, kw2))
+                    break
+        if candidates:
+            for kw1, kw2 in candidates:
+                match1 = ckw_out[kw1] # subset of the kw2
+                match2 = ckw_out[kw2]
+                positions1 = match1[0]
+                for pos1 in positions1:
+                    for pos2 in match2[0]:
+                        if _span_overlapping(pos1, pos2):
+                            del positions1[positions1.index(pos1)]
+                            if len(positions1) == 0: # if we removed all the matches
+                                del ckw_out[kw1]  # also delete the keyword
+                            break
 
-    return ckw_list
+    log.info("Matching composite keywords... %d keywords found "
+            "in %.1f sec." % (len(ckw_out), time.clock() - timer_start),
+            )
+
+    return ckw_out
+
+
 
 def get_author_keywords(skw_db, ckw_db, fulltext):
     """Finds out human defined keyowrds in a text string. Searches for
     the string "Keywords:" and its declinations and matches the
     following words."""
     timer_start = time.clock()
+    out = {}
 
-    split_string = CFG_BIBCLASSIFY_AUTHOR_KW_START.split(fulltext, 1)
+    split_string = bconfig.CFG_BIBCLASSIFY_AUTHOR_KW_START.split(fulltext, 1)
     if len(split_string) == 1:
-        write_message("INFO: Matching author keywords... No keywords found.",
-        stream=sys.stderr, verbose=3)
-        return None
+        log.info("Matching author keywords... no keywords marker found.")
+        return out
+
 
     kw_string = split_string[1]
 
-    for regex in CFG_BIBCLASSIFY_AUTHOR_KW_END:
+    for regex in bconfig.CFG_BIBCLASSIFY_AUTHOR_KW_END:
         parts = regex.split(kw_string, 1)
         kw_string = parts[0]
 
     # We separate the keywords.
-    author_keywords = CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION.split(kw_string)
+    author_keywords = bconfig.CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION.split(kw_string)
 
-    write_message("INFO: Matching author keywords... %d keywords found in "
-        "%.1f sec." % (len(author_keywords), time.clock() - timer_start),
-        stream=sys.stderr, verbose=3)
+    log.info("Matching author keywords... %d keywords found in "
+        "%.1f sec." % (len(author_keywords), time.clock() - timer_start))
 
-    out = {}
+
     for kw in author_keywords:
         # If the author keyword is an acronym with capital letters
         # separated by points, remove the points.
@@ -216,10 +281,9 @@ def get_author_keywords(skw_db, ckw_db, fulltext):
 
         # First try with the keyword as such, then lower it.
         kw_with_spaces = ' %s ' % kw
-        matching_skw = get_single_keywords(skw_db, kw_with_spaces,
-            verbose=False)
+        matching_skw = get_single_keywords(skw_db, kw_with_spaces)
         matching_ckw = get_composite_keywords(ckw_db, kw_with_spaces,
-            matching_skw, verbose=False)
+            matching_skw)
 
         if matching_skw or matching_ckw:
             out[kw] = (matching_skw, matching_ckw)
@@ -227,9 +291,9 @@ def get_author_keywords(skw_db, ckw_db, fulltext):
 
         lowkw = kw.lower()
 
-        matching_skw = get_single_keywords(skw_db, ' %s ' % lowkw, verbose=False)
+        matching_skw = get_single_keywords(skw_db, ' %s ' % lowkw)
         matching_ckw = get_composite_keywords(ckw_db, ' %s ' % lowkw,
-            matching_skw, verbose=False)
+            matching_skw)
 
         out[kw] = (matching_skw, matching_ckw)
 
@@ -247,11 +311,11 @@ def _get_ckw_span(fulltext, spans):
 
     if dist == 0:
         # Two keywords are adjacent. We have a match.
-        return (min(words[0] + words[1]), max(words[0] + words[1]))
+        return (min(words[0] + words[1]), max(words[0] + words[1])) #FIXME: huh, this is a bug?! a sum???
     elif dist <= _MAXIMUM_SEPARATOR_LENGTH:
         separator = fulltext[words[0][1]:words[1][0] + 1]
         # Check the separator.
-        if separator.strip() in CFG_BIBCLASSIFY_VALID_SEPARATORS:
+        if separator.strip() in bconfig.CFG_BIBCLASSIFY_VALID_SEPARATORS:
             return (min(words[0] + words[1]), max(words[0] + words[1]))
 
     # There is no inclusion.
@@ -264,3 +328,14 @@ def _contains_span(span0, span1):
         span0[1] < span1[1]):
         return False
     return True
+
+def _span_overlapping(aspan, bspan):
+    # there are 6 posibilities, 2 are false
+    if bspan[0] >= aspan[0]:
+        if bspan[0] > aspan[1]:
+            return
+    else:
+        if aspan[0] > bspan[1]:
+            return
+    return (min(aspan[0], bspan[0]), max(aspan[1], bspan[1]))
+

@@ -22,32 +22,22 @@ BibClassify command-line interface.
 
 This modules provides a CLI for BibClassify. It reads the options and calls
 the method output_keywords_for_sources from bibclassify_engine.
+
+This module is STANDALONE safe
 """
 
 import getopt
 import sys
 
-STANDALONE = False
 
-try:
-    from invenio.bibclassify_engine import output_keywords_for_sources
-    from invenio.bibclassify_utils import write_message, set_verbose_level
-    from invenio.bibclassify_daemon import bibclassify_daemon
-    from invenio.bibclassify_ontology_reader import check_taxonomy
-except ImportError, err:
-    from bibclassify_engine import output_keywords_for_sources
-    from bibclassify_utils import write_message, set_verbose_level
-    from bibclassify_ontology_reader import check_taxonomy
-    write_message("WARNING: Running in standalone mode.", stream=sys.stderr,
-        verbose = 2)
-    STANDALONE = True
+import bibclassify_config as bconfig
+log = bconfig.get_logger("bibclassify.cli")
 
-# Retrieve the custom configuration if it exists.
-try:
-    from bibclassify_config_local import *
-except ImportError:
-    # No local configuration was found.
-    pass
+
+import bibclassify_engine as engine
+import bibclassify_ontology_reader as reader
+
+daemon = None
 
 def get_recids_list(recids_string):
     """Returns a list of recIDs."""
@@ -81,13 +71,16 @@ def main():
     arguments = sys.argv
     for index, argument in enumerate(arguments):
         if 'bibclassify' in argument:
+            arguments = arguments[index+1:]
             break
-    arguments = arguments[index+1:]
+    else:
+        arguments = arguments[1:]
+
 
     run_as_daemon = False
 
     # Check if running in standalone or daemon mode.
-    if not arguments:
+    if not arguments and not bconfig.STANDALONE:
         run_as_daemon = True
     elif len(arguments) == 1 and arguments[0].isdigit():
         # Running the task with its PID number (bibsched style).
@@ -100,14 +93,18 @@ def main():
                 run_as_daemon = True
 
     if run_as_daemon:
-        bibclassify_daemon()
+        import bibclassify_daemon as daemon
+        if daemon:
+            daemon.bibclassify_daemon()
+        else:
+            log.error("We are running in a standalone mode, can't start daemon")
     else:
         options = _read_options(arguments)
 
         if options['check_taxonomy']:
-            check_taxonomy(options['taxonomy'])
+            reader.check_taxonomy(options['taxonomy'])
 
-        output_keywords_for_sources(options["text_files"],
+        engine.output_keywords_for_sources(options["text_files"],
             options["taxonomy"],
             rebuild_cache=options["rebuild_cache"],
             no_cache=options["no_cache"],
@@ -131,7 +128,9 @@ be run are looked for from the database (=records modified since the last run).
 General options:
   -h, --help                display this help and exit
   -V, --version             output version information and exit
-  -v, --verbose=LEVEL       sets the verbose to LEVEL (=0)
+  -v, --verbose=LEVEL       number between 1 and 50, higher level means:
+                            show only messages more important than level x
+                            [debugging=10, info=20, warnings=30, errors=40]
   -k, --taxonomy=NAME       sets the taxonomy NAME. It can be a simple
                             controlled vocabulary or a descriptive RDF/SKOS
                             and can be located in a local file or URL.
@@ -144,12 +143,16 @@ Standalone file mode options:
                             to set no limit
   -m, --matching-mode=TYPE  changes the search mode to TYPE (full or partial)
                             (=full)
-  --detect-author-keywords  detect keywords that are explicitely written in the
+  -d, --detect-author-keywords  detect keywords that are explicitely written in the
                             document
-   --extract-acronyms       outputs a list of acronyms and expansions found in
+  -e, --extract-acronyms    outputs a list of acronyms and expansions found in
                             the document.
    --acronyms-file=FILE     if specified, the acronyms will be added to the
                             content of that file
+  -r, --only-core-tags      filters the single and composite keywords leaving
+                            only those that are marked as core. Author keywords
+                            and acronyms are ignored in this mode.
+
 Daemon mode options:
   -i, --recid=RECID         extract keywords for a record and store into DB
                             (=all necessary ones for pre-defined taxonomies)
@@ -207,7 +210,7 @@ def _read_options(options_string):
     }
 
     try:
-        short_flags = "m:f:k:o:n:m:v:sqhV"
+        short_flags = "m:f:k:o:n:m:v:rsqhVde"
         long_flags = ["taxonomy=", "output-mode=", "verbose=", "spires",
             "keywords-number=", "matching-mode=", "help", "version", "file",
             "rebuild-cache", "no-limit", "no-cache", "check-taxonomy",
@@ -240,7 +243,9 @@ def _read_options(options_string):
         "--no-cache": "no_cache",
         "--check-taxonomy": "check_taxonomy",
         "--detect-author-keywords": "with_author_keywords",
-        "--extract-acronyms": "acronyms",
+        "-d": "with_author_keywords",
+        "--extract-acronyms": "extract_acronyms",
+        "-e": "extract_acronyms",
         "--only-core-tags": "only_core_tags",
     }
 
@@ -250,7 +255,8 @@ def _read_options(options_string):
         elif option in ("-V", "--version"):
             _display_version()
         elif option in ("-v", "--verbose"):
-            set_verbose_level(argument)
+            log.setLevel(int(argument))
+            bconfig.set_global_level(int(argument))
         elif option in ("-f", "--file"):
             options["text_files"].append(argument)
         elif option in with_argument:
@@ -260,8 +266,8 @@ def _read_options(options_string):
         else:
             # This shouldn't happen as gnu_getopt should already handle
             # that case.
-            write_message("ERROR: option unrecognized -- %s" % option,
-                stream=sys.stderr, verbose=1)
+            log.error("option unrecognized -- %s" % option)
+
 
     # Collect the text inputs.
     options["text_files"] = args
@@ -271,38 +277,32 @@ def _read_options(options_string):
     # input?
     if not args:
         if not options["check_taxonomy"] and not options["text_files"]:
-            write_message("ERROR: please specify a file or directory.",
-                stream=sys.stderr, verbose=0)
+            log.error("Please specify a file or directory.")
             sys.exit(0)
     # No taxonomy input.
     elif not options["taxonomy"]:
-        write_message("ERROR: please specify a taxonomy file.",
-            stream=sys.stderr, verbose=0)
+        log.error("Please specify a taxonomy file.")
         sys.exit(0)
     # Output mode is correct?
     elif options["output_mode"]:
         options["output_mode"] = options["output_mode"].lower() # sanity
         if options["output_mode"] not in ("text", "marcxml", "html"):
-            write_message("ERROR: output (-o) should be TEXT, MARCXML or HTML.",
-                          stream=sys.stderr, verbose=0)
+            log.error("Output (-o) should be TEXT, MARCXML or HTML.")
             sys.exit(0)
     # Match mode is correct?
     elif options["match_mode"]:
         options["match_mode"] = options["match_mode"].lower() # sanity
         if options["match_mode"] not in ("full", "partial"):
-            write_message("ERROR: mode (-m) should be FULL or PARTIAL.",
-                          stream=sys.stderr, verbose=0)
+            log.error("Mode (-m) should be FULL or PARTIAL.")
             sys.exit(0)
     # Output limit is correct?
     try:
         options["output_limit"] = int(options["output_limit"])
         if options["output_limit"] < 0:
-            write_message("ERROR: output limit must be a positive integer.",
-                stream=sys.stderr, verbose=0)
+            log.error("Output limit must be a positive integer.")
             sys.exit(0)
     except ValueError:
-        write_message("ERROR: output limit must be a positive integer.",
-            stream=sys.stderr, verbose=0)
+        log.error("Output limit must be a positive integer.")
         sys.exit(0)
 
     return options

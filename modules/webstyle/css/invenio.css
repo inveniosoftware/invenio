@@ -2499,24 +2499,97 @@ a:hover.bibMergeImgClickable img {
     padding: 3px;
 }
 /* end of WebAlert module */
+
 /* BibClassify module */
-.tagCloud {
-    margin: auto;
-    clear: both;
+.bibclassify {
+    text-align: center;
 }
-.tagCloud span {
+.bibclassify-kwlist {
+    width: 60%;
+    float: top;
+    margin-left: 20%;
+    margin-top: 20px;
+    margin-bottom: 20px;
     font-family: Arial, Helvetica, sans-serif;
-    text-decoration: none;
-    margin-right: 6px;
-    margin-top: 6px;
-    margin-bottom: 6px;
-    padding: 0;
 }
-.tagCloud a {
+.bibclassify .tagcloud {
+    width: 60%;
+    float: top;
+    margin-left: 20%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+.bibclassify .cloud {
+    text-align: center;
+    color: red;
+    font-size: 80%;
+    margin-top: 15px;
+}
+.bibclassify-kwlist hr {
+    display: block;
+    clear: left;
+    margin: -0.66em 0;
+    visibility: hidden;
+}
+.kw-list {
+    float: left;
+    width: 47%;
+    overflow: auto;
+    height:100%;
+    padding:1%;
+    text-align: left;
+}
+.bibclassify .acronym {
+    display: none;
+}
+.bibclassify .author-kw {
+    color: #993300;
+}
+.bibclassify .other-kw {
+    color: green;
+}
+.bibclassify .keyword.composite.f695 {
+    color: green;
+}
+.bibclassify .keyword {
+    white-space:nowrap;
     text-decoration: none;
 }
-.tagCloud a:hover {
+.bibclassify .keyword.composite{
+    color: #3366CC;
+}
+.bibclassify .keyword.single {
+    color: #666666;
+}
+.bibclassify a.keyword:hover {
     text-decoration: underline;
+}
+.bibclassify .nav-links {
+    text-align: left;
+    margin-left: 20%;
+    font-size: small;
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.bibclassify-top {
+    width: 60%;
+    float: top;
+    margin-left: 20%;
+    padding: 10px;
+    border:2px solid #CC6633;
+}
+.bibclassify-nav {
+    background-color:#d3d3d3;
+    text-align: center;
+}
+.bibclassify-bottom {
+    background-color:#d3d3d3;
+    font-size:smaller;
+    text-align:center;
+}
+.bibclassify-marcxml {
+    margin-left: 10%;
+    text-align: left;
 }
 /* end of BibClassify module */
 

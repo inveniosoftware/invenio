@@ -30,34 +30,19 @@ references section and to replace unicode characters.
 
 import sys
 import re
+import bibclassify_config as bconfig
 
-try:
-    from bibclassify_utils import write_message
-except ImportError, err:
-    print >> sys.stderr, "Import error: %s" % err
-    sys.exit(0)
-
-try:
-    from invenio.refextract import replace_undesirable_characters, \
+from refextract import replace_undesirable_characters, \
         find_reference_section, find_end_of_reference_section
-except ImportError:
-    # Running in standalone mode.
-    try:
-        from refextract import replace_undesirable_characters, \
-            find_reference_section, find_end_of_reference_section
-    except ImportError:
-        sys.exit(0)
 
-def normalize_fulltext(fulltext):
-    """Returns a 'cleaned' version of the output provided by pdftotext."""
-    # We recognize keywords by the spaces. We need these to match the
-    # first and last words of the document.
-    fulltext = " " + fulltext + " "
 
-    # Replace some weird unicode characters.
-    fulltext = replace_undesirable_characters(fulltext)
-    # Replace the greek characters by their name.
-    fulltext = _replace_greek_characters(fulltext)
+log = bconfig.get_logger("bibclassify.text_normalizer")
+
+_washing_regex = []
+def get_washing_regex():
+    global _washing_regex
+    if len(_washing_regex):
+        return _washing_regex
 
     washing_regex = [
         # Replace non and anti with non- and anti-. This allows a better
@@ -72,12 +57,12 @@ def normalize_fulltext(fulltext):
 
     # Remove spaces in particle names.
     # Particles with -/+/*
-    washing_regex += [(re.compile(r"(%s) ([-+*])" % name), r"\1\2")
+    washing_regex += [(re.compile(r"(\W%s) ([-+*])" % name), r"\1\2")
                       for name in ("c", "muon", "s", "B", "D", "K", "Lambda",
                           "Mu", "Omega", "Pi", "Sigma", "Tau", "W", "Xi")]
 
     # Particles followed by numbers
-    washing_regex += [(re.compile(r"(%s) ([0-9]\W)" % name), r"\1\2")
+    washing_regex += [(re.compile(r"(\W%s) ([0-9]\W)" % name), r"\1\2")
                       for name in ("a", "b", "c", "f", "h", "s", "B", "D", "H",
                           "K", "L", "Phi", "Pi", "Psi","Rho", "Stor", "UA",
                           "Xi", "Z")]
@@ -113,6 +98,22 @@ def normalize_fulltext(fulltext):
         # Remove multiple line breaks.
         (re.compile(r"\n+"), r"\n"),
     ]
+    _washing_regex = washing_regex
+    return _washing_regex
+
+
+def normalize_fulltext(fulltext):
+    """Returns a 'cleaned' version of the output provided by pdftotext."""
+    # We recognize keywords by the spaces. We need these to match the
+    # first and last words of the document.
+    fulltext = " " + fulltext + " "
+
+    # Replace some weird unicode characters.
+    fulltext = replace_undesirable_characters(fulltext)
+    # Replace the greek characters by their name.
+    fulltext = _replace_greek_characters(fulltext)
+
+    washing_regex = get_washing_regex()
 
     # Apply the regular expressions to the fulltext.
     for regex, replacement in washing_regex:
@@ -129,8 +130,7 @@ def cut_references(text_lines):
             ref_sect_start["marker"], ref_sect_start["marker_pattern"])
         del text_lines[start:end + 1]
     else:
-        write_message("WARNING: No references could be found.",
-            stream=sys.stderr, verbose=2)
+        log.warning("Found no references to remove.")
         return text_lines
 
     return text_lines
@@ -237,8 +237,7 @@ def _replace_greek_characters(line):
         try:
             line = line.replace(greek_char, replacement)
         except UnicodeDecodeError:
-            write_message("WARNING: Unicode decoding error.",
-                stream=sys.stderr, verbose=2)
+            log.warning("Unicode decoding error.")
             return ""
 
     return line
