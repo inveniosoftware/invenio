@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
-"PO-Revision-Date: 2008-08-18 07:39+0200\n"
+"PO-Revision-Date: 2010-05-18 09:52+0200\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1346,12 +1346,11 @@ msgstr "ou"
 
 #: modules/bibedit/lib/bibedit_templates.py:250
 msgid "Comparison of:"
-msgstr ""
+msgstr "Comparaison de:"
 
 #: modules/bibedit/lib/bibedit_templates.py:251
-#, fuzzy
 msgid "Revision"
-msgstr "division"
+msgstr "Révision"
 
 #: modules/bibformat/lib/bibformat_templates.py:315
 #: modules/bibformat/lib/bibformat_templates.py:427
@@ -1773,9 +1772,8 @@ msgid "Manage Files of This Record"
 msgstr ""
 
 #: modules/bibformat/lib/elements/bfe_edit_record.py:52
-#, fuzzy
 msgid "Edit This Record"
-msgstr "Editer une autre notice"
+msgstr "Editer cette notice"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:189
 #: modules/bibformat/web/admin/bibformatadmin.py:257
@@ -1944,38 +1942,32 @@ msgid "View next entries..."
 msgstr ""
 
 #: modules/bibharvest/lib/bibharvest_templates.py:340
-#, fuzzy
 msgid "previous month"
-msgstr "précédent"
+msgstr "mois précédent"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:347
-#, fuzzy
 msgid "next month"
-msgstr "mois quelconque"
+msgstr "mois prochain"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:442
-#, fuzzy
 msgid "main Page"
-msgstr "Pages d'administration"
+msgstr "Page principale"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:449
 #: modules/bibharvest/lib/oai_harvest_admin.py:100
-#, fuzzy
 msgid "edit"
 msgstr "Éditer"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:453
 #: modules/websubmit/lib/websubmit_managedocfiles.py:997
 #: modules/bibharvest/lib/oai_harvest_admin.py:104
-#, fuzzy
 msgid "delete"
 msgstr "Supprimer"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:457
 #: modules/bibharvest/lib/oai_harvest_admin.py:108
-#, fuzzy
 msgid "test"
-msgstr "fois"
+msgstr "test"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:461
 #: modules/bibharvest/lib/oai_harvest_admin.py:112
@@ -1986,7 +1978,7 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:116
 #, fuzzy
 msgid "harvest"
-msgstr "Panier partagé"
+msgstr "Importer"
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:126
 msgid "Citation history:"
@@ -2001,28 +1993,24 @@ msgid "Download user distribution:"
 msgstr "Distribution des téléchargements"
 
 #: modules/bibupload/lib/batchuploader_templates.py:129
-#, fuzzy
 msgid "Warning: Please, select a valid time"
-msgstr "Veuillez choisir une catégorie"
+msgstr "Attention: veuillez spécifier une heure valide"
 
 #: modules/bibupload/lib/batchuploader_templates.py:133
-#, fuzzy
 msgid "Warning: Please, select a valid file"
-msgstr "Veuillez choisir une catégorie"
+msgstr "Attention: veuillez sélectionner un fichier valide"
 
 #: modules/bibupload/lib/batchuploader_templates.py:137
 msgid "Warning: The date format is not correct"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:141
-#, fuzzy
 msgid "Warning: Please, select a valid date"
-msgstr "Veuillez choisir une catégorie"
+msgstr "Attention: veuillez sélectionner une date valide"
 
 #: modules/bibupload/lib/batchuploader_templates.py:167
-#, fuzzy
 msgid "Select file to upload: "
-msgstr "Choisir la méthode"
+msgstr "Sélectionnez un fichier à envoyer: "
 
 #: modules/bibupload/lib/batchuploader_templates.py:168
 msgid "File type:"
@@ -2040,22 +2028,19 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:171
 #: modules/bibupload/lib/batchuploader_templates.py:359
-#, fuzzy
 msgid "Date:"
-msgstr "Date"
+msgstr "Date:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:172
 #: modules/bibupload/lib/batchuploader_templates.py:360
-#, fuzzy
 msgid "Time:"
-msgstr "Heure"
+msgstr "Heure:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:173
 #: modules/bibupload/lib/batchuploader_templates.py:355
 #: modules/bibupload/lib/batchuploader_templates.py:361
-#, fuzzy
 msgid "Example:"
-msgstr "Exemple"
+msgstr "Exemple:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:174
 #: modules/bibupload/lib/batchuploader_templates.py:362
@@ -2063,37 +2048,30 @@ msgid "All fields with"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:175
-#, fuzzy
 msgid "are mandatory"
-msgstr "obligatoire"
+msgstr "sont obligatoires"
 
 #: modules/bibupload/lib/batchuploader_templates.py:191
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your file has been succesfully queued. You can check your %(x_url1_open)"
 "supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%"
 "(x_url2_close)s"
-msgstr ""
-"Vous êtes enregistré comme %(x_user)s. Vous pouvez a) %(x_url1_open)svous "
-"déconnecter%(x_url1_close)s; b) modifier vos %(x_url2_open)spréférences de "
-"compte%(x_url2_close)s."
+msgstr "Votre fichier a été transmis dans la file d'exécution avec succès. Vous pouvez consulter %(x_url1_open)svotre historique d'envois%(x_url1_close)s ou %(x_url2_open)ssoumettre un nouveau fichier%(x_url2_close)s."
 
 #: modules/bibupload/lib/batchuploader_templates.py:205
-#, fuzzy
 msgid "No metadata files have been uploaded yet."
-msgstr "Aucun relecteur n'a été sélectionné pour l'instant."
+msgstr "Aucun fichier de métadonnées n'a été envoyé pour le moment."
 
 #: modules/bibupload/lib/batchuploader_templates.py:218
 #: modules/bibupload/lib/batchuploader_templates.py:260
-#, fuzzy
 msgid "Submit time"
-msgstr "Aide à la soumission"
+msgstr "Soumis le"
 
 #: modules/bibupload/lib/batchuploader_templates.py:219
 #: modules/bibupload/lib/batchuploader_templates.py:261
-#, fuzzy
 msgid "File name"
-msgstr "nom de l'alerte"
+msgstr "Nom du fichier"
 
 #: modules/bibupload/lib/batchuploader_templates.py:220
 #: modules/bibupload/lib/batchuploader_templates.py:262
@@ -2101,9 +2079,8 @@ msgid "Execution time"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:247
-#, fuzzy
 msgid "No document files have been uploaded yet."
-msgstr "Aucun relecteur n'a été sélectionné pour l'instant."
+msgstr "Aucun document n'a été envoyé pour le moment."
 
 #: modules/bibupload/lib/batchuploader_templates.py:302
 #: modules/bibupload/lib/batchuploader_webinterface.py:134
@@ -2119,14 +2096,12 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:308
 #: modules/bibupload/lib/batchuploader_webinterface.py:316
-#, fuzzy
 msgid "Upload history"
-msgstr "Historique des téléchargements:"
+msgstr "Historique des envois"
 
 #: modules/bibupload/lib/batchuploader_templates.py:311
-#, fuzzy
 msgid "Daemon monitor"
-msgstr "mois quelconque"
+msgstr "Moniteur de processus"
 
 #: modules/bibupload/lib/batchuploader_templates.py:354
 msgid "Input dir:"
@@ -2137,9 +2112,8 @@ msgid "Filename matching:"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:363
-#, fuzzy
 msgid "are mandatory."
-msgstr "obligatoire"
+msgstr "sont obligatoires."
 
 #: modules/bibupload/lib/batchuploader_templates.py:371
 #, python-format
@@ -2147,14 +2121,12 @@ msgid "<b>%s documents</b> have been found."
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:373
-#, fuzzy
 msgid "The following files have been succesfully queued:"
-msgstr "Les erreurs suivantes ont été découvertes"
+msgstr "Les fichiers suivants ont été placés dans la file d'attente avec succès:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:378
-#, fuzzy
 msgid "The following errors have ocurred:"
-msgstr "Les erreurs suivantes ont été découvertes"
+msgstr "Les erreurs suivantes sont survenues:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:385
 msgid ""
@@ -2170,9 +2142,8 @@ msgid "Using <b>web interface upload</b>, actions are executed a single time."
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:398
-#, fuzzy
 msgid "Check the"
-msgstr "Cliquer ici"
+msgstr "Consultez le"
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 msgid " Batch Uploader daemon help page"
@@ -2526,9 +2497,8 @@ msgid "Run Record Merger"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:238
-#, fuzzy
 msgid "Configure Bibknowledge"
-msgstr "Configurer BibIndex"
+msgstr "Configurer BibKnowledge"
 
 #: modules/webaccess/lib/access_control_config.py:239
 #: modules/websession/lib/websession_templates.py:1097
@@ -2537,9 +2507,8 @@ msgstr "Configurer BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:240
 #: modules/websession/lib/websession_templates.py:1100
-#, fuzzy
 msgid "Configure OAI Harvest"
-msgstr "Configurer BibHarvest"
+msgstr "Configurer l'Import OAI"
 
 #: modules/webaccess/lib/access_control_config.py:241
 #: modules/websession/lib/websession_templates.py:1102
@@ -2578,15 +2547,13 @@ msgstr "Configurer WebSubmit"
 
 #: modules/webaccess/lib/access_control_config.py:248
 #: modules/websession/lib/websession_templates.py:1112
-#, fuzzy
 msgid "Configure WebJournal"
-msgstr "Configurer WebComment"
+msgstr "Configurer WebJournal"
 
 #: modules/webaccess/lib/access_control_config.py:249
 #: modules/websession/lib/websession_templates.py:1091
-#, fuzzy
 msgid "Run BibCirculation"
-msgstr "Lancer BibEdit"
+msgstr "Lancer BibCirculation"
 
 #: modules/webaccess/lib/access_control_config.py:250
 #: modules/websession/lib/websession_templates.py:1095
@@ -2682,9 +2649,8 @@ msgstr "inconnu"
 
 #: modules/webalert/lib/webalert.py:163 modules/webalert/lib/webalert.py:217
 #: modules/webalert/lib/webalert.py:303 modules/webalert/lib/webalert.py:341
-#, fuzzy
 msgid "You do not have rights for this operation."
-msgstr "Vous n'êtes pas autorisé à voir le contenu de ce panier."
+msgstr "Vous n'êtes pas autorisé à effectuer cette opération."
 
 #: modules/webalert/lib/webalert.py:198
 msgid "You already have an alert defined for the specified query and basket."
@@ -2970,9 +2936,8 @@ msgstr "Définir une nouvelle alerte"
 #: modules/webalert/lib/webalert_webinterface.py:357
 #: modules/webalert/lib/webalert_webinterface.py:434
 #: modules/webalert/lib/webalert_webinterface.py:508
-#, fuzzy
 msgid "You are not authorized to use alerts."
-msgstr "Vous n'avez pas l'autorisation de voir cette page."
+msgstr "Vous n'êtes pas autorisés à utiliser les alertes."
 
 #: modules/webalert/lib/webalert_webinterface.py:79
 msgid "Popular Searches"
@@ -3160,26 +3125,23 @@ msgstr "Liste des paniers publics"
 
 #: modules/webbasket/lib/webbasket.py:2098
 #: modules/webbasket/lib/webbasket_webinterface.py:425
-#, fuzzy
 msgid "Search baskets"
-msgstr "Panier partagé"
+msgstr "Chercher dans les paniers"
 
 #: modules/webbasket/lib/webbasket.py:2103
 #: modules/webbasket/lib/webbasket_webinterface.py:731
 #: modules/websearch/lib/websearch_templates.py:2848
 #: modules/websearch/lib/websearch_templates.py:3034
-#, fuzzy
 msgid "Add to basket"
-msgstr "Ajouter aux paniers"
+msgstr "Ajouter au panier"
 
 #: modules/webbasket/lib/webbasket.py:2143
 #: modules/webbasket/lib/webbasket_templates.py:218
 #: modules/webbasket/lib/webbasket_templates.py:224
 #: modules/webbasket/lib/webbasket_templates.py:626
 #: modules/webbasket/lib/webbasket_templates.py:734
-#, fuzzy
 msgid "Public baskets"
-msgstr "Panier public"
+msgstr "Paniers publics"
 
 #: modules/webbasket/lib/webbasket.py:2173
 #, python-format

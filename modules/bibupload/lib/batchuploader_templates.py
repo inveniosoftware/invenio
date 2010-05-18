@@ -140,14 +140,14 @@ class Template:
                 <div><b>%(msg)s</b></div>
                 """ % {'msg': _("Warning: Please, select a valid date")}
         body_content += """
-    <div><span class="mandatory_field""> * </span> %(txt1)s<input type="file" name="metafile" size="30" onChange="filename.value=(this.value)"></div>
+    <div><span class="mandatory_field""> * </span> %(txt1)s:<input type="file" name="metafile" size="30" onChange="filename.value=(this.value)"></div>
     <input type="hidden" name="filename" id="filename" value="">
-    <div><span class="mandatory_field""> * </span> %(txt2)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <div><span class="mandatory_field""> * </span> %(txt2)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <select name="filetype">
             <option>MarcXML</option>
         </select>
     </div>
-    <div><span class="mandatory_field""> * </span> %(txt3)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <div><span class="mandatory_field""> * </span> %(txt3)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <select name="mode">
             <option %(sel1)s>--insert</option>
             <option %(sel2)s>--replace</option>
@@ -156,23 +156,23 @@ class Template:
             <option %(sel5)s>-ir insert-or-replace</option>
         </select>
     </div><br/>
-    <div>%(txt4)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt5)s</span>
+    <div>%(txt4)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt5)s:</span>
     <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-    &nbsp;&nbsp;<span class="italics">%(txt6)s</span>
+    &nbsp;&nbsp;<span class="italics">%(txt6)s:</span>
     <input type="text" name="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-    <span class="italics">%(txt7)s 2009-12-20 19:22:18</span>
-    <div><i>%(txt8)s <span class="mandatory_field""> * </span> %(txt9)s</i></div>
+    <span class="italics">%(txt7)s: 2009-12-20 19:22:18</span>
+    <div><i>%(txt8)s</i></div>
     <div> <input type="submit" value="Upload" class="adminbutton"> </div>
 </fieldset>
-""" % {'txt1': _("Select file to upload: "),
-        'txt2': _("File type:"),
-        'txt3': _("Upload mode:"),
+""" % {'txt1': _("Select file to upload"),
+        'txt2': _("File type"),
+        'txt3': _("Upload mode"),
         'txt4': _("Upload later? then select:"),
-        'txt5': _("Date:"),
-        'txt6': _("Time:"),
-        'txt7': _("Example:"),
-        'txt8': _("All fields with"),
-        'txt9': _("are mandatory"),
+        'txt5': _("Date"),
+        'txt6': _("Time"),
+        'txt7': _("Example"),
+        'txt8': _("All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory") % \
+                  {'x_fmt_open': '<span class="mandatory_field">', 'x_fmt_close': '</span>'},
         'sel1': mode == '--insert' and "selected" or "",
         'sel2': mode == '--replace' and "selected" or "",
         'sel3': mode == '--correct' and "selected" or "",
@@ -188,7 +188,7 @@ class Template:
         """ Displays message when the upload is succesful """
         _ = gettext_set_language(ln)
         body_content = """<br/>"""
-        body_content += _("Your file has been succesfully queued. You can check your %(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%(x_url2_close)s") %\
+        body_content += _("Your file has been successfully queued. You can check your %(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%(x_url2_close)s") %\
              {'x_url1_open': "<a href=\"%s/batchuploader/history\">" % CFG_SITE_URL,
               'x_url1_close': "</a>",
               'x_url2_open': "<a href=\"%s/batchuploader/metadata\">" % CFG_SITE_URL,
@@ -327,40 +327,40 @@ class Template:
         body_content += """
         <div id="content">
         <fieldset>
-        <div><span class="mandatory_field""> * </span> %(txt1)s&nbsp;&nbsp;<input type="text" name="docfolder" size="30">
-        <span class="italics">%(txt2)s /afs/cern.ch/user/j/user/public/foo/</span></div>
-        <div><span class="mandatory_field""> * </span> %(txt3)s
+        <div><span class="mandatory_field""> * </span> %(txt1)s:&nbsp;&nbsp;<input type="text" name="docfolder" size="30">
+        <span class="italics">%(txt2)s: /afs/cern.ch/user/j/user/public/foo/</span></div>
+        <div><span class="mandatory_field""> * </span> %(txt3)s:
         <select name="matching">
             <option>reportnumber</option>
             <option>recid</option>
         </select>
         </div>
-        <div><span class="mandatory_field""> * </span> %(txt4)s <input type="radio" name="mode" value="append" "checked">append</input>
+        <div><span class="mandatory_field""> * </span> %(txt4)s: <input type="radio" name="mode" value="append" "checked">append</input>
                                                                 <input type="radio" name="mode" value="correct">revise</input>
         </div>
         <br/>
-        <div>%(txt5)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt6)s</span>
+        <div>%(txt5)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt6)s:</span>
         <input type="text" id="datepicker" name="submit_date" value=%(submit_date)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-        &nbsp;&nbsp;<span class="italics">%(txt7)s</span>
+        &nbsp;&nbsp;<span class="italics">%(txt7)s:</span>
         <input type="text" name="submit_time" value=%(submit_time)s onBlur="defText(this)" onFocus="clearText(this)" style="width:100px" >
-        <span class="italics">%(txt8)s 2009-12-20 19:22:18</span>
+        <span class="italics">%(txt8)s: 2009-12-20 19:22:18</span>
         <br/>
-        <div><i>%(txt9)s <span class="mandatory_field""> * </span> %(txt10)s</i></div>
+        <div><i>%(txt9)s</i></div>
         <div> <input type="submit" value="Upload" class="adminbutton"> </div>
         </fieldset>
         </form></div>
         """ % {'submit_date': submit_date,
                'submit_time': submit_time,
-               'txt1': _("Input dir:"),
-               'txt2': _("Example:"),
-               'txt3': _("Filename matching:"),
-               'txt4': _("Upload mode:"),
+               'txt1': _("Input directory"),
+               'txt2': _("Example"),
+               'txt3': _("Filename matching"),
+               'txt4': _("Upload mode"),
                'txt5': _("Upload later? then select:"),
-               'txt6': _("Date:"),
-               'txt7': _("Time:"),
-               'txt8': _("Example:"),
-               'txt9': _("All fields with"),
-               'txt10': _("are mandatory.")
+               'txt6': _("Date"),
+               'txt7': _("Time"),
+               'txt8': _("Example"),
+               'txt9': _("All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory") % \
+                        {'x_fmt_open': '<span class="mandatory_field">', 'x_fmt_close': '</span>'}
                }
         return body_content
 
@@ -370,12 +370,12 @@ class Template:
         body_content = "<br/>"
         body_content += _("<b>%s documents</b> have been found." % info[0])
         body_content += "<br/><br/>"
-        body_content += _("The following files have been succesfully queued:")
+        body_content += _("The following files have been successfully queued:")
         body_content += "<ul>"
         for uploaded_file in info[1]:
             body_content += "<li><b>%s</b></li>" % uploaded_file
         body_content += "</ul>"
-        body_content += _("The following errors have ocurred:")
+        body_content += _("The following errors have occurred:")
         body_content += "<ul>"
         for error in errors:
             if error != 'MoveError':
@@ -394,11 +394,14 @@ class Template:
         _ = gettext_set_language(ln)
         body_content = "<br/><div id=\"info_box\">"
         body_content += "<ul>"
-        body_content += "<li>" + _("Using <b>web interface upload</b>, actions are executed a single time.") + "</li>"
-        body_content += "<li>" + _("Check the") + "<a href=%s/help/admin/bibupload-admin-guide#4.2>" % CFG_SITE_URL + \
-                _(" Batch Uploader daemon help page") + "</a>" + _(" for executing these actions periodically.") + "</li>"
+        body_content += "<li>" + _("Using %(x_fmt_open)sweb interface upload%(x_fmt_close)s, actions are executed a single time.") % \
+                        {'x_fmt_open': '<b>', 'x_fmt_close':'</b>'} + "</li>"
+        body_content += "<li>" + _("Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for executing these actions periodically.") % \
+                        {'x_url_open': '<a href="%s/help/admin/bibupload-admin-guide#4.2">' % CFG_SITE_URL,
+                         'x_url_close': "</a>"} + \
+                         "</li>"
         body_content += "</div><br/>"
-        body_content += "<h3> Metadata folders </h3>"
+        body_content += "<h3>%s</h3>" % _("Metadata folders")
         body_content += "<ul>"
         for folder in metadata.keys():
             body_content += "<li><b>" + folder + "</b></li>"
@@ -420,18 +423,18 @@ class Template:
                 body_content += filename + "<br />"
         body_content += "</ul>"
 
-        header = ['ID', 'Name', 'Time', 'Status', 'Progress']
+        header = [_("ID"), _("Name"), _("Time"), _("Status"), _("Progress")]
         actions = []
-        body_content += """<br /><b>Last BibSched tasks:</b><br />"""
+        body_content += """<br /><b>%s</b><br />""" % _("Last BibSched tasks:")
         res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='batchuploader' and runtime< now() ORDER by runtime")
         if len(res) > 0:
-            (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
-            actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
+            (tsk_id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[len(res) - 1]
+            actions.append([tsk_id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
         else:
             actions.append(['', 'batchuploader', '', '', 'Not executed yet'])
 
         body_content += tupletotable(header=header, tuple=actions)
-        body_content += """<br /><b>Next scheduled BibSched run:</b><br />"""
+        body_content += """<br /><b>%s</b><br />""" % _("Next scheduled BibSched run:")
         actions = []
         res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='batchuploader' and runtime > now() ORDER by runtime")
         if len(res) > 0:
