@@ -1240,9 +1240,11 @@ class WordTable:
 
         ## inconsistency detected!
         write_message("EMERGENCY: %s inconsistencies detected..." % self.tablename)
-        write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sR tables.\nRunning 'bibindex --repair' is recommended.""" \
-            % (self.tablename, self.tablename[:-1]))
-        raise StandardError
+        error_message = "Errors found. You should check consistency of the " \
+                "%s - %sR tables.\nRunning 'bibindex --repair' is " \
+                "recommended." % (self.tablename, self.tablename[:-1])
+        write_message("EMERGENCY: " + error_message, stream=sys.stderr)
+        raise StandardError, error_message
 
     def fix_recID_range(self, low, high):
         """Try to fix reverse index database consistency (e.g. table idxWORD01R) in the low,high doc-id range.
@@ -1301,14 +1303,19 @@ class WordTable:
                             self.put(recID, word, sign)
 
                 else:
-                    write_message("EMERGENCY: %s for %d is in inconsistent state. Couldn't repair it." % (self.tablename, recID))
+                    write_message("EMERGENCY: %s for %d is in inconsistent "
+                            "state. Couldn't repair it." % (self.tablename,
+                                recID), stream=sys.stderr)
                     ok = 0
 
         if not ok:
-            write_message("""EMERGENCY: Unrepairable errors found. You should check consistency
-                of the %s - %sR tables. Deleting affected TEMPORARY and FUTURE entries
-                from these tables is recommended; see the BibIndex Admin Guide.""" % (self.tablename, self.tablename[:-1]))
-            raise StandardError
+            error_message = "Unrepairable errors found. You should check " \
+                    "consistency of the %s - %sR tables. Deleting affected " \
+                    "TEMPORARY and FUTURE entries from these tables is " \
+                    "recommended; see the BibIndex Admin Guide." % \
+                    (self.tablename, self.tablename[:-1])
+            write_message("EMERGENCY: " + error_message, stream=sys.stderr)
+            raise StandardError, error_message
 
 def main():
     """Main that construct all the bibtask."""
@@ -1481,9 +1488,10 @@ def task_run_core():
                     wordTable.del_recIDs(recIDs_range)
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
-                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
-                                sys.stderr)
-                    raise StandardError
+                    error_message = "Missing IDs of records to delete from " \
+                            "index %s." % wordTable.tablename
+                    write_message(error_message, stream=sys.stderr)
+                    raise StandardError, error_message
             elif task_get_option("cmd") == "add":
                 if task_get_option("id"):
                     wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
@@ -1505,9 +1513,10 @@ def task_run_core():
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
-                write_message("Invalid command found processing %s" % \
-                    wordTable.tablename, sys.stderr)
-                raise StandardError
+                error_message = "Invalid command found processing %s" % \
+                    wordTable.tablename
+                write_message(error_message, stream=sys.stderr)
+                raise StandardError, error_message
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception(alert_admin=True)
@@ -1537,9 +1546,10 @@ def task_run_core():
                     wordTable.del_recIDs(recIDs_range)
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
-                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
-                                sys.stderr)
-                    raise StandardError
+                    error_message = "Missing IDs of records to delete from " \
+                            "index %s." % wordTable.tablename
+                    write_message(error_message, stream=sys.stderr)
+                    raise StandardError, error_message
             elif task_get_option("cmd") == "add":
                 if task_get_option("id"):
                     wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
@@ -1560,9 +1570,10 @@ def task_run_core():
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
-                write_message("Invalid command found processing %s" % \
-                    wordTable.tablename, sys.stderr)
-                raise StandardError
+                error_message = "Invalid command found processing %s" % \
+                        wordTable.tablename
+                write_message(error_message, stream=sys.stderr)
+                raise StandardError, error_message
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception()
@@ -1600,9 +1611,10 @@ def task_run_core():
                     wordTable.del_recIDs(recIDs_range)
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
-                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
-                                sys.stderr)
-                    raise StandardError
+                    error_message = "Missing IDs of records to delete from " \
+                            "index %s." % wordTable.tablename
+                    write_message(error_message, stream=sys.stderr)
+                    raise StandardError, error_message
             elif task_get_option("cmd") == "add":
                 if task_get_option("id"):
                     wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
@@ -1624,9 +1636,10 @@ def task_run_core():
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
             else:
-                write_message("Invalid command found processing %s" % \
-                    wordTable.tablename, sys.stderr)
-                raise StandardError
+                error_message = "Invalid command found processing %s" % \
+                        wordTable.tablename
+                write_message(error_message, stream=sys.stderr)
+                raise StandardError, error_message
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             register_exception()
