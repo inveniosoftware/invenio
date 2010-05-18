@@ -1946,7 +1946,7 @@ function addFieldSave(fieldTmpNo)
     ind2: ind2,
     subfields: subfields,
     value: value,
-    undoRedo: undHoandler
+    undoRedo: undoHandler
   };
   createReq(data, function(json){
     updateStatus('report', gRESULT_CODES[json['resultCode']]);
