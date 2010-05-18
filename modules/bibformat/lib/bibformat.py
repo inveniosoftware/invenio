@@ -89,7 +89,6 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
                 omit = True
         if not omit:
             out += line
-            out += "\n"
         if omit and line.count('</datafield>'):
             omit = False
     return out
