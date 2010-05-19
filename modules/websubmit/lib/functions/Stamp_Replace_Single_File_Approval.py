@@ -74,6 +74,15 @@ def Stamp_Replace_Single_File_Approval(parameters, \
             that file doesn't exist, the file will not be renamed after
             stamping.
 
+         + switch_file: (string) - when this value is set, specifies
+            the name of a file that will swith on/off the
+            stamping. The stamp will be applied if the file exists in
+            the submission directory and is not empty. If the file
+            cannot be found or is empty, the stamp is not applied.
+            Useful for eg. if you want to let your users control the
+            stamping with a checkbox on your submission page.
+            Leave this parameter empty to always stamp by default.
+
          + stamp: (string) - the type of stamp to be applied to the file.
             should be one of:
               + first (only the first page is stamped);
@@ -110,6 +119,17 @@ def Stamp_Replace_Single_File_Approval(parameters, \
                              'layer'               : "",
                              'verbosity'           : 0,
                            }
+
+    ## Check if stamping is enabled
+    switch_file = parameters.get('switch_file', '')
+    if switch_file:
+        # Good, a "switch file" was specified. Check if it exists, and
+        # it its value is not empty.
+        if not _read_in_file(os.path.join(curdir, switch_file)):
+            # File does not exist, or is emtpy. Silently abort
+            # stamping.
+            return ""
+
     ## Submission access number:
     access = _read_in_file("%s/access" % curdir)
     ## record ID for the current submission. It is found in the special file

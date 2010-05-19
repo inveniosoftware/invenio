@@ -537,6 +537,7 @@ INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_templ
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','new_file_name');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','stamp');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','layer');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','switch_file');
 INSERT INTO sbmFUNDESC VALUES ('Move_FCKeditor_Files_to_Storage','input_fields');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','maxsize');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','minsize');
