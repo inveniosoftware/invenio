@@ -1155,7 +1155,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                                 other_urls = urls[1:]
                                 assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment))
                                 for (url, format, description, comment) in other_urls:
-                                    assert(_add_new_format(bibdoc, url, format, docname, description, doctype, newname, description, comment))
+                                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
                         if icon != KEEP_OLD_VALUE:
                             _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
