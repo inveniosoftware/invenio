@@ -91,7 +91,7 @@ from invenio.bibtask import task_init, write_message, \
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
     KEEP_OLD_VALUE, decompose_bibdocfile_old_url, decompose_bibdocfile_url, \
-    bibdocfile_url_p
+    bibdocfile_url_p, InvenioWebSubmitFileError
 
 #Statistic variables
 stat = {}
@@ -734,11 +734,16 @@ def synchronize_8564(rec_id, record, record_had_FFT):
         comment = field_get_subfield_values(field, 'z')[:1]
         if url:
             recid, docname, format = decompose_bibdocfile_url(url[0])
-            bibdoc = BibRecDocs(recid).get_bibdoc(docname)
-            if description:
-                bibdoc.set_description(description[0], format)
-            if comment:
-                bibdoc.set_comment(comment[0], format)
+            try:
+                bibdoc = BibRecDocs(recid).get_bibdoc(docname)
+                if description:
+                    bibdoc.set_description(description[0], format)
+                if comment:
+                    bibdoc.set_comment(comment[0], format)
+            except InvenioWebSubmitFileError:
+                ## Apparently the referenced docname doesn't exist anymore.
+                ## Too bad. Let's skip it.
+                write_message("WARNING: docname %s does not seem to exist for record %s. Has it been renamed outside FFT?" % (docname, recid), stream=sys.stderr)
 
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
     tags8564s = record_get_field_instances(record, '856', '4', ' ')
