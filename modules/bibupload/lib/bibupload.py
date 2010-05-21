@@ -914,7 +914,7 @@ def synchronize_8564(rec_id, record, record_had_FFT, pretend=False):
                 except InvenioWebSubmitFileError:
                     ## Apparently the referenced docname doesn't exist anymore.
                     ## Too bad. Let's skip it.
-                    write_message("WARNING: docname %s doesn't exist for record %s. Has it been renamed outside FFT?" % (docname, recid), stream=sys.stderr)
+                    write_message("WARNING: docname %s does not seem to exist for record %s. Has it been renamed outside FFT?" % (docname, recid), stream=sys.stderr)
 
     def merge_bibdocfile_into_marc(field, subfields):
         """
