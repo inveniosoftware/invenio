@@ -23,6 +23,7 @@ BibIndex stemmer facility based on the Porter Stemming Algorithm.
 __revision__ = "$Id$"
 
 from thread import get_ident
+from invenio.bibindex_engine_stemmer_greek import greek_stemmer
 
 _stemmers = {}
 
@@ -61,6 +62,10 @@ try:
         """Return WORD stemmed according to language LANG (e.g. 'en')."""
         if lang and is_stemmer_available_for_language(lang):
             return _stemmers[get_ident()][lang].stemWord(word)
+        elif lang == 'el':
+            #TODO: first we have to capitalize the word
+            # and remove accents from the vowels
+            return greek_stemmer().stem_word(word)
         else:
             return word
 
@@ -445,6 +450,10 @@ except ImportError:
         if lang == 'en' and _stemmers and _stemmers.has_key(get_ident()):
             #make sure _stemmers[get_ident()] is avail..
             return _stemmers[get_ident()].stem(word, 0, len(word)-1)
+        elif lang == 'el':
+            #TODO: first we have to capitalize the word
+            # and remove accents from the vowels
+            return greek_stemmer().stem_word(word)
         else:
             return word
 

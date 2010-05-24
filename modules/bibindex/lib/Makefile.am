@@ -18,7 +18,7 @@
 pylibdir = $(libdir)/python/invenio
 pylib_DATA = bibindex_engine.py bibindex_engine_config.py bibindex_engine_tests.py \
              bibindexadminlib.py bibindex_engine_stemmer.py bibindex_engine_stopwords.py \
-             bibindex_engine_stemmer_tests.py \
+             bibindex_engine_stemmer_tests.py bibindex_engine_stemmer_greek.py \
              bibindex_engine_tokenizer.py bibindex_engine_tokenizer_tests.py \
              bibindexadmin_regression_tests.py
 
