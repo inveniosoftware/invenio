@@ -52,13 +52,16 @@ def Stamp_Replace_Single_File_Approval(parameters, \
          + latex_template: (string) - the name of the LaTeX template that
             should be used for the creation of the stamp.
 
-         + latex_template_vars: (string) - a string-ified dictionary of
-            variables to be replaced in the LaTeX template and the values
-            (or names of files in curdir containing the values) with which to
-            replace them.
+         + latex_template_vars: (string) - a string-ified dictionary
+            of variables to be replaced in the LaTeX template and the
+            values (or names of files in curdir containing the values)
+            with which to replace them. Use prefix 'FILE:' to specify
+            that the stamped value must be read from a file in
+            submission direcotory instead of being a fixed value to
+            stamp.
             E.G.:
-               { 'TITLE' : 'DEMOTHESIS_TITLE',
-                 'DATE'  : 'DEMOTHESIS_DATE'
+               { 'TITLE' : 'FILE:DEMOTHESIS_TITLE',
+                 'DATE'  : 'FILE:DEMOTHESIS_DATE'
                }
 
          + file_to_be_stamped: (string) - this is the name of a file in the
@@ -77,6 +80,14 @@ def Stamp_Replace_Single_File_Approval(parameters, \
               + all (all pages are stamped);
               + coverpage (a separate cover-page is added to the file as a
                  first page);
+
+         + layer: (string) - the position of the stamp. Should be one of:
+              + background (invisible if original file has a white
+                -not transparent- background layer)
+              + foreground (on top of the stamped file.  If the stamp
+                does not have a transparent background, will hide all
+                of the document layers)
+           The default value is 'background'.
     """
     ############
     ## Definition of important variables:
@@ -88,6 +99,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
     ##    'input-file'          : "", ## INPUT FILE
     ##    'output-file'         : "", ## OUTPUT FILE
     ##    'stamp'               : "", ## STAMP TYPE
+    ##    'layer'               : "", ## LAYER TO STAMP
     ##    'verbosity'           : 0,  ## VERBOSITY (we don't care about it)
     ##  }
     file_stamper_options = { 'latex-template'      : "",
@@ -95,6 +107,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
                              'input-file'          : "",
                              'output-file'         : "",
                              'stamp'               : "",
+                             'layer'               : "",
                              'verbosity'           : 0,
                            }
     ## Submission access number:
@@ -126,6 +139,13 @@ def Stamp_Replace_Single_File_Approval(parameters, \
     ## The type of stamp to be applied to the file(s):
     stamp = "%s" % ((type(parameters['stamp']) is str and \
                      parameters['stamp'].lower()) or "")
+    ## The layer to use for stamping:
+    try:
+        layer = parameters['layer']
+    except KeyError:
+        layer = "background"
+    if not layer in ('background', 'foreground'):
+        layer = "background"
     ## Get the name of the file to be stamped from the file indicated in
     ## the file_to_be_stamped parameter:
     try:
@@ -305,6 +325,8 @@ def Stamp_Replace_Single_File_Approval(parameters, \
     file_stamper_options['latex-template'] = latex_template
     file_stamper_options['latex-template-var'] = latex_template_vars
     file_stamper_options['stamp'] = stamp
+    file_stamper_options['layer'] = layer
+
     ## Put the input file and output file into the file_stamper_options
     ## dictionary:
     file_stamper_options['input-file'] = bibdocfile_file_to_stamp.fullpath

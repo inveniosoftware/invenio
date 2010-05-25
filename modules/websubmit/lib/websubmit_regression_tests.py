@@ -22,10 +22,12 @@
 __revision__ = "$Id$"
 
 import unittest
+import os
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_PREFIX
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
+from invenio import websubmit_file_stamper
 
 class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebSubmit web pages whether they are up or not."""
@@ -126,11 +128,74 @@ class WebSubmitXSSVulnerabilityTest(unittest.TestCase):
                           password="j123ekyll"))
 
 
+class WebSubmitStampingTest(unittest.TestCase):
+    """Test WebSubmit file stamping tool"""
+
+    def test_stamp_coverpage(self):
+        """websubmit - creation of a PDF cover page stamp (APIs)"""
+        file_stamper_options = { 'latex-template'      : "demo-stamp-left.tex",
+                                 'latex-template-var'  : {'REPORTNUMBER':'TEST-2010','DATE':'10/10/2000'},
+                                 'input-file'          : CFG_PREFIX + "/lib/webtest/invenio/test.pdf",
+                                 'output-file'         : "test-stamp-coverpage.pdf",
+                                 'stamp'               : "coverpage",
+                                 'layer'               : "foreground",
+                                 'verbosity'           : 0,
+                                 }
+        try:
+            (stamped_file_path_only, stamped_file_name) = \
+                    websubmit_file_stamper.stamp_file(file_stamper_options)
+        except:
+            self.fail("Stamping failed")
+
+        # Test that file is now bigger...
+        assert os.path.getsize(os.path.join(stamped_file_path_only,
+                                            stamped_file_name)) > 12695
+
+    def test_stamp_firstpage(self):
+        """websubmit - stamping first page of a PDF (APIs)"""
+        file_stamper_options = { 'latex-template'      : "demo-stamp-left.tex",
+                                 'latex-template-var'  : {'REPORTNUMBER':'TEST-2010','DATE':'10/10/2000'},
+                                 'input-file'          : CFG_PREFIX + "/lib/webtest/invenio/test.pdf",
+                                 'output-file'         : "test-stamp-firstpage.pdf",
+                                 'stamp'               : "first",
+                                 'layer'               : "background",
+                                 'verbosity'           : 0,
+                                 }
+        try:
+            (stamped_file_path_only, stamped_file_name) = \
+                    websubmit_file_stamper.stamp_file(file_stamper_options)
+        except:
+            self.fail("Stamping failed")
+
+        # Test that file is now bigger...
+        assert os.path.getsize(os.path.join(stamped_file_path_only,
+                                            stamped_file_name)) > 12695
+
+    def test_stamp_allpages(self):
+        """websubmit - stamping all pages of a PDF (APIs)"""
+        file_stamper_options = { 'latex-template'      : "demo-stamp-left.tex",
+                                 'latex-template-var'  : {'REPORTNUMBER':'TEST-2010','DATE':'10/10/2000'},
+                                 'input-file'          : CFG_PREFIX + "/lib/webtest/invenio/test.pdf",
+                                 'output-file'         : "test-stamp-allpages.pdf",
+                                 'stamp'               : "all",
+                                 'layer'               : "foreground",
+                                 'verbosity'           : 0,
+                                 }
+        try:
+            (stamped_file_path_only, stamped_file_name) = \
+                    websubmit_file_stamper.stamp_file(file_stamper_options)
+        except:
+            self.fail("Stamping failed")
+
+        # Test that file is now bigger...
+        assert os.path.getsize(os.path.join(stamped_file_path_only,
+                                            stamped_file_name)) > 12695
 
 
 TEST_SUITE = make_test_suite(WebSubmitWebPagesAvailabilityTest,
                              WebSubmitTestLegacyURLs,
-                             WebSubmitXSSVulnerabilityTest)
+                             WebSubmitXSSVulnerabilityTest,
+                             WebSubmitStampingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

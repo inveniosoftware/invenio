@@ -476,5 +476,7 @@ update-v0.99.1-tables:
 	echo "INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_nb_length');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Move_FCKeditor_Files_to_Storage','Transfer files attached to the record with the FCKeditor');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Move_FCKeditor_Files_to_Storage','input_fields');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','layer');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','layer');" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

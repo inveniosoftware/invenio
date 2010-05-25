@@ -518,6 +518,7 @@ INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','files_to_be_stamped');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template_vars');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','stamp');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','layer');
 INSERT INTO sbmFUNDESC VALUES ('Make_Dummy_MARC_XML_Record','dummyrec_source_tpl');
 INSERT INTO sbmFUNDESC VALUES ('Make_Dummy_MARC_XML_Record','dummyrec_create_tpl');
 INSERT INTO sbmFUNDESC VALUES ('Print_Success_APP','decision_file');
@@ -535,6 +536,7 @@ INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_templ
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_template_vars');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','new_file_name');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','stamp');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','layer');
 INSERT INTO sbmFUNDESC VALUES ('Move_FCKeditor_Files_to_Storage','input_fields');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','maxsize');
 INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','minsize');

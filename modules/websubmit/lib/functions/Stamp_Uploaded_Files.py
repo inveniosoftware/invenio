@@ -35,14 +35,18 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
          + latex_template: (string) - the name of the LaTeX template that
             should be used for the creation of the stamp.
 
-         + latex_template_vars: (string) - a string-ified dictionary of
-            variables to be replaced in the LaTeX template and the values
-            (or names of files in curdir containing the values) with which to
-            replace them.
+         + latex_template_vars: (string) - a string-ified dictionary
+            of variables to be replaced in the LaTeX template and the
+            values (or names of files in curdir containing the values)
+            with which to replace them. Use prefix 'FILE:' to specify
+            that the stamped value must be read from a file in
+            submission direcotory instead of being a fixed value to
+            stamp.
             E.G.:
-               { 'TITLE' : 'DEMOTHESIS_TITLE',
-                 'DATE'  : 'DEMOTHESIS_DATE'
+               { 'TITLE' : 'FILE:DEMOTHESIS_TITLE',
+                 'DATE'  : 'FILE:DEMOTHESIS_DATE'
                }
+
          + files_to_be_stamped: (string) - The directories in which files
             should be stamped: This is a comma-separated list of directory
             names. E.g.:
@@ -54,6 +58,13 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
               + all (all pages are stamped);
               + coverpage (a separate cover-page is added to the file as a
                  first page);
+
+         + layer: (string) - the position of the stamp. Should be one of:
+              + background (invisible if original file has a white -
+                            not transparent- background layer)
+              + foreground (on top of the stamped file. If the stamp
+                            does not have a transparent background,
+                            will hide all of the document layers)
 
     If all goes according to plan, for each directory in which files are to
     be stamped, the original, unstamped files should be found in a
@@ -69,6 +80,7 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
     ##    'input-file'          : "", ## INPUT FILE
     ##    'output-file'         : "", ## OUTPUT FILE
     ##    'stamp'               : "", ## STAMP TYPE
+    ##    'layer'               : "", ## LAYER TO STAMP
     ##    'verbosity'           : 0,  ## VERBOSITY (we don't care about it)
     ##  }
     file_stamper_options = { 'latex-template'      : "",
@@ -76,6 +88,7 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
                              'input-file'          : "",
                              'output-file'         : "",
                              'stamp'               : "",
+                             'layer'               : "",
                              'verbosity'           : 0,
                            }
     ## A dictionary of arguments to be passed to visit_for_stamping:
@@ -97,6 +110,13 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
     ## The type of stamp to be applied to the file(s):
     stamp = "%s" % ((type(parameters['stamp']) is str and \
                      parameters['stamp'].lower()) or "")
+    ## The layer to use for stamping:
+    try:
+        layer = parameters['layer']
+    except KeyError:
+        layer = "background"
+    if not layer in ('background', 'foreground'):
+        layer = "background"
     ## The directories in which files should be stamped:
     ## This is a comma-separated list of directory names. E.g.:
     ## DEMOTHESIS_MAIN,DEMOTHESIS_ADDITIONAL
@@ -194,6 +214,7 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
     file_stamper_options['latex-template'] = latex_template
     file_stamper_options['latex-template-var'] = latex_template_vars
     file_stamper_options['stamp'] = stamp
+    file_stamper_options['layer'] = layer
 
     for stampdir in stamping_locations:
         ## Create the full path to the stamp directory - it is considered
