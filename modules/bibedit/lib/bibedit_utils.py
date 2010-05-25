@@ -26,7 +26,6 @@ by both the web and CLI interfaces.
 
 __revision__ = "$Id$"
 
-import commands
 import cPickle
 import difflib
 import fnmatch
@@ -46,15 +45,18 @@ from invenio.bibrecord import create_record, create_records, \
     record_get_field_value, record_has_field, record_xml_output, \
     record_strip_empty_fields, record_strip_empty_volatile_subfields
 from invenio.bibtask import task_low_level_submission
-from invenio.config import CFG_BINDIR, CFG_BIBEDIT_LOCKLEVEL, \
+from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPDIR
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions
-from invenio.search_engine import get_fieldvalues, print_record, record_exists
+from invenio.search_engine import get_fieldvalues, print_record, \
+     record_exists, get_colID, guess_primary_collection_of_a_record, \
+     get_record
 from invenio.webuser import get_user_info
 from invenio.dbquery import run_sql
+from invenio.websearchadminlib import get_detailed_page_tabs
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPDIR)
@@ -529,3 +531,24 @@ def _record_has_id_p(record, recid, rec_oaiid, rec_sysno):
                 SYSNO_TAG[4], SYSNO_TAG[5]) == rec_sysno):
             return True
     return False
+
+
+def can_record_have_physical_copies(recid):
+    """Determine if the record can have physical copies
+    (addable through the bibCirculation module).
+    The information is derieved using the tabs displayed for a given record.
+    Only records already saved within the collection may have the physical copies
+    @result True or False
+    """
+    if get_record(recid) == None:
+        return False
+
+    col_id = get_colID(guess_primary_collection_of_a_record(recid))
+    collections = get_detailed_page_tabs(col_id)
+
+    if (not collections.has_key("holdings")) or \
+        (not collections["holdings"].has_key("visible")):
+        return False
+
+    return collections["holdings"]["visible"] == True
+

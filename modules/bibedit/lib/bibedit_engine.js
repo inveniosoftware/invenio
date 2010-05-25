@@ -154,6 +154,12 @@ var gRecRevisionHistory = [];
 
 var gUndoList = []; // list of possible undo operations
 var gRedoList = []; // list of possible redo operations
+
+// number of bibcirculation copies from the retrieval time
+var gPhysCopiesNum = 0;
+var gBibCircUrl = null;
+
+var gDisplayBibCircPanel = false;
 /*
  * **************************** 2. Initialization ******************************
  */
@@ -256,6 +262,9 @@ function initMisc(){
              ' * Cancel (to discard your changes)';
     }
   };
+
+  //Initialising the BibCircualtion integration plugin
+  $("#bibEditBibCirculationBtn").bind("click", onBibCirculationBtnClicked);
 }
 
 
@@ -417,10 +426,16 @@ function resetBibeditState(){
   gDisabledHpEntries = {};
   gReadOnlyMode = false;
   gRecRevisionHistory = [];
+  gUndoList = [];
+  gRedoList = [];
+  gPhysCopiesNum = 0;
+  gBibCircUrl = null;
 
   updateRevisionsHistory();
   updateInterfaceAccordingToMode();
   updateRevisionsHistory();
+  updateUrView();
+  updateBibCirculationPanel();
   holdingPenPanelRemoveEntries();
 }
 
@@ -1106,6 +1121,9 @@ function onGetRecordSuccess(json){
   gRecIDLoading = null;
   gRecRev = json['recordRevision'];
   gRecRevAuthor = json['revisionAuthor'];
+  gPhysCopiesNum = json['numberOfCopies'];
+  gBibCircUrl = json['bibCirculationUrl'];
+  gDisplayBibCircPanel = json['canRecordHavePhysicalCopies'];
 
   var revDt = formatDateTime(getRevisionDate(gRecRev));
   var recordRevInfo = "record revision: " + revDt;
@@ -1140,6 +1158,7 @@ function onGetRecordSuccess(json){
   gHoldingPenLoadedChanges = {};
 
   adjustHPChangesetsActivity();
+  updateBibCirculationPanel();
 
   // updating the undo/redo lists
   gUndoList = json['undoList'];
@@ -1233,7 +1252,10 @@ function onCancelClick(){
       gRecRevisionHistory = [];
       gHoldingPenLoadedChanges = [];
       gHoldingPenChanges = [];
+      gPhysCopiesNum = 0;
+      gBibCircUrl = null;
       // making the changes visible
+      updateBibCirculationPanel();
       updateInterfaceAccordingToMode();
       updateRevisionsHistory();
       updateUrView();
@@ -1269,6 +1291,10 @@ function onDeleteRecordClick(){
   /*
    * Handle 'Delete record' button.
    */
+  if (gPhysCopiesNum > 0){
+    displayAlert('errorPhysicalCopiesExist');
+    return;
+  }
   if (displayAlert('confirmDeleteRecord')){
     updateStatus('updating');
     createReq({recID: gRecID, requestType: 'deleteRecord'}, function(json){
@@ -1361,6 +1387,10 @@ function cleanUp(disableRecBrowser, searchPattern, searchType,
   gReadOnlyMode = false;
   gHoldingPenLoadedChanges = null;
   gHoldingPenChanges = null;
+  gUndoList = [];
+  gRedoList = [];
+  gBibCircUrl = null;
+  gPhysCopiesNum = 0;
 }
 
 function positionBibEditPanel(minimalPosition){
@@ -4171,4 +4201,64 @@ function createFields(toCreateFields, isUndo){
   reColorFields();
 
   return ajaxData;
+}
+
+
+/* Bibcirculation Panel functions */
+
+function isBibCirculationPanelNecessary(){
+  /** A function checking if the BibCirculation connectivity panel should
+      be displayed. This information is derieved from the state of the record.
+      Returns true or false
+  */
+
+  if (gRecID === null){
+    return false;
+  }
+
+  // only if the record is saved and exists in the database and belongs
+  // to a particular colelction
+  return gDisplayBibCircPanel;
+}
+
+
+function updateBibCirculationPanel(){
+  /** Updates the BibCirculation panel contents and visibility
+  */
+  if (gDisplayBibCircPanel === false){
+    // in case, the panel is present, should be hidden
+    $("#bibEditBibCircConnection").addClass("bibEditHiddenElement");
+  }
+  else {
+    // the panel must be present - we have to show it
+    $(".bibEditBibCircConnection").removeClass("bibEditHiddenElement");
+  }
+
+  var interfaceElement = $("#bibEditBibCircConnection");
+  if (isBibCirculationPanelNecessary()){
+    interfaceElement.removeClass("bibEditHiddenElement");
+  } else {
+    interfaceElement.addClass("bibEditHiddenElement");
+  }
+
+  // updating the content
+  var copiesCountElement = $('#bibEditBibCirculationCopies');
+  copiesCountElement.attr("innerHTML", gPhysCopiesNum);
+}
+
+function bibCircIntGetEditCopyUrl(recId){
+  /**A function returning the address under which, the edition of a
+      given record is possible
+  */
+
+//  return "/admin/bibcirculation/bibcirculationadmin.py/get_item_details?recid=" + recId;
+  return gBibCircUrl;
+}
+
+
+function onBibCirculationBtnClicked(e){
+  /** A function redirecting the user to the BibCiculation web interface
+  */
+  var link = bibCircIntGetEditCopyUrl(gRecID);
+  window.open(link);
 }

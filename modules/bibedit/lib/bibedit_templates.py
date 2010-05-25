@@ -191,14 +191,29 @@ class Template:
             }
 
         holdingpenpanel = '<div class="bibEditMenuSectionHeader">\n' \
-                            '          %(imgCompressMenuSection)sHolding Pen\n' \
-                            '<table class="bibEditMenuMore">\n<tr><td>' \
-                            '   <div id="bibEditHoldingPenToolbar"> '  \
-                            '      <div id="bibeditHPChanges"></div>' \
-                            ' </div> </td></tr></table>' \
-                            '        </div>\n'  %{ 'imgCompressMenuSection': imgCompressMenuSection,
-                                                  }
-#                            self.holdingPenPanel(CFG_SITE_LANG)
+            '          %(imgCompressMenuSection)sHolding Pen\n' \
+            '<table class="bibEditMenuMore">\n<tr><td>' \
+            '   <div id="bibEditHoldingPenToolbar"> '  \
+            '      <div id="bibeditHPChanges"></div>' \
+            ' </div> </td></tr></table>' \
+            '        </div>\n'  % \
+            { 'imgCompressMenuSection': imgCompressMenuSection }
+
+        bibcirculationpanel = \
+            '      <div class="bibEditMenuSection" ' \
+            ' id="bibEditBibCircConnection">\n' \
+            '<div class="bibEditMenuSectionHeader">\n' \
+            '          %(imgCompressMenuSection)sPhysical Copies\n' \
+            '    <table class="bibEditMenuMore">\n<tr><td ' \
+            ' class="bibEditBibCircPanel">' \
+            '    Number of copies: ' \
+            '       <div id="bibEditBibCirculationCopies">0</div><br/>' \
+            '    <button id="bibEditBibCirculationBtn">' \
+            'Edit physical copies</button>' \
+            ' </td></tr></table></div></div>' \
+            % {
+               'imgCompressMenuSection': imgCompressMenuSection,
+              }
 
         lnkhelp = img('/img/help.png', '', style='vertical-align: bottom') + \
             link('Help', href='#', onclick='window.open(' \
@@ -225,6 +240,7 @@ class Template:
             '      <div class="bibEditMenuSection">\n' \
             '        %(historymenu)s\n' \
             '      </div>\n' \
+            '        %(circulationmenu)s\n' \
             '      <div id="bibEditMenuSection">\n' \
             '        %(statusarea)s\n' \
             '      </div>\n' \
@@ -239,7 +255,8 @@ class Template:
                 'lnkhelp': lnkhelp,
                 'holdingpenpanel': holdingpenpanel,
                 'historymenu': historymenu,
-                'undoredosection': undoredosection
+                'undoredosection': undoredosection,
+                'circulationmenu': bibcirculationpanel
                 }
 
     def history_comparebox(self, ln, revdate, revdate_cmp, comparison):

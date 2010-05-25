@@ -36,6 +36,8 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
     CFG_BIBEDIT_KEYWORD_RDFLABEL
 
+from invenio.config import CFG_SITE_LANG
+
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
     get_related_hp_changesets, get_hp_update_xml, delete_hp_change, \
     get_record_last_modification_date, get_record_revision_author, \
@@ -49,7 +51,8 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
     update_cache_file_contents, get_field_templates, get_marcxml_of_revision, \
     revision_to_timestamp, timestamp_to_revision, \
-    get_record_revision_timestamps, record_revision_exists
+    get_record_revision_timestamps, record_revision_exists, \
+    can_record_have_physical_copies
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -65,6 +68,9 @@ from invenio.bibcatalog import bibcatalog_system
 from invenio.webpage import page
 from invenio.bibknowledge import get_kbd_values_for_bibedit, get_kbr_values, \
      get_kbt_items_for_bibedit #autosuggest
+
+from invenio.bibcirculation_dblayer import get_number_copies, has_copies
+from invenio.bibcirculation_utils import create_item_details_url
 
 import re
 import difflib
@@ -301,7 +307,8 @@ def perform_request_newticket(recid, uid):
         errmsg = "ticket_submit failed"
     return (errmsg, t_url)
 
-def perform_request_ajax(req, recid, uid, data, isBulk = False):
+def perform_request_ajax(req, recid, uid, data, isBulk = False, \
+                         ln = CFG_SITE_LANG):
     """Handle Ajax requests by redirecting to appropriate function."""
     response = {}
     request_type = data['requestType']
@@ -335,7 +342,7 @@ def perform_request_ajax(req, recid, uid, data, isBulk = False):
         response.update(perform_request_update_record(request_type, recid, \
                                                       uid, cacheMTime, data, \
                                                       hpChanges, undo_redo, \
-                                                      isBulk))
+                                                      isBulk, ln))
     elif request_type in ('autosuggest', 'autocomplete', 'autokeyword'):
         response.update(perform_request_autocomplete(request_type, recid, uid, \
                                                      data))
@@ -437,7 +444,7 @@ def perform_request_holdingpen(request_type, recId, changeId=None):
         delete_hp_change(changeId)
     return response
 
-def perform_request_record(req, request_type, recid, uid, data):
+def perform_request_record(req, request_type, recid, uid, data, ln=CFG_SITE_LANG):
     """Handle 'major' record related requests like fetching, submitting or
     deleting a record, cancel editing or preparing a record for merging.
 
@@ -497,6 +504,7 @@ def perform_request_record(req, request_type, recid, uid, data):
         record_status = record_exists(recid)
         existing_cache = cache_exists(recid, uid)
         read_only_mode = False
+
         if data.has_key("inReadOnlyMode"):
             read_only_mode = data['inReadOnlyMode']
 
@@ -580,6 +588,9 @@ def perform_request_record(req, request_type, recid, uid, data):
             last_revision_ts = revision_to_timestamp( \
                 get_record_last_modification_date(recid))
             revisions_history = get_record_revision_timestamps(recid)
+            number_of_physical_copies = get_number_copies(recid)
+            bibcirc_details_URL = create_item_details_url(recid, ln)
+            can_have_copies = can_record_have_physical_copies(recid)
 
             response['cacheDirty'], response['record'], \
                 response['cacheMTime'], response['recordRevision'], \
@@ -591,6 +602,9 @@ def perform_request_record(req, request_type, recid, uid, data):
                 revision_author, last_revision_ts, revisions_history, \
                 read_only_mode, pending_changes, disabled_hp_changes, \
                 undo_list, redo_list
+            response['numberOfCopies'] = number_of_physical_copies
+            response['bibCirculationUrl'] = bibcirc_details_URL
+            response['canRecordHavePhysicalCopies'] = can_have_copies
             # Set tag format from user's session settings.
             try:
                 tagformat_settings = session_param_get(req, 'bibedit_tagformat')
@@ -638,7 +652,7 @@ def perform_request_record(req, request_type, recid, uid, data):
                     response['resultCode'] = 4
             except:
                 response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[ \
-                    'wrong_cache_file_format']
+                    'error_wrong_cache_file_format']
     elif request_type == 'revert':
         revId = data['revId']
         job_date = "%s-%s-%s %s:%s:%s" % re_revdate_split.search(revId).groups()
@@ -669,11 +683,17 @@ def perform_request_record(req, request_type, recid, uid, data):
         # been modified in another editor.
         existing_cache = cache_exists(recid, uid)
         pending_changes = []
-        if existing_cache and cache_expired(recid, uid) and \
+
+        if has_copies(recid):
+            response['resultCode'] = \
+                CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_physical_copies_exist']
+        elif existing_cache and cache_expired(recid, uid) and \
                 record_locked_by_other_user(recid, uid):
-            response['resultCode'] = 104
+            response['resultCode'] = \
+                CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rec_locked_by_user']
         elif record_locked_by_queue(recid):
-            response['resultCode'] = 105
+            response['resultCode'] = \
+                CFG_BIBEDIT_AJAX_RESULT_CODES_REV['error_rec_locked_by_queue']
         else:
             if not existing_cache:
                 record_revision, record, pending_changes, \
@@ -730,7 +750,8 @@ def perform_request_record(req, request_type, recid, uid, data):
     return response
 
 def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
-                                  hpChanges, undoRedoOp, isBulk=False):
+                                  hpChanges, undoRedoOp, isBulk=False, \
+                                  ln=CFG_SITE_LANG):
     """Handle record update requests like adding, modifying, moving or deleting
     of fields or subfields. Possible common error situations:
     - Missing cache file
@@ -754,7 +775,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
                 undo_list, redo_list = get_cache_file_contents(recid, uid)[1:]
         except:
             response['resultCode'] = CFG_BIBEDIT_AJAX_RESULT_CODES_REV[ \
-                'wrong_cache_file_format']
+                'error_wrong_cache_file_format']
             return response
 
         # process all the Holding Pen changes operations ... regardles the

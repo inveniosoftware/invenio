@@ -930,6 +930,9 @@ function displayAlert(msgType, args){
     case 'alertDeleteProtectedField':
       msg = 'ERROR: Cannot delete protected field ' + args[0] + '.';
       break;
+    case 'errorPhysicalCopiesExist':
+      msg = "ERROR: Cannot delete record when physical copies exist. First remove the copies in the BibCirculation module and then try again";
+      break;
     default:
       msg = msgType;
   }

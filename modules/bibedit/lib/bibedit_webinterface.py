@@ -122,7 +122,7 @@ class WebInterfaceEditPages(WebInterfaceDirectory):
             # Handle RESTful calls from logged in users by redirecting to
             # generic URL.
             redirect_to_url(req, '%s/record/edit/#state=edit&recid=%s&recrev=%s' % (
-                    CFG_SITE_URL, self.recid, "sampleValue"))
+                    CFG_SITE_URL, self.recid, ""))
 
         elif recid is not None:
             json_response.update({'recID': recid})

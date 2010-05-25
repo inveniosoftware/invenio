@@ -2013,7 +2013,6 @@ input.hyperlinkformSubmitButton {
   opacity: 0.4;
   vertical-align: bottom;
 }
-
 #bibEditContent {
   min-height: 300px;
   margin-left: 150px;
@@ -2135,23 +2134,25 @@ input.hyperlinkformSubmitButton {
 }
 
 .bibeditscrollArea {
-width: 200px;
-height: 75px;
-padding-left: 5px;
-padding-right: 5px;
-border-color: #6699CC;
-border-width: 1px;
-border-style: solid;
-float: left;
-overflow: auto;
+    width: 200px;
+    height: 75px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-color: #6699CC;
+    border-width: 1px;
+    border-style: solid;
+    float: left;
+    overflow: auto;
 }
+
 .bibeditscrollArea ul {
-margin-top: 0px;
-margin-bottom: 0px;
-list-style: none;
-margin-left: 0;
-padding-left: 0;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    list-style: none;
+    margin-left: 0;
+    padding-left: 0;
 }
+
 .bibeditHPCorrection{
     border-width: 1px;
     background-color: #FAEBD7;
@@ -2169,11 +2170,11 @@ padding-left: 0;
     max-height: 150px;
 }
 
-
 .bibeditHPHiddenElement{
     visibility: hidden;
     display: none;
 }
+
 .bibeditHPPanelEntry{
     border-width: 1px;
     border-style: dotted;
@@ -2241,10 +2242,10 @@ padding-left: 0;
 }
 
 .bibeditHPEntryCol2{
-	display: table-cell;
-	max-width: 28px;
-	min-width: 28px;
-	margin: 0px;
+    display: table-cell;
+    max-width: 28px;
+    min-width: 28px;
+    margin: 0px;
 }
 
 .bibeditHPPanelEntryDisabled {
@@ -2359,6 +2360,10 @@ padding-left: 0;
 
 .bibEditURDescEntrySelected{
     background-color: #aaaaaa;
+}
+
+.bibEditBibCircPanel{
+    font-weight: normal;
 }
 
 /* end of BibEdit module */

@@ -523,6 +523,18 @@ def get_number_copies(recid):
     return res[0][0]
 
 
+def has_copies(recid):
+    """
+    Indicate if there are any physical copies of a document described
+    by the record
+
+    @param recid: The identifier of the record
+    @type recid: int
+
+    @return True or False according to the state
+    """
+    return get_number_copies(recid) != 0;
+
 def bor_loans_historical_overview(borrower_id):
     """
     Get loans historical overview of a given borrower_id.
