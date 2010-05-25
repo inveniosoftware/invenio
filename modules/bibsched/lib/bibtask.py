@@ -26,8 +26,8 @@ bibtask_config.CFG_BIBTASK_VALID_TASKS.
 A valid task must call the task_init function with the proper parameters.
 Generic task related parameters (user, sleeptime, runtime, task_id, task_name
 verbose)
-go to _task_params global dictionary accessible through task_get_task_param.
-Option specific to the particular BibTask go to _options global dictionary
+go to _TASK_PARAMS global dictionary accessible through task_get_task_param.
+Option specific to the particular BibTask go to _OPTIONS global dictionary
 and are accessible via task_get_option/task_set_option.
 
 In order to log something properly, just use write_message(s) with the desired
@@ -68,6 +68,26 @@ from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
 from invenio.webuser import get_user_preferences, get_email
 from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS
+
+# Global _TASK_PARAMS dictionary.
+_TASK_PARAMS = {
+        'version': '',
+        'task_stop_helper_fnc': None,
+        'task_name': os.path.basename(sys.argv[0]),
+        'task_specific_name': '',
+        'user': '',
+        # If the task is not initialized (usually a developer debugging
+        # a single method), output all messages.
+        'verbose': 9,
+        'sleeptime': '',
+        'runtime': time.strftime("%Y-%m-%d %H:%M:%S"),
+        'priority': 0,
+        'runtime_limit': None,
+        'profile': [],
+        }
+
+# Global _OPTIONS dictionary.
+_OPTIONS = {}
 
 # Which tasks don't need to ask the user for authorization?
 CFG_VALID_PROCESSES_NO_AUTH_NEEDED = ("bibupload", )
@@ -186,8 +206,8 @@ def setup_loggers(task_id=None):
         logger.removeHandler(handler)
     formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
     if task_id is not None:
-        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _task_params['task_id']), 'a', 1*1024*1024, 10)
-        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a', 1*1024*1024, 10)
+        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
+        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a', 1*1024*1024, 10)
         log_logger.setFormatter(formatter)
         log_logger.setLevel(logging.DEBUG)
         err_logger.setFormatter(formatter)
@@ -235,8 +255,8 @@ def task_init(
     @param task_run_fnc: will be called as the main core function. Must return
     False in case of errors.
     """
-    global _task_params, _options
-    _task_params = {
+    global _TASK_PARAMS, _OPTIONS
+    _TASK_PARAMS = {
         "version" : version,
         "task_stop_helper_fnc" : task_stop_helper_fnc,
         "task_name" : os.path.basename(sys.argv[0]),
@@ -251,22 +271,22 @@ def task_init(
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
-        _task_params['task_id'] = int(sys.argv[1])
-        argv = _task_get_options(_task_params['task_id'], _task_params['task_name'])
+        _TASK_PARAMS['task_id'] = int(sys.argv[1])
+        argv = _task_get_options(_TASK_PARAMS['task_id'], _TASK_PARAMS['task_name'])
         to_be_submitted = False
     else:
         argv = sys.argv
 
-    setup_loggers(_task_params.get('task_id'))
+    setup_loggers(_TASK_PARAMS.get('task_id'))
 
     if type(argv) is dict:
         # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
         # This is needed for old task submitted before CLI parameters
-        # where stored in DB and _options dictionary was stored instead.
-        _options = argv
+        # where stored in DB and _OPTIONS dictionary was stored instead.
+        _OPTIONS = argv
     else:
         try:
-            _task_build_params(_task_params['task_name'], argv, description,
+            _task_build_params(_TASK_PARAMS['task_name'], argv, description,
                 help_specific_usage, version, specific_params,
                 task_submit_elaborate_specific_parameter_fnc,
                 task_submit_check_options_fnc)
@@ -281,8 +301,8 @@ def task_init(
             raise
 
     write_message('argv=%s' % (argv, ), verbose=9)
-    write_message('_options=%s' % (_options, ), verbose=9)
-    write_message('_task_params=%s' % (_task_params, ), verbose=9)
+    write_message('_OPTIONS=%s' % (_OPTIONS, ), verbose=9)
+    write_message('_TASK_PARAMS=%s' % (_TASK_PARAMS, ), verbose=9)
 
     if to_be_submitted:
         _task_submit(argv, authorization_action, authorization_msg)
@@ -292,7 +312,7 @@ def task_init(
                 try:
                     from cStringIO import StringIO
                     import pstats
-                    filename = os.path.join(CFG_TMPDIR, 'bibsched_task_%s.pyprof' % _task_params['task_id'])
+                    filename = os.path.join(CFG_TMPDIR, 'bibsched_task_%s.pyprof' % _TASK_PARAMS['task_id'])
                     existing_sorts = pstats.Stats.sort_arg_dict_default.keys()
                     required_sorts = []
                     profile_dump = []
@@ -322,7 +342,7 @@ def task_init(
                             profile_dump.append(strstream.getvalue())
                     profile_dump = '\n'.join(profile_dump)
                     profile_dump += '\nYou can use profile=%s' % existing_sorts
-                    open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a').write("%s" % profile_dump)
+                    open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _TASK_PARAMS['task_id']), 'a').write("%s" % profile_dump)
                     os.remove(filename)
                 except ImportError:
                     ret = _task_run(task_run_fnc)
@@ -360,11 +380,11 @@ def _task_build_params(
     @param task_submit_check_options: must check the validity of options (via
     bibtask_get_option) once all the options where parsed;
     """
-    global _task_params, _options
-    _options = {}
+    global _OPTIONS
+    _OPTIONS = {}
 
     if task_name in CFG_BIBTASK_DEFAULT_TASK_SETTINGS:
-        _options.update(CFG_BIBTASK_DEFAULT_TASK_SETTINGS[task_name])
+        _OPTIONS.update(CFG_BIBTASK_DEFAULT_TASK_SETTINGS[task_name])
 
     # set user-defined options:
     try:
@@ -389,26 +409,26 @@ def _task_build_params(
             if opt[0] in ("-h", "--help"):
                 _usage(0, help_specific_usage=help_specific_usage, description=description)
             elif opt[0] in ("-V", "--version"):
-                print _task_params["version"]
+                print _TASK_PARAMS["version"]
                 sys.exit(0)
             elif opt[0] in ("-u", "--user"):
-                _task_params["user"] = opt[1]
+                _TASK_PARAMS["user"] = opt[1]
             elif opt[0] in ("-v", "--verbose"):
-                _task_params["verbose"] = int(opt[1])
+                _TASK_PARAMS["verbose"] = int(opt[1])
             elif opt[0] in ("-s", "--sleeptime"):
                 if task_name not in CFG_TASK_IS_NOT_A_DEAMON:
                     get_datetime(opt[1]) # see if it is a valid shift
-                    _task_params["sleeptime"] = opt[1]
+                    _TASK_PARAMS["sleeptime"] = opt[1]
             elif opt[0] in ("-t", "--runtime"):
-                _task_params["runtime"] = get_datetime(opt[1])
+                _TASK_PARAMS["runtime"] = get_datetime(opt[1])
             elif opt[0] in ("-P", "--priority"):
-                _task_params["priority"] = int(opt[1])
+                _TASK_PARAMS["priority"] = int(opt[1])
             elif opt[0] in ("-N", "--name"):
-                _task_params["task_specific_name"] = opt[1]
+                _TASK_PARAMS["task_specific_name"] = opt[1]
             elif opt[0] in ("-L", "--limit"):
-                _task_params["runtime_limit"] = parse_runtime_limit(opt[1])
+                _TASK_PARAMS["runtime_limit"] = parse_runtime_limit(opt[1])
             elif opt[0] in ("--profile", ):
-                _task_params["profile"] += opt[1].split(',')
+                _TASK_PARAMS["profile"] += opt[1].split(',')
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -421,57 +441,57 @@ def _task_build_params(
 
 def task_set_option(key, value):
     """Set an value to key in the option dictionary of the task"""
-    global _options
+    global _OPTIONS
     try:
-        _options[key] = value
+        _OPTIONS[key] = value
     except NameError:
-        _options = {key : value}
+        _OPTIONS = {key : value}
 
 def task_get_option(key, default=None):
     """Returns the value corresponding to key in the option dictionary of the task"""
     try:
-        return _options.get(key, default)
+        return _OPTIONS.get(key, default)
     except NameError:
         return default
 
 def task_has_option(key):
-    """Map the has_key query to _options"""
+    """Map the has_key query to _OPTIONS"""
     try:
-        return _options.has_key(key)
+        return _OPTIONS.has_key(key)
     except NameError:
         return False
 
 def task_get_task_param(key, default=None):
     """Returns the value corresponding to the particular task param"""
     try:
-        return _task_params.get(key, default)
+        return _TASK_PARAMS.get(key, default)
     except NameError:
         return default
 
 def task_set_task_param(key, value):
     """Set the value corresponding to the particular task param"""
-    global _task_params
+    global _TASK_PARAMS
     try:
-        _task_params[key] = value
+        _TASK_PARAMS[key] = value
     except NameError:
-        _task_params = {key : value}
+        _TASK_PARAMS = {key : value}
 
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     write_message("Updating task progress to %s." % msg, verbose=9)
     return run_sql("UPDATE schTASK SET progress=%s where id=%s",
-        (msg, _task_params["task_id"]))
+        (msg, _TASK_PARAMS["task_id"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
     write_message("Updating task status to %s." % val, verbose=9)
     return run_sql("UPDATE schTASK SET status=%s where id=%s",
-        (val, _task_params["task_id"]))
+        (val, _TASK_PARAMS["task_id"]))
 
 def task_read_status():
     """Read status information in the BibSched task table."""
     res = run_sql("SELECT status FROM schTASK where id=%s",
-        (_task_params['task_id'],), 1)
+        (_TASK_PARAMS['task_id'],), 1)
     try:
         out = res[0][0]
     except:
@@ -486,7 +506,7 @@ def write_messages(msgs, stream=sys.stdout, verbose=1):
 def write_message(msg, stream=sys.stdout, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
-    if msg and _task_params['verbose'] >= verbose:
+    if msg and _TASK_PARAMS['verbose'] >= verbose:
         if stream == sys.stdout:
             logging.info(msg)
         elif stream == sys.stderr:
@@ -693,23 +713,23 @@ def _task_submit(argv, authorization_action, authorization_msg):
     ## sanity check: remove eventual "task" option:
 
     ## authenticate user:
-    _task_params['user'] = authenticate(_task_params["user"], authorization_action, authorization_msg)
+    _TASK_PARAMS['user'] = authenticate(_TASK_PARAMS["user"], authorization_action, authorization_msg)
 
     ## submit task:
-    if _task_params['task_specific_name']:
-        task_name = '%s:%s' % (_task_params['task_name'], _task_params['task_specific_name'])
+    if _TASK_PARAMS['task_specific_name']:
+        task_name = '%s:%s' % (_TASK_PARAMS['task_name'], _TASK_PARAMS['task_specific_name'])
     else:
-        task_name = _task_params['task_name']
+        task_name = _TASK_PARAMS['task_name']
     write_message("storing task options %s\n" % argv, verbose=9)
-    _task_params['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
+    _TASK_PARAMS['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
                                            runtime,sleeptime,status,progress,arguments,priority)
                                          VALUES (%s,%s,%s,%s,'WAITING','',%s, %s)""",
-        (task_name, _task_params['user'], _task_params["runtime"],
-         _task_params["sleeptime"], marshal.dumps(argv), _task_params['priority']))
+        (task_name, _TASK_PARAMS['user'], _TASK_PARAMS["runtime"],
+         _TASK_PARAMS["sleeptime"], marshal.dumps(argv), _TASK_PARAMS['priority']))
 
     ## update task number:
-    write_message("Task #%d submitted." % _task_params['task_id'])
-    return _task_params['task_id']
+    write_message("Task #%d submitted." % _TASK_PARAMS['task_id'])
+    return _TASK_PARAMS['task_id']
 
 
 def _task_get_options(task_id, task_name):
@@ -741,7 +761,7 @@ def _task_run(task_run_fnc):
     check_running_process_user()
     try:
         pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
-            'bibsched_task_%d.pid' % _task_params['task_id'])
+            'bibsched_task_%d.pid' % _TASK_PARAMS['task_id'])
         pidfile = open(pidfile_name, 'w')
         pidfile.write(str(os.getpid()))
         pidfile.close()
@@ -754,17 +774,17 @@ def _task_run(task_run_fnc):
     task_status = task_read_status()
     if task_status not in ("WAITING", "SCHEDULED"):
         write_message("Error: The task #%d is %s.  I expected WAITING or SCHEDULED." %
-            (_task_params['task_id'], task_status), sys.stderr)
+            (_TASK_PARAMS['task_id'], task_status), sys.stderr)
         return False
 
     time_now = time.time()
-    if _task_params['runtime_limit'] is not None and os.environ.get('BIBSCHED_MODE', 'manual') != 'manual':
-        if not _task_params['runtime_limit'][0][0] <= time_now <= _task_params['runtime_limit'][0][1]:
-            if time_now <= _task_params['runtime_limit'][0][0]:
-                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_task_params['runtime_limit'][0][0]))
+    if _TASK_PARAMS['runtime_limit'] is not None and os.environ.get('BIBSCHED_MODE', 'manual') != 'manual':
+        if not _TASK_PARAMS['runtime_limit'][0][0] <= time_now <= _TASK_PARAMS['runtime_limit'][0][1]:
+            if time_now <= _TASK_PARAMS['runtime_limit'][0][0]:
+                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_TASK_PARAMS['runtime_limit'][0][0]))
             else:
-                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_task_params['runtime_limit'][1][0]))
-            progress = run_sql("SELECT progress FROM schTASK WHERE id=%s", (_task_params['task_id'], ))
+                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_TASK_PARAMS['runtime_limit'][1][0]))
+            progress = run_sql("SELECT progress FROM schTASK WHERE id=%s", (_TASK_PARAMS['task_id'], ))
             if progress:
                 progress = progress[0][0]
             else:
@@ -774,8 +794,8 @@ def _task_run(task_run_fnc):
                 postponed_times = int(g.group(1))
             else:
                 postponed_times = 0
-            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _task_params['task_id']))
-            write_message("Task #%d postponed because outside of runtime limit" % _task_params['task_id'])
+            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _TASK_PARAMS['task_id']))
+            write_message("Task #%d postponed because outside of runtime limit" % _TASK_PARAMS['task_id'])
             return True
 
     ## initialize signal handler:
@@ -786,12 +806,12 @@ def _task_run(task_run_fnc):
     signal.signal(signal.SIGABRT, _task_sig_suicide)
     signal.signal(signal.SIGINT, _task_sig_stop)
     ## we can run the task now:
-    write_message("Task #%d started." % _task_params['task_id'])
+    write_message("Task #%d started." % _TASK_PARAMS['task_id'])
     task_update_status("RUNNING")
     ## run the task:
-    _task_params['task_starting_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    _TASK_PARAMS['task_starting_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
-    sleeptime = _task_params['sleeptime']
+    sleeptime = _TASK_PARAMS['sleeptime']
     try:
         try:
             if callable(task_run_fnc) and task_run_fnc():
@@ -810,24 +830,24 @@ def _task_run(task_run_fnc):
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recycle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress='' WHERE id=%s", (new_runtime, _task_params['task_id']))
-                write_message("Task #%d finished and resubmitted." % _task_params['task_id'])
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress='' WHERE id=%s", (new_runtime, _TASK_PARAMS['task_id']))
+                write_message("Task #%d finished and resubmitted." % _TASK_PARAMS['task_id'])
             elif task_status == 'STOPPED':
-                run_sql("UPDATE schTASK SET status='WAITING', progress='' WHERE id=%s", (_task_params['task_id'], ))
-                write_message("Task #%d stopped and resubmitted." % _task_params['task_id'])
+                run_sql("UPDATE schTASK SET status='WAITING', progress='' WHERE id=%s", (_TASK_PARAMS['task_id'], ))
+                write_message("Task #%d stopped and resubmitted." % _TASK_PARAMS['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
-                #res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_task_params['task_id'], ))
+                #res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_TASK_PARAMS['task_id'], ))
                 #proc, user, sleeptime, arguments, priority = res[0]
                 #run_sql("""INSERT INTO schTASK (proc,user,
                             #runtime,sleeptime,status,arguments,priority)
                             #VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
                             #(proc, user, new_runtime, sleeptime, arguments, priority))
-                write_message("Task #%d finished but not resubmitted. [%s]" % (_task_params['task_id'], task_status))
+                write_message("Task #%d finished but not resubmitted. [%s]" % (_TASK_PARAMS['task_id'], task_status))
 
         else:
             ## we are done:
-            write_message("Task #%d finished. [%s]" % (_task_params['task_id'], task_status))
+            write_message("Task #%d finished. [%s]" % (_TASK_PARAMS['task_id'], task_status))
         ## Removing the pid
         os.remove(pidfile_name)
     return True
