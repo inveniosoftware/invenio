@@ -36,6 +36,8 @@ base class.
 
 __revision__ = "$Id"
 
+import cgi
+
 from invenio import search_engine
 from invenio import bibrecord
 from invenio import bibformat
@@ -43,6 +45,8 @@ from invenio import bibformat
 from invenio.config import CFG_TMPDIR
 from time import strftime
 from invenio.bibtask import task_low_level_submission
+
+from invenio.dbquery import run_sql
 
 from invenio import template
 multiedit_templates = template.load('bibeditmulti')
@@ -212,7 +216,6 @@ class DeleteFieldCommand(BaseFieldCommand):
     def process_record(self, record):
         """@see: BaseFieldCommand.process_record"""
         bibrecord.record_delete_field(record, self._tag, self._ind1, self._ind2)
-
 class UpdateFieldCommand(BaseFieldCommand):
     """Deletes given fields from a record"""
 
@@ -230,14 +233,14 @@ class UpdateFieldCommand(BaseFieldCommand):
             self._apply_subfield_commands_to_field(record, current_field[4])
 
 
-
-
 def perform_request_index(language):
     """Creates the page of MultiEdit
 
     @param language: language of the page
     """
-    return multiedit_templates.page_contents(language=language)
+    collections = ["Any collection"]
+    collections.extend([collection[0] for collection in run_sql('SELECT name FROM collection')])
+    return multiedit_templates.page_contents(language=language, collections=collections)
 
 def get_scripts():
     """Returns JavaScripts that have to be
@@ -266,7 +269,7 @@ def perform_request_detailed_record(record_id, update_commands, output_format, l
 
     return result
 
-def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display, language):
+def perform_request_test_search(search_criteria, update_commands, output_format, page_to_display, language, outputTags, collection=""):
     """Returns the results of a test search.
 
     @param search_criteria: search criteria used in the test search
@@ -277,7 +280,9 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
     """
     RECORDS_PER_PAGE = 10
 
-    record_IDs = search_engine.perform_request_search(p=search_criteria)
+    if collection == "Any collection":
+        collection = ""
+    record_IDs = search_engine.perform_request_search(p=search_criteria, c=collection)
 
     number_of_records = len(record_IDs)
 
@@ -298,7 +303,7 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
         formated_record = _get_formated_record(record_id=record_id,
                              output_format=output_format,
                              update_commands = update_commands,
-                             language=language)
+                             language=language, outputTags=outputTags)
 
         records_content.append((record_id, formated_record))
 
@@ -307,27 +312,23 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
                                                 number_of_records = number_of_records,
                                                 current_page = page_to_display,
                                                 records_per_page = RECORDS_PER_PAGE,
-                                                language = language)
+                                                language = language,
+                                                output_format=output_format)
     return result
 
-def perform_request_submit_changes(search_criteria, update_commands, language):
+def perform_request_submit_changes(search_criteria, update_commands, language, upload_mode, tag_list, collection):
     """Submits changes for upload into database.
 
     @param search_criteria: search criteria used in the test search
     @param update_commands: list of commands used to update record contents
     @param language: the language used to format the content
     """
-    # FIXME: remove this row when you want to allow submition
-    # It is disabled during the test period.
-    return "This functionality is disabled during the testing period."
 
-    _submit_changes_to_bibupload(search_criteria, update_commands)
+    _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection)
 
-    #FIXME: return message form the templates
-    return "Changes are sent to the server. \
-            It will take some time before they are applied."
+    return multiedit_templates.changes_applied()
 
-def _get_formated_record(record_id, output_format, update_commands, language):
+def _get_formated_record(record_id, output_format, update_commands, language, outputTags=""):
     """Returns a record in a given format
 
     @param record_id: the ID of record to format
@@ -339,13 +340,20 @@ def _get_formated_record(record_id, output_format, update_commands, language):
 
     xml_record = bibrecord.record_xml_output(updated_record)
 
-
-    # FIXME: Remove this as soon as the formatting for MARC is
-    # implemented in bibformat
     if "hm" == output_format:
-        result = _create_marc(xml_record)
-        return result
+        result = "<pre>\n"
+        marc_record = _create_marc(xml_record)
+        if "All tags" not in outputTags or not outputTags:
+            for line in marc_record.split('\n')[:-1]:
+                for tag in outputTags:
+                    if tag in line.split()[0]:
+                        result += "%09d " % record_id + line.strip() + '\n'
+        else:
+            for line in marc_record.split('\n')[:-1]:
+                result += "%09d " % record_id + line.strip() + '\n'
 
+        result += "</pre>"
+        return result
 
     result = bibformat.format_record(recID=None,
                                      of=output_format,
@@ -353,9 +361,9 @@ def _get_formated_record(record_id, output_format, update_commands, language):
                                      ln=language)
     return result
 
-
 # FIXME: Remove this method as soon as the formatting for MARC is
 # implemented in bibformat
+
 from invenio import xmlmarc2textmarclib as xmlmarc2textmarclib
 def _create_marc(records_xml):
     """Creates MARC from MARCXML.
@@ -365,7 +373,7 @@ def _create_marc(records_xml):
     @return: string containing information about the records
     in MARC format
     """
-    aleph_marc_output = "<pre>"
+    aleph_marc_output = ""
 
     records = bibrecord.create_records(records_xml)
     for (record, status_code, list_of_errors) in records:
@@ -379,19 +387,17 @@ def _create_marc(records_xml):
         if sysno == None:
             sysno = ""
 
-        options = {"aleph-marc":1, "correct-mode":1, "append-mode":0,
+        options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
                    "delete-mode":0, "insert-mode":0, "replace-mode":0,
-                   "text-marc":0}
+                   "text-marc":1}
         aleph_record = xmlmarc2textmarclib.create_marc_record(record,
                                                               sysno,
                                                               options)
         aleph_marc_output += aleph_record
 
-    aleph_marc_output += "</pre>"
     return aleph_marc_output
 
-
-def _submit_changes_to_bibupload(search_criteria, update_commands):
+def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection):
     """This methods takes care of submitting the changes to the server
     through bibupload.
 
@@ -400,8 +406,11 @@ def _submit_changes_to_bibupload(search_criteria, update_commands):
     the criteria
 
     @param update_commands: the commands defining the changes. These
-    commands perform the necessary changes before the records are submitted"""
-    record_IDs = search_engine.perform_request_search(p=search_criteria)
+    commands perform the necessary changes before the records are submitted
+    """
+    if collection == "Any collection":
+        collection = ""
+    record_IDs = search_engine.perform_request_search(p=search_criteria, c=collection)
 
     updated_records = []
 
@@ -410,8 +419,8 @@ def _submit_changes_to_bibupload(search_criteria, update_commands):
         updated_records.append(current_updated_record)
 
     file_path = _get_file_path_for_bibupload()
-    _save_records_xml(updated_records, file_path)
-    _upload_file_with_bibupload(file_path)
+    _save_records_xml(updated_records, file_path, upload_mode, tag_list)
+    _upload_file_with_bibupload(file_path, upload_mode)
 
 def _get_updated_record(record_id, update_commands):
     """Applies all the changes specified by the commands
@@ -428,12 +437,14 @@ def _get_updated_record(record_id, update_commands):
 
     return record
 
-def _upload_file_with_bibupload(file_path):
-    """Uploads file with bibupload"""
-    #FIXME: Replace with -c (corrections)
-    #when we add possibility to delete fields in correction mode
-    task_low_level_submission('bibupload', 'multiedit', '-P', '5', '-r',
-                              '%s' % file_path)
+def _upload_file_with_bibupload(file_path, upload_mode):
+    """
+    Uploads file with bibupload
+
+       @param file_path: path to the file where the XML will be saved.
+       @param upload_mode: -c for correct or -r for replace
+    """
+    task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '%s' % file_path)
 
 def _get_file_path_for_bibupload():
     """Returns file path for saving a file for bibupload """
@@ -441,7 +452,7 @@ def _get_file_path_for_bibupload():
     current_time = strftime("%Y%m%d%H%M%S")
     return "%s/%s_%s%s" % (CFG_TMPDIR, "multiedit_", current_time, ".xml")
 
-def _save_records_xml(records, file_path):
+def _save_records_xml(records, file_path, upload_mode, tag_list):
     """Saves records in a file in XML format
 
     @param records: list of records (record structures)
@@ -450,6 +461,12 @@ def _save_records_xml(records, file_path):
     output_file = None
     try:
         output_file = open(file_path, "w")
+
+        if upload_mode == "-c":
+            for record in records:
+                for tag in record.keys():
+                    if tag not in tag_list:
+                        del(record[tag])
 
         records_xml = bibrecord.print_recs(records)
 

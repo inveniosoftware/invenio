@@ -137,11 +137,15 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
 
         language = json_data["language"]
         search_criteria = json_data["searchCriteria"]
+        output_tags = json_data["outputTags"]
+        output_tags = output_tags.split(',')
+        output_tags = [tag.strip() for tag in output_tags]
         action_type = json_data["actionType"]
         current_record_id = json_data["currentRecordID"]
         commands = json_data["commands"]
         output_format = json_data["outputFormat"]
         page_to_display = json_data["pageToDisplay"]
+        collection = json_data["collection"]
 
         if action_type == self._action_types.test_search:
             return multi_edit_engine.perform_request_test_search(
@@ -149,35 +153,39 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
                                                     [],
                                                     output_format,
                                                     page_to_display,
-                                                    language)
+                                                    language,
+                                                    output_tags,
+                                                    collection)
 
-        if action_type == self._action_types.display_detailed_record:
+        elif action_type == self._action_types.display_detailed_record:
             return multi_edit_engine.perform_request_detailed_record(
                                                     current_record_id,
                                                     [],
                                                     output_format,
                                                     language)
 
-        if action_type == self._action_types.preview_results:
-            commands_list = self._create_commands_list(commands)
+        elif action_type == self._action_types.preview_results:
+            commands_list, upload_mode, tag_list = self._create_commands_list(commands)
             return multi_edit_engine.perform_request_test_search(
                                                     search_criteria,
                                                     commands_list,
                                                     output_format,
                                                     page_to_display,
-                                                    language)
+                                                    language,
+                                                    output_tags,
+                                                    collection)
 
-        if action_type == self._action_types.display_detailed_result:
-            commands_list = self._create_commands_list(commands)
+        elif action_type == self._action_types.display_detailed_result:
+            commands_list, upload_mode, tag_list = self._create_commands_list(commands)
             return multi_edit_engine.perform_request_detailed_record(
                                                     current_record_id,
                                                     commands_list,
                                                     output_format,
                                                     language)
 
-        if action_type == self._action_types.submit_changes:
-            commands_list = self._create_commands_list(commands)
-            return multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language)
+        elif action_type == self._action_types.submit_changes:
+            commands_list, upload_mode, tag_list = self._create_commands_list(commands)
+            return multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language, upload_mode, tag_list, collection)
 
         # In case we obtain wrong action type we return empty page.
         return " "
@@ -220,9 +228,12 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
 
         commands_list = []
 
+        upload_mode = '-c'
+        tag_list = ["001"]
         for current_field in commands_json_structure:
 
             tag = current_field["tag"]
+            tag_list.append(tag)
             ind1 = current_field["ind1"]
             ind2 = current_field["ind2"]
             action = current_field["action"]
@@ -234,7 +245,8 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             if action == self._field_action_types.add:
                 command = multi_edit_engine.AddFieldCommand(tag, ind1, ind2, subfield_commands)
             elif action == self._field_action_types.delete:
-                command = multi_edit_engine.UpdateFieldCommand(tag, ind1, ind2, subfield_commands)
+                command = multi_edit_engine.DeleteFieldCommand(tag, ind1, ind2, subfield_commands)
+                upload_mode = '-r'
             elif action == self._field_action_types.update:
                 command = multi_edit_engine.UpdateFieldCommand(tag, ind1, ind2, subfield_commands)
             else:
@@ -243,4 +255,5 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
 
             commands_list.append(command)
 
-        return commands_list
+        return commands_list, upload_mode, tag_list
+

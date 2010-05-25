@@ -58,9 +58,9 @@ var gCurrentCommandID = 0;
 var gPageToDiplay = 1;
 var gDeleteCommandIDPrefix = "deleteCommandID_";
 var gCommandDisplayTemplateIDPrefix = "commandDisplayTemplateID_";
-var gOutputFormat = gOutputFormatTypes.htmlBrief;
+var gOutputFormat = gOutputFormatTypes.marc;
 var gOutputFormatDetails = gOutputFormatTypes.htmlDetailed;
-var gOutputFormatPreview = gOutputFormatTypes.htmlBrief;
+var gOutputFormatPreview = gOutputFormatTypes.marc;
 
 $(document).ready( function() {
 	rebindControls();
@@ -86,7 +86,7 @@ function rebindControls() {
 	$(".buttonOutputFormatHTMLBrief").bind("click", onButtonOutputFormatHTMLBriefClick);
 	$(".buttonOutputFormatHTMLDetailed").bind("click", onButtonOutputFormatHTMLDetailedClick);
 	$(".buttonOutputFormatMARC").bind("click", onButtonOutputFormatMARCClick);
-	$(".resultItem").bind("click", onResultItemClick);
+	/*$(".resultItem").bind("click", onResultItemClick);*/
 	$(".buttonGoToFirstPage").bind("click", onButtonGoToFirstPageClick);
 	$(".buttonGoToPreviousPage").bind("click", onButtonGoToPreviousPageClick);
 	$(".buttonGoToNextPage").bind("click", onButtonGoToNextPageClick);
@@ -107,25 +107,6 @@ function onButtonGoToNextPageClick(){
 	performAJAXRequest();
 }
 
-function onResultItemClick() {
-	/*
-	 * Displays details about the record when the user click on it in the
-	 * results list
-	 */
-	var recordID = $(this).attr("id");
-	gCurrentRecordID = recordID.split("_")[1];
-
-	if (gActionToPerform == gActionTypes.testSearch) {
-		gActionToPerform = gActionTypes.displayDetailedRecord;
-	} else {
-		gActionToPerform = gActionTypes.displayDetailedResult;
-	}
-
-	gOutputFormat = gOutputFormatDetails;
-
-	performAJAXRequest();
-}
-
 function onButtonOutputFormatMarcXMLClick(){
 	setOutputFormat(gOutputFormatTypes.marcXML);
 }
@@ -137,6 +118,35 @@ function onButtonOutputFormatHTMLDetailedClick(){
 }
 function onButtonOutputFormatMARCClick(){
 	setOutputFormat(gOutputFormatTypes.marc);
+}
+
+function onSelectOutputFormatChange(value){
+	if (value == "Marc"){
+		setOutputFormat(gOutputFormatTypes.marc);
+	}
+	else{
+		setOutputFormat(gOutputFormatTypes.htmlBrief);
+	}
+}
+
+function onSelectSubfieldActionChange(value){
+	if (value == "0"){
+		onButtonSaveNewFieldClick();
+	}
+}
+
+
+function onEnter(evt){
+	var keyCode = null;
+	if( evt.which ) {
+		keyCode = evt.which;
+	} else if( evt.keyCode ) {
+		keyCode = evt.keyCode;
+	}if( 13 == keyCode ) {
+		onButtonTestSearchClick();
+		return false;
+	}
+	return true;
 }
 function setOutputFormat(outputFormat){
 	// We have separate format for the preview and detailed view
@@ -197,9 +207,8 @@ function onButtonSubmitChangesClick(){
 	/*
 	 * Submits changes defined by user
 	 */
-	alert("This functionality is disabled during the testing period.");
-	//gActionToPerform = gActionTypes.submitChanges;
-	//performAJAXRequest();
+	gActionToPerform = gActionTypes.submitChanges;
+	performAJAXRequest();
 }
 
 function performAJAXRequest() {
@@ -226,22 +235,25 @@ function createJSONData() {
 	 */
 
 	var searchCriteria = $("#textBoxSearchCriteria").val();
+	var outputTags = $("#textBoxOutputTags").val();
 	var language = $("#language").val();
 	var actionType = gActionToPerform;
 	var currentRecordID = gCurrentRecordID;
 	var outputFormat = gOutputFormat;
 	var pageToDisplay = gPageToDiplay;
-
+  var collection = $("#collection").val();
 	var commands = createCommandsList();
 
 	var data = {
 		language :language,
 		searchCriteria :searchCriteria,
+		outputTags :outputTags,
 		actionType :actionType,
 		currentRecordID :currentRecordID,
 		commands :commands,
 		outputFormat :outputFormat,
-		pageToDisplay :pageToDisplay
+		pageToDisplay :pageToDisplay,
+		collection: collection
 	};
 
 	return JSON.stringify(data);
@@ -334,13 +346,13 @@ function rebindActionsRelatedControls() {
 	 */
     // Field related
     $(".buttonNewField").bind("click", onButtonNewFieldClick);
-    $(".buttonSaveNewField").bind("click", onButtonSaveNewFieldClick);
-    $(".buttonCancelNewField").bind("click", onButtonCancelNewFieldClick);
+    $("#buttonSaveNewField").bind("click", onButtonSaveNewFieldClick);
+    $("#buttonCancelNewField").bind("click", onButtonCancelNewFieldClick);
     $(".buttonDeleteField").bind("click", onButtonDeleteFieldClick);
     // Subfield related
     $(".buttonNewSubfield").bind("click", onButtonNewSubfieldClick);
-    $(".buttonSaveNewSubfield").bind("click", onButtonSaveNewSubfieldClick);
-    $(".buttonCancelNewSubfield").bind("click", onButtonCancelNewSubfieldClick);
+    $("#buttonSaveNewSubfield").bind("click", onButtonSaveNewSubfieldClick);
+    $("#buttonCancelNewSubfield").bind("click", onButtonCancelNewSubfieldClick);
     $(".buttonDeleteSubfield").bind("click", onButtonDeleteSubfieldClick);
     $(".subfieldActionType").bind("change", onSubfieldActionTypeChange);
 }
@@ -455,8 +467,10 @@ function createSubfield(templateNewSubield){
 
 function onButtonSaveNewFieldClick() {
 
+
     // template for displaying the information
     var templateDisplayField = $("#displayTemplates .templateDisplayField").clone();
+
     // here is where the user entered the information
     var templateNewField = $(this).parents(".templateNewField");
 
@@ -464,6 +478,7 @@ function onButtonSaveNewFieldClick() {
 
     var fieldDisplayID = templateNewField.attr("id");
     var fieldID = getFieldID(fieldDisplayID);
+
     gFields[fieldID] = field;
 
     // update field appearence at the user interface
@@ -483,6 +498,25 @@ function onButtonSaveNewFieldClick() {
     templateNewField.replaceWith(templateDisplayField);
 
     rebindControls();
+    addMessage(fieldID, actionText);
+}
+
+function addMessage(fieldID, actionText) {
+    if (actionText != "Delete field") {
+        var templateMsg = $("#displayTemplates .templateMsg").clone();
+
+        templateMsg.attr("id", 'Msg_' + fieldID);
+        templateMsg.find(".msg").eq(0).text("Warning: add one subfield action before applying changes");
+
+        $("#actionsDisplayArea .lastRow").before(templateMsg);
+
+        rebindControls();
+    }
+}
+
+function deleteMsg(fieldID) {
+    var msgID = "#" + 'Msg_' + fieldID;
+    $(msgID).remove();
 }
 
 function onButtonDeleteFieldClick() {
@@ -492,7 +526,7 @@ function onButtonDeleteFieldClick() {
 
     var fieldID = getFieldID(fieldDisplayID);
 
-    // delete subfileds from the UI
+    // delete subfields from the UI
     for (subfieldID in gFields[fieldID].subfields){
         var subfieldSelector = "#" + generateSubfieldDisplayID(fieldID, subfieldID);
         $(subfieldSelector).remove();
@@ -501,6 +535,7 @@ function onButtonDeleteFieldClick() {
     // delete field itself
     delete gFields[fieldID];
     fieldElement.remove();
+    deleteMsg(fieldID);
 }
 
 function onButtonNewSubfieldClick() {
@@ -552,6 +587,7 @@ function onButtonSaveNewSubfieldClick() {
 
     templateNewSubfield.replaceWith(templateDisplaySubfield );
 
+    deleteMsg(fieldID);
     rebindControls();
 }
 
