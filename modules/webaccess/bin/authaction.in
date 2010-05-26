@@ -56,7 +56,7 @@ def main():
     arguments in sys.argv.
     If the number of arguments is wrong it prints help.
     Return 0 on success, 9 or higher on failure. """
-    
+
     alen, auth = len(sys.argv), 0
 
     # return ``not permitted'' if wrong arguments
@@ -64,7 +64,7 @@ def main():
         usage(0)
     elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
         sys.stderr.write("%s\n" % __revision__)
-        sys.exit(0)    
+        sys.exit(0)
     if alen < 3 or alen % 2 == 0:
         print "7 - %s" % CFG_WEBACCESS_WARNING_MSGS[7]
         return "7 - %s" % CFG_WEBACCESS_WARNING_MSGS[7]
@@ -72,7 +72,7 @@ def main():
     # try to authorize
     else:
         # get values
-        id_user = sys.argv[1]
+        id_user = int(sys.argv[1])
         name_action = sys.argv[2]
 
         dict = {}
@@ -81,12 +81,12 @@ def main():
 
         # run ace-function
         (auth_code, auth_message) = acc_authorize_action(id_user, name_action, **dict)
-   
-    # print and return 
+
+    # print and return
     print "%s - %s" % (auth_code, auth_message)
     return "%s - %s" % (auth_code, auth_message)
 
 
 if __name__ == '__main__':
-    main() 
+    main()
 
