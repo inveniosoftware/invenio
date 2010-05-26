@@ -48,7 +48,8 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
       validate_date_format, \
       create_ill_record, \
       get_list_of_ILL_requests, \
-      generate_email_body
+      generate_email_body, \
+      create_item_details_url
 
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
@@ -158,12 +159,11 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
             infos.append('The barcode <strong>%s</strong> does not exist on BibCirculation database.' % p)
             body = bibcirculation_templates.tmpl_item_search(infos=infos, ln=ln)
         else:
-            body = bibcirculation_templates.tmpl_item_search_result(result=has_recid,
-                                                                    ln=ln)
+            body = bibcirculation_templates.tmpl_item_search_result(result=has_recid, ln=ln)
     else:
         result = perform_request_search(cc="Books", sc="1", p=p, f=f)
-        body = bibcirculation_templates.tmpl_item_search_result(result=result,
-                                                                ln=ln)
+        body = bibcirculation_templates.tmpl_item_search_result(result=result, ln=ln)
+
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
@@ -618,14 +618,13 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
             tup = (borrower_id, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
-        if len(result) == 0 and key:
-            infos.append("0 borrowers found.")
+    if len(result) == 0 and key:
+        infos.append("0 borrowers found.")
 
-
-    if len(result) == 1:
+    elif len(list_infos) == 1:
         return loan_on_desk_step2(req, tup, ln)
-    else:
-        body = bibcirculation_templates.tmpl_loan_on_desk_step1(result=list_infos,
+
+    body = bibcirculation_templates.tmpl_loan_on_desk_step1(result=list_infos,
                                                                 key=key,
                                                                 string=string,
                                                                 infos=infos,
@@ -4230,7 +4229,7 @@ def order_new_copy_step3(req, order_info, ln):
     #db.add_new_copy(barcode, recid, library_id, '', '',
     #                'expected: %s' % expected_date, '', status)
 
-    body = list_ordered_books(req,ln) #bibcirculation_templates.tmpl_order_new_copy_step3(ln=ln)
+    #body = list_ordered_books(req,ln) #bibcirculation_templates.tmpl_order_new_copy_step3(ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -4241,12 +4240,14 @@ def order_new_copy_step3(req, order_info, ln):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    return page(title="Order new copy",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
+    #return page(title="Order new copy",
+    #            uid=id_user,
+    #            req=req,
+    #            body=body,
+    #            navtrail=navtrail_previous_links,
+    #            lastupdated=__lastupdated__)
+
+    return get_item_details(req, recid, ln)
 
 
 def list_ordered_books(req, ln):
@@ -4597,7 +4598,7 @@ def register_ill_request_step3(req, borrower_id, request_info, ln=CFG_SITE_LANG)
 
     db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
                                     period_of_interest_to, 'pending', str(library_notes),
-                                    only_edition or 'No')
+                                    only_edition or 'No', 'book')
 
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -4620,11 +4621,9 @@ def register_ill_request_step3(req, borrower_id, request_info, ln=CFG_SITE_LANG)
                 lastupdated=__lastupdated__)
 
 
-def list_ill_request(req, ln=CFG_SITE_LANG):
+def list_ill_request(req, status, ln=CFG_SITE_LANG):
     """
     """
-
-    ill_req = db.get_ill_requests()
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -4634,6 +4633,8 @@ def list_ill_request(req, ln=CFG_SITE_LANG):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
+
+    ill_req = db.get_ill_requests(status)
 
     body = bibcirculation_templates.tmpl_list_ill_request(ill_req=ill_req, ln=ln)
 
@@ -4646,7 +4647,7 @@ def list_ill_request(req, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CFG_SITE_LANG):
+def ill_request_details_step1(req, delete_key, ill_request_id, new_status, ln=CFG_SITE_LANG):
     """
     """
 
@@ -4655,25 +4656,12 @@ def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CF
         del library_notes[delete_key]
         db.update_ill_request_notes(ill_request_id, library_notes)
 
-    ill_borrower_request = db.get_ill_borrower_request(ill_request_id)
+    if new_status:
+        db.update_ill_request_status(ill_request_id,new_status)
 
-    if ill_status == 'pending':
-        ill_req_details = db.get_ill_request_pending(ill_request_id)
+    ill_request_borrower_details = db.get_ill_request_borrower_details(ill_request_id)
 
-    elif ill_status == 'request sent, not yet received':
-        ill_req_details = db.get_ill_request_sent(ill_request_id)
-
-    elif ill_status == 'request cancelled':
-        ill_req_details = db.get_ill_request_sent(ill_request_id)
-
-    elif ill_status == 'item received, due date defined':
-        ill_req_details = db.get_ill_request_received(ill_request_id)
-
-    elif ill_status == 'item returned':
-        ill_req_details = db.get_ill_request_returned(ill_request_id)
-
-    else:
-        ill_req_details = db.get_ill_request_returned(ill_request_id)
+    ill_request_details=db.get_ill_request_details(ill_request_id)
 
     libraries = db.get_external_libraries()
 
@@ -4687,10 +4675,9 @@ def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CF
         return mustloginpage(req, auth_message)
 
     body = bibcirculation_templates.tmpl_ill_request_details_step1(ill_request_id=ill_request_id,
-                                                                   ill_req_details=ill_req_details,
+                                                                   ill_request_details=ill_request_details,
                                                                    libraries=libraries,
-                                                                   ill_status=ill_status,
-                                                                   ill_borrower_request=ill_borrower_request,
+                                                                   ill_request_borrower_details=ill_request_borrower_details,
                                                                    ln=ln)
 
     return page(title="ILL request details",
@@ -4702,190 +4689,61 @@ def ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln=CF
                 lastupdated=__lastupdated__)
 
 
-def ill_request_details_step2(req, delete_key, ill_request_id, ill_status, library_id, request_date, expected_date, arrival_date,
+def ill_request_details_step2(req, delete_key, ill_request_id, new_status, library_id, request_date, expected_date, arrival_date,
                               due_date, return_date, cost, currency, barcode, library_notes, ln=CFG_SITE_LANG):
     """
     """
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     if delete_key and ill_request_id:
         library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
         del library_previous_notes[delete_key]
         db.update_ill_request_notes(ill_request_id, library_previous_notes)
 
-    ill_borrower_request = db.get_ill_borrower_request(ill_request_id)
-
-    if ill_status == 'pending':
-        request_info = (ill_request_id, library_notes)
-        ill_req_details = db.get_ill_request_pending(ill_request_id)
-
-    elif ill_status == 'request sent, not yet received':
-        request_info = (ill_request_id, library_id, request_date, expected_date,
-                        cost, currency, barcode, library_notes)
-        ill_req_details = db.get_ill_request_pending(ill_request_id)
-
-    elif ill_status == 'request cancelled':
-        request_info = (ill_request_id, cost, currency, barcode, library_notes)
-        ill_req_details = db.get_ill_request_cancelled(ill_request_id)
-
-    elif ill_status == 'item received, due date defined':
-        request_info = (ill_request_id, arrival_date, due_date, cost, currency, barcode, library_notes)
-        ill_req_details = db.get_ill_item_received(ill_request_id)
-
-    elif ill_status == 'item returned':
-        request_info = (ill_request_id, return_date, cost, currency, library_notes)
-        ill_req_details = db.get_ill_item_returned(ill_request_id)
-
-    else:
-        request_info = (ill_request_id, library_notes)
-        ill_req_details = db.get_ill_request_closed(ill_request_id)
-
-
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
-
-    body = bibcirculation_templates.tmpl_ill_request_details_step2(ill_req_details=ill_req_details,
-                                                                   request_info=request_info,
-                                                                   ill_status=ill_status,
-                                                                   ill_borrower_request=ill_borrower_request,
-                                                                   ln=ln)
-
-    return page(title="ILL request details",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
-
-
-def ill_request_details_step3(req, request_info, ill_status, ln=CFG_SITE_LANG):
-    """
-    """
-
-    if ill_status == 'pending':
-        (ill_request_id, library_notes) = request_info
-
-        if db.get_ill_request_notes(ill_request_id):
-            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        else:
-            library_previous_notes = {}
-
-        if library_notes:
-            library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
-
-        db.update_ill_request_pending(ill_request_id, ill_status, str(library_previous_notes))
-
-    elif ill_status == 'request sent, not yet received':
-        (ill_request_id, library_id, request_date, expected_date,
-         cost, currency, barcode, library_notes) = request_info
-
+    cost_format = None
+    if cost:
         cost_format = cost + ' ' + currency
 
-        if db.get_ill_request_notes(ill_request_id):
-            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        else:
-            library_previous_notes = {}
+    if db.get_ill_request_notes(ill_request_id):
+        library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
+    else:
+        library_previous_notes = {}
 
-        if library_notes:
-            library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+    if library_notes:
+        library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
 
-        db.update_ill_request_sent(ill_request_id, ill_status, library_id, request_date, expected_date,
-                                   cost_format, barcode, str(library_previous_notes))
-
-    elif ill_status == 'request cancelled':
-        (ill_request_id, cost, currency, barcode, library_notes) = request_info
-
-        cost_format = cost + ' ' + currency
-
-        if db.get_ill_request_notes(ill_request_id):
-            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        else:
-            library_previous_notes = {}
-
-        if library_notes:
-            library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
-
-        db.update_ill_request_cancelled(ill_request_id, ill_status, cost_format,
-                                        barcode, str(library_previous_notes))
-
-    elif ill_status == 'item received, due date defined':
-        (ill_request_id, arrival_date, due_date, cost, currency, barcode, library_notes) = request_info
-
-        cost_format = cost + ' ' + currency
-
-        if db.get_ill_request_notes(ill_request_id):
-            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        else:
-            library_previous_notes = {}
-
-        if library_notes:
-            library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
-
-        db.update_ill_item_received(ill_request_id, ill_status, arrival_date, due_date, cost_format,
-                                    barcode, str(library_previous_notes))
-
+    if new_status == 'on loan':
         borrower_id = db.get_ill_borrower(ill_request_id)
         loaned_on = datetime.date.today()
         db.new_loan(borrower_id, '0', barcode, loaned_on, due_date, 'on loan', 'ill','')
 
-    elif ill_status == 'item returned':
-        (ill_request_id, return_date, cost, currency, library_notes) = request_info
-
-        cost_format = cost + ' ' + currency
-
-        if db.get_ill_request_notes(ill_request_id):
-            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        else:
-            library_previous_notes = {}
-
-        if library_notes:
-            library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
-
-        db.update_ill_item_returned(ill_request_id, ill_status, return_date, cost_format,
-                                    str(library_previous_notes))
-
+    elif new_status == 'returned':
         borrower_id = db.get_ill_borrower(ill_request_id)
         barcode = db.get_ill_barcode(ill_request_id)
         db.update_ill_loan_status(borrower_id, barcode, return_date, 'ill')
 
-    else:
-        (ill_request_id, library_notes) = request_info
+    db.update_ill_request(ill_request_id, library_id, request_date, expected_date,
+                          arrival_date, due_date, return_date, new_status, cost_format, barcode,
+                          str(library_previous_notes))
 
-        if db.get_ill_request_notes(ill_request_id):
-            library_previous_notes = eval(db.get_ill_request_notes(ill_request_id))
-        else:
-            library_previous_notes = {}
+    return list_ill_request(req,new_status,ln)
 
-        if library_notes:
-            library_previous_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+    #body = bibcirculation_templates.tmpl_ill_request_details_step3(ln=ln)
+    #return page(title="ILL request details",
+    #            uid=id_user,
+    #            req=req,
+    #            body=body,
+    #            navtrail=navtrail_previous_links,
+    #            lastupdated=__lastupdated__)
 
-        db.update_ill_request_closed(ill_request_id, ill_status, str(library_previous_notes))
-
-
-
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
-
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
-
-    body = bibcirculation_templates.tmpl_ill_request_details_step3(ln=ln)
-
-
-    return page(title="ILL request details",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
 
 def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
     """
@@ -5594,14 +5452,14 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
         ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
 
     db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
-                                    period_of_interest_to, 'pending',
-                                    str(ill_request_notes), only_edition)
+                                    period_of_interest_to, 'new',
+                                    str(ill_request_notes), only_edition, 'book')
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    return list_ill_request(req, ln)
+    return list_ill_request(req, "new", ln)
 
 def get_borrower_ill_details(req, borrower_id, ill_id, ln=CFG_SITE_LANG):
     """
@@ -5998,13 +5856,14 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         request_details = (period_of_interest_from, period_of_interest_to,
                            additional_comments)
 
-        body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step2(article_info=article_info,
-                                                                                      request_details=request_details,
-                                                                                      result=None,
-                                                                                      key=key,
-                                                                                      string=string,
-                                                                                      infos=infos,
-                                                                                      ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_article_request_step2(article_info=article_info,
+                                                                                request_details=request_details,
+                                                                                result=None,
+                                                                                key=key,
+                                                                                string=string,
+                                                                                infos=infos,
+                                                                                ln=ln)
+
 
         navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -6144,23 +6003,26 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_ill_article_request_step3(req, book_info, user_info, request_details, ln):
+def register_ill_article_request_step3(req, item_info, user_info, request_details, ln):
 
     """
     """
+
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    (_periodical_title, title, authors, _report_number, _volume, _issue, _page, year, issn) = book_info
+    (periodical_title, title, authors, report_number, volume, issue, page, year, issn) = item_info
+    volume = volume + ', '+ issue + ', '+ page
 
     info = (title, authors, "", "", year, "", issn)
 
     create_ill_record(info)
 
-    book_info = {'title': title, 'authors': authors, 'place': "", 'publisher': "",
-                 'year' : year,  'edition': "", 'isbn' : issn}
+    item_info = {'periodical_title': periodical_title, 'title': title, 'authors': authors, 'place': "", 'publisher': "",
+                 'year' : year,  'edition': "", 'issn' : issn, 'volume': volume }
+
 
     (period_of_interest_from, period_of_interest_to,
      library_notes) = request_details
@@ -6173,15 +6035,15 @@ def register_ill_article_request_step3(req, book_info, user_info, request_detail
     if library_notes:
         ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
 
-    db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
-                                    period_of_interest_to, 'pending',
-                                    str(ill_request_notes), only_edition)
+    db.ill_register_request_on_desk(borrower_id, item_info, period_of_interest_from,
+                                    period_of_interest_to, 'new',
+                                    str(ill_request_notes), only_edition, 'article')
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    return list_ill_request(req, ln)
+    return list_ill_request(req, 'new', ln)
 
 def ill_search(req, ln=CFG_SITE_LANG):
     """
@@ -6205,10 +6067,11 @@ def ill_search(req, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
+                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def ill_search_result(p, f):
+def ill_search_result(req, p, f, date_from, date_to, ln):
     """
     Search an item and return a list with all the possible results. To retrieve
     the information desired, we use the method 'perform_request_search' (from
@@ -6223,17 +6086,38 @@ def ill_search_result(p, f):
 
     @return:   list of recids
     """
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
-    if f == 'title':
-        from invenio.intbitset import intbitset
+    if date_from == 'the beginning':
+        date_from = '0000-00-00'
+    if date_to == 'now':
+        date_to = '9999-12-31'
 
-        ill_cds = get_list_of_ILL_requests()
-        ill_books = perform_request_search(cc="ILL Books")
+    if f=='title':
+        ill_req = db.search_ill_requests_title(p, date_from, date_to)
+    elif f=='ILL_request_ID':
+        ill_req = db.search_ill_requests_id(p, date_from, date_to)
 
-        tmp = intbitset(ill_cds + ill_books)
-        ill_pattern = intbitset(perform_request_search(c=["Books", "ILL Books"], p=p))
+    body = bibcirculation_templates.tmpl_list_ill_request(ill_req=ill_req, ln=ln)
 
-        result = list(ill_pattern & tmp)
 
-        ### UNFINISHED ###
-        return result
+    return page(title="List of ILL requests",
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+    #if f == 'title':
+        #from invenio.intbitset import intbitset
+        #
+        #ill_cds = get_list_of_ILL_requests()
+        #ill_books = perform_request_search(cc="ILL Books")
+        #
+        #tmp = intbitset(ill_cds + ill_books)
+        #ill_pattern = intbitset(perform_request_search(c=["Books", "ILL Books"], p=p))
+        #
+        #result = list(ill_pattern & tmp)

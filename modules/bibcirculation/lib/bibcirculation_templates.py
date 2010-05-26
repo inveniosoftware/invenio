@@ -160,7 +160,11 @@ _MENU_ = """
          <a href="#">ILL</a>
         <ul class="subsubmenu" style="width:17.5em;">
             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/ill_search">Search...</a></li>
-            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request">List of requests</a></li>
+            <!--<li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request">All requests</a></li>-->
+            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request?status=new">New</a></li>
+            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request?status=requested">Requested</a></li>
+            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request?status=on loan">On loan</a></li>
+
             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/register_ill_book_request">Register Book request</a></li>
             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/register_ill_article_request_step1">Register Article request</a></li>
         </ul>
@@ -762,10 +766,10 @@ class Template:
         <br />
              <table class="bibcirctable_contents">
                   <tr>
-                       <td class="bibcirctableheader" width="30">%s</td>
-                       <td class="bibcirctableheader" width="30">%s</td>
-                       <td class="bibcirctableheader" width="30">%s</td>
-                       <td class="bibcirctableheader" width="30">%s</td>
+                       <td class="bibcirctableheader">%s</td>
+                       <td class="bibcirctableheader">%s</td>
+                       <td class="bibcirctableheader">%s</td>
+                       <td class="bibcirctableheader">%s</td>
                   </tr>
         """ % (CFG_SITE_URL,
                recid,
@@ -857,45 +861,51 @@ class Template:
         more_6_months = (today + gap).strftime('%Y-%m-%d')
 
         out = """
+        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
         <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
         <form name="request_form" action="%s/record/%s/holdings/send" method="get" >
         <br />
-          <table class="bibcirctable_contents">
+        <div align=center>
+          <table class="bibcirctable_contents" align=center>
             <tr>
-              <td align="center" class="bibcirctableheader">%s</td>
+              <td class="bibcirctableheader" align=center>%s</td>
             </tr>
           </table>
           <br />
-          <table class="bibcirctable_contents">
-            <tr>
-              <td align="right" class="bibcirctableheader">%s</td>
-              <td align="center">
+
+          <table align=center class="tablesorterborrower" width="100" border="0" cellspacing="1" align="center">
+
+            <tr align=center>
+              <th align=center>%s</th>
+              <td>
 
                 <script type="text/javascript">
-                    $(function() {
+                    $(function(){
                         $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                     });
                 </script>
-                <input type="text" size="12" id="date_picker1" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
+                <input type="text" size="12" id="date_picker1" name="period_from" value="%s" style='border: 1px solid #cfcfcf'>
+
               </td>
             </tr>
-            <tr>
-              <td align="right" class="bibcirctableheader">%s</td>
-              <td align="center"
+            <tr align=center>
+              <th align=center>%s</th>
+              <td>
 
                  <script type="text/javascript">
                     $(function() {
                         $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                     });
                 </script>
-                <input type="text" size="12" id="date_picker2" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
+                <input type="text" size="12" id="date_picker2" name="period_to" value="%s" style='border: 1px solid #cfcfcf'>
 
               </td>
             </tr>
           </table>
+          </div>
           <br />
           <br />
           <table class="bibcirctable_contents">
@@ -1876,7 +1886,7 @@ class Template:
 
         out += _MENU_
 
-        if len(result) == 0:
+        if result == None:
             out += """
             <div class="bibcircbottom">
             <br />
@@ -1898,19 +1908,20 @@ class Template:
         </table>
         <br />
           <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-          <thead>
-            <tr>
-              <th>%s</th>
-              <th>%s</th>
-              <th>%s</th>
-              <th>%s</th>
-            </tr>
-          </thead>
+            <thead>
+              <tr>
+                <th>%s</th>
+                <th>%s</th>
+                <th>%s</th>
+                <th>%s</th>
+              </tr>
+            </thead>
           <tbody>
         """ % (len(result), _("Title"),
                _("Author"), _("Publisher"),
                _("No. Copies"))
 
+### FIXME: If one result -> go ahead ###
             for recid in result:
 
                 (book_author, book_editor, book_copies) = get_item_info_for_search_result(recid)
@@ -2748,7 +2759,10 @@ class Template:
         (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
         if book_isbn:
-            book_cover = get_book_cover(book_isbn)
+            try:
+                book_cover = get_book_cover(book_isbn)
+            except KeyError:
+                book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
@@ -2809,7 +2823,7 @@ class Template:
                    _("Publisher"), book_editor,
                    _("ISBN"), book_isbn,
                    CFG_SITE_URL, recid,
-                   _("Edit this item"),
+                   _("Edit this record"),
                    str(book_cover),
                    _("Additional details"))
 
@@ -9562,7 +9576,7 @@ class Template:
                       <select name="status" style='border: 1px solid #cfcfcf'>
                           <option value ="ordered">ordered</option>
                           <option value ="cancelled">cancelled</option>
-                          <option value ="not arrived">not arrived</option>
+                          <option value ="not arrived">arrived</option>
                       </select>
                     </td>
                 </tr>
@@ -10655,6 +10669,9 @@ class Template:
 
         (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
+        today = datetime.date.today()
+        within_six_months = (datetime.date.today() + datetime.timedelta(days=182)).strftime('%Y-%m-%d')
+
         out += """
            <div align="center">
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -10713,11 +10730,12 @@ class Template:
         conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            """% (CFG_SITE_URL, CFG_SITE_URL)
 
+        out += """
              <table class="bibcirctable">
                 <tr align="center">
                      <td class="bibcirctableheader">%s</td>
@@ -10727,36 +10745,24 @@ class Template:
                <tr>
                 <th width="150">%s</th>
                 <td>
-                  <input type="text" size="12" id="%s" name="period_of_interest_from"
-                  value="" style='border: 1px solid #cfcfcf'>
-                  <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                  onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
-                    </td>
-                </tr>
+                    <script type="text/javascript">
+                        $(function() {
+                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                        });
+                    </script>
+                    <input type="text" size="10" id="date_picker1" name="period_of_interest_from" value="%s" style='border: 1px solid #cfcfcf'>
+                </td>
+               </tr>
                 <tr>
                 <th width="150">%s</th>
                 <td>
-                <input type="text" size="12" id="%s" name="period_of_interest_to"
-                value="" style='border: 1px solid #cfcfcf'>
-                <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
-                    </td>
+                    <script type="text/javascript">
+                        $(function() {
+                            $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                        });
+                    </script>
+                    <input type="text" size="10" id="date_picker2" name="period_of_interest_to" value="%s" style='border: 1px solid #cfcfcf'>
+                </td>
                 </tr>
                 <tr>
                    <th valign="top" width="150">%s</th>
@@ -10791,9 +10797,9 @@ class Template:
              <br />
              <br />
              </div>
-             """ % (_("ILL request details"), _("Period of interest - From"), _("period_of_interest_from"),
-                    _("jsCal1"), _("period_of_interest_from"), _("jsCal1"),
-                    _("Period of interest - To"), _("period_of_interest_to"), _("jsCal2"), _("period_of_interest_to"), _("jsCal2"),
+             """ % (_("ILL request details"),
+                    _("Period of interest - From"), CFG_SITE_URL, today,
+                    _("Period of interest - To"),   CFG_SITE_URL, within_six_months,
                     _("Additional comments"),
                     _("I accept the %s of the service in particular the return of books in due time." % (conditions_link)),
                     _("I want this edition only."),
@@ -11041,6 +11047,7 @@ class Template:
                        <th>%s</th>
                        <th>%s</th>
                        <th>%s</th>
+                       <th>%s</th>
                     </tr>
              </thead>
              <tbody>
@@ -11048,32 +11055,38 @@ class Template:
                   _("Item"),
                   _("Supplier"),
                   _("Status"),
-                  _("From"),
-                  _("To"),
+                  _("ID"),
+                  _("Interest from"),
+                  _("Type"),
                   _("Option(s)"))
 
-        for (ill_request_id, _borrower_id, borrower_name, library_id,
-             ill_status, period_from, period_to, book_info) in ill_req:
 
-            #borrower_link = create_html_link(CFG_SITE_URL +
-            #                                 '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
-            #                                 {'borrower_id': borrower_id, 'ln': ln},
-            #                                 (borrower_name))
+
+        for (ill_request_id, borrower_id, borrower_name, library_id,
+             ill_status, period_from, period_to, item_info, type) in ill_req:
+
+            borrower_link = create_html_link(CFG_SITE_URL +
+                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             {'borrower_id': borrower_id, 'ln': ln},
+                                             (borrower_name))
 
             if library_id:
                 library_name = db.get_library_name(library_id)
             else:
                 library_name = '-'
 
-            book_info = eval(book_info)
+            item_info = eval(item_info)
 
             try:
                 title_link = create_html_link(CFG_SITE_URL +
                                           '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
-                                          {'recid': book_info['recid'], 'ln': ln},
-                                          (book_title_from_MARC(int(book_info['recid']))))
+                                          {'recid': item_info['recid'], 'ln': ln},
+                                          (book_title_from_MARC(int(item_info['recid']))))
             except KeyError:
-                title_link = book_info['title']
+                if type == 'book':
+                    title_link = item_info['title']
+                else:
+                    title_link = item_info['periodical_title']
 
 
             out += """
@@ -11084,15 +11097,15 @@ class Template:
                     <td class="bibcirccontent">%s</td>
                     <td class="bibcirccontent">%s</td>
                     <td class="bibcirccontent">%s</td>
+                    <td class="bibcirccontent">%s</td>
                     <td align="center">
-                       <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1?ill_request_id=%s&ill_status=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                       <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                        value=%s class='bibcircbutton'>
                     </td>
                    </tr>
 
-                    """ % (borrower_name, title_link, library_name, ill_status,
-                           period_from, period_to, CFG_SITE_URL, ill_request_id,
-                           str(ill_status), _('select'))
+                    """ % (borrower_link, title_link, library_name, ill_status,ill_request_id,
+                           period_from, type, CFG_SITE_URL, ill_request_id, _('select'))
 
 
         out += """
@@ -11103,9 +11116,8 @@ class Template:
 
         return out
 
-    def tmpl_ill_request_details_step1(self, ill_request_id, ill_req_details,
-                                       libraries, ill_status, ill_borrower_request,
-                                       ln=CFG_SITE_LANG):
+    def tmpl_ill_request_details_step1(self, ill_request_id, ill_request_details, libraries, ill_request_borrower_details,ln=CFG_SITE_LANG):
+
         """
         @param ill_request_id: identify the ILL request. Primary key of crcILLREQUEST
         @type ill_request_id: int
@@ -11119,9 +11131,10 @@ class Template:
         @param ill_status: status of an ILL request
         @type ill_status: string
 
-        @param ill_borrower_request: borrower's informations
-        @type ill_borrower_request: tuple
+        @param ill_request_borrower_details: borrower's informations
+        @type ill_request_borrower_details: tuple
         """
+
         _ = gettext_set_language(ln)
 
         out = _MENU_
@@ -11133,12 +11146,53 @@ class Template:
             """% (CFG_SITE_URL, CFG_SITE_URL)
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
-         period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_borrower_request
+         period_from, period_to, item_info, borrower_comments, only_this_edition, request_type) = ill_request_borrower_details
 
-        book_info = eval(book_info)
+        (library_id, request_date, expected_date, arrival_date, due_date, return_date,
+         cost, barcode, library_notes, ill_status) = ill_request_details
+
+        if cost:
+            (value, currency) = cost.split()
+        else:
+            (value, currency) = (0, 'EUR')
+
+        if library_notes == '' or library_notes == None:
+            previous_library_notes = {}
+        else:
+            previous_library_notes = eval(library_notes)
+
+        key_array = previous_library_notes.keys()
+        key_array.sort()
+
+        item_info = eval(item_info)
+
+        today = datetime.date.today()
+        within_a_week  = (datetime.date.today() + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+        within_a_month = (datetime.date.today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+
+
+        notes=''
+        for key in key_array:
+            delete_note = create_html_link(CFG_SITE_URL +
+                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
+                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ln': ln},
+                                           (_("[delete]")))
+
+            notes += """<tr class="bibcirccontent">
+                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
+                            <td width="400"><i>%s</i></td>
+                            <td width="65" align="center">%s</td>
+                        </tr>
+
+                     """ % (key, previous_library_notes[key], delete_note)
+
+        if library_id:
+            library_name = db.get_library_name(library_id)
+        else:
+            library_name = '-'
 
         try:
-            (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(book_info['recid']))
+            (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(item_info['recid']))
 
             if book_isbn:
                 book_cover = get_book_cover(book_isbn)
@@ -11179,13 +11233,12 @@ class Template:
                         <th width="100">%s</th>
                         <td>%s</td>
                      </tr>
-                     </table>
-                     </td>
-                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
-                     </tr>
+                    </table>
+                   </td>
+                   <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                 </tr>
               </table>
               <br />
-
               """  % (CFG_SITE_URL,
                       ill_request_id,
                       _("Item details"),
@@ -11203,81 +11256,164 @@ class Template:
 
         except KeyError:
             try:
-                book_cover = get_book_cover(book_info['isbn'])
+                book_cover = get_book_cover(item_info['isbn'])
             except KeyError:
                 book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-            out += """
-            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
-               <div class="bibcircbottom">
-               <input type=hidden name=ill_request_id value=%s>
-                <br />
-                <table class="bibcirctable">
-                  <tr>
-                    <td class="bibcirctableheader" width="10">%s</td>
-                  </tr>
-                </table>
-                <table class="bibcirctable">
-                 <tr valign='top'>
-                   <td width="400">
-                    <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>%s</td>
+            f=open("/tmp/item_info",'w')
+            f.write(str(item_info)+'\n')
+            f.close()
+            if str(request_type) == 'book':
+                out += """
+                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
+                   <div class="bibcircbottom">
+                   <input type=hidden name=ill_request_id value=%s>
+                    <br />
+                    <table class="bibcirctable">
+                      <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                      </tr>
+                    </table>
+                    <table class="bibcirctable">
+                     <tr valign='top'>
+                       <td width="400">
+                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
                          </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>%s</td>
-                     </tr>
-                </table>
-                  </td>
-                    <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
-                  </tr>
-              </table>
-              <br />
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                             </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                        </table>
+                      </td>
+                        <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                      </tr>
+                  </table>
+                  <br />
 
-              """  % (CFG_SITE_URL,
-                      ill_request_id,
-                      _("Item details"),
-                      _("Name"),
-                      book_info['title'],
-                      _("Author(s)"),
-                      book_info['authors'],
-                      _("Place"),
-                      book_info['place'],
-                      _("Publisher"),
-                      book_info['publisher'],
-                      _("Year"),
-                      book_info['year'],
-                      _("Edition"),
-                      book_info['edition'],
-                      _("ISBN"),
-                      book_info['isbn'],
-                      str(book_cover))
+                  """  % (CFG_SITE_URL,
+                          ill_request_id,
+                          _("Item details"),
+                          _("Title"),
+                          item_info['title'],
+                          _("Author(s)"),
+                          item_info['authors'],
+                          _("Place"),
+                          item_info['place'],
+                          _("Publisher"),
+                          item_info['publisher'],
+                          _("Year"),
+                          item_info['year'],
+                          _("Edition"),
+                          item_info['edition'],
+                          _("ISBN"),
+                          item_info['isbn'],
+                          str(book_cover))
+
+            # for articles
+            elif str(request_type) == 'article':
+
+                out += """
+                <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+                <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
+                   <div class="bibcircbottom">
+                   <input type=hidden name=ill_request_id value=%s>
+                    <br />
+                    <table class="bibcirctable">
+                      <tr>
+                        <td class="bibcirctableheader" width="10">%s</td>
+                      </tr>
+                    </table>
+                    <table class="bibcirctable">
+                     <tr valign='top'>
+                       <td width="400">
+                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                             </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>%s</td>
+                         </tr>
+                        </table>
+                      </td>
+                        <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                      </tr>
+                  </table>
+                  <br />
+
+                  """  % (CFG_SITE_URL,
+                          ill_request_id,
+                          _("Item details"),
+                          _("Periodical Title"),
+                          item_info['periodical_title'],
+                          _("Article Title"),
+                          item_info['title'],
+                          _("Author(s)"),
+                          item_info['authors'],
+                          _("Volume, Issue, Page"),
+                          item_info['volume'],
+                          _("ISSN"),
+                          item_info['issn'],
+                          _("Place"),
+                          item_info['place'],
+                          _("Publisher"),
+                          item_info['publisher'],
+                          _("Year"),
+                          item_info['year'],
+                          str(book_cover))
+            else:
+                out+= """aqui falta algo, no?"""
 
         out += """
-
         <table class="bibcirctable">
           <tr valign='top'>
             <td width="550">
@@ -11330,72 +11466,76 @@ class Template:
                     _("Period of interest (From)"), period_from,
                     _("Period of interest (To)"), period_to,
                     _("Borrower comments"), borrower_comments or '-',
-                    _("Only this edition?"), only_this_edition,
+                    _("Only this edition?"), only_this_edition or 'No',
                     _("ILL request details"))
 
-#### PENDING ####
-        if ill_status == 'pending':
-            if not ill_req_details:
-                previous_library_notes = {}
-            else:
-                previous_library_notes = eval(ill_req_details)
 
-            out += """
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                          <input type=hidden name=ill_status value="pending">
-                          <th width="100">%s</th>
-                          <td>
-                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status='pending'" selected>
-                                Pending
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request sent, not yet received">
-                                Request sent, not yet received
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request cancelled">
-                                Request cancelled
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item received, due date defined">
-                                Item received, due date defined
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item returned">
-                                Item returned
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=document received, request closed">
-                                Document received, request closed
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th width="150">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100" valign="top">%s</th>
-                          <td>
-                            <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
-                                                                ill_request_id, ill_request_id, ill_request_id,
-                                                                ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
+#### NEW ####
+        if ill_status == 'new' or ill_status == None or ill_status == '':
+            if request_type == 'book':
+                out += """
+                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                            <tr>
+                                <input type=hidden name=new_status value="new">
+                              <th width="100">%s</th>
+                              <td>
+                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
+                                    New
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+                                    Requested
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
+                                    On loan
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
+                                    Returned
+                                  </option>
+                                </select>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th width="150">%s</th>
+                              <td>%s</td>
+                            </tr>
+                            <tr>
+                              <th width="100" valign="top">%s</th>
+                              <td>
+                                <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
+                                                                    ill_request_id, ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
+            if request_type == 'article':
+                    out += """
+                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                            <tr>
+                                <input type=hidden name=new_status value="new">
+                              <th width="100">%s</th>
+                              <td>
+                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
+                                    New
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+                                    Requested
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
+                                    Received
+                                  </option>
+                                </select>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th width="150">%s</th>
+                              <td>%s</td>
+                            </tr>
+                            <tr>
+                              <th width="100" valign="top">%s</th>
+                              <td>
+                                <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
+                                                                    ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
 
-            key_array = previous_library_notes.keys()
-            key_array.sort()
 
-            for key in key_array:
-                delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
-                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status, 'ln': ln},
-                                           (_("[delete]")))
-
-                out += """<tr class="bibcirccontent">
-                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-                            <td width="400"><i>%s</i></td>
-                            <td width="65" align="center">%s</td>
-                          </tr>
-
-                      """ % (key, previous_library_notes[key], delete_note)
-
+            out += notes
 
             out += """
                             </table>
@@ -11412,61 +11552,76 @@ class Template:
 
                       """ % (_("Library notes"))
 
-##### REQUEST SENT, NOT YET RECEIVED ##############
-        elif ill_status == 'request sent, not yet received':
-            (library_id, request_date, expected_date, cost, barcode, previous_notes) = ill_req_details
+############# REQUESTED ##############
+        elif ill_status == 'requested':
 
-            if not previous_notes:
-                previous_library_notes = {}
-            else:
-                previous_library_notes = eval(previous_notes)
+            if request_type == 'book':
+                out += """
+                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                            <tr>
+                            <input type=hidden name=new_status value="requested">
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">
+                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
+                                    New
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
+                                    Requested
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
+                                    On loan
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
+                                    Returned
+                                  </option>
+                                </select>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">%s</td>
+                            </tr>
+                            <tr>
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">
+                                <select name="library_id"  style='border: 1px solid #cfcfcf'>
 
-            if cost:
-                (value, currency) = cost.split()
-            else:
-                (value, currency) = (0, 'EUR')
+                            """ % (_("Status"), ill_request_id, ill_request_id,
+                                   ill_request_id, ill_request_id, _("ILL request ID"), ill_request_id,
+                                   _("Library/Supplier"))
+            if request_type == 'article':
+                out += """
+                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                            <tr>
+                            <input type=hidden name=new_status value="requested">
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">
+                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
+                                    New
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
+                                    Requested
+                                  </option>
+                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
+                                    Received
+                                  </option>
+                                </select>
+                              </td>
+                            </tr>
+                            <tr>
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">%s</td>
+                            </tr>
+                            <tr>
+                              <th width="150">%s</th>
+                              <td class="bibcirccontent">
+                                <select name="library_id"  style='border: 1px solid #cfcfcf'>
 
-            out += """
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                          <input type=hidden name=ill_status value="%s">
-                          <th width="150">%s</th>
-                          <td class="bibcirccontent">
-                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=pending">
-                                Pending
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request sent, not yet received" selected>
-                                Request sent, not yet received
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request cancelled">
-                                Request cancelled
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item received, due date defined">
-                                Item received, due date defined
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item returned">
-                                Item returned
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=document received, request closed">
-                                Document received, request closed
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th width="150">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="150">%s</th>
-                          <td class="bibcirccontent">
-                            <select name="library_id"  style='border: 1px solid #cfcfcf'>
-
-                        """ % (ill_status, _("Status"), ill_request_id, ill_request_id,
-                               ill_request_id, ill_request_id, ill_request_id,
-                               ill_request_id, _("ILL request ID"), ill_request_id,
-                               _("Library/Supplier"))
+                            """ % (_("Status"), ill_request_id, ill_request_id,
+                                   ill_request_id, _("ILL request ID"), ill_request_id,
+                                   _("Library/Supplier"))
 
             for(library_id, name) in libraries:
                 out += """<option value ="%s">%s</option>""" % (library_id, name)
@@ -11508,9 +11663,9 @@ class Template:
                         <select name="currency"  style='border: 1px solid #cfcfcf'>
 
                         """ % (_("Request date"),
-                               CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
+                               CFG_SITE_URL, today,
                                _("Expected date"),
-                               CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=7)).strftime('%Y-%m-%d'),
+                               CFG_SITE_URL, within_a_week,
                                _("Cost"), value)
 
 
@@ -11544,26 +11699,10 @@ class Template:
                     <tr>
                           <th width="100" valign="top">%s</th>
                           <td>
-                            <table class="bibcircnotes"> """  %(_("Barcode"), barcode,
+                            <table class="bibcircnotes"> """  %(_("Barcode"), barcode or 'No barcode asociated',
                                                                 _("Previous notes"))
 
-            key_array = previous_library_notes.keys()
-            key_array.sort()
-
-            for key in key_array:
-                delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
-                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status, 'ln': ln},
-                                           (_("[delete]")))
-
-                out += """<tr class="bibcirccontent">
-                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-                            <td width="400"><i>%s</i></td>
-                            <td width="65" align="center">%s</td>
-                          </tr>
-
-                      """ % (key, previous_library_notes[key], delete_note)
-
+            out += notes
 
             out += """
                             </table>
@@ -11580,49 +11719,27 @@ class Template:
 
                       """ % (_("Library notes"))
 
-##### CANCELLED ##############
-        elif ill_status == 'request cancelled':
-            (library_id, request_date, expected_date, cost, barcode, previous_notes) = ill_req_details
-
-            if not previous_notes:
-                previous_library_notes = {}
-            else:
-                previous_library_notes = eval(previous_notes)
-
-            if cost:
-                (value, currency) = cost.split()
-            else:
-                (value, currency) = (0, 'EUR')
-
-            if library_id:
-                library_name = db.get_library_name(library_id)
-            else:
-                library_name = '-'
+##### ON LOAN ##############
+        elif ill_status == 'on loan':
 
             out += """
                       <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                      <input type=hidden name=ill_status value="%s">
                         <tr>
+                        <input type=hidden name=new_status value="on loan">
                           <th width="100">%s</th>
                           <td class="bibcirccontent">
                             <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                             <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=pending">
-                                Pending
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
+                                New
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request sent, not yet received">
-                                Request sent, not yet received
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+                                Requested
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request cancelled" selected>
-                                Request cancelled
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan" selected>
+                                On loan
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item received, due date defined">
-                                Item received, due date defined
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item returned">
-                                Item returned
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=document received, request closed">
-                                Document received, request closed
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
+                                Returned
                               </option>
                             </select>
                           </td>
@@ -11643,17 +11760,61 @@ class Template:
                           <th width="100">%s</th>
                           <td class="bibcirccontent">%s</td>
                         </tr>
+
+                    """ % (_("Status"), ill_request_id, ill_request_id,
+                            ill_request_id, ill_request_id, _("ILL request ID"), ill_request_id,
+                            _("Library"), library_name,
+                            _("Request date"), request_date, _("Expected date"),
+                            expected_date)
+
+            if str(arrival_date)=='0000-00-00':
+                date1=today
+            else:
+                date1=arrival_date
+
+            if str(due_date)=='0000-00-00':
+                date2=within_a_month
+            else:
+                date2=due_date
+
+
+            out += """
+                    <tr>
+                       <th width="150">%s</th>
+                       <td class="bibcirccontent">
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
+                        </script>
+                        <input type="text" size="10" id="date_picker1" name="arrival_date" value="%s" style='border: 1px solid #cfcfcf'>
+
+                      </td>
+                    </tr>
+                    <tr>
+                      <th width="150">%s</th>
+                      <td class="bibcirccontent">
+
+                        <script type="text/javascript">
+                             $(function() {
+                                 $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                             });
+                        </script>
+                        <input type="text" size="10" id="date_picker2" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="hidden" name="request_date" value="%s">
+                        <input type="hidden" name="expected_date" value="%s">
+                      </td>
+                    </tr>
+                """ % (_("Arrival date"), CFG_SITE_URL, date1, _("Due date"), CFG_SITE_URL, date2, request_date, expected_date)
+
+            out += """
                         <tr>
                           <th width="100">%s</th>
                           <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
                             <select name="currency"  style='border: 1px solid #cfcfcf'>
 
-                            """  % (ill_status, _("Status"), ill_request_id, ill_request_id,
-                                    ill_request_id, ill_request_id, ill_request_id,
-                                    ill_request_id, _("ILL request ID"), ill_request_id,
-                                    _("Library"), library_name,
-                                    _("Request date"), request_date, _("Expected date"),
-                                    expected_date, _("Cost"), value)
+                    """  % (_("Cost"), value)
 
             if currency == 'EUR':
                 out += """
@@ -11686,22 +11847,7 @@ class Template:
                           <td>
                             <table class="bibcircnotes"> """ % (_("Barcoce"), barcode, _("Previous notes"))
 
-            key_array = previous_library_notes.keys()
-            key_array.sort()
-
-            for key in key_array:
-                delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
-                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status, 'ln': ln},
-                                           (_("[delete]")))
-
-                out += """<tr class="bibcirccontent">
-                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-                            <td width="400"><i>%s</i></td>
-                            <td width="65" align="center">%s</td>
-                          </tr>
-
-                      """ % (key, previous_library_notes[key], delete_note)
+            out += notes
 
 
             out += """
@@ -11719,50 +11865,28 @@ class Template:
 
                       """ % (_("Library notes"))
 
-##### ITEM RECEIVED, DUE DATE DEFINED ##############
-        elif ill_status == 'item received, due date defined':
 
-            (library_id, request_date, expected_date, arrival_date, due_date, cost, barcode, previous_notes) = ill_req_details
-
-            if not previous_notes:
-                previous_library_notes = {}
-            else:
-                previous_library_notes = eval(previous_notes)
-
-            if cost:
-                (value, currency) = cost.split()
-            else:
-                (value, currency) = (0, 'EUR')
-
-            if library_id:
-                library_name = db.get_library_name(library_id)
-            else:
-                library_name = '-'
+##### RETURNED ##############
+        elif ill_status == 'returned':
 
             out += """
                       <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                      <input type=hidden name=ill_status value="%s">
                         <tr>
+                        <input type=hidden name=new_status value="returned">
                           <th width="100">%s</th>
                           <td class="bibcirccontent">
                             <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                             <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=pending">
-                                Pending
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
+                                New
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request sent, not yet received">
-                                Request sent, not yet received
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+                                Requested
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request cancelled">
-                                Request cancelled
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
+                                On loan
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item received, due date defined" selected>
-                                Item received, due date defined
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item returned">
-                                Item returned
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=document received, request closed">
-                                Document received, request closed
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned" selected>
+                                Returned
                               </option>
                             </select>
                           </td>
@@ -11785,34 +11909,25 @@ class Template:
                         </tr>
                         <tr>
                           <th width="100">%s</th>
-                          <td class="bibcirccontent">
-                            <input type="text" size="12" id="%s" name="arrival_date" value="%s" style='border: 1px solid #cfcfcf'>
-                            <img src="/jsCalendar/jsCalendar.gif" alt="select arrival date" id="%s"
-                            onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                            >
-                            <script type="text/javascript" language='JavaScript'>
-                            Calendar.setup({
-                            inputField     :    '%s',
-                            ifFormat       :    '%%Y-%%m-%%d',
-                            button	   :    '%s'
-                            });
-                            </script>
-                          </td>
+                          <td class="bibcirccontent">%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
                         </tr>
                         <tr>
                           <th width="100">%s</th>
                           <td class="bibcirccontent">
-                            <input type="text" size="12" id="%s" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
-                            <img src="/jsCalendar/jsCalendar.gif" alt="select due date" id="%s"
-                            onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                            >
-                            <script type="text/javascript" language='JavaScript'>
-                            Calendar.setup({
-                            inputField     :    '%s',
-                            ifFormat       :    '%%Y-%%m-%%d',
-                            button	   :    '%s'
-                            });
+                            <script type="text/javascript">
+                                $(function() {
+                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                                });
                             </script>
+                            <input type="text" size="10" id="date_picker1" name="return_date" value="%s" style='border: 1px solid #cfcfcf'>
+                            <input type="hidden" name="request_date" value="%s">
+                            <input type="hidden" name="expected_date" value="%s">
+                            <input type="hidden" name="arrival_date" value="%s">
+                            <input type="hidden" name="due_date" value="%s">
                           </td>
                         </tr>
                         <tr>
@@ -11820,183 +11935,12 @@ class Template:
                           <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
                             <select name="currency"  style='border: 1px solid #cfcfcf'>
 
-                            """  % (ill_status, _("Status"), ill_request_id, ill_request_id,
-                                    ill_request_id, ill_request_id, ill_request_id,
-                                    ill_request_id,  _("ILL request ID"), ill_request_id,
-                                    _("Library"), library_name,
-                                    _("Request date"), request_date, _("Expected date"), expected_date,
-                                    _("Arrival date"), _("arrival_date"), arrival_date,
-                                    _("jsCal3"), _("arrival_date"), _("jsCal3"),
-                                    _("Due date"), _("due_date"), due_date,
-                                    _("jsCal4"), _("due_date"), _("jsCal4"),
-                                    _("Cost"), value)
-
-
-            if currency == 'EUR':
-                out += """
-                <option value="EUR" selected>EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD">USD</option> """
-
-            elif currency == 'CHF':
-                out += """
-                <option value="EUR">EUR</option>
-                <option value="CHF" selected>CHF</option>
-                <option value="USD">USD</option> """
-
-            else:
-                out +="""
-                <option value="EUR">EUR</option>
-                <option value="CHF">CHF</option>
-                <option value="USD" selected>USD</option> """
-
-            out += """
-                            </select>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent"><input type="text" size="12" name="barcode" value="%s" style='border: 1px solid #cfcfcf'>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th width="100" valign="top">%s</th>
-                          <td>
-                            <table class="bibcircnotes"> """ % (_("Barcode"), barcode, _("Previous notes"))
-
-            key_array = previous_library_notes.keys()
-            key_array.sort()
-
-            for key in key_array:
-                delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
-                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status, 'ln': ln},
-                                           (_("[delete]")))
-
-                out += """<tr class="bibcirccontent">
-                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-                            <td width="400"><i>%s</i></td>
-                            <td width="65" align="center">%s</td>
-                          </tr>
-
-                      """ % (key, previous_library_notes[key], delete_note)
-
-
-            out += """
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th valign="top" width="100">%s</th>
-                          <td><textarea name='library_notes' rows="6" cols="74" style='border: 1px solid #cfcfcf'></textarea></td>
-                        </tr>
-                      </table>
-                      </td>
-                   </tr>
-                 </table>
-
-                      """ % (_("Library notes"))
-
-##### ITEM RETURNED ##############
-        elif ill_status == 'item returned':
-            (library_id, request_date, expected_date, arrival_date, due_date, return_date, cost, barcode, previous_notes) = ill_req_details
-
-            if not previous_notes:
-                previous_library_notes = {}
-            else:
-                previous_library_notes = eval(previous_notes)
-
-            if cost:
-                (value, currency) = cost.split()
-            else:
-                (value, currency) = (0, 'EUR')
-
-            if library_id:
-                library_name = db.get_library_name(library_id)
-            else:
-                library_name = '-'
-
-            out += """
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                      <input type=hidden name=ill_status value="%s">
-                        <tr>
-                          <th width="150">%s</th>
-                          <td class="bibcirccontent">
-                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                             <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=pending">
-                                Pending
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request sent, not yet received">
-                                Request sent, not yet received
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request cancelled">
-                                Request cancelled
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item received, due date defined">
-                                Item received, due date defined
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item returned" selected>
-                                Item returned
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=document received, request closed">
-                                Document received, request closed
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">
-                            <input type="text" size="12" id="%s" name="return_date" value="%s" style='border: 1px solid #cfcfcf'>
-                            <img src="/jsCalendar/jsCalendar.gif" alt="select arrival date" id="%s"
-                            onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                            >
-                            <script type="text/javascript" language='JavaScript'>
-                            Calendar.setup({
-                            inputField     :    '%s',
-                            ifFormat       :    '%%Y-%%m-%%d',
-                            button	   :    '%s'
-                            });
-                            </script>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
-                            <select name="currency"  style='border: 1px solid #cfcfcf'>
-
-                            """  % (ill_status, _("Status"), ill_request_id, ill_request_id,
-                                    ill_request_id, ill_request_id, ill_request_id,
-                                    ill_request_id, _("ILL request ID"), ill_request_id,
+                            """  % ( _("Status"), ill_request_id,ill_request_id,ill_request_id,ill_request_id, _("ILL request ID"), ill_request_id,
                                     _("Library"), library_name,
                                     _("Request date"), request_date, _("Expected date"), expected_date,
                                     _("Arrival date"), arrival_date, _("Due date"), due_date,
-                                    _("Return date"), _("return_date"), return_date,
-                                    _("jsCal4"), _("return_date"), _("jsCal4"),
+                                    _("Return date"), CFG_SITE_URL, return_date,
+                                    request_date, expected_date,arrival_date,due_date,
                                     _("Cost"), value)
 
 
@@ -12031,23 +11975,7 @@ class Template:
                           <td>
                             <table class="bibcircnotes"> """ % (_("Barcode"), barcode, _("Previous notes"))
 
-            key_array = previous_library_notes.keys()
-            key_array.sort()
-
-            for key in key_array:
-                delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
-                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status, 'ln': ln},
-                                           (_("[delete]")))
-
-                out += """<tr class="bibcirccontent">
-                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-                            <td width="400"><i>%s</i></td>
-                            <td width="65" align="center">%s</td>
-                          </tr>
-
-                      """ % (key, previous_library_notes[key], delete_note)
-
+            out += notes
 
             out += """
                             </table>
@@ -12064,48 +11992,27 @@ class Template:
 
                       """ % (_("Library notes"))
 
-        else:
-            (library_id, request_date, expected_date, arrival_date, due_date, return_date, cost, barcode, previous_notes) = ill_req_details
-
-            if not previous_notes:
-                previous_library_notes = {}
+##### RECEIVED ##############
+        elif ill_status == 'received':
+            if str(arrival_date)=='0000-00-00':
+                date1=today
             else:
-                previous_library_notes = eval(previous_notes)
-
-            if cost:
-                (value, currency) = cost.split()
-            else:
-                (value, currency) = (0, 'EUR')
-
-            if library_id:
-                library_name = db.get_library_name(library_id)
-            else:
-                library_name = '-'
-
+                date1=arrival_date
             out += """
                       <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                      <input type=hidden name=ill_status value="%s">
                         <tr>
-                          <th width="150">%s</th>
+                        <input type=hidden name=new_status value="received">
+                          <th width="100">%s</th>
                           <td class="bibcirccontent">
-                           <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                             <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=pending">
-                                Pending
+                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
+                                New
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request sent, not yet received">
-                                Request sent, not yet received
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+                                Requested
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=request cancelled">
-                                Request cancelled
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item received, due date defined">
-                                Item received, due date defined
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=item returned">
-                                Item returned
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&ill_status=document received, request closed" selected>
-                                Document received, request closed
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received" selected>
+                                Received
                               </option>
                             </select>
                           </td>
@@ -12128,58 +12035,62 @@ class Template:
                         </tr>
                         <tr>
                           <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                         <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">%s %s</td>
+                          <td class="bibcirccontent">
+                            <script type="text/javascript">
+                                $(function() {
+                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                                });
+                            </script>
+                            <input type="text" size="10" id="date_picker1" name="arrival_date" value="%s" style='border: 1px solid #cfcfcf'>
+                            <input type="hidden" name="request_date" value="%s">
+                            <input type="hidden" name="expected_date" value="%s">
+                          </td>
                         </tr>
                         <tr>
                           <th width="100">%s</th>
-                          <td class="bibcirccontent">%s</td>
-                        </tr>
+                          <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
+                            <select name="currency"  style='border: 1px solid #cfcfcf'>
 
-                        """  % (ill_status, _("Status"), ill_request_id, ill_request_id,
-                                ill_request_id, ill_request_id, ill_request_id,
-                                ill_request_id, _("ILL request ID"), ill_request_id,
-                                _("Library"), library_name,
-                                _("Request date"), request_date, _("Expected date"), expected_date,
-                                _("Arrival date"), arrival_date, _("Due date"), due_date,
-                                _("Return date"), return_date, _("Cost"), value, currency,
-                                _("Barcode"), barcode)
+                            """  % ( _("Status"), ill_request_id,ill_request_id,ill_request_id, _("ILL request ID"), ill_request_id,
+                                    _("Library"), library_name,
+                                    _("Request date"), request_date, _("Expected date"), expected_date,
+                                    _("Arrival date"), CFG_SITE_URL, date1,
+                                    request_date, expected_date,
+                                    _("Cost"), value)
 
+
+            if currency == 'EUR':
+                out += """
+                <option value="EUR" selected>EUR</option>
+                <option value="CHF">CHF</option>
+                <option value="USD">USD</option> """
+
+            elif currency == 'CHF':
+                out += """
+                <option value="EUR">EUR</option>
+                <option value="CHF" selected>CHF</option>
+                <option value="USD">USD</option> """
+
+            else:
+                out +="""
+                <option value="EUR">EUR</option>
+                <option value="CHF">CHF</option>
+                <option value="USD" selected>USD</option> """
 
             out += """
+                            </select>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
+                          <td class="bibcirccontent">%s</td>
+                        </tr>
                         <tr>
                           <th width="100" valign="top">%s</th>
                           <td>
-                            <table class="bibcircnotes"> """ % (_("Previous notes"))
+                            <table class="bibcircnotes"> """ % (_("Barcode"), barcode, _("Previous notes"))
 
-            key_array = previous_library_notes.keys()
-            key_array.sort()
-
-            for key in key_array:
-                delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
-                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status, 'ln': ln},
-                                           (_("[delete]")))
-
-                out += """<tr class="bibcirccontent">
-                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
-                            <td width="400"><i>%s</i></td>
-                            <td width="65" align="center">%s</td>
-                          </tr>
-
-                      """ % (key, previous_library_notes[key], delete_note)
-
+            out += notes
 
             out += """
                             </table>
@@ -12190,11 +12101,12 @@ class Template:
                           <td><textarea name='library_notes' rows="6" cols="74" style='border: 1px solid #cfcfcf'></textarea></td>
                         </tr>
                       </table>
-                    </td>
-                  </tr>
+                     </td>
+                   </tr>
                  </table>
 
                       """ % (_("Library notes"))
+###### END STATUSES ######
 
 
         out += """
@@ -12222,7 +12134,7 @@ class Template:
         return out
 
 
-    def tmpl_ill_request_details_step2(self, ill_req_details, request_info, ill_status, ill_borrower_request, ln=CFG_SITE_LANG):
+    def tmpl_ill_request_details_step2(self, ill_req_details, request_info, ill_status, ill_request_borrower_details, ln=CFG_SITE_LANG):
         """
         @param ill_req_details: informations about a given ILL request
         @type ill_req_details: tuple
@@ -12233,8 +12145,8 @@ class Template:
         @param ill_status: status of an ILL request
         @type ill_status: string
 
-        @param ill_borrower_request: borrower's informations
-        @type ill_borrower_request: tuple
+        @param ill_request_borrower_details: borrower's informations
+        @type ill_request_borrower_details: tuple
         """
 
         _ = gettext_set_language(ln)
@@ -12242,7 +12154,7 @@ class Template:
         out = _MENU_
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
-         period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_borrower_request
+         period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_request_borrower_details
 
         book_info = eval(book_info)
 
@@ -12446,12 +12358,12 @@ class Template:
                     _("Only this edition?"), only_this_edition,
                     _("ILL request details"))
 
-        if ill_status == 'pending':
+        if ill_status == 'new':
 
             if not ill_req_details:
                 previous_library_notes = {}
             else:
-                previous_library_notes = eval(ill_req_details)
+                previous_library_notes = eval(ill_req_details[8])
 
             (ill_request_id, library_notes) = request_info
 
@@ -12507,12 +12419,12 @@ class Template:
 
                      """ % (_("Library notes"), library_notes or '-')
 
-        elif ill_status == 'request sent, not yet received':
+        elif ill_status == 'requested':
 
             if not ill_req_details:
                 previous_library_notes = {}
             else:
-                previous_library_notes = eval(ill_req_details)
+                previous_library_notes = eval(ill_req_details[8])
 
             (ill_request_id, library_id, request_date, expected_date,
              cost, currency, barcode, library_notes) =  request_info
@@ -16593,27 +16505,70 @@ class Template:
 
         out += _MENU_
 
+#<input type=hidden name=start value="0">
+#<input type=hidden name=end value="10">
+
         out += """
         <div class="bibcircbottom">
+        <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
+        <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
+        <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
         <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_search_result" method="get" >
         <br />
         <br />
         <br />
-        <input type=hidden name=start value="0">
-        <input type=hidden name=end value="10">
+
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirctableheader">Search ILL request by
               <input type="radio" name="f" value="title" checked>title
-              <input type="radio" name="f" value="supplier">supplier
-              <br />
-              <br />
+              <input type="radio" name="f" value="ILL_request_ID">ill_request_id
             </td>
           </tr>
-          <tr align="center">
-          <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
-                             </tr>
         </table>
+
+        <br />
+        <table class="bibcirctable">
+            <tr align="center" width=10>
+                <td width=10><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
+            </tr>
+        </table>
+        """ % (CFG_SITE_URL,CFG_SITE_URL,CFG_SITE_URL,CFG_SITE_URL)
+
+        out += """
+        <br />
+        <table align="center">
+
+            <tr align="center">
+                <td class="bibcirctableheader" align="right">date restriction:    </td>
+                <td class="bibcirctableheader" align="right">From</td>
+                <td align="left">
+                <script type="text/javascript">
+                    $(function(){
+                        $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                    });
+                </script>
+                <input type="text" size="12" id="date_picker1" name="date_from" value="%s" style='border: 1px solid #cfcfcf'>
+                </td>
+            </tr>
+
+            <tr align="center">
+                <td class="bibcirctableheader" align="right"></td>
+                <td class="bibcirctableheader" align="right">To</td>
+                <td align="left">
+                    <script type="text/javascript">
+                        $(function(){
+                            $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                        });
+                    </script>
+                    <input type="text" size="12" id="date_picker2" name="date_to" value="%s" style='border: 1px solid #cfcfcf'>
+                </td>
+            </tr>
+        </table>
+
+        """ % (CFG_SITE_URL,_("the beginning"),CFG_SITE_URL,_("now"))
+
+        out += """
         <br />
         <table class="bibcirctable">
           <tr align="center">
@@ -16633,6 +16588,6 @@ class Template:
         </div>
         <form>
 
-        """ % (CFG_SITE_URL, _("Back"), _("Search"))
+        """ % (_("Back"), _("Search"))
 
         return out

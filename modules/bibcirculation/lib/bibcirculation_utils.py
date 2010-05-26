@@ -106,9 +106,9 @@ def get_book_cover(isbn):
                                'Keywords=' + isbn)
 
     # parse XML
-    xml_img = minidom.parse(cover_xml)
 
     try:
+        xml_img = minidom.parse(cover_xml)
         retrieve_book_cover = xml_img.getElementsByTagName('MediumImage')
         book_cover = retrieve_book_cover.item(0).firstChild.firstChild.data
     except AttributeError:
@@ -674,3 +674,7 @@ def generate_email_body(template, loan_id):
                       book_isbn, book_editor)
 
     return out
+
+def create_item_details_url(recid, ln):
+    url = '/admin/bibcirculation/bibcirculationadmin.py/get_item_details?ln=%s&recid=%s' % (ln, str(recid))
+    return CFG_SITE_URL+url

@@ -285,7 +285,7 @@ def get_loans_notes(req, loan_id=None, recid=None, delete_key=None,
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes
     """
-    return bal.get_loans_notes(req, loan_id, recid, delete_key,
+    return bal.get_loans_notes(req, loan_id, delete_key,
                                library_notes, back, ln)
 
 def get_item_loans_notes(req, loan_id=None, recid=None,
@@ -738,22 +738,22 @@ def register_ill_request_step3(req, borrower_id=None, request_info=None, ln=CFG_
 
     return bal.register_ill_request_step3(req, borrower_id, request_info, ln)
 
-def list_ill_request(req, ln=CFG_SITE_LANG):
+def list_ill_request(req, status=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/list_ill_request
     """
 
-    return bal.list_ill_request(req, ln)
+    return bal.list_ill_request(req, status, ln)
 
-def ill_request_details_step1(req, delete_key=None, ill_request_id=None, ill_status=None, ln=CFG_SITE_LANG):
+def ill_request_details_step1(req, delete_key=None, ill_request_id=None, new_status=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1
     """
 
-    return bal.ill_request_details_step1(req, delete_key, ill_request_id, ill_status, ln)
+    return bal.ill_request_details_step1(req, delete_key, ill_request_id, new_status, ln)
 
 
-def ill_request_details_step2(req, delete_key=None, ill_request_id=None, ill_status=None, library_id=None,
+def ill_request_details_step2(req, delete_key=None, ill_request_id=None, new_status=None, library_id=None,
                               request_date=None, expected_date=None, arrival_date=None, due_date=None,
                               return_date=None, cost=None,
                               currency=None, barcode=None, library_notes=None, ln=CFG_SITE_LANG):
@@ -762,7 +762,8 @@ def ill_request_details_step2(req, delete_key=None, ill_request_id=None, ill_sta
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2
     """
 
-    return bal.ill_request_details_step2(req, delete_key, ill_request_id, ill_status, library_id,
+
+    return bal.ill_request_details_step2(req, delete_key, ill_request_id, new_status, library_id,
                                          request_date, expected_date, arrival_date, due_date,
                                          return_date, cost, currency,
                                          barcode, library_notes, ln)
@@ -1042,9 +1043,9 @@ def ill_search(req, ln=CFG_SITE_LANG):
     """
     return bal.ill_search(req, ln)
 
-def ill_search_result(req, p=None, f=None, ln=CFG_SITE_LANG):
+def ill_search_result(req, p=None, f=None, date_from=None, date_to=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/item_search_result
     """
 
-    return bal.ill_search_result(p, f)
+    return bal.ill_search_result(req, p, f, date_from, date_to, ln)
