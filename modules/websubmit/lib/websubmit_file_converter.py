@@ -394,7 +394,7 @@ def check_openoffice_tmpdir():
     if not os.path.isdir(CFG_OPENOFFICE_TMPDIR):
         raise InvenioWebSubmitFileConverterError('%s is not a directory' % CFG_OPENOFFICE_TMPDIR)
     now = str(time.time())
-    execute_command('sudo', '-u', CFG_OPENOFFICE_USER, CFG_PATH_OPENOFFICE_PYTHON, 'import os; open(os.path.join(%s, "test"), "w").write(%s)' % (repr(CFG_OPENOFFICE_TMPDIR), repr(now)))
+    execute_command('sudo', '-u', CFG_OPENOFFICE_USER, CFG_PATH_OPENOFFICE_PYTHON, '-c', 'import os; open(os.path.join(%s, "test"), "w").write(%s)' % (repr(CFG_OPENOFFICE_TMPDIR), repr(now)))
     try:
         test = open(os.path.join(CFG_OPENOFFICE_TMPDIR, 'test')).read()
         if test != now:
