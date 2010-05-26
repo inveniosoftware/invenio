@@ -435,8 +435,8 @@ class Template:
         actions = []
         res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='batchuploader' and runtime > now() ORDER by runtime")
         if len(res) > 0:
-           (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
-           actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
+            (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
+            actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
         else:
             actions.append(['', 'batchuploader', '', '', 'Not scheduled'])
 
