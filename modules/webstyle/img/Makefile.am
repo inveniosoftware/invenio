@@ -28,6 +28,16 @@ img_DATA = add-small.png \
            atlantis_logo.gif \
            atlantis_logo_small.gif \
            at.gif \
+           balloon_arrow_left_shadow.png \
+           balloon_bottom_left_shadow.png \
+           balloon_bottom_shadow.png \
+           balloon_right_shadow.png \
+           balloon_top_right_shadow.png \
+           balloon_arrow_shadow.png \
+           balloon_bottom_right_shadow.png \
+           balloon_left_shadow.png \
+           balloon_top_left_shadow.png \
+           balloon_top_shadow.png \
            blankicon.gif \
            blue_gradient.gif \
            bullet_toggle_minus.png \
@@ -169,11 +179,13 @@ img_DATA = add-small.png \
            table_row_insert.png \
            table_sort.png \
            tick.gif \
+           tree_branch.gif \
            up.gif \
            user-icon-1-16x16.gif \
            user-icon-1-20x20.gif \
            user-icon-1-24x24.gif \
            waiting_or.gif \
+           warning.png \
            webbasket_create.png \
            webbasket_create_small.png \
            webbasket_delete.png \

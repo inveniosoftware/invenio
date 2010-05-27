@@ -2550,33 +2550,33 @@ border-collapse:collapse;
 border-spacing: 0px;
 }
 #balloon table td.topleft{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_top_left_shadow.png) no-repeat bottom right;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_top_left_shadow.png) no-repeat bottom right;
 }
 #balloon table td.bottomleft{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_bottom_left_shadow.png) no-repeat top right;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_bottom_left_shadow.png) no-repeat top right;
 }
 #balloon table td.topright{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_top_right_shadow.png) no-repeat bottom left;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_top_right_shadow.png) no-repeat bottom left;
 }
 #balloon table td.bottomright{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_bottom_right_shadow.png) no-repeat top left;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_bottom_right_shadow.png) no-repeat top left;
 }
 #balloon table td.top{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_top_shadow.png) repeat-x bottom left;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_top_shadow.png) repeat-x bottom left;
 }
 #balloon table td.bottom{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_bottom_shadow.png) repeat-x top left;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_bottom_shadow.png) repeat-x top left;
 }
 #balloon table td.left{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_left_shadow.png) repeat-y top right;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_left_shadow.png) repeat-y top right;
 text-align:right;
 padding:0;
 }
 #balloon table td.right{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_right_shadow.png) repeat-y top left;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_right_shadow.png) repeat-y top left;
 }
 #balloon table td.arrowleft{
-background: transparent url(%(CFG_SITE_URL)s/img/balloon/balloon_arrow_left_shadow.png) no-repeat bottom right;
+background: transparent url(%(CFG_SITE_URL)s/img/balloon_arrow_left_shadow.png) no-repeat bottom right;
 width:24px;
 height:27px;
 }
@@ -2622,7 +2622,7 @@ revise_balloon = '''
       <td class="topright">&nbsp;</td>
     </tr>
     <tr>
-      <td class="left" vertical-align="center" width="24"><img alt=" " src="../img/balloon/balloon_arrow_left_shadow.png" /></td>
+      <td class="left" vertical-align="center" width="24"><img alt=" " src="../img/balloon_arrow_left_shadow.png" /></td>
       <td class="center">
         <table id="balloonReviseFile">
           <tr>
@@ -2635,7 +2635,7 @@ revise_balloon = '''
               <div id="commentBox" style=""><label for="comment">%(comment_label)s:</label><br/><textarea name="comment" id="comment" rows="3"/></textarea></div>
               <div id="restrictionBox" style="display:none">%(restrictions)s</div>
               <div id="keepPreviousVersions" style="display:none"><input type="checkbox" id="balloonReviseFileKeep" name="keepPreviousFiles" checked="checked" /><label for="balloonReviseFileKeep">%(previous_versions_label)s</label>&nbsp;<small>[<a href="" onclick="alert('%(previous_versions_help)s');return false;">?</a>]</small></div>
-              <p id="warningFormats" style="display:none"><img src="%(CFG_SITE_URL)s/img/balloon/warning.png" alt="Warning"/> %(revise_format_warning)s&nbsp;[<a href="" onclick="alert('%(revise_format_help)s');return false;">?</a>]</p>
+              <p id="warningFormats" style="display:none"><img src="%(CFG_SITE_URL)s/img/warning.png" alt="Warning"/> %(revise_format_warning)s&nbsp;[<a href="" onclick="alert('%(revise_format_help)s');return false;">?</a>]</p>
               <div style="text-align:right;margin-top:5px"><input type="button" value="%(cancel)s" onclick="javascript:hide_revise_panel();"/> <input type="submit" value="%(upload)s"/></div>
             </td>
           </tr>
