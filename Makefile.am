@@ -486,5 +486,6 @@ update-v0.99.1-tables:
 	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','layer');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','switch_file');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','switch_file');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','paths_and_restrictions');" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~ *.pyc *.tmp

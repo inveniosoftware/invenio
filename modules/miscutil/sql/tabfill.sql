@@ -515,6 +515,7 @@ INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','documenttype');
 INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','iconsize');
 INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','paths_and_suffixes');
 INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','rename');
+INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','paths_and_restrictions');
 INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','elementNameToDoctype');
 INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','createIconDoctypes');
 INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','createRelatedFormats');

@@ -140,7 +140,7 @@ def get_dictionary_from_string(dict_string):
     final_dictionary = {}
     for key_value_string in key_vals:
         ## Split the pair apart, based on ":":
-        key_value_pair = re.split(r'(?<!\\):', key_value_string)
+        key_value_pair = re.split(r'(?<!\\):', key_value_string, 1)
         ## check that the length of the new list is 2:
         if len(key_value_pair) != 2:
             ## There was a problem with the splitting - pass this pair
