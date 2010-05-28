@@ -204,7 +204,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use ill."))
 
-        body = display_ill_form(uid=uid, ln=argd['ln'])
+        body = display_ill_form(ln=argd['ln'])
 
         return page(title       = _("Interlibrary loan request for books"),
                     body        = body,
@@ -273,7 +273,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                                     additional_comments =  argd['additional_comments'],
                                     conditions = argd['conditions'],
                                     only_edition = argd['only_edition'],
-                                    type='book',
+                                    request_type='book',
                                     ln=argd['ln'])
 
         return page(title       = _("Interlibrary loan request for books"),

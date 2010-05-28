@@ -38,8 +38,8 @@ from invenio.mailutils import send_email
 from invenio.bibcirculation_utils import hold_request_mail, \
      book_title_from_MARC, \
      make_copy_available, \
-     create_ill_record, \
-     book_information_from_MARC
+     create_ill_record
+     #book_information_from_MARC
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 
@@ -472,7 +472,7 @@ def display_ill_form(ln=CFG_SITE_LANG):
 
 def ill_register_request(uid, title, authors, place, publisher, year, edition,
                          isbn, period_of_interest_from, period_of_interest_to,
-                         additional_comments, conditions, only_edition, ln=CFG_SITE_LANG):
+                         additional_comments, conditions, only_edition, request_type, ln=CFG_SITE_LANG):
     """
     Register new ILL request. Create new record (collection: ILL Books)
 
@@ -534,8 +534,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
 
                 #Register ILL request on crcILLREQUEST.
                 db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, 'pending', additional_comments,
-                                        only_edition or 'False', 'book')
+                                        period_of_interest_to, 'new', additional_comments,
+                                        only_edition or 'False', request_type)
 
                 #Display confirmation message.
                 message = "Your ILL request has been registered and the " \
@@ -574,8 +574,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                     db.add_borrower_address(ldap_address, email)
 
                     db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, 'pending', additional_comments,
-                                        only_edition or 'False', 'book')
+                                        period_of_interest_to, 'new', additional_comments,
+                                        only_edition or 'False', request_type)
 
                     message = "Your ILL request has been registered and the document"\
                               " will be sent to you via internal mail."
@@ -631,8 +631,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                 is_borrower = db.is_borrower(email)
 
                 db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, 'pending', additional_comments,
-                                        only_edition or 'False', 'book')
+                                        period_of_interest_to, 'new', additional_comments,
+                                        only_edition or 'False', request_type)
 
                 message = "Your ILL request has been registered and the document"\
                           " will be sent to you via internal mail."

@@ -6313,7 +6313,7 @@ class Template:
 
 
 
-        conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
+        #conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
              <table class="bibcirctable">
@@ -6337,7 +6337,7 @@ class Template:
         return out
 
     def tmpl_new_book_step2(self, ln=CFG_SITE_LANG):
-
+        ### FIXME ###
         return "Y aquí se hace algo..."
 
     def tmpl_add_new_copy_step1(self):
@@ -11063,7 +11063,7 @@ class Template:
 
 
         for (ill_request_id, borrower_id, borrower_name, library_id,
-             ill_status, period_from, period_to, item_info, type) in ill_req:
+             ill_status, period_from, _period_to, item_info, request_type) in ill_req:
 
             borrower_link = create_html_link(CFG_SITE_URL +
                                              '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
@@ -11083,7 +11083,7 @@ class Template:
                                           {'recid': item_info['recid'], 'ln': ln},
                                           (book_title_from_MARC(int(item_info['recid']))))
             except KeyError:
-                if type == 'book':
+                if request_type == 'book':
                     title_link = item_info['title']
                 else:
                     title_link = item_info['periodical_title']
@@ -11105,7 +11105,7 @@ class Template:
                    </tr>
 
                     """ % (borrower_link, title_link, library_name, ill_status,ill_request_id,
-                           period_from, type, CFG_SITE_URL, ill_request_id, _('select'))
+                           period_from, request_type, CFG_SITE_URL, ill_request_id, _('select'))
 
 
         out += """
@@ -11505,34 +11505,34 @@ class Template:
                                 <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
                                                                     ill_request_id, ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
             if request_type == 'article':
-                    out += """
-                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                            <tr>
-                                <input type=hidden name=new_status value="new">
-                              <th width="100">%s</th>
-                              <td>
-                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
-                                    New
-                                  </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
-                                    Requested
-                                  </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
-                                    Received
-                                  </option>
-                                </select>
-                              </td>
-                            </tr>
-                            <tr>
-                              <th width="150">%s</th>
-                              <td>%s</td>
-                            </tr>
-                            <tr>
-                              <th width="100" valign="top">%s</th>
-                              <td>
-                                <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
-                                                                    ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
+                out += """
+                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                        <tr>
+                            <input type=hidden name=new_status value="new">
+                          <th width="100">%s</th>
+                          <td>
+                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
+                                New
+                              </option>
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+                                Requested
+                              </option>
+                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
+                                Received
+                              </option>
+                            </select>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th width="150">%s</th>
+                          <td>%s</td>
+                        </tr>
+                        <tr>
+                          <th width="100" valign="top">%s</th>
+                          <td>
+                            <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
+                                                                ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
 
 
             out += notes

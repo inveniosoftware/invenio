@@ -47,9 +47,9 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
       update_request_data, \
       validate_date_format, \
       create_ill_record, \
-      get_list_of_ILL_requests, \
-      generate_email_body, \
-      create_item_details_url
+      generate_email_body
+      #get_list_of_ILL_requests, \
+      #create_item_details_url
 
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
@@ -4215,8 +4215,8 @@ def order_new_copy_step3(req, order_info, ln):
     Order a new copy. Step 3.
     """
 
-    (recid, barcode, vendor_id, cost, currency, status,
-     order_date, expected_date, library_id, notes) = order_info
+    (recid, _barcode, vendor_id, cost, currency, status,
+     order_date, expected_date, _library_id, notes) = order_info
 
     cost_format = cost + ' ' + currency
 
@@ -4231,11 +4231,11 @@ def order_new_copy_step3(req, order_info, ln):
 
     #body = list_ordered_books(req,ln) #bibcirculation_templates.tmpl_order_new_copy_step3(ln=ln)
 
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+    #navtrail_previous_links = '<a class="navtrail" ' \
+    #                          'href="%s/help/admin">Admin Area' \
+    #                          '</a>' % (CFG_SITE_URL,)
 
-    id_user = getUid(req)
+    #id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
@@ -4694,7 +4694,7 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status, libra
     """
     """
 
-    id_user = getUid(req)
+    #id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
@@ -4704,9 +4704,9 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status, libra
         del library_previous_notes[delete_key]
         db.update_ill_request_notes(ill_request_id, library_previous_notes)
 
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+    #navtrail_previous_links = '<a class="navtrail" ' \
+    #                          'href="%s/help/admin">Admin Area' \
+    #                          '</a>' % (CFG_SITE_URL,)
 
     cost_format = None
     if cost:
@@ -5431,7 +5431,7 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
 
     """
     """
-    id_user = getUid(req)
+    #id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
@@ -5455,9 +5455,9 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
                                     period_of_interest_to, 'new',
                                     str(ill_request_notes), only_edition, 'book')
 
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+    #navtrail_previous_links = '<a class="navtrail" ' \
+    #                          'href="%s/help/admin">Admin Area' \
+    #                          '</a>' % (CFG_SITE_URL,)
 
     return list_ill_request(req, "new", ln)
 
@@ -6008,13 +6008,13 @@ def register_ill_article_request_step3(req, item_info, user_info, request_detail
     """
     """
 
-    id_user = getUid(req)
+    #id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    (periodical_title, title, authors, report_number, volume, issue, page, year, issn) = item_info
-    volume = volume + ', '+ issue + ', '+ page
+    (periodical_title, title, authors, _report_number, volume, issue, page_number, year, issn) = item_info
+    volume = volume + ', '+ issue + ', '+ page_number
 
     info = (title, authors, "", "", year, "", issn)
 
@@ -6039,9 +6039,9 @@ def register_ill_article_request_step3(req, item_info, user_info, request_detail
                                     period_of_interest_to, 'new',
                                     str(ill_request_notes), only_edition, 'article')
 
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+    #navtrail_previous_links = '<a class="navtrail" ' \
+    #                          'href="%s/help/admin">Admin Area' \
+    #                          '</a>' % (CFG_SITE_URL,)
 
     return list_ill_request(req, 'new', ln)
 

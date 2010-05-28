@@ -2033,7 +2033,7 @@ def get_ill_requests(status):
     """
     """
 
-    all = """select ill.id, ill.id_crcBORROWER, bor.name,
+    all_of_them = """select ill.id, ill.id_crcBORROWER, bor.name,
                       ill.id_crcLIBRARY, ill.status,
                       DATE_FORMAT(ill.period_of_interest_from,'%Y-%m-%d'),
                       DATE_FORMAT(ill.period_of_interest_to,'%Y-%m-%d'),
@@ -2052,7 +2052,7 @@ def get_ill_requests(status):
                 order by ill.id desc""" % (status)
 
     if status == None:
-        res = run_sql(all)
+        res = run_sql(all_of_them)
     else:
         res = run_sql(query)
 
@@ -2076,7 +2076,7 @@ def search_ill_requests_title(title, date_from, date_to):
     return run_sql(query)
 
 
-def search_ill_requests_id(id, date_from, date_to):
+def search_ill_requests_id(reqid, date_from, date_to):
 
     query = """select ill.id, ill.id_crcBORROWER, bor.name,
                       ill.id_crcLIBRARY, ill.status,
@@ -2088,7 +2088,7 @@ def search_ill_requests_id(id, date_from, date_to):
                       and ill.id = %s
                       and DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') >= '%s'
                       and DATE_FORMAT(ill.request_date,'%%Y-%%m-%%d') <= '%s'
-                order by ill.id desc""" % (id, date_from, date_to)
+                order by ill.id desc""" % (reqid, date_from, date_to)
 
     return run_sql(query)
 
