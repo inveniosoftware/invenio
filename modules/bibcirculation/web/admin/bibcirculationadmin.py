@@ -252,7 +252,6 @@ def get_borrower_loans_details(req, recid=None, barcode=None, borrower_id=None,
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details
     """
-
     return bal.get_borrower_loans_details(req, recid, barcode, borrower_id,
                                           renewall, force, loan_id, ln)
 
@@ -431,14 +430,12 @@ def add_new_copy_step1(req, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step1
     """
-
-    return bal.add_new_copy_step1(req, ln)
+    return bal.add_new_copy_step1(req)
 
 def add_new_copy_step2(req, p=None, f=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step2
     """
-
     return bal.add_new_copy_step2(req, p, f, ln)
 
 def add_new_copy_step3(req, recid=None, ln=CFG_SITE_LANG):
@@ -453,7 +450,6 @@ def add_new_copy_step4(req, barcode=None, library=None, location=None,
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step4
     """
-
     return bal.add_new_copy_step4(req, barcode, library, location, collection,
                                   description, loan_period, status, recid, ln)
 
@@ -462,7 +458,6 @@ def add_new_copy_step5(req, tup_infos=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step5
     """
     tup_infos = eval(tup_infos)
-
     return bal.add_new_copy_step5(req, tup_infos, ln)
 
 def update_item_info_step1(req, ln=CFG_SITE_LANG):
