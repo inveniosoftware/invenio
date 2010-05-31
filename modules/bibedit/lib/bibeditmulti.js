@@ -191,8 +191,11 @@ function onButtonSubmitChangesClick(){
 	/*
 	 * Submits changes defined by user
 	 */
-	gActionToPerform = gActionTypes.submitChanges;
-	performAJAXRequest();
+	var confirmation = confirm('Are you sure you want to submit the changes?');
+	if (confirmation == true) {
+		gActionToPerform = gActionTypes.submitChanges;
+		performAJAXRequest();
+	}
 }
 
 function rebindControls() {
