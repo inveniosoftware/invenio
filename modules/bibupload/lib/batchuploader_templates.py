@@ -89,7 +89,7 @@ class Template:
         """
 
         styles += """
-        <link type="text/css" href="%(site_url)s/img/jquery-ui.css" rel="stylesheet" />
+        <link type="text/css" href="%(site_url)s/img/jquery/jquery-ui.css" rel="stylesheet" />
         <script type="text/javascript">
             function clearText(field){
                 if (field.value == field.defaultValue){
@@ -102,8 +102,8 @@ class Template:
                 }
             }
         </script>
-        <script type="text/javascript" src="%(site_url)s/js/jquery.min.js"></script>
-        <script type="text/javascript" src="%(site_url)s/js/ui.datepicker.min.js"></script>
+        <script type="text/javascript" src="%(site_url)s/js/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="%(site_url)s/js/jquery/jquery.ui.datepicker.min.js"></script>
         """ % {'site_url':CFG_SITE_URL}
 
         return styles
@@ -474,5 +474,4 @@ class Template:
         body_content += tupletotable(header=header, tuple=actions)
 
         return body_content
-
 

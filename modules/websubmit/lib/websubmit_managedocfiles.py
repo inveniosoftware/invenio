@@ -2241,8 +2241,8 @@ def get_upload_file_interface_javascript(form_url_params):
     interface.
     """
     javascript = '''
-<script type="text/javascript" src="/js/jquery.min.js"></script>
-<script type="text/javascript" src="/js/jquery.form.js"></script>
+<script type="text/javascript" src="/js/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="/js/jquery/jquery.form.js"></script>
 <script type="text/javascript">
 <!--
 '''

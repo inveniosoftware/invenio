@@ -716,11 +716,17 @@ div .boxleft_2 {
     def scripts(self):
         """Returns the scripts that should be imported."""
 
-        scripts = ["jquery.min.js",
-                   "json2.js",
-                   "bibeditmulti.js"]
+        scripts_jquery = ["jquery.min.js",
+                   "json2.js"]
+
+        scripts = ["bibeditmulti.js"]
 
         result = ""
+
+        for script in scripts_jquery:
+            result += '<script type="text/javascript" src="%s/js/jquery/%s">' \
+            '</script>\n' % (CFG_SITE_URL, script)
+
         for script in scripts:
             result += '<script type="text/javascript" src="%s/js/%s">' \
             '</script>\n' % (CFG_SITE_URL, script)
