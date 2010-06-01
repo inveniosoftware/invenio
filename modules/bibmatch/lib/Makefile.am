@@ -17,7 +17,7 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibmatch_engine.py
+pylib_DATA = bibmatch_engine.py bibmatch_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 

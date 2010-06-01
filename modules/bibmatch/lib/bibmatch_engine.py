@@ -19,15 +19,15 @@
 
 __revision__ = "$Id$"
 
-import fileinput
-import string
-import os
 import sys
-import getopt
+if sys.hexversion < 0x2040000:
+    # pylint: disable-msg=W0622
+    from sets import Set as set #for "&" intersection
+    # pylint: enable-msg=W0622
 
-from invenio.config import \
-     CFG_BINDIR, \
-     CFG_VERSION
+import getopt
+import string
+
 from invenio.search_engine import perform_request_search
 from invenio.bibrecord import create_records, record_get_field_instances, \
     record_get_field_values, record_xml_output
@@ -42,20 +42,25 @@ def usage():
 
  Examples:
 
- $ bibmatch [--print-new] --field=\"title\" < input.xml > output.xml
- $ bibmatch --print-match --field=\"245__a\" --mode=\"a\" < input.xml > output.xml
- $ bibmatch --print-ambiguous --query-string=\"245__a||100__a\" < input.xml > output.xml
+ $ bibmatch -b -n < input.xml
+ $ bibmatch --field=title < input.xml >  unmatched.xml
+ $ bibmatch --field=245__a --mode=a < input.xml > unmatched.xml
+ $ bibmatch --print-ambiguous --query-string="245__a||100__a" < input.xml > unmatched.xml
 
- $bibmatch [options] < input.xml > output.xml
+ $ bibmatch [options] < input.xml > unmatched.xml
 
  Options:
 
+
  Output:
 
- -0 --print-new (default)
- -1 --print-match
- -2 --print-ambiguous
- -b --batch-output=(filename)
+ -0 --print-new (default) print unmatched in stdout
+ -1 --print-match print matched records in stdout
+ -2 --print-ambiguous print records that match more than 1 existing records
+ -3 --print-fuzzy print records that match the longest words in existing records
+
+ -b --batch-output=(filename). filename.0 will be new records, filename.1 will be matched,
+      filename.2 will be ambiguous, filename.3 will be fuzzy match
 
  Simple query:
 
@@ -65,11 +70,24 @@ def usage():
 
  -c --config=(config-filename)
  -q --query-string=(uploader_querystring)
- -m --mode=(a|e|o|p|r)[3]
- -o --operator=(a|o)[2]
+ -m --mode=(a|e|o|p|r)
+ -o --operator=(a|o)
+
+ Where mode is:
+  "a" all of the words,
+  "o" any of the words,
+  "e" exact phrase,
+  "p" partial phrase,
+  "r" regular expression.
+
+ Operator is:
+  "a" and,
+  "o" or.
 
  General options:
 
+ -n   --noprocess          Do not print records in stdout.
+ -i,  --input              use a named file instead of stdin for input
  -h,  --help               print this help and exit
  -V,  --version            print version information and exit
  -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
@@ -108,11 +126,10 @@ class Querystring:
 
     def from_qrystr(self, qrystr="", search_mode="eee", operator="aa"):
         """Converts qrystr into querystring (uploader format)"""
-
         self.default()
         self.field  = []
         self.format = []
-        self.mode   = ["e","e","e"]
+        self.mode   = ["e", "e", "e"]
         fields = string.split(qrystr,"||")
         for field in fields:
             tags =  string.split(field, "::")
@@ -123,7 +140,7 @@ class Querystring:
                     self.field.append(tag)
                 else:
                     format.append(tag)
-                i +=1
+                i += 1
             self.format.append(format)
 
         while(len(self.format) < 3):
@@ -150,13 +167,13 @@ class Querystring:
         self.mode     = []
         self.operator = []
         self.format   = []
+        self.pattern.append("") #default: no pattern
         self.pattern.append("")
         self.pattern.append("")
-        self.pattern.append("")
-        self.field.append("245__a")
+        self.field.append("245__a") #default: this field
         self.field.append("")
         self.field.append("")
-        self.mode.append("a")
+        self.mode.append("") #default: no mode
         self.mode.append("")
         self.mode.append("")
         self.operator.append("")
@@ -168,7 +185,7 @@ class Querystring:
         return
 
     def change_search_mode(self, mode="a"):
-        self.mode     = [mode,mode,mode]
+        self.mode     = [mode, mode, mode]
         return
 
     def search_engine_encode(self):
@@ -182,7 +199,7 @@ class Querystring:
                         letter = "a"
                     else:
                         letter = "_"
-                i+=1
+                i += 1
                 field__ += str(letter)
             field_.append(field__)
         self.field = field_
@@ -201,65 +218,197 @@ def get_field_tags(field):
 
 def get_subfield(field, subfield):
     "Return subfield of a field."
-
     for sbf in field:
         if(sbf[0][0][0] == subfield):
             return sbf[0][0][1]
 
     return ""
 
-def matched_records(recID_lists):
-    "Analyze list of matches. Ambiguous record result is always preferred."
+def bylen(word1, word2):
+    return len(word1) - len(word2)
 
-    recID_tmp = []
+def main_words_list(wstr):
+    """Select the longest words for matching"""
+    words = []
+    if wstr:
+        words = wstr.split()
+        words.sort(cmp=bylen)
+        words.reverse()
+        words = words[:5]
+    return words
 
-    for recID_list in recID_lists:
-        if(len(recID_list) > 1):
-            return 2
-        if(len(recID_list) == 1):
-            if(len(recID_tmp) == 0):
-                recID_tmp.append(recID_list[0])
+def match_records(records, qrystrs=None, perform_request_search_mode="eee", operator="a", verbose=1):
+    """ Do the actual job. Check which records are new, which are matched,
+        which are ambiguous and which are fuzzy-matched.
+    Parameters:
+    @records: an array of records to analyze
+    @qrystrs: querystrings
+    @perform_request_search_mode: run the query in this mode
+    @operator: "o" "a"
+    @verbose: be loud
+    @return an array of arrays of records, like this [newrecs,matchedrecs,
+                                                      ambiguousrecs,fuzzyrecs]
+    """
+    newrecs = []
+    matchedrecs = []
+    ambiguousrecs = []
+    fuzzyrecs = []
+
+    record_counter = 0
+    for rec in records:
+        record_counter += 1
+        if (verbose > 1):
+            sys.stderr.write("\n Processing record: #%d .." % record_counter)
+
+        if qrystrs == None:
+            qrystrs = []
+
+        if len(qrystrs)==0:
+            qrystrs.append("")
+
+        more_detailed_info = ""
+
+        for qrystr in qrystrs:
+            querystring = Querystring()
+            querystring.default()
+
+            if(qrystr != ""):
+                querystring.from_qrystr(qrystr,
+                                        perform_request_search_mode,
+                                        operator)
             else:
-                if(recID_list[0] in recID_tmp):
-                    pass
+                querystring.default()
+
+            querystring.search_engine_encode()
+
+            ### get field values for record instance
+
+            inst = []
+
+            ### get appropriate fields from database
+            for field in querystring.field:
+                ### use expanded tags
+                tag  = field[0:3]
+                ind1 = field[3:4]
+                ind2 = field[4:5]
+                code = field[5:6]
+
+                if((ind1 == "_")or(ind1 == "%")):
+                    ind1 = ""
+                if((ind2 == "_")or(ind2 == "%")):
+                    ind2 = ""
+                if((code == "_")or(code == "%")):
+                    code = "a"
+
+                if(field != "001"):
+                    finsts = record_get_field_instances(rec[0], tag, ind1, ind2)
+                    sbf = get_subfield(finsts, code)
+                    inst.append(sbf)
+                elif(field in ["001"]):
+                    sbf = record_get_field_values(rec[0], field, ind1="",
+                                                  ind2="", code="")
+                    inst.append(sbf)
                 else:
-                    return 2
+                    inst.append("")
 
-    if(len(recID_tmp) == 1):
-        return 1
 
-    return 0
+            ### format acquired field values
 
-def matched_records_min(recID_lists):
-    "Analyze lists of matches. New record result is preferred if result is unmatched."
+            i = 0
+            for instance in inst:
+                for format in querystring.format[i]:
+                    inst[i] = bibconvert.FormatField(inst[i], format)
+                i += 1
 
-    min = 2
+            ### perform the search
 
-    for recID_list in recID_lists:
-        if(len(recID_list) < min):
-            min = len(recID_list)
-        if(min==1):
-            return min
-    return min
+            if(inst[0] != ""):
+                p1 = inst[0]
+                f1 = querystring.field[0]
+                m1 = querystring.mode[0]
+                op1 = querystring.operator[0]
 
-def matched_records_max(recID_lists):
-    "Analyze lists of matches. Ambiguous result is preferred if result is unmatched."
+                p2 = inst[1]
+                f2 = querystring.field[1]
+                m2 = querystring.mode[1]
+                op2 = querystring.operator[1]
 
-    max = 0
+                p3 = inst[2]
+                f3 = querystring.field[2]
+                m3 = querystring.mode[2]
+                aas = querystring.advanced
 
-    for recID_list in recID_lists:
-        if(len(recID_list) == 1):
-            return 1
-        if(len(recID_list) > max):
-            max = len(recID_list)
+                #1st run the basic perform_req_search
+                recID_list = perform_request_search(
+                    p1=p1, f1=f1, m1=m1, op1=op1,
+                    p2=p2, f2=f2, m2=m2, op2=op2,
+                    p3=p3, f3=f3, m3=m3, aas=aas)
 
-    if (max > 1):
-        return 2
-    elif (max == 1):
-        return 1
-    else:
-        return 0
-    return 2
+                if (verbose > 8):
+                    sys.stderr.write("\nperform_request_search with values"+\
+                     " p1="+str(p1)+" f1="+str(f1)+" m1="+str(m1)+" op1="+str(op1)+\
+                     " p2="+str(p2)+" f2="+str(f2)+" m1="+str(m1)+" op2="+str(op2)+\
+                     " p3="+str(p3)+" f3="+str(f1)+" m1="+str(m1)+" aas="+str(aas)+\
+                     " result="+str(recID_list)+"\n")
+
+                if len(recID_list) > 1: #ambig match
+                    ambiguousrecs.append(rec)
+                    if (verbose > 8):
+                        sys.stderr.write("ambiguous\n")
+                if len(recID_list) == 1: #match
+                    matchedrecs.append(rec)
+                    if (verbose > 8):
+                        sys.stderr.write("match\n")
+                if len(recID_list) == 0: #no match..
+                    #try fuzzy matching
+                    intersected = None
+                    #check if all the words appear in the
+                    #field of interest
+                    words1 = main_words_list(p1)
+                    words2 = main_words_list(p2)
+                    words3 = main_words_list(p3)
+
+                    for word in words1:
+                        word = "'"+word+"'"
+                        ilist = perform_request_search(p=word, f=f1)
+                        if (verbose > 8):
+                            sys.stderr.write("fuzzy perform_request_search with values"+\
+                                             " p="+str(word)+" f="+str(f1)+" res "+str(ilist)+"\n")
+                        if intersected == None:
+                            intersected = ilist
+                        intersected =  list(set(ilist)&set(intersected))
+
+                    for word in words2:
+                        word = "'"+word+"'"
+                        ilist = perform_request_search(p=word, f=f2)
+                        if (verbose > 8):
+                            sys.stderr.write("fuzzy perform_request_search with values"+\
+                                             " p="+str(word)+" f="+str(f1)+" res "+str(ilist)+"\n")
+                        if intersected == None:
+                            intersected = ilist
+                        intersected =  list(set(ilist)&set(intersected))
+
+                    for word in words3:
+                        word = "'"+word+"'"
+                        ilist = perform_request_search(p=word, f=f3)
+                        if (verbose > 8):
+                            sys.stderr.write("fuzzy perform_request_search with values"+\
+                                             " p="+str(word)+" f="+str(f1)+" res "+str(ilist)+"\n")
+                        if intersected == None:
+                            intersected = ilist
+                        intersected =  list(set(ilist)&set(intersected))
+
+                    if intersected:
+                        #this was a fuzzy match
+                        fuzzyrecs.append(rec)
+                        if (verbose > 8):
+                            sys.stderr.write("fuzzy\n")
+                    else:
+                        newrecs.append(rec)
+                        if (verbose > 8):
+                            sys.stderr.write("new\n")
+    #return results
+    return [newrecs, matchedrecs, ambiguousrecs, fuzzyrecs]
 
 def main():
     # Record matches database content when defined search gives exactly one record in the result set.
@@ -268,11 +417,12 @@ def main():
     # qrystr - querystring in the UpLoader format
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:],"012hVm:f:q:c:nv:o:b:",
+        opts, args = getopt.getopt(sys.argv[1:], "0123hVFm:q:c:nv:o:b:i:",
                  [
                    "print-new",
                    "print-match",
                    "print-ambiguous",
+                   "print-fuzzy",
                    "help",
                    "version",
                    "mode=",
@@ -282,41 +432,38 @@ def main():
                    "no-process",
                    "verbose=",
                    "operator=",
-                   "batch-output="
+                   "batch-output=",
+                   "input="
                  ])
 
     except getopt.GetoptError, e:
         usage()
 
-    recs_out    = []
-    recID_list  = []
-    recID_lists = []
-    qrystrs     = []
-    match_mode  = 0                 # default match mode to print new records
-    rec_new     = 0                 # indicator that record is new
-    rec_match   = 0                 # indicator that record is matched
-    matched     = 0                 # number of records matched
-    record_counter = 0              # number of records processed
+    newrecs     = []                #array for new records
+    matchedrecs = []                #          matched
+    ambiguousrecs = []              #          ambig
+    fuzzyrecs = []                  #fuzzy
+    qrystrs     = []                #query strings
+    print_mode  = 0                 # default match mode to print new records
     noprocess   = 0
-    result      = [0,0,0]
     perform_request_search_mode = "eee"
     operator    = "aa"
     verbose     = 1                 # 0..be quiet
-    level       = 1                 # 1..exact match
-    file_read   = ""
+    file_read   = ""                #input buffer
     records     = []
-    batch_output = ""
+    batch_output = ""               #print stuff in files
+    f_input = ""                    #read from where, if param "i"
     predefined_fields = ["title", "author"]
 
-
     for opt, opt_value in opts:
-
         if opt in ["-0", "--print-new"]:
-            match_mode = 0
+            print_mode = 0
         if opt in ["-1", "--print-match"]:
-            match_mode = 1
+            print_mode = 1
         if opt in ["-2", "--print-ambiguous"]:
-            match_mode = 2
+            print_mode = 2
+        if opt in ["-3", "--print-fuzzy"]:
+            print_mode = 3
         if opt in ["-n", "--no-process"]:
             noprocess = 1
         if opt in ["-h", "--help"]:
@@ -325,6 +472,8 @@ def main():
         if opt in ["-V", "--version"]:
             print __revision__
             sys.exit(0)
+        if opt in ["-F", "--fuzzy"]:
+            fuzzy = 1
         if opt in ["-v", "--verbose"]:
             verbose = int(opt_value)
         if opt in ["-q", "--query-string"]:
@@ -335,6 +484,8 @@ def main():
             operator         = opt_value
         if opt in ["-b", "--batch-output"]:
             batch_output     = opt_value
+        if opt in ["-i", "--input"]:
+            f_input     = opt_value
         if opt in ["-f", "--field"]:
             alternate_querystring = []
             if opt_value in predefined_fields:
@@ -352,10 +503,16 @@ def main():
                     qrystrs.append(tmp[1])
 
     if verbose:
-        sys.stderr.write("\nBibMatch: Parsing input file ... ")
+        sys.stderr.write("\nBibMatch: Parsing input file "+f_input+"... ")
 
-    for line_in in sys.stdin:
-        file_read += line_in
+    if not f_input:
+        for line_in in sys.stdin:
+            file_read += line_in
+    else:
+        f = open(f_input)
+        for line_in in f:
+            file_read += line_in
+        f.close()
 
     records = create_records(file_read)
 
@@ -367,167 +524,31 @@ def main():
         if verbose:
             sys.stderr.write("read %d records" % len(records))
             sys.stderr.write("\nBibMatch: Matching ...")
-
-    ### Prepare batch output
-
-        if (batch_output != ""):
-            out_0 = []
-            out_1 = []
-            out_2 = []
-
-        for rec in records:
-
-    ### for each query-string
-
-            record_counter += 1
-
-            if (verbose > 1):
-
-                sys.stderr.write("\n Processing record: #%d .." % record_counter)
-
-            recID_lists = []
-
-            if(len(qrystrs)==0):
-                qrystrs.append("")
-
-            more_detailed_info = ""
-
-            for qrystr in qrystrs:
-
-                querystring = Querystring()
-                querystring.default()
-
-                if(qrystr != ""):
-                    querystring.from_qrystr(qrystr, perform_request_search_mode, operator)
-                else:
-                    querystring.default()
-
-
-    ### search engine qrystr encode
-
-                querystring.search_engine_encode()
-
-    ### get field values
-
-                inst = []
-
-                ### get appropriate corresponding fields from database
-
-                i = 0
-                for field in querystring.field:
-
-
-                    ### use expanded tags
-
-                    tag  = field[0:3]
-                    ind1 = field[3:4]
-                    ind2 = field[4:5]
-                    code = field[5:6]
-
-                    if((ind1 == "_")or(ind1 == "%")):
-                        ind1 = ""
-                    if((ind2 == "_")or(ind2 == "%")):
-                        ind2 = ""
-                    if((code == "_")or(code == "%")):
-                        code = "a"
-
-                    if(field != "001"):
-                        sbf = get_subfield(record_get_field_instances(rec[0], tag, ind1, ind2), code)
-                        inst.append(sbf)
-                    elif(field in ["001"]):
-                        sbf = record_get_field_values(rec[0], field, ind1="", ind2="", code="")
-                        inst.append(sbf)
-                    else:
-                        inst.append("")
-                    i += 1
-
-    ### format acquired field values
-
-                i = 0
-                for instance in inst:
-                    for format in querystring.format[i]:
-                        inst[i] = bibconvert.FormatField(inst[i],format)
-                    i += 1
-
-    ### perform sensible request search only
-
-                if(inst[0]!=""):
-                    recID_list = perform_request_search(
-                          p1=inst[0], f1=querystring.field[0], m1=querystring.mode[0], op1=querystring.operator[0],
-                          p2=inst[1], f2=querystring.field[1], m2=querystring.mode[1], op2=querystring.operator[1],
-                          p3=inst[2], f3=querystring.field[2], m3=querystring.mode[2], aas=querystring.advanced)
-                else:
-                    recID_list = []
-
-                recID_lists.append(recID_list)
-
-    ### more detailed info ...
-
-                if(verbose > 8):
-                    more_detailed_info = "%s\n  Matched recIDs: %s" % (more_detailed_info, recID_lists)
-                if(verbose > 2):
-                    more_detailed_info = "%s\n  On query: %s, %s, %s, %s\n            %s, %s, %s, %s\n            %s, %s, %s\n" % (more_detailed_info, inst[0], querystring.field[0], querystring.mode[0], querystring.operator[0], inst[1], querystring.field[1], querystring.mode[1], querystring.operator[1], inst[2], querystring.field[2], querystring.mode[2])
-
-
-    ### for multitagged fields (e.g. title), unmatched result corresponds to the item in extreme
-            rec_match = matched_records_max(recID_lists)
-
-    ### print-new
-
-            if (rec_match==0):
-                result[0] += 1
-                if(match_mode==0):
-                    recs_out.append(rec)
-                if (batch_output != ""):
-                    out_0.append(rec)
-
-                if verbose:
-                    sys.stderr.write(".")
-                if (verbose > 1):
-                    sys.stderr.write("NEW")
-
-    ### print-match
-
-            elif (rec_match <= level):
-                result[1] += 1
-                if(match_mode==1):
-                    recs_out.append(rec)
-                if (batch_output != ""):
-                    out_1.append(rec)
-
-                if verbose:
-                    sys.stderr.write(".")
-                if (verbose > 1):
-                    sys.stderr.write("MATCH")
-
-
-    ### print-ambiguous
-
-            elif(rec_match > level):
-                result[2] += 1
-                if(match_mode==2):
-                    recs_out.append(rec)
-                if (batch_output != ""):
-                    out_2.append(rec)
-
-                if verbose:
-                    sys.stderr.write(".")
-                if (verbose > 1):
-                    sys.stderr.write("AMBIGUOUS")
-
-            else:
-                pass
-
-            sys.stderr.write(more_detailed_info)
+        [newrecs, matchedrecs,
+         ambiguousrecs, fuzzyrecs] = match_records(records,
+                                                   qrystrs,
+                                                   perform_request_search_mode,
+                                                   operator,
+                                                   verbose)
+    #set the output according to print..
+    if print_mode == 0:
+        recs_out = newrecs
+    if print_mode == 1:
+        recs_out = matchedrecs
+    if print_mode == 2:
+        recs_out = ambiguousrecs
+    if print_mode == 3:
+        recs_out = fuzzyrecs
 
     if verbose:
         sys.stderr.write("\n\n Bibmatch report\n")
         sys.stderr.write("=" * 35)
-        sys.stderr.write("\n New records         : %d" % result[0])
-        sys.stderr.write("\n Matched records     : %d" % result[1])
-        sys.stderr.write("\n Ambiguous records   : %d\n" % result[2])
+        sys.stderr.write("\n New records         : %d" % len(newrecs))
+        sys.stderr.write("\n Matched records     : %d" % len(matchedrecs))
+        sys.stderr.write("\n Ambiguous records   : %d" % len(ambiguousrecs))
+        sys.stderr.write("\n Fuzzy records       : %d\n" % len(fuzzyrecs))
         sys.stderr.write("=" * 35)
-        sys.stderr.write("\n Total records       : %d\n" % record_counter)
+        sys.stderr.write("\n Total records       : %d\n" % len(records))
 
     if noprocess:
         pass
@@ -535,22 +556,28 @@ def main():
         for record in recs_out:
             print record_xml_output(record[0])
 
-        if (batch_output != ""):
-            filename = "%s.0" % batch_output
-            file_0 = open(filename,"w")
-            filename = "%s.1" % batch_output
-            file_1 = open(filename,"w")
-            filename = "%s.2" % batch_output
-            file_2 = open(filename,"w")
-            for record in out_0:
-                file_0.write(record_xml_output(record[0]))
-            for record in out_1:
-                file_1.write(record_xml_output(record[0]))
-            for record in out_2:
-                file_2.write(record_xml_output(record[0]))
-            file_0.close()
-            file_1.close()
-            file_2.close()
+    if (batch_output != ""):
+        filename = "%s.0" % batch_output
+        file_0 = open(filename,"w")
+        filename = "%s.1" % batch_output
+        file_1 = open(filename,"w")
+        filename = "%s.2" % batch_output
+        file_2 = open(filename,"w")
+        filename = "%s.3" % batch_output #for fuzzy
+        file_3 = open(filename,"w")
+
+        for record in newrecs:
+            file_0.write(record_xml_output(record[0]))
+        for record in matchedrecs:
+            file_1.write(record_xml_output(record[0]))
+        for record in ambiguousrecs:
+            file_2.write(record_xml_output(record[0]))
+        for record in fuzzyrecs:
+            file_3.write(record_xml_output(record[0]))
+        file_0.close()
+        file_1.close()
+        file_2.close()
+        file_3.close()
 
 
 

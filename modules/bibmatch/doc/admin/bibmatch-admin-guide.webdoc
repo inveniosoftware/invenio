@@ -21,39 +21,17 @@
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
-<p>BibMatch allows to match bibliographic data in a MARCXML file against database content. Providing an input file in MARCXML the produced output corresponds to a selection of records in MARCXML that do (not) match the database content. This way it is for example possible to identify potential double entries before they get uploaded in a database. </p>
+<p>BibMatch matches bibliographic data in a MARCXML file against the
+database content. With a MARCXML input file, the produced output shows
+a selection of records in the input that match the database content.
+This way, it is possible to identify potential duplicate entries,
+before they are uploaded in a database. </p>
 
 <h4>BibMatch commmand-line tool</h4>
 
 <blockquote>
 <pre>
 
- Usage: bibmatch [options] < input.xml > output.xml
-
- Options:
-
- Output:
-
- -0 --print-new (default)
- -1 --print-match
- -2 --print-ambiguous
- -b --batch-output=(filename)
-
- Simple query:
-
- -f --field=(field)
-
- Advanced query:
-
- -c --config=(config-filename)
- -q --query-string=(uploader_querystring)
- -m --mode=(a|e|o|p|r)[3]
- -o --operator=(a|o)[2]
-
- General options:
-
- -h,  --help               print this help and exit
- -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
 
 </pre>
 </blockquote>
@@ -68,7 +46,7 @@ To match records on title and print out only new (unmatched) ones:
 </pre>
 </blockquote>
 
-To print potential double entries before upload for manual double check:
+To print potential duplicate entries before manual upload, run:
 
 <blockquote>
 <pre>
@@ -81,5 +59,58 @@ To print undecided result from a match on multiple fields:
 <blockquote>
 <pre>
  $ bibmatch --print-ambiguous --query-string=\"245__a||100__a\" < input.xml > output.xml
+</pre>
+</blockquote>
+
+To print "fuzzy" (almost matching by title) records:
+
+<blockquote>
+<pre>
+ $ bibmatch --print-fuzzy  < input.xml > output.xml
+</pre>
+</blockquote>
+
+Command line options:
+
+<blockquote>
+<pre>
+ -0 --print-new (default) print unmatched in stdout
+ -1 --print-match print matched records in stdout
+ -2 --print-ambiguous print records that match more than 1 existing records
+ -3 --print-fuzzy print records that match the longest words in existing records
+
+ -b --batch-output=(filename). filename.0 will be new records, filename.1 will be matched,
+      filename.2 will be ambiguous, filename.3 will be fuzzy match
+
+ Simple query:
+
+ -f --field=(field)
+
+ Advanced query:
+
+ -c --config=(config-filename)
+ -q --query-string=(uploader_querystring)
+ -m --mode=(a|e|o|p|r)
+ -o --operator=(a|o)
+
+ Where mode is:
+  "a" all of the words,
+  "o" any of the words,
+  "e" exact phrase,
+  "p" partial phrase,
+  "r" regular expression.
+
+ Operator is:
+  "a" and,
+  "o" or.
+
+ General options:
+
+ -n   --noprocess          Do not print records in stdout.
+ -i,  --input              use a named file instead of stdin for input
+ -h,  --help               print this help and exit
+ -V,  --version            print version information and exit
+ -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
+ 
 </pre>
 </blockquote>
