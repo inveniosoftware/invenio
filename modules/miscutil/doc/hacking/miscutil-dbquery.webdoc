@@ -77,19 +77,19 @@ if res:
 
 If you want to escape the parameters yourself in the client code, you
 could in principle import and make use of the
-function <code>escape_string()</code>:
+function <code>real_escape_string()</code>:
 
 <blockquote>
 <pre>
-from invenio.dbquery import run_sql, escape_string
+from invenio.dbquery import run_sql, real_escape_string
 [...]
-res = run_sql("SELECT id FROM collection WHERE name='%s'" % escape_string(c), None)
+res = run_sql("SELECT id FROM collection WHERE name='%s'" % real_escape_string(c), None)
 if res:
     colID = res[0][0]
 </pre>
 </blockquote>
 
-but beware, this function is not UTF-8 safe!  So better do not use it.
+but it is better to use the former automatic technique.
 </p>
 
 <p>The <code>run_sql()</code> raises Python DB API 2.0 exceptions that
