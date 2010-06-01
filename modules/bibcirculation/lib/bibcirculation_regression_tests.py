@@ -50,7 +50,7 @@ class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
     def test_admin_pages_availability(self):
         """bibcirculation - availability of main admin page"""
 
-        baseurl = CFG_SITE_URL + '/admin/bibcirculation/bibcirculationadmin.py'
+        baseurl = CFG_SITE_URL + '/admin2/bibcirculation'
 
         self.assertEqual([], test_web_page_content(baseurl,
                                                    expected_text="BibCirculation Admin"))
@@ -60,7 +60,7 @@ class BibCirculationAdminsWebPagesAvailabilityTest(unittest.TestCase):
     def test_borrower_search_availability(self):
         """bibcirculation - availability of borrower search"""
 
-        baseurl = CFG_SITE_URL + '/admin/bibcirculation/bibcirculationadmin.py/' \
+        baseurl = CFG_SITE_URL + '/admin2/bibcirculation/' \
                                + 'borrower_search_result?column=name&string=john'
 
         self.assertEqual([], test_web_page_content(baseurl, username='admin',

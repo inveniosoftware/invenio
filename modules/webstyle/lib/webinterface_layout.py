@@ -196,6 +196,13 @@ except:
     register_exception(alert_admin=True, subject='EMERGENCY')
     WebInterfaceDocumentationPages = WebInterfaceDumbPages
 
+try:
+    from invenio.bibcirculationadmin_webinterface import \
+         WebInterfaceBibCirculationAdminPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceBibCirculationAdminPages = WebInterfaceDumbPages
+
 if CFG_DEVEL_SITE:
     try:
         from invenio.httptest_webinterface import WebInterfaceHTTPTestPages
@@ -206,6 +213,12 @@ if CFG_DEVEL_SITE:
 else:
     test_exports = []
 
+class WebInterfaceAdminPages(WebInterfaceDirectory):
+    """This class implements /admin2 admin pages."""
+    _exports = ['index', 'bibcirculation']
+    def index(self, req, form):
+        return "FIXME: return /help/admin content"
+    bibcirculation = WebInterfaceBibCirculationAdminPages()
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
@@ -232,6 +245,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'unapi',
         'exporter',
         'kb',
+        'admin2',
         'batchuploader'
         ] + test_exports
 
@@ -259,6 +273,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     unapi = WebInterfaceUnAPIPages()
     exporter = WebInterfaceFieldExporterPages()
     kb = WebInterfaceBibKnowledgePages()
+    admin2 = WebInterfaceAdminPages()
     batchuploader = WebInterfaceBatchUploaderPages()
 
 # This creates the 'handler' function, which will be invoked directly

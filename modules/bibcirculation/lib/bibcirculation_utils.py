@@ -57,7 +57,7 @@ def hold_request_mail(recid, borrower_id):
     #########################################################
 
     title_link = create_html_link(CFG_SITE_URL +
-                                  '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                  '/admin2/bibcirculation/get_item_details',
                                   {'recid': recid},
                                   (book_title))
 
@@ -676,5 +676,5 @@ def generate_email_body(template, loan_id):
     return out
 
 def create_item_details_url(recid, ln):
-    url = '/admin/bibcirculation/bibcirculationadmin.py/get_item_details?ln=%s&recid=%s' % (ln, str(recid))
+    url = '/admin2/bibcirculation/get_item_details?ln=%s&recid=%s' % (ln, str(recid))
     return CFG_SITE_URL+url

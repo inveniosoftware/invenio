@@ -49,48 +49,48 @@ _MENU_ = """
       <h2><a name="localNavLinks">Main navigation links:</a></h2>
       <ul>
       <!-- <li>
-       <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py">Home</a>
+       <a href="%(url)s/admin2/bibcirculation">Home</a>
       </li> -->
 
     <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Loan</a>
+        <a href="%(url)s/admin2/bibcirculation/loan_on_desk_step1">Loan</a>
     </li>
 
     <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_return">Return</a>
+        <a href="%(url)s/admin2/bibcirculation/loan_return">Return</a>
     </li>
 
     <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search?redirect='yes'">Request</a>
+        <a href="%(url)s/admin2/bibcirculation/borrower_search?redirect='yes'">Request</a>
     </li>
 
     <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search">Borrowers</a>
+        <a href="%(url)s/admin2/bibcirculation/borrower_search">Borrowers</a>
     </li>
 
 <!--
      <li class="hassubmenu">
          <a href="#">Borrowers</a>
          <ul class="subsubmenu" style="width:16.5em;">
-          <li><a href = "%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_search">Search...</a></li>
-          <li><a href = "%(url)s/admin/bibcirculation/bibcirculationadmin.py/borrower_notification">Notify</a></li>
-          <li><a href = "%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_borrower_step1">Add new borrower</a></li>
-          <li><a href = "%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step1">Update info</a></li>
+          <li><a href = "%(url)s/admin2/bibcirculation/borrower_search">Search...</a></li>
+          <li><a href = "%(url)s/admin2/bibcirculation/borrower_notification">Notify</a></li>
+          <li><a href = "%(url)s/admin2/bibcirculation/add_new_borrower_step1">Add new borrower</a></li>
+          <li><a href = "%(url)s/admin2/bibcirculation/update_borrower_info_step1">Update info</a></li>
          </ul>
         </li>
 -->
     <li>
-        <a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/item_search">Items</a>
+        <a href="%(url)s/admin2/bibcirculation/item_search">Items</a>
     </li>
 <!--
      <li class="hassubmenu">
          <a href="#">Items</a>
         <ul class="subsubmenu" style="width:16.5em;">
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/item_search">Search...</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/new_item">Add new item</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step1">Add new copy</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/item_search">Search...</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/new_item">Add new item</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/add_new_copy_step1">Add new copy</a></li>
           <li><a href="#"># - Remove</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step1">Update info</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/update_item_info_step1">Update info</a></li>
         </ul>
         </li>
 -->
@@ -98,13 +98,13 @@ _MENU_ = """
     <li class="hassubmenu">
          <a href="#">Lists</a>
         <ul class="subsubmenu" style="width:17.5em;">
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans">Last loans</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_expired_loans">Overdue loans</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests">Items on shelf with holds</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_waiting_requests">Items on loan with holds</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_expired_loans_with_requests">Overdue loans with holds</a></li>
-          <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/ordered_books">Ordered books</a></li>
-     <!-- <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans_test">TEST loans</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/all_loans">Last loans</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/all_expired_loans">Overdue loans</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/get_pending_requests">Items on shelf with holds</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/get_waiting_requests">Items on loan with holds</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/get_expired_loans_with_requests">Overdue loans with holds</a></li>
+          <li><a href="%(url)s/admin2/bibcirculation/ordered_books">Ordered books</a></li>
+     <!-- <li><a href="%(url)s/admin2/bibcirculation/all_loans_test">TEST loans</a></li>
           <li><a href="#"># - Stats</a></li> -->
         </ul>
     </li>
@@ -113,9 +113,9 @@ _MENU_ = """
      <li class="hassubmenu">
          <a href="#">Loans</a>
          <ul class="subsubmenu" style="width:16.5em;">
-         <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">On library desk</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/loan_return">Return book</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_loans">List of all loans</a></li>
+         <li><a href="%(url)s/admin2/bibcirculation/loan_on_desk_step1">On library desk</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/loan_return">Return book</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/all_loans">List of all loans</a></li>
              <li><a href="#"># - Stats</a></li>
             </ul>
         </li>
@@ -123,8 +123,8 @@ _MENU_ = """
      <li class="hassubmenu">
          <a href="#">Requests</a>
          <ul class="subsubmenu" style="width:16.5em;">
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests">List of pending requests</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/all_requests">List of hold requests</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/get_pending_requests">List of pending requests</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/all_requests">List of hold requests</a></li>
              <li><a href="#"># - Stats</a></li>
             </ul>
         </li>
@@ -133,40 +133,40 @@ _MENU_ = """
     <li class="hassubmenu">
          <a href="#">Libraries</a>
          <ul class="subsubmenu" style="width:16.5em;">
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_library_step1">Search...</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_library_step1">Add new library</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step1">Update info</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/search_library_step1">Search...</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/add_new_library_step1">Add new library</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/update_library_info_step1">Update info</a></li>
           </ul>
     </li>
 
     <li class="hassubmenu">
          <a href="#">Vendors</a>
         <ul class="subsubmenu" style="width:16.5em;">
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/search_vendor_step1">Search...</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/add_new_vendor_step1">Add new vendor</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step1">Update info</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/search_vendor_step1">Search...</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/add_new_vendor_step1">Add new vendor</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/update_vendor_info_step1">Update info</a></li>
         </ul>
     </li>
 
     <li class="hassubmenu">
          <a href="#">Acquisitions</a>
         <ul class="subsubmenu" style="width:16.5em;">
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/ordered_books">List of ordered books</a></li>
-             <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/new_book_step1">Order new book</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/ordered_books">List of ordered books</a></li>
+             <li><a href="%(url)s/admin2/bibcirculation/new_book_step1">Order new book</a></li>
         </ul>
     </li>
 
     <li class="hassubmenu">
          <a href="#">ILL</a>
         <ul class="subsubmenu" style="width:17.5em;">
-            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/ill_search">Search...</a></li>
-            <!--<li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request">All requests</a></li>-->
-            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request?status=new">New</a></li>
-            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request?status=requested">Requested</a></li>
-            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/list_ill_request?status=on loan">On loan</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/ill_search">Search...</a></li>
+            <!--<li><a href="%(url)s/admin2/bibcirculation/list_ill_request">All requests</a></li>-->
+            <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=new">New</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=requested">Requested</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=on loan">On loan</a></li>
 
-            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/register_ill_book_request">Register Book request</a></li>
-            <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/register_ill_article_request_step1">Register Article request</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/register_ill_book_request">Register Book request</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/register_ill_article_request_step1">Register Article request</a></li>
         </ul>
     </li>
 
@@ -174,7 +174,7 @@ _MENU_ = """
          <a href="#">Help</a>
         <ul class="subsubmenu" style="width:16.5em;">
           <li><a href="%(url)s/help/admin/bibcirculation-admin-guide" target="_blank">Admin guide</a></li>
-             <!-- <li><a href="%(url)s/admin/bibcirculation/bibcirculationadmin.py/help_contactsupport">Contact Support</a></li> -->
+             <!-- <li><a href="%(url)s/admin2/bibcirculation/help_contactsupport">Contact Support</a></li> -->
         </ul>
     </li>
     <div class="clear"></div>
@@ -325,7 +325,7 @@ class Template:
             bibcirc_link = ''
         else:
             bibcirc_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                            '/admin2/bibcirculation/get_item_details',
                                             {'recid': recid, 'ln': ln},
                                             _("See this book on BibCirculation"))
 
@@ -426,12 +426,12 @@ class Template:
             for (borrower_id, name) in result:
                 if redirect == 'no':
                     borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
                 else:
                     borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step1',
+                                             '/admin2/bibcirculation/create_new_request_step1',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -982,7 +982,7 @@ class Template:
             </table>
             <br /> <br />
             <table class="bibcirctable">
-            <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+            <td><input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
             value=%s class='formbutton'></td>
             </table>
             <br /> <br />
@@ -1049,7 +1049,7 @@ class Template:
 
         else:
             out += """
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+            <form name="borrower_form" action="%s/admin2/bibcirculation/all_loans" method="get" >
             <br />
             <table id="table_all_loans" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
@@ -1078,12 +1078,12 @@ class Template:
             for (request_id, recid, name, borrower_id, library, location, date_from, date_to, request_date) in result:
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
                 borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -1092,7 +1092,7 @@ class Template:
                 function confirmation() {
                   var answer = confirm("Delete this request?")
                   if (answer){
-                    window.location = "%s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests?request_id=%s";
+                    window.location = "%s/admin2/bibcirculation/get_pending_requests?request_id=%s";
                     }
                   else{
                     alert("Request not deleted.")
@@ -1116,7 +1116,7 @@ class Template:
 
 
                  <input type=button style="background: url(/img/dialog-yes.png) no-repeat; width: 150px; text-align: right;"
-                 onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/associate_barcode?request_id=%s&recid=%s&borrower_id=%s'"
+                 onClick="location.href='%s/admin2/bibcirculation/associate_barcode?request_id=%s&recid=%s&borrower_id=%s'"
                  onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                  value='%s' class="bibcircbutton">
                  </td>
@@ -1235,7 +1235,7 @@ class Template:
 
         else:
             out += """
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+            <form name="borrower_form" action="%s/admin2/bibcirculation/all_loans" method="get" >
             <br />
             <table id="table_all_loans" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
@@ -1265,12 +1265,12 @@ class Template:
                  date_from, date_to, request_date) in result:
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
                 borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -1279,7 +1279,7 @@ class Template:
                 function confirmation() {
                   var answer = confirm("Delete this request?")
                   if (answer){
-                    window.location = "%s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests?request_id=%s";
+                    window.location = "%s/admin2/bibcirculation/get_pending_requests?request_id=%s";
                     }
                   else{
                     alert("Request not deleted.")
@@ -1300,7 +1300,7 @@ class Template:
                  onClick="confirmation()"
                  class="bibcircbutton">
 
-                 <input type=button type=button style="background: url(/img/dialog-yes.png) no-repeat; width: 150px; text-align: right;" onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/associate_barcode?request_id=%s&recid=%s&borrower_id=%s'"
+                 <input type=button type=button style="background: url(/img/dialog-yes.png) no-repeat; width: 150px; text-align: right;" onClick="location.href='%s/admin2/bibcirculation/associate_barcode?request_id=%s&recid=%s&borrower_id=%s'"
                  value='%s' class="bibcircbutton">
                  </td>
                 </tr>
@@ -1386,7 +1386,7 @@ class Template:
             <br /> <br />            <br />
             <table class="bibcirctable_contents">
             <td align="center">
-            <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+            <input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
             value="Back to home" class='formbutton'>
             </td>
             </table>
@@ -1399,7 +1399,7 @@ class Template:
 
         else:
             out += """
-            <form name="list_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request" method="get" >
+            <form name="list_form" action="%s/admin2/bibcirculation/get_next_waiting_loan_request" method="get" >
             <div class="bibcircbottom">
             <br />
             <br />
@@ -1438,9 +1438,9 @@ class Template:
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">
-                 <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request?check_id=%s&recid=%s&barcode=%s'"
+                 <input type=button onClick="location.href='%s/admin2/bibcirculation/get_next_waiting_loan_request?check_id=%s&recid=%s&barcode=%s'"
                  value='%s' class="formbutton">
-                 <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/update_next_loan_request_status?check_id=%s&barcode=%s'"
+                 <input type=button onClick="location.href='%s/admin2/bibcirculation/update_next_loan_request_status?check_id=%s&barcode=%s'"
                  value='%s' class="formbutton"></td>
                  </td>
                  </tr>
@@ -1489,7 +1489,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_return_confirm" method="get">
+        <form name="return_form" action="%s/admin2/bibcirculation/loan_return_confirm" method="get">
         <div class="bibcircbottom">
         <br />
         <br />
@@ -1543,17 +1543,17 @@ class Template:
 
 
         borrower_link = create_html_link(CFG_SITE_URL +
-                                         '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                         '/admin2/bibcirculation/get_borrower_details',
                                          {'borrower_id': borrower_id, 'ln': ln},
                                          (borrower_name))
 
         title_link = create_html_link(CFG_SITE_URL +
-                                      '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                      '/admin2/bibcirculation/get_item_details',
                                       {'recid': recid, 'ln': ln},
                                       (book_title_from_MARC(recid)))
 
         out += """
-           <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request" method="get" >
+           <form name="return_form" action="%s/admin2/bibcirculation/get_next_waiting_loan_request" method="get" >
              <div class="bibcircbottom">
              <br />
              <div class="infoboxsuccess">%s</div>
@@ -1676,7 +1676,7 @@ class Template:
                function confirmation() {
                  var answer = confirm("Delete this request?")
                  if (answer){
-                   window.location = "%s/admin/bibcirculation/bibcirculationadmin.py/get_next_waiting_loan_request?check_id=%s&recid=%s&barcode=%s";
+                   window.location = "%s/admin2/bibcirculation/get_next_waiting_loan_request?check_id=%s&recid=%s&barcode=%s";
                    }
                  }
                </script>
@@ -1695,7 +1695,7 @@ class Template:
                     <input type=button onClick="confirmation()" value='%s' class="bibcircbutton"
                     style="background: url(/img/dialog-cancel.png) no-repeat; width: 75px; text-align: right;">
 
-                 <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/update_next_loan_request_status?check_id=%s&barcode=%s'"
+                 <input type=button onClick="location.href='%s/admin2/bibcirculation/update_next_loan_request_status?check_id=%s&barcode=%s'"
                  value='%s' class="bibcircbutton" style="background: url(/img/dialog-yes.png) no-repeat; width: 125px; text-align: right;"></td>
                  </td>
                  </tr>
@@ -1776,7 +1776,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br /><br />         <br />
-        <form name="borrower_search" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_search_result" method="get" >
+        <form name="borrower_search" action="%s/admin2/bibcirculation/borrower_search_result" method="get" >
              <table class="bibcirctable">
                <tr align="center">
                  <td class="bibcirctableheader">%s
@@ -1830,7 +1830,7 @@ class Template:
 
         out += """
         <div class="bibcircbottom">
-        <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/item_search_result" method="get" >
+        <form name="search_form" action="%s/admin2/bibcirculation/item_search_result" method="get" >
         <br />
         <br />
         <br />
@@ -1927,7 +1927,7 @@ class Template:
                 (book_author, book_editor, book_copies) = get_item_info_for_search_result(recid)
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -1975,7 +1975,7 @@ class Template:
 
         out += """
         <div class="bibcircbottom">
-        <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1" method="get" >
+        <form name="step1_form1" action="%s/admin2/bibcirculation/loan_on_desk_step1" method="get" >
         <br />
         <br />
         <br />
@@ -2061,7 +2061,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="step1_form2" action="/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step2" method="get">
+            <form name="step1_form2" action="/admin2/bibcirculation/loan_on_desk_step2" method="get">
             <table class="bibcirctable">
               <tr width="200">
                 <td align="center">
@@ -2113,7 +2113,7 @@ class Template:
         out += """
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/loan_on_desk_step3" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -2204,7 +2204,7 @@ class Template:
         out += """
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step4" method="get" >
+            <form name="step3_form" action="%s/admin2/bibcirculation/loan_on_desk_step4" method="get" >
               <br />
               <br />
               <input type=hidden name="list_of_books" value="%s">
@@ -2384,7 +2384,7 @@ class Template:
              <br /> <br />
              <table class="bibcirctable">
              <td>
-             <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+             <input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
              value='Back to home' class='formbutton'>
              </td>
              </table>
@@ -2462,7 +2462,7 @@ class Template:
         </table>
         <br />
         <table class="bibcirctable">
-             <td><input type="button" onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/register_new_loan?print_data=true'"
+             <td><input type="button" onClick="location.href='%s/admin2/bibcirculation/register_new_loan?print_data=true'"
              value="%s" class="formbutton"></td>
         </table>
         <br />
@@ -2501,7 +2501,7 @@ class Template:
         borrower_id = int(borrower_id[:-1])
 
         out += """
-        <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_new_loan" method="get" >
+        <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan" method="get" >
              <div class="bibcircbottom">
              <input type=hidden name=borrower_id value=%s>
              <br />
@@ -2564,7 +2564,7 @@ class Template:
         out += _MENU_
 
         out += """
-        <form name="all_requests_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_requests" method="get" >
+        <form name="all_requests_form" action="%s/admin2/bibcirculation/all_requests" method="get" >
             <div class="bibcircbottom">
                 <br />
                 <table class="bibcirctable">
@@ -2590,12 +2590,12 @@ class Template:
         for (id_lr, borid, name, recid, status, date_from, date_to, request_date) in result:
 
             borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borid, 'ln': ln},
                                              (name))
 
             title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -2608,7 +2608,7 @@ class Template:
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">
-                   <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/all_requests?request_id=%s'"
+                   <input type=button onClick="location.href='%s/admin2/bibcirculation/all_requests?request_id=%s'"
                    value='%s' class="formbutton">
                  </td>
             </tr>
@@ -2670,7 +2670,7 @@ class Template:
               $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
             });
             </script>
-        <form name="all_loans_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_loan_request_status" method="get" >
+        <form name="all_loans_form" action="%s/admin2/bibcirculation/update_loan_request_status" method="get" >
              <div class="bibcircbottom">
              <br />
                   <table id="table_requests" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
@@ -2703,7 +2703,7 @@ class Template:
                  request_date) in result:
 
                 borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -2717,7 +2717,7 @@ class Template:
                  <td>%s</td>
                  <td>%s</td>
                  <td align="center">
-                   <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_requests_details?recid=%s&request_id=%s'"
+                   <input type=button onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid=%s&request_id=%s'"
                    value='%s' class='formbutton'>
                  </td>
             </tr>
@@ -2731,7 +2731,7 @@ class Template:
         <br />
         <table class="bibcirctable">
              <tr>
-                  <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_details?recid=%s'"
+                  <td><input type=button onClick="location.href='%s/admin2/bibcirculation/get_item_details?recid=%s'"
                        value='%s' class='formbutton'></td>
              </tr>
         </table>
@@ -2870,7 +2870,7 @@ class Template:
              description, due_date) in copies:
 
             library_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/get_library_details',
+                                            '/admin2/bibcirculation/get_library_details',
                                             {'library_id': library_id, 'ln': ln},
                                             (library_name))
 
@@ -2948,13 +2948,13 @@ class Template:
             <table class="bibcirctable">
                  <tr>
                      <td>
-                     <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step3?recid=%s'"
+                     <input type=button onClick="location.href='%s/admin2/bibcirculation/add_new_copy_step3?recid=%s'"
                      value='%s' class="formbutton">
 
-                     <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/order_new_copy_step1?recid=%s'"
+                     <input type=button onClick="location.href='%s/admin2/bibcirculation/order_new_copy_step1?recid=%s'"
                      value='%s' class="formbutton">
 
-                     <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_step0?recid=%s'"
+                     <input type=button onClick="location.href='%s/admin2/bibcirculation/register_ill_request_step0?recid=%s'"
                      value='%s'class="formbutton">
                      </td>
                 </tr>
@@ -2971,7 +2971,7 @@ class Template:
                       <td width="50">%s</td>
                       <td>
                       <input type="button" value='%s'
-                      onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_requests_details?recid=%s'"
+                      onClick="location.href='%s/admin2/bibcirculation/get_item_requests_details?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
                       </td>
@@ -2982,7 +2982,7 @@ class Template:
                       <td width="50">%s</td>
                       <td>
                       <input type="button" value='%s'
-                      onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_details?recid=%s'"
+                      onClick="location.href='%s/admin2/bibcirculation/get_item_loans_details?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
                       </td>
@@ -3001,7 +3001,7 @@ class Template:
                       <td width="50">%s</td>
                       <td>
                       <input type="button" value='%s'
-                      onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_req_historical_overview?recid=%s'"
+                      onClick="location.href='%s/admin2/bibcirculation/get_item_req_historical_overview?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
                       </td>
@@ -3012,7 +3012,7 @@ class Template:
                       <td width="50">%s</td>
                       <td>
                       <input type="button" value='%s'
-                      onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_historical_overview?recid=%s'"
+                      onClick="location.href='%s/admin2/bibcirculation/get_item_loans_historical_overview?recid=%s'"
                       onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       class="bibcircbutton">
                       </td>
@@ -3105,7 +3105,7 @@ class Template:
             for (recid, barcode, library_name, location, req_from, req_to, req_date) in req_hist_overview:
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -3204,7 +3204,7 @@ class Template:
                  returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -3304,7 +3304,7 @@ class Template:
                  location, req_from, req_to, req_date) in req_hist_overview:
 
                 borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -3395,7 +3395,7 @@ class Template:
         for (name, borrower_id, barcode, library_name, location, loaned_on, due_date, returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
 
             borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -3453,12 +3453,12 @@ class Template:
         (library_id, name, address, email, phone, notes) = library_details
 
         no_notes_link = create_html_link(CFG_SITE_URL +
-                                         '/admin/bibcirculation/bibcirculationadmin.py/get_library_notes',
+                                         '/admin2/bibcirculation/get_library_notes',
                                          {'library_id': library_id},
                                          (_("No notes")))
 
         see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_library_notes',
+                                          '/admin2/bibcirculation/get_library_notes',
                                           {'library_id': library_id},
                                           (_("Notes about this library")))
 
@@ -3503,7 +3503,7 @@ class Template:
              <table>
                  <tr>
                    <td>
-                     <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step3?library_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                     <input type=button onClick="location.href='%s/admin2/bibcirculation/update_library_info_step3?library_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                      value=%s  class="bibcircbutton">
                       </td>
                  </tr>
@@ -3552,42 +3552,42 @@ class Template:
         (borrower_id, name, email, phone, address, mailbox) = borrower
 
         #req_link = create_html_link(CFG_SITE_URL +
-        #                            '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details',
+        #                            '/admin2/bibcirculation/get_borrower_requests_details',
         #                            {'borrower_id': borrower_id},
         #                            (_("More details")))
 
         no_notes_link = create_html_link(CFG_SITE_URL +
-                                         '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes',
+                                         '/admin2/bibcirculation/get_borrower_notes',
                                          {'borrower_id': borrower_id},
                                          (_("No notes")))
 
         see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes',
+                                          '/admin2/bibcirculation/get_borrower_notes',
                                           {'borrower_id': borrower_id},
                                           (_("Notes about this borrower")))
 
         #loans_link = create_html_link(CFG_SITE_URL +
-        #                              '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
+        #                              '/admin2/bibcirculation/get_borrower_loans_details',
         #                              {'borrower_id': borrower_id},
         #                              (_("More details")))
         #
         #ill_link = create_html_link(CFG_SITE_URL +
-        #                            '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_ill_details',
+        #                            '/admin2/bibcirculation/get_borrower_ill_details',
         #                            {'borrower_id': borrower_id},
         #                            (_("More details")))
         #
         #req_hist_link = create_html_link(CFG_SITE_URL +
-        #                                 '/admin/bibcirculation/bibcirculationadmin.py/bor_requests_historical_overview',
+        #                                 '/admin2/bibcirculation/bor_requests_historical_overview',
         #                                 {'borrower_id': borrower_id},
         #                                 (_("More details")))
         #
         #loans_hist_link = create_html_link(CFG_SITE_URL +
-        #                                   '/admin/bibcirculation/bibcirculationadmin.py/bor_loans_historical_overview',
+        #                                   '/admin2/bibcirculation/bor_loans_historical_overview',
         #                                   {'borrower_id': borrower_id},
         #                                   (_("More details")))
         #
         #ill_hist_link = create_html_link(CFG_SITE_URL +
-        #                                 '/admin/bibcirculation/bibcirculationadmin.py/bor_ill_historical_overview',
+        #                                 '/admin2/bibcirculation/bor_ill_historical_overview',
         #                                 {'borrower_id': borrower_id},
         #                                 (_("More details")))
 
@@ -3599,7 +3599,7 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_notification" method="get" >
+            <form name="borrower_form" action="%s/admin2/bibcirculation/borrower_notification" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
             <br />
@@ -3656,7 +3656,7 @@ class Template:
         </table>
         <!-- <table class="bibcirctable">
              <tr>
-                  <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step3?borrower_id=%s'"
+                  <td><input type=button onClick="location.href='%s/admin2/bibcirculation/update_borrower_info_step3?borrower_id=%s'"
                        value=%s class='formbutton'></td>
              </tr>
         </table> -->
@@ -3664,11 +3664,11 @@ class Template:
         <table class="bibcirctable">
           <tr>
             <td>
-            <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step2?user_info=%s,%s,%s,%s,%s,%s'"
+            <input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step2?user_info=%s,%s,%s,%s,%s,%s'"
             value='%s' class='formbutton'>
-            <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step1?borrower_id=%s'"
+            <input type=button onClick="location.href='%s/admin2/bibcirculation/create_new_request_step1?borrower_id=%s'"
             value='%s' class='formbutton'>
-            <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_book_request_from_borrower_page?borrower_id=%s'"
+            <input type=button onClick="location.href='%s/admin2/bibcirculation/register_ill_book_request_from_borrower_page?borrower_id=%s'"
             value='%s' class='formbutton'>
             <input type='submit' name='notify_button' value='%s' class='formbutton'>
             </td>
@@ -3686,7 +3686,7 @@ class Template:
             <td width="50">%s</td>
             <td>
               <input type="button"
-              onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details?borrower_id=%s'"
+              onClick="location.href='%s/admin2/bibcirculation/get_borrower_requests_details?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
             </td>
@@ -3696,7 +3696,7 @@ class Template:
             <td width="50">%s</td>
             <td>
               <input type="button"
-              onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details?borrower_id=%s'"
+              onClick="location.href='%s//admin2/bibcirculation/get_borrower_loans_details?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
             </td>
@@ -3706,7 +3706,7 @@ class Template:
             <td width="50">%s</td>
             <td>
               <input type="button"
-              onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/get_borrower_ill_details?borrower_id=%s'"
+              onClick="location.href='%s//admin2/bibcirculation/get_borrower_ill_details?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
             </td>
@@ -3724,7 +3724,7 @@ class Template:
             <td width="50">%s</td>
             <td>
               <input type="button"
-              onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/bor_requests_historical_overview?borrower_id=%s'"
+              onClick="location.href='%s//admin2/bibcirculation/bor_requests_historical_overview?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
             </td>
@@ -3734,7 +3734,7 @@ class Template:
             <td width="50">%s</td>
             <td>
               <input type="button"
-              onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/bor_loans_historical_overview?borrower_id=%s'"
+              onClick="location.href='%s//admin2/bibcirculation/bor_loans_historical_overview?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
             </td>
@@ -3744,7 +3744,7 @@ class Template:
             <td width="50">%s</td>
             <td>
               <input type="button"
-              onClick="location.href='%s//admin/bibcirculation/bibcirculationadmin.py/bor_ill_historical_overview?borrower_id=%s'"
+              onClick="location.href='%s//admin2/bibcirculation/bor_ill_historical_overview?borrower_id=%s'"
               onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
               value='%s' class="bibcircbutton">
             </td>
@@ -3806,7 +3806,7 @@ class Template:
              $('#table_requests').tablesorter({widthFixed: true, widgets: ['zebra']})
            });
          </script>
-        <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_requests_details" method="get" >
+        <form name="borrower_form" action="%s/admin2/bibcirculation/get_borrower_requests_details" method="get" >
         <div class="bibcircbottom">
         <br />
              <table id="table_requests" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
@@ -3836,7 +3836,7 @@ class Template:
 
             for (recid, status, library, location, date_from, date_to, request_date, request_id) in result:
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -3852,7 +3852,7 @@ class Template:
                  <td align="center">
                  <input type="button" value='%s' style="background: url(/img/dialog-cancel.png)
                  no-repeat; width: 75px; text-align: right;"
-                 onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests?request_id=%s'"
+                 onClick="location.href='%s/admin2/bibcirculation/get_pending_requests?request_id=%s'"
                  onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                  class="bibcircbutton">
                  </td>
@@ -3870,7 +3870,7 @@ class Template:
         <table class="bibcirctable">
              <tr>
                   <td>
-                    <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details?borrower_id=%s'"
+                    <input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_details?borrower_id=%s'"
                     value='%s' class='formbutton'>
                   </td>
              </tr>
@@ -3904,7 +3904,7 @@ class Template:
 
         else:
             out += """
-        <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details?submit_changes=true" method="get" >
+        <form name="borrower_form" action="%s/admin2/bibcirculation/get_borrower_loans_details?submit_changes=true" method="get" >
         <input type=hidden name=borrower_id value=%s>
         <div class="bibcircbottom">
 
@@ -3952,17 +3952,17 @@ class Template:
             for (recid, barcode, loaned_on, due_date, nb_renewall, nb_overdue, date_overdue, loan_type, notes, loan_id, status) in borrower_loans:
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                          '/admin2/bibcirculation/get_loans_notes',
                                           {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                           (_("No notes")))
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                          '/admin2/bibcirculation/get_loans_notes',
                                           {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                           (_("See notes")))
 
@@ -4013,7 +4013,7 @@ class Template:
         <table class="bibcirctable">
           <tr>
             <td class="bibcirccontent" align="right" width="100">
-              <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details?borrower_id=%s&renewall=true'"
+              <input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_loans_details?borrower_id=%s&renewall=true'"
               value='%s' class='bibcircbutton'onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"></td>
           </tr>
         </table>
@@ -4025,7 +4025,7 @@ class Template:
         <table class="bibcirctable">
           <tr>
             <td>
-              <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details?borrower_id=%s'"
+              <input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_details?borrower_id=%s'"
               value='%s' class='formbutton'></td>
           </tr>
         </table>
@@ -4097,7 +4097,7 @@ class Template:
 
         else:
             out += """
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+            <form name="borrower_form" action="%s/admin2/bibcirculation/all_loans" method="get" >
             <br />
             <table id="table_all_loans" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
@@ -4129,17 +4129,17 @@ class Template:
                  date_overdue, notes, loan_id) in result:
 
                 borrower_link = create_html_link(CFG_SITE_URL +
-                                                 '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                                 '/admin2/bibcirculation/get_borrower_details',
                                                  {'borrower_id': borrower_id, 'ln': ln},
                                                  (borrower_name))
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
-                                                  '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                                  '/admin2/bibcirculation/get_loans_notes',
                                                   {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                   (_("see notes")))
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
-                                                 '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                                 '/admin2/bibcirculation/get_loans_notes',
                                                  {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                  (_("no notes")))
 
@@ -4152,7 +4152,7 @@ class Template:
                     check_notes = see_notes_link
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                              '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                              '/admin2/bibcirculation/get_item_details',
                                               {'recid': recid, 'ln': ln},
                                               (book_title_from_MARC(recid)))
 
@@ -4167,7 +4167,7 @@ class Template:
                         <td>%s - %s</td>
                         <td>%s</td>
                         <td align="center">
-                        <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                        <input type=button onClick="location.href='%s/admin2/bibcirculation/claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                              value='%s' class='bibcircbutton'></td>
                     </tr>
 
@@ -4277,7 +4277,7 @@ class Template:
 
         else:
             out += """
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans" method="get" >
+            <form name="borrower_form" action="%s/admin2/bibcirculation/all_loans" method="get" >
             <br />
             <table id="table_all_loans" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                <thead>
@@ -4309,17 +4309,17 @@ class Template:
                  date_overdue, notes, loan_id) in result:
 
                 borrower_link = create_html_link(CFG_SITE_URL +
-                                                 '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                                 '/admin2/bibcirculation/get_borrower_details',
                                                  {'borrower_id': borrower_id, 'ln': ln},
                                                  (borrower_name))
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
-                                                  '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                                  '/admin2/bibcirculation/get_loans_notes',
                                                   {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                   (_("see notes")))
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
-                                                 '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                                 '/admin2/bibcirculation/get_loans_notes',
                                                  {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                                  (_("no notes")))
 
@@ -4332,7 +4332,7 @@ class Template:
                     check_notes = see_notes_link
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                              '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                              '/admin2/bibcirculation/get_item_details',
                                               {'recid': recid, 'ln': ln},
                                               (book_title_from_MARC(recid)))
 
@@ -4347,7 +4347,7 @@ class Template:
                         <td>%s - %s</td>
                         <td>%s</td>
                         <td align="center">
-                        <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                        <input type=button onClick="location.href='%s/admin2/bibcirculation/claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                              value='%s' class='bibcircbutton'></td>
                     </tr>
 
@@ -4415,7 +4415,7 @@ class Template:
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <form name="borrower_notification" action="%s/admin/bibcirculation/bibcirculationadmin.py/borrower_notification" method="get" >
+        <form name="borrower_notification" action="%s/admin2/bibcirculation/borrower_notification" method="get" >
              <div class="bibcircbottom">
              <input type=hidden name=borrower_id value=%s>
              <br />
@@ -4560,17 +4560,17 @@ class Template:
              date_overdue, notes, loan_id) in result:
 
             borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (borrower_name))
 
             see_notes_link = create_html_link(CFG_SITE_URL +
-                                              '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                              '/admin2/bibcirculation/get_loans_notes',
                                               {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                               (_("see notes")))
 
             no_notes_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                             '/admin2/bibcirculation/get_loans_notes',
                                             {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                              (_("no notes")))
 
@@ -4580,7 +4580,7 @@ class Template:
                 check_notes = see_notes_link
 
             title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -4652,7 +4652,7 @@ class Template:
             });
             </script>
             <br />
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_details" method="get" >
+            <form name="borrower_form" action="%s/admin2/bibcirculation/get_item_loans_details" method="get" >
             <input type=hidden name=recid value=%s>
             """ % (CFG_SITE_URL,
                    recid)
@@ -4690,17 +4690,17 @@ class Template:
                  status, notes, loan_id) in result:
 
                 borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (borrower_name))
 
                 no_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                          '/admin2/bibcirculation/get_loans_notes',
                                           {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                           (_("No notes")))
 
                 see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                          '/admin2/bibcirculation/get_loans_notes',
                                           {'loan_id': loan_id, 'recid': recid, 'ln': ln},
                                           (_("See notes")))
 
@@ -4747,7 +4747,7 @@ class Template:
         <table class="bibcirctable">
              <tr>
                   <td>
-                       <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_item_details?recid=%s'"
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/get_item_details?recid=%s'"
                        value='%s' class='formbutton'>
                   </td>
              </tr>
@@ -4787,7 +4787,7 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="return_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_new_loan" method="get" >
+            <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
             <input type=hidden name=request_id value=%s>
@@ -4909,7 +4909,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes" method="get" >
+            <form name="borrower_notes" action="%s/admin2/bibcirculation/get_borrower_notes" method="get" >
             <input type=hidden name=borrower_id value='%s'>
             <br />
             <br />
@@ -4931,7 +4931,7 @@ class Template:
 
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_notes',
+                                           '/admin2/bibcirculation/get_borrower_notes',
                                            {'delete_key': key, 'borrower_id': borrower_id, 'ln': ln},
                                            (_("[delete]")))
 
@@ -4965,7 +4965,7 @@ class Template:
             <table class="bibcirctable">
               <tr>
                 <td>
-                  <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details?borrower_id=%s'"
+                  <input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_details?borrower_id=%s'"
                   value=%s class='formbutton'>
                   <input type="submit" value='%s' class="formbutton">
                 </td>
@@ -5004,7 +5004,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="loans_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes" method="get" >
+            <form name="loans_notes" action="%s/admin2/bibcirculation/get_loans_notes" method="get" >
             <input type="hidden" name="loan_id" value="%s">
             <br />
             <br />
@@ -5026,7 +5026,7 @@ class Template:
 
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/get_loans_notes',
+                                           '/admin2/bibcirculation/get_loans_notes',
                                            {'delete_key': key, 'loan_id': loan_id, 'ln': ln, 'back': cgi.escape(back, True)},
                                            (_("[delete]")))
 
@@ -5234,7 +5234,7 @@ class Template:
         elif errors:
             out += """
             <div class="bibcircbottom">
-            <form name="list_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/new_item" method="get" >
+            <form name="list_form" action="%s/admin2/bibcirculation/new_item" method="get" >
             <br />
             <br />
             <br />
@@ -5254,7 +5254,7 @@ class Template:
         else:
             out += """
             <div class="bibcircbottom">
-            <form name="list_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/new_item" method="get" >
+            <form name="list_form" action="%s/admin2/bibcirculation/new_item" method="get" >
             <br />
             <br />
             <br />
@@ -5291,7 +5291,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="add_new_borrower_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_borrower_step2" method="get" >
+            <form name="add_new_borrower_step1_form" action="%s/admin2/bibcirculation/add_new_borrower_step2" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -5364,7 +5364,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="add_new_borrower_step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_borrower_step3" method="get" >
+            <form name="add_new_borrower_step2_form" action="%s/admin2/bibcirculation/add_new_borrower_step3" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -5455,7 +5455,7 @@ class Template:
                 <table class="bibcirctable">
                 <tr>
                   <td>
-                       <input type=button value=%s onClick= onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+                       <input type=button value=%s onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
                        class="formbutton">
                   </td>
                  </tr>
@@ -5484,7 +5484,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br /><br />         <br />
-        <form name="update_borrower_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step2" method="get" >
+        <form name="update_borrower_info_step1_form" action="%s/admin2/bibcirculation/update_borrower_info_step2" method="get" >
              <table class="bibcirctable">
                   <tr align="center">
                         <td class="bibcirctableheader">%s
@@ -5547,7 +5547,7 @@ class Template:
 
         for (borrower_id, name) in result:
             borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step3',
+                                             '/admin2/bibcirculation/update_borrower_info_step3',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (name))
 
@@ -5595,7 +5595,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="update_borrower_info_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step4" method="get" >
+            <form name="update_borrower_info_step3_form" action="%s/admin2/bibcirculation/update_borrower_info_step4" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -5671,7 +5671,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="update_borrower_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_borrower_info_step5" method="get" >
+            <form name="update_borrower_info_step4_form" action="%s/admin2/bibcirculation/update_borrower_info_step5" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -5742,7 +5742,7 @@ class Template:
                 <table class="bibcirctable">
                 <tr>
                   <td>
-                       <input type=button value='%s' onClick= onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+                       <input type=button value='%s' onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
                        class="formbutton">
                   </td>
                  </tr>
@@ -5767,7 +5767,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="add_new_library_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_library_step2" method="get" >
+            <form name="add_new_library_step1_form" action="%s/admin2/bibcirculation/add_new_library_step2" method="get" >
               <br />
               <br />
                <table class="bibcirctable">
@@ -5848,7 +5848,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="add_new_library_step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_library_step3" method="get" >
+            <form name="add_new_library_step2_form" action="%s/admin2/bibcirculation/add_new_library_step3" method="get" >
               <br />
               <br />
                <table class="bibcirctable">
@@ -5925,7 +5925,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s
-                        onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+                        onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
                         class="formbutton">
                   </td>
                  </tr>
@@ -5954,7 +5954,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br /><br />         <br />
-        <form name="update_library_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step2" method="get" >
+        <form name="update_library_info_step1_form" action="%s/admin2/bibcirculation/update_library_info_step2" method="get" >
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader">%s
@@ -6023,7 +6023,7 @@ class Template:
 
         for (library_id, name) in result:
             library_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step3',
+                                            '/admin2/bibcirculation/update_library_info_step3',
                                             {'library_id': library_id, 'ln': ln},
                                             (name))
 
@@ -6070,7 +6070,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="update_library_info_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step4" method="get" >
+            <form name="update_library_info_step3_form" action="%s/admin2/bibcirculation/update_library_info_step4" method="get" >
              <input type=hidden name=library_id value=%s>
               <br />
               <br />
@@ -6145,7 +6145,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="update_library_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_library_info_step5" method="get" >
+            <form name="update_library_info_step4_form" action="%s/admin2/bibcirculation/update_library_info_step5" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -6220,7 +6220,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s
-                        onClick= onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+                        onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
                         class="formbutton">
                   </td>
                  </tr>
@@ -6247,7 +6247,7 @@ class Template:
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/new_book_step2" method="get">
+           <form name="display_ill_form" action="%s/admin2/bibcirculation/new_book_step2" method="get">
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader">%s</td>
@@ -6349,7 +6349,7 @@ class Template:
 
         out += """
         <div class="bibcircbottom">
-        <form name="add_new_copy_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step2" method="get" >
+        <form name="add_new_copy_step1_form" action="%s/admin2/bibcirculation/add_new_copy_step2" method="get" >
         <br />
         <br />
         <br />
@@ -6424,7 +6424,7 @@ class Template:
         for recid in result:
 
             title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step3',
+                                          '/admin2/bibcirculation/add_new_copy_step3',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -6484,7 +6484,7 @@ class Template:
               $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
             });
             </script>
-           <form name="add_new_copy_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step4" method="get" >
+           <form name="add_new_copy_step3_form" action="%s/admin2/bibcirculation/add_new_copy_step4" method="get" >
            <div class="bibcircbottom">
                 <br />
                      <table class="bibcirctable">
@@ -6573,7 +6573,7 @@ class Template:
              status, collection, description, due_date) in result:
 
             library_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/get_library_details',
+                                            '/admin2/bibcirculation/get_library_details',
                                             {'library_id': libid, 'ln': ln},
                                             (lib_name))
 
@@ -6711,7 +6711,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="add_new_copy_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_copy_step5" method="get" >
+            <form name="add_new_copy_step4_form" action="%s/admin2/bibcirculation/add_new_copy_step5" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -6777,7 +6777,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         item_link = create_html_link(CFG_SITE_URL +
-                                     '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                     '/admin2/bibcirculation/get_item_details',
                                      {'recid': recid, 'ln': ln},
                                      (_("new copy")))
 
@@ -6799,7 +6799,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value='%s'
-                       onClick= onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'" class="formbutton">
+                       onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'" class="formbutton">
                   </td>
                  </tr>
                 </table>
@@ -6823,7 +6823,7 @@ class Template:
 
         out += """
         <div class="bibcircbottom">
-        <form name="update_item_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step2" method="get" >
+        <form name="update_item_info_step1_form" action="%s/admin2/bibcirculation/update_item_info_step2" method="get" >
         <br />
         <br />
         <br />
@@ -6895,7 +6895,7 @@ class Template:
         for recid in result:
 
             title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step3',
+                                          '/admin2/bibcirculation/update_item_info_step3',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -6947,7 +6947,7 @@ class Template:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
         out += """
-           <form name="update_item_info_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step4" method="get" >
+           <form name="update_item_info_step3_form" action="%s/admin2/bibcirculation/update_item_info_step4" method="get" >
            <div class="bibcircbottom">
                 <br />
                      <table class="bibcirctable">
@@ -7027,7 +7027,7 @@ class Template:
         for (barcode, loan_period, lib_name, libid, location, nb_requests, status, collection, description) in result:
 
             library_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/get_library_details',
+                                            '/admin2/bibcirculation/get_library_details',
                                             {'library_id': libid, 'ln': ln},
                                             (lib_name))
 
@@ -7042,7 +7042,7 @@ class Template:
                      <td class="bibcirccontent" align="center">%s</td>
                      <td class="bibcirccontent" align="center">%s</td>
                      <td class="bibcirccontent" align="center">
-                     <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step4?barcode=%s'"
+                     <input type=button onClick="location.href='%s/admin2/bibcirculation/update_item_info_step4?barcode=%s'"
                      value=%s class="formbutton">
                      </td>
                      <td class="bibcirccontent" width="350"></td>
@@ -7098,7 +7098,7 @@ class Template:
 
         out += """
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step5" method="get" >
+           <form name="update_item_info_step4_form" action="%s/admin2/bibcirculation/update_item_info_step5" method="get" >
            <div class="bibcircbottom">
                 <br />
                      <table class="bibcirctable">
@@ -7510,7 +7510,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom">
-            <form name="update_item_info_step5_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_item_info_step6" method="get" >
+            <form name="update_item_info_step5_form" action="%s/admin2/bibcirculation/update_item_info_step6" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -7595,7 +7595,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value='%s'
-                        onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'" class="formbutton">
+                        onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'" class="formbutton">
                   </td>
                  </tr>
                 </table>
@@ -7626,7 +7626,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br /><br />         <br />
-        <form name="search_library_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/search_library_step2" method="get" >
+        <form name="search_library_step1_form" action="%s/admin2/bibcirculation/search_library_step2" method="get" >
           <table class="bibcirctable">
            <tr align="center">
              <td class="bibcirctableheader">%s
@@ -7708,7 +7708,7 @@ class Template:
             for (library_id, name) in result:
 
                 library_link = create_html_link(CFG_SITE_URL +
-                                            '/admin/bibcirculation/bibcirculationadmin.py/get_library_details',
+                                            '/admin2/bibcirculation/get_library_details',
                                             {'library_id': library_id, 'ln': ln},
                                             (name))
 
@@ -7766,7 +7766,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="library_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_library_notes" method="get" >
+            <form name="library_notes" action="%s/admin2/bibcirculation/get_library_notes" method="get" >
             <input type=hidden name=library_id value='%s'>
             <br />
             <br />
@@ -7788,7 +7788,7 @@ class Template:
 
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/get_library_notes',
+                                           '/admin2/bibcirculation/get_library_notes',
                                            {'delete_key': key, 'library_id': library_id, 'ln': ln},
                                            (_("[delete]")))
 
@@ -7822,7 +7822,7 @@ class Template:
             <table class="bibcirctable">
               <tr>
                   <td>
-                      <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_library_details?library_id=%s'"
+                      <input type=button onClick="location.href='%s/admin2/bibcirculation/get_library_details?library_id=%s'"
                        value=%s class='formbutton'>
                        <input type="submit" value='%s' class="formbutton">
                   </td>
@@ -7874,7 +7874,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/change_due_date_step2" method="get" >
+            <form name="borrower_notes" action="%s/admin2/bibcirculation/change_due_date_step2" method="get" >
             <br />
             <br />
             <table class="bibcirctable">
@@ -7995,7 +7995,7 @@ class Template:
                 <table class="bibcirctable">
                 <tr>
                   <td>
-                    <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details?borrower_id=%s'"
+                    <input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_loans_details?borrower_id=%s'"
                     value=%s class='formbutton'>
                   </td>
                  </tr>
@@ -8033,7 +8033,7 @@ class Template:
         (borrower_id, name, email, phone, address, mailbox) = borrower
 
         out += """
-            <form name="create_new_loan_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_loan_step2" method="get" >
+            <form name="create_new_loan_form1" action="%s/admin2/bibcirculation/create_new_loan_step2" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
             <br />
@@ -8166,7 +8166,7 @@ class Template:
                 <tr>
                     <td width="500" valign="top">
 
-                    <form name="create_new_loan_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step1" method="get" >
+                    <form name="create_new_loan_form1" action="%s/admin2/bibcirculation/create_new_request_step1" method="get" >
                     <input type=hidden name=borrower_id value=%s>
                     <table class="bibcirctable">
                         <tr align="center">
@@ -8230,7 +8230,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step2" method="get" >
+            <form name="form2" action="%s/admin2/bibcirculation/create_new_request_step2" method="get" >
             <table class="bibcirctable">
               <tr width="200">
                 <td align="center">
@@ -8373,7 +8373,7 @@ class Template:
                           <td class="bibcirccontent" align="center">%s</td>
                           <td class="bibcirccontent" align="center">%s</td>
                           <td class="bibcirccontent" align="right">
-                          <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step2?barcode=%s&recid=%s&user_info=%s,%s,%s,%s,%s,%s'"
+                          <input type=button onClick="location.href='%s/admin2/bibcirculation/place_new_request_step2?barcode=%s&recid=%s&user_info=%s,%s,%s,%s,%s,%s'"
                           value='%s' class="formbutton"></td>
                      </tr>
 
@@ -8417,7 +8417,7 @@ class Template:
         <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
-        <form name="request_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/create_new_request_step4" method="get" >
+        <form name="request_form" action="%s/admin2/bibcirculation/create_new_request_step4" method="get" >
         <div class="bibcircbottom">
         <br />
         <br />
@@ -8515,7 +8515,7 @@ class Template:
         <br />
         <br />
         <table class="bibcirctable">
-        <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+        <td><input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
@@ -8625,7 +8625,7 @@ class Template:
 
         out += """
         <td valign='top' align='center'>
-        <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step1" method="get" >
+        <form name="step1_form1" action="%s/admin2/bibcirculation/place_new_request_step1" method="get" >
         <input type=hidden name=barcode value='%s'>
         <input type=hidden name=recid value='%s'>
         <table>
@@ -8713,7 +8713,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step2" method="get" >
+            <form name="step1_form2" action="%s/admin2/bibcirculation/place_new_request_step2" method="get" >
             <input type=hidden name=barcode value='%s'>
             <input type=hidden name=recid value='%s'>
             <table class="bibcirctable">
@@ -8792,7 +8792,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom">
-            <form name="step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/place_new_request_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/place_new_request_step3" method="get" >
             <input type=hidden name=barcode value='%s'>
             <input type=hidden name=recid value='%s'>
             <input type=hidden name=user_info value="%s">
@@ -8984,7 +8984,7 @@ class Template:
         <br />
         <br />
         <table class="bibcirctable">
-        <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+        <td><input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
@@ -9092,7 +9092,7 @@ class Template:
 
         out += """
         <td valign='top' align='center'>
-        <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/place_new_loan_step1" method="get" >
+        <form name="step1_form1" action="%s/admin2/bibcirculation/place_new_loan_step1" method="get" >
         <input type=hidden name=barcode value='%s'>
         <input type=hidden name=recid value='%s'>
         <table>
@@ -9180,7 +9180,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step3" method="get" >
+            <form name="step1_form2" action="%s/admin2/bibcirculation/loan_on_desk_step3" method="get" >
             <input type=hidden name=barcode value='%s'>
 
             <table class="bibcirctable">
@@ -9257,7 +9257,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom">
-            <form name="step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/place_new_loan_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/place_new_loan_step3" method="get" >
             <input type=hidden name=barcode value='%s'>
             <input type=hidden name=recid value='%s'>
             <input type=hidden name=email value='%s'>
@@ -9467,7 +9467,7 @@ class Template:
            .submit { margin-left: 12em; }
            em { font-weight: bold; padding-right: 1em; vertical-align: top; }
            </style>
-           <form name="order_new_copy_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/order_new_copy_step2" method="get" >
+           <form name="order_new_copy_step1_form" action="%s/admin2/bibcirculation/order_new_copy_step2" method="get" >
            <div class="bibcircbottom">
              <br />
              <table class="bibcirctable">
@@ -9680,7 +9680,7 @@ class Template:
         out += """
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/order_new_copy_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/order_new_copy_step3" method="get" >
                 <input type=hidden name=order_info value="%s">
               <br />
               <table class="bibcirctable">
@@ -9830,7 +9830,7 @@ class Template:
         <br />
         <br />
         <table class="bibcirctable">
-        <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+        <td><input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
@@ -9898,18 +9898,18 @@ class Template:
             vendor_name = db.get_vendor_name(vendor_id)
 
             title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
 
             no_notes_link = create_html_link(CFG_SITE_URL +
-                                         '/admin/bibcirculation/bibcirculationadmin.py/get_purchase_notes',
+                                         '/admin2/bibcirculation/get_purchase_notes',
                                          {'purchase_id': purchase_id},
                                          (_("No notes")))
 
             see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_purchase_notes',
+                                          '/admin2/bibcirculation/get_purchase_notes',
                                           {'purchase_id': purchase_id},
                                           (_("See notes")))
 
@@ -9928,7 +9928,7 @@ class Template:
                  <td class="bibcirccontent" align="center">%s</td>
                  <td class="bibcirccontent" align="center">%s</td>
                  <td align="center">
-                   <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/ordered_books_details_step1?purchase_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                   <input type=button onClick="location.href='%s/admin2/bibcirculation/ordered_books_details_step1?purchase_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                        value=%s class='bibcircbutton'>
                     </td>
             </tr>
@@ -9969,7 +9969,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_purchase_notes" method="get" >
+            <form name="borrower_notes" action="%s/admin2/bibcirculation/get_purchase_notes" method="get" >
             <input type=hidden name=purchase_id value='%s'>
             <br />
             <br />
@@ -9991,7 +9991,7 @@ class Template:
 
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/get_purchase_notes',
+                                           '/admin2/bibcirculation/get_purchase_notes',
                                            {'delete_key': key, 'purchase_id': purchase_id, 'ln': ln},
                                            (_("[delete]")))
 
@@ -10025,7 +10025,7 @@ class Template:
             <table class="bibcirctable">
               <tr>
                   <td>
-                       <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/ordered_books'"
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/ordered_books'"
                        value=%s class='formbutton'>
                        <input type="submit" value='%s' class="formbutton">
                   </td>
@@ -10129,7 +10129,7 @@ class Template:
 
         out += """
         <td valign='top' align='center'>
-        <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_step0" method="get" >
+        <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_step0" method="get" >
         <input type=hidden name=recid value='%s'>
         <table>
 
@@ -10216,7 +10216,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_step1" method="get" >
+            <form name="step1_form2" action="%s/admin2/bibcirculation/register_ill_request_step1" method="get" >
             <input type=hidden name=recid value='%s'>
             <table class="bibcirctable">
               <tr width="200">
@@ -10280,7 +10280,7 @@ class Template:
 
         out += """
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_step2" method="get" >
+           <form name="update_item_info_step4_form" action="%s/admin2/bibcirculation/register_ill_request_step2" method="get" >
            <div class="bibcircbottom" align="center">
                 <br />
                      <table class="bibcirctable">
@@ -10487,7 +10487,7 @@ class Template:
         <div class=bibcircbottom align="center">
         <br />
         <br />
-         <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_step3" method="get" >
+         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_step3" method="get" >
                  <table>
                    <tr align="center">
                      <td class="bibcirctableheader">%s</td>
@@ -10640,7 +10640,7 @@ class Template:
         <br />
         <br />
         <table class="bibcirctable">
-        <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+        <td><input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
@@ -11066,7 +11066,7 @@ class Template:
              ill_status, period_from, _period_to, item_info, request_type) in ill_req:
 
             borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (borrower_name))
 
@@ -11079,7 +11079,7 @@ class Template:
 
             try:
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': item_info['recid'], 'ln': ln},
                                           (book_title_from_MARC(int(item_info['recid']))))
             except KeyError:
@@ -11099,7 +11099,7 @@ class Template:
                     <td class="bibcirccontent">%s</td>
                     <td class="bibcirccontent">%s</td>
                     <td align="center">
-                       <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/ill_request_details_step1?ill_request_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                        value=%s class='bibcircbutton'>
                     </td>
                    </tr>
@@ -11174,7 +11174,7 @@ class Template:
         notes=''
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step1',
+                                           '/admin2/bibcirculation/ill_request_details_step1',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ln': ln},
                                            (_("[delete]")))
 
@@ -11200,7 +11200,7 @@ class Template:
                 book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
             out += """
-            <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
+            <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=ill_request_id value=%s>
                 <br />
@@ -11266,7 +11266,7 @@ class Template:
             if str(request_type) == 'book':
                 out += """
                 <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-                <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
+                <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
                    <div class="bibcircbottom">
                    <input type=hidden name=ill_request_id value=%s>
                     <br />
@@ -11338,7 +11338,7 @@ class Template:
 
                 out += """
                 <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-                <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2" method="get" >
+                <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
                    <div class="bibcircbottom">
                    <input type=hidden name=ill_request_id value=%s>
                     <br />
@@ -12168,7 +12168,7 @@ class Template:
 
             out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step3" method="get" >
+            <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=request_info value="%s">
                 <br />
@@ -12232,7 +12232,7 @@ class Template:
 
             out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="ill_req_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step3" method="get" >
+            <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=request_info value="%s">
                 <br />
@@ -12390,7 +12390,7 @@ class Template:
 
             for key in key_array:
                 delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2',
+                                           '/admin2/bibcirculation/ill_request_details_step2',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status,
                                             'library_notes': library_notes, 'ln': ln},
                                            (_("[delete]")))
@@ -12482,7 +12482,7 @@ class Template:
 
             for key in key_array:
                 delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2',
+                                           '/admin2/bibcirculation/ill_request_details_step2',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status,
                                             'library_notes': library_notes, 'ln': ln},
                                            (_("[delete]")))
@@ -12573,7 +12573,7 @@ class Template:
 
             for key in key_array:
                 delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2',
+                                           '/admin2/bibcirculation/ill_request_details_step2',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status,
                                             'library_notes': library_notes, 'ln': ln},
                                            (_("[delete]")))
@@ -12675,7 +12675,7 @@ class Template:
 
             for key in key_array:
                 delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2',
+                                           '/admin2/bibcirculation/ill_request_details_step2',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status,
                                             'library_notes': library_notes, 'ln': ln},
                                            (_("[delete]")))
@@ -12776,7 +12776,7 @@ class Template:
 
             for key in key_array:
                 delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2',
+                                           '/admin2/bibcirculation/ill_request_details_step2',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status,
                                             'library_notes': library_notes, 'ln': ln},
                                            (_("[delete]")))
@@ -12879,7 +12879,7 @@ class Template:
 
             for key in key_array:
                 delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ill_request_details_step2',
+                                           '/admin2/bibcirculation/ill_request_details_step2',
                                            {'delete_key': key, 'ill_request_id': ill_request_id, 'ill_status': ill_status,
                                             'library_notes': library_notes, 'ln': ln},
                                            (_("[delete]")))
@@ -12958,7 +12958,7 @@ class Template:
         <br />
         <br />
         <table class="bibcirctable">
-        <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+        <td><input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
@@ -13001,7 +13001,7 @@ class Template:
 
         out += """
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="update_item_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ordered_books_details_step2" method="get" >
+           <form name="update_item_info_step4_form" action="%s/admin2/bibcirculation/ordered_books_details_step2" method="get" >
            <div class="bibcircbottom">
            <input type=hidden name=purchase_id value="%s">
                 <br />
@@ -13190,7 +13190,7 @@ class Template:
         for key in key_array:
 
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/ordered_books_details_step1',
+                                           '/admin2/bibcirculation/ordered_books_details_step1',
                                            {'delete_key': key, 'purchase_id': purchase_id, 'ln': ln},
                                            (_("[delete]")))
 
@@ -13264,7 +13264,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ordered_books_details_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/ordered_books_details_step3" method="get" >
                 <input type=hidden name=purchase_id value="%s">
                 <input type=hidden name=recid value="%s">
                 <input type=hidden name=vendor_id value="%s">
@@ -13440,7 +13440,7 @@ class Template:
         <br />
         <br />
         <table class="bibcirctable">
-        <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+        <td><input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
         value='%s' class='formbutton'></td>
         </table>
         <br />
@@ -13468,7 +13468,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="add_new_vendor_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_vendor_step2" method="get" >
+            <form name="add_new_vendor_step1_form" action="%s/admin2/bibcirculation/add_new_vendor_step2" method="get" >
               <br />
               <br />
                <table class="bibcirctable">
@@ -13547,7 +13547,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="add_new_vendor_step2_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/add_new_vendor_step3" method="get" >
+            <form name="add_new_vendor_step2_form" action="%s/admin2/bibcirculation/add_new_vendor_step3" method="get" >
               <br />
               <br />
                <table class="bibcirctable">
@@ -13623,7 +13623,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s
-                        onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+                        onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
                         class="formbutton">
                   </td>
                  </tr>
@@ -13653,7 +13653,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br /><br />         <br />
-        <form name="update_vendor_info_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step2" method="get" >
+        <form name="update_vendor_info_step1_form" action="%s/admin2/bibcirculation/update_vendor_info_step2" method="get" >
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader">%s
@@ -13726,7 +13726,7 @@ class Template:
 
         for (vendor_id, name) in result:
             vendor_link = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step3',
+                                           '/admin2/bibcirculation/update_vendor_info_step3',
                                            {'vendor_id': vendor_id, 'ln': ln},
                                            (name))
 
@@ -13777,7 +13777,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="update_vendor_info_step3_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step4" method="get" >
+            <form name="update_vendor_info_step3_form" action="%s/admin2/bibcirculation/update_vendor_info_step4" method="get" >
              <input type=hidden name=vendor_id value=%s>
               <br />
               <br />
@@ -13856,7 +13856,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="update_vendor_info_step4_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step5" method="get" >
+            <form name="update_vendor_info_step4_form" action="%s/admin2/bibcirculation/update_vendor_info_step5" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -13931,7 +13931,7 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value=%s
-                        onClick= onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+                        onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
                         class="formbutton">
                   </td>
                  </tr>
@@ -13961,7 +13961,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br /><br />         <br />
-        <form name="search_vendor_step1_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/search_vendor_step2" method="get" >
+        <form name="search_vendor_step1_form" action="%s/admin2/bibcirculation/search_vendor_step2" method="get" >
           <table class="bibcirctable">
            <tr align="center">
              <td class="bibcirctableheader">%s
@@ -14035,7 +14035,7 @@ class Template:
         for (vendor_id, name) in result:
 
             vendor_link = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/get_vendor_details',
+                                           '/admin2/bibcirculation/get_vendor_details',
                                            {'vendor_id': vendor_id, 'ln': ln},
                                            (name))
 
@@ -14088,12 +14088,12 @@ class Template:
         (vendor_id, name, address, email, phone, notes) = vendor_details
 
         no_notes_link = create_html_link(CFG_SITE_URL +
-                                         '/admin/bibcirculation/bibcirculationadmin.py/get_vendor_notes',
+                                         '/admin2/bibcirculation/get_vendor_notes',
                                          {'vendor_id': vendor_id},
                                          (_("No notes")))
 
         see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_vendor_notes',
+                                          '/admin2/bibcirculation/get_vendor_notes',
                                           {'vendor_id': vendor_id},
                                           (_("Notes about this vendor")))
 
@@ -14133,7 +14133,7 @@ class Template:
                  </table>
                  <table>
                  <tr>
-                      <td><input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/update_vendor_info_step3?vendor_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
+                      <td><input type=button onClick="location.href='%s/admin2/bibcirculation/update_vendor_info_step3?vendor_id=%s'" onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                       value=%s  class="bibcircbutton">
                       </td>
                  </tr>
@@ -14177,7 +14177,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="vendor_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_vendor_notes" method="get" >
+            <form name="vendor_notes" action="%s/admin2/bibcirculation/get_vendor_notes" method="get" >
             <br />
             <br />
             <table class="bibcirctable">
@@ -14232,7 +14232,7 @@ class Template:
              <table class="bibcirctable">
              <tr>
                   <td>
-                       <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_vendor_details?vendor_id=%s'"
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/get_vendor_details?vendor_id=%s'"
                        value=%s class='formbutton'>
                   </td>
              </tr>
@@ -14268,7 +14268,7 @@ class Template:
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step2" method="get">
+           <form name="display_ill_form" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step2" method="get">
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader">%s</td>
@@ -14465,7 +14465,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-         <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step2" method="get" >
+         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step2" method="get" >
         <br />
 
                 <table class="bibcirctable">
@@ -14643,7 +14643,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step3" method="get" >
+            <form name="step1_form2" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step3" method="get" >
             <input type=hidden name=book_info value="%s">
             <table class="bibcirctable">
               <tr width="200">
@@ -14713,7 +14713,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-        <form name="step3_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step4" method="get" >
+        <form name="step3_form1" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step4" method="get" >
         <br />
                 <table class="bibcirctable">
                   <tr>
@@ -14849,7 +14849,7 @@ class Template:
         #out += """
         #<style type="text/css"> @import url("/img/tablesorter.css"); </style>
         #<div class=bibcircbottom align="center">
-        # <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step4" method="get" >
+        # <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step4" method="get" >
         # <br />
         #    <table class="bibcirctable">
         #        <tr>
@@ -15059,7 +15059,7 @@ class Template:
             if supplier_id:
                 library_name = db.get_library_name(supplier_id)
                 library_link = create_html_link(CFG_SITE_URL +
-                                                '/admin/bibcirculation/bibcirculationadmin.py/get_library_details',
+                                                '/admin2/bibcirculation/get_library_details',
                                                 {'library_id': supplier_id, 'ln': ln},
                                                 (library_name))
             else:
@@ -15069,7 +15069,7 @@ class Template:
             book_info = eval(book_info)
             try:
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': book_info['recid'], 'ln': ln},
                                           (book_title_from_MARC(int(book_info['recid']))))
             except KeyError:
@@ -15077,12 +15077,12 @@ class Template:
 
             # links to notes pages
             lib_no_notes_link = create_html_link(CFG_SITE_URL +
-                                                 '/admin/bibcirculation/bibcirculationadmin.py/get_ill_library_notes',
+                                                 '/admin2/bibcirculation/get_ill_library_notes',
                                                  {'ill_id': ill_id},
                                                  (_("No notes")))
 
             lib_see_notes_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_ill_library_notes',
+                                          '/admin2/bibcirculation/get_ill_library_notes',
                                           {'ill_id': ill_id},
                                           (_("Notes about this ILL")))
 
@@ -15117,7 +15117,7 @@ class Template:
         <table class="bibcirctable">
           <tr>
             <td>
-              <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details?borrower_id=%s'"
+              <input type=button onClick="location.href='%s/admin2/bibcirculation/get_borrower_details?borrower_id=%s'"
               value='%s' class='formbutton'>
             </td>
           </tr>
@@ -15152,7 +15152,7 @@ class Template:
 
         out +="""
             <div class="bibcircbottom">
-            <form name="borrower_notes" action="%s/admin/bibcirculation/bibcirculationadmin.py/get_ill_library_notes" method="get" >
+            <form name="borrower_notes" action="%s/admin2/bibcirculation/get_ill_library_notes" method="get" >
             <input type=hidden name=ill_id value='%s'>
             <br />
             <br />
@@ -15174,7 +15174,7 @@ class Template:
 
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin/bibcirculation/bibcirculationadmin.py/get_ill_library_notes',
+                                           '/admin2/bibcirculation/get_ill_library_notes',
                                            {'delete_key': key, 'ill_id': ill_id, 'ln': ln},
                                            (_("[delete]")))
 
@@ -15208,7 +15208,7 @@ class Template:
             <table class="bibcirctable">
               <tr>
                   <td>
-                       <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/ordered_books'"
+                       <input type=button onClick="location.href='%s/admin2/bibcirculation/ordered_books'"
                        value=%s class='formbutton'>
                        <input type="submit" value='%s' class="formbutton">
                   </td>
@@ -15249,7 +15249,7 @@ class Template:
             <br /> <br />            <br />
             <table class="bibcirctable_contents">
             <td align="center">
-            <input type=button onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1'"
+            <input type=button onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
             value='%s' class='formbutton'>
             </td>
             </table>
@@ -15311,13 +15311,13 @@ class Template:
 
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
                 if borrower_name:
                     borrower_link = create_html_link(CFG_SITE_URL +
-                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             '/admin2/bibcirculation/get_borrower_details',
                                              {'borrower_id': borrower_id, 'ln': ln},
                                              (borrower_name))
                 else:
@@ -15329,7 +15329,7 @@ class Template:
                 function confirmation(id){
                   var answer = confirm("Delete this request?")
                   if (answer){
-                    window.location = "%s/admin/bibcirculation/bibcirculationadmin.py/get_expired_loans_with_requests?request_id="+id;
+                    window.location = "%s/admin2/bibcirculation/get_expired_loans_with_requests?request_id="+id;
                   }
                   else{
                     alert("Request not deleted.")
@@ -15351,7 +15351,7 @@ class Template:
                         onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                         class="bibcircbutton">
                     <input type=button style="background: url(/img/dialog-yes.png) no-repeat; width: 150px; text-align: right;"
-                        onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/associate_barcode?request_id=%s&recid=%s&borrower_id=%s'"
+                        onClick="location.href='%s/admin2/bibcirculation/associate_barcode?request_id=%s&recid=%s&borrower_id=%s'"
                         onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                         value='%s' class="bibcircbutton">
                   </td>
@@ -15397,7 +15397,7 @@ class Template:
                     <tr>
                       <td>
                         <input type=button style="background: url(/img/document-print.png) no-repeat; width: 135px; text-align: right;"
-                        onClick="location.href='%s/admin/bibcirculation/bibcirculationadmin.py/get_pending_requests?print_data=true'"
+                        onClick="location.href='%s/admin2/bibcirculation/get_pending_requests?print_data=true'"
                         onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                         value='%s' class="bibcircbutton">
                       </td>
@@ -15426,7 +15426,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom align="center">
-        <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_book_request_result"
+        <form name="search_form" action="%s/admin2/bibcirculation/register_ill_book_request_result"
         method="get" >
         <br />
         <br />
@@ -15496,7 +15496,7 @@ class Template:
             out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-        <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_with_no_recid_step1" method="get" >
+        <form name="search_form" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step1" method="get" >
         <br />
         <table class="bibcirctable">
           <tr align="center">
@@ -15525,7 +15525,7 @@ class Template:
                 (book_author, book_editor, book_copies) = get_item_info_for_search_result(recid)
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -15580,7 +15580,7 @@ class Template:
 
         out += """
         <div class=bibcircbottom align="center">
-        <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_book_request_from_borrower_page_result"
+        <form name="search_form" action="%s/admin2/bibcirculation/register_ill_book_request_from_borrower_page_result"
         method="get" >
         <input type=hidden name=borrower_id value=%s>
         <br />
@@ -15687,7 +15687,7 @@ class Template:
                 (book_author, book_editor, book_copies) = get_item_info_for_search_result(recid)
 
                 title_link = create_html_link(CFG_SITE_URL +
-                                          '/admin/bibcirculation/bibcirculationadmin.py/get_item_details',
+                                          '/admin2/bibcirculation/get_item_details',
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
@@ -15746,7 +15746,7 @@ class Template:
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_from_borrower_page_step2" method="get">
+           <form name="display_ill_form" action="%s/admin2/bibcirculation/register_ill_request_from_borrower_page_step2" method="get">
            <input type=hidden name=borrower_id value=%s>
              <table class="bibcirctable">
                   <tr align="center">
@@ -15936,7 +15936,7 @@ class Template:
         <div class=bibcircbottom align="center">
         <br />
         <br />
-         <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_request_from_borrower_page_step4" method="get" >
+         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_from_borrower_page_step4" method="get" >
                  <table>
                    <tr align="center">
                      <td class="bibcirctableheader">%s</td>
@@ -16083,7 +16083,7 @@ class Template:
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_article_request_step2" method="get">
+           <form name="display_ill_form" action="%s/admin2/bibcirculation/register_ill_article_request_step2" method="get">
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader" width="10">%s</td>
@@ -16272,7 +16272,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-         <form name="step1_form1" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_article_request_step2" method="get" >
+         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_article_request_step2" method="get" >
         <br />
           <table class="bibcirctable">
                   <tr>
@@ -16445,7 +16445,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="step1_form2" action="%s/admin/bibcirculation/bibcirculationadmin.py/register_ill_article_request_step3" method="get" >
+            <form name="step1_form2" action="%s/admin2/bibcirculation/register_ill_article_request_step3" method="get" >
             <input type=hidden name=book_info value="%s">
             <table class="bibcirctable">
               <tr width="200">
@@ -16513,7 +16513,7 @@ class Template:
         <link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />
         <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
-        <form name="search_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/ill_search_result" method="get" >
+        <form name="search_form" action="%s/admin2/bibcirculation/ill_search_result" method="get" >
         <br />
         <br />
         <br />

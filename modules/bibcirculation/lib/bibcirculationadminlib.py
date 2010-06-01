@@ -112,7 +112,7 @@ def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -167,7 +167,7 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -231,7 +231,7 @@ def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG)
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -262,7 +262,7 @@ def item_search(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -361,7 +361,7 @@ def borrower_notification(req, borrower_id, template, message,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -410,7 +410,7 @@ def get_next_waiting_loan_request(req, recid, barcode, check_id,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -460,7 +460,7 @@ def update_next_loan_request_status(req, check_id, barcode, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -488,7 +488,7 @@ def loan_return(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -863,7 +863,7 @@ def loan_on_desk_step4(req, list_of_books, user_info,
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    return redirect_to_url(req, '%s/admin/bibcirculation/bibcirculationadmin.py/all_loans?msg=ok' % CFG_SITE_URL)
+    return redirect_to_url(req, '%s/admin2/bibcirculation/all_loans?msg=ok' % CFG_SITE_URL)
 
 
 def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
@@ -1156,12 +1156,12 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
     infos = []
 
     force_renew_link = create_html_link(CFG_SITE_URL +
-                        '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
+                        '/admin2/bibcirculation/get_borrower_loans_details',
                         {'barcode': barcode, 'borrower_id': borrower_id, 'loan_id': loan_id, 'force': 'true'},
                         ("Yes"))
 
     no_renew_link = create_html_link(CFG_SITE_URL +
-                        '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
+                        '/admin2/bibcirculation/get_borrower_loans_details',
                         {'borrower_id': borrower_id},
                         ("No"))
 
@@ -1191,7 +1191,7 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
             new_due_date = renew_loan_for_X_days(barcode)
 
             force_renewall_link = create_html_link(CFG_SITE_URL +
-                                                   '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_loans_details',
+                                                   '/admin2/bibcirculation/get_borrower_loans_details',
                                                    {'barcode': barcode, 'borrower_id': borrower_id, 'loan_id': loan_id, 'force': 'true'},
                                                    ("Yes"))
 
@@ -1266,12 +1266,12 @@ def get_item_loans_details(req, recid, barcode, loan_id, force, ln=CFG_SITE_LANG
 
 
         force_renew_link = create_html_link(CFG_SITE_URL +
-                        '/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_details',
+                        '/admin2/bibcirculation/get_item_loans_details',
                         {'barcode': barcode, 'loan_id': loan_id, 'force': 'true', 'recid': recid},
                         ("Yes"))
 
         no_renew_link = create_html_link(CFG_SITE_URL +
-                        '/admin/bibcirculation/bibcirculationadmin.py/get_item_loans_details',
+                        '/admin2/bibcirculation/get_item_loans_details',
                         {'recid': recid},
                         ("No"))
 
@@ -1712,7 +1712,7 @@ def all_loans(req, msg=None, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -1776,7 +1776,7 @@ def all_expired_loans(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -1910,7 +1910,7 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -1959,7 +1959,7 @@ def get_loans_notes(req, loan_id, delete_key,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -3094,7 +3094,7 @@ def search_library_step2(req, column, string, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -3137,7 +3137,7 @@ def get_library_notes(req, library_id, delete_key,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -4134,7 +4134,7 @@ def place_new_loan_step3(req, barcode, recid, _ccid, name, email, phone,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5263,7 +5263,7 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
         navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
         id_user = getUid(req)
@@ -5382,7 +5382,7 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5406,7 +5406,7 @@ def register_ill_request_with_no_recid_step3(req, book_info, user_info, request_
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
 
@@ -5556,7 +5556,7 @@ def get_expired_loans_with_requests(req, request_id, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5581,7 +5581,7 @@ def register_ill_book_request(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5636,7 +5636,7 @@ def register_ill_book_request_result(req, p, f, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5658,7 +5658,7 @@ def register_ill_book_request_from_borrower_page(req, borrower_id, ln=CFG_SITE_L
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5717,7 +5717,7 @@ def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5797,7 +5797,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id, title, autho
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
 
@@ -5822,7 +5822,7 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -5868,7 +5868,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
         id_user = getUid(req)
@@ -5988,7 +5988,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -6053,7 +6053,7 @@ def ill_search(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
@@ -6089,7 +6089,7 @@ def ill_search_result(req, p, f, date_from, date_to, ln):
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk_step1">Circulation Management' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     if date_from == 'the beginning':
