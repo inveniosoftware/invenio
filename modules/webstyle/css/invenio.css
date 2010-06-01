@@ -2869,7 +2869,6 @@ div.subtitle {
 	margin:0;
 	padding:0 0 0 0px;
 }
-
 .menu li {
 	display:block;
 	float:left;
@@ -2877,20 +2876,19 @@ div.subtitle {
 	padding: 7px;
 	height:100%;
 	margin-right:10px;
-	/*/*//*/
+        /*/*//*/
 	display : none;
 	/* */
 }
-.menu .hassubmenu{
+.menu .hassubmenu {
 	position:relative;
 }
-
-.menu .hassubmenu a{
+.menu .hassubmenu a {
         display: inline-block; /* Necessary on IE */
 	padding-right:12px;
 	background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;
 }
-.menu .on.hassubmenu a{
+.menu .on.hassubmenu a {
 	background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;
 }
 .menu .on {
@@ -2899,7 +2897,7 @@ div.subtitle {
 .menu a img {
 	vertical-align:middle;
 }
-.menu img{
+.menu img {
 	border:none;
 }
 .menu .right {
@@ -2910,7 +2908,7 @@ div.subtitle {
 	margin-left:0;
 	background-image:none;
 }
-.menu a{
+.menu a {
 	white-space:nowrap;
 	text-decoration:none;
 	margin:0;
@@ -2935,14 +2933,14 @@ div.subtitle {
 	background-color:#fff;
         background-image:none !important;
 }
-.menu ul.subsubmenu li a, .menu div ul.subsubmenu li a:hover, .menu div ul.subsubmenu li a:visited{
+.menu ul.subsubmenu li a, .menu div ul.subsubmenu li a:hover, .menu div ul.subsubmenu li a:visited {
 	background-color:transparent;
         background-image:none !important;
 	display:block;
         text-transform:capitalize;
         color: #36c;
 }
-.menu ul.subsubmenu li a:hover{
+.menu ul.subsubmenu li a:hover {
 	text-decoration:underline
 }
 .menu :hover ul {
@@ -2950,11 +2948,11 @@ div.subtitle {
 	position: absolute;
 }
 /* Override/Customize rollover menus in some cases*/
-.menu .headermoduleboxbody .hassubmenu a{
+.menu .headermoduleboxbody .hassubmenu a {
 	/*background: transparent url(drop_down_menu_arrow_down_lb.gif) no-repeat right center;*/
         background-image:url(drop_down_menu_arrow_down_lb.gif)
 }
-.menu .headermoduleboxbody .hassubmenu a.header:hover{
+.menu .headermoduleboxbody .hassubmenu a.header:hover {
 	/*background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;*/
         background-image:url(drop_down_menu_arrow_down_b.gif)
 }

@@ -39,8 +39,10 @@ from invenio.bibcirculation_utils import hold_request_mail, \
      book_title_from_MARC, \
      make_copy_available, \
      create_ill_record
+     #book_information_from_MARC
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
+
 
 def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
     """
@@ -185,17 +187,13 @@ def perform_new_request(recid, barcode, ln=CFG_SITE_LANG):
 
 
 def perform_new_request_send(uid, recid,
-                             from_year, from_month, from_day,
-                             to_year, to_month, to_day,
+                             period_from, period_to,
                              barcode, ln=CFG_SITE_LANG):
 
     """
     @param recid: recID - CDS Invenio record identifier
     @param ln: language of the page
     """
-
-    request_from = get_datetext(from_year, from_month, from_day)
-    request_to = get_datetext(to_year, to_month, to_day)
 
     nb_requests = db.get_number_requests_per_copy(barcode)
     is_on_loan = db.is_item_on_loan(barcode)
@@ -215,10 +213,14 @@ def perform_new_request_send(uid, recid,
         if address != 0:
 
             db.new_hold_request(is_borrower, recid, barcode,
-                                request_from, request_to, status)
+                                period_from, period_to, status)
+
+            is_on_loan=db.is_item_on_loan(barcode)
+
             db.update_item_status('requested', barcode)
 
-            send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+            if not is_on_loan:
+                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
                        toaddr=CFG_SITE_SUPPORT_EMAIL,
                        subject='Hold request for books confirmation',
                        content=hold_request_mail(recid, is_borrower),
@@ -226,9 +228,9 @@ def perform_new_request_send(uid, recid,
                        attempt_sleeptime=10
                        )
             if CFG_CERN_SITE == 1:
-                message = bibcirculation_templates.tmpl_message_request_send_ok_cern(ln=ln)
+                message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
             else:
-                message = bibcirculation_templates.tmpl_message_request_send_ok_other(ln=ln)
+                message = bibcirculation_templates.tmpl_message_request_send_ok_other()
 
         else:
             if CFG_CERN_SITE == 1:
@@ -244,7 +246,7 @@ def perform_new_request_send(uid, recid,
                     db.add_borrower_address(ldap_address, email)
 
                     db.new_hold_request(is_borrower, recid, barcode,
-                                        request_from, request_to, status)
+                                        period_from, period_to, status)
 
                     db.update_item_status('requested', barcode)
 
@@ -300,24 +302,24 @@ def perform_new_request_send(uid, recid,
                 is_borrower = db.is_borrower(email)
 
                 db.new_hold_request(is_borrower, recid, barcode,
-                                    request_from, request_to, status)
+                                    period_from, period_to, status)
 
                 db.update_item_status('requested', barcode)
 
                 send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                           toaddr=CFG_SITE_SUPPORT_EMAIL,
+                           toaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
                            subject='Hold request for books confirmation',
                            content=hold_request_mail(recid, is_borrower),
                            attempt_times=1,
                            attempt_sleeptime=10
                            )
-                message = bibcirculation_templates.tmpl_message_request_send_ok_cern(ln=ln)
+                message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
 
             else:
-                message = bibcirculation_templates.tmpl_message_request_send_fail_cern(ln=ln)
+                message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
 
         else:
-            message = bibcirculation_templates.tmpl_message_request_send_ok_other(ln=ln)
+            message = bibcirculation_templates.tmpl_message_request_send_ok_other()
 
     body = bibcirculation_templates.tmpl_new_request_send(message=message, ln=ln)
 
@@ -340,6 +342,9 @@ def ill_request_with_recid(recid, ln=CFG_SITE_LANG):
 
     return body
 
+ #(title, year, authors, isbn, publisher) = book_information_from_MARC(int(recid))
+ #book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
+ #                'year' : year,  'edition': edition, 'isbn' : isbn}
 
 def ill_register_request_with_recid(recid, uid, period_of_interest_from,
                                     period_of_interest_to, additional_comments,
@@ -360,86 +365,16 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
     @type period_of_interest_to: string
     """
 
+
     # create a dictionnary
     book_info = {'recid': recid}
+
+
 
     user = collect_user_info(uid)
     is_borrower = db.is_borrower(user['email'])
 
-    #Check if borrower is on DB.
-    if is_borrower != 0:
-        address = db.get_borrower_address(user['email'])
-
-        #Check if borrower has an address.
-        if address != 0:
-
-            #Check if borrower has accepted ILL conditions.
-            if conditions:
-
-                #Register ILL request on crcILLREQUEST.
-                db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, 'pending', additional_comments,
-                                        only_edition or 'False')
-
-                #Display confirmation message.
-                message = "Your ILL request has been registered and the " \
-                          "document will be sent to you via internal mail."
-
-                #Notify librarian about new ILL request.
-                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                               toaddr=CFG_SITE_SUPPORT_EMAIL,
-                               subject='ILL request for books confirmation',
-                               content=hold_request_mail(recid, is_borrower),
-                               attempt_times=1,
-                               attempt_sleeptime=10
-                               )
-
-            #Borrower did not accept ILL conditions.
-            else:
-                infos = []
-                infos.append("You didn't accept the ILL conditions.")
-                body = bibcirculation_templates.tmpl_ill_request_with_recid(recid, infos=infos, ln=ln)
-
-        #Borrower doesn't have an address.
-        else:
-
-            #If BibCirculation at CERN, use LDAP.
-            if CFG_CERN_SITE == 1:
-                email=user['email']
-                result = get_user_info_from_ldap(email)
-
-                try:
-                    ldap_address = result['physicalDeliveryOfficeName'][0]
-                except KeyError:
-                    ldap_address = None
-
-                # verify address
-                if ldap_address is not None:
-                    db.add_borrower_address(ldap_address, email)
-
-                    db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                            period_of_interest_to, additional_comments,
-                                            conditions, only_edition or 'False')
-
-                    message = "Your ILL request has been registered and the document"\
-                              " will be sent to you via internal mail."
-
-
-                    send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                               toaddr=CFG_SITE_SUPPORT_EMAIL,
-                               subject='ILL request for books confirmation',
-                               content=hold_request_mail(recid, is_borrower),
-                               attempt_times=1,
-                               attempt_sleeptime=10
-                               )
-                else:
-                    message = "It is not possible to validate your request. "\
-                              "Your office address is not available. "\
-                              "Please contact ... "
-
-    else:
-
-        # Get information from CERN LDAP
+    if is_borrower == 0:
         if CFG_CERN_SITE == 1:
             result = get_user_info_from_ldap(email=user['email'])
 
@@ -468,36 +403,59 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
             except KeyError:
                 mailbox = None
 
-            # verify address
             if address is not None:
                 db.new_borrower(name, email, phone, address, mailbox, '')
-
-                is_borrower = db.is_borrower(email)
-
-                db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, additional_comments,
-                                        conditions, only_edition or 'False')
-
-                message = "Your ILL request has been registered and the document"\
-                          " will be sent to you via internal mail."
-
-                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                           toaddr=CFG_SITE_SUPPORT_EMAIL,
-                           subject='ILL request for books confirmation',
-                           content=hold_request_mail(recid, is_borrower),
-                           attempt_times=1,
-                           attempt_sleeptime=10
-                           )
-
             else:
-                message = "It is not possible to validate your request. "\
-                          "Your office address is not available."\
-                          " Please contact ... "
+                message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
+        else:
+            message = bibcirculation_templates.tmpl_message_request_send_fail_other()
 
-    body = bibcirculation_templates.tmpl_ill_register_request_with_recid(message=message, ln=ln)
+        return bibcirculation_templates.tmpl_ill_register_request_with_recid(message=message, ln=ln)
 
+    address = db.get_borrower_address(user['email'])
+    if address == 0:
+        if CFG_CERN_SITE == 1:
+            email=user['email']
+            result = get_user_info_from_ldap(email)
 
-    return body
+            try:
+                address = result['physicalDeliveryOfficeName'][0]
+            except KeyError:
+                address = None
+
+            if address is not None:
+                db.add_borrower_address(address, email)
+            else:
+                message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
+        else:
+            message = bibcirculation_templates.tmpl_message_request_send_fail_other()
+
+        return bibcirculation_templates.tmpl_ill_register_request_with_recid(message=message, ln=ln)
+
+    if not conditions:
+        infos = []
+        infos.append("You didn't accept the ILL conditions.")
+        return bibcirculation_templates.tmpl_ill_request_with_recid(recid, infos=infos, ln=ln)
+
+    else:
+        db.ill_register_request(book_info, is_borrower, period_of_interest_from,
+                                period_of_interest_to, 'new', additional_comments,
+                                only_edition or 'False','book')
+
+        if CFG_CERN_SITE == 1:
+            message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
+        else:
+            message = bibcirculation_templates.tmpl_message_request_send_ok_other()
+
+        #Notify librarian about new ILL request.
+        send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                    toaddr="piubrau@gmail.com",
+                    subject='ILL request for books confirmation',
+                    content=hold_request_mail(recid, is_borrower),
+                    attempt_times=1,
+                    attempt_sleeptime=10)
+
+        return bibcirculation_templates.tmpl_ill_register_request_with_recid(message=message, ln=ln)
 
 
 def display_ill_form(ln=CFG_SITE_LANG):
@@ -514,7 +472,7 @@ def display_ill_form(ln=CFG_SITE_LANG):
 
 def ill_register_request(uid, title, authors, place, publisher, year, edition,
                          isbn, period_of_interest_from, period_of_interest_to,
-                         additional_comments, conditions, only_edition, ln=CFG_SITE_LANG):
+                         additional_comments, conditions, only_edition, request_type, ln=CFG_SITE_LANG):
     """
     Register new ILL request. Create new record (collection: ILL Books)
 
@@ -576,8 +534,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
 
                 #Register ILL request on crcILLREQUEST.
                 db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, 'pending', additional_comments,
-                                        only_edition or 'False')
+                                        period_of_interest_to, 'new', additional_comments,
+                                        only_edition or 'False', request_type)
 
                 #Display confirmation message.
                 message = "Your ILL request has been registered and the " \
@@ -616,8 +574,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                     db.add_borrower_address(ldap_address, email)
 
                     db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, 'pending', additional_comments,
-                                        only_edition or 'False')
+                                        period_of_interest_to, 'new', additional_comments,
+                                        only_edition or 'False', request_type)
 
                     message = "Your ILL request has been registered and the document"\
                               " will be sent to you via internal mail."
@@ -673,8 +631,8 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                 is_borrower = db.is_borrower(email)
 
                 db.ill_register_request(book_info, is_borrower, period_of_interest_from,
-                                        period_of_interest_to, 'pending', additional_comments,
-                                        only_edition or 'False')
+                                        period_of_interest_to, 'new', additional_comments,
+                                        only_edition or 'False', request_type)
 
                 message = "Your ILL request has been registered and the document"\
                           " will be sent to you via internal mail."
