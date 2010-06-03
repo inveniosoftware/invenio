@@ -28,6 +28,7 @@ import pprint
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
+from invenio.errorlib import register_exception
 
 def Create_Modify_Interface_getfieldval_fromfile(cur_dir, fld=""):
     """Read a field's value from its corresponding text file in 'cur_dir' (if it exists) into memory.
@@ -83,7 +84,16 @@ def Create_Modify_Interface_transform_date(fld_val):
 def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     """
     Create an interface for the modification of a document, based on
-    the fields that the user has chosen to modify.
+    the fields that the user has chosen to modify. This avoids having
+    to redefine a submission page for the modifications, but rely on
+    the elements already defined for the initial submission i.e. SBI
+    action (The only page that needs to be built for the modification
+    is the page letting the user specify a document to modify).
+
+    This function should be added at step 1 of your modification
+    workflow, after the functions that retrieves report number and
+    record id (Get_Report_Number, Get_Recid). Functions at step 2 are
+    the one executed upon successful submission of the form.
 
     Create_Modify_Interface expects the following parameters:
 
@@ -99,8 +109,22 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     FORM is then created. This form allows a user to modify certain
     field values for a record.
 
-    The file referenced by "fieldnameMBI" is usually generated from a
-    multiple select form field)
+    The file referenced by 'fieldnameMBI' is usually generated from a
+    multiple select form field): users can then select one or several
+    fields to modify
+
+    Note that the function will display WebSubmit Response elements,
+    but will not be able to set an initial value: this must be done by
+    the Response element iteself.
+
+    The function creates a file named 'Create_Modify_Interface_DONE'
+    in the submission directory after it has been executed for the
+    first time. This flag is an indicator for the function that
+    displayed values should not be retrieved from the database, but
+    from the submitted values (in case the page is reloaded). You can
+    also rely on this value when building your WebSubmit Response
+    element in order to retrieve value either from the record, or from
+    the submission directory.
     """
     global sysno,rn
     t = ""
@@ -228,8 +252,8 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
                     exec co in the_globals
                     text = the_globals['text']
                 except:
-                    msg = "Error in evaluating response element %s with globals %s" % (pprint.pformat(full_field), pprint.pformat(globals()))
-                    register_exception(req=req, alert_admin=True, prefix=msg)
+                    msg = "Error in evaluating response element %s with globals %s" % (pprint.pformat(field), pprint.pformat(globals()))
+                    register_exception(req=None, alert_admin=True, prefix=msg)
                     raise InvenioWebSubmitFunctionError(msg)
             else:
                 text = "%s: unknown field type" % field

@@ -27,7 +27,21 @@ img_DATA = websubmit-admin-guide-elements.png \
 	websubmit-admin-guide-form.png \
 	websubmit-admin-guide-main_menu.png \
 	websubmit-admin-guide-menu_page.png \
-    publiline-guide-flow.png
+	publiline-guide-flow.png \
+	websubmit-admin-guide-workflow1.png \
+	websubmit-admin-guide-workflow2.png \
+	websubmit-admin-guide-workflow3.png \
+	websubmit-admin-guide-workflow4.png \
+	websubmit-admin-guide-workflow4b.png \
+	websubmit-admin-guide-page0.jpg \
+	websubmit-admin-guide-screenshot1.png \
+	websubmit-admin-guide-screenshot2.png \
+	websubmit-admin-guide-screenshot3.png \
+	websubmit-admin-guide-screenshot4.png \
+	websubmit-admin-guide-screenshot1-small.png \
+	websubmit-admin-guide-screenshot2-small.png \
+	websubmit-admin-guide-screenshot3-small.png \
+	websubmit-admin-guide-screenshot4-small.png
 
 webdoclibdir = $(libdir)/webdoc/invenio/admin
 
