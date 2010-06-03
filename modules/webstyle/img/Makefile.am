@@ -25,8 +25,6 @@ img_DATA = add-small.png \
            arrow_link-icon-15x11-right.gif \
            arrow_up.gif \
            arrow_up2.png \
-           atlantis_logo.gif \
-           atlantis_logo_small.gif \
            at.gif \
            balloon_arrow_left_shadow.png \
            balloon_bottom_left_shadow.png \
@@ -42,7 +40,6 @@ img_DATA = add-small.png \
            blue_gradient.gif \
            bullet_toggle_minus.png \
            bullet_toggle_plus.png \
-           cds.png \
            circle_green.png \
            circle_red.png \
            cross_red.gif \
@@ -147,6 +144,9 @@ img_DATA = add-small.png \
            sclose.gif \
            se.gif \
            search.png \
+           site_logo.gif \
+           site_logo_rss.png \
+           site_logo_small.gif \
            smallbin.gif \
            smalldown.gif \
            smallfiles.gif \

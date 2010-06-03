@@ -274,7 +274,7 @@ color: #6E5907;
 }
 .headerboxbodylogo a, .headerboxbodylogo a:visited{
    padding-left: 40px;
-   background: transparent url(atlantis_logo_small.gif) no-repeat top left;
+   background: transparent url(site_logo_small.gif) no-repeat top left;
    color: #36c;
    font-size: 20px;
    font-weight: bold;
@@ -291,7 +291,7 @@ color: #6E5907;
 .home .headerboxbodylogo a, .home .headerboxbodylogo a:visited{
    margin-left: 5px;
    padding-left: 90px;
-   background: transparent url(atlantis_logo.gif) no-repeat top left;
+   background: transparent url(site_logo.gif) no-repeat top left;
    height: 75px;
    line-height: 3em;
    font-size: 26px;

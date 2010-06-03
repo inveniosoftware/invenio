@@ -63,7 +63,6 @@ from invenio.config import \
 
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
-#from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
@@ -3388,7 +3387,7 @@ class Template:
         <webMaster>%(sitesupportemail)s</webMaster>
         <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s%(total_results)s%(start_index)s%(items_per_page)s
         <image>
-            <url>%(siteurl)s/img/cds.png</url>
+            <url>%(siteurl)s/img/site_logo_rss.png</url>
             <title>%(sitename)s</title>
             <link>%(siteurl)s</link>
         </image>
