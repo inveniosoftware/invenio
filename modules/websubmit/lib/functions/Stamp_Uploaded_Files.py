@@ -40,7 +40,7 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
             values (or names of files in curdir containing the values)
             with which to replace them. Use prefix 'FILE:' to specify
             that the stamped value must be read from a file in
-            submission direcotory instead of being a fixed value to
+            submission directory instead of being a fixed value to
             stamp.
             E.G.:
                { 'TITLE' : 'FILE:DEMOTHESIS_TITLE',
@@ -51,6 +51,13 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
             should be stamped: This is a comma-separated list of directory
             names. E.g.:
                DEMOTHESIS_MAIN,DEMOTHESIS_ADDITIONAL
+
+            (If you use Create_Upload_Files_Interface function, you
+            should know that uploaded files goes under a subdirectory
+            'updated/' of the /files/ folder in submission directory:
+            in this case you have to specify this component in the
+            parameter. For eg:
+            updated/DEMOTHESIS_MAIN,updated/DEMOTHESIS_ADDITIONAL)
 
          + stamp: (string) - the type of stamp to be applied to the files.
             should be one of:
@@ -65,6 +72,19 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
               + foreground (on top of the stamped file. If the stamp
                             does not have a transparent background,
                             will hide all of the document layers)
+
+         + switch_file: (string) - when this value is set, specifies
+            the name of a file that will swith on/off the
+            stamping. The 'switch_file' must contain the names defined
+            in 'files_to_be_stamped' (comma-separated values). Stamp
+            will be applied only to files referenced in the
+            switch_file. No stamp is applied if the switch_file is
+            missing from the submission directory.
+            However if the no switch_file is defined in this variable
+            (parameter is left empty), stamps are applied according
+            the variable 'files_to_be_stamped'.
+            Useful for eg. if you want to let your users control the
+            stamping with a checkbox on your submission page.
 
     If all goes according to plan, for each directory in which files are to
     be stamped, the original, unstamped files should be found in a
@@ -128,6 +148,26 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
         stamping_locations = stamp_content_of.split(",")
     else:
         stamping_locations = []
+
+    ## Check if stamping is enabled
+    switch_file = parameters.get('switch_file', '')
+    if switch_file:
+        # Good, a "switch file" was specified. Check if it exists, and
+        # it its value is not empty.
+        switch_file_content = ''
+        try:
+            fd = file(os.path.join(curdir, switch_file))
+            switch_file_content = fd.read().split(',')
+            fd.close()
+        except:
+            switch_file_content = ''
+        if not switch_file_content:
+            # File does not exist, or is emtpy. Silently abort
+            # stamping.
+            return ""
+        else:
+            stamping_locations = [location for location in stamping_locations \
+                                  if location in switch_file_content]
 
     if len(stamping_locations) == 0:
         ## If there are no items to be stamped, don't continue:

@@ -519,6 +519,7 @@ INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template_vars');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','stamp');
 INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','layer');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','switch_file');
 INSERT INTO sbmFUNDESC VALUES ('Make_Dummy_MARC_XML_Record','dummyrec_source_tpl');
 INSERT INTO sbmFUNDESC VALUES ('Make_Dummy_MARC_XML_Record','dummyrec_create_tpl');
 INSERT INTO sbmFUNDESC VALUES ('Print_Success_APP','decision_file');

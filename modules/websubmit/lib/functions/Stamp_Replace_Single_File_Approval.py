@@ -57,7 +57,7 @@ def Stamp_Replace_Single_File_Approval(parameters, \
             values (or names of files in curdir containing the values)
             with which to replace them. Use prefix 'FILE:' to specify
             that the stamped value must be read from a file in
-            submission direcotory instead of being a fixed value to
+            submission directory instead of being a fixed value to
             stamp.
             E.G.:
                { 'TITLE' : 'FILE:DEMOTHESIS_TITLE',
