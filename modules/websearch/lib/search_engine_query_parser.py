@@ -610,7 +610,7 @@ class SpiresToInvenioSyntaxConverter:
         self._re_pattern_double_quotes = re.compile("\"(.*?)\"")
         self._re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
         self._re_pattern_space = re.compile("__SPACE__")
-
+        self._re_pattern_IRN_search = re.compile(r'970__a:(?P<irn>\d+)')
 
     def convert_query(self, query):
         """Converts the query from SPIRES syntax to Invenio syntax
@@ -639,6 +639,7 @@ class SpiresToInvenioSyntaxConverter:
             query = self._distribute_keywords_across_combinations(query)
 
             query = self._convert_dates(query)
+            query = self._convert_irns_to_spires_irns(query)
             query = self._convert_spires_author_search_to_invenio_author_search(query)
             query = self._convert_spires_exact_author_search_to_invenio_author_search(query)
             query = self._convert_spires_truncation_to_invenio_truncation(query)
@@ -767,6 +768,14 @@ class SpiresToInvenioSyntaxConverter:
 
         query = self._re_dates_match.sub(create_replacement_pattern, query)
 
+        return query
+
+    def _convert_irns_to_spires_irns(self, query):
+        """Prefix IRN numbers with SPIRES- so they match the INSPIRE format."""
+        def create_replacement_pattern(match):
+            """method used for replacement with regular expression"""
+            return '970__a:SPIRES-' + match.group('irn')
+        query = self._re_pattern_IRN_search.sub(create_replacement_pattern, query)
         return query
 
     def _convert_spires_date_after_to_invenio_span_query(self, query):
