@@ -463,7 +463,7 @@ class Template:
 <Developer>Powered by CDS Invenio</Developer>
 <Url type="text/html" indexOffset="1" rel="results" template="%(html_search_syntax)s" />
 <Url type="application/rss+xml" indexOffset="1" rel="results" template="%(rss_search_syntax)s" />
-<Url type="application/opensearchdescription+xml" rel="self" template="%(CFG_SITE_URL)s/search/opensearchdescription" />
+<Url type="application/opensearchdescription+xml" rel="self" template="%(CFG_SITE_URL)s/opensearchdescription" />
 <moz:SearchForm>%(CFG_SITE_URL)s</moz:SearchForm>
 </OpenSearchDescription>""" % \
   {'CFG_SITE_URL': CFG_SITE_URL,
@@ -3388,14 +3388,13 @@ class Template:
         <category></category>
         <generator>CDS Invenio %(version)s</generator>
         <webMaster>%(sitesupportemail)s</webMaster>
-        <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s%(total_results)s%(start_index)s%(total_results)s
+        <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s%(total_results)s%(start_index)s%(items_per_page)s
         <image>
             <url>%(siteurl)s/img/cds.png</url>
             <title>%(sitename)s</title>
             <link>%(siteurl)s</link>
         </image>
-         <url type="application/rss+xml" indexOffset="1" rel="results" template="%(search_syntax)s" />
-         <atom:link rel="search" href="%(siteurl)s/search/opensearchdescription" type="application/opensearchdescription+xml" title="Content Search" />
+         <atom:link rel="search" href="%(siteurl)s/opensearchdescription" type="application/opensearchdescription+xml" title="Content Search" />
 
         <textInput>
           <title>Search </title>
@@ -3425,7 +3424,7 @@ class Template:
                              '\n<opensearch:totalResults>%i</opensearch:totalResults>' % nb_found) or '',
                'start_index': (jrec and \
                              '\n<opensearch:startIndex>%i</opensearch:startIndex>' % jrec) or '',
-               'total_results': (rg and \
+               'items_per_page': (rg and \
                              '\n<opensearch:itemsPerPage>%i</opensearch:itemsPerPage>' % rg) or '',
         }
         return out
