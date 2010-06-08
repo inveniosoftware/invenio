@@ -813,7 +813,7 @@ def create_file_upload_interface(recid,
     if len(cleaned_doctypes) > 0:
         body += '''<input type="button" onclick="%(display_revise_panel)s;updateForm('%(defaultSelectedDoctype)s', %(can_describe_doctypes)s, %(can_comment_doctypes)s, %(can_restrict_doctypes)s);return false;" value="%(add_new_file)s"/>''' % \
                {'display_revise_panel':javascript_display_revise_panel(action='add', target='', show_doctypes=True, show_keep_previous_versions=False, show_rename=can_name_new_files, show_description=True, show_comment=True, bibdocname='', description='', comment='', show_restrictions=True, restriction=len(restrictions_and_desc) > 0 and restrictions_and_desc[0][0] or '', doctypes=doctypes_list),
-                'defaultSelectedDoctype': doctypes[0],
+                'defaultSelectedDoctype': cleaned_doctypes[0],
                 'add_new_file': _("Add new file"),
                 'can_describe_doctypes':js_can_describe_doctypes,
                 'can_comment_doctypes': repr({}.fromkeys(can_comment_doctypes, '')),
