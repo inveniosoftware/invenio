@@ -31,7 +31,8 @@ from cStringIO import StringIO
 from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
     CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, \
-    CFG_CERN_SITE, CFG_SITE_EMERGENCY_PHONE_NUMBERS
+    CFG_CERN_SITE, CFG_SITE_EMERGENCY_PHONE_NUMBERS, \
+    CFG_SITE_ADMIN_EMAIL_EXCEPTIONS
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -291,8 +292,8 @@ def register_exception(force_stack=False,
     the log
 
     @param alert_admin: wethever to send the exception to the administrator via
-        email
-
+        email. Note this parameter is bypassed when
+                CFG_SITE_ADMIN_EMAIL_EXCEPTIONS is set to a value different than 1
     @param subject: overrides the email subject
 
     @return: 1 if successfully wrote to stream, 0 if not
@@ -345,13 +346,19 @@ def register_exception(force_stack=False,
             except:
                 written_to_log = False
 
-            if alert_admin or not written_to_log:
+            if CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or \
+                (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or \
+                not written_to_log:
                 ## If requested or if it's impossible to write in the log
                 from invenio.mailutils import send_email
                 if not subject:
                     filename, line_no, function_name = _get_filename_and_line(exc_info)
                     subject = 'Exception (%s:%s:%s)' % (filename, line_no, function_name)
                 subject = '%s at %s' % (subject, CFG_SITE_URL)
+                if not written_to_log:
+                        email_text += """\
+Note that this email was sent to you because it has been impossible to log
+this exception into %s""" % os.path.join(CFG_LOGDIR, 'invenio.' + stream)
                 send_email(
                     CFG_SITE_ADMIN_EMAIL,
                     CFG_SITE_ADMIN_EMAIL,
