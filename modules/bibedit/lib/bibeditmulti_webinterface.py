@@ -108,7 +108,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
                                        text = auth_msg)
 
         if argd[self._JSON_DATA_KEY]:
-            return self._process_json_request(form)
+            return self._process_json_request(form, req)
 
         body = multi_edit_engine.perform_request_index(language)
         title = _("Multi-Record Editor")
@@ -123,7 +123,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
 
     __call__ = index
 
-    def _process_json_request(self, form):
+    def _process_json_request(self, form, req):
         """Takes care about the json requests."""
 
         argd = wash_urlargd(form, {
@@ -185,7 +185,7 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
 
         elif action_type == self._action_types.submit_changes:
             commands_list, upload_mode, tag_list = self._create_commands_list(commands)
-            return multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language, upload_mode, tag_list, collection)
+            return multi_edit_engine.perform_request_submit_changes(search_criteria, commands_list, language, upload_mode, tag_list, collection, req)
 
         # In case we obtain wrong action type we return empty page.
         return " "

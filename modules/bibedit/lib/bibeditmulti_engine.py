@@ -42,9 +42,13 @@ from invenio import search_engine
 from invenio import bibrecord
 from invenio import bibformat
 
-from invenio.config import CFG_TMPDIR
+from invenio.config import CFG_TMPDIR, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,\
+                           CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,\
+                           CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME
 from time import strftime
 from invenio.bibtask import task_low_level_submission
+
+from invenio.webuser import collect_user_info, isUserSuperAdmin
 
 from invenio.dbquery import run_sql
 
@@ -316,7 +320,7 @@ def perform_request_test_search(search_criteria, update_commands, output_format,
                                                 output_format=output_format)
     return result
 
-def perform_request_submit_changes(search_criteria, update_commands, language, upload_mode, tag_list, collection):
+def perform_request_submit_changes(search_criteria, update_commands, language, upload_mode, tag_list, collection, req):
     """Submits changes for upload into database.
 
     @param search_criteria: search criteria used in the test search
@@ -324,9 +328,9 @@ def perform_request_submit_changes(search_criteria, update_commands, language, u
     @param language: the language used to format the content
     """
 
-    _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection)
+    status, file_path = _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection, req)
 
-    return multiedit_templates.changes_applied()
+    return multiedit_templates.changes_applied(status, file_path)
 
 def _get_formated_record(record_id, output_format, update_commands, language, outputTags=""):
     """Returns a record in a given format
@@ -397,7 +401,7 @@ def _create_marc(records_xml):
 
     return aleph_marc_output
 
-def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection):
+def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, tag_list, collection, req):
     """This methods takes care of submitting the changes to the server
     through bibupload.
 
@@ -411,6 +415,7 @@ def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, 
     if collection == "Any collection":
         collection = ""
     record_IDs = search_engine.perform_request_search(p=search_criteria, c=collection)
+    num_records = len(record_IDs)
 
     updated_records = []
 
@@ -420,7 +425,7 @@ def _submit_changes_to_bibupload(search_criteria, update_commands, upload_mode, 
 
     file_path = _get_file_path_for_bibupload()
     _save_records_xml(updated_records, file_path, upload_mode, tag_list)
-    _upload_file_with_bibupload(file_path, upload_mode)
+    return _upload_file_with_bibupload(file_path, upload_mode, num_records, req)
 
 def _get_updated_record(record_id, update_commands):
     """Applies all the changes specified by the commands
@@ -437,14 +442,31 @@ def _get_updated_record(record_id, update_commands):
 
     return record
 
-def _upload_file_with_bibupload(file_path, upload_mode):
+def _upload_file_with_bibupload(file_path, upload_mode, num_records, req):
     """
     Uploads file with bibupload
 
        @param file_path: path to the file where the XML will be saved.
        @param upload_mode: -c for correct or -r for replace
+       @return tuple formed by status of the upload:
+           0-changes to be made instantly
+           1-changes to be made only in limited hours
+           2-user is superadmin. Changes made in limited hours
+           3-no rights to upload
+           and the upload file path
     """
-    task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '%s' % file_path)
+    if num_records < CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING:
+        task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '%s' % file_path)
+        return (0, file_path)
+    elif num_records < CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING:
+        task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '-L', CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME,'%s' % file_path)
+        return (1, file_path)
+    else:
+        user_info = collect_user_info(req)
+        if isUserSuperAdmin(user_info):
+            task_low_level_submission('bibupload', 'multiedit', '-P', '5', upload_mode, '-L', CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME, '%s' % file_path)
+            return (2, file_path)
+        return (3, file_path)
 
 def _get_file_path_for_bibupload():
     """Returns file path for saving a file for bibupload """

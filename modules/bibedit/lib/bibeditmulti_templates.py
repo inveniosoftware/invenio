@@ -21,7 +21,10 @@ __revision__ = "$Id$"
 
 import cgi
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,\
+                           CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,\
+                           CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME,\
+                           CFG_SITE_ADMIN_EMAIL
 from invenio.messages import gettext_set_language
 
 
@@ -138,6 +141,26 @@ div .boxleft {
 
 #actionsDisplayArea .header {
     background-color: #C3D9FF;
+}
+
+.clean-ok{
+    border:solid 1px #349534;
+    background:#C9FFCA;
+    color:#008000;
+    font-size:14px;
+    font-weight:bold;
+    padding:4px;
+    text-align:center;
+}
+
+.clean-error{
+    border:solid 1px #CC0000;
+    background:#F7CBCA;
+    color:#CC0000;
+    font-size:14px;
+    font-weight:bold;
+    padding:4px;
+    text-align:center;
 }
 
 </style>
@@ -473,10 +496,13 @@ div .boxleft {
             next_page_button = ""
             last_page_button = ""
 
-#<span class="buttonOutputFormatMARC  linkButton">MARC</span>,
-#                    <span class="buttonOutputFormatHTMLBrief  linkButton">HTML Brief</span>
-
+        user_warning = ""
+        if number_of_records > CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING:
+            user_warning = """<div class="clean-error">%(warning_msg)s</div>
+                           """ % {"warning_msg": "Due to the amount of records to be modified, you need 'superadmin' rights to send the modifications. If it is not the case, your changes will be saved once you click the 'Apply Changes' button and you will be able to contact the admin to apply them"
+                                 }
         header = """
+        %(user_warning)s
         <table class="searchresultsbox">
             <tr><td class="searchresultsboxheader">
                 <strong>%(number_of_records)s</strong> %(text_records_found)s
@@ -495,7 +521,8 @@ div .boxleft {
             </tr>
         </table>
 
-        """ % {"number_of_records" : number_of_records,
+        """ % {"user_warning": user_warning,
+               "number_of_records" : number_of_records,
                "text_records_found" : _("records found"),
                "first_page_button" : first_page_button,
                "previous_page_button" : previous_page_button,
@@ -556,9 +583,32 @@ div .boxleft {
 
         return result
 
-    def changes_applied(self):
+    def changes_applied(self, status, file_path):
         """ returns html message when changes sent to server """
 
-        body = "Changes have been sent to the server. It will take some time before they are applied. You can <a href=%s/record/multiedit>reset </a> the editor." % (CFG_SITE_URL)
-
+        if status == 0:
+            body = """
+                   <div class="clean-ok"><div>Changes have been sent to the server. It will take some time before they are applied. You can <a href=%s/record/multiedit>reset </a> the editor.</div>
+                   """ % (CFG_SITE_URL)
+        elif status in [1, 2]:
+            body = """
+                   <div class="clean-ok">You are submitting a file that manipulates more than %s records. Your job will therefore be processed only during <strong>%s</strong>. <br /><br />
+            If you are not happy about this, please contact %s, quoting your file <strong>%s</strong> <br /><br />
+            You can <a href=%s/record/multiedit>reset</a> the editor.</div>
+                   """ % (CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,
+                          CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME,
+                          CFG_SITE_ADMIN_EMAIL,
+                          file_path,
+                          CFG_SITE_URL)
+        else:
+            body = """
+                   <div class="clean-error">Sorry, you are submitting a file that manipulates more than %s records. You don't have enough rights for this.
+                   <br /> <br />
+                   If you are not happy about this, please contact %s, quoting your file %s <br /><br />
+                   You can <a href=%s/record/multiedit>reset</a> the editor.</div>
+                   """ % (CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,
+                          CFG_SITE_ADMIN_EMAIL,
+                          file_path,
+                          CFG_SITE_URL)
         return body
+
