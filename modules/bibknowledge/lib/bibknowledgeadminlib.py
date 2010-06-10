@@ -98,14 +98,21 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to",
                 newmappings.append(mapping)
         #we were searching, so replace
         mappings = newmappings
-    #if this bk is dynamic, get the configuration from the DB
+    #if this bk is dynamic, get the configuration from the DB, and a list of
+    #collections as a bonus
     dyn_config = None
+    collections = None
     if kb_type == 'd':
+        from invenio.search_engine import get_alphabetically_ordered_collection_list
         dyn_config = bibknowledge_dblayer.get_kb_dyn_config(kb_id)
+        collections = []
+        collitems = get_alphabetically_ordered_collection_list()
+        for collitem in collitems:
+            collections.append(collitem[0])
     return bibknowledge_templates.tmpl_admin_kb_show(ln, kb_id, name,
                                                      mappings, sortby, startat,
                                                      kb_type, search_term,
-                                                     dyn_config)
+                                                     dyn_config, collections)
 
 
 def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG,

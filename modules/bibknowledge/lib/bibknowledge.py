@@ -138,6 +138,12 @@ def add_kb(kb_name="Untitled", kb_type=None):
     kb_id = bibknowledge_dblayer.add_kb(name, "", kb_type)
     return kb_id
 
+def add_dynamic_kb(kbname, tag, collection="", searchwith=""):
+    """A convenience method"""
+    kb_id = add_kb(kb_name=kbname, kb_type='dynamic')
+    bibknowledge_dblayer.save_kb_dyn_config(kb_id, tag, collection, searchwith)
+    return kb_id
+
 def kb_mapping_exists(kb_name, key):
     """
     Returns the information if a mapping exists.
@@ -282,29 +288,37 @@ def get_kbd_values(kbname, searchwith=""):
         return []
     if not confdict.has_key('field'):
         return []
+    myefield = None #the field by wich to search, in expression
     field = confdict['field']
     expression = confdict['expression']
     collection = ""
     if confdict.has_key('collection'):
         collection = confdict['collection']
     reclist = [] #return this
-    #see if searchwith is a quoted expression
-    if searchwith:
-        if not searchwith.startswith("'"):
-            searchwith = "'"+searchwith
-        if not searchwith.endswith("'"):
-            searchwith = searchwith+"'"
     if searchwith and expression:
-        if (expression.count('%') > 0) or (expression.endswith(":*")):
+        if (expression.count('%') > 0):
             expression = expression.replace("%", searchwith)
-            expression = expression.replace(":*", ':'+searchwith)
+            #take the field, unnecessary except for debugging..
+            myval = ""
+            found = expression.find(":")
+            if (found > -1):
+                myefield = expression[:found]
+                myval = expression[found+1:]
+                #check if myval is quoted..
+                if not (myval.startswith("'") or myval.startswith('"')):
+                    myval = "'"+myval
+                if not (myval.endswith("'") or myval.endswith('"')):
+                    myval = myval+"'"
+                expression = myefield+":"+myval
+            reclist = search_engine.perform_request_search(p=expression,
+                                                           cc=collection)
         else:
             #no %.. just make a combination
-            expression = expression + "and "+searchwith
-        reclist = search_engine.perform_request_search(p=expression,
+            expression = expression + " and "+searchwith
+            reclist = search_engine.perform_request_search(p=expression,
                                                        cc=collection)
     else: #either no expr or no searchwith.. but never mind about searchwith
-        if expression:
+        if expression: #in this case: only expression
             reclist = search_engine.perform_request_search(p=expression, cc=collection)
         else:
             #make a fake expression so that only records that have this field
@@ -319,25 +333,34 @@ def get_kbd_values(kbname, searchwith=""):
         val_list = []
         for f in fieldvaluelist:
             (val, dummy) = f
-            #support "starts with",
-            #indicated by the * at the end of the searchstring
-            if searchwith and (len(searchwith) > 2) and (searchwith[-2] == '*'):
-                if (val.startswith(searchwith[1:-3])):
-                    val_list.append(val)
-            else:
-                val_list.append(val)
+            val_list.append(val)
         return val_list
     return [] #in case nothing worked
 
-def get_kbd_values_for_bibedit(tag, collection="", searchwith=""):
+
+def get_existing_kbd_values_for_bibedit(kb_name, searchwith=""):
     """
-    A specific convenience method: based on a tag and collection, create a temporary dynamic knowledge base
+    Get values from a configured dynamic kb
+    @param kb_name the name of the knowledge base
+    @param searchwith search by this
+    """
+    return get_kbd_values(kb_name, searchwith)
+
+
+def get_kbd_values_for_bibedit(tag, collection="", searchwith="", dkbname=""):
+    """
+    A specific convenience method: use or create a temporary dynamic knowledge base
     a return its values.
+
+    Example1: tag=100__a : return values of 100__a
+    Example2: tag=100__a, searchwith=Jill: return values of 100__a that match with Jill
+
     Note: the performace of this function is ok compared to a plain
     perform req search / get most popular fields -pair. The overhead is about 5% with large record sets.
     @param tag: the tag like 100__a
     @param collection: collection id
     @param searchwith: the string to search. If empty, match all.
+    @
     """
     kb_id = add_kb(kb_name="tmp_dynamic", kb_type='dynamic')
     #get the kb name since it may be catenated by a number

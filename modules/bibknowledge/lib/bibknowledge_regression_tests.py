@@ -23,9 +23,9 @@ import unittest
 from os import remove
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
 from invenio.bibknowledge import kb_exists, get_kba_values, \
-     get_kbr_keys, get_kbd_values_for_bibedit, get_kbs_info, add_kb,\
+     get_kbr_keys, get_kbd_values_for_bibedit, get_kbs_info, add_kb, add_dynamic_kb, \
      delete_kb, add_kb_mapping, remove_kb_mapping, get_kb_name, kb_mapping_exists, \
-     get_kbt_items_for_bibedit
+     get_kbt_items_for_bibedit, get_existing_kbd_values_for_bibedit
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
 
 
@@ -85,6 +85,16 @@ class BibknowledgeTests(unittest.TestCase):
         """bibknowledge - test a dynamic db"""
         myvalues = get_kbd_values_for_bibedit("100__a", "", "Ellis")
         self.assertEqual(1, len(myvalues))
+
+
+    def test_existing_kb_values_for_bibedit(self):
+        """bibknowledge - create a "find x by y" db and search it"""
+        #create..
+        new_kb_id = add_dynamic_kb("test_dyn","100__a", "245__:%")
+        kbname = get_kb_name(new_kb_id)
+        vals = get_existing_kbd_values_for_bibedit(kbname,"Rio Macâe")
+        self.assertEqual(1, len(val))
+        self.assertEqual(val[0], 'Charles Darwin')
 
     def test_taxonomy(self):
         """bibknowledge - test a taxonomy"""

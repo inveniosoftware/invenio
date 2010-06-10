@@ -91,7 +91,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
             return bibknowledgeadmin.kb_upload(req, kb=kb, ln=ln)
         #check if this is "export"
         if self.extrapath == "export":
-            return bibknowledgeadmin.kb_export(req, kbname=kbname, format=format, ln=ln, searchvalue=term)
+            return bibknowledgeadmin.kb_export(req, kbname=kbname, format=format, searchvalue=search, ln=ln)
 
         #first check if this is a specific action
         if action == "new":

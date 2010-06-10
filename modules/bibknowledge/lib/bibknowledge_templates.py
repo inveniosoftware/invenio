@@ -208,13 +208,14 @@ class Template:
         return out
 
 
-    def tmpl_admin_dynamic_kb(self, ln, kb_id, dyn_config=None, exportstr=""):
+    def tmpl_admin_dynamic_kb(self, ln, kb_id, dyn_config=None, collections=None, exportstr=""):
         """
         An auxiliary method used by tmpl_admin_kb_show in order to configure a dynamic (collection based) kb.
         @param ln: language
         @param kb_id: the id of the kb
         @param kb_name: the name of the kb
         @param dyn_config: a dictionary with keys: expression
+        @param collections: a list of collection names
         @param exportstr: a string to print about exporting
         """
         _ = gettext_set_language(ln)    # load the right message language
@@ -244,14 +245,29 @@ class Template:
                          in 270__a will be created.")+"<br/>"
         pleaseconf += _("If the expression contains '%', like '270__a:*%*', \
                          it will be replaced by a search string when the \
-                         knowledge base is used.")+"<br/>"
+                         knowledge base is used.")+"<br/><br/>"
         pleaseconf += _("You can enter a collection name if the expression \
-                         should be evaluated in a specific collection.")
-
+                         should be evaluated in a specific collection.")+"<br/><br/>"
+        pleaseconf += _("Example 1: Your records contain field 270__a for \
+                         the name and address of the author's institute. \
+                         If you set the field to '270__a' and the expression \
+                         to '270__a:*Paris*', a list of institutes in Paris \
+                         will be created.")+"<br/><br/>"
+        pleaseconf += _("Example 2: Return the institute's name (100__a) when the \
+                         user gives its postal code (270__a): \
+                         Set field to 100__a, expression to 270__a:*%*.")+"<br/><br/>"
+        #create a pretty select box
+        selectbox = "<select name=\"collection\"><option>"+_("Any collection")+"</option>"
+        for mycoll in collections:
+            selectbox += "<option value=\""+mycoll+"\""
+            if mycoll == collection:
+                selectbox += " selected=\"1\" "
+            selectbox += ">"+mycoll+"</option>"
+        selectbox += "</select>"
         pleaseconf += '''<form action="kb">
                          Field: <input name="field" value="%(field)s"/>
                          Expression: <input name="expression" value="%(expression)s"/>
-                         Collection: <input name="collection" value="%(collection)s"/>
+                         Collection: %(selectbox)s
                          <input type="hidden" name="action" value="dynamic_update"/>
                          <input type="hidden" name="ln" value="%(ln)s"/>
                          <input type="hidden" name="kb" value="%(kb_id)s"/>
@@ -259,7 +275,8 @@ class Template:
                          </form>''' % { 'kb_id': kb_id,
                                         'expression': cgi.escape(expression, 1),
                                         'field': cgi.escape(field, 1),
-                                        'collection': cgi.escape(collection, 1), 'ln': ln ,
+                                        'collection': cgi.escape(collection, 1),
+                                        'selectbox': selectbox, 'ln': ln ,
                                         'save': _("Save")}
         if field or expression:
             pleaseconf += "<p>"+_("Exporting: ")
@@ -268,7 +285,7 @@ class Template:
 
     def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings,
                            sortby, startat=0, kb_type=None,
-                           lookup_term="", dyn_config=None):
+                           lookup_term="", dyn_config=None, collections=None):
         """
         Returns the content of a knowledge base.
 
@@ -281,6 +298,7 @@ class Template:
         @param kb_type: None or 't' meaning taxonomy, or 'd' meaning a dynamic kb.
         @param lookup_term: focus on this left side if it is in the KB
         @param dyn_config: configuration for dynamic kb's
+        @param collections: a list of collections names (will be needed by dyn kb)
         @return main management console as html
         """
 
@@ -319,7 +337,8 @@ action=attributes&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s">%(attributes)s</a>
 
         if kb_type == 'd':
             #it's a dynamic kb. Create a config form.
-            return self.tmpl_admin_dynamic_kb(ln, kb_id, dyn_config, export)
+
+            return self.tmpl_admin_dynamic_kb(ln, kb_id, dyn_config, collections, export)
 
         if kb_type == 't':
             #it's a taxonomy (ontology). Show a dialog to upload it.
