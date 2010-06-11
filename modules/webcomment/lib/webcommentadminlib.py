@@ -26,7 +26,8 @@ from invenio.webcomment import query_get_comment, \
 from invenio.urlutils import wash_url_argument
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language, wash_language
-from invenio.webuser import get_user_info, collect_user_info
+from invenio.webuser import get_user_info, collect_user_info, \
+                            isUserAdmin
 from invenio.access_control_engine import acc_authorize_action, \
      acc_get_authorized_emails
 from invenio.search_engine import perform_request_search
@@ -78,7 +79,7 @@ def get_user_collections(req):
     collections = run_sql('SELECT name FROM collection')
     for collection in collections:
         collection_emails = acc_get_authorized_emails('moderatecomments', collection=collection[0])
-        if user_info['email'] in collection_emails:
+        if user_info['email'] in collection_emails or isUserAdmin(user_info):
             res.append(collection[0])
     return res
 
@@ -234,7 +235,7 @@ def perform_request_comments(req=None, ln=CFG_SITE_LANG, uid="", comID="", recID
 
 
 
-def perform_request_hot(req=None, ln=CFG_SITE_LANG, comments=1, top=10, collection=""):
+def perform_request_hot(req=None, ln=CFG_SITE_LANG, comments=1, top=10, collection="Show all"):
     """
     Display the list of hottest comments/reviews along with information about the comment.
 
