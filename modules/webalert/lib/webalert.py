@@ -1,5 +1,3 @@
-## $Id$
-##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -45,15 +43,15 @@ class AlertError(Exception):
 def check_alert_name(alert_name, uid, ln=CFG_SITE_LANG):
     """check this user does not have another alert with this name."""
 
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
     sql = """select id_query
            from user_query_basket
-           where id_user=%s and alert_name='%s'"""%(uid, alert_name.strip())
-    res =  run_sql(sql)
+           where id_user=%s and alert_name=%s"""
+    res =  run_sql(sql, (uid, alert_name.strip()))
     if len(res) > 0:
-        raise AlertError( _("You already have an alert named %s.") % ('<b>' + alert_name + '</b>',) )
+        raise AlertError( _("You already have an alert named %s.") % ('<b>' + cgi.escape(alert_name) + '</b>',) )
 
 def get_textual_query_info_from_urlargs(urlargs, ln=CFG_SITE_LANG):
     """Return nicely formatted search pattern and catalogue from urlargs of the search query.
@@ -71,7 +69,7 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
     input:  default permanent="n"; permanent="y" display permanent queries(most popular)
     output: list of searches in formatted html
     """
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
     # first detect number of queries:
@@ -86,18 +84,20 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
         pass
 
     # query for queries:
+    params = ()
     if permanent == "n":
         SQL_query = "SELECT DISTINCT(q.id),q.urlargs "\
                     "FROM query q, user_query uq "\
-                    "WHERE uq.id_user='%s' "\
+                    "WHERE uq.id_user=%s "\
                     "AND uq.id_query=q.id "\
-                    "ORDER BY q.id DESC" % uid
+                    "ORDER BY q.id DESC"
+        params = (uid,)
     else:
         # permanent="y"
         SQL_query = "SELECT q.id,q.urlargs "\
                     "FROM query q "\
                     "WHERE q.type='p'"
-    query_result = run_sql(SQL_query)
+    query_result = run_sql(SQL_query, params)
 
     queries = []
     if len(query_result) > 0:
@@ -129,7 +129,26 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
              guesttxt = warning_guest_user(type="alerts", ln=ln)
            )
 
-def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket,uid, old_id_basket=None, ln = CFG_SITE_LANG):
+def check_user_can_add_alert(id_user, id_query):
+    """Check if ID_USER has really alert adding rights on ID_QUERY
+    (that is, the user made the query herself or the query is one of
+    predefined `popular' queries) and return True or False
+    accordingly.  Useful to filter out malicious users trying to guess
+    idq URL parameter values in order to access potentially restricted
+    query alerts."""
+    # is this a predefined popular query?
+    res = run_sql("""SELECT COUNT(*) FROM query
+                      WHERE id=%s AND type='p'""", (id_query,))
+    if res and res[0][0]:
+        return True
+    # has the user performed this query in the past?
+    res = run_sql("""SELECT COUNT(*) FROM user_query
+                      WHERE id_query=%s AND id_user=%s""", (id_query, id_user))
+    if res and res[0][0]:
+        return True
+    return False
+
+def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket, uid, old_id_basket=None, ln = CFG_SITE_LANG):
     """get the alert settings
     input:  action="add" for a new alert (blank form), action="modify" for an update
             (get old values)
@@ -137,6 +156,11 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
             for the "modify" action specify old alert_name, frequency of checking,
             e-mail notification and basket id.
     output: alert settings input form"""
+    # load the right language
+    _ = gettext_set_language(ln)
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
     # display query information
     res = run_sql("SELECT urlargs FROM query WHERE id=%s", (id_query,))
     try:
@@ -168,8 +192,8 @@ def check_alert_is_unique(id_basket, id_query, uid, ln=CFG_SITE_LANG ):
     sql = """select id_query
             from user_query_basket
             where id_user = %s and id_query = %s
-            and id_basket= %s"""%(uid, id_query, id_basket)
-    res =  run_sql(sql)
+            and id_basket = %s"""
+    res =  run_sql(sql, (uid, id_query, id_basket))
     if len(res):
         raise AlertError(_("You already have an alert defined for the specified query and basket."))
 
@@ -183,15 +207,19 @@ def perform_add_alert(alert_name, frequency, notification,
             new basket name for this alert;
             identifier of the query to be alerted
     output: confirmation message + the list of alerts Web page"""
-    # load the right message language
-    _ = gettext_set_language(ln)
+    # sanity check
     if (None in (alert_name, frequency, notification, id_basket, id_query, uid)):
         return ''
-    #check the alert name is not empty
+    # load the right language
+    _ = gettext_set_language(ln)
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
+    # check the alert name is not empty
     alert_name = alert_name.strip()
     if alert_name == "":
         raise AlertError(_("The alert name cannot be empty."))
-    #check if the alert can be created
+    # check if the alert can be created
     check_alert_name(alert_name, uid, ln)
     check_alert_is_unique(id_basket, id_query, uid, ln)
     if id_basket != 0 and not check_user_owns_baskets(uid, id_basket):
@@ -201,11 +229,11 @@ def perform_add_alert(alert_name, frequency, notification,
     query = """INSERT INTO user_query_basket (id_user, id_query, id_basket,
                                               frequency, date_creation, date_lastrun,
                                               alert_name, notification)
-               VALUES ('%s','%s','%s','%s','%s','','%s','%s')"""
-    query %= (uid, id_query, id_basket,
+               VALUES (%s,%s,%s,%s,%s,'',%s,%s)"""
+    params = (uid, id_query, id_basket,
               frequency, convert_datestruct_to_datetext(time.localtime()),
               alert_name, notification)
-    run_sql(query)
+    run_sql(query, params)
     out = _("The alert %s has been added to your profile.")
     out %= '<b>' + cgi.escape(alert_name) + '</b>'
     out += perform_list_alerts(uid, ln=ln)
@@ -224,9 +252,9 @@ def perform_list_alerts(uid, ln=CFG_SITE_LANG):
                        DATE_FORMAT(a.date_lastrun,'%%Y-%%m-%%d %%H:%%i:%%s')
                 FROM user_query_basket a LEFT JOIN query q ON a.id_query=q.id
                                          LEFT JOIN bskBASKET b ON a.id_basket=b.id
-                WHERE a.id_user='%s'
-                ORDER BY a.alert_name ASC """ % uid
-    res = run_sql(query)
+                WHERE a.id_user=%s
+                ORDER BY a.alert_name ASC """
+    res = run_sql(query, (uid,))
     alerts = []
     for (qry_id, qry_args,
          bsk_id, bsk_name,
@@ -268,24 +296,29 @@ def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG)
             identifier of the basket
             uid
     output: confirmation message + the list of alerts Web page"""
+    # load the right language
+    _ = gettext_set_language(ln)
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
     # set variables
     out = ""
     if (None in (alert_name, id_query, id_basket, uid)):
         return out
     # remove a row from the alerts table: user_query_basket
     query = """DELETE FROM user_query_basket
-               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
-    query %= (uid, id_query, id_basket)
-    res = run_sql(query)
+               WHERE id_user=%s AND id_query=%s AND id_basket=%s"""
+    params = (uid, id_query, id_basket)
+    res = run_sql(query, params)
     if res:
-        out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % alert_name
+        out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % cgi.escape(alert_name)
     else:
-        out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % alert_name
+        out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % cgi.escape(alert_name)
     out += perform_list_alerts(uid, ln=ln)
     return out
 
 
-def perform_update_alert(alert_name, frequency, notification, id_basket, id_query, old_id_basket,uid, ln = CFG_SITE_LANG):
+def perform_update_alert(alert_name, frequency, notification, id_basket, id_query, old_id_basket, uid, ln = CFG_SITE_LANG):
     """update alert settings into the database
     input:  the name of the new alert;
             alert frequency: 'month', 'week' or 'day';
@@ -295,26 +328,30 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
             identifier of the query to be alerted
             old identifier of the basket associated to the alert
     output: confirmation message + the list of alerts Web page"""
-    #set variables
     out = ''
+    # sanity check
     if (None in (alert_name, frequency, notification, id_basket, id_query, old_id_basket, uid)):
         return out
 
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
-    #check the alert name is not empty
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
+
+    # check the alert name is not empty
     if alert_name.strip() == "":
         raise AlertError(_("The alert name cannot be empty."))
 
-    #check if the alert can be created
+    # check if the alert can be created
     sql = """select alert_name
             from user_query_basket
             where id_user=%s
             and id_basket=%s
-            and id_query=%s"""%( uid, old_id_basket, id_query )
+            and id_query=%s"""
     try:
-        old_alert_name = run_sql( sql )[0][0]
+        old_alert_name = run_sql(sql, (uid, old_id_basket, id_query))[0][0]
     except IndexError:
         # FIXME: I18N since this technique of the below raise message,
         # since this technique (detecting old alert IDs) is not nice
@@ -327,16 +364,16 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
 
     # update a row into the alerts table: user_query_basket
     query = """UPDATE user_query_basket
-               SET alert_name='%s',frequency='%s',notification='%s',
-                   date_creation='%s',date_lastrun='',id_basket='%s'
-               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
-    query %= (alert_name, frequency, notification,
+               SET alert_name=%s,frequency=%s,notification=%s,
+                   date_creation=%s,date_lastrun='',id_basket=%s
+               WHERE id_user=%s AND id_query=%s AND id_basket=%s"""
+    params = (alert_name, frequency, notification,
               convert_datestruct_to_datetext(time.localtime()),
               id_basket, uid, id_query, old_id_basket)
 
-    run_sql(query)
+    run_sql(query, params)
 
-    out += _("The alert %s has been successfully updated.") % ("<b>" + alert_name + "</b>",)
+    out += _("The alert %s has been successfully updated.") % ("<b>" + cgi.escape(alert_name) + "</b>",)
     out += "<br /><br />\n" + perform_list_alerts(uid, ln=ln)
     return out
 
@@ -359,9 +396,9 @@ def account_list_alerts(uid, ln=CFG_SITE_LANG):
                        DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'),
                        a.id_basket
                 FROM query q, user_query_basket a
-                WHERE a.id_user='%s' AND a.id_query=q.id
-                ORDER BY a.alert_name ASC """ % uid
-    res = run_sql(query)
+                WHERE a.id_user=%s AND a.id_query=q.id
+                ORDER BY a.alert_name ASC """
+    res = run_sql(query, (uid,))
     alerts = []
     if len(res):
         for row in res:
@@ -376,8 +413,8 @@ def account_list_searches(uid, ln=CFG_SITE_LANG):
     """ account_list_searches: list the searches of the user
         input:  the user id
         output: resume of the searches"""
-    out =""
-  # first detect number of queries:
+    out = ""
+    # first detect number of queries:
     nb_queries_total = 0
     res = run_sql("SELECT COUNT(*) FROM user_query WHERE id_user=%s", (uid,), 1)
     try:
@@ -385,7 +422,7 @@ def account_list_searches(uid, ln=CFG_SITE_LANG):
     except:
         pass
 
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
     out += _("You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s is available with a possibility to (a) view search results and (b) subscribe to an automatic email alerting service for these queries.") % {'x_nb': nb_queries_total, 'x_url_open': '<a href="../youralerts/display?ln=%s">' % ln, 'x_url_close': '</a>'}

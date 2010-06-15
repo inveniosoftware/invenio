@@ -59,7 +59,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        # load the right message language
+        # load the right language
         _ = gettext_set_language(argd['ln'])
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -120,11 +120,28 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        # load the right message language
+        # load the right language
         _ = gettext_set_language(argd['ln'])
 
-        html = webalert.perform_input_alert("add", argd['idq'], argd['name'], argd['freq'],
-                                            argd['notif'], argd['idb'], uid, ln=argd['ln'])
+        try:
+            html = webalert.perform_input_alert("add", argd['idq'], argd['name'], argd['freq'],
+                                                argd['notif'], argd['idb'], uid, ln=argd['ln'])
+        except webalert.AlertError, msg:
+            return page(title=_("Error"),
+                        body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
+                        navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                     'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                     'ln': argd['ln'],
+                                     'account' : _("Your Account"),
+                                  },
+                        description=_("%s Personalize, Set a new alert") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        uid=uid,
+                        language=argd['ln'],
+                        req=req,
+                        lastupdated=__lastupdated__,
+                        navmenuid='youralerts')
+
         if argd['error_msg'] != "":
             html = webalert_templates.tmpl_errorMsg(
                      ln = argd['ln'],
@@ -172,11 +189,28 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        # load the right message language
+        # load the right language
         _ = gettext_set_language(argd['ln'])
 
-        html = webalert.perform_input_alert("update", argd['idq'], argd['name'], argd['freq'],
-                                            argd['notif'], argd['idb'], uid, argd['old_idb'], ln=argd['ln'])
+        try:
+            html = webalert.perform_input_alert("update", argd['idq'], argd['name'], argd['freq'],
+                                                argd['notif'], argd['idb'], uid, argd['old_idb'], ln=argd['ln'])
+        except webalert.AlertError, msg:
+            return page(title=_("Error"),
+                        body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
+                        navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                     'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                     'ln': argd['ln'],
+                                     'account' : _("Your Account"),
+                                  },
+                        description=_("%s Personalize, Set a new alert") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        uid=uid,
+                        language=argd['ln'],
+                        req=req,
+                        lastupdated=__lastupdated__,
+                        navmenuid='youralerts')
+
         if argd['error_msg'] != "":
             html = webalert_templates.tmpl_errorMsg(
                      ln = argd['ln'],
@@ -217,7 +251,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        # load the right message language
+        # load the right language
         _ = gettext_set_language(argd['ln'])
 
         return page(title=_("Your Alerts"),
@@ -259,15 +293,28 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        # load the right message language
+        # load the right language
         _ = gettext_set_language(argd['ln'])
 
         try:
             html = webalert.perform_add_alert(argd['name'], argd['freq'], argd['notif'],
                                               argd['idb'], argd['idq'], uid, ln=argd['ln'])
-        except webalert.AlertError, e:
-            html = e
-            #return self.input(req, form)
+        except webalert.AlertError, msg:
+            return page(title=_("Error"),
+                        body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
+                        navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                     'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                     'ln': argd['ln'],
+                                     'account' : _("Your Account"),
+                                  },
+                        description=_("%s Personalize, Set a new alert") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        uid=uid,
+                        language=argd['ln'],
+                        req=req,
+                        lastupdated=__lastupdated__,
+                        navmenuid='youralerts')
+
         return page(title=_("Display alerts"),
                     body=html,
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -308,14 +355,28 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        # load the right message language
+        # load the right language
         _ = gettext_set_language(argd['ln'])
 
         try:
             html = webalert.perform_update_alert(argd['name'], argd['freq'], argd['notif'],
                                                  argd['idb'], argd['idq'], argd['old_idb'], uid, ln=argd['ln'])
-        except webalert.AlertError, e:
-            return self.modify(req, form)
+        except webalert.AlertError, msg:
+            return page(title=_("Error"),
+                        body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
+                        navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                     'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                     'ln': argd['ln'],
+                                     'account' : _("Your Account"),
+                                  },
+                        description=_("%s Personalize, Set a new alert") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        uid=uid,
+                        language=argd['ln'],
+                        req=req,
+                        lastupdated=__lastupdated__,
+                        navmenuid='youralerts')
+
         return page(title=_("Display alerts"),
                     body=html,
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -353,12 +414,31 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        # load the right message language
+        # load the right language
         _ = gettext_set_language(argd['ln'])
 
+        try:
+            html = webalert.perform_remove_alert(argd['name'], argd['idq'],
+                                                 argd['idb'], uid, ln=argd['ln'])
+        except webalert.AlertError, msg:
+            return page(title=_("Error"),
+                        body=webalert_templates.tmpl_errorMsg(ln=argd['ln'], error_msg=msg),
+                        navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                     'sitesecureurl' : CFG_SITE_SECURE_URL,
+                                     'ln': argd['ln'],
+                                     'account' : _("Your Account"),
+                                  },
+                        description=_("%s Personalize, Set a new alert") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                        uid=uid,
+                        language=argd['ln'],
+                        req=req,
+                        lastupdated=__lastupdated__,
+                        navmenuid='youralerts')
+
+        # display success
         return page(title=_("Display alerts"),
-                    body=webalert.perform_remove_alert(argd['name'], argd['idq'],
-                                                       argd['idb'], uid, ln=argd['ln']),
+                    body=html,
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
