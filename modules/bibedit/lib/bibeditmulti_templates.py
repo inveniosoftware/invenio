@@ -41,6 +41,36 @@ class Template:
 
         styles = """
 <style type="text/css">
+
+select[disabled] {
+    color: #696969;
+    background: #d3d3d3;
+}
+
+select {
+    border: solid 1px #000000;
+    font-family: Arial, Sans-Serif;
+    font-size: 15px;
+}
+
+input[type="text"]{
+    border: solid 1px #000000;
+    font-family: Arial, Sans-Serif;
+    font-size: 15px;
+}
+
+.actOnFieldLink{
+    font-family: Arial, Sans-Serif;
+    color: blue;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+div .pagebody td{
+    font-family: Arial, Sans-Serif;
+    font-size: 16px;
+}
+
 .txtTag {
     width: 34px;
 }
@@ -55,6 +85,10 @@ class Template:
 
 .txtValue {
     width: 200px;
+}
+
+.textBoxConditionSubfield {
+    width: 14px;
 }
 
 .msg {
@@ -129,10 +163,22 @@ class Template:
     cursor: pointer;
 }
 
-div .boxleft {
+div .boxContainer{
+    margin-left: 20px;
     text-align: left;
-    margin-left: 2%;
-    padding: 3px;
+    width: 550px;
+}
+
+div .boxleft {
+    float: left;
+    width: 150px;
+    padding-top: 3px;
+}
+
+div .boxleft_2 {
+    float: left;
+    width: 400px;
+    padding-top: 3px;
 }
 
 #actionsDisplayArea {
@@ -163,6 +209,10 @@ div .boxleft {
     text-align:center;
 }
 
+.inputValueGrey{
+    color:#000000;
+}
+
 </style>
         """
         return styles
@@ -184,19 +234,34 @@ div .boxleft {
 </tr>
 <tr>
     <td>
-    <div class="boxleft">
-    <b>%(text_search_criteria)s:&nbsp;&nbsp;</b>
-    <input type="text" id="textBoxSearchCriteria"  size="46" onkeypress="onEnter(event);"> <br />
+    <div class="boxContainer">
+        <div class="boxleft">
+            <b>%(text_search_criteria)s:</b>
+        </div>
+        <div class="boxleft_2">
+            <input type="text" id="textBoxSearchCriteria"  size="40" onkeypress="onEnter(event);"> <br />
+        </div>
     </div>
-    <div class="boxleft">
-    <b>%(text_filter_collection)s:&nbsp;</b> %(collections)s <br />
+    <div class="boxContainer">
+        <div class="boxleft">
+            <b>%(text_filter_collection)s:&nbsp;</b>
+        </div>
+        <div class="boxleft_2">
+            %(collections)s <br />
+        </div>
     </div>
-    <div class="boxleft">
-    <b>%(text_output_tags)s:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</b>
-    <input type="text" id="textBoxOutputTags" value="All tags" size="33" onkeypress="onEnter(event);"> <i>Ex. 100, 700</i> <br/>
+    <div class="boxContainer">
+        <div class="boxleft">
+            <b>%(text_output_tags)s:</b>
+        </div>
+        <div class="boxleft_2">
+            <div><input class="inputValueGrey" type="text" id="textBoxOutputTags" value="All tags" size="28" onkeypress="onEnter(event);">&nbsp;&nbsp;<i>Ex. 100, 700</i><br/></div>
+        </div>
     </div>
-    <div class="boxleft">
-    <input id="buttonTestSearch" value="%(text_test_search)s" type="submit" class="formbutton"></button>
+    <div class="boxContainer">
+        <div class="boxleft">
+            <input id="buttonTestSearch" value="%(text_test_search)s" type="submit" class="formbutton"></button>
+        </div>
     </div>
     </td>
 </tr>
@@ -209,9 +274,13 @@ div .boxleft {
 </tr>
 <tr>
     <td>
-        <div class="boxleft">
-        <input id="buttonPreviewResults" value="%(text_preview_results)s" type="button" class="formbutton"></button>
-        <input id="buttonSubmitChanges" value="%(text_submit_changes)s" type="button" class="formbutton"></button>
+        <div class="boxContainer">
+            <div class="boxleft">
+                <input id="buttonPreviewResults" value="%(text_preview_results)s" type="button" class="formbutton"></button>
+            </div>
+            <div class="boxleft_2">
+                <input id="buttonSubmitChanges" value="%(text_submit_changes)s" type="button" class="formbutton"></button>
+            </div>
         </div>
     </td>
 </tr>
@@ -241,9 +310,9 @@ div .boxleft {
 
     def _get_collections(self, collections):
         """ Returns html select for collections"""
-        html = "<select id=\"collection\">"
+        html = "<select id=\"collection\" onChange=\"onSelectCollectionChange(event);\">"
         for collection_name in collections:
-            html += '<option value="%(collection_name)s">%(collection_name)s</option>' % {'collection_name': cgi.escape(collection_name)}
+            html += '<option value="%(collection_name)s"">%(collection_name)s</option>' % {'collection_name': cgi.escape(collection_name)}
         html += "</select>"
         return html
 
@@ -297,12 +366,13 @@ div .boxleft {
     <tr class="tagTableRow">
         <td />
         <td>
-        <input class="textBoxFieldTag txtTag" type="Text" maxlength="3" /><input class="textBoxFieldInd1 txtInd" type="Text" maxlength="1" /><input class="textBoxFieldInd2 txtInd" type="text" maxlength="1" />
+        <input class="textBoxFieldTag txtTag" type="Text" onkeypress="onPressEsc(event);" maxlength="3" /><input class="textBoxFieldInd1 txtInd" onkeypress="onPressEsc(event);" type="Text" maxlength="1" /><input class="textBoxFieldInd2 txtInd" onkeypress="onPressEsc(event);" type="text" maxlength="1" />
         </td>
         <td />
         <td />
         <td>
-        <select class="fieldActionType")">
+        <select class="fieldActionType" onchange="onFieldActionTypeChange(this);">
+        <option>%(text_select_action)s</option>
         <option value="0">%(text_add_field)s</option>
         <option value="1">%(text_delete_field)s</option>
         <option value="2">%(text_update_field)s</option>
@@ -311,11 +381,14 @@ div .boxleft {
         <td/>
         <td/>
     </tr>
-    <tr class="tagTableRow"><td /><td /><td>&nbsp;</td><td /><td colspan="2">
+    <tr class="tagTableRow"><td /><td /><td /><td /><td>&nbsp;</td><td/><td/></tr>
+    </tbody>
+
+<tr class="tagTableRow"><td /><td /><td>&nbsp;</td><td /><td colspan="2">
         <input value="%(text_save)s" type="button" id="buttonSaveNewField" class="formbutton"/>
         <input value="%(text_cancel)s" type="button" id="buttonCancelNewField" class="formbutton"/>
     </td><td/></tr>
-</tbody>
+
 
 <tbody class="templateDisplayField" valign="middle">
     <tr class="tagTableRow">
@@ -353,6 +426,13 @@ div .boxleft {
 
         <span class="newValueParameters"><strong> %(text_with)s </strong></span>
         <span class="newValue newValueParameters">new value</span>
+
+        <span class="conditionParameters"><strong> %(text_with_condition)s </strong></span>
+        <span class="condition conditionParameters"></span>
+
+        <span class="conditionSubfieldParameters"><strong> %(text_with_condition_subfield)s </strong></span>
+        <span class="conditionSubfield conditionSubfieldParameters"></span>
+
     </td>
     <td/>
 </tr>
@@ -377,13 +457,26 @@ div .boxleft {
     <tr class="valueParameters">
         <td /><td /><td /><td />
         <td colspan="3">
-            <input class="txtValue textBoxValue" type="text" value="%(text_value)s" maxlength="50"/>
+            <input id="textBoxValue" class="txtValue textBoxValue" type="text" value="%(text_value)s" maxlength="50"/>
         </td>
     </tr>
     <tr class="newValueParameters">
         <td /><td /><td /><td />
         <td colspan="3">
-            <input class="txtValue textBoxNewValue" type="text" value="%(text_new_value)s"/>
+            <input id="textBoxNewValue" class="txtValue textBoxNewValue" type="text" value="%(text_new_value)s"/>
+        </td>
+    </tr>
+    <tr class="conditionParameters">
+        <td /> <td /> <td /> <td /><td colspan="3">when other subfield
+        <input class="txtValue textBoxConditionSubfield" type="text"/>
+        is equal to
+        <input id="textBoxCondition" class="txtValue textBoxCondition" type="text" value="%(text_condition)s"/>
+        </td>
+    </tr>
+    <tr class="conditionActOnFields">
+        <td /><td /><td /><td />
+        <td colspan="3">
+            <span class="actOnFieldLink" id="actOnFields"><u>%(text_filter_fields)s</u></span>
         </td>
     </tr>
     <tr>
@@ -425,7 +518,11 @@ div .boxleft {
               "text_replace_text" : _("Replace substring"),
               "text_replace_content" : _("Replace full content"),
               "text_with" : _("with"),
+              "text_with_condition": _("when field equals"),
+              "text_with_condition_subfield" : _("on subfield"),
               "text_new_value" : _("new value"),
+              "text_condition" : _("condition"),
+              "text_filter_fields": _("Apply only to specific field instances"),
               "text_value" : _("value")
              }
         return html

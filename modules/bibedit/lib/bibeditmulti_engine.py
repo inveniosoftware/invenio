@@ -58,11 +58,13 @@ multiedit_templates = template.load('bibeditmulti')
 # base command for subfields
 class BaseSubfieldCommand:
     """Base class for commands manipulating subfields"""
-    def __init__(self, subfield, value = "", new_value = ""):
+    def __init__(self, subfield, value = "", new_value = "", condition = "", condition_subfield = ""):
         """Initialization."""
         self._subfield = subfield
         self._value = value
         self._new_value = new_value
+        self._condition = condition
+        self._condition_subfield = condition_subfield
 
     def process_field(self, record, tag, field_number):
         """Make changes to a record.
@@ -92,12 +94,14 @@ class BaseSubfieldCommand:
         """
         if tag not in record.keys():
             return
-
         for field in record[tag]:
             if field[4] == field_number:
                 subfield_index = 0
                 for subfield in field[0]:
-                    if subfield[0] == self._subfield:
+                    if self._condition != 'condition':
+                        if (self._condition_subfield == subfield[0]) and (self._condition == subfield[1]):
+                            callback(record, tag, field_number, subfield_index)
+                    elif subfield[0] == self._subfield:
                         callback(record, tag, field_number, subfield_index)
                     subfield_index = subfield_index+1
 
@@ -105,12 +109,18 @@ class BaseSubfieldCommand:
 
 class AddSubfieldCommand(BaseSubfieldCommand):
     """Add subfield to a given field"""
-
     def process_field(self, record, tag, field_number):
         """@see: BaseSubfieldCommand.process_field"""
-        bibrecord.record_add_subfield_into(record, tag,
-                                           self._subfield, self._value,
-                                           field_position_global=field_number)
+        action = lambda record, tag, field_number, subfield_index: \
+                      bibrecord.record_add_subfield_into(record, tag,
+                                         self._subfield, self._value,
+                                         None,
+                                         field_position_global=field_number)
+        if self._condition != 'condition':
+            self._perform_on_all_matching_subfields(record, tag,
+                                                    field_number, action)
+        else:
+            action(record, tag, field_number, None)
 
 class DeleteSubfieldCommand(BaseSubfieldCommand):
     """Delete subfield from a given field"""

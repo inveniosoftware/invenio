@@ -204,6 +204,8 @@ function rebindControls() {
 	 */
 
 	rebindActionsRelatedControls();
+	initTextBoxes();
+
 
 	$("#buttonTestSearch").bind("click", onButtonTestSearchClick);
 	$("#buttonPreviewResults").bind("click", onButtonPreviewResultsClick);
@@ -306,6 +308,23 @@ function setOutputFormat(outputFormat){
 	}
 }
 
+function initTextBoxes(){
+    $('#textBoxValue, #textBoxNewValue, #textBoxOutputTags, #textBoxCondition').focus(function() {
+        if (this.value == this.defaultValue){
+            this.value = '';
+        }
+        if(this.value != this.defaultValue){
+            this.select();
+        }
+    });
+
+    $('#textBoxValue, #textBoxNewValue, #textBoxOutputTags, #textBoxCondition').blur(function() {
+        if ($.trim(this.value) == ''){
+            this.value = (this.defaultValue ? this.defaultValue : '');
+        }
+    });
+
+}
 
 $(document).ready( function() {
 	rebindControls();
@@ -341,9 +360,11 @@ function cleanIndicator(indicator) {
     return cleanedValue;
 }
 
-function displayProperSubfieldInformation(actionParentElement, actionType) {
+function displayProperSubfieldInformation(actionParentElement, actionType, displayCondition) {
     actionParentElement.find(".valueParameters").hide();
     actionParentElement.find(".newValueParameters").hide();
+    actionParentElement.find(".conditionParameters").hide();
+    actionParentElement.find(".conditionSubfieldParameters").hide();
 
     if (actionType == null){
         actionType = actionParentElement.find(".subfieldActionType").eq(0).val();
@@ -364,8 +385,48 @@ function displayProperSubfieldInformation(actionParentElement, actionType) {
     var field = gFields[fieldID];
 
     if(field.action == gFieldActionTypes.addField){
-        actionParentElement.find(".subfieldActionType").attr("disabled", "disabled");
+        actionParentElement.find(".subfieldActionType").attr("disabled", "true");
     }
+
+    if (displayCondition == 'true') {
+        actionParentElement.find(".conditionParameters").show();
+        actionParentElement.find(".conditionSubfieldParameters").show();
+    }
+
+}
+
+function unbindControls(filter_field){
+    if (filter_field == 'true'){
+        $("#actOnFields").unbind("click");
+        $("#actOnFieldsRemove").unbind("click");
+        $("#actOnFieldsRemove").bind("click", onActOnFieldsRemoveClick);
+    }
+    else{
+        $("#actOnFields").unbind("click");
+        $("#actOnFields").bind("click", onActOnFieldsClick);
+        $("#actOnFieldsRemove").unbind("click");
+    }
+
+}
+
+function onActOnFieldsClick() {
+    var parentElement = $(this).parents(".templateNewSubfield").eq(0);
+    parentElement.find(".conditionParameters").show();
+    parentElement.find(".conditionSubfieldParameters").show();
+    parentElement.find("#actOnFields").html('<u>Act on all fields</u>');
+    parentElement.find("#actOnFields").attr('id', 'actOnFieldsRemove');
+
+    unbindControls('true');
+}
+
+function onActOnFieldsRemoveClick() {
+    var parentElement = $(this).parents(".templateNewSubfield").eq(0);
+    parentElement.find(".conditionParameters").hide();
+    parentElement.find(".conditionSubfieldParameters").hide();
+    parentElement.find("#actOnFieldsRemove").html('<u>Apply only to specific field instances</u>');
+    parentElement.find("#actOnFieldsRemove").attr('id', 'actOnFields');
+
+    unbindControls('false');
 }
 
 function generateFieldDisplayID() {
@@ -423,12 +484,16 @@ function createSubfield(templateNewSubield){
     var value = templateNewSubield.find(".textBoxValue").eq(0).val();
     var newValue = templateNewSubield.find(".textBoxNewValue").eq(0).val();
     var action = templateNewSubield.find(".subfieldActionType").eq(0).val();
+    var condition = templateNewSubield.find(".textBoxCondition").eq(0).val();
+    var conditionSubfield = templateNewSubield.find(".textBoxConditionSubfield").eq(0).val();
 
     var subfield = {
         subfieldCode : subfieldCode,
         value : value,
         newValue : newValue,
-        action : action
+        action : action,
+        condition : condition,
+        conditionSubfield : conditionSubfield
     };
 
     return subfield;
@@ -463,14 +528,19 @@ function createField(jqueryElement) {
     return field;
 }
 
+function onFieldActionTypeChange(instance) {
+    onButtonSaveNewFieldClick(instance);
+}
+
 function onSubfieldActionTypeChange() {
     var parentElement = $(this).parents(".templateNewSubfield").eq(0);
 
     displayProperSubfieldInformation(parentElement);
 }
 
-function onButtonNewSubfieldClick() {
+function onButtonNewSubfieldClick(instance) {
     // find the id of the field that is parent of the subfield
+
     var templateField = $(this).parents(".templateDisplayField");
     var fieldDisplayID = templateField.attr("id");
     var fieldID = getFieldID(fieldDisplayID);
@@ -499,8 +569,8 @@ function onButtonNewFieldClick() {
     rebindControls();
 }
 
-function onButtonCancelNewFieldClick() {
-    $(this).parents(".templateNewField").remove();
+function onButtonCancelNewFieldClick(instance) {
+    $(instance).parents(".templateNewField").remove();
 }
 
 function onButtonDeleteFieldClick() {
@@ -545,9 +615,15 @@ function onButtonSaveNewSubfieldClick() {
     templateDisplaySubfield.find(".subfieldCode").eq(0).text(currentSubfield.subfieldCode);
     templateDisplaySubfield.find(".value").eq(0).text(currentSubfield.value);
     templateDisplaySubfield.find(".newValue").eq(0).text(currentSubfield.newValue);
+    templateDisplaySubfield.find(".condition").eq(0).text(currentSubfield.condition);
+    templateDisplaySubfield.find(".conditionSubfield").eq(0).text(currentSubfield.conditionSubfield);
 
-    displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action);
-
+    if (templateDisplaySubfield.find(".condition").eq(0).text() != 'condition') {
+        displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action, 'true');
+    }
+    else {
+        displayProperSubfieldInformation(templateDisplaySubfield, currentSubfield.action);
+    }
     templateNewSubfield.replaceWith(templateDisplaySubfield );
 
     deleteMsg(fieldID);
@@ -566,12 +642,13 @@ function onButtonDeleteSubfieldClick() {
     subfieldElement.remove();
 }
 
-function onButtonSaveNewFieldClick() {
+function onButtonSaveNewFieldClick(instance) {
     // template for displaying the information
+
     var templateDisplayField = $("#displayTemplates .templateDisplayField").clone();
 
     // here is where the user entered the information
-    var templateNewField = $(this).parents(".templateNewField");
+    var templateNewField = $(instance).parents(".templateNewField");
 
     var field = createField(templateNewField);
 
@@ -615,6 +692,8 @@ function rebindActionsRelatedControls() {
     $("#buttonCancelNewSubfield").bind("click", onButtonCancelNewSubfieldClick);
     $(".buttonDeleteSubfield").bind("click", onButtonDeleteSubfieldClick);
     $(".subfieldActionType").bind("change", onSubfieldActionTypeChange);
+    $("#actOnFields").bind("click", onActOnFieldsClick);
+    $("#actOnFieldsRemove").bind("click", onActOnFieldsRemoveClick);
 }
 
 function onSelectOutputFormatChange(value){
@@ -626,12 +705,6 @@ function onSelectOutputFormatChange(value){
 	}
 }
 
-function onSelectSubfieldActionChange(value){
-	if (value == "0"){
-		onButtonSaveNewFieldClick();
-	}
-}
-
 function onEnter(evt){
 	var keyCode = null;
 	if( evt.which ) {
@@ -640,7 +713,25 @@ function onEnter(evt){
 		keyCode = evt.keyCode;
 	}if( 13 == keyCode ) {
 		onButtonTestSearchClick();
-		return false;
 	}
-	return true;
 }
+
+function onPressEsc(evt){
+    var keyCode = null;
+
+    if( evt.which ) {
+        keyCode = evt.which;
+    }
+    else if( evt.keyCode ) {
+        keyCode = evt.keyCode;
+    }
+    if( 27 == keyCode ) {
+        onButtonCancelNewFieldClick(evt.target);
+    }
+}
+
+function onSelectCollectionChange(evt){
+    onButtonTestSearchClick();
+}
+
+

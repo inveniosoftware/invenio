@@ -206,15 +206,17 @@ class WebInterfaceMultiEditPages(WebInterfaceDirectory):
             subfield_code = current_subfield["subfieldCode"]
             value = current_subfield["value"]
             new_value = current_subfield["newValue"]
+            condition = current_subfield["condition"]
+            condition_subfield = current_subfield["conditionSubfield"]
 
             if action == self._subfield_action_types.add:
-                subfield_command = multi_edit_engine.AddSubfieldCommand(subfield_code, value)
+                subfield_command = multi_edit_engine.AddSubfieldCommand(subfield_code, value, condition=condition, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.delete:
-                subfield_command = multi_edit_engine.DeleteSubfieldCommand(subfield_code)
+                subfield_command = multi_edit_engine.DeleteSubfieldCommand(subfield_code, condition=condition, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.replace_content:
-                subfield_command = multi_edit_engine.ReplaceSubfieldContentCommand(subfield_code, value)
+                subfield_command = multi_edit_engine.ReplaceSubfieldContentCommand(subfield_code, value, condition=condition, condition_subfield=condition_subfield)
             elif action == self._subfield_action_types.replace_text:
-                subfield_command = multi_edit_engine.ReplaceTextInSubfieldCommand(subfield_code, value, new_value)
+                subfield_command = multi_edit_engine.ReplaceTextInSubfieldCommand(subfield_code, value, new_value, condition=condition, condition_subfield=condition_subfield)
             else:
                 subfield_command = multi_edit_engine.BaseFieldCommand(subfield_code, value, new_value)
 
