@@ -95,6 +95,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Structured metadata search</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Span queries</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Refersto/citedby search operators</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combined metadata/fulltext/citation search</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Frequently asked questions</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">How to wisely choose your search terms (speed-wise)</a>
@@ -117,6 +118,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Recherche structurée</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Expressions régulières</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Requêtes de plages</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Refersto/citedby search operators</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Recherche combinée métadonnées/fulltext/citation</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Foire aux questions</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Comment sélectionner vos termes de recherche de manière intelligente (en termes de vitesse)</a>
@@ -139,6 +141,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Strukturierte Metadatensuche</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Regular expressions</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Bereichs-Recherche</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Referfsto/citedby search operators</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Kombinierte Metadaten-/Volltext-/Zitatsuche</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">FAQ</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Wie wähle ich am geschicktesten meinen Suchbegriff</a>
@@ -161,6 +164,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Búsqueda por metadatos estructurados</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Expresiones regulares</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Consultas por rango</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Refersto/citedby search operators</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combinación de metadatos/texto completo/cita bibliográfica</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Preguntas frecuentes</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Elegir correctamente los términos de búsqueda (speed-wise)</a>
@@ -183,6 +187,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#structured">Cerca por metadadess estructurades</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#regexp">Expressions regulars</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#span">Consultes per rang</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#referstocitedby">Refersto/citedby search operators</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#combined">Combinació de metadades/text complet/referència bibliogràfica</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto">Preguntes freqüents</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#howto-choose-terms">Escollir correctament els térmes de cerca (speed-wise)</a>
@@ -3472,7 +3477,7 @@ between <em>1983</em> and <em>1992</em>, type:</p>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="muon decay year:1983->1992" />
+      <input size="40" type="text" name="p" value="muon decay year:1983-&gt;1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3486,7 +3491,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;-&gt;&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3503,7 +3508,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="muon decay year:1983->1992" />
+      <input size="40" type="text" name="p" value="muon decay year:1983->1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3516,7 +3521,7 @@ J</em> to <em>Ellis, Qqq</em>, saisissez:
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3534,7 +3539,7 @@ sobre <em>par motor</em> publicados entre <em>1983</em> y
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992" />
+      <input size="40" type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3549,7 +3554,7 @@ debemos escribir:
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
+      <input size="40" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3567,7 +3572,7 @@ escriure:</p>
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="destintegraci&oacute; muon any:1983->1992" />
+      <input size="40" type="text" name="p" value="destintegraci&oacute; muon any:1983->1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3582,7 +3587,7 @@ cal escriure:
       <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
+      <input size="40" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3590,6 +3595,90 @@ cal escriure:
       </blockquote>
       </form>
 </ca>
+</lang>
+
+<h3><a name="referstocitedby">
+<lang>
+<en>Refersto and citedby search operators</en>
+</lang>
+</a></h3>
+
+<lang>
+<en>
+<p>It is possible to search in citation network by means
+   of <code>citedby</code> and <code>refersto</code> search operators.
+   For example, to find out who cites hep-th/0201100, you can type:</p>
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="refersto:reportnumber:hep-th/0201100" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
+
+   <p>For example, to find out which papers are cited by Klebanov, you can type:</p>
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="citedby:author:klebanov" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
+
+   <p>To set up a cite alert for new papers citing author I. Klebanov, you can type:</p>
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="refersto:author:&quot;Klebanov, I&quot;" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
+
+   <p>Note that <code>refersto</code> and <code>citedby</code> search
+   operators work on any regular query.  For example, to find all
+   papers that cite papers that are tagged with the gravitino keyword,
+   type:</p>
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="refersto:keyword:gravitino" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
+
+   <p>Note also that these operators can be freely combined with
+   regular metadata search.  For example, to find papers authored by
+   Klebanov that are cited by Papadimitriou but that do not cite any
+   of Papadimitriou's papers themselves, type:</p>
+
+      <form action="<CFG_SITE_URL>/search" method="get">
+      <input type="hidden" name="ln" value="<lang:current />" />
+      <blockquote>
+      <input size="40" type="text" name="p" value="author:klebanov AND citedby:author:papadimitriou NOT refersto:author:papadimitriou" />
+      <select name="f"><option value="">_(any field)_</option>
+                       <option value="title">_(title)_</option>
+                       <option value="author">_(author)_</option></select>
+      <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+      </blockquote>
+      </form>
+
+</en>
 </lang>
 
 <h3><a name="combined">

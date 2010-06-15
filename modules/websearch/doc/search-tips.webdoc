@@ -158,7 +158,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Returns records containing words <em>higgs</em> and
+  <en>Return records containing words <em>higgs</em> and
       <em>boson</em>.</en>
   <fr>Retourne les notices contenant les mots <em>higgs</em> et
       <em>boson</em>.</fr>
@@ -181,7 +181,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Returns records containing phrase <em>'higgs boson'</em> in
+  <en>Return records containing phrase <em>'higgs boson'</em> in
       title.</en>
   <fr>Retourne les notices contenant la phrase <em>'higgs boson'</em>
       dans le titre.</fr>
@@ -206,7 +206,7 @@ della ricerca.</it>
 <td width="50%">
 <lang>
 
-  <en>Returns records entitled exactly <em>"Higgs boson"</em> but not
+  <en>Return records entitled exactly <em>"Higgs boson"</em> but not
       records such as <em>"Overview of Higgs boson
       production"</em>.</en>
   <fr>Retourne les notices dont le titre est exactement <em>"Higgs
@@ -250,7 +250,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Returns records containing words <em>muon</em>, <em>muons</em>,
+  <en>Return records containing words <em>muon</em>, <em>muons</em>,
       <em>muonic</em>, etc.</en>
   <fr>Retourne les notices contenant les mots <em>muon</em>,
       <em>muons</em>, <em>muonic</em>, etc.</fr>
@@ -301,7 +301,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Returns records containing both <em>muon</em> and <em>kaon</em>.</en>
+  <en>Return records containing both <em>muon</em> and <em>kaon</em>.</en>
   <fr>Retourne les notices contenant à la fois <em>muon</em> et <em>kaon</em>.</fr>
   <it>Restituisce i record contenenti sia <em>muon</em> che <em>kaon</em>.</it>
 </lang>
@@ -321,7 +321,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Returns records containing either <em>muon</em> or <em>kaon</em>.</en>
+  <en>Return records containing either <em>muon</em> or <em>kaon</em>.</en>
   <fr>Retourne les notices contenant soit <em>muon</em>, soit <em>kaon</em>.</fr>
   <it>Restituisce i record contenenti <em>muon</em> e/o <em>kaon</em>.</it>
 </lang>
@@ -341,7 +341,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Returns records containing <em>muon</em> but not <em>kaon</em>.</en>
+  <en>Return records containing <em>muon</em> but not <em>kaon</em>.</en>
   <fr>Retourne les notices contenant <em>muon</em>, mais pas <em>kaon</em>.</fr>
   <it>Restituisce i record contenenti <em>muon</em> ma non <em>kaon</em>.</it>
 </lang>
@@ -375,7 +375,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Returns records containing either <em>gravity</em> or <em>supergravity</em>,
+  <en>Return records containing either <em>gravity</em> or <em>supergravity</em>,
       and <em>ellis</em> or <em>perelstein</em>.  Nested parens are not supported.</en>
 </lang>
 </td>
@@ -462,6 +462,74 @@ della ricerca.</it>
   <en>more on span queries...</en>
   <fr>plus d'informations au sujet des requêtes par périodes...</fr>
   <it>maggiori informazioni sulle ricerche tramite intervalli di tempo...</it>
+</lang>
+</a></small></div>
+
+<h5><lang>
+<en>How to search inside citation network:</en>
+</lang></h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<CFG_SITE_URL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
+    <input size="20" type="text" name="p" value="cited:3->30" />
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+    </form>
+</td>
+<td width="50%">
+<lang>
+  <en>Return papers that are cited between 3 and 30 times.</en>
+</lang>
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<CFG_SITE_URL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
+    <input size="20" type="text" name="p" value="refersto:author:ellis" />
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+    </form>
+</td>
+<td width="50%">
+<lang>
+  <en>Return all papers that cite any of the papers written
+  by <em>ellis</em>.  Useful for citation alerts.</en>
+</lang>
+</td>
+</tr>
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<CFG_SITE_URL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
+    <input size="20" type="text" name="p" value="citedby:author:ellis" />
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+    </form>
+</td>
+<td width="50%">
+<lang>
+  <en>Return all papers that are cited by any of the papers written
+  by <em>ellis</em>.</en>
+</lang>
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="search-guide<lang:link/>#referstocitedby">
+<lang>
+  <en>more on refersto/citedby operators...</en>
 </lang>
 </a></small></div>
 

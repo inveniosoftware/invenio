@@ -93,7 +93,8 @@ webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
 from invenio.bibrank_citation_searcher import get_cited_by_count, calculate_cited_by_list, \
-    calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by
+    calculate_co_cited_with_list, get_records_with_num_cites, get_self_cited_by, \
+    get_refersto_hitset, get_citedby_hitset
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time
@@ -1793,7 +1794,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             basic_search_units_hitsets.append(basic_search_unit_hitset)
         else:
             # stage 2-2: no hits found for this search unit, try to replace non-alphanumeric chars inside pattern:
-            if re.search(r'[^a-zA-Z0-9\s\:]', bsu_p):
+            if re.search(r'[^a-zA-Z0-9\s\:]', bsu_p) and bsu_f != 'refersto' and bsu_f != 'citedby':
                 if bsu_p.startswith('"') and bsu_p.endswith('"'): # is it ACC query?
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', "*", bsu_p)
                 else: # it is WRD query
@@ -1962,6 +1963,12 @@ def search_unit(p, f=None, m=None):
         set = search_unit_in_bibrec(p, p, 'c')
     elif f == 'datemodified':
         set = search_unit_in_bibrec(p, p, 'm')
+    elif f == 'refersto':
+        # we are doing search by the citation count
+        set = search_unit_refersto(p)
+    elif f == 'citedby':
+        # we are doing search by the citation count
+        set = search_unit_citedby(p)
     elif m == 'a' or m == 'r':
         # we are doing either phrase search or regexp search
         index_id = get_index_id_from_field(f)
@@ -2202,6 +2209,34 @@ def search_unit_by_times_cited(p):
         allrecs = HitSet(run_sql_cached("SELECT id FROM bibrec", affected_tables=['bibrec']))
     return get_records_with_num_cites(numstr, allrecs)
 
+def search_unit_refersto(query):
+    """
+    Search for records satisfying the query (e.g. author:ellis) and
+    return list of records referred to by these records.
+    """
+    if query:
+        ahitset = search_pattern(p=query)
+        if ahitset:
+            return get_refersto_hitset(ahitset)
+        else:
+            return HitSet([])
+    else:
+        return HitSet([])
+
+def search_unit_citedby(query):
+    """
+    Search for records satisfying the query (e.g. author:ellis) and
+    return list of records cited by these records.
+    """
+    if query:
+        ahitset = search_pattern(p=query)
+        if ahitset:
+            return get_citedby_hitset(ahitset)
+        else:
+            return HitSet([])
+    else:
+        return HitSet([])
+
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG, display_nearest_terms_box=True):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
     _ = gettext_set_language(ln)
@@ -2340,6 +2375,11 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     if not p: # sanity check
         p = "."
     index_id = get_index_id_from_field(f)
+    # special indexes:
+    if f == 'refersto':
+        return _("There are no records referring to %s.") % cgi.escape(p)
+    if f == 'citedby':
+        return _("There are no records cited by %s.") % cgi.escape(p)
     # look for nearest terms:
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)

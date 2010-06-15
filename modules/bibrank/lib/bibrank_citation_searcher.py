@@ -156,6 +156,31 @@ def get_cited_by_list(recordlist):
         result.append([recid, cache_cited_by_dictionary.get(recid, [])])
     return result
 
+def get_refersto_hitset(ahitset):
+    """
+    Return a hitset of records that refers to (cite) some records from
+    the given ahitset.  Useful for search engine's
+    refersto:author:ellis feature.
+    """
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
+    out = intbitset()
+    if ahitset:
+        for recid in ahitset:
+            out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+    return out
+
+def get_citedby_hitset(ahitset):
+    """
+    Return a hitset of records that are cited by records in the given
+    ahitset.  Useful for search engine's citedby:author:ellis feature.
+    """
+    cache_cited_by_dictionary = get_citation_dict("reversedict")
+    out = intbitset()
+    if ahitset:
+        for recid in ahitset:
+            out = out | intbitset(cache_cited_by_dictionary.get(recid, []))
+    return out
+
 def get_cited_by_weight(recordlist):
     """Return a tuple of ([recid,number_of_citing_records],...) for all the
        records in recordlist.
@@ -168,7 +193,7 @@ def get_cited_by_weight(recordlist):
 
 def calculate_cited_by_list(record_id, sort_order="d"):
     """Return a tuple of ([recid,citation_weight],...) for all the
-       record in citing RECORD_ID.  The resulting recids is sorted by
+       record citing RECORD_ID.  The resulting recids is sorted by
        ascending/descending citation weights depending or SORT_ORDER.
     """
     cache_cited_by_dictionary = get_citation_dict("citationdict")

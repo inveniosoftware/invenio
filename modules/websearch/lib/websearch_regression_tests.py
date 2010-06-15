@@ -1584,6 +1584,58 @@ class WebSearchSpanQueryTest(unittest.TestCase):
                                                expected_text='[8, 11, 13, 17, 47]'))
 
 
+class WebSearchReferstoCitedbyTest(unittest.TestCase):
+    """Test of refersto/citedby search operators."""
+
+    def test_refersto_recid(self):
+        'websearch - refersto:recid:84'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Arecid%3A84&of=id&ap=0',
+                                               expected_text='[85, 88, 91]'))
+
+    def test_refersto_repno(self):
+        'websearch - refersto:reportnumber:hep-th/0205061'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Areportnumber%3Ahep-th/0205061&of=id&ap=0',
+                                               expected_text='[91]'))
+
+    def test_refersto_author_word(self):
+        'websearch - refersto:author:klebanov'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Aauthor%3Aklebanov&of=id&ap=0',
+                                               expected_text='[85, 86, 88, 91]'))
+
+    def test_refersto_author_phrase(self):
+        'websearch - refersto:author:"Klebanov, I"'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=refersto%3Aauthor%3A%22Klebanov,%20I%22&of=id&ap=0',
+                                               expected_text='[85, 86, 88, 91]'))
+
+    def test_citedby_recid(self):
+        'websearch - citedby:recid:92'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=citedby%3Arecid%3A92&of=id&ap=0',
+                                               expected_text='[74, 91]'))
+
+    def test_citedby_repno(self):
+        'websearch - citedby:reportnumber:hep-th/0205061'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=citedby%3Areportnumber%3Ahep-th/0205061&of=id&ap=0',
+                                               expected_text='[78]'))
+
+    def test_citedby_author_word(self):
+        'websearch - citedby:author:klebanov'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=citedby%3Aauthor%3Aklebanov&of=id&ap=0',
+                                               expected_text='[95]'))
+
+    def test_citedby_author_phrase(self):
+        'websearch - citedby:author:"Klebanov, I"'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=citedby%3Aauthor%3A%22Klebanov,%20I%22&of=id&ap=0',
+                                               expected_text='[95]'))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1615,7 +1667,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchGetFieldValuesTest,
                              WebSearchAddToBasketTest,
                              WebSearchAlertTeaserTest,
-                             WebSearchSpanQueryTest)
+                             WebSearchSpanQueryTest,
+                             WebSearchReferstoCitedbyTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

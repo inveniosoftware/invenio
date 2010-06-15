@@ -51,6 +51,8 @@ INSERT INTO field VALUES (21,'affiliation','affiliation');
 INSERT INTO field VALUES (22,'exact author','exactauthor');
 INSERT INTO field VALUES (23,'date created','datecreated');
 INSERT INTO field VALUES (24,'date modified','datemodified');
+INSERT INTO field VALUES (25,'refers to','refersto');
+INSERT INTO field VALUES (26,'cited by','citedby');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
