@@ -235,12 +235,12 @@ def fromDB(rank_method_code):
 def del_rank_method_codeDATA(rank_method_code):
     """Delete the data for a rank method"""
     id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    res = run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
+    run_sql("DELETE FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
 
 def del_recids(rank_method_code, range_rec):
     """Delete some records from the rank method"""
     id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
-    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0] ))
+    res = run_sql("SELECT relevance_data FROM rnkMETHODDATA WHERE id_rnkMETHOD=%s", (id[0][0], ))
     if res:
         rec_dict = deserialize_via_marshal(res[0][0])
         write_message("Old size: %s" % len(rec_dict))
