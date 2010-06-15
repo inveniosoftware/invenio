@@ -66,32 +66,63 @@ CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION = False
 
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
 
-_mimes = MimeTypes()
+_mimes = MimeTypes(strict=False)
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
 _mimes.encodings_map.update({'.bz2' : 'bzip2'})
-_extensions = _mimes.encodings_map.keys() + \
-              _mimes.suffix_map.keys() + \
-              _mimes.types_map[1].keys() + \
-              CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS
-_extensions.sort()
-_extensions.reverse()
-_extensions = set([ext.lower() for ext in _extensions])
 
 class InvenioWebSubmitFileError(Exception):
     pass
 
+def _generate_extensions():
+    """
+    Generate the regular expression to match all the known extensions.
+
+    @return: the regular expression.
+    @rtype: regular expression object
+    """
+    _tmp_extensions = _mimes.encodings_map.keys() + \
+                _mimes.suffix_map.keys() + \
+                _mimes.types_map[1].keys() + \
+                CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS
+    extensions = []
+    for ext in _tmp_extensions:
+        if ext.startswith('.'):
+            extensions.append(ext)
+        else:
+            extensions.append('.' + ext)
+    extensions.sort()
+    extensions.reverse()
+    extensions = set([ext.lower() for ext in extensions])
+    extensions = '\\' + '$|\\'.join(extensions) + '$'
+    extensions = extensions.replace('+', '\\+')
+    return re.compile(extensions, re.I)
+
+#: Regular expression to recognized extensions.
+_extensions = _generate_extensions()
+
 def file_strip_ext(afile):
-    """Strip in the best way the extension from a filename"""
-    lowfile = afile.lower()
-    ext = '.'
-    while ext:
-        ext = ''
-        for c_ext in _extensions:
-            if lowfile.endswith(c_ext):
-                lowfile = lowfile[0:-len(c_ext)]
-                ext = c_ext
-                break
-    return afile[:len(lowfile)]
+    """
+    Strip in the best way the extension from a filename.
+
+    >>> file_strip_ext("foo.tar.gz")
+    'foo'
+    >>> file_strip_ext("foo.buz.gz")
+    'foo.buz'
+    >>> file_strip_ext("foo.buz")
+    'foo'
+
+    @param afile: the path/name of a file.
+    @type afile: string
+    @return: the name/path without the extension (and version).
+    @rtype: string
+    """
+    nextfile = _extensions.sub('', afile)
+    if nextfile == afile:
+        nextfile = os.path.splitext(afile)[0]
+    while nextfile != afile:
+        afile = nextfile
+        nextfile = _extensions.sub('', afile)
+    return nextfile
 
 def normalize_format(format):
     """Normalize the format."""
