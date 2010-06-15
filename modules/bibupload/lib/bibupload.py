@@ -413,25 +413,27 @@ def find_record_ids_by_oai_id(oaiId):
     returns a list of identifiers matching a given oai identifier
     """
     # Is this record already in invenio (matching by oaiid)
-    recids1 = search_pattern(p=oaiId, f=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, m='e').tolist()
-    # Is this record already in invenio (matching by reportnumber i.e.
-    # particularly 037. Idea: to avoid doubbles insertions)
-    repnumber = oaiId.split(":")[-1]
-    recids2 = search_pattern(p = repnumber,
-                             f = "reportnumber",
-                             m = 'e' ).tolist()
-    # Is this record already in invenio (matching by reportnumber i.e.
-    # particularly 037. Idea:  to avoid doubbles insertions)
-    repnumber = "arXiv:" + oaiId.split(":")[-1]
-    recids3 = search_pattern(p = repnumber,
-                             f = "reportnumber",
-                             m = 'e' ).tolist()
-    # now assuring, the results are unique
-    res = {}
-    for  rid in recids1 + recids2 + recids3:
-        res[rid] = 1
+    if oaiId:
+        recids = search_pattern(p=oaiId, f=CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, m='e')
 
-    return res.keys()
+        # Is this record already in invenio (matching by reportnumber i.e.
+        # particularly 037. Idea: to avoid doubbles insertions)
+        repnumber = oaiId.split(":")[-1]
+        if repnumber:
+            recids |= search_pattern(p = repnumber,
+                                    f = "reportnumber",
+                                    m = 'e' )
+
+        # Is this record already in invenio (matching by reportnumber i.e.
+        # particularly 037. Idea:  to avoid double insertions)
+        repnumber = "arXiv:" + oaiId.split(":")[-1]
+        recids |= search_pattern(p = repnumber,
+                                f = "reportnumber",
+                                m = 'e' )
+
+        return recids
+    else:
+        return intbitset()
 
 def insert_record_into_holding_pen(record, oai_id, pretend=False):
     query = "INSERT INTO bibHOLDINGPEN (oai_id, changeset_date, changeset_xml, id_bibrec) VALUES (%s, NOW(), %s, %s)"
