@@ -28,6 +28,7 @@ __revision__ = "$Id$"
 
 ## minimally recommended/required versions:
 cfg_min_python_version = "2.3"
+cfg_max_python_version = "2.5.9999"
 cfg_min_mysqldb_version = "1.2.1_p2"
 
 ## 0) import modules needed for this testing:
@@ -50,9 +51,9 @@ def wait_for_user(msg):
 if sys.version < cfg_min_python_version:
     print """
     *******************************************************
-    ** ERROR: OLD PYTHON DETECTED: %s
+    ** ERROR: TOO OLD PYTHON DETECTED: %s
     *******************************************************
-    ** You seem to be using an old version of Python.    **
+    ** You seem to be using a too old version of Python. **
     ** You must use at least Python %s.                 **
     **                                                   **
     ** Note that if you have more than one Python        **
@@ -63,6 +64,23 @@ if sys.version < cfg_min_python_version:
     ** Please upgrade your Python before continuing.     **
     *******************************************************
     """ % (string.replace(sys.version, "\n", ""), cfg_min_python_version)
+    sys.exit(1)
+if sys.version > cfg_max_python_version:
+    print """
+    *******************************************************
+    ** ERROR: TOO NEW PYTHON DETECTED: %s
+    *******************************************************
+    ** You seem to be using a too new version of Python. **
+    ** You must use at most Python %s.             **
+    **                                                   **
+    ** Perhaps you have downloaded and are installing an **
+    ** old Invenio version?  Please look for more recent **
+    ** Invenio version or please contact the development **
+    ** team at <cds.support@cern.ch> about this problem. **
+    **                                                   **
+    ** Installation aborted.                             **
+    *******************************************************
+    """ % (string.replace(sys.version, "\n", ""), cfg_max_python_version)
     sys.exit(1)
 
 ## 2) check for required modules:
