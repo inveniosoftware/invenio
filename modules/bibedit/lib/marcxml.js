@@ -52,7 +52,7 @@ function decodeMarcXMLRecord(marcXml){
     // first parsing the attributes
     var tag = field.getAttribute("tag");
 
-    if (tag == null){
+    if (tag === null){
       throw xmlStructureException;
     }
 
@@ -64,7 +64,7 @@ function decodeMarcXMLRecord(marcXml){
       // generating the subfields based on the child elements
       var ind1 = field.getAttribute("ind1");
       var ind2 = field.getAttribute("ind2");
-      if (ind1 == null || ind2 == null){
+      if (ind1 === null || ind2 === null){
         throw xmlStructureException;
       }
 
@@ -73,7 +73,7 @@ function decodeMarcXMLRecord(marcXml){
       for (subfieldId = 0; subfieldId < subfields.length; subfieldId++){
         subfield = subfields[subfieldId];
         code = subfield.getAttribute("code");
-        if (code == null){
+        if (code === null){
           throw xmlStructureException;
         }
         value = subfield.textContent;

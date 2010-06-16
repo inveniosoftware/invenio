@@ -138,7 +138,7 @@ function onSearchClick(event){
   if (searchType == 'recID'){
     // Record ID - do some basic validation.
     var searchPatternParts = searchPattern.split(".");
-    var recID = parseInt(searchPatternParts[0]);
+    var recID = parseInt(searchPatternParts[0], 10);
     var recRev = searchPatternParts[1];
 
     if (gRecID == recID && recRev == gRecRev){
@@ -146,14 +146,14 @@ function onSearchClick(event){
       updateStatus('ready');
       return;
     }
-    if (gRecordDirty && gReadOnlyMode == false){
+    if (gRecordDirty && gReadOnlyMode === false){
       // Warn of unsubmitted changes.
       if (!displayAlert('confirmLeavingChangedRecord')){
 	updateStatus('ready');
 	return;
       }
     }
-    else if (gRecID && gReadOnlyMode == false)
+    else if (gRecID && gReadOnlyMode === false)
       // If the record is unchanged, delete the cache.
       createReq({recID: gRecID, requestType: 'deleteRecordCache'});
 
@@ -202,7 +202,7 @@ function onSearchForRecordSuccess(json){
    * Handle successfull 'searchForRecord' requests (custom search).
    */
   gResultSet = json['resultSet'];
-  if (gResultSet.length == 0){
+  if (gResultSet.length === 0){
     // Search yielded no results.
     changeAndSerializeHash({state: 'edit'});
     cleanUp(true, null, null, true, true);
@@ -239,11 +239,12 @@ function onNextRecordClick(){
     // If the record is unchanged, erase the cache.
     createReq({recID: gRecID, requestType: 'deleteRecordCache'});
   var recordCount = gResultSet.length;
-  var prevIndex = gResultSetIndex++;
+  var prevIndex = gResultSetIndex;
+  gResultSetIndex += 1;
   var currentIndex = prevIndex + 1;
   if (currentIndex == recordCount-1)
     $(this).unbind('click').attr('disabled', 'disabled');
-  if (prevIndex == 0)
+  if (prevIndex === 0)
     $('#btnPrev').bind('click', onPrevRecordClick).removeAttr('disabled');
   $('#cellRecordNo').text((currentIndex+1) + ' / ' + recordCount);
   getRecord(gResultSet[currentIndex]);
@@ -264,9 +265,10 @@ function onPrevRecordClick(){
     // If the record is unchanged, erase the cache.
     createReq({recID: gRecID, requestType: 'deleteRecordCache'});
   var recordCount = gResultSet.length;
-  var prevIndex = gResultSetIndex--;
+  var prevIndex = gResultSetIndex;
+  gResultSetIndex -= 1;
   var currentIndex = prevIndex - 1;
-  if (currentIndex == 0)
+  if (currentIndex === 0)
     $(this).unbind('click').attr('disabled', 'disabled');
   if (prevIndex == recordCount-1)
     $('#btnNext').bind('click', onNextRecordClick).removeAttr('disabled');

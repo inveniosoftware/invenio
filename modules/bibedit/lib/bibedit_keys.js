@@ -276,7 +276,7 @@ function onKeyCtrlUp(event){
   /*
    * Handle key ctrl+up (move subfield up).
    */
-  if (gReady==false)
+  if (gReady === false)
     return;
   gReady = false;
   // check if we want to move a field or subfield
@@ -305,7 +305,7 @@ function onKeyCtrlDown(event){
   /*
    * Handle key ctrl+down (move subfield down).
    */
-  if (gReady==false)
+  if (gReady === false)
     return;
   gReady = false;
   // check if we want to move a field or subfield

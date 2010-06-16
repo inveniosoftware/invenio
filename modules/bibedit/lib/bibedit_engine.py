@@ -37,7 +37,7 @@ from invenio.bibedit_config import CFG_BIBEDIT_AJAX_RESULT_CODES, \
     CFG_BIBEDIT_TAG_FORMAT, CFG_BIBEDIT_AJAX_RESULT_CODES_REV, \
     CFG_BIBEDIT_AUTOSUGGEST_TAGS, CFG_BIBEDIT_AUTOCOMPLETE_TAGS_KBS,\
     CFG_BIBEDIT_KEYWORD_TAXONOMY, CFG_BIBEDIT_KEYWORD_TAG, \
-    CFG_BIBEDIT_KEYWORD_RDFLABEL
+    CFG_BIBEDIT_KEYWORD_RDFLABEL, CFG_BIBEDIT_LOG, CFG_BIBEDIT_LOGFILE
 
 from invenio.config import CFG_SITE_LANG, CFG_DEVEL_SITE
 from invenio.bibedit_dblayer import get_name_tags_all, reserve_record_id, \
@@ -54,7 +54,7 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     update_cache_file_contents, get_field_templates, get_marcxml_of_revision, \
     revision_to_timestamp, timestamp_to_revision, \
     get_record_revision_timestamps, record_revision_exists, \
-    can_record_have_physical_copies
+    can_record_have_physical_copies, bibedit_log
 
 from invenio.bibrecord import create_record, print_rec, record_add_field, \
     record_add_subfield_into, record_delete_field, \
@@ -302,9 +302,13 @@ def perform_request_newticket(recid, uid):
         errmsg = "ticket_submit failed"
     return (errmsg, t_url)
 
+
 def perform_request_ajax(req, recid, uid, data, isBulk = False, \
                          ln = CFG_SITE_LANG):
     """Handle Ajax requests by redirecting to appropriate function."""
+
+    bibedit_log( str(data) )
+
     response = {}
     request_type = data['requestType']
     undo_redo = None

@@ -38,7 +38,7 @@ from datetime import datetime
 
 from invenio.bibedit_config import CFG_BIBEDIT_FILENAME, \
     CFG_BIBEDIT_RECORD_TEMPLATES_PATH, CFG_BIBEDIT_TO_MERGE_SUFFIX, \
-    CFG_BIBEDIT_FIELD_TEMPLATES_PATH
+    CFG_BIBEDIT_FIELD_TEMPLATES_PATH, CFG_BIBEDIT_LOG, CFG_BIBEDIT_LOGFILE
 from invenio.bibedit_dblayer import get_record_last_modification_date, \
     delete_hp_change
 from invenio.bibrecord import create_record, create_records, \
@@ -558,3 +558,10 @@ def can_record_have_physical_copies(recid):
 
     return collections["holdings"]["visible"] == True
 
+def bibedit_log(message):
+    """If logging is enabled, writes a log information into the bibedit log file"""
+    if CFG_BIBEDIT_LOG:
+        # more verbose logging requested
+        f = open(CFG_BIBEDIT_LOGFILE, "a")
+        f.write("{\"datetime\": '%s', \n \"data\" : %s}, \n\n" % (str(datetime.now()), message))
+        f.close()
