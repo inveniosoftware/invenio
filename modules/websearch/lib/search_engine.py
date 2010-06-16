@@ -99,6 +99,8 @@ try:
 except:
     pass
 
+VIEWRESTRCOLL_ID = acc_get_action_id(VIEWRESTRCOLL)
+
 ## global vars:
 search_cache = {} # will cache results of previous searches
 cfg_nb_browse_seen_records = 100 # limit of the number of records to check when browsing certain collection
@@ -166,10 +168,9 @@ class RestrictedCollectionDataCacher(DataCacher):
         def cache_filler():
             ret = []
             try:
-                viewcollid = acc_get_action_id(VIEWRESTRCOLL)
                 res = run_sql("""SELECT DISTINCT ar.value
                     FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id
-                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (viewcollid,))
+                    WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,))
             except Exception:
                 # database problems, return empty cache
                 return []
@@ -191,34 +192,72 @@ try:
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
 
+def get_permitted_restricted_collections(user_info):
+    """Return a list of collection that are restricted but for which the user
+    is authorized."""
+    restricted_collection_cache.recreate_cache_if_needed()
+    ret = []
+    for collection in restricted_collection_cache.cache:
+        if acc_authorize_action(user_info, 'viewrestrcoll', collection=collection)[0] == 0:
+            ret.append(collection)
+    return ret
+
+def get_restricted_collections_for_recid(recid):
+    """
+    Return the list of restricted collection names to which recid belongs.
+    """
+    restricted_collections = run_sql("""SELECT c.name, c.reclist FROM accROLE_accACTION_accARGUMENT raa JOIN accARGUMENT ar ON raa.id_accARGUMENT = ar.id JOIN collection c ON ar.value=c.name WHERE ar.keyword = 'collection' AND raa.id_accACTION = %s""", (VIEWRESTRCOLL_ID,))
+    return [row[0] for row in restricted_collections if recid in HitSet(row[1])]
+
+
+def is_user_owner_of_record(user_info, recid):
+    """
+    Check if the user is owner of the record, i.e. he is the submitter
+    and/or belongs to a owner-like group authorized to 'see' the record.
+
+    @param user_info: the user_info dictionary that describe the user.
+    @type user_info: user_info dictionary
+    @param recid: the record identifier.
+    @type recid: positive integer
+    @return: True if the user is 'owner' of the record; False otherwise
+    @rtype: bool
+    """
+    authorized_emails_or_group = []
+    for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
+        authorized_emails_or_group.extend(get_fieldvalues(recid, tag))
+    for email_or_group in authorized_emails_or_group:
+        if email_or_group in user_info['group']:
+            return True
+        email = email_or_group.strip().lower()
+        if user_info['email'].strip().lower() == email:
+            return True
+    return False
 
 def check_user_can_view_record(user_info, recid):
-    """Check if the user is authorized to view the given recid. The function
-    grants access in two cases: either user has author rights on ths record,
-    or he has view rights to the primary collection this record belongs to.
-    Returns the same type as acc_authorize_action
     """
+    Check if the user is authorized to view the given recid. The function
+    grants access in two cases: either user has author rights on this
+    record, or he has view rights to the primary collection this record
+    belongs to.
 
-    def _is_user_in_authorized_author_list_for_recid(user_info, recid):
-        """Return True if the user have submitted the given record."""
-        authorized_emails = []
-        for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
-            authorized_emails.extend(get_fieldvalues(recid, tag))
-        for email in authorized_emails:
-            email = email.strip().lower()
-            if user_info['email'].strip().lower() == email:
-                return True
-        return False
-
-    record_primary_collection = guess_primary_collection_of_a_record(recid)
-    if collection_restricted_p(record_primary_collection):
-        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-        if auth_code == 0 or _is_user_in_authorized_author_list_for_recid(user_info, recid):
-            return (0, '')
+    @param user_info: the user_info dictionary that describe the user.
+    @type user_info: user_info dictionary
+    @param recid: the record identifier.
+    @type recid: positive integer
+    @return: (0, ''), when authorization is granted, (>0, 'message') when
+    authorization is not granted
+    @rtype: (int, string)
+    """
+    restricted_collections = get_restricted_collections_for_recid(recid)
+    if not restricted_collections or is_user_owner_of_record(user_info, recid):
+        return (0, '')
+    for collection in restricted_collections:
+        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
+        if auth_code == 0:
+            continue
         else:
             return (auth_code, auth_msg)
-    else:
-        return (0, '')
+    return (0, '')
 
 class IndexStemmingDataCacher(DataCacher):
     def __init__(self):
