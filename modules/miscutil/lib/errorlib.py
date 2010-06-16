@@ -349,8 +349,8 @@ def register_exception(force_stack=False,
                 ## If requested or if it's impossible to write in the log
                 from invenio.mailutils import send_email
                 if not subject:
-                    filename, line_no = _get_filename_and_line(exc_info)
-                    subject = 'Exception (%s:%s)' % (filename, line_no)
+                    filename, line_no, function_name = _get_filename_and_line(exc_info)
+                    subject = 'Exception (%s:%s:%s)' % (filename, line_no, function_name)
                 subject = '%s at %s' % (subject, CFG_SITE_URL)
                 send_email(
                     CFG_SITE_ADMIN_EMAIL,
@@ -612,13 +612,14 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % {
 
 def _get_filename_and_line(exc_info):
     """
-    Return the filename and the line where the exception happened.
+    Return the filename, the line and the function_name where the exception happened.
     """
     tb = exc_info[2]
-    exception_info = traceback.extract_tb(tb, 1)[0]
+    exception_info = traceback.extract_tb(tb)[-1]
     filename = os.path.basename(exception_info[0])
     line_no = exception_info[1]
-    return filename, line_no
+    function_name = exception_info[2]
+    return filename, line_no, function_name
 
 def _truncate_dynamic_string(val, maxlength=500):
     """
