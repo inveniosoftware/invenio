@@ -484,14 +484,16 @@ def task_set_task_param(key, value):
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
     write_message("Updating task progress to %s." % msg, verbose=9)
-    return run_sql("UPDATE schTASK SET progress=%s where id=%s",
-        (msg, _TASK_PARAMS["task_id"]))
+    if "task_id" in _TASK_PARAMS:
+        return run_sql("UPDATE schTASK SET progress=%s where id=%s",
+            (msg, _TASK_PARAMS["task_id"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
     write_message("Updating task status to %s." % val, verbose=9)
-    return run_sql("UPDATE schTASK SET status=%s where id=%s",
-        (val, _TASK_PARAMS["task_id"]))
+    if "task_id" in _TASK_PARAMS:
+        return run_sql("UPDATE schTASK SET status=%s where id=%s",
+            (val, _TASK_PARAMS["task_id"]))
 
 def task_read_status():
     """Read status information in the BibSched task table."""

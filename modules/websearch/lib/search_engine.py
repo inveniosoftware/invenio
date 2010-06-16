@@ -282,16 +282,43 @@ def check_user_can_view_record(user_info, recid):
     authorization is not granted
     @rtype: (int, string)
     """
-    restricted_collections = get_restricted_collections_for_recid(recid)
-    if not restricted_collections or is_user_owner_of_record(user_info, recid):
+    if record_public_p(recid):
+        ## The record is already known to be public.
         return (0, '')
-    for collection in restricted_collections:
-        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
+    ## At this point, either webcoll has not yet run or there are some
+    ## restricted collections. Let's see first if the user own the record.
+    if is_user_owner_of_record(user_info, recid):
+        ## Perfect! It's authorized then!
+        return (0, '')
+    if is_record_in_any_collection(recid):
+        ## OK! Some collection do refer to the record.
+        ## We assume webcoll has run.
+        for collection in get_restricted_collections_for_recid(recid):
+            (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collection)
+            if auth_code == 0:
+                continue
+            else:
+                return (auth_code, auth_msg)
+        ## Either there were no restricted collections or the user is authorized
+        ## to all of them. Good!
+        return (0, '')
+    elif record_exists(recid) > 0:
+        ## We are in the case where webcoll has not run.
+        ## Let's authorize SUPERADMIN
+        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=None)
         if auth_code == 0:
-            continue
+            return (0, '')
         else:
-            return (auth_code, auth_msg)
-    return (0, '')
+            ## Too bad. Let's print a nice message:
+            return (1, """The record you are trying to access has just been
+submitted to the system and needs to be assigned to the
+proper collections. It is currently restricted for security reasons
+until the assignment will be fully completed. Please come back later to
+properly access this record.""")
+    else:
+        ## The record either does not exists or has been deleted.
+        ## Let's handle these situations outside of this code.
+        return (0, '')
 
 class IndexStemmingDataCacher(DataCacher):
     """
@@ -2805,6 +2832,16 @@ def guess_collection_of_a_record(recID, referer=None):
                 if recID in get_collection_reclist(name):
                     return name
     return guess_primary_collection_of_a_record(recID)
+
+def is_record_in_any_collection(recID):
+    """Return True if the record belongs to at least one collection. This is a
+    good, although not perfect, indicator to guess if webcoll has already run
+    after this record has been entered into the system.
+    """
+    for name in collection_reclist_cache.cache.keys():
+        if recID in get_collection_reclist(name):
+            return True
+    return False
 
 def get_all_collections_of_a_record(recID):
     """Return all the collection names a record belongs to.
