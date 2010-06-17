@@ -53,7 +53,11 @@ TAG, ATTRS, CHILDREN = 0, 1, 2
 AVAILABLE_PARSERS = []
 
 # Do we remove singletons (empty tags)?
-CFG_BIBRECORD_KEEP_SINGLETONS = False
+# NOTE: this is currently set to True as there are some external workflow
+# exploiting singletons, e.g. bibupload -c used to delete fields, and
+# bibdocfile --fix-marc called on a record where the latest document
+# has been deleted.
+CFG_BIBRECORD_KEEP_SINGLETONS = True
 
 try:
     import pyRXP
@@ -93,7 +97,8 @@ def create_field(subfields=None, ind1=' ', ind2=' ', controlfield_value='',
     return field
 
 def create_records(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
-    correct=CFG_BIBRECORD_DEFAULT_CORRECT, parser=''):
+    correct=CFG_BIBRECORD_DEFAULT_CORRECT, parser='',
+    keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
     """Creates a list of records from the marcxml description. Returns a
     list of objects initiated by the function create_record(). Please
     see that function's docstring."""
@@ -102,11 +107,12 @@ def create_records(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
     record_xmls = regex.findall(marcxml)
 
     return [create_record(record_xml, verbose=verbose, correct=correct,
-            parser=parser) for record_xml in record_xmls]
+            parser=parser, keep_singletons=keep_singletons) for record_xml in record_xmls]
 
 def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
     correct=CFG_BIBRECORD_DEFAULT_CORRECT, parser='',
-    sort_fields_by_indicators=False):
+    sort_fields_by_indicators=False,
+    keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
     """Creates a record object from the marcxml description.
 
     Uses the best parser available in CFG_BIBRECORD_PARSERS_AVAILABLE or
@@ -152,11 +158,14 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
 
     try:
         if parser == 'pyrxp':
-            rec = _create_record_rxp(marcxml, verbose, correct)
+            rec = _create_record_rxp(marcxml, verbose, correct,
+                keep_singletons=keep_singletons)
         elif parser == '4suite':
-            rec = _create_record_4suite(marcxml)
+            rec = _create_record_4suite(marcxml,
+                keep_singletons=keep_singletons)
         elif parser == 'minidom':
-            rec = _create_record_minidom(marcxml)
+            rec = _create_record_minidom(marcxml,
+                keep_singletons=keep_singletons)
     except InvenioBibRecordParserError, ex1:
         return (None, 0, str(ex1))
 
@@ -179,7 +188,7 @@ def create_record(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
         # Correct the structure of the record.
         errs = _correct_record(rec)
 
-    return (rec, errs and 0 or 1, errs)
+    return (rec, int(not errs), errs)
 
 def record_get_field_instances(rec, tag="", ind1=" ", ind2=" "):
     """Returns the list of field instances for the specified tag and
@@ -1220,7 +1229,8 @@ def _select_parser(parser=None):
         return parser
 
 def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
-    correct=CFG_BIBRECORD_DEFAULT_CORRECT):
+    correct=CFG_BIBRECORD_DEFAULT_CORRECT,
+    keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
     """Creates a record object using the RXP parser.
 
     If verbose>3 then the parser will be strict and will stop in case of
@@ -1273,7 +1283,7 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
             field = ([], ' ', ' ', value, field_position_global)
             record.setdefault(controlfield[ATTRS]['tag'], []).append(field)
             field_position_global += 1
-        elif CFG_BIBRECORD_KEEP_SINGLETONS:
+        elif keep_singletons:
             field = ([], ' ', ' ', '', field_position_global)
             record.setdefault(controlfield[ATTRS]['tag'], []).append(field)
             field_position_global += 1
@@ -1285,10 +1295,10 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
             if subfield[CHILDREN]:
                 value = ''.join([n for n in subfield[CHILDREN]])
                 subfields.append((subfield[ATTRS].get('code', '!'), value))
-            elif CFG_BIBRECORD_KEEP_SINGLETONS:
+            elif keep_singletons:
                 subfields.append((subfield[ATTRS].get('code', '!'), ''))
 
-        if subfields or CFG_BIBRECORD_KEEP_SINGLETONS:
+        if subfields or keep_singletons:
             # Create the field.
             tag = datafield[ATTRS].get('tag', '!')
             ind1 = datafield[ATTRS].get('ind1', '!')
@@ -1302,7 +1312,8 @@ def _create_record_rxp(marcxml, verbose=CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL,
 
     return record
 
-def _create_record_from_document(document):
+def _create_record_from_document(document,
+        keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
     """Creates a record from the document (of type
     xml.dom.minidom.Document or Ft.Xml.Domlette.Document)."""
     root = None
@@ -1329,7 +1340,7 @@ def _create_record_from_document(document):
         text_nodes = controlfield.childNodes
         value = ''.join([n.data for n in text_nodes]).encode("utf-8")
 
-        if value or CFG_BIBRECORD_KEEP_SINGLETONS:
+        if value or keep_singletons:
             field = ([], " ", " ", value, field_position_global)
             record.setdefault(tag, []).append(field)
             field_position_global += 1
@@ -1340,11 +1351,11 @@ def _create_record_from_document(document):
         for subfield in _get_children_by_tag_name(datafield, "subfield"):
             text_nodes = subfield.childNodes
             value = ''.join([n.data for n in text_nodes]).encode("utf-8")
-            if value or CFG_BIBRECORD_KEEP_SINGLETONS:
+            if value or keep_singletons:
                 code = subfield.getAttributeNS(None, 'code').encode("utf-8")
                 subfields.append((code or '!', value))
 
-        if subfields or CFG_BIBRECORD_KEEP_SINGLETONS:
+        if subfields or keep_singletons:
             tag = datafield.getAttributeNS(None, "tag").encode("utf-8") or '!'
 
             ind1 = datafield.getAttributeNS(None, "ind1").encode("utf-8")
@@ -1357,16 +1368,18 @@ def _create_record_from_document(document):
 
     return record
 
-def _create_record_minidom(marcxml):
+def _create_record_minidom(marcxml,
+        keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
     """Creates a record using minidom."""
     try:
         dom = xml.dom.minidom.parseString(marcxml)
     except xml.parsers.expat.ExpatError, ex1:
         raise InvenioBibRecordParserError(str(ex1))
 
-    return _create_record_from_document(dom)
+    return _create_record_from_document(dom, keep_singletons=keep_singletons)
 
-def _create_record_4suite(marcxml):
+def _create_record_4suite(marcxml,
+        keep_singletons=CFG_BIBRECORD_KEEP_SINGLETONS):
     """Creates a record using the 4suite parser."""
     try:
         dom = Ft.Xml.Domlette.NonvalidatingReader.parseString(marcxml,
@@ -1374,7 +1387,7 @@ def _create_record_4suite(marcxml):
     except Ft.Xml.ReaderException, ex1:
         raise InvenioBibRecordParserError(ex1.message)
 
-    return _create_record_from_document(dom)
+    return _create_record_from_document(dom, keep_singletons=keep_singletons)
 
 def _concat(alist):
     """Concats a list of lists"""

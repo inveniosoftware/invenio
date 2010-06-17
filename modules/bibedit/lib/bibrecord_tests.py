@@ -1442,23 +1442,26 @@ class BibRecordSingletonTest(unittest.TestCase):
 
     if parser_minidom_available:
         def test_singleton_removal_minidom(self):
-            """bibrecord - singleton removal with minidom"""
+            """bibrecord - enforcing singleton removal with minidom"""
             rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='minidom')[0][0]
+                                           correct=1, parser='minidom',
+                                           keep_singletons=False)[0][0]
             self.assertEqual(rec, self.rec_expected)
 
     if parser_4suite_available:
         def test_singleton_removal_4suite(self):
-            """bibrecord - singleton removal with 4suite"""
+            """bibrecord - enforcing singleton removal with 4suite"""
             rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='4suite')[0][0]
+                                           correct=1, parser='4suite',
+                                           keep_singletons=False)[0][0]
             self.assertEqual(rec, self.rec_expected)
 
     if parser_pyrxp_available:
         def test_singleton_removal_pyrxp(self):
-            """bibrecord - singleton removal with pyrxp"""
+            """bibrecord - enforcing singleton removal with pyrxp"""
             rec = bibrecord.create_records(self.xml, verbose=1,
-                                           correct=1, parser='pyrxp')[0][0]
+                                           correct=1, parser='pyrxp',
+                                           keep_singletons=False)[0][0]
             self.assertEqual(rec, self.rec_expected)
 
 class BibRecordNumCharRefTest(unittest.TestCase):
