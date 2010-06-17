@@ -738,6 +738,12 @@ class BibMatchTest(unittest.TestCase):
         [dummy1, dummy2, dummy3, fuzzyrecs] = match_records(records)
         self.assertEqual(1,len(fuzzyrecs))
 
+    def test_check_remote(self):
+        """bibmatch - check remote match (Invenio demo site) """
+        records = create_records(self.recxml1)
+        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        self.assertEqual(1,len(matchedrecs))
+
 TEST_SUITE = make_test_suite(BibMatchTest)
 
 if __name__ == "__main__":

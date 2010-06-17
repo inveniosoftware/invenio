@@ -28,7 +28,8 @@ if sys.hexversion < 0x2040000:
 import getopt
 import string
 
-from invenio.search_engine import perform_request_search
+from invenio.config import CFG_SITE_URL
+from invenio.invenio_connector import InvenioConnector
 from invenio.bibrecord import create_records, record_get_field_instances, \
     record_get_field_values, record_xml_output
 from invenio import bibconvert
@@ -46,6 +47,7 @@ def usage():
  $ bibmatch --field=title < input.xml >  unmatched.xml
  $ bibmatch --field=245__a --mode=a < input.xml > unmatched.xml
  $ bibmatch --print-ambiguous --query-string="245__a||100__a" < input.xml > unmatched.xml
+ $ bibmatch --print-match -i input.xml -r 'http://cdsweb.cern.ch'
 
  $ bibmatch [options] < input.xml > unmatched.xml
 
@@ -91,6 +93,8 @@ def usage():
  -h,  --help               print this help and exit
  -V,  --version            print version information and exit
  -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
+ -r,  --remote=URL         match against a remote invenio installation (URL, no trailing '/')
+                           Beware: Only searches public records attached to home collection
 
     """ % sys.argv[0]
     sys.exit(1)
@@ -237,7 +241,7 @@ def main_words_list(wstr):
         words = words[:5]
     return words
 
-def match_records(records, qrystrs=None, perform_request_search_mode="eee", operator="a", verbose=1):
+def match_records(records, qrystrs=None, perform_request_search_mode="eee", operator="a", verbose=1, server_url=CFG_SITE_URL):
     """ Do the actual job. Check which records are new, which are matched,
         which are ambiguous and which are fuzzy-matched.
     Parameters:
@@ -246,9 +250,13 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
     @perform_request_search_mode: run the query in this mode
     @operator: "o" "a"
     @verbose: be loud
+    @server_url: server url to match against
     @return an array of arrays of records, like this [newrecs,matchedrecs,
                                                       ambiguousrecs,fuzzyrecs]
     """
+
+    server = InvenioConnector(server_url)
+
     newrecs = []
     matchedrecs = []
     ambiguousrecs = []
@@ -339,16 +347,16 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
                 aas = querystring.advanced
 
                 #1st run the basic perform_req_search
-                recID_list = perform_request_search(
+                recID_list = server.search(
                     p1=p1, f1=f1, m1=m1, op1=op1,
                     p2=p2, f2=f2, m2=m2, op2=op2,
-                    p3=p3, f3=f3, m3=m3, aas=aas)
+                    p3=p3, f3=f3, m3=m3, of='id')
 
                 if (verbose > 8):
                     sys.stderr.write("\nperform_request_search with values"+\
                      " p1="+str(p1)+" f1="+str(f1)+" m1="+str(m1)+" op1="+str(op1)+\
-                     " p2="+str(p2)+" f2="+str(f2)+" m1="+str(m1)+" op2="+str(op2)+\
-                     " p3="+str(p3)+" f3="+str(f1)+" m1="+str(m1)+" aas="+str(aas)+\
+                     " p2="+str(p2)+" f2="+str(f2)+" m2="+str(m2)+" op2="+str(op2)+\
+                     " p3="+str(p3)+" f3="+str(f3)+" m3="+str(m3)+\
                      " result="+str(recID_list)+"\n")
 
                 if len(recID_list) > 1: #ambig match
@@ -370,7 +378,7 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
 
                     for word in words1:
                         word = "'"+word+"'"
-                        ilist = perform_request_search(p=word, f=f1)
+                        ilist = server.search(p=word, f=f1, of="id")
                         if (verbose > 8):
                             sys.stderr.write("fuzzy perform_request_search with values"+\
                                              " p="+str(word)+" f="+str(f1)+" res "+str(ilist)+"\n")
@@ -380,20 +388,20 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
 
                     for word in words2:
                         word = "'"+word+"'"
-                        ilist = perform_request_search(p=word, f=f2)
+                        ilist = server.search(p=word, f=f2, of="id")
                         if (verbose > 8):
                             sys.stderr.write("fuzzy perform_request_search with values"+\
-                                             " p="+str(word)+" f="+str(f1)+" res "+str(ilist)+"\n")
+                                             " p="+str(word)+" f="+str(f2)+" res "+str(ilist)+"\n")
                         if intersected == None:
                             intersected = ilist
                         intersected =  list(set(ilist)&set(intersected))
 
                     for word in words3:
                         word = "'"+word+"'"
-                        ilist = perform_request_search(p=word, f=f3)
+                        ilist = server.search(p=word, f=f3, of="id")
                         if (verbose > 8):
                             sys.stderr.write("fuzzy perform_request_search with values"+\
-                                             " p="+str(word)+" f="+str(f1)+" res "+str(ilist)+"\n")
+                                             " p="+str(word)+" f="+str(f3)+" res "+str(ilist)+"\n")
                         if intersected == None:
                             intersected = ilist
                         intersected =  list(set(ilist)&set(intersected))
@@ -417,7 +425,7 @@ def main():
     # qrystr - querystring in the UpLoader format
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "0123hVFm:q:c:nv:o:b:i:",
+        opts, args = getopt.getopt(sys.argv[1:], "0123hVFm:q:c:nv:o:b:i:r:",
                  [
                    "print-new",
                    "print-match",
@@ -433,7 +441,8 @@ def main():
                    "verbose=",
                    "operator=",
                    "batch-output=",
-                   "input="
+                   "input=",
+                   "remote="
                  ])
 
     except getopt.GetoptError, e:
@@ -453,6 +462,7 @@ def main():
     records     = []
     batch_output = ""               #print stuff in files
     f_input = ""                    #read from where, if param "i"
+    server_url = CFG_SITE_URL       #url to server performing search, local by default
     predefined_fields = ["title", "author"]
 
     for opt, opt_value in opts:
@@ -486,6 +496,8 @@ def main():
             batch_output     = opt_value
         if opt in ["-i", "--input"]:
             f_input     = opt_value
+        if opt in ["-r", "--remote"]:
+            server_url = opt_value
         if opt in ["-f", "--field"]:
             alternate_querystring = []
             if opt_value in predefined_fields:
@@ -529,7 +541,8 @@ def main():
                                                    qrystrs,
                                                    perform_request_search_mode,
                                                    operator,
-                                                   verbose)
+                                                   verbose,
+                                                   server_url)
     #set the output according to print..
     if print_mode == 0:
         recs_out = newrecs
