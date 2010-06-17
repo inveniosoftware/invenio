@@ -33,7 +33,8 @@ from tempfile import mkstemp
 from invenio.config import CFG_SITE_URL
 from invenio.invenio_connector import InvenioConnector
 from invenio.bibrecord import create_records, record_get_field_instances, \
-    record_get_field_values, record_xml_output
+    record_get_field_values, record_xml_output, record_modify_controlfield, \
+    record_has_field, record_add_field
 from invenio import bibconvert
 from invenio.dbquery import run_sql
 from invenio.textmarc2xmlmarc import transform_file
@@ -44,24 +45,14 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+
 def usage():
     """Print help"""
 
     print >> sys.stderr, \
     """ Usage: %s [options]
 
- Examples:
-
- $ bibmatch -b -n < input.xml
- $ bibmatch --field=title < input.xml >  unmatched.xml
- $ bibmatch --field=245__a --mode=a < input.xml > unmatched.xml
- $ bibmatch --print-ambiguous --query-string="245__a||100__a" < input.xml > unmatched.xml
- $ bibmatch --print-match -i input.xml -r 'http://cdsweb.cern.ch'
-
- $ bibmatch [options] < input.xml > unmatched.xml
-
  Options:
-
 
  Output:
 
@@ -105,6 +96,19 @@ def usage():
  -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
  -r,  --remote=URL         match against a remote invenio installation (URL, no trailing '/')
                            Beware: Only searches public records attached to home collection
+ -a,  --alter-recid        The recid (controlfield 001) of matched or fuzzy matched records in
+                           output will be replaced by the 001 value of the matched record.
+                           Useful to prepare files to then be used with BibUpload.
+
+ Examples:
+
+ $ bibmatch -b -n < input.xml
+ $ bibmatch --field=title < input.xml >  unmatched.xml
+ $ bibmatch --field=245__a --mode=a < input.xml > unmatched.xml
+ $ bibmatch --print-ambiguous --query-string="245__a||author" < input.xml > ambigmatched.xml
+ $ bibmatch --print-match -i input.xml -r 'http://cdsweb.cern.ch'
+ $ bibmatch -a -1 < input.xml > modified_match.xml
+ $ bibmatch [options] < input.xml > unmatched.xml
 
     """ % sys.argv[0]
     sys.exit(1)
@@ -251,16 +255,33 @@ def main_words_list(wstr):
         words = words[:5]
     return words
 
-def match_records(records, qrystrs=None, perform_request_search_mode="eee", operator="a", verbose=1, server_url=CFG_SITE_URL):
-    """ Do the actual job. Check which records are new, which are matched,
-        which are ambiguous and which are fuzzy-matched.
-    Parameters:
-    @records: an array of records to analyze
-    @qrystrs: querystrings
-    @perform_request_search_mode: run the query in this mode
-    @operator: "o" "a"
-    @verbose: be loud
-    @server_url: server url to match against
+def match_records(records, qrystrs=None, perform_request_search_mode="eee", operator="a", verbose=1, server_url=CFG_SITE_URL, modify=0):
+    """ Match passed records with existing records on a local or remote Invenio
+    installation. Returns which records are new (no match), which are matched,
+    which are ambiguous and which are fuzzy-matched.
+
+    @param records: records to analyze
+    @type records: list of records
+
+    @param qrystrs: Querystrings
+    @type qrystrs: list of object
+
+    @param server_url: which server to search on. Local installation by default
+    @type server_url: str
+
+    @param perform_request_search_mode: run the query in this mode
+    @type perform_request_search_mode: string
+
+    @param operator: "o" "a"
+    @type operator: str
+
+    @param verbose: be loud
+    @type verbose: int
+
+    @param modify: output modified records of matches
+    @type modify: int
+
+    @rtype: list of lists
     @return an array of arrays of records, like this [newrecs,matchedrecs,
                                                       ambiguousrecs,fuzzyrecs]
     """
@@ -374,6 +395,11 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
                     if (verbose > 8):
                         sys.stderr.write("ambiguous\n")
                 if len(recID_list) == 1: #match
+                    if modify:
+                        if record_has_field(rec[0], '001'):
+                            record_modify_controlfield(rec[0], '001', controlfield_value=str(recID_list[0]), field_position_global=1)
+                        else:
+                            record_add_field(rec[0], '001', controlfield_value=str(recID_list[0]))
                     matchedrecs.append(rec)
                     if (verbose > 8):
                         sys.stderr.write("match\n")
@@ -418,6 +444,11 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
 
                     if intersected:
                         #this was a fuzzy match
+                        if modify:
+                            if record_has_field(rec[0], '001'):
+                                record_modify_controlfield(rec[0], '001', controlfield_value=str(intersected[0]), field_position_global=1)
+                            else:
+                                record_add_field(rec[0], '001', controlfield_value=str(intersected[0]))
                         fuzzyrecs.append(rec)
                         if (verbose > 8):
                             sys.stderr.write("fuzzy\n")
@@ -454,7 +485,7 @@ def main():
     Using advanced search only 3 fields can be queried concurrently
     qrystr - querystring in the UpLoader format. """
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "0123hVFm:q:c:nv:o:b:i:r:t",
+        opts, args = getopt.getopt(sys.argv[1:], "0123hVFm:q:c:nv:o:b:i:r:ta",
                  [
                    "print-new",
                    "print-match",
@@ -472,7 +503,8 @@ def main():
                    "batch-output=",
                    "input=",
                    "remote=",
-                   "text-marc-output"
+                   "text-marc-output",
+                   "alter-recid"
                  ])
 
     except getopt.GetoptError, e:
@@ -489,6 +521,7 @@ def main():
     batch_output = ""               #print stuff in files
     f_input = ""                    #read from where, if param "i"
     server_url = CFG_SITE_URL       #url to server performing search, local by default
+    modify = 0                      #alter output with matched record indentifiers
     predefined_fields = ["title", "author"]
     textmarc_output = 0
 
@@ -527,6 +560,8 @@ def main():
             f_input     = opt_value
         if opt in ["-r", "--remote"]:
             server_url = opt_value
+        if opt in ["-a", "--alter-recid"]:
+            modify = 1
         if opt in ["-f", "--field"]:
             alternate_querystring = []
             if opt_value in predefined_fields:
@@ -575,7 +610,8 @@ def main():
                                       perform_request_search_mode,
                                       operator,
                                       verbose,
-                                      server_url)
+                                      server_url,
+                                      modify)
     # set the output according to print..
     # 0-newrecs 1-matchedrecs 2-ambiguousrecs 3-fuzzyrecs
     recs_out = match_results[print_mode]

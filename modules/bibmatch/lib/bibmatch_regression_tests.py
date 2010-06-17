@@ -24,7 +24,7 @@
 __revision__ = "$Id$"
 
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibrecord import create_records
+from invenio.bibrecord import create_records, record_has_field
 from invenio.bibmatch_engine import match_records, transform_input_to_marcxml
 import unittest
 
@@ -772,17 +772,24 @@ class BibMatchTest(unittest.TestCase):
         self.assertEqual(1,len(fuzzyrecs))
 
     def test_check_remote(self):
-        """bibmatch - check remote match (Invenio demo site) """
+        """bibmatch - check remote match (Invenio demo site)"""
         records = create_records(self.recxml1)
         [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
         self.assertEqual(1,len(matchedrecs))
 
     def test_check_textmarc(self):
-        """bibmatch - check textmarc as input """
+        """bibmatch - check textmarc as input"""
         marcxml = transform_input_to_marcxml("", self.textmarc)
         records = create_records(marcxml)
         [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
         self.assertEqual(2,len(matchedrecs))
+
+    def test_check_altered(self):
+        """bibmatch - check altered match"""
+        records = create_records(self.recxml1)
+        self.assertTrue(not record_has_field(records[0][0], '001'))
+        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, modify=1)
+        self.assertTrue(record_has_field(matchedrecs[0][0], '001'))
 
 TEST_SUITE = make_test_suite(BibMatchTest)
 
