@@ -3402,12 +3402,6 @@ function setSelectionStatusAll(status){
   });
 }
 
-function prepareApplyAllHPChangesHandler(){
-    // a container for many undo/redo operations in the same time
-    throw 'To implement';
-}
-
-
 /*** Handlers for specific operations*/
 
 function renderURList(list, idPrefix, isInverted){

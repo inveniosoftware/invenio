@@ -838,7 +838,7 @@ def perform_request_update_record(request_type, recid, uid, cacheMTime, data, \
             # This is a genuine operation - we have to add a new descriptor
             # to the undo list and cancel the redo unless the operation is
             # a bulk operation
-            if undoRedoOp != None:
+            if undoRedoOp != None and undoRedoOp != 0:
                 undo_list = undo_list + [undoRedoOp]
                 redo_list = []
             else:

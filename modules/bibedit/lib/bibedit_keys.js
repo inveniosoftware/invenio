@@ -29,79 +29,94 @@
 var gSelectionModeOn = false;
 var gReady = true;
 
+
+/** a functor allowing skipping the usage of hotkeys plugin in the case of inputs */
+function disableInInput(fn){
+    return function(event){
+	//TODO: Piotr: Here a check if the even is fired on the input
+	if (event.target.tagName.toLowerCase() != "input"){
+	    fn(event);
+	}
+    }
+}
 function initHotkeys(){
   /*
    * Initialize all hotkeys.
    */
   // New record.
-  $(document).bind('keydown', {combi: 'shift+n', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'Shift+n',
+    disableInInput(function(event){
       $('#imgNewRecord').trigger('click');
       event.preventDefault();
-  });
-    // Clone record.
-  $(document).bind('keydown', {combi: 'shift+l', disableInInput: true},
-    function(event){
+    }));
+
+  // Clone record.
+  $(document).bind('keydown', 'Shift+l',
+    disableInInput(function(event){
       var imgCloneRecord = $('#imgCloneRecord');
       if (!imgCloneRecord.hasClass('bibEditImgFaded')){
 	imgCloneRecord.trigger('click');
 	event.preventDefault();
       }
-  });
+  }));
   // Focus on record selection field.
-  $(document).bind('keydown', {combi: 'g', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'g',
+    disableInInput(function(event){
       $('#txtSearchPattern').focus();
       event.preventDefault();
-  });
+    }));
   // Previous record.
-  $(document).bind('keydown', {combi: 'ctrl+right', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'Ctrl+right',
+    disableInInput(function(event){
       var btnNext = $('#btnNext');
       if (!btnNext.attr('disabled')){
 	btnNext.trigger('click');
 	event.preventDefault();
       }
-  });
+  }));
+
   // Next record.
-  $(document).bind('keydown', {combi: 'ctrl+left', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'Ctrl+left',
+    disableInInput(function(event){
       var btnPrev = $('#btnPrev');
       if (!btnPrev.attr('disabled')){
 	btnPrev.trigger('click');
 	event.preventDefault();
       }
-  });
+    }));
+
   // Submit record.
-  $(document).bind('keydown', {combi: 'shift+s', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'Shift+s',
+    disableInInput(function(event){
       var btnSubmit = $('#btnSubmit');
       if (!btnSubmit.attr('disabled')){
 	btnSubmit.trigger('click');
 	event.preventDefault();
       }
-  });
+    }));
   // Cancel editing.
-  $(document).bind('keydown', {combi: 'shift+c', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'shift+c',
+    disableInInput(function(event){
       var btnCancel = $('#btnCancel');
       if (!btnCancel.attr('disabled')){
 	btnCancel.trigger('click');
 	event.preventDefault();
       }
-  });
+    }));
+
   // Delete record.
-  $(document).bind('keydown', {combi: 'shift+d', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'Shift+d',
+   disableInInput(function(event){
       var btnDeleteRecord = $('#btnDeleteRecord');
       if (!btnDeleteRecord.attr('disabled')){
 	btnDeleteRecord.trigger('click');
 	event.preventDefault();
       }
-  });
+   }));
+
   // Toggle MARC/human tags.
-  $(document).bind('keydown', {combi: 'shift+t', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'Shift+t',
+    disableInInput(function(event){
       if (gTagFormat == 'MARC'){
 	var btnHumanTags = $('#btnHumanTags');
 	if (!btnHumanTags.attr('disabled')){
@@ -116,52 +131,52 @@ function initHotkeys(){
 	  event.preventDefault();
 	}
       }
-  });
+    }));
+
   // Add new field.
-  $(document).bind('keydown', {combi: 'a', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'a',
+    disableInInput(function(event){
       var btnAddField = $('#btnAddField');
       if (!btnAddField.attr('disabled')){
 	btnAddField.trigger('click');
 	event.preventDefault();
       }
-  });
+    }));
+
   // Delete selected field(s).
-  $(document).bind('keydown', {combi: 'del', disableInInput: true},
-    function(event){
+  $(document).bind('keydown', 'del',
+    disableInInput(function(event){
       var btnDeleteSelected = $('#btnDeleteSelected');
       if (!btnDeleteSelected.attr('disabled')){
 	onDeleteClick(event);
 	event.preventDefault();
       }
-  });
+  }));
 
   // Toggle 'selection mode'.
-  $(document).bind('keydown', {combi: 's', disableInInput: true}, onKeyS);
+  $(document).bind('keydown', 's', disableInInput(onKeyS));
+
+
   // Edit focused subfield.
-  $(document).bind('keydown', {combi: 'return'},
+  $(document).bind('keydown', 'return',
 		   onKeyReturn);
   // Save content and jump to next content field.
-  $(document).bind('keydown', {combi: 'tab'},
-		   onKeyTab);
+  $(document).bind('keydown', 'tab', onKeyTab);
 
   // Lauch autosuggest
-  $(document).bind('keydown', {combi: 'ctrl+shift+a'}, function (event)  { onAutosuggest(event); } );
-  $(document).bind('keydown', {combi: 'ctrl+9'}, function (event)  { onAutosuggest(event); } );
+  $(document).bind('keydown', 'ctrl+shift+a', function (event)  { onAutosuggest(event); } );
+  $(document).bind('keydown', 'ctrl+9', function (event)  { onAutosuggest(event); } );
 
   // Save content and jump to previous content field.
-  $(document).bind('keydown', {combi: 'shift+tab'},
-		   onKeyTab);
+  $(document).bind('keydown', 'shift+tab', onKeyTab);
   // Select focused subfield.
-  $(document).bind('keydown', {combi: 'space', disableInInput: true},
-		   onKeySpace);
+  $(document).bind('keydown', 'space', disableInInput(onKeySpace));
   // Select focused subfields parent field.
-  $(document).bind('keydown', {combi: 'shift+space', disableInInput: true},
-		   onKeySpace);
+  $(document).bind('keydown', 'shift+space', disableInInput(onKeySpace));
   // Move selected field/subfield up.
-  $(document).bind('keydown', {combi: 'ctrl+up'}, onKeyCtrlUp);
+  $(document).bind('keydown', 'ctrl+up', onKeyCtrlUp);
   // Move selected field/subfield down.
-  $(document).bind('keydown', {combi: 'ctrl+down'}, onKeyCtrlDown);
+  $(document).bind('keydown', 'ctrl+down', onKeyCtrlDown);
   // Save content in current form.
   $(document).bind('keydown', 'ctrl+shift+s', function(event){
     onTriggerFormControl('Save', event);
@@ -175,13 +190,13 @@ function initHotkeys(){
     onTriggerFormControl('Clear', event);
   });
   // Add subfield in form.
-  $(document).bind('keydown', {combi: 'ctrl+shift+e'}, onKeyCtrlShiftE);
+  $(document).bind('keydown', 'ctrl+shift+e', onKeyCtrlShiftE);
   // Remove subfield from form.
-  $(document).bind('keydown', {combi: 'ctrl+shift+d'}, onKeyCtrlShiftD);
+  $(document).bind('keydown', 'ctrl+shift+d', onKeyCtrlShiftD);
   // Binding the undo/redo operations
 
-  $(document).bind('keydown', {combi: 'ctrl+shift+z'}, onUndo);
-  $(document).bind('keydown', {combi: 'ctrl+shift+y'}, onRedo);
+  $(document).bind('keydown', 'ctrl+shift+z', onUndo);
+  $(document).bind('keydown', 'ctrl+shift+y', onRedo);
 }
 
 function onKeyS(event){
