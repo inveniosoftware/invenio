@@ -46,11 +46,11 @@ def format(bfo, style):
         if style != '':
             linkattrd['style'] = style
 
-        out += create_html_link(CFG_SITE_URL + '/record/' + str(bfo.recID) + '/edit/',
-                         urlargd={'ln': bfo.lang,
-                                  'recid': str(bfo.recID)},
-                         link_label=_("Edit This Record"),
-                         linkattrd=linkattrd)
+        out += create_html_link(CFG_SITE_URL +
+               '/record/edit/?#state=edit&recid=%s&ln=%s' % (str(bfo.recID), bfo.lang,),
+               {},
+               link_label=_("Edit This Record"),
+               linkattrd=linkattrd)
 
     return out
 
