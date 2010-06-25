@@ -667,7 +667,7 @@ def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, ex
             output_format = '.hocr'
         input_file, output_file, working_dir = prepare_io(input_file, output_file, output_format)
         #execute_command('pdfimages %s %s', input_file, os.path.join(working_dir, 'image'))
-        execute_command(CFG_PATH_PDFTOPPM, '-r', '300', '-aa', 'yes', '-freetype' 'yes', input_file, os.path.join(working_dir, 'image'))
+        execute_command(CFG_PATH_PDFTOPPM, '-r', '300', '-aa', 'yes', '-freetype', 'yes', input_file, os.path.join(working_dir, 'image'))
 
         images = os.listdir(working_dir)
         images.sort()
