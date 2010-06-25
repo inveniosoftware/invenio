@@ -497,7 +497,7 @@ def pdf2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
                 title = g.group(1)
                 break
     if not title:
-        raise InvenioWebSubmitFileConverterError("It's impossible to automatically discover the title. Please specify it as a parameter")
+        title = 'No title'
 
     debug("Extracted title is %s" % title)
 
@@ -562,7 +562,7 @@ def ps2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
 
     input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
     if not title:
-        raise InvenioWebSubmitFileConverterError("It's impossible to automatically discover the title. Please specify it as a parameter")
+        title = 'No title'
 
     shutil.copy(os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'ISOCoatedsb.icc'), working_dir)
     pdfa_header = open(os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFA_def.ps')).read()
