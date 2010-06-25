@@ -52,6 +52,7 @@ from invenio.websubmit_config import InvenioWebSubmitFileStamperError
 
 
 ## ***** Functions related to the creation of the PDF Stamp file: *****
+re_latex_includegraphics = re.compile('\\includegraphics\[.*?\]\{(?P<image>.*?)\}')
 def copy_template_files_to_stampdir(path_workingdir, latex_template):
     """In order to stamp a PDF fulltext file, LaTeX is used to create a
        "stamp" page that is then merged with the fulltext PDF.
@@ -152,23 +153,11 @@ def copy_template_files_to_stampdir(path_workingdir, latex_template):
     ## Now that the LaTeX template file has been copied locally, extract
     ## the names of graphics files to be included in the resulting
     ## document and attempt to copy them to the working "stamp" directory:
-    cmd_findgraphics = \
-       """grep includegraphic %s | """ \
-       """sed -n 's/^[^{]*{\\([^}]\\{1,\\}\\)}.*$/\\1/p'""" \
-       % escape_shell_arg("%s/%s" % (path_workingdir, template_name))
-
-    fh_findgraphics = os.popen(cmd_findgraphics, "r")
-    graphic_names = fh_findgraphics.readlines()
-    findgraphics_errcode = fh_findgraphics.close()
-
-    if findgraphics_errcode is not None:
-        ## There was an error involving the grep/sed command.
-        ## Unable to extract the details of any graphics to
-        ## be included:
-        msg = """Unable to stamp file. There was """ \
-              """a problem when trying to obtain details of images """ \
-              """included by the LaTeX template."""
-        raise InvenioWebSubmitFileStamperError(msg)
+    template_desc = file(os.path.join(path_workingdir, template_name))
+    template_code = template_desc.read()
+    template_desc.close()
+    graphic_names = [match_obj.group('image') for match_obj in \
+                     re_latex_includegraphics.finditer(template_code)]
 
     ## Copy each include-graphic extracted from the template
     ## into the working stamp directory:
@@ -1470,25 +1459,36 @@ def stamp_file(options):
         fails for one reason or another.
     """
     ## SANITY CHECKS:
-    ## Does the options dictionary contain all expected keys?
+    ## Does the options dictionary contain all mandatory keys?
     ##
     ## A list of the names of the expected options:
-    expected_option_names = ["latex-template", \
-                             "latex-template-var", \
-                             "input-file", \
-                             "output-file", \
-                             "stamp", \
-                             "layer", \
-                             "verbosity"]
-    expected_option_names.sort()
-    ## A list of the option names that have been received:
-    received_option_names = options.keys()
-    received_option_names.sort()
+    mandatory_option_names = ["latex-template", \
+                              "latex-template-var", \
+                              "input-file", \
+                              "output-file"]
+    optional_option_names_and_defaults = {"layer": "background", \
+                                          "verbosity": 0,
+                                          "stamp": "first"}
 
-    if expected_option_names != received_option_names:
-        ## Error: he dictionary of options had an illegal structure:
-        msg = """Error: Unexpected value received for "options" parameter."""
-        raise TypeError(msg)
+    ## Are we missing some mandatory parameters?
+    received_option_names = options.keys()
+    for mandatory_option_name in mandatory_option_names:
+        if not mandatory_option_name in received_option_names:
+            msg = """Error: Mandatory parameter %s is missing""" % mandatory_option_name
+            raise InvenioWebSubmitFileStamperError(msg)
+
+    ## Are we getting some unknown option?
+    for received_option_name in received_option_names:
+        if not received_option_name in mandatory_option_names and \
+           not received_option_name in optional_option_names_and_defaults.keys():
+            ## Error: the dictionary of options had an illegal structure:
+            msg = """Error: Option %s is not a recognized parameter""" % received_option_name
+            raise InvenioWebSubmitFileStamperError(msg)
+
+    ## Set default options when not specified
+    for opt, value in optional_option_names_and_defaults.iteritems():
+        if not options.has_key(opt):
+            options[opt] = value
 
     ## Do we have an input file to work on?
     if options["input-file"] in (None, ""):
