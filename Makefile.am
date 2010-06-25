@@ -46,13 +46,13 @@ kwalitee-check:
 	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --stats $(top_srcdir)
 
 kwalitee-check-errors-only:
-	@find $(top_srcdir) -name '*.py' -exec pylint -e {} \; 2> /dev/null
+	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-errors $(top_srcdir)
 
 kwalitee-check-variables:
-	@find $(top_srcdir) -name '*.py' -exec pylint --reports=n --enable-checker=variables {} \; 2> /dev/null
+	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-variables $(top_srcdir)
 
 kwalitee-check-indentation:
-	@find $(top_srcdir) -name '*.py' -exec pylint --reports=n --enable-checker=format {} 2> /dev/null \; | grep -E '(^\*|indentation)'
+	@$(PYTHON) $(top_srcdir)/modules/miscutil/lib/kwalitee.py --check-indentation $(top_srcdir)
 
 kwalitee-check-sql-queries:
 	@echo "* Listing potentially dangerous SQL queries:"

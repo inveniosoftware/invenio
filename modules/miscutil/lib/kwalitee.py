@@ -39,8 +39,9 @@ Check options::
    --check-pep8             check PEP8 compliance
 
 Examples::
-   $ python kwalitee.py --stats ~/src/cds-invenio/
+   $ python kwalitee.py --stats ~/private/src/cds-invenio/
    $ python kwalitee.py --stats ../../websearch/lib/*.py
+   $ python kwalitee.py --check-some ../../websearch/lib/
    $ python kwalitee.py --check-all ../../websearch/lib/search_engine.py
 """
 
@@ -562,6 +563,28 @@ Legend:
     return
 
 
+def get_python_filenames_from_pathnames(pathnames):
+    """Get recursively all Python filenames from given pathnames.
+    Input: list of pathnames (a pathname is a file or a directory).
+    Output: list of Python files.
+    """
+    out = set([])
+    for pathname in pathnames:
+        if os.path.isdir(pathname):
+            # we have directory, so recursively searching list of files:
+            for rootdir, subdirs, files in os.walk(pathname):
+                for afile in files:
+                    if afile.endswith('.py'):
+                        out.add(os.path.join(rootdir,afile))
+        else:
+            # we have file:
+            if pathname.endswith('.py'):
+                out.add(pathname)
+    out = list(out)
+    out.sort()
+    return out
+
+
 def print_heading(phrase, prefix='\033[1m', suffix='\033[0;0m'):
     """Print heading phrase in a special style (default=bold)."""
     print prefix + '>>> ' + phrase + suffix
@@ -601,7 +624,7 @@ def cmd_check_errors(filenames):
     print_heading('Checking Python errors...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("pylint -e %s" % filename)
+        (dummy, pipe, dummy)= os.popen3("pylint --errors-only %s" % filename)
         for line in pipe.readlines():
             out += line
         pipe.close()
@@ -615,13 +638,17 @@ def cmd_check_variables(filenames):
     print_heading('Checking Python variables...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("pylint --reports=n "
-                                        " --enable-checker=variables %s" % \
+        (dummy, pipe, dummy)= os.popen3("pylint --reports=n %s" % \
                                         filename)
         for line in pipe.readlines():
             if line.startswith('F:') or line.startswith('E:') or \
                    line.startswith('W:'):
-                out += line
+                if 'variable' in line or \
+                   'name' in line or \
+                   'global' in line or \
+                   'Unused' in line or \
+                   'Redefining' in line:
+                    out += line
         pipe.close()
         if out:
             print '***', filename
@@ -633,8 +660,7 @@ def cmd_check_indentation(filenames):
     print_heading('Checking Python indentation...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("pylint --reports=n "
-                                        " --enable-checker=format %s" % \
+        (dummy, pipe, dummy)= os.popen3("pylint --reports=n %s" % \
                                         filename)
         for line in pipe.readlines():
             if 'indent' in line:
@@ -721,7 +747,7 @@ def main():
     else:
         # detect what to run:
         cmd_option = None
-        cmd_filenames = None
+        cmd_pathnames = None
         for opt_idx in range(1, len(sys.argv)):
             opt = sys.argv[opt_idx]
             if opt in ('--stats', '--check-all', '--check-some',
@@ -730,16 +756,21 @@ def main():
                        '--check-docstrings', '--check-pep8'):
                 cmd_option = opt[2:].replace('-', '_')
             elif not opt.startswith('--'):
-                cmd_filenames = sys.argv[opt_idx:]
+                cmd_pathnames = sys.argv[opt_idx:]
                 break
         if not cmd_option:
             print "ERROR: Cannot detect option; see '--help'."
             sys.exit(1)
-        if not cmd_filenames:
+        if not cmd_pathnames:
             print "ERROR: Please specify directory/file; see '--help'."
             sys.exit(1)
         # run it:
-        eval('cmd_' + cmd_option)(cmd_filenames)
+        if cmd_option == 'stats':
+            eval('cmd_' + cmd_option)(cmd_pathnames)
+        else:
+            # detect Python files to process:
+            cmd_filenames = get_python_filenames_from_pathnames(cmd_pathnames)
+            eval('cmd_' + cmd_option)(cmd_filenames)
         print_heading('Done.')
     return
 
