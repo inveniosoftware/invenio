@@ -20,6 +20,8 @@ __revision__ = "$Id$"
 
 import os
 import cgi
+import glob
+import sys
 
 from invenio.config import \
      CFG_PATH_CONVERT, \
@@ -27,61 +29,52 @@ from invenio.config import \
      CFG_PATH_GZIP, \
      CFG_SITE_LANG
 from invenio.bibdocfile import decompose_file
-from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError
+from invenio.errorlib import register_exception
+from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.dbquery import run_sql
 from invenio.bibsched import server_pid
 from invenio.messages import gettext_set_language
+from logging import debug, error, DEBUG, getLogger
 
-def createRelatedFormats(fullpath, overwrite=True):
+
+def createRelatedFormats(fullpath, overwrite=True, debug=False):
     """Given a fullpath, this function extracts the file's extension and
     finds in which additional format the file can be converted and converts it.
     @param fullpath: (string) complete path to file
     @param overwrite: (bool) overwrite already existing formats
     Return a list of the paths to the converted files
     """
+    if debug:
+        getLogger().setLevel(DEBUG)
     createdpaths = []
     basedir, filename, extension = decompose_file(fullpath)
     extension = extension.lower()
-    if extension == ".pdf":
-        if overwrite or \
-               not os.path.exists("%s/%s.ps" % (basedir, filename)):
-            # Create PostScript
+    if debug:
+        print >> sys.stderr, "basedir: %s, filename: %s, extension: %s" % (basedir, filename, extension)
+
+    filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
+    if debug:
+        print >> sys.stderr, "filelist: %s" % filelist
+    missing_formats = get_missing_formats(filelist)
+    if debug:
+        print >> sys.stderr, "missing_formats: %s" % missing_formats
+    for path, formats in missing_formats.iteritems():
+        if debug:
+            print >> sys.stderr, "... path: %s, formats: %s" % (path, formats)
+        for aformat in formats:
+            if debug:
+                print >> sys.stderr, "...... aformat: %s" % aformat
+            newpath = os.path.join(basedir, filename + aformat)
+            if debug:
+                print >> sys.stderr, "...... newpath: %s" % newpath
             try:
-                convert_file(fullpath, "%s/%s.ps" % (basedir, filename))
-                createdpaths.append("%s/%s.ps" % (basedir, filename))
-            except InvenioWebSubmitFileConverterError:
-                pass
-        if overwrite or \
-               not os.path.exists("%s/%s.ps.gz" % (basedir, filename)):
-            if os.path.exists("%s/%s.ps" % (basedir, filename)):
-                os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
-                createdpaths.append("%s/%s.ps.gz" % (basedir, filename))
-    if extension == ".ps":
-        if overwrite or \
-               not os.path.exists("%s/%s.pdf" % (basedir, filename)):
-            # Create PDF
-            try:
-                convert_file(fullpath, "%s/%s.pdf" % (basedir, filename))
-                createdpaths.append("%s/%s.pdf" % (basedir, filename))
-            except InvenioWebSubmitFileConverterError:
-                pass
-    if extension == ".ps.gz":
-        if overwrite or \
-               not os.path.exists("%s/%s.ps" % (basedir, filename)):
-            #gunzip file
-            os.system("%s %s" % (CFG_PATH_GUNZIP, fullpath))
-        if overwrite or \
-               not os.path.exists("%s/%s.pdf" % (basedir, filename)):
-            # Create PDF
-            try:
-                convert_file("%s/%s.ps" % (basedir, filename), "%s/%s.pdf" % (basedir, filename))
-                createdpaths.append("%s/%s.pdf" % (basedir, filename))
-            except InvenioWebSubmitFileConverterError:
-                pass
-        #gzip file
-        if not os.path.exists("%s/%s.ps.gz" % (basedir, filename)):
-            os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
+                convert_file(path, newpath)
+                createdpaths.append(newpath)
+            except InvenioWebSubmitFileConverterError, msg:
+                if debug:
+                    print >> sys.stderr, "...... Exception: %s" % msg
+                register_exception(alert_admin=True)
     return createdpaths
 
 def createIcon(fullpath, iconsize):

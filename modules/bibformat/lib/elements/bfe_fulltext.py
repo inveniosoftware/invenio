@@ -25,7 +25,7 @@ from invenio.bibdocfile import BibRecDocs, file_strip_ext
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE
-from cgi import escape
+from cgi import escape, parse_qs
 from urlparse import urlparse
 from os.path import basename
 import urllib
@@ -281,6 +281,9 @@ def get_files(bfo, distinguish_main_and_additional_files=True, include_subformat
                                 descr = _('Fulltext')
                             if not parsed_urls['main_urls'].has_key(descr):
                                 parsed_urls['main_urls'][descr] = []
+                            params = parse_qs(params)
+                            if 'subformat' in params:
+                                url_format += ' (%s)' % params['subformat'][0]
                             parsed_urls['main_urls'][descr].append((url, name, url_format))
                 if not assigned: # Url is not a bibdoc :-S
                     if not descr:

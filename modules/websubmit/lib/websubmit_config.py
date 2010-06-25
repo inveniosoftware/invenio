@@ -60,21 +60,21 @@ CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM = ('txt', 'html', 'xml', 'odt', 
 ## a format and as values the corresponding list of desired converted
 ## formats.
 CFG_WEBSUBMIT_DESIRED_CONVERSIONS = {
-    'pdf' : ('ps.gz', ),
-    'ps.gz' : ('pdf', ),
+    'pdf' : ('ps.gz', 'pdf;pdfa'),
+    'ps.gz' : ('pdf;pdfa', ),
     'djvu' : ('ps.gz', 'pdf'),
-    'docx' : ('doc', 'odt', 'pdf', 'ps.gz'),
-    'doc' : ('odt', 'pdf', 'ps.gz'),
-    'rtf' : ('pdf', 'odt', 'ps.gz'),
-    'odt' : ('pdf', 'doc', 'ps.gz'),
-    'pptx' : ('ppt', 'odp', 'pdf', 'ps.gz'),
-    'ppt' : ('odp', 'pdf', 'ps.gz'),
-    'odp' : ('pdf', 'ppt', 'ps.gz'),
+    'docx' : ('doc', 'odt', 'pdf;pdfa', 'ps.gz'),
+    'doc' : ('odt', 'pdf;pdfa', 'ps.gz'),
+    'rtf' : ('pdf;pdfa', 'odt', 'ps.gz'),
+    'odt' : ('pdf;pdfa', 'doc', 'ps.gz'),
+    'pptx' : ('ppt', 'odp', 'pdf;pdfa', 'ps.gz'),
+    'ppt' : ('odp', 'pdf;pdfa', 'ps.gz'),
+    'odp' : ('pdf;pdfa', 'ppt', 'ps.gz'),
     'xlsx' : ('xls', 'ods', 'csv'),
     'xls' : ('ods', 'csv'),
     'ods' : ('xls', 'csv'),
-    'tiff' : ('pdf', 'ps.gz'),
-    'tif' : ('pdf', 'ps.gz')
+    'tiff' : ('pdf;pdfa', 'ps.gz'),
+    'tif' : ('pdf;pdfa', 'ps.gz')
 }
 
 ## CFG_WEBSUBMIT_ICON_SUBFORMAT_RE -- a subformat is an Invenio concept to give

@@ -134,9 +134,9 @@ def get_conversion_map():
         if CFG_PATH_GUNZIP:
             ret['.ps.gz']['.txt'] = (pstotext, {})
     if CFG_PATH_GS:
-        ret['.ps']['.pdf'] = (ps2pdfa, {})
+        ret['.ps']['.pdf;pdfa'] = (ps2pdfa, {})
         if CFG_PATH_GUNZIP:
-            ret['.ps.gz']['.pdf'] = (ps2pdfa, {})
+            ret['.ps.gz']['.pdf;pdfa'] = (ps2pdfa, {})
     if CFG_PATH_PDFTOPS:
         ret['.pdf']['.ps'] = (pdf2ps, {'compress': False})
         if CFG_PATH_GZIP:
@@ -146,7 +146,7 @@ def get_conversion_map():
     if CFG_PATH_PDFTOPPM and CFG_PATH_OCROSCRIPT and CFG_PATH_PAMFILE:
         ret['.pdf']['.hocr'] = (pdf2hocr, {})
     if CFG_PATH_PDFTOPS and CFG_PATH_GS and CFG_PATH_PDFOPT and CFG_PATH_PDFINFO:
-        ret['.pdf']['.pdf'] = (pdf2pdfa, {})
+        ret['.pdf']['.pdf;pdfa'] = (pdf2pdfa, {})
     ret['.txt']['.txt'] = (txt2text, {})
     ret['.csv']['.txt'] = (txt2text, {})
     ret['.html']['.txt'] = (html2text, {})
@@ -160,39 +160,39 @@ def get_conversion_map():
     if CFG_PATH_OPENOFFICE_PYTHON and CFG_OPENOFFICE_SERVER_HOST:
         ret['.rtf']['.odt'] = (unoconv, {'output_format': 'odt'})
         ret['.rtf']['.doc'] = (unoconv, {'output_format': 'doc'})
-        ret['.rtf']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.rtf']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.rtf']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.doc']['.odt'] = (unoconv, {'output_format': 'odt'})
-        ret['.doc']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.doc']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.doc']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.docx']['.odt'] = (unoconv, {'output_format': 'odt'})
         ret['.docx']['.doc'] = (unoconv, {'output_format': 'doc'})
-        ret['.docx']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.docx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.docx']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.odt']['.doc'] = (unoconv, {'output_format': 'doc'})
-        ret['.odt']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.odt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.odt']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.ppt']['.odp'] = (unoconv, {'output_format': 'odp'})
-        ret['.ppt']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.ppt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.ppt']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.pptx']['.odp'] = (unoconv, {'output_format': 'odp'})
         ret['.pptx']['.ppt'] = (unoconv, {'output_format': 'ppt'})
-        ret['.pptx']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.pptx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.pptx']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.odp']['.ppt'] = (unoconv, {'output_format': 'ppt'})
-        ret['.odp']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.odp']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.odp']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.xls']['.ods'] = (unoconv, {'output_format': 'ods'})
-        ret['.xls']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.xls']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.xls']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.xls']['.csv'] = (unoconv, {'output_format': 'csv'})
         ret['.xlsx']['.xls'] = (unoconv, {'output_format': 'xls'})
         ret['.xlsx']['.ods'] = (unoconv, {'output_format': 'ods'})
-        ret['.xlsx']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.xlsx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.xlsx']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.xlsx']['.csv'] = (unoconv, {'output_format': 'csv'})
         ret['.ods']['.xls'] = (unoconv, {'output_format': 'xls'})
-        ret['.ods']['.pdf'] = (unoconv, {'output_format': 'pdf'})
+        ret['.ods']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.ods']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.ods']['.csv'] = (unoconv, {'output_format': 'csv'})
     return ret
@@ -272,7 +272,7 @@ def can_pdfopt():
 
 def can_pdfa():
     """Return True if it's possible to generate PDF/As."""
-    return bool(CFG_PATH_PDFTOPS and CFG_PATH_GS and CFG_PATH_PDFINFO)
+    return bool(CFG_PATH_PDFTOPS and CFG_PATH_GS and CFG_PATH_PDFINFO and os.path.exists(os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'ISOCoatedsb.icc')))
 
 
 def can_perform_ocr():
@@ -501,7 +501,10 @@ def pdf2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
 
     debug("Extracted title is %s" % title)
 
-    shutil.copy(os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'ISOCoatedsb.icc'), working_dir)
+    if os.path.exists(os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'ISOCoatedsb.icc')):
+        shutil.copy(os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'ISOCoatedsb.icc'), working_dir)
+    else:
+        raise InvenioWebSubmitFileConverterError('ERROR: ISOCoatedsb.icc file missing. Have you run "make install-pdfa-helper-files" as part of your Invenio deployment?')
     pdfa_header = open(os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'PDFA_def.ps')).read()
     pdfa_header = pdfa_header.replace('<<<<TITLEMARKER>>>>', title)
     inputps = os.path.join(working_dir, 'input.ps')
