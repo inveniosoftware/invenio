@@ -445,6 +445,12 @@ update-v0.99.1-tables:
 	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Uploaded_Files_to_Storage','forceFileRevision');"  | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Upload_Files_Interface','Display generic interface to add/revise/delete files. To be used before function \"Move_Uploaded_Files_to_Storage\"');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Uploaded_Files_to_Storage','Attach files uploaded with \"Create_Upload_Files_Interface\"')" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','elementNameToDoctype');"  | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','createIconDoctypes');"  | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','createRelatedFormats');"  | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','iconsize');"  | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Revised_Files_to_Storage','keepPreviousVersionDoctypes');"  | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Revised_Files_to_Storage','Revise files initially uploaded with \"Move_Files_to_Storage\"')" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','maxsize');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','minsize');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Create_Upload_Files_Interface','doctypes');" | ${prefix}/bin/dbexec

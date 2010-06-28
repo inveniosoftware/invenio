@@ -47,20 +47,27 @@ CFG_MSG_USER_NOT_AUTHORIZED = """
 
 def User_is_Record_Owner_or_Curator(parameters, curdir, form, user_info=None):
     """
-    In certain actions of some WebSubmit submissions, it may be not be
-    desirable to allow all users to have a carte blanche to modify
-    records in a collection as they see fit.
-    For example, we may say that a user is allowed to modify a document
-    ONLY if they are listed in the record as an "owner"/"submitter", or
-    if listed in WebAccess as a "curator" for the given document type
-    collection.
-    This function therefore checks whether the user has the rights to
-    carry out a given action on a document type either by being listed in
-    the record or explicitly via WebAccess.
+    Check that user is either the original submitter, or that it has
+    been granted access to carry out the action via Webaccess. This
+    enables collaborative editing of records, so that collections can
+    be curated by a group of people in addition to the original submitter.
+
     If the user has permission, the function ends silently. If not, it
     will raise an InvenioWebSubmitFunctionStop, informing the user that
     they don't have rights and sending them back to the submission web
     form.
+
+    Note that the original author must also be authorized by WebAccess
+    in order to modify the record.
+
+    WARNING: you have to understand that wherever you use this
+    function, any user authorized via WebAccess for this action will
+    be able to modify any records that can go through this
+    workflow. For eg. when using this function in a DEMOPIC
+    submission, in a 'MBI' action, it is enough that a user is
+    connected to the 'submit' action with the 'DEMOPIC/MBI' parameters
+    to modify any record.
+
     @parameters: None.
     @return: Empty string.
     @Exceptions raised: InvenioWebSubmitFunctionStop when user is denied

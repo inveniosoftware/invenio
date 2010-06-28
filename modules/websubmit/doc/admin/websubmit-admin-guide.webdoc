@@ -1178,9 +1178,9 @@ replace the files that have been previously uploaded with doctype
 be used in combination with other techniques, as long as the mapping
 in <code>elementNameToDoctype</code> can be done unambiguously.</p>
 
-<p>Check the documentation strings
-inside <code>Move_Revised_Files_To_Storage.py</code> for more
-detailed information.</p>
+<p>Check
+the <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=Move_Revised_Files_to_Storage"><code>Move_Revised_Files_To_Storage</code>
+function documentation for more detailed information.</p>
 
 <a name="5.3"></a><h3>5.3 Create_Upload_Files_Interface +
 Move_Uploaded_Files_To_Storage functions</h3>
@@ -1223,12 +1223,12 @@ example of such setup can be found in DEMOPIC submission.</p>
 
 <p><b>1)</b> Go to your submission in WebSubmit admin, and add a new
 submission action (for e.g. "[SRV] Submit New File"). If necessary,
-create your own acton in <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/actionlist">WebSubmit admin "Available WebSubmit Actions"</a>
+create your own action in <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/actionlist">WebSubmit admin "Available WebSubmit Actions"</a>
 page. You can clone from another existing action (in that case move to
 point 4 below), or simply create an empty action.</p>
 
-<p><b>2)</b> Go to the new SRV action interface ("View Interface"), add and
-open a page and add fields that will allow users to specify the record
+<p><b>2)</b> Go to the new SRV action interface ("View Interface"), add a
+page, open it and add fields that will allow users to specify the record
 to update. Typically you will add a "<code>DEMO_RN</code>" field to enter the
 report number, and "<code>DEMO_CONTINUE</code>" button to submit the form.</p>
 
@@ -1252,22 +1252,16 @@ documents can be deleted once they have been uploaded). Use
 "<code>|</code>" as separator (for all <code>can_*_doctypes</code>
 parameters).</p>
 
-<p>Run the following command or check the
-<code>Create_Upload_Files_Interface.py</code> file to read more about the available
-parameters:</p>
-<pre>
-$ echo -e 'from invenio.websubmit_functions.Create_Upload_Files_Interface import Create_Upload_Files_Interface as f\nprint f.__doc__' | python
-</pre>
+<p>To read more about the parameters available for this function, check the <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=Create_Upload_Files_Interface"><code>Create_Upload_Files_Interface</code> function documentation</a>.</p>
 
 <p><b>5)</b> Configure the <code>Move_Uploaded_Files_To_Storage</code>. There are less options
 than in <code>Create_Upload_Files_Interface</code> function. Specify for e.g. in
-<code>createIconDoctypes</code> for which doctypes icons will be created, or in
-"<code>forceFileRevision</code>" which For an up-to-date documentation check
-<code>Move_Uploaded_Files_To_Storage.py</code> or run:</p>
-
-<pre>
-$ echo -e 'from invenio.websubmit_functions.Move_Uploaded_Files_to_Storage import Move_Uploaded_Files_to_Storage as f\nprint f.__doc__' | python
-</pre>
+<code>createIconDoctypes</code> for which doctypes icons will be
+created, or in "<code>forceFileRevision</code>" if revisions of file
+attributes trigger a new file revision. For an up-to-date
+documentation check
+the <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=Move_Uploaded_Files_to_Storage"><code>Move_Uploaded_Files_to_Storage</code>
+function documentation</a>.</p>
 
 <h4>Revising/deleting files</h4>
 
