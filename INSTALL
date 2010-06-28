@@ -656,6 +656,13 @@ Contents
           data collections, document types, document formats, word
           indexes, etc.
 
+      $ sudo ln -s /opt/cds-invenio/etc/bash_completion.d/inveniocfg \
+                   /etc/bash_completion.d/inveniocfg
+
+           Optionally, if you are using Bash shell completion, then
+           you may want to create the above symlink in order to
+           configure completion for the inveniocfg command.
+
 Good luck, and thanks for choosing CDS Invenio.
 
        - CDS Development Group

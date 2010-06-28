@@ -20,7 +20,7 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.90.20100516, cds.support@cern.ch)
+AC_INIT(cds-invenio, 0.99.90.20100628, cds.support@cern.ch)
 AM_INIT_AUTOMAKE([tar-ustar])
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
@@ -668,6 +668,9 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/doc/Makefile \
 	  modules/miscutil/doc/hacking/Makefile \
+	  modules/miscutil/etc/Makefile \
+	  modules/miscutil/etc/bash_completion.d/Makefile \
+	  modules/miscutil/etc/bash_completion.d/inveniocfg \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/sql/Makefile \
 	  modules/miscutil/web/Makefile \

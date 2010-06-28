@@ -1,5 +1,5 @@
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2010 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,6 +15,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bin demo doc etc lib sql web
+etcdir = $(sysconfdir)/bash_completion.d
 
-CLEANFILES = *~
+etc_DATA = inveniocfg
+
+EXTRA_DIST = inveniocfg.in
+
+CLEANFILES = *~ *.tmp
