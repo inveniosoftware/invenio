@@ -1,4 +1,4 @@
-    ## This file is part of Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
@@ -816,7 +816,6 @@ URI: http://%(host)s%(page)s
                        'record_brief':record_brief}
 
         out = restriction_flag + out
-
         return out
 
     def detailed_record_container_bottom(self, recid, tabs, ln=CFG_SITE_LANG,

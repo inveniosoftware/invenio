@@ -123,6 +123,8 @@ def convert_conf_option(option_name, option_value):
     ## 3c) special cases: dicts and real pythonic lists
     if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',
                        'CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS',
+                       'CFG_WEBSEARCH_FULLTEXT_SNIPPETS',
+                       'CFG_WEBSEARCH_FULLTEXT_SNIPPETS_CHARS',
                        'CFG_SITE_EMERGENCY_EMAIL_ADDRESSES',
                        'CFG_BIBMATCH_FUZZY_WORDLIMITS',
                        'CFG_BIBMATCH_QUERY_TEMPLATES',
