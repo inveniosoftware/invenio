@@ -37,10 +37,17 @@ pylib_DATA = websubmit_config.py websubmit_engine.py file.py \
              bibdocfile.py \
              bibdocfilecli.py \
              bibdocfile_regression_tests.py \
-             hocrlib.py
+             hocrlib.py \
+             websubmit_file_metadata.py
+
+metadataplugindir = $(libdir)/python/invenio/websubmit_file_metadata_plugins
+metadataplugin_DATA = __init__.py \
+                      wsm_extractor_plugin.py \
+                      wsm_pyexiv2_plugin.py \
+                      wsm_pdftk_plugin.py
 
 noinst_DATA = fulltext_files_migration_kit.py icon_migration_kit.py
 
-EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
+EXTRA_DIST = $(pylib_DATA) $(metadataplugin_DATA) $(noinst_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc

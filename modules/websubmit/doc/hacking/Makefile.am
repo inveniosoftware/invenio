@@ -21,7 +21,8 @@ webdoclib_DATA = bibdocfile-api.webdoc \
                  websubmit-internals.webdoc \
                  websubmit-file-converter.webdoc \
                  websubmit-file-stamper.webdoc \
-                 websubmit-icon-creator.webdoc
+                 websubmit-icon-creator.webdoc \
+                 websubmit-file-metadata.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
