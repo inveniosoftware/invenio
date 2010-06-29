@@ -38,6 +38,7 @@ pylib_DATA = __init__.py \
              htmlutils_tests.py \
              testutils.py \
              testutils_regression_tests.py \
+             invenio_connector.py \
              urlutils.py \
              urlutils_tests.py \
              w3c_validator.py \

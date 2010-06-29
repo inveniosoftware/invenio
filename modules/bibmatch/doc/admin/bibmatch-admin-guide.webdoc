@@ -27,6 +27,9 @@ a selection of records in the input that match the database content.
 This way, it is possible to identify potential duplicate entries,
 before they are uploaded in a database. </p>
 
+<p>Note: BibMatch only matches against public records attached to the
+home collection.</p>
+
 <h4>BibMatch commmand-line tool</h4>
 
 <blockquote>
@@ -67,6 +70,14 @@ To print "fuzzy" (almost matching by title) records:
 <blockquote>
 <pre>
  $ bibmatch --print-fuzzy  < input.xml > output.xml
+</pre>
+</blockquote>
+
+To match against public records on an remote Invenio installation (i.e http://cdsweb.cern.ch):
+
+<blockquote>
+<pre>
+ $ bibmatch --print-match -i input.xml -r 'http://cdsweb.cern.ch'
 </pre>
 </blockquote>
 
@@ -111,6 +122,8 @@ Command line options:
  -h,  --help               print this help and exit
  -V,  --version            print version information and exit
  -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
- 
+ -r,  --remote=URL         match against a remote invenio installation (URL, no trailing '/')
+                           Beware: Only searches public records attached to home collection
+
 </pre>
 </blockquote>
