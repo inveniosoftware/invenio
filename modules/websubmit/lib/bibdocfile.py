@@ -1370,14 +1370,14 @@ class BibDocFile:
         self.dir = os.path.dirname(fullpath)
         self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, urllib.quote(self.name), urllib.quote(self.format))
         if format == "":
-            self.mime = "text/plain"
+            self.mime = "application/octet-stream"
             self.encoding = ""
             self.fullname = name
         else:
             self.fullname = "%s%s" % (name, self.format)
             (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
             if self.mime is None:
-                self.mime = "text/plain"
+                self.mime = "application/octet-stream"
 
     def __repr__(self):
         return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.description), repr(self.comment)))
