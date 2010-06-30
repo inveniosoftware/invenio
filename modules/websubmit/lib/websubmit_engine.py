@@ -45,6 +45,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, collect_user_info
 from invenio.websubmit_config import *
 from invenio.messages import gettext_set_language, wash_language
+from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
 from invenio.websubmitadmin_engine import string_is_alphanumeric_including_underscore
 
@@ -1115,7 +1116,13 @@ def endaction(req,
           next_action = next_action,
         )
 
-    if not finished:
+    if finished:
+        # register event in webstat
+        try:
+            register_customevent("websubmissions", [get_longname_of_doctype(doctype)])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+    else:
         t += websubmit_templates.tmpl_page_do_not_leave_submission_js(ln)
 
     # start display:

@@ -161,12 +161,25 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	wget http://tablesorter.com/jquery.tablesorter.zip && \
+<<<<<<< HEAD
 	wget http://www.uploadify.com/wp-content/uploads/Uploadify-v2.1.3.zip -O uploadify.zip && \
 	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
 	unzip -u uploadify.zip && \
 	mv -T jquery.uploadify-v2.1.3 uploadify && \
+=======
+	wget http://www.uploadify.com/_files/jquery.uploadify-v2.1.0.zip && \
+	wget http://flot.googlecode.com/files/flot-0.6.zip && \
+	wget http://trentrichardson.com/examples/timepicker/js/jquery-ui-timepicker-addon-0.5.min.js && \
+	mv jquery-ui-timepicker-addon-0.5.min.js jquery-ui-timepicker-addon.min.js && \
+	unzip jquery.tablesorter.zip && \
+	rm jquery.tablesorter.zip && \
+	unzip -u flot-0.6.zip && \
+	mv flot/jquery.flot.selection.min.js flot/jquery.flot.min.js flot/excanvas.min.js ./ && \
+	rm flot-0.6.zip && rm -r flot && \
+	unzip -u jquery.uploadify-v2.1.0.zip -d uploadify && \
+>>>>>>> 4eeb749... WebStat: additional stats and various improvements
 	mv uploadify/swfobject.js ./ && \
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
 	mv uploadify/jquery.uploadify.v2.1.3.min.js ./jquery.uploadify.min.js && \
@@ -184,6 +197,7 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jqueryui.com/download/jquery-ui-1.7.3.custom.zip && \
 	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js && \
 	mv development-bundle/ui/ui.core.js ui.core.js && \
+	mv development-bundle/ui/js/jquery-ui-1.7.3.custom.min.js jquery-ui-1.7.3.custom.min.js && \
 	rm -rf development-bundle && \
 	rm jquery-ui-1.7.3.custom.zip && \
 	mkdir -p ${prefix}/var/www/img && \
@@ -206,6 +220,10 @@ uninstall-jquery-plugins:
 	rm -f jquery.effects.highlight.min.js && \
 	rm -f jquery.MultiFile.pack.js && \
 	rm -f jquery.jeditable.mini.js && \
+	rm -f jquery.flot.selection.min.js && \
+	rm -f jquery.flot.min.js && \
+	rm -f excanvas.min.js && \
+	rm -f jquery-ui-timepicker-addon.min.js && \
 	rm -f jquery.tablesorter.js && \
 	rm -f jquery.tablesorter.pager.js && \
 	rm -f ui.datepicker.min.js && \

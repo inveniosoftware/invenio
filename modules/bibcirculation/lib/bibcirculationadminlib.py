@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import datetime, time
+import datetime, time, cgi
 
 # Others Invenio imports
 from invenio.config import \
@@ -50,6 +50,8 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
       generate_email_body
       #get_list_of_ILL_requests, \
       #create_item_details_url
+from invenio.webstat import register_customevent
+from invenio.errorlib import register_exception
 
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
@@ -455,6 +457,7 @@ def update_next_loan_request_status(req, check_id, barcode, ln=CFG_SITE_LANG):
     db.update_loan_request_status(check_id,'done')
     db.update_request_barcode(barcode, check_id)
     db.new_loan(borrower_id, recid, barcode, loaned_on, due_date, 'on loan', 'normal','')
+
     db.update_item_status('on loan', barcode)
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -985,7 +988,11 @@ def register_new_loan(req, barcode, borrower_id,
 
         db.new_loan(borrower_id, recid, barcode,
                     loaned_on, due_date, 'on loan', 'normal', note_format)
-
+        # register event in webstat
+        try:
+            register_customevent("loanrequest", [request_id, db.get_last_id()[0]])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
         requested_barcode = db.get_requested_barcode(request_id)
 
         if requested_barcode == barcode:

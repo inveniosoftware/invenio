@@ -204,6 +204,11 @@ Contents
            <http://www.gnu.org/software/gettext/>
         This is available by default on many systems.
 
+     l) (recommended) xlwt 0.7.2, Library to create spreadsheet files
+        compatible with MS Excel 97/2000/XP/2003 XLS files, on any
+	platform, with Python 2.3 to 2.6
+	   <http://pypi.python.org/pypi/xlwt>
+
    Note that the configure script checks whether you have all the
    prerequisite software installed and that it won't let you continue
    unless everything is in order.  It also warns you if it cannot find

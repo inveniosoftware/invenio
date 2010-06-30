@@ -1090,6 +1090,9 @@ def new_loan(borrower_id, recid, barcode,
 
     return res
 
+def get_last_id():
+    return run_sql("SELECT LAST_INSERT_ID()")[0]
+
 def get_item_loans(recid):
     """
     recid: identify the record. It is also the primary key of

@@ -62,6 +62,7 @@ from invenio.webjournal import \
      perform_request_contact, \
      perform_request_popup, \
      perform_request_search
+from invenio.webstat import register_customevent
 
 import invenio.template
 webjournal_templates = invenio.template.load('webjournal')
@@ -243,6 +244,11 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                            article_id,
                                            editor,
                                            verbose=argd['verbose'])
+            # register event in webstat
+            try:
+                register_customevent("journals", ["display", journal_name, journal_issue, category, argd['ln'], article_id])
+            except:
+                register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
         return html
 
     def contact(self, req, form):
