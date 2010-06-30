@@ -342,7 +342,7 @@ def create_html_mailto(email, subject=None, body=None, cc=None, bcc=None,
         return mailto_link
     elif email_obfuscation_mode == 3:
         # Javascript-based
-        return '''<script language="JavaScript"''' \
+        return '''<script language="JavaScript" ''' \
             '''type="text/javascript">''' \
             '''document.write('%s'.split("").reverse().join(""))''' \
             '''</script>''' % \
