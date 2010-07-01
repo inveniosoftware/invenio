@@ -191,6 +191,9 @@ def get_keyevent_trend_download_frequency(args):
     Returns the number of full text downloads carried out
     during the given timestamp range.
 
+    @param args['collection']: A collection name
+    @type args['collection']: str
+
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
 
@@ -203,11 +206,21 @@ def get_keyevent_trend_download_frequency(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
+
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
-    sql = "SELECT download_time FROM rnkDOWNLOADS WHERE download_time > '%s' \
-            AND download_time < '%s'  ORDER BY download_time DESC" \
-                                                        % (lower, upper)
+    # Collect list of timestamps of insertion in the specific collection
+    if args['collection'] == 'All':
+        sql = "SELECT download_time FROM rnkDOWNLOADS WHERE download_time > '%s' \
+            AND download_time < '%s'  ORDER BY download_time DESC" % (lower, upper)
+    else:
+        ids = get_collection_reclist(args['collection']).tolist()
+        if len(ids) == 0:
+            return []
+        ids_str = str(ids).replace('[', '(').replace(']', ')')
+        sql = "SELECT download_time FROM rnkDOWNLOADS WHERE download_time > '%s' \
+            AND download_time < '%s' AND id_bibrec IN %s \
+            ORDER BY download_time DESC" % (lower, upper, ids_str)
     actions = [x[0] for x in run_sql(sql)]
 
     return _get_trend_from_actions(actions, 0, args['t_start'],
@@ -1162,6 +1175,47 @@ def get_keyevent_user_lists(args):
 
     return (res)
 
+def get_keyevent_trend_comments_frequency(args):
+    """
+    Returns the number of comments (of any kind) carried out
+    during the given timestamp range.
+
+    @param args['collection']: A collection name
+    @type args['collection']: str
+
+    @param args['t_start']: Date and time of start point
+    @type args['t_start']: str
+
+    @param args['t_end']: Date and time of end point
+    @type args['t_end']: str
+
+    @param args['granularity']: Granularity of date and time
+    @type args['granularity']: str
+
+    @param args['t_format']: Date and time formatting string
+    @type args['t_format']: str
+    """
+    # collect action dates
+    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    if args['collection'] == 'All':
+        sql = "SELECT date_creation FROM cmtRECORDCOMMENT " + \
+          "WHERE date_creation > '%s' AND date_creation < '%s'" \
+          % (lower, upper) + " ORDER BY date_creation DESC"
+    else:
+        ids = get_collection_reclist(args['collection']).tolist()
+        if len(ids) == 0:
+            return []
+        ids_str = str(ids).replace('[', '(').replace(']', ')')
+        sql = "SELECT date_creation FROM cmtRECORDCOMMENT \
+            WHERE date_creation > '%s' AND date_creation < '%s'  \
+            AND id_bibrec IN %s ORDER BY date_creation DESC" \
+            % (lower, upper, ids_str)
+    action_dates = [x[0] for x in run_sql(sql)]
+
+    return _get_trend_from_actions(action_dates, 0, args['t_start'],
+                          args['t_end'], args['granularity'], args['t_format'])
+
 # KEY EVENT SNAPSHOT SECTION
 
 def get_keyevent_snapshot_uptime_cmd():
@@ -1904,12 +1958,6 @@ def create_graph_table(data, path, settings):
                         """ % vr
                 out = out[:-6] + "</td></tr>"
     out += "</table>"
-
-    # Write to destination file
-    if path == '':
-        print out
-    else:
-        open(path, 'w').write(out)
 
 def create_graph_dump(dump, path):
     """

@@ -39,7 +39,8 @@ from invenio.webstat import perform_display_customevent
 from invenio.webstat import perform_display_customevent_help
 from invenio.webstat import perform_display_error_log_analyzer, \
     register_customevent, \
-    perform_display_custom_summary
+    perform_display_custom_summary, \
+    perform_display_stats_per_coll
 
 def detect_suitable_graph_format():
     """
@@ -66,7 +67,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                  'ill_requests_stats', 'ill_requests_lists', 'ill_requests_graph', 'items_stats',
                  'items_list', 'loans_requests', 'loans_request_lists', 'user_stats',
                  'user_lists', 'error_log', 'customevent', 'customevent_help',
-                 'customevent_register', 'custom_summary', 'export' ]
+                 'customevent_register', 'custom_summary', 'collections', 'export' ]
 
     navtrail = """<a class="navtrail" href="%s/stats/%%(ln_link)s">Statistics</a>""" % CFG_SITE_URL
 
@@ -211,7 +212,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def download_frequency(self, req, form):
         """Download frequency statistics page."""
-        argd = wash_urlargd(form, {'timespan': (str, "today"),
+        argd = wash_urlargd(form, {'collection': (str, "All"),
+                                   'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
                                    'format': (str, SUITABLE_GRAPH_FORMAT),
@@ -821,6 +823,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         register_customevent(argd['event_id'], params)
         return redirect_to_url(req, unquote(argd['url']), apache.HTTP_MOVED_PERMANENTLY)
 
+
     # CUSTOM REPORT SECTION
 
     def custom_summary(self, req, form):
@@ -847,6 +850,31 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='custom query summary',
+                    language=ln)
+
+    # COLLECTIONS SECTION
+
+    def collections(self, req, form):
+        """Collections statistics page"""
+        argd = wash_urlargd(form, {'coll': (str, "All"),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        if auth_code:
+            return page_not_authorized(req,
+                navmenuid='collections',
+                ln=ln)
+
+        return page(title="Statistics of %s" % argd['coll'],
+                    body=perform_display_stats_per_coll(argd['coll'], req, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    description="CDS, Statistics, Collection %s" % argd['coll'],
+                    keywords="CDS, statistics, %s" % argd['coll'],
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='collections',
                     language=ln)
 
     # EXPORT SECTION

@@ -18,7 +18,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import datetime, cgi
+import datetime, cgi, urllib
 from invenio.config import \
      CFG_WEBDIR, \
      CFG_SITE_URL, \
@@ -166,6 +166,21 @@ class Template:
         out = """<h3>Library report</h3>
                  <ul><li><a href="%s/stats/custom_summary">Custom query summary</a></li></ul>
                  """ % CFG_SITE_URL
+
+    def tmpl_collection_stats_list(self, collections, ln=CFG_SITE_LANG):
+        """
+        Generates a list of available collections statistics.
+        """
+        out = """<h3>Collections stats</h3>"""
+
+        temp_out = ""
+        for coll in collections:
+            temp_out += """<li><a href="%s/stats/collections?%s">%s</a></li>""" \
+                        % (CFG_SITE_URL, urllib.urlencode({'coll':coll[0]}), coll[1])
+        if len(collections) == 0:
+            out += self.tmpl_error("There are currently no collections available.", ln=ln)
+        else:
+            out += "<ul>" + temp_out + "</ul>"
         return out
 
     def tmpl_customevent_help(self, ln=CFG_SITE_LANG):
@@ -551,11 +566,11 @@ class Template:
 
         # Create the body (text boxes and button)
         fields = (("""<input type="text" name="query" value="%s" size="35"/>""" % cgi.escape(query), """<input type="text" name="tag" value="%s"/>""" % cgi.escape(tag), """<input class="formbutton" type="submit" name="action_gen" value="Generate"/>"""),)
-        
+
         # Create form footer
         formfooter = """</form>"""
 
-        
+
         out = self._tmpl_box(formheader, formfooter, [("custom_summary_table",)], headers, fields, [""], ln=ln)
 
         out += """<div>
@@ -571,14 +586,14 @@ Distribution across %s
 </tr>
 
 <tr>
-<td align="right"><b>Nb.</b></td>  
+<td align="right"><b>Nb.</b></td>
 <td><b>%s</b></td>
 </tr>
 
 """ % (cgi.escape(tag_name), cgi.escape(tag_name[0].capitalize() + tag_name[1:]))
         for title, number in data:
             out += """<tr>
-<td align="right">%d</td>  
+<td align="right">%d</td>
 <td>%s</td>
 </tr>
 """ % (number, cgi.escape(title))

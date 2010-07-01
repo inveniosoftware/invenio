@@ -118,11 +118,17 @@ TYPE_REPOSITORY = [ ('gnuplot', 'Image - Gnuplot'),
                     ('python', 'Data - Python code', export_to_python),
                     ('csv', 'Data - CSV', export_to_csv) ]
 
+
 def _get_doctypes():
     """Returns all the possible doctypes of a new submission"""
     doctypes = [("all","All")]
     [doctypes.append(x) for x in get_docid_docname_alldoctypes()]
     return doctypes
+
+def get_collection_list_plus_all():
+    coll = get_alphabetically_ordered_collection_list()
+    coll.append(['All', 'All'])
+    return coll
 
 # Key event repository, add an entry here to support new key measures.
 KEYEVENT_REPOSITORY = { 'collection population':
@@ -166,21 +172,20 @@ KEYEVENT_REPOSITORY = { 'collection population':
                            },
                         'download frequency':
                           { 'fullname': 'Download frequency',
-                            'specificname': 'Download frequency',
+                            'specificname': 'Download frequency in collection "%(collection)s"',
                             'gatherer': get_keyevent_trend_download_frequency,
-                            'extraparams': {},
-                            'cachefilename':
-                                   'webstat_%(event_id)s_%(timespan)s',
+                            'extraparams': {'collection': ('Collection', get_collection_list_plus_all)},
+                            'cachefilename': 'webstat_%(id)s_%(collection)s_%(timespan)s',
                             'ylabel': 'Number of downloads',
                             'multiple': None,
                             'output':'Graph'
                            },
-                        'comments frequency':
+                         'comments frequency':
                           { 'fullname': 'Comments frequency',
-                            'specificname': 'Comments frequency',
+                            'specificname': 'Comments frequency in collection "%(collection)s"',
                             'gatherer': get_keyevent_trend_comments_frequency,
-                            'extraparams': {},
-                            'cachefilename': 'webstat_%(event_id)s_%(timespan)s',
+                            'extraparams': {'collection': ('Collection', get_collection_list_plus_all)},
+                            'cachefilename': 'webstat_%(id)s_%(collection)s_%(timespan)s',
                             'ylabel': 'Number of comments',
                             'multiple': None,
                             'output':'Graph'
@@ -945,12 +950,15 @@ def perform_request_index(ln=CFG_SITE_LANG):
     # Display the custom statistics
     out += TEMPLATES.tmpl_customevent_list(_get_customevents(), ln=ln)
 
-
     # Display error log analyzer
     out += TEMPLATES.tmpl_error_log_statistics_list(ln=ln)
 
     # Display annual report
     out += TEMPLATES.tmpl_custom_summary(ln=ln)
+
+    # Display test for collections
+    out += TEMPLATES.tmpl_collection_stats_list(get_collection_list_plus_all(), ln=ln)
+
     return out
 
 def perform_display_keyevent(event_id=None, args={},
@@ -1064,7 +1072,6 @@ def perform_display_keyevent(event_id=None, args={},
                   "xtic_format": t_args['xtic_format'],
                   "format": choosed['format'],
                   "multiple": KEYEVENT_REPOSITORY[event_id]['multiple'] }
-
     else:
         if args.has_key('format') and args['format'] == 'Excel':
             export_to_excel(data, req)
@@ -1229,6 +1236,63 @@ def perform_display_customevent_data_ascii_dump(ids, args, args_req, choosed):
     gatherer = lambda: get_customevent_dump(args_req)
     force = choosed['timespan'] == "select date"
     return eval(_get_file_using_cache(filename, gatherer, force).read())
+
+def perform_display_stats_per_coll(collection='All', req=None, ln=CFG_SITE_LANG):
+    """
+    Display general statistics for a given collection
+
+    @param req: The Apache request object, necessary for export redirect.
+    @type req:
+    """
+    timespan = 'this month'
+    events_id = ('download frequency', 'collection population', 'comments frequency')
+    format = 'gnuplot'
+    # Make sure extraparams are valid, if any
+    if not collection in [x[0] for x in get_collection_list_plus_all()]:
+        return TEMPLATES.tmpl_error('Please specify a valid value for parameter "Collection".')
+
+    # Arguments OK beyond this point!
+
+    # Get unique name for caching purposes (make sure that the params used in the filename are safe!)
+    choosed = {'timespan' : timespan, 'collection' : collection}
+    out = "<table>"
+    pair = False
+    for event_id in events_id:
+        filename = KEYEVENT_REPOSITORY[event_id]['cachefilename'] \
+               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0]) for param in choosed] +
+                      [('id', re.subn("[^\w]", "_", event_id)[0])])
+
+        # Get time parameters from repository
+        # TODO: This should quite possibly be lifted out (webstat_engine?), in any case a cleaner repository
+        _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
+            _get_timespans()[3]
+        args = { 't_start': t_start, 't_end': t_end, 'granularity': granularity,
+                 't_format': t_format, 'xtic_format': xtic_format, 'collection' : collection }
+        # Create closure of frequency function in case cache needs to be refreshed
+        gatherer = lambda: KEYEVENT_REPOSITORY[event_id]['gatherer'](args)
+
+        # Determine if this particular file is due for scheduling cacheing, in that case we must not
+        # allow refreshing of the rawdata.
+        allow_refresh = not _is_scheduled_for_cacheing(event_id)
+
+        # Get data file from cache (refresh if necessary)
+        data = eval(_get_file_using_cache(filename, gatherer, allow_refresh=allow_refresh).read())
+
+        # Prepare the graph settings that are being passed on to grapher
+        settings = { "title": KEYEVENT_REPOSITORY[event_id]['specificname'] % args,
+                  "xlabel": t_fullname + ' (' + granularity + ')',
+                  "ylabel": KEYEVENT_REPOSITORY[event_id]['ylabel'],
+                  "xtic_format": xtic_format,
+                  "format": format,
+                  "multiple": KEYEVENT_REPOSITORY[event_id]['multiple'],
+                  "size": '360,270'}
+        if not pair:
+            out += '<tr>'
+        out += '<td>%s</td>' % _perform_display_event(data, os.path.basename(filename), settings, ln=ln)
+        if pair:
+            out += '</tr>'
+        pair = not pair
+    return out + "</table>"
 
 def perform_display_customevent_help(ln=CFG_SITE_LANG):
     """Display the custom event help"""
