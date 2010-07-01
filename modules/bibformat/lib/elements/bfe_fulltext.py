@@ -218,7 +218,8 @@ def get_files(bfo):
                         'documents.cern.ch' in url or \
                         'doc.cern.ch' in url or \
                         'preprints.cern.ch' in url):
-                    url_params_dict = dict([part.split('=') for part in params.split('&')])
+                    url_params_dict = dict([part.split('=') for part in params.split('&') \
+                                            if len(part) == 2])
                     if url_params_dict.has_key('categ') and \
                            (url_params_dict['categ'].split('.', 1)[0] in cern_arxiv_categories) and \
                            url_params_dict.has_key('id'):
