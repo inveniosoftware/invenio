@@ -904,8 +904,7 @@ def create_adminactivities_menu(req, uid, navmenuid, ln="en"):
            user_info['uri'].startswith('/record/'):
         try:
             # Get record ID and try to cast it to an int
-            current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[-1])
-
+            current_record_id = int(urlparse.urlparse(user_info['uri'])[2].split('/')[2])
         except:
             pass
         else:
