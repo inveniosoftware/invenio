@@ -324,6 +324,13 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "title:this and not title:that"
         self._compare_searches(inv_search, spi_search)
 
+    def test_distribution_without_spacing(self):
+        """SPIRES search syntax - find t this and that ->title:this and title:that"""
+        # motivated by trac-187
+        spi_search = "find aff SLAC and Stanford"
+        inv_search = "affiliation:SLAC and affiliation:Stanford"
+        self._compare_searches(inv_search, spi_search)
+
 TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, TestSpiresToInvenioSyntaxConverter)
 
 

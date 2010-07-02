@@ -986,8 +986,9 @@ class SpiresToInvenioSyntaxConverter:
         def create_replacement_pattern(match):
             # the regular expression where this group name is defined is in
             # the method _compile_regular_expressions()
-            return match.group('keyword') + ' ' + match.group('content') + \
-                   ' ' +  match.group('combination') + ' ' + match.group('keyword') + ' ' + match.group('last_content')
+            return match.group('keyword') + match.group('content') + \
+                   ' ' +  match.group('combination') + ' ' + match.group('keyword') + \
+                   match.group('last_content')
 
         query = self._re_distribute_keywords.sub(create_replacement_pattern, query)
         return query
