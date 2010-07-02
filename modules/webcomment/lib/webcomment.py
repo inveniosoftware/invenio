@@ -626,7 +626,8 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
 
 def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
                                 note="", score=0, priority=0,
-                                client_ip_address='', editor_type='textarea'):
+                                client_ip_address='', editor_type='textarea',
+                                req=None):
     """
     Private function
     Insert a comment/review or remarkinto the database
@@ -637,6 +638,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
     @param score: review star score
     @param priority: remark priority #!FIXME
     @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
+    @param req: request object. If provided, email notification are sent after we reply to user request.
     @return: integer >0 representing id if successful, integer 0 if not
     """
     current_date = calculate_start_date('0d')
@@ -670,20 +672,38 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         action_time = convert_datestruct_to_datetext(time.localtime())
         query2 = """INSERT INTO cmtACTIONHISTORY  (id_cmtRECORDCOMMENT,
                      id_bibrec, id_user, client_host, action_time, action_code)
-                    VALUES ('', %s, %s, inet_aton(%s), %s, %s)"""
-        params2 = (recID, uid, client_ip_address, action_time, action_code)
+                    VALUES (%s, %s, %s, inet_aton(%s), %s, %s)"""
+        params2 = (res, recID, uid, client_ip_address, action_time, action_code)
         run_sql(query2, params2)
 
-        # Email this comment to 'subscribers'
-        (subscribers_emails1, subscribers_emails2) = \
-                              get_users_subscribed_to_discussion(recID)
-        email_subscribers_about_new_comment(recID, reviews=reviews,
-                                            emails1=subscribers_emails1,
-                                            emails2=subscribers_emails2,
-                                            comID=res, msg=msg,
-                                            note=note, score=score,
-                                            editor_type=editor_type, uid=uid)
-        return int(res)
+        def notify_subscribers_callback(data):
+            """
+            Define a callback that retrieves subscribed users, and
+            notify them by email.
+
+            @param data: contains the necessary parameters in a tuple:
+                         (recid, uid, comid, msg, note, score, editor_type, reviews)
+            """
+            recid, uid, comid, msg, note, score, editor_type, reviews = data
+            # Email this comment to 'subscribers'
+            (subscribers_emails1, subscribers_emails2) = \
+                                  get_users_subscribed_to_discussion(recid)
+            email_subscribers_about_new_comment(recid, reviews=reviews,
+                                                emails1=subscribers_emails1,
+                                                emails2=subscribers_emails2,
+                                                comID=comid, msg=msg,
+                                                note=note, score=score,
+                                                editor_type=editor_type, uid=uid)
+
+        # Register our callback to notify subscribed people after
+        # having replied to our current user.
+        data = (recID, uid, res, msg, note, score, editor_type, reviews)
+        if req:
+            req.register_cleanup(notify_subscribers_callback, data)
+        else:
+            notify_subscribers_callback(data)
+
+    return int(res)
 
 def subscribe_user_to_discussion(recID, uid):
     """
@@ -1106,7 +1126,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                           client_ip_address=None,
                                           editor_type='textarea',
                                           can_attach_files=False,
-                                          subscribe=False):
+                                          subscribe=False,
+                                          req=None):
     """
     Add a comment/review or remark
     @param recID: record id
@@ -1124,6 +1145,7 @@ def perform_request_add_comment_or_remark(recID=0,
     @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
     @param can_attach_files: if user can attach files to comments or not
     @param subscribe: if True, subscribe user to receive new comments by email
+    @param req: request object. Used to register callback to send email notification
     @return:
              - html add form if action is display or reply
              - html successful added form if action is submit
@@ -1199,7 +1221,8 @@ def perform_request_add_comment_or_remark(recID=0,
                     success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
                                                           note=note, score=score, priority=0,
                                                           client_ip_address=client_ip_address,
-                                                          editor_type=editor_type)
+                                                          editor_type=editor_type,
+                                                          req=req)
                 else:
                     warnings.append('WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE')
                     success = 1
@@ -1208,7 +1231,8 @@ def perform_request_add_comment_or_remark(recID=0,
                     success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
                                                           note=note, score=score, priority=0,
                                                           client_ip_address=client_ip_address,
-                                                          editor_type=editor_type)
+                                                          editor_type=editor_type,
+                                                          req=req)
                     if success > 0 and subscribe:
                         subscribe_user_to_discussion(recID, uid)
                 else:

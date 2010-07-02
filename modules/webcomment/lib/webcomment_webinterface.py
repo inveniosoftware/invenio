@@ -374,7 +374,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                              client_ip_address=client_ip_address,
                                                                              editor_type=argd['editor_type'],
                                                                              can_attach_files=can_attach_files,
-                                                                             subscribe=subscribe)
+                                                                             subscribe=subscribe,
+                                                                             req=req)
 
             if self.discussion:
                 title = _("Add Review")
