@@ -23,7 +23,9 @@ from invenio.config import \
      CFG_WEBDIR, \
      CFG_SITE_URL, \
      CFG_SITE_LANG
+
 from invenio.webstat_engine import xlwt_imported
+from invenio.webstat_engine import get_invenio_error_details
 
 class Template:
 
@@ -119,6 +121,30 @@ class Template:
         """
         out = """<h3>Bibcirculation stats</h3>"""
 
+        return out
+
+    def tmpl_error_log_analizer(self, invenio_ranking, invenio_last_errors, apache_ranking):
+        """
+        Generates the statistics of the last errors
+        """
+        out = """<script type='text/javascript' src='%s/js/collapse.js'></script>
+                 <h3>Error log statistics</h3>
+                 <h4>Invenio error log</h4>
+                 <h5>Ranking</h5>
+                 <pre>%s</pre>
+                 <h5>Last errors</h5>
+""" % (CFG_SITE_URL, invenio_ranking)
+        lines = invenio_last_errors.splitlines()
+        error_number = len(lines)
+        for line in lines:
+            out += """<div class='collapsable'> 
+                          %s
+                          <pre>%s</pre>
+                      </div>
+""" % (line, get_invenio_error_details(error_number).replace('<', '&lt;').replace('>', '&gt;'))
+            error_number -= 1
+        out += """<h4>Apache error log</h4>
+                  <pre>%s</pre>""" % apache_ranking
         return out
 
     def tmpl_customevent_help(self, ln=CFG_SITE_LANG):

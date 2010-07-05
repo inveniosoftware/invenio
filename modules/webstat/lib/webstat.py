@@ -44,7 +44,7 @@ from invenio.bibsched import is_task_scheduled, \
     get_task_options
 from invenio.bibcirculation_utils import book_title_from_MARC
 
-# Imports handling key events
+# Imports handling key events and error log
 from invenio.webstat_engine import get_keyevent_trend_collection_population, \
     get_keyevent_trend_search_frequency, \
     get_keyevent_trend_search_type_distribution, \
@@ -76,7 +76,11 @@ from invenio.webstat_engine import get_keyevent_trend_collection_population, \
     _get_item_doctype, \
     _get_request_statuses, \
     _get_libraries, \
-    _get_loan_periods
+    _get_loan_periods, \
+    get_invenio_error_log_ranking, \
+    get_invenio_last_n_errors, \
+    update_error_log_analyzer, \
+    get_apache_error_log_ranking
 
 # Imports handling custom events
 from invenio.webstat_engine import get_customevent_table, \
@@ -927,6 +931,11 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
    # out += TEMPLATES.tmpl_loans_statistics(ln=ln)
 
+    # Display error log analizer
+    update_error_log_analyzer()
+    out += TEMPLATES.tmpl_error_log_analizer(get_invenio_error_log_ranking(), 
+                                             get_invenio_last_n_errors(5),
+                                             get_apache_error_log_ranking())
     return out
 
 def perform_display_keyevent(event_id=None, args={},

@@ -24,7 +24,7 @@ try:
     xlwt_imported = True
 except ImportError:
     xlwt_imported = False
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME
+from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME, CFG_BINDIR
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search, \
     get_collection_reclist, \
@@ -1236,6 +1236,29 @@ def get_keyevent_bibcirculation_report(freq = 'yearly'):
     illrequests = run_sql("SELECT COUNT(*) FROM crcILLREQUEST WHERE request_date > %s", (datefrom,))[0][0]
     holdrequest = run_sql("SELECT COUNT(*) FROM crcLOANREQUEST WHERE request_date > %s", (datefrom,))[0][0]
     return (loans, renewals, returns, illrequests, holdrequest)
+
+# ERROR LOG STATS
+
+def update_error_log_analyzer():
+    """Creates splitted files for today's errors"""
+    _run_cmd('bash %s/webstat-errorlog-analizer -is' % CFG_BINDIR)
+
+def get_invenio_error_log_ranking():
+    """ Returns the ranking of the errors in the invenio log"""
+    return _run_cmd('bash %s/webstat-errorlog-analizer -ir' % CFG_BINDIR)
+
+def get_invenio_last_n_errors(n):
+    """Returns the last n errors in the invenio log (without details)"""
+    return _run_cmd('bash %s/webstat-errorlog-analizer -il %d' % (CFG_BINDIR, n))
+
+def get_invenio_error_details(error):
+    """Returns the complete text of the invenio error."""
+    out = _run_cmd('bash %s/webstat-errorlog-analizer -id %s' % (CFG_BINDIR,error))
+    return out
+
+def get_apache_error_log_ranking():
+    """ Returns the ranking of the errors in the apache log"""
+    return _run_cmd('bash %s/webstat-errorlog-analizer -ar' % CFG_BINDIR)
 
 # CUSTOM EVENT SECTION
 
