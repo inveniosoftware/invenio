@@ -702,4 +702,4 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words):
             j += 1
         return shorter_snippet
     else:
-	return snippet
+        return snippet

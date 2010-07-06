@@ -4112,7 +4112,7 @@ class Template:
                        <th>%s</th>
                        <th></th>
                     </tr>
-              </thead>
+               </thead>
               <tbody>
                        """% (CFG_SITE_URL,
                           _("Borrower"),
@@ -4292,7 +4292,7 @@ class Template:
                        <th>%s</th>
                        <th></th>
                     </tr>
-              </thead>
+               </thead>
               <tbody>
                        """% (CFG_SITE_URL,
                           _("Borrower"),
@@ -4544,7 +4544,7 @@ class Template:
                     <th>%s</th>
                     <th>%s</th>
                   </tr>
-		</thead>
+                </thead>
                 <tbody>
                 """% (_("Borrower"),
                       _("Item"),
@@ -4614,7 +4614,7 @@ class Template:
                      <option selected="selected" value="25">25</option>
                      <option value="40">40</option>
                      <option value="60">60</option>
-		   </select>
+                 </select>
                  </form>
                </div>
                  """
@@ -10384,7 +10384,7 @@ class Template:
                        Calendar.setup({
                            inputField     :    '%s',
                            ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
+                           button         :    '%s'
                            });
                        </script>
                     </td>
@@ -10399,7 +10399,7 @@ class Template:
                        Calendar.setup({
                            inputField     :    '%s',
                            ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
+                           button         :    '%s'
                            });
                        </script>
                     </td>
@@ -10949,7 +10949,7 @@ class Template:
                        Calendar.setup({
                            inputField     :    '%s',
                            ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
+                           button         :    '%s'
                            });
                        </script>
                     </td>
@@ -10966,7 +10966,7 @@ class Template:
                        Calendar.setup({
                            inputField     :    '%s',
                            ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
+                           button         :    '%s'
                            });
                        </script>
                     </td>
@@ -15839,7 +15839,7 @@ class Template:
                        Calendar.setup({
                            inputField     :    '%s',
                            ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
+                           button         :    '%s'
                            });
                        </script>
                     </td>
@@ -15855,7 +15855,7 @@ class Template:
                        Calendar.setup({
                            inputField     :    '%s',
                            ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
+                           button         :    '%s'
                            });
                        </script>
                     </td>

@@ -191,16 +191,16 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
     def parse_scanned(self, scanned):
         """Return all the indexable variations for a tagged token dictionary.
 
-	    Does this via the combinatoric expansion of the following rules:
-	    - Expands first names as name, first initial with period, first initial
+        Does this via the combinatoric expansion of the following rules:
+        - Expands first names as name, first initial with period, first initial
             without period.
-	    - Expands compound last names as each of their non-stopword subparts.
-	    - Titles are treated literally, but applied serially.
+        - Expands compound last names as each of their non-stopword subparts.
+        - Titles are treated literally, but applied serially.
 
-	    Please note that titles will be applied to complete last names only.
-	    So for example, if there is a compound last name of the form,
-	    "Ibanez y Gracia", with the title, "(ed.)", then only the combination
-	    of those two strings will do, not "Ibanez" and not "Gracia".
+        Please note that titles will be applied to complete last names only.
+        So for example, if there is a compound last name of the form,
+        "Ibanez y Gracia", with the title, "(ed.)", then only the combination
+        of those two strings will do, not "Ibanez" and not "Gracia".
 
         @param scanned: lexically tagged input items in the form of the output
             from scan()
@@ -344,16 +344,16 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
     def tokenize(self, s):
         """Main entry point.  Output the list of strings expanding s.
 
-	    Does this via the combinatoric expansion of the following rules:
-	    - Expands first names as name, first initial with period, first initial
+        Does this via the combinatoric expansion of the following rules:
+        - Expands first names as name, first initial with period, first initial
             without period.
-	    - Expands compound last names as each of their non-stopword subparts.
-	    - Titles are treated literally, but applied serially.
+        - Expands compound last names as each of their non-stopword subparts.
+        - Titles are treated literally, but applied serially.
 
-	    Please note that titles will be applied to complete last names only.
-	    So for example, if there is a compound last name of the form,
-	    "Ibanez y Gracia", with the title, "(ed.)", then only the combination
-	    of those two strings will do, not "Ibanez" and not "Gracia".
+        Please note that titles will be applied to complete last names only.
+        So for example, if there is a compound last name of the form,
+        "Ibanez y Gracia", with the title, "(ed.)", then only the combination
+        of those two strings will do, not "Ibanez" and not "Gracia".
 
         @param s: the input to be lexically tagged
         @type s: string

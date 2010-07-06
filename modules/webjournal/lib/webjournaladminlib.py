@@ -534,19 +534,19 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
 
     <controller>
         <issue_grouping>2</issue_grouping>
-	<issues_per_year>52</issues_per_year>
-	<hide_unreleased_issues>all</hide_unreleased_issues>
+    <issues_per_year>52</issues_per_year>
+    <hide_unreleased_issues>all</hide_unreleased_issues>
         <marc_tags>
             <issue_number>773__n</issue_number>
-	    <order_number>773__c</order_number>
+        <order_number>773__c</order_number>
         </marc_tags>
-	<alert_sender>%(CFG_SITE_SUPPORT_EMAIL)s</alert_sender>
-	<alert_recipients>recipients@atlantis.atl</alert_recipients>
-	<languages>en,fr</languages>
-	<submission>
+    <alert_sender>%(CFG_SITE_SUPPORT_EMAIL)s</alert_sender>
+    <alert_recipients>recipients@atlantis.atl</alert_recipients>
+    <languages>en,fr</languages>
+    <submission>
             <doctype>DEMOJRN</doctype>
             <report_number_field>DEMOJRN_RN</report_number_field>
-	</submission>
+    </submission>
         <first_issue>02/2009</first_issue>
         <draft_keyword>DRAFT</draft_keyword>
     </controller>
