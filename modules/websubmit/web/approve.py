@@ -18,12 +18,6 @@
 __revision__ = "$Id$"
 
 ## import interesting modules:
-import string
-import os
-import sys
-import time
-import types
-import re
 import urllib
 
 from invenio.config import \
@@ -31,16 +25,12 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_VERSION, \
      CFG_SITE_NAME_INTL
 from invenio.dbquery import run_sql
-from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
 from invenio.websubmit_config import *
-from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, page_not_authorized
+from invenio.webpage import page
+from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
-from invenio.errorlib import register_exception
 from invenio.urlutils import redirect_to_url
 
 def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):

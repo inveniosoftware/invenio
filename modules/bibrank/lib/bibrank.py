@@ -79,16 +79,6 @@ from invenio.errorlib import register_exception
 from invenio.bibtask import task_init, write_message, task_get_option, \
     task_set_option, get_datetime, task_update_status, \
     task_sleep_now_if_required
-from invenio.bibrank_tag_based_indexer import \
-    single_tag_rank_method, \
-    citation, \
-    download_weight_filtering_user, \
-    download_weight_total, \
-    file_similarity_by_times_downloaded
-from invenio.bibrank_word_indexer import word_similarity
-from invenio.bibrank_citerank_indexer import citerank
-
-
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by

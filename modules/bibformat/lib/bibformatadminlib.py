@@ -38,10 +38,9 @@ from invenio.bibformat_config import \
 from invenio.urlutils import wash_url_argument
 from invenio.errorlib import get_msgs_for_code_list
 from invenio.messages import gettext_set_language, wash_language, language_list_long
-from invenio.search_engine import perform_request_search, get_alphabetically_ordered_collection_list
+from invenio.search_engine import perform_request_search
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
-from invenio.websearch_webcoll import get_collection
 from invenio.textutils import encode_for_xml
 
 import invenio.template

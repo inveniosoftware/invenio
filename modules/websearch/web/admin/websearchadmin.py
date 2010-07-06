@@ -21,8 +21,6 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import sys
-
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box, adderrorbox

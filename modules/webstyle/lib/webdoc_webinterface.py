@@ -25,7 +25,7 @@ __revision__ = \
 __lastupdated__ = """$Date$"""
 
 import cgi
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANGS
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_LANGS
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid

@@ -13,7 +13,10 @@
 ### Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 ### Copyright 2007-2008 Dag Wieers <dag@wieers.com>
 
-import getopt, sys, os, glob, time
+import getopt
+import sys
+import os
+import time
 
 global unopath
 

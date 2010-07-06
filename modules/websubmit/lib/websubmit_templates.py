@@ -18,18 +18,12 @@
 __revision__ = "$Id$"
 
 import urllib
-import time
 import cgi
-import gettext
-import string
-import locale
 import re
 import operator
-import os
 
 from invenio.config import \
      CFG_SITE_URL, \
-     CFG_VERSION, \
      CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.messages import gettext_set_language
@@ -39,7 +33,6 @@ from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.htmlutils import escape_html
 from websubmit_config import \
      CFG_WEBSUBMIT_CHECK_USER_LEAVES_SUBMISSION
-import invenio.template
 
 class Template:
 

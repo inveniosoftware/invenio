@@ -18,7 +18,6 @@
 
 __revision__ = "$Id$"
 
-import re
 import os
 import cgi
 
@@ -26,7 +25,6 @@ from invenio.config import \
      CFG_PATH_CONVERT, \
      CFG_PATH_GUNZIP, \
      CFG_PATH_GZIP, \
-     CFG_CERN_SITE, \
      CFG_SITE_LANG
 from invenio.bibdocfile import decompose_file
 from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError

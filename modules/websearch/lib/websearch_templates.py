@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 
 import time
 import cgi
-import gettext
 import string
 import re
 import locale
@@ -44,7 +43,6 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_BIBRANK_SHOW_CITATION_STATS, \
      CFG_BIBRANK_SHOW_CITATION_GRAPHS, \
-     CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \

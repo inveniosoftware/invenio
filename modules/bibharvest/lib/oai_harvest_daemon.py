@@ -46,7 +46,6 @@ from invenio.bibtask import \
      task_get_option, \
      task_set_option, \
      write_message, \
-     task_update_status, \
      task_init, \
      task_sleep_now_if_required, \
      task_update_progress, \

@@ -42,7 +42,7 @@ from invenio.access_control_admin import \
      acc_get_all_roles, \
      acc_get_role_users
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, list_registered_users, page_not_authorized
+from invenio.webuser import getUid, list_registered_users, page_not_authorized
 from invenio.messages import wash_language
 
 def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",

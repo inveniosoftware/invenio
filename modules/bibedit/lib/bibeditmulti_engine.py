@@ -36,8 +36,6 @@ base class.
 
 __revision__ = "$Id"
 
-import cgi
-
 from invenio import search_engine
 from invenio import bibrecord
 from invenio import bibformat

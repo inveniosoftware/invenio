@@ -38,8 +38,8 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_WEBSUBMIT_FILEDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
-    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url, \
-    CFG_BIBDOCFILE_AVAILABLE_FLAGS
+    bibdocfile_url_to_bibdoc, decompose_bibdocfile_url
+    
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search
 from invenio.textutils import wrap_text_in_a_box, wait_for_user

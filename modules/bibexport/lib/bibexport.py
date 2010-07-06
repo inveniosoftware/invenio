@@ -43,8 +43,7 @@ from ConfigParser import ConfigParser
 from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, task_set_option, \
-       task_get_option, task_update_progress, task_has_option, \
-       task_get_task_param#, task_sleep_now_if_required
+       task_get_option, task_has_option, task_get_task_param
 
 def _detect_jobs_to_run(string_of_jobnames=None):
     """Detect which jobs to run from optional string of jobs.

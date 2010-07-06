@@ -35,7 +35,6 @@ if sys.hexversion < 0x2060000:
 else:
     from hashlib import md5
 
-from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_get_role_id, acc_add_user_role
 from datetime import datetime, timedelta

@@ -18,7 +18,12 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import os, time, re, datetime, cPickle, calendar, sys
+import os
+import time
+import re
+import datetime
+import cPickle
+import calendar
 from urllib import quote
 
 from invenio import template
@@ -55,11 +60,6 @@ from invenio.webstat_engine import create_graph_dump
 # Imports for handling exports
 from invenio.webstat_engine import export_to_python
 from invenio.webstat_engine import export_to_csv
-
-if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
-    from sets import Set as set
-    # pylint: enable-msg=W0622
 
 
 TEMPLATES = template.load('webstat')

@@ -24,15 +24,10 @@ import string
 import os
 import re
 import sys
-import time
-import getopt
-from time import gmtime, strftime, localtime
+from time import strftime, localtime
 import os.path
 
-from invenio.config import \
-     CFG_OAI_ID_PREFIX, \
-     CFG_VERSION,\
-     CFG_ETCDIR
+from invenio.config import CFG_OAI_ID_PREFIX, CFG_ETCDIR
 from invenio.search_engine import perform_request_search
 
 CFG_BIBCONVERT_KB_PATH = "%s%sbibconvert%sKB" % (CFG_ETCDIR, os.sep, os.sep)

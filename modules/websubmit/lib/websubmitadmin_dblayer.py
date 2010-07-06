@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
 from invenio.websubmitadmin_config import *
-from random import seed, randint
+from random import randint
 
 ## Functions related to the organisation of catalogues:
 

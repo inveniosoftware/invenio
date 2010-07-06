@@ -42,7 +42,6 @@ from invenio.config import \
     CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL, \
     CFG_SITE_ADMIN_EMAIL, \
-    CFG_SITE_SECURE_URL, \
     CFG_SITE_URL
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
@@ -56,7 +55,7 @@ from invenio.dbquery import run_sql, OperationalError
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, \
-    set_user_preferences, setUid, update_Uid
+    set_user_preferences, update_Uid
 from invenio.urlutils import redirect_to_url
 from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
     DEF_DEMO_ROLES, DEF_DEMO_AUTHS, WEBACCESSACTION, MAXPAGEUSERS, \

@@ -1,5 +1,4 @@
-from invenio.htmlutils import HTMLWasher, cfg_html_buffer_allowed_tag_whitelist,\
-                              cfg_html_buffer_allowed_attribute_whitelist
+from invenio.htmlutils import HTMLWasher
 
 class EmailWasher(HTMLWasher):
     """

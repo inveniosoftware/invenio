@@ -29,8 +29,7 @@ from invenio.bibformat_engine import BibFormatObject
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_CACHEDIR, \
-     CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     CFG_CERN_SITE
+     CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webjournal_utils import \
      parse_url_string, \
      make_journal_url, \

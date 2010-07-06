@@ -33,7 +33,6 @@ from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
 from invenio.dateutils import datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.webuser import list_users_in_roles
-from invenio.webbasket_dblayer import get_groups_user_member_of
 from invenio.websession_config import CFG_WEBSESSION_USERGROUP_STATUS
 
 def check_user_owns_message(uid, msgid):

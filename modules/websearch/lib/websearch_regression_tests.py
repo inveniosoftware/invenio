@@ -34,7 +34,7 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable-msg=W0622
 
-from mechanize import Browser, LinkNotFoundError, HTTPError
+from mechanize import Browser, LinkNotFoundError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \

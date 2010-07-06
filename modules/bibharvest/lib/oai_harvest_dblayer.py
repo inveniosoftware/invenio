@@ -17,7 +17,6 @@
 
 
 from invenio.dbquery import run_sql
-import datetime
 
 class HistoryEntry:
     date_harvested = None

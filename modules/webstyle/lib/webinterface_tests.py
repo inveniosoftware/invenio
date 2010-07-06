@@ -19,7 +19,8 @@
 
 __revision__ = "$Id$"
 
-import unittest, sys, cgi
+import unittest
+import cgi
 
 from invenio.testutils import make_test_suite, run_test_suite
 

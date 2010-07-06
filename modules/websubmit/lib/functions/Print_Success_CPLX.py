@@ -25,8 +25,6 @@ import os
 
 from invenio.dbquery import run_sql
 
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
-
 def Print_Success_CPLX(parameters, curdir, form, user_info=None):
     global rn
     act = form['act']

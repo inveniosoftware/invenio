@@ -42,7 +42,7 @@ from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
 from invenio.webuser import get_preferred_user_language, isGuestUser, \
     getUid, loginUser, update_Uid, isUserSuperAdmin, collect_user_info
-from invenio.webinterface_handler_wsgi_utils import StringField, Field
+from invenio.webinterface_handler_wsgi_utils import StringField
 
 ## The following variable is True if the installation make any difference
 ## between HTTP Vs. HTTPS connections.

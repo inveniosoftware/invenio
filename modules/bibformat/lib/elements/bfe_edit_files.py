@@ -24,7 +24,6 @@ from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL
 from invenio.access_control_engine import acc_authorize_action
-from invenio.search_engine import guess_primary_collection_of_a_record
 
 def format(bfo, style):
     """

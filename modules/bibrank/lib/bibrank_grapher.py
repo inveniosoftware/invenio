@@ -20,15 +20,9 @@
 __revision__ = "$Id$"
 
 import os
-import sys
-import time
 import tempfile
 
-from invenio.config import \
-     CFG_SITE_URL, \
-     CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_VERSION, \
-     CFG_WEBDIR
+from invenio.config import CFG_WEBDIR
 from invenio.websubmit_config import *
 
 ## test gnuplot presence:

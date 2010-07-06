@@ -36,14 +36,12 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_SITE_URL, \
      CFG_SITE_LANGS, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
 from invenio.dbquery import run_sql, Error, get_table_update_time
-from invenio.access_control_engine import acc_authorize_action
 from invenio.bibrank_record_sorter import get_bibrank_methods
 from invenio.dateutils import convert_datestruct_to_dategui
 from invenio.bibformat import format_record

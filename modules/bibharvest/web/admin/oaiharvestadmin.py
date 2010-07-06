@@ -26,8 +26,8 @@ import simplejson as json
 import datetime
 import math
 import urllib
-from invenio.webpage import page, create_error_box
-from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG
+from invenio.webpage import page
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.bibrankadminlib import check_user

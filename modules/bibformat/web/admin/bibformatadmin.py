@@ -26,27 +26,13 @@ import MySQLdb
 from invenio import bibformatadminlib, \
                     bibformat_dblayer,\
                     bibformat_engine
-
-import os
-import re
-import sys
-
-if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
-    from sets import Set as set
-    # pylint: enable-msg=W0622
-
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \
-                           create_basic_search_units, \
-                           get_alphabetically_ordered_collection_list, \
-                           get_fieldvalues, perform_request_search
-from invenio.websearch_webcoll import get_collection
-from invenio.bibrank_downloads_indexer import uniq
+                           create_basic_search_units
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME
 
 def index(req, ln=CFG_SITE_LANG):

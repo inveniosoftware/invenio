@@ -20,9 +20,8 @@
 __revision__ = "$Id$"
 
 import re
-from random import randint, seed
 from os.path import split, basename, isfile
-from os import access, F_OK, R_OK, W_OK, getpid, rename, unlink
+from os import access, F_OK, R_OK, getpid, rename, unlink
 from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *

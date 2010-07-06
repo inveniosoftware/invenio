@@ -26,7 +26,6 @@ import unittest
 
 from invenio import search_engine
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.config import CFG_SITE_URL
 
 class TestWashQueryParameters(unittest.TestCase):
     """Test for washing of search query parameters."""

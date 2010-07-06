@@ -25,7 +25,6 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set
     # pylint: enable-msg=W0622
 
-from numpy import array
 from invenio import bibrank_citerank_indexer
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibtask import task_set_task_param

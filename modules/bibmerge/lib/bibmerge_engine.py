@@ -21,7 +21,6 @@
 
 import os
 
-from invenio.config import CFG_SITE_URL
 from invenio.bibmerge_merger import merge_field_group, replace_field, \
                                     add_field, delete_field, merge_field, \
                                     add_subfield, replace_subfield, \
@@ -32,11 +31,11 @@ from invenio.bibedit_utils import cache_exists, cache_expired, \
     create_cache_file, delete_cache_file, get_cache_file_contents, \
     get_cache_mtime, latest_record_revision, record_locked_by_other_user, \
     record_locked_by_queue, save_xml_record, touch_cache_file, \
-    update_cache_file_contents, get_bibrecord, _get_file_path, \
+    update_cache_file_contents, _get_file_path, \
     get_record_revision_ids, revision_format_valid_p, split_revid, \
     get_marcxml_of_revision_id
 from invenio.htmlutils import remove_html_markup
-from invenio.search_engine import record_exists, search_pattern
+from invenio.search_engine import record_exists
 from invenio.bibrecord import create_record, record_xml_output, record_add_field
 from invenio.bibedit_config import CFG_BIBEDIT_TO_MERGE_SUFFIX
 

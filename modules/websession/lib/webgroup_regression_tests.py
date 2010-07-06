@@ -24,13 +24,12 @@
 __revision__ = "$Id$"
 
 from mechanize import Browser
-from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
+from invenio.config import CFG_SITE_SECURE_URL
 
 from invenio.dbquery import run_sql
 from invenio.webgroup import synchronize_external_groups, synchronize_all_external_groups
 from invenio.webgroup_dblayer import get_external_groups, get_all_login_method_groups
-from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+from invenio.testutils import make_test_suite, run_test_suite
 import unittest
 
 class WebGroupTest(unittest.TestCase):

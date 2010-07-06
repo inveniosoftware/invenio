@@ -21,9 +21,8 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
-from urllib import quote
 
 class Template:
 

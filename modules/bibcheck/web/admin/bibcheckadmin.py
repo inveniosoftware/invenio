@@ -19,7 +19,6 @@
 
 import cgi
 import os
-import os.path
 import MySQLdb
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box

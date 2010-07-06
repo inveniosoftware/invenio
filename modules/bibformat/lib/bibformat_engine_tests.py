@@ -33,7 +33,6 @@ from invenio import bibformat_engine
 from invenio import bibformat_utils
 from invenio import bibformat_config
 from invenio import bibformatadminlib
-from invenio import bibrecord
 from invenio.config import CFG_TMPDIR
 from invenio.testutils import make_test_suite, run_test_suite
 

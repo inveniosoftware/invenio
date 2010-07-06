@@ -28,7 +28,7 @@ from datetime import datetime
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
 from invenio.bibtask import check_running_process_user
 from invenio.dbquery import run_sql, OperationalError
-from invenio.bibdocfile import BibDoc, BibRecDocs
+from invenio.bibdocfile import BibDoc
 from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.bibdocfilecli import cli_fix_marc
 from invenio.errorlib import register_exception

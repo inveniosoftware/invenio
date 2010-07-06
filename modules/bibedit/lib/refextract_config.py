@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_VERSION, CFG_ETCDIR, CFG_SITE_NAME
+from invenio.config import CFG_VERSION, CFG_ETCDIR
 
 # pylint: disable-msg=C0301
 

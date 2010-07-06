@@ -25,8 +25,7 @@ __revision__ = \
     "$Id$"
 
 ## configuration parameters read from the general config file:
-from invenio.config import \
-     CFG_VERSION, CFG_SITE_NAME
+from invenio.config import CFG_VERSION
 ## version number:
 BIBINDEX_ENGINE_VERSION = "CDS Invenio/%s bibindex/%s" % (CFG_VERSION, CFG_VERSION)
 

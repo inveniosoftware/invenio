@@ -33,7 +33,6 @@ from invenio.dbquery import run_sql
 from invenio.config import CFG_PREFIX, \
      CFG_SITE_LANG, \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
-     CFG_SITE_ADMIN_EMAIL,\
      CFG_SITE_SUPPORT_EMAIL,\
      CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL,\
      CFG_SITE_URL,\
@@ -44,7 +43,6 @@ from invenio.config import CFG_PREFIX, \
      CFG_WEBCOMMENT_ADMIN_NOTIFICATION_LEVEL,\
      CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
      CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
-     CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS,\
      CFG_WEBCOMMENT_DEFAULT_MODERATOR
 from invenio.webmessage_mailutils import \
      email_quote_txt, \
@@ -62,8 +60,6 @@ from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE, \
      CFG_WEBCOMMENT_RESTRICTION_DATAFIELD, \
      CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_admin import acc_is_role
-from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
      check_user_can_view_record, \

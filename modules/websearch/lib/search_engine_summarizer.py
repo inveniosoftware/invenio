@@ -59,7 +59,6 @@ def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None
        for instance p='Smith, Paul' and f='author'.  They are used for links.
        REQ is the Apache/mod_python request object.
     """
-    import search_engine
     if of == 'hcs':
         # this is HTML cite summary
 

@@ -60,7 +60,6 @@ from invenio.bibtask import \
 from invenio.bibrecord import \
      record_delete_subfield, \
      field_xml_output
-from invenio.bibformat import format_record
 
 DATAFIELD_SET_HEAD = \
                    "<datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">" % \

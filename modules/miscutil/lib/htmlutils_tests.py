@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio import dbquery
 from invenio.htmlutils import HTMLWasher, nmtoken_from_string, \
      remove_html_markup
 from invenio.testutils import make_test_suite, run_test_suite

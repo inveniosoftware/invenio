@@ -19,23 +19,16 @@
 
 __revision__ = "$Id$"
 
-import cgi
-import re
-import os
-import urllib
-import time
 import random
-from zlib import compress,decompress
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_VERSION, \
      CFG_SITE_URL, \
      CFG_BINDIR
-from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
+from invenio.bibrankadminlib import write_outcome, modify_translations, \
+        get_def_name, get_name, get_languages, addadminbox, tupletotable, \
+        createhiddenform
 from invenio.dbquery import run_sql, get_table_status_info
-from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
-from invenio.webuser import getUid, get_email
 from invenio.bibindex_engine_stemmer import get_stemming_language_map
 import invenio.template
 websearch_templates = invenio.template.load('websearch')

@@ -66,7 +66,6 @@ import re
 import sys
 import time
 from zlib import compress
-import urllib2
 import socket
 import marshal
 import copy
