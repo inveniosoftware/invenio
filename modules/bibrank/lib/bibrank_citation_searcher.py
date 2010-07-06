@@ -20,10 +20,9 @@
 __revision__ = "$Id$"
 
 import re
-import marshal
-from zlib import decompress, error
 
-from invenio.dbquery import run_sql, get_table_update_time, OperationalError
+from invenio.dbquery import run_sql, get_table_update_time, OperationalError, \
+        deserialize_via_marshal
 from invenio.intbitset import intbitset
 from invenio.data_cacher import DataCacher
 
@@ -36,7 +35,7 @@ class CitationDictsDataCacher(DataCacher):
         def cache_filler():
             alldicts = {}
             try:
-                res = run_sql("""SELECT object_name,object_value FROM rnkCITATIONDATA""")
+                res = run_sql("SELECT object_name,object_value FROM rnkCITATIONDATA")
             except OperationalError:
                 # database problems, return empty cache
                 return {}
@@ -44,7 +43,7 @@ class CitationDictsDataCacher(DataCacher):
                 object_name = row[0]
                 object_value = row[1]
                 try:
-                    object_value_dict = marshal.loads(decompress(object_value))
+                    object_value_dict = deserialize_via_marshal(object_value)
                 except:
                     object_value_dict = {}
                 alldicts[object_name] = object_value_dict
@@ -201,7 +200,7 @@ def get_author_cited_by(authorstring):
     if res and res[0] and res[0][0]:
         #has to be prepared for corrupted data!
         try:
-            citations = marshal.loads(decompress(res[0][0]))
+            citations = deserialize_via_marshal(res[0][0])
         except:
             citations = []
     return citations

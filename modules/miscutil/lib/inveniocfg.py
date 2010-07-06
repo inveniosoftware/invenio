@@ -72,8 +72,6 @@ import re
 import shutil
 import socket
 import sys
-import zlib
-import marshal
 
 def print_usage():
     """Print help."""
@@ -384,7 +382,7 @@ def cli_cmd_reset_recstruct_cache(conf):
     will adapt the database to either store or not store the recstruct
     format."""
     from invenio.intbitset import intbitset
-    from invenio.dbquery import run_sql
+    from invenio.dbquery import run_sql, serialize_via_marshal
     from invenio.search_engine import get_record
     from invenio.bibsched import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
@@ -403,7 +401,7 @@ def cli_cmd_reset_recstruct_cache(conf):
         tot = len(recids)
         count = 0
         for recid in recids:
-            value = zlib.compress(marshal.dumps(get_record(recid)))
+            value = serialize_via_marshal(get_record(recid))
             run_sql("DELETE FROM bibfmt WHERE id_bibrec=%s AND format='recstruct'", (recid, ))
             run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
             count += 1
