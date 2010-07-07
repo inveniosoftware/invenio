@@ -17,6 +17,7 @@
 
 __revision__ = "$Id$"
 
+import os
 from invenio.bibdocfile import BibRecDocs
 
 def Add_Files(parameters, curdir, form, user_info=None):

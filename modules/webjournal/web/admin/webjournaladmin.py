@@ -34,7 +34,9 @@ from invenio.webjournal_config import \
      InvenioWebJournalNoJournalOnServerError, \
      InvenioWebJournalNoNameError, \
      InvenioWebJournalNoCurrentIssueError, \
-     InvenioWebJournalIssueNumberBadlyFormedError
+     InvenioWebJournalIssueNumberBadlyFormedError, \
+     InvenioWebJournalJournalIdNotFoundDBError
+
 from invenio.webjournal_washer import \
      wash_journal_name, \
      wash_issue_number

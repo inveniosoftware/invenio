@@ -22,6 +22,7 @@
    ## PARAMETERS:    -
 
 import os
+import re
 
 from invenio.dbquery import run_sql
 
