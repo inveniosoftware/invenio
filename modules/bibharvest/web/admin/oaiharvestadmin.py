@@ -519,7 +519,7 @@ def getHoldingPenData(req, elementId):
 
     if len(elements) == 2:
         filter = elements[1]
-        resultHtml =  oha.perform_request_gethpyears(elements[0], filer);
+        resultHtml =  oha.perform_request_gethpyears(elements[0], filter);
     elif len(elements) == 3:
         # only the year is specified
         result = ""
