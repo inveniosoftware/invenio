@@ -27,7 +27,6 @@ if sys.hexversion < 0x2040000:
 
 import os
 import getopt
-import string
 from tempfile import mkstemp
 
 from invenio.config import CFG_SITE_URL
@@ -100,6 +99,12 @@ def usage():
                            output will be replaced by the 001 value of the matched record.
                            Useful to prepare files to then be used with BibUpload.
 
+ Predefined fields:
+
+ The following predefined field names can be used:
+  "title"
+  "author"
+
  Examples:
 
  $ bibmatch -b -n < input.xml
@@ -148,9 +153,9 @@ class Querystring:
         self.field  = []
         self.format = []
         self.mode   = ["e", "e", "e"]
-        fields = string.split(qrystr,"||")
+        fields = qrystr.split("||")
         for field in fields:
-            tags =  string.split(field, "::")
+            tags = field.split("::")
             i = 0
             format = []
             for tag in tags:
@@ -227,7 +232,8 @@ class Querystring:
 def get_field_tags(field):
     "Gets list of field 'field' for the record with 'sysno' system number from the database."
 
-    query = "select tag.value from tag left join field_tag on tag.id=field_tag.id_tag left join field on field_tag.id_field=field.id where field.code='%s'" % field;
+    query = "select tag.value from tag left join field_tag on tag.id=field_tag.id_tag " \
+            + "left join field on field_tag.id_field=field.id where field.code='%s'" % (field, )
     out = []
     res = run_sql(query)
     for row in res:
@@ -255,10 +261,45 @@ def main_words_list(wstr):
         words = words[:5]
     return words
 
-def match_records(records, qrystrs=None, perform_request_search_mode="eee", operator="a", verbose=1, server_url=CFG_SITE_URL, modify=0):
+def match_result_output(recID_list, server_url, qrystr, matchmode="no match"):
+    """Generates result as XML comments from passed record and matching parameters.
+
+    @param record: record tuple containing results
+    @type record: list
+
+    @param server_url: url to the server the matching has been performed
+    @type server_url: str
+
+    @param qrystrs: Querystrings
+    @type qrystrs: list of object
+
+    @param matchmode: matching type
+    @type matchmode: str
+
+    @rtype str
+    @return XML result string
+    """
+    result = []
+    for recID in recID_list:
+        result.append("<!-- BibMatch-Matching-Found: %s/record/%s -->" \
+                             % (server_url, recID))
+    result.append("<!-- BibMatch-Matching-Mode: %s -->" \
+                              % (matchmode, ))
+    query = []
+    for field in qrystr.field:
+        if field != "":
+            query.append(field)
+    result.append("<!-- BibMatch-Matching-Criteria: %s -->" \
+                              % ("||".join(query), ))
+    return "\n".join(result)
+
+def match_records(records, qrystrs=None, perform_request_search_mode="eee", \
+                  operator="a", verbose=1, server_url=CFG_SITE_URL, modify=0):
     """ Match passed records with existing records on a local or remote Invenio
     installation. Returns which records are new (no match), which are matched,
-    which are ambiguous and which are fuzzy-matched.
+    which are ambiguous and which are fuzzy-matched. A formatted result of each
+    records matching are appended to each record tuple:
+    (record, status_code, list_of_errors, result)
 
     @param records: records to analyze
     @type records: list of records
@@ -391,16 +432,20 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
                      " result="+str(recID_list)+"\n")
 
                 if len(recID_list) > 1: #ambig match
-                    ambiguousrecs.append(rec)
+                    ambiguousrecs.append(rec + (match_result_output(recID_list, \
+                                                server_url, querystring, "ambiguous-matched"), ))
                     if (verbose > 8):
                         sys.stderr.write("ambiguous\n")
                 if len(recID_list) == 1: #match
                     if modify:
                         if record_has_field(rec[0], '001'):
-                            record_modify_controlfield(rec[0], '001', controlfield_value=str(recID_list[0]), field_position_global=1)
+                            record_modify_controlfield(rec[0], '001', \
+                                                       controlfield_value=str(recID_list[0]), \
+                                                       field_position_global=1)
                         else:
                             record_add_field(rec[0], '001', controlfield_value=str(recID_list[0]))
-                    matchedrecs.append(rec)
+                    matchedrecs.append(rec + (match_result_output(recID_list, \
+                                                server_url, querystring, "exact-matched"), ))
                     if (verbose > 8):
                         sys.stderr.write("match\n")
                 if len(recID_list) == 0: #no match..
@@ -446,14 +491,18 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
                         #this was a fuzzy match
                         if modify:
                             if record_has_field(rec[0], '001'):
-                                record_modify_controlfield(rec[0], '001', controlfield_value=str(intersected[0]), field_position_global=1)
+                                record_modify_controlfield(rec[0], '001', \
+                                      controlfield_value=str(intersected[0]), field_position_global=1)
                             else:
                                 record_add_field(rec[0], '001', controlfield_value=str(intersected[0]))
-                        fuzzyrecs.append(rec)
+                        fuzzyrecs.append(rec + (match_result_output(intersected, \
+                                                server_url, querystring, "fuzzy-matched"), ))
                         if (verbose > 8):
                             sys.stderr.write("fuzzy\n")
                     else:
-                        newrecs.append(rec)
+                        #no match
+                        newrecs.append(rec + (match_result_output(recID_list, \
+                                                server_url, querystring), ))
                         if (verbose > 8):
                             sys.stderr.write("new\n")
     #return results
@@ -574,7 +623,7 @@ def main():
             config_file      = opt_value
             config_file_read = bibconvert.read_file(config_file, 0)
             for line in config_file_read:
-                tmp = string.split(line, "---")
+                tmp = line.split("---")
                 if(tmp[0] == "QRYSTR"):
                     qrystrs.append(tmp[1])
 
@@ -633,6 +682,7 @@ def main():
                 sysno = get_sysno_from_record(record[0], options)
                 print create_marc_record(record[0], sysno, options)
             else:
+                print record[3]
                 print record_xml_output(record[0])
 
     if batch_output:
@@ -647,6 +697,7 @@ def main():
                     sysno = get_sysno_from_record(record[0], options)
                     out += create_marc_record(record[0], sysno, options)
                 else:
+                    out += record[3]
                     out += record_xml_output(record[0])
                 file_fd.write(out + '\n')
             file_fd.close()
