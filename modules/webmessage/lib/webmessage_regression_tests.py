@@ -39,8 +39,6 @@ from invenio.webmessage_dblayer import CFG_WEBMESSAGE_STATUS_CODE, \
      get_gids_from_groupnames, \
      get_groupnames_like, \
      get_nb_new_messages_for_user, \
-     get_groupnames_like, \
-     get_nb_new_messages_for_user, \
      get_nb_readable_messages_for_user, \
      get_nicknames_like, \
      get_nicks_from_uids, \

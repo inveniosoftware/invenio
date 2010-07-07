@@ -75,8 +75,6 @@ from invenio.bibrecord import \
      print_rec
 from invenio.bibformat import format_record
 from invenio.bibtask import task_low_level_submission
-from invenio.webjournal_config import \
-     InvenioWebJournalNoJournalOnServerError
 import invenio.template
 wjt = invenio.template.load('webjournal')
 

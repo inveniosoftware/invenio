@@ -25,7 +25,6 @@ import re
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_SITE_URL, \
      CFG_SITE_URL
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action

@@ -21,7 +21,6 @@ __revision__ = "$Id$"
 
 # import sys
 import os
-import os.path
 import smtplib
 
 import invenio.elmsubmit_EZEmail as elmsubmit_EZEmail

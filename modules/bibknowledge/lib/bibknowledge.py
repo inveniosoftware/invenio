@@ -25,7 +25,6 @@ from invenio import bibknowledge_dblayer
 from invenio.bibformat_config  import CFG_BIBFORMAT_ELEMENTS_PATH
 from invenio.config import CFG_WEBDIR
 import os
-import os.path
 import re
 import libxml2
 import libxslt

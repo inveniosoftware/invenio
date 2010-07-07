@@ -22,9 +22,7 @@ import cgi
 import re
 import operator
 
-from invenio.config import \
-     CFG_SITE_URL, \
-     CFG_SITE_URL, \
+from invenio.config import CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, convert_datestruct_to_dategui

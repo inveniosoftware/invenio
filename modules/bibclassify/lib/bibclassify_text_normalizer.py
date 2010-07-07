@@ -41,6 +41,7 @@ try:
     from invenio.refextract import replace_undesirable_characters, \
         find_reference_section, find_end_of_reference_section
 except ImportError:
+    # Running in standalone mode.
     try:
         from refextract import replace_undesirable_characters, \
             find_reference_section, find_end_of_reference_section

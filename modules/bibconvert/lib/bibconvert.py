@@ -25,7 +25,6 @@ import os
 import re
 import sys
 from time import strftime, localtime
-import os.path
 
 from invenio.config import CFG_OAI_ID_PREFIX, CFG_ETCDIR
 from invenio.search_engine import perform_request_search

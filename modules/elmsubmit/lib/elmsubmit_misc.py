@@ -25,7 +25,6 @@ __revision__ = "$Id$"
 
 import tempfile
 import os
-import os.path
 import random
 import stat
 import textwrap

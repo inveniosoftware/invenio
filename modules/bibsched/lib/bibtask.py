@@ -55,7 +55,6 @@ import time
 import datetime
 import traceback
 import logging
-import logging.handlers
 
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
@@ -322,7 +321,7 @@ def task_init(
                         if sort not in required_sorts:
                             required_sorts.append(sort)
                     if sys.hexversion < 0x02050000:
-                        import hotshot, hotshot.stats
+                        import hotshot
                         pr = hotshot.Profile(filename)
                         ret = pr.runcall(_task_run, task_run_fnc)
                         for sort_type in required_sorts:
