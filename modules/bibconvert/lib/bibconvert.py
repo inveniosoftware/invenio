@@ -1056,7 +1056,7 @@ def FormatField(value, fn):
         if (par[0]!= ""):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                out = re.sub(par[0], value)
+                out = re.sub(par[0], par[1], value)
             else:
                 out = value.replace(par[0], par[1])
 
@@ -1557,7 +1557,7 @@ def format_field(value, fn):
         if (par[0]!= ""):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                out = re.sub(par[0], value)
+                out = re.sub(par[0], par[1], value)
             else:
                 out = value.replace(par[0], par[1])
 
