@@ -160,8 +160,8 @@ def _get_recids_foreach_ontology(recids=None, collections=None, taxonomy=None):
                     stream=sys.stderr, verbose=2)
         else:
             write_message("ERROR: Collection '%s' doesn't contain any record. "
-                "Cannot analyse keywords." % (ontology, collection),
-                stream=sys.stderr, verbose=0)
+                "Cannot analyse keywords." % collection, stream=sys.stderr,
+                verbose=0)
 
     return rec_onts
 
