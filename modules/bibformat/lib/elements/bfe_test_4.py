@@ -28,5 +28,6 @@ def format(bfo, param1, param2='default value'):
     @param unknown_param: desc3
     @see: element2.py unknown_element.py
     """
+    # Deliberate broken element used for testing.
     unloadable element
     return "test"

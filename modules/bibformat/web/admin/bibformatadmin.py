@@ -354,8 +354,7 @@ def output_format_update_attributes(req, bfo, ln=CFG_SITE_LANG,
                                                                            'names_trans':names_trans})
     else:
         return page_not_authorized(req=req,
-                                   text=auth_msg,
-                                   chosen_option="")
+                                   text=auth_msg)
 
 def output_format_delete(req, bfo, ln=CFG_SITE_LANG, chosen_option=""):
     """

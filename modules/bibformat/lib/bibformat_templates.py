@@ -1765,7 +1765,7 @@ class Template:
         _ = gettext_set_language(ln)    # load the right message language
 
         out = '''
-        <p>To add a new basic element (only fetch the value of a field, without special post-processing), go to the <a href="%(siteurl)sadmin/bibindex/bibindexadmin.py/field">BibEdit "Manage Logical Fields"</a> page and add a name for a field. Make sure that the name is unique and corresponds well to the field. For example, to add an element that fetch the value of field 245__%, add a new logical field with name "title" and field "245__%". Then in your template, call BFE_TITLE to print the title.</p>
+        <p>To add a new basic element (only fetch the value of a field, without special post-processing), go to the <a href="%(siteurl)sadmin/bibindex/bibindexadmin.py/field">BibEdit "Manage Logical Fields"</a> page and add a name for a field. Make sure that the name is unique and corresponds well to the field. For example, to add an element that fetch the value of field 245__%%, add a new logical field with name "title" and field "245__%%". Then in your template, call BFE_TITLE to print the title.</p>
         <p>To add a new complex element (for eg. special formatting of the field, condition on the value, etc.) you must go to the lib/python/invenio/bibformat_elements directory of your Invenio installation, and add a new format element file. Read documentation for more information.</p>
         ''' % {'siteurl':CFG_SITE_URL}
 
