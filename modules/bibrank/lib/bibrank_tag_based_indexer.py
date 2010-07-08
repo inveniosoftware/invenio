@@ -20,14 +20,15 @@
 
 __revision__ = "$Id$"
 
+import os
 import sys
 import time
-import marshal
 import ConfigParser
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_ETCDIR
+     CFG_ETCDIR, \
+     CFG_PREFIX
 from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
 from invenio.bibrank_downloads_indexer import *
@@ -35,7 +36,6 @@ from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_mars
 from invenio.errorlib import register_exception
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
 from invenio.bibindex_engine import create_range_list
-
 
 options = {}
 
@@ -45,7 +45,7 @@ def remove_auto_cites(dic):
         new_list = dic.fromkeys(dic[key]).keys()
         try:
             new_list.remove(key)
-        except ValueError, e:
+        except ValueError:
             pass
         dic[key] = new_list
     return dic
@@ -225,6 +225,18 @@ def intoDB(dict, date, rank_method_code):
     run_sql("INSERT INTO rnkMETHODDATA(id_rnkMETHOD, relevance_data) VALUES (%s,%s)", (midstr, serdata,))
     run_sql("UPDATE rnkMETHOD SET last_updated=%s WHERE name=%s", (date, rank_method_code))
 
+    # FIXME: the following is a workaround for the citation indexer
+    # memory troubles, when Apache WSGI daemon processes may end up
+    # doubling the memory after citation dictionary is updated;
+    # therefore let us restart the WSGI daemon application after the
+    # citation indexer finished, which relieves this problem.  The
+    # restart is done via touching invenio.wsgi file.  The proper fix
+    # for this problem would be strict separation between citation
+    # indexer updating dicts and citation searcher loading dicts.
+    if rank_method_code == 'citation':
+        os.system('touch ' + os.path.join(CFG_PREFIX, 'var', 'www-wsgi',
+                                          'invenio.wsgi'))
+
 def fromDB(rank_method_code):
     """Get the data for a rank method"""
     id = run_sql("SELECT id from rnkMETHOD where name=%s", (rank_method_code, ))
@@ -251,7 +263,6 @@ def del_recids(rank_method_code, range_rec):
                 if rec_dict.has_key(i):
                     del rec_dict[i]
         write_message("New size: %s" % len(rec_dict))
-        date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         intoDB(rec_dict, begin_date, rank_method_code)
     else:
         write_message("Create before deleting!")
@@ -330,7 +341,6 @@ def bibrank_engine(run):
         pass
 
     startCreate = time.time()
-    sets = {}
     try:
         options["run"] = []
         options["run"].append(run)
@@ -426,7 +436,7 @@ def add_recIDs_by_date(rank_method_code, dates=""):
     if not dates:
         try:
             dates = (get_lastupdated(rank_method_code), '')
-        except Exception, e:
+        except Exception:
             dates = ("0000-00-00 00:00:00", '')
     if dates[0] is None:
         dates = ("0000-00-00 00:00:00", '')
@@ -458,7 +468,7 @@ def getName(rank_method_code, ln=CFG_SITE_LANG, type='ln'):
             return res[0][0]
         else:
             raise Exception
-    except Exception, e:
+    except Exception:
         write_message("Cannot run rank method, either given code for method is wrong, or it has not been added using the webinterface.")
         raise Exception
 
