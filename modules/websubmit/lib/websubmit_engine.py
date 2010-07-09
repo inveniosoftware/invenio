@@ -772,13 +772,10 @@ def endaction(req,
     # load the right message language
     _ = gettext_set_language(ln)
 
-    try:
-        rn
-    except NameError:
-        rn = ""
     dismode = mode
     ln = wash_language(ln)
     sys.stdout = req
+    rn = ""
     t = ""
     # get user ID:
     uid = getUid(req)
@@ -1018,8 +1015,8 @@ def endaction(req,
         ## Handle the execution of the functions for this
         ## submission/step:
         start_time = time.time()
-        (function_content, last_step, action_score) = print_function_calls(
-                                                req=req,
+        (function_content, last_step, action_score, rn) = \
+                           print_function_calls(req=req,
                                                 doctype=doctype,
                                                 action=act,
                                                 step=step,
@@ -1066,7 +1063,7 @@ def endaction(req,
         ## If we are in the last step of an action, we can update
         ## the "journal of submissions"
         if last_step == 1:
-            if uid_email != "" and uid_email != "guest" and rn != "":
+            if uid_email != "" and uid_email != "guest":
                 ## update the "journal of submission":
                 ## Does the submission already exist in the log?
                 submission_exists = \
@@ -1493,9 +1490,15 @@ def action_details (doctype, action):
     else:
         return -1
 
-def print_function_calls (req, doctype, action, step, form, start_time, access, curdir, dismode, rn, last_step, action_score, ln=CFG_SITE_LANG):
-    # Calls the functions required by an "action" action on a "doctype" document
-    # In supervisor mode, a table of the function calls is produced
+def print_function_calls(req, doctype, action, step, form, start_time,
+    access, curdir, dismode, rn, last_step, action_score,
+    ln=CFG_SITE_LANG):
+    """ Calls the functions required by an 'action'
+    action on a 'doctype' document In supervisor mode, a table of the
+    function calls is produced
+
+    @return: (function_output_string, last_step, action_score, rn)
+    """
     user_info = collect_user_info(req)
     # load the right message language
     _ = gettext_set_language(ln)
@@ -1638,7 +1641,7 @@ def print_function_calls (req, doctype, action, step, form, start_time, access, 
     else :
         if dismode == 'S':
             t = "<br /><br /><b>" + _("The chosen action is not supported by the document type.") + "</b>"
-    return (t, the_globals['last_step'], the_globals['action_score'])
+    return (t, the_globals['last_step'], the_globals['action_score'], the_globals['rn'])
 
 
 def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=CFG_SITE_LANG):
