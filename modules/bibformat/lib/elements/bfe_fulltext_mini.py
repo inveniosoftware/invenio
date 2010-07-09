@@ -25,18 +25,22 @@ from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from cgi import escape
 
-def format(bfo, style, separator='; ', show_icons='no'):
+def format(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes'):
     """
     This is the format for formatting fulltext links in the mini panel.
     @param separator: the separator between urls.
     @param style: CSS class of the link
     @param show_icons: if 'yes', print icons for fulltexts
+    @param focus_on_main_file: if 'yes' and a doctype 'Main' is found,
+    prominently display this doctype. In that case other doctypes are
+    summarized with a link to the Fulltext tab, named"Additional files".
     """
     _ = gettext_set_language(bfo.lang)
     out = ''
 
     # Retrieve files
-    (parsed_urls, old_versions, additionals) = get_files(bfo)
+    (parsed_urls, old_versions, additionals) = \
+                  get_files(bfo, distinguish_main_and_additional_files=focus_on_main_file.lower() == 'yes')
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']

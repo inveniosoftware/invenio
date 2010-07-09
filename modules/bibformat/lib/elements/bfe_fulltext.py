@@ -141,7 +141,7 @@ def escape_values(bfo):
     """
     return 0
 
-def get_files(bfo):
+def get_files(bfo, distinguish_main_and_additional_files=True):
     """
     Returns the files available for the given record.
     Returned structure is a tuple (parsed_urls, old_versions, additionals):
@@ -166,8 +166,9 @@ def get_files(bfo):
     - keys in main_url dictionaries are defined by the BibDoc.
     - older versions are not part of the parsed urls
     - returns only main files when possible, that is when doctypes
-      make a distinction between "Main" files and other files. Otherwise
-      returns all the files as main.
+      make a distinction between 'Main' files and other
+      files. Otherwise returns all the files as main. This is only
+      enabled if distinguish_main_and_additional_files is set to True
     """
     _ = gettext_set_language(bfo.lang)
 
@@ -191,7 +192,8 @@ def get_files(bfo):
     # and "additional" files. Otherwise they will all be considered
     # equally as main files
     distinct_main_and_additional_files = False
-    if len(bibarchive.list_bibdocs(doctype='Main')) > 0:
+    if len(bibarchive.list_bibdocs(doctype='Main')) > 0 and \
+           distinguish_main_and_additional_files:
         distinct_main_and_additional_files = True
 
     # Parse URLs
