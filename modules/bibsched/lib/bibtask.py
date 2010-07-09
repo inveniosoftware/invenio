@@ -328,7 +328,10 @@ def task_init(
                             tmp_out = sys.stdout
                             sys.stdout = StringIO()
                             hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
+                            # pylint: disable-msg=E1103
+                            # This is a hack. sys.stdout is a StringIO in this case.
                             profile_dump.append(sys.stdout.getvalue())
+                            # pylint: enable-msg=E1103
                             sys.stdout = tmp_out
                     else:
                         import cProfile
