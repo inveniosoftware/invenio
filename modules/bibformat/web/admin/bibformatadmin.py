@@ -994,6 +994,7 @@ def validate_format(req, ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
 
         else: #No format specified
             return page(title=_("Format Validation"),
+                        body="No format has been specified.",
                         uid=uid,
                         language=ln,
                         errors = [("ERR_BIBFORMAT_VALIDATE_NO_FORMAT")],
