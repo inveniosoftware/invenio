@@ -178,7 +178,8 @@ class SitemapWriter(object):
         self.filedescriptor.write(self.header)
         self.file_size += len(self.footer)
 
-    def add_url(self, url, lastmod="", changefreq="", priority=""):
+    def add_url(self, url, lastmod=datetime(1900, 1, 1), changefreq="",
+            priority=""):
         """ create a new url node. Returns the number of url nodes in sitemap"""
         self.num_urls += 1
         url_node = u"""
@@ -245,7 +246,7 @@ class SitemapIndexWriter(SitemapWriter):
         self.filedescriptor.write(self.header)
         self.file_size += len(self.footer)
 
-    def add_url(self, url, lastmod=""):
+    def add_url(self, url, lastmod=datetime(1900, 1, 1)):
         """ create a new url node. Returns the number of url nodes in sitemap"""
         self.num_urls += 1
         url_node = u"""

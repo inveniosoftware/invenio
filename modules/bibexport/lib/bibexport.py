@@ -94,7 +94,10 @@ def task_run_core():
                 # every bibexport method must define run_export_job() that will do the job
                 exec "from invenio.bibexport_method_%s import run_export_method" % jobname_export_method
                 write_message("started export job " + jobname, verbose=3)
+                # pylint: disable-msg=E0602
+                # The import is done via the exec command 2 lines above.
                 run_export_method(jobname)
+                # pylint: enable-msg=E0602
                 _update_job_lastrun_time(jobname)
                 write_message("finished export job " + jobname, verbose=3)
             except Exception, msg:
