@@ -133,7 +133,7 @@ class Template:
                     <li>The option <em>name</em> is the name of the customevent.</li>
                     <li>Each param in the customevent must be given as <em>param(num)</em> where
                     <em>(num)</em> is an unique number.</li>
-                  </ol>""" % { "bindir": CFG_BINDIR, }
+                  </ol>"""
 
 
     def tmpl_error(self, msg, ln=CFG_SITE_LANG):
