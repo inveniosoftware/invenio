@@ -895,7 +895,7 @@ class CompressTool:
         self._filename = None
         self._fh = None
 
-        raise Exception("Method must be overriden in child class")
+        raise Exception("Method must be overridden in child class")
 
     def list_all_members(self):
         _check_mode(self._mode, 'r')
