@@ -43,7 +43,12 @@ from invenio.websearch_external_collections_utils import get_collection_id, get_
     warning, get_verbose_print
 
 import invenio.template
+
+# Global variables
 template = invenio.template.load('websearch_external_collections')
+external_collections_state = None
+dico_collection_external_searches = None
+dico_collection_seealso = None
 
 #dico_collection_external_searches = {}
 #dico_collection_seealso = {}
@@ -246,13 +251,6 @@ def external_collection_load_states():
             engine_set = dictionary[collection_id]
             engine_set.add(engine)
 
-def external_collection_init():
-    """Load db infos if it's not already done."""
-    if not external_collection_init.done:
-        external_collection_load_states()
-        external_collection_init.done = True
-external_collection_init.done = False
-
 def external_collection_get_state(external_collection, collection_id):
     external_collection_load_states()
     if not external_collections_state.has_key(collection_id):
@@ -317,7 +315,9 @@ def get_external_collection_engine(external_collection_name):
     else:
         return None
 
-external_collection_init()
+# Load db infos if it's not already done.
+if external_collections_state is None:
+    external_collection_load_states()
 
 # Hosted Collections related functions (the following functions should eventually be regrouped as above)
 # These functions could eventually be placed into there own file, ex. websearch_hosted_collections.py
