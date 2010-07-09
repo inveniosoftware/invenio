@@ -525,9 +525,13 @@ def get_xml_from_config(nodes, journal_name):
     for node_path in nodes:
         node = config_file
         for node_path_component in node_path.split('/'):
+            # pylint: disable-msg=E1103
+            # The node variable can be rewritten in the loop and therefore
+            # its type can change.
             if node != config_file and node.length > 0:
                 # We have a NodeList object: consider only first child
                 node = node.item(0)
+            # pylint: enable-msg=E1103
             try:
                 node = node.getElementsByTagName(node_path_component)
             except:
@@ -1539,7 +1543,7 @@ def clear_cache_for_article(journal_name, category, recid, issue):
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
 
-    cache_path = os.path.abspath('%s/webjournal/%s/%s_article_%s_%s_%s.html' % \
+    cache_path = os.path.abspath('%s/webjournal/%s/' %
                                   (CFG_CACHEDIR, journal_name))
     if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
         # Mmh, not accessing correct path. Stop deleting cache
