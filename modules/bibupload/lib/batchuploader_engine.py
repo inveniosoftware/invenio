@@ -169,6 +169,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
     from invenio.bibdocfile import BibRecDocs, file_strip_ext
     import shutil
     from invenio.search_engine import perform_request_search, \
+                                      search_pattern, \
                                       guess_collection_of_a_record
     _ = gettext_set_language(ln)
     errors = []
@@ -196,7 +197,7 @@ def document_upload(req=None, folder="", matching="", mode="", exec_date="", exe
             extension = docfile[len(identifier):]
             rec_id = None
             if identifier:
-                rec_id = perform_request_search(p1=identifier, f1=matching, m1='e')
+                rec_id = search_pattern(p=identifier, f=matching, m='e')
             if not rec_id:
                 errors.append((docfile, err_desc[2]))
                 continue

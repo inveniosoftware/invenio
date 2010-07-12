@@ -73,7 +73,7 @@ def check_time(time):
     """
     if not time or time == "hh:mm:ss":
         return 0
-    correct_format = re.match("[0-2][0-4]:[0-5]\d:[0-5]\d", time)
+    correct_format = re.match("[0-2]\d:[0-5]\d:[0-5]\d", time)
     if not correct_format:
         return 1
     return 0
