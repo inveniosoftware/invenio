@@ -287,7 +287,7 @@ def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
             except:
                 pass
         if action == 'delete':
-            body = perform_request_del_com_mod(ln=ln, comIDs=comIDs)
+            body = perform_request_del_com(ln=ln, comIDs=comIDs)
             title = _("Delete comments")
         elif action == 'unreport':
             body = suppress_abuse_report(ln=ln, comIDs=comIDs)
