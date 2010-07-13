@@ -1484,7 +1484,7 @@ class Template:
         if type(alldoctypes) not in (list, tuple):
             ## bad list of document types - reset
             alldoctypes = ()
-        body_content += """<form method="get" action="%(adminurl)s/%(action)s">""" \
+        body_content += """<form method="post" action="%(adminurl)s/%(action)s">""" \
                    % { 'adminurl' : WEBSUBMITADMINURL , 'action' : cgi.escape(perform_act, 1) }
         body_content += """
         <table width="90%%">
