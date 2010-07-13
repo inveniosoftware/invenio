@@ -121,7 +121,7 @@ etc..
 The main advantage of setting a maximum depth is to not enter into
 deep, meaningless indentations when users might not understand the
 concept of threads, and mix the "reply to" and "add comment"
-actions. When <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH</code> is reacched,
+actions. When <code>CFG_WEBCOMMENT_MAX_COMMENT_THREAD_DEPTH</code> is reached,
 the level of discussion becomes a "flat" discussion.
 </p>
 <p>
@@ -351,7 +351,7 @@ store a revision number in your metadata, or date, etc.
 <p>
 <em>How to restrict commenting rounds?</em>: you can combine rounds
 with the comment-level restrictions documented in
-section <a href="#2.6.3">Comment-level restrictions</a>, which uses a
+section <a href="#3.5.3">Comment-level restrictions</a>, which uses a
 similar mechanism to protect comments.
 </p>
 
@@ -392,7 +392,9 @@ the <code>viewrestrcomment</code> WebAccess action must be set up.
 The "status" parameter of the <code>viewrestrcomment</code> must match
 the value in the MARC metadata. This lets you define different
 restrictions based on the value in the metadata.
-</p>
+<br/>Unless the status is empty, the comment will be restricted, even if
+no role is specifically linked to the <code>viewrestrcomment</code>
+action for this status.</p>
 
 <p>Note that whatever the status of the record is, a reply to a
 comment always inherits the restriction of the parent.</p>
