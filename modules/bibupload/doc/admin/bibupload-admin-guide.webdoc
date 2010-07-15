@@ -335,9 +335,9 @@ correcting, please use the KEEP-OLD-VALUE special keyword with the
 desired $d and $z subfield.
 </p>
 
-<p>The $r subfield can contain a keyword that can be use to restrict
-the given document. The same keyword must be specified for all the
-format of a given document. The keyword will be used as the status
+<p>The $r subfield can contain a string that can be use to restrict
+the given document. The same value must be specified for all the
+format of a given document. By default the keyword will be used as the status
 parameter for the "viewrestrdoc" action, which can be used to give
 access right/restriction to desired user. e.g. if you set the keyword
 "thesis", you can the connect the "thesisviewer" to the action
@@ -346,6 +346,31 @@ user which are linked with the "thesisviewer" role will be able to
 download the document. Instead any other user will not be
 allowed. Note, if you use the keyword "KEEP-OLD-VALUE" the previous
 restrictions if applicable will be kept.
+</p>
+
+<p>More advanced document-level restriction is indeed possible. If the value
+contains infact:
+<ul>
+<li><tt><strong>email: </strong>john.doe@example.org</tt>: then only the user
+having <tt>john.doe@example.org</tt> as email address will be authorized to
+access the given document.</li>
+<li><tt><strong>group: </strong>example</tt>: then only users belonging to
+the local/external group <tt>example</tt> will be authorized to
+access the given document.</li>
+<li><tt><strong>role: </strong>example</tt>: then only the users
+belonging to the WebAccess role <tt>example</tt> will be authorized to
+access the given document.</li>
+<li><tt><strong>firerole: </strong>allow .../deny...</tt>: then only the users
+implicitly matched by the given
+<a href="/help/admin/webaccess-admin-guide#6">firewall like role definition</a>
+will be authorized to access the given document.</li>
+<li><tt><strong>status: </strong>example</tt>: then only the users
+belonging to roles having an authorization for the WebAccess action
+<tt>viewrestrdoc</tt> with parameter <tt>status</tt> set to <tt>example</tt>
+will be authorized (that is exactly like setting $r to <tt>example</tt>).</li>
+</ul>
+Note, that authors (as defined in the record MARC) and superadmin are always
+authorized to access a document, no matter what is the given value of the status.
 </p>
 
 <p>Note that each time bibupload is called on a record, the 8564 tags

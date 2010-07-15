@@ -423,6 +423,7 @@ update-v0.99.2-tables:
 	echo "INSERT INTO knwKBRVAL (id,m_key,m_value,id_knwKB) SELECT id,m_key,m_value,id_fmtKNOWLEDGEBASES FROM fmtKNOWLEDGEBASEMAPPINGS;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc CHANGE docname docname varchar(250) COLLATE utf8_bin NOT NULL default 'file';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibdoc CHANGE status status text NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE bibdoc ADD COLUMN text_extraction_date datetime NOT NULL default '0000-00-00';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE collection DROP COLUMN restricted;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec

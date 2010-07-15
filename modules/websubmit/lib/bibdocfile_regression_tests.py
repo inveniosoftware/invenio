@@ -23,7 +23,8 @@ __revision__ = "$Id$"
 
 import unittest
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.bibdocfile import BibRecDocs#, BibDoc, BibDocFile
+from invenio.bibdocfile import BibRecDocs, check_bibdoc_authorization
+from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import \
         CFG_SITE_URL, \
         CFG_PREFIX, \
@@ -235,9 +236,30 @@ class BibDocFilesTest(unittest.TestCase):
         my_new_bibdoc.delete()
         self.assertEqual(my_new_bibdoc.deleted_p(), True)
 
+class CheckBibDocAuthorization(unittest.TestCase):
+    """Regression tests for check_bibdoc_authorization function."""
+    def test_check_bibdoc_authorization(self):
+        """bibdocfile - check_bibdoc_authorization function"""
+        from invenio.webuser import collect_user_info, get_uid_from_email
+        jekyll = collect_user_info(get_uid_from_email('jekyll@cds.cern.ch'))
+        self.assertEqual(check_bibdoc_authorization(jekyll, 'role:thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
+        self.assertEqual(check_bibdoc_authorization(jekyll, 'role: thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
+        self.assertEqual(check_bibdoc_authorization(jekyll, 'role:  thesesviewer'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
+        self.assertNotEqual(check_bibdoc_authorization(jekyll, 'Role:  thesesviewer')[0], 0)
+        self.assertEqual(check_bibdoc_authorization(jekyll, 'email: jekyll@cds.cern.ch'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
+        self.assertEqual(check_bibdoc_authorization(jekyll, 'email: jekyll@cds.cern.ch'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
+
+        juliet = collect_user_info(get_uid_from_email('juliet.capulet@cds.cern.ch'))
+        self.assertEqual(check_bibdoc_authorization(juliet, 'restricted_picture'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
+        self.assertEqual(check_bibdoc_authorization(juliet, 'status: restricted_picture'), (0, CFG_WEBACCESS_WARNING_MSGS[0]))
+        self.assertNotEqual(check_bibdoc_authorization(juliet, 'restricted_video')[0], 0)
+        self.assertNotEqual(check_bibdoc_authorization(juliet, 'status: restricted_video')[0], 0)
+
+
 
 TEST_SUITE = make_test_suite(BibRecDocsTest, \
                              BibDocsTest, \
-                             BibDocFilesTest)
+                             BibDocFilesTest, \
+                             CheckBibDocAuthorization)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

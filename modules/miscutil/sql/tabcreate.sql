@@ -2760,7 +2760,7 @@ CREATE TABLE IF NOT EXISTS tag (
 
 CREATE TABLE IF NOT EXISTS bibdoc (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  status varchar(50) NOT NULL default '',
+  status text NOT NULL default '',
   docname varchar(250) COLLATE utf8_bin NOT NULL default 'file',
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',

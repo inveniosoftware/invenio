@@ -185,7 +185,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     if docname == doc.get_docname():
                         try:
                             docfile = doc.get_file(format, version)
-                            (auth_code, auth_message) = docfile.is_restricted(req)
+                            (auth_code, auth_message) = docfile.is_restricted(user_info)
                             if auth_code != 0:
                                 if CFG_WEBSUBMIT_ICON_SUBFORMAT_RE.match(get_subformat_from_format(format)):
                                     return stream_restricted_icon(req)

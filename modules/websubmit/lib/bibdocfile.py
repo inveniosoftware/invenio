@@ -94,6 +94,10 @@ from invenio.bibrecord import record_get_field_instances, \
 from invenio.urlutils import create_url
 from invenio.textutils import nice_size
 from invenio.access_control_engine import acc_authorize_action
+from invenio.webuser import collect_user_info
+from invenio.access_control_admin import acc_is_user_in_role, acc_get_role_id
+from invenio.access_control_firerole import compile_role_definition, acc_firerole_check_user
+from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR,\
     CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
@@ -2633,10 +2637,10 @@ class BibDocFile:
                  description = self.description or ''
                )
 
-    def is_restricted(self, req):
+    def is_restricted(self, user_info):
         """Returns restriction state. (see acc_authorize_action return values)"""
         if self.status not in ('', 'DELETED'):
-            return acc_authorize_action(req, 'viewrestrdoc', status=self.status)
+            return check_bibdoc_authorization(user_info, status=self.status)
         elif self.status == 'DELETED':
             return (1, 'File has ben deleted')
         else:
@@ -2751,6 +2755,71 @@ class BibDocFile:
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
             raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
+
+_RE_STATUS_PARSER = re.compile(r'^(?P<type>email|group|egroup|role|firerole|status):\s*(?P<value>.*)$', re.M)
+def check_bibdoc_authorization(user_info, status):
+    """
+    Check if the user is authorized to access a document protected with the given status.
+
+    L{status} is a string of the form::
+
+        auth_type: auth_value
+
+    where C{auth_type} can have values in::
+        email, group, role, firerole, status
+
+    and C{auth_value} has a value interpreted againsta C{auth_type}:
+    - C{email}: the user can access the document if his/her email matches C{auth_value}
+    - C{group}: the user can access the document if one of the groups (local or
+        external) of which he/she is member matches C{auth_value}
+    - C{role}: the user can access the document if he/she belongs to the WebAccess
+        role specified in C{auth_value}
+    - C{firerole}: the user can access the document if he/she is implicitly matched
+        by the role described by the firewall like role definition in C{auth_value}
+    - C{status}: the user can access the document if he/she is authorized to
+        for the action C{viewrestrdoc} with C{status} paramter having value
+        C{auth_value}
+
+    @note: If no C{auth_type} is specified or if C{auth_type} is not one of the
+        above, C{auth_value} will be set to the value contained in the
+        parameter C{status}, and C{auth_type} will be considered to be C{status}.
+
+    @param user_info: the user_info dictionary
+    @type: dict
+    @param status: the status of the document.
+    @type status: string
+    @return: a tuple, of the form C{(auth_code, auth_message)} where auth_code is 0
+        if the authorization is granted and greater than 0 otherwise.
+    @rtype: (int, string)
+    @raise ValueError: in case of unexpected parsing error.
+    """
+    def parse_status(status):
+        g = _RE_STATUS_PARSER.match(status)
+        if g:
+            return (g.group('type'), g.group('value'))
+        else:
+            return ('status', status)
+    if acc_is_user_in_role(user_info, acc_get_role_id(SUPERADMINROLE)):
+        return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+    auth_type, auth_value = parse_status(status)
+    if auth_type == 'status':
+        return acc_authorize_action(user_info, 'viewrestrdoc', status=auth_value)
+    elif auth_type == 'email':
+        if not auth_value.lower().strip() == user_info['email'].lower().strip():
+            return (1, 'You must be member of the group %s in order to access this document' % repr(auth_value))
+    elif auth_type == 'group':
+        if not auth_value in user_info['group']:
+            return (1, 'You must be member of the group %s in order to access this document' % repr(auth_value))
+    elif auth_type == 'role':
+        if not acc_is_user_in_role(user_info, acc_get_role_id(auth_value)):
+            return (1, 'You must be member in the role %s in order to access this document' % repr(auth_value))
+    elif auth_type == 'firerole':
+        if not acc_firerole_check_user(user_info, compile_role_definition(auth_value)):
+            return (1, 'You must be authorized in order to access this document')
+    else:
+        raise ValueError, 'Unexpected authorization type %s for %s' % (repr(auth_type), repr(auth_value))
+    return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+
 
 def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None):
     """This is a generic function to stream a file to the user.
