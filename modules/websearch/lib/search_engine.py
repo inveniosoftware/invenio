@@ -3356,20 +3356,27 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
 
                     if ln != CFG_SITE_LANG:
                         link_ln = '?ln=%s' % ln
+
+                    recid = recIDs[irec]
+                    recid_to_display = recid  # Record ID used to build the URL.
                     if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
-                        recid_to_display = get_fieldvalues(recIDs[irec], CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG)[0]
-                    else:
-                        recid_to_display = recIDs[irec]
+                        try:
+                            recid_to_display = get_fieldvalues(recid,
+                                    CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG)[0]
+                        except IndexError:
+                            # No external sysno is available, keep using
+                            # internal recid.
+                            pass
 
                     citedbynum = 0 #num of citations, to be shown in the cit tab
                     references = -1 #num of references
 
-                    citedbynum = get_cited_by_count(recid_to_display)
+                    citedbynum = get_cited_by_count(recid)
                     reftag = ""
                     reftags = get_field_tags("reference")
                     if reftags:
                         reftag = reftags[0]
-                    tmprec = get_record(recid_to_display)
+                    tmprec = get_record(recid)
                     if reftag and len(reftag) > 4:
                         references = len(record_get_field_instances(tmprec, reftag[0:3], reftag[3], reftag[4]))
 
@@ -3459,7 +3466,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                                                       tabs,
                                                                                       ln))
                     elif tab == 'keywords':
-                        from bibclassify_webinterface import \
+                        from invenio.bibclassify_webinterface import \
                             record_get_keywords, get_sorting_options, \
                             generate_keywords, get_keywords_body
                         from invenio.webinterface_handler import wash_urlargd
