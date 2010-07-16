@@ -1021,7 +1021,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             assert(curdir == os.path.abspath(curdir))
         except AssertionError:
             register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (args['indir'], args['doctype'], args['access']))
-            return warningMsg("Invalid parameters")
+            return warningMsg("Invalid parameters", req)
 
         subname = "%s%s" % (args['act'], args['doctype'])
 

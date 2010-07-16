@@ -28,7 +28,8 @@ import re
 import os
 import time
 import fnmatch
-import datetime
+import time
+from datetime import datetime
 from logging import getLogger, debug, DEBUG
 from optparse import OptionParser, OptionGroup, OptionValueError
 from tempfile import mkstemp
@@ -39,7 +40,7 @@ from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
     nice_size, check_valid_url, clean_url, get_docname_from_url, \
     guess_format_from_url, KEEP_OLD_VALUE, decompose_bibdocfile_fullpath, \
     bibdocfile_url_to_bibdoc, decompose_bibdocfile_url
-    
+
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
@@ -110,9 +111,12 @@ def _parse_datetime(var):
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]
         value = float(m.groups()[1])
-        return datetime.datetime.fromtimestamp(date + sign * factor * value)
+        return datetime.fromtimestamp(date + sign * factor * value)
     else:
-        return datetime.datetime.strptime(var, "%Y-%m-%d %H:%M:%S")
+        return datetime(*(time.strptime(var, "%Y-%m-%d %H:%M:%S")[0:6]))
+        # The code above is Python 2.4 compatible. The following is the 2.5
+        # version.
+        # return datetime.strptime(var, "%Y-%m-%d %H:%M:%S")
 
 def _parse_date_range(var):
     """Returns the two dates contained as a low,high tuple"""
@@ -763,7 +767,7 @@ def cli_fix_duplicate_docnames(options):
     """Fix duplicate docnames."""
     fixed = intbitset()
     tot = 0
-    for recid in cli_recids_iterator():
+    for recid in cli_recids_iterator(options):
         tot += 1
         bibrecdocs = BibRecDocs(recid)
         if not bibrecdocs.check_duplicate_docnames():

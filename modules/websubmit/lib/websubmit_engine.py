@@ -162,7 +162,7 @@ def interface(req,
     fieldhtml = []
     level = []
     fullDesc = []
-    text = []
+    text = ''
     check = []
     select = []
     radio = []

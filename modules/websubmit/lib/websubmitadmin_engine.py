@@ -2112,7 +2112,7 @@ def _delete_referee_doctype(errors, warnings, doctype, categid, refereeid):
     """
     user_msg = []
     role_name = """referee_%s_%s""" % (doctype, categid)
-    error_code = acc_delete_user_role(id_user=refereeid, name_roll=role_name)
+    error_code = acc_delete_user_role(id_user=refereeid, name_role=role_name)
     if error_code > 0:
         ## referee was deleted from category
         user_msg.append(""" "%s".""" % (doctype,))

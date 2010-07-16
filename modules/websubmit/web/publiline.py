@@ -358,7 +358,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
     confirm_send = 0
     if send == _("Send Again"):
         if authors == "unknown" or title == "unknown":
-            SendWarning(doctype,categ,RN,title,authors,access, ln = ln)
+            SendWarning(doctype, categ, RN, title, authors, access)
         else:
             # @todo - send in different languages
             SendEnglish(doctype,categ,RN,title,authors,access,sysno)
@@ -489,7 +489,10 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CF
         if not(__check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
             return t
 
+        # FIXME This error will be fixed with Sam's new version of publiline.
+        # pylint: disable-msg=E1101
         comments = basketdb.get_comments(id_bskBASKET, sysno)
+        # pylint: enable-msg=E1101
 
         if dProjectLeaderAction != None:
             user_can_add_comment = 0
