@@ -3485,6 +3485,7 @@ CREATE TABLE IF NOT EXISTS hstDOCUMENT (
 
 CREATE TABLE IF NOT EXISTS crcBORROWER (
   id int(15) unsigned NOT NULL auto_increment,
+  ccid int(15) unsigned NULL default NULL,
   name varchar(255) NOT NULL default '',
   email varchar(255) NOT NULL default '',
   phone varchar(60) default NULL,
@@ -3493,7 +3494,10 @@ CREATE TABLE IF NOT EXISTS crcBORROWER (
   borrower_since datetime NOT NULL default '0000-00-00 00:00:00',
   borrower_until datetime NOT NULL default '0000-00-00 00:00:00',
   notes text,
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id),
+  UNIQUE KEY (ccid),
+  KEY (name),
+  KEY (email)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcILLREQUEST (

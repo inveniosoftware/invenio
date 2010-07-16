@@ -820,7 +820,7 @@ def get_borrower_details(borrower_id):
     borrower_id: identify the borrower. It is also the primary key of
                  the table crcBORROWER.
     """
-    res =  run_sql("""select id, name, email, phone, address, mailbox
+    res =  run_sql("""select id, ccid, name, email, phone, address, mailbox
                       from crcBORROWER
                       where id=%s""", (borrower_id, ))
     if res:
@@ -862,11 +862,12 @@ def search_borrower_by_name(string):
     """
     string: search pattern.
     """
+    string = string.replace("'", "\\'")
 
     res = run_sql("""select id, name
                      from crcBORROWER
-                     where name regexp %s order by name
-                     """, (string, ))
+                     where upper(name) like upper('%%%s%%') order by name
+                     """ % (string))
 
     return res
 
@@ -905,6 +906,18 @@ def search_borrower_by_id(string):
     res = run_sql("""select id, name
                      from crcBORROWER
                      where id=%s
+                     """, (string, ))
+
+    return res
+
+def search_borrower_by_ccid(string):
+    """
+    string: search pattern.
+    """
+
+    res = run_sql("""select id, name
+                     from crcBORROWER
+                     where ccid=%s
                      """, (string, ))
 
     return res
@@ -1162,6 +1175,32 @@ def get_all_expired_loans():
 
     return res
 
+def get_overdue_loans():
+    """
+    Get overdue loans.
+    """
+    res = run_sql(
+    """
+    select bor.id,
+           bor.name,
+           bor.email,
+           it.id_bibrec,
+           l.barcode,
+           DATE_FORMAT(l.loaned_on,'%Y-%m-%d'),
+           DATE_FORMAT(l.due_date,'%Y-%m-%d'),
+           l.number_of_renewals,
+           l.overdue_letter_number,
+           DATE_FORMAT(l.overdue_letter_date,'%Y-%m-%d'),
+           l.notes,
+           l.id
+    from crcLOAN l, crcBORROWER bor, crcITEM it
+    where l.id_crcBORROWER = bor.id
+          and l.barcode = it.barcode
+          and (l.status = 'on loan' and l.due_date < CURDATE())
+    """)
+
+    return res
+
 
 def get_borrower_loans(borrower_id):
     """
@@ -1375,7 +1414,7 @@ def is_borrower(email):
     else:
         return 0
 
-def new_borrower(name, email, phone, address, mailbox, notes):
+def new_borrower(ccid, name, email, phone, address, mailbox, notes):
     """
     Add/Register a new borrower on the crcBORROWER table.
     name: borrower's name.
@@ -1384,7 +1423,8 @@ def new_borrower(name, email, phone, address, mailbox, notes):
     address: borrower's address.
     """
 
-    run_sql("""insert into crcBORROWER (name,
+    run_sql("""insert into crcBORROWER ( ccid,
+                                         name,
                                          email,
                                          phone,
                                          address,
@@ -1392,8 +1432,8 @@ def new_borrower(name, email, phone, address, mailbox, notes):
                                          borrower_since,
                                          borrower_until,
                                          notes)
-               values(%s, %s, %s, %s, %s, NOW(), '0000-00-00 00:00:00', %s)""",
-            (name, email, phone, address, mailbox, notes))
+               values(%s, %s, %s, %s, %s, %s, NOW(), '0000-00-00 00:00:00', %s)""",
+            (ccid, name, email, phone, address, mailbox, notes))
 
 def get_borrower_address(email):
     """
@@ -1775,7 +1815,7 @@ def get_borrower_data_by_name(name):
     Retrieve borrower's data by name.
     """
 
-    res = run_sql("""select id, name, email, phone,
+    res = run_sql("""select id, ccid, name, email, phone,
                             address, mailbox
                        from crcBORROWER
                       where name regexp %s order by name""",
@@ -1789,7 +1829,7 @@ def get_borrower_data_by_email(email):
     Retrieve borrower's data by email.
     """
 
-    res = run_sql("""select id, name, email, phone,
+    res = run_sql("""select id, ccid, name, email, phone,
                             address, mailbox
                        from crcBORROWER
                       where email regexp %s""",
@@ -1802,7 +1842,7 @@ def get_borrower_data_by_id(borrower_id):
     Retrieve borrower's data by borrower_id.
     """
 
-    res = run_sql("""select id, name, email, phone,
+    res = run_sql("""select id, ccid, name, email, phone,
                             address, mailbox
                        from crcBORROWER
                       where id regexp %s""",
@@ -2570,7 +2610,7 @@ def get_ill_requests_details(borrower_id):
                             DATE_FORMAT(due_date,'%%Y-%%m-%%d'),
                             status, library_notes
                        from crcILLREQUEST
-                      where id_crcBORROWER=%s and status!='document received, request closed' """, (borrower_id, ))
+                      where id_crcBORROWER=%s and status!='returned' """, (borrower_id, ))
 
     return res
 
@@ -2585,7 +2625,7 @@ def bor_ill_historical_overview(borrower_id):
                             DATE_FORMAT(due_date,'%%Y-%%m-%%d'),
                             status, library_notes
                        from crcILLREQUEST
-                      where id_crcBORROWER=%s and status='document received, request closed'"""
+                      where id_crcBORROWER=%s and status='returned'"""
                   , (borrower_id, ))
 
     return res
@@ -2804,6 +2844,3 @@ def get_loan_recid(loan_id):
         return res[0][0]
     else:
         return None
-
-def delete_ill_req():
-    run_sql(""" DELETE FROM crcILLREQUEST where 1=1""")

@@ -43,7 +43,7 @@ def get_expired_loan():
 
     res = run_sql("""select id_crcBORROWER, id, id_bibrec
                      from crcLOAN
-                     where status = 'on loan' and due_date < NOW()
+                     where (status = 'on loan' and due_date < NOW()) or (status='expired')
                      """)
     return res
 
@@ -107,7 +107,7 @@ def send_overdue_letter(borrower_id, subject, content):
                )
     return 1
 
-def send_second_recall(date_letters):
+def must_send_second_recall(date_letters):
     """
     @param date_letters: date of the last letter.
     @type date_letters: string
@@ -125,7 +125,7 @@ def send_second_recall(date_letters):
     else:
         return False
 
-def send_third_recall(date_letters):
+def must_send_third_recall(date_letters):
     """
     @param date_letters: date of the last letter.
     @type date_letters: string
@@ -156,11 +156,11 @@ def task_run_core():
 
         if number_of_letters == 0:
             content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL1'], loan_id)
-        elif number_of_letters == 1 and send_second_recall(date_letters):
+        elif number_of_letters == 1 and must_send_second_recall(date_letters):
             content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL2'], loan_id)
-        elif number_of_letters == 2 and send_third_recall(date_letters):
+        elif number_of_letters == 2 and must_send_third_recall(date_letters):
             content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
-        else:
+        elif must_send_third_recall(date_letters):
             content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
 
         title = ''.join(get_fieldvalues(recid, "245__a"))

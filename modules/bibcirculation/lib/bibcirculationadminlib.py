@@ -97,44 +97,6 @@ def index(req, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
-    """
-    Page (for administrator) where is it possible to search
-    for a borrower (who is on crcBORROWER table) using is name,
-    email, phone or id.
-    """
-
-    infos = []
-
-    if empty_barcode:
-        infos.append(empty_barcode)
-
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
-
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
-
-    body = bibcirculation_templates.tmpl_borrower_search(infos=infos, redirect=redirect, ln=ln)
-
-    if redirect == 'yes':
-        title="New Request"
-    else:
-        title="Borrower Search"
-
-    return page(title=title,
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
-
-
 def item_search_result(req, p, f, ln=CFG_SITE_LANG):
     """
     Search an item and return a list with all the possible results. To retrieve
@@ -182,6 +144,42 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
+def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
+    """
+    Page (for administrator) where is it possible to search
+    for a borrower (who is on crcBORROWER table) using his/her name,
+    email, phone or id.
+    """
+
+    infos = []
+
+    if empty_barcode:
+        infos.append(empty_barcode)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a> &gt; <a class="navtrail" ' \
+                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_borrower_search(infos=infos, redirect=redirect, ln=ln)
+
+    if redirect == 'yes':
+        title="New Request"
+    else:
+        title="Borrower Search"
+
+    return page(title=title,
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
 
 def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG):
     """
@@ -199,26 +197,56 @@ def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG)
 
     if string == '':
         empty_barcode = 'Empty string. Please, try again.'
-        return borrower_search(req, empty_barcode, ln)
+        return borrower_search(req, empty_barcode, redirect, ln)
 
     if CFG_CERN_SITE == 1:
-        if column == 'name':
+        if   column == 'name':
             result = db.search_borrower_by_name(string)
         elif column == 'email':
             result = db.search_borrower_by_email(string)
         else:
-            from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
-            ldap_info = get_user_info_from_ldap(ccid=string)
+            result = db.search_borrower_by_ccid(int(string))
 
-            try:
-                mail = ldap_info['mail'][0]
-            except KeyError:
-                mail = None
+            if result == ():
 
-            if mail:
-                result = db.search_borrower_by_email(mail)
-            else:
-                result = ()
+                from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+                ldap_info = get_user_info_from_ldap(ccid=string)
+
+                if len(ldap_info) == 0:
+                    result = ()
+                else:
+                    if ldap_info == 'busy':
+                        message = bibcirculation_templates.tmpl_message_sever_busy(ln)
+                        return borrower_search(req, message, redirect, ln)
+
+                    else:
+                        try:
+                            name = ldap_info['cn'][0]
+                        except KeyError:
+                            name = ""
+                        try:
+                            email = ldap_info['mail'][0]
+                        except KeyError:
+                            email = ""
+                        try:
+                            phone = ldap_info['telephoneNumber'][0]
+                        except KeyError:
+                            phone = ""
+                        try:
+                            address = ldap_info['physicalDeliveryOfficeName'][0]
+                        except KeyError:
+                            address = ""
+                        try:
+                            mailbox = ldap_info['postOfficeBox'][0]
+                        except KeyError:
+                            mailbox = ""
+                        try:
+                            ccid = ldap_info['employeeID'][0]
+                        except KeyError:
+                            ccid = ""
+
+                        db.new_borrower(ccid, name, email, phone, address, mailbox, '')
+                        result = db.search_borrower_by_ccid(int(ccid))
 
     else:
         if column == 'name':
@@ -546,7 +574,6 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
-
     list_infos = []
 
     if CFG_CERN_SITE == 1:
@@ -555,51 +582,55 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
             from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
             result = get_user_info_from_ldap(ccid=string)
 
-            try:
-                name = result['cn'][0]
-            except KeyError:
-                name = ""
+            if result == 'busy':
+                infos.append(bibcirculation_templates.tmpl_message_sever_busy(ln))
 
-            try:
-                ccid = result['employeeID'][0]
-            except KeyError:
-                ccid = ""
+            elif result:
+                try:
+                    name = result['cn'][0]
+                except KeyError:
+                    name = ""
 
-            try:
-                email = result['mail'][0]
-            except KeyError:
-                email = ""
+                try:
+                    email = result['mail'][0]
+                except KeyError:
+                    email = ""
 
-            try:
-                phone = result['telephoneNumber'][0]
-            except KeyError:
-                phone = ""
+                try:
+                    phone = result['telephoneNumber'][0]
+                except KeyError:
+                    phone = ""
 
-            try:
-                address = result['physicalDeliveryOfficeName'][0]
-            except KeyError:
-                address = ""
+                try:
+                    address = result['physicalDeliveryOfficeName'][0]
+                except KeyError:
+                    address = ""
 
-            try:
-                mailbox = result['postOfficeBox'][0]
-            except KeyError:
-                mailbox = ""
+                try:
+                    mailbox = result['postOfficeBox'][0]
+                except KeyError:
+                    mailbox = ""
 
-            tup = (ccid, name, email, phone, address, mailbox)
-            list_infos.append(tup)
+                try:
+                    ccid = result['employeeID'][0]
+                except KeyError:
+                    ccid = ""
+
+                tup = ('', ccid, name, email, phone, address, mailbox)
+                list_infos.append(tup)
 
         elif key =='name' and string:
             result = db.get_borrower_data_by_name(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
 
         elif key =='email' and string:
             result = db.get_borrower_data_by_email(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
         else:
             result = list_infos
@@ -614,8 +645,8 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
         else:
             result = db.get_borrower_data_by_id(string)
 
-        for (borrower_id, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, name, email, phone, address, mailbox)
+        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
     if len(result) == 0 and key:
@@ -781,7 +812,7 @@ def loan_on_desk_step4(req, list_of_books, user_info,
 
     infos = []
 
-    (_ccid, name, email, phone, address, mailbox) = user_info
+    (id, ccid, name, email, phone, address, mailbox) = user_info
 
     loaned_on = datetime.date.today()
     is_borrower = db.is_borrower(email)
@@ -847,7 +878,7 @@ def loan_on_desk_step4(req, list_of_books, user_info,
                         lastupdated=__lastupdated__)
 
     if is_borrower == 0:
-        db.new_borrower(name, email, phone, address, mailbox, '')
+        db.new_borrower(ccid, name, email, phone, address, mailbox, '')
         is_borrower = db.is_borrower(email)
 
     for i in range(len(list_of_books)):
@@ -1088,35 +1119,41 @@ def get_borrower_details(req, borrower_id, ln=CFG_SITE_LANG):
     """
 
     borrower = db.get_borrower_details(borrower_id)
-    requests = db.get_borrower_request_details(borrower_id)
-    loans = db.get_borrower_loan_details(borrower_id)
-    notes = db.get_borrower_notes(borrower_id)
-    ill = db.get_ill_requests_details(borrower_id)
+    if borrower == None:
+        info = 'Borrower not found, please try again.'
+        return borrower_search(req, info, 'no', ln)
 
-    req_hist = db.bor_requests_historical_overview(borrower_id)
-    loans_hist = db.bor_loans_historical_overview(borrower_id)
-    ill_hist = db.bor_ill_historical_overview(borrower_id)
+    else:
+        requests = db.get_borrower_request_details(borrower_id)
+        loans = db.get_borrower_loan_details(borrower_id)
+        notes = db.get_borrower_notes(borrower_id)
+        ill = db.get_ill_requests_details(borrower_id)
 
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a>' % (CFG_SITE_URL,)
+        req_hist = db.bor_requests_historical_overview(borrower_id)
+        loans_hist = db.bor_loans_historical_overview(borrower_id)
+        ill_hist = db.bor_ill_historical_overview(borrower_id)
 
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
+        navtrail_previous_links = '<a class="navtrail" ' \
+                                  'href="%s/help/admin">Admin Area' \
+                                  '</a>' % (CFG_SITE_URL,)
 
-    body = bibcirculation_templates.tmpl_borrower_details(borrower=borrower,
-                                                          requests=requests,
-                                                          loans=loans,
-                                                          notes=notes,
-                                                          ill=ill,
-                                                          req_hist=req_hist,
-                                                          loans_hist=loans_hist,
-                                                          ill_hist=ill_hist,
-                                                          ln=ln)
+        id_user = getUid(req)
+        (auth_code, auth_message) = is_adminuser(req)
+        if auth_code != 0:
+            return mustloginpage(req, auth_message)
 
-    return page(title="Borrower details",
+        body = bibcirculation_templates.tmpl_borrower_details(borrower=borrower,
+                                                              requests=requests,
+                                                              loans=loans,
+                                                              notes=notes,
+                                                              ill=ill,
+                                                              req_hist=req_hist,
+                                                              loans_hist=loans_hist,
+                                                              ill_hist=ill_hist,
+                                                              ln=ln)
+
+
+        return page(title="Borrower details",
                 uid=id_user,
                 req=req,
                 body=body,
@@ -1890,6 +1927,10 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
                           the table crcBORROWER.
 
    """
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     if delete_key and borrower_id:
         borrower_notes = eval(db.get_borrower_notes(borrower_id))
@@ -1912,11 +1953,6 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
                               '</a> &gt; <a class="navtrail" ' \
                               'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
-
-    id_user = getUid(req)
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0:
-        return mustloginpage(req, auth_message)
 
     body = bibcirculation_templates.tmpl_borrower_notes(borrower_notes=borrower_notes,
                                                         borrower_id=borrower_id,
@@ -2054,7 +2090,7 @@ def add_new_borrower_step3(req, tup_infos, ln=CFG_SITE_LANG):
     @param tup_infos:  tuple containing borrower information.
     """
 
-    db.new_borrower(tup_infos[0], tup_infos[1], tup_infos[2],
+    db.new_borrower('', tup_infos[0], tup_infos[1], tup_infos[2],
                     tup_infos[3], tup_infos[4], tup_infos[5])
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -3185,11 +3221,12 @@ def change_due_date_step1(req, loan_id, borrower_id, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
+                metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
 
-def change_due_date_step2(req, due_date, loan_id, borrower_id, ln=CFG_SITE_LANG):
+def change_due_date_step2(req, new_due_date, loan_id, borrower_id, ln=CFG_SITE_LANG):
     """
     Change the due date of a loan, step2.
 
@@ -3202,7 +3239,7 @@ def change_due_date_step2(req, due_date, loan_id, borrower_id, ln=CFG_SITE_LANG)
                  the table crcBORROWER.
     """
 
-    db.update_due_date(loan_id, due_date)
+    db.update_due_date(loan_id, new_due_date)
     due_date = db.get_loan_due_date(loan_id)
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -3214,7 +3251,7 @@ def change_due_date_step2(req, due_date, loan_id, borrower_id, ln=CFG_SITE_LANG)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_change_due_date_step2(due_date=due_date,
+    body = bibcirculation_templates.tmpl_change_due_date_step2(new_due_date=new_due_date,
                                                                borrower_id=borrower_id,
                                                                ln=ln)
     return page(title="Change due date",
@@ -3639,21 +3676,21 @@ def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
             except KeyError:
                 mailbox = ""
 
-            tup = (ccid, name, email, phone, address, mailbox)
+            tup = ('',ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
         elif key =='name' and string:
             result = db.get_borrower_data_by_name(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
 
         elif key =='email' and string:
             result = db.get_borrower_data_by_email(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
         else:
             result = list_infos
@@ -3668,8 +3705,8 @@ def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
         else:
             result = db.get_borrower_data_by_id(string)
 
-        for (borrower_id, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, name, email, phone, address, mailbox)
+        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
     if len(result) == 1:
@@ -3763,7 +3800,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
     @return:        new request.
     """
 
-    (_ccid, name, email, phone, address, mailbox) = user_info
+    (id, ccid, name, email, phone, address, mailbox) = user_info
 
     # validate the period of interest given by the admin
     if validate_date_format(period_from) is False:
@@ -3834,18 +3871,14 @@ def place_new_request_step3(req, barcode, recid, user_info,
 
     is_borrower = db.is_borrower(email)
 
-    if is_borrower != 0:
-        db.new_hold_request(is_borrower, recid, barcode,
-                            period_from, period_to, status)
-        db.update_item_status('requested', barcode)
-
-    else:
-        db.new_borrower(name, email, phone, address, mailbox, '')
+    if is_borrower == 0:
+        db.new_borrower(ccid, name, email, phone, address, mailbox, '')
         is_borrower = db.is_borrower(email)
 
-        db.new_hold_request(is_borrower, recid, barcode,
+
+    db.new_hold_request(is_borrower, recid, barcode,
                             period_from, period_to, status)
-        db.update_item_status('requested', barcode)
+    db.update_item_status('requested', barcode)
 
 
     body = bibcirculation_templates.tmpl_place_new_request_step3(ln=ln)
@@ -3952,21 +3985,21 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
             except KeyError:
                 mailbox = ""
 
-            tup = (ccid, name, email, phone, address, mailbox)
+            tup = ('', ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
         elif key =='name' and string:
             result = db.get_borrower_data_by_name(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
 
         elif key =='email' and string:
             result = db.get_borrower_data_by_email(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
         else:
             list_infos = []
@@ -3981,8 +4014,8 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
         else:
             result = db.get_borrower_data_by_id(string)
 
-        for (borrower_id, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, name, email, phone, address, mailbox)
+        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
     body = bibcirculation_templates.tmpl_place_new_loan_step1(result=list_infos,
@@ -4049,7 +4082,7 @@ def place_new_loan_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def place_new_loan_step3(req, barcode, recid, _ccid, name, email, phone,
+def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
                          address, mailbox, due_date, notes, ln=CFG_SITE_LANG):
     """
     Place a new loan from the item's page, step3.
@@ -4117,7 +4150,7 @@ def place_new_loan_step3(req, barcode, recid, _ccid, name, email, phone,
                                                                ln=ln)
 
     else:
-        db.new_borrower(name, email, phone, address, mailbox, '')
+        db.new_borrower(ccid, name, email, phone, address, mailbox, '')
         is_borrower = db.is_borrower(email)
 
         db.new_loan(is_borrower, recid, barcode,
@@ -4407,7 +4440,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
                 except KeyError:
                     mailbox = ""
 
-                tup = (ccid, name, email, phone, address, mailbox)
+                tup = ('',ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
 
         elif key =='email' and string:
@@ -4442,7 +4475,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
             except KeyError:
                 mailbox = ""
 
-            tup = (ccid, name, email, phone, address, mailbox)
+            tup = ('',ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
         elif key =='ccid' and string:
@@ -4478,7 +4511,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
             except KeyError:
                 mailbox = ""
 
-            tup = (ccid, name, email, phone, address, mailbox)
+            tup = ('',ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
         else:
@@ -4494,8 +4527,8 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
         else:
             result = db.get_borrower_data_by_id(string)
 
-        for (borrower_id, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, name, email, phone, address, mailbox)
+        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
 
@@ -5321,15 +5354,15 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
         elif key =='name' and string:
             result = db.get_borrower_data_by_name(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
 
         elif key =='email' and string:
             result = db.get_borrower_data_by_email(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
         else:
             result = list_infos
@@ -5344,8 +5377,8 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
         else:
             result = db.get_borrower_data_by_id(string)
 
-        for (borrower_id, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, name, email, phone, address, mailbox)
+        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
 
@@ -5461,7 +5494,7 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
 
     return list_ill_request(req, "new", ln)
 
-def get_borrower_ill_details(req, borrower_id, ill_id, ln=CFG_SITE_LANG):
+def get_borrower_ill_details(req, borrower_id, ln=CFG_SITE_LANG):
     """
     Display ILL details of a borrower.
 
@@ -5492,7 +5525,33 @@ def get_borrower_ill_details(req, borrower_id, ill_id, ln=CFG_SITE_LANG):
     title = "ILL details - %s" % (name)
     body = bibcirculation_templates.tmpl_borrower_ill_details(result=result,
                                                               borrower_id=borrower_id,
-                                                              ill_id=ill_id,
+                                                              ln=ln)
+
+    return page(title=title,
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def bor_ill_historical_overview(req, borrower_id, ln):
+
+    result = db.bor_ill_historical_overview(borrower_id)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    name = db.get_borrower_name(borrower_id)
+
+    title = "ILL historical overview - %s" % (name)
+    body = bibcirculation_templates.tmpl_borrower_ill_details(result=result,
+                                                              borrower_id=borrower_id,
                                                               ln=ln)
 
     return page(title=title,
@@ -5926,15 +5985,15 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         elif key =='name' and string:
             result = db.get_borrower_data_by_name(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
 
         elif key =='email' and string:
             result = db.get_borrower_data_by_email(string)
 
-            for (borrower_id, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, name, email, phone, address, mailbox)
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
                 list_infos.append(tup)
         else:
             result = list_infos
@@ -5949,8 +6008,8 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         else:
             result = db.get_borrower_data_by_id(string)
 
-        for (borrower_id, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, name, email, phone, address, mailbox)
+        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
 
@@ -6103,7 +6162,6 @@ def ill_search_result(req, p, f, date_from, date_to, ln):
         ill_req = db.search_ill_requests_id(p, date_from, date_to)
 
     body = bibcirculation_templates.tmpl_list_ill_request(ill_req=ill_req, ln=ln)
-
 
     return page(title="List of ILL requests",
                 req=req,

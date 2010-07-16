@@ -296,8 +296,13 @@ def perform_new_request_send(uid, recid,
             except KeyError:
                 mailbox = None
 
+            try:
+                ccid = result['employeeID'][0]
+            except KeyError:
+                ccid = ''
+
             if address is not None:
-                db.new_borrower(name, email, phone, address, mailbox, '')
+                db.new_borrower(ccid, name, email, phone, address, mailbox, '')
 
                 is_borrower = db.is_borrower(email)
 
@@ -403,8 +408,13 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
             except KeyError:
                 mailbox = None
 
+            try:
+                ccid = user_info['employeeID'][0]
+            except KeyError:
+                ccid = ''
+
             if address is not None:
-                db.new_borrower(name, email, phone, address, mailbox, '')
+                db.new_borrower(ccid, name, email, phone, address, mailbox, '')
             else:
                 message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
         else:
@@ -624,9 +634,14 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
             except KeyError:
                 mailbox = None
 
+            try:
+                ccid = user_info['employeeID'][0]
+            except KeyError:
+                ccid = ''
+
             # verify address
             if address is not None:
-                db.new_borrower(name, email, phone, address, mailbox, '')
+                db.new_borrower(ccid,name, email, phone, address, mailbox, '')
 
                 is_borrower = db.is_borrower(email)
 

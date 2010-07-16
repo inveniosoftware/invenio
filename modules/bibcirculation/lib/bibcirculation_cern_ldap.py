@@ -56,15 +56,14 @@ def get_user_info_from_ldap(nickname="", email="", ccid=""):
     else:
         return {}
     try:
-        result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE, query,  timeout=5)
+        result = connection.search_st(CFG_CERN_LDAP_BASE, ldap.SCOPE_SUBTREE, query, timeout=5)
         if result and nickname:
-            return result
+            return result[0][1]
         else:
             try:
                 return result[0][1]
             except IndexError:
                 return {}
-    except ldap.TIMEOUT:
-        pass
+    except:
+        return 'busy'
     return {}
-

@@ -33,6 +33,17 @@ if CFG_CERN_SITE == 1:
     'OVERDUE': 'Overdue letter template (write some text)',
     'REMINDER': 'Reminder letter template (write some text)',
     'NOTIFICATION': 'Notification letter template (write some text)',
+    'SEND_RECALL': 'Dear Colleague,\n\n'\
+                       'The loan for the document(s)\n\n'\
+                       'Item information:\n\n'\
+                       '\t title: %s \n'\
+                       '\t year: %s \n'\
+                       '\t author(s): %s \n'\
+                       '\t isbn: %s \n'\
+                       '\t publisher: %s \n\n'\
+                       'is overdue and another reader(s) is/are waiting for the document(s).'\
+                       'Please return them to the Library as soon as possible.'\
+                       '\n\nBest regards',
     'RECALL1': 'Dear Colleague,\n\n'\
                'The loan period has now expired for the following Library item which you'\
                ' borrowed. Please return it to the Library (either personally or by'\

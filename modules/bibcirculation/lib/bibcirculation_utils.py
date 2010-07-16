@@ -111,7 +111,7 @@ def get_book_cover(isbn):
         xml_img = minidom.parse(cover_xml)
         retrieve_book_cover = xml_img.getElementsByTagName('MediumImage')
         book_cover = retrieve_book_cover.item(0).firstChild.firstChild.data
-    except AttributeError:
+    except:
         book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
     return book_cover
@@ -126,20 +126,20 @@ def book_information_from_MARC(recid):
     @return tuple with title, year, author, isbn and editor.
     """
 
-    book_title = ' '.join(get_fieldvalues(recid, "245__a") + \
-                          get_fieldvalues(recid, "245__b") + \
-                          get_fieldvalues(recid, "245__n") + \
-                          get_fieldvalues(recid, "245__p"))
+    book_title  = ' '.join(get_fieldvalues(recid, "245__a") + \
+                           get_fieldvalues(recid, "245__b") + \
+                           get_fieldvalues(recid, "245__n") + \
+                           get_fieldvalues(recid, "245__p"))
 
-    book_year = ' '.join(get_fieldvalues(recid, "260__c"))
+    book_year   = ' '.join(get_fieldvalues(recid, "260__c"))
 
-    book_author = '  '.join(get_fieldvalues(recid, "100__a") + \
-                            get_fieldvalues(recid, "100__u"))
+    book_author = ' '.join(get_fieldvalues(recid, "100__a") + \
+                           get_fieldvalues(recid, "100__u"))
 
-    book_isbn = ' '.join(get_fieldvalues(recid, "020__a"))
+    book_isbn   = ' '.join(get_fieldvalues(recid, "020__a"))
 
-    book_editor = ' , '.join(get_fieldvalues(recid, "260__a") + \
-                             get_fieldvalues(recid, "260__b"))
+    book_editor = ', '.join(get_fieldvalues(recid,"260__a") + \
+                           get_fieldvalues(recid, "260__b"))
 
 
     return (book_title, book_year, book_author, book_isbn, book_editor)
