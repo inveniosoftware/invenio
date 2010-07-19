@@ -67,8 +67,9 @@ from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
      check_user_can_view_record, \
-     get_all_collections_of_a_record, \
-     get_fieldvalues
+     get_fieldvalues, \
+     get_collection_reclist, \
+     get_colID
 from invenio.webcomment_washer import EmailWasher
 try:
     import invenio.template
@@ -935,7 +936,9 @@ def unsubscribe_user_from_discussion(recID, uid):
 def get_user_subscription_to_discussion(recID, uid):
     """
     Returns the type of subscription for the given user to this
-    discussion.
+    discussion. This does not check authorizations (for eg. if user
+    was subscribed, but is suddenly no longer authorized).
+
     @param recID: record ID
     @param uid: user id
     @return:
@@ -977,8 +980,12 @@ def get_users_subscribed_to_discussion(recID, check_authorizations=True):
     res = run_sql(query, params)
     for row in res:
         uid = row[0]
-        user_info = collect_user_info(uid)
-        (auth_code, auth_msg) = check_user_can_view_comments(user_info, recID)
+        if check_authorizations:
+            user_info = collect_user_info(uid)
+            (auth_code, auth_msg) = check_user_can_view_comments(user_info, recID)
+        else:
+            # Don't check and grant access
+            auth_code = False
         if auth_code:
             # User is no longer authorized to view comments.
             # Delete subscription
@@ -989,12 +996,10 @@ def get_users_subscribed_to_discussion(recID, check_authorizations=True):
                 subscribers_emails[email] = True
 
     # Get users automatically subscribed, based on the record metadata
-    collections = get_all_collections_of_a_record(recID)
-    primary_collection = guess_primary_collection_of_a_record(recID)
-    if primary_collection not in collections:
-        collections.append(primary_collection)
-    for collection in collections:
-        if CFG_WEBCOMMENT_EMAIL_REPLIES_TO.has_key(collection):
+    collections_with_auto_replies = CFG_WEBCOMMENT_EMAIL_REPLIES_TO.keys()
+    for collection in collections_with_auto_replies:
+        if (get_colID(collection) is not None) and \
+               (recID in get_collection_reclist(collection)):
             fields = CFG_WEBCOMMENT_EMAIL_REPLIES_TO[collection]
             for field in fields:
                 emails = get_fieldvalues(recID, field)
@@ -1143,26 +1148,29 @@ def get_record_status(recid):
     @return tuple(restriction, round_name), where 'restriction' is empty string when no restriction applies
     @rtype (string, int)
     """
-    # Retrieve record collections
-    collections = get_all_collections_of_a_record(recid)
-    primary_collection = guess_primary_collection_of_a_record(recid)
-    if primary_collection not in collections:
-        collections.append(primary_collection)
-    # And find the first one (last one) that matches the configuration
-    collections_with_commenting_rounds = [coll for coll in collections if coll in CFG_WEBCOMMENT_ROUND_DATAFIELD.keys()]
-    collections_with_restriction = [coll for coll in collections if coll in CFG_WEBCOMMENT_RESTRICTION_DATAFIELD.keys()]
-
+    collections_with_rounds = CFG_WEBCOMMENT_ROUND_DATAFIELD.keys()
     commenting_round = ""
-    if collections_with_commenting_rounds:
-        commenting_rounds = get_fieldvalues(recid, CFG_WEBCOMMENT_ROUND_DATAFIELD.get(collections_with_commenting_rounds[-1], ""))
-        if commenting_rounds:
-            commenting_round = commenting_rounds[0]
+    for collection in collections_with_rounds:
+        # Find the first collection defines rounds field for this
+        # record
+        if get_colID(collection) is not None and \
+               (recid in get_collection_reclist(collection)):
+            commenting_rounds = get_fieldvalues(recid, CFG_WEBCOMMENT_ROUND_DATAFIELD.get(collection, ""))
+            if commenting_rounds:
+                commenting_round = commenting_rounds[0]
+            break
 
+    collections_with_restrictions = CFG_WEBCOMMENT_RESTRICTION_DATAFIELD.keys()
     restriction = ""
-    if collections_with_restriction:
-        restrictions = get_fieldvalues(recid, CFG_WEBCOMMENT_RESTRICTION_DATAFIELD.get(collections_with_restriction[-1], ""))
-        if restrictions:
-            restriction = restrictions[0]
+    for collection in collections_with_restrictions:
+        # Find the first collection that defines restriction field for
+        # this record
+        if get_colID(collection) is not None and \
+               recid in get_collection_reclist(collection):
+            restrictions = get_fieldvalues(recid, CFG_WEBCOMMENT_RESTRICTION_DATAFIELD.get(collection, ""))
+            if restrictions:
+                restriction = restrictions[0]
+            break
 
     return (restriction, commenting_round)
 
