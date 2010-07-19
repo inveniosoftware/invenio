@@ -1733,7 +1733,11 @@ def check_user_can_view_comment(user_info, comid, restriction=None):
     @return: the same type as acc_authorize_action
     """
     if restriction is None:
-        restriction = query_get_comment(comid)[11]
+        comment = query_get_comment(comid)
+        if comment:
+            restriction = comment[11]
+        else:
+            return (1, 'Comment %i does not exist' % comid)
     if restriction == "":
         return  (0, '')
     return acc_authorize_action(user_info, 'viewrestrcomment', status=restriction)

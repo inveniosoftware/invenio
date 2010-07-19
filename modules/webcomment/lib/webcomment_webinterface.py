@@ -37,7 +37,8 @@ from invenio.webcomment import check_recID_is_in_range, \
                                check_user_can_attach_file_to_comments, \
                                check_user_can_view_comments, \
                                check_user_can_send_comments, \
-                               check_user_can_view_comment
+                               check_user_can_view_comment, \
+                               query_get_comment
 from invenio.config import \
      CFG_PREFIX, \
      CFG_TMPDIR, \
@@ -707,11 +708,11 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         """
         argd = wash_urlargd(form, {'file': (str, None),
                                    'comid': (int, 0)})
+        _ = gettext_set_language(argd['ln'])
 
         # Can user view this record, i.e. can user access its
         # attachments?
         uid = getUid(req)
-
         user_info = collect_user_info(req)
         # Check that user can view record, and its comments (protected
         # with action "viewcomment")
@@ -726,6 +727,13 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = auth_msg)
 
+        # Does comment exist?
+        if not query_get_comment(argd['comid']):
+            req.status = apache.HTTP_NOT_FOUND
+            return page(title=_("Page Not Found"),
+                        body=_('The requested comment could not be found'),
+                        req=req)
+
         # Check that user can view this particular comment, protected
         # using its own restriction
         (auth_code, auth_msg) = check_user_can_view_comment(user_info, argd['comid'])
@@ -737,7 +745,8 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
-                                       text = auth_msg)
+                                       text = auth_msg,
+                                       ln=argd['ln'])
 
         if not argd['file'] is None:
             # Prepare path to file on disk. Normalize the path so that
@@ -754,7 +763,11 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
                 return stream_file(req, path)
 
         # Send error 404 in all other cases
-        return apache.HTTP_NOT_FOUND
+        req.status = apache.HTTP_NOT_FOUND
+        return page(title=_("Page Not Found"),
+                    body=_('The requested file could not be found'),
+                    req=req,
+                    language=argd['ln'])
 
 ##     def put(self, req, form):
 ##         """
