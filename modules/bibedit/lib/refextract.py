@@ -5137,7 +5137,7 @@ def get_cli_options():
                 cli_opts['verbosity'] = 0
             else:
                 cli_opts['verbosity'] = int(o[1])
-        elif o[0] in ("-z", "--raw-citations"):
+        elif o[0] in ("-z", "--raw-references"):
             ## treat input as pure reference lines:
             cli_opts['treat_as_reference_section'] = 1
         elif o[0] in ("-x", "--xmlfile"):
