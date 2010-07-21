@@ -217,7 +217,7 @@ class InvenioConnector:
         else:
             params = urllib.urlencode({'file': marcxml,
                                         'mode': mode})
-            return urllib2.urlopen(self.server_url + "/webupload.py", params)
+            return urllib2.urlopen(self.server_url + "/batchuploader/robotupload", params)
 
     def _parse_results(self, results, cached_records):
         """
