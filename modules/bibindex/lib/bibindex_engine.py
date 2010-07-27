@@ -705,14 +705,17 @@ def update_index_last_updated(index_id, starting_time=None):
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map, wash_index_terms=True, is_fulltext_index=False):
+    def __init__(self, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map, wash_index_terms=50, is_fulltext_index=False):
         """Creates words table instance.
         @param index_id: the index integer identificator
         @param fields_to_index: a list of fields to index
         @param table_name_pattern: i.e. idxWORD%02dF or idxPHRASE%02dF
         @parm default_get_words_fnc: the default function called to extract words from a metadata
         @param tag_to_words_fnc_map: a mapping to specify particular function to
-        extract words from particular metdata (such as 8564_u)
+            extract words from particular metdata (such as 8564_u)
+        @param wash_index_terms: do we wash index terms, and if yes (when >0),
+            how many characters do we keep in the index terms; see
+            max_char_length parameter of wash_index_term()
         """
         self.index_id = index_id
         self.tablename = table_name_pattern % index_id
@@ -1087,7 +1090,7 @@ class WordTable:
         """Adds/deletes a word to the word list."""
         try:
             if self.wash_index_terms:
-                word = wash_index_term(word)
+                word = wash_index_term(word, self.wash_index_terms)
             if self.value.has_key(word):
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign
@@ -1427,14 +1430,23 @@ def task_run_core():
                 fnc_get_words_from_phrase = get_words_from_date_tag
             else:
                 fnc_get_words_from_phrase = get_words_from_phrase
-            wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF',
-                                  fnc_get_words_from_phrase,
-                                  {'8564_u': get_words_from_fulltext})
+
+            wordTable = WordTable(index_id=index_id,
+                                  fields_to_index=index_tags,
+                                  table_name_pattern='idxWORD%02dF',
+                                  default_get_words_fnc=fnc_get_words_from_phrase,
+                                  tag_to_words_fnc_map={'8564_u': get_words_from_fulltext},
+                                  wash_index_terms=50)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-            wordTable = WordTable(index_id, index_tags, 'idxPAIR%02dF', get_pairs_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+            wordTable = WordTable(index_id=index_id,
+                                  fields_to_index=index_tags,
+                                  table_name_pattern='idxPAIR%02dF',
+                                  default_get_words_fnc=get_pairs_from_phrase,
+                                  tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                                  wash_index_terms=100)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
@@ -1445,9 +1457,12 @@ def task_run_core():
                 fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
             else:
                 fnc_get_phrases_from_phrase = get_phrases_from_phrase
-            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF',
-                                  fnc_get_phrases_from_phrase,
-                                  {'8564_u': get_nothing_from_phrase}, False)
+            wordTable = WordTable(index_id=index_id,
+                                  fields_to_index=index_tags,
+                                  table_name_pattern='idxPHRASE%02dF',
+                                  default_get_words_fnc=fnc_get_phrases_from_phrase,
+                                  tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                                  wash_index_terms=0)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
@@ -1466,8 +1481,13 @@ def task_run_core():
             fnc_get_words_from_phrase = get_words_from_date_tag
         else:
             fnc_get_words_from_phrase = get_words_from_phrase
-        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxWORD%02dF',
-                              fnc_get_words_from_phrase, {'8564_u': get_words_from_fulltext}, is_fulltext_index=is_fulltext_index)
+        wordTable = WordTable(index_id=index_id,
+                              fields_to_index=index_tags,
+                              table_name_pattern=reindex_prefix + 'idxWORD%02dF',
+                              default_get_words_fnc=fnc_get_words_from_phrase,
+                              tag_to_words_fnc_map={'8564_u': get_words_from_fulltext},
+                              is_fulltext_index=is_fulltext_index,
+                              wash_index_terms=50)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
@@ -1525,7 +1545,12 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
 
         # Let's work on pairs now
-        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxPAIR%02dF', get_pairs_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+        wordTable = WordTable(index_id=index_id,
+                              fields_to_index=index_tags,
+                              table_name_pattern=reindex_prefix + 'idxPAIR%02dF',
+                              default_get_words_fnc=get_pairs_from_phrase,
+                              tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                              wash_index_terms=100)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
@@ -1588,9 +1613,12 @@ def task_run_core():
             fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
         else:
             fnc_get_phrases_from_phrase = get_phrases_from_phrase
-        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxPHRASE%02dF',
-                              fnc_get_phrases_from_phrase,
-                              {'8564_u': get_nothing_from_phrase}, False)
+        wordTable = WordTable(index_id=index_id,
+                              fields_to_index=index_tags,
+                              table_name_pattern=reindex_prefix + 'idxPHRASE%02dF',
+                              default_get_words_fnc=fnc_get_phrases_from_phrase,
+                              tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
+                              wash_index_terms=0)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
