@@ -99,11 +99,12 @@ def usage():
                            output will be replaced by the 001 value of the matched record.
                            Useful to prepare files to then be used with BibUpload.
 
- Predefined fields:
+ Common predefined fields used in querystrings: (for Invenio demo site, your fields may vary!)
 
- The following predefined field names can be used:
-  "title"
-  "author"
+ 'abstract', 'affiliation', 'anyfield', 'author', 'coden', 'collaboration',
+ 'collection', 'datecreated', 'datemodified', 'division', 'exactauthor',
+ 'experiment', 'fulltext', 'isbn', 'issn', 'journal', 'keyword', 'recid',
+ 'reference', 'reportnumber', 'subject', 'title', 'year'
 
  Examples:
 
@@ -144,7 +145,6 @@ class Querystring:
         self.format.append([])
         self.format.append([])
         self.format.append([])
-        self.advanced = 0
         return
 
     def from_qrystr(self, qrystr="", search_mode="eee", operator="aa"):
@@ -204,7 +204,6 @@ class Querystring:
         self.format.append([])
         self.format.append([])
         self.format.append([])
-        self.advanced = 1
         return
 
     def change_search_mode(self, mode="a"):
@@ -367,6 +366,11 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", \
 
             ### get appropriate fields from database
             for field in querystring.field:
+                tags = get_field_tags(field)
+                if len(tags) > 0:
+                    # Fetch value from input record of first tag only
+                    # FIXME: Extracting more then first tag, evaluating each
+                    field = tags[0]
                 ### use expanded tags
                 tag  = field[0:3]
                 ind1 = field[3:4]
@@ -416,7 +420,6 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", \
                 p3 = inst[2]
                 f3 = querystring.field[2]
                 m3 = querystring.mode[2]
-                aas = querystring.advanced
 
                 #1st run the basic perform_req_search
                 recID_list = server.search(
@@ -570,8 +573,7 @@ def main():
     batch_output = ""               #print stuff in files
     f_input = ""                    #read from where, if param "i"
     server_url = CFG_SITE_URL       #url to server performing search, local by default
-    modify = 0                      #alter output with matched record indentifiers
-    predefined_fields = ["title", "author"]
+    modify = 0                      #alter output with matched record identifiers
     textmarc_output = 0
 
     for opt, opt_value in opts:
@@ -612,9 +614,8 @@ def main():
         if opt in ["-a", "--alter-recid"]:
             modify = 1
         if opt in ["-f", "--field"]:
-            alternate_querystring = []
-            if opt_value in predefined_fields:
-                alternate_querystring = get_field_tags(opt_value)
+            alternate_querystring = get_field_tags(opt_value)
+            if len(alternate_querystring) > 0:
                 for item in alternate_querystring:
                     qrystrs.append(item)
             else:

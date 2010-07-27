@@ -791,6 +791,13 @@ class BibMatchTest(unittest.TestCase):
         [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, modify=1)
         self.assertTrue(record_has_field(matchedrecs[0][0], '001'))
 
+    def test_check_qrystr(self):
+        """bibmatch - check querystrings"""
+        qrystrs = ["author||reportnumber"]
+        records = create_records(self.recxml1)
+        [dummy1, matchedrecs, dummy3, dummy4] = match_records(records, qrystrs=qrystrs)
+        self.assertEqual(1,len(matchedrecs))
+
 TEST_SUITE = make_test_suite(BibMatchTest)
 
 if __name__ == "__main__":
