@@ -200,6 +200,8 @@ class Template:
             choosed['cols'] = [[("","","")]]
         num_ids = len(choosed['ids'])
 
+        operators = [('and', 'AND'), ('or', 'OR'), ('and_not', 'AND NOT')]
+
         # Crate the ids of the tables
         table_id = ["time_format"]
         table_id.extend([ 'cols' + str(i) for i in range(num_ids)])
@@ -235,7 +237,7 @@ class Template:
             for bool,col,value in choosed['cols'][i]:
                 select_row.append("")
                 if not is_first_loop:
-                    select_row.append("""<select name="bool%d"> <option value="and">AND</option> <option value="or">OR</option> <option value="and_not">AND NOT</option> </select>""" % i)
+                    select_row.append(self._tmpl_select_box(operators, "", "bool%d"%i, bool))
                 if id:
                     select_row.append(self._tmpl_select_box(options['cols'][id],
                                                     " - select " + options['cols']['__header'],
@@ -544,7 +546,7 @@ class Template:
 
         if multiple is True:
             sel = sel.replace("<select ", """<select multiple="multiple" size="5" """)
-        else:
+        elif explaination:
             sel += """<option value="">%s</option>""" % explaination
 
         for realname, printname in [(x[0], x[1]) for x in iterable]:
