@@ -37,4 +37,4 @@ FCKConfig.EnterMode = 'p';
    we need to add 'p' here
 */
 FCKConfig.RemoveFormatTags = 'b,big,code,del,dfn,em,font,i,ins,kbd,q,samp,small,span,strike,strong,sub,sup,tt,u,var,p' ;
-
+FCKConfig.TemplateReplaceAll = false ;
