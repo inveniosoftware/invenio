@@ -117,14 +117,15 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     but will not be able to set an initial value: this must be done by
     the Response element iteself.
 
-    The function creates a file named 'Create_Modify_Interface_DONE'
-    in the submission directory after it has been executed for the
-    first time. This flag is an indicator for the function that
-    displayed values should not be retrieved from the database, but
-    from the submitted values (in case the page is reloaded). You can
-    also rely on this value when building your WebSubmit Response
-    element in order to retrieve value either from the record, or from
-    the submission directory.
+    Additionally the function creates an internal field named
+    'Create_Modify_Interface_DONE' on the interface, that can be
+    retrieved in curdir after the form has been submitted.
+    This flag is an indicator for the function that displayed values
+    should not be retrieved from the database, but from the submitted
+    values (in case the page is reloaded). You can also rely on this
+    value when building your WebSubmit Response element in order to
+    retrieve value either from the record, or from the submission
+    directory.
     """
     global sysno,rn
     t = ""
@@ -258,19 +259,12 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
             else:
                 text = "%s: unknown field type" % field
             t = t + "<small>%s</small>" % text
+
+    # output our flag field
+    t += '<input type="hidden" name="Create_Modify_Interface_DONE" value="DONE\n" />'
+
     # output some more text
     t = t + "<br /><br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;user_must_confirm_before_leaving_page = false;document.forms[0].submit();\"></small></CENTER></H4>"
-    # Flag File to be written if first call to page, which tells function that if page is reloaded,
-    # it should get field values from text files in curdir, instead of from DB record:
-    if not os.path.exists("%s/%s" % (curdir, "Create_Modify_Interface_DONE")):
-        # Write flag file:
-        try:
-            fp = open("%s/%s" % (curdir, "Create_Modify_Interface_DONE"), "w")
-            fp.write("DONE\n")
-            fp.flush()
-            fp.close()
-        except IOError, e:
-            # Can't open flag file for writing
-            pass
+
     return t
 
