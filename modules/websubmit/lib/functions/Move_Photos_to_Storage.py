@@ -46,6 +46,7 @@ __revision__ = "$Id: Move_Photos_to_Storage.py,v 1.7 2009/11/26 14:29:05 jerome 
 
 import os
 import time
+import re
 from urllib import quote
 from cgi import escape
 
@@ -149,7 +150,7 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                                   })
                             fileiconpath = os.path.join(icon_path, icon_name)
                         except InvenioWebSubmitIconCreatorError, e:
-                            _do_log(curdir, "Icon could not be created to %s:" % (filepath, e))
+                            _do_log(curdir, "Icon could not be created to %s: %s" % (filepath, e))
                             pass
                         if os.path.exists(fileiconpath):
                             try:
@@ -174,6 +175,7 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
             # Existing file
             bibdocname = bibrecdocs.get_docname(int(photo_id))
             if photo_id in photo_manager_delete_list:
+                # In principle we should not get here. but just in case...
                 bibrecdocs.delete_bibdoc(bibdocname)
                 _do_log(curdir, "Deleted  %s" % bibdocname)
             else:
@@ -182,6 +184,16 @@ def Move_Photos_to_Storage(parameters, curdir, form, user_info=None):
                                for bibdocfile in bibdoc.list_latest_files()]:
                     bibdoc.set_comment(photo_description, file_format)
                     _do_log(curdir, "Added comment %s" % photo_description)
+
+    # Now delete requeted files
+    for photo_id in photo_manager_delete_list:
+        try:
+            bibdocname = bibrecdocs.get_docname(int(photo_id))
+            bibrecdocs.delete_bibdoc(bibdocname)
+            _do_log(curdir, "Deleted  %s" % bibdocname)
+        except:
+            # we tried to delete a photo that does not exist (maybe already deleted)
+            pass
 
     # Update the MARC
     _do_log(curdir, "Asking bibdocfile to fix marc")
@@ -206,7 +218,8 @@ def read_param_file(curdir, param, split_lines=False):
             else:
                 param_value = fd.read()
             fd.close()
-    except:
+    except Exception, e:
+        _do_log(curdir, 'Could not read %s: %s' % (param, e))
         pass
     return param_value
 
@@ -285,6 +298,10 @@ def create_photos_manager_interface(sysno, session_id, uid,
     photo_manager_new_dict = dict([value.split('/', 1) for value in PHOTO_MANAGER_NEW if '/' in value])
     photo_manager_descriptions_dict = {}
 
+    # Compile a regular expression that can match the "default" icon,
+    # and not larger version.
+    CFG_WEBSUBMIT_ICON_SUBFORMAT_RE_DEFAULT = re.compile(CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT + '\Z')
+
     # Load the existing photos from the DB if we are displaying
     # this interface for the first time, and if a record exists
     if sysno and not PHOTO_MANAGER_ORDER:
@@ -293,7 +310,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
             if doc.get_icon() is not None:
                 original_url = doc.list_latest_files()[0].get_url()
                 doc_id = str(doc.get_id())
-                icon_url = doc.get_icon().list_latest_files()[0].get_url()
+                icon_url = doc.get_icon(subformat_re=CFG_WEBSUBMIT_ICON_SUBFORMAT_RE_DEFAULT).get_url() # Get "default" icon
                 description = ""
                 for bibdoc_file in doc.list_latest_files():
                     #format = bibdoc_file.get_format().lstrip('.').upper()
