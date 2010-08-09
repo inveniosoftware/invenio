@@ -238,9 +238,9 @@ class Template:
                    </tr>
                    </thead>
                    <tbody>
-                   """ % (_("Barcode"), _("Library"), _("Collection"),
+                   """ % (_("Options"), _("Library"), _("Collection"),
                           _("Location"), _("Description"), _("Loan period"),
-                          _("Status"), _("Due date"), _("Option(s)"))
+                          _("Status"), _("Due date"), _("Barcode"))
 
         for (barcode, library, collection, location, description,
              loan_period, status, due_date) in holdings_info:
@@ -268,9 +268,9 @@ class Template:
                           <td align='center'>%s</td>
                      </tr>
 
-                """ % (barcode, library, collection or '-', location,
+                """ % (request_button, library, collection or '-', location,
                        description or '-', loan_period, status,
-                       due_date or '-', request_button)
+                       due_date or '-', barcode)
 
         from invenio.bibcirculationadminlib import is_adminuser
         (auth_code, _auth_message) = is_adminuser(req)
@@ -363,7 +363,7 @@ class Template:
             <br />
             <div class="infoboxmsg">%s</div>
             <br />
-          """ % (_("0 borrowers found."))
+          """ % (_("0 borrowers found. Search by CCID."))
 
         else:
             out += """
@@ -1520,7 +1520,7 @@ class Template:
              <div class="infoboxsuccess">%s</div>
              <br />
              <table class="bibcirctable">
-        """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
+               """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
 
         (_book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
@@ -2858,7 +2858,7 @@ class Template:
                            _("No of loans"),
                            _("Collection"),
                            _("Description"),
-                           _("Action(s)"))
+                           _("Actions"))
 
 
         for (barcode, loan_period, library_name, library_id,
@@ -2893,6 +2893,7 @@ class Template:
                       <OPTION VALUE="update_item_info_step4?barcode=%s">Update
                       <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                       <OPTION VALUE="" DISABLED>New loan
+                      <OPTION VALUE="" DISABLED>Delete copy
                     </SELECT>
                   </td>
                  </tr>
@@ -2906,10 +2907,11 @@ class Template:
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
                          <OPTION VALUE="" DISABLED>New request
                          <OPTION VALUE="" DISABLED>New loan
+                         <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
                        </SELECT>
                      </td>
                  </tr>
-                 """ % (barcode)
+                 """ % (barcode, barcode)
 
             elif status == 'Not for loan':
                 out += """
@@ -2919,10 +2921,11 @@ class Template:
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
                          <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                          <OPTION VALUE="place_new_loan_step1?barcode=%s">New loan
+                         <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
                        </SELECT>
                      </td>
                  </tr>
-                 """ % (barcode, barcode, barcode)
+                 """ % (barcode, barcode, barcode, barcode)
 
             else:
                 out += """
@@ -2932,10 +2935,11 @@ class Template:
                          <OPTION VALUE="update_item_info_step4?barcode=%s">Update
                          <OPTION VALUE="place_new_request_step1?barcode=%s">New request
                          <OPTION VALUE="place_new_loan_step1?barcode=%s">New loan
+                         <OPTION VALUE="delete_copy_step1?barcode=%s">Delete copy
                        </SELECT>
                      </td>
                  </tr>
-                 """ % (barcode, barcode, barcode)
+                 """ % (barcode, barcode, barcode, barcode)
 
 
         out += """
@@ -2950,9 +2954,9 @@ class Template:
                      <input type=button onClick="location.href='%s/admin2/bibcirculation/order_new_copy_step1?recid=%s'"
                      value='%s' class="formbutton">
 
-                     <input type=button onClick="location.href='%s/admin2/bibcirculation/register_ill_request_step0?recid=%s'"
+                <!--<input type=button onClick="location.href='%s/admin2/bibcirculation/register_ill_request_step0?recid=%s'"
                      value='%s'class="formbutton">
-                     </td>
+                     </td>  -->
                 </tr>
             </table>
             <br />
@@ -4447,15 +4451,12 @@ class Template:
               _("CERN Library"),
               _("To"))
 
-
         out += """
         <td>
         <input type="text" name="borrower_email" size="60" style='border: 1px solid #cfcfcf' value="%s">
         </td>
         </tr>
         """ % (email)
-
-
 
         out += """
              <tr>
@@ -6376,7 +6377,7 @@ class Template:
 
     def tmpl_new_book_step2(self, ln=CFG_SITE_LANG):
         ### FIXME ###
-        return "Y aquí se hace algo..."
+        return "Coming soon..."
 
     def tmpl_add_new_copy_step1(self):
         """
@@ -6486,7 +6487,7 @@ class Template:
         </tr>
         </table>
         <br />
-       <br />
+        <br />
         <br />
         </div>
         """
@@ -14554,11 +14555,11 @@ class Template:
                         </tr>
                         <tr>
                           <th width="100">%s</th>
-                          <td>%s</td><input type=hidden name=publisher value="%s">
+                          <td>%s</td><input type=hidden name=year value="%s">
                         </tr>
                         <tr>
                           <th width="100">%s</th>
-                          <td>%s</td><input type=hidden name=year value="%s">
+                          <td>%s</td><input type=hidden name=publisher value="%s">
                         </tr>
                         <tr>
                           <th width="100">%s</th>
@@ -14715,7 +14716,7 @@ class Template:
 
             """ % (CFG_SITE_URL, book_info)
 
-            for (id,ccid, name, email, phone, address, mailbox) in result:
+            for (id, ccid, name, email, phone, address, mailbox) in result:
                 out += """
                        <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
 
@@ -14766,7 +14767,7 @@ class Template:
 
         (title, authors, place, publisher, year, edition, isbn) = book_info
 
-        (_borrower_id, ccid, name, email, phone, address, mailbox) = user_info
+        (borrower_id, ccid, name, email, phone, address, mailbox) = user_info
 
         display_id = borrower_id
         id_string= _("ID")
@@ -15113,10 +15114,12 @@ class Template:
             <th>%s</th>
             <th>%s</th>
             <th>%s</th>
+            <th>%s</th>
           </tr>
         </thead>
         <tbody>
-         """% (_("Item"),
+         """% (_("ILL ID"),
+               _("Item"),
                _("Supplier"),
                _("Request date"),
                _("Expected date"),
@@ -15149,6 +15152,14 @@ class Template:
             except KeyError:
                 title_link = book_info['title']
 
+            try:
+                ill_id_link = create_html_link(CFG_SITE_URL +
+                                          '/admin2/bibcirculation/ill_request_details_step1',
+                                          {'ill_request_id': str(ill_id), 'ln': ln},
+                                          str(ill_id))
+            except KeyError:
+                title_link = book_info['title']
+
             # links to notes pages
             lib_no_notes_link = create_html_link(CFG_SITE_URL +
                                                  '/admin2/bibcirculation/get_ill_library_notes',
@@ -15177,9 +15188,10 @@ class Template:
               <td>%s</td>
               <td>%s</td>
               <td>%s</td>
+              <td>%s</td>
             </tr>
 
-            """ % (title_link, library_link, request_date,
+            """ % (ill_id_link, title_link, library_link, request_date,
                    expected_date, arrival_date, due_date, status,
                    notes_link)
 
@@ -16674,5 +16686,207 @@ class Template:
         <form>
 
         """ % (_("Back"), _("Search"))
+
+        return out
+
+
+    def tmpl_delete_copy_step1(self, barcode_to_delete, recid, result, infos, ln=CFG_SITE_LANG):
+        """
+        @param ln: language of the page
+        """
+
+        _ = gettext_set_language(ln)
+
+        #out = self.tmpl_infobox(infos, ln)
+
+        out = _MENU_
+
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+
+        if book_isbn:
+            book_cover = get_book_cover(book_isbn)
+        else:
+            book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
+
+
+        out += """
+           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+           <script src="/js/jquery.js" type="text/javascript"></script>
+            <script src="/js/jquery.tablesorter.js" type="text/javascript"></script>
+            <script type="text/javascript">
+            $(document).ready(function() {
+              $('#table_copies').tablesorter({widthFixed: true, widgets: ['zebra']})
+            });
+            </script>
+           <form name="delete_copy_step2_form" action="%s/admin2/bibcirculation/delete_copy_step2" method="get">
+           <div class="bibcircbottom">
+                <br />
+                     <table class="bibcirctable">
+                          <tr>
+                               <td class="bibcirctableheader" width="10">%s</td>
+                          </tr>
+                </table>
+                <table class="bibcirctable">
+                 <tr valign='top'>
+                    <td width="400">
+                    <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     <tr>
+                        <th width="100">%s</th>
+                        <td>%s</td>
+                     </tr>
+                     </table>
+                     </td>
+                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                     </tr>
+              </table>
+
+           <br />
+           <table class="bibcirctable">
+                <tr>
+                     <td class="bibcirctableheader">%s</td>
+                </tr>
+           </table>
+
+           """  % (CFG_SITE_URL,
+                   _("Item details"),
+                   _("Name"),
+                   book_title,
+                   _("Author(s)"),
+                   book_author,
+                   _("Year"),
+                   book_year,
+                   _("Publisher"),
+                   book_editor,
+                   _("ISBN"),
+                   book_isbn,
+                   str(book_cover),
+                   _("Copies of %s" % book_title))
+
+
+        out += """<table id="table_copies" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                  <thead>
+                    <tr>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                      <th>%s</th>
+                    </tr>
+                    </thead>
+                    <tbody>""" % (_("Barcode"),
+                                _("Status"),
+                                _("Due date"),
+                                _("Library"),
+                                _("Location"),
+                                _("Loan period"),
+                                _("No of loans"),
+                                _("Collection"),
+                                _("Description"))
+
+        for (barcode, loan_period, lib_name, libid, location, nb_requests,
+             status, collection, description, due_date) in result:
+
+            library_link = create_html_link(CFG_SITE_URL +
+                                            '/admin2/bibcirculation/get_library_details',
+                                            {'library_id': libid, 'ln': ln},
+                                            (lib_name))
+
+            out += """
+                 <tr>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                     <td>%s</td>
+                 </tr>
+                 """ % (barcode, status, due_date, library_link, location,
+                        loan_period, nb_requests, collection or '-',
+                        description or '-')
+
+        out += """ </tbody>
+                  </table>
+                """
+        out += self.tmpl_infobox(infos, ln)
+
+        out += """<table id="table_copies" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+          <thead>
+            <tr>
+              <th>%s</th>
+              <th>%s</th>
+              <th>%s</th>
+              <th>%s</th>
+              <th>%s</th>
+              <th>%s</th>
+              <th>%s</th>
+              <th>%s</th>
+              <th>%s</th>
+            </tr>
+            </thead>
+            <tbody>""" % (_("Barcode"),
+                        _("Status"),
+                        _("Due date"),
+                        _("Library"),
+                        _("Location"),
+                        _("Loan period"),
+                        _("No of loans"),
+                        _("Collection"),
+                        _("Description"))
+
+        for (barcode, loan_period, lib_name, libid, location, nb_requests,
+             status, collection, description, due_date) in result:
+            if barcode == barcode_to_delete:
+                library_link = create_html_link(CFG_SITE_URL +
+                                                '/admin2/bibcirculation/get_library_details',
+                                                {'library_id': libid, 'ln': ln},
+                                                (lib_name))
+
+                out += """
+                     <tr>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                         <td>%s</td>
+                     </tr>
+                     """ % (barcode, status, due_date, library_link, location,
+                            loan_period, nb_requests, collection or '-',
+                            description or '-')
+
+        out += """ </tbody>
+                  </table>
+                """
+        out+= """<input type=hidden name=barcode value=%s>""" % (str(barcode_to_delete))
+        out+= """<input type=button value=%s onClick="history.go(-1)" class="formbutton">"""%(_("Back"))
+        out+= """<input type="submit" value='%s' class="formbutton">""" %(_("Delete"))
+
+        out += """</div></form>"""
 
         return out

@@ -32,7 +32,25 @@ if CFG_CERN_SITE == 1:
     CFG_BIBCIRCULATION_TEMPLATES = {
     'OVERDUE': 'Overdue letter template (write some text)',
     'REMINDER': 'Reminder letter template (write some text)',
-    'NOTIFICATION': 'Notification letter template (write some text)',
+    'NOTIFICATION': 'Hello:\n'\
+                    'this is an automatic email for confirming the request for a book on behalf of:\n'\
+                    '%s (ccid: %s, email: %s)\n'\
+                    '%s (%s)\n\n'\
+                    '\tTitle: %s\n'\
+                    '\tAuthor: %s\n'\
+                    '\tPublisher: %s\n'\
+                    '\tYear: %s\n'\
+                    '\tIsbn: %s\n\n'\
+                    '\tLocation: %s\n'\
+                    '\tLibrary: %s\n'\
+                    '\t%s\n\n'\
+                    '\tRequest date: %s\n\n'\
+                    'The document will be sent to you via internal mail.\n\n'\
+                    'Best regards\n',
+    #user_name, ccid, user_email, address,department, mailbox, title,
+    #author, publisher, year, isbn, location, library,
+    #link_to_holdings_details, request_date
+
     'SEND_RECALL': 'Dear Colleague,\n\n'\
                        'The loan for the document(s)\n\n'\
                        'Item information:\n\n'\
@@ -96,7 +114,21 @@ else:
     CFG_BIBCIRCULATION_TEMPLATES = {
         'OVERDUE': 'Overdue letter template (write some text)',
         'REMINDER': 'Reminder letter template (write some text)',
-        'NOTIFICATION': 'Notification letter template (write some text)',
+        'NOTIFICATION': 'Hello:\n'\
+                    'this is an automatic email for confirming the request for a book on behalf of:\n'\
+                    '%s (ccid: %s, email: %s)\n'\
+                    '%s (%s)\n\n'\
+                    '\tTitle: %s\n'\
+                    '\tAuthor: %s\n'\
+                    '\tPublisher: %s\n'\
+                    '\tYear: %s\n'\
+                    '\tIsbn: %s\n\n'\
+                    '\tLocation: %s\n'\
+                    '\tLibrary: %s\n'\
+                    '\t%s\n\n'\
+                    '\tRequest date: %s\n\n'\
+                    'The document will be sent to you via internal mail.\n\n'\
+                    'Best regards\n',
         'SEND_RECALL': 'Dear Colleague,\n\n'\
                        'The loan for the document(s)\n\n'\
                        'Item information:\n\n'\

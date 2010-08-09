@@ -641,6 +641,29 @@ def get_library_details(library_id):
     else:
         return None
 
+def get_loan_request_details(req_id):
+
+    res = run_sql("""SELECT lr.id_bibrec,
+                            bor.name,
+                            bor.id,
+                            lib.name,
+                            it.location,
+                            DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
+                            DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
+                            lr.request_date
+                     FROM   crcLOANREQUEST lr,
+                            crcBORROWER bor,
+                            crcITEM it,
+                            crcLIBRARY lib
+                     WHERE  lr.id_crcBORROWER=bor.id AND it.barcode=lr.barcode AND
+                            lib.id = it.id_crcLIBRARY AND
+                            lr.id=%s""" % (req_id))
+
+    if res:
+        return res[0]
+    else:
+        return None
+
 def get_loan_request_by_status(status):
     """
     status: request status.
@@ -665,7 +688,6 @@ def get_loan_request_by_status(status):
                   """ ,
                      (status, ))
     return res
-
 
 def update_loan_request_status(request_id, status):
     """
@@ -1667,8 +1689,8 @@ def get_libraries():
     """
 
     res = run_sql("""select id, name
-                       from crcLIBRARY""")
-                      #where type<>'external' """)
+                       from crcLIBRARY
+                       where type<>'external' """)
 
     return res
 
@@ -1712,6 +1734,10 @@ def add_new_copy(barcode, recid, library_id, collection, location, description,
                              values (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
             (barcode, recid, library_id, collection, location, description,
              loan_period, status))
+
+def delete_copy(barcode):
+    res = run_sql("""delete from crcITEM where barcode='%s'""" % (barcode))
+    return res
 
 def get_item_info(barcode):
     """

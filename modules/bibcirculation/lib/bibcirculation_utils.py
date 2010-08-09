@@ -28,10 +28,71 @@ from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
      CFG_BIBCIRCULATION_WORKING_DAYS, \
-     CFG_BIBCIRCULATION_HOLIDAYS
+     CFG_BIBCIRCULATION_HOLIDAYS, \
+     CFG_CERN_SITE
 from invenio.messages import gettext_set_language
 
 import datetime, time
+
+def search_user(column, string):
+    if CFG_CERN_SITE == 1:
+        if   column == 'name':
+            result = db.search_borrower_by_name(string)
+        elif column == 'email':
+            result = db.search_borrower_by_email(string)
+        else:
+            try:
+                result = db.search_borrower_by_ccid(int(string))
+            except:
+                result= ()
+
+            if result == ():
+                from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+
+                ldap_info = 'busy'
+                while ldap_info == 'busy':
+                    ldap_info = get_user_info_from_ldap(ccid=string)
+
+                if len(ldap_info) == 0:
+                    result = ()
+                else:
+                    try:
+                        name = ldap_info['cn'][0]
+                    except KeyError:
+                        name = ""
+                    try:
+                        email = ldap_info['mail'][0]
+                    except KeyError:
+                        email = ""
+                    try:
+                        phone = ldap_info['telephoneNumber'][0]
+                    except KeyError:
+                        phone = ""
+                    try:
+                        address = ldap_info['physicalDeliveryOfficeName'][0]
+                    except KeyError:
+                        address = ""
+                    try:
+                        mailbox = ldap_info['postOfficeBox'][0]
+                    except KeyError:
+                        mailbox = ""
+                    try:
+                        ccid = ldap_info['employeeID'][0]
+                    except KeyError:
+                        ccid = ""
+
+                    db.new_borrower(ccid, name, email, phone, address, mailbox, '')
+                    result = db.search_borrower_by_ccid(int(ccid))
+
+    else:
+        if column == 'name':
+            result = db.search_borrower_by_name(string)
+        elif column == 'email':
+            result = db.search_borrower_by_email(string)
+        else:
+            result = db.search_borrower_by_id(string)
+
+    return result
 
 def hold_request_mail(recid, borrower_id):
     """

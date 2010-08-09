@@ -29,7 +29,7 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
     """Defines the set of /admin2/bibcirculation pages."""
 
-    _exports = ['', 'index', 'borrower_search', 'item_search', 'borrower_notification', 'get_pending_requests', 'item_search_result', 'loan_return', 'loan_on_desk_step1', 'loan_on_desk_step2', 'loan_on_desk_step3', 'loan_on_desk_step4', 'loan_on_desk_confirm', 'register_new_loan', 'loan_return_confirm', 'get_next_waiting_loan_request', 'update_next_loan_request_status', 'all_requests', 'get_item_req_historical_overview', 'get_item_loans_historical_overview', 'all_loans_test', 'all_loans', 'bor_loans_historical_overview', 'bor_requests_historical_overview', 'get_item_requests_details', 'get_item_loans_details', 'get_borrower_details', 'get_item_details', 'get_library_details', 'get_borrower_requests_details', 'get_borrower_loans_details', 'borrower_search_result', 'associate_barcode', 'get_borrower_notes', 'get_loans_notes', 'get_item_loans_notes', 'new_item', 'add_new_borrower_step1', 'add_new_borrower_step2', 'add_new_borrower_step3', 'update_borrower_info_step1', 'update_borrower_info_step2', 'update_borrower_info_step3', 'update_borrower_info_step4', 'update_borrower_info_step5', 'add_new_library_step1', 'add_new_library_step2', 'add_new_library_step3', 'update_library_info_step1', 'update_library_info_step2', 'update_library_info_step3', 'update_library_info_step4', 'update_library_info_step5', 'new_book_step1', 'new_book_step2', 'add_new_copy_step1', 'add_new_copy_step2', 'add_new_copy_step3', 'add_new_copy_step4', 'add_new_copy_step5', 'update_item_info_step1', 'update_item_info_step2', 'update_item_info_step3', 'update_item_info_step4', 'update_item_info_step5', 'update_item_info_step6', 'search_library_step1', 'search_library_step2', 'get_library_notes', 'change_due_date_step1', 'change_due_date_step2', 'claim_book_return', 'all_expired_loans', 'get_waiting_requests', 'create_new_loan_step1', 'create_new_loan_step2', 'create_new_request_step1', 'create_new_request_step2', 'create_new_request_step3', 'create_new_request_step4', 'place_new_request_step1', 'place_new_request_step2', 'place_new_request_step3', 'place_new_loan_step1', 'place_new_loan_step2', 'place_new_loan_step3', 'order_new_copy_step1', 'order_new_copy_step3', 'ordered_books', 'get_purchase_notes', 'register_ill_request_step0', 'register_ill_request_step1', 'register_ill_request_step2', 'register_ill_request_step3', 'list_ill_request', 'ill_request_details_step1', 'ill_request_details_step2', 'ill_request_details_step3', 'ordered_books_details_step1', 'ordered_books_details_step2', 'ordered_books_details_step3', 'add_new_vendor_step1', 'add_new_vendor_step2', 'add_new_vendor_step3', 'update_vendor_info_step1', 'update_vendor_info_step2', 'update_vendor_info_step3', 'update_vendor_info_step4', 'update_vendor_info_step5', 'search_vendor_step1', 'search_vendor_step2', 'get_vendor_details', 'get_vendor_notes', 'register_ill_request_with_no_recid_step1', 'register_ill_request_with_no_recid_step2', 'register_ill_request_with_no_recid_step3', 'register_ill_request_with_no_recid_step4', 'get_borrower_ill_details', 'get_ill_library_notes', 'get_expired_loans_with_requests', 'register_ill_book_request', 'register_ill_book_request_result', 'register_ill_book_request_from_borrower_page', 'register_ill_book_request_from_borrower_page_result', 'register_ill_request_from_borrower_page_step1', 'register_ill_request_from_borrower_page_step2', 'register_ill_article_request_step1', 'register_ill_article_request_step2', 'register_ill_article_request_step3', 'ill_search', 'ill_search_result', 'bor_ill_historical_overview']
+    _exports = ['', 'index', 'borrower_search', 'item_search', 'borrower_notification', 'get_pending_requests', 'item_search_result', 'loan_return', 'loan_on_desk_step1', 'loan_on_desk_step2', 'loan_on_desk_step3', 'loan_on_desk_step4', 'loan_on_desk_confirm', 'register_new_loan', 'loan_return_confirm', 'get_next_waiting_loan_request', 'update_next_loan_request_status', 'all_requests', 'get_item_req_historical_overview', 'get_item_loans_historical_overview', 'all_loans_test', 'all_loans', 'bor_loans_historical_overview', 'bor_requests_historical_overview', 'get_item_requests_details', 'get_item_loans_details', 'get_borrower_details', 'get_item_details', 'get_library_details', 'get_borrower_requests_details', 'get_borrower_loans_details', 'borrower_search_result', 'associate_barcode', 'get_borrower_notes', 'get_loans_notes', 'get_item_loans_notes', 'new_item', 'add_new_borrower_step1', 'add_new_borrower_step2', 'add_new_borrower_step3', 'update_borrower_info_step1', 'update_borrower_info_step2', 'update_borrower_info_step3', 'update_borrower_info_step4', 'update_borrower_info_step5', 'add_new_library_step1', 'add_new_library_step2', 'add_new_library_step3', 'update_library_info_step1', 'update_library_info_step2', 'update_library_info_step3', 'update_library_info_step4', 'update_library_info_step5', 'new_book_step1', 'new_book_step2', 'add_new_copy_step1', 'add_new_copy_step2', 'add_new_copy_step3', 'add_new_copy_step4', 'add_new_copy_step5', 'update_item_info_step1', 'update_item_info_step2', 'update_item_info_step3', 'update_item_info_step4', 'update_item_info_step5', 'update_item_info_step6', 'search_library_step1', 'search_library_step2', 'get_library_notes', 'change_due_date_step1', 'change_due_date_step2', 'claim_book_return', 'all_expired_loans', 'get_waiting_requests', 'create_new_loan_step1', 'create_new_loan_step2', 'create_new_request_step1', 'create_new_request_step2', 'create_new_request_step3', 'create_new_request_step4', 'place_new_request_step1', 'place_new_request_step2', 'place_new_request_step3', 'place_new_loan_step1', 'place_new_loan_step2', 'place_new_loan_step3', 'order_new_copy_step1', 'order_new_copy_step3', 'ordered_books', 'get_purchase_notes', 'register_ill_request_step0', 'register_ill_request_step1', 'register_ill_request_step2', 'register_ill_request_step3', 'list_ill_request', 'ill_request_details_step1', 'ill_request_details_step2', 'ill_request_details_step3', 'ordered_books_details_step1', 'ordered_books_details_step2', 'ordered_books_details_step3', 'add_new_vendor_step1', 'add_new_vendor_step2', 'add_new_vendor_step3', 'update_vendor_info_step1', 'update_vendor_info_step2', 'update_vendor_info_step3', 'update_vendor_info_step4', 'update_vendor_info_step5', 'search_vendor_step1', 'search_vendor_step2', 'get_vendor_details', 'get_vendor_notes', 'register_ill_request_with_no_recid_step1', 'register_ill_request_with_no_recid_step2', 'register_ill_request_with_no_recid_step3', 'register_ill_request_with_no_recid_step4', 'get_borrower_ill_details', 'get_ill_library_notes', 'get_expired_loans_with_requests', 'register_ill_book_request', 'register_ill_book_request_result', 'register_ill_book_request_from_borrower_page', 'register_ill_book_request_from_borrower_page_result', 'register_ill_request_from_borrower_page_step1', 'register_ill_request_from_borrower_page_step2', 'register_ill_article_request_step1', 'register_ill_article_request_step2', 'register_ill_article_request_step3', 'ill_search', 'ill_search_result', 'bor_ill_historical_overview', 'delete_copy_step1', 'delete_copy_step2']
 
     def index(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation"""
@@ -51,20 +51,21 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         """http://cdsweb.cern.ch/admin2/bibcirculation/holdings_search"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
-        return bal.item_search(req, ln)
+        return bal.item_search(req, [], ln)
 
 
     def borrower_notification(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/borrower_notification"""
-        argd = wash_urlargd(form, {'borrower_id': (str, None), 'template': (str, None), 'message': (str, None), 'load_msg_template': (str, None), 'subject': (str, None), 'send_message': (str, None), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'borrower_id': (str, None), 'borrower_email': (str,None), 'template': (str, None), 'message': (str, None), 'load_msg_template': (str, None), 'subject': (str, None), 'send_message': (str, None), 'ln': (str, "en")})
         borrower_id = argd['borrower_id']
+        borrower_email = argd['borrower_email']
         template = argd['template']
         message = argd['message']
         load_msg_template = argd['load_msg_template']
         subject = argd['subject']
         send_message = argd['send_message']
         ln = argd['ln']
-        return bal.borrower_notification(req, borrower_id, template,
+        return bal.borrower_notification(req, borrower_id, borrower_email, template,
                                          message, load_msg_template,
                                          subject, send_message, ln)
 
@@ -81,12 +82,29 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
     def item_search_result(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/item_search_result"""
         argd = wash_urlargd(form, {'p': (str, None), 'f': (str, None), 'ln': (str, "en")})
-        p = argd['p']
-        f = argd['f']
+        p  = argd['p']
+        f  = argd['f']
         ln = argd['ln']
 
         return bal.item_search_result(req, p, f, ln)
 
+    def delete_copy_step1(self, req, form):
+        """http://cdsweb.cern.ch/admin2/bibcirculation/delete_copy_step1"""
+        argd = wash_urlargd(form, {'barcode': (str, ''), 'ln': (str, "en")})
+
+        barcode = argd['barcode']
+        ln = argd['ln']
+
+        return bal.delete_copy_step1(req, barcode, ln)
+
+    def delete_copy_step2(self, req, form):
+        """http://cdsweb.cern.ch/admin2/bibcirculation/delete_copy_step2"""
+        argd = wash_urlargd(form, {'barcode': (str, ''), 'ln': (str, "en")})
+
+        barcode = argd['barcode']
+        ln = argd['ln']
+
+        return bal.delete_copy_step2(req, barcode, ln)
 
     def loan_return(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/loan_return"""
@@ -457,7 +475,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def update_borrower_info_step5(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_borrower_info_step5"""
-        argd = wash_urlargd(form, {'tup_infos': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'tup_infos': (str, '()'), 'ln': (str, "en")})
         tup_infos = argd['tup_infos']
         ln = argd['ln']
         tup_infos = eval(tup_infos)
@@ -535,7 +553,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def update_library_info_step5(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step5"""
-        argd = wash_urlargd(form, {'tup_infos': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'tup_infos': (str, '()'), 'ln': (str, "en")})
         tup_infos = argd['tup_infos']
         ln = argd['ln']
         tup_infos = eval(tup_infos)
@@ -615,7 +633,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def update_item_info_step2(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step2"""
-        argd = wash_urlargd(form, {'p': (int, 0), 'f': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'p': (str, '()'), 'f': (str, '()'), 'ln': (str, "en")})
         p = argd['p']
         f = argd['f']
         ln = argd['ln']
@@ -632,7 +650,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def update_item_info_step4(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step4"""
-        argd = wash_urlargd(form, {'barcode': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'barcode': (str, '()'), 'ln': (str, "en")})
         barcode = argd['barcode']
         ln = argd['ln']
         return bal.update_item_info_step4(req, barcode, ln)
@@ -640,7 +658,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def update_item_info_step5(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step5"""
-        argd = wash_urlargd(form, {'barcode': (int, 0), 'library': (int, 0), 'location': (int, 0), 'collection': (int, 0), 'description': (int, 0), 'loan_period': (int, 0), 'status': (int, 0), 'recid': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'barcode': (str, '-'), 'library': (int, 0), 'location': (str, 'Unknown'), 'collection': (str, 'Unknown'), 'description': (str, ''), 'loan_period': (str, '4 weeks'), 'status': (str, 'available'), 'recid': (int, 0), 'ln': (str, "en")})
         barcode = argd['barcode']
         library = argd['library']
         location = argd['location']
@@ -657,7 +675,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def update_item_info_step6(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_item_info_step6"""
-        argd = wash_urlargd(form, {'tup_infos': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'tup_infos': (str, ''), 'ln': (str, "en")})
         tup_infos = argd['tup_infos']
         ln = argd['ln']
         tup_infos = eval(tup_infos)
@@ -674,7 +692,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def search_library_step2(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/search_library_step2"""
-        argd = wash_urlargd(form, {'column': (int, 0), 'string': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'column': (str, ''), 'string': (str, ''), 'ln': (str, "en")})
         column = argd['column']
         string = argd['string']
         ln = argd['ln']
@@ -1142,7 +1160,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def update_vendor_info_step5(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_vendor_info_step5"""
-        argd = wash_urlargd(form, {'tup_infos': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'tup_infos': (str, '()'), 'ln': (str, "en")})
         tup_infos = argd['tup_infos']
         ln = argd['ln']
         tup_infos = eval(tup_infos)
@@ -1159,7 +1177,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def search_vendor_step2(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/search_vendor_step2"""
-        argd = wash_urlargd(form, {'column': (int, 0), 'string': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'column': (str, ''), 'string': (str, ''), 'ln': (str, "en")})
         column = argd['column']
         string = argd['string']
         ln = argd['ln']
@@ -1397,7 +1415,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
 
     def register_ill_article_request_step3(self, req, form):
-        argd = wash_urlargd(form, {'book_info': (int, 0), 'user_info': (int, 0), 'request_details': (int, 0), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'book_info': (str, '()'), 'user_info': (str, 'new_cpoy'), 'request_details': (str, '()'), 'ln': (str, "en")})
         book_info = argd['book_info']
         user_info = argd['user_info']
         request_details = argd['request_details']

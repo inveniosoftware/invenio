@@ -41,7 +41,7 @@ def item_search(req, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/holdings_search
     """
-    return bal.item_search(req, ln)
+    return bal.item_search(req, [], ln)
 
 
 def borrower_notification(req, borrower_id=None, template=None,

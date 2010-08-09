@@ -68,6 +68,9 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
     _exports = ['', 'display', 'loanshistoricaloverview']
 
+    def __init__(self, recid=-1):
+        self.recid = recid
+
     def index(self, req, form):
         """ The function called by default
         """
