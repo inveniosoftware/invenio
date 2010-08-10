@@ -56,7 +56,7 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
 # Bibcirculation imports
 from invenio.bibcirculation_config import \
      CFG_BIBCIRCULATION_TEMPLATES, CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
-     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
+     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, CFG_BIBCIRCULATION_LOANS_EMAIL
 import invenio.bibcirculation_dblayer as db
 import invenio.template
 bibcirculation_templates = invenio.template.load('bibcirculation')
@@ -3868,7 +3868,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
 
 
         send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                toaddr   = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
                 subject  = subject,
                 content  = message,
                 header   = '',
@@ -6050,7 +6050,7 @@ def delete_copy_step1(req, barcode, ln):
     navtrail_previous_links = '<a class="navtrail" ' \
                                   'href="%s/help/admin">Admin Area' \
                                   '</a>' % (CFG_SITE_URL,)
-    
+
     recid = db.get_recid(barcode)
     if recid:
         recid = recid[0]

@@ -148,7 +148,6 @@ def task_run_core():
     run daemon
     """
 
-    #write_message("Getting expired loans ...", verbose=9)
     expired_loans = get_expired_loan()
 
     for (borrower_id, loan_id, recid) in expired_loans:
@@ -166,11 +165,8 @@ def task_run_core():
         title = ''.join(get_fieldvalues(recid, "245__a"))
         subject = "LOAN RECALL: " + title
         update_expired_loan(loan_id)
-        #write_message("Updating information about expired loans")
-        send_overdue_letter(borrower_id, subject, content)
-        #write_message("Sending overdue letter")
 
-    #write_message("Done!!")
+        send_overdue_letter(borrower_id, subject, content)
 
     return 1
 

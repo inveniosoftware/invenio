@@ -41,7 +41,8 @@ from invenio.bibcirculation_utils import hold_request_mail, \
      create_ill_record
      #book_information_from_MARC
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
+                                          CFG_BIBCIRCULATION_LOANS_EMAIL
 
 
 def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
@@ -221,7 +222,7 @@ def perform_new_request_send(uid, recid,
 
             if not is_on_loan:
                 send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                       toaddr=CFG_SITE_SUPPORT_EMAIL,
+                       toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                        subject='Hold request for books confirmation',
                        content=hold_request_mail(recid, is_borrower),
                        attempt_times=1,
@@ -251,7 +252,7 @@ def perform_new_request_send(uid, recid,
                     db.update_item_status('requested', barcode)
 
                     send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                               toaddr=CFG_SITE_SUPPORT_EMAIL,
+                               toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                                subject='Hold request for books confirmation',
                                content=hold_request_mail(recid, is_borrower),
                                attempt_times=1,
@@ -312,7 +313,7 @@ def perform_new_request_send(uid, recid,
                 db.update_item_status('requested', barcode)
 
                 send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                           toaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                           toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                            subject='Hold request for books confirmation',
                            content=hold_request_mail(recid, is_borrower),
                            attempt_times=1,
@@ -459,7 +460,7 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
 
         #Notify librarian about new ILL request.
         send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                    toaddr="piubrau@gmail.com",
+                    toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                     subject='ILL request for books confirmation',
                     content=hold_request_mail(recid, is_borrower),
                     attempt_times=1,
@@ -553,7 +554,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
 
                 #Notify librarian about new ILL request.
                 send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                               toaddr=CFG_SITE_SUPPORT_EMAIL,
+                               toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                                subject='ILL request for books confirmation',
                                content="",
                                attempt_times=1,
@@ -592,7 +593,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
 
 
                     send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                               toaddr=CFG_SITE_SUPPORT_EMAIL,
+                               toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                                subject='ILL request for books confirmation',
                                content="",
                                attempt_times=1,
@@ -653,7 +654,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                           " will be sent to you via internal mail."
 
                 send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                           toaddr=CFG_SITE_SUPPORT_EMAIL,
+                           toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                            subject='ILL request for books confirmation',
                            content="",
                            attempt_times=1,

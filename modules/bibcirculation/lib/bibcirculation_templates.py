@@ -43,7 +43,7 @@ from invenio.bibcirculation_utils import get_book_cover, \
 
 _MENU_ = """
 
-      <div id="cdlhead">
+      <div>
       <map name="Navigation_Bar" id="cdlnav">
       <div id="bibcircmenu" class="cdsweb">
       <h2><a name="localNavLinks">Main navigation links:</a></h2>
