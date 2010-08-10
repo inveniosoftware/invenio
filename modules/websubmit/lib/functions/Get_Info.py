@@ -122,8 +122,8 @@ def DocumentNotFound(repno):
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    user_must_confirm_before_leaving_page = false;
-   document.forms[0].submit();
    alert('The document %s cannot be found in our database.\\nAnyway, you can still choose another document if you wish.');
+   document.forms[0].submit();
 </SCRIPT>""" % repno)
     return 0
 

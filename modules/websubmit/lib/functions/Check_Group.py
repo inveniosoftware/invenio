@@ -44,8 +44,8 @@ def Check_Group(parameters, curdir, form, user_info=None):
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    user_must_confirm_before_leaving_page = false;
-   document.forms[0].submit();
    alert('The given group name (%s) is invalid.');
+   document.forms[0].submit();
 </SCRIPT>""" % (group,))
     else:
         raise InvenioWebSubmitFunctionStop("""

@@ -48,8 +48,8 @@ def Is_Referee(parameters, curdir, form, user_info=None):
         document.forms[0].curpage.value = 1;
         document.forms[0].step.value = 0;
         user_must_confirm_before_leaving_page = false;
-        document.forms[0].submit();
         alert('Sorry you (%s) have not been recognized as a referee for this type of document.\\nIf you think this is an error, please contact %s');
+        document.forms[0].submit();
 </SCRIPT>""" % (uid_email,CFG_SITE_SUPPORT_EMAIL))
     return ""
 

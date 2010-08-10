@@ -53,8 +53,8 @@ def printNotRequested(rn):
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    user_must_confirm_before_leaving_page = false;
-   document.forms[0].submit();
    alert('The document %s has never been asked for approval.\\nAnyway, you can still choose another document if you wish.');
+   document.forms[0].submit();
 </SCRIPT>""" % rn
     return t
 
@@ -65,8 +65,8 @@ def printApproved(rn):
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    user_must_confirm_before_leaving_page = false;
-   document.forms[0].submit();
    alert('The document %s has already been approved.\\nAnyway, you can still choose another document if you wish.');
+   document.forms[0].submit();
 </SCRIPT>""" % rn
     return t
 
@@ -77,8 +77,8 @@ def printRejected(rn):
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    user_must_confirm_before_leaving_page = false;
-   document.forms[0].submit();
    alert('The document %s has already been rejected.\\nAnyway, you can still choose another document if you wish.');
+   document.forms[0].submit();
 </SCRIPT>""" % rn
     return t
 

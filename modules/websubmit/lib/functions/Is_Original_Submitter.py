@@ -58,8 +58,8 @@ def Is_Original_Submitter(parameters, curdir, form, user_info=None):
    document.forms[0].curpage.value = 1;
    document.forms[0].step.value = 0;
    user_must_confirm_before_leaving_page = false;
-   document.forms[0].submit();
    alert('Only the submitter of this document has the right to do this action. \\nYour login (%s) is different from the one of the submitter (%s).');
+   document.forms[0].submit();
 </SCRIPT>""" % (uid_email,email))
     elif re.search(uid_email,email, re.IGNORECASE) is None and \
              auth_code == 0:

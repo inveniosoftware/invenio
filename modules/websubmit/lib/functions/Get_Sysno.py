@@ -52,9 +52,9 @@ def Get_Sysno(parameters, curdir, form, user_info=None):
     else:
         searchresults = list(search_pattern(req=None, p=rn, f="reportnumber"))
         if len(searchresults) == 0:
-            raise InvenioWebSubmitFunctionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;user_must_confirm_before_leaving_page = false;document.forms[0].submit();alert('The report %s cannot be found in our database.\\nPerhaps it has not been integrated yet?\\nAnyway, you can choose another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
+            raise InvenioWebSubmitFunctionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;user_must_confirm_before_leaving_page = false;alert('The report %s cannot be found in our database.\\nPerhaps it has not been integrated yet?\\nAnyway, you can choose another report number if you wish.\\n Or retry this action in a few minutes.');document.forms[0].submit();</SCRIPT>" % rn)
         elif len(searchresults) > 1:
-            raise InvenioWebSubmitFunctionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;user_must_confirm_before_leaving_page = false;document.forms[0].submit();alert('Multiple documents have been found with report number %s\\nYou can try with another report number if you wish.\\n Or retry this action in a few minutes.');</SCRIPT>" % rn)
+            raise InvenioWebSubmitFunctionStop("<SCRIPT>document.forms[0].action=\"/submit\";document.forms[0].curpage.value=1;document.forms[0].step.value=0;user_must_confirm_before_leaving_page = false;alert('Multiple documents have been found with report number %s\\nYou can try with another report number if you wish.\\n Or retry this action in a few minutes.');document.forms[0].submit();</SCRIPT>" % rn)
         else:
             sysno = searchresults[0]
         # save resultin a file

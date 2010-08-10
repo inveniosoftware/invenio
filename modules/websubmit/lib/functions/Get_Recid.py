@@ -39,10 +39,11 @@ document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
 document.forms[0].step.value=0;
 user_must_confirm_before_leaving_page = false;
-document.forms[0].submit();
 alert('The document with report-number [%s] cannot be found in our """ \
 """database.\\nPerhaps it has not yet been integrated?\\nYou can choose """ \
-"""another report number or retry this action in a few minutes.');\n</script>"""
+"""another report number or retry this action in a few minutes.');\n
+document.forms[0].submit();
+</script>"""
 
 ## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
 ## when multiple document recids for the given report-number are found found:
@@ -51,10 +52,11 @@ document.forms[0].action="/submit";
 document.forms[0].curpage.value=1;
 document.forms[0].step.value=0;
 user_must_confirm_before_leaving_page = false;
-document.forms[0].submit();
 alert('Multiple documents with the report number [%s] have been found.\\n""" \
 """You can choose another report number or retry this action in a few """ \
-"""minutes.');\n</script>"""
+"""minutes.');\n
+document.forms[0].submit();
+</script>"""
 
 ## JavaScript action and message to be passed to "InvenioWebSubmitFunctionStop"
 ## when the recid found doesn't match the type of document that should be
