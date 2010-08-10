@@ -576,23 +576,31 @@ to restrict your submission:</p>
 
 <p>If you have set up an action that requires to modify an existing
 record (to add file, modify metadata, etc.) you can add the
-"<code>Is_Original_Submitter</code>" function in order to only let the
-original submitter of the record modify the record. This function must
-be added at the beginning of your list of functions (usually after the
-"<code>Get_Recid</code>" function), for <b>each action</b>,
-and <b>each step</b>. Check out the <a href="#2.3"><em>Adding the
-functions</em></a> section of this guide to learn how to add this function
-to your workflow.</p>
+"<code><a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=Is_Original_Submitter">Is_Original_Submitter</a></code>"
+function in order to only let the original submitter of the record
+modify the record. This function must be added at the beginning of
+your list of functions (usually after the
+"<code><a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=Get_Recid">Get_Recid</a></code>"
+function), for <b>each action</b>, and <b>each step</b>. Check out
+the <a href="#2.3"><em>Adding the functions</em></a> section of this
+guide to learn how to add this function to your workflow.</p>
+
+<p>You can also use the
+"<code><a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=User_is_Record_Owner_or_Curator">User_is_Record_Owner_or_Curator</a></code>"
+function to enable access to the original submitter of the record AND
+users connected to a specific WebAccess role.</p>
 
 <p>If you have set up an action (for eg. "APP") that requires to
 approve a document by a referee (defined in the list of referees for
-your submission) you can add the "<code>Is_Referee</code>" function in
-order to only let the referee go through. This function must be added
-at the beginning of your list of functions (usually after the
-"<code>Get_Recid</code>" function), for <b>each action</b>,
-and <b>each step</b>. Check out the <a href="#2.3"><em>Adding the
-functions</em></a> section of this guide to learn how to add this function
-to your workflow.</p>
+your submission) you can add the
+"<code><a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=Is_Referee">Is_Referee</a></code>"
+function in order to only let the referee go through. This function
+must be added at the beginning of your list of functions (usually
+after the
+"<code><a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py/functionedit?funcname=Get_Recid">Get_Recid</a></code>"
+function), for <b>each action</b>, and <b>each step</b>. Check out
+the <a href="#2.3"><em>Adding the functions</em></a> section of this
+guide to learn how to add this function to your workflow.</p>
 
 <a name="3"></a><h2>3. WebSubmit Elements</h2>
 
@@ -1483,13 +1491,25 @@ connected to a role. To make it short: a submission it not restricted
 until it is...
 </p>
 
-<p>Once configured the above restrictions do not prevent for eg. any
-authorized user to modify documents submitted by others. To enable
-finer-grained restrictions, use the WebSubmit function
-"<code>Is_Original_Submitter</code>" in your SBI, SRV, etc. submission
-workflow (for eg. just after the "Get_Recid" function). Check also
-the <a href="#2.4">Restricting the submission</a> how-to from this
-guide.</p>
+<p>Note that it is your responsibility as WebSubmit admin to <b>ensure
+that your workflow is not modifying records outside the desired
+scope</b>. Given that records are independant of the submission that
+created them, there is no mechanism in the WebSubmit engine that
+prevents the DEMOART submission to modify records created with the
+DEMOBOOK submission. A check must be added at the level of WebSubmit
+functions of your submission to make sure that chosen submission and
+category well match the record to be modified (for eg. retrieved via
+the <code>Get_Report_Number</code> function)</p>.
+
+
+<p>All the above checks also do not <b>prevent any authorized user to
+modify documents submitted by others</b>. To enable finer-grained
+restrictions, use the WebSubmit function
+"<code>Is_Original_Submitter</code>" or
+"<code>User_is_Record_Owner_or_Curator</code>" in your MBI, SRV,
+etc. submission workflow (for eg. just after the "Get_Recid"
+function). Check also the <a href="#2.4">Restricting the
+submission</a> how-to from this guide.</p>
 
 
 <a name="7"></a><h2>Terminology</h2>
