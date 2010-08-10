@@ -295,6 +295,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
     def display(self, req, form):
         """Display basket interface."""
+        #import rpdb2; rpdb2.start_embedded_debugger('password', fAllowRemote=True)
 
         argd = wash_urlargd(form, {'category':
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
@@ -351,9 +352,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
-        if argd['of'] == 'xm':
+        if argd['of'] != 'hb':
             page_start(req, of=argd['of'])
-            return perform_request_export_xml(body)
+
+            if argd['of'].startswith('x'):
+                xml = perform_request_export_xml(body)
+                return xml
 
         return page(title       = _("Display baskets"),
                     body        = body,

@@ -1843,13 +1843,13 @@ class Template:
                     ln=CFG_SITE_LANG):
         """Template for basket display."""
 
-        if of != 'xm':
+        if not of.startswith('x'):
             out = """
 <table class="bskbasket" width="100%">"""
         else:
             out = ""
 
-        if of != 'xm':
+        if not of.startswith('x'):
             out += self.tmpl_basket_header(bskid,
                                            name,
                                            nb_items,
@@ -1864,7 +1864,7 @@ class Template:
                                            share_level,
                                            ln)
 
-        if of != 'xm':
+        if not of.startswith('x'):
             out += self.tmpl_basket_footer(bskid,
                                            nb_items,
                                            (user_can_view_content,
@@ -1887,18 +1887,17 @@ class Template:
                                         of,
                                         ln)
 
-        if of != 'xm':
+        if not of.startswith('x'):
             out += """
 </table>"""
 
-        if of != 'xm':
+        if not of.startswith('x'):
             out += self.tmpl_create_export_as_list(selected_category,
                                                    selected_topic,
                                                    selected_group,
                                                    bskid,
                                                    None,
                                                    False)
-
         return out
 
     def tmpl_basket_header(self,
@@ -2067,7 +2066,7 @@ class Template:
                             ln=CFG_SITE_LANG):
         """Template for basket content display."""
 
-        if of != 'xm':
+        if not of.startswith('x'):
             _ = gettext_set_language(ln)
             items_html = """
   <tbody>"""
@@ -2121,6 +2120,7 @@ class Template:
             for item in items:
                 items_xml += item[4] + "\n"
             return items_xml
+
 
     def __tmpl_basket_item(self,
                            count,
@@ -3703,7 +3703,7 @@ class Template:
                                    public=False):
         """Tamplate that creates a bullet list of export as formats for a basket or an item."""
 
-        list_of_export_as_formats = [('MARCXML', 'xm')]
+        list_of_export_as_formats = [('BibTeX','hx'), ('DC','xd'), ('EndNote','xe'), ('MARCXML', 'xm'), ('NLM','xn'), ('RefWorks','xw')]
 
         recid = item and "&recid=" + str(item[0]) or ""
 
@@ -3723,9 +3723,10 @@ class Template:
 
         export_as_html = ""
         for format in list_of_export_as_formats:
-            export_as_html += """<a style="text-decoration:underline;font-weight:normal" href="%s&of=%s">%s</a>""" % \
+            export_as_html += """<a style="text-decoration:underline;font-weight:normal" href="%s&of=%s">%s</a>, """ % \
                               (href, format[1], format[0])
-
+        if export_as_html:
+            export_as_html = export_as_html[:-2]
         out = """
 <div style="float:right; text-align:right;">
   <ul class="bsk_export_as_list">
