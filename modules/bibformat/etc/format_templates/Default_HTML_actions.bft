@@ -13,4 +13,5 @@
             <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='CFG_SITE_URL'/>record/<BFE_RECORD_ID/>/export/xw?ln=<BFE_CLIENT_INFO var='ln'/>">RefWorks</a></li>
         <BFE_EDIT_RECORD prefix="<li>" suffix="</li>" />
         <BFE_EDIT_FILES prefix="<li>" suffix="</li>" />
+        <li><a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/>bibsword?ln=<BFE_CLIENT_INFO var='ln'/>&recid=<BFE_RECORD_ID/>&id_remote_server=1">Push to arXiv</a></li>
 </ul>

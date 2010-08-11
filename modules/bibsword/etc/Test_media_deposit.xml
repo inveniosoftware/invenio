@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:sword="http://purl.org/net/sword/">
+  <author>
+    <name>CDS_Invenio</name>
+  </author>
+  <title>Accepted media deposit to arXiv</title>
+  <id>info:arxiv/app/10070072</id>
+  <updated>2010-07-01T17:53:07Z</updated>
+  <content type="application/pdf" src="https://arxiv.org/sword-app/edit/10070072"/>
+  <source>
+    <generator uri="https://arxiv.org/sword-app/" version="1.1">SWORD@arXiv.org</generator>
+  </source>
+  <summary>A media deposit of type "application/pdf" was stored in the author's workspace</summary>
+  <sword:treatment>stored in author's workspace</sword:treatment>
+  <sword:verboseDescription>stored as is</sword:verboseDescription>
+  <sword:noOp>true</sword:noOp>
+  <sword:userAgent>Invenio SWORD client</sword:userAgent>
+  <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" scheme="http://arxiv.org/terms/arXiv/" term="http://arxiv.org/terms/arXiv/physics">Physics</arxiv:primary_category>
+  <link rel="edit-media" href="https://arxiv.org/sword-app/edit/10070072"/>
+  <link rel="edit" href="https://arxiv.org/sword-app/edit/10070072.atom"/>
+</entry>

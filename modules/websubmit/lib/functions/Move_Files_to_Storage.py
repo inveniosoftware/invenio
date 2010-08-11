@@ -89,13 +89,24 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
       The specified restrictions can include a variable that can be
       replaced at runtime, for eg:
       {'DEMOART_APPENDIX':'restricted to <PA>file:SuE</PA>'}
+
+    + parameters['paths_and_doctypes']: if a doctype is specified,
+      the file will be saved under the 'doctype/collection' instead
+      of under the default doctype/collection given by the name
+      of the upload element that was used on the websubmit interface.
+      to configure the doctype in websubmit, enter the value as in a
+      dictionnary, for eg:
+      {'PATHS_SWORD_UPL' : 'PUSHED_TO_ARXIV'} -> from
+      Demo_Export_Via_Sword [DEMOSWR] Document Types
     """
+
     global sysno
     paths_and_suffixes = parameters['paths_and_suffixes']
     paths_and_restrictions = parameters['paths_and_restrictions']
     rename = parameters['rename']
     documenttype = parameters['documenttype']
     iconsizes = parameters['iconsize'].split(',')
+    paths_and_doctypes = parameters['paths_and_doctypes']
 
     ## Create an instance of BibRecDocs for the current recid(sysno)
     bibrecdocs = BibRecDocs(sysno)
@@ -103,6 +114,8 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
     paths_and_suffixes = get_dictionary_from_string(paths_and_suffixes)
 
     paths_and_restrictions = get_dictionary_from_string(paths_and_restrictions)
+
+    paths_and_doctypes = get_dictionary_from_string(paths_and_doctypes)
 
     ## Go through all the directories specified in the keys
     ## of parameters['paths_and_suffixes']
@@ -115,6 +128,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
             restriction = re.sub('<PA>(?P<content>[^<]*)</PA>',
                                  get_pa_tag_content,
                                  restriction)
+
             ## Go through all the files in curdir/files/path
             for current_file in os.listdir("%s/files/%s" % (curdir, path)):
                 ## retrieve filename and extension
@@ -128,7 +142,8 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                     filename = re.sub('<PA>(?P<content>[^<]*)</PA>', \
                                       get_pa_tag_content, \
                                       parameters['rename'])
-                if rename or len(paths_and_suffixes[path]) != 0:
+
+                if rename or len(paths_and_suffixes[path]) != 0 :
                     ## Rename the file
                     try:
                         # Write the log rename_cmd
@@ -138,6 +153,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                         ## Rename
                         os.rename("%s/files/%s/%s" % (curdir, path, current_file), \
                                   "%s/files/%s/%s%s" % (curdir, path, filename, extension))
+
                         fd.close()
                         ## Save the new name in a text file in curdir so that
                         ## the new filename can be used by templates to created the recmysl
@@ -151,7 +167,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                 fullpath = "%s/files/%s/%s%s" % (curdir, path, filename, extension)
                 ## Check if there is any existing similar file
                 if not bibrecdocs.check_file_exists(fullpath):
-                    bibdoc = bibrecdocs.add_new_file(fullpath, doctype=path, never_fail=True)
+                    bibdoc = bibrecdocs.add_new_file(fullpath, doctype=paths_and_doctypes.get(path, path), never_fail=True)
                     bibdoc.set_status(restriction)
                     ## Fulltext
                     if documenttype == "fulltext":

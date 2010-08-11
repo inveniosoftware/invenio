@@ -3719,4 +3719,42 @@ CREATE TABLE IF NOT EXISTS user_expJOB (
   KEY id_expJOB (id_expJOB)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS swrREMOTESERVER (
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(50) unique NOT NULL,
+  host varchar(50) NOT NULL,
+  username varchar(50) NOT NULL,
+  password varchar(50) NOT NULL,
+  email varchar(50) NOT NULL,
+  realm varchar(50) NOT NULL,
+  url_base_record varchar(50) NOT NULL,
+  url_servicedocument varchar(80) NOT NULL,
+  xml_servicedocument longblob,
+  last_update int(15) unsigned NOT NULL,
+  PRIMARY KEY (id)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS swrCLIENTDATA (
+  id int(15) unsigned NOT NULL auto_increment,
+  id_swrREMOTESERVER int(15) NOT NULL,
+  id_record int(15) NOT NULL,
+  report_no varchar(50) NOT NULL,
+  id_remote varchar(50) NOT NULL,
+  id_user int(15) NOT NULL,
+  user_name varchar(100) NOT NULL,
+  user_email varchar(100) NOT NULL,
+  xml_media_deposit longblob NOT NULL,
+  xml_metadata_submit longblob NOT NULL,
+  submission_date datetime NOT NULL default '0000-00-00 00:00:00',
+  publication_date datetime NOT NULL default '0000-00-00 00:00:00',
+  removal_date datetime NOT NULL default '0000-00-00 00:00:00',
+  link_medias varchar(150) NOT NULL,
+  link_metadata varchar(150) NOT NULL,
+  link_status varchar(150) NOT NULL,
+  status varchar(150) NOT NULL default 'submitted',
+  last_update datetime NOT NULL,
+  PRIMARY KEY (id)
+) TYPE=MyISAM;
+
+
 -- end of file

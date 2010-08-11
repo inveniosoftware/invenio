@@ -659,6 +659,14 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibsched/doc/hacking/Makefile \
 	  modules/bibsched/lib/Makefile \
 	  modules/bibupload/Makefile \
+          modules/bibsword/Makefile \
+          modules/bibsword/bin/Makefile \
+          modules/bibsword/bin/bibsword \
+          modules/bibsword/doc/Makefile \
+          modules/bibsword/doc/admin/Makefile \
+          modules/bibsword/doc/hacking/Makefile \
+          modules/bibsword/lib/Makefile \
+          modules/bibsword/etc/Makefile \
 	  modules/bibupload/bin/Makefile \
 	  modules/bibupload/bin/bibupload \
 	  modules/bibupload/bin/batchuploader \

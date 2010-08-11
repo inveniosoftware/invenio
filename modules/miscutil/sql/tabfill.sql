@@ -1,5 +1,3 @@
--- $Id$
-
 -- This file is part of Invenio.
 -- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
 --
@@ -333,7 +331,7 @@ INSERT INTO tag VALUES (117,'record ID','001');
 INSERT INTO tag VALUES (118,'isbn','020__a');
 INSERT INTO tag VALUES (119,'issn','022__a');
 INSERT INTO tag VALUES (120,'coden','030__a');
--- INSERT INTO tag VALUES (121,'doi','773__a');
+INSERT INTO tag VALUES (121,'doi','9094Ca');
 INSERT INTO tag VALUES (122,'850x','850%');
 INSERT INTO tag VALUES (123,'851x','851%');
 INSERT INTO tag VALUES (124,'852x','852%');
@@ -348,6 +346,14 @@ INSERT INTO tag VALUES (132,'collaboration','710__g');
 INSERT INTO tag VALUES (133,'first author affiliation','100__u');
 INSERT INTO tag VALUES (134,'additional author affiliation','700__u');
 INSERT INTO tag VALUES (135,'caption','8564_y');
+INSERT INTO tag VALUES (136,'journal code','9094Cc');
+INSERT INTO tag VALUES (137,'journal title','9094Cp');
+INSERT INTO tag VALUES (138,'journal page','9094Cv');
+INSERT INTO tag VALUES (139,'journal year','9094Cy');
+INSERT INTO tag VALUES (140,'comment','500__a');
+INSERT INTO tag VALUES (141,'title','245__a');
+INSERT INTO tag VALUES (142,'main abstract','245__a');
+INSERT INTO tag VALUES (143,'internal notes','595__a');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '');
@@ -600,5 +606,7 @@ INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata
 INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (17, 'usage;comments;metadata');
+
+INSERT INTO swrREMOTESERVER VALUES (1, 'arXiv', 'arxiv.org', 'CDS_Invenio', 'sword_invenio', 'admin', 'SWORD at arXiv', 'http://arxiv.org/abs', 'https://arxiv.org/sword-app/servicedocument', '', 0);
 
 -- end of file

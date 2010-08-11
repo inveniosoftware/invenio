@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deposit>
+   <status>unknown</status>
+   <error>identifier does not correspond to a SWORD wrapper, it may belong to a media deposit</error>
+</deposit>

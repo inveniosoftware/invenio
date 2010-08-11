@@ -28,6 +28,7 @@ pylib_DATA = __init__.py \
              Create_Cplx_Approval.py \
              Create_Modify_Interface.py \
              Create_Recid.py \
+             Export_Via_SWORD.py \
              Finish_Submission.py \
              Format_Record.py \
              Generate_Group_File.py \

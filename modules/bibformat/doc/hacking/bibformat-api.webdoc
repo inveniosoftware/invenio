@@ -747,7 +747,7 @@ carefully such that it is not too long, but self explanatory (you can
 prefix the filename with BFE or not, but the element will always be
 called with prefix &lt;BFE_ inside templates).  Then you just need to
 drop the file in the lib/python/invenio/bibformat_elements/ directory
-of your CDS Invenio installation. Inside your file you have to define
+of your Invenio installation. Inside your file you have to define
 a function named "format_element", which takes at least a "bfo"
 parameter (bfo for BibFormat Object). The function must return a
 string:

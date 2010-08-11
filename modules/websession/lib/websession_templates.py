@@ -1091,6 +1091,8 @@ class Template:
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibcirculation/bibcirculationadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibCirculation"))
                 if action == "runbibmerge":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/merge/">%s</a>""" % (CFG_SITE_URL, _("Run Record Merger"))
+                if action == "runbibswordclient":
+                    tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/bibsword/">%s</a>""" % (CFG_SITE_URL, _("Run BibSword Client"))
                 if action == "runbatchuploader":
                     tmp_out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/batchuploader/metadata?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run Batch Uploader"))
                 if action == "cfgbibformat":

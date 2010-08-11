@@ -311,6 +311,25 @@ engine.
 
 <tr>
 <td>
+    <strong>BibSword Client Admin</strong>
+</td>
+<td>
+    Enables you to consult and refresh the status of the forwared
+    record to any SWORD Remote Server. It also gives information about
+    the SWORD configuration and credential of the Remote Server.
+    Finally, this function allows admin to forward record from
+    Invenio to any configured Remote Server.
+</td>
+<td>
+    <a href="<CFG_SITE_URL>/bibsword/">BibSword Client Admin Interface</a>
+</td>
+<td>
+   <a href="bibsword-client-admin-guide">BibSword Client Admin Guide</a>
+</td>
+</tr>
+
+<tr>
+<td>
   <strong>OAI Repository Admin</strong>
 </td>
 <td>
