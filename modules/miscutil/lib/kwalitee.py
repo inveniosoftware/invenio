@@ -49,9 +49,10 @@ import os
 import re
 import sys
 import time
+import subprocess
 
 __revision__ = "$Id$" #: revision number
-verbose = 0 #: verbose level
+VERBOSE = 0 #: verbose level
 
 
 def get_list_of_python_code_files(modulesdir, modulename):
@@ -60,17 +61,14 @@ def get_list_of_python_code_files(modulesdir, modulename):
     """
     out = []
     # firstly, find out *.py files:
-    (dummy, pipe, dummy)= os.popen3("find %s/%s/ -name '*.py'" % \
-                                    (modulesdir, modulename))
-    out.extend([filename.strip() for filename in pipe.readlines()])
-    pipe.close()
+    out.extend(get_python_filenames_from_pathnames(["%s/%s/" % \
+                                                   (modulesdir, modulename)]))
     # secondly, find out bin/*.in files:
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/bin/ -name '*.in'" % \
-                                     (modulesdir, modulename))
-    out.extend([filename.strip() for filename in pipe.readlines()])
-    pipe.close()
+    out.extend(get_python_filenames_from_pathnames(["%s/%s/" % \
+                                                   (modulesdir, modulename)],
+                                                   extension='.in'))
     # last, remove Makefile, test files, z_ files:
-    # pylint: disable-msg=W0141
+    # pylint: disable=W0141
     out = filter(lambda x: not x.endswith("Makefile.in"), out)
     out = filter(lambda x: not x.endswith("dbexec.in"), out)
     out = filter(lambda x: not x.endswith("_tests.py"), out)
@@ -83,7 +81,7 @@ def wash_list_of_python_files_for_pylinting(filenames):
     """Remove away some Python files that are not suitable for
        pylinting, e.g. known wrong test files or empty init files.
     """
-    # pylint: disable-msg=W0141
+    # pylint: disable=W0141
     # take only .py files for pylinting:
     filenames = filter(lambda x: x.endswith(".py"),
                                  filenames)
@@ -106,23 +104,23 @@ def wash_list_of_python_files_for_pylinting(filenames):
 def get_list_of_python_unit_test_files(modulesdir, modulename):
     """Return list of Python unit test files for MODULENAME in MODULESDIR."""
     out = []
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*_tests.py'" % \
-                                     (modulesdir, modulename))
-    out.extend([filename.strip() for filename in pipe.readlines()])
-    pipe.close()
-    # pylint: disable-msg=W0141
-    out = filter(lambda x: not x.endswith("_regression_tests.py"), out)
+    for filename in get_python_filenames_from_pathnames(["%s/%s/" % \
+                                                        (modulesdir,
+                                                         modulename)]):
+        if filename.endswith('_tests.py') and \
+           not filename.endswith('_regression_tests.py'):
+            out.append(filename)
     return out
 
 
 def get_list_of_python_regression_test_files(modulesdir, modulename):
     """Return list of Python unit test files for MODULENAME in MODULESDIR."""
     out = []
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name "
-                                     "'*_regression_tests.py'" % \
-                                     (modulesdir, modulename))
-    out.extend([filename.strip() for filename in pipe.readlines()])
-    pipe.close()
+    for filename in get_python_filenames_from_pathnames(["%s/%s/" % \
+                                                        (modulesdir,
+                                                         modulename)]):
+        if filename.endswith('_regression_tests.py'):
+            out.append(filename)
     return out
 
 
@@ -130,10 +128,16 @@ def get_list_of_web_test_files(modulesdir, modulename):
     """Return list of HTML Selenese web test files for MODULENAME
     in MODULESDIR."""
     out = []
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name 'test_*.html'" % \
-                                     (modulesdir, modulename))
-    out.extend([filename.strip() for filename in pipe.readlines()])
-    pipe.close()
+    process = subprocess.Popen(['find', '%s/%s/' % (modulesdir, modulename),
+                                '-name', 'test_*.html'],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    process_output, process_error = process.communicate()
+    if process_error:
+        print "[ERROR]", process_error
+    for test_file in process_output.split('\n'): # pylint: disable=E1103
+        if test_file:
+            out.append(test_file)
     return out
 
 
@@ -144,8 +148,13 @@ def get_nb_lines_in_file(filename):
 
 def get_nb_test_cases_in_file(filename):
     """Return number of test cases in FILENAME."""
-    (dummy, pipe, dummy) = os.popen3("grep ' def test' %s" % filename)
-    return len(pipe.readlines())
+    process = subprocess.Popen(['grep', ' def test', filename],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    process_output, process_error = process.communicate()
+    if process_error:
+        print "[ERROR]", process_error
+    return process_output.count('\n')
 
 
 def get_pylint_results(filename):
@@ -155,8 +164,13 @@ def get_pylint_results(filename):
     nb_msg_fatal) for FILENAME.  If score cannot be detected, print an
     error and return (-999999999, -999999999, 0, 0, 0, 0, 0).
     """
-    (dummy, pipe, dummy) = os.popen3("pylint %s" % filename)
-    pylint_output = pipe.read()
+    process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+                                filename],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    pylint_output, pylint_error = process.communicate()
+    if pylint_error:
+        print "[ERROR]", pylint_error
 
     # detect number of missing docstrings:
     nb_missing_docstrings = pylint_output.count(": Missing docstring")
@@ -178,7 +192,7 @@ def get_pylint_results(filename):
     nb_msg_fatal = pylint_output.count("\nF:")
 
     # return results:
-    if verbose >= 9:
+    if VERBOSE >= 9:
         print "get_pylint_results(%s) = (%d, %s, %s, %s, %s, %s, %s)" % \
               (filename, nb_missing_docstrings, pylint_score,
                nb_msg_convention, nb_msg_refactor, nb_msg_warning,
@@ -197,12 +211,16 @@ def get_nb_pychecker_warnings(filename):
     nb_warnings_found = 0
     filename_to_watch_for = os.path.basename(filename) # pychecker strips
                                                        # leading path
-    (dummy, pipe, dummy) = os.popen3("pychecker --limit=10000 %s" % filename)
-    pychecker_output_lines = pipe.readlines()
-    for line in pychecker_output_lines:
+    process = subprocess.Popen(['pychecker', '-Q', '--limit=10000', filename],
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE)
+    pychecker_output, dummy_pychecker_error = process.communicate()
+    #if dummy_pychecker_error:
+    #    print "[ERROR]", dummy_pychecker_error
+    for line in pychecker_output.split('\n'): # pylint: disable=E1103
         if line.find(filename_to_watch_for + ":") > -1:
             nb_warnings_found += 1
-    if verbose >= 9:
+    if VERBOSE >= 9:
         print "get_nb_pychecker_warnings(%s) = %s" % (filename,
                                                       nb_warnings_found)
     return nb_warnings_found
@@ -287,7 +305,7 @@ def get_invenio_modulenames(dirname="."):
     """
     modulenames = os.listdir(dirname)
     # remove CVS:
-    # pylint: disable-msg=W0141
+    # pylint: disable=W0141
     modulenames = filter(lambda x: not x=="CVS", modulenames)
     # remove non-directories:
     modulenames = filter(lambda x: os.path.isdir(dirname + "/" + x),
@@ -297,6 +315,13 @@ def get_invenio_modulenames(dirname="."):
     # sort alphabetically:
     modulenames.sort()
     return modulenames
+
+
+def shorten_module_name(modulename, maxlen=13):
+    """Return MODULENAME shortened to maximum length of MAXLEN characters.
+       Useful for pretty-printing module names in aligned tables.
+    """
+    return modulename[:maxlen]
 
 
 def generate_kwalitee_stats_for_all_modules(modulesdir):
@@ -380,7 +405,8 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
               "%(nb_regressiont)6d %(nb_webt)6d %(nb_tests_per_1k_loc)8.2f " \
               "%(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f " \
               "%(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
-              {'modulename': kwalitee[modulename]['modulename'],
+              {'modulename': \
+                     shorten_module_name(kwalitee[modulename]['modulename']),
                'nb_loc': kwalitee[modulename]['nb_loc'],
                'nb_unitt': kwalitee[modulename]['nb_unit_tests'],
                'nb_regressiont': kwalitee[modulename]['nb_regression_tests'],
@@ -561,22 +587,25 @@ Legend:
     return
 
 
-def get_python_filenames_from_pathnames(pathnames):
+def get_python_filenames_from_pathnames(pathnames, extension='.py'):
     """Get recursively all Python filenames from given pathnames.
     Input: list of pathnames (a pathname is a file or a directory).
     Output: list of Python files.
     """
+    if not isinstance(pathnames, list):
+        # sanity check in case people pass one pathname without list
+        pathnames = [pathnames]
     out = set([])
     for pathname in pathnames:
         if os.path.isdir(pathname):
             # we have directory, so recursively searching list of files:
-            for rootdir, subdirs, files in os.walk(pathname):
+            for rootdir, dummy_subdirs, files in os.walk(pathname):
                 for afile in files:
-                    if afile.endswith('.py'):
-                        out.add(os.path.join(rootdir,afile))
+                    if afile.endswith(extension):
+                        out.add(os.path.join(rootdir, afile))
         else:
             # we have file:
-            if pathname.endswith('.py'):
+            if pathname.endswith(extension):
                 out.add(pathname)
     out = list(out)
     out.sort()
@@ -622,10 +651,13 @@ def cmd_check_errors(filenames):
     print_heading('Checking Python errors...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("pylint --errors-only %s" % filename)
-        for line in pipe.readlines():
-            out += line
-        pipe.close()
+        process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+                                    '--errors-only', filename],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        out, err = process.communicate()
+        if err:
+            print "[ERROR]", err
         if out:
             print '***', filename
             print out
@@ -636,9 +668,14 @@ def cmd_check_variables(filenames):
     print_heading('Checking Python variables...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("pylint --reports=n %s" % \
-                                        filename)
-        for line in pipe.readlines():
+        process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+                                    '--reports=n', filename],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        pylint_output, pylint_error = process.communicate()
+        if pylint_error:
+            print "[ERROR]", pylint_error
+        for line in pylint_output.split('\n'): # pylint: disable=E1103
             if line.startswith('F:') or line.startswith('E:') or \
                    line.startswith('W:'):
                 if 'variable' in line or \
@@ -646,8 +683,7 @@ def cmd_check_variables(filenames):
                    'global' in line or \
                    'Unused' in line or \
                    'Redefining' in line:
-                    out += line
-        pipe.close()
+                    out += line + '\n'
         if out:
             print '***', filename
             print out
@@ -658,12 +694,16 @@ def cmd_check_indentation(filenames):
     print_heading('Checking Python indentation...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("pylint --reports=n %s" % \
-                                        filename)
-        for line in pipe.readlines():
+        process = subprocess.Popen(['pylint', '--rcfile=/dev/null',
+                                    '--reports=n', filename],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        process_output, process_error = process.communicate()
+        if process_error:
+            print "[ERROR]", process_error
+        for line in process_output.split('\n'): # pylint: disable=E1103
             if 'indent' in line:
-                out += line
-        pipe.close()
+                out += line + '\n'
         if out:
             print '***', filename
             print out
@@ -674,10 +714,15 @@ def cmd_check_whitespace(filenames):
     print_heading('Checking trailing whitespace...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("grep -Hni ' $' %s" % filename)
-        for line in pipe.readlines():
-            out += line
-        pipe.close()
+        process = subprocess.Popen(['grep', '-Hni', ' $', filename],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        process_output, process_error = process.communicate()
+        if process_error:
+            print "[ERROR]", process_error
+        for line in process_output.split('\n'): # pylint: disable=E1103
+            if line:
+                out += line + '\n'
         if out:
             print '***', filename
             print out
@@ -688,12 +733,16 @@ def cmd_check_docstrings(filenames):
     print_heading('Checking Python docstrings compliance...')
     for filename in filenames:
         out = ''
-        (dummy, pipe, dummy)= os.popen3("epydoc -v --simple-term " \
-                                        "--check %s" % filename)
-        for line in pipe.readlines():
+        process = subprocess.Popen(['epydoc', '-v', '--simple-term',
+                                    '--check', filename],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        process_output, process_error = process.communicate()
+        if process_error:
+            print "[ERROR]", process_error
+        for line in process_output.split('\n'): # pylint: disable=E1103
             if not line.startswith('  [......'):
-                out += line
-        pipe.close()
+                out += line + '\n'
         if out:
             print '***', filename
             print out
@@ -705,13 +754,13 @@ def cmd_check_pep8(filenames):
     path_to_pep8 = sys.argv[0].replace('kwalitee.py', 'pep8.py')
     for filename in filenames:
         out = ''
-        sys.argv[0]
-        (dummy, pipe, dummy)= os.popen3("python %s --repeat "
-                                        "--statistics %s" % \
-                                        (path_to_pep8, filename))
-        for line in pipe.readlines():
-            out += line
-        pipe.close()
+        process = subprocess.Popen(['python', path_to_pep8, '--repeat',
+                                    '--statistics', filename],
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE)
+        out, err = process.communicate()
+        if err:
+            print "[ERROR]", err
         if out:
             print '***', filename
             print out
@@ -768,6 +817,14 @@ def main():
         else:
             # detect Python files to process:
             cmd_filenames = get_python_filenames_from_pathnames(cmd_pathnames)
+            if not cmd_filenames:
+                # Hmm, maybe people passed invenio.webfoo_bar, so
+                # let's try to continue.  Most checks will work, some
+                # will not (e.g. PEP8).  FIXME: clean this
+                # double-entry stuff, display verbose warnings in
+                # respective tests, and after cleaning advertize it in
+                # the --help page.
+                cmd_filenames = cmd_pathnames
             eval('cmd_' + cmd_option)(cmd_filenames)
         print_heading('Done.')
     return
