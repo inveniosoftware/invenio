@@ -26,7 +26,7 @@ pylib_DATA = bibcirculation.py \
              bibcirculation_webinterface.py \
              bibcirculation_dblayer.py \
 	     bibcirculation_config.py \
-	     bibcirculation_daemon.py \
+	     bibcircd.py \
 	     bibcirculation_utils.py \
 	     bibcirculation_cern_ldap.py \
              bibcirculation_regression_tests.py

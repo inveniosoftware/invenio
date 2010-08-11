@@ -28,7 +28,7 @@ CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
                            "oaiharvest", "oairepositoryupdater", "inveniogc",
                            "webstatadmin", "bibclassify", "bibexport",
-                           "dbdump", "batchuploader")
+                           "dbdump", "batchuploader", "bibcircd")
 
 # Task that should not be reinstatiated
 CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')

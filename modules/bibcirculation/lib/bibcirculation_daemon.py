@@ -27,7 +27,9 @@ import sys
 import datetime
 import time
 from invenio.dbquery import run_sql
-from invenio.bibtask import task_init
+from invenio.bibtask import task_init, task_sleep_now_if_required, \
+                            task_update_progress, write_message, \
+                            task_set_option, task_get_option
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
@@ -35,6 +37,15 @@ from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
 from invenio.search_engine import get_fieldvalues
 from invenio.bibcirculation_utils import generate_email_body
 
+def task_submit_elaborate_specific_parameter(key, value, opts, args):
+    """ Given the string key, checks its meaning and returns True if
+        has elaborated the key.
+        Possible keys:
+    """
+    if key in ('-o', '--overdue-letters'):
+        task_set_option('overdue-letters', True)
+        return True
+    return False
 
 def get_expired_loan():
     """
@@ -148,25 +159,43 @@ def task_run_core():
     run daemon
     """
 
-    expired_loans = get_expired_loan()
+    if task_get_option("overdue-letters"):
+        expired_loans = db.get_all_expired_loans()
 
-    for (borrower_id, loan_id, recid) in expired_loans:
-        (number_of_letters, date_letters) = get_overdue_letters_info(loan_id)
+        total = len(expired_loans)
+        done  = 0
 
-        if number_of_letters == 0:
-            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL1'], loan_id)
-        elif number_of_letters == 1 and must_send_second_recall(date_letters):
-            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL2'], loan_id)
-        elif number_of_letters == 2 and must_send_third_recall(date_letters):
-            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
-        elif must_send_third_recall(date_letters):
-            content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
 
-        title = ''.join(get_fieldvalues(recid, "245__a"))
-        subject = "LOAN RECALL: " + title
-        update_expired_loan(loan_id)
+        for (borrower_id, bor_name, recid, barcode,
+            loaned_on, due_date, number_of_renewals, number_of_letters,
+            date_letters, notes, loan_id) in expired_loans:
 
-        send_overdue_letter(borrower_id, subject, content)
+            number_of_letters=int(number_of_letters)
+
+            content = ''
+            if number_of_letters == 0:
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL1'], loan_id)
+            elif number_of_letters == 1 and must_send_second_recall(date_letters):
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL2'], loan_id)
+            elif number_of_letters == 2 and must_send_third_recall(date_letters):
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
+            elif must_send_third_recall(date_letters):
+                content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
+
+            if content != '':
+                title = ''.join(get_fieldvalues(recid, "245__a"))
+                subject = "LOAN RECALL: " + title
+                
+                update_expired_loan(loan_id)
+                send_overdue_letter(borrower_id, subject, content)
+
+            done+=1
+
+            task_update_progress("Done %d out of %d." % (done, total))
+
+            task_sleep_now_if_required(can_stop_too=True)
+            time.sleep(1)
+
 
     return 1
 
@@ -174,11 +203,14 @@ def main():
     """
     main()
     """
-    task_init(authorization_action='runbibcirculation',
+    task_init(authorization_action='runbibcircd',
               authorization_msg="BibCirculation Task Submission",
+              help_specific_usage="""-o,  --overdue-letters\tCheck overdue loans and send recall emails if necessary.\n""",
               description="""Examples:
               %s -u admin
-              """ % (sys.argv[0],),
+              """ % (sys.argv[0]),
+              specific_params=("o:", ["overdue-letters"]),
+              task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               version=__revision__,
               task_run_fnc = task_run_core)
 
