@@ -140,14 +140,14 @@ class InvenioConnector:
             self.cached_queries[params + str(parse_results)] = parsed_records
             return parsed_records
         else:
-            # pylint: disable-msg=E1103
+            # pylint: disable=E1103
             # The whole point of the following code is to make sure we can
             # handle two types of variable.
             try:
                 res = results.read()
             except AttributeError:
                 res = results
-            # pylint: enable-msg=E1103
+            # pylint: enable=E1103
 
             if of == "id":
                 if type(res) is str:

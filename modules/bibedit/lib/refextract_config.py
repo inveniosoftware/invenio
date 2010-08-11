@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_VERSION, CFG_ETCDIR
 
-# pylint: disable-msg=C0301
+# pylint: disable=C0301
 
 # version number:
 CFG_REFEXTRACT_VERSION = "CDS Invenio/%s refextract/%s" % (CFG_VERSION, CFG_VERSION)

@@ -61,7 +61,6 @@ from invenio.webstat_engine import create_graph_dump
 from invenio.webstat_engine import export_to_python
 from invenio.webstat_engine import export_to_csv
 
-
 TEMPLATES = template.load('webstat')
 
 # Constants

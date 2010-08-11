@@ -75,7 +75,7 @@ the coding standard.  If you develop in Emacs, run M-x pylint RET on
 your buffers frequently.  Read and implement pylint suggestions.
 (Note that using lambda and friends may lead to false pylint warnings.
 You can switch them off by putting block comments of the form ``#
-pylint: disable-msg=C0301''.)</p>
+pylint: disable=C0301''.)</p>
 
 <p>Do not forget to run pychecker on your code either.  It is another
 source code checker that catches some situations better and some

@@ -17,8 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# pylint: disable-msg=C0301
-# pylint: disable-msg=E1102
+# pylint: disable=C0301
+# pylint: disable=E1102
 
 """WebSearch module regression tests."""
 
@@ -30,9 +30,9 @@ import urlparse, cgi
 import sys
 
 if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
+    # pylint: disable=W0622
     from sets import Set as set
-    # pylint: enable-msg=W0622
+    # pylint: enable=W0622
 
 from mechanize import Browser, LinkNotFoundError
 

@@ -523,7 +523,7 @@ class Convertor:
 #            standard.setPropertyValue('Size', pageSize)
 
             error(1, "Selected output format: %s" % outputfmt)
-            # pylint: disable-msg=E1103
+            # pylint: disable=E1103
             # outputfmt is an instance of the class Fmt.
             error(1, "Selected ooffice filter: %s" % outputfmt.filter)
             error(1, "Used doctype: %s" % outputfmt.doctype)
@@ -567,7 +567,7 @@ class Convertor:
             else:
                 doc.storeToURL("private:stream", outputprops)
 
-            # pylint: enable-msg=E1103
+            # pylint: enable=E1103
 
             doc.dispose()
             doc.close(True)

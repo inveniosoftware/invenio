@@ -17,7 +17,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# pylint: disable-msg=E1102
+# pylint: disable=E1102
 
 """Unit tests for the user handling library."""
 
@@ -36,7 +36,7 @@ class WebGroupTest(unittest.TestCase):
     """Test functions related to the Apache authentication."""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
+        # pylint: disable=C0103
         """setting up helper variables for tests"""
         self.email = 'ciccio@pasticcio.it'
         self.pwd = '123'

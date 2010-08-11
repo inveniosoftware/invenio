@@ -490,9 +490,9 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CF
             return t
 
         # FIXME This error will be fixed with Sam's new version of publiline.
-        # pylint: disable-msg=E1101
+        # pylint: disable=E1101
         comments = basketdb.get_comments(id_bskBASKET, sysno)
-        # pylint: enable-msg=E1101
+        # pylint: enable=E1101
 
         if dProjectLeaderAction != None:
             user_can_add_comment = 0

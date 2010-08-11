@@ -20,7 +20,7 @@
 __revision__ = \
     "$Id$"
 
-# pylint: disable-msg=C0301
+# pylint: disable=C0301
 
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE

@@ -24,7 +24,7 @@
 
 __revision__ = "$Id$"
 
-# pylint: disable-msg=C0301
+# pylint: disable=C0301
 CFG_MISCUTIL_ERROR_MESSAGES = \
 {   'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED':  '_("Invalid argument %s was passed")',
     'ERR_MISCUTIL_WRITE_FAILED': '_("Unable to write to file %s")',

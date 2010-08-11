@@ -24,7 +24,7 @@ the citation graph:
 - time decayed pagerank
 """
 
-# pylint: disable-msg=E0611
+# pylint: disable=E0611
 
 import ConfigParser
 from math import exp
@@ -35,9 +35,9 @@ import sys
 from numpy import array, ones, zeros, int32, float32, sqrt, dot
 
 if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
+    # pylint: disable=W0622
     from sets import Set as set
-    # pylint: enable-msg=W0622
+    # pylint: enable=W0622
 
 from invenio.dbquery import run_sql, serialize_via_marshal, \
         deserialize_via_marshal

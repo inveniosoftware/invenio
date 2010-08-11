@@ -30,7 +30,7 @@ class ExternalAuthenticationCernTest(unittest.TestCase):
     """Test functions related to the CERN authentication."""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
+        # pylint: disable=C0103
         """setting up helper variables for tests"""
         from invenio import external_authentication_cern as cern
         self.username, self.userpwd, self.useremail = \

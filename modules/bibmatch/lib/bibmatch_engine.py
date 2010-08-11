@@ -21,9 +21,9 @@ __revision__ = "$Id$"
 
 import sys
 if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
+    # pylint: disable=W0622
     from sets import Set as set #for "&" intersection
-    # pylint: enable-msg=W0622
+    # pylint: enable=W0622
 
 import getopt
 import string

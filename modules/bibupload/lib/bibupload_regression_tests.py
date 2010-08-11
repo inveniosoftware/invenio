@@ -17,7 +17,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# pylint: disable-msg=C0301
+# pylint: disable=C0301
 
 """Regression tests for the BibUpload."""
 
@@ -174,7 +174,7 @@ class BibUploadInsertModeTest(GenericBibUploadTest):
     """Testing insert mode."""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
+        # pylint: disable=C0103
         """Initialise the MARCXML variable"""
         GenericBibUploadTest.setUp(self)
         self.test = """<record>
@@ -277,7 +277,7 @@ class BibUploadAppendModeTest(GenericBibUploadTest):
     """Testing append mode."""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
+        # pylint: disable=C0103
         """Initialize the MARCXML variable"""
         GenericBibUploadTest.setUp(self)
         self.test_existing = """<record>
@@ -1000,7 +1000,7 @@ class BibUploadRecordsWithSYSNOTest(GenericBibUploadTest):
     """Testing uploading of records that have external SYSNO present."""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
+        # pylint: disable=C0103
         """Initialize the MARCXML test records."""
         GenericBibUploadTest.setUp(self)
         # Note that SYSNO fields are repeated but with different
@@ -1250,7 +1250,7 @@ class BibUploadRecordsWithEXTOAIIDTest(GenericBibUploadTest):
     """Testing uploading of records that have external EXTOAIID present."""
 
     def setUp(self):
-        # pylint: disable-msg=C0103
+        # pylint: disable=C0103
         """Initialize the MARCXML test records."""
         GenericBibUploadTest.setUp(self)
         # Note that EXTOAIID fields are repeated but with different

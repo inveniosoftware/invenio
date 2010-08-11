@@ -15,7 +15,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-# pylint: disable-msg=C0103
+# pylint: disable=C0103
 
 from invenio.bibrecord import record_has_field, \
                               record_get_field_instances, \

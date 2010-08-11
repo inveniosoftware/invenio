@@ -120,7 +120,7 @@ def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
       + createRelatedFormats: if uploaded files get converted to
                               whatever format we can (1) or not (0)
     """
-    # pylint: disable-msg=E0602
+    # pylint: disable=E0602
     # sysno is defined in the WebSubmit functions sandbox.
 
     global sysno
@@ -168,7 +168,7 @@ def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
     # links do not point to possible dead files
     run_sql("DELETE from bibfmt WHERE format='HB' AND id_bibrec=%s", (sysno,))
 
-    # pylint: enable-msg=E0602
+    # pylint: enable=E0602
 
 def add(bibrecdocs, curdir, sysno, file_path, doctype,
         iconsize, create_icon_doctypes, createRelatedFormats_p):

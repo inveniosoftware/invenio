@@ -80,7 +80,7 @@ from invenio.bibtask import task_init, write_message, task_get_option, \
     task_set_option, get_datetime, task_update_status, \
     task_sleep_now_if_required
 
-# pylint: disable-msg=W0611
+# pylint: disable=W0611
 # Disabling unused import pylint check, since these are needed to get
 # imported here, and are called later dynamically.
 from invenio.bibrank_tag_based_indexer import \
@@ -91,7 +91,7 @@ from invenio.bibrank_tag_based_indexer import \
     file_similarity_by_times_downloaded
 from invenio.bibrank_word_indexer import word_similarity
 from invenio.bibrank_citerank_indexer import citerank
-# pylint: enable-msg=W0611
+# pylint: enable=W0611
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by

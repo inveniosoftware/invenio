@@ -88,7 +88,7 @@ tmpl = invenio.template.load('websession')
 
 re_invalid_nickname = re.compile(""".*[,'@]+.*""")
 
-# pylint: disable-msg=C0301
+# pylint: disable=C0301
 
 def createGuestUser():
     """Create a guest user , insert into user null values in all fields

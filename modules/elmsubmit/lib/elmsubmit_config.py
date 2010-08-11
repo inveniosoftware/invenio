@@ -31,7 +31,7 @@ CFG_ELMSUBMIT_FILES = {
 # Messages we need to send to the user, before we've identified the
 # correct language to talk to them in (so we assume English!):
 
-# pylint: disable-msg=C0301
+# pylint: disable=C0301
 
 CFG_ELMSUBMIT_NOLANGMSGS = {'bad_email': 'Your email could not be parsed correctly to discover a submission. Please check your email client is functioning correctly.',
              'bad_submission': 'The submission data that you have provided could not be parsed correctly. Please visit <%s> for a description of the correct format.' % CFG_SITE_URL,

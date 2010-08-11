@@ -27,9 +27,9 @@ import sys
 from copy import copy
 
 if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
+    # pylint: disable=W0622
     from sets import Set as set
-    # pylint: enable-msg=W0622
+    # pylint: enable=W0622
 
 from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql, OperationalError

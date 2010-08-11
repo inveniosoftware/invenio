@@ -28,7 +28,7 @@ but see the others as well.
 __revision__ = "$Id$"
 
 # dbquery clients can import these from here:
-# pylint: disable-msg=W0611
+# pylint: disable=W0611
 from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     DatabaseError, OperationalError, IntegrityError, \
                     InternalError, NotSupportedError, \

@@ -187,7 +187,7 @@ class Cookie(object):
         """
 
         result = ["%s=%s" % (self.name, self.value)]
-        # pylint: disable-msg=E1101
+        # pylint: disable=E1101
         # The attribute _valid_attr is provided by the metaclass 'metaCookie'.
         for name in self._valid_attr:
             if hasattr(self, name):
@@ -195,7 +195,7 @@ class Cookie(object):
                     result.append(name)
                 else:
                     result.append("%s=%s" % (name, getattr(self, name)))
-        # pylint: enable-msg=E1101
+        # pylint: enable=E1101
         return "; ".join(result)
 
     def __repr__(self):

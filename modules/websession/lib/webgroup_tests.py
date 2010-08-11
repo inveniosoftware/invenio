@@ -26,9 +26,9 @@ import sys
 from invenio.testutils import make_test_suite, run_test_suite
 
 if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
+    # pylint: disable=W0622
     from sets import Set as set
-    # pylint: enable-msg=W0622
+    # pylint: enable=W0622
 
 class WebGroupTests(unittest.TestCase):
     """Test functions related to the WebGroup usage."""

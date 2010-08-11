@@ -99,7 +99,7 @@ CFG_WEBBASKET_WARNING_MESSAGES = {
     'WRN_WEBBASKET_INVALID_OUTPUT_FORMAT': '_("The selected output format is not available or is invalid.")',
     }
 
-# pylint: disable-msg=C0301
+# pylint: disable=C0301
 CFG_WEBBASKET_ERROR_MESSAGES = {
     'ERR_WEBBASKET_DB_ERROR': '_("There was an error with the database")',
     }

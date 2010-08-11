@@ -78,9 +78,9 @@ from invenio import webinterface_handler_config as apache
 socket.setdefaulttimeout(40)
 
 if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
+    # pylint: disable=W0622
     from sets import Set as set
-    # pylint: enable-msg=W0622
+    # pylint: enable=W0622
 
 from invenio.shellutils import escape_shell_arg
 from invenio.dbquery import run_sql, DatabaseError, blob_to_string

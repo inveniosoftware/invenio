@@ -63,9 +63,9 @@ from invenio.errorlib import register_exception
 from invenio.htmlutils import remove_html_markup
 
 if sys.hexversion < 0x2040000:
-    # pylint: disable-msg=W0622
+    # pylint: disable=W0622
     from sets import Set as set
-    # pylint: enable-msg=W0622
+    # pylint: enable=W0622
 
 # FIXME: journal tag and journal pubinfo standard format are defined here:
 if CFG_CERN_SITE:
