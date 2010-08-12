@@ -87,6 +87,11 @@ from invenio.webstat_engine import get_customevent_table, \
     get_customevent_trend, \
     get_customevent_dump
 
+# Imports handling custom report
+from invenio.webstat_engine import get_custom_summary_data, \
+    _get_tag_name, \
+    create_custom_summary_graph
+
 # Imports for handling outputting
 from invenio.webstat_engine import create_graph_trend, \
     create_graph_dump, \
@@ -940,8 +945,12 @@ def perform_request_index(ln=CFG_SITE_LANG):
     # Display the custom statistics
     out += TEMPLATES.tmpl_customevent_list(_get_customevents(), ln=ln)
 
+
     # Display error log analyzer
     out += TEMPLATES.tmpl_error_log_statistics_list(ln=ln)
+
+    # Display annual report
+    out += TEMPLATES.tmpl_custom_summary(ln=ln)
     return out
 
 def perform_display_keyevent(event_id=None, args={},
@@ -1231,6 +1240,22 @@ def perform_display_error_log_analyzer(ln=CFG_SITE_LANG):
     return TEMPLATES.tmpl_error_log_analyzer(get_invenio_error_log_ranking(),
                                              get_invenio_last_n_errors(5),
                                              get_apache_error_log_ranking())
+
+def perform_display_custom_summary(args, ln=CFG_SITE_LANG):
+    """Display the custom summary (annual report)
+
+    @param args: { param name: argument value } (search query and output tag)
+    @type args: { str: str }
+    """
+    if args['tag'] == '':
+        args['tag'] = "909C4p"
+    data = get_custom_summary_data(args['query'], args['tag'])
+    tag_name = _get_tag_name(args['tag'])
+    if tag_name == '':
+        tag_name = args['tag']
+    path =  WEBSTAT_GRAPH_DIRECTORY + os.path.basename("tmp_webstat_custom_summary_" + args['query'] + args['tag'])
+    create_custom_summary_graph(data[:-1], path)
+    return TEMPLATES.tmpl_display_custom_summary(tag_name, data, args['query'], args['tag'], path, ln=ln)
 
 # INTERNALS
 

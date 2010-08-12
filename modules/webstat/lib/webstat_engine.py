@@ -18,7 +18,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import calendar, commands, datetime, time, os, cPickle, re
+import calendar, commands, datetime, time, os, cPickle, re, random
 try:
     import xlwt
     xlwt_imported = True
@@ -28,7 +28,8 @@ from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME, CFG_BINDIR
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search, \
     get_collection_reclist, \
-    get_fieldvalues
+    get_fieldvalues, \
+    get_most_popular_field_values
 from invenio.dbquery import run_sql, \
     wash_table_column_name
 from invenio.websubmitadmin_dblayer import get_docid_docname_alldoctypes
@@ -1436,6 +1437,100 @@ def get_customevent_args(event_id):
         # No such event table
         return None
 
+# CUSTOM SUMMARY SECTION
+
+def get_custom_summary_data(query, tag):
+    """Returns the annual report data for the specified year
+    @param year: Year of publication on the journal
+    @type year: int
+
+    @param query: Search query to make customized report
+    @type query: str
+
+    @param tag: MARC tag for the output
+    @type tag: str
+    """
+
+    # Check arguments
+    if tag == '':
+        tag = "909C4p"
+
+    # First get records of the year
+    recids = perform_request_search(p=query, of="id") 
+
+    # Then return list by tag
+    pub = list(get_most_popular_field_values(recids, tag))
+    
+    sel = 0
+    for elem in pub:
+        sel += elem[1]
+    if len(pub) == 0:
+        return []
+    pub.append(('Others', len(recids) - sel))
+    pub.append(('TOTAL', len(recids)))
+
+    return pub
+
+def create_custom_summary_graph(data, path):
+    """
+    Creates a pie chart with the information from the custom summary and 
+    saves it in the file specified by the path argument
+    """
+    # If no input, we don't bother about anything
+    if len(data) == 0:
+        return
+    os.environ['HOME'] = CFG_TMPDIR
+    
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+    except ImportError:
+        return
+    # make a square figure and axes
+    matplotlib.rcParams['font.size'] = 8
+    labels = [x[0] for x in data]
+    numb_elem = float(len(labels))
+    width = 6 + numb_elem / 7
+    f = plt.figure(1, figsize=(width, 6))
+
+    plt.axes([0.1, 0.1, 4.2/width, 0.7])
+
+    numb = [x[1] for x in data]
+    total = sum(numb)
+    fracs = [x*100/total for x in numb]
+    colors = []
+    
+    random.seed()
+    for i in range(numb_elem):
+        col = 0.5 + float(i) / (numb_elem * 2.0)
+        rand = random.random() / 2.0
+        if i % 3 == 0:
+            red = col
+            green = col + rand
+            blue = col - rand
+            if green > 1.0:
+                green = 1
+        elif i % 3 == 1:
+            red = col - rand
+            green = col 
+            blue = col + rand
+            if blue > 1.0:
+                blue = 1
+        elif i % 3 == 2:
+            red = col + rand
+            green = col - rand
+            blue = col 
+            if red > 1.0:
+                red = 1
+        colors.append((red, green, blue))
+    patches = plt.pie(fracs, colors=tuple(colors), labels=labels, autopct='%1i%%', pctdistance=0.8, shadow=True)[0]
+    plt.title('Publications', bbox={'facecolor':'0.8', 'pad':5})
+    legend_keywords = {"prop": {"size" : "small"}}
+    plt.figlegend(patches, labels, 'lower right', **legend_keywords)
+    plt.savefig(path)
+    plt.close(f)
+
 # GRAPHER
 
 def create_graph_trend(trend, path, settings):
@@ -2180,3 +2275,15 @@ def _get_loan_periods():
     for dt in run_sql("SELECT DISTINCT(loan_period) FROM crcITEM ORDER BY loan_period ASC"):
         dts.append((dt[0], dt[0]))
     return dts
+
+def _get_tag_name(tag):
+    """
+    For a specific MARC tag, it returns the human-readable name
+    """
+    res = run_sql("SELECT name FROM tag WHERE value LIKE '%%%s%%'" % (tag))
+    if res:
+        return res[0][0]
+    res = run_sql("SELECT name FROM tag WHERE value LIKE '%%%s%%'" % (tag[:-1]))
+    if res:
+        return res[0][0]
+    return ''

@@ -158,6 +158,14 @@ class Template:
             error_number -= 1
         out += """<h4>Apache error log</h4>
                   <pre>%s</pre>""" % apache_ranking
+
+    def tmpl_custom_summary(self, ln=CFG_SITE_LANG):
+        """
+        Link to custom annual report
+        """
+        out = """<h3>Library report</h3>
+                 <ul><li><a href="%s/stats/custom_summary">Custom query summary</a></li></ul>
+                 """ % CFG_SITE_URL
         return out
 
     def tmpl_customevent_help(self, ln=CFG_SITE_LANG):
@@ -531,6 +539,52 @@ class Template:
         """Displays a Javascript graph representing a trend"""
         return self.tmpl_display_trend(title, "<div>%s</div>" % open(filename, 'r').read(), ln=ln)
 
+
+    def tmpl_display_custom_summary(self, tag_name, data, query, tag, path, ln=CFG_SITE_LANG):
+        """Display the custom summary (annual report)"""
+        # Create the FORM's header
+        formheader = """<form method="get">
+        <input type="hidden" name="ln"value="%s" />""" % ln
+
+        # Create the headers
+        headers = [("Query", "Output tag","")]
+
+        # Create the body (text boxes and button)
+        fields = (("""<input type="text" name="query" value="%s" size="35"/>""" % cgi.escape(query), """<input type="text" name="tag" value="%s"/>""" % cgi.escape(tag), """<input class="formbutton" type="submit" name="action_gen" value="Generate"/>"""),)
+        
+        # Create form footer
+        formfooter = """</form>"""
+
+        
+        out = self._tmpl_box(formheader, formfooter, [("custom_summary_table",)], headers, fields, [""], ln=ln)
+
+        out += """<div>
+<table border>
+
+<tr>
+
+<td colspan=2>
+<b><center>
+Distribution across %s
+</center>
+</td>
+</tr>
+
+<tr>
+<td align="right"><b>Nb.</b></td>  
+<td><b>%s</b></td>
+</tr>
+
+""" % (cgi.escape(tag_name), cgi.escape(tag_name[0].capitalize() + tag_name[1:]))
+        for title, number in data:
+            out += """<tr>
+<td align="right">%d</td>  
+<td>%s</td>
+</tr>
+""" % (number, cgi.escape(title))
+        out += """</table></div>
+<div><img src="%s" /></div>"""%cgi.escape(path.replace(CFG_WEBDIR, CFG_SITE_URL))
+        return out
 
     # INTERNALS
 

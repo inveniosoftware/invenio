@@ -18,7 +18,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import os, sys
+import os, sys, datetime
 from urllib import unquote
 from invenio import webinterface_handler_config as apache
 
@@ -37,8 +37,9 @@ from invenio.webstat import perform_request_index
 from invenio.webstat import perform_display_keyevent
 from invenio.webstat import perform_display_customevent
 from invenio.webstat import perform_display_customevent_help
-from invenio.webstat import perform_display_error_log_analyzer
-from invenio.webstat import register_customevent
+from invenio.webstat import perform_display_error_log_analyzer, \
+    register_customevent, \
+    perform_display_custom_summary
 
 def detect_suitable_graph_format():
     """
@@ -65,7 +66,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                  'ill_requests_stats', 'ill_requests_lists', 'ill_requests_graph', 'items_stats',
                  'items_list', 'loans_requests', 'loans_request_lists', 'user_stats',
                  'user_lists', 'error_log', 'customevent', 'customevent_help',
-                 'customevent_register', 'export' ]
+                 'customevent_register', 'custom_summary', 'export' ]
 
     navtrail = """<a class="navtrail" href="%s/stats/%%(ln_link)s">Statistics</a>""" % CFG_SITE_URL
 
@@ -820,6 +821,33 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         register_customevent(argd['event_id'], params)
         return redirect_to_url(req, unquote(argd['url']), apache.HTTP_MOVED_PERMANENTLY)
 
+    # CUSTOM REPORT SECTION
+
+    def custom_summary(self, req, form):
+        """Custom report page"""
+        argd = wash_urlargd(form, {'query': (str, ""),
+                                   'tag': (str, "909C4p"),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        if auth_code:
+            return page_not_authorized(req,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                text=auth_msg,
+                navmenuid='custom query summary',
+                ln=ln)
+
+        return page(title="Custom query summary",
+                    body=perform_display_custom_summary(argd, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    description="CDS, Statistics, Custom Query Summary",
+                    keywords="CDS, statistics, custom query summary",
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='custom query summary',
+                    language=ln)
 
     # EXPORT SECTION
 
