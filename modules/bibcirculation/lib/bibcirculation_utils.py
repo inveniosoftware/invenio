@@ -339,7 +339,7 @@ def print_new_loan_information(req, ln):
     (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
     # get borrower's data/information (name, address, email)
-    (borrower_name, borrower_address, borrower_email) = db.get_borrower_data(borrower_id)
+    (borrower_name, borrower_address, _borrower_mailbox, borrower_email) = db.get_borrower_data(borrower_id)
 
     # Generate printable format
     req.content_type = "text/html"

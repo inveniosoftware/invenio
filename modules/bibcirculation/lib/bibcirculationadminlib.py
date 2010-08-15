@@ -224,6 +224,7 @@ def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG)
             return get_borrower_details(req, result[0][0], ln)
         else:
             return create_new_request_step1(req, result[0][0])
+            #return create_new_request_step1(req, borrower_id, p, f, search, ln)
     else:
         body = bibcirculation_templates.tmpl_borrower_search_result(result=result, redirect=redirect, ln=ln)
 
@@ -3381,7 +3382,7 @@ def create_new_request_step1(req, borrower_id, p="", f="", search=None, ln=CFG_S
     infos = []
     borrower = db.get_borrower_details(borrower_id)
 
-    if p == '':
+    if search and p == '':
         infos.append('Empty string. Please, try again.')
         result = ''
 
@@ -3957,41 +3958,47 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
 
     if CFG_CERN_SITE == 1:
         if key =='ccid' and string:
-            from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
-            result = get_user_info_from_ldap(ccid=string)
+            result = db.get_borrower_data_by_ccid(string)
+            if result != ():
+                for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+                    tup = (borrower_id, ccid, name, email, phone, address, mailbox)
+                    list_infos.append(tup)
+            else:
+                from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+                result = get_user_info_from_ldap(ccid=string)
 
-            try:
-                name = result['cn'][0]
-            except KeyError:
-                name = ""
+                try:
+                    name = result['cn'][0]
+                except KeyError:
+                    name = ""
 
-            try:
-                ccid = result['employeeID'][0]
-            except KeyError:
-                ccid = ""
+                try:
+                    ccid = result['employeeID'][0]
+                except KeyError:
+                    ccid = ""
 
-            try:
-                email = result['mail'][0]
-            except KeyError:
-                email = ""
+                try:
+                    email = result['mail'][0]
+                except KeyError:
+                    email = ""
 
-            try:
-                phone = result['telephoneNumber'][0]
-            except KeyError:
-                phone = ""
+                try:
+                    phone = result['telephoneNumber'][0]
+                except KeyError:
+                    phone = ""
 
-            try:
-                address = result['physicalDeliveryOfficeName'][0]
-            except KeyError:
-                address = ""
+                try:
+                    address = result['physicalDeliveryOfficeName'][0]
+                except KeyError:
+                    address = ""
 
-            try:
-                mailbox = result['postOfficeBox'][0]
-            except KeyError:
-                mailbox = ""
+                try:
+                    mailbox = result['postOfficeBox'][0]
+                except KeyError:
+                    mailbox = ""
 
-            tup = ('', ccid, name, email, phone, address, mailbox)
-            list_infos.append(tup)
+                tup = ('', ccid, name, email, phone, address, mailbox)
+                list_infos.append(tup)
 
         elif key =='name' and string:
             result = db.get_borrower_data_by_name(string)

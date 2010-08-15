@@ -1876,6 +1876,19 @@ def get_borrower_data_by_id(borrower_id):
 
     return res
 
+def get_borrower_data_by_ccid(borrower_ccid):
+    """
+    Retrieve borrower's data by borrower_id.
+    """
+
+    res = run_sql("""select id, ccid, name, email, phone,
+                            address, mailbox
+                       from crcBORROWER
+                      where ccid regexp %s""",
+                  (borrower_ccid, ))
+
+    return res
+
 def get_number_requests_per_copy(barcode):
     """
     barcode: identify the item. It is the primary key of the table
