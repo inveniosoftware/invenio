@@ -561,7 +561,7 @@ class SpiresToInvenioSyntaxConverter:
 
     def __init__(self):
         """Initialize the state of the converter"""
-        self._init_monthes()
+        self._init_months()
         self._compile_regular_expressions()
 
     def _compile_regular_expressions(self):
@@ -650,12 +650,12 @@ class SpiresToInvenioSyntaxConverter:
 
         return query
 
-    def _init_monthes(self):
+    def _init_months(self):
         """Defines a dictionary matching the name
         of the month with its corresponding number"""
 
-        # this dictionary is used when generating match patterns for monthes
-        self._monthes = {'jan':'01', 'january':'01',
+        # this dictionary is used when generating match patterns for months
+        self._months = {'jan':'01', 'january':'01',
                          'feb':'02', 'february':'02',
                          'mar':'03', 'march':'03',
                          'apr':'04', 'april':'04',
@@ -682,19 +682,19 @@ class SpiresToInvenioSyntaxConverter:
                                             '10':'10',
                                             '11':'11',
                                             '12':'12',}
-        # combine it with monthes in order to cover all the cases
-        self._month_name_to_month_number.update(self._monthes)
+        # combine it with months in order to cover all the cases
+        self._month_name_to_month_number.update(self._months)
 
     def _get_month_names_match(self):
         """Retruns part of a patter that matches month in a date"""
 
-        monthes_match = ''
-        for month_name in self._monthes.keys():
-            monthes_match = monthes_match + month_name + '|'
+        months_match = ''
+        for month_name in self._months.keys():
+            months_match = months_match + month_name + '|'
 
-        monthes_match = r'\b(' + monthes_match[0:-1] + r')\b'
+        months_match = r'\b(' + months_match[0:-1] + r')\b'
 
-        return monthes_match
+        return months_match
 
     def _get_month_number(self, month_name):
         """Returns the corresponding number for a given month

@@ -188,7 +188,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
     """
     _ = gettext_set_language(ln)
     if display == 'short':
-        monthes = {0: _("Month"),
+        months = {0: _("Month"),
                    1: _("Jan"),
                    2: _("Feb"),
                    3: _("Mar"),
@@ -202,7 +202,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
                    11: _("Nov"),
                    12: _("Dec")}
     else:
-        monthes = {0: _("Month"),
+        months = {0: _("Month"),
                    1: _("January"),
                    2: _("February"),
                    3: _("March"),
@@ -215,7 +215,7 @@ def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
                    10: _("October"),
                    11: _("November"),
                    12: _("December")}
-    return monthes[month_nb]
+    return months[month_nb]
 
 def create_day_selectbox(name, selected_day=0, ln=CFG_SITE_LANG):
     """

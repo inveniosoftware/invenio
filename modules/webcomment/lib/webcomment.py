@@ -1213,10 +1213,10 @@ def calculate_start_date(display_since):
             yesterday = today.replace(year=final_nb_year)
     # month
     elif time_type == 'm':
-        # to convert nb of monthes in years
+        # to convert nb of months in years
         nb_year = nb / 12                        # nb_year = number of year to substract
         nb = nb % 12
-        if nb > today.month-1:                    # ex: july(07)-9 monthes = -1year -3monthes
+        if nb > today.month-1:                    # ex: july(07)-9 months = -1year -3months
             nb_year += 1
             nb_month = 12 - (today.month % nb)
         else:
