@@ -29,8 +29,7 @@ bibcirculation_templates = invenio.template.load('bibcirculation')
 # others invenio imports
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_CERN_SITE, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_CERN_SITE
 from invenio.dateutils import get_datetext
 import datetime
 from invenio.webuser import collect_user_info
@@ -410,7 +409,7 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
                 mailbox = None
 
             try:
-                ccid = user_info['employeeID'][0]
+                ccid = result['employeeID'][0]
             except KeyError:
                 ccid = ''
 
@@ -636,7 +635,7 @@ def ill_register_request(uid, title, authors, place, publisher, year, edition,
                 mailbox = None
 
             try:
-                ccid = user_info['employeeID'][0]
+                ccid = result['employeeID'][0]
             except KeyError:
                 ccid = ''
 

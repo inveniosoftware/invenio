@@ -20,9 +20,9 @@
 __revision__ = ""
 
 import invenio.bibcirculationadminlib as bal
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
+from invenio.config import CFG_SITE_URL
 from invenio.urlutils import wash_url_argument, redirect_to_url
-from cgi import escape
+#from cgi import escape
 
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
@@ -376,7 +376,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         """http://cdsweb.cern.ch/admin2/bibcirculation/get_loans_notes"""
         argd = wash_urlargd(form, {'loan_id': (str, None), 'recid': (str, None), 'delete_key': (str, None), 'library_notes': (str, None), 'back': (str, ""), 'ln': (str, "en")})
         loan_id = argd['loan_id']
-        recid = argd['recid']
+        #recid = argd['recid']
         delete_key = argd['delete_key']
         library_notes = argd['library_notes']
         back = argd['back']
@@ -389,7 +389,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         """http://cdsweb.cern.ch/admin2/bibcirculation/get_item_loans_notes"""
         argd = wash_urlargd(form, {'loan_id': (str, None), 'add_notes': (str, None), 'new_note': (str, None), 'ln': (str, "en")})
         loan_id = argd['loan_id']
-        recid = argd['recid']
+        #recid = argd['recid']
         add_notes = argd['add_notes']
         new_note = argd['new_note']
         ln = argd['ln']
@@ -497,11 +497,11 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         email = argd['email']
         phone = argd['phone']
         address = argd['address']
-        type = argd['type']
+        library_type = argd['type']
         notes = argd['notes']
         ln = argd['ln']
         return bal.add_new_library_step2(req, name, email, phone, address,
-                                         type, notes, ln)
+                                         library_type, notes, ln)
 
 
     def add_new_library_step3(self, req, form):
@@ -579,7 +579,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         """http://cdsweb.cern.ch/admin2/bibcirculation/add_new_copy_step1"""
         argd = wash_urlargd(form, {'ln': (str, "en")})
         ln = argd['ln']
-        return bal.add_new_copy_step1(req)
+        return bal.add_new_copy_step1(req, ln)
 
 
     def add_new_copy_step2(self, req, form):

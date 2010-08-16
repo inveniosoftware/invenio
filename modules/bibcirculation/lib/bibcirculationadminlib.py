@@ -769,7 +769,7 @@ def loan_on_desk_step4(req, list_of_books, user_info,
 
     infos = []
 
-    (id, ccid, name, email, phone, address, mailbox) = user_info
+    (_id, ccid, name, email, phone, address, mailbox) = user_info
 
     loaned_on = datetime.date.today()
     is_borrower = db.is_borrower(email)
@@ -2658,7 +2658,7 @@ def new_book_step2(req,ln):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def add_new_copy_step1(req):
+def add_new_copy_step1(req, ln=CFG_SITE_LANG):
     """
     Add a new copy.
     """
@@ -2672,7 +2672,7 @@ def add_new_copy_step1(req):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_add_new_copy_step1()
+    body = bibcirculation_templates.tmpl_add_new_copy_step1(ln)
 
     return page(title="Associate copy to item",
                 uid=id_user,
@@ -3197,7 +3197,7 @@ def change_due_date_step2(req, new_due_date, loan_id, borrower_id, ln=CFG_SITE_L
     """
 
     db.update_due_date(loan_id, new_due_date)
-    due_date = db.get_loan_due_date(loan_id)
+    #due_date = db.get_loan_due_date(loan_id)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -3763,7 +3763,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
     @return:        new request.
     """
 
-    (id, ccid, name, email, phone, address, mailbox) = user_info
+    (_id, ccid, name, email, phone, address, mailbox) = user_info
 
     # validate the period of interest given by the admin
     if validate_date_format(period_from) is False:
@@ -4386,7 +4386,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
 
     if string == '':
         message = 'Empty string. Please, try again.'
-        return borrower_search(req, message, redirect, ln)
+        return borrower_search(req, message, 'no', ln)
     else:
         result = search_user(key, string)
 
@@ -4438,7 +4438,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
                 else:
                     if ldap_info == 'busy':
                         message = bibcirculation_templates.tmpl_message_sever_busy(ln)
-                        return borrower_search(req, message, redirect, ln)
+                        return borrower_search(req, message, 'no', ln)
 
                     else:
                         try:
@@ -4476,13 +4476,13 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
             result = db.search_borrower_by_email(string)
         else:
             result = db.search_borrower_by_id(string)
-
+    list_infos = []
     for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
             tup = (borrower_id, ccid, name, email, phone, address, mailbox)
             list_infos.append(tup)
 
 
-    body = bibcirculation_templates.tmpl_register_ill_request_step0(result=result,
+    body = bibcirculation_templates.tmpl_register_ill_request_step0(result=list_infos,
                                                                     infos=infos,
                                                                     key=key,
                                                                     string=string,
@@ -5230,11 +5230,11 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
     request_details = (period_of_interest_from, period_of_interest_to,
                            additional_comments, only_edition)
     if not key:
-        list = None
+        borrowers_list = None
 
     elif not string:
         infos.append('Empty string. Please, try again.')
-        list = None
+        borrowers_list = None
 
     else:
         if validate_date_format(period_of_interest_from) is False:
@@ -5256,18 +5256,18 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
         else:
             result = search_user(key, string)
 
-            list = []
+            borrowers_list = []
             if len(result)==0:
                 infos.append("O borrowers found.")
             else:
                 for user in result:
-                    tuple = db.get_borrower_data_by_id(user[0])[0]
-                    list.append(tuple)
+                    borrower_data = db.get_borrower_data_by_id(user[0])[0]
+                    borrowers_list.append(borrower_data)
 
 
     body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step2(book_info=book_info,
                                                                                     request_details=request_details,
-                                                                                    result=list,
+                                                                                    result=borrowers_list,
                                                                                     key=key,
                                                                                     string=string,
                                                                                     infos=infos,
@@ -5302,7 +5302,6 @@ def register_ill_request_with_no_recid_step3(req, book_info, user_info, request_
                               '</a> &gt; <a class="navtrail" ' \
                               'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
                               '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
-
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -5957,7 +5956,7 @@ def register_ill_article_request_step3(req, item_info, user_info, request_detail
 
     only_edition = ""
 
-    (borrower_id, ccid, _name, _email, _phone, _address, _mailbox) = user_info
+    (borrower_id, _ccid, _name, _email, _phone, _address, _mailbox) = user_info
 
     ill_request_notes = {}
     if library_notes:
@@ -6065,13 +6064,8 @@ def delete_copy_step1(req, barcode, ln):
         infos.append("Do you really want to delete this copy of the book?")
 
         copies = db.get_item_copies_details(recid)
-        requests = db.get_item_requests(recid)
-        loans = db.get_item_loans(recid)
-        req_hist_overview = db.get_item_requests_historical_overview(recid)
-        loans_hist_overview = db.get_item_loans_historical_overview(recid)
 
-
-        id_user = getUid(req)
+        #id_user = getUid(req)
         (auth_code, auth_message) = is_adminuser(req)
         if auth_code != 0:
             return mustloginpage(req, auth_message)
@@ -6096,7 +6090,7 @@ def delete_copy_step1(req, barcode, ln):
 
 def delete_copy_step2(req, barcode, ln):
 
-    id_user = getUid(req)
+    #id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)

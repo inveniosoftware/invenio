@@ -28,7 +28,7 @@ import datetime
 import time
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, task_sleep_now_if_required, \
-                            task_update_progress, write_message, \
+                            task_update_progress, \
                             task_set_option, task_get_option
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
@@ -166,9 +166,9 @@ def task_run_core():
         done  = 0
 
 
-        for (borrower_id, bor_name, recid, barcode,
-            loaned_on, due_date, number_of_renewals, number_of_letters,
-            date_letters, notes, loan_id) in expired_loans:
+        for (borrower_id, _bor_name, recid, _barcode,
+            _loaned_on, _due_date, _number_of_renewals, number_of_letters,
+            date_letters, _notes, loan_id) in expired_loans:
 
             number_of_letters=int(number_of_letters)
 
@@ -185,7 +185,7 @@ def task_run_core():
             if content != '':
                 title = ''.join(get_fieldvalues(recid, "245__a"))
                 subject = "LOAN RECALL: " + title
-                
+
                 update_expired_loan(loan_id)
                 send_overdue_letter(borrower_id, subject, content)
 

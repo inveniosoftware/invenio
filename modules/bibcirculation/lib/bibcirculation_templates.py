@@ -2036,10 +2036,10 @@ class Template:
                   <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:200'>
 
               """
-            for (id, ccid, name, email, phone, address, mailbox) in result:
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
                 out += """
                        <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
-                       """ % (id, ccid, name, email, phone, address, mailbox, name)
+                       """ % (borrower_id, ccid, name, email, phone, address, mailbox, name)
 
             out += """
                     </select>
@@ -2070,11 +2070,11 @@ class Template:
         """
         @param ln: language of the page
         """
-        (id, ccid, name, email, phone, address, mailbox) = user_info
+        (borrower_id, ccid, name, email, phone, address, mailbox) = user_info
 
         _ = gettext_set_language(ln)
 
-        display_id=id
+        display_id=borrower_id
         id_string= _("ID")
         if CFG_CERN_SITE == 1:
             display_id=ccid
@@ -2169,12 +2169,12 @@ class Template:
         """
         @param ln: language of the page
         """
-        (id, ccid, name, email, phone, address, mailbox) = user_info
+        (borrower_id, ccid, name, email, phone, address, mailbox) = user_info
         #user_info = [str(ccid), str(name), str(email), str(phone), str(address), str(mailbox)]
 
         _ = gettext_set_language(ln)
 
-        display_id=id
+        display_id=borrower_id
         id_string= _("ID")
         if CFG_CERN_SITE == 1:
             display_id=ccid
@@ -2385,12 +2385,12 @@ class Template:
         @param ln: language of the page
         """
 
-        (id, ccid, name, email, phone, address, mailbox) = borrower_info
+        (borrower_id, ccid, name, email, phone, address, mailbox) = borrower_info
         (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
         _ = gettext_set_language(ln)
 
-        display_id=id
+        display_id=borrower_id
         id_string= _("ID")
         if CFG_CERN_SITE == 1:
             display_id=ccid
@@ -3557,9 +3557,9 @@ class Template:
 
         out += _MENU_
 
-        (id, ccid, name, email, phone, address, mailbox) = borrower
+        (borrower_id, ccid, name, email, phone, address, mailbox) = borrower
 
-        display_id=id
+        display_id=borrower_id
         id_string= _("ID")
         if CFG_CERN_SITE == 1:
             display_id=ccid
@@ -4799,9 +4799,9 @@ class Template:
 
         out += _MENU_
 
-        (id, ccid, name, email, phone, address, mailbox) = borrower
+        (borrower_id, ccid, name, email, phone, address, mailbox) = borrower
 
-        display_id = id
+        display_id = borrower_id
         id_string= _("ID")
         if CFG_CERN_SITE == 1:
             display_id=ccid
@@ -6379,7 +6379,7 @@ class Template:
         ### FIXME ###
         return "Coming soon..."
 
-    def tmpl_add_new_copy_step1(self):
+    def tmpl_add_new_copy_step1(self, ln):
         """
         @param ln: language of the page
         """
@@ -8110,6 +8110,10 @@ class Template:
                       <td width="100">%s</td>
                       <td class="bibcirccontent">%s</td>
                  </tr>
+                 <tr>
+                      <td width="100">%s</td>
+                      <td class="bibcirccontent">%s</td>
+                 </tr>
             </table>
             """% (CFG_SITE_URL,
                   borrower_id,
@@ -8780,11 +8784,11 @@ class Template:
 
             """ % (CFG_SITE_URL, barcode, recid)
 
-            for (id, ccid, name, email, phone, address, mailbox) in result:
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
                 out += """
                        <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
 
-                       """ % (id, ccid, name, email, phone, address, mailbox, name)
+                       """ % (borrower_id, ccid, name, email, phone, address, mailbox, name)
 
             out += """
                     </select>
@@ -8838,7 +8842,7 @@ class Template:
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-        (id,ccid, name, email, phone, address, mailbox) = user_info
+        (_borrower_id, ccid, name, email, phone, address, mailbox) = user_info
 
         _ = gettext_set_language(ln)
 
@@ -9247,11 +9251,11 @@ class Template:
 
             """ % (CFG_SITE_URL, barcode)
 
-            for (id,ccid, name, email, phone, address, mailbox) in result:
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
                 out += """
                        <option value ="[\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\',\'%s\']">%s
 
-                       """ % (id,ccid, name, email, phone, address, mailbox, name)
+                       """ % (borrower_id,ccid, name, email, phone, address, mailbox, name)
 
             out += """
                     </select>
@@ -9303,7 +9307,7 @@ class Template:
         else:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-        (id, ccid, name, email, phone, address, mailbox) = user_info.split(',')
+        (_borrower_id, ccid, name, email, phone, address, mailbox) = user_info.split(',')
 
         _ = gettext_set_language(ln)
 
@@ -10189,7 +10193,6 @@ class Template:
         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_step0" method="get" >
         <input type=hidden name=recid value='%s'>
         <table>
-
             """  % (CFG_SITE_URL, recid)
 
         if CFG_CERN_SITE == 1:
@@ -10197,7 +10200,6 @@ class Template:
             out += """
                  <tr>
                    <td class="bibcirctableheader" align="center">Search user by
-
                    """
 
             if key == 'email':
@@ -10282,11 +10284,11 @@ class Template:
 
             """ % (CFG_SITE_URL, recid)
 
-            for (id, ccid, name, email, phone, address, mailbox) in result:
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
                 out += """
                        <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
 
-                       """ % (id, ccid, name, email, phone, address, mailbox, name)
+                       """ % (borrower_id, ccid, name, email, phone, address, mailbox, name)
 
             out += """
                     </select>
@@ -10325,11 +10327,11 @@ class Template:
         @type user_info: tuple
         """
 
-        (id, ccid, name, email, phone, address, mailbox) = user_info.split(',')
+        (borrower_id, ccid, name, email, phone, address, mailbox) = user_info.split(',')
 
         _ = gettext_set_language(ln)
 
-        display_id=id
+        display_id=borrower_id
         id_string= _("ID")
         if CFG_CERN_SITE == 1:
             display_id=ccid
@@ -10654,7 +10656,7 @@ class Template:
                              _("Additional comments"), notes,
                              _("Only this edition"), only_edition,
                              _("Borrower details"),
-                             id_strinf, id,
+                             id_string, display_id,
                              _("Name"), name,
                              _("Email"), email,
                              _("Phone"), phone,
@@ -14716,11 +14718,11 @@ class Template:
 
             """ % (CFG_SITE_URL, book_info)
 
-            for (id, ccid, name, email, phone, address, mailbox) in result:
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
                 out += """
                        <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
 
-                       """ % (id,ccid, name, email, phone, address, mailbox, name)
+                       """ % (borrower_id, ccid, name, email, phone, address, mailbox, name)
 
             out += """
                     </select>
@@ -16551,11 +16553,11 @@ class Template:
 
             """ % (CFG_SITE_URL, article_info)
 
-            for (id,ccid, name, email, phone, address, mailbox) in result:
+            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
                 out += """
                        <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
 
-                       """ % (id,ccid, name, email, phone, address, mailbox, name)
+                       """ % (borrower_id, ccid, name, email, phone, address, mailbox, name)
 
             out += """
                     </select>
