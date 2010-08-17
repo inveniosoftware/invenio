@@ -22,12 +22,9 @@
 __revision__ = \
     "$Id$"
 
-import httplib
-import socket
 import re
 
-from invenio.external_authentication import ExternalAuth, \
-        InvenioWebAccessExternalAuthError
+from invenio.external_authentication import ExternalAuth
 
 
 # Tunable list of settings to be hidden

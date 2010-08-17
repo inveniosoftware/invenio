@@ -28,8 +28,6 @@ import os
 import re
 import sys
 import time
-import urllib2
-import tempfile
 
 from invenio.config import \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS, \
@@ -38,7 +36,6 @@ from invenio.config import \
      CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
-     CFG_SITE_URL, CFG_TMPDIR, \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
      CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
      CFG_BIBINDEX_SPLASH_PAGES
@@ -48,9 +45,9 @@ from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_CHECK_MYSQL_THREADS
 from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer, \
      BibIndexExactNameTokenizer
-from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, \
-     decompose_bibdocfile_url, bibdocfile_url_to_bibdoc, normalize_format, \
-     decompose_file, download_url, guess_format_from_url, BibRecDocs
+from invenio.bibdocfile import bibdocfile_url_p, \
+     bibdocfile_url_to_bibdoc, normalize_format, \
+     download_url, guess_format_from_url, BibRecDocs
 from invenio.websubmit_file_converter import convert_file
 from invenio.search_engine import perform_request_search, strip_accents, \
      wash_index_term, lower_index_term, get_index_stemming_language
@@ -63,7 +60,6 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
-from invenio.shellutils import escape_shell_arg
 from invenio.htmlutils import remove_html_markup
 
 if sys.hexversion < 0x2040000:

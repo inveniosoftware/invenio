@@ -1188,7 +1188,7 @@ class Template:
                 }
         return out
 
-    def tmpl_create_useractivities_menu(req, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
+    def tmpl_create_useractivities_menu(self, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
         """
         Returns the main navigation menu with actions based on user's
         priviledges
@@ -1293,7 +1293,7 @@ class Template:
         out += '</ul></div>'
         return out
 
-    def tmpl_create_adminactivities_menu(req, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats, activities):
+    def tmpl_create_adminactivities_menu(self, ln, selected, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats, activities):
         """
         Returns the main navigation menu with actions based on user's
         priviledges

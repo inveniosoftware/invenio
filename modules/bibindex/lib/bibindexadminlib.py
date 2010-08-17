@@ -19,23 +19,17 @@
 
 __revision__ = "$Id$"
 
-import cgi
-import re
-import os
-import urllib
-import time
 import random
-from zlib import compress,decompress
 
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_VERSION, \
      CFG_SITE_URL, \
      CFG_BINDIR
-from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
+from invenio.bibrankadminlib import write_outcome, modify_translations, \
+        get_def_name, get_name, get_languages, addadminbox, tupletotable, \
+        createhiddenform
+from invenio.access_control_engine import acc_authorize_action
 from invenio.dbquery import run_sql, get_table_status_info
-from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
-from invenio.webuser import getUid, get_email
 from invenio.bibindex_engine_stemmer import get_stemming_language_map
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -1735,3 +1729,12 @@ def get_lang_list(table, field, id):
         lang = """<b><span class="info">None</span></b>"""
     return lang
 
+def check_user(req, role, adminarea=2, authorized=0):
+    # FIXME: Add doctype.
+    # This function is similar to the one found in
+    # bibharvest/lib/oai_repository_admin.py, bibrank/lib/bibrankadminlib.py and
+    # websubmit/lib/websubmitadmin_engine.py.
+    auth_code, auth_message = acc_authorize_action(req, role)
+    if not authorized and auth_code != 0:
+        return ("false", auth_message)
+    return ("", auth_message)

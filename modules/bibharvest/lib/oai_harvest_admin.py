@@ -35,8 +35,7 @@ from invenio.config import \
      CFG_SITE_URL,\
      CFG_ETCDIR, \
      CFG_BINDIR, \
-     CFG_LOGDIR, \
-     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
+     CFG_LOGDIR
 from invenio.bibrankadminlib import \
      write_outcome, \
      addadminbox, \
@@ -47,11 +46,10 @@ from invenio.dbquery import run_sql
 from invenio.oai_harvest_dblayer import get_history_entries, \
      get_month_logs_size, get_history_entries_for_day, \
      get_day_logs_size, get_entry_history, get_entry_logs_size, \
-     get_holdingpen_entries, delete_holdingpen_entry, get_holdingpen_entry, \
+     get_holdingpen_entries, delete_holdingpen_entry, \
      get_holdingpen_years, get_holdingpen_month, get_holdingpen_year, \
-     get_holdingpen_day_fragment, get_holdingpen_day_size, \
-     get_holdingpen_entry_details
-from invenio.search_engine import search_pattern, get_record
+     get_holdingpen_day_fragment, get_holdingpen_entry_details
+from invenio.search_engine import get_record
 
 import invenio.template
 from invenio import oai_harvest_daemon

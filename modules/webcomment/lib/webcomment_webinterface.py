@@ -24,7 +24,6 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = """$Id$"""
 
-import urllib
 import cgi
 from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_display_comments_or_remarks, \
@@ -40,11 +39,9 @@ from invenio.webcomment import check_recID_is_in_range, \
                                check_user_can_view_comment, \
                                query_get_comment
 from invenio.config import \
-     CFG_PREFIX, \
      CFG_TMPDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
-     CFG_SITE_SECURE_URL, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS

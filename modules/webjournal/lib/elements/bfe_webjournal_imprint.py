@@ -20,7 +20,6 @@
 """W
 ebJournal Element - Prints issue number
 """
-import datetime
 from invenio.webjournal_utils import \
      parse_url_string, \
      get_issue_number_display, \

@@ -26,7 +26,6 @@ import sre_constants
 import os
 import cgi
 import re
-import os.path
 from invenio.websubmit_dblayer import get_simple_approval_status, \
                                       update_approval_request_status
 from invenio.websubmit_functions.Shared_Functions import ParamFromFile

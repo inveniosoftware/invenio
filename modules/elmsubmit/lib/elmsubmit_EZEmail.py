@@ -73,21 +73,6 @@ __revision__ = "$Id$"
 
 import email
 
-import email.Message
-import email.Parser
-import email.Generator
-import email.Header
-import email.Charset
-import email.Encoders
-
-import email.MIMENonMultipart
-import email.MIMEMultipart
-import email.MIMEMessage
-import email.MIMEText
-import email.Utils
-
-import email.Errors
-
 import mimetypes
 
 # Non email imports:
@@ -97,7 +82,7 @@ import time
 import datetime
 import os
 
-import StringIO
+from StringIO import StringIO
 import quopri
 import uu
 import base64

@@ -24,7 +24,6 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import cgi
-import os
 from datetime import timedelta
 
 from invenio.config import \
@@ -49,7 +48,6 @@ from invenio.access_control_engine import make_apache_message, make_list_apache_
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
-from invenio import bibcatalog_system
 from invenio import webgroup_dblayer
 from invenio.messages import gettext_set_language, wash_language
 from invenio.mailutils import send_email

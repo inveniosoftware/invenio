@@ -36,9 +36,7 @@ from invenio.config import \
      CFG_OAI_EXPIRE, \
      CFG_OAI_IDENTIFY_DESCRIPTION, \
      CFG_OAI_ID_FIELD, \
-     CFG_OAI_ID_PREFIX, \
      CFG_OAI_LOAD, \
-     CFG_OAI_SAMPLE_IDENTIFIER, \
      CFG_OAI_SET_FIELD, \
      CFG_CACHEDIR, \
      CFG_SITE_NAME, \

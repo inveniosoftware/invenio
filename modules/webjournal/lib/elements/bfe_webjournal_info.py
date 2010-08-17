@@ -45,7 +45,7 @@ def format(bfo, var=''):
     elif var == 'WEBJOURNAL_ISSUE_NUMBER':
         out = this_issue_number
     elif var == 'WEBJOURNAL_CURRENT_ISSUE_NUMBER':
-        out = get_current_issue(journal_name)
+        out = get_current_issue(bfo.lang, journal_name)
     elif var == 'WEBJOURNAL_URL':
         out = make_journal_url(bfo.user_info['uri'], {'ln': bfo.lang})
     elif var == 'WEBJOURNAL_CSS_URL':

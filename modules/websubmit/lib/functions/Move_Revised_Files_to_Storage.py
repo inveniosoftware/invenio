@@ -33,7 +33,6 @@ __revision__ = "$Id$"
 import time
 import os
 
-from invenio.websubmit_functions import Create_Upload_Files_Interface
 from invenio.bibdocfile import \
      InvenioWebSubmitFileError, \
      BibRecDocs
@@ -44,6 +43,7 @@ from invenio.config import CFG_BINDIR
 from invenio.dbquery import run_sql
 from invenio.websubmit_functions.Shared_Functions import \
      createRelatedFormats
+from invenio.websubmit_managedocfiles import get_description_and_comment
 
 def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -120,6 +120,9 @@ def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
       + createRelatedFormats: if uploaded files get converted to
                               whatever format we can (1) or not (0)
     """
+    # pylint: disable-msg=E0602
+    # sysno is defined in the WebSubmit functions sandbox.
+
     global sysno
     bibrecdocs = BibRecDocs(int(sysno))
 
@@ -164,6 +167,8 @@ def Move_Revised_Files_to_Storage(parameters, curdir, form, user_info=None):
     # Delete the HB BibFormat cache in the DB, so that the fulltext
     # links do not point to possible dead files
     run_sql("DELETE from bibfmt WHERE format='HB' AND id_bibrec=%s", (sysno,))
+
+    # pylint: enable-msg=E0602
 
 def add(bibrecdocs, curdir, sysno, file_path, doctype,
         iconsize, create_icon_doctypes, createRelatedFormats_p):
@@ -221,8 +226,8 @@ def revise(bibrecdocs, curdir, sysno, file_path, bibdoc_name, doctype,
 
         # Retrieve the current description and comment, or they
         # will be lost when revising
-        (prev_desc, prev_comment)= \
-                    Create_Upload_Files_Interface.get_description_and_comment(bibrecdocs.list_bibdocs(doctype)[0].list_latest_files())
+        latest_files = bibrecdocs.list_bibdocs(doctype)[0].list_latest_files()
+        prev_desc, prev_comment = get_description_and_comment(latest_files)
 
         if doctype in keep_previous_version_doctypes:
             # Standard procedure, keep previous version

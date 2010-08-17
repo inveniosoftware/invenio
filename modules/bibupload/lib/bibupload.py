@@ -66,7 +66,6 @@ import re
 import sys
 import time
 from zlib import compress
-import urllib2
 import socket
 import marshal
 import copy
@@ -92,7 +91,6 @@ from invenio.bibrecord import create_records, \
                               record_get_field_values, \
                               field_get_subfield_values, \
                               field_get_subfield_instances, \
-                              record_extract_oai_id, \
                               record_modify_subfield, \
                               record_delete_subfield_from, \
                               record_delete_fields, \

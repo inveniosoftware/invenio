@@ -21,7 +21,6 @@ __revision__ = "$Id$"
 
 # import sys
 import os
-import os.path
 import smtplib
 
 import invenio.elmsubmit_EZEmail as elmsubmit_EZEmail
@@ -30,7 +29,6 @@ import invenio.elmsubmit_submission_parser as elmsubmit_submission_parser
 # import the config file
 
 from invenio.config import CFG_TMPDIR, CFG_SITE_NAME
-from invenio.config import CFG_WEBSUBMIT_STORAGEDIR
 import invenio.elmsubmit_config as elmsubmit_config
 
 import invenio.elmsubmit_field_validation as elmsubmit_field_validation

@@ -36,9 +36,8 @@ from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR
 from invenio.intbitset import intbitset
 from invenio.websearch_webcoll import Collection
 from invenio.messages import language_list_long
-from invenio.bibtask import task_init, write_message, task_set_option, \
-       task_get_option, task_update_progress, task_has_option, \
-       task_get_task_param#, task_sleep_now_if_required
+from invenio.bibtask import write_message, task_update_progress
+       
 
 DEFAULT_TIMEZONE = '+01:00'
 
@@ -179,7 +178,8 @@ class SitemapWriter(object):
         self.filedescriptor.write(self.header)
         self.file_size += len(self.footer)
 
-    def add_url(self, url, lastmod="", changefreq="", priority=""):
+    def add_url(self, url, lastmod=datetime(1900, 1, 1), changefreq="",
+            priority=""):
         """ create a new url node. Returns the number of url nodes in sitemap"""
         self.num_urls += 1
         url_node = u"""
@@ -246,7 +246,7 @@ class SitemapIndexWriter(SitemapWriter):
         self.filedescriptor.write(self.header)
         self.file_size += len(self.footer)
 
-    def add_url(self, url, lastmod=""):
+    def add_url(self, url, lastmod=datetime(1900, 1, 1)):
         """ create a new url node. Returns the number of url nodes in sitemap"""
         self.num_urls += 1
         url_node = u"""

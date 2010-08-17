@@ -55,7 +55,7 @@ Reply to my question please.<br/>
 """
         res =  webmessage_mailutils.email_quoted_txt2html(text,
                                                           tabs_before=0,
-                              		                  indent_txt='>>',
+                                                          indent_txt='>>',
                                                           linebreak_txt="\n",
                                                           indent_html=('<div class="commentbox">', "</div>"),
                                                           linebreak_html='<br/>')

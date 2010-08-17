@@ -36,7 +36,7 @@ from invenio import webinterface_handler_config as apache
 import cgi
 import urllib
 import urlparse
-from socket import gethostbyname, gaierror
+from socket import gaierror
 import os
 import crypt
 import socket

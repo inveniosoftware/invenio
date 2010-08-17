@@ -22,11 +22,9 @@ import sys
 import os
 import cgi
 from fnmatch import fnmatch
-from cgi import parse_qs
 
 from wsgiref.validate import validator
-from wsgiref.util import setup_testing_defaults, FileWrapper, \
-    guess_scheme
+from wsgiref.util import FileWrapper, guess_scheme
 
 if __name__ != "__main__":
     # Chances are that we are inside mod_wsgi.

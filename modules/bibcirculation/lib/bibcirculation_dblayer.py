@@ -1496,13 +1496,13 @@ def get_pdf_request_data(status):
                             lr.id_bibrec,
                             bor.name,
                             lib.name,
-	                    it.location,
+                            it.location,
                             DATE_FORMAT(lr.period_of_interest_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.period_of_interest_to,'%%Y-%%m-%%d'),
                             lr.request_date
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor,
-			    crcITEM it,
+                            crcITEM it,
                             crcLIBRARY lib
                      WHERE  lr.id_crcBORROWER=bor.id AND
                             it.id_bibrec=lr.id_bibrec AND

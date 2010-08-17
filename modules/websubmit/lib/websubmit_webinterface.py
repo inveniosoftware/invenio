@@ -55,7 +55,7 @@ from invenio.search_engine import \
      create_navtrail_links, check_user_can_view_record, record_empty
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioWebSubmitFileError, stream_file, \
-    decompose_file, propose_next_docname, get_subformat_from_format, calculate_md5, BibDocFile
+    decompose_file, propose_next_docname, get_subformat_from_format
 from invenio.errorlib import register_exception
 from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 import invenio.template
@@ -1021,7 +1021,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             assert(curdir == os.path.abspath(curdir))
         except AssertionError:
             register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (args['indir'], args['doctype'], args['access']))
-            return warningMsg("Invalid parameters")
+            return warningMsg("Invalid parameters", req)
 
         subname = "%s%s" % (args['act'], args['doctype'])
 

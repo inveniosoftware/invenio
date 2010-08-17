@@ -30,13 +30,8 @@ Il ne faut pas oublier de definir les roles...
 __revision__ = "$Id$"
 
 ## import interesting modules:
-import string
 import os
-import sys
-import time
-import types
 import re
-import shutil
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -47,13 +42,12 @@ from invenio.config import \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_SECURE_URL, \
-     CFG_VERSION
+     CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql, Error, OperationalError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, list_registered_users, page_not_authorized
+from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.messages import gettext_set_language, wash_language
 from invenio.websubmit_config import *
 from invenio.search_engine import search_pattern, get_fieldvalues
@@ -64,10 +58,9 @@ from invenio.webgroup_dblayer import get_group_infos, insert_new_group, insert_n
 from invenio.webaccessadmin_lib import cleanstring_email
 from invenio.access_control_config import MAXSELECTUSERS
 from invenio.access_control_admin import acc_get_user_email
-from invenio.webmessage import perform_request_send, perform_request_write_with_search
+from invenio.webmessage import perform_request_send
 import invenio.webbasket_dblayer as basketdb
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, CFG_WEBBASKET_CATEGORIES, CFG_WEBBASKET_SHARE_LEVELS_ORDERED
-from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.errorlib import register_exception
 from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
 
@@ -365,7 +358,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
     confirm_send = 0
     if send == _("Send Again"):
         if authors == "unknown" or title == "unknown":
-            SendWarning(doctype,categ,RN,title,authors,access, ln = ln)
+            SendWarning(doctype, categ, RN, title, authors, access)
         else:
             # @todo - send in different languages
             SendEnglish(doctype,categ,RN,title,authors,access,sysno)
@@ -496,7 +489,10 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CF
         if not(__check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
             return t
 
+        # FIXME This error will be fixed with Sam's new version of publiline.
+        # pylint: disable-msg=E1101
         comments = basketdb.get_comments(id_bskBASKET, sysno)
+        # pylint: enable-msg=E1101
 
         if dProjectLeaderAction != None:
             user_can_add_comment = 0

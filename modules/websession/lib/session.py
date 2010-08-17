@@ -32,7 +32,6 @@ import random
 import re
 import sys
 import os
-from thread import get_ident
 if sys.hexversion < 0x2060000:
     from md5 import md5
 else:

@@ -21,12 +21,10 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import sys
-
 import invenio.webjournaladminlib as wjn
 from invenio.access_control_engine import acc_authorize_action
-from invenio.webpage import page, create_error_box, adderrorbox
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
+from invenio.webpage import page, create_error_box
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import wash_language, gettext_set_language
@@ -36,7 +34,9 @@ from invenio.webjournal_config import \
      InvenioWebJournalNoJournalOnServerError, \
      InvenioWebJournalNoNameError, \
      InvenioWebJournalNoCurrentIssueError, \
-     InvenioWebJournalIssueNumberBadlyFormedError
+     InvenioWebJournalIssueNumberBadlyFormedError, \
+     InvenioWebJournalJournalIdNotFoundDBError
+
 from invenio.webjournal_washer import \
      wash_journal_name, \
      wash_issue_number

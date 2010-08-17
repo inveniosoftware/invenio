@@ -23,10 +23,8 @@
 __revision__ = "$Id$"
 
 import unittest
-import re
 import os
-import os.path
-from string import expandtabs, replace
+from string import expandtabs
 import xml.dom.minidom
 
 from invenio.config import CFG_TMPDIR

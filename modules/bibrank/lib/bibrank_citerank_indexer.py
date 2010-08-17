@@ -26,7 +26,6 @@ the citation graph:
 
 # pylint: disable-msg=E0611
 
-import marshal
 import ConfigParser
 from math import exp
 import datetime
@@ -34,14 +33,14 @@ import time
 import re
 import sys
 from numpy import array, ones, zeros, int32, float32, sqrt, dot
-from zlib import decompress
 
 if sys.hexversion < 0x2040000:
     # pylint: disable-msg=W0622
     from sets import Set as set
     # pylint: enable-msg=W0622
 
-from invenio.dbquery import run_sql, serialize_via_marshal
+from invenio.dbquery import run_sql, serialize_via_marshal, \
+        deserialize_via_marshal
 from invenio.bibtask import write_message
 from invenio.config import CFG_ETCDIR
 
@@ -95,7 +94,7 @@ def get_citations_from_db():
     cit_compressed = run_sql(query)
     cit = []
     if cit_compressed and cit_compressed[0] and cit_compressed[0][0]:
-        cit = marshal.loads(decompress(cit_compressed[0][0]))
+        cit = deserialize_via_marshal(cit_compressed[0][0])
         if cit:
             for item in cit:
                 #check for duplicates in citation dictionary

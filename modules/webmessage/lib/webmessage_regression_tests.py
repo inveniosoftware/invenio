@@ -39,8 +39,6 @@ from invenio.webmessage_dblayer import CFG_WEBMESSAGE_STATUS_CODE, \
      get_gids_from_groupnames, \
      get_groupnames_like, \
      get_nb_new_messages_for_user, \
-     get_groupnames_like, \
-     get_nb_new_messages_for_user, \
      get_nb_readable_messages_for_user, \
      get_nicknames_like, \
      get_nicks_from_uids, \
@@ -77,7 +75,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         # juliet writes the message to romeo
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                         ln=CFG_SITE_LANG)
@@ -92,7 +90,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         # juliet writes the message to romeo
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
@@ -109,7 +107,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         # juliet writes the message to romeo
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
@@ -121,7 +119,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         # juliet writes the message to romeo
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
@@ -137,19 +135,19 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         # juliet writes 3 messages to romeo
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
@@ -162,19 +160,19 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         # juliet writes 3 messages to romeo
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
@@ -189,7 +187,7 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         # juliet writes a message to romeo
         webmessage.perform_request_send(6,
                                         msg_to_user="romeo",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi romeo",
                                         msg_body="hello romeo how are you?",
                                        ln=CFG_SITE_LANG)
@@ -228,25 +226,25 @@ class WebMessageSendingAndReceivingMessageTest(unittest.TestCase):
         """webmessage - you give a quota, it returns users over-quota"""
         webmessage.perform_request_send(6,
                                         msg_to_user="jekyll",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="jekyll",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="jekyll",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
                                        ln=CFG_SITE_LANG)
         webmessage.perform_request_send(6,
                                         msg_to_user="jekyll",
-                             	        msg_to_group="",
+                                        msg_to_group="",
                                         msg_subject="Hi jekyll",
                                         msg_body="hello how are you?",
                                        ln=CFG_SITE_LANG)

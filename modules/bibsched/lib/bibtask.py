@@ -322,14 +322,17 @@ def task_init(
                         if sort not in required_sorts:
                             required_sorts.append(sort)
                     if sys.hexversion < 0x02050000:
-                        import hotshot, hotshot.stats
+                        import hotshot
                         pr = hotshot.Profile(filename)
                         ret = pr.runcall(_task_run, task_run_fnc)
                         for sort_type in required_sorts:
                             tmp_out = sys.stdout
                             sys.stdout = StringIO()
                             hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
+                            # pylint: disable-msg=E1103
+                            # This is a hack. sys.stdout is a StringIO in this case.
                             profile_dump.append(sys.stdout.getvalue())
+                            # pylint: enable-msg=E1103
                             sys.stdout = tmp_out
                     else:
                         import cProfile

@@ -21,8 +21,6 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import sys
-
 import invenio.bibindexadminlib as bic
 from invenio.webpage import page, create_error_box
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME

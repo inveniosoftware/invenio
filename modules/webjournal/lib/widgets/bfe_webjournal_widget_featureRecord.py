@@ -21,7 +21,7 @@
 WebJournal widget - List the featured records
 """
 from invenio.bibformat_engine import BibFormatObject
-from invenio.config import CFG_SITE_URL, CFG_ETCDIR
+from invenio.config import CFG_SITE_URL
 from invenio.webjournal_utils import \
      parse_url_string, \
      get_featured_records

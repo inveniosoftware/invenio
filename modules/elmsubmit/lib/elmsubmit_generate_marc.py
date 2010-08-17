@@ -19,10 +19,7 @@
 
 __revision__ = "$Id$"
 
-import os
-from string import split
 import invenio.elmsubmit_config as elmsubmit_config
-
 
 def generate_marc(submission_dict):
     """ method generates a marc xml file from the submission dict

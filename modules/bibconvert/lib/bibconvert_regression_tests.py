@@ -25,8 +25,7 @@ import unittest
 
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages, \
-                              test_web_page_existence
+                              test_web_page_content, test_web_page_existence
 
 class BibConvertWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibConvert web pages whether they are up or not."""

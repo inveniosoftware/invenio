@@ -37,18 +37,14 @@ __revision__ = "$Id$"
    ##                     (if any)
    ##
 
-import os
-import re
-
-from invenio.config import \
-     CFG_SITE_ADMIN_EMAIL, \
-     CFG_SITE_NAME, \
+from invenio.config import CFG_SITE_NAME, \
      CFG_SITE_URL, \
      CFG_SITE_SUPPORT_EMAIL
 
 from invenio.mailutils import send_email
 from invenio.access_control_admin import acc_get_role_id, acc_get_role_users
 from invenio.search_engine import search_pattern, get_fieldvalues
+from invenio.dbquery import run_sql
 
 #Copied from publiline
 def get_brief_doc_details_from_repository(reportnumber):

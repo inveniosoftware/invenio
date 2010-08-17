@@ -642,7 +642,9 @@ def _get_trend_from_actions(action_dates, initial_value, t_start, t_end, granula
         action_dates = action_dates[:-1]
 
     vector = [(None, initial_value)]
+    # pylint: disable-msg=E1101
     old = dt_iter.next()
+    # pylint: enable-msg=E1101
     upcoming_action = action_dates.pop()
 
     for current in dt_iter:

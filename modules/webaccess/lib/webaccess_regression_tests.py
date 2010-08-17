@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_add_role, acc_delete_role, \
     acc_get_role_definition
 from invenio.access_control_firerole import compile_role_definition, \

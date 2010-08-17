@@ -29,13 +29,11 @@ __revision__ = "$Id$"
 
 import re
 import zlib
-import os
 
 from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
-     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS, \
-     CFG_PATH_PDFTOTEXT
+     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS
 from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
 from invenio.textutils import encode_for_xml
@@ -702,4 +700,4 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words):
             j += 1
         return shorter_snippet
     else:
-	return snippet
+        return snippet

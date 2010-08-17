@@ -23,11 +23,9 @@ __revision__ = "$Id$"
 
 import unittest
 import os
-import re
 import sys
 
-from invenio.dbquery import run_sql
-from invenio.errorlib import register_exception, get_pretty_traceback, find_all_values_to_hide
+from invenio.errorlib import register_exception, get_pretty_traceback
 from invenio.config import CFG_SITE_URL, CFG_LOGDIR
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages

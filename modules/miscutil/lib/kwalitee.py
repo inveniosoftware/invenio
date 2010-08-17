@@ -294,8 +294,6 @@ def get_invenio_modulenames(dirname="."):
                          modulenames)
     # remove webhelp, not in Python:
     modulenames = filter(lambda x: not x=="webhelp", modulenames)
-    # remove webstat, not in Python:
-    modulenames = filter(lambda x: not x=="webstat", modulenames)
     # sort alphabetically:
     modulenames.sort()
     return modulenames

@@ -16,7 +16,6 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-import os
 from invenio.errorlib import register_exception
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 

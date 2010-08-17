@@ -30,19 +30,13 @@ import time
 
 from invenio.bibrecord import record_xml_output
 from invenio.config import CFG_SITE_URL
-from invenio.webinterface_handler import WebInterfaceDirectory, wash_urlargd
-from invenio.webpage import pageheaderonly, pagefooteronly
-from invenio.search_engine import get_colID, \
-    guess_primary_collection_of_a_record, create_navtrail_links, \
-    perform_request_search, get_record
-from invenio.websearchadminlib import get_detailed_page_tabs
-from invenio.template import load
+from invenio.webinterface_handler import wash_urlargd
+from invenio.search_engine import perform_request_search, get_record
 from invenio.htmlutils import escape_html
 from invenio.bibclassify_text_extractor import is_pdf
 from invenio.bibdocfile import BibRecDocs
-from invenio.bibclassify_engine import output_keywords_for_local_file, \
-    output_marc
-from invenio.config import CFG_TMPDIR, CFG_BINDIR
+from invenio.bibclassify_engine import output_marc
+from invenio.config import CFG_TMPDIR
 
 DEFAULT_OPTS = {
     'type': 'tagcloud',

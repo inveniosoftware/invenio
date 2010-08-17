@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio import bibrank_citation_searcher
 from invenio.testutils import make_test_suite, run_test_suite
 
 class TestCitationSearcher(unittest.TestCase):

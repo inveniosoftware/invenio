@@ -26,14 +26,11 @@ except ImportError:
     _got_bz2 = False
 
 import gzip
-import zipfile
 import tarfile
 import shutil
 import os
-import copy
 import re
 import tempfile
-import glob
 import sys
 
 WARN_SKIP = True
@@ -44,13 +41,11 @@ from invenio.elmsubmit_misc import write_to_and_return_tempfile_name as _write_t
 from invenio.elmsubmit_misc import provide_dir_with_perms_then_exec as _provide_dir_with_perms_then_exec
 from invenio.elmsubmit_misc import dirtree as _dirtree
 from invenio.elmsubmit_misc import count_dotdot as _count_dotdot
-from invenio.elmsubmit_misc import get_perms as _get_perms
 from invenio.elmsubmit_misc import random_alphanum_string as _random_alphanum_string
 from invenio.elmsubmit_misc import backup_directory as _backup_directory
 from invenio.elmsubmit_misc import open_tempfile as _open_tempfile
 from invenio.elmsubmit_misc import split_common_path as _split_common_path
 from invenio.elmsubmit_misc import recursive_dir_contents as _recursive_dir_contents
-from invenio.elmsubmit_misc import concat as _concat
 from invenio.elmsubmit_misc import mkdir_parents as _mkdir_parents
 
 # Store all files written out in two lists:
@@ -895,8 +890,12 @@ class CompressTool:
         self._file_loc
         self._mode
         """
+        self._mode = None
+        self._ext = None
+        self._filename = None
+        self._fh = None
 
-        raise Exception("method must be overided in child class")
+        raise Exception("Method must be overridden in child class")
 
     def list_all_members(self):
         _check_mode(self._mode, 'r')

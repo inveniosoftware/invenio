@@ -24,9 +24,7 @@ __revision__ = "$Id$"
 from time import localtime
 from zlib import decompress
 
-from invenio.config import \
-     CFG_SITE_LANG, \
-     CFG_VERSION
+from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql, run_sql_cached, OperationalError
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language

@@ -153,7 +153,7 @@ def Send_Delete_Mail_read_file(filename):
             ## so that the admin is informed.
             err_msg = """Error in a WebSubmit function. An unexpected """ \
                       """error was encountered when trying to read from """ \
-                      """the file [%S].""" % filename
+                      """the file [%s].""" % filename
             register_exception(prefix=err_msg)
     return file_contents
 

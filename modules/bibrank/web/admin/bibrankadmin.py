@@ -21,7 +21,6 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import sys
 import invenio.bibrankadminlib as brc
 #reload(brc)
 from invenio.webpage import page, create_error_box

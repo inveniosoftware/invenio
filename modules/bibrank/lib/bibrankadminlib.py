@@ -19,24 +19,16 @@
 
 __revision__ = "$Id$"
 
-import cgi
-import re
 import os
 import ConfigParser
-from zlib import compress,decompress
-import marshal
-from invenio import webinterface_handler_config as apache
 
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR, \
-     CFG_VERSION, \
      CFG_SITE_URL
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
 from invenio.dbquery import run_sql
-from invenio.webpage import page, pageheaderonly, pagefooteronly
-from invenio.webuser import getUid, get_email
 
 def getnavtrail(previous = ''):
     navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)

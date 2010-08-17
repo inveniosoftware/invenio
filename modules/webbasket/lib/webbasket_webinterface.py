@@ -37,7 +37,6 @@ from invenio.webbasket import \
      perform_request_search, \
      create_guest_warning_box, \
      create_basket_navtrail, \
-     create_guest_warning_box, \
      perform_request_write_note, \
      perform_request_save_note, \
      perform_request_delete_note, \

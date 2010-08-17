@@ -25,14 +25,9 @@ __revision__ = \
 
 __lastupdated__ = """$Date$"""
 
-import cgi
-import os
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANGS
-from invenio.messages import gettext_set_language
+from invenio.config import CFG_SITE_URL
 from invenio.webpage import page
-from invenio.webuser import getUid
-from invenio.webdoc import get_webdoc_parts, get_webdoc_topics
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):

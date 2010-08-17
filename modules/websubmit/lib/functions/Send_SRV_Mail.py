@@ -29,14 +29,10 @@ __revision__ = "$Id$"
    ##             noteFile: name of the file containing a note from the user
 
 import os
-import re
 
-from invenio.config import \
-     CFG_SITE_URL, \
-     CFG_SITE_ADMIN_EMAIL, \
+from invenio.config import CFG_SITE_URL, \
      CFG_SITE_NAME, \
-     CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_URL
+     CFG_SITE_SUPPORT_EMAIL
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 from invenio.websubmit_functions.Retrieve_Data import Get_Field

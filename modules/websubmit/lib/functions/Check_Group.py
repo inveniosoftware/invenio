@@ -19,7 +19,6 @@ __revision__ = "$Id$"
 
 import os
 import re
-import time
 
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop

@@ -180,7 +180,6 @@ def bibsched_send_signal(proc, task_id, signal):
 class Manager:
     def __init__(self, old_stdout):
         import curses
-        import curses.panel
         from curses.wrapper import wrapper
         self.old_stdout = old_stdout
         self.curses = curses

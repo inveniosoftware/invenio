@@ -32,7 +32,6 @@ __revision__ = "$Id$"
 import cgi
 import re
 import os
-import os.path
 import time
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.websubmit_config import InvenioWebSubmitFunctionError

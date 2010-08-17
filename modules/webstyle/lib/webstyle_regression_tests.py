@@ -29,8 +29,7 @@ import mechanize
 
 from invenio.config import CFG_SITE_URL, CFG_PREFIX, CFG_DEVEL_SITE
 from invenio.bibdocfile import calculate_md5
-from invenio.testutils import make_test_suite, run_test_suite, \
-                              test_web_page_content, merge_error_messages
+from invenio.testutils import make_test_suite, run_test_suite
 
 
 class WebStyleWSGIUtilsTest(unittest.TestCase):

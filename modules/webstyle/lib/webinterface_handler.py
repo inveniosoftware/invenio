@@ -42,7 +42,7 @@ from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
 from invenio.webuser import get_preferred_user_language, isGuestUser, \
     getUid, loginUser, update_Uid, isUserSuperAdmin, collect_user_info
-from invenio.webinterface_handler_wsgi_utils import StringField, Field
+from invenio.webinterface_handler_wsgi_utils import StringField
 
 ## The following variable is True if the installation make any difference
 ## between HTTP Vs. HTTPS connections.
@@ -302,14 +302,16 @@ def create_handler(root):
                     required_sorts.append(sort)
             if sys.hexversion < 0x02050000:
                 import hotshot
-                import hotshot.stats
                 pr = hotshot.Profile(filename)
                 ret = pr.runcall(_handler, req)
                 for sort_type in required_sorts:
                     tmp_out = sys.stdout
                     sys.stdout = StringIO()
                     hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
+                    # pylint: disable-msg=E1103
+                    # This is a hack. sys.stdout was replaced by a StringIO.
                     profile_dump.append(sys.stdout.getvalue())
+                    # pylint: enable-msg=E1103
                     sys.stdout = tmp_out
             else:
                 import cProfile

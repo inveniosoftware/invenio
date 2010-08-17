@@ -26,7 +26,7 @@ import cgi
 
 # CDS Invenio imports
 from invenio.urlutils import create_html_link
-from invenio.webuser import get_user_info, isGuestUser, collect_user_info
+from invenio.webuser import get_user_info, collect_user_info, isGuestUser
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.webcomment_config import \

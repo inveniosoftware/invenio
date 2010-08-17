@@ -18,7 +18,8 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL
+from invenio.config import CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, \
+        CFG_SITE_NAME, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL
 
 def format(bfo, var=''):
     '''

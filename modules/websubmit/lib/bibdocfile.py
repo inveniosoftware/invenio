@@ -102,7 +102,6 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, \
     CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
-from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 websearch_templates = invenio.template.load('websearch')

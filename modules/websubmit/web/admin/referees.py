@@ -25,7 +25,6 @@ import re
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_SITE_URL, \
      CFG_SITE_URL
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -42,7 +41,7 @@ from invenio.access_control_admin import \
      acc_get_all_roles, \
      acc_get_role_users
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, list_registered_users, page_not_authorized
+from invenio.webuser import getUid, list_registered_users, page_not_authorized
 from invenio.messages import wash_language
 
 def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
@@ -50,10 +49,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
     """Main entry point for the management of referees."""
     ln = wash_language(ln)
     # get user ID:
-    try:
-        uid = getUid(req)
-    except Error, e:
-        return errorMsg(str(e), req, ln=ln)
+    uid = getUid(req)
     (auth_code, auth_message) = acc_authorize_action(req, "cfgwebsubmit", verbose=0)
     if auth_code != 0:
         ## user is not authorised to use WebSubmit Admin:
@@ -69,14 +65,14 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
         # if the role does not exists, we create it
         if roleId == 0:
             if acc_add_role(role, "referees for document type %s category %s" % (doctype, categ[1])) == 0:
-                return errorMsg("Cannot create referee role", req)
+                return errorMsg("Cannot create referee role", req, uid)
             else:
                 roleId = acc_get_role_id(role)
             # if the action does not exist, we create it
             actionId = acc_get_action_id("referee")
             if actionId == 0:
                 if acc_add_action("referee", "", "no", ("doctype","categ")) == 0:
-                    return errorMsg("Cannot create action 'referee'", req)
+                    return errorMsg("Cannot create action 'referee'", req, uid)
                 else:
                     actionId = acc_get_action_id("referee")
             #create arguments
@@ -84,7 +80,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
             arg2Id = acc_add_argument("categ", categ[1])
             # then link the role with the action
             if acc_add_role_action_arguments(roleId, actionId, -1, 0, 0, [arg1Id, arg2Id]) == 0:
-                return errorMsg("Cannot link role with action", req)
+                return errorMsg("Cannot link role with action", req, uid)
         roleId = acc_get_role_id(role)
         # For each id in the array
         if isinstance(addusers, types.ListType):

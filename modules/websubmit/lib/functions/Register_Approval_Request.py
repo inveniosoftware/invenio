@@ -25,7 +25,6 @@ import sre_constants
 import os
 import cgi
 import re
-import os.path
 from invenio.websubmit_dblayer import register_new_approval_request, \
                                       get_simple_approval_status, \
                                       update_approval_request_status

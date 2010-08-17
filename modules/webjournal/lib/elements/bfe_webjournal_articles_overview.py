@@ -35,7 +35,6 @@ from invenio.messages import gettext_set_language
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_TMPDIR, \
-     CFG_CERN_SITE, \
      CFG_SITE_LANG
 from invenio.webjournal_utils import \
      cache_index_page, \
@@ -46,7 +45,6 @@ from invenio.webjournal_utils import \
      issue_is_later_than, \
      get_current_issue
 from invenio.webjournal_utils import \
-     image_pattern, \
      img_pattern, \
      header_pattern, \
      header_pattern2, \

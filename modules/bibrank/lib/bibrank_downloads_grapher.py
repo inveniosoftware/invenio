@@ -21,9 +21,7 @@ __revision__ = "$Id$"
 
 import string
 import os
-import sys
 import time
-import tempfile
 import calendar
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION

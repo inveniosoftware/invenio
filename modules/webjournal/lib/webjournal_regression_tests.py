@@ -320,7 +320,7 @@ TEST_SUITE = make_test_suite(ArticlesRelated,
                              JournalConfigVars,
                              TimeIssueFunctions,
                              JournalRelated,
-		             HtmlCachingFunction)
+                             HtmlCachingFunction)
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
 

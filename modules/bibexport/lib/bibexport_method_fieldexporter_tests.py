@@ -29,8 +29,6 @@ from invenio.testutils import make_test_suite, run_test_suite
 
 from invenio.bibexport_method_fieldexporter_dblayer import QueryResult
 
-from invenio.bibformat import format_record
-
 def _create_record_marc_xml():
     """Creates MARC XML containing one record"""
     xml_text="""

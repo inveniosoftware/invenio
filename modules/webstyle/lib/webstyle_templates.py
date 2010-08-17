@@ -42,8 +42,6 @@ from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
 from invenio.bibformat import format_record
-from invenio.webuser import collect_user_info, isUserSubmitter, \
-     isUserReferee
 from invenio import template
 websearch_templates = template.load('websearch')
 

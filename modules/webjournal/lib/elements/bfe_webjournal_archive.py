@@ -123,9 +123,9 @@ def format(bfo, lowest_issue):
     <hr />
     <form class="archiveform" action="%(CFG_SITE_URL)s/journal/search" name="search" method="get">
         <em>%(custom_date_label)s <small>(dd/mm/yyyy  -> e.g. 01/03/2006)</small>: </em>
-   	<input type="text" value="" maxlength="10" size="10" name="archive_date" />
+        <input type="text" value="" maxlength="10" size="10" name="archive_date" />
         <input type="hidden" value="%(journal_name)s" name="name" />
-   	<input type="hidden" value="%(ln)s" name="ln" />
+        <input type="hidden" value="%(ln)s" name="ln" />
         <input type="submit" value="Go" name="archive_search" />
     </form>
     ''' % {'CFG_SITE_URL': CFG_SITE_URL,

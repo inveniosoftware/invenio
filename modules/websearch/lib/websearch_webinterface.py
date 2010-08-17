@@ -69,13 +69,11 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
-     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBDIR, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
@@ -85,19 +83,31 @@ from invenio.config import \
      CFG_INSPIRE_SITE
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
+from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, http_check_credentials, logoutUser, isUserSuperAdmin, \
-    session_param_get
-from invenio import search_engine
+    collect_user_info, http_check_credentials, logoutUser, isUserSuperAdmin
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
-from invenio.search_engine import get_colID, get_coll_i18nname, \
-    check_user_can_view_record, collection_restricted_p, restricted_collection_cache, \
-    get_fieldvalues, get_fieldvalues_alephseq_like, get_most_popular_field_values, get_mysql_recid_from_aleph_sysno
+from invenio.search_engine import check_user_can_view_record, \
+     collection_reclist_cache, \
+     collection_restricted_p, \
+     create_similarly_named_authors_link_box, \
+     get_colID, \
+     get_coll_i18nname, \
+     get_fieldvalues, \
+     get_fieldvalues_alephseq_like, \
+     get_most_popular_field_values, \
+     get_mysql_recid_from_aleph_sysno, \
+     guess_primary_collection_of_a_record, \
+     page_end, \
+     page_start, \
+     perform_request_cache, \
+     perform_request_log, \
+     perform_request_search, \
+     restricted_collection_cache
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -106,7 +116,7 @@ from invenio.bibformat_engine import get_output_formats
 from invenio.websearch_webcoll import mymkdir, get_collection
 from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno
-from invenio.bibrank_citation_searcher import get_author_cited_by, get_cited_by_list
+from invenio.bibrank_citation_searcher import get_cited_by_list
 from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.search_engine_summarizer import summarize_records
 from invenio.errorlib import register_exception
@@ -222,7 +232,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         req.send_http_header()
         uid = getUid(req)
 
-        search_engine.page_start(req, "hb", "", "", ln, uid)
+        page_start(req, "hb", "", "", ln, uid)
 
         #wants to check it in case of no results
         self.authorname = self.authorname.replace("+"," ")
@@ -237,9 +247,9 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         time2 = time.time()
 
         #search the publications by this author
-        pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="exactauthor")
+        pubs = perform_request_search(req=req, p=self.authorname, f="exactauthor")
         #get most frequent authors of these pubs
-        popular_author_tuples = search_engine.get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
+        popular_author_tuples = get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
         authors = []
         for (auth, frequency) in popular_author_tuples:
             if len(authors) < MAX_COLLAB_LIST:
@@ -250,14 +260,14 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             req.write("<br/>popularized authors: "+str(time1-time2)+"<br/>")
 
         #and publication venues
-        venuetuples =  search_engine.get_most_popular_field_values(pubs, (VENUE_TAG))
+        venuetuples =  get_most_popular_field_values(pubs, (VENUE_TAG))
         time2 = time.time()
         if verbose == 9:
             req.write("<br/>venues: "+str(time2-time1)+"<br/>")
 
 
         #and keywords
-        kwtuples = search_engine.get_most_popular_field_values(pubs, (KEYWORD_TAG, FKEYWORD_TAG), count_repetitive_values=False)
+        kwtuples = get_most_popular_field_values(pubs, (KEYWORD_TAG, FKEYWORD_TAG), count_repetitive_values=False)
         if CFG_INSPIRE_SITE:
             # filter kw tuples against unwanted keywords:
             kwtuples_filtered = ()
@@ -332,11 +342,11 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         req.write(out)
 
-        simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
+        simauthbox = create_similarly_named_authors_link_box(self.authorname)
         req.write(simauthbox)
         if verbose == 9:
             req.write("<br/>all: "+str(time.time()-genstart)+"<br/>")
-        return search_engine.page_end(req, 'hb', ln)
+        return page_end(req, 'hb', ln)
 
     def get_institute_pub_dict(self, recids):
         """return a dictionary consisting of institute -> list of publications"""
@@ -444,7 +454,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -454,7 +464,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 navmenuid='search')
 
         # mod_python does not like to return [] in case when of=id:
-        out = search_engine.perform_request_search(req, **argd)
+        out = perform_request_search(req, **argd)
         if out == []:
             return str(out)
         else:
@@ -517,7 +527,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
-        record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
+        record_primary_collection = guess_primary_collection_of_a_record(self.recid)
 
         if collection_restricted_p(record_primary_collection):
             (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
@@ -531,7 +541,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         req.argd = argd
 
         # mod_python does not like to return [] in case when of=id:
-        out = search_engine.perform_request_search(req, **argd)
+        out = perform_request_search(req, **argd)
         if out == []:
             return str(out)
         else:
@@ -622,7 +632,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                             text = auth_msg,\
                             navmenuid='search')
             else:
-                involved_collections.add(search_engine.guess_primary_collection_of_a_record(argd['recid']))
+                involved_collections.add(guess_primary_collection_of_a_record(argd['recid']))
 
         # If any of the collection requires authentication, redirect
         # to the authentication form.
@@ -644,7 +654,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         req.argd = argd
 
         # mod_python does not like to return [] in case when of=id:
-        out = search_engine.perform_request_search(req, **argd)
+        out = perform_request_search(req, **argd)
         if out == []:
             return str(out)
         else:
@@ -653,12 +663,12 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
     def cache(self, req, form):
         """Search cache page."""
         argd = wash_urlargd(form, {'action': (str, 'show')})
-        return search_engine.perform_request_cache(req, action=argd['action'])
+        return perform_request_cache(req, action=argd['action'])
 
     def log(self, req, form):
         """Search log page."""
         argd = wash_urlargd(form, {'date': (str, '')})
-        return search_engine.perform_request_log(req, date=argd['date'])
+        return perform_request_log(req, date=argd['date'])
 
     def authenticate(self, req, form):
         """Restricted search results pages."""
@@ -695,7 +705,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
 
         # mod_python does not like to return [] in case when of=id:
-        out = search_engine.perform_request_search(req, **argd)
+        out = perform_request_search(req, **argd)
         if out == []:
             return str(out)
         else:
@@ -1037,7 +1047,7 @@ def display_collection(req, c, aas, verbose, ln):
         show_title_p = False
         body_css_classes.append('home')
 
-    if len(search_engine.collection_reclist_cache.cache.keys()) == 1:
+    if len(collection_reclist_cache.cache.keys()) == 1:
         # if there is only one collection defined, do not print its
         # title on the page as it would be displayed repetitively.
         show_title_p = False
@@ -1148,7 +1158,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                 previous_url = websearch_templates.build_rss_url(argd,
                                                                  jrec=prev_jrec)
 
-            recIDs = search_engine.perform_request_search(req, of="id",
+            recIDs = perform_request_search(req, of="id",
                                                           c=argd['c'], cc=argd['cc'],
                                                           p=argd['p'], f=argd['f'],
                                                           p1=argd['p1'], f1=argd['f1'],
@@ -1257,7 +1267,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
             return redirect_to_url(req, target, norobot=True)
@@ -1267,7 +1277,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
                 navmenuid='search')
 
         # mod_python does not like to return [] in case when of=id:
-        out = search_engine.perform_request_search(req, **argd)
+        out = perform_request_search(req, **argd)
         if out == []:
             return str(out)
         else:

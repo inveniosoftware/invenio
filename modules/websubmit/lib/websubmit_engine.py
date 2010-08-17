@@ -33,14 +33,12 @@ from urllib import quote_plus
 from cgi import escape
 
 from invenio.config import \
-     CFG_BINDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
      CFG_PYLIBDIR, \
-     CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_VERSION
-from invenio.dbquery import run_sql, Error
+     CFG_WEBSUBMIT_STORAGEDIR
+from invenio.dbquery import Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box
@@ -164,7 +162,7 @@ def interface(req,
     fieldhtml = []
     level = []
     fullDesc = []
-    text = []
+    text = ''
     check = []
     select = []
     radio = []

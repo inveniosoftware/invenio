@@ -24,7 +24,6 @@ __revision__ = "$Id$"
 
 import os
 import cgi
-import os.path
 from invenio.errorlib import register_exception
 
 def Print_Success_APP(parameters, curdir, form, user_info=None):

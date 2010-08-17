@@ -21,8 +21,6 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-import sys
-
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box, adderrorbox
@@ -362,32 +360,6 @@ def checkexternalcollections(req, colID, ln=CFG_SITE_LANG, icl=None, update="", 
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addoutputformat(req, colID, ln=CFG_SITE_LANG, code='', name='', callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
-
-    try:
-        uid = getUid(req)
-    except Error, e:
-        return error_page(req)
-
-
-    auth = check_user(req,'cfgwebsearch')
-    if not auth[0]:
-        return page(title="Edit Collection",
-                body=wsc.perform_addoutputformat(colID=colID,
-                                                 ln=ln,
-                                                 code=code,
-                                                 name=name,
-                                                 callback=callback,
-                                                 confirm=confirm),
-                uid=uid,
-                language=ln,
-                req=req,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)
-    else:
-        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
 def showoutputformats(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
@@ -596,31 +568,6 @@ def modifyfield(req, colID, fldID, fldvID='', ln=CFG_SITE_LANG, callback='yes', 
                                              ln=ln,
                                              callback=callback,
                                              confirm=confirm),
-                uid=uid,
-                language=ln,
-                req=req,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)
-    else:
-        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
-def modifyoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, sel_type='', trans=[], confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
-
-    try:
-        uid = getUid(req)
-    except Error, e:
-        return error_page(req)
-
-    auth = check_user(req,'cfgwebsearch')
-    if not auth[0]:
-        return page(title="Edit Collection",
-                body=wsc.perform_modifyoutputformat(colID=colID,
-                                                    ln=ln,
-                                                    fmtID=fmtID,
-                                                    sel_type=sel_type,
-                                                    trans=trans,
-                                                    confirm=confirm),
                 uid=uid,
                 language=ln,
                 req=req,

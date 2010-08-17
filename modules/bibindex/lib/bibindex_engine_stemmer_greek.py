@@ -352,8 +352,8 @@ class greek_stemmer:
             w = stem + 'ΜΑ'
         fp = re.match(pat2, w)
         if fp and test1:
-           stem = fp.group(1)
-           w = stem
+            stem = fp.group(1)
+            w = stem
 
         # STEP 7
         pat = '^(.+?)(ΕΣΤΕΡ|ΕΣΤΑΤ|ΟΤΕΡ|ΟΤΑΤ|ΥΤΕΡ|ΥΤΑΤ|ΩΤΕΡ|ΩΤΑΤ)$'
