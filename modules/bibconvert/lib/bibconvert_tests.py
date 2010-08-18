@@ -50,6 +50,21 @@ class TestFormattingFunctions(unittest.TestCase):
         self.assertEqual("hello world!", bibconvert.FormatField("Hello world!", "DOWN()"))
         self.assertEqual("Hello World!", bibconvert.FormatField("Hello world!", "CAP()"))
 
+    def test_ff_regex(self):
+        """bibconvert - formatting functions with regular expression"""
+        self.assertEqual("Hello world!",
+                bibconvert.FormatField("Hellx wyrld!", "REP(//[xy]//,o)"))
+        self.assertEqual("Hello world!",
+                bibconvert.FormatField("Hello world!", "REP(//[abc]//,o)"))
+        self.assertEqual("Hello world!",
+                bibconvert.FormatField("Hello world! @", "EXP(//[@_]//,1)"))
+        self.assertEqual("Hello world!",
+                bibconvert.FormatField("Hello world!", "EXP(//[abcd]+//,1)"))
+        self.assertEqual("lala",
+                bibconvert.FormatField("Hello world!", "IF(//^Hello .*!$//,lala,lolo)"))
+        self.assertEqual("lolo",
+                bibconvert.FormatField("Hello world!", "IF(//^Hello .*x$//,lala,lolo)"))
+
 
 class TestGlobalFormattingFunctions(unittest.TestCase):
     """Test bibconvert global formatting functions."""
@@ -127,6 +142,14 @@ class TestLimw(unittest.TestCase):
         self.assertEqual(" cd xx 12 34",
                          bibconvert.FormatField(test_input, "LIMW( ,L)"))
 
+    def test_limw_left_regex(self):
+        """bibconvert - LIMW(c,L) with regular expression"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual("ab ",
+                bibconvert.FormatField(test_input, "LIMW(//\s//,R)"))
+        self.assertEqual(test_input,
+                bibconvert.FormatField(test_input, "LIMW(//[!_-]//,R)"))
+
     def test_limw_right(self):
         """bibconvert - LIMW(c,R)"""
         test_input = "ab cd xx 12 34"
@@ -135,6 +158,21 @@ class TestLimw(unittest.TestCase):
         test_input = "sep_1999"
         self.assertEqual("sep_",
                          bibconvert.FormatField(test_input, "LIMW(_,R)"))
+
+    def test_limw_right_regex(self):
+        """bibconvert - LIMW(c,R) with regular expression"""
+        test_input = "ab cd xx 12 34"
+        self.assertEqual("ab ",
+                bibconvert.FormatField(test_input, "LIMW(//\s//,R)"))
+        self.assertEqual(test_input,
+                bibconvert.FormatField(test_input, "LIMW(//[!_-]//,R)"))
+
+        test_input = "sep_1999"
+        self.assertEqual("sep_",
+                bibconvert.FormatField(test_input, "LIMW(//[!_]//,R)"))
+        self.assertEqual(test_input,
+                bibconvert.FormatField(test_input, "LIMW(//[!_-]//,R)"))
+
 
 class TestWords(unittest.TestCase):
     """Test bibconvert WORDS() function."""
