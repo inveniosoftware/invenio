@@ -1101,6 +1101,10 @@ input,select {
     color: #000;
     background: #fff;
 }
+input[disabled], input[disabled="true"]{
+   /* <http://reference.sitepoint.com/css/attributeselector#compatibilitysection> */
+   color: #666;
+}
 .wsactionbutton {
     width: 150px;
     height: 25px;

@@ -326,10 +326,10 @@ class Template:
                          'doctype' : doctype,
                          'shortname' : snameCateg[i],
                        }
-            out += "</td>"
+            out += "</td><td>"
         else:
-            out += "<script>checked=1;</script>"
-        out += """<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            out += '<td><script type="text/javascript">checked=1;</script>'
+        out += """&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
                   <td>
                     <table><tr><td>
                """
