@@ -59,7 +59,9 @@ class TestFormattingFunctions(unittest.TestCase):
         self.assertEqual("Hello world!",
                 bibconvert.FormatField("Hello world! @", "EXP(//[@_]//,1)"))
         self.assertEqual("Hello world!",
-                bibconvert.FormatField("Hello world!", "EXP(//[abcd]+//,1)"))
+                bibconvert.FormatField("Hello world! abc", "EXP(//[oz]+//,0)"))
+        self.assertEqual("Hello world!",
+                bibconvert.FormatField("Hello world!", "EXP(//[abc]+//,1)"))
         self.assertEqual("lala",
                 bibconvert.FormatField("Hello world!", "IF(//^Hello .*!$//,lala,lolo)"))
         self.assertEqual("lolo",
