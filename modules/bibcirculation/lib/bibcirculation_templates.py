@@ -179,14 +179,14 @@ class Template:
 
         if not book_title_from_MARC(recid):
             out = """<div align="center"
-                     <div class="infoboxmsg">
+                     <div class="bibcircinfoboxmsg">
                       This record does not exist.
                       </div>"""
             return out
 
         elif not has_copies(recid):
             out = """<div align="center"
-                     <div class="infoboxmsg">
+                     <div class="bibcircinfoboxmsg">
                       This record has no copies.
                       </div>"""
             return out
@@ -197,7 +197,7 @@ class Template:
             ill_link = """<a href='%s/record/%s/holdings/ill_request_with_recid'>ILL services</a>""" % (CFG_SITE_URL, recid)
 
             out = """<div align="center"
-                     <div class="infoboxmsg">
+                     <div class="bibcircinfoboxmsg">
                       All the copies of <strong>%s</strong> are missing.You can request a copy using <strong>%s</strong>.
                       </div>""" % (book_title_from_MARC(recid), ill_link)
 
@@ -206,7 +206,7 @@ class Template:
         # verify if there are no copies
         elif not holdings_info:
             out = """<div align="center"
-                     <div class="infoboxmsg">
+                     <div class="bibcircinfoboxmsg">
                       This item has no holdings.
                       </div>"""
             return out
@@ -299,7 +299,7 @@ class Template:
 
     def tmpl_book_not_for_loan(self):
         message = """<div align="center"
-                     <div class="infoboxmsg">
+                     <div class="bibcircinfoboxmsg">
                       This item is not for loan.
                       </div>"""
         return message
@@ -361,7 +361,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
           """ % (_("0 borrowers found. Search by CCID."))
 
@@ -438,7 +438,7 @@ class Template:
 
         renew_all_link = create_html_link(CFG_SITE_SECURE_URL +
                                           '/yourloans/display',
-                                          {'borrower_id': borrower_id},
+                                          {'borrower_id': borrower_id, 'action':'renew_all'},
                                           (_("Renew all loans")))
 
         loanshistoricaloverview_link = create_html_link(CFG_SITE_SECURE_URL +
@@ -495,7 +495,7 @@ class Template:
                 else:
                     renew_link = create_html_link(CFG_SITE_SECURE_URL +
                                                   '/yourloans/display',
-                                                  {'barcode': barcode},
+                                                  {'barcode': barcode, 'action':'renew'},
                                                   (_("Renew")))
 
                 out += """
@@ -595,7 +595,7 @@ class Template:
 
                 cancel_request_link = create_html_link(CFG_SITE_URL +
                                                        '/yourloans/display',
-                                                       {'request_id': request_id},
+                                                       {'request_id': request_id, 'action':'cancel'},
                                                        (_("Cancel")))
                 out += """
                 <tr>
@@ -1517,7 +1517,7 @@ class Template:
            <form name="return_form" action="%s/admin2/bibcirculation/get_next_waiting_loan_request" method="get" >
              <div class="bibcircbottom">
              <br />
-             <div class="infoboxsuccess">%s</div>
+             <div class="bibcircinfoboxsuccess">%s</div>
              <br />
              <table class="bibcirctable">
                """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
@@ -1591,7 +1591,7 @@ class Template:
         if result:
             out += """
             </table>
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <script src="/js/jquery.js" type="text/javascript"></script>
@@ -1674,7 +1674,7 @@ class Template:
         else:
             out += """
               </table>
-              <div class="infoboxmsg">%s</div>""" % (_("There are no requests waiting on the item <strong>%s</strong>." % book_title_from_MARC(recid)))
+              <div class="bibcircinfoboxmsg">%s</div>""" % (_("There are no requests waiting on the item <strong>%s</strong>." % book_title_from_MARC(recid)))
 
             out += """
             <br />
@@ -1704,7 +1704,7 @@ class Template:
         out += """
         <div class="bibcircbottom">
         <br />
-        <div class="subtitle">
+        <div class="bibcircsubtitle">
         %s
         </div>
         <br />
@@ -1858,7 +1858,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             """ % (_("0 item(s) found."))
 
@@ -2402,7 +2402,7 @@ class Template:
 
         out += """
         <br />
-        <div class="infoboxsuccess">%s</div>
+        <div class="bibcircinfoboxsuccess">%s</div>
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
         <br />
@@ -2652,7 +2652,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             """ % (_("There are no requests."))
 
@@ -3070,7 +3070,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
           """ % (_("There are no requests."))
 
@@ -3158,7 +3158,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             """ % (_("There are no loans."))
 
@@ -3270,7 +3270,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             """ % (_("There are no requests."))
 
@@ -3572,12 +3572,12 @@ class Template:
 
         no_notes_link = create_html_link(CFG_SITE_URL +
                                          '/admin2/bibcirculation/get_borrower_notes',
-                                         {'borrower_id': id},
+                                         {'borrower_id': borrower_id},
                                          (_("No notes")))
 
         see_notes_link = create_html_link(CFG_SITE_URL +
                                           '/admin2/bibcirculation/get_borrower_notes',
-                                          {'borrower_id': id},
+                                          {'borrower_id': borrower_id},
                                           (_("Notes about this borrower")))
 
         #loans_link = create_html_link(CFG_SITE_URL +
@@ -3654,7 +3654,7 @@ class Template:
                </tr>
 
             """ % (CFG_SITE_URL,
-                   id,
+                   display_id,
                    _("Personal details"),
                    id_string, display_id,
                    _("Name"), name,
@@ -3687,7 +3687,7 @@ class Template:
             value='%s' class='formbutton'>
             <input type=button onClick="location.href='%s/admin2/bibcirculation/create_new_request_step1?borrower_id=%s'"
             value='%s' class='formbutton'>
-            <input type=button onClick="location.href='%s/admin2/bibcirculation/register_ill_book_request_from_borrower_page?borrower_id=%s'"
+            <input type=button onClick="location.href='%s/admin2/bibcirculation/register_ill_book_request?borrower_id=%s'"
             value='%s' class='formbutton'>
             <input type='submit' name='notify_button' value='%s' class='formbutton'>
             </td>
@@ -3778,19 +3778,19 @@ class Template:
         </table>
         <br />
         </div>
-        """ % (CFG_SITE_URL, id, _("Update"),
-               CFG_SITE_URL, id, ccid, name, email, phone, address, mailbox, _("New loan"),
-               CFG_SITE_URL, id, _("New request"),
-               CFG_SITE_URL, id, _("New ILL request"),
+        """ % (CFG_SITE_URL, borrower_id, _("Update"),
+               CFG_SITE_URL, borrower_id, ccid, name, email, phone, address, mailbox, _("New loan"),
+               CFG_SITE_URL, borrower_id, _("New request"),
+               CFG_SITE_URL, borrower_id, _("New ILL request"),
                _("Notify this borrower"),
                _("Requests, Loans and ILL overview on"), time.ctime(),
-               _("Requests"), nb_requests, CFG_SITE_URL, id, _("More details"),
-               _("Loans"), nb_loans, CFG_SITE_URL, id, _("More details"),
-               _("ILL"), nb_ill, CFG_SITE_URL, id, _("More details"),
+               _("Requests"), nb_requests, CFG_SITE_URL, borrower_id, _("More details"),
+               _("Loans"), nb_loans, CFG_SITE_URL, borrower_id, _("More details"),
+               _("ILL"), nb_ill, CFG_SITE_URL, borrower_id, _("More details"),
                _("Historical overview"),
-               _("Requests"), nb_req_hist, CFG_SITE_URL, id, _("More details"),
-               _("Loans"), nb_loans_hist, CFG_SITE_URL, id, _("More details"),
-               _("ILL"), nb_ill_hist, CFG_SITE_URL, id, _("More details"),
+               _("Requests"), nb_req_hist, CFG_SITE_URL, borrower_id, _("More details"),
+               _("Loans"), nb_loans_hist, CFG_SITE_URL, borrower_id, _("More details"),
+               _("ILL"), nb_ill_hist, CFG_SITE_URL, borrower_id, _("More details"),
                _("Back"))
 
 
@@ -3811,7 +3811,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
           """ % (_("There are no requests."))
 
@@ -3917,7 +3917,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
           """ % (_("There are no loans."))
 
@@ -4007,7 +4007,7 @@ class Template:
                   <OPTION VALUE="">Select an action
                   <OPTION VALUE="get_borrower_loans_details?borrower_id=%s&barcode=%s&loan_id=%s&recid=%s">Renew
                   <OPTION VALUE="loan_return_confirm?barcode=%s">Return
-                  <OPTION VALUE="change_due_date_step1?loan_id=%s&borrower_id=%s">Change due date
+                  <OPTION VALUE="change_due_date_step1?barcode=%s&borrower_id=%s">Change due date
                   <OPTION VALUE="claim_book_return?borrower_id=%s&recid=%s&loan_id=%s&template=claim_return">Send recall
                 </SELECT>
               </td>
@@ -4021,7 +4021,7 @@ class Template:
                    check_notes, status,
                    borrower_id, barcode,
                    loan_id, recid,
-                   barcode, loan_id, borrower_id,
+                   barcode, barcode, borrower_id,
                    borrower_id, recid, loan_id,
                    barcode, loan_id)
 
@@ -4652,7 +4652,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             """ % (_("There are no loans."))
 
@@ -4740,7 +4740,7 @@ class Template:
                       <OPTION VALUE="">Select an action
                       <OPTION VALUE="get_item_loans_details?barcode=%s&loan_id=%s&recid=%s">Renew
                       <OPTION VALUE="loan_return_confirm?barcode=%s">Return
-                      <OPTION VALUE="change_due_date_step1?loan_id=%s">Change due date
+                      <OPTION VALUE="change_due_date_step1?barcode=%s">Change due date
                       <OPTION VALUE="claim_book_return?recid=%s&template=claim_return">Send recall
                     </SELECT>
                  </td>
@@ -4848,7 +4848,7 @@ class Template:
                </tr>
             </table>
             """% (CFG_SITE_URL,
-                  id,
+                  borrower_id,
                   request_id,
                   _("Personal details"),
                   id_string, display_id,
@@ -7722,7 +7722,7 @@ class Template:
             out += """
             <div class="bibcircbottom">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             """ % (_("0 library(ies) found."))
 
@@ -9041,7 +9041,7 @@ class Template:
         <div class="bibcircbottom">
         <br />
         <br />
-        <div class="infoboxsuccess">%s</div>
+        <div class="bibcircinfoboxsuccess">%s</div>
         <br />
         <br />
         <table class="bibcirctable">
@@ -10104,423 +10104,423 @@ class Template:
 
         return out
 
-    def tmpl_register_ill_request_step0(self, result, infos, key, string, recid, ln=CFG_SITE_LANG):
-        """
-        @param result: borrower's information
-        @type result: list
+    #def tmpl_register_ill_request_step0(self, result, infos, key, string, recid, ln=CFG_SITE_LANG):
+    #    """
+    #    @param result: borrower's information
+    #    @type result: list
+    #
+    #    @param infos: informations
+    #    @type infos: list
+    #
+    #    @param key: field (name, email, etc...)
+    #    @param key: string
+    #
+    #    @param string: pattern
+    #    @type string: string
+    #
+    #    @param recid: identify the record. Primary key of bibrec.
+    #    @type recid: int
+    #
+    #    @param ln: language of the page
+    #    """
+    #    _ = gettext_set_language(ln)
+    #
+    #    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+    #
+    #    if book_isbn:
+    #        book_cover = get_book_cover(book_isbn)
+    #    else:
+    #        book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
+    #
+    #    out = self.tmpl_infobox(infos, ln)
+    #
+    #    out += _MENU_
+    #
+    #    out += """
+    #    <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+    #    <div class="bibcircbottom">
+    #    <br />
+    #      <table class="bibcirctable">
+    #              <tr>
+    #                 <td class="bibcirctableheader" width="10">%s</td>
+    #              </tr>
+    #            </table>
+    #            <table class="bibcirctable">
+    #              <tr>
+    #                <td width="500" valign='top'>
+    #                  <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+    #                    <tr>
+    #                      <th width="100">%s</th>
+    #                      <td>%s</td>
+    #                    </tr>
+    #                    <tr>
+    #                      <th width="100">%s</th>
+    #                      <td>%s</td>
+    #                    </tr>
+    #                    <tr>
+    #                      <th width="100">%s</th>
+    #                      <td>%s</td>
+    #                    </tr>
+    #                    <tr>
+    #                      <th width="100">%s</th>
+    #                      <td>%s</td>
+    #                    </tr>
+    #                    <tr>
+    #                      <th width="100">%s</th>
+    #                      <td>%s</td>
+    #                    </tr>
+    #                 </table>
+    #                 </td>
+    #                 <td width="200" align='center' valign='top'>
+    #                   <table>
+    #                     <tr>
+    #                       <td>
+    #                         <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+    #                       </td>
+    #                     </tr>
+    #                   </table>
+    #                 </td>
+    #                 """ % (_("Item details"),
+    #                        _("Title"), book_title,
+    #                        _("Author(s)"), book_author,
+    #                        _("Year"), book_year,
+    #                        _("Publisher"), book_editor,
+    #                        _("ISBN"), book_isbn,
+    #                        str(book_cover))
+    #
+    #    out += """
+    #    <td valign='top' align='center'>
+    #    <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_step0" method="get" >
+    #    <input type=hidden name=recid value='%s'>
+    #    <table>
+    #        """  % (CFG_SITE_URL, recid)
+    #
+    #    if CFG_CERN_SITE == 1:
+    #
+    #        out += """
+    #             <tr>
+    #               <td class="bibcirctableheader" align="center">Search user by
+    #               """
+    #
+    #        if key == 'email':
+    #            out += """
+    #               <input type="radio" name="key" value="ccid">ccid
+    #               <input type="radio" name="key" value="name">name
+    #               <input type="radio" name="key" value="email" checked>email
+    #               """
+    #
+    #        elif key == 'name':
+    #            out += """
+    #               <input type="radio" name="key" value="ccid">ccid
+    #               <input type="radio" name="key" value="name" checked>name
+    #               <input type="radio" name="key" value="email">email
+    #               """
+    #
+    #        else:
+    #            out += """
+    #               <input type="radio" name="key" value="ccid" checked>ccid
+    #               <input type="radio" name="key" value="name">name
+    #               <input type="radio" name="key" value="email">email
+    #               """
+    #
+    #    else:
+    #        out += """
+    #             <tr>
+    #               <td class="bibcirctableheader" align="center">Search borrower by
+    #
+    #               """
+    #
+    #        if key == 'email':
+    #            out += """
+    #               <input type="radio" name="key" value="id">id
+    #               <input type="radio" name="key" value="name">name
+    #               <input type="radio" name="key" value="email" checked>email
+    #               """
+    #
+    #        elif key == 'id':
+    #            out += """
+    #               <input type="radio" name="key" value="id" checked>id
+    #               <input type="radio" name="key" value="name">name
+    #               <input type="radio" name="key" value="email">email
+    #               """
+    #
+    #        else:
+    #            out += """
+    #               <input type="radio" name="key" value="id">id
+    #               <input type="radio" name="key" value="name" checked>name
+    #               <input type="radio" name="key" value="email">email
+    #               """
+    #
+    #    out += """
+    #                <br><br>
+    #                </td>
+    #                </tr>
+    #                <tr>
+    #                <td align="center">
+    #                <input type="text" size="40" id="string" name="string"  value='%s' style='border: 1px solid #cfcfcf'>
+    #                </td>
+    #                </tr>
+    #                <tr>
+    #                <td align="center">
+    #                <br>
+    #                <input type="submit" value="Search" class="formbutton">
+    #                </td>
+    #                </tr>
+    #
+    #               </table>
+    #      </form>
+    #
+    #    """ % (string or '')
+    #
+    #    if result:
+    #        out += """
+    #        <br />
+    #        <form name="step1_form2" action="%s/admin2/bibcirculation/register_ill_request_step1" method="get" >
+    #        <input type=hidden name=recid value='%s'>
+    #        <table class="bibcirctable">
+    #          <tr width="200">
+    #            <td align="center">
+    #              <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:40%%'>
+    #
+    #        """ % (CFG_SITE_URL, recid)
+    #
+    #        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+    #            out += """
+    #                   <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
+    #
+    #                   """ % (borrower_id, ccid, name, email, phone, address, mailbox, name)
+    #
+    #        out += """
+    #                </select>
+    #                </td>
+    #                </tr>
+    #                </table>
+    #                <table class="bibcirctable">
+    #                <tr>
+    #                    <td ALIGN="center">
+    #                    <input type="submit" value='%s' class="formbutton">
+    #                    </td>
+    #                </tr>
+    #                </table>
+    #                </form>
+    #                """ % (_("Select user"))
+    #
+    #    out += """
+    #              </td>
+    #            </tr>
+    #          </table>
+    #          <br />
+    #          <br />
+    #          <br />
+    #          <br />
+    #          </div>
+    #          """
+    #
+    #    return out
 
-        @param infos: informations
-        @type infos: list
-
-        @param key: field (name, email, etc...)
-        @param key: string
-
-        @param string: pattern
-        @type string: string
-
-        @param recid: identify the record. Primary key of bibrec.
-        @type recid: int
-
-        @param ln: language of the page
-        """
-        _ = gettext_set_language(ln)
-
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
-
-        if book_isbn:
-            book_cover = get_book_cover(book_isbn)
-        else:
-            book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
-
-        out = self.tmpl_infobox(infos, ln)
-
-        out += _MENU_
-
-        out += """
-        <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        <div class="bibcircbottom">
-        <br />
-          <table class="bibcirctable">
-                  <tr>
-                     <td class="bibcirctableheader" width="10">%s</td>
-                  </tr>
-                </table>
-                <table class="bibcirctable">
-                  <tr>
-                    <td width="500" valign='top'>
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100">%s</th>
-                          <td>%s</td>
-                        </tr>
-                     </table>
-                     </td>
-                     <td width="200" align='center' valign='top'>
-                       <table>
-                         <tr>
-                           <td>
-                             <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
-                           </td>
-                         </tr>
-                       </table>
-                     </td>
-                     """ % (_("Item details"),
-                            _("Title"), book_title,
-                            _("Author(s)"), book_author,
-                            _("Year"), book_year,
-                            _("Publisher"), book_editor,
-                            _("ISBN"), book_isbn,
-                            str(book_cover))
-
-        out += """
-        <td valign='top' align='center'>
-        <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_step0" method="get" >
-        <input type=hidden name=recid value='%s'>
-        <table>
-            """  % (CFG_SITE_URL, recid)
-
-        if CFG_CERN_SITE == 1:
-
-            out += """
-                 <tr>
-                   <td class="bibcirctableheader" align="center">Search user by
-                   """
-
-            if key == 'email':
-                out += """
-                   <input type="radio" name="key" value="ccid">ccid
-                   <input type="radio" name="key" value="name">name
-                   <input type="radio" name="key" value="email" checked>email
-                   """
-
-            elif key == 'name':
-                out += """
-                   <input type="radio" name="key" value="ccid">ccid
-                   <input type="radio" name="key" value="name" checked>name
-                   <input type="radio" name="key" value="email">email
-                   """
-
-            else:
-                out += """
-                   <input type="radio" name="key" value="ccid" checked>ccid
-                   <input type="radio" name="key" value="name">name
-                   <input type="radio" name="key" value="email">email
-                   """
-
-        else:
-            out += """
-                 <tr>
-                   <td class="bibcirctableheader" align="center">Search borrower by
-
-                   """
-
-            if key == 'email':
-                out += """
-                   <input type="radio" name="key" value="id">id
-                   <input type="radio" name="key" value="name">name
-                   <input type="radio" name="key" value="email" checked>email
-                   """
-
-            elif key == 'id':
-                out += """
-                   <input type="radio" name="key" value="id" checked>id
-                   <input type="radio" name="key" value="name">name
-                   <input type="radio" name="key" value="email">email
-                   """
-
-            else:
-                out += """
-                   <input type="radio" name="key" value="id">id
-                   <input type="radio" name="key" value="name" checked>name
-                   <input type="radio" name="key" value="email">email
-                   """
-
-        out += """
-                    <br><br>
-                    </td>
-                    </tr>
-                    <tr>
-                    <td align="center">
-                    <input type="text" size="40" id="string" name="string"  value='%s' style='border: 1px solid #cfcfcf'>
-                    </td>
-                    </tr>
-                    <tr>
-                    <td align="center">
-                    <br>
-                    <input type="submit" value="Search" class="formbutton">
-                    </td>
-                    </tr>
-
-                   </table>
-          </form>
-
-        """ % (string or '')
-
-        if result:
-            out += """
-            <br />
-            <form name="step1_form2" action="%s/admin2/bibcirculation/register_ill_request_step1" method="get" >
-            <input type=hidden name=recid value='%s'>
-            <table class="bibcirctable">
-              <tr width="200">
-                <td align="center">
-                  <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:40%%'>
-
-            """ % (CFG_SITE_URL, recid)
-
-            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
-                out += """
-                       <option value ='%s,%s,%s,%s,%s,%s,%s'>%s
-
-                       """ % (borrower_id, ccid, name, email, phone, address, mailbox, name)
-
-            out += """
-                    </select>
-                    </td>
-                    </tr>
-                    </table>
-                    <table class="bibcirctable">
-                    <tr>
-                        <td ALIGN="center">
-                        <input type="submit" value='%s' class="formbutton">
-                        </td>
-                    </tr>
-                    </table>
-                    </form>
-                    """ % (_("Select user"))
-
-        out += """
-                  </td>
-                </tr>
-              </table>
-              <br />
-              <br />
-              <br />
-              <br />
-              </div>
-              """
-
-        return out
-
-    def tmpl_register_ill_request_step1(self, recid, user_info, ln=CFG_SITE_LANG):
-        """
-        @param recid: identify the record. Primary key of bibrec.
-        @type recid: int
-
-        @param user_info: user's informations
-        @type user_info: tuple
-        """
-
-        (borrower_id, ccid, name, email, phone, address, mailbox) = user_info.split(',')
-
-        _ = gettext_set_language(ln)
-
-        display_id=borrower_id
-        id_string= _("ID")
-        if CFG_CERN_SITE == 1:
-            display_id=ccid
-            id_string= _("CCID")
-
-        out = """  """
-
-        out += _MENU_
-
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
-
-        out += """
-           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="update_item_info_step4_form" action="%s/admin2/bibcirculation/register_ill_request_step2" method="get" >
-           <div class="bibcircbottom" align="center">
-                <br />
-                     <table class="bibcirctable">
-                          <tr align="center">
-                               <td class="bibcirctableheader" width="10">%s</td>
-                          </tr>
-                </table>
-                    <input type=hidden name=recid value='%s'>
-                    <input type=hidden name=user_info value="%s">
-                    <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-                     <tr>
-                        <th width="100">%s</th>
-                        <td class="bibcirccontent">%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td class="bibcirccontent">%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td class="bibcirccontent">%s</td>
-                         </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td class="bibcirccontent">%s</td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td class="bibcirccontent">%s</td>
-                     </tr>
-                     </table>
-           <br />
-
-           """  % (CFG_SITE_URL,
-                   _("Item details"),
-                   recid, user_info,
-                   _("Name"),
-                   book_title,
-                   _("Author(s)"),
-                   book_author,
-                   _("Year"),
-                   book_year,
-                   _("Publisher"),
-                   book_editor,
-                   _("ISBN"),
-                   book_isbn)
-
-        out += """
-                <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-                <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-                <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-                <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
-
-
-              <br />
-              <table>
-                <tr>
-                  <td class="bibcirctableheader">%s</td>
-                </tr>
-              </table>
-              <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-                <tr>
-                    <th width="100">%s</th>
-                    <td class="bibcirccontent">%s</td>
-                </tr>
-                <tr>
-                    <th width="100">%s</th>
-                    <td class="bibcirccontent">%s</td>
-                </tr>
-                <tr>
-                    <th width="100">%s</th>
-                    <td class="bibcirccontent">%s</td>
-                </tr>
-                <tr>
-                    <th width="100">%s</th>
-                    <td class="bibcirccontent">%s</td>
-                 </tr>
-                  <tr>
-                    <th width="100">%s</th>
-                    <td class="bibcirccontent">%s</td>
-                 </tr>
-                  <tr>
-                    <th width="100">%s</th>
-                    <td class="bibcirccontent">%s</td>
-                 </tr>
-                </table>
-                <br />
-                <table>
-                <tr>
-                  <td class="bibcirctableheader">%s</td>
-                </tr>
-              </table>
-                <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-                <tr>
-                <th width="150">%s</th>
-                <td class="bibcirccontent">
-                       <input type="text" size="12" id="%s" name="period_of_interest_from" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
-                    </td>
-                </tr>
-                <tr>
-                <th width="150">%s</th>
-                <td class="bibcirccontent">
-                       <input type="text" size="12" id="%s" name="period_of_interest_to" value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
-                    </td>
-                </tr>
-                <tr>
-                   <th valign="top" width="150">%s</th>
-                   <td><textarea name='notes' rows="6" cols="30"
-                   style='border: 1px solid #cfcfcf'></textarea></td>
-                </tr>
-                </table>
-                <table class="bibcirctable">
-                  <tr align="center">
-                    <td>
-                    <input name="only_edition" type="checkbox" value="Yes" />%s</td>
-                  </tr>
-                </table>
-                </td>
-                <td>
-                """ % (_("Borrower details"),
-                       id_string, display_id,
-                       _("Name"), name,
-                       _("Email"), email,
-                       _("Phone"), phone,
-                       _("Address"), address,
-                       _("Mailbox"), mailbox,
-                       _("ILL request details"),
-                       _("Period of interest - From"), _("period_of_interest_from"),
-                       _("jsCal3"), _("period_of_interest_from"), _("jsCal3"),
-                       _("Period of interest - To"), _("period_of_interest_to"),
-                       _("jsCal4"), _("period_of_interest_to"), _("jsCal4"),
-                       _("Additional comments"),
-                       _("Borrower wants only this edition?"))
-
-        out += """
-
-             <table>
-             <br />
-             <table class="bibcirctable">
-                <tr align="center">
-                  <td>
-                       <input type=button value=%s
-                        onClick="history.go(-1)" class="formbutton">
-
-                       <input type="submit"
-                       value=%s class="formbutton">
-
-                  </td>
-                 </tr>
-             </table>
-             </form>
-             <br />
-             <br />
-             </div>
-             """ % (_("Back"), _("Continue"))
-
-        return out
+    #def tmpl_register_ill_request_step1(self, recid, user_info, ln=CFG_SITE_LANG):
+    #    """
+    #    @param recid: identify the record. Primary key of bibrec.
+    #    @type recid: int
+    #
+    #    @param user_info: user's informations
+    #    @type user_info: tuple
+    #    """
+    #
+    #    (borrower_id, ccid, name, email, phone, address, mailbox) = user_info.split(',')
+    #
+    #    _ = gettext_set_language(ln)
+    #
+    #    display_id=borrower_id
+    #    id_string= _("ID")
+    #    if CFG_CERN_SITE == 1:
+    #        display_id=ccid
+    #        id_string= _("CCID")
+    #
+    #    out = """  """
+    #
+    #    out += _MENU_
+    #
+    #    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+    #
+    #    out += """
+    #       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+    #       <form name="update_item_info_step4_form" action="%s/admin2/bibcirculation/register_ill_request_step2" method="get" >
+    #       <div class="bibcircbottom" align="center">
+    #            <br />
+    #                 <table class="bibcirctable">
+    #                      <tr align="center">
+    #                           <td class="bibcirctableheader" width="10">%s</td>
+    #                      </tr>
+    #            </table>
+    #                <input type=hidden name=recid value='%s'>
+    #                <input type=hidden name=user_info value="%s">
+    #                <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td class="bibcirccontent">%s</td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td class="bibcirccontent">%s</td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td class="bibcirccontent">%s</td>
+    #                     </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td class="bibcirccontent">%s</td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td class="bibcirccontent">%s</td>
+    #                 </tr>
+    #                 </table>
+    #       <br />
+    #
+    #       """  % (CFG_SITE_URL,
+    #               _("Item details"),
+    #               recid, user_info,
+    #               _("Name"),
+    #               book_title,
+    #               _("Author(s)"),
+    #               book_author,
+    #               _("Year"),
+    #               book_year,
+    #               _("Publisher"),
+    #               book_editor,
+    #               _("ISBN"),
+    #               book_isbn)
+    #
+    #    out += """
+    #            <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
+    #            <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
+    #            <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
+    #            <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+    #
+    #
+    #          <br />
+    #          <table>
+    #            <tr>
+    #              <td class="bibcirctableheader">%s</td>
+    #            </tr>
+    #          </table>
+    #          <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+    #            <tr>
+    #                <th width="100">%s</th>
+    #                <td class="bibcirccontent">%s</td>
+    #            </tr>
+    #            <tr>
+    #                <th width="100">%s</th>
+    #                <td class="bibcirccontent">%s</td>
+    #            </tr>
+    #            <tr>
+    #                <th width="100">%s</th>
+    #                <td class="bibcirccontent">%s</td>
+    #            </tr>
+    #            <tr>
+    #                <th width="100">%s</th>
+    #                <td class="bibcirccontent">%s</td>
+    #             </tr>
+    #              <tr>
+    #                <th width="100">%s</th>
+    #                <td class="bibcirccontent">%s</td>
+    #             </tr>
+    #              <tr>
+    #                <th width="100">%s</th>
+    #                <td class="bibcirccontent">%s</td>
+    #             </tr>
+    #            </table>
+    #            <br />
+    #            <table>
+    #            <tr>
+    #              <td class="bibcirctableheader">%s</td>
+    #            </tr>
+    #          </table>
+    #            <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+    #            <tr>
+    #            <th width="150">%s</th>
+    #            <td class="bibcirccontent">
+    #                   <input type="text" size="12" id="%s" name="period_of_interest_from" value="" style='border: 1px solid #cfcfcf'>
+    #                   <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
+    #                   onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
+    #                   <script type="text/javascript" language='JavaScript'>
+    #                   Calendar.setup({
+    #                       inputField     :    '%s',
+    #                       ifFormat       :    '%%Y-%%m-%%d',
+    #                       button	  :    '%s'
+    #                       });
+    #                   </script>
+    #                </td>
+    #            </tr>
+    #            <tr>
+    #            <th width="150">%s</th>
+    #            <td class="bibcirccontent">
+    #                   <input type="text" size="12" id="%s" name="period_of_interest_to" value="" style='border: 1px solid #cfcfcf'>
+    #                   <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
+    #                   onmouseover="this.style.background='red';" onmouseout="this.style.background=''">
+    #                   <script type="text/javascript" language='JavaScript'>
+    #                   Calendar.setup({
+    #                       inputField     :    '%s',
+    #                       ifFormat       :    '%%Y-%%m-%%d',
+    #                       button	  :    '%s'
+    #                       });
+    #                   </script>
+    #                </td>
+    #            </tr>
+    #            <tr>
+    #               <th valign="top" width="150">%s</th>
+    #               <td><textarea name='notes' rows="6" cols="30"
+    #               style='border: 1px solid #cfcfcf'></textarea></td>
+    #            </tr>
+    #            </table>
+    #            <table class="bibcirctable">
+    #              <tr align="center">
+    #                <td>
+    #                <input name="only_edition" type="checkbox" value="Yes" />%s</td>
+    #              </tr>
+    #            </table>
+    #            </td>
+    #            <td>
+    #            """ % (_("Borrower details"),
+    #                   id_string, display_id,
+    #                   _("Name"), name,
+    #                   _("Email"), email,
+    #                   _("Phone"), phone,
+    #                   _("Address"), address,
+    #                   _("Mailbox"), mailbox,
+    #                   _("ILL request details"),
+    #                   _("Period of interest - From"), _("period_of_interest_from"),
+    #                   _("jsCal3"), _("period_of_interest_from"), _("jsCal3"),
+    #                   _("Period of interest - To"), _("period_of_interest_to"),
+    #                   _("jsCal4"), _("period_of_interest_to"), _("jsCal4"),
+    #                   _("Additional comments"),
+    #                   _("Borrower wants only this edition?"))
+    #
+    #    out += """
+    #
+    #         <table>
+    #         <br />
+    #         <table class="bibcirctable">
+    #            <tr align="center">
+    #              <td>
+    #                   <input type=button value=%s
+    #                    onClick="history.go(-1)" class="formbutton">
+    #
+    #                   <input type="submit"
+    #                   value=%s class="formbutton">
+    #
+    #              </td>
+    #             </tr>
+    #         </table>
+    #         </form>
+    #         <br />
+    #         <br />
+    #         </div>
+    #         """ % (_("Back"), _("Continue"))
+    #
+    #    return out
 
     def tmpl_register_ill_request_step2(self, user_info, request_info, ln=CFG_SITE_LANG):
         """
@@ -10918,7 +10918,6 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = self.tmpl_infobox(infos, ln)
-
 
         out += """
            <div align="center">
@@ -11701,7 +11700,7 @@ class Template:
                        <td class="bibcirccontent">
 
                         <script type="text/javascript">
-                             $(function() {
+                             $(function(){
                                  $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                              });
                         </script>
@@ -14314,7 +14313,7 @@ class Template:
 
         return out
 
-    def tmpl_register_ill_request_with_no_recid_step1(self, infos, ln=CFG_SITE_LANG):
+    def tmpl_register_ill_request_with_no_recid_step1(self, infos, borrower_id, ln=CFG_SITE_LANG):
         """
         @param infos: informations
         @type infos: list
@@ -14330,7 +14329,7 @@ class Template:
         <br />
         <br />
           <div class="bibcircbottom" align="center">
-          <div class="infoboxmsg"><strong>%s<br />%s</strong></div>
+          <div class="bibcircinfoboxmsg"><strong>%s<br />%s</strong></div>
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14340,6 +14339,7 @@ class Template:
                     <td class="bibcirctableheader">%s</td>
                   </tr>
                 </table>
+                <input type=hidden name=borrower_id value=%s>
                 <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
                     <tr>
                         <th width="100">%s</th>
@@ -14390,7 +14390,7 @@ class Template:
 
            """  % (_("Book does not exists on CDS Invenio."),_("Please fill the following form."),
                    CFG_SITE_URL,
-                   _("Item details"),
+                   _("Item details"), borrower_id,
                    _("Book title"),
                    _("Author(s)"),
                    _("Place"),
@@ -15499,7 +15499,7 @@ class Template:
 
         return out
 
-    def tmpl_register_ill_book_request(self, infos, ln=CFG_SITE_LANG):
+    def tmpl_register_ill_book_request(self, infos, borrower_id, ln=CFG_SITE_LANG):
         """
         @param infos: informations
         @type infos: list
@@ -15518,10 +15518,11 @@ class Template:
         method="get" >
         <br />
         <br />
-        <div class="infoboxmsg"><strong>%s</strong></div>
+        <div class="bibcircinfoboxmsg"><strong>%s</strong></div>
         <br />
         <input type=hidden name=start value="0">
         <input type=hidden name=end value="10">
+        <input type=hidden name=borrower_id value=%s>
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirctableheader">Search item by
@@ -15555,12 +15556,12 @@ class Template:
         </form>
 
         """ % (CFG_SITE_URL, _("Check if the book already exists on CDS Invenio,"\
-                               + " before to send your ILL request."),
+                               + " before to send your ILL request."), borrower_id,
                _("Back"), _("Search"))
 
         return out
 
-    def tmpl_register_ill_book_request_result(self, result, ln=CFG_SITE_LANG):
+    def tmpl_register_ill_book_request_result(self, result, borrower_id, ln=CFG_SITE_LANG):
         """
         @param result: book's information
         @type result: list
@@ -15576,9 +15577,10 @@ class Template:
             out += """
             <div class="bibcircbottom" align="center">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
-            """ % (_("0 items found."))
+            <input type=hidden name=borrower_id value=%s>
+            """ % (_("0 items found."), borrower_id)
 
         else:
             out += """
@@ -15586,6 +15588,7 @@ class Template:
         <div class="bibcircbottom">
         <form name="search_form" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step1" method="get" >
         <br />
+        <input type=hidden name=borrower_id value=%s>
         <table class="bibcirctable">
           <tr align="center">
             <td>
@@ -15604,7 +15607,7 @@ class Template:
             </tr>
           </thead>
           <tbody>
-        """ % (CFG_SITE_URL,len(result), _("Title"),
+        """ % (CFG_SITE_URL, borrower_id, len(result), _("Title"),
                _("Author"), _("Publisher"),
                _("No. Copies"))
 
@@ -15673,7 +15676,7 @@ class Template:
         <input type=hidden name=borrower_id value=%s>
         <br />
         <br />
-        <div class="infoboxmsg"><strong>%s</strong></div>
+        <div class="bibcircinfoboxmsg"><strong>%s</strong></div>
         <br />
         <input type=hidden name=start value="0">
         <input type=hidden name=end value="10">
@@ -15739,7 +15742,7 @@ class Template:
             out += """
             <div class="bibcircbottom" align="center">
             <br />
-            <div class="infoboxmsg">%s</div>
+            <div class="bibcircinfoboxmsg">%s</div>
             <br />
             """ % (_("0 items found."))
 
@@ -15830,7 +15833,7 @@ class Template:
         <br />
         <br />
           <div class="bibcircbottom" align="center">
-          <div class="infoboxmsg"><strong>%s</strong></div>
+          <div class="bibcircinfoboxmsg"><strong>%s</strong></div>
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>

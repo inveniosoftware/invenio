@@ -1241,6 +1241,14 @@ def get_borrower_loans(borrower_id):
 
     return res
 
+def get_current_loan_id(barcode):
+    res = run_sql(""" select id
+                      from crcLOAN
+                      where barcode='%s' and status='on loan'
+                  """ % (barcode))
+
+    if res:
+        return res[0][0]
 
 def update_due_date(loan_id, new_due_date):
     """
@@ -1263,7 +1271,8 @@ def update_due_date_borrower(borrower_id, new_due_date):
     new_due_date: new due date.
     """
     return int(run_sql("""UPDATE  crcLOAN
-                             SET  due_date=%s
+                             SET  due_date=%s,
+                                  number_of_renewals = number_of_renewals + 1
                            WHERE  id_crcBORROWER=%s and status='on loan'
                            """, (new_due_date, borrower_id)))
 
@@ -1871,10 +1880,13 @@ def get_borrower_data_by_id(borrower_id):
     res = run_sql("""select id, ccid, name, email, phone,
                             address, mailbox
                        from crcBORROWER
-                      where id regexp %s""",
+                      where id=%s""",
                   (borrower_id, ))
 
-    return res
+    if res:
+        return res[0]
+    else:
+        return None
 
 def get_borrower_data_by_ccid(borrower_ccid):
     """

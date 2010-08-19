@@ -64,7 +64,7 @@ def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
 
 
 def perform_borrower_loans(uid, barcode, borrower_id,
-                           request_id, ln=CFG_SITE_LANG):
+                           request_id, action, ln=CFG_SITE_LANG):
     """
     Display all the loans and the requests of a given borrower.
 
@@ -82,15 +82,15 @@ def perform_borrower_loans(uid, barcode, borrower_id,
 
     infos = []
 
-    is_borrower = db.is_borrower(db.get_invenio_user_email(uid))
-    loans = db.get_borrower_loans(is_borrower)
-    requests = db.get_borrower_requests(is_borrower)
+    borrower_id = db.is_borrower(db.get_invenio_user_email(uid))
+
 
     tmp_date = datetime.date.today() + datetime.timedelta(days=30)
     new_due_date = get_datetext(tmp_date.year, tmp_date.month, tmp_date.day)
 
     #renew loan
-    if barcode:
+    if action == 'renew':
+    #if barcode:
         recid = db.get_id_bibrec(barcode)
         queue = db.get_queue_request(recid)
 
@@ -99,16 +99,19 @@ def perform_borrower_loans(uid, barcode, borrower_id,
                          "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user " \
                          "is waiting for this book.")
         else:
-            db.update_due_date(barcode, new_due_date)
+            loan_id = db.get_current_loan_id(barcode)
+            db.update_due_date(loan_id, new_due_date)
             infos.append("Your loan has been renewed with sucess.")
 
     #cancel request
-    if request_id:
+    elif action == 'cancel':
+    #elif request_id:
         db.cancel_request(request_id, 'cancelled')
         make_copy_available(request_id)
 
     #renew all loans
-    elif borrower_id:
+    elif action == 'renew_all':
+    #elif borrower_id:
         list_of_recids = db.get_borrower_recids(borrower_id)
         for (recid) in list_of_recids:
             queue = db.get_queue_request(recid[0])
@@ -119,13 +122,15 @@ def perform_borrower_loans(uid, barcode, borrower_id,
                              "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user" \
                              " is waiting for this book.")
             else:
-                db.update_due_date_borrower(borrower_id,
-                                            new_due_date)
+                db.update_due_date_borrower(borrower_id, new_due_date)
         infos.append("All loans have been renewed with success.")
+
+    loans = db.get_borrower_loans(borrower_id)
+    requests = db.get_borrower_requests(borrower_id)
 
     body = bibcirculation_templates.tmpl_yourloans(loans=loans,
                                                    requests=requests,
-                                                   borrower_id=is_borrower,
+                                                   borrower_id=borrower_id,
                                                    infos=infos,
                                                    ln=ln)
 

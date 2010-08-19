@@ -2844,17 +2844,7 @@ div.bibcircbottom {
     border-color:#cdcdcd;
 }
 
-div.title {
-    width: 600px;
-    padding-left: 5px;
-    color: #36c;
-    font-size: 20px;
-    font-weight: bold;
-    font-variant: small-caps;
-    padding-bottom:2px;
-}
-
-div.subtitle {
+.bibcircsubtitle {
     width: 600px;
     padding-left: 5px;
     color: #36c;
@@ -2890,7 +2880,7 @@ div.subtitle {
     -moz-border-radius: 0px;
 }
 
-.infoboxsuccess{
+.bibcircinfoboxsuccess{
     background-color: #dcfdc1;
     padding: 20px;
     color: #3e5e25;
@@ -2900,7 +2890,7 @@ div.subtitle {
     width: 50%;
 }
 
-.infoboxmsg{
+.bibcircinfoboxmsg{
     background-color: #cadff5;
     padding: 20px;
     color: #336598;
@@ -2910,10 +2900,6 @@ div.subtitle {
     width: 50%;
 }
 
-.clear {
-    clear:both;
-    line-height:1px;
-}
 
 /* Rollover menus */
 

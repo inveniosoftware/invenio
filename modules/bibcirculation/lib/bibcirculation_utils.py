@@ -51,6 +51,7 @@ def search_user(column, string):
 
                 ldap_info = 'busy'
                 while ldap_info == 'busy':
+                    time.sleep(1)
                     ldap_info = get_user_info_from_ldap(ccid=string)
 
                 if len(ldap_info) == 0:

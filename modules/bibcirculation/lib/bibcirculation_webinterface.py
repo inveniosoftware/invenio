@@ -86,7 +86,8 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
 
         argd = wash_urlargd(form, {'barcode': (str, ""),
                                    'borrower_id': (int, 0),
-                                   'request_id': (int, 0)})
+                                   'request_id': (int, 0),
+                                   'action': (str, "")})
 
         # Check if user is logged
         uid = getUid(req)
@@ -114,6 +115,7 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                                       barcode=argd['barcode'],
                                       borrower_id=argd['borrower_id'],
                                       request_id=argd['request_id'],
+                                      action=argd['action'],
                                       ln=argd['ln'])
 
         return page(title       = _("Your Loans"),

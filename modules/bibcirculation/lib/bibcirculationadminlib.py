@@ -531,88 +531,95 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
-    list_infos = []
 
-    if CFG_CERN_SITE == 1:
 
-        if key =='ccid' and string:
-            from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
-            result = get_user_info_from_ldap(ccid=string)
+    #if CFG_CERN_SITE == 1:
+    #
+    #    if key =='ccid' and string:
+    #        from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
+    #        result = get_user_info_from_ldap(ccid=string)
+    #
+    #        if result == 'busy':
+    #            infos.append(bibcirculation_templates.tmpl_message_sever_busy(ln))
+    #
+    #        elif result:
+    #            try:
+    #                name = result['cn'][0]
+    #            except KeyError:
+    #                name = ""
+    #
+    #            try:
+    #                email = result['mail'][0]
+    #            except KeyError:
+    #                email = ""
+    #
+    #            try:
+    #                phone = result['telephoneNumber'][0]
+    #            except KeyError:
+    #                phone = ""
+    #
+    #            try:
+    #                address = result['physicalDeliveryOfficeName'][0]
+    #            except KeyError:
+    #                address = ""
+    #
+    #            try:
+    #                mailbox = result['postOfficeBox'][0]
+    #            except KeyError:
+    #                mailbox = ""
+    #
+    #            try:
+    #                ccid = result['employeeID'][0]
+    #            except KeyError:
+    #                ccid = ""
+    #
+    #            tup = ('', ccid, name, email, phone, address, mailbox)
+    #            list_infos.append(tup)
+    #
+    #    elif key =='name' and string:
+    #        result = db.get_borrower_data_by_name(string)
+    #
+    #        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+    #            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
+    #            list_infos.append(tup)
+    #
+    #    elif key =='email' and string:
+    #        result = db.get_borrower_data_by_email(string)
+    #
+    #        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+    #            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
+    #            list_infos.append(tup)
+    #    else:
+    #        result = list_infos
+    #
+    #else:
+    #    if key =='name' and string:
+    #        result = db.get_borrower_data_by_name(string)
+    #
+    #    elif key =='email' and string:
+    #        result = db.get_borrower_data_by_email(string)
+    #
+    #    else:
+    #        result = db.get_borrower_data_by_id(string)
+    #
+    #    for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+    #        tup = (borrower_id, ccid, name, email, phone, address, mailbox)
+    #        list_infos.append(tup)
 
-            if result == 'busy':
-                infos.append(bibcirculation_templates.tmpl_message_sever_busy(ln))
-
-            elif result:
-                try:
-                    name = result['cn'][0]
-                except KeyError:
-                    name = ""
-
-                try:
-                    email = result['mail'][0]
-                except KeyError:
-                    email = ""
-
-                try:
-                    phone = result['telephoneNumber'][0]
-                except KeyError:
-                    phone = ""
-
-                try:
-                    address = result['physicalDeliveryOfficeName'][0]
-                except KeyError:
-                    address = ""
-
-                try:
-                    mailbox = result['postOfficeBox'][0]
-                except KeyError:
-                    mailbox = ""
-
-                try:
-                    ccid = result['employeeID'][0]
-                except KeyError:
-                    ccid = ""
-
-                tup = ('', ccid, name, email, phone, address, mailbox)
-                list_infos.append(tup)
-
-        elif key =='name' and string:
-            result = db.get_borrower_data_by_name(string)
-
-            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
-                list_infos.append(tup)
-
-        elif key =='email' and string:
-            result = db.get_borrower_data_by_email(string)
-
-            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
-                list_infos.append(tup)
-        else:
-            result = list_infos
-
-    else:
-        if key =='name' and string:
-            result = db.get_borrower_data_by_name(string)
-
-        elif key =='email' and string:
-            result = db.get_borrower_data_by_email(string)
-
-        else:
-            result = db.get_borrower_data_by_id(string)
-
-        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
-            list_infos.append(tup)
+    result = search_user(key, string)
+    borrowers_list = []
 
     if len(result) == 0 and key:
         infos.append("0 borrowers found. Search by CCID")
+    elif len(result) == 1:
+        borrower_data = db.get_borrower_data_by_id(result[0][0])
+        return loan_on_desk_step2(req, borrower_data, ln)
+    else:
+        for user in result:
+            borrower_data = db.get_borrower_data_by_id(user[0])
+            borrowers_list.append(borrower_data)
 
-    elif len(list_infos) == 1:
-        return loan_on_desk_step2(req, tup, ln)
-
-    body = bibcirculation_templates.tmpl_loan_on_desk_step1(result=list_infos,
+    body = bibcirculation_templates.tmpl_loan_on_desk_step1(result=borrowers_list,
                                                                 key=key,
                                                                 string=string,
                                                                 infos=infos,
@@ -3148,7 +3155,7 @@ def get_library_notes(req, library_id, delete_key,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def change_due_date_step1(req, loan_id, borrower_id, ln=CFG_SITE_LANG):
+def change_due_date_step1(req, barcode, borrower_id, ln=CFG_SITE_LANG):
     """
     Change the due date of a loan, step1.
 
@@ -3158,7 +3165,7 @@ def change_due_date_step1(req, loan_id, borrower_id, ln=CFG_SITE_LANG):
     borrower_id: identify the borrower. It is also the primary key of
                  the table crcBORROWER.
     """
-
+    loan_id = db.get_current_loan_id(barcode)
     loan_details = db.get_loan_infos(loan_id)
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -3169,6 +3176,7 @@ def change_due_date_step1(req, loan_id, borrower_id, ln=CFG_SITE_LANG):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
+
 
     body = bibcirculation_templates.tmpl_change_due_date_step1(loan_details=loan_details,
                                                                loan_id=loan_id,
@@ -5195,7 +5203,7 @@ def get_vendor_notes(req, vendor_id, add_notes, new_note, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_ill_request_with_no_recid_step1(req, ln=CFG_SITE_LANG):
+def register_ill_request_with_no_recid_step1(req, borrower_id, ln=CFG_SITE_LANG):
     """
     """
     infos = []
@@ -5209,7 +5217,7 @@ def register_ill_request_with_no_recid_step1(req, ln=CFG_SITE_LANG):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos,ln=ln)
+    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos, borrower_id=borrower_id, ln=ln)
 
     return page(title="Register ILL request",
                 uid=id_user,
@@ -5222,74 +5230,84 @@ def register_ill_request_with_no_recid_step1(req, ln=CFG_SITE_LANG):
 def register_ill_request_with_no_recid_step2(req, title, authors, place,
                                              publisher, year, edition, isbn, period_of_interest_from,
                                              period_of_interest_to, additional_comments,
-                                             only_edition, key, string, ln=CFG_SITE_LANG):
+                                             only_edition, key, string, borrower_id, ln=CFG_SITE_LANG):
     """
     """
-    infos = []
-    book_info = (title, authors, place, publisher, year, edition, isbn)
-    request_details = (period_of_interest_from, period_of_interest_to,
-                           additional_comments, only_edition)
-    if not key:
-        borrowers_list = None
-
-    elif not string:
-        infos.append('Empty string. Please, try again.')
-        borrowers_list = None
-
-    else:
-        if validate_date_format(period_of_interest_from) is False:
-            infos = []
-            infos.append("The given 'period_of_interest_from' <strong>%s</strong>" \
-                         " is not a valid date or date format" % period_of_interest_from)
-
-            body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos,
-                                                                                          ln=ln)
-
-        elif validate_date_format(period_of_interest_to) is False:
-            infos = []
-            infos.append("The given 'period_of_interest_to' <strong>%s</strong>" \
-                         " is not a valid date or date format" % period_of_interest_to)
-
-            body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos,
-                                                                                          ln=ln)
-
-        else:
-            result = search_user(key, string)
-
-            borrowers_list = []
-            if len(result)==0:
-                infos.append("O borrowers found.")
-            else:
-                for user in result:
-                    borrower_data = db.get_borrower_data_by_id(user[0])[0]
-                    borrowers_list.append(borrower_data)
-
-
-    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step2(book_info=book_info,
-                                                                                    request_details=request_details,
-                                                                                    result=borrowers_list,
-                                                                                    key=key,
-                                                                                    string=string,
-                                                                                    infos=infos,
-                                                                                    ln=ln)
-
-    navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
+    infos = []
+    book_info = (title, authors, place, publisher, year, edition, isbn)
+    request_details = (period_of_interest_from, period_of_interest_to,
+                           additional_comments, only_edition)
+
+    if borrower_id == None:
+        if not key:
+            borrowers_list = None
+
+        elif not string:
+            infos.append('Empty string. Please, try again.')
+            borrowers_list = None
+
+        else:
+            if validate_date_format(period_of_interest_from) is False:
+                infos = []
+                infos.append("The given 'period_of_interest_from' <strong>%s</strong>" \
+                             " is not a valid date or date format" % period_of_interest_from)
+
+                body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos,
+                                                                                              ln=ln)
+
+            elif validate_date_format(period_of_interest_to) is False:
+                infos = []
+                infos.append("The given 'period_of_interest_to' <strong>%s</strong>" \
+                             " is not a valid date or date format" % period_of_interest_to)
+
+                body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos,
+                                                                                              ln=ln)
+
+            else:
+                result = search_user(key, string)
+
+                borrowers_list = []
+                if len(result)==0:
+                    infos.append("O borrowers found.")
+                else:
+                    for user in result:
+                        borrower_data = db.get_borrower_data_by_id(user[0])
+                        borrowers_list.append(borrower_data)
+
+
+        body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step2(book_info=book_info,
+                                                                                        request_details=request_details,
+                                                                                        result=borrowers_list,
+                                                                                        key=key,
+                                                                                        string=string,
+                                                                                        infos=infos,
+                                                                                        ln=ln)
+
+    else:
+        user_info = db.get_borrower_data_by_id(borrower_id)
+        return register_ill_request_with_no_recid_step3(req, book_info, user_info, request_details, ln)
+
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                                  'href="%s/help/admin">Admin Area' \
+                                  '</a> &gt; <a class="navtrail" ' \
+                                  'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                                  '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+
+
+
     return page(title="Register ILL request",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
+                    uid=id_user,
+                    req=req,
+                    body=body,
+                    navtrail=navtrail_previous_links,
+                    lastupdated=__lastupdated__)
 
 
 def register_ill_request_with_no_recid_step3(req, book_info, user_info, request_details, ln):
@@ -5493,7 +5511,7 @@ def get_expired_loans_with_requests(req, request_id, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_ill_book_request(req, ln=CFG_SITE_LANG):
+def register_ill_book_request(req, borrower_id, ln=CFG_SITE_LANG):
     """
     Display a form where is possible to searh for an item.
     """
@@ -5511,6 +5529,7 @@ def register_ill_book_request(req, ln=CFG_SITE_LANG):
     infos = []
 
     body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos,
+                                                                   borrower_id=borrower_id,
                                                                    ln=ln)
 
     return page(title="Register ILL Book request",
@@ -5520,7 +5539,7 @@ def register_ill_book_request(req, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_ill_book_request_result(req, p, f, ln=CFG_SITE_LANG):
+def register_ill_book_request_result(req, borrower_id, p, f,  ln=CFG_SITE_LANG):
     """
     Search an item and return a list with all the possible results. To retrieve
     the information desired, we use the method 'perform_request_search' (from
@@ -5538,22 +5557,22 @@ def register_ill_book_request_result(req, p, f, ln=CFG_SITE_LANG):
     infos = []
     if p == '':
         infos.append('Empty string. Please, try again.')
-        body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos, ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos, borrower_id=borrower_id,  ln=ln)
     else:
         if f == 'barcode':
             has_recid = db.get_recid(p)
 
             if has_recid is None:
                 infos.append('The barcode <strong>%s</strong> does not exist on BibCirculation database.' % p)
-                body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos, ln=ln)
+                body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos, borrower_id=borrower_id, ln=ln)
             else:
-                body = bibcirculation_templates.tmpl_register_ill_book_request_result(result=has_recid, ln=ln)
+                body = bibcirculation_templates.tmpl_register_ill_book_request_result(result=has_recid, borrower_id=borrower_id, ln=ln)
         else:
             result = perform_request_search(cc="Books", sc="1", p=p, f=f)
             if len(result) == 0:
-                return register_ill_request_with_no_recid_step1(req, ln)
+                return register_ill_request_with_no_recid_step1(req, borrower_id, ln)
             else:
-                body = bibcirculation_templates.tmpl_register_ill_book_request_result(result=result, ln=ln)
+                body = bibcirculation_templates.tmpl_register_ill_book_request_result(result=result, borrower_id=borrower_id, ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
