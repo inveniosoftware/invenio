@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
-"PO-Revision-Date: 2010-02-28 23:01+0100\n"
+"PO-Revision-Date: 2010-08-20 07:35+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1772,7 +1772,7 @@ msgstr "Texto completo"
 
 #: modules/bibformat/lib/elements/bfe_edit_files.py:51
 msgid "Manage Files of This Record"
-msgstr ""
+msgstr "Gestionar los ficheros de este registro"
 
 #: modules/bibformat/lib/elements/bfe_edit_record.py:52
 #, fuzzy
@@ -2014,7 +2014,7 @@ msgstr "Seleccione una categoría"
 
 #: modules/bibupload/lib/batchuploader_templates.py:137
 msgid "Warning: The date format is not correct"
-msgstr ""
+msgstr "Atención: el formato de la fecha no es correcto"
 
 #: modules/bibupload/lib/batchuploader_templates.py:141
 #, fuzzy
@@ -2040,7 +2040,7 @@ msgstr "Subir"
 #: modules/bibupload/lib/batchuploader_templates.py:170
 #: modules/bibupload/lib/batchuploader_templates.py:358
 msgid "Upload later? then select:"
-msgstr ""
+msgstr "Prefiere subirlo después?  En este caso seleccione:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:171
 #: modules/bibupload/lib/batchuploader_templates.py:359
@@ -2064,7 +2064,7 @@ msgstr "Ejemplo"
 #: modules/bibupload/lib/batchuploader_templates.py:174
 #: modules/bibupload/lib/batchuploader_templates.py:362
 msgid "All fields with"
-msgstr ""
+msgstr "Todos los campos con"
 
 #: modules/bibupload/lib/batchuploader_templates.py:175
 #, fuzzy
@@ -2102,7 +2102,7 @@ msgstr "nombre de la alerta"
 #: modules/bibupload/lib/batchuploader_templates.py:220
 #: modules/bibupload/lib/batchuploader_templates.py:262
 msgid "Execution time"
-msgstr ""
+msgstr "Tiempo de ejecución"
 
 #: modules/bibupload/lib/batchuploader_templates.py:247
 #, fuzzy
@@ -2113,13 +2113,13 @@ msgstr "Todavía no existe ningún revisor seleccionado."
 #: modules/bibupload/lib/batchuploader_webinterface.py:134
 #: modules/bibupload/lib/batchuploader_webinterface.py:292
 msgid "Metadata batch upload"
-msgstr ""
+msgstr "Carga masiva de metadatos"
 
 #: modules/bibupload/lib/batchuploader_templates.py:305
 #: modules/bibupload/lib/batchuploader_webinterface.py:157
 #: modules/bibupload/lib/batchuploader_webinterface.py:210
 msgid "Document batch upload"
-msgstr ""
+msgstr "Carga masiva de documentos"
 
 #: modules/bibupload/lib/batchuploader_templates.py:308
 #: modules/bibupload/lib/batchuploader_webinterface.py:316
@@ -2134,11 +2134,11 @@ msgstr "cualquier mes"
 
 #: modules/bibupload/lib/batchuploader_templates.py:354
 msgid "Input dir:"
-msgstr ""
+msgstr "Directorio de entrada:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:356
 msgid "Filename matching:"
-msgstr ""
+msgstr "Ficheros del tipo:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:363
 #, fuzzy
@@ -2148,7 +2148,7 @@ msgstr "obligatorio"
 #: modules/bibupload/lib/batchuploader_templates.py:371
 #, python-format
 msgid "<b>%s documents</b> have been found."
-msgstr ""
+msgstr "Se han encontrado <b>%s documentos</b>."
 
 #: modules/bibupload/lib/batchuploader_templates.py:373
 #, fuzzy
@@ -2164,14 +2164,18 @@ msgstr "Se han encontrado los siguentes errores"
 msgid ""
 "Some files could not be moved to DONE folder. Please remove them manually."
 msgstr ""
+"Algunos ficheros no se han podido pasar al directorio DONE.  Bórrelos "
+"manualmente."
 
 #: modules/bibupload/lib/batchuploader_templates.py:387
 msgid "All uploaded files were moved to DONE folder."
-msgstr ""
+msgstr "Todos los ficheros se han pasado al directorio DONE."
 
 #: modules/bibupload/lib/batchuploader_templates.py:397
 msgid "Using <b>web interface upload</b>, actions are executed a single time."
 msgstr ""
+"Usando la <b>interfaz web de subir ficheros</b>, las acciones sólo se "
+"ejecutan una vez."
 
 #: modules/bibupload/lib/batchuploader_templates.py:398
 #, fuzzy
@@ -2180,23 +2184,23 @@ msgstr "Haga clic aquí"
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 msgid " Batch Uploader daemon help page"
-msgstr ""
+msgstr " Página de ayuda del proceso de subida masiva"
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 msgid " for executing these actions periodically."
-msgstr ""
+msgstr " para ejecutar estas acciones periódicamente."
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:213
 msgid "Document batch upload result"
-msgstr ""
+msgstr "Resultado de la subida masiva"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:290
 msgid "Upload succesful"
-msgstr ""
+msgstr "Subida correcta"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:340
 msgid "Batch Uploader: Daemon monitor"
-msgstr ""
+msgstr "Subida masiva: seguimiento del proceso"
 
 #: modules/miscutil/lib/dateutils.py:73 modules/miscutil/lib/dateutils.py:100
 #: modules/webbasket/lib/webbasket.py:180
@@ -2482,15 +2486,15 @@ msgstr "veces citado"
 
 #: modules/miscutil/lib/inveniocfg.py:482
 msgid "time-decay cite count"
-msgstr ""
+msgstr "contador de citas en el tiempo"
 
 #: modules/miscutil/lib/inveniocfg.py:483
 msgid "all-time-best cite rank"
-msgstr ""
+msgstr "clasificación por máximo número de citas"
 
 #: modules/miscutil/lib/inveniocfg.py:484
 msgid "time-decay cite rank"
-msgstr ""
+msgstr "clasificación por citas en el tiempo"
 
 #: modules/miscutil/lib/mailutils.py:151 modules/miscutil/lib/mailutils.py:164
 #: modules/webcomment/lib/webcomment_templates.py:1932
@@ -2520,7 +2524,7 @@ msgstr "Ejecutar el editor de múltiples registros"
 #: modules/webaccess/lib/access_control_config.py:236
 #: modules/websession/lib/webuser.py:903
 msgid "Run Document File Manager"
-msgstr ""
+msgstr "Ejecutar el gestor de ficheros del documento"
 
 #: modules/webaccess/lib/access_control_config.py:237
 #: modules/websession/lib/websession_templates.py:1093
@@ -2593,7 +2597,7 @@ msgstr "Ejecutar BibEdit"
 #: modules/webaccess/lib/access_control_config.py:250
 #: modules/websession/lib/websession_templates.py:1095
 msgid "Run Batch Uploader"
-msgstr ""
+msgstr "Ejecutar el gestor de cargas masivas"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3515
 #, python-format
@@ -3232,7 +3236,7 @@ msgstr "Buscar en %s registros:"
 
 #: modules/webbasket/lib/webbasket_templates.py:560
 msgid "Search also in notes (where allowed)"
-msgstr ""
+msgstr "Buscar también en las notas (si procede)"
 
 #: modules/webbasket/lib/webbasket_templates.py:597
 #, fuzzy
@@ -3272,7 +3276,7 @@ msgstr "No se han encontrado valores."
 #: modules/webbasket/lib/webbasket_templates.py:752
 #: modules/webbasket/lib/webbasket_templates.py:786
 msgid "In"
-msgstr ""
+msgstr "En"
 
 #: modules/webbasket/lib/webbasket_templates.py:882
 #: modules/webbasket/lib/webbasket_webinterface.py:1256
@@ -3379,6 +3383,8 @@ msgid ""
 "Provide a url for the external item you wish to add and fill in a title and "
 "description"
 msgstr ""
+"Escriba una url para el item externo que desea añadir y póngale un "
+"título y descripción"
 
 #: modules/webbasket/lib/webbasket_templates.py:1257
 #: modules/websubmit/lib/websubmit_templates.py:2724
@@ -3394,7 +3400,7 @@ msgstr "Título"
 
 #: modules/webbasket/lib/webbasket_templates.py:1261
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: modules/webbasket/lib/webbasket_templates.py:1289
 #, fuzzy
@@ -3408,7 +3414,7 @@ msgstr "Los registros seleccionados se han añadido correctamente en %i cestas."
 
 #: modules/webbasket/lib/webbasket_templates.py:1295
 msgid "Proceed to the"
-msgstr ""
+msgstr "Continue a"
 
 #: modules/webbasket/lib/webbasket_templates.py:1299
 #, fuzzy
@@ -3418,7 +3424,7 @@ msgstr "Cestas de grupo"
 #: modules/webbasket/lib/webbasket_templates.py:1300
 #: modules/webbasket/lib/webbasket_templates.py:1304
 msgid "or return to your"
-msgstr ""
+msgstr "o vuelva a su"
 
 #: modules/webbasket/lib/webbasket_templates.py:1303
 #, fuzzy
@@ -3447,15 +3453,15 @@ msgstr "Escoja una categoría"
 
 #: modules/webbasket/lib/webbasket_templates.py:1396
 msgid "first"
-msgstr ""
+msgstr "primero"
 
 #: modules/webbasket/lib/webbasket_templates.py:1398
 msgid "Optionally, add a note to each one of these items"
-msgstr ""
+msgstr "Si lo desea, puede añadir una nota a uno de estos registros"
 
 #: modules/webbasket/lib/webbasket_templates.py:1399
 msgid "Optionally, add a note to this item"
-msgstr ""
+msgstr "Opcionalmente, añada una nota a este registro"
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
 #, fuzzy
@@ -3695,7 +3701,7 @@ msgstr "Subirlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2184
 msgid "You cannot move this item up"
-msgstr ""
+msgstr "No es posible subirlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2198
 msgid "Move item down"
@@ -3703,7 +3709,7 @@ msgstr "Bajarlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2202
 msgid "You cannot move this item down"
-msgstr ""
+msgstr "No es posible bajarlo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2216
 #: modules/webbasket/lib/webbasket_templates.py:3101
@@ -3757,7 +3763,7 @@ msgstr "Ítem"
 #: modules/webbasket/lib/webbasket_templates.py:2420
 #: modules/webbasket/lib/webbasket_templates.py:3254
 msgid " of "
-msgstr ""
+msgstr "de"
 
 #: modules/webbasket/lib/webbasket_templates.py:2432
 #: modules/webbasket/lib/webbasket_templates.py:2435
@@ -3848,7 +3854,7 @@ msgstr "Subscribirse a esta cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:3015
 msgid "This public basket belongs to the user "
-msgstr ""
+msgstr "Esta cesta pública pertenece al usuario "
 
 #: modules/webbasket/lib/webbasket_templates.py:3039
 #, fuzzy
@@ -4183,7 +4189,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1023
 msgid "Send me an email when a new comment is posted"
-msgstr ""
+msgstr "Enviar un email cuando se publique un nuevo comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:1035
 #: modules/webcomment/lib/webcomment_templates.py:1151
@@ -5083,7 +5089,7 @@ msgstr "identificación"
 #: modules/websearch/lib/websearch_templates.py:472
 #, python-format
 msgid "Search on %(x_CFG_SITE_NAME_INTL)s"
-msgstr ""
+msgstr "Buscar en %(x_CFG_SITE_NAME_INTL)s"
 
 #: modules/websearch/lib/websearch_templates.py:696
 #: modules/websearch/lib/websearch_templates.py:845
@@ -5199,6 +5205,8 @@ msgid ""
 "This is a hosted external collection. Please click on the Search button to "
 "see its content."
 msgstr ""
+"Esta es una colección externa alojada.  Pulse el botón de búsqueda "
+"para ver su contenido."
 
 #: modules/websearch/lib/websearch_templates.py:1470
 msgid "This collection does not contain any document yet."
@@ -7265,6 +7273,10 @@ msgid ""
 "names. Choose a different name and upload your file again. In particular, "
 "note that you should not include the extension in the renaming field."
 msgstr ""
+"No se puede usar el punto '.', barra '/', o barra inversa '\\\\\\\\' en "
+"los nombres de ficheros.  Escoja un nombre diferente o vuelva a subir "
+"su fichero.  En particular, tenga en cuenta de no incluir la extensión "
+"en el nuevo nombre."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:784
 msgid "Choose how you want to restrict access to this file."
@@ -7314,7 +7326,7 @@ msgstr "Guardar cambios"
 #: modules/websubmit/lib/websubmit_managedocfiles.py:864
 #, python-format
 msgid "Need help revising or adding files to record %(recid)s"
-msgstr ""
+msgstr "Necesito ayuda para revisar o añadir ficheros al registro %(recid)s"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:866
 #, python-format
@@ -7324,6 +7336,10 @@ msgid ""
 "I have attached the new version to this email.\n"
 "Best regards"
 msgstr ""
+"Estimado soporte,\n"
+"necesito su ayuda para revisar o añadir ficheros al registro %(recid)s.\n"
+"He añadido la nueva versión en este mensaje.\n"
+"Cordialmente,"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:871
 #, python-format
@@ -7358,6 +7374,8 @@ msgid ""
 "Note that your submission as been inserted into the bibliographic task queue "
 "and is waiting for execution.\n"
 msgstr ""
+"Su contribución ha sido enviada a la cola de tareas bibliográficas y "
+"está esperando su ejecución.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:206
 #, python-format
@@ -7366,6 +7384,9 @@ msgid ""
 "currently %s tasks waiting to be executed. Your record should be available "
 "within a few minutes and searchable within an hour or thereabouts.\n"
 msgstr ""
+"La cola de tareas se está ejecutando automáticament, y en estos "
+"momentos hay %s tareas esperando su ejecución.  Su registro estará a "
+"punto dentro de poco, y buscable en una hora, aproximadamente.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:208
 msgid ""
@@ -7373,6 +7394,10 @@ msgid ""
 "currently set to the manual mode. Your submission is well registered but may "
 "take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
+"Debido a una intervención humana o a un problema temporal, la cola de "
+"tareas está en modo manual.  Su contribución ha quedado registrada, "
+"pero puede tardar más de lo habitual hasta que esté bien integrado y "
+"buscable.\n"
 
 #: modules/websubmit/lib/websubmit_engine.py:179
 #: modules/websubmit/lib/websubmit_engine.py:791
@@ -7668,7 +7693,7 @@ msgstr "todos los tipos de documento"
 
 #: modules/websubmit/lib/websubmit_templates.py:1492
 msgid "Subm.No."
-msgstr ""
+msgstr "Envío"
 
 #: modules/websubmit/lib/websubmit_templates.py:1493
 msgid "Reference"
@@ -8376,7 +8401,7 @@ msgstr ""
 #: modules/webjournal/lib/webjournal_templates.py:268
 #, python-format
 msgid "If you cannot read this email please go to %(x_journal_link)s"
-msgstr ""
+msgstr "Si no puede leer este mensaje vaya a %(x_journal_link)s"
 
 #: modules/webjournal/lib/webjournal_templates.py:415
 #: modules/webjournal/lib/webjournal_templates.py:664
@@ -11233,16 +11258,18 @@ msgstr "Eliminar de la lista de espera"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1096
 msgid "Error when retrieving the Holding Pen entry"
-msgstr ""
+msgstr "Error al recuperar la entrada en espera"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1104
 msgid "Error when retrieving the record"
-msgstr ""
+msgstr "Error al recuperar el registro"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1112
 msgid ""
 "Error when formatting the Holding Pen entry. Probably it's content is broken"
 msgstr ""
+"Error al formatear la entrada en espera.  Probablemente su contenido "
+"esté mal"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1117
 #, fuzzy

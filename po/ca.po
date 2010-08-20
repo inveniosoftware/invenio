@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
-"PO-Revision-Date: 2010-02-28 23:01+0100\n"
+"PO-Revision-Date: 2010-08-20 07:35+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1772,7 +1772,7 @@ msgstr "Text complet"
 
 #: modules/bibformat/lib/elements/bfe_edit_files.py:51
 msgid "Manage Files of This Record"
-msgstr ""
+msgstr "Gestioneu els fitxers d'aquest registre"
 
 #: modules/bibformat/lib/elements/bfe_edit_record.py:52
 #, fuzzy
@@ -2015,7 +2015,7 @@ msgstr "Seleccioneu"
 
 #: modules/bibupload/lib/batchuploader_templates.py:137
 msgid "Warning: The date format is not correct"
-msgstr ""
+msgstr "Atenció: el format de la data no és correcte"
 
 #: modules/bibupload/lib/batchuploader_templates.py:141
 #, fuzzy
@@ -2041,7 +2041,7 @@ msgstr "Penjar"
 #: modules/bibupload/lib/batchuploader_templates.py:170
 #: modules/bibupload/lib/batchuploader_templates.py:358
 msgid "Upload later? then select:"
-msgstr ""
+msgstr "Preferiu penjar-lo després?  Doncs trieu:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:171
 #: modules/bibupload/lib/batchuploader_templates.py:359
@@ -2065,7 +2065,7 @@ msgstr "Exemple"
 #: modules/bibupload/lib/batchuploader_templates.py:174
 #: modules/bibupload/lib/batchuploader_templates.py:362
 msgid "All fields with"
-msgstr ""
+msgstr "Tots els camps amb"
 
 #: modules/bibupload/lib/batchuploader_templates.py:175
 #, fuzzy
@@ -2103,7 +2103,7 @@ msgstr "nom de l'alerta"
 #: modules/bibupload/lib/batchuploader_templates.py:220
 #: modules/bibupload/lib/batchuploader_templates.py:262
 msgid "Execution time"
-msgstr ""
+msgstr "Temps d'execució"
 
 #: modules/bibupload/lib/batchuploader_templates.py:247
 #, fuzzy
@@ -2114,13 +2114,13 @@ msgstr "Encara no hi ha cap revisor seleccionat."
 #: modules/bibupload/lib/batchuploader_webinterface.py:134
 #: modules/bibupload/lib/batchuploader_webinterface.py:292
 msgid "Metadata batch upload"
-msgstr ""
+msgstr "Càrrega massiva de metadades"
 
 #: modules/bibupload/lib/batchuploader_templates.py:305
 #: modules/bibupload/lib/batchuploader_webinterface.py:157
 #: modules/bibupload/lib/batchuploader_webinterface.py:210
 msgid "Document batch upload"
-msgstr ""
+msgstr "Càrrega massiva de documents"
 
 #: modules/bibupload/lib/batchuploader_templates.py:308
 #: modules/bibupload/lib/batchuploader_webinterface.py:316
@@ -2135,11 +2135,11 @@ msgstr "qualsevol mes"
 
 #: modules/bibupload/lib/batchuploader_templates.py:354
 msgid "Input dir:"
-msgstr ""
+msgstr "Directori d'entrada:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:356
 msgid "Filename matching:"
-msgstr ""
+msgstr "Fitxers del tipus:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:363
 #, fuzzy
@@ -2149,7 +2149,7 @@ msgstr "obligatori"
 #: modules/bibupload/lib/batchuploader_templates.py:371
 #, python-format
 msgid "<b>%s documents</b> have been found."
-msgstr ""
+msgstr "S'han trobat <b>%s documents</b>."
 
 #: modules/bibupload/lib/batchuploader_templates.py:373
 #, fuzzy
@@ -2165,14 +2165,18 @@ msgstr "S'han trobat els següents errors"
 msgid ""
 "Some files could not be moved to DONE folder. Please remove them manually."
 msgstr ""
+"Alguns fitxers no s'han pogut passar al directori DONE.  Esborreu-los "
+"manualment."
 
 #: modules/bibupload/lib/batchuploader_templates.py:387
 msgid "All uploaded files were moved to DONE folder."
-msgstr ""
+msgstr "Tots els fitxers s'han passat al directori DONE."
 
 #: modules/bibupload/lib/batchuploader_templates.py:397
 msgid "Using <b>web interface upload</b>, actions are executed a single time."
 msgstr ""
+"Usant la <b>interfície web de pujada de fitxers</b>, les accions només "
+"s'executen un cop."
 
 #: modules/bibupload/lib/batchuploader_templates.py:398
 #, fuzzy
@@ -2181,23 +2185,23 @@ msgstr "Feu clic aquí"
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 msgid " Batch Uploader daemon help page"
-msgstr ""
+msgstr " Pàgina d'ajuda del procés de pujada massiva"
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 msgid " for executing these actions periodically."
-msgstr ""
+msgstr " per executar aquestes accions periòdicament."
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:213
 msgid "Document batch upload result"
-msgstr ""
+msgstr "Resultat de la pujada massiva"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:290
 msgid "Upload succesful"
-msgstr ""
+msgstr "Pujada correcta"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:340
 msgid "Batch Uploader: Daemon monitor"
-msgstr ""
+msgstr "Pujada massiva: seguiment del procés"
 
 #: modules/miscutil/lib/dateutils.py:73 modules/miscutil/lib/dateutils.py:100
 #: modules/webbasket/lib/webbasket.py:180
@@ -2484,15 +2488,15 @@ msgstr "vegades citat"
 
 #: modules/miscutil/lib/inveniocfg.py:482
 msgid "time-decay cite count"
-msgstr ""
+msgstr "comptador de cites en el temps"
 
 #: modules/miscutil/lib/inveniocfg.py:483
 msgid "all-time-best cite rank"
-msgstr ""
+msgstr "classificació per màxim número de cites"
 
 #: modules/miscutil/lib/inveniocfg.py:484
 msgid "time-decay cite rank"
-msgstr ""
+msgstr "classificació per cites en el temps"
 
 #: modules/miscutil/lib/mailutils.py:151 modules/miscutil/lib/mailutils.py:164
 #: modules/webcomment/lib/webcomment_templates.py:1932
@@ -2522,7 +2526,7 @@ msgstr "Executar l'editor de múltiples registres"
 #: modules/webaccess/lib/access_control_config.py:236
 #: modules/websession/lib/webuser.py:903
 msgid "Run Document File Manager"
-msgstr ""
+msgstr "Executar el gestor de fitxers del document"
 
 #: modules/webaccess/lib/access_control_config.py:237
 #: modules/websession/lib/websession_templates.py:1093
@@ -2595,7 +2599,7 @@ msgstr "Executar BibEdit"
 #: modules/webaccess/lib/access_control_config.py:250
 #: modules/websession/lib/websession_templates.py:1095
 msgid "Run Batch Uploader"
-msgstr ""
+msgstr "Executar el gestor de càrregueas massives"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3515
 #, python-format
@@ -3237,7 +3241,7 @@ msgstr "Cercar en %s registres"
 
 #: modules/webbasket/lib/webbasket_templates.py:560
 msgid "Search also in notes (where allowed)"
-msgstr ""
+msgstr "Cercar també a les notes (si pertoca)"
 
 #: modules/webbasket/lib/webbasket_templates.py:597
 #, fuzzy
@@ -3277,7 +3281,7 @@ msgstr "No s'han trobat valors."
 #: modules/webbasket/lib/webbasket_templates.py:752
 #: modules/webbasket/lib/webbasket_templates.py:786
 msgid "In"
-msgstr ""
+msgstr "A"
 
 #: modules/webbasket/lib/webbasket_templates.py:882
 #: modules/webbasket/lib/webbasket_webinterface.py:1256
@@ -3384,6 +3388,8 @@ msgid ""
 "Provide a url for the external item you wish to add and fill in a title and "
 "description"
 msgstr ""
+"Escriviu una url per a l'item extern que hi voleu afegir i poseu-li un "
+"títol i descripció"
 
 #: modules/webbasket/lib/webbasket_templates.py:1257
 #: modules/websubmit/lib/websubmit_templates.py:2724
@@ -3399,7 +3405,7 @@ msgstr "Títol"
 
 #: modules/webbasket/lib/webbasket_templates.py:1261
 msgid "URL"
-msgstr ""
+msgstr "URL"
 
 #: modules/webbasket/lib/webbasket_templates.py:1289
 #, fuzzy
@@ -3414,7 +3420,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1295
 msgid "Proceed to the"
-msgstr ""
+msgstr "Continueu a"
 
 #: modules/webbasket/lib/webbasket_templates.py:1299
 #, fuzzy
@@ -3424,7 +3430,7 @@ msgstr "Cistells de grup"
 #: modules/webbasket/lib/webbasket_templates.py:1300
 #: modules/webbasket/lib/webbasket_templates.py:1304
 msgid "or return to your"
-msgstr ""
+msgstr "o torneu al vostre"
 
 #: modules/webbasket/lib/webbasket_templates.py:1303
 #, fuzzy
@@ -3453,15 +3459,15 @@ msgstr "Seleccioneu una categoria"
 
 #: modules/webbasket/lib/webbasket_templates.py:1396
 msgid "first"
-msgstr ""
+msgstr "primer"
 
 #: modules/webbasket/lib/webbasket_templates.py:1398
 msgid "Optionally, add a note to each one of these items"
-msgstr ""
+msgstr "Si ho voleu, podeu afegir una nota a un d'aquests registres"
 
 #: modules/webbasket/lib/webbasket_templates.py:1399
 msgid "Optionally, add a note to this item"
-msgstr ""
+msgstr "Opcionalment, afegiu una nota a aquest registre"
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
 #, fuzzy
@@ -3703,7 +3709,7 @@ msgstr "Puja'l"
 
 #: modules/webbasket/lib/webbasket_templates.py:2184
 msgid "You cannot move this item up"
-msgstr ""
+msgstr "No podeu pujar-lo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2198
 msgid "Move item down"
@@ -3711,7 +3717,7 @@ msgstr "Baixa'l"
 
 #: modules/webbasket/lib/webbasket_templates.py:2202
 msgid "You cannot move this item down"
-msgstr ""
+msgstr "No podeu baixar-lo"
 
 #: modules/webbasket/lib/webbasket_templates.py:2216
 #: modules/webbasket/lib/webbasket_templates.py:3101
@@ -3765,7 +3771,7 @@ msgstr "Ítem"
 #: modules/webbasket/lib/webbasket_templates.py:2420
 #: modules/webbasket/lib/webbasket_templates.py:3254
 msgid " of "
-msgstr ""
+msgstr "de"
 
 #: modules/webbasket/lib/webbasket_templates.py:2432
 #: modules/webbasket/lib/webbasket_templates.py:2435
@@ -3856,7 +3862,7 @@ msgstr "Subscriure's a aquest cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:3015
 msgid "This public basket belongs to the user "
-msgstr ""
+msgstr "Aquest cistell públic pertany a l'usuari "
 
 #: modules/webbasket/lib/webbasket_templates.py:3039
 #, fuzzy
@@ -4195,7 +4201,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1023
 msgid "Send me an email when a new comment is posted"
-msgstr ""
+msgstr "Envieu-me un email quan es publiqui un nou comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:1035
 #: modules/webcomment/lib/webcomment_templates.py:1151
@@ -5097,7 +5103,7 @@ msgstr "identificació"
 #: modules/websearch/lib/websearch_templates.py:472
 #, python-format
 msgid "Search on %(x_CFG_SITE_NAME_INTL)s"
-msgstr ""
+msgstr "Cercar en %(x_CFG_SITE_NAME_INTL)s"
 
 #: modules/websearch/lib/websearch_templates.py:696
 #: modules/websearch/lib/websearch_templates.py:845
@@ -5213,6 +5219,8 @@ msgid ""
 "This is a hosted external collection. Please click on the Search button to "
 "see its content."
 msgstr ""
+"Aquesta és una col·lecció externa allotjada.  Premeu el botó de cerca "
+"per a veure el seu contingut."
 
 #: modules/websearch/lib/websearch_templates.py:1470
 msgid "This collection does not contain any document yet."
@@ -7304,6 +7312,10 @@ msgid ""
 "names. Choose a different name and upload your file again. In particular, "
 "note that you should not include the extension in the renaming field."
 msgstr ""
+"No podeu usar el punt '.', barra '/', o barra inversa '\\\\\\\\' en els "
+"noms de fitxers.  Escolliu un nom diferent o pujeu un altre cop el "
+"vostre fitxer.  En particular, tingueu en compte que no heu d'incloure "
+"l'extensió en el nou nom."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:784
 msgid "Choose how you want to restrict access to this file."
@@ -7353,7 +7365,7 @@ msgstr "Desar els canvis"
 #: modules/websubmit/lib/websubmit_managedocfiles.py:864
 #, python-format
 msgid "Need help revising or adding files to record %(recid)s"
-msgstr ""
+msgstr "Necessito ajuda per revisar o afegir fitxers al registre %(recid)s"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:866
 #, python-format
@@ -7363,6 +7375,10 @@ msgid ""
 "I have attached the new version to this email.\n"
 "Best regards"
 msgstr ""
+"Benvolgut suport,\n"
+"necessito la vostra ajuda per revisar o afegir fitxers al registre %(recid)s.\n"
+"He adjuntat la nueva versión en aquest missatge.\n"
+"Cordialment,"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:871
 #, python-format
@@ -7397,6 +7413,8 @@ msgid ""
 "Note that your submission as been inserted into the bibliographic task queue "
 "and is waiting for execution.\n"
 msgstr ""
+"La vostra contribució ha estat enviada a la cua de tasques "
+"bibliogràfiques i està esperant la seva execució.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:206
 #, python-format
@@ -7405,6 +7423,9 @@ msgid ""
 "currently %s tasks waiting to be executed. Your record should be available "
 "within a few minutes and searchable within an hour or thereabouts.\n"
 msgstr ""
+"La cua de tasques s'està executant automàticament, i ara mateix hi ha "
+"%s tasques esperant la seva execució.  El vostre registre estarà a punt "
+"en poca estona, i cercable en una hora, aproximadament.\n"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:208
 msgid ""
@@ -7412,6 +7433,10 @@ msgid ""
 "currently set to the manual mode. Your submission is well registered but may "
 "take longer than usual before it is fully integrated and searchable.\n"
 msgstr ""
+"Degut a una intervenció humana o a un problema temporal, la cua de "
+"tasques està en modus manual.  La vostra contribució ha quedat "
+"enregistrada però pot trigar més de l'habitual abans no estigui ben "
+"integrat i cercable.\n"
 
 #: modules/websubmit/lib/websubmit_engine.py:179
 #: modules/websubmit/lib/websubmit_engine.py:791
@@ -7707,7 +7732,7 @@ msgstr "tots els tipus de document"
 
 #: modules/websubmit/lib/websubmit_templates.py:1492
 msgid "Subm.No."
-msgstr ""
+msgstr "Lliurament"
 
 #: modules/websubmit/lib/websubmit_templates.py:1493
 msgid "Reference"
@@ -8415,7 +8440,7 @@ msgstr ""
 #: modules/webjournal/lib/webjournal_templates.py:268
 #, python-format
 msgid "If you cannot read this email please go to %(x_journal_link)s"
-msgstr ""
+msgstr "Si no podeu llegir aquest missatge aneu a %(x_journal_link)s"
 
 #: modules/webjournal/lib/webjournal_templates.py:415
 #: modules/webjournal/lib/webjournal_templates.py:664
@@ -11286,16 +11311,18 @@ msgstr "Esborrar de la llista d'espera"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1096
 msgid "Error when retrieving the Holding Pen entry"
-msgstr ""
+msgstr "Error en recuperar l'entrada en espera"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1104
 msgid "Error when retrieving the record"
-msgstr ""
+msgstr "Error en recuperar el registre"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1112
 msgid ""
 "Error when formatting the Holding Pen entry. Probably it's content is broken"
 msgstr ""
+"Error al formatejar l'entrada en espera.  Probablemente el seu "
+"contingut estigui malament"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:1117
 #, fuzzy
