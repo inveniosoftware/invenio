@@ -32,7 +32,8 @@ from invenio.config import \
      CFG_DATABASE_HOST, \
      CFG_DATABASE_NAME
 from invenio.access_control_engine import acc_authorize_action
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
+from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
+    SUPERADMINROLE, CFG_EXTERNAL_AUTH_DEFAULT
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
         collect_user_info
@@ -274,7 +275,7 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
 
     CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS
     prefs = get_user_preferences(uid)
-    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']][0]:
+    if CFG_EXTERNAL_AUTHENTICATION.has_key(prefs['login_method']) and CFG_EXTERNAL_AUTHENTICATION[prefs['login_method']] is not None:
         CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS_LOCAL = 3
 
     out = websession_templates.tmpl_user_preferences(
@@ -298,11 +299,11 @@ def perform_set(email, ln, can_config_bibcatalog = False, verbose = 0):
         # to switch.
 
         for method in methods:
-            if CFG_EXTERNAL_AUTHENTICATION[method][0]:
+            if CFG_EXTERNAL_AUTHENTICATION[method] is not None:
                 try:
-                    if not CFG_EXTERNAL_AUTHENTICATION[method][0].user_exists(email):
+                    if not CFG_EXTERNAL_AUTHENTICATION[method].user_exists(email):
                         methods.remove(method)
-                except (AttributeError, InvenioWebAccessExternalAuthError):
+                except (AttributeError, InvenioWebAccessExternalAuthError, NotImplementedError):
                     methods.remove(method)
         methods.sort()
 
@@ -352,7 +353,7 @@ def create_register_page_box(referer='', ln=CFG_SITE_LANG):
            )
 
 ##  create_login_page_box(): ask for the user's email and password, for login into the system
-def create_login_page_box(referer='', apache_msg="", ln=CFG_SITE_LANG):
+def create_login_page_box(referer='', ln=CFG_SITE_LANG):
     # List of referer regexep and message to print
 
     _ = gettext_set_language(ln)
@@ -368,27 +369,15 @@ def create_login_page_box(referer='', apache_msg="", ln=CFG_SITE_LANG):
             msg = txt
             break
 
-    # FIXME: Temporary Hack to help CDS current migration
-    if CFG_CERN_SITE and apache_msg:
-        return msg + apache_msg
-
-    if apache_msg:
-        msg += apache_msg + "<p>2) Otherwise please authenticate yourself" \
-        " in the following form:</p>"
-
     internal = None
     for system in CFG_EXTERNAL_AUTHENTICATION.keys():
-        if not CFG_EXTERNAL_AUTHENTICATION[system][0]:
+        if CFG_EXTERNAL_AUTHENTICATION[system] is None:
             internal = system
             break
     register_available = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS <= 1 and internal
-    methods = CFG_EXTERNAL_AUTHENTICATION.keys()
+    ## Let's retrieve all the login method that are not dedicated to robots
+    methods = [method[0] for method in CFG_EXTERNAL_AUTHENTICATION.iteritems() if not method[1] or not method[1].robot_login_method_p()]
     methods.sort()
-    selected = ''
-    for method in methods:
-        if CFG_EXTERNAL_AUTHENTICATION[method][1]:
-            selected = method
-            break
 
     return websession_templates.tmpl_login_form(
              ln = ln,
@@ -396,7 +385,7 @@ def create_login_page_box(referer='', apache_msg="", ln=CFG_SITE_LANG):
              internal = internal,
              register_available = register_available,
              methods = methods,
-             selected_method = selected,
+             selected_method = CFG_EXTERNAL_AUTH_DEFAULT,
              msg = msg,
            )
 

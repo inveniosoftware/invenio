@@ -85,7 +85,7 @@ from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, http_check_credentials, logoutUser, isUserSuperAdmin
+    collect_user_info, logoutUser, isUserSuperAdmin
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
@@ -453,7 +453,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+        if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
@@ -621,7 +621,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 restricted_collection_cache.recreate_cache_if_needed()
                 for collname in restricted_collection_cache.cache:
                     (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collname)
-                    if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+                    if auth_code and user_info['email'] == 'guest':
                         coll_recids = get_collection(collname).reclist
                         if coll_recids & recids:
                             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
@@ -640,7 +640,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         for coll in involved_collections:
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+                if auth_code and user_info['email'] == 'guest':
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                             make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
@@ -680,7 +680,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         for coll in argd['c'] + [argd['cc']]:
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+                if auth_code and user_info['email'] == 'guest':
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                             make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
@@ -889,17 +889,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
         accepted_args = dict(legacy_collection_default_urlargd)
-        accepted_args.update({'referer' : (str, ''),
-             'realm' : (str, '')})
         argd = wash_urlargd(form, accepted_args)
-
-        # Apache authentication stuff
-        if argd['realm']:
-            http_check_credentials(req, argd['realm'])
-            return redirect_to_url(req, argd['referer'] or '%s/youraccount/youradminactivities' % CFG_SITE_SECURE_URL, norobot=True)
-
-        del argd['referer']
-        del argd['realm']
 
         # Treat `as' argument specially:
         if argd.has_key('as'):
@@ -1119,7 +1109,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
         for coll in argd['c'] + [argd['cc']]:
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+                if auth_code and user_info['email'] == 'guest':
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                             make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
@@ -1267,7 +1257,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
             argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+        if auth_code and user_info['email'] == 'guest':
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})

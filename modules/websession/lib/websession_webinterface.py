@@ -25,6 +25,7 @@ __lastupdated__ = """$Date$"""
 
 import cgi
 from datetime import timedelta
+import os
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -44,8 +45,9 @@ from invenio import webbasket
 from invenio import webalert
 from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
-from invenio.access_control_engine import make_apache_message, make_list_apache_firerole, acc_authorize_action
+from invenio.access_control_engine import acc_authorize_action
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.webinterface_handler_config import HTTP_BAD_REQUEST
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
 from invenio import webgroup_dblayer
@@ -68,7 +70,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
     _exports = ['', 'edit', 'change', 'lost', 'display',
                 'send_email', 'youradminactivities', 'access',
-                'delete', 'logout', 'login', 'register', 'resetpassword']
+                'delete', 'logout', 'login', 'register', 'resetpassword',
+                'robotlogin']
 
     _force_https = True
 
@@ -326,7 +329,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         ## Change login method if needed:
         if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
-                and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION.keys():
+                and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION:
             title = _("Settings edited")
             act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
@@ -334,7 +337,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if prefs['login_method'] != args['login_method']:
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
                     mess += '<p>' + _("Unable to change login method.")
-                elif not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0]:
+                elif not CFG_EXTERNAL_AUTHENTICATION[args['login_method']]:
                     # Switching to internal authentication: we drop any external datas
                     p_email = webuser.get_email(uid)
                     webuser.drop_external_settings(uid)
@@ -363,7 +366,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         mess += '<p>' + _("Unable to switch to external login method %s, because your email address is unknown.") % cgi.escape(args['login_method'])
                     else:
                         try:
-                            if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']][0].user_exists(email):
+                            if not CFG_EXTERNAL_AUTHENTICATION[args['login_method']].user_exists(email):
                                 mess += '<p>' +  _("Unable to switch to external login method %s, because your email address is unknown to the external login system.") % cgi.escape(args['login_method'])
                             else:
                                 prefs['login_method'] = args['login_method']
@@ -550,8 +553,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         user_prefs = webuser.get_user_preferences(webuser.emailUnique(args['p_email']))
         if user_prefs:
-            if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) and \
-               CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] is not None:
+            if user_prefs['login_method'] in CFG_EXTERNAL_AUTHENTICATION and \
+               CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']] is not None:
                 eMsg = _("Cannot send password reset request since you are using external authentication system.")
                 return page(title=_("Your Account"),
                             body=webaccount.perform_emailMessage(eMsg, args['ln']),
@@ -680,6 +683,65 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     lastupdated=__lastupdated__,
                     navmenuid='youraccount')
 
+
+    def robotlogin(self, req, form):
+        from invenio.external_authentication import InvenioWebAccessExternalAuthError
+        args = wash_urlargd(form, {
+            'login_method': (str, None),
+            'remember_me' : (str, ''),
+            'referer': (str, ''),
+            'p_un': (str, ''),
+            'p_pw': (str, '')
+        })
+        # sanity checks:
+        args['login_method'] = wash_login_method(args['login_method'])
+        args['remember_me'] = args['remember_me'] != ''
+        locals().update(args)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
+            return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'],
+                                               navmenuid='youraccount')
+        uid = webuser.getUid(req)
+
+        # load the right message language
+        _ = gettext_set_language(args['ln'])
+
+        try:
+            (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
+        except InvenioWebAccessExternalAuthError, err:
+            return page("Error", body=str(err))
+        if len(iden)>0:
+            uid = webuser.update_Uid(req, args['p_un'], args['remember_me'])
+            uid2 = webuser.getUid(req)
+            if uid2 == -1:
+                webuser.logoutUser(req)
+                return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid,
+                                                    navmenuid='youraccount')
+
+            # login successful!
+            if args['referer']:
+                redirect_to_url(req, args['referer'])
+            else:
+                return self.display(req, form)
+        else:
+            mess = CFG_WEBACCESS_WARNING_MSGS[msgcode] % cgi.escape(args['login_method'])
+            if msgcode == 14:
+                if webuser.username_exists_p(args['p_un']):
+                    mess = CFG_WEBACCESS_WARNING_MSGS[15] % cgi.escape(args['login_method'])
+            act = '/youraccount/login%s' % make_canonical_urlargd({'ln' : args['ln'], 'referer' : args['referer']}, {})
+            return page(title=_("Login"),
+                        body=webaccount.perform_back(mess, act, _("login"), args['ln']),
+                        navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
+                        description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                        keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
+                        uid=uid,
+                        req=req,
+                        secure_page_p = 1,
+                        language=args['ln'],
+                        lastupdated=__lastupdated__,
+                        navmenuid='youraccount')
+
+
+
     def login(self, req, form):
         args = wash_urlargd(form, {
             'p_un': (str, None),
@@ -706,27 +768,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(args['ln'])
 
-        apache_msg = ""
         if args['action']:
             cookie = args['action']
             try:
                 action, arguments = mail_cookie_check_authorize_action(cookie)
-                apache_msg = make_apache_message(action, arguments, args['referer'])
-
-                # FIXME: Temporary Hack to help CDS current migration
-                if CFG_CERN_SITE:
-                    roles = make_list_apache_firerole(action, arguments)
-                    if len(roles) == 1:
-                        # There's only one role enabled to see this collection
-                        # Let's redirect to log to it!
-                        return redirect_to_url(req, '%s/%s' % (CFG_SITE_SECURE_URL, make_canonical_urlargd({'realm' : roles[0][0], 'referer' : args['referer']}, {})))
             except InvenioWebAccessMailCookieError:
                 pass
 
         if not CFG_EXTERNAL_AUTH_USING_SSO:
             if args['p_un'] is None or not args['login_method']:
                 return page(title=_("Login"),
-                            body=webaccount.create_login_page_box(args['referer'], apache_msg, args['ln']),
+                            body=webaccount.create_login_page_box(args['referer'], args['ln']),
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                             description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                             keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
@@ -1290,7 +1342,7 @@ def wash_login_method(login_method):
 
     @warning: Beware, 'Local' is hardcoded here!
     """
-    if login_method in CFG_EXTERNAL_AUTHENTICATION.keys():
+    if login_method in CFG_EXTERNAL_AUTHENTICATION:
         return login_method
     else:
         return 'Local'

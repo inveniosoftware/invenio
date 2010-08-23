@@ -27,44 +27,6 @@ from invenio import webuser
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.dbquery import run_sql
 
-class ApacheAuthenticationTests(unittest.TestCase):
-    """Test functions related to the Apache authentication."""
-
-    def test_auth_apache_user_p(self):
-        """webuser - apache user password checking"""
-        # These should succeed:
-        self.assertEqual(True,
-                         webuser.auth_apache_user_p('jekyll', 'j123ekyll'))
-        self.assertEqual(True,
-                         webuser.auth_apache_user_p('hyde', 'h123yde'))
-        # Note: the following one should succeed even though the real
-        # password is different, because crypt() looks at first 8
-        # chars only:
-        self.assertEqual(True,
-                         webuser.auth_apache_user_p('jekyll', 'j123ekylx'))
-        # Now some attempts that should fail:
-        self.assertEqual(False,
-                         webuser.auth_apache_user_p('jekyll', ''))
-        self.assertEqual(False,
-                         webuser.auth_apache_user_p('jekyll', 'h123yde'))
-        self.assertEqual(False,
-                         webuser.auth_apache_user_p('jekyll', 'aoeuidhtns'))
-        self.assertEqual(False,
-                         webuser.auth_apache_user_p('aoeui', ''))
-        self.assertEqual(False,
-                         webuser.auth_apache_user_p('aoeui', 'h123yde'))
-        self.assertEqual(False,
-                         webuser.auth_apache_user_p('aoeui', 'dhtns'))
-
-    def test_auth_apache_user_in_groups(self):
-        """webuser - apache user group membership checking"""
-        self.assertEqual(['theses'],
-          webuser.auth_apache_user_in_groups('jekyll'))
-        self.assertEqual([],
-          webuser.auth_apache_user_in_groups('hyde'))
-        self.assertEqual([],
-          webuser.auth_apache_user_in_groups('aoeui'))
-
 class IsUserSuperAdminTests(unittest.TestCase):
     """Test functions related to the isUserSuperAdmin function."""
     def setUp(self):
@@ -79,7 +41,7 @@ class IsUserSuperAdminTests(unittest.TestCase):
         """webuser - isUserSuperAdmin with hyde"""
         self.failIf(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_hyde)))
 
-TEST_SUITE = make_test_suite(ApacheAuthenticationTests, IsUserSuperAdminTests)
+TEST_SUITE = make_test_suite(IsUserSuperAdminTests)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

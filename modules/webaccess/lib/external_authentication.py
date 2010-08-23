@@ -50,14 +50,14 @@ class ExternalAuth:
         usernames and email addresses.
         Raise InvenioWebAccessExternalAuthError in case of external troubles.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
         #return None
 
     def user_exists(self, email, req=None):
         """Check the external authentication system for existance of email.
         @return: True if the user exists, False otherwise
         """
-        raise NotImplementedError
+        raise NotImplementedError()
 
 
     def fetch_user_groups_membership(self, username, password=None, req=None):
@@ -65,14 +65,14 @@ class ExternalAuth:
         and their description to which the user is subscribed.
         Raise InvenioWebAccessExternalAuthError in case of troubles.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
         #return {}
 
     def fetch_user_nickname(self, username, password=None, req=None):
         """Given a username and a password, returns the right nickname belonging
         to that user (username could be an email).
         """
-        raise NotImplementedError
+        raise NotImplementedError()
         #return Nickname
 
     def fetch_user_preferences(self, username, password=None, req=None):
@@ -87,7 +87,7 @@ class ExternalAuth:
         name but starting with EXTERNAL). If a pref begins with HIDDEN_ it will
         be ignored.
         """
-        raise NotImplementedError
+        raise NotImplementedError()
         #return {}
 
     def fetch_all_users_groups_membership(self, req=None):
@@ -95,4 +95,11 @@ class ExternalAuth:
         each groups.
         @return: {'mygroup': ('description', ['email1', 'email2', ...]), ...}
         """
-        raise NotImplementedError
+        raise NotImplementedError()
+
+    def robot_login_method_p():
+        """Return True if this method is dedicated to robots and should
+        not therefore be available as a choice to regular users upon login.
+        """
+        return False
+    robot_login_method_p = staticmethod(robot_login_method_p)

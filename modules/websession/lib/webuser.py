@@ -82,7 +82,7 @@ from invenio.errorlib import register_exception
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
-    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS
+    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS, CFG_EXTERNAL_AUTH_DEFAULT
 import invenio.template
 tmpl = invenio.template.load('websession')
 
@@ -169,11 +169,6 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
                 req=req,
                 navmenuid=navmenuid)
 
-def getApacheUser(req):
-    """Return the ApacheUser taking it from the cookie of the request."""
-    session = get_session(req)
-    return session.get('apache_user')
-
 def getUid(req):
     """Return user ID taking it from the cookie of the request.
        Includes control mechanism for the guest users, inserting in
@@ -227,19 +222,6 @@ def getUid(req):
             return uid
         else:
             return -1
-
-def setApacheUser(req, apache_user):
-    """It sets the apache_user into the session, and raise the cookie to the client.
-    """
-    if hasattr(req, '_user_info'):
-        del req._user_info
-    session = get_session(req)
-    session['apache_user'] = apache_user
-    user_info = collect_user_info(req, login_time=True)
-    session['user_info'] = user_info
-    req._user_info = user_info
-    session.save()
-    return apache_user
 
 def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
@@ -474,7 +456,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
 
     activated = 1 # By default activated
 
-    if not login_method or not CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # local login
+    if not login_method or not CFG_EXTERNAL_AUTHENTICATION[login_method]: # local login
         if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 2:
             return 5
         elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT:
@@ -536,12 +518,12 @@ def loginUser(req, p_un, p_pw, login_method):
 
     # go on with the old stuff based on p_email:
 
-    if not CFG_EXTERNAL_AUTHENTICATION.has_key(login_method):
+    if not login_method in CFG_EXTERNAL_AUTHENTICATION:
         return ([], p_email, p_pw, 12)
 
-    if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
+    if CFG_EXTERNAL_AUTHENTICATION[login_method]: # External Authenthication
         try:
-            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req) or CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_un, p_pw, req) ## We try to login with either the email of the nickname
+            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(p_email, p_pw, req) or CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(p_un, p_pw, req) ## We try to login with either the email of the nickname
             if p_email:
                 p_email = p_email.lower()
             else:
@@ -554,9 +536,9 @@ def loginUser(req, p_un, p_pw, login_method):
             if not query_result: # First time user
                 p_pw_local = int(random.random() * 1000000)
                 p_nickname = ''
-                if CFG_EXTERNAL_AUTHENTICATION[login_method][0].enforce_external_nicknames:
+                if CFG_EXTERNAL_AUTHENTICATION[login_method].enforce_external_nicknames:
                     try: # Let's discover the external nickname!
-                        p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_nickname(p_email, p_pw, req)
+                        p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method].fetch_user_nickname(p_email, p_pw, req)
                     except (AttributeError, NotImplementedError):
                         pass
                     except:
@@ -569,6 +551,7 @@ def loginUser(req, p_un, p_pw, login_method):
                     res = registerUser(req, p_email, p_pw_local, '',
                     register_without_nickname=True,
                     login_method=login_method)
+                    query_result = run_sql("SELECT id from user where email=%s", (p_email,))
                 elif res == 0: # Everything was ok, with or without nickname.
                     query_result = run_sql("SELECT id from user where email=%s", (p_email,))
                 elif res == 6: # error in contacting the user via email
@@ -576,7 +559,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 else:
                     return([], p_email, p_pw_local, 13)
             try:
-                groups = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_groups_membership(p_email, p_pw, req)
+                groups = CFG_EXTERNAL_AUTHENTICATION[login_method].fetch_user_groups_membership(p_email, p_pw, req)
                 # groups is a dictionary {group_name : group_description,}
                 new_groups = {}
                 for key, value in groups.items():
@@ -588,18 +571,20 @@ def loginUser(req, p_un, p_pw, login_method):
                 register_exception(alert_admin=True)
                 return([], p_email, p_pw, 16)
             else: # Groups synchronization
-                if groups != 0:
+                if groups:
                     userid = query_result[0][0]
                     from invenio.webgroup import synchronize_external_groups
                     synchronize_external_groups(userid, groups, login_method)
 
             user_prefs = get_user_preferences(query_result[0][0])
-            if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
-                # Let's prevent the user to switch login_method
-                if user_prefs.has_key("login_method") and \
-                           user_prefs["login_method"] != login_method:
-                    return([], p_email, p_pw, 11)
-            user_prefs["login_method"] = login_method
+            if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
+                ## I.e. if the login method is not of robot type:
+                if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4:
+                    # Let's prevent the user to switch login_method
+                    if user_prefs.has_key("login_method") and \
+                            user_prefs["login_method"] != login_method:
+                        return([], p_email, p_pw, 11)
+                user_prefs["login_method"] = login_method
 
             # Cleaning external settings
             for key in user_prefs.keys():
@@ -607,13 +592,13 @@ def loginUser(req, p_un, p_pw, login_method):
                     del user_prefs[key]
             try:
                 # Importing external settings
-                new_prefs = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_preferences(p_email, p_pw, req)
+                new_prefs = CFG_EXTERNAL_AUTHENTICATION[login_method].fetch_user_preferences(p_email, p_pw, req)
                 for key, value in new_prefs.items():
                     user_prefs['EXTERNAL_' + key] = value
             except (AttributeError, NotImplementedError):
                 pass
             except InvenioWebAccessExternalAuthError:
-                register_exception(alert_admin=True)
+                register_exception(req=req, alert_admin=True)
                 return([], p_email, p_pw, 16)
             # Storing settings
             set_user_preferences(query_result[0][0], user_prefs)
@@ -630,7 +615,7 @@ def loginUser(req, p_un, p_pw, login_method):
                 preferred_login_method = get_user_preferences(query_result[0][0])['login_method']
                 p_email = query_result[0][1].lower()
                 if login_method != preferred_login_method:
-                    if CFG_EXTERNAL_AUTHENTICATION.has_key(preferred_login_method):
+                    if preferred_login_method in CFG_EXTERNAL_AUTHENTICATION:
                         return ([], p_email, p_pw, 11)
             elif note == '2': # Email address need to be confirmed by user
                 return ([], p_email, p_pw, 17)
@@ -1007,10 +992,8 @@ def get_default_user_preferences():
     user_preference = {
         'login_method': ''}
 
-    for system in CFG_EXTERNAL_AUTHENTICATION.keys():
-        if CFG_EXTERNAL_AUTHENTICATION[system][1]:
-            user_preference['login_method'] = system
-            break
+    if CFG_EXTERNAL_AUTH_DEFAULT in CFG_EXTERNAL_AUTHENTICATION:
+        user_preference['login_method'] = CFG_EXTERNAL_AUTH_DEFAULT
     return user_preference
 
 def get_preferred_user_language(req):
@@ -1073,8 +1056,6 @@ def collect_user_info(req, login_time=False, refresh=False):
     the user preferences (collected at login time and built by the different
     external authentication plugins) and if the mod_python request object is
     provided, also the remote_ip, remote_host, referer, agent fields.
-    If the user is authenticated with Apache should provide also
-    apache_user and apache_group.
     NOTE: if req is a mod_python request object, the user_info dictionary
     is saved into req._user_info (for caching purpouses)
     setApacheUser & setUid will properly reset it.
@@ -1086,8 +1067,6 @@ def collect_user_info(req, login_time=False, refresh=False):
         'referer' : '',
         'uri' : '',
         'agent' : '',
-        'apache_user' : '',
-        'apache_group' : [],
         'uid' : -1,
         'nickname' : '',
         'email' : '',
@@ -1108,7 +1087,7 @@ def collect_user_info(req, login_time=False, refresh=False):
 
     try:
         is_req = False
-        if req is None:
+        if not req:
             uid = -1
         elif type(req) in (type(1), type(1L)):
             ## req is infact a user identification
@@ -1142,12 +1121,6 @@ def collect_user_info(req, login_time=False, refresh=False):
             user_info['referer'] = req.headers_in.get('Referer', '')
             user_info['uri'] = req.unparsed_uri or ()
             user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
-            try:
-                user_info['apache_user'] = getApacheUser(req)
-                if user_info['apache_user']:
-                    user_info['apache_group'] = auth_apache_user_in_groups(user_info['apache_user'])
-            except AttributeError:
-                pass
         user_info['uid'] = uid
         user_info['nickname'] = get_nickname(uid) or ''
         user_info['email'] = get_email(uid) or ''
@@ -1157,7 +1130,7 @@ def collect_user_info(req, login_time=False, refresh=False):
             user_info['group'] = [group[1] for group in get_groups(uid)]
             prefs = get_user_preferences(uid)
             login_method = prefs['login_method']
-            login_object = CFG_EXTERNAL_AUTHENTICATION[login_method][0]
+            login_object = CFG_EXTERNAL_AUTHENTICATION[login_method]
             if login_object and ((datetime.datetime.now() - get_last_login(uid)).seconds > 3600):
                 ## The user uses an external authentication method and it's a bit since
                 ## she has not performed a login
@@ -1212,87 +1185,3 @@ def collect_user_info(req, login_time=False, refresh=False):
     except Exception, e:
         register_exception()
     return user_info
-
-## --- follow some functions for Apache user/group authentication
-
-def _load_apache_password_file(apache_password_file=CFG_APACHE_PASSWORD_FILE):
-    ret = {}
-    for row in open(os.path.join(CFG_TMPDIR, apache_password_file)):
-        row = row.split(':')
-        if len(row) == 2:
-            ret[row[0].strip()] = row[1].strip()
-    return ret
-_apache_passwords = _load_apache_password_file()
-
-def auth_apache_user_p(user, password):
-    """Check whether user-supplied credentials correspond to valid
-    Apache password data file."""
-    if user in _apache_passwords:
-        password_apache = _apache_passwords[user]
-        salt = password_apache[:2]
-        return crypt.crypt(password, salt) == password_apache
-    else:
-        return False
-
-def _load_apache_group_file(apache_group_file=CFG_APACHE_GROUP_FILE):
-    ret = {}
-    for row in open(os.path.join(CFG_TMPDIR, apache_group_file)):
-        row = row.split(':')
-        if len(row) == 2:
-            group = row[0].strip()
-            users = row[1].strip().split(' ')
-            for user in users:
-                user = user.strip()
-                if user not in ret:
-                    ret[user] = []
-                ret[user].append(group)
-    return ret
-_apache_groups = _load_apache_group_file()
-
-def auth_apache_user_in_groups(user):
-    """Return list of Apache groups to which Apache user belong."""
-    return _apache_groups.get(user, [])
-
-def http_get_credentials(req):
-    if req.headers_in.has_key("Authorization"):
-        try:
-            s = req.headers_in["Authorization"][6:]
-            s = base64.decodestring(s)
-            user, passwd = s.split(":", 1)
-        except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
-            raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
-        return (user, passwd)
-    return (None, None)
-
-def http_check_credentials(req, role):
-    """Retrieve Apache password and check user credential with the
-    check_auth function. If this function returns True check if the user
-    is enabled to the given role. If this is True, return, otherwise
-    popup a new apache login box.
-    """
-
-    authorized = False
-    while True:
-        if req.headers_in.has_key("Authorization"):
-            try:
-                s = req.headers_in["Authorization"][6:]
-                s = base64.decodestring(s)
-                user, passwd = s.split(":", 1)
-            except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
-                raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
-
-            authorized = auth_apache_user_p(user, passwd)
-
-        if authorized:
-            setApacheUser(req, user)
-            authorized = acc_firerole_check_user(collect_user_info(req), load_role_definition(acc_get_role_id(role)))
-            setApacheUser(req, '')
-
-        if not authorized:
-            # note that Opera supposedly doesn't like spaces around "=" below
-            s = 'Basic realm="%s"' % role
-            req.headers_out["WWW-Authenticate"] = s
-            raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
-        else:
-            setApacheUser(req, user)
-            return

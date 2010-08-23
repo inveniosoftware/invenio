@@ -108,7 +108,7 @@ class AccessControlFireRoleTest(unittest.TestCase):
     def test_deserialize(self):
         """firerole - deserializing"""
         self.assertEqual(compile_role_definition("allow any"),
-            (True, False, ()))
+            (True, ()))
 
     def test_firerole_literal_email(self):
         """firerole - firerole core testing literal email matching"""

@@ -890,13 +890,8 @@ II. Example - connecting role and user</a>
    If a external login system is used, you may want to protect the users username / password using <strong>HTTPS</strong>.
 
    To add new system, two changes must be made (for the time being):
-   - The name of the method, if it is default or not, and the classname must be added to the variable
-     <strong>CFG_EXTERNAL_AUTHENTICATION</strong> in <em>access_control_config.py</em>. Atleast one method must be marked as the
-     default one. The internal login method should be given with None as classname.
-
-     Example:
-      CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % CFG_SITE_NAME: (None, True), "CERN NICE (external)":
-                                                        (AuthCernWrapper(), False)}
+   - The name of the method, if it is default or not, and an instance of the class must be added to the variable
+     <strong>CFG_EXTERNAL_AUTHENTICATION</strong> in <em>access_control_config.py</em>.
 
    - A class must be created derived from the class external_authentication inside file
      <em>external_authentication.py</em>. This class must include at least the
@@ -1107,9 +1102,6 @@ II. Example - connecting role and user</a>
         <li><strong>referer</strong>: the webpage from where the user is coming from</li>
         <li><strong>uri</strong>: the uri the user is visiting</li>
         <li><strong>agent</strong>: the agent string describing the user's browser</li>
-        <li><strong>apache_user</strong>: the <a href="websearch-admin-guide#3.2">Apache user</a> provided by the authenticated user</li>
-        <li><strong>apache_group/apache_groups</strong>: the Apache groups to which the apache user
-            belong</li>
     </ul>
 
     Note that you can specify either (apache_)group or (apache_)groups (with or

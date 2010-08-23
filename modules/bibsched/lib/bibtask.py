@@ -671,7 +671,7 @@ def authenticate(user, authorization_action, authorization_msg=""):
         uid = res[0][0]
         ok = False
         login_method = get_user_preferences(uid)['login_method']
-        if not CFG_EXTERNAL_AUTHENTICATION[login_method][0]:
+        if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
             #Local authentication, let's see if we want passwords.
             res = run_sql("select id from user where id=%s "
                     "and password=AES_ENCRYPT(email,'')",
@@ -687,14 +687,14 @@ def authenticate(user, authorization_action, authorization_msg=""):
             except KeyboardInterrupt:
                 sys.stderr.write("\n")
                 sys.exit(1)
-            if not CFG_EXTERNAL_AUTHENTICATION[login_method][0]:
+            if not CFG_EXTERNAL_AUTHENTICATION[login_method]:
                 res = run_sql("select id from user where id=%s "
                         "and password=AES_ENCRYPT(email, %s)",
                 (uid, password_entered), 1)
                 if res:
                     ok = True
             else:
-                if CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(get_email(uid), password_entered):
+                if CFG_EXTERNAL_AUTHENTICATION[login_method].auth_user(get_email(uid), password_entered):
                     ok = True
         if not ok:
             print "Sorry, wrong credentials for %s." % user

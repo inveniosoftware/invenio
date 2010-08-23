@@ -151,6 +151,11 @@ def find_all_values_to_hide(local_variables, analyzed_stack=None):
             ret.add(str(value))
         if isinstance(value, dict):
             ret |= find_all_values_to_hide(value, analyzed_stack)
+    if '' in ret:
+        ## Let's discard the empty string in case there is an empty password,
+        ## or otherwise anything will be separated by '<*****>' in the output
+        ## :-)
+        ret.remove('')
     return ret
 
 def get_pretty_traceback(req=None, exc_info=None, force_stack=True):

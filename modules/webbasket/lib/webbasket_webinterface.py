@@ -158,7 +158,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use baskets."))
 
-        if user_info['email'] == 'guest' and not user_info['apache_user']:
+        if user_info['email'] == 'guest':
             # Ask to login
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
@@ -232,7 +232,7 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, dummy) = check_user_can_attach_file_to_comments(user_info, argd['recid'])
 
-        if user_info['email'] == 'guest' and not user_info['apache_user']:
+        if user_info['email'] == 'guest':
             # 1. User is guest: must login prior to upload
             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
         if not user_info['precached_usebaskets']:

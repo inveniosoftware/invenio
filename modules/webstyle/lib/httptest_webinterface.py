@@ -33,7 +33,7 @@ from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
-    _exports = ["", "post1", "post2", "sso", "dumpreq"]
+    _exports = ["", "post1", "post2", "sso", "dumpreq", "whatismyip"]
 
     def __call__(self, req, form):
         redirect_to_url(req, CFG_SITE_URL + '/httptest/post1')
@@ -88,4 +88,11 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
             body = """<p>Please send a file via POST.</p>"""
             return page("test2", body=body, req=req)
         path, mimetype = handle_file_post(req)
-        return  stream_file(req, path, mime=mimetype)
+        return stream_file(req, path, mime=mimetype)
+
+    def whatismyip(self, req, form):
+        """
+        Return the client IP as seen by the server (useful for testing e.g. Robot authentication)
+        """
+        req.content_type = "text/plain"
+        return req.remote_ip

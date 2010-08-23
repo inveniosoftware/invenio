@@ -23,7 +23,8 @@ __revision__ = \
 # pylint: disable=C0301
 
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
-     CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE
+     CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE, \
+     CFG_OPENAIRE_SITE
 from invenio.messages import gettext_set_language
 
 
@@ -61,7 +62,7 @@ MAXPAGEUSERS = 25
 CFG_ACC_EMPTY_ROLE_DEFINITION_SRC = 'deny all'
 
 # default role definition, compiled:
-CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ = (False, False, ())
+CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ = (False, ())
 
 # default role definition, compiled and serialized:
 CFG_ACC_EMPTY_ROLE_DEFINITION_SER = None
@@ -74,27 +75,46 @@ else:
     CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS = ['8560_f']
 
 # Use external source for access control?
-# Atleast one must be added
-# Adviced not to change the name, since it is used to identify the account
-# Format is:   System name: (System class, Default True/Flase), atleast one
-# must be default
-CFG_EXTERNAL_AUTHENTICATION = {"Local" : (None, True)}
 
-# Variables to set to the SSO Authentication name if using SSO
-CFG_EXTERNAL_AUTH_USING_SSO = False
-CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+# CFG_EXTERNAL_AUTHENTICATION -- this is a dictionary with the enabled login method.
+# The key is the name of the login method and the value is an instance of
+# of the login method (see /help/admin/webaccess-admin-guide#5). Set the value
+# to None if you wish to use the local Invenio authentication method.
+# CFG_EXTERNAL_AUTH_DEFAULT -- set this to the key in CFG_EXTERNAL_AUTHENTICATION
+# that should be considered as default login method
+# CFG_EXTERNAL_AUTH_USING_SSO -- set this to the login method name of an SSO
+# login method, if any, otherwise set this to None.
+# CFG_EXTERNAL_AUTH_LOGOUT_SSO -- if CFG_EXTERNAL_AUTH_USING_SSO was not None
+# set this to the URL that should be contacted to perform an SSO logout
 
+from invenio.external_authentication_robot import ExternalAuthRobot
 if CFG_CERN_SITE:
-    if True:
-        import external_authentication_sso as ea_sso
-        CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
-        # Link to reach in order to logout from SSO
-        CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
-        CFG_EXTERNAL_AUTHENTICATION = {CFG_EXTERNAL_AUTH_USING_SSO : (ea_sso.ExternalAuthSSO(), True)}
-    else:
-        import external_authentication_cern as ea_cern
-        CFG_EXTERNAL_AUTHENTICATION = {"Local": (None, False), \
-        "CERN": (ea_cern.ExternalAuthCern(), True)}
+    import external_authentication_sso as ea_sso
+    CFG_EXTERNAL_AUTH_USING_SSO = "CERN"
+    CFG_EXTERNAL_AUTH_DEFAULT = CFG_EXTERNAL_AUTH_USING_SSO
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO = 'https://login.cern.ch/adfs/ls/?wa=wsignout1.0'
+    CFG_EXTERNAL_AUTHENTICATION = {
+        CFG_EXTERNAL_AUTH_USING_SSO : ea_sso.ExternalAuthSSO(),
+    }
+elif CFG_OPENAIRE_SITE:
+    CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
+    CFG_EXTERNAL_AUTH_USING_SSO = False
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+    CFG_EXTERNAL_AUTHENTICATION = {
+    "Local": None,
+    "OpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
+    "ZOpenAIRE": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+    }
+else:
+    CFG_EXTERNAL_AUTH_DEFAULT = 'Local'
+    CFG_EXTERNAL_AUTH_USING_SSO = False
+    CFG_EXTERNAL_AUTH_LOGOUT_SSO = None
+    CFG_EXTERNAL_AUTHENTICATION = {
+    "Local": None,
+    "Robot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=False),
+    "ZRobot": ExternalAuthRobot(enforce_external_nicknames=True, use_zlib=True)
+    }
+
 
 # default data for the add_default_settings function
 # Note: by default the definition is set to deny any. This won't be a problem
@@ -114,7 +134,7 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
 
 # Demo site roles
 DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
-                  ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"\nallow apache_group "theses"'),
+                  ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"'),
                   ('thesescurator', 'Theses collection curator', 'deny any'),
                   ('referee_DEMOBOO_*', 'Book collection curator', 'deny any'),
                   ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'),
@@ -154,6 +174,7 @@ DEF_ACTIONS = (
                ('cfgoairepository', 'configure OAI Repository', '', 'no'),
                ('cfgbibindex', 'configure BibIndex', '', 'no'),
                ('cfgbibexport', 'configure BibExport', '', 'no'),
+               ('cfgrobotkeys', 'configure Robot keys', 'login_method,robot', 'yes'),
                ('runbibindex', 'run BibIndex', '', 'no'),
                ('runbibupload', 'run BibUpload', '', 'no'),
                ('runwebcoll', 'run webcoll', 'collection', 'yes'),
