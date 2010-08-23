@@ -113,7 +113,9 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBSUBMIT_STORAGEDIR, \
     CFG_BIBDOCFILE_USE_XSENDFILE, \
     CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY, \
-    CFG_SITE_RECORD
+    CFG_SITE_RECORD, \
+    CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS
+
 from invenio.websubmit_config import CFG_WEBSUBMIT_ICON_SUBFORMAT_RE, \
     CFG_WEBSUBMIT_DEFAULT_ICON_SUBFORMAT
 import invenio.template
@@ -145,6 +147,9 @@ CFG_BIBDOCFILE_AVAILABLE_FLAGS = (
 
 #: constant used if FFT correct with the obvious meaning.
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
+
+_CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS = [(re.compile(regex), headers)
+        for regex, headers in CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS]
 
 _mimes = MimeTypes(strict=False)
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
@@ -199,6 +204,12 @@ _extensions = _generate_extensions()
 class InvenioWebSubmitFileError(Exception):
     """
     Exception raised in case of errors related to fulltext files.
+    """
+    pass
+
+class InvenioBibdocfileUnauthorizedURL(Exception):
+    """
+    Exception raised when one tries to download an unauthorized external URL.
     """
     pass
 
@@ -315,7 +326,10 @@ def guess_format_from_url(url):
     else:
         ## Since the URL is remote, let's try to perform a HEAD request
         ## and see the corresponding headers
-        info = urllib2.urlopen(url).info()
+        try:
+            info = open_url(url).info()
+        except InvenioBibdocfileUnauthorizedURL:
+            return ""
         content_disposition = info.getheader('Content-Disposition')
         if content_disposition:
             filename = parse_content_disposition(content_disposition)
@@ -3441,7 +3455,10 @@ def check_valid_url(url):
                     return
             raise StandardError, "%s is not in one of the allowed paths." % path
         else:
-            urllib2.urlopen(url)
+            try:
+                open_url(url)
+            except InvenioBibdocfileUnauthorizedURL, e:
+                raise StandardError, str(e)
     except Exception, e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
@@ -3462,7 +3479,7 @@ def download_url(url, format=None, sleep=2):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
     if format is None:
-        format = decompose_file(url)[2]
+        format = guess_format_from_url(url)
     else:
         format = normalize_format(format)
     protocol = urllib2.urlparse.urlsplit(url)[0]
@@ -3483,7 +3500,7 @@ def download_url(url, format=None, sleep=2):
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
                 try:
-                    from_file = urllib2.urlopen(url)
+                    from_file = open_url(url)
                     to_file = open(tmppath, 'w')
                     while True:
                         block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
@@ -3492,6 +3509,8 @@ def download_url(url, format=None, sleep=2):
                         to_file.write(block)
                     to_file.close()
                     from_file.close()
+                except InvenioBibdocfileUnauthorizedURL, e:
+                    raise StandardError, str(e)
                 except Exception, e:
                     raise StandardError, "Error when downloading %s into %s: %s" % (url, tmppath, e)
                 if os.path.getsize(tmppath) > 0:
@@ -3805,3 +3824,28 @@ def readfile(filename):
         return open(filename).read()
     except Exception:
         return ''
+
+def open_url(url):
+    """
+    Opens a URL. Checks if the URL is present in
+    CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS and uses the headers specified in
+    the config variable.
+
+    @param url: the URL to open
+    @type url: string
+    @return: a file-like object as returned by urllib2.urlopen.
+    """
+    headers_to_use = None
+
+    for regex, headers in _CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS:
+        if regex.match(url) is not None:
+            headers_to_use = headers
+            break
+
+    if headers_to_use is None:
+        # URL is not allowed.
+        raise InvenioBibdocfileUnauthorizedURL, "%s is not an authorized " \
+                "external URL." % url
+    else:
+        request = urllib2.Request(url, headers=headers_to_use)
+        return urllib2.urlopen(request)
