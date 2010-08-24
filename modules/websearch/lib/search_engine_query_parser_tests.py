@@ -331,8 +331,7 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self.assertEqual(fin_result, find_result)
 
     def test_distribution_of_search_terms(self):
-        """ SPIRES search syntax - find t this and not that ->title:this and not title:that"""
-
+        """SPIRES search syntax - find t this and not that ->title:this and not title:that"""
         spi_search = "find t this and not that"
         inv_search = "title:this and not title:that"
         self._compare_searches(inv_search, spi_search)
@@ -344,7 +343,15 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "affiliation:SLAC and affiliation:Stanford"
         self._compare_searches(inv_search, spi_search)
 
-TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, TestSpiresToInvenioSyntaxConverter)
+    def test_keyword_as_kw(self):
+        """SPIRES search syntax - find kw something ->keyword:something"""
+        spi_search = "find kw meson"
+        inv_search = "keyword:meson"
+        self._compare_searches(inv_search, spi_search)
+
+
+TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser,
+                             TestSpiresToInvenioSyntaxConverter)
 
 
 if __name__ == "__main__":

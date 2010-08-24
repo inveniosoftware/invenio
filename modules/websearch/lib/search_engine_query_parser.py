@@ -477,6 +477,7 @@ class SpiresToInvenioSyntaxConverter:
         # keywords
         'k' : 'keyword:',
         'keywords' : 'keyword:',
+        'kw' : 'keyword:',
         # note
         'note' : '500__a:',
         'n' : '500__a:',
