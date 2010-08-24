@@ -149,17 +149,18 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def loan_on_desk_step4(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/loan_on_desk_step5"""
-        argd = wash_urlargd(form, {'list_of_books': (str, None), 'user_info': (str, None), 'due_date': (str, None), 'note': (str, None), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'list_of_books': (str, None), 'user_info': (str, None), 'datepickerhidden': (str, None), 'note': (str, None), 'ln': (str, "en")})
         list_of_books = argd['list_of_books']
         user_info = argd['user_info']
-        due_date = argd['due_date']
+        due_date = argd['datepickerhidden']
         note = argd['note']
         ln = argd['ln']
 
         user_info = eval(user_info)
 
         list_of_books = eval(list_of_books)
-        due_date = wash_url_argument(due_date, 'list')
+        due_date = due_date.split(',')
+        #due_date = wash_url_argument(due_date, 'list')
 
 
         return bal.loan_on_desk_step4(req, list_of_books, user_info,
@@ -1216,7 +1217,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def register_ill_request_with_no_recid_step2(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
-        argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None), 'place': (str, None), 'publisher': (str, None), 'year': (str, None), 'edition': (str, None), 'isbn': (str, None), 'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None), 'additional_comments': (str, None), 'only_edition': (str, 'No'), 'key': (str, None), 'string': (str, None), 'borrower_id': (str, None), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None), 'place': (str, None), 'publisher': (str, None), 'year': (str, None), 'edition': (str, None), 'isbn': (str, None), 'budget_code': (str,None), 'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None), 'additional_comments': (str, None), 'only_edition': (str, 'No'), 'key': (str, None), 'string': (str, None), 'borrower_id': (str, None), 'ln': (str, "en")})
         title = argd['title']
         authors = argd['authors']
         place = argd['place']
@@ -1224,6 +1225,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         year = argd['year']
         edition = argd['edition']
         isbn = argd['isbn']
+        budget_code = argd['budget_code']
         period_of_interest_from = argd['period_of_interest_from']
         period_of_interest_to = argd['period_of_interest_to']
         additional_comments = argd['additional_comments']
@@ -1236,7 +1238,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         ln = argd['ln']
 
         return bal.register_ill_request_with_no_recid_step2(req, title, authors, place,
-                                                            publisher, year, edition, isbn, period_of_interest_from,
+                                                            publisher, year, edition, isbn, budget_code, period_of_interest_from,
                                                             period_of_interest_to, additional_comments,
                                                             only_edition, key, string, borrower_id, ln)
 
@@ -1398,7 +1400,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
     def register_ill_article_request_step2(self, req, form):
         """http://cdsweb.cern.ch/admin2/bibcirculation/register_ill_request_with_no_recid_step2"""
-        argd = wash_urlargd(form, {'periodical_title': (str, None), 'article_title': (str, None), 'author': (str, None), 'report_number': (str, None), 'volume': (str, None), 'issue': (str, None), 'page': (str, None), 'year': (str, None), 'issn': (str, None), 'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None), 'additional_comments': (str, None), 'key': (str, None), 'string': (str, None), 'ln': (str, "en")})
+        argd = wash_urlargd(form, {'periodical_title': (str, None), 'article_title': (str, None), 'author': (str, None), 'report_number': (str, None), 'volume': (str, None), 'issue': (str, None), 'page': (str, None), 'year': (str, None), 'budget_code': (str, None), 'issn': (str, None), 'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None), 'additional_comments': (str, None), 'key': (str, None), 'string': (str, None), 'ln': (str, "en")})
         periodical_title = argd['periodical_title']
         article_title = argd['article_title']
         author = argd['author']
@@ -1407,6 +1409,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         issue = argd['issue']
         page = argd['page']
         year = argd['year']
+        budget_code = argd['budget_code']
         issn = argd['issn']
         period_of_interest_from = argd['period_of_interest_from']
         period_of_interest_to = argd['period_of_interest_to']
@@ -1416,7 +1419,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         ln = argd['ln']
 
         return bal.register_ill_article_request_step2(req, periodical_title, article_title, author, report_number,
-                                                      volume, issue, page, year, issn,
+                                                      volume, issue, page, year, budget_code, issn,
                                                       period_of_interest_from, period_of_interest_to,
                                                       additional_comments, key, string, ln)
 

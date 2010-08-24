@@ -44,7 +44,7 @@ def search_user(column, string):
             try:
                 result = db.search_borrower_by_ccid(int(string))
             except:
-                result= ()
+                result = ()
 
             if result == ():
                 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
@@ -52,7 +52,12 @@ def search_user(column, string):
                 ldap_info = 'busy'
                 while ldap_info == 'busy':
                     time.sleep(1)
-                    ldap_info = get_user_info_from_ldap(ccid=string)
+                    if column == 'id':
+                        ldap_info = get_user_info_from_ldap(ccid=string)
+                    elif column == 'email':
+                        ldap_info = get_user_info_from_ldap(email=string)
+                    else:
+                        ldap_info = get_user_info_from_ldap(nickname=string)
 
                 if len(ldap_info) == 0:
                     result = ()
@@ -686,14 +691,17 @@ def all_copies_are_missing(recid):
 
     copies_status = db.get_copies_status(recid)
     number_of_missing = 0
-    for (status) in copies_status:
-        if status == 'missing':
-            number_of_missing += 1
-
-    if number_of_missing == len(copies_status):
+    if copies_status == None:
         return True
     else:
-        return False
+        for (status) in copies_status:
+            if status == 'missing':
+                number_of_missing += 1
+
+        if number_of_missing == len(copies_status):
+            return True
+        else:
+            return False
 
 def has_copies(recid):
     """

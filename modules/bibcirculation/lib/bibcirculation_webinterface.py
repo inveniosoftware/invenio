@@ -41,6 +41,7 @@ from invenio.search_engine import create_navtrail_links, \
      record_exists
 from invenio.urlutils import redirect_to_url, \
                              make_canonical_urlargd
+
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
@@ -52,6 +53,9 @@ websearch_templates = invenio.template.load('websearch')
 
 # bibcirculation imports
 bibcirculation_templates = invenio.template.load('bibcirculation')
+import invenio.bibcirculation_dblayer as db
+
+from invenio.bibcirculation_utils import search_user
 from invenio.bibcirculation import perform_new_request, \
                                    perform_new_request_send, \
                                    perform_get_holdings_information, \
@@ -171,15 +175,16 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
     """Defines the set of /ill pages."""
 
 
-    _exports = ['', 'display', 'register_request']
+    _exports = ['', 'register_request', 'book_request_step1','book_request_step2','book_request_step3',
+                'article_request_step1', 'article_request_step2', 'article_request_step3']
 
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/ill/display?%s" % (CFG_SITE_URL,
+        redirect_to_url(req, "%s/ill/book_request_step1?%s" % (CFG_SITE_URL,
                                                           req.args))
 
-    def display(self, req, form):
+    def book_request_step1(self, req, form):
         """
         Displays all loans of a given user
         @param ln:  language
@@ -191,14 +196,14 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         # Check if user is logged
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "%s/ill/display" % \
+            return page_not_authorized(req, "%s/ill/book_request_step1" % \
                                        (CFG_SITE_URL,),
                                        navmenuid="ill")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
-                    'referer' : "%s/ill/display%s" % (
+                    'referer' : "%s/ill/book_request_step1%s" % (
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})), norobot=True)
@@ -210,7 +215,265 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use ill."))
 
-        body = display_ill_form(ln=argd['ln'])
+
+        ### get borrower_id ###
+        borrower_id = search_user('email',user_info['email'])
+        if borrower_id == ():
+            body = "wrong user id"
+        else:
+            body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1([], None, False, argd['ln'])
+        #body = display_ill_form(ln=argd['ln'])
+
+        return page(title       = _("Interlibrary loan request for books"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def book_request_step2(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None),
+            'place': (str, None), 'publisher': (str, None), 'year': (str, None),
+            'edition': (str, None), 'isbn': (str, None), 'budget_code': (str, None),
+            'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
+            'additional_comments': (str, None), 'only_edition': (str, 'No'),'ln': (str, "en")})
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/book_request_step2" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/book_request_step2%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use ill."))
+
+        borrower_id = search_user('email',user_info['email'])
+        if borrower_id != ():
+            borrower_id = borrower_id[0][0]
+
+            book_info = (argd['title'], argd['authors'], argd['place'], argd['publisher'],
+                         argd['year'], argd['edition'], argd['isbn'])
+            user_info = db.get_borrower_data_by_id(borrower_id)
+
+            request_details = (argd['budget_code'], argd['period_of_interest_from'],
+                               argd['period_of_interest_to'], argd['additional_comments'],
+                               argd['only_edition'])
+            body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(book_info, user_info, request_details, False, argd['ln'])
+
+        else:
+            body = "wrong user id"
+
+        return page(title       = _("Interlibrary loan request for books"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def book_request_step3(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+        argd = wash_urlargd(form, {'book_info': (str, None), 'user_info': (str, None), 'request_details': (str, None), 'ln': (str, "en")})
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/book_request_step2" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/book_request_step2%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use ill."))
+
+        book_info = argd['book_info']
+        user_info = argd['user_info']
+        request_details = argd['request_details']
+        ln = argd['ln']
+
+        if type(book_info) is str:
+            book_info = eval(book_info)
+
+        if type(request_details) is str:
+            request_details = eval(request_details)
+
+        if type(user_info) is str:
+            user_info = eval(user_info)
+
+        (title, authors, place, publisher, year, edition, isbn) = book_info
+        #create_ill_record(book_info)
+
+        book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
+                 'year' : year,  'edition': edition, 'isbn' : isbn}
+
+        (budget_code, period_of_interest_from, period_of_interest_to,
+            library_notes, only_edition) = request_details
+
+        borrower_id = user_info[0]
+
+        ill_request_notes = {}
+        if library_notes:
+            ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+
+        ### budget_code ###
+        db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
+                                    period_of_interest_to, 'new',
+                                    str(ill_request_notes), only_edition, 'book')
+
+        infos=[]
+        infos.append('Interlibrary loan request done.')
+        body = bibcirculation_templates.tmpl_infobox(infos, ln)
+
+        return page(title       = _("Interlibrary loan request for books"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def article_request_step1(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {})
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/article_request_step1" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/article_request_step1%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use ill."))
+
+
+        ### get borrower_id ###
+        borrower_id = search_user('email',user_info['email'])
+        if borrower_id == ():
+            body = "Wrong user id"
+        else:
+            body = bibcirculation_templates.tmpl_register_ill_article_request_step1([], False, argd['ln'])
+
+
+        return page(title       = _("Interlibrary loan request for books"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "ill")
+
+    def article_request_step2(self, req, form):
+        """
+        Displays all loans of a given user
+        @param ln:  language
+        @return the page for inbox
+        """
+
+        argd = wash_urlargd(form, {'periodical_title': (str, None), 'article_title': (str, None),
+            'author': (str, None), 'report_number': (str, None), 'volume': (str, None),
+            'issue': (str, None), 'page': (str, None), 'year': (str, None), 'budget_code': (str, None),
+            'issn': (str, None), 'period_of_interest_from': (str, None),
+            'period_of_interest_to': (str, None), 'additional_comments': (str, None),
+            'key': (str, None), 'string': (str, None), 'ln': (str, "en")})
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/ill/article_request_step2" % \
+                                       (CFG_SITE_URL,),
+                                       navmenuid="ill")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/ill/article_request_step2%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})), norobot=True)
+
+        _ = gettext_set_language(argd['ln'])
+
+        user_info = collect_user_info(req)
+        if not user_info['precached_useloans']:
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to use ill."))
+
+        borrower_id = search_user('email',user_info['email'])
+        if borrower_id != ():
+            borrower_id = borrower_id[0][0]
+
+            ill_request_notes = {}
+            if library_notes:
+                ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+
+            item_info = {'periodical_title': argd['periodical_title'],
+                'title': argd['article_title'], 'authors': argd['author'], 'place': "",
+                'publisher': "", 'year' : argd['year'], 'edition': "", 'issn' : argd['issn'],
+                'volume': argd['volume'] }
+
+            ### budget_code ###
+            db.ill_register_request_on_desk(borrower_id, item_info, argd['period_of_interest_from'],
+                                    argd['period_of_interest_to'], 'new',
+                                    str(ill_request_notes), 'No', 'article')
+
+            infos=[]
+            infos.append('Interlibrary loan request done.')
+            body = bibcirculation_templates.tmpl_infobox(infos, argd['ln'])
+
+        else:
+            body = "Wrong user id"
 
         return page(title       = _("Interlibrary loan request for books"),
                     body        = body,
@@ -227,7 +490,6 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         @param ln:  language
         @return the page for inbox
         """
-
 
         argd = wash_urlargd(form, {'ln': (str, ""),
                                    'title': (str, ""),

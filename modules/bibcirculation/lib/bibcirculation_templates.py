@@ -2189,10 +2189,28 @@ class Template:
         out += """
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+            <script type="text/javascript" language='JavaScript'>
+            function groupDatePicker(){
+                var index = 0;
+        	var datepicker = null;
+                var datepickerhidden = this.document.getElementById("datepickerhidden")
+                    do{
+    		datepicker = this.document.getElementById("date_picker"+index)
+		if(datepicker != null){
+                    if (index != 0){
+                        datepickerhidden.value += ",";
+                    }
+		    datepickerhidden.value += datepicker.value ;
+    		}
+		index = index + 1;
+            }while(datepicker != null);
+            }
+            </script>
             <form name="step3_form" action="%s/admin2/bibcirculation/loan_on_desk_step4" method="get" >
               <br />
               <br />
               <input type=hidden name="list_of_books" value="%s">
+              <input type=hidden name="datepickerhidden" id="datepickerhidden"  value="">
               <table class="bibcirctable">
                           <tr>
                                <td class="bibcirctableheader">%s</td>
@@ -2260,7 +2278,7 @@ class Template:
                         _("Due date"), _("Write note(s)"))
 
 
-        iterator = 1
+        iterator = 0
 
         for (recid, barcode, library_id, location) in list_of_books:
 
@@ -2280,15 +2298,15 @@ class Template:
                             $("%s").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
                         });
                     </script>
-                    <input type="text" size="12" id="%s" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
+                    <input type="text" size="12" id="%s" name="%s" value="%s" style='border: 1px solid #cfcfcf'>
 
                     </td>
                   <td ><textarea name='note' rows="1" cols="40" style='border: 1px solid #cfcfcf'></textarea></td>
                 </tr>
                 """ % (book_title_from_MARC(recid), barcode,
-                       library_name, location,
-                        "#date_picker" + str(iterator), CFG_SITE_URL ,"date_picker" + str(iterator),due_date)
-
+                       library_name, location, "#date_picker"+str(iterator),
+                       CFG_SITE_URL ,"date_picker"+str(iterator),
+                       'due_date'+str(iterator), due_date)
 
             iterator += 1
 
@@ -2303,7 +2321,7 @@ class Template:
                        onClick="history.go(-1)" class="formbutton">
 
                        <input type="submit"
-                       value=%s class="formbutton">
+                       value=%s class="formbutton" onmousedown="groupDatePicker();">
 
                        <input type=hidden name="user_info" value="%s">
                   </td>
@@ -3654,7 +3672,7 @@ class Template:
                </tr>
 
             """ % (CFG_SITE_URL,
-                   display_id,
+                   borrower_id,
                    _("Personal details"),
                    id_string, display_id,
                    _("Name"), name,
@@ -10909,175 +10927,175 @@ class Template:
         return out
 
 
-    def tmpl_display_ill_form(self, infos, ln=CFG_SITE_LANG):
-        """
-        @param infos: informations
-        @type infos: list
-        """
-
-        _ = gettext_set_language(ln)
-
-        out = self.tmpl_infobox(infos, ln)
-
-        out += """
-           <div align="center">
-           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s/ill/register_request" method="get">
-                <table class="bibcirctable">
-                  <tr align="center">
-                    <td class="bibcirctableheader" width="10">%s</td>
-                  </tr>
-                </table>
-                <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-                  <tr>
-                        <th width="100">%s</th>
-                        <td>
-                          <input type="text" size="45" name="title" style='border: 1px solid #cfcfcf'>
-                        </td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>
-                          <input type="text" size="45" name="authors" style='border: 1px solid #cfcfcf'>
-                        </td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>
-                          <input type="text" size="30" name="place" style='border: 1px solid #cfcfcf'>
-                        </td>
-                         </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>
-                          <input type="text" size="30" name="publisher" style='border: 1px solid #cfcfcf'>
-                        </td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>
-                          <input type="text" size="30" name="year" style='border: 1px solid #cfcfcf'>
-                        </td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>
-                          <input type="text" size="30" name="edition" style='border: 1px solid #cfcfcf'>
-                        </td>
-                     </tr>
-                     <tr>
-                        <th width="100">%s</th>
-                        <td>
-                          <input type="text" size="30" name="isbn" style='border: 1px solid #cfcfcf'>
-                        </td>
-                     </tr>
-                </table>
-
-
-           <br />
-
-           """  % (CFG_SITE_URL,
-                   _("Item details"),
-                   _("Title"),
-                   _("Author(s)"),
-                   _("Place"),
-                   _("Publisher"),
-                   _("Year"),
-                   _("Edition"),
-                   _("ISBN"))
-
-
-
-        conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
-
-        out += """
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
-        <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
-        <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
-
-             <table class="bibcirctable">
-                <tr align="center">
-                     <td class="bibcirctableheader">%s</td>
-                </tr>
-             </table>
-             <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-               <tr>
-                <th width="150">%s</th>
-                <td>
-                       <input type="text" size="12" id="%s" name="period_of_interest_from"
-                       value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
-                    </td>
-                </tr>
-                <tr>
-                <th width="150">%s</th>
-                <td>
-                       <input type="text" size="12" id="%s" name="period_of_interest_to"
-                       value="" style='border: 1px solid #cfcfcf'>
-                       <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
-                       onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
-                       >
-                       <script type="text/javascript" language='JavaScript'>
-                       Calendar.setup({
-                           inputField     :    '%s',
-                           ifFormat       :    '%%Y-%%m-%%d',
-                           button	  :    '%s'
-                           });
-                       </script>
-                    </td>
-                </tr>
-                <tr>
-                   <th valign="top" width="150">%s</th>
-                   <td><textarea name='additional_comments' rows="6" cols="30"
-                   style='border: 1px solid #cfcfcf'></textarea></td>
-                </tr>
-              </table>
-              <table class="bibcirctable">
-                <tr align="center">
-                  <td>
-                    <input name="conditions" type="checkbox" value="accepted" />%s</td>
-                </tr>
-                <tr align="center">
-                  <td>
-                    <input name="only_edition" type="checkbox" value="True" />%s</td>
-                </tr>
-             </table>
-             <br />
-             <table class="bibcirctable">
-                <tr align="center">
-                  <td>
-                       <input type=button value=%s
-                        onClick="history.go(-1)" class="formbutton">
-
-                       <input type="submit"
-                       value=%s class="formbutton">
-
-                  </td>
-                 </tr>
-             </table>
-             </form>
-             <br />
-             <br />
-             </div>
-             """ % (_("ILL request details"), _("Period of interest - From"), _("period_of_interest_from"),
-                    _("jsCal1"), _("period_of_interest_from"), _("jsCal1"),
-                    _("Period of interest - To"), _("period_of_interest_to"), _("jsCal2"), _("period_of_interest_to"), _("jsCal2"),
-                    _("Additional comments"),
-                    _("I accept the %s of the service in particular the return of books in due time." % (conditions_link)),
-                    _("I want this edition only."),
-                    _("Back"), _("Continue"))
-
-        return out
+    #def tmpl_display_ill_form(self, infos, ln=CFG_SITE_LANG):
+    #    """
+    #    @param infos: informations
+    #    @type infos: list
+    #    """
+    #
+    #    _ = gettext_set_language(ln)
+    #
+    #    out = self.tmpl_infobox(infos, ln)
+    #
+    #    out += """
+    #       <div align="center">
+    #       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
+    #       <form name="display_ill_form" action="%s/ill/register_request" method="get">
+    #            <table class="bibcirctable">
+    #              <tr align="center">
+    #                <td class="bibcirctableheader" width="10">%s</td>
+    #              </tr>
+    #            </table>
+    #            <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+    #              <tr>
+    #                    <th width="100">%s</th>
+    #                    <td>
+    #                      <input type="text" size="45" name="title" style='border: 1px solid #cfcfcf'>
+    #                    </td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td>
+    #                      <input type="text" size="45" name="authors" style='border: 1px solid #cfcfcf'>
+    #                    </td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td>
+    #                      <input type="text" size="30" name="place" style='border: 1px solid #cfcfcf'>
+    #                    </td>
+    #                     </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td>
+    #                      <input type="text" size="30" name="publisher" style='border: 1px solid #cfcfcf'>
+    #                    </td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td>
+    #                      <input type="text" size="30" name="year" style='border: 1px solid #cfcfcf'>
+    #                    </td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td>
+    #                      <input type="text" size="30" name="edition" style='border: 1px solid #cfcfcf'>
+    #                    </td>
+    #                 </tr>
+    #                 <tr>
+    #                    <th width="100">%s</th>
+    #                    <td>
+    #                      <input type="text" size="30" name="isbn" style='border: 1px solid #cfcfcf'>
+    #                    </td>
+    #                 </tr>
+    #            </table>
+    #
+    #
+    #       <br />
+    #
+    #       """  % (CFG_SITE_URL,
+    #               _("Item details"),
+    #               _("Title"),
+    #               _("Author(s)"),
+    #               _("Place"),
+    #               _("Publisher"),
+    #               _("Year"),
+    #               _("Edition"),
+    #               _("ISBN"))
+    #
+    #
+    #
+    #    conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
+    #
+    #    out += """
+    #    <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar.js"></script>
+    #    <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-setup.js"></script>
+    #    <script type="text/javascript" language='JavaScript' src="/jsCalendar/calendar-en.js"></script>
+    #    <style type="text/css"> @import url("/jsCalendar/calendar-blue.css"); </style>
+    #
+    #         <table class="bibcirctable">
+    #            <tr align="center">
+    #                 <td class="bibcirctableheader">%s</td>
+    #            </tr>
+    #         </table>
+    #         <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+    #           <tr>
+    #            <th width="150">%s</th>
+    #            <td>
+    #                   <input type="text" size="12" id="%s" name="period_of_interest_from"
+    #                   value="" style='border: 1px solid #cfcfcf'>
+    #                   <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
+    #                   onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
+    #                   >
+    #                   <script type="text/javascript" language='JavaScript'>
+    #                   Calendar.setup({
+    #                       inputField     :    '%s',
+    #                       ifFormat       :    '%%Y-%%m-%%d',
+    #                       button	  :    '%s'
+    #                       });
+    #                   </script>
+    #                </td>
+    #            </tr>
+    #            <tr>
+    #            <th width="150">%s</th>
+    #            <td>
+    #                   <input type="text" size="12" id="%s" name="period_of_interest_to"
+    #                   value="" style='border: 1px solid #cfcfcf'>
+    #                   <img src="/jsCalendar/jsCalendar.gif" alt="select period of interest" id="%s"
+    #                   onmouseover="this.style.background='red';" onmouseout="this.style.background=''"
+    #                   >
+    #                   <script type="text/javascript" language='JavaScript'>
+    #                   Calendar.setup({
+    #                       inputField     :    '%s',
+    #                       ifFormat       :    '%%Y-%%m-%%d',
+    #                       button	  :    '%s'
+    #                       });
+    #                   </script>
+    #                </td>
+    #            </tr>
+    #            <tr>
+    #               <th valign="top" width="150">%s</th>
+    #               <td><textarea name='additional_comments' rows="6" cols="30"
+    #               style='border: 1px solid #cfcfcf'></textarea></td>
+    #            </tr>
+    #          </table>
+    #          <table class="bibcirctable">
+    #            <tr align="center">
+    #              <td>
+    #                <input name="conditions" type="checkbox" value="accepted" />%s</td>
+    #            </tr>
+    #            <tr align="center">
+    #              <td>
+    #                <input name="only_edition" type="checkbox" value="True" />%s</td>
+    #            </tr>
+    #         </table>
+    #         <br />
+    #         <table class="bibcirctable">
+    #            <tr align="center">
+    #              <td>
+    #                   <input type=button value=%s
+    #                    onClick="history.go(-1)" class="formbutton">
+    #
+    #                   <input type="submit"
+    #                   value=%s class="formbutton">
+    #
+    #              </td>
+    #             </tr>
+    #         </table>
+    #         </form>
+    #         <br />
+    #         <br />
+    #         </div>
+    #         """ % (_("ILL request details"), _("Period of interest - From"), _("period_of_interest_from"),
+    #                _("jsCal1"), _("period_of_interest_from"), _("jsCal1"),
+    #                _("Period of interest - To"), _("period_of_interest_to"), _("jsCal2"), _("period_of_interest_to"), _("jsCal2"),
+    #                _("Additional comments"),
+    #                _("I accept the %s of the service in particular the return of books in due time." % (conditions_link)),
+    #                _("I want this edition only."),
+    #                _("Back"), _("Continue"))
+    #
+    #    return out
 
     def tmpl_list_ill_request(self, ill_req, ln=CFG_SITE_LANG):
         """
@@ -11325,9 +11343,6 @@ class Template:
             except KeyError:
                 book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
-            f=open("/tmp/item_info",'w')
-            f.write(str(item_info)+'\n')
-            f.close()
             if str(request_type) == 'book':
                 out += """
                 <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14313,7 +14328,7 @@ class Template:
 
         return out
 
-    def tmpl_register_ill_request_with_no_recid_step1(self, infos, borrower_id, ln=CFG_SITE_LANG):
+    def tmpl_register_ill_request_with_no_recid_step1(self, infos, borrower_id, admin=True, ln=CFG_SITE_LANG):
         """
         @param infos: informations
         @type infos: list
@@ -14321,19 +14336,31 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        if admin:
+            form_url = CFG_SITE_URL+'/admin2/bibcirculation/register_ill_request_with_no_recid_step2'
+        else:
+            form_url = CFG_SITE_URL+'/ill/book_request_step2'
+
+
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        if admin:
+            out += _MENU_
 
-        out += """
-        <br />
-        <br />
-          <div class="bibcircbottom" align="center">
-          <div class="bibcircinfoboxmsg"><strong>%s<br />%s</strong></div>
-          <br />
-          <br />
+            out += """
+            <br />
+            <br />
+              <div class="bibcircbottom" align="center">
+              <div class="bibcircinfoboxmsg"><strong>%s<br />%s</strong></div>
+              <br />
+              <br />
+            """ % (_("Book does not exists on CDS Invenio."),_("Please fill the following form."))
+
+        out+= """
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step2" method="get">
+           <form name="display_ill_form" action="%s" method="get">
+           """ % (form_url)
+        out+= """
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader">%s</td>
@@ -14388,9 +14415,7 @@ class Template:
 
            <br />
 
-           """  % (_("Book does not exists on CDS Invenio."),_("Please fill the following form."),
-                   CFG_SITE_URL,
-                   _("Item details"), borrower_id,
+           """  % (_("Item details"), borrower_id,
                    _("Book title"),
                    _("Author(s)"),
                    _("Place"),
@@ -14413,9 +14438,15 @@ class Template:
                 </tr>
              </table>
              <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-               <tr>
-                <th valign="center" width="100">%s</th>
-                <td valign="center" width="250">
+                <tr>
+                    <th width="100">%s</th>
+                    <td>
+                        <input type="text" size="30" name="budget_code" style='border: 1px solid #cfcfcf'>
+                    </td>
+                </tr>
+                <tr>
+                    <th valign="center" width="100">%s</th>
+                    <td valign="center" width="250">
 
                         <script type="text/javascript">
                              $(function() {
@@ -14427,7 +14458,7 @@ class Template:
                     </td>
                 </tr>
                 """% (CFG_SITE_URL, CFG_SITE_URL,
-                      _("ILL request details"),
+                      _("ILL request details"), _("Budget code"),
                       _("Period of interest (From)"),
                       CFG_SITE_URL,
                     datetime.date.today().strftime('%Y-%m-%d'))
@@ -14514,7 +14545,7 @@ class Template:
 
         (title, authors, place, publisher, year, edition, isbn) = book_info
 
-        (period_of_interest_from, period_of_interest_to,
+        (budget_code, period_of_interest_from, period_of_interest_to,
          additional_comments, only_edition)= request_details
 
         _ = gettext_set_language(ln)
@@ -14580,6 +14611,10 @@ class Template:
                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                         <tr>
                           <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=budget_code value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
                           <td>%s</td><input type=hidden name=period_of_interest_from value="%s">
                         </tr>
                         <tr>
@@ -14615,6 +14650,7 @@ class Template:
                             _("Edition"), edition, edition,
                             _("ISBN"), isbn, isbn,
                             _("ILL request details"),
+                            _("Budget code"), budget_code, budget_code,
                             _("Period of interest - From"), period_of_interest_from, period_of_interest_from,
                             _("Period of interest - To"), period_of_interest_to, period_of_interest_to,
                             _("Additional comments"), additional_comments, additional_comments,
@@ -14753,7 +14789,7 @@ class Template:
 
         return out
 
-    def tmpl_register_ill_request_with_no_recid_step3(self, book_info, user_info, request_details, ln):
+    def tmpl_register_ill_request_with_no_recid_step3(self, book_info, user_info, request_details, admin=True, ln=CFG_SITE_LANG):
         """
         @param book_info: book's informations
         @type book_info: tuple
@@ -14767,6 +14803,12 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        if admin:
+            form_url = CFG_SITE_URL+'/admin2/bibcirculation/register_ill_request_with_no_recid_step4'
+        else:
+            form_url = CFG_SITE_URL+'/ill/book_request_step3'
+
+
         (title, authors, place, publisher, year, edition, isbn) = book_info
 
         (borrower_id, ccid, name, email, phone, address, mailbox) = user_info
@@ -14777,15 +14819,18 @@ class Template:
             display_id=ccid
             id_string= _("CCID")
 
-        (period_of_interest_from, period_of_interest_to,
+        (budget_code, period_of_interest_from, period_of_interest_to,
          additional_comments, only_edition)= request_details
 
-        out = _MENU_
+
+        out = ""
+        if admin:
+            out += _MENU_
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-        <form name="step3_form1" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step4" method="get" >
+        <form name="step3_form1" action="%s" method="get" >
         <br />
                 <table class="bibcirctable">
                   <tr>
@@ -14827,12 +14872,27 @@ class Template:
                           <td>%s</td>
                         </tr>
                       </table>
+                      """ % (form_url, book_info, request_details,
+                            _("Item details"),
+                            _("Title"), title,
+                            _("Author(s)"), authors,
+                            _("Place"), place,
+                            _("Year"), year,
+                            _("Publisher"), publisher,
+                            _("Edition"), edition,
+                            _("ISBN"), isbn)
+
+        out+= """
                       <table>
                          <tr>
                            <td class="bibcirctableheader">%s</td>
                         </tr>
                        </table>
                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+                        <tr>
+                          <th width="100">%s</th>
+                          <td>%s</td>
+                        </tr>
                         <tr>
                           <th width="100">%s</th>
                           <td>%s</td>
@@ -14860,16 +14920,8 @@ class Template:
                          </tr>
                        </table>
                      </td>
-                     """ % (CFG_SITE_URL, book_info, request_details,
-                            _("Item details"),
-                            _("Title"), title,
-                            _("Author(s)"), authors,
-                            _("Place"), place,
-                            _("Year"), year,
-                            _("Publisher"), publisher,
-                            _("Edition"), edition,
-                            _("ISBN"), isbn,
-                            _("ILL request details"),
+                     """ % (_("ILL request details"),
+                            _("Budget code"), budget_code,
                             _("Period of interest (From)"), period_of_interest_from,
                             _("Period of interest (To)"), period_of_interest_to,
                             _("Additional comments"), additional_comments,
@@ -16165,7 +16217,7 @@ class Template:
 
         return out
 
-    def tmpl_register_ill_article_request_step1(self, infos, ln=CFG_SITE_LANG):
+    def tmpl_register_ill_article_request_step1(self, infos, admin=True, ln=CFG_SITE_LANG):
         """
         @param infos: informations
         @type infos: list
@@ -16173,10 +16225,14 @@ class Template:
 
         _ = gettext_set_language(ln)
 
+        if admin:
+            form_url = CFG_SITE_URL+'/admin2/bibcirculation/register_ill_article_request_step2'
+        else:
+            form_url = CFG_SITE_URL+'/ill/article_request_step2'
+
         out = self.tmpl_infobox(infos, ln)
-
-        out += _MENU_
-
+        if admin:
+            out += _MENU_
 
         out += """
         <br />
@@ -16185,7 +16241,7 @@ class Template:
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s/admin2/bibcirculation/register_ill_article_request_step2" method="get">
+           <form name="display_ill_form" action="%s" method="get">
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader" width="10">%s</td>
@@ -16257,7 +16313,7 @@ class Template:
 
            <br />
 
-           """  % (CFG_SITE_URL,
+           """  % (form_url,
                    _("Article details"),
                    _("Periodical title"),
                    _("Article title"),
@@ -16362,7 +16418,7 @@ class Template:
         (periodical_title, article_title, author, report_number,
          volume, issue, page, year, issn) = article_info
 
-        (period_of_interest_from, period_of_interest_to,
+        (period_of_interest_from, period_of_interest_to, budget_code,
          additional_comments)= request_details
 
         _ = gettext_set_language(ln)
@@ -16419,6 +16475,10 @@ class Template:
                         </tr>
                         <tr>
                           <th width="100">%s</th>
+                          <td>%s</td><input type=hidden name=budget_code value="%s">
+                        </tr>
+                        <tr>
+                          <th width="100">%s</th>
                           <td>%s</td><input type=hidden name=issn value="%s">
                         </tr>
                       </table>
@@ -16454,6 +16514,7 @@ class Template:
                             _("Issue"), issue, issue,
                             _("Page"), page, page,
                             _("Year"), year, year,
+                            _("Budget code"), budget_code, budget_code,
                             _("ISSN"), issn, issn,
                             _("ILL request details"),
                             _("Period of interest - From"), period_of_interest_from, period_of_interest_from,

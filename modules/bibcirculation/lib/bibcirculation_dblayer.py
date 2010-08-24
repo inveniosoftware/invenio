@@ -303,25 +303,25 @@ def new_hold_request(borrower_id, recid, barcode, date_from, date_to, status):
 
     return res
 
-def get_barcode(recid):
-    """
-    Get all the barcodes(copies) of a record(item).
-
-    @param recid: identify the record. Primary key of bibrec.
-    @type recid: int
-
-    @return list with barcode(s).
-    """
-
-    res = run_sql("""select barcode
-                     from crcITEM
-                     where id_bibrec=%s
-                  """, (recid, ))
-
-    if res:
-        return res[0][0]
-    else:
-        return None
+#def get_barcode(recid):
+#    """
+#    Get all the barcodes(copies) of a record(item).
+#
+#    @param recid: identify the record. Primary key of bibrec.
+#    @type recid: int
+#
+#    @return list with barcode(s).
+#    """
+#
+#    res = run_sql("""select barcode
+#                     from crcITEM
+#                     where id_bibrec=%s
+#                  """, (recid, ))
+#
+#    if res:
+#        return res[0][0]
+#    else:
+#        return None
 
 def get_due_date(barcode):
     """
@@ -1880,8 +1880,7 @@ def get_borrower_data_by_id(borrower_id):
     res = run_sql("""select id, ccid, name, email, phone,
                             address, mailbox
                        from crcBORROWER
-                      where id=%s""",
-                  (borrower_id, ))
+                      where id='%s'""" % (borrower_id))
 
     if res:
         return res[0]

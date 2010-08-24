@@ -776,10 +776,10 @@ def loan_on_desk_step4(req, list_of_books, user_info,
 
     infos = []
 
-    (_id, ccid, name, email, phone, address, mailbox) = user_info
+    (borrower_id, ccid, name, email, phone, address, mailbox) = user_info
 
     loaned_on = datetime.date.today()
-    is_borrower = db.is_borrower(email)
+    #is_borrower = db.is_borrower(email)
 
     #Check if one of the given items is on loan.
     on_loan = []
@@ -841,16 +841,16 @@ def loan_on_desk_step4(req, list_of_books, user_info,
                         navtrail=navtrail_previous_links,
                         lastupdated=__lastupdated__)
 
-    if is_borrower == 0:
-        db.new_borrower(ccid, name, email, phone, address, mailbox, '')
-        is_borrower = db.is_borrower(email)
+    #if is_borrower == 0:
+    #    db.new_borrower(ccid, name, email, phone, address, mailbox, '')
+    #    is_borrower = db.is_borrower(email)
 
     for i in range(len(list_of_books)):
         note_format = {}
         if note:
             note_format[time.strftime("%Y-%m-%d %H:%M:%S")] = str(note)
 
-        db.new_loan(is_borrower, list_of_books[i][0], list_of_books[i][1],
+        db.new_loan(borrower_id, list_of_books[i][0], list_of_books[i][1],
                     loaned_on, due_date[i], 'on loan', 'normal', note_format)
         db.update_item_status('on loan', list_of_books[i][1])
 
@@ -5217,7 +5217,7 @@ def register_ill_request_with_no_recid_step1(req, borrower_id, ln=CFG_SITE_LANG)
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos, borrower_id=borrower_id, ln=ln)
+    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos, borrower_id=borrower_id, admin=True, ln=ln)
 
     return page(title="Register ILL request",
                 uid=id_user,
@@ -5228,7 +5228,7 @@ def register_ill_request_with_no_recid_step1(req, borrower_id, ln=CFG_SITE_LANG)
                 lastupdated=__lastupdated__)
 
 def register_ill_request_with_no_recid_step2(req, title, authors, place,
-                                             publisher, year, edition, isbn, period_of_interest_from,
+                                             publisher, year, edition, isbn, budget_code, period_of_interest_from,
                                              period_of_interest_to, additional_comments,
                                              only_edition, key, string, borrower_id, ln=CFG_SITE_LANG):
     """
@@ -5241,7 +5241,7 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
 
     infos = []
     book_info = (title, authors, place, publisher, year, edition, isbn)
-    request_details = (period_of_interest_from, period_of_interest_to,
+    request_details = (budget_code, period_of_interest_from, period_of_interest_to,
                            additional_comments, only_edition)
 
     if borrower_id == None:
@@ -5329,6 +5329,7 @@ def register_ill_request_with_no_recid_step3(req, book_info, user_info, request_
     body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(book_info=book_info,
                                                                                   user_info=user_info,
                                                                                   request_details=request_details,
+                                                                                  admin=True,
                                                                                   ln=ln)
 
     return page(title="Register ILL request",
@@ -5353,15 +5354,16 @@ def register_ill_request_with_no_recid_step4(req, book_info, user_info, request_
     book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
                  'year' : year,  'edition': edition, 'isbn' : isbn}
 
-    (period_of_interest_from, period_of_interest_to,
+    (budget_code, period_of_interest_from, period_of_interest_to,
      library_notes, only_edition) = request_details
 
-    (borrower_id, _ccid, _name, _email, _phone, _address, _mailbox) = user_info
+    borrower_id = user_info[0]
 
     ill_request_notes = {}
     if library_notes:
         ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
 
+### budget_code ###
     db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
                                     period_of_interest_to, 'new',
                                     str(ill_request_notes), only_edition, 'book')
@@ -5732,6 +5734,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id, title, autho
         body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(book_info=book_info,
                                                                                   user_info=user_info,
                                                                                   request_details=request_details,
+                                                                                  admin=True,
                                                                                   ln=ln)
 
 
@@ -5783,10 +5786,9 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
 
 
 def register_ill_article_request_step2(req, periodical_title, article_title, author, report_number,
-                                       volume, issue, pages, year, issn,
+                                       volume, issue, pages, year, budget_code, issn,
                                        period_of_interest_from, period_of_interest_to,
                                        additional_comments, key, string, ln=CFG_SITE_LANG):
-
 
     infos = []
 
@@ -5794,7 +5796,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         infos.append('Empty string. Please, try again.')
         article_info = (periodical_title, article_title, author, report_number,
                         volume, issue, pages, year, issn)
-        request_details = (period_of_interest_from, period_of_interest_to,
+        request_details = (period_of_interest_from, period_of_interest_to, budget_code,
                            additional_comments)
 
         body = bibcirculation_templates.tmpl_register_ill_article_request_step2(article_info=article_info,
@@ -5804,7 +5806,6 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
                                                                                 string=string,
                                                                                 infos=infos,
                                                                                 ln=ln)
-
 
         navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -5824,81 +5825,15 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
-    list_infos = []
+    result = search_user(key, string)
+    borrowers_list = []
 
-    if CFG_CERN_SITE == 1:
-        if key =='ccid' and string:
-
-            result = db.get_borrower_data_by_id(string)
-
-            ###if result ==
-
-            from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
-            result = get_user_info_from_ldap(ccid=string)
-
-            try:
-                name = result['cn'][0]
-            except:
-                name = ""
-
-            try:
-                ccid = result['employeeID'][0]
-            except:
-                ccid = ""
-
-            try:
-                email = result['mail'][0]
-            except:
-                email = ""
-
-            try:
-                phone = result['telephoneNumber'][0]
-            except:
-                phone = ""
-
-            try:
-                address = result['physicalDeliveryOfficeName'][0]
-            except:
-                address = ""
-
-            try:
-                mailbox = result['postOfficeBox'][0]
-            except:
-                mailbox = ""
-
-            tup = (ccid, name, email, phone, address, mailbox)
-            list_infos.append(tup)
-
-        elif key =='name' and string:
-            result = db.get_borrower_data_by_name(string)
-
-            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
-                list_infos.append(tup)
-
-        elif key =='email' and string:
-            result = db.get_borrower_data_by_email(string)
-
-            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
-                tup = (borrower_id, ccid, name, email, phone, address, mailbox)
-                list_infos.append(tup)
-        else:
-            result = list_infos
-
+    if len(result) == 0 and key:
+        infos.append("0 borrowers found. Search by CCID")
     else:
-        if key =='name' and string:
-            result = db.get_borrower_data_by_name(string)
-
-        elif key =='email' and string:
-            result = db.get_borrower_data_by_email(string)
-
-        else:
-            result = db.get_borrower_data_by_id(string)
-
-        for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
-            tup = (borrower_id, ccid, name, email, phone, address, mailbox)
-            list_infos.append(tup)
-
+        for user in result:
+            borrower_data = db.get_borrower_data_by_id(user[0])
+            borrowers_list.append(borrower_data)
 
     if validate_date_format(period_of_interest_from) is False:
         infos = []
@@ -5920,12 +5855,12 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         article_info = (periodical_title, article_title, author, report_number,
                         volume, issue, pages, year, issn)
 
-        request_details = (period_of_interest_from, period_of_interest_to,
+        request_details = (period_of_interest_from, period_of_interest_to, budget_code,
                            additional_comments)
 
         body = bibcirculation_templates.tmpl_register_ill_article_request_step2(article_info=article_info,
                                                                                 request_details=request_details,
-                                                                                result=list_infos,
+                                                                                result=borrowers_list,
                                                                                 key=key,
                                                                                 string=string,
                                                                                 infos=infos,
@@ -5960,8 +5895,8 @@ def register_ill_article_request_step3(req, item_info, user_info, request_detail
         return mustloginpage(req, auth_message)
 
     (periodical_title, title, authors, _report_number, volume, issue, page_number, year, issn) = item_info
-    volume = volume + ', '+ issue + ', '+ page_number
 
+    volume = volume + ', '+ issue + ', '+ page_number
     info = (title, authors, "", "", year, "", issn)
 
     create_ill_record(info)
@@ -5970,7 +5905,7 @@ def register_ill_article_request_step3(req, item_info, user_info, request_detail
                  'year' : year,  'edition': "", 'issn' : issn, 'volume': volume }
 
 
-    (period_of_interest_from, period_of_interest_to,
+    (period_of_interest_from, period_of_interest_to, budget_code,
      library_notes) = request_details
 
     only_edition = ""
@@ -5980,6 +5915,9 @@ def register_ill_article_request_step3(req, item_info, user_info, request_detail
     ill_request_notes = {}
     if library_notes:
         ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+
+
+### budget_code ###
 
     db.ill_register_request_on_desk(borrower_id, item_info, period_of_interest_from,
                                     period_of_interest_to, 'new',

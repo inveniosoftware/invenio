@@ -165,6 +165,12 @@ except:
     WebInterfaceYourLoansPages = WebInterfaceDumbPages
 
 try:
+    from invenio.bibcirculation_webinterface import WebInterfaceILLPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceILLPages = WebInterfaceDumbPages
+
+try:
     from invenio.webjournal_webinterface import WebInterfaceJournalPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
@@ -231,6 +237,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'yourbaskets',
         'yourmessages',
         'yourloans',
+        'ill',
         'yourgroups',
         'yourtickets',
         'comments',
@@ -261,6 +268,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     yourbaskets = WebInterfaceYourBasketsPages()
     yourmessages = WebInterfaceYourMessagesPages()
     yourloans = WebInterfaceYourLoansPages()
+    ill = WebInterfaceILLPages()
     yourgroups = WebInterfaceYourGroupsPages()
     yourtickets = WebInterfaceYourTicketsPages()
     comments = WebInterfaceCommentsPages()
