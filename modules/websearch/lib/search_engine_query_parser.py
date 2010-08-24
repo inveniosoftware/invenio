@@ -589,10 +589,8 @@ class SpiresToInvenioSyntaxConverter:
         # are searched)and the operator preceding the term. In case that the
         # names of the groups defined in the expression are changed, the
         # chagned should be reflected in the code that use it.
-        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:)(?P<search_content>.*?(\b|\'|\"|\/))(?= and | or | not |$)', re.IGNORECASE)
-
-        # regular expression used to split string by white space as separator
-        self._re_split_pattern = re.compile(r'\s*')
+        #self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:)(?P<search_content>.*?(\b|\'|\"|\/))(?= and | or | not |$)', re.IGNORECASE)
+        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:)(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression matching date after pattern
         self._re_date_after_match = re.compile(r'\b(d|date)\b\s*(after|>)\s*(?P<year>\d{4})\b', re.IGNORECASE)
@@ -808,41 +806,40 @@ class SpiresToInvenioSyntaxConverter:
         author: ellis or title:THESE THREE WORDS it is exoanded to
         author:ellis or (title: THESE and title:THREE...)
 
+        Not all the search terms are expanded this way, but only title: and
+        keyword: - see _re_search_term_pattern_match for details.
+        """
 
-        For a combining operator "and" is used though FIXME this is not
-        correct, it should really be calculated by boolean expansion of parens.
-
-
-        Not all the search terms are expanded this way, but only a short
-        list of them"""
-
-        def create_replacement_pattern(match):
+        def create_replacements(term, content):
             result = ''
-            search_term = match.group('search_term')
-            combine_operator = match.group('combine_operator')
-            search_content = match.group('search_content').strip()
-
+            content = content.strip()
 
             # replace spaces within quotes by __SPACE__ temporarily:
-            search_content = self._re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", search_content)
-            search_content = self._re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", search_content)
-            search_content = self._re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", search_content)
+            content = self._re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", content)
+            content = self._re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", content)
+            content = self._re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", content)
 
-            words = self._re_split_pattern.split(search_content)
+            words = content.split()
             if len(words) > 1:
-                #FIXME this will break if it happens to be nested.
-                result = combine_operator + ' (' + search_term + words[0]
+                result = '(' + term + words[0]
                 for word in words[1:]:
-                    result =  result + ' and ' + search_term + word
-                result = result + ') '
+                    result += ' and ' + term + word
+                result += ')'
             else:
-                result = combine_operator + ' ' + search_term + words[0]
+                result = term + words[0]
             # replace back __SPACE__ by spaces:
             result = self._re_pattern_space.sub(" ", result)
             return result.strip()
 
-        query = self._re_search_term_pattern_match.sub(create_replacement_pattern, query)
-        return query
+        result = ''
+        current_position = 0
+        for match in self._re_search_term_pattern_match.finditer(query):
+            result += query[current_position : match.start()]
+            result += ' ' + match.group('combine_operator') + ' '
+            result += create_replacements(match.group('search_term'), match.group('search_content'))
+            current_position = match.end()
+        result += query[current_position : len(query)]
+        return result.strip()
 
     def _convert_spires_truncation_to_invenio_truncation(self, query):
         """Replace SPIRES truncation symbol # with invenio trancation symbol *"""

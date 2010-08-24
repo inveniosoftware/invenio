@@ -330,7 +330,7 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         # return [] twice.  Unlikely though.
         self.assertEqual(fin_result, find_result)
 
-    def test_distribution_of_search_terms(self):
+    def test_distribution_of_notted_search_terms(self):
         """SPIRES search syntax - find t this and not that ->title:this and not title:that"""
         spi_search = "find t this and not that"
         inv_search = "title:this and not title:that"
@@ -354,6 +354,37 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find dk \"B --> pi pi\""
         inv_search = "695__a:\"B --> pi pi\""
         self._compare_searches(inv_search, spi_search)
+
+    def test_distribution_of_search_terms(self):
+        """SPIRES search syntax - find t this and that ->title:this and title:that"""
+        spi_search = "find t this and that"
+        inv_search = "title:this and title:that"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_syntax_converter_expand_search_patterns_alone(self):
+        """SPIRES search syntax - simplest expansion"""
+        spi_search = "find t bob sam"
+        inv_search = "title:bob and title:sam"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_syntax_converter_expand_search_patterns_conjoined(self):
+        """SPIRES search syntax - simplest distribution"""
+        spi_search = "find t bob and sam"
+        inv_search = "title:bob and title:sam"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_syntax_converter_expand_search_patterns_multiple(self):
+        """SPIRES search syntax - expansion (no distribution)"""
+        spi_search = "find t bob sam and k couch"
+        inv_search = "title:bob and title:sam and keyword:couch"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_syntax_converter_expand_search_patterns_multiple_conjoined(self):
+        """SPIRES search syntax - distribution and expansion"""
+        spi_search = "find t bob sam and couch"
+        inv_search = "title:bob and title:sam and title:couch"
+        self._compare_searches(inv_search, spi_search)
+
 
 TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser,
                              TestSpiresToInvenioSyntaxConverter)
