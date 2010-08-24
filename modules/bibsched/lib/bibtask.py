@@ -323,6 +323,7 @@ def task_init(
                             required_sorts.append(sort)
                     if sys.hexversion < 0x02050000:
                         import hotshot
+                        import hotshot.stats
                         pr = hotshot.Profile(filename)
                         ret = pr.runcall(_task_run, task_run_fnc)
                         for sort_type in required_sorts:

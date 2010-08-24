@@ -302,6 +302,7 @@ def create_handler(root):
                     required_sorts.append(sort)
             if sys.hexversion < 0x02050000:
                 import hotshot
+                import hotshot.stats
                 pr = hotshot.Profile(filename)
                 ret = pr.runcall(_handler, req)
                 for sort_type in required_sorts:
