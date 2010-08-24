@@ -20,7 +20,7 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.90.20100628, cds.support@cern.ch)
+AC_INIT(cds-invenio, 0.99.90.20100823, cds.support@cern.ch)
 AM_INIT_AUTOMAKE([tar-ustar])
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
@@ -551,6 +551,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibedit/bin/bibedit \
 	  modules/bibedit/bin/refextract \
 	  modules/bibedit/bin/xmlmarc2textmarc \
+	  modules/bibedit/bin/textmarc2xmlmarc \
 	  modules/bibedit/bin/xmlmarclint \
 	  modules/bibedit/doc/Makefile \
 	  modules/bibedit/doc/admin/Makefile \

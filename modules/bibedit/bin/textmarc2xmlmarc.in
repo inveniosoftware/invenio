@@ -1,3 +1,6 @@
+#!@PYTHON@
+# -*- mode: python; coding: utf-8 -*-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -15,16 +18,21 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = refextract \
-              xmlmarclint \
-              xmlmarc2textmarc \
-              textmarc2xmlmarc \
-              bibedit
+"""
+TEXT MARC to XML MARC utility.
+"""
 
-EXTRA_DIST = refextract.in \
-             xmlmarclint.in \
-             xmlmarc2textmarc.in \
-             textmarc2xmlmarc.in \
-             bibedit.in
+__revision__ = "$Id$"
 
-CLEANFILES = *~ *.tmp
+try:
+    from invenio.textmarc2xmlmarc import main
+except ImportError, err:
+    import sys
+    sys.stderr.write("Error: %s" % err)
+    sys.stderr.flush()
+    sys.exit(1)
+
+
+## Begin:
+if __name__ == "__main__":
+    main()
