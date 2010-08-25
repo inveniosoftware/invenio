@@ -33,7 +33,7 @@ from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext, \
                               convert_datetext_to_datestruct
 from invenio import bibrecord as bibrecord
-from invenio import xmlmarc2textmarclib as xmlmarc2textmarclib
+from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 
 class Job:
     """Represents job that will run certain number of queries
@@ -341,12 +341,12 @@ class QueryResult:
         records = bibrecord.create_records(records_xml)
         for (record, status_code, list_of_errors) in records:
             sysno_options = {"text-marc":1}
-            sysno = xmlmarc2textmarclib.get_sysno_from_record(record,
+            sysno = xmlmarc2textmarc.get_sysno_from_record(record,
                                                               sysno_options)
             options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
                        "delete-mode":0, "insert-mode":0, "replace-mode":0,
                        "text-marc":1}
-            aleph_record = xmlmarc2textmarclib.create_marc_record(record,
+            aleph_record = xmlmarc2textmarc.create_marc_record(record,
                                                                   sysno,
                                                                   options)
             aleph_marc_output += aleph_record

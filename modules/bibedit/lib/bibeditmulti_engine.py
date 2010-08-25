@@ -376,7 +376,7 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
 # FIXME: Remove this method as soon as the formatting for MARC is
 # implemented in bibformat
 
-from invenio import xmlmarc2textmarclib as xmlmarc2textmarclib
+from invenio import xmlmarc2textmarc as xmlmarc2textmarc
 def _create_marc(records_xml):
     """Creates MARC from MARCXML.
 
@@ -393,8 +393,8 @@ def _create_marc(records_xml):
         # By this reason it should exist in the MARC XML
         # otherwise it will be None in the output ALEPH marc
         sysno_options = {"text-marc":0}
-        sysno = xmlmarc2textmarclib.get_sysno_from_record(record,
-                                                              sysno_options)
+        sysno = xmlmarc2textmarc.get_sysno_from_record(record,
+                                                       sysno_options)
 
         if sysno == None:
             sysno = ""
@@ -402,9 +402,9 @@ def _create_marc(records_xml):
         options = {"aleph-marc":0, "correct-mode":1, "append-mode":0,
                    "delete-mode":0, "insert-mode":0, "replace-mode":0,
                    "text-marc":1}
-        aleph_record = xmlmarc2textmarclib.create_marc_record(record,
-                                                              sysno,
-                                                              options)
+        aleph_record = xmlmarc2textmarc.create_marc_record(record,
+                                                           sysno,
+                                                           options)
         aleph_marc_output += aleph_record
 
     return aleph_marc_output
