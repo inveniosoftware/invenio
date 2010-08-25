@@ -21,12 +21,12 @@
 Format records using specified format.
 
 API functions: format_record, format_records, create_excel,
-               get_output_format_content_type
+get_output_format_content_type
 
 Used to wrap the BibFormat engine and associated functions. This is
-also where special formatting of multiple records (that the engine
-does not handle, as it works on a single record basis) should be put,
-with name create_*.
+also where special formatting functions of multiple records (that the
+engine does not handle, as it works on a single record basis) should
+be defined, with name C{def create_*}.
 
 SEE: bibformat_utils.py
 """
@@ -94,15 +94,17 @@ def filter_hidden_fields(recxml, user_info=None, filter_tags=CFG_BIBFORMAT_HIDDE
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False):
     """
-    Formats a record given output format.
+    Formats a record in given output format.
 
     Returns a formatted version of the record in the specified
     language, search pattern, and with the specified output format.
     The function will define which format template must be applied.
 
     The record to be formatted can be specified with its ID (with
-    'recID' parameter) or given as XML representation(with
-    'xml_record' parameter). If both are specified 'recID' is ignored.
+    'recID' parameter) or given as XML representation (with
+    'xml_record' parameter). If 'xml_record' is specified 'recID' is
+    ignored (but should still be given for reference. A dummy recid 0
+    or -1 could be used).
 
     'user_info' allows to grant access to some functionalities on a
     page depending on the user's priviledges. The 'user_info' object
@@ -110,18 +112,26 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
     is the same object as the one returned by
     'webuser.collect_user_info(req)'
 
-    @param recID: the ID of record to format
+    @param recID: the ID of record to format.
+    @type recID: int
     @param of: an output format code (or short identifier for the output format)
+    @type of: string
     @param ln: the language to use to format the record
+    @type ln: string
     @param verbose: the level of verbosity from 0 to 9 (O: silent,
                                                        5: errors,
                                                        7: errors and warnings, stop if error in format elements
                                                        9: errors and warnings, stop if error (debug mode ))
+    @type verbose: int
     @param search_pattern: list of strings representing the user request in web interface
+    @type search_pattern: list(string)
     @param xml_record: an xml string represention of the record to format
+    @type xml_record: string or None
     @param user_info: the information of the user who will view the formatted page (if applicable)
     @param on_the_fly: if False, try to return an already preformatted version of the record in the database
+    @type on_the_fly: boolean
     @return: formatted record
+    @rtype: string
     """
     from invenio.search_engine import record_exists
     if search_pattern is None:
@@ -248,9 +258,9 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                    record_separator=None, record_suffix=None, prologue="",
                    epilogue="", req=None, on_the_fly=False):
     """
-    Returns a list of formatted records given by a list of record IDs
-    or a list of records as xml.  Adds a prefix before each record, a
-    suffix after each record, plus a separator between records.
+    Format records given by a list of record IDs or a list of records
+    as xml.  Adds a prefix before each record, a suffix after each
+    record, plus a separator between records.
 
     Also add optional prologue and epilogue to the complete formatted
     list.
@@ -275,11 +285,35 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     This function takes the same parameters as 'format_record' except for:
     @param recIDs: a list of record IDs
+    @type recIDs: list(int)
+    @param of: an output format code (or short identifier for the output format)
+    @type of: string
+    @param ln: the language to use to format the record
+    @type ln: string
+    @param verbose: the level of verbosity from 0 to 9 (0: silent,
+                                                        5: errors,
+                                                        7: errors and warnings, stop if error in format elements
+                                                        9: errors and warnings, stop if error (debug mode ))
+    @type verbose: int
+    @param search_pattern: list of strings representing the user request in web interface
+    @type search_pattern: list(string)
+    @param user_info: the information of the user who will view the formatted page (if applicable)
     @param xml_records: a list of xml string representions of the records to format
-    @param header: a string printed before all formatted records
-    @param separator: either a string or a function that returns string to separate formatted records
+    @type xml_records: list(string)
+    @param record_prefix: a string printed before B{each} formatted records (n times)
+    @type record_prefix: string
+    @param record_suffix: a string printed after B{each} formatted records (n times)
+    @type record_suffix: string
+    @param prologue: a string printed at the beginning of the complete formatted records (1x)
+    @type prologue: string
+    @param epilogue: a string printed at the end of the complete formatted output (1x)
+    @type epilogue: string
+    @param record_separator: either a string or a function that returns string to join formatted records
+    @param record_separator: string or function
     @param req: an optional request object where to print records
     @param on_the_fly: if False, try to return an already preformatted version of the record in the database
+    @type on_the_fly: boolean
+    @rtype: string
     """
     if req is not None:
         req.write(prologue)
@@ -426,7 +460,7 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
 
 def get_output_format_content_type(of):
     """
-    Returns the content type (eg. 'text/html' or 'application/ms-excel') \
+    Returns the content type (for example 'text/html' or 'application/ms-excel') \
     of the given output format.
 
     @param of: the code of output format for which we want to get the content type
