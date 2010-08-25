@@ -131,7 +131,7 @@ def get_conversion_map():
         '.xml': {},
         '.hocr': {},
         '.pdf;pdfa': {},
-
+        '.asc': {},
     }
     if CFG_PATH_GZIP:
         ret['.ps']['.ps.gz'] = (gzip, {})
@@ -171,6 +171,7 @@ def get_conversion_map():
     if CFG_PATH_PDFTOTEXT:
         ret['.pdf']['.txt'] = (pdf2text, {})
         ret['.pdf;pdfa']['.txt'] = (pdf2text, {})
+    ret['.asc']['.txt'] = (txt2text, {})
     ret['.txt']['.txt'] = (txt2text, {})
     ret['.csv']['.txt'] = (txt2text, {})
     ret['.html']['.txt'] = (html2text, {})
