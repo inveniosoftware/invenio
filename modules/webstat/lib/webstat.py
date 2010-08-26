@@ -37,8 +37,8 @@ from invenio.config import \
      CFG_SITE_LANG
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
 from invenio.search_engine import get_alphabetically_ordered_collection_list
-from invenio.dbquery import run_sql, \
-    wash_table_column_name
+from invenio.websubmitadmin_dblayer import get_docid_docname_alldoctypes
+from invenio.dbquery import run_sql, wash_table_column_name
 from invenio.bibsched import is_task_scheduled, \
     get_task_ids_by_descending_date, \
     get_task_options
@@ -112,6 +112,12 @@ TYPE_REPOSITORY = [ ('gnuplot', 'Image - Gnuplot'),
                     ('asciidump', 'Image - ASCII dump'),
                     ('python', 'Data - Python code', export_to_python),
                     ('csv', 'Data - CSV', export_to_csv) ]
+
+def _get_doctypes():
+    """Returns all the possible doctypes of a new submission"""
+    doctypes = [("all","All")]
+    [doctypes.append(x) for x in get_docid_docname_alldoctypes()]
+    return doctypes
 
 # Key event repository, add an entry here to support new key measures.
 KEYEVENT_REPOSITORY = { 'collection population':
@@ -732,12 +738,12 @@ def basket_display():
         res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
                       % tbl_name)
         days = (res[-1][0] - res[0][0]).days + 1
-        public = run_sql("SELECT COUNT(*) FROM %s " % (tbl_name)+
+        public = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
                              "WHERE action = 'display_public'")[0][0]
-        users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % (tbl_name))[0][0]
+        users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % tbl_name)[0][0]
         adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'"
-                       % (tbl_name))[0][0]
-        displays = run_sql("SELECT COUNT(*) FROM %s "  % (tbl_name) + \
+                       % tbl_name)[0][0]
+        displays = run_sql("SELECT COUNT(*) FROM %s "  % tbl_name + \
                  "WHERE action = 'display' OR action = 'display_public'")[0][0]
         hits = adds + displays
         average = hits / days
@@ -762,15 +768,15 @@ def alert_display():
         return []
     try:
         res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time"
-                      % (tbl_name))
+                      % tbl_name)
         days = (res[-1][0] - res[0][0]).days + 1
         res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % (tbl_name))
         users = res[0][0]
         hits = res[0][1]
         displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'list'"
-                           % (tbl_name))[0][0]
+                           % tbl_name)[0][0]
         search = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display'"
-                         % (tbl_name))[0][0]
+                         % tbl_name)[0][0]
         average = hits / days
 
         res = [("Alerts page hits", hits)]

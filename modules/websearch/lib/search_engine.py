@@ -3309,7 +3309,11 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
 
+<<<<<<< HEAD
 def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LANG, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab='', sf='', so='d', sp='', rm=''):
+=======
+def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LANG, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab='', graphtype='gnuplot'):
+>>>>>>> f132b4f... BibRank: add support for flot graphs
 
     """
     Prints list of records 'recIDs' formatted according to 'format' in
@@ -3504,7 +3508,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         #if r:
                         #    downloadsimilarity = r
                         if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS:
-                            downloadhistory = create_download_history_graph_and_box(recIDs[irec], ln)
+                            downloadhistory = create_download_history_graph_and_box(recIDs[irec], ln, graphtype)
 
                         r = calculate_reading_similarity_list(recIDs[irec], "pageviews")
                         viewsimilarity = None
@@ -3551,7 +3555,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         # Citation history, if needed
                         citationhistory = None
                         if citinglist:
-                            citationhistory = create_citation_history_graph_and_box(recid, ln)
+                            citationhistory = create_citation_history_graph_and_box(recid, ln, graphtype)
                         #debug
                         if verbose > 3:
                             print_warning(req, "Citation graph debug: " + \
@@ -4438,7 +4442,15 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             if of == "id":
                 return [recidx for recidx in range(recid, recidb) if record_exists(recidx)]
             else:
+<<<<<<< HEAD
                 print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose, tab=tab, sf=sf, so=so, sp=sp, rm=rm)
+=======
+                try:
+                    graphtype=urlparse.parse_qs(req.args)['graphtype'][0]
+                except KeyError:
+                    graphtype='gnuplot'
+                print_records(req, range(recid, recidb), -1, -9999, of, ot, ln, search_pattern=p, verbose=verbose, tab=tab, graphtype=graphtype)
+>>>>>>> f132b4f... BibRank: add support for flot graphs
             if req and of.startswith("h"): # register detailed record page view event
                 client_ip_address = str(req.remote_ip)
                 register_page_view_event(recid, uid, client_ip_address)

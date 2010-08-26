@@ -24,7 +24,7 @@ import os
 import time
 import calendar
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION, CFG_WEBDIR
 from invenio.messages import gettext_set_language
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
@@ -34,7 +34,7 @@ from invenio.bibrank_grapher import *
 color_line_list = ['9', '19', '10', '15', '21', '18']
 cfg_id_bibdoc_id_bibrec = 5
 
-def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
+def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG, graphtype='gnuplot'):
     """Create graph with citation history for record ID_BIBREC (into a
        temporary file) and return HTML box refering to that image.
        Called by Detailed record pages.
@@ -65,13 +65,17 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         if not id_bibdocs:
             pass
         elif len(id_bibdocs) <= cfg_id_bibdoc_id_bibrec and 0 not in id_bibdocs:
-            history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs))
+            history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs), graphtype)
         else:
-            history_analysis_results = draw_downloads_statistics(id_bibrec, [])
+            history_analysis_results = draw_downloads_statistics(id_bibrec, [], graphtype)
         if history_analysis_results and history_analysis_results[0]:
-            graph_file_history = CFG_SITE_URL + "/img/" + history_analysis_results[0]
+            if history_analysis_results[2] == 'flot':
+                graph_file_history = CFG_WEBDIR + "/img/" + history_analysis_results[0]
+                html_content += """<tr><td valign=center align=center>%s</td>""" % open(graph_file_history).read()
+            else:#gnuplot
+                graph_file_history = CFG_SITE_URL + "/img/" + history_analysis_results[0]
+                html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
             file_to_close_history = history_analysis_results[1]
-            html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
             if file_to_close_history :
                 if os.path.exists(file_to_close_history):
                     os.unlink(file_to_close_history)
@@ -79,7 +83,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
             out += """<br/><br/><table><tr><td class="blocknote">
                       %s</td></tr><tr><td>
                       <table border="0" cellspacing="1" cellpadding="1">""" % _("Download history:")
-            out += html_content
+            out += graph_type_box(graphtype) + html_content
             out += "</table></td></tr></table>"
 
     if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION:
@@ -91,9 +95,10 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         if ips:
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
             if users_analysis_results[0]:
-                graph_file_users = CFG_SITE_URL + "/img/"  + users_analysis_results[0]
+                #graph_file_users = CFG_SITE_URL + "/img/"  + users_analysis_results[0]
+                graph_file_users = CFG_WEBDIR + "/img/"  + users_analysis_results[0]
                 file_to_close_users = users_analysis_results[1]
-                html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_users
+                html_content += """<tr><td valign=center align=center>%s</td>""" % open(graph_file_users).read()
                 if file_to_close_users:
                     if os.path.exists(file_to_close_users):
                         os.unlink(file_to_close_users)
@@ -107,7 +112,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
     # return html code used by get_file or search_engine
     return out
 
-def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
+def draw_downloads_statistics(id_bibrec, id_bibdoc_list, graphtype):
     """Create a graph of download history using a temporary file to store datas
     and a new png file for each id_bibrec to store the image of the graph which will
     be referenced by html code."""
@@ -168,7 +173,7 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
     fname = result2[0]
     y_max = result2[1]
     #Use create the graph from the temporary file
-    return create_temporary_image(id_bibrec, 'download_history', fname, ' ', 'Times downloaded', [0, 0], y_max, id_bibdoc_list, docfile_name_list, tic_list)
+    return create_temporary_image(id_bibrec, 'download_history', fname, ' ', 'Times downloaded', [0, 0], y_max, id_bibdoc_list, docfile_name_list, tic_list, graphtype)
 
 def create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition=""):
     """-Return a list of tuple of the form [('10/2004',3),(..)] used to plot graph
@@ -293,6 +298,6 @@ def create_users_analysis_graph(id_bibrec, ips):
     #1 100.0
     #3 0.0
     #plot the graph
-    return create_temporary_image(id_bibrec, 'download_users', result2[0], ' ', 'User distribution', (0, 0), result2[1], [], [], [1, 3])
+    return create_temporary_image(id_bibrec, 'download_users', result2[0], ' ', 'User distribution', (0, 0), result2[1], [], [], [1, 3], graphtype)
 
 
