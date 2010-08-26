@@ -294,9 +294,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             write_message("... will extract words from %s" % ', '.join(urls_to_index), verbose=2)
             words = {}
             for url in urls_to_index:
-                format = guess_format_from_url(url)
-                write_message("... %s format was guessed for %s" % (format, url), verbose=3)
-                tmpdoc = download_url(url, format)
+                tmpdoc = download_url(url)
                 file_converter_logger = get_file_converter_logger()
                 old_logging_level = file_converter_logger.getEffectiveLevel()
                 if task_get_task_param("verbose") > 3:

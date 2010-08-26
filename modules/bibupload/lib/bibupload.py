@@ -1187,8 +1187,6 @@ def elaborate_fft_tags(record, rec_id, mode, pretend=False):
                 else:
                     format = ""
 
-            format = normalize_format(format)
-
             # Let's discover the icon
             icon = field_get_subfield_values(fft, 'x')
             if icon != []:

@@ -148,8 +148,8 @@ CFG_BIBDOCFILE_AVAILABLE_FLAGS = (
 #: constant used if FFT correct with the obvious meaning.
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
 
-_CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS = [(re.compile(regex), headers)
-        for regex, headers in CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS]
+_CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS = [(re.compile(_regex), _headers)
+        for _regex, _headers in CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS]
 
 _mimes = MimeTypes(strict=False)
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
@@ -298,15 +298,6 @@ def guess_format_from_url(url):
         recognize it.
     @rtype: string
     """
-    def parse_content_disposition(text):
-        for item in text.split(';'):
-            item = item.strip()
-            if item.strip().startswith('filename='):
-                return item[len('filename="'):-len('"')]
-
-    def parse_content_type(text):
-        return text.split(';')[0].strip()
-
     ## Let's try to guess the extension by considering the URL as a filename
     ext = decompose_file(url, skip_version=True, only_known_extensions=True)[2]
     if ext.startswith('.'):
@@ -327,20 +318,14 @@ def guess_format_from_url(url):
         ## Since the URL is remote, let's try to perform a HEAD request
         ## and see the corresponding headers
         try:
-            info = open_url(url).info()
-        except InvenioBibdocfileUnauthorizedURL:
+            response = open_url(url, head_request=True)
+            info = response.info()
+        except (InvenioBibdocfileUnauthorizedURL, urllib2.URLError):
             return ""
-        content_disposition = info.getheader('Content-Disposition')
-        if content_disposition:
-            filename = parse_content_disposition(content_disposition)
-            if filename:
-                return decompose_file(filename)[2]
-        content_type = info.getheader('Content-Type')
-        if content_type:
-            content_type = parse_content_type(content_type)
-            ext = _mimes.guess_extension(content_type)
-            if ext:
-                return normalize_format(ext)
+        format = get_format_from_message_headers(info)
+        if format:
+            return format
+
         if CFG_HAS_MAGIC:
             ## Last solution: let's download the remote resource
             ## and use the Python magic library to guess the extension
@@ -3429,8 +3414,7 @@ def get_format_from_url(url):
 
 def clean_url(url):
     """Given a local url e.g. a local path it render it a realpath."""
-    protocol = urllib2.urlparse.urlsplit(url)[0]
-    if protocol in ('', 'file'):
+    if is_url_a_local_file(url):
         path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
         return os.path.abspath(path)
     else:
@@ -3442,7 +3426,13 @@ def is_url_a_local_file(url):
     return protocol in ('', 'file')
 
 def check_valid_url(url):
-    """Check for validity of a url or a file."""
+    """
+    Check for validity of a url or a file.
+
+    @param url: the URL to check
+    @type url: string
+    @raise StandardError: if the URL is not a valid URL.
+    """
     try:
         if is_url_a_local_file(url):
             path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
@@ -3475,53 +3465,164 @@ def safe_mkstemp(suffix):
         tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
     return (tmpfd, tmppath)
 
-def download_url(url, format=None, sleep=2):
-    """Download a url (if it corresponds to a remote file) and return a local url
-    to it."""
+def download_local_file(filename, format=None):
+    """
+    Copies a local file to Invenio's temporary directory.
+
+    @param filename: the name of the file to copy
+    @type filename: string
+    @param format: the format of the file to copy
+    @type format: string
+    @return: the path of the temporary file created
+    @rtype: string
+    @raise StandardError: when something went wrong
+    """
+    # Make sure the format is OK.
     if format is None:
-        format = guess_format_from_url(url)
+        format = guess_format_from_url(filename)
     else:
         format = normalize_format(format)
-    protocol = urllib2.urlparse.urlsplit(url)[0]
-    tmpfd, tmppath = safe_mkstemp(format)
+
+    tmpfd, tmppath = None, ''
+
+    # Now try to copy.
     try:
+        path = urllib2.urlparse.urlsplit(urllib.unquote(filename))[2]
+        if os.path.abspath(path) != path:
+            raise StandardError, "%s is not a normalized path (would be %s)." \
+                    % (path, os.path.normpath(path))
+        for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR,
+                CFG_WEBSUBMIT_STORAGEDIR]:
+            if path.startswith(allowed_path):
+                tmpfd, tmppath = safe_mkstemp(format)
+                shutil.copy(path, tmppath)
+                tmpfd.close()
+                if os.path.getsize(tmppath) == 0:
+                    raise StandardError, "%s seems to be empty" % filename
+                break
+        else:
+            raise StandardError, "%s is not in one of the allowed paths." % path
+    except Exception, e:
         try:
-            if protocol in ('', 'file'):
-                path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
-                if os.path.abspath(path) != path:
-                    raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
-                for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR, CFG_TMPSHAREDDIR, CFG_WEBSUBMIT_STORAGEDIR]:
-                    if path.startswith(allowed_path):
-                        shutil.copy(path, tmppath)
-                        if os.path.getsize(tmppath) > 0:
-                            return tmppath
-                        else:
-                            raise StandardError, "%s seems to be empty" % url
-                raise StandardError, "%s is not in one of the allowed paths." % path
-            else:
-                try:
-                    from_file = open_url(url)
-                    to_file = open(tmppath, 'w')
-                    while True:
-                        block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
-                        if not block:
-                            break
-                        to_file.write(block)
-                    to_file.close()
-                    from_file.close()
-                except InvenioBibdocfileUnauthorizedURL, e:
-                    raise StandardError, str(e)
-                except Exception, e:
-                    raise StandardError, "Error when downloading %s into %s: %s" % (url, tmppath, e)
-                if os.path.getsize(tmppath) > 0:
-                    return tmppath
-                else:
-                    raise StandardError, "%s seems to be empty" % url
-        except:
+            tmpfd.close()
+        except Exception:
+            pass
+        try:
             os.remove(tmppath)
-            raise
-    finally:
-        os.close(tmpfd)
+        except Exception:
+            pass
+        raise StandardError, "Impossible to copy the local file '%s': %s" % \
+                (filename, str(e))
+
+    return tmppath
+
+def download_external_url(url, format=None):
+    """
+    Download a url (if it corresponds to a remote file) and return a
+    local url to it.
+    """
+    tmppath = None
+
+    # Make sure the format is OK.
+    if format is None:
+        # First try to find a known extension to the URL
+        format = decompose_file(url, skip_version=True,
+                only_known_extensions=True)[2]
+        if not format:
+            # No correct format could be found. Will try to get it from the
+            # HTTP message headers.
+            format = ''
+    else:
+        format = normalize_format(format)
+
+    from_file, tmpfd, tmppath = None, None, ''
+
+    try:
+        from_file = open_url(url)
+    except InvenioBibdocfileUnauthorizedURL, e:
+        raise StandardError, str(e)
+    except urllib2.URLError, e:
+        raise StandardError, 'URL could not be opened: %s' % str(e)
+
+    if not format:
+        # We could not determine the format from the URL, so let's try
+        # to read it from the HTTP headers.
+        format = get_format_from_message_headers(from_file.info())
+
+    try:
+        tmpfd, tmppath = safe_mkstemp(format)
+
+        to_file = open(tmppath, 'w')
+        while True:
+            block = from_file.read(CFG_BIBDOCFILE_BLOCK_SIZE)
+            if not block:
+                break
+            to_file.write(block)
+        to_file.close()
+        from_file.close()
+
+        if os.path.getsize(tmppath) == 0:
+            raise StandardError, "%s seems to be empty" % url
+    except Exception, e:
+        # Try to close and remove the temporary file.
+        try:
+            tmpfd.close()
+        except Exception:
+            pass
+        try:
+            os.remove(tmppath)
+        except Exception:
+            pass
+        raise StandardError, "Error when downloading %s into %s: %s" % \
+                (url, tmppath, e)
+
+    return tmppath
+
+def get_format_from_message_headers(headers):
+    """
+    Tries to retrieve the format of the file from the message headers.
+    """
+    def parse_content_type(text):
+        return text.split(';')[0].strip()
+
+    def parse_content_disposition(text):
+        for item in text.split(';'):
+            item = item.strip()
+            if item.strip().startswith('filename='):
+                return item[len('filename="'):-len('"')]
+
+    format = ''
+
+    content_disposition = headers.getheader('Content-Disposition')
+    if content_disposition:
+        filename = parse_content_disposition(content_disposition)
+        if filename:
+            format = decompose_file(filename)[2]
+    content_type = headers.getheader('Content-Type')
+    if content_type:
+        content_type = parse_content_type(content_type)
+        ext = _mimes.guess_extension(content_type)
+        if ext:
+            format = normalize_format(ext)
+
+    return format
+
+def download_url(url, format=None):
+    """
+    Download a url (if it corresponds to a remote file) and return a
+    local url to it.
+    """
+    tmppath = None
+
+    try:
+        if is_url_a_local_file(url):
+            tmppath = download_local_file(url, format=format)
+        else:
+            tmppath = download_external_url(url, format=format)
+    except StandardError:
+        raise
+
+    return tmppath
 
 class BibDocMoreInfo:
     """
@@ -3825,27 +3926,47 @@ def readfile(filename):
     except Exception:
         return ''
 
-def open_url(url):
+class HeadRequest(urllib2.Request):
     """
-    Opens a URL. Checks if the URL is present in
+    A request object to perform a HEAD request.
+    """
+    def get_method(self):
+        return 'HEAD'
+
+def open_url(url, headers=None, head_request=False):
+    """
+    Opens a URL. If headers are passed as argument, no check is performed and
+    the URL will be opened. Otherwise checks if the URL is present in
     CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS and uses the headers specified in
     the config variable.
 
     @param url: the URL to open
     @type url: string
+    @param headers: the headers to use
+    @type headers: dictionary
+    @param head_request: if True, perform a HEAD request, otherwise a POST
+            request
+    @type head_request: boolean
     @return: a file-like object as returned by urllib2.urlopen.
     """
     headers_to_use = None
 
-    for regex, headers in _CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS:
-        if regex.match(url) is not None:
-            headers_to_use = headers
-            break
+    if headers is None:
+        for regex, headers in _CFG_BIBUPLOAD_FFT_ALLOWED_EXTERNAL_URLS:
+            if regex.match(url) is not None:
+                headers_to_use = headers
+                break
 
-    if headers_to_use is None:
-        # URL is not allowed.
-        raise InvenioBibdocfileUnauthorizedURL, "%s is not an authorized " \
-                "external URL." % url
+        if headers_to_use is None:
+            # URL is not allowed.
+            raise InvenioBibdocfileUnauthorizedURL, "%s is not an authorized " \
+                    "external URL." % url
     else:
-        request = urllib2.Request(url, headers=headers_to_use)
-        return urllib2.urlopen(request)
+        headers_to_use = headers
+
+    request_obj = head_request and HeadRequest or urllib2.Request
+    request = request_obj(url)
+    for key, value in headers_to_use.items():
+        request.add_header(key, value)
+
+    return urllib2.urlopen(request)
