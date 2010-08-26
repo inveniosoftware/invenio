@@ -65,9 +65,12 @@ else:
 
 try:
     import magic
+    if not hasattr(magic, "open"):
+        raise ImportError
     CFG_HAS_MAGIC = True
 except ImportError:
     CFG_HAS_MAGIC = False
+
 from datetime import datetime
 from mimetypes import MimeTypes
 from thread import get_ident

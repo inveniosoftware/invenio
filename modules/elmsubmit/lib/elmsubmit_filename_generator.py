@@ -32,6 +32,8 @@ import zlib
 
 try:
     import magic
+    if not hasattr(magic, "open"):
+        raise ImportError
     _got_magic = True
 except ImportError:
     _got_magic = False

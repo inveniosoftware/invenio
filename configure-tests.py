@@ -239,6 +239,8 @@ except ImportError, msg:
 
 try:
     import magic
+    if not hasattr(magic, "open"):
+        raise StandardError
 except ImportError, msg:
     print """
     *****************************************************
@@ -254,6 +256,21 @@ except ImportError, msg:
     ** into production.)                               **
     *****************************************************
     """ % msg
+except StandardError:
+    print """
+    *****************************************************
+    ** IMPORT WARNING python-magic
+    *****************************************************
+    ** The python-magic package you installed is not   **
+    ** the one supported by Invenio. Please refer to   **
+    ** the INSTALL file for more details.              **
+    **                                                 **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
+    *****************************************************
+    """
 
 try:
     import reportlab
