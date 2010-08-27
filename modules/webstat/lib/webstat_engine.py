@@ -1456,31 +1456,32 @@ def get_custom_summary_data(query, tag):
         tag = "909C4p"
 
     # First get records of the year
-    recids = perform_request_search(p=query, of="id") 
+    recids = perform_request_search(p=query, of="id")
 
     # Then return list by tag
     pub = list(get_most_popular_field_values(recids, tag))
-    
+
     sel = 0
     for elem in pub:
         sel += elem[1]
     if len(pub) == 0:
         return []
-    pub.append(('Others', len(recids) - sel))
+    if len(recids) - sel != 0:
+        pub.append(('Others', len(recids) - sel))
     pub.append(('TOTAL', len(recids)))
 
     return pub
 
 def create_custom_summary_graph(data, path):
     """
-    Creates a pie chart with the information from the custom summary and 
+    Creates a pie chart with the information from the custom summary and
     saves it in the file specified by the path argument
     """
     # If no input, we don't bother about anything
     if len(data) == 0:
         return
     os.environ['HOME'] = CFG_TMPDIR
-    
+
     try:
         import matplotlib
         matplotlib.use('Agg')
@@ -1500,7 +1501,7 @@ def create_custom_summary_graph(data, path):
     total = sum(numb)
     fracs = [x*100/total for x in numb]
     colors = []
-    
+
     random.seed()
     for i in range(numb_elem):
         col = 0.5 + float(i) / (numb_elem * 2.0)
@@ -1513,14 +1514,14 @@ def create_custom_summary_graph(data, path):
                 green = 1
         elif i % 3 == 1:
             red = col - rand
-            green = col 
+            green = col
             blue = col + rand
             if blue > 1.0:
                 blue = 1
         elif i % 3 == 2:
             red = col + rand
             green = col - rand
-            blue = col 
+            blue = col
             if red > 1.0:
                 red = 1
         colors.append((red, green, blue))
