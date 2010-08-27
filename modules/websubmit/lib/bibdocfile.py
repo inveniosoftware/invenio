@@ -3456,14 +3456,18 @@ def safe_mkstemp(suffix):
     """Create a temporary filename that don't have any '.' inside a part
     from the suffix."""
     tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
+    # Close the file and leave the responsability to the client code to
+    # correctly open/close it.
+    os.close(tmpfd)
+
     if '.' not in suffix:
         # Just in case format is empty
-        return tmpfd, tmppath
+        return tmppath
     while '.' in os.path.basename(tmppath)[:-len(suffix)]:
-        os.close(tmpfd)
         os.remove(tmppath)
         tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
-    return (tmpfd, tmppath)
+        os.close(tmpfd)
+    return tmppath
 
 def download_local_file(filename, format=None):
     """
@@ -3483,7 +3487,7 @@ def download_local_file(filename, format=None):
     else:
         format = normalize_format(format)
 
-    tmpfd, tmppath = None, ''
+    tmppath = ''
 
     # Now try to copy.
     try:
@@ -3494,23 +3498,15 @@ def download_local_file(filename, format=None):
         for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR,
                 CFG_WEBSUBMIT_STORAGEDIR]:
             if path.startswith(allowed_path):
-                tmpfd, tmppath = safe_mkstemp(format)
+                tmppath = safe_mkstemp(format)
                 shutil.copy(path, tmppath)
-                tmpfd.close()
                 if os.path.getsize(tmppath) == 0:
+                    os.remove(tmppath)
                     raise StandardError, "%s seems to be empty" % filename
                 break
         else:
             raise StandardError, "%s is not in one of the allowed paths." % path
     except Exception, e:
-        try:
-            tmpfd.close()
-        except Exception:
-            pass
-        try:
-            os.remove(tmppath)
-        except Exception:
-            pass
         raise StandardError, "Impossible to copy the local file '%s': %s" % \
                 (filename, str(e))
 
@@ -3535,7 +3531,7 @@ def download_external_url(url, format=None):
     else:
         format = normalize_format(format)
 
-    from_file, tmpfd, tmppath = None, None, ''
+    from_file, to_file, tmppath = None, None, ''
 
     try:
         from_file = open_url(url)
@@ -3550,7 +3546,7 @@ def download_external_url(url, format=None):
         format = get_format_from_message_headers(from_file.info())
 
     try:
-        tmpfd, tmppath = safe_mkstemp(format)
+        tmppath = safe_mkstemp(format)
 
         to_file = open(tmppath, 'w')
         while True:
@@ -3566,7 +3562,7 @@ def download_external_url(url, format=None):
     except Exception, e:
         # Try to close and remove the temporary file.
         try:
-            tmpfd.close()
+            to_file.close()
         except Exception:
             pass
         try:
