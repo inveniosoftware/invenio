@@ -25,8 +25,10 @@ if sys.hexversion < 0x2040000:
     from sets import Set as set #for "&" intersection
     # pylint: enable=W0622
 
+import os
 import getopt
 import string
+from tempfile import mkstemp
 
 from invenio.config import CFG_SITE_URL
 from invenio.invenio_connector import InvenioConnector
@@ -34,6 +36,13 @@ from invenio.bibrecord import create_records, record_get_field_instances, \
     record_get_field_values, record_xml_output
 from invenio import bibconvert
 from invenio.dbquery import run_sql
+from invenio.textmarc2xmlmarc import transform_file
+from invenio.xmlmarc2textmarc import get_sysno_from_record, create_marc_record
+
+try:
+    from cStringIO import StringIO
+except ImportError:
+    from StringIO import StringIO
 
 def usage():
     """Print help"""
@@ -63,6 +72,7 @@ def usage():
 
  -b --batch-output=(filename). filename.0 will be new records, filename.1 will be matched,
       filename.2 will be ambiguous, filename.3 will be fuzzy match
+ -t --text-marc-output transform the output to text-marc format instead of the default MARCXML
 
  Simple query:
 
@@ -418,14 +428,33 @@ def match_records(records, qrystrs=None, perform_request_search_mode="eee", oper
     #return results
     return [newrecs, matchedrecs, ambiguousrecs, fuzzyrecs]
 
-def main():
-    # Record matches database content when defined search gives exactly one record in the result set.
-    # By default the match is done on the title field.
-    # Using advanced search only 3 fields can be queried concurrently
-    # qrystr - querystring in the UpLoader format
-
+def transform_input_to_marcxml(filename, file_input=""):
+    """ Takes the filename or input of text-marc and transforms it
+    to MARCXML. """
+    if not filename:
+        # Create temporary file to read from
+        tmp_fd, filename = mkstemp()
+        os.write(tmp_fd, file_input)
+        os.close(tmp_fd)
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "0123hVFm:q:c:nv:o:b:i:r:",
+        # Redirect output, transform, restore old references
+        old_stdout = sys.stdout
+        new_stdout = StringIO()
+        sys.stdout = new_stdout
+
+        transform_file(filename)
+    finally:
+        sys.stdout = old_stdout
+    return new_stdout.getvalue()
+
+def main():
+    """ Record matches database content when defined search gives
+    exactly one record in the result set. By default the match is
+    done on the title field.
+    Using advanced search only 3 fields can be queried concurrently
+    qrystr - querystring in the UpLoader format. """
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "0123hVFm:q:c:nv:o:b:i:r:t",
                  [
                    "print-new",
                    "print-match",
@@ -442,16 +471,13 @@ def main():
                    "operator=",
                    "batch-output=",
                    "input=",
-                   "remote="
+                   "remote=",
+                   "text-marc-output"
                  ])
 
     except getopt.GetoptError, e:
         usage()
-
-    newrecs     = []                #array for new records
-    matchedrecs = []                #          matched
-    ambiguousrecs = []              #          ambig
-    fuzzyrecs = []                  #fuzzy
+    match_results = []
     qrystrs     = []                #query strings
     print_mode  = 0                 # default match mode to print new records
     noprocess   = 0
@@ -464,6 +490,7 @@ def main():
     f_input = ""                    #read from where, if param "i"
     server_url = CFG_SITE_URL       #url to server performing search, local by default
     predefined_fields = ["title", "author"]
+    textmarc_output = 0
 
     for opt, opt_value in opts:
         if opt in ["-0", "--print-new"]:
@@ -484,6 +511,8 @@ def main():
             sys.exit(0)
         if opt in ["-F", "--fuzzy"]:
             fuzzy = 1
+        if opt in ["-t", "--text-marc-output"]:
+            textmarc_output = 1
         if opt in ["-v", "--verbose"]:
             verbose = int(opt_value)
         if opt in ["-q", "--query-string"]:
@@ -526,6 +555,11 @@ def main():
             file_read += line_in
         f.close()
 
+    # Detect input type
+    if not file_read.startswith('<'):
+        # Not xml, assume type textmarc
+        file_read = transform_input_to_marcxml(f_input, file_read)
+
     records = create_records(file_read)
 
     if len(records) == 0:
@@ -536,66 +570,48 @@ def main():
         if verbose:
             sys.stderr.write("read %d records" % len(records))
             sys.stderr.write("\nBibMatch: Matching ...")
-        [newrecs, matchedrecs,
-         ambiguousrecs, fuzzyrecs] = match_records(records,
-                                                   qrystrs,
-                                                   perform_request_search_mode,
-                                                   operator,
-                                                   verbose,
-                                                   server_url)
-    #set the output according to print..
-    if print_mode == 0:
-        recs_out = newrecs
-    if print_mode == 1:
-        recs_out = matchedrecs
-    if print_mode == 2:
-        recs_out = ambiguousrecs
-    if print_mode == 3:
-        recs_out = fuzzyrecs
+        match_results = match_records(records,
+                                      qrystrs,
+                                      perform_request_search_mode,
+                                      operator,
+                                      verbose,
+                                      server_url)
+    # set the output according to print..
+    # 0-newrecs 1-matchedrecs 2-ambiguousrecs 3-fuzzyrecs
+    recs_out = match_results[print_mode]
 
     if verbose:
         sys.stderr.write("\n\n Bibmatch report\n")
         sys.stderr.write("=" * 35)
-        sys.stderr.write("\n New records         : %d" % len(newrecs))
-        sys.stderr.write("\n Matched records     : %d" % len(matchedrecs))
-        sys.stderr.write("\n Ambiguous records   : %d" % len(ambiguousrecs))
-        sys.stderr.write("\n Fuzzy records       : %d\n" % len(fuzzyrecs))
+        sys.stderr.write("\n New records         : %d" % len(match_results[0]))
+        sys.stderr.write("\n Matched records     : %d" % len(match_results[1]))
+        sys.stderr.write("\n Ambiguous records   : %d" % len(match_results[2]))
+        sys.stderr.write("\n Fuzzy records       : %d\n" % len(match_results[3]))
         sys.stderr.write("=" * 35)
         sys.stderr.write("\n Total records       : %d\n" % len(records))
 
-    if noprocess:
-        pass
-    else:
+    if not noprocess:
+        options = {'text-marc':1, 'aleph-marc':0}
         for record in recs_out:
-            print record_xml_output(record[0])
+            if textmarc_output:
+                sysno = get_sysno_from_record(record[0], options)
+                print create_marc_record(record[0], sysno, options)
+            else:
+                print record_xml_output(record[0])
 
-    if (batch_output != ""):
-        filename = "%s.0" % batch_output
-        file_0 = open(filename,"w")
-        filename = "%s.1" % batch_output
-        file_1 = open(filename,"w")
-        filename = "%s.2" % batch_output
-        file_2 = open(filename,"w")
-        filename = "%s.3" % batch_output #for fuzzy
-        file_3 = open(filename,"w")
-
-        for record in newrecs:
-            file_0.write(record_xml_output(record[0]))
-        for record in matchedrecs:
-            file_1.write(record_xml_output(record[0]))
-        for record in ambiguousrecs:
-            file_2.write(record_xml_output(record[0]))
-        for record in fuzzyrecs:
-            file_3.write(record_xml_output(record[0]))
-        file_0.close()
-        file_1.close()
-        file_2.close()
-        file_3.close()
-
-
-
-
-
-
-
-
+    if batch_output:
+        i = 0
+        options = {'text-marc':1, 'aleph-marc':0}
+        for result in match_results:
+            filename = "%s.%i" % (batch_output, i)
+            file_fd = open(filename,"w")
+            for record in result:
+                out = ""
+                if textmarc_output:
+                    sysno = get_sysno_from_record(record[0], options)
+                    out += create_marc_record(record[0], sysno, options)
+                else:
+                    out += record_xml_output(record[0])
+                file_fd.write(out + '\n')
+            file_fd.close()
+            i += 1

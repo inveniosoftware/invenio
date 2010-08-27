@@ -81,6 +81,14 @@ To match against public records on an remote Invenio installation (i.e http://cd
 </pre>
 </blockquote>
 
+Using text-marc as output-format:
+
+<blockquote>
+<pre>
+ $ bibmatch -b out.marc -t < input.xml
+</pre>
+</blockquote>
+
 Command line options:
 
 <blockquote>
@@ -92,6 +100,7 @@ Command line options:
 
  -b --batch-output=(filename). filename.0 will be new records, filename.1 will be matched,
       filename.2 will be ambiguous, filename.3 will be fuzzy match
+ -t --text-marc-output transform the output to text-marc format instead of the default MARCXML
 
  Simple query:
 

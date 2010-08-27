@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibrecord import create_records
-from invenio.bibmatch_engine import match_records
+from invenio.bibmatch_engine import match_records, transform_input_to_marcxml
 import unittest
 
 class BibMatchTest(unittest.TestCase):
@@ -33,6 +33,40 @@ class BibMatchTest(unittest.TestCase):
 
     def setUp(self):
         """setting up helper variables for tests"""
+        self.textmarc = """
+000000020 001__ 20
+000000020 041__ $$aeng
+000000020 088__ $$aJYFL-RR-82-7
+000000020 100__ $$aArje, J$$uUniversity of Jyvaskyla
+000000020 245__ $$aCharge creation and reset mechanisms in an ion guide isotope separator (IGIS)
+000000020 260__ $$aJyvaskyla$$bFinland Univ. Dept. Phys.$$cJul 1982
+000000020 300__ $$a18 p
+000000020 65017 $$2SzGeCERN$$aDetectors and Experimental Techniques
+000000020 909C0 $$y1982
+000000020 909C0 $$b19
+000000020 909C1 $$uJyväsklä Univ.
+000000020 909C1 $$c1990-01-28$$l50$$m2002-01-04$$oBATCH
+000000020 909CS $$sn$$w198238n
+000000020 980__ $$aREPORT
+
+000000019 001__ 19
+000000019 041__ $$aeng
+000000019 088__ $$aSTAN-CS-81-898-MF
+000000019 100__ $$aWhang, K$$uStanford University
+000000019 245__ $$aSeparability as a physical database design methodology
+000000019 260__ $$aStanford, CA$$bStanford Univ. Comput. Sci. Dept.$$cOct 1981
+000000019 300__ $$a60 p
+000000019 65017 $$2SzGeCERN$$aComputing and Computers
+000000019 700__ $$aWiederhold, G
+000000019 700__ $$aSagalowicz, D
+000000019 909C0 $$y1981
+000000019 909C0 $$b19
+000000019 909C1 $$uStanford Univ.
+000000019 909C1 $$c1990-01-28$$l50$$m2002-01-04$$oBATCH
+000000019 909CS $$sn$$w198238n
+000000019 980__ $$aREPORT
+        """
+
         #this exists in the DB, just some bibliography removed.
         self.recxml1 = """
   <record>
@@ -742,6 +776,13 @@ class BibMatchTest(unittest.TestCase):
         records = create_records(self.recxml1)
         [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
         self.assertEqual(1,len(matchedrecs))
+
+    def test_check_textmarc(self):
+        """bibmatch - check textmarc as input """
+        marcxml = transform_input_to_marcxml("", self.textmarc)
+        records = create_records(marcxml)
+        [dummy1, matchedrecs, dummy3, fuzzyrecs] = match_records(records, server_url="http://invenio-demo.cern.ch")
+        self.assertEqual(2,len(matchedrecs))
 
 TEST_SUITE = make_test_suite(BibMatchTest)
 
