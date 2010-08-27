@@ -319,10 +319,9 @@ def guess_format_from_url(url):
         ## and see the corresponding headers
         try:
             response = open_url(url, head_request=True)
-            info = response.info()
         except (InvenioBibdocfileUnauthorizedURL, urllib2.URLError):
             return ""
-        format = get_format_from_message_headers(info)
+        format = get_format_from_http_response(response)
         if format:
             return format
 
@@ -3475,11 +3474,12 @@ def download_local_file(filename, format=None):
 
     @param filename: the name of the file to copy
     @type filename: string
-    @param format: the format of the file to copy
+    @param format: the format of the file to copy (will be found if not
+            specified)
     @type format: string
     @return: the path of the temporary file created
     @rtype: string
-    @raise StandardError: when something went wrong
+    @raise StandardError: if something went wrong
     """
     # Make sure the format is OK.
     if format is None:
@@ -3516,6 +3516,14 @@ def download_external_url(url, format=None):
     """
     Download a url (if it corresponds to a remote file) and return a
     local url to it.
+
+    @param url: the URL to download
+    @type url: string
+    @param format: the format of the file (will be found if not specified)
+    @type format: string
+    @return: the path to the download local file
+    @rtype: string
+    @raise StandardError: if the download failed
     """
     tmppath = None
 
@@ -3543,7 +3551,7 @@ def download_external_url(url, format=None):
     if not format:
         # We could not determine the format from the URL, so let's try
         # to read it from the HTTP headers.
-        format = get_format_from_message_headers(from_file.info())
+        format = get_format_from_http_response(from_file)
 
     try:
         tmppath = safe_mkstemp(format)
@@ -3574,9 +3582,15 @@ def download_external_url(url, format=None):
 
     return tmppath
 
-def get_format_from_message_headers(headers):
+def get_format_from_http_response(response):
     """
-    Tries to retrieve the format of the file from the message headers.
+    Tries to retrieve the format of the file from the message headers of the
+    HTTP response.
+
+    @param response: the HTTP response
+    @type response: file-like object (as returned by urllib.urlopen)
+    @return: the format of the remote resource
+    @rtype: string
     """
     def parse_content_type(text):
         return text.split(';')[0].strip()
@@ -3587,14 +3601,16 @@ def get_format_from_message_headers(headers):
             if item.strip().startswith('filename='):
                 return item[len('filename="'):-len('"')]
 
+    info = response.info()
+
     format = ''
 
-    content_disposition = headers.getheader('Content-Disposition')
+    content_disposition = info.getheader('Content-Disposition')
     if content_disposition:
         filename = parse_content_disposition(content_disposition)
         if filename:
             format = decompose_file(filename)[2]
-    content_type = headers.getheader('Content-Type')
+    content_type = info.getheader('Content-Type')
     if content_type:
         content_type = parse_content_type(content_type)
         ext = _mimes.guess_extension(content_type)
