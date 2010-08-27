@@ -210,11 +210,14 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                 'publication_date': ('textbox', 'Publication date'),
                                 'creation_date': ('textbox', 'Creation date')},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_%(udc)s_%(item_status)s_%(publication_date)s_%(creation_date)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(user_address)s_' + \
+                                '%(udc)s_%(item_status)s_%(publication_date)s' + \
+                                '_%(creation_date)s_%(timespan)s',
                             'rows': ['Number of documents loaned',
                                          'Number of items loaned on the total number of items',
                                          'Number of items never loaned on the total number of items',
-                                         'Average time between the date of the record creation and the date of the first loan'],
+                                         'Average time between the date of ' + \
+                                         'the record creation and the date of the first loan'],
                             'output':'Table'
                            },
                          'loans lists':
@@ -231,7 +234,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                 'creation_date': ('textbox', 'Creation date'),
                                 'user_address': ('textbox', 'User address')},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(udc)s_%(loan_period)s_%(min_loans)s_%(max_loans)s_%(publication_date)s_%(creation_date)s_%(user_address)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(udc)s_%(loan_period)s' + \
+                                 '_%(min_loans)s_%(max_loans)s_%(publication_date)s_' + \
+                                 '%(creation_date)s_%(user_address)s_%(timespan)s',
                             'rows': [],
                             'output':'List'
                            },
@@ -929,13 +934,8 @@ def perform_request_index(ln=CFG_SITE_LANG):
     # Display the custom statistics
     out += TEMPLATES.tmpl_customevent_list(_get_customevents(), ln=ln)
 
-   # out += TEMPLATES.tmpl_loans_statistics(ln=ln)
-
-    # Display error log analizer
-    update_error_log_analyzer()
-    out += TEMPLATES.tmpl_error_log_analizer(get_invenio_error_log_ranking(), 
-                                             get_invenio_last_n_errors(5),
-                                             get_apache_error_log_ranking())
+    # Display error log analyzer
+    out += TEMPLATES.tmpl_error_log_statistics_list(ln=ln)
     return out
 
 def perform_display_keyevent(event_id=None, args={},
@@ -994,9 +994,11 @@ def perform_display_keyevent(event_id=None, args={},
         return out
 
     # Make sure extraparams are valid, if any
-    if KEYEVENT_REPOSITORY[event_id]['output'] == 'Graph' and event_id != 'percentage satisfied ill requests':
+    if KEYEVENT_REPOSITORY[event_id]['output'] == 'Graph' and \
+            event_id != 'percentage satisfied ill requests':
         for param in choosed:
-            if options.has_key(param) and options[param] == 'combobox' and not choosed[param] in [x[0] for x in options[param][2]]:
+            if options.has_key(param) and options[param] == 'combobox' and \
+                    not choosed[param] in [x[0] for x in options[param][2]]:
                 return out + TEMPLATES.tmpl_error(
                 'Please specify a valid value for parameter "%s".'
                                                % options[param][0], ln=ln)
@@ -1216,6 +1218,13 @@ def perform_display_customevent_data_ascii_dump(ids, args, args_req, choosed):
 def perform_display_customevent_help(ln=CFG_SITE_LANG):
     """Display the custom event help"""
     return TEMPLATES.tmpl_customevent_help(ln=ln)
+
+def perform_display_error_log_analyzer(ln=CFG_SITE_LANG):
+    """Display the error log analyzer"""
+    update_error_log_analyzer()
+    return TEMPLATES.tmpl_error_log_analyzer(get_invenio_error_log_ranking(),
+                                             get_invenio_last_n_errors(5),
+                                             get_apache_error_log_ranking())
 
 # INTERNALS
 

@@ -369,7 +369,6 @@ def get_keyevent_loan_statistics(args):
 
     return ((loans,), (loaned_on_total,), (never_loaned_on_total,), (avg,))
 
-
 def get_keyevent_loan_lists(args):
     """
     Lists:
@@ -481,7 +480,10 @@ def get_keyevent_loan_lists(args):
         most_loaned.append((rec, loans, copies, loans/copies))
     if most_loaned == []:
         return (res)
-    most_loaned = sorted(most_loaned, key=lambda doc: doc[3], reverse=True)[:49]
+    most_loaned.sort(cmp=lambda x,y: cmp(x[3], y[3]))
+    if len(most_loaned) > 50:
+        most_loaned = most_loaned[:49]
+    most_loaned.reverse()
     for rec, loans, copies, _ in most_loaned:
         author = get_fieldvalues(rec, "100__a")
         if len(author) > 0:
@@ -1241,24 +1243,24 @@ def get_keyevent_bibcirculation_report(freq = 'yearly'):
 
 def update_error_log_analyzer():
     """Creates splitted files for today's errors"""
-    _run_cmd('bash %s/webstat-errorlog-analizer -is' % CFG_BINDIR)
+    _run_cmd('bash %s/webstat -e -is' % CFG_BINDIR)
 
 def get_invenio_error_log_ranking():
     """ Returns the ranking of the errors in the invenio log"""
-    return _run_cmd('bash %s/webstat-errorlog-analizer -ir' % CFG_BINDIR)
+    return _run_cmd('bash %s/webstat -e -ir' % CFG_BINDIR)
 
 def get_invenio_last_n_errors(n):
     """Returns the last n errors in the invenio log (without details)"""
-    return _run_cmd('bash %s/webstat-errorlog-analizer -il %d' % (CFG_BINDIR, n))
+    return _run_cmd('bash %s/webstat -e -il %d' % (CFG_BINDIR, n))
 
 def get_invenio_error_details(error):
     """Returns the complete text of the invenio error."""
-    out = _run_cmd('bash %s/webstat-errorlog-analizer -id %s' % (CFG_BINDIR,error))
+    out = _run_cmd('bash %s/webstat -e -id %s' % (CFG_BINDIR, error))
     return out
 
 def get_apache_error_log_ranking():
     """ Returns the ranking of the errors in the apache log"""
-    return _run_cmd('bash %s/webstat-errorlog-analizer -ar' % CFG_BINDIR)
+    return _run_cmd('bash %s/webstat -e -ar' % CFG_BINDIR)
 
 # CUSTOM EVENT SECTION
 
@@ -1574,8 +1576,8 @@ def create_graph_trend_gnu_plot(trend, path, settings):
                 data.append([row, trend[row][1][col]])
             plot_items.append(Gnuplot.PlotItems
                                   .Data(data, title=settings["multiple"][col]))
-            tmp_max = max(x[col] for x in data)
-            tmp_min = min(x[col] for x in data)
+            tmp_max = max([x[col] for x in data])
+            tmp_min = min([x[col] for x in data])
             if tmp_max > y_max:
                 y_max = tmp_max
             if tmp_min < y_min:
@@ -2122,6 +2124,9 @@ def _get_datetime_iter(t_start, granularity='day',
         tim += eval("datetime.timedelta(" + span + ")")
 
 def _to_datetime(dttime, dt_format='%Y-%m-%d %H:%M:%S'):
+    """
+    Transforms a string into a datetime
+    """
     return datetime.datetime(*time.strptime(dttime, dt_format)[:6])
 
 def _run_cmd(command):
@@ -2147,41 +2152,6 @@ def _get_doctypes():
 def _get_item_statuses():
     """Returns all the possible status of an item"""
     return [("available", "Available"), ("requested","Requested"), ("on loan","On loan"), ("missing","Missing")]
-
-def _get_user_addresses():
-    """Returns all the possible user addresses (from a borrower)"""
-    adds = []
-    for add in run_sql("SELECT DISTINCT address FROM crcBORROWER ORDER BY address ASC"):
-        adds.append((add[0], add[0]))
-    return adds
-
-def _get_udcs():
-    """Returns all the possible UDC (MARC field 080$$a)"""
-    udcs = []
-    for udc in run_sql("SELECT DISTINCT value FROM bib08x WHERE tag='080__a' ORDER BY value ASC"):
-        udcs.append((udc[0], udc[0]))
-    return udcs
-
-def _get_publication_date():
-    """Returns all the possible years for the publication date of an item"""
-    pdates = []
-    for pdate in run_sql("SELECT DISTINCT value FROM bib26x WHERE tag='260__c'"):
-        pdates.append(re.search('[0-9]{4}', pdate[0]).group(0))
-    pdates = list(set(pdates))
-    pdates.sort()
-    ret = []
-    for pdate in pdates:
-        ret.append((pdate, pdate))
-    return ret
-
-def _get_creation_date():
-    """Returns all the possible dates for the creation date of a record"""
-    cdates = []
-    for cdate in run_sql("SELECT DISTINCT creation_date FROM bibrec ORDER BY creation_date ASC"):
-        fcdate = cdate[0].strftime("%b %Y")
-        if cdates == [] or fcdate != cdates[-1][0]:
-            cdates.append((fcdate, fcdate))
-    return cdates
 
 def _get_item_doctype():
     """Returns all the possible types of document for an item"""
@@ -2210,7 +2180,3 @@ def _get_loan_periods():
     for dt in run_sql("SELECT DISTINCT(loan_period) FROM crcITEM ORDER BY loan_period ASC"):
         dts.append((dt[0], dt[0]))
     return dts
-
-def _get_empty_param():
-    """Returns an empty list for using as param of key events"""
-    return []

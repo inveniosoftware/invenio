@@ -123,25 +123,38 @@ class Template:
 
         return out
 
-    def tmpl_error_log_analizer(self, invenio_ranking, invenio_last_errors, apache_ranking):
+    def tmpl_error_log_statistics_list(self, ln=CFG_SITE_LANG):
         """
         Generates the statistics of the last errors
         """
-        out = """<script type='text/javascript' src='%s/js/collapse.js'></script>
-                 <h3>Error log statistics</h3>
+        return """<h3>Error log statistics</h3>
+                 <p>Displays statistics about the last errors in the Invenio and Apache logs</p>
+                 <ul><li><a href="%s/stats/error_log%s">Error log analyzer</a></li></ul>""" % (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln='+ln) or '')
+
+    def tmpl_error_log_analyzer(self, invenio_ranking, invenio_last_errors, apache_ranking):
+        out = """<script src="%s/js/jquery.min.js"></script>
                  <h4>Invenio error log</h4>
                  <h5>Ranking</h5>
                  <pre>%s</pre>
                  <h5>Last errors</h5>
-""" % (CFG_SITE_URL, invenio_ranking)
+""" % (CFG_SITE_URL, cgi.escape(invenio_ranking))
         lines = invenio_last_errors.splitlines()
         error_number = len(lines)
         for line in lines:
-            out += """<div class='collapsable'> 
-                          %s
-                          <pre>%s</pre>
+            out += """<div>
+                          %(line)s<button id="bt_toggle%(error_number)s">Toggle</button>
+                          <pre id="txt_error%(error_number)s">%(error_details)s</pre>
                       </div>
-""" % (line, get_invenio_error_details(error_number).replace('<', '&lt;').replace('>', '&gt;'))
+                      <script>
+                          $("#txt_error%(error_number)s").slideToggle("fast");
+                          $("#bt_toggle%(error_number)s").click(function () {
+                              $("#txt_error%(error_number)s").slideToggle("fast");
+                          });
+                      </script>
+
+""" % {'line':cgi.escape(line),
+       'error_number':error_number,
+       'error_details':cgi.escape(get_invenio_error_details(error_number))}
             error_number -= 1
         out += """<h4>Apache error log</h4>
                   <pre>%s</pre>""" % apache_ranking
@@ -660,14 +673,7 @@ class Template:
             else:
                 s_date = datetime.datetime.today().date().strftime("%m/%d/%Y %H:%M")
                 f_date = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
-            sel += """<style type="text/css">
-			/* css for timepicker */
-			#ui-timepicker-div dl{ text-align: left; }
-			#ui-timepicker-div dl dt{ height: 25px; }
-			#ui-timepicker-div dl dd{ margin: -25px 0 10px 65px; }
-
-		      </style>
-                      <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui.css" type="text/css" />
+            sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui.css" type="text/css" />
                       <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.min.js"></script>
                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-1.7.3.custom.min.js"></script>
                       <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.min.js"></script>
@@ -698,7 +704,16 @@ class Template:
         return sel
 
     def _tmpl_text_box(self, name, preselected, ln=CFG_SITE_LANG):
+        """
+        Generates a HTML text-box menu.
 
+        @param name: The name of the textbox label.
+        @type name: str
+
+        @param preselected: The value that should be preselected. Blank or empty
+        list for none.
+        @type preselected: str | []
+        """
         if name == 'min_loans' or name == 'max_loans':
             return """<script type="text/javascript">
  function checkNumber(input){

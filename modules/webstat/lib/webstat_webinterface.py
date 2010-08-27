@@ -37,6 +37,7 @@ from invenio.webstat import perform_request_index
 from invenio.webstat import perform_display_keyevent
 from invenio.webstat import perform_display_customevent
 from invenio.webstat import perform_display_customevent_help
+from invenio.webstat import perform_display_error_log_analyzer
 from invenio.webstat import register_customevent
 
 def detect_suitable_graph_format():
@@ -63,7 +64,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                  'loans_stats', 'loans_lists', 'renewals_lists', 'returns_table', 'returns_graph',
                  'ill_requests_stats', 'ill_requests_lists', 'ill_requests_graph', 'items_stats',
                  'items_list', 'loans_requests', 'loans_request_lists', 'user_stats',
-                 'user_lists', 'customevent', 'customevent_help',
+                 'user_lists', 'error_log', 'customevent', 'customevent_help',
                  'customevent_register', 'export' ]
 
     navtrail = """<a class="navtrail" href="%s/stats/%%(ln_link)s">Statistics</a>""" % CFG_SITE_URL
@@ -751,13 +752,36 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     body=perform_display_keyevent('loans request lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
-                    description="CDS, Statistics, Loans  requestlists",
+                    description="CDS, Statistics, Loans  request lists",
                     keywords="CDS, statistics, Loans request lists",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='loans request lists',
                     language=ln)
 
+    def error_log(self, req, form):
+        """Number of loans request lists page."""
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        if auth_code:
+            return page_not_authorized(req,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                text=auth_msg,
+                navmenuid='error log analyzer',
+                ln=ln)
+
+        return page(title="Error log analyzer",
+                    body=perform_display_error_log_analyzer(ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    description="CDS, Statistics, Error log analyzer",
+                    keywords="CDS, statistics, Error log analyzer",
+                    req=req,
+                    lastupdated=__lastupdated__,
+                    navmenuid='error log analyzer',
+                    language=ln)
 
     def customevent_help(self, req, form):
         """Custom event help page"""
