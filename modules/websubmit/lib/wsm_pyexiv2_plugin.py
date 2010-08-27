@@ -23,6 +23,7 @@ Dependencies: Exiv2
 
 __plugin_version__ = "WebSubmit File Metadata Plugin API 1.0"
 
+import os
 import base64
 import httplib
 import tempfile
@@ -324,8 +325,9 @@ def fake_image_init(verbose):
     @return: path to fake image
     """
     # Create temp file for fake image
-    (dummy, path_to_fake) = tempfile.mkstemp(prefix='wsm_image_plugin_img_',
+    (fd, path_to_fake) = tempfile.mkstemp(prefix='wsm_image_plugin_img_',
                                              dir=CFG_TMPDIR)
+    os.close(fd)
 
     # Open fake image and write head to it
     fake_image = open(path_to_fake, 'a')

@@ -990,6 +990,7 @@ def create_temporary_zip_file_with_job_result(job_result):
     _save_job_result_in_output_directory(job_result)
     # create temporary file for zipping the content of the directory
     (temp_zip_file, path_to_temp_zip_file) = tempfile.mkstemp(suffix = ".zip")
+    os.close(temp_zip_file)
     # zip the content of the directory
     _zip_directory_content_to_file(path_to_temporary_directory,
                                    path_to_temp_zip_file)

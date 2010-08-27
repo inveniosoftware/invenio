@@ -128,8 +128,9 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
             print 'Problem with inputfile to PDFTK'
 
     # Info file for pdftk
-    (dummy, path_to_info) = tempfile.mkstemp(prefix="wsm_pdf_plugin_info_", \
+    (fd, path_to_info) = tempfile.mkstemp(prefix="wsm_pdf_plugin_info_", \
                                              dir=CFG_TMPDIR)
+    os.close(fd)
     file_in = open(path_to_info, 'w')
     if verbose > 5:
         print "Saving PDFTK info file to %s" % path_to_info
@@ -181,8 +182,9 @@ def write_metadata_local(inputfile, outputfile, metadata_dictionary, verbose):
                 print "Invalid option: "
     file_in.close()
 
-    (dummy, pdf_temp_path) = tempfile.mkstemp(prefix="wsm_pdf_plugin_pdf_", \
+    (fd, pdf_temp_path) = tempfile.mkstemp(prefix="wsm_pdf_plugin_pdf_", \
                                               dir=CFG_TMPDIR)
+    os.close(fd)
 
     # Now we call pdftk tool to update the info on a pdf
     #try:

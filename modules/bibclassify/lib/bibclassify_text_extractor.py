@@ -111,7 +111,8 @@ def text_lines_from_url(url, user_agent=""):
     try:
         distant_stream = urllib2.urlopen(request)
         # Write the URL content to a temporary file.
-        local_file = tempfile.mkstemp(prefix="bibclassify.")[1]
+        tmpfd, local_file = tempfile.mkstemp(prefix="bibclassify.")
+        os.close(tmpfd)
         local_stream = open(local_file, "w")
         local_stream.write(distant_stream.read())
         local_stream.close()
