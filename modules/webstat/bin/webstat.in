@@ -100,9 +100,15 @@ errorLogMode(){
 
 invenioSplit() {
     rm ${TMPDIR}/inverr*
-    count=$((`grep -c "$searchstringmonth" $INVENIOLOGFILE`-$numberoferrors))
-    chars=$((`echo $numberoferrors | wc -c`-1))
-    csplit -f ${TMPDIR}/inverr -n $chars $INVENIOLOGFILE %"$searchstringmonth"% {"$count"} /"$searchstringmonth"/ {$(($numberoferrors-2))}
+    errors=`grep -c "$searchstringmonth" $INVENIOLOGFILE`
+    count=$(($errors-$numberoferrors))
+    if [[ $count -le 0 ]];then
+        chars=$((`echo $errors | wc -c`-1))
+        csplit -f ${TMPDIR}/inverr -n $chars $INVENIOLOGFILE /"$searchstringmonth"/ {$(($errors-1))}
+    else
+        chars=$((`echo $numberoferrors | wc -c`-1))
+        csplit -f ${TMPDIR}/inverr -n $chars $INVENIOLOGFILE %"$searchstringmonth"% {"$count"} /"$searchstringmonth"/ {$(($numberoferrors-2))}
+    fi
 }
 
 invenioErrorRanking () {

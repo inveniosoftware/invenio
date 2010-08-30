@@ -22,10 +22,10 @@ __revision__ = "$Id$"
 import os
 import time
 
-from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_WEBDIR
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_WEBDIR, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
-from invenio.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img, graph_type_box, GRAPH_TYPES
+from invenio.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
 from invenio.bibrank_citation_searcher import calculate_cited_by_list
 
 cfg_bibrank_print_citation_history = 1
@@ -103,16 +103,16 @@ def get_initial_result(rec_years):
         result[year] = 0
     return result
 
-def html_command(file, format):
+def html_command(file):
     t = ''
-    if format == 'gnuplot':
+    if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 1:
         t = """<img src='%s/img/%s' align="center" alt="">""" % (CFG_SITE_URL, file)
-    elif format == 'flot':
+    elif CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2:
         t = open(CFG_WEBDIR + "/img/" + file).read()
     #t += "</table></td></tr></table>"
     return t
 
-def create_citation_history_graph_and_box(recid, ln=CFG_SITE_LANG, graphtype='gnuplot'):
+def create_citation_history_graph_and_box(recid, ln=CFG_SITE_LANG):
     """Create graph with citation history for record RECID (into a
        temporary file) and return HTML box refering to that image.
        Called by Detailed record pages.
@@ -124,21 +124,19 @@ def create_citation_history_graph_and_box(recid, ln=CFG_SITE_LANG, graphtype='gn
     if cfg_bibrank_print_citation_history:
         coordinates = calculate_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """<br /><table><tr><td class="blocknote">%s</td></tr></table>"""% _("Citation history:")
-            html_head += graph_type_box(graphtype)               
+            html_head = """<br /><table><tr><td class="blocknote">%s</td></tr></table>"""% _("Citation history:")   
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = calculate_citation_graphe_x_coordinates(recid)
             years.sort()
             datas_info = write_coordinates_in_tmp_file([coordinates])
-            graphe = create_temporary_image(recid, 'citation', datas_info[0], 'Year', 'Times cited', [0,0], datas_info[1], [], ' ', years, graphtype)
+            graphe = create_temporary_image(recid, 'citation', datas_info[0], 'Year', 'Times cited', [0,0], datas_info[1], [], ' ', years)
             graphe_image = graphe[0]
             graphe_source_file = graphe[1]
-            graphtype = graphe[2]
             if graphe_image and graphe_source_file:
                 if os.path.exists(graphe_source_file):
                     os.unlink(datas_info[0])
-                    html_graphe_code = """<p>%s"""% html_command(graphe_image, graphtype)
+                    html_graphe_code = """<p>%s"""% html_command(graphe_image)
                 html_result = html_head + html_graphe_code
     return html_result
 

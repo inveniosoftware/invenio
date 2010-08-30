@@ -18,7 +18,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import os, sys, datetime
+import os, sys
 from urllib import unquote
 from invenio import webinterface_handler_config as apache
 
@@ -30,6 +30,8 @@ from invenio.config import \
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
 from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.search_engine import collection_restricted_p
 from invenio.webuser import collect_user_info, page_not_authorized
 from invenio.urlutils import redirect_to_url
 
@@ -41,6 +43,7 @@ from invenio.webstat import perform_display_error_log_analyzer, \
     register_customevent, \
     perform_display_custom_summary, \
     perform_display_stats_per_coll
+
 
 def detect_suitable_graph_format():
     """
@@ -57,17 +60,18 @@ def detect_suitable_graph_format():
 
 SUITABLE_GRAPH_FORMAT = detect_suitable_graph_format()
 
+
 class WebInterfaceStatsPages(WebInterfaceDirectory):
     """Defines the set of stats pages."""
 
-    _exports = [ '',
+    _exports = ['',
                  'collection_population', 'search_frequency', 'search_type_distribution',
                  'download_frequency', 'comments_frequency', 'number_of_loans', 'web_submissions',
                  'loans_stats', 'loans_lists', 'renewals_lists', 'returns_table', 'returns_graph',
                  'ill_requests_stats', 'ill_requests_lists', 'ill_requests_graph', 'items_stats',
                  'items_list', 'loans_requests', 'loans_request_lists', 'user_stats',
                  'user_lists', 'error_log', 'customevent', 'customevent_help',
-                 'customevent_register', 'custom_summary', 'collections', 'export' ]
+                 'customevent_register', 'custom_summary', 'collections', 'export']
 
     navtrail = """<a class="navtrail" href="%s/stats/%%(ln_link)s">Statistics</a>""" % CFG_SITE_URL
 
@@ -79,7 +83,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='index',
                 ln=ln)
@@ -94,7 +98,6 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     language=ln)
 
     # KEY EVENT SECTION
-
     def collection_population(self, req, form):
         """Collection population statistics page."""
         argd = wash_urlargd(form, {'collection': (str, CFG_SITE_NAME),
@@ -108,7 +111,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='collection population',
                 ln=ln)
@@ -116,7 +119,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Collection population",
                     body=perform_display_keyevent('collection population', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Collection population",
                     keywords="CDS, statistics, collection population",
                     req=req,
@@ -136,7 +139,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='search frequency',
                 ln=ln)
@@ -144,7 +147,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Search frequency",
                     body=perform_display_keyevent('search frequency', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Search frequency",
                     keywords="CDS, statistics, search frequency",
                     req=req,
@@ -154,7 +157,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def comments_frequency(self, req, form):
         """Comments frequency statistics page."""
-        argd = wash_urlargd(form, {'timespan': (str, "today"),
+        argd = wash_urlargd(form, {'collection': (str, "All"),
+                                   'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
                                    'format': (str, SUITABLE_GRAPH_FORMAT),
@@ -164,7 +168,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='comments frequency',
                 ln=ln)
@@ -172,15 +176,13 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Comments frequency",
                     body=perform_display_keyevent('comments frequency', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Comments frequency",
                     keywords="CDS, statistics, Comments frequency",
                     req=req,
                     lastupdated=__lastupdated__,
                     navmenuid='comments frequency',
                     language=ln)
-
-
 
     def search_type_distribution(self, req, form):
         """Search type distribution statistics page."""
@@ -194,7 +196,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         ln = argd['ln']
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='search type distribution',
                 ln=ln)
@@ -202,7 +204,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Search type distribution",
                     body=perform_display_keyevent('search type distribution', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Search type distribution",
                     keywords="CDS, statistics, search type distribution",
                     req=req,
@@ -223,7 +225,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='download frequency',
                 ln=ln)
@@ -231,7 +233,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Download frequency",
                     body=perform_display_keyevent('download frequency', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Download frequency",
                     keywords="CDS, statistics, download frequency",
                     req=req,
@@ -251,7 +253,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='number of loans',
                 ln=ln)
@@ -259,7 +261,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Number of loans",
                     body=perform_display_keyevent('number of loans', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Number of loans",
                     keywords="CDS, statistics, Number of loans",
                     req=req,
@@ -280,7 +282,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='web submissions',
                 ln=ln)
@@ -288,7 +290,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Web submissions",
                     body=perform_display_keyevent('web submissions', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Web submissions",
                     keywords="CDS, statistics, websubmissions",
                     req=req,
@@ -298,11 +300,11 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def loans_stats(self, req, form):
         """Number of loans statistics page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
-                                   'udc' : (str, ""),
-                                   'item_status' : (str, ""),
-                                   'publication_date' : (str, ""),
-                                   'creation_date' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
+                                   'udc': (str, ""),
+                                   'item_status': (str, ""),
+                                   'publication_date': (str, ""),
+                                   'creation_date': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -313,7 +315,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='loans statistics',
                 ln=ln)
@@ -321,7 +323,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Loans statistics",
                     body=perform_display_keyevent('loans statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Loans statistics",
                     keywords="CDS, statistics, Loans statistics",
                     req=req,
@@ -331,13 +333,13 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def loans_lists(self, req, form):
         """Number of loans lists page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
-                                   'udc' : (str, ""),
-                                   'loan_period' : (str, ""),
-                                   'min_loans' : (int, 0),
-                                   'max_loans' : (int, sys.maxint),
-                                   'publication_date' : (str, ""),
-                                   'creation_date' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
+                                   'udc': (str, ""),
+                                   'loan_period': (str, ""),
+                                   'min_loans': (int, 0),
+                                   'max_loans': (int, sys.maxint),
+                                   'publication_date': (str, ""),
+                                   'creation_date': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -350,7 +352,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='loans lists',
                 ln=ln)
@@ -358,7 +360,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Loans lists",
                     body=perform_display_keyevent('loans lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Loans lists",
                     keywords="CDS, statistics, Loans lists",
                     req=req,
@@ -368,9 +370,9 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def renewals_lists(self, req, form):
         """Renewed items lists page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
-                                   'udc' : (str, ""),
-                                   'collection' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
+                                   'udc': (str, ""),
+                                   'collection': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -381,7 +383,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='renewals',
                 ln=ln)
@@ -389,7 +391,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Renewals lists",
                     body=perform_display_keyevent('renewals', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Renewals lists",
                     keywords="CDS, statistics, Renewals lists",
                     req=req,
@@ -409,7 +411,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='returns table',
                 ln=ln)
@@ -417,7 +419,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Returns table",
                     body=perform_display_keyevent('number returns', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Returns table",
                     keywords="CDS, statistics, Returns table",
                     req=req,
@@ -437,7 +439,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='returns graph',
                 ln=ln)
@@ -445,7 +447,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Returns graph",
                     body=perform_display_keyevent('percentage returns', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Returns graph",
                     keywords="CDS, statistics, Returns graph",
                     req=req,
@@ -455,10 +457,10 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def ill_requests_stats(self, req, form):
         """ILL Requests statistics page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
-                                   'doctype' : (str, ""),
-                                   'status' : (str, ""),
-                                   'supplier' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
+                                   'doctype': (str, ""),
+                                   'status': (str, ""),
+                                   'supplier': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -469,7 +471,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='ill requests statistics',
                 ln=ln)
@@ -477,7 +479,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="ILL Requests statistics",
                     body=perform_display_keyevent('ill requests statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, ILL Requests statistics",
                     keywords="CDS, statistics, ILL Requests statistics",
                     req=req,
@@ -487,8 +489,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def ill_requests_lists(self, req, form):
         """Number of loans lists page."""
-        argd = wash_urlargd(form, {'doctype' : (str, ""),
-                                   'supplier' : (str, ""),
+        argd = wash_urlargd(form, {'doctype': (str, ""),
+                                   'supplier': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -499,7 +501,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='ill requests list',
                 ln=ln)
@@ -507,7 +509,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="ILL Requests list",
                     body=perform_display_keyevent('ill requests list', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, ILL Requests list",
                     keywords="CDS, statistics, ILL Requests list",
                     req=req,
@@ -517,10 +519,10 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def ill_requests_graph(self, req, form):
         """Percentage of satisfied ILL requests graph page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
-                                   'doctype' : (str, ""),
-                                   'status' : (str, ""),
-                                   'supplier' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
+                                   'doctype': (str, ""),
+                                   'status': (str, ""),
+                                   'supplier': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -531,15 +533,16 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='percentage satisfied ill requests',
                 ln=ln)
 
         return page(title="Percentage of satisfied ILL requests",
-                    body=perform_display_keyevent('percentage satisfied ill requests', argd, req, ln=ln),
+                    body=perform_display_keyevent('percentage satisfied ill requests',
+                                                  argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Percentage of satisfied ILL requests",
                     keywords="CDS, statistics, Percentage of satisfied ILL requests",
                     req=req,
@@ -549,8 +552,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def items_stats(self, req, form):
         """ILL Requests statistics page."""
-        argd = wash_urlargd(form, {'udc' : (str, ""),
-                                   'collection' : (str, ""),
+        argd = wash_urlargd(form, {'udc': (str, ""),
+                                   'collection': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -561,7 +564,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='items stats',
                 ln=ln)
@@ -569,7 +572,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Items statistics",
                     body=perform_display_keyevent('items stats', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Items statistics",
                     keywords="CDS, statistics, Items statistics",
                     req=req,
@@ -579,16 +582,16 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def items_list(self, req, form):
         """Number of loans lists page."""
-        argd = wash_urlargd(form, {'library' : (str, ""),
-                                   'status' : (str, ""),
-                                   'format' : (str, ""),
+        argd = wash_urlargd(form, {'library': (str, ""),
+                                   'status': (str, ""),
+                                   'format': (str, ""),
                                    'ln': (str, CFG_SITE_LANG)})
         ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='items list',
                 ln=ln)
@@ -596,7 +599,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Items list",
                     body=perform_display_keyevent('items list', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Items list",
                     keywords="CDS, statistics, Items list",
                     req=req,
@@ -606,7 +609,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def loans_requests(self, req, form):
         """Number of loans statistics page."""
-        argd = wash_urlargd(form, {'item_status' : (str, ""),
+        argd = wash_urlargd(form, {'item_status': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -617,7 +620,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='loan request statistics',
                 ln=ln)
@@ -625,7 +628,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Hold requests statistics",
                     body=perform_display_keyevent('loan request statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Hold requests statistics",
                     keywords="CDS, statistics, Hold requests statistics",
                     req=req,
@@ -635,7 +638,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def user_stats(self, req, form):
         """Number of loans statistics page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -646,7 +649,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='user statistics',
                 ln=ln)
@@ -654,7 +657,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Users statistics",
                     body=perform_display_keyevent('user statistics', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Users statistics",
                     keywords="CDS, statistics, Users statistics",
                     req=req,
@@ -664,7 +667,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def user_lists(self, req, form):
         """Number of loans lists page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -675,7 +678,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='user lists',
                 ln=ln)
@@ -683,7 +686,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Users lists",
                     body=perform_display_keyevent('user lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Users lists",
                     keywords="CDS, statistics, Users lists",
                     req=req,
@@ -691,9 +694,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     navmenuid='user lists',
                     language=ln)
 
-
     # CUSTOM EVENT SECTION
-
     def customevent(self, req, form):
         """Custom event statistics page"""
         arg_format = {'ids': (list, []),
@@ -705,9 +706,9 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         for key in form.keys():
             if key[:4] == 'cols':
                 i = key[4:]
-                arg_format['cols'+i] = (list, [])
-                arg_format['col_value'+i] = (list, [])
-                arg_format['bool'+i] = (list, [])
+                arg_format['cols' + i] = (list, [])
+                arg_format['col_value' + i] = (list, [])
+                arg_format['bool' + i] = (list, [])
         argd = wash_urlargd(form, arg_format)
 
         ln = argd['ln']
@@ -715,7 +716,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='custom event',
                 ln=ln)
@@ -724,7 +725,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Custom event",
                     body=body,
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS Personalize, Statistics, Custom event",
                     keywords="CDS, statistics, custom event",
                     req=req,
@@ -734,8 +735,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def loans_request_lists(self, req, form):
         """Number of loans request lists page."""
-        argd = wash_urlargd(form, {'user_address' : (str, ""),
-                                   'udc' : (str, ""),
+        argd = wash_urlargd(form, {'user_address': (str, ""),
+                                   'udc': (str, ""),
                                    'timespan': (str, "today"),
                                    's_date': (str, ""),
                                    'f_date': (str, ""),
@@ -746,7 +747,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='loans request lists',
                 ln=ln)
@@ -754,7 +755,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Loans request lists",
                     body=perform_display_keyevent('loans request lists', argd, req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Loans  request lists",
                     keywords="CDS, statistics, Loans request lists",
                     req=req,
@@ -770,7 +771,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='error log analyzer',
                 ln=ln)
@@ -778,7 +779,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Error log analyzer",
                     body=perform_display_error_log_analyzer(ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Error log analyzer",
                     keywords="CDS, statistics, Error log analyzer",
                     req=req,
@@ -794,7 +795,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='custom event help',
                 ln=ln)
@@ -802,7 +803,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Custom event help",
                     body=perform_display_customevent_help(ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS Personalize, Statistics, Custom event help",
                     keywords="CDS, statistics, custom event help",
                     req=req,
@@ -823,20 +824,19 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         register_customevent(argd['event_id'], params)
         return redirect_to_url(req, unquote(argd['url']), apache.HTTP_MOVED_PERMANENTLY)
 
-
     # CUSTOM REPORT SECTION
-
     def custom_summary(self, req, form):
         """Custom report page"""
         argd = wash_urlargd(form, {'query': (str, ""),
                                    'tag': (str, "909C4p"),
+                                   'title': (str, "Publications"),
                                    'ln': (str, CFG_SITE_LANG)})
         ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='custom query summary',
                 ln=ln)
@@ -844,7 +844,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         return page(title="Custom query summary",
                     body=perform_display_custom_summary(argd, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Custom Query Summary",
                     keywords="CDS, statistics, custom query summary",
                     req=req,
@@ -853,7 +853,6 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     language=ln)
 
     # COLLECTIONS SECTION
-
     def collections(self, req, form):
         """Collections statistics page"""
         argd = wash_urlargd(form, {'coll': (str, "All"),
@@ -863,13 +862,22 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 navmenuid='collections',
+                text=auth_msg,
                 ln=ln)
 
+        if collection_restricted_p(argd['coll']):
+            (auth_code_coll, auth_msg_coll) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=argd['coll'])
+            if auth_code_coll:
+                return page_not_authorized(req,
+                                           navmenuid='collections',
+                                           text=auth_msg_coll,
+                                           ln=ln)
         return page(title="Statistics of %s" % argd['coll'],
                     body=perform_display_stats_per_coll(argd['coll'], req, ln=ln),
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
-                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln=' + ln) or ''),
                     description="CDS, Statistics, Collection %s" % argd['coll'],
                     keywords="CDS, statistics, %s" % argd['coll'],
                     req=req,
@@ -878,7 +886,6 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     language=ln)
 
     # EXPORT SECTION
-
     def export(self, req, form):
         """Exports data"""
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
@@ -887,7 +894,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
+                navtrail=self.navtrail % {'ln_link': (ln != CFG_SITE_LANG and '?ln=' + ln) or ''},
                 text=auth_msg,
                 navmenuid='export',
                 ln=ln)
@@ -905,7 +912,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         req.send_http_header()
 
         # Rebuild path, send it to the user, and clean up.
-        filename = CFG_TMPDIR + '/' +  argd["filename"]
+        filename = CFG_TMPDIR + '/' + argd["filename"]
         req.sendfile(filename)
         os.remove(filename)
 

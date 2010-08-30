@@ -24,7 +24,6 @@ import re
 import datetime
 import cPickle
 import calendar
-import sys
 from datetime import timedelta
 from urllib import quote
 
@@ -36,8 +35,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
-from invenio.search_engine import get_alphabetically_ordered_collection_list
-from invenio.websubmitadmin_dblayer import get_docid_docname_alldoctypes
+from invenio.search_engine import get_alphabetically_ordered_collection_list, \
+    is_hosted_collection
 from invenio.dbquery import run_sql, wash_table_column_name
 from invenio.bibsched import is_task_scheduled, \
     get_task_ids_by_descending_date, \
@@ -111,43 +110,42 @@ WEBSTAT_CACHE_INTERVAL = 600 # Seconds, cache_* functions not affected by this.
 WEBSTAT_RAWDATA_DIRECTORY = CFG_TMPDIR + "/"
 WEBSTAT_GRAPH_DIRECTORY = CFG_WEBDIR + "/img/"
 
-TYPE_REPOSITORY = [ ('gnuplot', 'Image - Gnuplot'),
-                    ('asciiart', 'Image - ASCII art'),
-                    ('flot', 'Image - Flot'),
-                    ('asciidump', 'Image - ASCII dump'),
-                    ('python', 'Data - Python code', export_to_python),
-                    ('csv', 'Data - CSV', export_to_csv) ]
+TYPE_REPOSITORY = [('gnuplot', 'Image - Gnuplot'),
+                   ('asciiart', 'Image - ASCII art'),
+                   ('flot', 'Image - Flot'),
+                   ('asciidump', 'Image - ASCII dump'),
+                   ('python', 'Data - Python code', export_to_python),
+                   ('csv', 'Data - CSV', export_to_csv)]
 
-
-def _get_doctypes():
-    """Returns all the possible doctypes of a new submission"""
-    doctypes = [("all","All")]
-    [doctypes.append(x) for x in get_docid_docname_alldoctypes()]
-    return doctypes
 
 def get_collection_list_plus_all():
+    """ Return all the collection names plus the name All"""
     coll = get_alphabetically_ordered_collection_list()
+    hosted_colls = []
+    for collection in coll:
+        if is_hosted_collection(collection[0]):
+            hosted_colls.append(collection)
+    for hosted_coll in hosted_colls:
+        coll.remove(hosted_coll)
     coll.append(['All', 'All'])
     return coll
 
 # Key event repository, add an entry here to support new key measures.
-KEYEVENT_REPOSITORY = { 'collection population':
-                          { 'fullname': 'Collection population',
+KEYEVENT_REPOSITORY = {'collection population':
+                          {'fullname': 'Collection population',
                             'specificname':
                                    'Population in collection "%(collection)s"',
                             'gatherer':
                                    get_keyevent_trend_collection_population,
                             'extraparams': {'collection': ('combobox', 'Collection',
-                                   get_alphabetically_ordered_collection_list)},
+                                   get_collection_list_plus_all)},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(collection)s\
-                                   _%(timespan)s',
+                                   'webstat_%(event_id)s_%(collection)s_%(timespan)s',
                             'ylabel': 'Number of records',
                             'multiple': None,
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                         'search frequency':
-                          { 'fullname': 'Search frequency',
+                          {'fullname': 'Search frequency',
                             'specificname': 'Search frequency',
                             'gatherer': get_keyevent_trend_search_frequency,
                             'extraparams': {},
@@ -155,10 +153,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                    'webstat_%(event_id)s_%(timespan)s',
                             'ylabel': 'Number of searches',
                             'multiple': None,
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                         'search type distribution':
-                          { 'fullname': 'Search type distribution',
+                          {'fullname': 'Search type distribution',
                             'specificname': 'Search type distribution',
                             'gatherer':
                                    get_keyevent_trend_search_type_distribution,
@@ -168,30 +165,29 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'ylabel': 'Number of searches',
                             'multiple': ['Simple searches',
                                          'Advanced searches'],
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                         'download frequency':
-                          { 'fullname': 'Download frequency',
+                          {'fullname': 'Download frequency',
                             'specificname': 'Download frequency in collection "%(collection)s"',
                             'gatherer': get_keyevent_trend_download_frequency,
-                            'extraparams': {'collection': ('Collection', get_collection_list_plus_all)},
-                            'cachefilename': 'webstat_%(id)s_%(collection)s_%(timespan)s',
+                            'extraparams': {'collection': ('combobox', 'Collection',
+                                                    get_collection_list_plus_all)},
+                            'cachefilename': 'webstat_%(event_id)s_%(collection)s_%(timespan)s',
                             'ylabel': 'Number of downloads',
                             'multiple': None,
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                          'comments frequency':
-                          { 'fullname': 'Comments frequency',
+                          {'fullname': 'Comments frequency',
                             'specificname': 'Comments frequency in collection "%(collection)s"',
                             'gatherer': get_keyevent_trend_comments_frequency,
-                            'extraparams': {'collection': ('Collection', get_collection_list_plus_all)},
-                            'cachefilename': 'webstat_%(id)s_%(collection)s_%(timespan)s',
+                            'extraparams': {'collection': ('combobox', 'Collection',
+                                                    get_collection_list_plus_all)},
+                            'cachefilename': 'webstat_%(event_id)s_%(collection)s_%(timespan)s',
                             'ylabel': 'Number of comments',
                             'multiple': None,
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                         'number of loans':
-                          { 'fullname': 'Number of loans',
+                          {'fullname': 'Number of loans',
                             'specificname': 'Number of loans',
                             'gatherer': get_keyevent_trend_number_of_loans,
                             'extraparams': {},
@@ -199,10 +195,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                    'webstat_%(event_id)s_%(timespan)s',
                             'ylabel': 'Number of loans',
                             'multiple': None,
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                         'web submissions':
-                          { 'fullname': 'Number of web submissions',
+                          {'fullname': 'Number of web submissions',
                             'specificname':
                                    'Number of web submissions of "%(doctype)s"',
                             'gatherer': get_keyevent_trend_web_submissions,
@@ -212,10 +207,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                 'webstat_%(event_id)s_%(doctype)s_%(timespan)s',
                             'ylabel': 'Web submissions',
                             'multiple': None,
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                         'loans statistics':
-                          { 'fullname': 'Loans statistics',
+                          {'fullname': 'Loans statistics',
                             'specificname': 'Loans statistics',
                             'gatherer':
                                    get_keyevent_loan_statistics,
@@ -231,13 +225,13 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                 '_%(creation_date)s_%(timespan)s',
                             'rows': ['Number of documents loaned',
                                          'Number of items loaned on the total number of items',
-                                         'Number of items never loaned on the total number of items',
+                                         'Number of items never loaned on the \
+                                         total number of items',
                                          'Average time between the date of ' + \
                                          'the record creation and the date of the first loan'],
-                            'output':'Table'
-                           },
+                            'output': 'Table'},
                          'loans lists':
-                           { 'fullname': 'Loans lists',
+                           {'fullname': 'Loans lists',
                             'specificname': 'Loans lists',
                             'gatherer':
                                    get_keyevent_loan_lists,
@@ -254,24 +248,21 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                  '_%(min_loans)s_%(max_loans)s_%(publication_date)s_' + \
                                  '%(creation_date)s_%(user_address)s_%(timespan)s',
                             'rows': [],
-                            'output':'List'
-                           },
+                            'output': 'List'},
                           'renewals':
-                           { 'fullname': 'Renewals',
+                           {'fullname': 'Renewals',
                             'specificname': 'Renewals',
                             'gatherer':
                                    get_keyevent_renewals_lists,
                             'extraparams': {
                                 'udc': ('textbox', 'UDC'),
-                                #'collection': ('Collection', get_alphabetically_ordered_collection_list), #add to cachefilename when uncommented
                                 'user_address': ('textbox', 'User address')},
                             'cachefilename':
                                    'webstat_%(event_id)s_%(udc)s_%(user_address)s_%(timespan)s',
                             'rows': [],
-                            'output':'List'
-                           },
+                            'output': 'List'},
                           'number returns':
-                           { 'fullname': 'Number of overdue returns',
+                           {'fullname': 'Number of overdue returns',
                             'specificname': 'Number of overdue returns',
                             'gatherer':
                                    get_keyevent_returns_table,
@@ -279,10 +270,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(timespan)s',
                             'rows': ['Number of overdue returns'],
-                            'output':'Table'
-                           },
+                            'output': 'Table'},
                           'percentage returns':
-                           { 'fullname': 'Percentage of overdue returns',
+                           {'fullname': 'Percentage of overdue returns',
                             'specificname': 'Percentage of overdue returns',
                             'gatherer':
                                    get_keyevent_trend_returns_percentage,
@@ -292,10 +282,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'ylabel': 'Percentage of overdue returns',
                             'multiple': ['Overdue returns',
                                          'Total returns'],
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                         'ill requests statistics':
-                          { 'fullname': 'ILL Requests statistics',
+                          {'fullname': 'ILL Requests statistics',
                             'specificname': 'ILL Requests statistics',
                             'gatherer':
                                    get_keyevent_ill_requests_statistics,
@@ -305,15 +294,20 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                 'status': ('combobox', 'Status of request', _get_request_statuses),
                                 'supplier': ('combobox', 'Supplier', _get_libraries)},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_%(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(user_address)s_\
+                                   %(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
                             'rows': ['Number of ILL requests',
-                                     'Number of satisfied ILL requests 3 months after the date of request creation',
-                                     'Average time between the date and  the hour of the ill request date and the date and the hour of the delivery item to the user',
-                                     'Average time between the date and  the hour the ILL request was sent to the supplier and the date and hour of the delivery item'],
-                            'output':'Table'
-                           },
+                                     'Number of satisfied ILL requests 3 months \
+                                     after the date of request creation',
+                                     'Average time between the date and the hour \
+                                     of the ill request date and the date and the \
+                                     hour of the delivery item to the user',
+                                     'Average time between the date and the hour \
+                                     the ILL request was sent to the supplier and \
+                                     the date and hour of the delivery item'],
+                            'output': 'Table'},
                           'ill requests list':
-                           { 'fullname': 'ILL Requests list',
+                           {'fullname': 'ILL Requests list',
                             'specificname': 'ILL Requests list',
                             'gatherer':
                                    get_keyevent_ill_requests_lists,
@@ -323,10 +317,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(doctype)s_%(supplier)s_%(timespan)s',
                             'rows': [],
-                            'output':'List'
-                           },
+                            'output': 'List'},
                           'percentage satisfied ill requests':
-                           { 'fullname': 'Percentage of satisfied ILL requests',
+                           {'fullname': 'Percentage of satisfied ILL requests',
                             'specificname': 'Percentage of satisfied ILL requests',
                             'gatherer':
                                    get_keyevent_trend_satisfied_ill_requests_percentage,
@@ -336,28 +329,26 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                 'status': ('combobox', 'Status of request', _get_request_statuses),
                                 'supplier': ('combobox', 'Supplier', _get_libraries)},
                             'cachefilename':
-                                   'webstat_%(event_id)s_%(user_address)s_%(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
+                                   'webstat_%(event_id)s_%(user_address)s_\
+                                   %(doctype)s_%(status)s_%(supplier)s_%(timespan)s',
                             'ylabel': 'Percentage of satisfied ILL requests',
                             'multiple': ['Satisfied ILL requests',
                                          'Total requests'],
-                            'output':'Graph'
-                           },
+                            'output': 'Graph'},
                           'items stats':
-                           { 'fullname': 'Items statistics',
+                           {'fullname': 'Items statistics',
                             'specificname': 'Items statistics',
                             'gatherer':
                                    get_keyevent_items_statistics,
                             'extraparams': {
                                 'udc': ('textbox', 'UDC'),
-                                #'collection': ('Collection', get_alphabetically_ordered_collection_list)#add to cachefilename when uncommented
                                 },
                             'cachefilename':
                                    'webstat_%(event_id)s_%(udc)s_%(timespan)s',
                             'rows': ['The total number of items', 'Total number of new items'],
-                            'output':'Table'
-                           },
+                            'output': 'Table'},
                           'items list':
-                           { 'fullname': 'Items list',
+                           {'fullname': 'Items list',
                             'specificname': 'Items list',
                             'gatherer':
                                    get_keyevent_items_lists,
@@ -367,10 +358,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(library)s_%(status)s',
                             'rows': [],
-                            'output':'List'
-                           },
+                            'output': 'List'},
                         'loan request statistics':
-                          { 'fullname': 'Hold requests statistics',
+                          {'fullname': 'Hold requests statistics',
                             'specificname': 'Hold requests statistics',
                             'gatherer':
                                    get_keyevent_loan_request_statistics,
@@ -378,13 +368,14 @@ KEYEVENT_REPOSITORY = { 'collection population':
                                 'item_status': ('combobox', 'Item status', _get_item_statuses)},
                             'cachefilename':
                                    'webstat_%(event_id)s_%(item_status)s_%(timespan)s',
-                            'rows': ['Number of hold requests, one week after the date of request creation',
+                            'rows': ['Number of hold requests, one week after the date of \
+                                        request creation',
                                          'Number of successful hold requests transactions',
-                                         'Average time between the hold request date and the date of delivery document  in a year'],
-                            'output':'Table'
-                           },
+                                         'Average time between the hold request date and \
+                                         the date of delivery document  in a year'],
+                            'output': 'Table'},
                          'loans request lists':
-                           { 'fullname': 'Hold requests lists',
+                           {'fullname': 'Hold requests lists',
                             'specificname': 'Hold requests lists',
                             'gatherer':
                                    get_keyevent_loan_request_lists,
@@ -394,10 +385,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(udc)s_%(user_address)s_%(timespan)s',
                             'rows': [],
-                            'output':'List'
-                           },
+                            'output': 'List'},
                          'user statistics':
-                           { 'fullname': 'Users statistics',
+                           {'fullname': 'Users statistics',
                             'specificname': 'Users statistics',
                             'gatherer':
                                    get_keyevent_user_statistics,
@@ -405,10 +395,9 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(user_address)s_%(timespan)s',
                             'rows': ['Number of active users'],
-                            'output':'Table'
-                           },
+                            'output': 'Table'},
                          'user lists':
-                           { 'fullname': 'Users lists',
+                           {'fullname': 'Users lists',
                             'specificname': 'Users lists',
                             'gatherer':
                                    get_keyevent_user_lists,
@@ -416,8 +405,7 @@ KEYEVENT_REPOSITORY = { 'collection population':
                             'cachefilename':
                                    'webstat_%(event_id)s_%(user_address)s_%(timespan)s',
                             'rows': [],
-                            'output':'List'
-                           }
+                            'output': 'List'}
 
                        }
 
@@ -449,7 +437,7 @@ def create_customevent(event_id=None, name=None, cols=[]):
 
     # Make sure the chosen id is not already taken
     if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s",
-                   (event_id,))) != 0:
+                   (event_id, ))) != 0:
         return "Event id [%s] already exists! Aborted." % event_id
 
     # Check if the cols are valid titles
@@ -491,6 +479,7 @@ def create_customevent(event_id=None, name=None, cols=[]):
             "Please use event id [%s] when registering an event.") \
             % (tbl_name, event_id)
 
+
 def modify_customevent(event_id=None, name=None, cols=[]):
     """
     Modify a custom event. It can modify the columns definition
@@ -522,7 +511,7 @@ def modify_customevent(event_id=None, name=None, cols=[]):
             return "Invalid column title: %s! Aborted." % argument
 
     res = run_sql("SELECT CONCAT('staEVENT', number), cols " + \
-                      "FROM staEVENT WHERE id = %s", (event_id,))
+                      "FROM staEVENT WHERE id = %s", (event_id, ))
     cols_orig = cPickle.loads(res[0][1])
 
     # add new cols
@@ -568,7 +557,8 @@ def modify_customevent(event_id=None, name=None, cols=[]):
         run_sql(sql_str, sql_param)
 
     # We're done! Print notice containing the name of the event.
-    return ("Event table [%s] successfully modified." % (event_id,))
+    return ("Event table [%s] successfully modified." % (event_id, ))
+
 
 def destroy_customevent(event_id=None):
     """
@@ -586,15 +576,16 @@ def destroy_customevent(event_id=None):
 
     # Check if the specified id exists
     if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s",
-                   (event_id,))) == 0:
+                   (event_id, ))) == 0:
         return "Event id [%s] doesn't exist! Aborted." % event_id
     else:
         tbl_name = get_customevent_table(event_id)
         run_sql("DROP TABLE %s" % (tbl_name))
-        run_sql("DELETE FROM staEVENT WHERE id = %s", (event_id,))
+        run_sql("DELETE FROM staEVENT WHERE id = %s", (event_id, ))
         return ("Event with id [%s] was successfully destroyed.\n" +
                 "Table [%s], with content, was destroyed.") \
                 % (event_id, tbl_name)
+
 
 def register_customevent(event_id, *arguments):
     """
@@ -612,7 +603,7 @@ def register_customevent(event_id, *arguments):
     @type *arguments: [params]
     """
     res = run_sql("SELECT CONCAT('staEVENT', number),cols " + \
-                      "FROM staEVENT WHERE id = %s",  (event_id,))
+                      "FROM staEVENT WHERE id = %s", (event_id, ))
     if not res:
         return # the id does not exist
     tbl_name = res[0][0]
@@ -642,6 +633,7 @@ def register_customevent(event_id, *arguments):
         run_sql(sql_str, tuple(sql_param))
     else:
         run_sql("INSERT INTO %s () VALUES ()" % (tbl_name))
+
 
 def cache_keyevent_trend(ids=[]):
     """
@@ -674,10 +666,10 @@ def cache_keyevent_trend(ids=[]):
             # Get timespans parameters
             args['timespan'] = timespans[i][0]
 
-            args.update({ 't_start': timespans[i][2], 't_end': timespans[i][3],
+            args.update({'t_start': timespans[i][2], 't_end': timespans[i][3],
                           'granularity': timespans[i][4],
                           't_format': timespans[i][5],
-                          'xtic_format': timespans[i][6] })
+                          'xtic_format': timespans[i][6]})
 
             for combo in combos:
                 args.update(combo)
@@ -696,6 +688,7 @@ def cache_keyevent_trend(ids=[]):
                 _get_file_using_cache(filename, gatherer, True).read()
 
     return True
+
 
 def cache_customevent_trend(ids=[]):
     """
@@ -717,15 +710,15 @@ def cache_customevent_trend(ids=[]):
         for i in range(len(timespans)):
             # Get timespans parameters
             args['timespan'] = timespans[i][0]
-            args.update({ 't_start': timespans[i][2], 't_end': timespans[i][3],
+            args.update({'t_start': timespans[i][2], 't_end': timespans[i][3],
                           'granularity': timespans[i][4],
                           't_format': timespans[i][5],
-                          'xtic_format': timespans[i][6] })
+                          'xtic_format': timespans[i][6]})
 
             # Create unique filename for this combination of parameters
             filename = "webstat_customevent_%(event_id)s_%(timespan)s" \
-                        % { 'event_id': re.subn("[^\w]", "_", event_id)[0],
-                        'timespan': re.subn("[^\w]", "_", args['timespan'])[0] }
+                        % {'event_id': re.subn("[^\w]", "_", event_id)[0],
+                        'timespan': re.subn("[^\w]", "_", args['timespan'])[0]}
 
             # Create closure of gatherer function in case cache
             # needs to be refreshed
@@ -735,6 +728,7 @@ def cache_customevent_trend(ids=[]):
             _get_file_using_cache(filename, gatherer, True).read()
 
     return True
+
 
 def basket_display():
     """
@@ -753,7 +747,7 @@ def basket_display():
         users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % tbl_name)[0][0]
         adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'"
                        % tbl_name)[0][0]
-        displays = run_sql("SELECT COUNT(*) FROM %s "  % tbl_name + \
+        displays = run_sql("SELECT COUNT(*) FROM %s " % tbl_name + \
                  "WHERE action = 'display' OR action = 'display_public'")[0][0]
         hits = adds + displays
         average = hits / days
@@ -767,6 +761,7 @@ def basket_display():
         res = []
 
     return res
+
 
 def alert_display():
     """
@@ -799,33 +794,42 @@ def alert_display():
 
     return res
 
+
 def loan_display():
     """
     Display loan statistics.
     """
-    total = run_sql("SELECT COUNT(*) FROM crcLOAN")[0][0]
-    toppop = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) " +
-                  "FROM crcLOAN GROUP BY id_bibrec " +
-                  "HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (" +
-                  "SELECT COUNT(DISTINCT id_crcBORROWER) n FROM crcLOAN GROUP BY id_bibrec) aux)")
-    topreq = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) " +
-                     "FROM crcLOANREQUEST GROUP BY id_bibrec " +
-                     "HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (" +
-                     "SELECT COUNT(DISTINCT id_crcBORROWER) n FROM crcLOANREQUEST GROUP BY id_bibrec) aux)")
-    res = [("Loans", total)]
-    for record in toppop:
-        res.append(("   Most popular records",
-                    book_title_from_MARC(record[0]) + '(%d)' % record[1]))
-    for record in topreq:
-        res.append(("   Most requested records", book_title_from_MARC(record[0]) + '(%d)' % record[1]))
-    loans, renewals, returns, illrequests, holdrequests = get_keyevent_bibcirculation_report()
-    res.append(("Yearly report", ''))
-    res.append(("   Loans", loans))
-    res.append(("   Renewals", renewals))
-    res.append(("   Returns", returns))
-    res.append(("   ILL requests", illrequests))
-    res.append(("   Hold requests", holdrequests))
-    return res
+    try:
+        total = run_sql("SELECT COUNT(*) FROM crcLOAN")[0][0]
+        toppop = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) \
+                      FROM crcLOAN GROUP BY id_bibrec \
+                      HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (\
+                      SELECT COUNT(DISTINCT id_crcBORROWER) n \
+                      FROM crcLOAN GROUP BY id_bibrec) aux)")
+        topreq = run_sql("SELECT id_bibrec, COUNT(DISTINCT id_crcBORROWER) " +
+                         "FROM crcLOANREQUEST GROUP BY id_bibrec " +
+                         "HAVING COUNT(DISTINCT id_crcBORROWER) = (SELECT MAX(n) from (" +
+                         "SELECT COUNT(DISTINCT id_crcBORROWER) n " +
+                         "FROM crcLOANREQUEST GROUP BY id_bibrec) aux)")
+        res = [("Loans", total)]
+        for record in toppop:
+            res.append(("   Most popular records",
+                        book_title_from_MARC(record[0]) + '(%d)' % record[1]))
+        for record in topreq:
+            res.append(("   Most requested records",
+                        book_title_from_MARC(record[0]) + '(%d)' % record[1]))
+        loans, renewals, returns, illrequests, holdrequests = \
+                get_keyevent_bibcirculation_report()
+        res.append(("Yearly report", ''))
+        res.append(("   Loans", loans))
+        res.append(("   Renewals", renewals))
+        res.append(("   Returns", returns))
+        res.append(("   ILL requests", illrequests))
+        res.append(("   Hold requests", holdrequests))
+        return res
+    except IndexError:
+        return []
+
 
 def get_url_customevent(url_dest, event_id, *arguments):
     """
@@ -864,9 +868,9 @@ def perform_request_index(ln=CFG_SITE_LANG):
     # Prepare the health base data
     health_indicators = []
     now = datetime.datetime.now()
-    yesterday = (now-datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    yesterday = (now - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
     today = now.strftime("%Y-%m-%d")
-    tomorrow = (now+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
+    tomorrow = (now + datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
     # Append session information to the health box
     if conf.get("general", "visitors_box") == "True":
@@ -877,8 +881,8 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     # Append searches information to the health box
     if conf.get("general", "search_box") == "True":
-        args = { 't_start': today, 't_end': tomorrow,
-                 'granularity': "day", 't_format': "%Y-%m-%d" }
+        args = {'t_start': today, 't_end': tomorrow,
+                 'granularity': "day", 't_format': "%Y-%m-%d"}
         searches = get_keyevent_trend_search_type_distribution(args)
         health_indicators.append(("Searches since midnight",
                                   sum(searches[0][1])))
@@ -888,15 +892,15 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     # Append new records information to the health box
     if conf.get("general", "record_box") == "True":
-        args = { 'collection': CFG_SITE_NAME, 't_start': today,
+        args = {'collection': CFG_SITE_NAME, 't_start': today,
                  't_end': tomorrow, 'granularity': "day",
-                 't_format': "%Y-%m-%d" }
+                 't_format': "%Y-%m-%d"}
         try:
             tot_records = get_keyevent_trend_collection_population(args)[0][1]
         except IndexError:
             tot_records = 0
-        args = { 'collection': CFG_SITE_NAME, 't_start': yesterday,
-                 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d" }
+        args = {'collection': CFG_SITE_NAME, 't_start': yesterday,
+                 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d"}
         try:
             new_records = tot_records - \
                 get_keyevent_trend_collection_population(args)[0][1]
@@ -961,6 +965,7 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     return out
 
+
 def perform_display_keyevent(event_id=None, args={},
                              req=None, ln=CFG_SITE_LANG):
     """
@@ -1020,7 +1025,7 @@ def perform_display_keyevent(event_id=None, args={},
     if KEYEVENT_REPOSITORY[event_id]['output'] == 'Graph' and \
             event_id != 'percentage satisfied ill requests':
         for param in choosed:
-            if options.has_key(param) and options[param] == 'combobox' and \
+            if param in options and options[param] == 'combobox' and \
                     not choosed[param] in [x[0] for x in options[param][2]]:
                 return out + TEMPLATES.tmpl_error(
                 'Please specify a valid value for parameter "%s".'
@@ -1036,7 +1041,7 @@ def perform_display_keyevent(event_id=None, args={},
                       [('event_id', re.subn("[^\w]", "_", event_id)[0])])
 
     # Get time parameters from repository
-    if choosed.has_key('timespan'):
+    if 'timespan' in choosed:
         if choosed['timespan'] == "select date":
             t_args = _get_time_parameters_select_date(args["s_date"], args["f_date"])
         else:
@@ -1054,7 +1059,7 @@ def perform_display_keyevent(event_id=None, args={},
     allow_refresh = not _is_scheduled_for_cacheing(event_id)
 
     # Get data file from cache (refresh if necessary)
-    force = choosed.has_key('timespan') and choosed['timespan'] == "select date"
+    force = 'timespan' in choosed and choosed['timespan'] == "select date"
     data = eval(_get_file_using_cache(filename, gatherer, force,
                                       allow_refresh=allow_refresh).read())
 
@@ -1064,16 +1069,16 @@ def perform_display_keyevent(event_id=None, args={},
             _get_export_closure(choosed['format'])(data, req)
             return out
         # Prepare the graph settings that are being passed on to grapher
-        settings = { "title": KEYEVENT_REPOSITORY[event_id]['specificname']\
+        settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname']\
                      % choosed,
                   "xlabel": t_args['t_fullname'] + ' (' + \
                      t_args['granularity'] + ')',
                   "ylabel": KEYEVENT_REPOSITORY[event_id]['ylabel'],
                   "xtic_format": t_args['xtic_format'],
                   "format": choosed['format'],
-                  "multiple": KEYEVENT_REPOSITORY[event_id]['multiple'] }
+                  "multiple": KEYEVENT_REPOSITORY[event_id]['multiple']}
     else:
-        if args.has_key('format') and args['format'] == 'Excel':
+        if 'format' in args and args['format'] == 'Excel':
             export_to_excel(data, req)
             return out
         settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname']\
@@ -1081,6 +1086,7 @@ def perform_display_keyevent(event_id=None, args={},
                      "rows": KEYEVENT_REPOSITORY[event_id]['rows']}
     return out + _perform_display_event(data,
                                  os.path.basename(filename), settings, ln=ln)
+
 
 def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     """
@@ -1100,24 +1106,24 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     cols_dict = _get_customevent_cols()
     cols_dict['__header'] = 'Argument'
     cols_dict['__none'] = []
-    options = { 'ids': ('Custom event', _get_customevents()),
+    options = {'ids': ('Custom event', _get_customevents()),
                 'timespan': ('Time span', _get_timespans()),
                 'format': ('Output format', _get_formats(True)),
-                'cols': cols_dict }
+                'cols': cols_dict}
 
     # Build a dictionary for the selected parameters:
     # { parameter name: argument internal name }
-    choosed = { 'ids': args['ids'], 'timespan': args['timespan'],
-                'format': args['format'],  's_date' : args['s_date'],
-                'f_date' : args['f_date']}
+    choosed = {'ids': args['ids'], 'timespan': args['timespan'],
+                'format': args['format'], 's_date': args['s_date'],
+                'f_date': args['f_date']}
     # Calculate cols
     index = []
     for key in args.keys():
         if key[:4] == 'cols':
             index.append(key[4:])
     index.sort()
-    choosed['cols'] = [ zip([""]+args['bool'+i], args['cols'+i],
-                            args['col_value'+i]) for i in index ]
+    choosed['cols'] = [zip([""] + args['bool' + i], args['cols' + i],
+                            args['col_value' + i]) for i in index]
     # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_customevent_box(options, choosed, ln=ln)
 
@@ -1181,27 +1187,28 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
         filename += args_req['t_start'] + "_" + args_req['t_end']
     else:
         filename += choosed['timespan']
-    settings = { "title": 'Custom event',
+    settings = {"title": 'Custom event',
                  "xlabel": args_req['t_fullname'] + ' (' + \
                      args_req['granularity'] + ')',
                  "ylabel": "Action quantity",
                  "xtic_format": args_req['xtic_format'],
                  "format": choosed['format'],
-                 "multiple": (type(ids) is list) and names or [] }
+                 "multiple": (type(ids) is list) and names or []}
 
     return out + _perform_display_event(data, os.path.basename(filename),
                                         settings, ln=ln)
 
+
 def perform_display_customevent_data(ids, args_req, choosed):
     """Returns the trend data"""
     data_unmerged = []
-    for event_id, i in [ (ids[i], str(i)) for i in range(len(ids))]:
+    for event_id, i in [(ids[i], str(i)) for i in range(len(ids))]:
         # Calculate cols
         args_req['cols'] = choosed['cols'][int(i)]
 
         # Get unique name for the rawdata file (wash arguments!)
         filename = "webstat_customevent_" + re.subn("[^\w]", "", event_id + \
-                   "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col)
+                   "_" + choosed['timespan'] + "_" + '-'.join([':'.join(col)
                                             for col in args_req['cols']]))[0]
 
         # Add the current id to the gatherer's arguments
@@ -1222,20 +1229,22 @@ def perform_display_customevent_data(ids, args_req, choosed):
     # Merge data from the unmerged trends into the final destination
     return [(x[0][0], tuple([y[1] for y in x])) for x in zip(*data_unmerged)]
 
+
 def perform_display_customevent_data_ascii_dump(ids, args, args_req, choosed):
     """Returns the trend data"""
-    for i in [ str(j) for j in range(len(ids))]:
-        args['bool'+i].insert(0, "")
-        args_req['cols'+i] = zip(args['bool'+i], args['cols'+i],
-                                 args['col_value'+i])
+    for i in [str(j) for j in range(len(ids))]:
+        args['bool' + i].insert(0, "")
+        args_req['cols' + i] = zip(args['bool' + i], args['cols' + i],
+                                 args['col_value' + i])
     filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) +
-                "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for
-                col in [ args['cols'+str(i)] for i in range(len(ids))]]) +
+                "_" + choosed['timespan'] + "_" + '-'.join([':'.join(col) for
+                col in [args['cols' + str(i)] for i in range(len(ids))]]) +
                                                 "_asciidump")[0]
     args_req['ids'] = ids
     gatherer = lambda: get_customevent_dump(args_req)
     force = choosed['timespan'] == "select date"
     return eval(_get_file_using_cache(filename, gatherer, force).read())
+
 
 def perform_display_stats_per_coll(collection='All', req=None, ln=CFG_SITE_LANG):
     """
@@ -1246,57 +1255,61 @@ def perform_display_stats_per_coll(collection='All', req=None, ln=CFG_SITE_LANG)
     """
     timespan = 'this month'
     events_id = ('download frequency', 'collection population', 'comments frequency')
-    format = 'gnuplot'
+    gformat = 'gnuplot'
     # Make sure extraparams are valid, if any
     if not collection in [x[0] for x in get_collection_list_plus_all()]:
         return TEMPLATES.tmpl_error('Please specify a valid value for parameter "Collection".')
 
     # Arguments OK beyond this point!
 
-    # Get unique name for caching purposes (make sure that the params used in the filename are safe!)
-    choosed = {'timespan' : timespan, 'collection' : collection}
+    # Get unique name for caching purposes (make sure that the params
+    # used in the filename are safe!)
+    choosed = {'timespan': timespan, 'collection': collection}
     out = "<table>"
     pair = False
     for event_id in events_id:
         filename = KEYEVENT_REPOSITORY[event_id]['cachefilename'] \
-               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0]) for param in choosed] +
-                      [('id', re.subn("[^\w]", "_", event_id)[0])])
+               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0])
+                       for param in choosed] +
+                      [('event_id', re.subn("[^\w]", "_", event_id)[0])])
 
         # Get time parameters from repository
-        # TODO: This should quite possibly be lifted out (webstat_engine?), in any case a cleaner repository
         _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
             _get_timespans()[3]
-        args = { 't_start': t_start, 't_end': t_end, 'granularity': granularity,
-                 't_format': t_format, 'xtic_format': xtic_format, 'collection' : collection }
+        args = {'t_start': t_start, 't_end': t_end, 'granularity': granularity,
+                't_format': t_format, 'xtic_format': xtic_format, 'collection': collection}
         # Create closure of frequency function in case cache needs to be refreshed
         gatherer = lambda: KEYEVENT_REPOSITORY[event_id]['gatherer'](args)
 
-        # Determine if this particular file is due for scheduling cacheing, in that case we must not
-        # allow refreshing of the rawdata.
+        # Determine if this particular file is due for scheduling cacheing,
+        # in that case we must not allow refreshing of the rawdata.
         allow_refresh = not _is_scheduled_for_cacheing(event_id)
 
         # Get data file from cache (refresh if necessary)
         data = eval(_get_file_using_cache(filename, gatherer, allow_refresh=allow_refresh).read())
 
         # Prepare the graph settings that are being passed on to grapher
-        settings = { "title": KEYEVENT_REPOSITORY[event_id]['specificname'] % args,
+        settings = {"title": KEYEVENT_REPOSITORY[event_id]['specificname'] % args,
                   "xlabel": t_fullname + ' (' + granularity + ')',
                   "ylabel": KEYEVENT_REPOSITORY[event_id]['ylabel'],
                   "xtic_format": xtic_format,
-                  "format": format,
+                  "format": gformat,
                   "multiple": KEYEVENT_REPOSITORY[event_id]['multiple'],
                   "size": '360,270'}
         if not pair:
             out += '<tr>'
-        out += '<td>%s</td>' % _perform_display_event(data, os.path.basename(filename), settings, ln=ln)
+        out += '<td>%s</td>' % _perform_display_event(data,
+                                    os.path.basename(filename), settings, ln=ln)
         if pair:
             out += '</tr>'
         pair = not pair
     return out + "</table>"
 
+
 def perform_display_customevent_help(ln=CFG_SITE_LANG):
     """Display the custom event help"""
     return TEMPLATES.tmpl_customevent_help(ln=ln)
+
 
 def perform_display_error_log_analyzer(ln=CFG_SITE_LANG):
     """Display the error log analyzer"""
@@ -1305,10 +1318,11 @@ def perform_display_error_log_analyzer(ln=CFG_SITE_LANG):
                                              get_invenio_last_n_errors(5),
                                              get_apache_error_log_ranking())
 
+
 def perform_display_custom_summary(args, ln=CFG_SITE_LANG):
     """Display the custom summary (annual report)
 
-    @param args: { param name: argument value } (search query and output tag)
+    @param args: { param name: argument value } (chart title, search query and output tag)
     @type args: { str: str }
     """
     if args['tag'] == '':
@@ -1317,9 +1331,11 @@ def perform_display_custom_summary(args, ln=CFG_SITE_LANG):
     tag_name = _get_tag_name(args['tag'])
     if tag_name == '':
         tag_name = args['tag']
-    path =  WEBSTAT_GRAPH_DIRECTORY + os.path.basename("tmp_webstat_custom_summary_" + args['query'] + args['tag'])
-    create_custom_summary_graph(data[:-1], path)
-    return TEMPLATES.tmpl_display_custom_summary(tag_name, data, args['query'], args['tag'], path, ln=ln)
+    path = WEBSTAT_GRAPH_DIRECTORY + os.path.basename("tmp_webstat_custom_summary_"
+                                                + args['query'] + args['tag'])
+    create_custom_summary_graph(data[:-1], path, args['title'])
+    return TEMPLATES.tmpl_display_custom_summary(tag_name, data, args['title'],
+                                    args['query'], args['tag'], path, ln=ln)
 
 # INTERNALS
 
@@ -1361,7 +1377,7 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
             try:
                 import Gnuplot
             except ImportError:
-                return 'Gnuplot is not installed. Returning ASCII art.' +\
+                return 'Gnuplot is not installed. Returning ASCII art.' + \
                        TEMPLATES.tmpl_display_event_trend_ascii(
                     settings["title"], path, ln=ln)
 
@@ -1382,6 +1398,7 @@ def _get_customevents():
     @type: [(str, str)]
     """
     return [(x[0], x[1]) for x in run_sql("SELECT id, name FROM staEVENT")]
+
 
 def _get_timespans(dttime=None):
     """
@@ -1405,47 +1422,40 @@ def _get_timespans(dttime=None):
     d_diff = lambda x: datetime.timedelta(days=x)
     # Helper function to return the number of days in the month x months ago
     d_in_m = lambda x: calendar.monthrange(
-        ((dttime.month-x<1) and dttime.year-1 or dttime.year),
-                                           (((dttime.month-1)-x)%12+1))[1]
+        ((dttime.month - x < 1) and dttime.year - 1 or dttime.year),
+                                           (((dttime.month - 1) - x) % 12 + 1))[1]
     to_str = lambda x: x.strftime(dtformat)
     dt_str = to_str(dttime)
 
     spans = [("today", "Today",
               dt_str,
-              to_str(dttime+d_diff(1)),
+              to_str(dttime + d_diff(1)),
               "hour", dtformat, "%H"),
              ("this week", "This week",
-              to_str(dttime-d_diff(dttime.weekday())),
-              to_str(dttime+d_diff(1)),
+              to_str(dttime - d_diff(dttime.weekday())),
+              to_str(dttime + d_diff(1)),
               "day", dtformat, "%a"),
              ("last week", "Last week",
-              to_str(dttime-d_diff(dttime.weekday()+7)),
-              to_str(dttime-d_diff(dttime.weekday())),
+              to_str(dttime - d_diff(dttime.weekday() + 7)),
+              to_str(dttime - d_diff(dttime.weekday())),
               "day", dtformat, "%a"),
              ("this month", "This month",
-              to_str(dttime-d_diff(dttime.day)+d_diff(1)),
-              to_str(dttime+d_diff(1)),
+              to_str(dttime - d_diff(dttime.day) + d_diff(1)),
+              to_str(dttime + d_diff(1)),
               "day", dtformat, "%d"),
              ("last month", "Last month",
-              to_str(dttime-d_diff(d_in_m(1))-d_diff(dttime.day)+d_diff(1)),
-              to_str(dttime-d_diff(dttime.day)+d_diff(1)),
+              to_str(dttime - d_diff(d_in_m(1)) - d_diff(dttime.day) + d_diff(1)),
+              to_str(dttime - d_diff(dttime.day) + d_diff(1)),
               "day", dtformat, "%d"),
              ("last three months", "Last three months",
-              to_str(dttime-d_diff(d_in_m(1))-d_diff(d_in_m(2))-
-                     d_diff(dttime.day)+d_diff(1)),
+              to_str(dttime - d_diff(d_in_m(1)) - d_diff(d_in_m(2)) -
+                     d_diff(dttime.day) + d_diff(1)),
               dt_str,
               "month", dtformat, "%b"),
              ("last year", "Last year",
-<<<<<<< HEAD
-              to_str((dt - datetime.timedelta(days=365)).replace(day=1)),
-              to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-              "month", format, "%b")]
-=======
-              to_str(dttime.replace(year=dttime.year-1,
-                                    month=(dttime.month+1) % 12, day=1)),
-              to_str(dttime.replace(month=(dttime.month+1) % 12, day=1)),
+              to_str((dttime - datetime.timedelta(days=365)).replace(day=1)),
+              to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
               "month", dtformat, "%b")]
->>>>>>> 4eeb749... WebStat: additional stats and various improvements
 
     # Get first year as indicated by the content's in bibrec
     try:
@@ -1458,47 +1468,29 @@ def _get_timespans(dttime=None):
     diff_year = year2 - year1
     if diff_year >= 2:
         spans.append(("last 2 years", "Last 2 years",
-<<<<<<< HEAD
-                      to_str((dt - datetime.timedelta(days=365*2)).replace(day=1)),
-                      to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-                      "month", format, "%b"))
-    if diff_year >= 5:
-        spans.append(("last 5 years", "Last 5 years",
-                      to_str((dt - datetime.timedelta(days=365*5)).replace(day=1)),
-                      to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-                      "year", format, "%Y"))
-    if diff_year >= 10:
-        spans.append(("last 10 years", "Last 10 years",
-                      to_str((dt - datetime.timedelta(days=365*10)).replace(day=1)),
-                      to_str((dt + datetime.timedelta(days=31)).replace(day=1)),
-                      "year", format, "%Y"))
-    spans.append(("full history", "Full history", str(y1), str(y2+1), "year", "%Y", "%Y"))
-    spans.extend([(str(x), str(x), str(x), str(x+1), "month", "%Y", "%b") for x in range(y2, y1-1, -1)])
-=======
-                      to_str(dttime.replace(year=dttime.year-2,
-                                        month=(dttime.month+1) % 12)),
-                      to_str(dttime.replace(month=(dttime.month+1) % 12)),
+                      to_str((dttime - datetime.timedelta(days=365 * 2)).replace(day=1)),
+                      to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
                       "month", dtformat, "%b"))
     if diff_year >= 5:
         spans.append(("last 5 years", "Last 5 years",
-                      to_str(dttime.replace(year=dttime.year-5,month=1)),
-                      to_str(dttime.replace(month=(dttime.month+1) % 12)),
+                      to_str((dttime - datetime.timedelta(days=365 * 5)).replace(day=1)),
+                      to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
                       "year", dtformat, "%Y"))
     if diff_year >= 10:
         spans.append(("last 10 years", "Last 10 years",
-                      to_str(dttime.replace(year=dttime.year-10,month=1)),
-                      to_str(dttime.replace(month=(dttime.month+1) % 12)),
+                      to_str((dttime - datetime.timedelta(days=365 * 10)).replace(day=1)),
+                      to_str((dttime + datetime.timedelta(days=31)).replace(day=1)),
                       "year", dtformat, "%Y"))
-    spans.append(("full history", "Full history", str(year1), str(year2+1),
+    spans.append(("full history", "Full history", str(year1), str(year2 + 1),
                   "year", "%Y", "%Y"))
-    spans.extend([(str(x), str(x), str(x), str(x+1), "month", "%Y", "%b")
-                  for x in range(year2, year1-1, -1)])
+    spans.extend([(str(x), str(x), str(x), str(x + 1), "month", "%Y", "%b")
+                  for x in range(year2, year1 - 1, -1)])
 
     spans.append(("select date", "Select date...", "", "",
                   "hour", dtformat, "%H"))
->>>>>>> 4eeb749... WebStat: additional stats and various improvements
 
     return spans
+
 
 def _get_time_parameters(options, timespan):
     """
@@ -1519,9 +1511,10 @@ def _get_time_parameters(options, timespan):
     _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
             options['timespan'][i][[x[0]
                           for x in options['timespan'][i]].index(timespan)]
-    return { 't_fullname' : t_fullname, 't_start': t_start, 't_end': t_end,
-             'granularity': granularity, 't_format': t_format,
-             'xtic_format': xtic_format }
+    return {'t_fullname': t_fullname, 't_start': t_start, 't_end': t_end,
+            'granularity': granularity, 't_format': t_format,
+            'xtic_format': xtic_format}
+
 
 def _get_time_parameters_select_date(s_date, f_date):
     """
@@ -1539,19 +1532,19 @@ def _get_time_parameters_select_date(s_date, f_date):
     t_fullname = "%s-%s" % (s_date, f_date)
     dt_start = datetime.datetime.strptime(s_date, "%m/%d/%Y %H:%M")
     dt_end = datetime.datetime.strptime(f_date, "%m/%d/%Y %H:%M")
-    if dt_end - dt_start <= timedelta (hours = 1):
+    if dt_end - dt_start <= timedelta(hours=1):
         xtic_format = "%m:%s"
         granularity = 'second'
-    elif dt_end - dt_start <= timedelta (days = 3):
+    elif dt_end - dt_start <= timedelta(days=3):
         xtic_format = "%H:%m"
         granularity = 'minute'
-    elif dt_end - dt_start <= timedelta (days = 7):
+    elif dt_end - dt_start <= timedelta(days=7):
         xtic_format = "%H"
         granularity = 'hour'
-    elif dt_end - dt_start <= timedelta (days = 60):
+    elif dt_end - dt_start <= timedelta(days=60):
         xtic_format = "%a"
         granularity = 'day'
-    elif dt_end - dt_start <= timedelta (days = 730):
+    elif dt_end - dt_start <= timedelta(days=730):
         xtic_format = "%d"
         granularity = 'month'
     else:
@@ -1560,9 +1553,10 @@ def _get_time_parameters_select_date(s_date, f_date):
     t_format = "%Y-%m-%d %H:%M:%S"
     t_start = dt_start.strftime("%Y-%m-%d %H:%M:%S")
     t_end = dt_end.strftime("%Y-%m-%d %H:%M:%S")
-    return { 't_fullname' : t_fullname, 't_start': t_start, 't_end': t_end,
-             'granularity': granularity, 't_format': t_format,
-             'xtic_format': xtic_format }
+    return {'t_fullname': t_fullname, 't_start': t_start, 't_end': t_end,
+            'granularity': granularity, 't_format': t_format,
+            'xtic_format': xtic_format}
+
 
 def _get_formats(with_dump=False):
     """
@@ -1582,6 +1576,7 @@ def _get_formats(with_dump=False):
     else:
         return [(x[0], x[1]) for x in TYPE_REPOSITORY if x[0] != 'asciidump']
 
+
 def _get_customevent_cols(event_id=""):
     """
     List of all the diferent name of columns in customevents.
@@ -1598,11 +1593,12 @@ def _get_customevent_cols(event_id=""):
     for event in run_sql(sql_str, sql_param):
         if event[0]:
             if event[1]:
-                cols[event[0]] = [ (name, name) for name
-                                   in cPickle.loads(event[1]) ]
+                cols[event[0]] = [(name, name) for name
+                                   in cPickle.loads(event[1])]
             else:
                 cols[event[0]] = []
     return cols
+
 
 def _is_type_export(typename):
     """
@@ -1618,6 +1614,7 @@ def _is_type_export(typename):
     return len(TYPE_REPOSITORY[[x[0] for x in
                                 TYPE_REPOSITORY].index(typename)]) == 3
 
+
 def _get_export_closure(typename):
     """
     Helper function that for a certain type, gives back the corresponding export
@@ -1630,6 +1627,7 @@ def _get_export_closure(typename):
     @type: function
     """
     return TYPE_REPOSITORY[[x[0] for x in TYPE_REPOSITORY].index(typename)][2]
+
 
 def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
     """
@@ -1677,6 +1675,7 @@ def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
 
     # Return the (perhaps just) cached file
     return open(filename, 'r')
+
 
 def _is_scheduled_for_cacheing(event_id):
     """

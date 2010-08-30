@@ -23,7 +23,6 @@ __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
 
-
 def verify_office_reference(uid):
     """
     Verify is there a reference for user's office
@@ -300,7 +299,6 @@ def new_hold_request(borrower_id, recid, barcode, date_from, date_to, status):
                                                 """, (borrower_id, recid, barcode,
                                                       date_from, date_to,
                                                       status))
-
     return res
 
 def get_barcode(recid):
@@ -1089,9 +1087,6 @@ def new_loan(borrower_id, recid, barcode,
                         due_date, status, loan_type, str(notes)))
 
     return res
-
-def get_last_id():
-    return run_sql("SELECT LAST_INSERT_ID()")[0]
 
 def get_item_loans(recid):
     """

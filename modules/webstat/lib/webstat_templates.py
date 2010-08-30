@@ -18,7 +18,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import datetime, cgi, urllib
+import datetime, cgi, urllib, os
 from invenio.config import \
      CFG_WEBDIR, \
      CFG_SITE_URL, \
@@ -26,6 +26,7 @@ from invenio.config import \
 
 from invenio.webstat_engine import xlwt_imported
 from invenio.webstat_engine import get_invenio_error_details
+
 
 class Template:
 
@@ -44,7 +45,7 @@ class Template:
         an easy way of overlooking the 'health', i.e. the current performance/efficency, of
         the system.
         """
-        out =  """<h3>Current system health</h3>"""
+        out = """<h3>Current system health</h3>"""
 
         temp_out = ""
         for statistic in health_statistics:
@@ -54,7 +55,7 @@ class Template:
                 temp_out += statistic[0] + '\n'
             else:
                 temp_out += statistic[0] + \
-                            '.'*(85 - len(str(statistic[0])) - len(str(statistic[1]))) + \
+                            '.' * (85 - len(str(statistic[0])) - len(str(statistic[1]))) + \
                             str(statistic[1]) + '\n'
 
         out += "<pre>" + temp_out + "</pre>"
@@ -90,7 +91,7 @@ class Template:
                     <li><a href="%(CFG_SITE_URL)s/stats/user_stats%(ln_link)s">User statistics</a></li>
                     <li><a href="%(CFG_SITE_URL)s/stats/user_lists%(ln_link)s">User lists</a></li>
                   </ul>""" % {'CFG_SITE_URL': CFG_SITE_URL,
-                              'ln_link' : (CFG_SITE_LANG != ln and '?ln='+ln) or ''}
+                              'ln_link': (CFG_SITE_LANG != ln and '?ln=' + ln) or ''}
 
     def tmpl_customevent_list(self, customevents, ln=CFG_SITE_LANG):
         """
@@ -125,13 +126,17 @@ class Template:
 
     def tmpl_error_log_statistics_list(self, ln=CFG_SITE_LANG):
         """
-        Generates the statistics of the last errors
+        Link to error log analyzer
         """
         return """<h3>Error log statistics</h3>
                  <p>Displays statistics about the last errors in the Invenio and Apache logs</p>
-                 <ul><li><a href="%s/stats/error_log%s">Error log analyzer</a></li></ul>""" % (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln='+ln) or '')
+                 <ul><li><a href="%s/stats/error_log%s">Error log analyzer</a></li>
+                 </ul>""" % (CFG_SITE_URL, (CFG_SITE_LANG != ln and '?ln=' + ln) or '')
 
     def tmpl_error_log_analyzer(self, invenio_ranking, invenio_last_errors, apache_ranking):
+        """
+        Generates the statistics of the last errors
+        """
         out = """<script src="%s/js/jquery.min.js"></script>
                  <h4>Invenio error log</h4>
                  <h5>Ranking</h5>
@@ -152,18 +157,19 @@ class Template:
                           });
                       </script>
 
-""" % {'line':cgi.escape(line),
-       'error_number':error_number,
-       'error_details':cgi.escape(get_invenio_error_details(error_number))}
+""" % {'line': cgi.escape(line),
+       'error_number': error_number,
+       'error_details': cgi.escape(get_invenio_error_details(error_number))}
             error_number -= 1
         out += """<h4>Apache error log</h4>
                   <pre>%s</pre>""" % apache_ranking
+        return out
 
     def tmpl_custom_summary(self, ln=CFG_SITE_LANG):
         """
         Link to custom annual report
         """
-        out = """<h3>Library report</h3>
+        return """<h3>Library report</h3>
                  <ul><li><a href="%s/stats/custom_summary">Custom query summary</a></li></ul>
                  """ % CFG_SITE_URL
 
@@ -176,7 +182,7 @@ class Template:
         temp_out = ""
         for coll in collections:
             temp_out += """<li><a href="%s/stats/collections?%s">%s</a></li>""" \
-                        % (CFG_SITE_URL, urllib.urlencode({'coll':coll[0]}), coll[1])
+                        % (CFG_SITE_URL, urllib.urlencode({'coll': coll[0]}), coll[1])
         if len(collections) == 0:
             out += self.tmpl_error("There are currently no collections available.", ln=ln)
         else:
@@ -254,34 +260,37 @@ class Template:
         sels = [[]]
         for param in order:
             if choosed[param] == 'select date':
-                sels[0].append(self._tmpl_select_box(options[param][2],                # SELECT box data
-                                      " - select " + options[param][1], # first item info
-                                      param,                            # name
-                                      [choosed['s_date'], choosed['f_date']], # selected value (perhaps several)
-                                      True,     # multiple box?
-                                      ln=ln))
+                sels[0].append(self._tmpl_select_box(options[param][2], # SELECT box data
+                    " - select " + options[param][1], # first item info
+                    param, # name
+                    [choosed['s_date'], choosed['f_date']], # selected value (perhaps several)
+                    True, # multiple box?
+                    ln=ln))
             elif options[param][0] == 'combobox':
-                sels[0].append(self._tmpl_select_box(options[param][2],                # SELECT box data
-                                      " - select " + options[param][1], # first item info
-                                      param,                            # name
-                                      choosed[param],                   # selected value (perhaps several)
-                                      type(choosed[param]) is list,     # multiple box?
-                                      ln=ln))
+                sels[0].append(self._tmpl_select_box(options[param][2], # SELECT box data
+                    " - select " + options[param][1], # first item info
+                    param, # name
+                    choosed[param], # selected value (perhaps several)
+                    type(choosed[param]) is list, # multiple box?
+                    ln=ln))
             elif options[param][0] == 'textbox':
-                sels[0].append(self._tmpl_text_box(param,               # name
-                                      choosed[param],                   # selected value
-                                      ln=ln))
+                sels[0].append(self._tmpl_text_box(param, # name
+                    choosed[param], # selected value
+                    ln=ln))
 
         # Create button
-        sels[0].append("""<input class="formbutton" type="submit" name="action_gen" value="Generate"/>""")
+        sels[0].append("""<input class="formbutton" type="submit"
+        name="action_gen" value="Generate"/>""")
 
         # Export to excel option
         if excel and xlwt_imported:
-            sels[0].append("""<input class="formbutton" type="submit" name="format" value="Excel"/>""")
+            sels[0].append("""<input class="formbutton" type="submit"
+            name="format" value="Excel"/>""")
         # Create form footer
         formfooter = """</form>"""
 
-        return self._tmpl_box(formheader, formfooter, ["keyevent_table"], headers, sels, [""], ln=ln)
+        return self._tmpl_box(formheader, formfooter, ["keyevent_table"],
+                              headers, sels, [""], ln=ln)
 
     def tmpl_customevent_box(self, options, choosed, ln=CFG_SITE_LANG):
         """
@@ -307,7 +316,7 @@ class Template:
 
         # Crate the ids of the tables
         table_id = ["time_format"]
-        table_id.extend([ 'cols' + str(i) for i in range(num_ids)])
+        table_id.extend(['cols' + str(i) for i in range(num_ids)])
 
         # Create the headers using the options permutation
         headers = [(options['timespan'][0], options['format'][0])]
@@ -318,27 +327,28 @@ class Template:
         sels = [[]]
         for param in ['timespan', 'format']:
             if choosed[param] == 'select date':
-                sels[0].append(self._tmpl_select_box(options[param][1],                # SELECT box data
-                                      " - select " + options[param][0], # first item info
-                                      param,                            # name
-                                      [choosed['s_date'], choosed['f_date']], # selected value (perhaps several)
-                                      True,     # multiple box?
-                                      ln=ln))
+                sels[0].append(self._tmpl_select_box(options[param][1], # SELECT box data
+                    " - select " + options[param][0], # first item info
+                    param, # name
+                    [choosed['s_date'], choosed['f_date']], # selected value (perhaps several)
+                    True, # multiple box?
+                    ln=ln))
             else:
-                sels[0].append(self._tmpl_select_box(options[param][1],                # SELECT box data
-                                      " - select " + options[param][0], # first item info
-                                      param,                            # name
-                                      choosed[param],                   # selected value (perhaps several)
-                                      type(choosed[param]) is list,     # multiple box?
-                                      ln=ln))
+                sels[0].append(self._tmpl_select_box(options[param][1], # SELECT box data
+                    " - select " + options[param][0], # first item info
+                    param, # name
+                    choosed[param], # selected value (perhaps several)
+                    type(choosed[param]) is list, # multiple box?
+                    ln=ln))
         for event_id, i in zip(choosed['ids'], range(num_ids)):
             select_table = []
             select_row = [self._tmpl_select_box(options['ids'][1],
-                                            " - select " + options['ids'][0],
-                                            'ids',
-                                            event_id,
-                                            attribute='onChange="javascript: changed_customevent(customevent[\'ids\'],%d);"' % i,
-                                            ln=ln)]
+                " - select " + options['ids'][0],
+                'ids',
+                event_id,
+                attribute='onChange="javascript: \
+                    changed_customevent(customevent[\'ids\'],%d);"' % i,
+                ln=ln)]
             is_first_loop = True
             row = 0
             if len(choosed['cols']) <= i:
@@ -348,7 +358,7 @@ class Template:
             for _, col, value in choosed['cols'][i]:
                 select_row.append("")
                 if not is_first_loop:
-                    select_row.append(self._tmpl_select_box(operators, "", "bool%d"%i, bool))
+                    select_row.append(self._tmpl_select_box(operators, "", "bool%d" % i, bool))
                 if event_id:
                     select_row.append(self._tmpl_select_box(options['cols'][event_id],
                                                     " - select " + options['cols']['__header'],
@@ -366,7 +376,7 @@ class Template:
                 else:
                     select_row.append("""<input name="col_value%d" value="%s">
                             <a href="javascript:;" onclick="delrow(%d,%d);">Remove row</a>""" \
-                            % (i,value,i,row))
+                            % (i, value, i, row))
                 select_table.append(select_row)
                 select_row = []
                 if is_first_loop:
@@ -377,19 +387,21 @@ class Template:
         # javascript for add col selectors
         sels_col = []
         sels_col.append(self._tmpl_select_box(options['ids'][1], " - select "
-                                              + options['ids'][0], 'ids', "",
-                                              False,
-                                              attribute='onChange="javascript: changed_customevent(customevent[\\\'ids\\\'],\' + col + \');"',
-                                              ln=ln))
+            + options['ids'][0], 'ids', "",
+            False,
+            attribute='onChange="javascript: \
+                changed_customevent(customevent[\\\'ids\\\'],\' + col + \');"',
+            ln=ln))
         sels_col.append("")
         sels_col.append(self._tmpl_select_box(options['cols']['__none'], "Choose CustomEvent",
                                             'cols\' + col + \'', "", False, ln=ln))
         sels_col.append("""<input name="col_value' + col + '">""")
         col_table = self._tmpl_box("", "", ["cols' + col + '"], headers[1:], [sels_col],
-                    ["""<a id="add' + col + '" href="javascript:;" onclick="addcol(\\'cols' + col + '\\', ' + col + ');">Add more arguments</a>
-                    <a id="del' + col + '" href="javascript:;" onclick="delblock(' + col + ');">Remove block</a>
-                        """], ln=ln)
-        col_table = col_table.replace('\n','')
+                    ["""<a id="add' + col + '" href="javascript:;"
+                    onclick="addcol(\\'cols' + col + '\\', ' + col + ');">Add more arguments</a>
+                    <a id="del' + col + '" href="javascript:;" onclick="delblock(' + col + ');">
+                    Remove block</a>"""], ln=ln)
+        col_table = col_table.replace('\n', '')
         formheader = """<script type="text/javascript">
                 var col = %d;
                 var col_select = new Array(%s,0);
@@ -427,11 +439,11 @@ class Template:
                     rows_pos[num][col_select[num]-1] = rows_pos_max[num];
                     rows_pos_max[num]++;
                 } """ % (num_ids,
-                        ','.join([ str(len(choosed['cols'][i])) for i in range(num_ids)]),
+                        ','.join([str(len(choosed['cols'][i])) for i in range(num_ids)]),
                         num_ids,
-                        ','.join([ str(i) for i in range(num_ids)]),
-                        ','.join([ str(len(block)) for block in choosed['cols']]),
-                        ','.join([ str(range(len(block))) for block in choosed['cols']]),
+                        ','.join([str(i) for i in range(num_ids)]),
+                        ','.join([str(len(block)) for block in choosed['cols']]),
+                        ','.join([str(range(len(block))) for block in choosed['cols']]),
                         sels_col[2].replace("' + col + '", "' + num + '"),
                         sels_col[3].replace("' + col + '", "' + num + '") + \
                                 """ <a href="javascript:;" onclick="delrow(' + num + ',' + (col_select[num]-1) + ');">Remove row</a>""")
@@ -528,7 +540,8 @@ class Template:
         # Create all footers
         footers = []
         footers.append("")
-        footers.append("""<a href="javascript:;" onclick="addcol('cols0', 0);">Add more arguments</a>""")
+        footers.append("""<a href="javascript:;" onclick="addcol('cols0', 0);">
+                            Add more arguments</a>""")
         for i in range(1, num_ids):
             footers.append("""
                     <a id="add%(i)d" href="javascript:;" onclick="addcol('cols%(i)d', %(i)d);">Add more arguments</a>
@@ -545,33 +558,50 @@ class Template:
 
     def tmpl_display_event_trend_ascii(self, title, filename, ln=CFG_SITE_LANG):
         """Displays a ASCII graph representing a trend"""
-        return self.tmpl_display_trend(title, "<div><pre>%s</pre></div>" % open(filename, 'r').read(), ln=ln)
+        try:
+            return self.tmpl_display_trend(title, "<div><pre>%s</pre></div>" %
+                                           open(filename, 'r').read(), ln=ln)
+        except IOError:
+            return "No data found"
 
     def tmpl_display_event_trend_image(self, title, filename, ln=CFG_SITE_LANG):
         """Displays an image graph representing a trend"""
-        return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" % filename.replace(CFG_WEBDIR, CFG_SITE_URL), ln=ln)
+        if os.path.isfile(filename):
+            return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" %
+                                    filename.replace(CFG_WEBDIR, CFG_SITE_URL), ln=ln)
+        else:
+            return "No data found"
+
     def tmpl_display_event_trend_text(self, title, filename, ln=CFG_SITE_LANG):
-        """Displays a Javascript graph representing a trend"""
-        return self.tmpl_display_trend(title, "<div>%s</div>" % open(filename, 'r').read(), ln=ln)
+        """Displays a text representing a trend"""
+        try:
+            return self.tmpl_display_trend(title, "<div>%s</div>" %
+                                           open(filename, 'r').read(), ln=ln)
+        except IOError:
+            return "No data found"
 
-
-    def tmpl_display_custom_summary(self, tag_name, data, query, tag, path, ln=CFG_SITE_LANG):
+    def tmpl_display_custom_summary(self, tag_name, data, title, query, tag,
+                                    path, ln=CFG_SITE_LANG):
         """Display the custom summary (annual report)"""
         # Create the FORM's header
         formheader = """<form method="get">
         <input type="hidden" name="ln"value="%s" />""" % ln
 
         # Create the headers
-        headers = [("Query", "Output tag","")]
+        headers = [("Chart title", "Query", "Output tag", "")]
 
         # Create the body (text boxes and button)
-        fields = (("""<input type="text" name="query" value="%s" size="35"/>""" % cgi.escape(query), """<input type="text" name="tag" value="%s"/>""" % cgi.escape(tag), """<input class="formbutton" type="submit" name="action_gen" value="Generate"/>"""),)
+        fields = (("""<input type="text" name="title" value="%s" size="20"/>""" % cgi.escape(title),
+                   """<input type="text" name="query" value="%s" size="35"/>""" % cgi.escape(query),
+                   """<input type="text" name="tag" value="%s" size="10"/>""" % cgi.escape(tag),
+                   """<input class="formbutton" type="submit" name="action_gen" value="Generate"/>"""), )
 
         # Create form footer
         formfooter = """</form>"""
 
 
-        out = self._tmpl_box(formheader, formfooter, [("custom_summary_table",)], headers, fields, [""], ln=ln)
+        out = self._tmpl_box(formheader, formfooter, [("custom_summary_table", )],
+                             headers, fields, [""], ln=ln)
 
         out += """<div>
 <table border>
@@ -598,11 +628,10 @@ Distribution across %s
 </tr>
 """ % (number, cgi.escape(title))
         out += """</table></div>
-<div><img src="%s" /></div>"""%cgi.escape(path.replace(CFG_WEBDIR, CFG_SITE_URL))
+<div><img src="%s" /></div>""" % cgi.escape(path.replace(CFG_WEBDIR, CFG_SITE_URL))
         return out
 
     # INTERNALS
-
     def tmpl_display_trend(self, title, html, ln=CFG_SITE_LANG):
         """
         Generates a generic display box for showing graphs (ASCII and IMGs)
@@ -613,7 +642,8 @@ Distribution across %s
                    <tbody><tr><td class="narrowsearchboxbody" valign="top">%s</td></tr></tbody>
                   </table> """ % (title, html)
 
-    def _tmpl_box(self, formheader, formfooter, table_id, headers, selectboxes, footers, ln=CFG_SITE_LANG):
+    def _tmpl_box(self, formheader, formfooter, table_id, headers, selectboxes,
+                  footers, ln=CFG_SITE_LANG):
         """
         Aggregates together the parameters in order to generate the
         corresponding box for customevent.
@@ -680,7 +710,8 @@ Distribution across %s
 
         return out
 
-    def _tmpl_select_box(self, iterable, explaination, name, preselected, multiple=False, attribute="", ln=CFG_SITE_LANG):
+    def _tmpl_select_box(self, iterable, explaination, name, preselected,
+                         multiple=False, attribute="", ln=CFG_SITE_LANG):
         """
         Generates a HTML SELECT drop-down menu.
 
@@ -718,7 +749,8 @@ Distribution across %s
                     }
 
                 </script>
-                <select name="timespan" id="timespan" onchange="javascript: changeTimeSpanDates(this.value);">"""
+                <select name="timespan" id="timespan"
+                    onchange="javascript: changeTimeSpanDates(this.value);">"""
             else:
                 sel = """<select name="%s">""" % name
 
@@ -731,7 +763,9 @@ Distribution across %s
             if printname is None:
                 printname = realname
             option = """<option value="%s">%s</option>""" % (realname, printname)
-            if realname == preselected or (type(preselected) is list and realname in preselected) or (name == "timespan" and realname == 'select date' and multiple):
+            if realname == preselected or (type(preselected) is list
+                    and realname in preselected) or (name == "timespan" and
+                                realname == 'select date' and multiple):
                 option = option.replace('">', '" selected="selected">')
             sel += option
         sel += "</select>"
@@ -742,10 +776,11 @@ Distribution across %s
             else:
                 s_date = datetime.datetime.today().date().strftime("%m/%d/%Y %H:%M")
                 f_date = datetime.datetime.now().strftime("%m/%d/%Y %H:%M")
-            sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui.css" type="text/css" />
+            sel += """<link rel="stylesheet" href="%(CFG_SITE_URL)s/img/jquery-ui.css"
+                        type="text/css" />
                       <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.min.js"></script>
                      <script language="javascript" type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-1.7.3.custom.min.js"></script>
-                      <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.min.js"></script>
+                      <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery-ui-timepicker-addon.js"></script>
 
                       <div id="selectDateTxt" onload style="position:relative;display:none">
                       <table align="center">
@@ -762,8 +797,8 @@ Distribution across %s
                       <script type="text/javascript">
                         $('#s_date').datetimepicker();
                         $('#f_date').datetimepicker({
-	                      hour: 23,
-	                      minute: 59
+                          hour: 23,
+                          minute: 59
                         });
                         if(document.getElementById("timespan").value == "select date"){
                             document.getElementById("selectDateTxt").style.display='block';

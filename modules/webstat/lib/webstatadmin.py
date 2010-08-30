@@ -27,12 +27,13 @@ from invenio.bibtask import task_init, task_get_option, task_set_option, \
                             task_has_option, task_update_progress, write_message
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
 
+
 def main():
     """Main dealing with all the BibTask magic."""
     task_init(authorization_action="runwebstatadmin",
               authorization_msg="Webstat Administrator",
               description="Description: %s Creates/deletes custom events. Can be set\n"
-                          "             to cache key events and previously defined custom events.\n" % sys.argv[0] ,
+                          "             to cache key events and previously defined custom events.\n" % sys.argv[0],
               help_specific_usage="  -n, --new-event=ID            create a new custom event with the human-readable ID\n"
                                   "  -r, --remove-event=ID         remote the custom event with id ID and all its data\n"
                                   "  -S, --show-events             show all currently available custom events\n"
@@ -50,10 +51,11 @@ def main():
               version=__revision__,
               specific_params=("n:r:Sl:a:c:de", ["new-event=", "remove-event=", "show-events",
                                                   "event-label=", "args=", "cache-events=", "dump-config",
-                                                  "load-config" ]),
+                                                  "load-config"]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_submit_check_options_fnc=task_submit_check_options,
               task_run_fnc=task_run_core)
+
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """
@@ -89,6 +91,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         return False
 
     return True
+
 
 def task_submit_check_options():
     """
@@ -199,7 +202,7 @@ display-your-searches-url = "/youralerts/display"
                             cols.append("")
                         cols[index] = value
                 if name:
-                    res = run_sql("SELECT COUNT(id) FROM staEVENT WHERE id = %s", (name,))
+                    res = run_sql("SELECT COUNT(id) FROM staEVENT WHERE id = %s", (name, ))
                     if res[0][0] == 0:
                         # name does not exist, create customevent
                         webstat.create_customevent(name, name, cols)
@@ -212,6 +215,7 @@ display-your-searches-url = "/youralerts/display"
     else:
         # False means that the --help should be displayed
         return False
+
 
 def task_run_core():
     """
@@ -227,7 +231,7 @@ def task_run_core():
         for i in range(len(keyevents)):
             write_message("Caching key event 1: %s" % keyevents[i])
             webstat.cache_keyevent_trend(keyevents)
-            task_update_progress("Part 1/2: done %d/%d" % (i+1, len(keyevents)))
+            task_update_progress("Part 1/2: done %d/%d" % (i + 1, len(keyevents)))
 
     # Cache custom events
     customevents = task_get_option("customevents")
@@ -235,10 +239,9 @@ def task_run_core():
         for i in range(len(customevents)):
             write_message("Caching custom event 1: %s" % customevents[i])
             webstat.cache_customevent_trend(customevents)
-            task_update_progress("Part 2/2: done %d/%d" % (i+1, len(customevents)))
+            task_update_progress("Part 2/2: done %d/%d" % (i + 1, len(customevents)))
 
     write_message("Finished rawdata caching succesfully")
     task_update_progress("Finished rawdata caching succesfully")
 
     return True
-

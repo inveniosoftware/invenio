@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import tempfile
 
-from invenio.config import CFG_WEBDIR, CFG_SITE_URL
+from invenio.config import CFG_WEBDIR, CFG_SITE_URL, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS
 from invenio.websubmit_config import *
 
 ## test gnuplot presence:
@@ -32,8 +32,7 @@ try:
 except ImportError, e:
     cfg_gnuplot_available = 0
 
-GRAPH_TYPES = (('gnuplot', 'GNU plot'),('flot', 'Flot'))
-DISPLAY_TYPE_BOX = 0
+GRAPH_TYPES = ((1, 'GNU plot'),(2, 'Flot'))
 
 def write_coordinates_in_tmp_file(lists_coordinates):
     """write the graph coordinates in a temporary file for reading it later
@@ -68,7 +67,7 @@ def write_coordinates_in_tmp_file(lists_coordinates):
 
     return [fname, max_y_datas]
 
-def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, format):
+def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, gnuplot=False):
     """From a temporary file, draw a gnuplot graph
     The arguments are as follows:
     recid          - record ID
@@ -85,12 +84,8 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
     y_max          - Max value of y. Used to set y range.
     docid_list     - In download_history case, docid_list is used to plot multiple curves.
     graphe_titles  - List of graph titles. It's used to name the curve in the legend.
-    intervals      - x tics location and xrange specification
-    format         - gnuplot or flot"""
-    global DISPLAY_TYPE_BOX
-    if not DISPLAY_TYPE_BOX:
-        format = 'flot'
-    if format == 'gnuplot':
+    intervals      - x tics location and xrange specification"""
+    if gnuplot or CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 1:
         if cfg_gnuplot_available == 0:
             return (None, None)
         #For different curves
@@ -176,13 +171,13 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
             plot_text = """plot "% s" index 0:0 using 1:2 title "" w steps lt %s lw 3"""  % (data_file, color_line_list[1])
 
         g('%s' % plot_text)
-    elif format == 'flot':
+    elif CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS == 2:
         graphe_name = "tmp_%s_%s_stats.html" % (kind_of_graphe, recid)
         out = """
               <!--[if IE]><script language="javascript" type="text/javascript" src="%(site)s/js/excanvas.min.js"></script><![endif]-->
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery-1.4.2.min.js"></script>
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.js"></script>
-              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.js"></script>
+              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.min.js"></script>
+              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.min.js"></script>
+              <script language="javascript" type="text/javascript" src="%(site)s/js/jquery.flot.selection.min.js"></script>
               <script id="source" language="javascript" type="text/javascript">
                      document.write('<div style="float:left"><div id="placeholder" style="width:500px;height:400px"></div></div>'+
               '<div id="miniature" style="float:left;margin-left:20px;margin-top:50px">' +
@@ -293,11 +288,8 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
             """
         options += """grid: { hoverable: true, clickable: true },
                 selection: { mode: "xy" } };"""
-        if not DISPLAY_TYPE_BOX:
-            DISPLAY_TYPE_BOX = True
-            # Generate also the gnuplot image in case javascript is disabled
-            gnuplotimage = create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, 'gnuplot')
-            DISPLAY_TYPE_BOX = False
+        # Generate also the gnuplot image in case javascript is disabled
+        gnuplotimage = create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals, gnuplot=True)
         # Write the plot method in javascript
         out += """%s
         var startData = getData();
@@ -377,10 +369,7 @@ def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, o
                 </script>"""
         # Support for disabled javascript
         out += "<noscript>"
-        if DISPLAY_TYPE_BOX:
-            out += "Javascript is disabled. Please, select another output format"
-        else:
-            out += """<img src='%s/img/%s' align="center" alt="">"""% (CFG_SITE_URL, gnuplotimage[0])
+        out += """<img src='%s/img/%s' align="center" alt="">"""% (CFG_SITE_URL, gnuplotimage[0])
         out += "</noscript>"
         open(CFG_WEBDIR + "/img/" + graphe_name, 'w').write(out)
         data.close()
@@ -416,16 +405,3 @@ def plot_command(first_line, file_source, indexes, title, style, line_type, line
     else:
         plot_text = """, "%s" index %s:%s using 1:2 title "%s" with %s lt %s lw %s %s %s"""  % (file_source, indexes[0], indexes[1], title, style, line_type, line_width, point_type, point_size)
     return plot_text
-
-def graph_type_box(graphtype):
-    if DISPLAY_TYPE_BOX:
-        out = """<p class="searchboxheader">Output format<br /><form method="get"><select name="graphtype">""" 
-        for gtype in GRAPH_TYPES:
-            if gtype[0] == graphtype:
-                out += """<option value="%s" selected>%s</option>"""%(gtype[0], gtype[1])
-            else:
-                out += """<option value="%s">%s</option>"""%(gtype[0], gtype[1])
-        out += """</select><input class="formbutton" type="submit" name="action_gen" value="Generate">  </form></p>"""
-        return out
-    else:
-        return ""

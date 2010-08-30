@@ -860,6 +860,7 @@ def loan_on_desk_step4(req, list_of_books, user_info,
 
         db.new_loan(is_borrower, list_of_books[i][0], list_of_books[i][1],
                     loaned_on, due_date[i], 'on loan', 'normal', note_format)
+
         db.update_item_status('on loan', list_of_books[i][1])
 
     navtrail_previous_links = '<a class="navtrail" ' \
@@ -986,11 +987,11 @@ def register_new_loan(req, barcode, borrower_id,
         else:
             note_format = ''
 
-        db.new_loan(borrower_id, recid, barcode,
+        last_id = db.new_loan(borrower_id, recid, barcode,
                     loaned_on, due_date, 'on loan', 'normal', note_format)
         # register event in webstat
         try:
-            register_customevent("loanrequest", [request_id, db.get_last_id()[0]])
+            register_customevent("loanrequest", [request_id, last_id])
         except:
             register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
         requested_barcode = db.get_requested_barcode(request_id)
@@ -3351,7 +3352,6 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
         due_date = renew_loan_for_X_days(barcode)
         db.new_loan(borrower_id, has_recid, barcode,
                     loaned_on, due_date, 'on loan', 'normal', notes_format)
-
         result = db.get_all_loans(20)
         title = "Current loans"
         infos.append('A new loan has been registered with success.')
@@ -4112,10 +4112,9 @@ def place_new_loan_step3(req, barcode, recid, _ccid, name, email, phone,
                                                               ln=ln)
 
     elif is_borrower != 0:
-        db.new_loan(is_borrower, recid, barcode,
+        last_id = db.new_loan(is_borrower, recid, barcode,
                     loaned_on, due_date, 'on loan',
                     'normal', notes_format)
-
         db.update_item_status('on loan', barcode)
 
         title = "New loan"
