@@ -295,6 +295,17 @@ class SimulatedModPythonRequest(object):
     def get_cleanups(self):
         return self.__cleanups
 
+    def __str__(self):
+        from pprint import pformat
+        out = ""
+        for key in dir(self):
+            try:
+                if not callable(getattr(self, key)) and not key.startswith("_SimulatedModPythonRequest") and not key.startswith('__'):
+                    out += 'req.%s: %s\n' % (key, pformat(getattr(self, key)))
+            except:
+                pass
+        return out
+
     content_type = property(get_content_type, set_content_type)
     unparsed_uri = property(get_unparsed_uri)
     uri = property(get_uri)

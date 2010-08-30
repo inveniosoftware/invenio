@@ -25,13 +25,15 @@ __revision__ = \
 
 __lastupdated__ = """$Date$"""
 
+import cgi
+
 from invenio.config import CFG_SITE_URL
 from invenio.webpage import page
 from invenio.webinterface_handler import WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url
 
 class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
-    _exports = ["", "post1", "post2", "sso"]
+    _exports = ["", "post1", "post2", "sso", "dumpreq"]
 
     def __call__(self, req, form):
         redirect_to_url(req, CFG_SITE_URL + '/httptest/post1')
@@ -51,6 +53,12 @@ class WebInterfaceHTTPTestPages(WebInterfaceDirectory):
             out += "<tr><td><strong>%s</strong></td><td>%s</td></tr>" % (var, value)
         out += "</table></body></html>"
         return out
+
+    def dumpreq(self, req, form):
+        """
+        Dump a textual representation of the request object.
+        """
+        return "<pre>%s</pre>" % cgi.escape(str(req))
 
     def post1(self, req, form):
         """
