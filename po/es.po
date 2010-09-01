@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
-"PO-Revision-Date: 2010-08-20 07:35+0200\n"
+"PO-Revision-Date: 2010-08-31 19:38+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1350,9 +1350,8 @@ msgid "Comparison of:"
 msgstr "Comparación entre:"
 
 #: modules/bibedit/lib/bibedit_templates.py:251
-#, fuzzy
 msgid "Revision"
-msgstr "división"
+msgstr "Revisión"
 
 #: modules/bibformat/lib/bibformat_templates.py:315
 #: modules/bibformat/lib/bibformat_templates.py:427
@@ -1525,9 +1524,8 @@ msgstr "Esconder la documentación"
 
 #: modules/bibformat/lib/bibformat_templates.py:583
 #: modules/websubmit/lib/websubmit_templates.py:876
-#, fuzzy
 msgid "Your modifications will not be saved."
-msgstr "Sus modificacions han sido enviadas"
+msgstr "Sus modificaciones no serán guardadas."
 
 #: modules/bibformat/lib/bibformat_templates.py:932
 #: modules/bibformat/lib/bibformat_templates.py:1056
@@ -1775,9 +1773,8 @@ msgid "Manage Files of This Record"
 msgstr "Gestionar los ficheros de este registro"
 
 #: modules/bibformat/lib/elements/bfe_edit_record.py:52
-#, fuzzy
 msgid "Edit This Record"
-msgstr "Edite otro registro"
+msgstr "Edite este registro"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:189
 #: modules/bibformat/web/admin/bibformatadmin.py:257
@@ -1946,38 +1943,32 @@ msgid "View next entries..."
 msgstr "Ver las próximas entradas..."
 
 #: modules/bibharvest/lib/bibharvest_templates.py:340
-#, fuzzy
 msgid "previous month"
-msgstr "anterior"
+msgstr "mes anterior"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:347
-#, fuzzy
 msgid "next month"
-msgstr "cualquier mes"
+msgstr "mes siguiente"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:442
-#, fuzzy
 msgid "main Page"
-msgstr "Páginas de administración"
+msgstr "Páginas principal"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:449
 #: modules/bibharvest/lib/oai_harvest_admin.py:100
-#, fuzzy
 msgid "edit"
-msgstr "Editar"
+msgstr "editar"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:453
 #: modules/websubmit/lib/websubmit_managedocfiles.py:997
 #: modules/bibharvest/lib/oai_harvest_admin.py:104
-#, fuzzy
 msgid "delete"
-msgstr "Suprimir"
+msgstr "suprimir"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:457
 #: modules/bibharvest/lib/oai_harvest_admin.py:108
-#, fuzzy
 msgid "test"
-msgstr "veces"
+msgstr "comprobar"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:461
 #: modules/bibharvest/lib/oai_harvest_admin.py:112
@@ -1986,9 +1977,8 @@ msgstr "historia"
 
 #: modules/bibharvest/lib/bibharvest_templates.py:465
 #: modules/bibharvest/lib/oai_harvest_admin.py:116
-#, fuzzy
 msgid "harvest"
-msgstr "Cesta compartida"
+msgstr "recolectar"
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:126
 msgid "Citation history:"
@@ -2003,39 +1993,33 @@ msgid "Download user distribution:"
 msgstr "Distribución de las descargas"
 
 #: modules/bibupload/lib/batchuploader_templates.py:129
-#, fuzzy
 msgid "Warning: Please, select a valid time"
-msgstr "Seleccione una categoría"
+msgstr "Atención: seleccione un tiempo válido"
 
 #: modules/bibupload/lib/batchuploader_templates.py:133
-#, fuzzy
 msgid "Warning: Please, select a valid file"
-msgstr "Seleccione una categoría"
+msgstr "Atención: seleccione un fichero válido"
 
 #: modules/bibupload/lib/batchuploader_templates.py:137
 msgid "Warning: The date format is not correct"
 msgstr "Atención: el formato de la fecha no es correcto"
 
 #: modules/bibupload/lib/batchuploader_templates.py:141
-#, fuzzy
 msgid "Warning: Please, select a valid date"
-msgstr "Seleccione una categoría"
+msgstr "Atención: seleccione una fecha válida"
 
 #: modules/bibupload/lib/batchuploader_templates.py:167
-#, fuzzy
 msgid "Select file to upload: "
-msgstr "Seleccione el método"
+msgstr "Seleccione el fichero a subir: "
 
 #: modules/bibupload/lib/batchuploader_templates.py:168
-#, fuzzy
 msgid "File type:"
-msgstr "Fichero subido"
+msgstr "Tipo de fichero:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:169
 #: modules/bibupload/lib/batchuploader_templates.py:357
-#, fuzzy
 msgid "Upload mode:"
-msgstr "Subir"
+msgstr "Modo de carga:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:170
 #: modules/bibupload/lib/batchuploader_templates.py:358
@@ -2044,22 +2028,19 @@ msgstr "Prefiere subirlo después?  En este caso seleccione:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:171
 #: modules/bibupload/lib/batchuploader_templates.py:359
-#, fuzzy
 msgid "Date:"
-msgstr "Fecha"
+msgstr "Fecha:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:172
 #: modules/bibupload/lib/batchuploader_templates.py:360
-#, fuzzy
 msgid "Time:"
-msgstr "Hora"
+msgstr "Hora:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:173
 #: modules/bibupload/lib/batchuploader_templates.py:355
 #: modules/bibupload/lib/batchuploader_templates.py:361
-#, fuzzy
 msgid "Example:"
-msgstr "Ejemplo"
+msgstr "Ejemplo:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:174
 #: modules/bibupload/lib/batchuploader_templates.py:362
@@ -2067,37 +2048,33 @@ msgid "All fields with"
 msgstr "Todos los campos con"
 
 #: modules/bibupload/lib/batchuploader_templates.py:175
-#, fuzzy
 msgid "are mandatory"
-msgstr "obligatorio"
+msgstr "son obligatorios"
 
 #: modules/bibupload/lib/batchuploader_templates.py:191
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your file has been succesfully queued. You can check your %(x_url1_open)"
 "supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%"
 "(x_url2_close)s"
 msgstr ""
-"Usted se ha identificado como %(x_user)s. Ahora puede a) %(x_url1_open)"
-"sdesconectarse%(x_url1_close)s; b) modificar las %(x_url2_open)spreferencias "
-"de su cuenta%(x_url2_close)s."
+"Su fichero está en cola. Ahora puede comprobar su "
+"%(x_url1_open)shistórico de cargas%(x_url1_close)s o "
+"%(x_url2_open)senviar otro fichero%(x_url2_close)s"
 
 #: modules/bibupload/lib/batchuploader_templates.py:205
-#, fuzzy
 msgid "No metadata files have been uploaded yet."
-msgstr "Todavía no existe ningún revisor seleccionado."
+msgstr "Todavía no se ha subido ningún fichero con metadatos."
 
 #: modules/bibupload/lib/batchuploader_templates.py:218
 #: modules/bibupload/lib/batchuploader_templates.py:260
-#, fuzzy
 msgid "Submit time"
-msgstr "Ayuda para el envio"
+msgstr "Enviado el"
 
 #: modules/bibupload/lib/batchuploader_templates.py:219
 #: modules/bibupload/lib/batchuploader_templates.py:261
-#, fuzzy
 msgid "File name"
-msgstr "nombre de la alerta"
+msgstr "Nombre del fichero"
 
 #: modules/bibupload/lib/batchuploader_templates.py:220
 #: modules/bibupload/lib/batchuploader_templates.py:262
@@ -2105,9 +2082,8 @@ msgid "Execution time"
 msgstr "Tiempo de ejecución"
 
 #: modules/bibupload/lib/batchuploader_templates.py:247
-#, fuzzy
 msgid "No document files have been uploaded yet."
-msgstr "Todavía no existe ningún revisor seleccionado."
+msgstr "Todavía no se ha subido ningún documento."
 
 #: modules/bibupload/lib/batchuploader_templates.py:302
 #: modules/bibupload/lib/batchuploader_webinterface.py:134
@@ -2123,14 +2099,12 @@ msgstr "Carga masiva de documentos"
 
 #: modules/bibupload/lib/batchuploader_templates.py:308
 #: modules/bibupload/lib/batchuploader_webinterface.py:316
-#, fuzzy
 msgid "Upload history"
-msgstr "Histórico de descargas:"
+msgstr "Histórico de envíos:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:311
-#, fuzzy
 msgid "Daemon monitor"
-msgstr "cualquier mes"
+msgstr "Seguimiento de tareas"
 
 #: modules/bibupload/lib/batchuploader_templates.py:354
 msgid "Input dir:"
@@ -2141,9 +2115,8 @@ msgid "Filename matching:"
 msgstr "Ficheros del tipo:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:363
-#, fuzzy
 msgid "are mandatory."
-msgstr "obligatorio"
+msgstr "son obligatorios."
 
 #: modules/bibupload/lib/batchuploader_templates.py:371
 #, python-format
@@ -2151,14 +2124,12 @@ msgid "<b>%s documents</b> have been found."
 msgstr "Se han encontrado <b>%s documentos</b>."
 
 #: modules/bibupload/lib/batchuploader_templates.py:373
-#, fuzzy
 msgid "The following files have been succesfully queued:"
-msgstr "Se han encontrado los siguentes errores"
+msgstr "Ficheros que están correctamente en la cola:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:378
-#, fuzzy
 msgid "The following errors have ocurred:"
-msgstr "Se han encontrado los siguentes errores"
+msgstr "Se han encontrado los siguentes errores:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:385
 msgid ""
@@ -2178,13 +2149,12 @@ msgstr ""
 "ejecutan una vez."
 
 #: modules/bibupload/lib/batchuploader_templates.py:398
-#, fuzzy
 msgid "Check the"
-msgstr "Haga clic aquí"
+msgstr "Compruebe la"
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 msgid " Batch Uploader daemon help page"
-msgstr " Página de ayuda del proceso de subida masiva"
+msgstr " página de ayuda del proceso de subida masiva"
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 msgid " for executing these actions periodically."
@@ -2503,7 +2473,7 @@ msgstr "Hola:"
 
 #: modules/miscutil/lib/mailutils.py:182 modules/miscutil/lib/mailutils.py:202
 msgid "Best regards"
-msgstr "Hasta la vista"
+msgstr "Cordialmente"
 
 #: modules/miscutil/lib/mailutils.py:184 modules/miscutil/lib/mailutils.py:204
 msgid "Need human intervention?  Contact"
@@ -2532,9 +2502,8 @@ msgid "Run Record Merger"
 msgstr "Unificar registros"
 
 #: modules/webaccess/lib/access_control_config.py:238
-#, fuzzy
 msgid "Configure Bibknowledge"
-msgstr "Configurar BibIndex"
+msgstr "Configurar Bibknowledge"
 
 #: modules/webaccess/lib/access_control_config.py:239
 #: modules/websession/lib/websession_templates.py:1097
@@ -2543,14 +2512,13 @@ msgstr "Configurar BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:240
 #: modules/websession/lib/websession_templates.py:1100
-#, fuzzy
 msgid "Configure OAI Harvest"
-msgstr "Configurar BibHarvest"
+msgstr "Configurar OAI Harvest"
 
 #: modules/webaccess/lib/access_control_config.py:241
 #: modules/websession/lib/websession_templates.py:1102
 msgid "Configure OAI Repository"
-msgstr "Configurar el repositorio OAI"
+msgstr "Configurar OAI Repository"
 
 #: modules/webaccess/lib/access_control_config.py:242
 #: modules/websession/lib/websession_templates.py:1104
@@ -2584,15 +2552,13 @@ msgstr "Configurar WebSumbit"
 
 #: modules/webaccess/lib/access_control_config.py:248
 #: modules/websession/lib/websession_templates.py:1112
-#, fuzzy
 msgid "Configure WebJournal"
-msgstr "Configurar WebComment"
+msgstr "Configurar WebJournal"
 
 #: modules/webaccess/lib/access_control_config.py:249
 #: modules/websession/lib/websession_templates.py:1091
-#, fuzzy
 msgid "Run BibCirculation"
-msgstr "Ejecutar BibEdit"
+msgstr "Ejecutar BibCirculation"
 
 #: modules/webaccess/lib/access_control_config.py:250
 #: modules/websession/lib/websession_templates.py:1095
@@ -2689,9 +2655,8 @@ msgstr "desconocida"
 
 #: modules/webalert/lib/webalert.py:163 modules/webalert/lib/webalert.py:217
 #: modules/webalert/lib/webalert.py:303 modules/webalert/lib/webalert.py:341
-#, fuzzy
 msgid "You do not have rights for this operation."
-msgstr "No tiene suficientes permisos para ver el contenido de esta cesta."
+msgstr "No tiene permisos para esta operación."
 
 #: modules/webalert/lib/webalert.py:198
 msgid "You already have an alert defined for the specified query and basket."
@@ -2976,9 +2941,8 @@ msgstr "Definir una nueva alerta"
 #: modules/webalert/lib/webalert_webinterface.py:357
 #: modules/webalert/lib/webalert_webinterface.py:434
 #: modules/webalert/lib/webalert_webinterface.py:508
-#, fuzzy
 msgid "You are not authorized to use alerts."
-msgstr "No está autorizado a ver esta área."
+msgstr "No está autorizado a gestionar alertas."
 
 #: modules/webalert/lib/webalert_webinterface.py:79
 msgid "Popular Searches"
@@ -3166,26 +3130,23 @@ msgstr "Lista de cestas públicas"
 
 #: modules/webbasket/lib/webbasket.py:2098
 #: modules/webbasket/lib/webbasket_webinterface.py:425
-#, fuzzy
 msgid "Search baskets"
-msgstr "Cesta compartida"
+msgstr "Cestas de búsquedas"
 
 #: modules/webbasket/lib/webbasket.py:2103
 #: modules/webbasket/lib/webbasket_webinterface.py:731
 #: modules/websearch/lib/websearch_templates.py:2848
 #: modules/websearch/lib/websearch_templates.py:3034
-#, fuzzy
 msgid "Add to basket"
-msgstr "Añadir a las cestas"
+msgstr "Añadir a la cesta"
 
 #: modules/webbasket/lib/webbasket.py:2143
 #: modules/webbasket/lib/webbasket_templates.py:218
 #: modules/webbasket/lib/webbasket_templates.py:224
 #: modules/webbasket/lib/webbasket_templates.py:626
 #: modules/webbasket/lib/webbasket_templates.py:734
-#, fuzzy
 msgid "Public baskets"
-msgstr "Cesta pública"
+msgstr "Cestas públicas"
 
 #: modules/webbasket/lib/webbasket.py:2173
 #, python-format
@@ -3197,26 +3158,24 @@ msgstr ""
 "cestas de grupo, y a %(x_nb_public)s cestas públicas de otros usuarios."
 
 #: modules/webbasket/lib/webbasket_templates.py:83
-#, fuzzy
 msgid "creating a new basket"
-msgstr "Crear una nueva cesta"
+msgstr "crear una nueva cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:88
-#, fuzzy
 msgid ""
 "You have no personal or group baskets or are subscribed to any public baskets"
-msgstr "%i grupos de usuarios se han subscrito a esta cesta."
+msgstr ""
+"No tiene cestas personal o de grupo, ni suscriptores a cestas "
+"públicas"
 
 #: modules/webbasket/lib/webbasket_templates.py:89
-#, fuzzy
 msgid "You may want to start by"
-msgstr "Puede comenzar a visualizar desde %s"
+msgstr "Puede comenzar a"
 
 #: modules/webbasket/lib/webbasket_templates.py:112
 #: modules/webbasket/lib/webbasket_templates.py:178
-#, fuzzy
 msgid "Back to Your Baskets"
-msgstr "Volver a las cestas"
+msgstr "Volver a sus cestas"
 
 #: modules/webbasket/lib/webbasket_templates.py:118
 #: modules/webbasket/lib/webbasket_webinterface.py:1208
@@ -3225,23 +3184,20 @@ msgstr "Crear cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:124
 #: modules/webbasket/lib/webbasket_webinterface.py:1131
-#, fuzzy
 msgid "Edit topic"
-msgstr "Editar grupo"
+msgstr "Editar el tema"
 
 #: modules/webbasket/lib/webbasket_templates.py:559
-#, fuzzy
 msgid "Search baskets for"
-msgstr "Buscar en %s registros:"
+msgstr "Buscarlo en las cestas"
 
 #: modules/webbasket/lib/webbasket_templates.py:560
 msgid "Search also in notes (where allowed)"
 msgstr "Buscar también en las notas (si procede)"
 
 #: modules/webbasket/lib/webbasket_templates.py:597
-#, fuzzy
 msgid "Results overview"
-msgstr "Sumario de los comentarios"
+msgstr "Sumario de los resultados"
 
 #: modules/webbasket/lib/webbasket_templates.py:599
 #: modules/webbasket/lib/webbasket_templates.py:609
@@ -3256,20 +3212,17 @@ msgstr "Sumario de los comentarios"
 #: modules/webbasket/lib/webbasket_templates.py:755
 #: modules/webbasket/lib/webbasket_templates.py:772
 #: modules/webbasket/lib/webbasket_templates.py:789
-#, fuzzy
 msgid "items found"
-msgstr "No se han encontrado valores."
+msgstr "items encontrados"
 
 #: modules/webbasket/lib/webbasket_templates.py:636
 #: modules/webbasket/lib/webbasket_templates.py:769
-#, fuzzy
 msgid "All public baskets"
-msgstr "Cesta pública"
+msgstr "Todas las cestas públicas"
 
 #: modules/webbasket/lib/webbasket_templates.py:653
-#, fuzzy
 msgid "No items found."
-msgstr "No se han encontrado valores."
+msgstr "No se ha encontrado ninguno."
 
 #: modules/webbasket/lib/webbasket_templates.py:681
 #: modules/webbasket/lib/webbasket_templates.py:717
@@ -3290,30 +3243,25 @@ msgid "Owner"
 msgstr "Propietario"
 
 #: modules/webbasket/lib/webbasket_templates.py:884
-#, fuzzy
 msgid "Last update"
 msgstr "Última actualización"
 
 #: modules/webbasket/lib/webbasket_templates.py:885
-#, fuzzy
 msgid "Items"
-msgstr "Ítem"
+msgstr "Ítems"
 
 #: modules/webbasket/lib/webbasket_templates.py:886
-#, fuzzy
 msgid "Views"
-msgstr "Visualizar"
+msgstr "Vistas"
 
 #: modules/webbasket/lib/webbasket_templates.py:968
 msgid "There is currently no publicly accessible basket"
 msgstr "No hay en este momento ninguna cesta públicamente accesible"
 
 #: modules/webbasket/lib/webbasket_templates.py:990
-#, fuzzy, python-format
+#, python-format
 msgid "Displaying public baskets %s - %s out of %s public baskets in total."
-msgstr ""
-"Lista de las cestas %(x_nb_begin)i-%(x_nb_end)i de un total de %(x_nb_total)"
-"i cestas."
+msgstr "Lista de cestas públicas %s - %s de un total de %s cestas públicas."
 
 #: modules/webbasket/lib/webbasket_templates.py:1057
 #: modules/webbasket/lib/webbasket_templates.py:1080
@@ -3374,7 +3322,6 @@ msgstr "Crear una nueva cesta"
 #: modules/webbasket/lib/webbasket_templates.py:2614
 #: modules/webbasket/lib/webbasket_templates.py:3105
 #: modules/webbasket/lib/webbasket_templates.py:3421
-#, fuzzy
 msgid "External item"
 msgstr "Registro externo"
 
@@ -3403,23 +3350,20 @@ msgid "URL"
 msgstr "URL"
 
 #: modules/webbasket/lib/webbasket_templates.py:1289
-#, fuzzy
 msgid "basket"
-msgstr "cestas"
+msgstr "cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:1294
-#, fuzzy
 msgid "items have been successfully added to your basket"
-msgstr "Los registros seleccionados se han añadido correctamente en %i cestas."
+msgstr "Los registros se han añadido correctamente a su cesta."
 
 #: modules/webbasket/lib/webbasket_templates.py:1295
 msgid "Proceed to the"
 msgstr "Continue a"
 
 #: modules/webbasket/lib/webbasket_templates.py:1299
-#, fuzzy
 msgid "previous basket"
-msgstr "Cestas de grupo"
+msgstr "cesta anterior"
 
 #: modules/webbasket/lib/webbasket_templates.py:1300
 #: modules/webbasket/lib/webbasket_templates.py:1304
@@ -3427,29 +3371,24 @@ msgid "or return to your"
 msgstr "o vuelva a su"
 
 #: modules/webbasket/lib/webbasket_templates.py:1303
-#, fuzzy
 msgid "search"
-msgstr "Buscar"
+msgstr "buscar"
 
 #: modules/webbasket/lib/webbasket_templates.py:1321
-#, fuzzy
 msgid "create a new one"
-msgstr "o cree uno de nuevo"
+msgstr "crear uno de nuevo"
 
 #: modules/webbasket/lib/webbasket_templates.py:1390
-#, fuzzy
 msgid "Adding"
 msgstr "Añadir"
 
 #: modules/webbasket/lib/webbasket_templates.py:1392
-#, fuzzy
 msgid "items to your baskets"
-msgstr "Sus cestas"
+msgstr "items en sus cestas"
 
 #: modules/webbasket/lib/webbasket_templates.py:1393
-#, fuzzy
 msgid "Please choose a basket"
-msgstr "Escoja una categoría"
+msgstr "Escoja una cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:1396
 msgid "first"
@@ -3464,9 +3403,8 @@ msgid "Optionally, add a note to this item"
 msgstr "Opcionalmente, añada una nota a este registro"
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
-#, fuzzy
 msgid "Add items"
-msgstr "Añadir a los usuarios"
+msgstr "Añadir items"
 
 #: modules/webbasket/lib/webbasket_templates.py:1429
 msgid "Are you sure you want to delete this basket?"
@@ -3536,14 +3474,12 @@ msgid "Save changes"
 msgstr "Guardar cambios"
 
 #: modules/webbasket/lib/webbasket_templates.py:1600
-#, fuzzy
 msgid "Topic's name"
-msgstr "Nombre del grupo:"
+msgstr "Nombre del tema"
 
 #: modules/webbasket/lib/webbasket_templates.py:1629
-#, fuzzy
 msgid "Editing topic"
-msgstr "Editar cesta"
+msgstr "Editar el tema"
 
 #: modules/webbasket/lib/webbasket_templates.py:1646
 #: modules/webbasket/lib/webbasket_templates.py:1661
@@ -3575,23 +3511,20 @@ msgid "add comments"
 msgstr "añadir comentarios"
 
 #: modules/webbasket/lib/webbasket_templates.py:1665
-#, fuzzy
 msgid "view notes"
-msgstr "Escriba un %s"
+msgstr "ver notas"
 
 #: modules/webbasket/lib/webbasket_templates.py:1667
-#, fuzzy
 msgid "add notes"
-msgstr "Añadir a los usuarios"
+msgstr "añadir notas"
 
 #: modules/webbasket/lib/webbasket_templates.py:1669
 msgid "add records"
 msgstr "añadir registros"
 
 #: modules/webbasket/lib/webbasket_templates.py:1671
-#, fuzzy
 msgid "delete notes"
-msgstr "resultados"
+msgstr "borrar notas"
 
 #: modules/webbasket/lib/webbasket_templates.py:1673
 msgid "remove records"
@@ -3641,26 +3574,22 @@ msgstr "Volver al resultado de la búsqueda"
 
 #: modules/webbasket/lib/webbasket_templates.py:1946
 #: modules/webbasket/lib/webbasket_templates.py:2949
-#, fuzzy
 msgid "items"
-msgstr "veces"
+msgstr "items"
 
 #: modules/webbasket/lib/webbasket_templates.py:1947
 #: modules/webbasket/lib/webbasket_templates.py:2313
 #: modules/webbasket/lib/webbasket_templates.py:3171
-#, fuzzy
 msgid "notes"
-msgstr "Nota"
+msgstr "notes"
 
 #: modules/webbasket/lib/webbasket_templates.py:1947
-#, fuzzy
 msgid "no notes yet"
 msgstr "sin notas"
 
 #: modules/webbasket/lib/webbasket_templates.py:1950
-#, fuzzy
 msgid "subscribers"
-msgstr "Subscribirse"
+msgstr "subscriptores"
 
 #: modules/webbasket/lib/webbasket_templates.py:1952
 #: modules/webbasket/lib/webbasket_templates.py:2951
@@ -3677,7 +3606,6 @@ msgstr "Editar cestas"
 #: modules/webbasket/lib/webbasket_templates.py:2038
 #: modules/webbasket/lib/webbasket_templates.py:2959
 #: modules/webbasket/lib/webbasket_templates.py:3012
-#, fuzzy
 msgid "Unsubscribe from basket"
 msgstr "Darse de baja de esta cesta"
 
@@ -3738,27 +3666,23 @@ msgstr "Eliminarlo"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13540
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13609
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14161
-#, fuzzy
 msgid "Notes"
-msgstr "Nota"
+msgstr "Notas"
 
 #: modules/webbasket/lib/webbasket_templates.py:2307
 #: modules/webbasket/lib/webbasket_templates.py:3165
-#, fuzzy
 msgid "Add a note..."
-msgstr "Añadir a los usuarios"
+msgstr "Añadir una nota..."
 
 #: modules/webbasket/lib/webbasket_templates.py:2314
 #: modules/webbasket/lib/webbasket_templates.py:3172
-#, fuzzy
 msgid "last note on"
-msgstr "último comentario"
+msgstr "último comentario en"
 
 #: modules/webbasket/lib/webbasket_templates.py:2420
 #: modules/webbasket/lib/webbasket_templates.py:3254
-#, fuzzy
 msgid "Item "
-msgstr "Ítem"
+msgstr "Ítem "
 
 #: modules/webbasket/lib/webbasket_templates.py:2420
 #: modules/webbasket/lib/webbasket_templates.py:3254
@@ -3773,9 +3697,8 @@ msgstr "de"
 #: modules/webbasket/lib/webbasket_templates.py:3266
 #: modules/webbasket/lib/webbasket_templates.py:3338
 #: modules/webbasket/lib/webbasket_templates.py:3341
-#, fuzzy
 msgid "Previous item"
-msgstr "Página anterior"
+msgstr "Ítem anterior"
 
 #: modules/webbasket/lib/webbasket_templates.py:2447
 #: modules/webbasket/lib/webbasket_templates.py:2450
@@ -3785,34 +3708,29 @@ msgstr "Página anterior"
 #: modules/webbasket/lib/webbasket_templates.py:3278
 #: modules/webbasket/lib/webbasket_templates.py:3350
 #: modules/webbasket/lib/webbasket_templates.py:3353
-#, fuzzy
 msgid "Next item"
-msgstr "Página siguiente"
+msgstr "Ítem siguiente"
 
 #: modules/webbasket/lib/webbasket_templates.py:2460
 #: modules/webbasket/lib/webbasket_templates.py:2547
 #: modules/webbasket/lib/webbasket_templates.py:3285
 #: modules/webbasket/lib/webbasket_templates.py:3360
-#, fuzzy
 msgid "Return to basket"
-msgstr "ninguna cesta"
+msgstr "Volver a la cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:2607
 #: modules/webbasket/lib/webbasket_templates.py:3414
-#, fuzzy
 msgid "The item you have selected does not exist."
-msgstr "Este registro no existe."
+msgstr "El ítem seleccionado no existe."
 
 #: modules/webbasket/lib/webbasket_templates.py:2635
 #: modules/webbasket/lib/webbasket_templates.py:3438
-#, fuzzy
 msgid "You do not have sufficient rights to view this item's notes."
-msgstr "No tiene suficientes permisos para ver el contenido de esta cesta."
+msgstr "No tiene permisos para ver las notas de este ítem."
 
 #: modules/webbasket/lib/webbasket_templates.py:2676
-#, fuzzy
 msgid "You do not have sufficient rights to view this item."
-msgstr "No tiene suficientes permisos para ver el contenido de esta cesta."
+msgstr "No tiene permisos para ver el esta ítem."
 
 #: modules/webbasket/lib/webbasket_templates.py:2782
 #: modules/webbasket/lib/webbasket_templates.py:2791
@@ -3820,15 +3738,13 @@ msgstr "No tiene suficientes permisos para ver el contenido de esta cesta."
 #: modules/webbasket/lib/webbasket_templates.py:3576
 #: modules/webbasket/lib/webbasket_webinterface.py:490
 #: modules/webbasket/lib/webbasket_webinterface.py:1492
-#, fuzzy
 msgid "Add a note"
-msgstr "Añadir a los usuarios"
+msgstr "Añadir una nota"
 
 #: modules/webbasket/lib/webbasket_templates.py:2783
 #: modules/webbasket/lib/webbasket_templates.py:3568
-#, fuzzy
 msgid "Add note"
-msgstr "Añadir a los usuarios"
+msgstr "Añadir nota"
 
 #: modules/webbasket/lib/webbasket_templates.py:2819
 #: modules/webbasket/lib/webbasket_templates.py:3604
@@ -3848,50 +3764,42 @@ msgstr "Nota"
 
 #: modules/webbasket/lib/webbasket_templates.py:2956
 #: modules/webbasket/lib/webbasket_templates.py:3009
-#, fuzzy
 msgid "Subscribe to basket"
-msgstr "Subscribirse a esta cesta"
+msgstr "Subscribirse a la cesta"
 
 #: modules/webbasket/lib/webbasket_templates.py:3015
 msgid "This public basket belongs to the user "
 msgstr "Esta cesta pública pertenece al usuario "
 
 #: modules/webbasket/lib/webbasket_templates.py:3039
-#, fuzzy
 msgid "This public basket belongs to you."
-msgstr "Se le ha enviado este libro..."
+msgstr "Esta cesta pública es suya."
 
 #: modules/webbasket/lib/webbasket_templates.py:3791
-#, fuzzy
 msgid "All your baskets"
-msgstr "Sus cestas"
+msgstr "Todas sus cestas"
 
 #: modules/webbasket/lib/webbasket_templates.py:3793
 #: modules/webbasket/lib/webbasket_templates.py:3868
-#, fuzzy
 msgid "Your personal baskets"
-msgstr "%i cestas personales"
+msgstr "Sus cestas personales"
 
 #: modules/webbasket/lib/webbasket_templates.py:3799
 #: modules/webbasket/lib/webbasket_templates.py:3879
-#, fuzzy
 msgid "Your group baskets"
-msgstr "%i cestas de grupo"
+msgstr "Sus cestas de grupo"
 
 #: modules/webbasket/lib/webbasket_templates.py:3805
-#, fuzzy
 msgid "Your public baskets"
-msgstr "Lista de cestas públicas"
+msgstr "Sus cestas públicas"
 
 #: modules/webbasket/lib/webbasket_templates.py:3806
-#, fuzzy
 msgid "All the public baskets"
-msgstr "Añadir a una cesta pública"
+msgstr "Todas las cestas públicas"
 
 #: modules/webbasket/lib/webbasket_templates.py:3863
-#, fuzzy
 msgid "*** basket name ***"
-msgstr "Nombre de la cesta"
+msgstr "*** nombre de la cesta ***"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:160
 #: modules/webbasket/lib/webbasket_webinterface.py:331
@@ -3909,14 +3817,12 @@ msgstr "Nombre de la cesta"
 #: modules/webbasket/lib/webbasket_webinterface.py:1411
 #: modules/webbasket/lib/webbasket_webinterface.py:1473
 #: modules/webbasket/lib/webbasket_webinterface.py:1534
-#, fuzzy
 msgid "You are not authorized to use baskets."
-msgstr "No está autorizado a ver esta área."
+msgstr "No está autorizado a usar cestas."
 
 #: modules/webbasket/lib/webbasket_webinterface.py:171
-#, fuzzy
 msgid "You are not authorized to view this attachment"
-msgstr "No está autorizado a ver esta área."
+msgstr "No está autorizado a ver esta adjunto"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:359
 msgid "Display baskets"
@@ -3925,9 +3831,8 @@ msgstr "Mostrar cestas"
 #: modules/webbasket/lib/webbasket_webinterface.py:559
 #: modules/webbasket/lib/webbasket_webinterface.py:634
 #: modules/webbasket/lib/webbasket_webinterface.py:1556
-#, fuzzy
 msgid "Display item and notes"
-msgstr "Mostrar las búsquedas"
+msgstr "Mostrar el ítem y las notas"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:814
 msgid "Delete a basket"
@@ -3938,9 +3843,9 @@ msgid "Copy record to basket"
 msgstr "Copiar el registro a la cesta"
 
 #: modules/webcomment/lib/webcomment.py:840
-#, fuzzy, python-format
+#, python-format
 msgid "Record %i"
-msgstr "Registro #%s"
+msgstr "Registro %i"
 
 #: modules/webcomment/lib/webcomment.py:851
 #, python-format
@@ -4039,9 +3944,8 @@ msgid "Report abuse"
 msgstr "Denuncie un abuso"
 
 #: modules/webcomment/lib/webcomment_templates.py:367
-#, fuzzy
 msgid "Undelete comment"
-msgstr "suprimir comentarios"
+msgstr "Recupera el comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:376
 #: modules/webcomment/lib/webcomment_templates.py:378
