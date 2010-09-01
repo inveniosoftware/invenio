@@ -41,6 +41,9 @@ Lexicon
 
 __revision__ = "$Id$"
 
+import datetime
+import re
+import time
 from time import strptime, strftime, localtime
 
 from invenio.config import CFG_SITE_LANG
@@ -291,3 +294,72 @@ def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG
         out += ">%i</option>\n"% i
     out += "</select>\n"
     return out
+
+_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?", re.I)
+_RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hour>\d\d?)(:(?P<minutes>\d\d?))?')
+def parse_runtime_limit(value):
+    """
+    Parsing CLI option for runtime limit, supplied as VALUE.
+    Value could be something like: Sunday 23:00-05:00, the format being
+    [Wee[kday]] [hh[:mm][-hh[:mm]]].
+    The function will return two valid time ranges. The first could be in the past, containing the present or in the future. The second is always in the future.
+    """
+    def extract_time(value):
+        value = _RE_RUNTIMELIMIT_HOUR.search(value).groupdict()
+        hour = int(value['hour']) % 24
+        minutes = (value['minutes'] is not None and int(value['minutes']) or 0) % 60
+        return hour * 3600 + minutes * 60
+
+    def extract_weekday(value):
+        try:
+            return {
+                'mon' : 0,
+                'tue' : 1,
+                'wed' : 2,
+                'thu' : 3,
+                'fri' : 4,
+                'sat' : 5,
+                'sun' : 6,
+            }[value[:3].lower()]
+        except KeyError:
+            raise ValueError, "%s is not a good weekday name." % value
+
+    today = datetime.datetime.today()
+    try:
+        g = _RE_RUNTIMELIMIT_FULL.search(value)
+        if not g:
+            raise ValueError
+        pieces = g.groupdict()
+        today_weekday = today.isoweekday() - 1
+        if pieces['weekday'] is None:
+            ## No weekday specified. So either today or tomorrow
+            first_occasion_day = 0
+            next_occasion_day = 24 * 3600
+        else:
+            ## Weekday specified. So either this week or next
+            weekday = extract_weekday(pieces['weekday'])
+            first_occasion_day = -((today_weekday - weekday) % 7) * 24 * 3600
+            next_occasion_day = first_occasion_day + 7 * 24 * 3600
+        if pieces['begin'] is None:
+            pieces['begin'] = '00:00'
+        if pieces['end'] is None:
+            pieces['end'] = '00:00'
+        beginning_time = extract_time(pieces['begin'])
+        ending_time = extract_time(pieces['end'])
+        if beginning_time >= ending_time:
+            ## end < begin we add a 24-hours watch tour.
+            ending_time += 24 * 3600
+        reference_time = time.mktime(datetime.datetime(today.year, today.month, today.day).timetuple())
+        first_range = (
+            reference_time + first_occasion_day + beginning_time,
+            reference_time + first_occasion_day + ending_time
+        )
+        second_range = (
+            reference_time + next_occasion_day + beginning_time,
+            reference_time + next_occasion_day + ending_time
+        )
+        return first_range, second_range
+    except ValueError:
+        raise
+    except:
+        raise ValueError, '"%s" does not seem to be correct format for parse_runtime_limit() [Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value

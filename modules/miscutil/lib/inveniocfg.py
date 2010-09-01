@@ -96,8 +96,7 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG',
                        'CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG',
                        'CFG_BIBUPLOAD_STRONG_TAGS',
-                       'CFG_BIBFORMAT_HIDDEN_TAGS',
-                       'CFG_SITE_EMERGENCY_PHONE_NUMBERS']:
+                       'CFG_BIBFORMAT_HIDDEN_TAGS',]:
         # some options are supposed be string even when they look like
         # numeric
         option_value = '"' + option_value + '"'
@@ -122,7 +121,9 @@ def convert_conf_option(option_name, option_value):
         option_value = option_value[1:-1]
 
     ## 3c) special cases: dicts
-    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT', 'CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS']:
+    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',
+                       'CFG_BATCHUPLOADER_WEB_ROBOT_RIGHTS',
+                       'CFG_SITE_EMERGENCY_EMAIL_ADDRESSES']:
         option_value = option_value[1:-1]
 
     ## 3d) special cases: comma-separated lists
@@ -136,7 +137,6 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS',
                        'CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS',
                        'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES',
-                       'CFG_SITE_EMERGENCY_PHONE_NUMBERS',
                        'CFG_WEBSTYLE_HTTP_STATUS_ALERT_LIST',
                        'CFG_WEBSEARCH_RSS_I18N_COLLECTIONS',
                        'CFG_BATCHUPLOADER_FILENAME_MATCHING_POLICY',

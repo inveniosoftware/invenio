@@ -21,10 +21,15 @@
 
 __revision__ = "$Id$"
 
-from invenio.errorlib import get_msg_associated_to_code, get_msgs_for_code_list
+from invenio.errorlib import get_msg_associated_to_code, \
+                             get_msgs_for_code_list, \
+                             get_emergency_recipients
 from invenio.testutils import make_test_suite, run_test_suite
 
 import unittest
+import datetime
+import time
+import calendar
 
 class TestInternalErrorlibErrors(unittest.TestCase):
     """
@@ -170,7 +175,51 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         testmessages = reduce(lambda x, y: str(x) + str(y), self.messages)
         self.assertEqual(0, testmessages.count('_('))
 
-TEST_SUITE = make_test_suite(TestInternalErrorlibErrors,)
+class TestGetEmergencyRecipients(unittest.TestCase):
+    def test_get_emergency_recipients(self):
+        """errorlib - test return of proper set of recipients"""
+        now = datetime.datetime.today()
+        tomorrow = now + datetime.timedelta(days=1)
+        diff_day = now + datetime.timedelta(days=4)
+        later = now.replace(hour=now.hour + 1)
+        earlier = now.replace(hour=now.hour - 1)
+        constraint_now = "%s %s-%s" % (
+                                    now.strftime("%a"),
+                                    earlier.strftime("%H:00"),
+                                    later.strftime("%H:00"),
+                                    )
+        constraint_tomorrow = "%s %s-%s" % (
+                                    tomorrow.strftime("%a"),
+                                    earlier.strftime("%H:00"),
+                                    later.strftime("%H:00"),
+                                    )
+        constraint_time = "%s-%s" % (
+                                    earlier.strftime("%H:00"),
+                                    later.strftime("%H:00"),
+                                    )
+        constraint_near_miss = "%s-%s" % (
+                                    earlier.strftime("%H:00"),
+                                    now.replace(minute=now.minute - 3) \
+                                        .strftime("%H:%M")
+                                    )
+        constraint_day = "%s" % now.strftime("%A")
+        constraint_diff_day = "%s" % diff_day.strftime("%A")
+        test_config = {
+                       constraint_now:      'now@example.com',
+                       constraint_tomorrow: 'tomorrow@example.com',
+                       constraint_time:     'time@example.com',
+                       constraint_day:      'day@example.com,day@foobar.com',
+                       constraint_diff_day: 'diff_day@example.com',
+                       constraint_near_miss:'near_miss@example.com',
+                       '*':                 'fallback@example.com',
+                       }
+        result = get_emergency_recipients(recipient_cfg=test_config)
+        expected = ['now@example.com', 'time@example.com',
+                    'day@example.com,day@foobar.com', 'fallback@example.com']
+        self.assertEqual(set(result), set(expected))
+
+TEST_SUITE = make_test_suite(TestInternalErrorlibErrors,
+                             TestGetEmergencyRecipients,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

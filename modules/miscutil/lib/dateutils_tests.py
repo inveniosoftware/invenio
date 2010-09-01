@@ -22,6 +22,9 @@
 __revision__ = "$Id$"
 
 import unittest
+import datetime
+import time
+import calendar
 import dateutils
 
 from invenio.config import CFG_SITE_LANGS
@@ -108,8 +111,85 @@ class ConvertIntoDateGUITest(unittest.TestCase):
                                                                ln='sk')
             self.assertEqual(dategui_sk, dategui_sk_expected)
 
+class ParseRuntimeLimitTest(unittest.TestCase):
+    """
+    Testing the runtime limit parser used by BibSched to determine task
+    runtimes and also by the errorlib.register_emergency function to parse the
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES configuration
+    """
+    def test_parse_runtime_limit_day_abbr_plus_times(self):
+        """dateutils - parse runtime using a weekday abbreviation plus a time range"""
+        limit = 'Sun 8:00-16:00'
+        day = datetime.date.today()
+        now = datetime.time()
+        while day.weekday() != calendar.SUNDAY:
+            day -= datetime.timedelta(1)
+        present_from = datetime.datetime.combine(day, now.replace(hour=8))
+        present_to = datetime.datetime.combine(day, now.replace(hour=16))
+        future_from = present_from + datetime.timedelta(days=7)
+        future_to = present_to + datetime.timedelta(days=7)
+        expected = (
+            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
+            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            )
+        result = dateutils.parse_runtime_limit(limit)
+        self.assertEqual(expected, result)
+
+    def test_parse_runtime_limit_day_plus_times(self):
+        """dateutils - parse runtime using a weekday plus a time range"""
+        limit = 'Thursday 18:00-22:00'
+        day = datetime.date.today()
+        now = datetime.time()
+        while day.weekday() != calendar.THURSDAY:
+            day -= datetime.timedelta(1)
+        present_from = datetime.datetime.combine(day, now.replace(hour=18))
+        present_to = datetime.datetime.combine(day, now.replace(hour=22))
+        future_from = present_from + datetime.timedelta(days=7)
+        future_to = present_to + datetime.timedelta(days=7)
+        expected = (
+            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
+            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            )
+        result = dateutils.parse_runtime_limit(limit)
+        self.assertEqual(expected, result)
+
+    def test_parse_runtime_limit_day_abbr_only(self):
+        """dateutils - parse runtime using just a weekday abbreviation"""
+        limit = 'Tue'
+        day = datetime.date.today()
+        now = datetime.time()
+        while day.weekday() != calendar.TUESDAY:
+            day -= datetime.timedelta(1)
+        present_from = datetime.datetime.combine(day, now.replace(hour=0))
+        present_to = present_from + datetime.timedelta(days=1)
+        future_from = present_from + datetime.timedelta(days=7)
+        future_to = present_to + datetime.timedelta(days=7)
+        expected = (
+            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
+            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            )
+        result = dateutils.parse_runtime_limit(limit)
+        self.assertEqual(expected, result)
+
+    def test_parse_runtime_limit_times_only(self):
+        """dateutils - parse runtime using just a time range"""
+        limit = '06:00-18:00'
+        day = datetime.date.today()
+        now = datetime.time()
+        present_from = datetime.datetime.combine(day, now.replace(hour=6))
+        present_to = datetime.datetime.combine(day, now.replace(hour=18))
+        future_from = present_from + datetime.timedelta(days=1)
+        future_to = present_to + datetime.timedelta(days=1)
+        expected = (
+            (time.mktime(present_from.timetuple()), time.mktime(present_to.timetuple())),
+            (time.mktime(future_from.timetuple()), time.mktime(future_to.timetuple())),
+            )
+        result = dateutils.parse_runtime_limit(limit)
+        self.assertEqual(expected, result)
+
 TEST_SUITE = make_test_suite(ConvertFromDateCVSTest,
-                             ConvertIntoDateGUITest,)
+                             ConvertIntoDateGUITest,
+                             ParseRuntimeLimitTest,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

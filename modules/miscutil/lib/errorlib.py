@@ -32,7 +32,7 @@ from cStringIO import StringIO
 from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
     CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, \
-    CFG_CERN_SITE, CFG_SITE_EMERGENCY_PHONE_NUMBERS, \
+    CFG_CERN_SITE, CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, \
     CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
     CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
@@ -40,6 +40,7 @@ from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.dbquery import run_sql
+
 
 ## Regular expression to match possible password related variable that should
 ## be disclosed in frame analysis.
@@ -112,29 +113,42 @@ def get_tracestack():
                     str(trace_tuple[3]) or ""}
     return tracestack_pretty
 
-
-def send_sms(phone_number, msg):
-    """Send msg as an SMS to each phone number.
-    Note: this function is just an example and works only at CERN
-    it should be reimplemented in your own instituition.
+def register_emergency(msg, recipients=None):
+    """Launch an emergency. This means to send email messages to each
+    address in 'recipients'. By default recipients will be obtained via
+    get_emergency_recipients() which loads settings from
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES
     """
-    if not CFG_CERN_SITE:
-        raise NotImplementedError("Implement this function "
-            "with your own method")
-    if phone_number[0] == '+':
-        phone_number = '00' + phone_number[1:]
-    if phone_number[0] != '0':
-        phone_number = '00' + phone_number
     from invenio.mailutils import send_email
-    return send_email(CFG_SITE_SUPPORT_EMAIL,
-        phone_number + '@mail2sms.cern.ch', '', msg, header='', footer='')
+    if not recipients:
+        recipients = get_emergency_recipients()
+    for address_str in recipients:
+        send_email(CFG_SITE_SUPPORT_EMAIL, address_str, "Emergency notification", msg)
 
+def get_emergency_recipients(recipient_cfg=CFG_SITE_EMERGENCY_EMAIL_ADDRESSES):
+    """Parse a list of appropriate emergency email recipients from
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES, or from a provided dictionary
+    comprised of 'time constraint' => 'comma separated list of addresses'
 
-def register_emergency(msg, send_sms_function=send_sms):
-    """Launch an emergency. This means to send sms messages to each
-    phone number in CFG_SITE_EMERGENCY_PHONE_NUMBERS."""
-    for phone_number in CFG_SITE_EMERGENCY_PHONE_NUMBERS:
-        send_sms_function(phone_number, msg)
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES format example:
+
+    CFG_SITE_EMERGENCY_EMAIL_ADDRESSES = {
+        'Sunday 22:00-06:00': '0041761111111@email2sms.foo.com',
+        '06:00-18:00': 'team-in-europe@foo.com,0041762222222@email2sms.foo.com',
+        '18:00-06:00': 'team-in-usa@foo.com',
+        '*': 'john.doe.phone@foo.com'}
+    """
+    from invenio.dateutils import parse_runtime_limit
+
+    recipients = set()
+    for time_condition, address_str in recipient_cfg.items():
+        if time_condition and time_condition is not '*':
+            (current_range, future_range) = parse_runtime_limit(time_condition)
+            time_now = time.time()
+            if not current_range[0] <= time_now <= current_range[1]:
+                continue
+        recipients.update([address_str])
+    return list(recipients)
 
 def find_all_values_to_hide(local_variables, analyzed_stack=None):
     """Return all the potential password to hyde."""
