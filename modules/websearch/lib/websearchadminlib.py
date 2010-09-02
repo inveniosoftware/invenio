@@ -2468,13 +2468,15 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
-    collections = run_sql("SELECT id, name, dbquery FROM collection ORDER BY id")
+    collections = run_sql("SELECT id, name, dbquery, nbrecs FROM collection "
+            "ORDER BY id")
 
-    header = ['ID', 'Name', 'Query', 'Subcollections', 'Restricted', 'Hosted', 'I18N', 'Status']
+    header = ['ID', 'Name','Query', 'Subcollections', 'Restricted', 'Hosted',
+            'I18N', 'Status', 'Number of records']
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
 
-    for (id, name, dbquery) in collections:
+    for (id, name, dbquery, nbrecs) in collections:
         reg_sons = len(get_col_tree(id, 'r'))
         vir_sons = len(get_col_tree(id, 'v'))
         status = ""
@@ -2519,7 +2521,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
         if status == "":
             status = """<b><span class="info">OK</span></b>"""
 
-        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, id, ln, name), dbquery, subs, restricted, hosted, i8n, status])
+        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, id, ln, name), dbquery, subs, restricted, hosted, i8n, status, nbrecs])
 
     output += tupletotable(header=header, tuple=actions)
 
