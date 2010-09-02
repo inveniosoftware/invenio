@@ -503,11 +503,11 @@ class SpiresToInvenioSyntaxConverter:
         'title' : 'title:',
         'with-language' : 'title:',
         # topic
-        'topic' : '653__a:',
-        'tp' : '653__a:',
-        'hep-topic' : '653__a:',
-        'desy-keyword' : '653__a:',
-        'dk' : '653__a:',
+        'topic' : '695__a:',
+        'tp' : '695__a:',
+        'hep-topic' : '695__a:',
+        'desy-keyword' : '695__a:',
+        'dk' : '695__a:',
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords

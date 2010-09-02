@@ -349,10 +349,14 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "keyword:meson"
         self._compare_searches(inv_search, spi_search)
 
+    def test_desy_keyword_translation(self):
+        """SPIRES search syntax - find dk "B --> pi pi" """
+        spi_search = "find dk \"B --> pi pi\""
+        inv_search = "695__a:\"B --> pi pi\""
+        self._compare_searches(inv_search, spi_search)
 
 TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser,
                              TestSpiresToInvenioSyntaxConverter)
-
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
