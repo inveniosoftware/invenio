@@ -184,7 +184,8 @@ class Record:
                         print instance_to_print
                         print "   </datafield>"
                     else:
-                        print "   <controlfield tag=\"%s\">%s</controlfield>" % (tag,instance_to_print)
+                        if not (tag == "001" and int(self.sysno) == int(instance_to_print)):
+                            print "   <controlfield tag=\"%s\">%s</controlfield>" % (tag,instance_to_print)
 
 
         ## display record footer
