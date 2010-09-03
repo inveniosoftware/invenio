@@ -344,6 +344,7 @@ def get_html_text_editor(name, id=None, content='', textual_content=None, width=
             oEditor.SetHTML(html_editor.value);
             var editor_type_field = document.getElementById('%(name)seditortype');
             editor_type_field.value = 'fckeditor';
+            oEditor.ResetIsDirty();
           }
 
         </script>
