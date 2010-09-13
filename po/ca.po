@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
-"PO-Revision-Date: 2010-08-31 19:38+0200\n"
+"PO-Revision-Date: 2010-09-12 22:38+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -3952,7 +3952,7 @@ msgstr "Denuncieu-ne un abús"
 
 #: modules/webcomment/lib/webcomment_templates.py:367
 msgid "Undelete comment"
-msgstr "Recupera el comentari"
+msgstr "Recupera el comentari suprimit"
 
 #: modules/webcomment/lib/webcomment_templates.py:376
 #: modules/webcomment/lib/webcomment_templates.py:378
@@ -3960,9 +3960,8 @@ msgid "Delete comment"
 msgstr "Suprimeix el comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:385
-#, fuzzy
 msgid "Unreport comment"
-msgstr "Suprimeix el comentari"
+msgstr "Suprimeix la denúncia al comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:440
 #, python-format
@@ -3976,19 +3975,16 @@ msgstr ""
 "%(x_nb_people)i de %(x_nb_total)i persones han trobat aquesta ressenya útil"
 
 #: modules/webcomment/lib/webcomment_templates.py:463
-#, fuzzy
 msgid "Undelete review"
-msgstr "Suprimeix les ressenyes seleccionades"
+msgstr "Recupera la ressenya suprimida"
 
 #: modules/webcomment/lib/webcomment_templates.py:472
-#, fuzzy
 msgid "Delete review"
-msgstr "Suprimeix les ressenyes seleccionades"
+msgstr "Suprimeix la ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:478
-#, fuzzy
 msgid "Unreport review"
-msgstr "Escriviu la vostra ressenya"
+msgstr "Suprimeix la denúncia a la ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:563
 #: modules/webcomment/lib/webcomment_templates.py:575
@@ -4075,20 +4071,19 @@ msgid "Subscribe"
 msgstr "Subscriure's"
 
 #: modules/webcomment/lib/webcomment_templates.py:829
-#, fuzzy
 msgid "Unsubscribe"
-msgstr "Subscriure's"
+msgstr "Donar-se de baixa"
 
 #: modules/webcomment/lib/webcomment_templates.py:836
-#, fuzzy
 msgid "You are not authorized to comment or review."
-msgstr "No esteu autoritzats a veure aquesta àrea."
+msgstr "No esteu autoritzats a fer comentaris o ressenyes."
 
 #: modules/webcomment/lib/webcomment_templates.py:989
-#, fuzzy, python-format
+#, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment."
 msgstr ""
-"El vostre àlies, %s, serà el que es mostri com autor d'aquest comentari"
+"Vigileu: El vostre àlies, %s, serà el que es mostri com autor d'aquest "
+"comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:993
 #: modules/webcomment/lib/webcomment_templates.py:1081
@@ -4141,17 +4136,10 @@ msgstr "Escriviu la vostra ressenya"
 msgid "Add review"
 msgstr "Afegiu la vostra ressenya"
 
-# #-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#
-# 'la' o 'una'?
 #: modules/webcomment/lib/webcomment_templates.py:1170
 #: modules/webcomment/lib/webcomment_webinterface.py:380
-#, fuzzy
 msgid "Add Review"
-msgstr ""
-"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"Afegiu una ressenya\n"
-"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"Afegiu la vostra ressenya"
+msgstr "Afegiu la vostra ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:1191
 msgid "Your review was successfully added."
@@ -4167,40 +4155,33 @@ msgstr "Torna al registre"
 
 #: modules/webcomment/lib/webcomment_templates.py:1274
 #: modules/webcomment/web/admin/webcommentadmin.py:173
-#, fuzzy
 msgid "View most commented records"
-msgstr "Visualitza els comentaris"
+msgstr "Visualitza els registres més comentats"
 
 #: modules/webcomment/lib/webcomment_templates.py:1276
 #: modules/webcomment/web/admin/webcommentadmin.py:209
-#, fuzzy
 msgid "View latest commented records"
-msgstr "Visualitza els comentaris"
+msgstr "Visualitza els registres amb els comentaris més recents"
 
 #: modules/webcomment/lib/webcomment_templates.py:1278
 #: modules/webcomment/web/admin/webcommentadmin.py:142
-#, fuzzy
 msgid "View all comments reported as abuse"
-msgstr "Visualitzar tots els usuaris denunciats"
+msgstr "Visualitzar tots els comentaris denunciats"
 
 #: modules/webcomment/lib/webcomment_templates.py:1282
 #: modules/webcomment/web/admin/webcommentadmin.py:172
-#, fuzzy
 msgid "View most reviewed records"
-msgstr "elimina registres"
+msgstr "Visualitza els registres amb més ressenyes"
 
-# Temps verbal: visualita?  Visualitzeu?
 #: modules/webcomment/lib/webcomment_templates.py:1284
 #: modules/webcomment/web/admin/webcommentadmin.py:208
-#, fuzzy
 msgid "View latest reviewed records"
-msgstr "Visualitzar totes les %s ressenyes"
+msgstr "Visualitza els registres amb les ressenyes més recents"
 
 #: modules/webcomment/lib/webcomment_templates.py:1286
 #: modules/webcomment/web/admin/webcommentadmin.py:142
-#, fuzzy
 msgid "View all reviews reported as abuse"
-msgstr "Visualitzar tots els usuaris denunciats"
+msgstr "Visualitzar totes les ressenyes denunciades"
 
 #: modules/webcomment/lib/webcomment_templates.py:1294
 msgid "View all users who have been reported"
@@ -4233,9 +4214,8 @@ msgstr ""
 "associades:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1344
-#, fuzzy
 msgid "Record ID:"
-msgstr "el número registre"
+msgstr "Registre :"
 
 #: modules/webcomment/lib/webcomment_templates.py:1346
 msgid "View Comment"
@@ -4367,14 +4347,12 @@ msgid "Suppress selected abuse report"
 msgstr "Suprimeix l'informe d'abús seleccionat"
 
 #: modules/webcomment/lib/webcomment_templates.py:1723
-#, fuzzy
 msgid "Undelete selected reviews"
-msgstr "Suprimeix les ressenyes seleccionades"
+msgstr "Recupera les ressenyes eliminades"
 
 #: modules/webcomment/lib/webcomment_templates.py:1727
-#, fuzzy
 msgid "Undelete selected comments"
-msgstr "Suprimeix els comentaris seleccionats"
+msgstr "Recupera els comentaris eliminats"
 
 #: modules/webcomment/lib/webcomment_templates.py:1728
 msgid "Delete selected comments"
@@ -4398,26 +4376,24 @@ msgid "Here are the reported comments of user %s"
 msgstr "Aquests són els comentaris denunciats de l'usuari %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1749
-#, fuzzy, python-format
+#, python-format
 msgid "Here is review %s"
-msgstr "Aquest és el comentari/ressenya %s"
+msgstr "Aquesta és la ressenya %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1751
-#, fuzzy, python-format
+#, python-format
 msgid "Here is comment %s"
-msgstr "Aquest és el comentari/ressenya %s"
+msgstr "Aquest és el comentari %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1754
-#, fuzzy, python-format
+#, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
-msgstr ""
-"Aquest és el comentari/ressenya %(x_cmtID)s escrita per l'usuari %(x_user)s"
+msgstr "Aquesta és la ressenya %(x_cmtID)s escrita per l'usuari %(x_user)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1756
-#, fuzzy, python-format
+#, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
-msgstr ""
-"Aquest és el comentari/ressenya %(x_cmtID)s escrita per l'usuari %(x_user)s"
+msgstr "Aquest és el comentari %(x_cmtID)s escrit per l'usuari %(x_user)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1762
 msgid "Here are all reported reviews sorted by the most reported"

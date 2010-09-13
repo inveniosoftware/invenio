@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
-"PO-Revision-Date: 2010-08-31 19:38+0200\n"
+"PO-Revision-Date: 2010-09-12 22:38+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -3945,7 +3945,7 @@ msgstr "Denuncie un abuso"
 
 #: modules/webcomment/lib/webcomment_templates.py:367
 msgid "Undelete comment"
-msgstr "Recupera el comentario"
+msgstr "Recupera el comentario suprimido"
 
 #: modules/webcomment/lib/webcomment_templates.py:376
 #: modules/webcomment/lib/webcomment_templates.py:378
@@ -3953,9 +3953,8 @@ msgid "Delete comment"
 msgstr "Suprimir comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:385
-#, fuzzy
 msgid "Unreport comment"
-msgstr "Suprimir comentario"
+msgstr "Suprimir la denuncia al comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:440
 #, python-format
@@ -3969,19 +3968,16 @@ msgstr ""
 "%(x_nb_people)i de %(x_nb_total)i personas han encontrado esta reseña útil"
 
 #: modules/webcomment/lib/webcomment_templates.py:463
-#, fuzzy
 msgid "Undelete review"
-msgstr "Eliminar las reseñas seleccionadas"
+msgstr "Recupera la reseña suprimido"
 
 #: modules/webcomment/lib/webcomment_templates.py:472
-#, fuzzy
 msgid "Delete review"
-msgstr "Eliminar las reseñas seleccionadas"
+msgstr "Eliminar la reseña"
 
 #: modules/webcomment/lib/webcomment_templates.py:478
-#, fuzzy
 msgid "Unreport review"
-msgstr "Escriba su reseña"
+msgstr "Suprimir la denuncia a la reseña"
 
 #: modules/webcomment/lib/webcomment_templates.py:563
 #: modules/webcomment/lib/webcomment_templates.py:575
@@ -4067,19 +4063,19 @@ msgid "Subscribe"
 msgstr "Subscribirse"
 
 #: modules/webcomment/lib/webcomment_templates.py:829
-#, fuzzy
 msgid "Unsubscribe"
-msgstr "Subscribirse"
+msgstr "Darse de baja"
 
 #: modules/webcomment/lib/webcomment_templates.py:836
-#, fuzzy
 msgid "You are not authorized to comment or review."
-msgstr "No está autorizado a ver esta área."
+msgstr "No está autorizado a hacer comentarios o reseñas."
 
 #: modules/webcomment/lib/webcomment_templates.py:989
-#, fuzzy, python-format
+#, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment."
-msgstr "Su alias, %s, será el que se muestre como autor de este comentario"
+msgstr ""
+"Atención: su alias, %s, será el que se muestre como autor de este "
+"comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:993
 #: modules/webcomment/lib/webcomment_templates.py:1081
@@ -4131,17 +4127,10 @@ msgstr "Escriba su reseña"
 msgid "Add review"
 msgstr "Añada su reseña"
 
-# #-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#
-# 'la' o 'una'?
 #: modules/webcomment/lib/webcomment_templates.py:1170
 #: modules/webcomment/lib/webcomment_webinterface.py:380
-#, fuzzy
 msgid "Add Review"
-msgstr ""
-"#-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"Añada la reseña\n"
-"#-#-#-#-#  es.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"Añada su reseña"
+msgstr "Añada su reseña"
 
 #: modules/webcomment/lib/webcomment_templates.py:1191
 msgid "Your review was successfully added."
@@ -4157,39 +4146,33 @@ msgstr "Volver al registro"
 
 #: modules/webcomment/lib/webcomment_templates.py:1274
 #: modules/webcomment/web/admin/webcommentadmin.py:173
-#, fuzzy
 msgid "View most commented records"
-msgstr "Ver comentarios"
+msgstr "Ver los registros más comentados"
 
 #: modules/webcomment/lib/webcomment_templates.py:1276
 #: modules/webcomment/web/admin/webcommentadmin.py:209
-#, fuzzy
 msgid "View latest commented records"
-msgstr "Ver comentarios"
+msgstr "Ver los registros con los comentarios más recientes"
 
 #: modules/webcomment/lib/webcomment_templates.py:1278
 #: modules/webcomment/web/admin/webcommentadmin.py:142
-#, fuzzy
 msgid "View all comments reported as abuse"
-msgstr "Visualizar todos los usuarios denunciados"
+msgstr "Visualizar todos los comentarios denunciados"
 
 #: modules/webcomment/lib/webcomment_templates.py:1282
 #: modules/webcomment/web/admin/webcommentadmin.py:172
-#, fuzzy
 msgid "View most reviewed records"
-msgstr "elimina registros"
+msgstr "Ver los registros con más reseñas"
 
 #: modules/webcomment/lib/webcomment_templates.py:1284
 #: modules/webcomment/web/admin/webcommentadmin.py:208
-#, fuzzy
 msgid "View latest reviewed records"
-msgstr "Visualizar todas las %s reseñas"
+msgstr "Ver los registros con las reseñas más recientes"
 
 #: modules/webcomment/lib/webcomment_templates.py:1286
 #: modules/webcomment/web/admin/webcommentadmin.py:142
-#, fuzzy
 msgid "View all reviews reported as abuse"
-msgstr "Visualizar todos los usuarios denunciados"
+msgstr "Visualizar todas las reseñas denunciadas"
 
 #: modules/webcomment/lib/webcomment_templates.py:1294
 msgid "View all users who have been reported"
@@ -4222,9 +4205,8 @@ msgstr ""
 "asociadas:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1344
-#, fuzzy
 msgid "Record ID:"
-msgstr "el número de registro"
+msgstr "Registro: "
 
 #: modules/webcomment/lib/webcomment_templates.py:1346
 msgid "View Comment"
@@ -4356,14 +4338,12 @@ msgid "Suppress selected abuse report"
 msgstr "Suprimir el informe de abuso seleccionado"
 
 #: modules/webcomment/lib/webcomment_templates.py:1723
-#, fuzzy
 msgid "Undelete selected reviews"
-msgstr "Eliminar las reseñas seleccionadas"
+msgstr "Recuperar las reseñas eliminadas"
 
 #: modules/webcomment/lib/webcomment_templates.py:1727
-#, fuzzy
 msgid "Undelete selected comments"
-msgstr "Suprimir los comentarios seleccionados"
+msgstr "Recuperar los comentarios eliminados"
 
 #: modules/webcomment/lib/webcomment_templates.py:1728
 msgid "Delete selected comments"
@@ -4387,26 +4367,24 @@ msgid "Here are the reported comments of user %s"
 msgstr "Estos son los comentarios denunciados del usuario %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1749
-#, fuzzy, python-format
+#, python-format
 msgid "Here is review %s"
-msgstr "Este es el comentario/reseña %s"
+msgstr "Ésta es la reseña %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1751
-#, fuzzy, python-format
+#, python-format
 msgid "Here is comment %s"
-msgstr "Este es el comentario/reseña %s"
+msgstr "Éste es el comentario %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1754
-#, fuzzy, python-format
+#, python-format
 msgid "Here is review %(x_cmtID)s written by user %(x_user)s"
-msgstr ""
-"Este es el comentario/reseña %(x_cmtID)s escrita por el usuario %(x_user)s"
+msgstr "Ésta es la reseña %(x_cmtID)s escrita por el usuario %(x_user)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1756
-#, fuzzy, python-format
+#, python-format
 msgid "Here is comment %(x_cmtID)s written by user %(x_user)s"
-msgstr ""
-"Este es el comentario/reseña %(x_cmtID)s escrita por el usuario %(x_user)s"
+msgstr "Éste es el comentario %(x_cmtID)s escrito por el usuario %(x_user)s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1762
 msgid "Here are all reported reviews sorted by the most reported"
