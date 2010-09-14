@@ -1416,7 +1416,7 @@ class WebSearchSummarizerTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=hcs',
                                                expected_text="Less known papers (1-9)",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=ellis%20cited%3A1-%3E9&rm=citation",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=ellis%20AND%20cited%3A1-%3E9&rm=citation",
                                                expected_link_label='1'))
 
 class WebSearchRecordCollectionGuessTest(unittest.TestCase):

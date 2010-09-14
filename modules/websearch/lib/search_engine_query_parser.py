@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -25,355 +25,284 @@ import re
 import string
 
 from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer as FNT
+from invenio.logicutils import to_cnf
 
 NameScanner = FNT()
 
 
-class SearchQueryParenthesisedParser:
-    """Parse search queries containing parenthesis.
-
-    Current implementation is a simple linear parsing that does not support
-    nested parenthesis and priority of operators.
-
-    In case there is a need for nested parenthesis and priority of operators,
-    the current implementation can be replaced by one that uses expression
-    trees as they are more or less a standard way for parsing expressions.
-
-    The method doing the main work is parse_query()
-
-    Input: parse_query("ellis AND (muon OR kaon)")
-    Output: list of [operator1, expression1, operator2, expression2, operator3...,expressionN].
-    In case of error: Exception is raised
-    """
-
-    # all operator symbols recognized in expression
-    _operators = ['+', '|', '-']
-
-    # error messages
-    _error_message_mismatched_parentheses = "Mismatched parenthesis."
-    _error_message_nested_parentheses_not_supported = "Nested parenthesis are currently not supported."
-
-    def __init__(self, default_operator='+'):
-        """Initialize the state of the parser"""
-
-        # default operator to be used if operator is missing between patterns
-        self._DEFAULT_OPERATOR = default_operator
-
-        self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
-
-        self._query = ''
-        # list of parsed patterns and operators
-        self._patterns = []
-        # indexes in the parsed query of beginning and end of currently parsed pattern
-        self._pattern_beginning = 0
-        self._pattern_end = 0
-
-        # operators before and after the current pattern matched during parsing
-        _preceding_operator = ""
-        _preceding_operator_position = -1
-
-        _following_operator = ""
-        _following_operator_position = -1
-
-        # flag indicating if processed symbols are inside parenthesis
-        self._inside_parentheses = False
-
-        # all operator symbols recognized in expression
-        _operators = ['+', '|', '-']
-        #print "\n__init__ called!" # FIXME: why can't operator be defined local?
-
-    def _reset_parse_state(self):
-        """Clean up state from any previous parse operations."""
-
-        # FIXME: Can this be done away with?  Is parse_query overly stateful?
-        self._patterns = []
-        self._pattern_beginning = 0
-        self._pattern_end = 0
-        self._clear_preceding_operator()
-        self._clear_following_operator()
-        self._inside_parentheses = False
-
-    def _clean_query(self, query):
-        """Clean the query performing replacement of AND, OR, NOT operators with their
-        equivalents +, |, - """
-
-        # result of the replacement
-        result = ""
-        current_position = 0
-
-        for match in self._re_quotes_match.finditer(query):
-            # clean the content after the previous quotes and before current quotes
-            cleanable_content = query[current_position : match.start()]
-            cleanable_content = self._clean_operators(cleanable_content)
-
-            # get the content in the quotas
-            quoted_content = match.group(0)
-
-            # append the processed content to the result
-            result = result + cleanable_content + quoted_content
-
-            # move current position at the end of the processed content
-            current_position = match.end()
-
-        # clean the content from the last appearance of quotes till the end of the query
-        cleanable_content = query[current_position : len(query)]
-        cleanable_content = self._clean_operators(cleanable_content)
-        result = result + cleanable_content
-
-        return result
-
-    def _clean_operators(self, query = ""):
-        """Replaces some of the content of the query with equivalent content
-        (e.g. replace 'AND' operator with '+' operator) for easier processing after that."""
-
-        for word, symbol in (('not', '-'), ('and', '+'), ('or', '|')):
-            query = re.sub('(?i)\\b'+word+'\\b', symbol, query)
-        return query
-
-    def parse_query(self, query=""):
-        """Parses the query and generates as an output a list of values
-        containing a sequence of patterns and operators
-        [operator1, pattern1, operator2, pattern2, operator3, ..., operatorN, patternN]
-
-        Every pattern is either sequence of search terms and operators
-        inside parenthesis or sequence of such terms and operators that are
-        outside parenthesis. Operators in the list are these operators that
-        are between pattern in parenthesis and pattern that is not in parenthesis"""
-
-        # if the query does not contain parentheses we just return it
-        if not self._hasQueryParentheses(query):
-            # we add the default operator in front of the query
-            return [self._DEFAULT_OPERATOR, query]
-
-        # clean the query replacing some of the content e.g. replace 'AND' with '+'
-        query = self._clean_query(query)
-        self._query = query
-
-        self._reset_parse_state()
-        # flag indicating if we are inside quotes
-        inside_quotes = False
-        # used for detecting escape sequences. Contains previously processed character.
-        previous_character = ""
-        # quotes that are recognized
-        quotes_symbols = ['"', "'"]
-        # contains the quotes symbol when we are between quotes
-        current_quotes_symbol = ""
-
-        # iterate through every character in query and perform appropriate action
-        for current_index in range(0, len(self._query)):
-            character = self._query[current_index]
-            # end of the pattern is the current character, which is not included
-            self._pattern_end = current_index
-
-            # include all the characters between quotes in the pattern without special processing
-            if inside_quotes and character != current_quotes_symbol:
-                continue
-
-            # process the quotes if they are not escaped
-            if character in quotes_symbols and previous_character != '\\':
-                # if we are not inside this should be a beginning of the quotes
-                if not inside_quotes:
-                    inside_quotes = True
-                    current_quotes_symbol = character
-                # in case we are inside quotes this is the closing quote
-                elif inside_quotes and character == current_quotes_symbol:
-                    inside_quotes = False
-                    current_quotes_symbol = ""
-                #asssign values to operators if necessary
-                self._assign_default_values_for_operators_if_necessary()
-            elif '(' == character and previous_character != '\\':
-                self._handle_open_parenthesis()
-            elif ')' == character and previous_character != '\\':
-                self._handle_close_parenthesis()
-            elif character in self._operators:
-                self._handle_operator(current_index)
-            else:
-                self._handle_non_white_space_characters(current_index)
-
-            # hold the previous character to use it when checking for escape sequences
-            previous_character = character
-
-        # as far as patterns are appended when reaching parenthesis we should ensure that we append the last pattern
-        self._append_last_pattern()
-
-        # check for mismatched parentheses
-        if self._inside_parentheses:
-            raise InvenioWebSearchQueryParserException("Mismatched parenthesis.")
-
-        return self._patterns
-
-    def _hasQueryParentheses(self, query=""):
-        """Check if the query contain parentheses inside."""
-        if -1 != query.find("("):
-            return True
-
-        if -1 != query.find(")"):
-            return True
-
-        return False
-
-    def _handle_open_parenthesis(self):
-        """Process opening parenthesis in the query."""
-
-        # check if we are already inside parentheses
-        if self._inside_parentheses:
-            raise InvenioWebSearchQueryParserException("Nested parentheses currently unsupported.")
-
-        # both operators preceding and following the pattern before parenthesis
-        # are known and also the pattern itself so append them to the result list.
-        self._append_preceding_operator()
-        self._append_pattern()
-        self._append_following_operator()
-
-        # mark that we are inside parenthesis
-        self._inside_parentheses = True
-
-        # clear operators because they are already in the result.
-        self._clear_preceding_operator()
-        self._clear_following_operator()
-
-    def _handle_close_parenthesis(self):
-        """Process closing parenthesis in the query."""
-
-        # check if we are inside parentheses
-        if not self._inside_parentheses:
-            raise InvenioWebSearchQueryParserException("Mismatched parenthesis.")
-
-        # append the pattern between the parentheses
-        self._append_pattern()
-        # mark that we are not inside parenthesis any more
-        self._inside_parentheses = False
-
-    def _handle_operator(self, operator_position):
-        """Process operator symbols in the query."""
-        if self._inside_parentheses:
-            return
-
-        operator = self._query[operator_position]
-
-        # if there is no preceding operator that means that this is the first
-        # appearance of an operator after closing parenthesis so we assign
-        # the value to the preceding operator
-        if self._preceding_operator == "":
-            self._preceding_operator = operator
-            self._preceding_operator_position = operator_position
-            # move the beginning of the patter after the operator
-            self._pattern_beginning = operator_position + 1
-
-            # if this is the operator preceding the query, we are not supposed
-            # to know the following operator because we are parsing beginning
-            self._clear_following_operator()
-        # if the preceding operator is assigned then this operator is currently
-        # the following operator of the pattern. If there operator after it will replace it
-        else:
-            self._following_operator = operator
-            self._following_operator_position = operator_position
-
-    def _handle_non_white_space_characters(self, character_postition):
-        """Process all non white characters that are not operators, quotes
-        or parenthesis and are not inside parenthesis or quotes"""
-
-        character = self._query[character_postition]
-
-        # if the character is white space or we are in parentheses we skip processing
-        if character.isspace() or self._inside_parentheses:
-            return
-
-        self._assign_default_values_for_operators_if_necessary()
-
-    def _assign_default_values_for_operators_if_necessary(self):
-        """Assign default values for preceding or following operators if this is necessary."""
-
-        # if the preceding operator is empty that means we are starting to parse a new
-        # pattern but there is no operator in front of it. In this case assign default
-        # value to preceding operator
-        if self._preceding_operator == "":
-            self._preceding_operator = self._DEFAULT_OPERATOR
-            self._preceding_operator_position = -1
-        # otherwise we are now parsing a pattern and can assign current value for following operator
-        else:
-            # default operator is assigned as a value and will be changed next
-            # time operator character is reached
-            self._following_operator = self._DEFAULT_OPERATOR
-            self._following_operator_position = -1
-
-    def _append_pattern(self):
-        """Appends the currently parsed pattern to the list with results"""
-        begin = self._calculate_pattern_beginning()
-        end = self._calculate_pattern_end()
-
-        current_pattern = self._query[begin : end]
-        current_pattern = current_pattern.strip()
-
-        #don't append empty patterns
-        if current_pattern != "":
-            self._patterns.append(current_pattern)
-
-        # move the beginning of next pattern at the end of current pattern
-        self._pattern_beginning = self._pattern_end+1
-
-    def _append_preceding_operator(self):
-        """Appends the operator preceding current pattern to the list with results."""
-        if self._preceding_operator != "":
-            self._patterns.append(self._preceding_operator)
-        else:
-            self._patterns.append(self._DEFAULT_OPERATOR)
-
-    def _append_following_operator(self):
-        """Appends the operator following current pattern to the list with results."""
-        if self._following_operator != "":
-            self._patterns.append(self._following_operator)
-
-    def _append_last_pattern(self):
-        """Appends the last pattern from the query to the list with results.
-        Operator preceding this pattern is also appended."""
-        self._pattern_end = self._pattern_end+1
-        self._append_preceding_operator()
-        self._append_pattern()
-
-        # if the last pattern was empty but default preceding operator
-        # is appended, then clean it
-        if self._patterns[-1] == self._DEFAULT_OPERATOR:
-            self._patterns = self._patterns[0 : -1] # remove last element
-
-    def _calculate_pattern_beginning(self):
-        """Calculates exact beginning of a pattern taking in mind positions of
-        operator proceeding the pattern."""
-        # if there is an operator character before the pattern it should not be
-        # included in the pattern
-        if self._pattern_beginning < self._preceding_operator_position:
-            return self._preceding_operator_position + 1
-
-        return self._pattern_beginning
-
-    def _calculate_pattern_end(self):
-        """Calculates exact end of a pattern taking in mind positions of
-        operator following the pattern."""
-        # if there is an operator character after the pattern it should not be
-        # included in the pattern
-        if self._pattern_end > self._following_operator_position and self._following_operator_position != -1:
-            return self._following_operator_position
-
-        return self._pattern_end
-
-    def _clear_preceding_operator(self):
-        """Cleans the value of the preceding operator"""
-        self._preceding_operator = ""
-        # after the value is cleaned the position is also cleaned. We accept -1 for cleaned value.
-        self._preceding_operator_position = -1
-
-    def _clear_following_operator(self):
-        """Cleans the value of the following operator"""
-        self._following_operator = ""
-        # after the value is cleaned the position is also cleaned. We accept -1 for cleaned value.
-        self._following_operator_position = -1
-
-
-class InvenioWebSearchQueryParserException(Exception):
-    """Exception for parsing errors."""
+class InvenioWebSearchMismatchedParensError(Exception):
+    """Exception for parse errors caused by mismatched parentheses."""
     def __init__(self, message):
         """Initialization."""
         self.message = message
+
+
+class SearchQueryParenthesisedParser(object):
+    """Search query parser that handles arbitrarily-nested parentheses
+
+    Parameters:
+    * substitution_dict: a dictionary mapping strings to other strings.  By
+      default, maps 'and', 'or' and 'not' to '+', '|', and '-'.  Dictionary
+      values will be treated as valid operators for output.
+    """
+
+    def __init__(self, substitution_dict = {'and': '+', 'or': '|', 'not': '-'}):
+        self.substitution_dict = substitution_dict
+        self.specials = set(['(', ')', '+', '|', '-', '+ -'])
+
+    # I think my names are both concise and clear
+    # pylint: disable=C0103
+    def _invenio_to_python_logical(self, q):
+        """Translate the + and - in invenio query strings into & and ~."""
+        p = q
+        p = re.sub('\+ -', '&~', p)
+        p = re.sub('\+', '&', p)
+        p = re.sub('-', '~', p)
+        p = re.sub(' ~', ' & ~', p)
+        return p
+
+    def _python_logical_to_invenio(self, q):
+        """Translate the & and ~ in logical expression strings into + and -."""
+        p = q
+        p = re.sub('\& ~', '-', p)
+        p = re.sub('~', '-', p)
+        p = re.sub('\&', '+', p)
+        return p
+    # pylint: enable=C0103
+
+    def parse_query(self, query):
+        """Make query into something suitable for search_engine.
+
+        This is the main entry point of the class.
+
+        Given an expression of the form:
+        "expr1 or expr2 (expr3 not (expr4 or expr5))"
+        produces annoted list output suitable for consumption by search_engine,
+        of the form:
+        ['+', 'expr1', '|', 'expr2', '+', 'expr3 - expr4 | expr5']
+
+        parse_query() is a wrapper for self.tokenize() and self.parse().
+        """
+        toklist = self.tokenize(query)
+        toklist, var_subs = self.substitute_variables(toklist)
+        toklist = self.tokenize(self.logically_reduce(toklist))
+        return self.parse(toklist, var_subs)
+
+    def substitute_variables(self, toklist):
+        """Given a token list, return a copy of token list in which all free
+        variables are bound with boolean variable names of the form 'pN'.
+        Additionally, all the substitutable logical operators are exchanged
+        for their symbolic form and implicit ands are made explicit
+
+        e.g., ((author:'ellis, j' and title:quark) or author:stevens jones)
+        becomes:
+              ((p0 + p1) | p2 + p3)
+        with the substitution table:
+        {'p0': "author:'ellis, j'", 'p1': "title:quark",
+         'p2': "author:stevens", 'p3': "jones" }
+
+        Return value is the substituted token list and a copy of the
+        substitution table.
+        """
+        def labels():
+            i = 0
+            while True:
+                yield 'p'+str(i)
+                i += 1
+
+        def filter_front_ands(toklist):
+            """Filter out extra logical connectives and whitespace from the front."""
+            while toklist[0] == '+' or toklist[0] == '|' or toklist[0] == '':
+                toklist = toklist[1:]
+            return toklist
+
+        var_subs = {}
+        labeler = labels()
+        new_toklist = ['']
+        cannot_be_anded = self.specials.difference((')',))
+        for token in toklist:
+            token = token.lower()
+            if token in self.substitution_dict:
+                if token == 'not' and new_toklist[-1] == '+':
+                    new_toklist[-1] = '+ -'
+                else:
+                    new_toklist.append(self.substitution_dict[token])
+            elif token == '(':
+                if new_toklist[-1] not in self.specials:
+                    new_toklist.append('+')
+                new_toklist.append(token)
+            elif token not in self.specials:
+                # apparently generators are hard for pylint to figure out
+                # Turns off msg about labeler not having a 'next' method
+                # pylint: disable=E1101
+                label = labeler.next()
+                # pylint: enable=E1101
+                var_subs[label] = token
+                if new_toklist[-1] not in cannot_be_anded:
+                    new_toklist.append('+')
+                new_toklist.append(label)
+            else:
+                if token == '-' and new_toklist[-1] == '+':
+                    new_toklist[-1] = '+ -'
+                else:
+                    new_toklist.append(token)
+        return filter_front_ands(new_toklist), var_subs
+
+    def logically_reduce(self, token_list):
+        """Return token_list in conjunctive normal form as a string.
+
+        CNF has the property that there will only ever be one level of
+        parenthetical nesting, and all distributable operators (such as
+        the not in -(p | q) will be fully distributed (as -p + -q).
+        """
+
+        s = ' '.join(token_list)
+        s = self._invenio_to_python_logical(s)
+        try:
+            s = str(to_cnf(to_cnf(s))) # XXX: sometimes NaryExpr doesn't
+                                       # fully flatten Expr; but it always
+                                       # does in 2 passes
+        except SyntaxError:
+            #raise InvenioWebSearchMismatchedParensError("Mismatched parentheses")
+            raise SyntaxError(str(s)+" couldn't be converted to a logic expression.")
+        if s[0] == '(' and s[-1] == ')':# s comes back with extra parens
+            s = s[1:-1]
+        s = self._python_logical_to_invenio(s)
+        return s
+
+    def tokenize(self, query):
+        """Given a query string, return a list of tokens from that string.
+
+        * Isolates meaningful punctuation: ( ) + | -
+        * Keeps single- and doubl-quoted strings together without interpretation.
+        * Splits everything else on whitespace.
+
+        i.e.:
+        "expr1|expr2 (expr3-(expr4 or expr5))"
+        becomes:
+        ['expr1', '|', 'expr2', '(', 'expr3', '-', '(', 'expr4', 'or', 'expr5', ')', ')']
+        """
+        ###
+        # Invariants:
+        # * Query is never modified
+        # * In every loop iteration, querytokens grows to the right
+        # * The only return point is at the bottom of the function, and the only
+        #   return value is querytokens
+        ###
+
+        def get_tokens(s):
+            """
+            Given string s, return a list of s's tokens.
+
+            Adds space around special punctuation, then splits on whitespace.
+            """
+            #for char in ['(',')', '+', '-', '|']:
+            for char in self.specials:
+                s = s.replace('->', '####DATE###RANGE##OP#') # XXX: Save '->'
+                s = re.sub('(?P<outside>[a-zA-Z0-9_,]+)\((?P<inside>[a-zA-Z0-9_,]*)\)',
+                           '#####\g<outside>####PAREN###\g<inside>##PAREN#', s) # XXX: Save U(1) and SL(2,Z)
+
+                s = s.replace(char, ' '+char+' ')
+
+                s = re.sub('#####(?P<outside>[a-zA-Z0-9_,]+)####PAREN###(?P<inside>[a-zA-Z0-9_,]*)##PAREN#',
+                           '\g<outside>(\g<inside>)', s) # XXX: Restore U(1) and SL(2,Z)
+                s = s.replace('####DATE###RANGE##OP#', '->') # XXX: Restore '->'
+            return s.split()
+
+        querytokens = []
+        current_position = 0
+        re_quotepairs = re.compile(r'[^\\](".*?[^\\]")|[^\\](\'.*?[^\\]\')')
+
+        for match in re_quotepairs.finditer(query):
+            # special case for when our regexp captures a single char before
+            # the quotes.  This is faster (in development time and code)
+            # than a much more complicated and complete regexp or using an
+            # FSM for quote balancing.  XXX: But is there a better way?
+            match_start = match.start()
+            quoted_region = match.group(0).strip()
+            if quoted_region[0] not in "'\"":
+                match_start += 1            # capture char 0 in unquoted below
+                quoted_region = quoted_region[1:]
+
+            # clean the content after the previous quotes and before current quotes
+            unquoted = query[current_position : match_start]
+            querytokens.extend(get_tokens(unquoted))
+
+            # XXX: sometimes we end up with labeled quoted regions split off from their
+            # labels, e.g., 'title:"compton scattering"' becomes
+            # ['title:', '"compton scattering"'] rather than ['title:"compton scattering"']
+            # This corrects for that.
+            if querytokens[-1][-1] == ':':
+                querytokens[-1] += quoted_region
+            else:
+                # add our newly tokenized content to the token list
+                querytokens.extend([quoted_region])
+
+            # move current position to the end of the tokenized content
+            current_position = match.end()
+
+        # get tokens from the last appearance of quotes until the query end
+        unquoted = query[current_position : len(query)]
+        querytokens.extend(get_tokens(unquoted))
+
+        return querytokens
+
+    def parse(self, token_list, variable_substitution_dict=None):
+        """Make token_list consumable by search_engine.
+
+        Turns a list of tokens and a variable mapping into a grouped list
+        of subexpressions in the format suitable for use by search_engine,
+        e.g.:
+        ['+', 'searchterm', '-', 'searchterm to exclude', '|', 'another term']
+
+        Incidentally, this works recursively so parens can cause arbitrarily
+        deep nestings.  But since the search_engine doesn't know about nested
+        structures, we need to flatten the input structure first.
+        """
+        ###
+        # Invariants:
+        # * Token list is never modified
+        # * Balanced parens remain balanced; unbalanced parens are an error
+        # * Individual tokens may only be exchanged for items in the variable
+        #   substitution dict; otherwise they pass through unmolested
+        # * Return value is built up mostly as a stack
+        ###
+
+        op_symbols = self.substitution_dict.values()
+        parsed_values = ['+']
+
+        i = 0
+        while i < len(token_list):
+            token = token_list[i]
+            if parsed_values[-1] not in op_symbols:
+                parsed_values.append('+')
+            if token == '(':
+                # Warning: Here be recursion
+                try:
+                    clause_end = token_list.index(')', i)
+                except ValueError:
+                    raise InvenioWebSearchMismatchedParensError("Mismatched '(' in "+str(token_list))
+                clause = token_list[i+1:clause_end]
+                clause = self.parse(clause, variable_substitution_dict)
+                parsed_values.append(' '.join(clause))
+                i = clause_end+1
+                continue
+            elif token == ')':
+                # Since we strip ) from recursive calls in clause above, all
+                # ) appearing now are necessarily errors.
+                raise InvenioWebSearchMismatchedParensError("Mismatched ')' in "+str(token_list))
+            elif token in op_symbols:
+                parsed_values[-1] = token
+            else:
+                if variable_substitution_dict != None and token in variable_substitution_dict:
+                    token = variable_substitution_dict[token]
+                parsed_values.append(token)
+            i += 1
+
+        # If we have an extra start symbol, remove the default one
+        if parsed_values[1] in op_symbols:
+            parsed_values = parsed_values[1:]
+        return parsed_values
 
 
 class SpiresToInvenioSyntaxConverter:
@@ -562,6 +491,8 @@ class SpiresToInvenioSyntaxConverter:
 
     def __init__(self):
         """Initialize the state of the converter"""
+        self._months = {}
+        self._month_name_to_month_number = {}
         self._init_months()
         self._compile_regular_expressions()
 
@@ -917,7 +848,7 @@ class SpiresToInvenioSyntaxConverter:
         if author_middle_name:
             search_pattern = self._A_TAG + '"' + author_surname + ', ' + author_name + '*' + ' ' + author_middle_name.replace(" ","* ") + '*"'
             if NAME_IS_NOT_INITIAL:
-                for i in range(1,len(author_name)):
+                for i in range(1, len(author_name)):
                     search_pattern += ' or ' + self._EA_TAG + "\"%s, %s %s\"" % (author_surname, author_name[0:i], author_middle_name)
             return search_pattern
 
@@ -971,7 +902,7 @@ class SpiresToInvenioSyntaxConverter:
         corresponding Invenio keywords"""
 
         for spires_keyword, invenio_keyword in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.iteritems():
-            query = self._replace_keyword(query, spires_keyword,\
+            query = self._replace_keyword(query, spires_keyword, \
                                           invenio_keyword)
 
         return query

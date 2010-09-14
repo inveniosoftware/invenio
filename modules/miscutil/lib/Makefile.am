@@ -27,6 +27,7 @@ pylib_DATA = __init__.py \
              dbquery.py \
              dbquery_tests.py \
              logicutils.py \
+             logicutils_tests.py \
              mailutils.py \
              miscutil_config.py \
              messages.py \
