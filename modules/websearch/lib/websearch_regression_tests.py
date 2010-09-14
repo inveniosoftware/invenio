@@ -1546,6 +1546,44 @@ class WebSearchAlertTeaserTest(unittest.TestCase):
                                                password='h123yde'))
 
 
+class WebSearchSpanQueryTest(unittest.TestCase):
+    """Test of span queries."""
+
+    def test_span_in_word_index(self):
+        """websearch - span query in a word index"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=year%3A1992-%3E1996&of=id&ap=0',
+                                               expected_text='[17, 66, 69, 71]'))
+
+    def test_span_in_phrase_index(self):
+        """websearch - span query in a phrase index"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=year%3A%221992%22-%3E%221996%22&of=id&ap=0',
+                                               expected_text='[17, 66, 69, 71]'))
+
+    def test_span_in_bibxxx(self):
+        """websearch - span query in MARC tables"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=909C0y%3A%221992%22-%3E%221996%22&of=id&ap=0',
+                                               expected_text='[17, 66, 69, 71]'))
+
+    def test_span_with_spaces(self):
+        """websearch - no span query when a space is around"""
+        # useful for reaction search
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3A%27mu%20--%3E%20e%27&of=id&ap=0',
+                                               expected_text='[67]'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=245%3A%27mu%20--%3E%20e%27&of=id&ap=0',
+                                               expected_text='[67]'))
+
+    def test_span_in_author(self):
+        """websearch - span query in special author index"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis,%20K%22-%3E%22Ellis,%20RZ%22&of=id&ap=0',
+                                               expected_text='[8, 11, 13, 17, 47]'))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1576,7 +1614,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchRecordCollectionGuessTest,
                              WebSearchGetFieldValuesTest,
                              WebSearchAddToBasketTest,
-                             WebSearchAlertTeaserTest)
+                             WebSearchAlertTeaserTest,
+                             WebSearchSpanQueryTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

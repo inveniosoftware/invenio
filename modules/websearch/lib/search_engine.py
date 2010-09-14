@@ -2041,9 +2041,6 @@ def search_unit_in_idxphrases(p, f, type):
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
-    # special washing for fuzzy author index:
-    if f == 'author' or f == 'exactauthor':
-        p = wash_author_name(p)
     # deduce in which idxPHRASE table we will search:
     idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
     if f:
@@ -2060,17 +2057,23 @@ def search_unit_in_idxphrases(p, f, type):
     else:
         p = string.replace(p, '*', '%') # we now use '*' as the truncation character
         ps = string.split(p, "->", 1) # check for span query:
-        if len(ps) == 2:
+        if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
             query_addons = "BETWEEN %s AND %s"
             query_params = (ps[0], ps[1])
         else:
             if string.find(p, '%') > -1:
                 query_addons = "LIKE %s"
-                query_params = (ps[0],)
+                query_params = (p,)
             else:
                 query_addons = "= %s"
-                query_params = (ps[0],)
+                query_params = (p,)
 
+    # special washing for fuzzy author index:
+    if f == 'author' or f == 'exactauthor':
+        query_params_washed = ()
+        for query_param in query_params:
+            query_params_washed += (wash_author_name(query_param),)
+        query_params = query_params_washed
     # perform search:
     res = run_sql("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
                   query_params)
@@ -2105,16 +2108,16 @@ def search_unit_in_bibxxx(p, f, type):
     else:
         p = string.replace(p, '*', '%') # we now use '*' as the truncation character
         ps = string.split(p, "->", 1) # check for span query:
-        if len(ps) == 2:
+        if len(ps) == 2 and not (ps[0].endswith(' ') or ps[1].startswith(' ')):
             query_addons = "BETWEEN %s AND %s"
             query_params = (ps[0], ps[1])
         else:
             if string.find(p, '%') > -1:
                 query_addons = "LIKE %s"
-                query_params = (ps[0],)
+                query_params = (p,)
             else:
                 query_addons = "= %s"
-                query_params = (ps[0],)
+                query_params = (p,)
     # construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
