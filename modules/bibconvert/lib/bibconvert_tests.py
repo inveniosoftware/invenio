@@ -173,7 +173,7 @@ class TestLimw(unittest.TestCase):
         self.assertEqual("sep_",
                 bibconvert.FormatField(test_input, "LIMW(//[!_]//,R)"))
         self.assertEqual(test_input,
-                bibconvert.FormatField(test_input, "LIMW(//[!_-]//,R)"))
+                bibconvert.FormatField(test_input, "LIMW(//[!-]//,R)"))
 
 
 class TestWords(unittest.TestCase):

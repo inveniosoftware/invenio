@@ -990,16 +990,19 @@ def FormatField(value, fn):
         if (par[0]!= ""):
             if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
                 par[0] = par[0][NRE:-NRE]
-                par[0] = re.search(par[0], value).group()
+                if re.search(par[0], value):
+                    par[0] = re.search(par[0], value).group()
+                else:
+                    par[0] = None
         if par[0]:
             tmp = value.split(par[0], 1) # split into two parts only
+            if (par[1] == "L"):
+                out = par[0] + tmp[1]
+            if (par[1] == "R"):
+                out = tmp[0] + par[0]
         else:
             # split by empty par means keep value full
-            tmp = [value]
-        if (par[1] == "L"):
-            out = par[0] + tmp[1]
-        if (par[1] == "R"):
-            out = tmp[0] + par[0]
+            out = value
 
     elif (fn == "WORDS"):
         tmp2 = [value]
@@ -1086,7 +1089,8 @@ def FormatField(value, fn):
         while N < 3:
             if (par[N][0:NRE] == regexp and par[N][-NRE:] == regexp):
                 par[N] = par[N][NRE:-NRE]
-                par[N] = re.search(par[N], value).group()
+                if re.search(par[N], value):
+                    par[N] = re.search(par[N], value).group()
             N += 1
 
         if (value == par[0]):
@@ -1101,7 +1105,8 @@ def FormatField(value, fn):
         par = set_par_defaults(par, ",0")
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
-            par[0] = re.search(par[0], value).group()
+            if re.search(par[0], value):
+                par[0] = re.search(par[0], value).group()
 
         tmp = value.split(" ")
         out2 = []
@@ -1602,7 +1607,8 @@ def format_field(value, fn):
         par = set_par_defaults(par, ",0")
         if (par[0][0:NRE] == regexp and par[0][-NRE:] == regexp):
             par[0] = par[0][NRE:-NRE]
-            par[0] = re.search(par[0], value).group()
+            if re.search(par[0], value):
+                par[0] = re.search(par[0], value).group()
 
         tmp = value.split(" ")
         out2 = []
