@@ -1588,7 +1588,7 @@ class Template:
         out += """</select>"""
         return out
 
-    def tmpl_record_links(self, recid, ln):
+    def tmpl_record_links(self, recid, ln, sf='', so='d', sp='', rm=''):
         """
           Displays the *More info* and *Find similar* links for a record
 
@@ -1615,7 +1615,12 @@ class Template:
             num_timescited = get_cited_by_count(recid)
             if num_timescited:
                 out += '''<span class="moreinfo"> - %s </span>''' % \
-                       create_html_link(self.build_search_url(p='refersto:recid:%d' % recid, rm='citation', ln=ln),
+                       create_html_link(self.build_search_url(p='refersto:recid:%d' % recid,
+                                                              sf=sf,
+                                                              so=so,
+                                                              sp=sp,
+                                                              rm=rm,
+                                                              ln=ln),
                                         {}, _("Cited by %i records") % num_timescited, {'class': "moreinfo"})
 
         return out
@@ -3284,7 +3289,7 @@ class Template:
                  ln=ln)
         return out
 
-    def tmpl_print_record_brief_links(self, ln, recID):
+    def tmpl_print_record_brief_links(self, ln, recID, sf='', so='d', sp='', rm=''):
         """Displays links for brief record on-the-fly
 
         Parameters:
@@ -3332,7 +3337,10 @@ class Template:
             if num_timescited:
                 out += '<span class="moreinfo"> - %s</span>' % \
                        create_html_link(self.build_search_url(p="refersto:recid:%d" % recID,
-                                                              rm="citation",
+                                                              sf=sf,
+                                                              so=so,
+                                                              sp=sp,
+                                                              rm=rm,
                                                               ln=ln),
                                         {}, num_timescited > 1 and _("Cited by %i records") % num_timescited
                                         or _("Cited by 1 record"),
@@ -3664,7 +3672,8 @@ class Template:
         return '</table>'
 
     def tmpl_detailed_record_citations_citing_list(self, recID, ln,
-                                                   citinglist):
+                                                   citinglist,
+                                                   sf='', so='d', sp='', rm=''):
         """Returns the list of record citing this one
 
         Parameters:
@@ -3691,9 +3700,12 @@ class Template:
                       <br /><br />
                     </td></tr>''' % {
                 'more': create_html_link(
-                self.build_search_url(p='refersto:recid:%d' % \
-                                      recID,      #XXXX
-                                      rm='citation', ln=ln),
+                self.build_search_url(p='refersto:recid:%d' % recID,      #XXXX
+                                      sf=sf,
+                                      so=so,
+                                      sp=sp,
+                                      rm=rm,
+                                      ln=ln),
                                       {}, _("more")),
                 'similar': similar}
         return out

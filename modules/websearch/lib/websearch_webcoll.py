@@ -465,6 +465,7 @@ class Collection:
                 passIDs.append({'id': self.latest_additions_info[idx]['id'],
                                 'body': self.latest_additions_info[idx]['format'] + \
                                         websearch_templates.tmpl_record_links(recid=self.latest_additions_info[idx]['id'],
+                                                                              rm='citation',
                                                                               ln=ln),
                                 'date': self.latest_additions_info[idx]['date']})
 
