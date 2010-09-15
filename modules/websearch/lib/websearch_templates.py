@@ -1615,7 +1615,7 @@ class Template:
             num_timescited = get_cited_by_count(recid)
             if num_timescited:
                 out += '''<span class="moreinfo"> - %s </span>''' % \
-                       create_html_link(self.build_search_url(p='recid:%d' % recid, rm='citation', ln=ln),
+                       create_html_link(self.build_search_url(p='refersto:recid:%d' % recid, rm='citation', ln=ln),
                                         {}, _("Cited by %i records") % num_timescited, {'class': "moreinfo"})
 
         return out
@@ -3331,7 +3331,7 @@ class Template:
             num_timescited = get_cited_by_count(recID)
             if num_timescited:
                 out += '<span class="moreinfo"> - %s</span>' % \
-                       create_html_link(self.build_search_url(p="recid:%d" % recID,
+                       create_html_link(self.build_search_url(p="refersto:recid:%d" % recID,
                                                               rm="citation",
                                                               ln=ln),
                                         {}, num_timescited > 1 and _("Cited by %i records") % num_timescited
@@ -3691,7 +3691,7 @@ class Template:
                       <br /><br />
                     </td></tr>''' % {
                 'more': create_html_link(
-                self.build_search_url(p='recid:%d' % \
+                self.build_search_url(p='refersto:recid:%d' % \
                                       recID,      #XXXX
                                       rm='citation', ln=ln),
                                       {}, _("more")),

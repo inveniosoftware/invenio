@@ -4381,7 +4381,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             return page_end(req, of, ln)
 
     elif rm and p.startswith("recid:"):
-        ## 3-ter - similarity search or citation search needed
+        ## 3-ter - similarity search (or old-style citation search) needed
         if req and not req.header_only:
             page_start(req, of, cc, aas, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3))
         if of.startswith("h"):
