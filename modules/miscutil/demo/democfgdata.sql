@@ -1507,6 +1507,7 @@ INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (3,'citation','0000-00-00 00:00:00');
+INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,3,10);
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,3,80);
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (4,'citerank_citation_t','0000-00-00 00:00:00');
