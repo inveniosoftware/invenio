@@ -318,6 +318,10 @@ def compress_subfields(out,subfield_code):
               <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
               <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
            </datafield>
+
+        - group together the contents of misc elements which belong to the same datafield element
+        - correctly manage mulitple references inside a single citation line (using multiple 'o'
+            tags to denote mulitple references)
            """
     in_lines = out.split('\n')
     ## hold the subfield compressed version of the xml, line by line
@@ -3593,6 +3597,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
 
 
         elif tag_type == "URL":
+
             ## This tag is an identified URL:
 
             ## From the "identified_urls" list, get this URL and its
@@ -4095,6 +4100,11 @@ def create_marc_xml_reference_section(ref_sect,
         ## Strip the 'marker' (e.g. [1]) from this reference line:
         (line_marker, working_line1) = \
                       remove_reference_line_marker(ref_line)
+    
+
+        ## Find DOI sections in citation
+        (working_line1, identified_dois) = identify_and_tag_doi(working_line1)
+
 
 
         ## Find DOI sections in citation
@@ -6562,5 +6572,3 @@ def test_get_reference_lines():
                ]
     return reflines
 
-if __name__ == '__main__':
-    main()
