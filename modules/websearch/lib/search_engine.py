@@ -647,6 +647,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 # secondly, determine search pattern and field:
                 if string.find(pi, ":") > 0:
                     fi, pi = string.split(pi, ":", 1)
+                    fi = wash_field(fi)
                     # test whether fi is a real index code or a MARC-tag defined code:
                     if fi in get_fieldcodes() or '00' <= fi[:2] <= '99':
                         pass
@@ -655,9 +656,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                         fi, pi = f, fi + ":" + pi
                 else:
                     fi, pi = f, pi
-                # look also for old ALEPH field names:
-                if fi and CFG_WEBSEARCH_FIELDS_CONVERT.has_key(string.lower(fi)):
-                    fi = CFG_WEBSEARCH_FIELDS_CONVERT[string.lower(fi)]
+                # wash 'fi' argument:
+                fi = wash_field(fi)
                 # wash 'pi' argument:
                 if re_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
@@ -700,6 +700,10 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 del opfts[i]
         except:
             pass
+
+    ## replace old logical field names if applicable:
+    if CFG_WEBSEARCH_FIELDS_CONVERT:
+        opfts = [[o,p,wash_field(f),t] for o,p,f,t in opfts]
 
     ## return search units:
     return opfts
@@ -1468,10 +1472,12 @@ def wash_pattern(p):
 def wash_field(f):
     """Wash field passed by URL."""
     # get rid of unnecessary whitespace:
-    f = string.strip(f)
-    # wash old-style CDS Invenio/ALEPH 'f' field argument, e.g. replaces 'wau' and 'au' by 'author'
-    if CFG_WEBSEARCH_FIELDS_CONVERT.has_key(string.lower(f)):
-        f = CFG_WEBSEARCH_FIELDS_CONVERT[f]
+    if f:
+        f = f.strip()
+    # wash legacy 'f' field names, e.g. replace 'wau' or `au' by
+    # 'author', if applicable:
+    if CFG_WEBSEARCH_FIELDS_CONVERT:
+        f = CFG_WEBSEARCH_FIELDS_CONVERT.get(f, f)
     return f
 
 def wash_dates(d1="", d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0):
@@ -2130,9 +2136,6 @@ def search_unit_in_bibxxx(p, f, type):
     if str(f[0]).isdigit() and str(f[1]).isdigit():
         tl.append(f) # 'f' seems to be okay as it starts by two digits
     else:
-        # convert old ALEPH tag names, if appropriate: (TODO: get rid of this before entering this function)
-        if CFG_WEBSEARCH_FIELDS_CONVERT.has_key(string.lower(f)):
-            f = CFG_WEBSEARCH_FIELDS_CONVERT[string.lower(f)]
         # deduce desired MARC tags on the basis of chosen 'f'
         tl = get_field_tags(f)
         if not tl:
