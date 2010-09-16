@@ -26,6 +26,7 @@ Usage: python kwalitee.py [options] <topsrcdir | file1.py file2.py ...>
 General options::
    -h, --help               print this help
    -V, --version            print version number
+   -q, --quiet              be quiet, print only warnings
 
 Check options::
    --stats                  generate kwalitee summary stats
@@ -52,7 +53,8 @@ import time
 import subprocess
 
 __revision__ = "$Id$" #: revision number
-VERBOSE = 0 #: verbose level
+
+QUIET_MODE = False #: are we running in quiet mode? (will be set from CLI)
 
 
 def get_list_of_python_code_files(modulesdir, modulename):
@@ -192,12 +194,6 @@ def get_pylint_results(filename):
     nb_msg_fatal = pylint_output.count("\nF:")
 
     # return results:
-    if VERBOSE >= 9:
-        print "get_pylint_results(%s) = (%d, %s, %s, %s, %s, %s, %s)" % \
-              (filename, nb_missing_docstrings, pylint_score,
-               nb_msg_convention, nb_msg_refactor, nb_msg_warning,
-               nb_msg_error, nb_msg_fatal)
-
     return (nb_missing_docstrings, float(pylint_score),
             nb_msg_convention, nb_msg_refactor, nb_msg_warning,
             nb_msg_error, nb_msg_fatal)
@@ -220,9 +216,6 @@ def get_nb_pychecker_warnings(filename):
     for line in pychecker_output.split('\n'): # pylint: disable=E1103
         if line.find(filename_to_watch_for + ":") > -1:
             nb_warnings_found += 1
-    if VERBOSE >= 9:
-        print "get_nb_pychecker_warnings(%s) = %s" % (filename,
-                                                      nb_warnings_found)
     return nb_warnings_found
 
 
@@ -614,6 +607,8 @@ def get_python_filenames_from_pathnames(pathnames, extension='.py'):
 
 def print_heading(phrase, prefix='\033[1m', suffix='\033[0;0m'):
     """Print heading phrase in a special style (default=bold)."""
+    if QUIET_MODE:
+        return
     print prefix + '>>> ' + phrase + suffix
     print
 
@@ -784,6 +779,7 @@ def cmd_stats(filenames):
 
 def main():
     """Analyze CLI options and invoke appropriate actions."""
+    global QUIET_MODE # pylint: disable=W0603
     # check options:
     if '--help' in sys.argv or \
        '-h' in sys.argv:
@@ -802,6 +798,8 @@ def main():
                        '--check-indentation', '--check-whitespace',
                        '--check-docstrings', '--check-pep8'):
                 cmd_option = opt[2:].replace('-', '_')
+            elif opt in ('-q', '--quiet'):
+                QUIET_MODE = True
             elif not opt.startswith('--'):
                 cmd_pathnames = sys.argv[opt_idx:]
                 break
