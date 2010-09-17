@@ -736,9 +736,16 @@ def cmd_check_docstrings(filenames):
         if process_error:
             print "[ERROR]", process_error
         for line in process_output.split('\n'): # pylint: disable=E1103
-            if not line.startswith('  [......'):
+            if line.startswith('  [......'):
+                pass
+            elif line.endswith('.__package__'):
+                # epydoc does not treat __package__ properly, so let's
+                # discard these types of findings
+                pass
+            else:
                 out += line + '\n'
-        if out:
+        if out and out.strip() != 'Warning: Undocumented:':
+            # something other than sole __package__ was found
             print '***', filename
             print out
 
