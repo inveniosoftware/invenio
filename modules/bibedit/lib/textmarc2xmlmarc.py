@@ -400,7 +400,7 @@ def transform_file(filename):
             if nbchars >= 72:
                 sys.stderr.write("\n   ")
                 nbchars = 5
-    sys.stderr.write("\n")
+        sys.stderr.write("\n")
 
 def usage(code, msg=''):
     "Prints usage for this module."
