@@ -35,6 +35,8 @@ from invenio.messages import gettext_set_language
 import datetime, time
 
 def search_user(column, string):
+    if string != None:
+        string = string.strip()
     if CFG_CERN_SITE == 1:
         if   column == 'name':
             result = db.search_borrower_by_name(string)
@@ -52,7 +54,7 @@ def search_user(column, string):
                 ldap_info = 'busy'
                 while ldap_info == 'busy':
                     time.sleep(1)
-                    if column == 'id':
+                    if column == 'id' or column == 'ccid':
                         ldap_info = get_user_info_from_ldap(ccid=string)
                     elif column == 'email':
                         ldap_info = get_user_info_from_ldap(email=string)
@@ -100,55 +102,121 @@ def search_user(column, string):
 
     return result
 
-def hold_request_mail(recid, borrower_id):
-    """
-    Create the mail who will be sent for each hold requests.
-
-    @param recid: identify the record. Primary key of bibrec.
-    @type recid: int
-
-    @param borrower_id: identify the borrower. Primary key of crcBORROWER.
-    @type borrower_id: int
-
-    @return email(body)
-    """
-
-    (book_title, book_year, book_author,
-    book_isbn, book_editor) = book_information_from_MARC(recid)
-
-    ############## need some code refactoring ###############
-
-    more_holdings_infos = db.get_holdings_details(recid)
-    borrower_infos = db.get_borrower_details(borrower_id)
-
-    #########################################################
-
-    title_link = create_html_link(CFG_SITE_URL +
-                                  '/admin2/bibcirculation/get_item_details',
-                                  {'recid': recid},
-                                  (book_title))
-
-    out = """
-
-           This is an automatic email for confirming the hold request for a
-           book on behalf of:
-
-            %s (email: %s)
-
-            title: %s
-            author: %s
-            location: %s
-            library: %s
-            publisher: %s
-            year: %s
-            isbn: %s
-
-    """ % (borrower_infos[1], borrower_infos[2],
-           title_link, book_author, more_holdings_infos[0][1],
-           more_holdings_infos[0][2],
-           book_editor, book_year, book_isbn)
-
-    return out
+#def hold_request_mail(recid, barcode, borrower_id):
+#    """
+#    Create the mail who will be sent for each hold requests.
+#
+#    @param recid: identify the record. Primary key of bibrec.
+#    @type recid: int
+#
+#    @param borrower_id: identify the borrower. Primary key of crcBORROWER.
+#    @type borrower_id: int
+#
+#    @return email(body)
+#    """
+#
+#    (book_title, book_year, book_author,
+#    book_isbn, book_editor) = book_information_from_MARC(recid)
+#
+#    ############## need some code refactoring ###############
+#
+#    more_holdings_infos = db.get_holdings_details(recid)
+#    borrower_infos = db.get_borrower_details(borrower_id)
+#
+#    #########################################################
+#
+#    title_link = create_html_link(CFG_SITE_URL +
+#                                  '/admin2/bibcirculation/get_item_details',
+#                                  {'recid': recid},
+#                                  (book_title))
+#
+#    (borrower_id, ccid, name, email, phone, address, mailbox) = borrower_infos
+#
+#    ## Register request
+#    #nb_requests = db.get_number_requests_per_copy(barcode)
+#    #is_on_loan = db.is_item_on_loan(barcode)
+#    #
+#    #if nb_requests == 0 and is_on_loan is not None:
+#    #    status = 'waiting'
+#    #elif nb_requests == 0 and is_on_loan is None:
+#    #    status = 'pending'
+#    #else:
+#    #    status = 'waiting'
+#    #
+#    #is_borrower = db.is_borrower(email)
+#    #
+#    #if is_borrower == 0:
+#    #    db.new_borrower(ccid, name, email, phone, address, mailbox, '')
+#    #    is_borrower = db.is_borrower(email)
+#    #
+#    #req_id = db.new_hold_request(is_borrower, recid, barcode,
+#    #                        period_from, period_to, status)
+#    #db.update_item_status('requested', barcode)
+#    #
+#    #if status == 'pending':
+#    (title, year, author, isbn, publisher) = book_information_from_MARC(int(recid))
+#    details = db.get_loan_request_details(req_id)
+#    if details:
+#        library  = details[3]
+#        location = details[4]
+#        request_date = details[7]
+#    else:
+#        location = ''
+#        library = ''
+#        request_date = ''
+#
+#    link_to_holdings_details = create_html_link(CFG_SITE_URL +
+#                                    '/record/%s/holdings'%str(recid),
+#                                    {'ln': ln},
+#                                    (CFG_SITE_URL +
+#                                    '/record/%s/holdings'%str(recid)))
+#    subject = 'New request'
+#    message = load_template('notification')
+#
+#    message = message % (name, ccid, email, address, mailbox, title,
+#                         author, publisher, year, isbn, location, library,
+#                         link_to_holdings_details, request_date)
+#
+#
+#    send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+#            toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
+#            subject  = subject,
+#            content  = message,
+#            header   = '',
+#            footer   = '',
+#            attempt_times=1,
+#            attempt_sleeptime=10
+#            )
+#    send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+#            toaddr   = email,
+#            subject  = subject,
+#            content  = message,
+#            header   = '',
+#            footer   = '',
+#            attempt_times=1,
+#            attempt_sleeptime=10
+#            )
+#    out = """
+#
+#           This is an automatic email for confirming the hold request for a
+#           book on behalf of:
+#
+#            %s (email: %s)
+#
+#            title: %s
+#            author: %s
+#            location: %s
+#            library: %s
+#            publisher: %s
+#            year: %s
+#            isbn: %s
+#
+#    """ % (borrower_infos[1], borrower_infos[2],
+#           title_link, book_author, more_holdings_infos[0][1],
+#           more_holdings_infos[0][2],
+#           book_editor, book_year, book_isbn)
+#
+#    return out
 
 
 def get_book_cover(isbn):
@@ -192,18 +260,16 @@ def book_information_from_MARC(recid):
 
     @return tuple with title, year, author, isbn and editor.
     """
+    # FIXME do the same that book_title_from_MARC
 
-    book_title  = ' '.join(get_fieldvalues(recid, "245__a") + \
-                           get_fieldvalues(recid, "245__b") + \
-                           get_fieldvalues(recid, "245__n") + \
-                           get_fieldvalues(recid, "245__p"))
+    book_title  = book_title_from_MARC(recid)
 
-    book_year   = ' '.join(get_fieldvalues(recid, "260__c"))
+    book_year   = ''.join(get_fieldvalues(recid, "260__c"))
 
-    book_author = ' '.join(get_fieldvalues(recid, "100__a") + \
+    book_author = ''.join(get_fieldvalues(recid, "100__a") + \
                            get_fieldvalues(recid, "100__u"))
 
-    book_isbn   = ' '.join(get_fieldvalues(recid, "020__a"))
+    book_isbn   = ''.join(get_fieldvalues(recid, "020__a"))
 
     book_editor = ', '.join(get_fieldvalues(recid,"260__a") + \
                            get_fieldvalues(recid, "260__b"))
@@ -222,10 +288,19 @@ def book_title_from_MARC(recid):
     @return book's title
     """
 
-    book_title = ' '.join(get_fieldvalues(recid, "245__a") + \
-                          get_fieldvalues(recid, "245__b") + \
-                          get_fieldvalues(recid, "245__n") + \
-                          get_fieldvalues(recid, "245__p"))
+    from invenio.search_engine import get_field_tags
+    title_tags = get_field_tags('title')
+
+
+    book_title = ''
+    i = 0
+    while book_title == '' and i<len(title_tags):
+        l = get_fieldvalues(recid,title_tags[i])
+        for candidate in l:
+            book_title = book_title + candidate + ': '
+        i+=1
+
+    book_title = book_title[:-2]
 
     return book_title
 
@@ -318,7 +393,7 @@ def renew_loan_for_X_days(barcode):
 
 def make_copy_available(request_id):
     """
-    Change the status of a copy for 'available' when
+    Change the status of a copy for 'on shelf' when
     an hold request was cancelled.
 
     @param request_id: identify the request: Primary key of crcLOANREQUEST
@@ -326,7 +401,7 @@ def make_copy_available(request_id):
     """
 
     barcode_requested = db.get_requested_barcode(request_id)
-    db.update_item_status('available', barcode_requested)
+    db.update_item_status('on shelf', barcode_requested)
 
     return
 
@@ -530,6 +605,7 @@ def get_item_info_for_search_result(recid):
 
     return book_infos
 
+
 def update_request_data(request_id):
     """
     Update the status of a given request.
@@ -539,17 +615,15 @@ def update_request_data(request_id):
     """
 
     barcode = db.get_request_barcode(request_id)
-    nb_requests = db.get_number_requests_per_copy(barcode)
     is_on_loan = db.is_item_on_loan(barcode)
 
-    if nb_requests == 0 and is_on_loan is not None:
+    if is_on_loan is not None:
         db.update_item_status('on loan', barcode)
-    elif nb_requests == 0 and is_on_loan is None:
-        db.update_item_status('available', barcode)
     else:
-        db.update_item_status('requested', barcode)
+        db.update_item_status('on shelf', barcode)
 
-    return
+
+    return True
 
 
 def compare_dates(date):

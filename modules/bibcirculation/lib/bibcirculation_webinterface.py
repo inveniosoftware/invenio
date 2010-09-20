@@ -65,6 +65,9 @@ from invenio.bibcirculation import perform_new_request, \
                                    ill_register_request, \
                                    ill_request_with_recid, \
                                    ill_register_request_with_recid
+import datetime
+import time
+
 
 class WebInterfaceYourLoansPages(WebInterfaceDirectory):
     """Defines the set of /yourloans pages."""
@@ -278,7 +281,8 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             request_details = (argd['budget_code'], argd['period_of_interest_from'],
                                argd['period_of_interest_to'], argd['additional_comments'],
                                argd['only_edition'])
-            body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(book_info, user_info, request_details, False, argd['ln'])
+            body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(
+                                        book_info, user_info, request_details, False, argd['ln'])
 
         else:
             body = "wrong user id"
@@ -297,7 +301,36 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         @param ln:  language
         @return the page for inbox
         """
-        argd = wash_urlargd(form, {'book_info': (str, None), 'user_info': (str, None), 'request_details': (str, None), 'ln': (str, "en")})
+
+        argd = wash_urlargd(form, {'title': (str, None), 'authors': (str, None),
+            'place': (str, None), 'publisher': (str, None), 'year': (str, None),
+            'edition': (str, None), 'isbn': (str, None), 'borrower_id': (str, None),
+            'budget_code': (str, None), 'period_of_interest_from': (str, None),
+            'period_of_interest_to': (str, None), 'additional_comments': (str, None),
+            'only_edition': (str, None), 'ln': (str, "en")})
+
+        title = argd['title']
+        authors = argd['authors']
+        place = argd['place']
+        publisher = argd['publisher']
+        year = argd['year']
+        edition = argd['edition']
+        isbn = argd['isbn']
+
+        borrower_id = argd['borrower_id']
+
+        budget_code = argd['budget_code']
+        period_of_interest_from = argd['period_of_interest_from']
+        period_of_interest_to = argd['period_of_interest_to']
+        library_notes = argd['additional_comments']
+        only_edition = argd['only_edition']
+
+        ln = argd['ln']
+
+        book_info = (title, authors, place, publisher, year, edition, isbn)
+        request_details = (budget_code, period_of_interest_from, period_of_interest_to,
+                            library_notes, only_edition)
+
         # Check if user is logged
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -320,30 +353,8 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use ill."))
 
-        book_info = argd['book_info']
-        user_info = argd['user_info']
-        request_details = argd['request_details']
-        ln = argd['ln']
-
-        if type(book_info) is str:
-            book_info = eval(book_info)
-
-        if type(request_details) is str:
-            request_details = eval(request_details)
-
-        if type(user_info) is str:
-            user_info = eval(user_info)
-
-        (title, authors, place, publisher, year, edition, isbn) = book_info
-        #create_ill_record(book_info)
-
         book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
                  'year' : year,  'edition': edition, 'isbn' : isbn}
-
-        (budget_code, period_of_interest_from, period_of_interest_to,
-            library_notes, only_edition) = request_details
-
-        borrower_id = user_info[0]
 
         ill_request_notes = {}
         if library_notes:
@@ -453,10 +464,10 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         borrower_id = search_user('email',user_info['email'])
         if borrower_id != ():
             borrower_id = borrower_id[0][0]
-
+            notes=argd['additional_comments']
             ill_request_notes = {}
-            if library_notes:
-                ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+            if notes:
+                ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(notes)
 
             item_info = {'periodical_title': argd['periodical_title'],
                 'title': argd['article_title'], 'authors': argd['author'], 'place': "",
@@ -464,9 +475,10 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                 'volume': argd['volume'] }
 
             ### budget_code ###
-            db.ill_register_request_on_desk(borrower_id, item_info, argd['period_of_interest_from'],
-                                    argd['period_of_interest_to'], 'new',
-                                    str(ill_request_notes), 'No', 'article')
+            db.ill_register_request_on_desk(borrower_id, item_info,
+                                            argd['period_of_interest_from'],
+                                            argd['period_of_interest_to'], 'new',
+                                            str(ill_request_notes), 'No', 'article')
 
             infos=[]
             infos.append('Interlibrary loan request done.')
@@ -582,6 +594,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                    'voted': (int, -1),
                                    'reported': (int, -1),
                                    })
+
         _ = gettext_set_language(argd['ln'])
 
         record_exists_p = record_exists(self.recid)
@@ -606,7 +619,6 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         body = perform_get_holdings_information(self.recid, req, argd['ln'])
 
         uid = getUid(req)
-
 
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
@@ -709,10 +721,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 text = auth_msg)
 
 
-
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=argd['ln'])
+        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)), self.recid, ln=argd['ln'])
         ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
@@ -738,18 +747,18 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         navtrail += '</a>'
 
         return pageheaderonly(title=title,
-                              navtrail=navtrail,
-                              uid=uid,
-                              verbose=1,
-                              req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
-                              language=argd['ln'],
-                              navmenuid='search',
-                              navtrail_append_title_p=0) + \
-                              websearch_templates.tmpl_search_pagestart(argd['ln']) + \
-                              top + body + bottom + \
-                              websearch_templates.tmpl_search_pageend(argd['ln']) + \
-                              pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
+                    navtrail=navtrail,
+                    uid=uid,
+                    verbose=1,
+                    req=req,
+                    metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                    language=argd['ln'],
+                    navmenuid='search',
+                    navtrail_append_title_p=0) + \
+                    websearch_templates.tmpl_search_pagestart(argd['ln']) + \
+                    top + body + bottom + \
+                    websearch_templates.tmpl_search_pageend(argd['ln']) + \
+                    pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
 
 
     def send(self, req, form):
@@ -772,7 +781,6 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         ln = CFG_SITE_LANG
         _ = gettext_set_language(ln)
 
-
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
@@ -786,10 +794,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 text = auth_msg)
 
 
-
-        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid,
-                                                    ln=ln)
+        unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)), self.recid, ln=ln)
         ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
         ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
         link_ln = ''
@@ -808,9 +813,12 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                                                      tabs,
                                                                      argd['ln'])
 
-        title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
-        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+        title = websearch_templates.tmpl_record_page_header_content(req, self.recid,
+                                                                    argd['ln'])[0]
+        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid),
+                                         ln=argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL,
+                                                                        self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
@@ -826,7 +834,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                               top + body + bottom + \
                               websearch_templates.tmpl_search_pageend(argd['ln']) + \
                               pagefooteronly(lastupdated=__lastupdated__,
-                                             language=argd['ln'], req=req)
+                              language=argd['ln'], req=req)
 
 
 
@@ -835,7 +843,6 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         """
         Show ILL request form.
         """
-
 
         argd = wash_urlargd(form, {'ln': (str, "")})
 

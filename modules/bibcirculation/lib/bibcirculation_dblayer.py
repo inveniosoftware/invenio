@@ -254,15 +254,13 @@ def update_item_status(status, barcode):
     """
     if status == 'on loan':
         return int(run_sql("""UPDATE  crcITEM
-                             SET  status=%s,
-                                  number_of_requests = number_of_requests + 1
-                           WHERE  barcode=%s""",
-                       (status, barcode)))
+                                 SET  status=%s,
+                                      number_of_requests = number_of_requests + 1
+                               WHERE  barcode=%s""", (status, barcode)))
     else:
         return int(run_sql("""UPDATE  crcITEM
-                             SET  status=%s
-                           WHERE  barcode=%s""",
-                           (status, barcode)))
+                                 SET  status=%s
+                               WHERE  barcode=%s""", (status, barcode)))
 
 
 def new_hold_request(borrower_id, recid, barcode, date_from, date_to, status):
@@ -456,7 +454,7 @@ def get_next_waiting_loan_request(recid):
 
     return res
 
-def update_loan_info(returned_on, status, barcode):
+def return_loan(barcode):
     """
     Update loan information when copy is returned.
 
@@ -473,9 +471,9 @@ def update_loan_info(returned_on, status, barcode):
     """
 
     return int(run_sql("""update crcLOAN
-                          set returned_on=%s, status=%s
+                          set returned_on=NOW(), status='returned', due_date=NULL
                           where barcode=%s
-                      """, (returned_on, status, barcode)))
+                      """, (barcode,)))
 
 
 
@@ -684,6 +682,7 @@ def get_loan_request_by_status(status):
                             crcLIBRARY lib
                      WHERE  lr.id_crcBORROWER=bor.id AND it.barcode=lr.barcode AND
                             lib.id = it.id_crcLIBRARY AND lr.status=%s
+                            AND lr.period_of_interest_to >= CURDATE()
                             ORDER BY lr.request_date;
                   """ ,
                      (status, ))
@@ -715,7 +714,9 @@ def get_all_requests():
                             lr.request_date
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and (lr.status='waiting' or lr.status='pending')
+                     WHERE  bor.id = lr.id_crcBORROWER
+                            AND (lr.status='waiting' OR lr.status='pending')
+                            AND lr.period_of_interest_to >= CURDATE()
                             ORDER BY lr.request_date
                             """)
 
@@ -837,14 +838,15 @@ def get_all_requests_order_by_item():
 
     return res
 
+
 def get_borrower_details(borrower_id):
     """
     borrower_id: identify the borrower. It is also the primary key of
                  the table crcBORROWER.
     """
-    res =  run_sql("""select id, ccid, name, email, phone, address, mailbox
-                      from crcBORROWER
-                      where id=%s""", (borrower_id, ))
+    res =  run_sql("""SELECT id, ccid, name, email, phone, address, mailbox
+                      FROM   crcBORROWER
+                      WHERE  id=%s""", (borrower_id, ))
     if res:
         return res[0]
     else:
@@ -1102,14 +1104,16 @@ def new_loan(borrower_id, recid, barcode,
     notes: loan notes.
     """
 
-
-
     res = run_sql(""" insert into crcLOAN (id_crcBORROWER, id_bibrec,
                                            barcode, loaned_on, due_date,
                                            status, type, notes)
                       values(%s, %s, %s, %s, %s, %s ,%s, %s)
                   """, (borrower_id, recid, barcode, loaned_on,
                         due_date, status, loan_type, str(notes)))
+
+    res = run_sql(""" UPDATE crcITEM
+                         SET status=%s
+                       WHERE barcode=%s""", (status, barcode))
 
     return res
 
@@ -1244,7 +1248,7 @@ def get_borrower_loans(borrower_id):
 def get_current_loan_id(barcode):
     res = run_sql(""" select id
                       from crcLOAN
-                      where barcode='%s' and status='on loan'
+                      where barcode='%s' and (status='on loan' or status = 'expired')
                   """ % (barcode))
 
     if res:
@@ -1262,6 +1266,13 @@ def update_due_date(loan_id, new_due_date):
                                   number_of_renewals = number_of_renewals + 1
                            WHERE  id=%s""",
                        (new_due_date, loan_id)))
+
+def renew_loan(loan_id, new_due_date):
+    run_sql("""UPDATE  crcLOAN
+                  SET  due_date=%s,
+                       number_of_renewals = number_of_renewals + 1,
+                       status = 'on loan'
+                WHERE  id=%s""", (new_due_date, loan_id))
 
 def update_due_date_borrower(borrower_id, new_due_date):
     """
@@ -1281,9 +1292,10 @@ def get_queue_request(recid):
     recid: identify the record. It is also the primary key of
            the table bibrec.
     """
-    res = run_sql(""" select id
+    res = run_sql(""" select id_crcBORROWER, status, DATE_FORMAT(request_date,'%%Y-%%m-%%d') as rd
                       from crcLOANREQUEST
                       where id_bibrec=%s and (status='pending' or status='waiting')
+                      order by rd
                   """, (recid, ))
 
     return res
@@ -1357,7 +1369,7 @@ def get_borrower_requests(borrower_id):
 
     return res
 
-def cancel_request(request_id, status):
+def cancel_request(request_id):
     """
     Cancel an hold request.
     request_id: identify the hold request who will be
@@ -1366,9 +1378,9 @@ def cancel_request(request_id, status):
     status: The new status of the hold request. In this case
             it will be 'cancelled'.
     """
-    run_sql("""update crcLOANREQUEST set status=%s
+    run_sql("""update crcLOANREQUEST set status='cancelled'
                where id=%s
-            """, (status, request_id))
+            """, (request_id,))
 
 def get_nb_copies_on_loan(recid):
     """
@@ -1799,6 +1811,25 @@ def update_item_info(barcode, library_id, collection, location, description,
                 (barcode, library_id, collection, location, description,
                  loan_period, status, barcode)))
 
+def update_item_recid(barcode, new_recid):
+    """
+    Update item's information.
+
+    barcode: identify the item. It is the primary key of the table
+             crcITEM.
+
+    library_id: identify the library. It is also the primary key of
+                the table crcLIBRARY.
+    """
+
+    res =run_sql("""update crcITEM
+                      set id_bibrec=%s,
+                          modification_date=NOW()
+                   where  barcode=%s""",
+                (new_recid, barcode))
+
+    return res
+
 def get_library_items(library_id):
     """
     Get all items who belong to a library.
@@ -1943,6 +1974,23 @@ def get_borrower_recids(borrower_id):
                   (borrower_id,))
 
     return res
+
+def get_borrower_loans_barcodes(borrower_id):
+    """
+    borrower_id: identify the borrower. It is also the primary key of
+                 the table crcBORROWER.
+    """
+
+    res = run_sql("""select barcode
+                       from crcLOAN
+                      where id_crcBORROWER=%s""",
+                  (borrower_id,))
+
+    list = []
+    for bc in res:
+        list.append(bc[0])
+
+    return list
 
 def get_loan_status(loan_id):
     """
@@ -2102,7 +2150,7 @@ def ill_register_request(item_info, borrower_id, period_of_interest_from,
                                          borrower_comments, only_this_edition, request_type)
                            values (%s, %s, %s, %s, %s, %s, %s, %s)""",
                                     (borrower_id, period_of_interest_from, period_of_interest_to,
-                                     status, str(item_info), additional_comments, only_edition, request_type))
+                         status, str(item_info), additional_comments, only_edition, request_type))
 
 
 def ill_register_request_on_desk(borrower_id, item_info, period_of_interest_from,
@@ -2641,12 +2689,11 @@ def get_recid(barcode):
 
     res = run_sql("""select id_bibrec
                        from crcITEM
-                      where barcode=%s""",
-                  (barcode, ))
+                      where barcode=%s""", (barcode, ))
 
     try:
-        return res[0]
-    except IndexError:
+        return res[0][0]
+    except:
         return None
 
 def get_ill_requests_details(borrower_id):
@@ -2769,7 +2816,7 @@ def barcode_in_use(barcode):
                       where barcode=%s""",
                   (barcode, ))
 
-    if res:
+    if len(res)>0:
         return True
     else:
         return False
@@ -2873,13 +2920,22 @@ def get_copies_status(recid):
 
     res = run_sql("""select status
                        from crcITEM
-                      where id_bibrec=%s""",
-                  (recid, ))
+                      where id_bibrec=%s""" % (recid))
 
-    if res:
-        return res[0]
-    else:
+    list = []
+    for r in res:
+        list.append(r[0])
+
+    if list == []:
         return None
+    else:
+        return list
+
+    #if res:
+    #    return res[0]
+    #else:
+    #    return None
+
 
 def get_loan_recid(loan_id):
     """
@@ -2894,3 +2950,37 @@ def get_loan_recid(loan_id):
         return res[0][0]
     else:
         return None
+
+def update_loan_recid(barcode, new_recid):
+
+    res = run_sql("""UPDATE crcLOAN
+                       SET id_bibrec=%s
+                     WHERE barcode='%s'
+                """ % (new_recid, barcode))
+
+    return res
+
+
+def update_barcode(old_barcode, barcode):
+
+    res = run_sql("""UPDATE crcITEM
+                       SET barcode=%s
+                     WHERE barcode=%s
+                """, (barcode, old_barcode))
+
+    res = run_sql("""UPDATE crcLOAN
+                       SET barcode=%s
+                     WHERE barcode=%s
+                """, (barcode, old_barcode))
+
+    res = run_sql("""UPDATE crcLOANREQUEST
+                       SET barcode=%s
+                     WHERE barcode=%s
+                """, (barcode, old_barcode))
+
+def tag_requests_as_done(barcode, user_id):
+    res = run_sql("""UPDATE crcLOANREQUEST
+                        SET status='done'
+                      WHERE barcode=%s
+                        and id_crcBORROWER=%s
+                  """,(barcode, user_id))

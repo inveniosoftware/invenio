@@ -33,9 +33,9 @@ from invenio.bibtask import task_init, task_sleep_now_if_required, \
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
-     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
+     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, CFG_BIBCIRCULATION_LOANS_EMAIL
 from invenio.search_engine import get_fieldvalues
-from invenio.bibcirculation_utils import generate_email_body
+from invenio.bibcirculation_utils import generate_email_body, book_title_from_MARC
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key, checks its meaning and returns True if
@@ -107,7 +107,7 @@ def send_overdue_letter(borrower_id, subject, content):
 
     to_borrower = db.get_borrower_email(borrower_id)
 
-    send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+    send_email(fromaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                toaddr=to_borrower,
                subject=subject,
                content=content,
@@ -131,7 +131,7 @@ def must_send_second_recall(date_letters):
     #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
     tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(weeks=1)
 
-    if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
+    if tmp_date.strftime("%Y-%m-%d") <= today.strftime("%Y-%m-%d"):
         return True
     else:
         return False
@@ -149,7 +149,7 @@ def must_send_third_recall(date_letters):
     #datetime.strptime(date_letters, "%Y-%m-%d") doesn't work (only on 2.5).
     tmp_date = datetime.datetime(*time_tuple[0:3]) + datetime.timedelta(days=3)
 
-    if tmp_date.strftime("%Y-%m-%d") == today.strftime("%Y-%m-%d"):
+    if tmp_date.strftime("%Y-%m-%d") <= today.strftime("%Y-%m-%d"):
         return True
     else:
         return False
@@ -167,8 +167,8 @@ def task_run_core():
 
 
         for (borrower_id, _bor_name, recid, _barcode,
-            _loaned_on, _due_date, _number_of_renewals, number_of_letters,
-            date_letters, _notes, loan_id) in expired_loans:
+             _loaned_on, _due_date, _number_of_renewals, number_of_letters,
+             date_letters, _notes, loan_id) in expired_loans:
 
             number_of_letters=int(number_of_letters)
 
@@ -179,11 +179,15 @@ def task_run_core():
                 content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL2'], loan_id)
             elif number_of_letters == 2 and must_send_third_recall(date_letters):
                 content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
-            elif must_send_third_recall(date_letters):
+            elif number_of_letters >= 3 and must_send_third_recall(date_letters):
                 content = generate_email_body(CFG_BIBCIRCULATION_TEMPLATES['RECALL3'], loan_id)
 
+#from invenio.search_engine import get_field_tags
+#get_field_tags('title')
+#Out: ['245__%', '246_%', '250__a', '711__a', '210__a', '222__a', '111__a']
+
             if content != '':
-                title = ''.join(get_fieldvalues(recid, "245__a"))
+                title = book_title_from_MARC(recid)
                 subject = "LOAN RECALL: " + title
 
                 update_expired_loan(loan_id)
@@ -209,7 +213,7 @@ def main():
               description="""Examples:
               %s -u admin
               """ % (sys.argv[0]),
-              specific_params=("o:", ["overdue-letters"]),
+              specific_params=("o", ["overdue-letters"]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               version=__revision__,
               task_run_fnc = task_run_core)

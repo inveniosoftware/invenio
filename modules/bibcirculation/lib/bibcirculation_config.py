@@ -196,9 +196,11 @@ if CFG_CERN_SITE == 1:
     CFG_BIBCIRCULATION_LOANS_EMAIL = 'lib.loans@cern.ch'
 else:
     CFG_BIBCIRCULATION_OVERDUE_LETTER_SENDER = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
-    CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'jaime.garcia.llopis@cern.ch'
+    CFG_BIBCIRCULATION_LIBRARIAN_EMAIL = 'Atlantis Library<balthasar.montague@cds.cern.ch>'
     CFG_BIBCIRCULATION_LOANS_EMAIL = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
 
 CFG_BIBCIRCULATION_HOLIDAYS = ['2009-07-09']
 
 CFG_BIBCIRCULATION_WORKING_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+CFG_BIBCIRCULATION_ITEM_STATUS = ['missing', 'on shelf', 'on loan', 'out of print', 'in process', 'on order', 'in binding', 'untraceable', 'cancelled', 'order delayed', 'not arrived', 'ordered', 'not published']

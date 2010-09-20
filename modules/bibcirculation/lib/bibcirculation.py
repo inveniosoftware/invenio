@@ -25,19 +25,21 @@ __revision__ = "$Id$"
 import invenio.bibcirculation_dblayer as db
 import invenio.template
 bibcirculation_templates = invenio.template.load('bibcirculation')
-
+from invenio.bibcirculationadminlib import load_template
 # others invenio imports
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_CERN_SITE
+     CFG_CERN_SITE, \
+     CFG_SITE_URL
 from invenio.dateutils import get_datetext
 import datetime
+from invenio.urlutils import create_html_link
 from invenio.webuser import collect_user_info
 from invenio.mailutils import send_email
-from invenio.bibcirculation_utils import hold_request_mail, \
-     book_title_from_MARC, \
+from invenio.bibcirculation_utils import book_title_from_MARC, \
+     book_information_from_MARC, \
      make_copy_available, \
-     create_ill_record
+     create_ill_record, search_user
      #book_information_from_MARC
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
@@ -94,36 +96,45 @@ def perform_borrower_loans(uid, barcode, borrower_id,
         recid = db.get_id_bibrec(barcode)
         queue = db.get_queue_request(recid)
 
-        if len(queue) != 0:
-            infos.append("It is not possible to renew your loan for " \
+        if len(queue) != 0 and queue[0][0] != borrower_id:
+                infos.append("It is not possible to renew your loan for " \
                          "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user " \
                          "is waiting for this book.")
         else:
             loan_id = db.get_current_loan_id(barcode)
-            db.update_due_date(loan_id, new_due_date)
+            db.renew_loan(loan_id, new_due_date)
+            db.tag_requests_as_done(barcode, borrower_id)
+            #db.update_due_date(loan_id, new_due_date)
             infos.append("Your loan has been renewed with sucess.")
 
     #cancel request
     elif action == 'cancel':
     #elif request_id:
-        db.cancel_request(request_id, 'cancelled')
+        db.cancel_request(request_id)
         make_copy_available(request_id)
 
     #renew all loans
     elif action == 'renew_all':
     #elif borrower_id:
-        list_of_recids = db.get_borrower_recids(borrower_id)
-        for (recid) in list_of_recids:
-            queue = db.get_queue_request(recid[0])
+        #list_of_recids = db.get_borrower_recids(borrower_id)
+        list_of_barcodes = db.get_borrower_loans_barcodes(borrower_id)
+        for bc in list_of_barcodes:
+            bc_recid = db.get_recid(bc)
+            queue = db.get_queue_request(bc_recid)
 
             #check if there are requests
-            if len(queue) != 0:
+            if len(queue) != 0 and queue[0][0] != borrower_id:
                 infos.append("It is not possible to renew your loan for " \
-                             "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user" \
-                             " is waiting for this book.")
+                        "<strong>" + book_title_from_MARC(bc_recid) + "</strong>. Another user" \
+                        " is waiting for this book.")
             else:
-                db.update_due_date_borrower(borrower_id, new_due_date)
-        infos.append("All loans have been renewed with success.")
+                loan_id = db.get_current_loan_id(bc)
+                db.renew_loan(loan_id, new_due_date)
+                db.tag_requests_as_done(barcode, borrower_id)
+                #db.update_due_date_borrower(borrower_id, new_due_date)
+
+        if infos == []:
+            infos.append("All loans have been renewed with success.")
 
     loans = db.get_borrower_loans(borrower_id)
     requests = db.get_borrower_requests(borrower_id)
@@ -133,9 +144,26 @@ def perform_borrower_loans(uid, barcode, borrower_id,
                                                    borrower_id=borrower_id,
                                                    infos=infos,
                                                    ln=ln)
-
     return body
 
+#def perform_get_holdings_information(recid, req, ln=CFG_SITE_LANG):
+#    """
+#    Display all the copies of an item.
+#
+#    @param recid: identify the record. Primary key of bibrec.
+#    @type recid: int
+#
+#    @return body(html)
+#    """
+#
+#    holdings_information = db.get_holdings_information(recid)
+#
+#    body = bibcirculation_templates.tmpl_holdings_information2(recid=recid,
+#                                                               req=req,
+#                                                               holdings_info=holdings_information,
+#                                                               ln=ln)
+#    return body
+### with message ###
 def perform_get_holdings_information(recid, req, ln=CFG_SITE_LANG):
     """
     Display all the copies of an item.
@@ -152,8 +180,9 @@ def perform_get_holdings_information(recid, req, ln=CFG_SITE_LANG):
                                                                req=req,
                                                                holdings_info=holdings_information,
                                                                ln=ln)
+    body += '''<p style="color:#f00">The online loan request system is partially under maintenance.
+    You can contact the <a style="color:#f00" href="mailto:Library.Desk@cern.ch">CERN Library desk</a> for any question</p>'''
     return body
-
 
 def perform_get_pending_request(ln=CFG_SITE_LANG):
     """
@@ -191,9 +220,7 @@ def perform_new_request(recid, barcode, ln=CFG_SITE_LANG):
     return body
 
 
-def perform_new_request_send(uid, recid,
-                             period_from, period_to,
-                             barcode, ln=CFG_SITE_LANG):
+def perform_new_request_send(uid, recid, period_from, period_to, barcode, ln=CFG_SITE_LANG):
 
     """
     @param recid: recID - CDS Invenio record identifier
@@ -211,129 +238,199 @@ def perform_new_request_send(uid, recid,
         status = 'waiting'
 
     user = collect_user_info(uid)
-    is_borrower = db.is_borrower(user['email'])
+    borrower = search_user('email',user['email'])
+    if borrower != ():
+        borrower = borrower[0]
+        borrower_id = borrower[0]
+        borrower_details = db.get_borrower_details(borrower_id)
+        (_id, ccid, name, email, phone, address, mailbox) = borrower_details
 
-    if is_borrower != 0:
-        address = db.get_borrower_address(user['email'])
-        if address != 0:
+        (title, year, author, isbn, publisher) = book_information_from_MARC(int(recid))
 
-            db.new_hold_request(is_borrower, recid, barcode,
+        req_id = db.new_hold_request(borrower_id, recid, barcode,
                                 period_from, period_to, status)
 
-            is_on_loan=db.is_item_on_loan(barcode)
+        is_on_loan=db.is_item_on_loan(barcode)
 
-            db.update_item_status('requested', barcode)
-
-            if not is_on_loan:
-                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                       toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
-                       subject='Hold request for books confirmation',
-                       content=hold_request_mail(recid, is_borrower),
-                       attempt_times=1,
-                       attempt_sleeptime=10
-                       )
-            if CFG_CERN_SITE == 1:
-                message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
-            else:
-                message = bibcirculation_templates.tmpl_message_request_send_ok_other()
-
+        details = db.get_loan_request_details(req_id)
+        if details:
+            library  = details[3]
+            location = details[4]
+            request_date = details[7]
         else:
-            if CFG_CERN_SITE == 1:
-                email=user['email']
-                result = get_user_info_from_ldap(email)
+            location = ''
+            library = ''
+            request_date = ''
 
-                try:
-                    ldap_address = result['physicalDeliveryOfficeName'][0]
-                except KeyError:
-                    ldap_address = None
+        link_to_holdings_details = create_html_link(CFG_SITE_URL +
+                                    '/record/%s/holdings'%str(recid),
+                                    {'ln': ln},
+                                    (CFG_SITE_URL +
+                                    '/record/%s/holdings'%str(recid)))
 
-                if ldap_address is not None:
-                    db.add_borrower_address(ldap_address, email)
+        subject = 'New request'
+        message = load_template('notification')
 
-                    db.new_hold_request(is_borrower, recid, barcode,
-                                        period_from, period_to, status)
+        message = message % (name, ccid, email, address, mailbox, title,
+                             author, publisher, year, isbn, location, library,
+                             link_to_holdings_details, request_date)
 
-                    db.update_item_status('requested', barcode)
+        send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+                toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
+                subject  = subject,
+                content  = message,
+                header   = '',
+                footer   = '',
+                attempt_times=1,
+                attempt_sleeptime=10
+                )
+        send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
+                toaddr   = email,
+                subject  = subject,
+                content  = message,
+                header   = '',
+                footer   = '',
+                attempt_times=1,
+                attempt_sleeptime=10
+                )
 
-                    send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                               toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
-                               subject='Hold request for books confirmation',
-                               content=hold_request_mail(recid, is_borrower),
-                               attempt_times=1,
-                               attempt_sleeptime=10
-                               )
-
-                    message = bibcirculation_templates.tmpl_message_request_send_ok_cern(ln=ln)
-
-                else:
-                    message = bibcirculation_templates.tmpl_message_request_send_fail_cern(ln=ln)
-
-            else:
-                message = bibcirculation_templates.tmpl_message_request_send_fail_other(ln=ln)
-
+        if CFG_CERN_SITE:
+            message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
+        else:
+            message = message = bibcirculation_templates.tmpl_message_request_send_ok_other()
 
     else:
-        if CFG_CERN_SITE == 1:
-            result = get_user_info_from_ldap(email=user['email'])
-
-            try:
-                name = result['cn'][0]
-            except KeyError:
-                name = None
-
-            try:
-                email = result['mail'][0]
-            except KeyError:
-                email = None
-
-            try:
-                phone = result['telephoneNumber'][0]
-            except KeyError:
-                phone = None
-
-            try:
-                address = result['physicalDeliveryOfficeName'][0]
-            except KeyError:
-                address = None
-
-            try:
-                mailbox = result['postOfficeBox'][0]
-            except KeyError:
-                mailbox = None
-
-            try:
-                ccid = result['employeeID'][0]
-            except KeyError:
-                ccid = ''
-
-            if address is not None:
-                db.new_borrower(ccid, name, email, phone, address, mailbox, '')
-
-                is_borrower = db.is_borrower(email)
-
-                db.new_hold_request(is_borrower, recid, barcode,
-                                    period_from, period_to, status)
-
-                db.update_item_status('requested', barcode)
-
-                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                           toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
-                           subject='Hold request for books confirmation',
-                           content=hold_request_mail(recid, is_borrower),
-                           attempt_times=1,
-                           attempt_sleeptime=10
-                           )
-                message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
-
-            else:
-                message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
-
+        if CFG_CERN_SITE:
+            message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
         else:
-            message = bibcirculation_templates.tmpl_message_request_send_ok_other()
+            message = message = bibcirculation_templates.tmpl_message_request_send_fail_other()
 
     body = bibcirculation_templates.tmpl_new_request_send(message=message, ln=ln)
 
     return body
+#############################################################
+#
+#    if is_borrower != 0:
+#        address = db.get_borrower_address(user['email'])
+#        if address != 0:
+#
+#            db.new_hold_request(is_borrower, recid, barcode,
+#                                period_from, period_to, status)
+#
+#            is_on_loan=db.is_item_on_loan(barcode)
+#
+#
+#
+#            if not is_on_loan:
+#                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+#                       toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
+#                       subject='Hold request for books confirmation',
+#                       content=hold_request_mail(recid, barcode, is_borrower),
+#                       attempt_times=1,
+#                       attempt_sleeptime=10
+#                       )
+#            if CFG_CERN_SITE == 1:
+#                message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
+#            else:
+#                message = bibcirculation_templates.tmpl_message_request_send_ok_other()
+#
+#        else:
+#            if CFG_CERN_SITE == 1:
+#                email=user['email']
+#                result = get_user_info_from_ldap(email)
+#
+#                try:
+#                    ldap_address = result['physicalDeliveryOfficeName'][0]
+#                except KeyError:
+#                    ldap_address = None
+#
+#                if ldap_address is not None:
+#                    db.add_borrower_address(ldap_address, email)
+#
+#                    db.new_hold_request(is_borrower, recid, barcode,
+#                                        period_from, period_to, status)
+#
+#
+#
+#                    send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+#                               toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
+#                               subject='Hold request for books confirmation',
+#                               content=hold_request_mail(recid, barcode, is_borrower),
+#                               attempt_times=1,
+#                               attempt_sleeptime=10
+#                               )
+#
+#                    message = bibcirculation_templates.tmpl_message_request_send_ok_cern(ln=ln)
+#
+#                else:
+#                    message = bibcirculation_templates.tmpl_message_request_send_fail_cern(ln=ln)
+#
+#            else:
+#                message = bibcirculation_templates.tmpl_message_request_send_fail_other(ln=ln)
+#
+#
+#    else:
+#        if CFG_CERN_SITE == 1:
+#            result = get_user_info_from_ldap(email=user['email'])
+#
+#            try:
+#                name = result['cn'][0]
+#            except KeyError:
+#                name = None
+#
+#            try:
+#                email = result['mail'][0]
+#            except KeyError:
+#                email = None
+#
+#            try:
+#                phone = result['telephoneNumber'][0]
+#            except KeyError:
+#                phone = None
+#
+#            try:
+#                address = result['physicalDeliveryOfficeName'][0]
+#            except KeyError:
+#                address = None
+#
+#            try:
+#                mailbox = result['postOfficeBox'][0]
+#            except KeyError:
+#                mailbox = None
+#
+#            try:
+#                ccid = result['employeeID'][0]
+#            except KeyError:
+#                ccid = ''
+#
+#            if address is not None:
+#                db.new_borrower(ccid, name, email, phone, address, mailbox, '')
+#
+#                is_borrower = db.is_borrower(email)
+#
+#                db.new_hold_request(is_borrower, recid, barcode,
+#                                    period_from, period_to, status)
+#
+#
+#
+#                send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
+#                           toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
+#                           subject='Hold request for books confirmation',
+#                           content=hold_request_mail(recid, barcode, is_borrower),
+#                           attempt_times=1,
+#                           attempt_sleeptime=10
+#                           )
+#                message = bibcirculation_templates.tmpl_message_request_send_ok_cern()
+#
+#            else:
+#                message = bibcirculation_templates.tmpl_message_request_send_fail_cern()
+#
+#        else:
+#            message = bibcirculation_templates.tmpl_message_request_send_ok_other()
+#
+#    body = bibcirculation_templates.tmpl_new_request_send(message=message, ln=ln)
+#
+#    return body
 
 
 def ill_request_with_recid(recid, ln=CFG_SITE_LANG):
@@ -466,7 +563,7 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
         send_email(fromaddr=CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
                     toaddr=CFG_BIBCIRCULATION_LOANS_EMAIL,
                     subject='ILL request for books confirmation',
-                    content=hold_request_mail(recid, is_borrower),
+                    content='',#hold_request_mail(recid=recid, is_borrower=is_borrower),
                     attempt_times=1,
                     attempt_sleeptime=10)
 
