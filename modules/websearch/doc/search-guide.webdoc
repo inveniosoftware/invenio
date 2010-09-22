@@ -1994,8 +1994,8 @@ You can also use parentheses in your queries to group boolean expressions togeth
 <p>This query returns records containing either <em>gravity</em> or <em>supergravity</em>,
 and either <em>ellis</em> or <em>perelstein</em> anywhere in the record.</p>
 
-<p>Note that you can use any number of parentheses in the query, but
-nesting of parentheses, such as <code>foo AND (bar OR (fuux NOT quux))</code>, is not supported.</p>
+<p>Note that you can use any number of parentheses in the query.  Nested
+parentheses, such as <code>foo AND (bar OR (fuux NOT quux))</code>, are also supported.</p>
 </en>
 </lang>
 

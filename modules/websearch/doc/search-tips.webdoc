@@ -376,7 +376,7 @@ della ricerca.</it>
 <td width="50%">
 <lang>
   <en>Return records containing either <em>gravity</em> or <em>supergravity</em>,
-      and <em>ellis</em> or <em>perelstein</em>.  Nested parens are not supported.</en>
+      and <em>ellis</em> or <em>perelstein</em>.  Nested parentheses are supported.</en>
 </lang>
 </td>
 </tr>
