@@ -741,8 +741,15 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
             infos.append("The given due date <strong>%s</strong>" \
                          " is not a valid date or date format" % date)
 
+            list_of_books = []
+            for bc in list_of_barcodes:
+                recid = db.get_id_bibrec(bc)
+                (library_id, location) = db.get_lib_location(bc)
+                tup = (recid, bc, library_id, location)
+                list_of_books.append(tup)
+
             body = bibcirculation_templates.tmpl_loan_on_desk_step3(user_id=user_id,
-                                                            list_of_barcodes=list_of_barcodes,
+                                                            list_of_books=list_of_books,
                                                             infos=infos,
                                                             ln=ln)
 
@@ -764,7 +771,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
         barcode = list_of_barcodes[i]
         recid = db.get_recid(barcode)
         db.new_loan(user_id, recid, barcode, loaned_on, due_date[i],
-                                    'on loan', 'normal', note_format)
+                    'on loan', 'normal', note_format)
 
         db.tag_requests_as_done(barcode, user_id)
         db.update_item_status('on loan', barcode)
@@ -896,7 +903,7 @@ def register_new_loan(req, barcode, borrower_id,
 
         db.new_loan(borrower_id, recid, barcode,
                     loaned_on, due_date, 'on loan', 'normal', note_format)
-        db.tag_requests_as_done(barcode, user_id)
+        db.tag_requests_as_done(barcode, borrower_id)
 
         requested_barcode = db.get_requested_barcode(request_id)
 
@@ -3242,7 +3249,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
         due_date = renew_loan_for_X_days(barcode)
         db.new_loan(borrower_id, has_recid, barcode,
                     loaned_on, due_date, 'on loan', 'normal', notes_format)
-        db.tag_requests_as_done(barcode, user_id)
+        db.tag_requests_as_done(barcode, borrower_id)
 
         result = db.get_all_loans(20)
         title = "Current loans"
@@ -3941,6 +3948,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
         notes_format = ''
 
     loaned_on = datetime.date.today()
+    # FIXME # code refactoring: is_borrower?
     is_borrower = db.is_borrower(email)
     borrower_info = db.get_borrower_data(is_borrower)
 
@@ -3969,7 +3977,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
                     loaned_on, due_date, 'on loan',
                     'normal', notes_format)
 
-        db.tag_requests_as_done(barcode, user_id)
+        db.tag_requests_as_done(barcode, is_borrower)
         db.update_item_status('on loan', barcode)
 
         title = "New loan"
@@ -5061,18 +5069,21 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
                         borrowers_list.append(borrower_data)
 
 
-        body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step2(book_info=book_info, request_details=request_details, result=borrowers_list, key=key, string=string, infos=infos, ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step2(
+                            book_info=book_info, request_details=request_details,
+                            result=borrowers_list, key=key, string=string, infos=infos, ln=ln)
 
     else:
         user_info = db.get_borrower_data_by_id(borrower_id)
-        return register_ill_request_with_no_recid_step3(req, book_info, user_info, request_details, ln)
+        return register_ill_request_with_no_recid_step3(req, title, authors, place, publisher,
+                                            year, edition, isbn, user_info, request_details, ln)
 
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                                  'href="%s/help/admin">Admin Area' \
-                                  '</a> &gt; <a class="navtrail" ' \
-                                  'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                                  '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
 
 

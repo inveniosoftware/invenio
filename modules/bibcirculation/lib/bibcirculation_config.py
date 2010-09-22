@@ -203,4 +203,6 @@ CFG_BIBCIRCULATION_HOLIDAYS = ['2009-07-09']
 
 CFG_BIBCIRCULATION_WORKING_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
-CFG_BIBCIRCULATION_ITEM_STATUS = ['missing', 'on shelf', 'on loan', 'out of print', 'in process', 'on order', 'in binding', 'untraceable', 'cancelled', 'order delayed', 'not arrived', 'ordered', 'not published']
+CFG_BIBCIRCULATION_ITEM_STATUS = ['missing', 'on shelf', 'on loan', 'out of print', 'in process',
+                                  'on order', 'in binding', 'untraceable', 'cancelled',
+                                  'order delayed', 'not arrived', 'ordered', 'not published']

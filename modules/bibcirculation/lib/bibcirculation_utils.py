@@ -21,17 +21,19 @@
 
 __revision__ = "$Id$"
 
-from invenio.search_engine import get_fieldvalues
-from invenio.bibtask import task_low_level_submission
 import invenio.bibcirculation_dblayer as db
+from invenio.search_engine import get_fieldvalues, get_field_tags
+from invenio.bibtask import task_low_level_submission
 from invenio.urlutils import create_html_link
+from invenio.textutils import encode_for_xml
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
-     CFG_BIBCIRCULATION_WORKING_DAYS, \
-     CFG_BIBCIRCULATION_HOLIDAYS, \
-     CFG_CERN_SITE
-from invenio.messages import gettext_set_language
 
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_AMAZON_ACCESS_KEY, \
+                                          CFG_BIBCIRCULATION_WORKING_DAYS, \
+                                          CFG_BIBCIRCULATION_HOLIDAYS, \
+                                          CFG_CERN_SITE
+
+from invenio.messages import gettext_set_language
 import datetime, time
 
 def search_user(column, string):
@@ -274,7 +276,6 @@ def book_information_from_MARC(recid):
     book_editor = ', '.join(get_fieldvalues(recid,"260__a") + \
                            get_fieldvalues(recid, "260__b"))
 
-
     return (book_title, book_year, book_author, book_isbn, book_editor)
 
 
@@ -288,9 +289,7 @@ def book_title_from_MARC(recid):
     @return book's title
     """
 
-    from invenio.search_engine import get_field_tags
     title_tags = get_field_tags('title')
-
 
     book_title = ''
     i = 0
@@ -673,36 +672,35 @@ def create_ill_record(book_info):
     (title, author, place, publisher, year, edition, isbn) = book_info
 
     ill_record = """
-    <record>
-    <datafield tag="020" ind1=" " ind2=" ">
-      <subfield code="a">%(isbn)s</subfield>
-    </datafield>
-    <datafield tag="100" ind1=" " ind2=" ">
-      <subfield code="a">%(author)s</subfield>
-    </datafield>
-    <datafield tag="245" ind1=" " ind2=" ">
-      <subfield code="a">%(title)s</subfield>
-    </datafield>
-    <datafield tag="250" ind1=" " ind2=" ">
-      <subfield code="a">%(edition)s</subfield>
-    </datafield>
-    <datafield tag="260" ind1=" " ind2=" ">
-      <subfield code="a">%(place)s</subfield>
-      <subfield code="b">%(publisher)s</subfield>
-      <subfield code="c">%(year)s</subfield>
-    </datafield>
-    <datafield tag="980" ind1=" " ind2=" ">
-      <subfield code="a">ILLBOOK</subfield>
-    </datafield>
-  </record>
-
-  """ % {'isbn': isbn,
-         'author': author,
-         'title': title,
-         'edition': edition,
-         'place': place,
-         'publisher': publisher,
-         'year': year}
+        <record>
+            <datafield tag="020" ind1=" " ind2=" ">
+                <subfield code="a">%(isbn)s</subfield>
+            </datafield>
+            <datafield tag="100" ind1=" " ind2=" ">
+                <subfield code="a">%(author)s</subfield>
+            </datafield>
+            <datafield tag="245" ind1=" " ind2=" ">
+                <subfield code="a">%(title)s</subfield>
+            </datafield>
+            <datafield tag="250" ind1=" " ind2=" ">
+                <subfield code="a">%(edition)s</subfield>
+            </datafield>
+            <datafield tag="260" ind1=" " ind2=" ">
+                <subfield code="a">%(place)s</subfield>
+                <subfield code="b">%(publisher)s</subfield>
+                <subfield code="c">%(year)s</subfield>
+            </datafield>
+            <datafield tag="980" ind1=" " ind2=" ">
+                <subfield code="a">ILLBOOK</subfield>
+            </datafield>
+        </record>
+  """ % {'isbn':      encode_for_xml(isbn),
+         'author':    encode_for_xml(author),
+         'title':     encode_for_xml(title),
+         'edition':   encode_for_xml(edition),
+         'place':     encode_for_xml(place),
+         'publisher': encode_for_xml(publisher),
+         'year':      encode_for_xml(year)}
 
     file_path = '%s/%s_%s.xml' % (CFG_TMPDIR, 'bibcirculation_ill_book',
                                   time.strftime("%Y%m%d_%H%M%S"))
@@ -712,8 +710,7 @@ def create_ill_record(book_info):
     xml_file.close()
 
     # Pass XML file to BibUpload.
-    task_low_level_submission('bibupload', 'bibcirculation', '-P', '5', '-i',
-                              file_path)
+    task_low_level_submission('bibupload', 'bibcirculation', '-P', '5', '-i', file_path)
 
     return ill_record
 

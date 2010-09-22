@@ -30,7 +30,8 @@ import simplejson as json
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_CERN_SITE, CFG_SITE_SECURE_URL
-from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL
+from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
+                                          CFG_BIBCIRCULATION_ITEM_STATUS
 from invenio.messages import gettext_set_language
 
 import invenio.bibcirculation_dblayer as db
@@ -41,7 +42,6 @@ from invenio.bibcirculation_utils import get_book_cover, \
       get_item_info_for_search_result, \
       all_copies_are_missing, \
       has_copies
-
 
 _MENU_ = """
 
@@ -6749,7 +6749,8 @@ class Template:
                 <tr>
                     <th width="100">%s</th>
                     <td>
-                      <input type="text" style='border: 1px solid #cfcfcf' size=35 name="description">
+                      <input type="text" style='border: 1px solid #cfcfcf' size=35
+                             name="description">
                     </td>
                 </tr>
                 <tr>
@@ -6762,12 +6763,27 @@ class Template:
                       </select>
                     </td>
                  </tr>
+            """ % (_("Location"), _("Collection"), _("Description"),
+                  _("Loan period"))
+
+        out += """
                  <tr>
                     <th width="100">%s</th>
                     <td>
                     <select name="status"  style='border: 1px solid #cfcfcf'>
-                          <option value ="available">available</option>
-                          <option value ="missing">missing</option>
+                """ % ( _("Status"))
+
+        for st in CFG_BIBCIRCULATION_ITEM_STATUS:
+            if st == 'in process':
+                out += """
+                          <option value ="%s" selected>%s</option>
+                    """ % (st,st)
+            else:
+                out += """
+                          <option value ="%s">%s</option>
+                    """ % (st,st)
+
+        out += """
                     </select>
                     </td>
                  </tr>
@@ -6787,8 +6803,7 @@ class Template:
            <br />
            </div>
            </form>
-           """ % (_("Location"), _("Collection"), _("Description"),
-                  _("Loan period"), _("Status"), recid)
+           """ % (recid)
 
         return out
 
@@ -7561,23 +7576,20 @@ class Template:
 
                       """ % (_("Status"))
 
-        if result[7] == 'on shelf':
-            out += """
-                          <option value ="available" selected>available</option>
-                          <option value ="missing">missing</option>
-                          """
-        elif result[7] == 'on loan':
-            out += """
-                          <option value ="available">available</option>
-                          <option value ="on loan" selected>on loan</option>
-                          <option value ="missing">missing</option>
-                          """
 
-        else:
-            out += """
-                          <option value ="available">available</option>
-                          <option value ="missing" selected>missing</option>
-                          """
+        for st in CFG_BIBCIRCULATION_ITEM_STATUS:
+            if st == 'on loan' and result[7] != 'on loan':
+                pass # to avoid creting a fake loan,
+                     # 'on loan is only shown if the item was on loan'
+            elif st == result[7]:
+                out += """
+                          <option value selected="%s">%s</option>
+                    """ % (st,st)
+            else:
+                out += """
+                          <option value ="%s">%s</option>
+                    """ % (st,st)
+
         out += """  </select>
                     </td>
                  </tr>
@@ -11250,7 +11262,6 @@ class Template:
                     """ % (borrower_link, title_link, library_name, ill_status,ill_request_id,
                            period_from, request_type, CFG_SITE_URL, ill_request_id, _('select'))
 
-
         out += """
            </tbody>
           </table>
@@ -11259,7 +11270,8 @@ class Template:
 
         return out
 
-    def tmpl_ill_request_details_step1(self, ill_request_id, ill_request_details, libraries, ill_request_borrower_details,ln=CFG_SITE_LANG):
+    def tmpl_ill_request_details_step1(self, ill_request_id, ill_request_details,
+                                       libraries, ill_request_borrower_details,ln=CFG_SITE_LANG):
 
         """
         @param ill_request_id: identify the ILL request. Primary key of crcILLREQUEST
@@ -11289,7 +11301,8 @@ class Template:
             """% (CFG_SITE_URL, CFG_SITE_URL)
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
-         period_from, period_to, item_info, borrower_comments, only_this_edition, request_type) = ill_request_borrower_details
+         period_from, period_to, item_info, borrower_comments,
+         only_this_edition, request_type) = ill_request_borrower_details
 
         (library_id, request_date, expected_date, arrival_date, due_date, return_date,
          cost, barcode, library_notes, ill_status) = ill_request_details

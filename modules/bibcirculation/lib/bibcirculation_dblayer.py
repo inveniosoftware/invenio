@@ -121,7 +121,7 @@ def get_loan_details(recid):
 
     res = run_sql("""select barcode, status
                      from crcITEM
-                     where id_bibrec=%s and status = "available" limit 1;
+                     where id_bibrec=%s and status = "on shelf" limit 1;
                   """, (recid, ))
 
 
