@@ -181,6 +181,25 @@ except ImportError, msg:
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
+    import dateutil
+except ImportError, msg:
+    print """
+    *****************************************************
+    ** IMPORT WARNING %s
+    *****************************************************
+    ** Note that dateutil is not really required but   **
+    ** we recommend it for user-friendly date          **
+    ** parsing.                                        **
+    **                                                 **
+    ** You can safely continue installing CDS Invenio  **
+    ** now, and add this module anytime later.  (I.e.  **
+    ** even after your CDS Invenio installation is put **
+    ** into production.)                               **
+    *****************************************************
+    """ % msg
+    wait_for_user("Press ENTER to continue the installation...")
+
+try:
     import libxml2
 except ImportError, msg:
     print """
