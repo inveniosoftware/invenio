@@ -4100,7 +4100,7 @@ def create_marc_xml_reference_section(ref_sect,
         ## Strip the 'marker' (e.g. [1]) from this reference line:
         (line_marker, working_line1) = \
                       remove_reference_line_marker(ref_line)
-    
+ 
 
         ## Find DOI sections in citation
         (working_line1, identified_dois) = identify_and_tag_doi(working_line1)
