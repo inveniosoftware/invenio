@@ -3533,6 +3533,7 @@ CREATE TABLE IF NOT EXISTS crcITEM (
   description varchar(60) default NULL,
   loan_period varchar(30) NOT NULL default '',
   status varchar(20) NOT NULL default '',
+  expected_arrival_date varchar(60) NOT NULL default '',
   creation_date datetime NOT NULL default '0000-00-00 00:00:00',
   modification_date datetime NOT NULL default '0000-00-00 00:00:00',
   number_of_requests int(3) unsigned NOT NULL default '0',

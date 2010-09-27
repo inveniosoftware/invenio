@@ -605,7 +605,7 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                 msg = _("Requested record does not seem to exist.")
             msg = '<span class="quicknote">' + msg + '</span>'
             title, description, keywords = \
-                   websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
+                websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
             return page(title = title,
                         show_title_p = False,
                         body = msg,
@@ -623,7 +623,8 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL,
+                                {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
@@ -655,24 +656,27 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
                                                                      argd['ln'])
 
         title = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])[0]
-        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+        navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid),
+                                         ln=argd['ln'])
+        navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL,
+                                                                        self.recid, argd['ln'])
         navtrail += title
         navtrail += '</a>'
 
         return pageheaderonly(title=title,
-                              navtrail=navtrail,
-                              uid=uid,
-                              verbose=1,
-                              req=req,
-                              metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
-                              language=argd['ln'],
-                              navmenuid='search',
-                              navtrail_append_title_p=0) + \
-                              websearch_templates.tmpl_search_pagestart(argd['ln']) + \
-                              top + body + bottom + \
-                              websearch_templates.tmpl_search_pageend(argd['ln']) + \
-                              pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'], req=req)
+                    navtrail=navtrail,
+                    uid=uid,
+                    verbose=1,
+                    req=req,
+                    metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
+                    language=argd['ln'],
+                    navmenuid='search',
+                    navtrail_append_title_p=0) + \
+                    websearch_templates.tmpl_search_pagestart(argd['ln']) + \
+                    top + body + bottom + \
+                    websearch_templates.tmpl_search_pageend(argd['ln']) + \
+                    pagefooteronly(lastupdated=__lastupdated__, language=argd['ln'],
+                    req=req)
 
     # Return the same page wether we ask for /record/123 or /record/123/
     __call__ = index

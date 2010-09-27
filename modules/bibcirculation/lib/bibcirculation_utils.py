@@ -37,18 +37,22 @@ from invenio.messages import gettext_set_language
 import datetime, time
 
 def search_user(column, string):
-    if string != None:
+    if string is not None:
         string = string.strip()
     if CFG_CERN_SITE == 1:
-        if   column == 'name':
+        if column == 'name':
             result = db.search_borrower_by_name(string)
-        elif column == 'email':
-            result = db.search_borrower_by_email(string)
         else:
-            try:
-                result = db.search_borrower_by_ccid(int(string))
-            except:
-                result = ()
+            if column == 'email':
+                try:
+                    result = db.search_borrower_by_email(string)
+                except:
+                    result = ()
+            else:
+                try:
+                    result = db.search_borrower_by_ccid(int(string))
+                except:
+                    result = ()
 
             if result == ():
                 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap

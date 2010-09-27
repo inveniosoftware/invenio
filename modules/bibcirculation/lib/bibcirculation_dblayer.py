@@ -1733,8 +1733,9 @@ def get_library_name(library_id):
     else:
         return None
 
+
 def add_new_copy(barcode, recid, library_id, collection, location, description,
-                 loan_period, status):
+                    loan_period, status, expected_arrival_date):
 
     """
     Add a new copy
@@ -1751,10 +1752,11 @@ def add_new_copy(barcode, recid, library_id, collection, location, description,
 
     run_sql("""insert into crcITEM (barcode, id_bibrec, id_crcLIBRARY,
                                     collection, location, description, loan_period,
-                                    status, creation_date, modification_date)
-                             values (%s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
+                                    status, expected_arrival_date, creation_date,
+                                    modification_date)
+                             values (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())""",
             (barcode, recid, library_id, collection, location, description,
-             loan_period, status))
+             loan_period, status, expected_arrival_date))
 
 def delete_copy(barcode):
     res = run_sql("""delete from crcITEM where barcode='%s'""" % (barcode))
@@ -1787,7 +1789,7 @@ def get_item_info(barcode):
         return None
 
 def update_item_info(barcode, library_id, collection, location, description,
-                 loan_period, status):
+                 loan_period, status, expected_arrival_date):
     """
     Update item's information.
 
@@ -1806,10 +1808,11 @@ def update_item_info(barcode, library_id, collection, location, description,
                           description=%s,
                           loan_period=%s,
                           status=%s,
+                          expected_arrival_date=%s,
                           modification_date=NOW()
                    where  barcode=%s""",
                 (barcode, library_id, collection, location, description,
-                 loan_period, status, barcode)))
+                 loan_period, status, expected_arrival_date, barcode)))
 
 def update_item_recid(barcode, new_recid):
     """
@@ -2964,18 +2967,18 @@ def update_loan_recid(barcode, new_recid):
 def update_barcode(old_barcode, barcode):
 
     res = run_sql("""UPDATE crcITEM
-                       SET barcode=%s
-                     WHERE barcode=%s
+                        SET barcode=%s
+                      WHERE barcode=%s
                 """, (barcode, old_barcode))
 
     res = run_sql("""UPDATE crcLOAN
-                       SET barcode=%s
-                     WHERE barcode=%s
+                        SET barcode=%s
+                      WHERE barcode=%s
                 """, (barcode, old_barcode))
 
     res = run_sql("""UPDATE crcLOANREQUEST
-                       SET barcode=%s
-                     WHERE barcode=%s
+                        SET barcode=%s
+                      WHERE barcode=%s
                 """, (barcode, old_barcode))
 
 def tag_requests_as_done(barcode, user_id):
@@ -2983,4 +2986,29 @@ def tag_requests_as_done(barcode, user_id):
                         SET status='done'
                       WHERE barcode=%s
                         and id_crcBORROWER=%s
-                  """,(barcode, user_id))
+                """,  (barcode, user_id))
+
+def get_expected_arrival_date(barcode):
+    res = run_sql("""SELECT expected_arrival_date
+                       FROM crcITEM
+                      WHERE barcode=%s """, (barcode,))
+    if res:
+        return res[0][0]
+    else:
+        return ''
+
+def merge_libraries(library_from, library_to):
+
+    run_sql("""UPDATE crcITEM
+                  SET id_crcLIBRARY=%s
+                WHERE id_crcLIBRARY=%s
+                  """,(library_to, library_from))
+
+    run_sql("""UPDATE crcILLREQUEST
+                  SET id_crcLIBRARY=%s
+                WHERE id_crcLIBRARY=%s
+                  """,(library_to, library_from))
+
+    run_sql("""DELETE from crcLIBRARY
+                WHERE id=%s
+                  """,(library_from,))

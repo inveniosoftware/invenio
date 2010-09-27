@@ -1409,12 +1409,14 @@ def get_library_details(req, library_id, ln=CFG_SITE_LANG):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    library_details = db.get_library_details(library_id)
-    library_items = db.get_library_items(library_id)
-
     navtrail_previous_links = '<a class="navtrail" ' \
                               ' href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
+
+    library_details = db.get_library_details(library_id)
+    library_items = db.get_library_items(library_id)
+
+
 
     body = bibcirculation_templates.tmpl_library_details(library_details=library_details,
                                                          library_items=library_items,
@@ -1426,6 +1428,91 @@ def get_library_details(req, library_id, ln=CFG_SITE_LANG):
                 body=body,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
+
+def merge_libraries_step1(req, library_id, f=None, p=None, ln=CFG_SITE_LANG):
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              ' href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    library_details = db.get_library_details(library_id)
+    library_items = db.get_library_items(library_id)
+
+    result = None
+
+    if f is not None:
+        if p is None or p is '':
+            result = db.get_all_libraries() #list of (id, name)
+        elif f == 'name':
+            result = db.search_library_by_name(p)
+        elif f == 'email':
+            result = db.search_library_by_email(p)
+
+
+    body = bibcirculation_templates.tmpl_merge_libraries_step1(library_details=library_details,
+                                                         library_items=library_items,
+                                                         result=result,
+                                                         f=f, p=p,
+                                                         ln=ln)
+
+    return page(title="Merge libraries",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def merge_libraries_step2(req, library_from, library_to, ln=CFG_SITE_LANG):
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              ' href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    library_from_details = db.get_library_details(library_from)
+    library_from_items   = db.get_library_items(library_from)
+
+    library_to_details   = db.get_library_details(library_to)
+    library_to_items     = db.get_library_items(library_to)
+
+    body = bibcirculation_templates.tmpl_merge_libraries_step2(
+                                                    library_from_details=library_from_details,
+                                                    library_from_items=library_from_items,
+                                                    library_to_details=library_to_details,
+                                                    library_to_items=library_to_items,
+                                                    ln=ln)
+
+    return page(title="Merge libraries",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def merge_libraries_step3(req, library_from, library_to, ln=CFG_SITE_LANG):
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              ' href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    db.merge_libraries(library_from, library_to)
+
+    return get_library_details(req, library_to, ln=CFG_SITE_LANG)
+
 
 def get_borrower_requests_details(req, borrower_id, request_id, ln=CFG_SITE_LANG):
     """
@@ -2648,7 +2735,7 @@ def add_new_copy_step3(req, recid, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 def add_new_copy_step4(req, barcode, library, location, collection, description,
-                       loan_period, status, recid, ln=CFG_SITE_LANG):
+                       loan_period, status, expected_arrival_date, recid, ln=CFG_SITE_LANG):
 
     """
     Add a new copy.
@@ -2685,14 +2772,12 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
                                                                 infos=infos,
                                                                 ln=ln)
 
-
     else:
         library_name = db.get_library_name(library)
         tup_infos = (barcode, library, library_name, location, collection, description,
-                     loan_period, status, recid)
+                     loan_period, status, expected_arrival_date, recid)
         title="Add new copy - IV"
-        body = bibcirculation_templates.tmpl_add_new_copy_step4(tup_infos=tup_infos,
-                                                                ln=ln)
+        body = bibcirculation_templates.tmpl_add_new_copy_step4(tup_infos=tup_infos, ln=ln)
 
     return page(title=title,
                 uid=id_user,
@@ -2701,8 +2786,8 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def add_new_copy_step5(req, barcode, library, location, collection,
-                       description, loan_period, status, recid, ln=CFG_SITE_LANG):
+def add_new_copy_step5(req, barcode, library, location, collection, description,
+            loan_period, status, expected_arrival_date, recid, ln=CFG_SITE_LANG):
     """
     Add a new copy.
     """
@@ -2711,16 +2796,14 @@ def add_new_copy_step5(req, barcode, library, location, collection,
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    db.add_new_copy(barcode, recid, library,
-                    collection, location, description,
-                    loan_period, status)
+    db.add_new_copy(barcode, recid, library, collection, location, description,
+                    loan_period, status, expected_arrival_date)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    body = bibcirculation_templates.tmpl_add_new_copy_step5(recid=recid,
-                                                            ln=ln)
+    body = bibcirculation_templates.tmpl_add_new_copy_step5(recid=recid, ln=ln)
 
     return page(title="Add new copy - V",
                 uid=id_user,
@@ -2836,7 +2919,7 @@ def update_item_info_step4(req, barcode, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 def update_item_info_step5(req, barcode, old_barcode, library, location, collection, description,
-                           loan_period, status, recid, ln=CFG_SITE_LANG):
+                           loan_period, status, expected_arrival_date, recid, ln=CFG_SITE_LANG):
 
     """
     Update the item's information.
@@ -2848,7 +2931,7 @@ def update_item_info_step5(req, barcode, old_barcode, library, location, collect
 
     library_name = db.get_library_name(library)
     tup_infos = (barcode, old_barcode, library, library_name, location, collection, description,
-                 loan_period, status, recid)
+                 loan_period, status, expected_arrival_date, recid)
 
     navtrail_previous_links = '<a class="navtrail"' \
                               ' href="%s/help/admin">Admin Area' \
@@ -2877,7 +2960,7 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
 
     # tuple containing information for the update process.
     (barcode, old_barcode, library_id, location, collection,
-     description, loan_period, status, recid) = tup_infos
+     description, loan_period, status, expected_arrival_date, recid) = tup_infos
 
     is_on_loan = db.is_on_loan(old_barcode)
     is_requested = db.is_requested(old_barcode)
@@ -2891,15 +2974,9 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
         db.update_item_status('on shelf', old_barcode)
         db.return_loan(old_barcode)
 
-    # if item requested and new status is available
-    # request has to be cancelled.
-    elif is_requested and status == 'on shelf':
-        for i in range(len(is_requested)):
-            db.update_loan_request_status(is_requested[i][0],'cancelled')
-
     # update item information.
     db.update_item_info(old_barcode, library_id, collection, location,
-                        description, loan_period, status)
+                        description, loan_period, status, expected_arrival_date)
 
     navtrail_previous_links = '<a class="navtrail"' \
                               'href="%s/help/admin">Admin Area' \
@@ -3321,9 +3398,9 @@ def create_new_request_step1(req, borrower_id, p="", f="", search=None, ln=CFG_S
         holdings_information = db.get_holdings_information(recid)
         user_info = db.get_borrower_details(borrower_id)
         body = bibcirculation_templates.tmpl_create_new_request_step2(user_info = user_info,
-                                                                  holdings_information = holdings_information,
-                                                                  recid=recid,
-                                                                  ln=ln)
+                                                    holdings_information = holdings_information,
+                                                    recid=recid,
+                                                    ln=ln)
 
     else:
         body = bibcirculation_templates.tmpl_create_new_request_step1(borrower=borrower,
@@ -3992,7 +4069,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
         db.new_loan(is_borrower, recid, barcode,
                     loaned_on, due_date, 'on loan',
                     'normal', notes_format)
-        db.tag_requests_as_done(barcode, user_id)
+        db.tag_requests_as_done(barcode, is_borrower)
         db.update_item_status('on loan', barcode)
 
         title = "New loan"
@@ -5641,19 +5718,20 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         request_details = (period_of_interest_from, period_of_interest_to, budget_code,
                            additional_comments)
 
-        body = bibcirculation_templates.tmpl_register_ill_article_request_step2(article_info=article_info,
-                                                                                request_details=request_details,
-                                                                                result=borrowers_list,
-                                                                                key=key,
-                                                                                string=string,
-                                                                                infos=infos,
-                                                                                ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_article_request_step2(
+                                                            article_info=article_info,
+                                                            request_details=request_details,
+                                                            result=borrowers_list,
+                                                            key=key,
+                                                            string=string,
+                                                            infos=infos,
+                                                            ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return invenio.webpage.page(title="Register ILL request",
                 uid=id_user,
@@ -5662,7 +5740,9 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def register_ill_article_request_step3(req, item_info, user_info, request_details, ln):
+def register_ill_article_request_step3(req, periodical_title, title, authors,
+                                       report_number, volume, issue, page_number, year, issn,
+                                       user_info, request_details, ln):
 
     """
     """
@@ -5672,15 +5752,14 @@ def register_ill_article_request_step3(req, item_info, user_info, request_detail
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    (periodical_title, title, authors, _report_number, volume, issue, page_number, year, issn) = item_info
-
     volume = volume + ', '+ issue + ', '+ page_number
     info = (title, authors, "", "", year, "", issn)
 
     create_ill_record(info)
 
-    item_info = {'periodical_title': periodical_title, 'title': title, 'authors': authors, 'place': "", 'publisher': "",
-                 'year' : year,  'edition': "", 'issn' : issn, 'volume': volume }
+    item_info = {'periodical_title': periodical_title, 'title': title, 'authors': authors,
+                 'place': "", 'publisher': "", 'year' : year,  'edition': "", 'issn' : issn,
+                 'volume': volume }
 
 
     (period_of_interest_from, period_of_interest_to, budget_code,
@@ -5857,13 +5936,13 @@ def delete_copy_step2(req, barcode, ln):
 
         title="Item details"
         body = bibcirculation_templates.tmpl_get_item_details(recid=recid,
-                                                          copies=copies,
-                                                          requests=requests,
-                                                          loans=loans,
-                                                          req_hist_overview = req_hist_overview,
-                                                          loans_hist_overview = loans_hist_overview,
-                                                          infos=infos,
-                                                          ln=ln)
+                                                    copies=copies,
+                                                    requests=requests,
+                                                    loans=loans,
+                                                    req_hist_overview = req_hist_overview,
+                                                    loans_hist_overview = loans_hist_overview,
+                                                    infos=infos,
+                                                    ln=ln)
 
     else:
         message = """The barcode <strong>%s</strong> was not found"""%(barcode)
