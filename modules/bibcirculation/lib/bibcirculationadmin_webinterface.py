@@ -639,14 +639,15 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step4"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
             'phone': (str, None), 'address': (str, None), 'library_id': (str, None),
-            'ln': (str, "en")})
+            'lib_type': (str, None), 'ln': (str, "en")})
         name = argd['name']
         email = argd['email']
         phone = argd['phone']
         address = argd['address']
+        lib_type = argd['lib_type']
         library_id = argd['library_id']
         ln = argd['ln']
-        return bal.update_library_info_step4(req, name, email, phone, address,
+        return bal.update_library_info_step4(req, name, email, phone, address, lib_type,
                                              library_id, ln)
 
 
@@ -654,15 +655,16 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         """http://cdsweb.cern.ch/admin2/bibcirculation/update_library_info_step5"""
         argd = wash_urlargd(form, {'name': (str, None), 'email': (str, None),
             'phone': (str, None), 'address': (str, None), 'library_id': (str, None),
-            'ln': (str, "en")})
+            'library_id': (str, None), 'ln': (str, "en")})
         name = argd['name']
         email = argd['email']
         phone = argd['phone']
         address = argd['address']
+        lib_type = argd['lib_type']
         library_id = argd['library_id']
         ln = argd['ln']
 
-        return bal.update_library_info_step5(req, name, email, phone, address,
+        return bal.update_library_info_step5(req, name, email, phone, address, lib_type,
                                              library_id, ln)
 
 

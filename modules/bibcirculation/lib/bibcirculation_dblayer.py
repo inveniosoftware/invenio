@@ -629,7 +629,7 @@ def get_library_details(library_id):
     library_id: identify the library. It is also the primary key of
             the table crcLIBRARY.
     """
-    res = run_sql("""select id, name, address, email, phone, notes
+    res = run_sql("""select id, name, address, email, phone, notes, type
                      from crcLIBRARY
                      where id=%s;
                      """, (library_id, ))
@@ -1689,7 +1689,7 @@ def get_all_libraries():
 
     return res
 
-def update_library_info(library_id, name, email, phone, address):
+def update_library_info(library_id, name, email, phone, address, lib_type):
     """
     Update library information.
 
@@ -1700,9 +1700,10 @@ def update_library_info(library_id, name, email, phone, address):
                              set name=%s,
                                  email=%s,
                                  phone=%s,
-                                 address=%s
+                                 address=%s,
+                                 type=%s
                           where  id=%s""",
-                       (name, email, phone, address, library_id)))
+                       (name, email, phone, address, lib_type, library_id)))
 
 def get_libraries():
     """

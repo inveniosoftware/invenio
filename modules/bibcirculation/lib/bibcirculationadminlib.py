@@ -2528,13 +2528,13 @@ def update_library_info_step2(req, column, string, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
+
 def update_library_info_step3(req, library_id, ln=CFG_SITE_LANG):
     """
     Update the library's information.
 
     library_id - identify the library. It is also the primary key of
                  the table crcLIBRARY.
-
     """
 
     id_user = getUid(req)
@@ -2558,7 +2558,7 @@ def update_library_info_step3(req, library_id, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def update_library_info_step4(req, name, email, phone, address,
+def update_library_info_step4(req, name, email, phone, address, lib_type,
                               library_id, ln=CFG_SITE_LANG):
     """
     Update the library's information.
@@ -2573,7 +2573,7 @@ def update_library_info_step4(req, name, email, phone, address,
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    tup_infos = (library_id, name, email, phone, address)
+    tup_infos = (library_id, name, email, phone, address, lib_type)
 
     body = bibcirculation_templates.tmpl_update_library_info_step4(tup_infos=tup_infos, ln=ln)
 
@@ -2584,7 +2584,7 @@ def update_library_info_step4(req, name, email, phone, address,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
-def update_library_info_step5(req, name, email, phone, address,
+def update_library_info_step5(req, name, email, phone, address, lib_type,
                               library_id, ln=CFG_SITE_LANG):
     """
     Update the library's information.
@@ -2601,7 +2601,7 @@ def update_library_info_step5(req, name, email, phone, address,
 
     #(library_id, name, email, phone, address) = tup_infos
 
-    db.update_library_info(library_id, name, email, phone, address)
+    db.update_library_info(library_id, name, email, phone, address, lib_type)
 
     body = bibcirculation_templates.tmpl_update_library_info_step5(ln=ln)
 

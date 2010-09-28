@@ -3508,7 +3508,7 @@ class Template:
         <div class="bibcircbottom">
         <br />
         """
-        (library_id, name, address, email, phone, notes) = library_details
+        (library_id, name, address, email, phone, lib_type, notes) = library_details
 
         no_notes_link = create_html_link(CFG_SITE_URL +
                                          '/admin2/bibcirculation/get_library_notes',
@@ -3553,6 +3553,10 @@ class Template:
                       <th width="100">%s</th>
                       <td>%s</td>
                  </tr>
+                 <tr>
+                      <th width="100">%s</th>
+                      <td>%s</td>
+                 </tr>
                   <tr>
                       <th width="100">%s</th>
                       <td>%s</td>
@@ -3572,6 +3576,7 @@ class Template:
                    _("Address"), address,
                    _("Email"), email,
                    _("Phone"), phone,
+                   _("Type"), lib_type,
                    _("Notes"), notes_link,
                    _("No of items"), len(library_items),
                    CFG_SITE_URL, library_id, _("Update"),
@@ -3609,7 +3614,7 @@ class Template:
         <div class="bibcircbottom">
         <br />
         """
-        (library_id, name, address, email, phone, notes) = library_details
+        (library_id, name, address, email, phone, lib_type, notes) = library_details
 
         no_notes_link = create_html_link(CFG_SITE_URL +
                                          '/admin2/bibcirculation/get_library_notes',
@@ -3638,6 +3643,10 @@ class Template:
                             </table>
                             <table class="tablesorter" border="0"
                                    cellpadding="0" cellspacing="1">
+                                <tr>
+                                    <th width="100">%s</th>
+                                    <td>%s</td>
+                                </tr>
                                 <tr>
                                     <th width="100">%s</th>
                                     <td>%s</td>
@@ -3703,6 +3712,7 @@ class Template:
                    _("Address"), address,
                    _("Email"),   email,
                    _("Phone"),   phone,
+                   _("Type"),    lib_type,
                    _("Notes"),   notes_link,
                    _("No of items"), len(library_items),
                 CFG_SITE_URL, library_id, _("Search library"), p or '', _("Search"))
@@ -3783,13 +3793,13 @@ class Template:
         """
 
         try:
-            (library_id_1, name_1, address_1, email_1, phone_1, notes_1) = library_from_details
+            (library_id_1,name_1,address_1,email_1,phone_1,type_1,notes_1)=library_from_details
             found_1 = True
         except:
             found_1 = False
 
         try:
-            (library_id_2, name_2, address_2, email_2, phone_2, notes_2) = library_to_details
+            (library_id_2,name_2,address_2,email_2,phone_2,type_2,notes_2)=library_to_details
             found_2 = True
         except:
             found_2 = False
@@ -3876,12 +3886,17 @@ class Template:
                                     <th width="100">%s</th>
                                     <td>%s</td>
                                 </tr>
+                                <tr>
+                                    <th width="100">%s</th>
+                                    <td>%s</td>
+                                </tr>
                             </table>
                 """ % (_("Library to be deleted"),
                    _("Name"),    name_1,
                    _("Address"), address_1,
                    _("Email"),   email_1,
                    _("Phone"),   phone_1,
+                   _("Type"),    type_1,
                    _("Notes"),   notes_link_1,
                    _("No of items"), len(library_from_items))
         else:
@@ -3938,6 +3953,7 @@ class Template:
                    _("Address"), address_2,
                    _("Email"),   email_2,
                    _("Phone"),   phone_2,
+                   _("Type"),    type_2,
                    _("Notes"),   notes_link_2,
                    _("No of items"), len(library_to_items))
         else:
@@ -6225,7 +6241,7 @@ class Template:
                 <table class="bibcirctable">
                 <tr>
                   <td>
-                       <input type=button value='%s' onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
+                       <input type=button value='%s'onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
                        class="formbutton">
                   </td>
                  </tr>
@@ -6250,7 +6266,8 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="add_new_library_step1_form" action="%s/admin2/bibcirculation/add_new_library_step2" method="get" >
+            <form name="add_new_library_step1_form"
+                  action="%s/admin2/bibcirculation/add_new_library_step2" method="get" >
               <br />
               <br />
                <table class="bibcirctable">
@@ -6280,14 +6297,15 @@ class Template:
                 <tr>
                     <th width="70">%s</th>
                     <td>
-                      <input type="text" style='border: 1px solid #cfcfcf' size=50 name="address">
+                      <input type="text" style='border: 1px solid #cfcfcf' size=50
+                             name="address">
                     </td>
                  </tr>
                  <tr>
                     <th width="70">%s</th>
                     <td>
                     <select name="type"  style='border: 1px solid #cfcfcf'>
-                          <option value ="internal">internal</option>
+                          <option value ="internal" selected>internal</option>
                           <option value ="external">external</option>
                       </select>
                     </td>
@@ -6295,7 +6313,8 @@ class Template:
                  <tr>
                     <th width="70" valign="top">%s</th>
                     <td>
-                      <textarea name="notes" rows="5" cols="39" style='border: 1px solid #cfcfcf'></textarea>
+                      <textarea name="notes" rows="5" cols="39"
+                                style='border: 1px solid #cfcfcf'></textarea>
                     </td>
                  </tr>
                 </table>
@@ -6331,7 +6350,8 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="add_new_library_step2_form" action="%s/admin2/bibcirculation/add_new_library_step3" method="get" >
+            <form name="add_new_library_step2_form"
+                  action="%s/admin2/bibcirculation/add_new_library_step3" method="get" >
               <br />
               <br />
                <table class="bibcirctable">
@@ -6527,9 +6547,7 @@ class Template:
         out += """
              </table>
              <br />
-             """
 
-        out += """
         <table class="bibcirctable">
              <tr align="center">
                   <td><input type=button value=%s
@@ -6550,7 +6568,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        (library_id, name, address, email, phone, _notes) = library_info
+        (library_id, name, address, email, phone, lib_type, _notes) = library_info
 
         out = """ """
 
@@ -6559,40 +6577,71 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom" align="center">
-            <form name="update_library_info_step3_form" action="%s/admin2/bibcirculation/update_library_info_step4" method="get" >
-             <input type=hidden name=library_id value=%s>
-              <br />
-              <br />
-              <table class="bibcirctable">
-                <tr align="center">
-                     <td class="bibcirctableheader">%s</td>
-                </tr>
-              </table>
-              <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-                <tr>
-                    <th width="70">%s</th>
-                    <td>
-                      <input type="text" style='border: 1px solid #cfcfcf' size=50 name="name" value="%s">
-                    </td>
-                </tr>
-                <tr>
-                    <th width="70">%s</th>
-                    <td>
-                      <input type="text" style='border: 1px solid #cfcfcf' size=50 name="email" value="%s">
-                    </td>
-                </tr>
-                <tr>
-                    <th width="70">%s</th>
-                    <td>
-                      <input type="text" style='border: 1px solid #cfcfcf' size=50 name="phone" value="%s">
-                    </td>
-                </tr>
-                <tr>
-                    <th width="70">%s</th>
-                    <td>
-                      <input type="text" style='border: 1px solid #cfcfcf' size=50 name="address" value="%s">
-                    </td>
-                 </tr>
+            <form name="update_library_info_step3_form"
+                  action="%s/admin2/bibcirculation/update_library_info_step4" method="get" >
+                <input type=hidden name=library_id value=%s>
+                <br />
+                <br />
+                <table class="bibcirctable">
+                    <tr align="center">
+                         <td class="bibcirctableheader">%s</td>
+                    </tr>
+                </table>
+                <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
+                    <tr>
+                        <th width="70">%s</th>
+                        <td>
+                          <input type="text" style='border: 1px solid #cfcfcf' size=50
+                                 name="name" value="%s">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="70">%s</th>
+                        <td>
+                          <input type="text" style='border: 1px solid #cfcfcf' size=50
+                                 name="email" value="%s">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="70">%s</th>
+                        <td>
+                          <input type="text" style='border: 1px solid #cfcfcf' size=50
+                                 name="phone" value="%s">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="70">%s</th>
+                        <td>
+                          <input type="text" style='border: 1px solid #cfcfcf' size=50
+                                 name="address" value="%s">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th width="70">%s</th>
+                        <td>
+                            <select name="lib_type"  style='border: 1px solid #cfcfcf'>
+                """  % (CFG_SITE_URL, library_id, _("Library information"),
+                       _("Name"), name,
+                       _("Email"), email,
+                       _("Phone"), phone,
+                       _("Address"), address,
+                       _("Type"))
+
+        if lib_type == 'internal':
+            out += """
+                                <option value ="internal" selected>internal</option>
+                                <option value ="external">external</option>
+                """
+        else:
+            out += """
+                                <option value ="internal">internal</option>
+                                <option value ="external" selected>external</option>
+                """
+
+        out += """
+                            </select>
+                        </td>
+                    </tr>
                 </table>
                 <br />
                 <table class="bibcirctable">
@@ -6611,19 +6660,14 @@ class Template:
                 <br />
                 </form>
                 </div>
-                """ % (CFG_SITE_URL, library_id, _("Library information"),
-                       _("Name"), name,
-                       _("Email"), email,
-                       _("Phone"), phone,
-                       _("Address"), address,
-                       _("Back"), _("Continue"))
+                """ % (_("Back"), _("Continue"))
 
 
         return out
 
     def tmpl_update_library_info_step4(self, tup_infos, ln=CFG_SITE_LANG):
 
-        (library_id, name, email, phone, address) = tup_infos
+        (library_id, name, email, phone, address, lib_type) = tup_infos
 
         _ = gettext_set_language(ln)
 
@@ -6654,7 +6698,10 @@ class Template:
                 </tr>
                 <tr>
                     <th width="70">%s</th> <td>%s</td>
-                 </tr>
+                </tr>
+                <tr>
+                    <th width="70">%s</th> <td>%s</td>
+                </tr>
                 </table>
                 <br />
                 <table class="bibcirctable">
@@ -6671,6 +6718,7 @@ class Template:
                        <input type=hidden name=email value="%s">
                        <input type=hidden name=phone value="%s">
                        <input type=hidden name=address value="%s">
+                       <input type=hidden name=lib_type value="%s">
                   </td>
                  </tr>
                 </table>
@@ -6683,8 +6731,9 @@ class Template:
                        _("Email"), email,
                        _("Phone"), phone,
                        _("Address"), address,
+                       _("Type"), lib_type,
                        _("Back"), _("Continue"),
-                       library_id, name, email, phone, address)
+                       library_id, name, email, phone, address, lib_type)
                        #tup_infos)
 
         return out
@@ -15283,7 +15332,8 @@ class Template:
             <table class="bibcirctable">
               <tr width="200">
                 <td align="center">
-                  <select name="user_info" size="8" style='border: 1px solid #cfcfcf; width:80%%'>
+                  <select name="user_info" size="8"
+                          style='border: 1px solid #cfcfcf; width:80%%'>
 
             """ % (CFG_SITE_URL, title, authors, place, publisher, year, edition, isbn)
                    #book_info)
