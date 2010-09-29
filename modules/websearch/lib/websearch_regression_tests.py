@@ -698,6 +698,40 @@ class WebSearchNearestTermsTest(unittest.TestCase):
                                                expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))
 
+    def test_nearest_terms_box_in_unsuccessful_partial_phrase_query(self):
+        """ websearch - nearest terms box for unsuccessful partial phrase query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%27Ellis%2C+Z%27',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3A%27Enqvist%2C+K%27",
+                                               expected_link_label='Enqvist, K'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%27ellisz%27&f=author',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%27Enqvist%2C+K%27&f=author",
+                                               expected_link_label='Enqvist, K'))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%27elliszà%27&f=author',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%27Enqvist%2C+K%27&f=author",
+                                               expected_link_label='Enqvist, K'))
+
+    def test_nearest_terms_box_in_unsuccessful_partial_phrase_advanced_query(self):
+        """ websearch - nearest terms box for unsuccessful partial phrase advanced search query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p1=aaa&f1=title&m1=p&as=1',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=p",
+                                               expected_link_label='A simple functional form for proton-nucleus total reaction cross sections'))
+
+    def test_nearest_terms_box_in_unsuccessful_exact_phrase_advanced_query(self):
+        """ websearch - nearest terms box for unsuccessful exact phrase advanced search query """
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?p1=aaa&f1=title&m1=e&as=1',
+                                               expected_text="Nearest terms in any collection are",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&f1=title&as=1&p1=A+simple+functional+form+for+proton-nucleus+total+reaction+cross+sections&m1=e",
+                                               expected_link_label='A simple functional form for proton-nucleus total reaction cross sections'))
+
     def test_nearest_terms_box_in_unsuccessful_boolean_query(self):
         """ websearch - nearest terms box for unsuccessful boolean query """
         self.assertEqual([],

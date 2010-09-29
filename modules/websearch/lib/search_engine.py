@@ -2377,6 +2377,8 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     nearest_terms = []
     if not p: # sanity check
         p = "."
+    if p.startswith('%') and p.endswith('%'):
+        p = p[1:-1] # fix for partial phrase
     index_id = get_index_id_from_field(f)
     # special indexes:
     if f == 'refersto':
@@ -2433,6 +2435,9 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
                         break
                     elif string.find(argd_px, f+':"'+p+'"') > -1:
                         argd[px] = string.replace(argd_px, f+':"'+p+'"', f+':"'+term+'"')
+                        break
+                    elif string.find(argd_px, f+':\''+p+'\'') > -1:
+                        argd[px] = string.replace(argd_px, f+':\''+p+'\'', f+':\''+term+'\'')
                         break
 
         terminfo.append((term, hits, argd))
