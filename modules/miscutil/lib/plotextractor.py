@@ -22,56 +22,71 @@ import os
 import getopt
 import re
 import time
-import urllib
 
-from invenio.shellutils import run_shell_command
-from invenio.textutils import encode_for_xml, wrap_text_in_a_box, \
+from invenio.shellutils import run_shell_command, Timeout, run_process_with_timeout
+from invenio.invenio_connector import InvenioConnector
+from invenio.textutils import wrap_text_in_a_box, \
                               wait_for_user
-from invenio.config import CFG_TMPDIR, CFG_BINDIR, CFG_BIBSCHED_PROCESS_USER
-from invenio.search_engine import perform_request_search
+from invenio.config import CFG_TMPDIR, CFG_SITE_URL
+from invenio.plotextractor_config import CFG_PLOTEXTRACTOR_DISALLOWED_TEX, \
+                                         CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT, \
+                                         CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT, \
+                                         CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
 from invenio.bibtask import task_low_level_submission
 from invenio.plotextractor_getter import get_list_of_all_matching_files, \
                                          parse_and_download, \
                                          make_single_directory, \
                                          tarballs_by_recids, \
                                          tarballs_by_arXiv_id
-from invenio.plotextractor_converter import untar, check_for_gzip, \
+from invenio.plotextractor_converter import untar, extract_text, \
                                             convert_images
 from invenio.plotextractor_output_utils import assemble_caption, \
                                                find_open_and_close_braces, \
                                                create_MARC, get_tex_location, \
                                                get_image_location, \
-                                               get_converted_image_name, \
-                                               write_message, write_messages
+                                               create_contextfiles, \
+                                               prepare_image_data, \
+                                               write_message
+from tempfile import mkstemp
 
-'''
+
+"""
 This programme will take a tarball from arXiv, untar it, convert all its
 associated images to PNG, find the captions to the images detailed in the
 included TeX document, and write MARCXML that reflects these associations.
-'''
+"""
 
 ARXIV_HEADER = 'arXiv:'
-SQUASHED_FILE = 'plotdata.xml'
 PLOTS_DIR = 'plots'
 
-help_param = 'help'
-tarball_param = 'tarball'
-tardir_param = 'tdir'
-infile_param = 'input'
-sdir_param = 'sdir'
-extract_text_param = 'extract-text'
-force_param = 'force'
-upload_param = 'call-bibupload'
-yes_i_know_param = 'yes-i-know'
-recid_param = 'recid'
-arXiv_param = 'arXiv'
-squash_param = 'squash'
-param_abbrs = 'ht:d:s:i:a:xfuyrq'
-params = [help_param, tarball_param+'=', tardir_param+'=', sdir_param+'=', \
-          infile_param+'=', arXiv_param, extract_text_param, force_param, \
-          upload_param, yes_i_know_param, recid_param, squash_param]
+MAIN_CAPTION_OR_IMAGE = 0
+SUB_CAPTION_OR_IMAGE = 1
 
 def main():
+    """
+    The main program loop.
+    """
+    help_param = 'help'
+    verbose_param = 'verbose'
+    tarball_param = 'tarball'
+    tardir_param = 'tdir'
+    infile_param = 'input'
+    sdir_param = 'sdir'
+    extract_text_param = 'extract-text'
+    force_param = 'force'
+    upload_param = 'call-bibupload'
+    yes_i_know_param = 'yes-i-know'
+    recid_param = 'recid'
+    arXiv_param = 'arXiv'
+    squash_param = 'squash'
+    refno_url_param = 'refno-url'
+    refno_param = 'skip-refno'
+    clean_param = 'clean'
+    param_abbrs = 'h:t:d:s:i:a:l:xfuyrqck'
+    params = [help_param, tarball_param + '=', tardir_param + '=', \
+              sdir_param + '=', infile_param + '=', arXiv_param + '=', refno_url_param + '=', \
+              extract_text_param, force_param, upload_param, yes_i_know_param, recid_param, \
+              squash_param, clean_param]
     try:
         opts, args = getopt.getopt(sys.argv[1:], param_abbrs, params)
     except getopt.GetoptError, err:
@@ -87,9 +102,13 @@ def main():
     upload_plots = False
     force = False
     squash = False
+    squash_path = ""
     yes_i_know = False
     recids = None
     arXiv = None
+    clean = False
+    refno_url = CFG_SITE_URL
+    skip_refno = False
 
     for opt, arg in opts:
         if opt in ['-h', help_param]:
@@ -102,7 +121,7 @@ def main():
         elif opt in ['-i', infile_param]:
             infile = arg
         elif opt in ['-r', recid_param]:
-            recid = arg
+            recids = arg
         elif opt in ['-a', arXiv_param]:
             arXiv = arg
         elif opt in ['-s', sdir_param]:
@@ -117,53 +136,68 @@ def main():
             squash = True
         elif opt in ['-y', yes_i_know_param]:
             yes_i_know = True
+        elif opt in ['-c', clean_param]:
+            clean = True
+        elif opt in ['-l', refno_url_param]:
+            refno_url = arg
+        elif opt in ['-k', refno_param]:
+            skip_refno = True
         else:
             usage()
             sys.exit()
 
     if sdir == None:
         sdir = CFG_TMPDIR
-
-    if not os.path.isdir(sdir):
+    elif not os.path.isdir(sdir):
         try:
             os.makedirs(sdir)
         except:
-            write_message('oopsie, we can\'t use this sdir.  using '+\
+            write_message('Error: We can\'t use this sdir.  using ' + \
                       'CFG_TMPDIR')
             sdir = CFG_TMPDIR
+
+    if skip_refno:
+        refno_url = ""
 
     tars_and_gzips = []
 
     if tarball != None:
         tars_and_gzips.append(tarball)
     if tdir != None:
-        filetypes = ['gzip compressed', 'ar archive'] # that catches [t,T]ar # FIXME
-        write_message('processing any tarballs in ' + tdir)
+        filetypes = ['gzip compressed', 'tar archive', 'Tar archive'] # FIXME
+        write_message('Currently processing any tarballs in ' + tdir)
         tars_and_gzips.extend(get_list_of_all_matching_files(tdir, filetypes))
     if infile != None:
         tars_and_gzips.extend(parse_and_download(infile, sdir))
     if recids != None:
         tars_and_gzips.extend(tarballs_by_recids(recids, sdir))
     if arXiv != None:
-        tars_and_gzips.extend(tarballs_by_arXiv_id(arXiv, sdir))
+        tars_and_gzips.extend(tarballs_by_arXiv_id([arXiv], sdir))
     if tars_and_gzips == []:
-        write_message('what?  no tarballs to process!')
+        write_message('Error: no tarballs to process!')
         sys.exit(1)
 
     if squash:
-        marc_file = os.path.join(sdir, SQUASHED_FILE)
-        open(marc_file, 'w').close()
+        squash_fd, squash_path = mkstemp(suffix = "_" + time.strftime("%Y%m%d%H%M%S") + ".xml", \
+                                  prefix = "plotextractor_", dir = sdir)
+        os.write(squash_fd, '<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n')
+        os.close(squash_fd)
 
     for tarball in tars_and_gzips:
-        process_single(tarball, sdir=sdir, xtract_text=xtract_text,\
-                       upload_plots=upload_plots, force=force, squash=squash)
+        process_single(tarball, sdir = sdir, xtract_text = xtract_text, \
+                       upload_plots = upload_plots, force = force, squash = squash_path, \
+                       yes_i_know = yes_i_know, refno_url = refno_url, \
+                       clean = clean)
+    if squash:
+        write_message('generated ' + squash_path)
+        if upload_plots:
+            upload_to_site(squash_path, yes_i_know)
 
-    if squash and upload_plots:
-        upload_to_site(marc_file, yes_i_know)
-
-def process_single(tarball, sdir=CFG_TMPDIR, xtract_text=False, \
-                   upload_plots=True, force=False, squash=False):
-    '''
+def process_single(tarball, sdir = CFG_TMPDIR, xtract_text = False, \
+                   upload_plots = False, force = False, squash = "", \
+                   yes_i_know = False, refno_url = "", \
+                   clean = False):
+    """
     Processes one tarball end-to-end.
 
     @param: tarball (string): the absolute location of the tarball we wish
@@ -177,143 +211,169 @@ def process_single(tarball, sdir=CFG_TMPDIR, xtract_text=False, \
         are named the same as the tarballs but with a .pdf extension.
     @param: upload_plots (boolean): true iff you want to bibupload the plots
         extracted by this process
+    @param: force (boolean): force creation of new xml file
+    @param: squash: write MARCXML output into a specified 'squash' file
+        instead of single files.
+    @param: yes_i_know: if True, no user interaction if upload_plots is True
+    @param: refno_url: URL to the invenio-instance to query for refno.
+    @param: clean: if True, everything except the original tarball, plots and
+            context- files will be removed
 
-    @return: None
-    '''
-
-    sub_dir, refno = get_defaults(tarball, sdir)
-
+    @return: marc_name(string): path to generated marcxml file
+    """
+    sub_dir, refno = get_defaults(tarball, sdir, refno_url)
     if not squash:
         marc_name = os.path.join(sub_dir, refno + '.xml')
+        if (force or not os.path.exists(marc_name)):
+            marc_fd = open(marc_name, 'w')
+            marc_fd.write('<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n')
+            marc_fd.close()
     else:
-        marc_name = os.path.join(sdir, SQUASHED_FILE)
-
-    if (force or not os.path.exists(marc_name)) and not squash:
-        open(marc_name, 'w').close()
-
+        marc_name = squash
     if xtract_text:
         extract_text(tarball)
-
-    image_list, tex_files = untar(tarball, sub_dir)
+    try:
+        extracted_files_list, image_list, tex_files = untar(tarball, sub_dir)
+    except Timeout:
+        write_message('Timeout during tarball extraction on ' + tarball)
+        return
     if tex_files == [] or tex_files == None:
         write_message(os.path.split(tarball)[-1] + ' is not a tarball')
-        run_shell_command('rm -r ' + sub_dir)
+        run_shell_command('rm -r %s', (sub_dir,))
         return
 
     converted_image_list = convert_images(image_list)
+    write_message('converted %d of %d images found for %s' % (len(converted_image_list), \
+                                                              len(image_list), \
+                                                              os.path.basename(tarball)))
+    extracted_image_data = []
 
-    images_and_captions_and_labels = [['','', []]]
     for tex_file in tex_files:
-        images_and_captions_and_labels.extend(extract_captions(tex_file,
-                                               sub_dir, converted_image_list))
-
-    marc_name = create_MARC(images_and_captions_and_labels, tex_files[0],
-                            refno, converted_image_list, marc_name)
-    if marc_name != None and not squash:
-        write_message('generated ' + marc_name)
-        if upload_plots:
-            upload_to_site(marc_name)
-
-    clean_up(image_list)
-
+        # Extract images, captions and labels
+        partly_extracted_image_data = extract_captions(tex_file, sub_dir, \
+                                                converted_image_list)
+        if partly_extracted_image_data != []:
+            cleaned_image_data = prepare_image_data(partly_extracted_image_data, \
+                                                  tex_file, converted_image_list)
+            # Using prev. extracted info, get contexts for each image found
+            extracted_image_data.extend((extract_context(tex_file, cleaned_image_data)))
+    if extracted_image_data == []:
+        write_message('No plots detected in ' + refno)
+    else:
+        if refno_url == "":
+            refno = None
+        create_contextfiles(extracted_image_data)
+        marc_xml = create_MARC(extracted_image_data, tarball, refno)
+        if marc_name != None:
+            marc_fd = open(marc_name, 'a')
+            marc_fd.write('%s\n</collection>\n' % (marc_xml,))
+            marc_fd.close()
+            if not squash:
+                write_message('generated ' + marc_name)
+                if upload_plots:
+                    upload_to_site(marc_name, yes_i_know)
+    if clean:
+        clean_up(extracted_files_list, image_list + converted_image_list)
     write_message('work complete on ' + os.path.split(tarball)[-1])
+    return marc_name
 
-def clean_up(image_list):
-    '''
+def clean_up(extracted_files_list, image_list):
+    """
     Removes all the intermediate stuff.
 
-    @param: image_list ([string, string, ...]): the images to remove
+    @param: extracted_files_list ([string, string, ...]): list of all extracted files
+    @param: image_list ([string, string, ...]): list of the images to keep
 
-    NOTE: when running this for later upload, it's not a good idea to
-        remove the converted images!
-    '''
-    return # FIXME do not delete image files before upload
-    for image_file in image_list:
-        run_shell_command('rm ' + image_file)
+    """
+    for extracted_file in extracted_files_list:
+        # Remove everything that is not in the image_list or is not a directory
+        if extracted_file not in image_list and extracted_file[-1] != os.sep:
+            run_shell_command('rm %s', (extracted_file,))
 
-def get_defaults(tarball, sdir):
-    '''
+def get_defaults(tarball, sdir, refno_url):
+    """
     A function for parameter-checking.
 
     @param: tarball (string): the location of the tarball to be extracted
     @param: sdir (string): the location of the scratch directory for untarring,
         conversions, and the ultimate destination of the MARCXML
+    @param: refno_url (string): server location on where to look for refno
 
     @return sdir, refno (string, string): the same
         arguments it was sent as is appropriate.
-    '''
+    """
 
     if sdir == None:
-        write_message('using default directory: ' + CFG_TMPDIR +\
-             ' for scratchwork')
+        # Missing sdir: using default directory: CFG_TMPDIR
         sdir = CFG_TMPDIR
-
     else:
         sdir = os.path.split(tarball)[0]
 
     # make a subdir in the scratch directory for each tarball
     sdir = make_single_directory(sdir, \
                                  os.path.split(tarball)[-1] + '_' + PLOTS_DIR)
-
-    arXiv_id = os.path.split(tarball)[-1]
-
-    refno = get_reference_number(tarball)
-    if refno == tarball:
-        write_message('can\'t find record id for ' + arXiv_id)
-
+    if refno_url != "":
+        refno = get_reference_number(tarball, refno_url)
+        if refno == None:
+            refno = os.path.basename(tarball)
+            write_message('Error: can\'t find record id for %s' % (refno,))
+    else:
+        write_message("Skipping ref-no check")
     return sdir, refno
 
-def get_reference_number(tarball):
-    '''
+def get_reference_number(tarball, refno_url):
+    """
     Attempts to determine the reference number of the file by searching.
 
     @param: tarball (string): the name of the tarball as downloaded from
         arXiv
+    @param: refno_url (string): url of repository to check for a
+        reference number for this record. If not set; returns None
 
     @return: refno (string): the reference number of the paper
-    '''
+    """
+    if refno_url:
+        server = InvenioConnector(refno_url)
+        # we just need the name of the file
+        tarball = os.path.split(tarball)[1]
+        prefix = '037__a:'
+        # the name right now looks like arXiv:hep-ph_9703009
+        # or arXiv:0910.0476
+        if tarball.startswith(ARXIV_HEADER):
+            if len(tarball.split('_')) > 1:
+                tarball = tarball.split(':')[1]
+                arXiv_record = tarball.replace('_', '/')
+            else:
+                arXiv_record = tarball
 
-    # we just need the name of the file
-    tarball = os.path.split(tarball)[1]
+            result = server.search(p = prefix + arXiv_record, of = 'id')
 
-    # the name right now looks like arXiv:hep-ph_9703009
-    # or arXiv:0910.0476
-    if tarball.startswith(ARXIV_HEADER):
-        tarball = tarball.split(':')[1]
-        if len(tarball.split('_')) > 1:
-            arXiv_record = tarball.replace('_', '/')
-        else:
-            arXiv_record = tarball
+            if len(result) == 0:
+                return None
 
-        result = perform_request_search(p=arXiv_record, f='reportnumber')
-
-        if len(result) == 0:
-            return tarball
-
-        return str(result[0])
-
-    arXiv_record = re.findall('(([a-zA-Z\\-]+/\\d+)|(\\d+\\.\\d+))', tarball)
-    if len(arXiv_record) > 1:
-        arXiv_record = arXiv_record[0]
-        result = perform_request_search(p=arXiv_record, f='reportnumber')
-
-        if len(result) > 0:
             return str(result[0])
 
-    tarball_mod = tarball.replace('_', '/')
-    arXiv_record = re.findall('(([a-zA-Z\\-]+/\\d+)|(\\d+\\.\\d+))',\
-                              tarball_mod)
-    if len(arXiv_record) > 1:
-        arXiv_record = arXiv_record[0]
-        result = perform_request_search(p=arXiv_record, f='reportnumber')
+        arXiv_record = re.findall('(([a-zA-Z\\-]+/\\d+)|(\\d+\\.\\d+))', tarball)
+        if len(arXiv_record) > 1:
+            arXiv_record = arXiv_record[0]
+            result = server.search(p = prefix + arXiv_record, of = 'id')
 
-        if len(result) > 0:
-            return str(result[0])
+            if len(result) > 0:
+                return str(result[0])
 
-    return tarball
+        tarball_mod = tarball.replace('_', '/')
+        arXiv_record = re.findall('(([a-zA-Z\\-]+/\\d+)|(\\d+\\.\\d+))', \
+                                  tarball_mod)
+        if len(arXiv_record) > 1:
+            arXiv_record = arXiv_record[0]
+            result = server.search(p = prefix + arXiv_record, of = 'id')
+
+            if len(result) > 0:
+                return str(result[0])
+    return None
 
 def rotate_image(filename, line, sdir, image_list):
-    '''
+    """
     Given a filename and a line, figure out what it is that the author
     wanted to do wrt changing the rotation of the image and convert the
     file so that this rotation is reflected in its presentation.
@@ -323,7 +383,7 @@ def rotate_image(filename, line, sdir, image_list):
 
     @output: the image file rotated in accordance with the rotate command
     @return: True if something was rotated
-    '''
+    """
 
     file_loc = get_image_location(filename, sdir, image_list)
     degrees = re.findall('(angle=[-\\d]+|rotate=[-\\d]+)', line)
@@ -337,38 +397,144 @@ def rotate_image(filename, line, sdir, image_list):
             not re.match('-*\\d+', degrees):
         return False
 
-    degrees = str(0-int(degrees))
+    degrees = str(0 - int(degrees))
 
-    cmd = 'mogrify -rotate ' + degrees + ' ' + file_loc
-    dummy, dummy, cmd_err = run_shell_command(cmd)
-
+    dummy, dummy, cmd_err = run_process_with_timeout('mogrify -rotate %s %s' % \
+                                                     (degrees, file_loc), shell = True)
     if cmd_err != '':
         return True
     else:
         return True
 
-MAIN_CAPTION_OR_IMAGE = 0
-SUB_CAPTION_OR_IMAGE = 1
+def get_context(lines, backwards = False):
+    """
+    Given a relevant string from a TeX file, this function will extract text
+    from it as far as it is deemed contextually relevant, either backwards or forwards
+    in the text. The level of relevance allowed is configurable. When it reaches some
+    point in the text that is determined to be out of scope from the current context,
+    like text that is identified as a new paragraph, a complex TeX structure
+    ('/begin', '/end', etc.) etc., it will return the previously allocated text.
 
-def extract_captions(tex_file, sdir, image_list, main=True):
-    '''
+    For use when extracting text with contextual value for an figure or plot.
+
+    @param lines (string): string to examine
+    @param reversed (bool): are we searching backwards?
+
+    @return context (string): extracted context
+    """
+    tex_tag = re.compile(r".*\\(\w+).*")
+    sentence = re.compile(r"(?<=[.?!])[\s]+(?=[A-Z])")
+    context = []
+
+    word_list = lines.split()
+    if backwards:
+        word_list.reverse()
+
+    # For each word we do the following:
+    #   1. Check if we have reached word limit
+    #   2. If not, see if this is a TeX tag and see if its 'illegal'
+    #   3. Otherwise, add word to context
+    for word in word_list:
+        if len(context) >= CFG_PLOTEXTRACTOR_CONTEXT_WORD_LIMIT:
+            break
+        match = tex_tag.match(word)
+        if (match and match.group(1) in CFG_PLOTEXTRACTOR_DISALLOWED_TEX):
+            # TeX Construct matched, return
+            if backwards:
+                # When reversed we need to go back and
+                # remove unwanted data within brackets
+                temp_word = ""
+                while len(context):
+                    temp_word = context.pop()
+                    if '}' in temp_word:
+                        break
+            break
+        context.append(word)
+
+    if backwards:
+        context.reverse()
+    text = " ".join(context)
+    sentence_list = sentence.split(text)
+
+    if backwards:
+        sentence_list.reverse()
+
+    if len(sentence_list) > CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT:
+        return " ".join(sentence_list[:CFG_PLOTEXTRACTOR_CONTEXT_SENTENCE_LIMIT])
+    else:
+        return " ".join(sentence_list)
+
+def extract_context(tex_file, extracted_image_data):
+    """
+    Given a .tex file and a label name, this function will extract the text before
+    and after for all the references made to this label in the text. The number
+    of characters to extract before and after is configurable.
+
+    @param tex_file (list): path to .tex file
+    @param extracted_image_data ([(string, string, list), ...]):
+        a list of tuples of images matched to labels and captions from
+        this document.
+
+    @return extracted_image_data ([(string, string, list, list),
+        (string, string, list, list),...)]: the same list, but now containing
+        extracted contexts
+    """
+    if os.path.isdir(tex_file) or not os.path.exists(tex_file):
+        return []
+    fd = open(tex_file)
+    lines = fd.read()
+    fd.close()
+
+    # Generate context for each image and its assoc. labels
+    new_image_data = []
+    for image, caption, label in extracted_image_data:
+        context_list = []
+
+        # Generate a list of index tuples for all matches
+        indicies = [match.span() \
+                    for match in re.finditer(r"(\\(?:fig|ref)\{" + label + "\})", \
+                                                          lines)]
+        for startindex, endindex in indicies:
+            # Retrive all lines before label until beginning of file
+            i = startindex - CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
+            if i < 0:
+                text_before = lines[:startindex]
+            else:
+                text_before = lines[i:startindex]
+            context_before = get_context(text_before, backwards = True)
+
+            # Retrive all lines from label until end of file and get context
+            i = endindex + CFG_PLOTEXTRACTOR_CONTEXT_EXTRACT_LIMIT
+            text_after = lines[endindex:i]
+            context_after = get_context(text_after)
+            context_list.append(context_before + ' \\ref{' + label + '} ' + context_after)
+        new_image_data.append((image, caption, label, context_list))
+    return new_image_data
+
+def extract_captions(tex_file, sdir, image_list, primary = True):
+    """
     Take the TeX file and the list of images in the tarball (which all,
     presumably, are used in the TeX file) and figure out which captions
     in the text are associated with which images
+    @param: lines (list): list of lines of the TeX file
 
     @param: tex_file (string): the name of the TeX file which mentions
         the images
+    @param: sdir (string): path to current sub-directory
+    @param: image_list (list): list of images in tarball
+    @param: primary (bool): is this the primary call to extract_caption?
 
-    @return: images_and_captions_and_labels ([(string, string, string),
-        (string, string, string), ...]):
+    @return: images_and_captions_and_labels ([(string, string, list),
+        (string, string, list), ...]):
         a list of tuples representing the names of images and their
         corresponding figure labels from the TeX file
-    '''
-
-    if os.path.isdir(tex_file):
+    """
+    if os.path.isdir(tex_file) or not os.path.exists(tex_file):
         return []
+    fd = open(tex_file)
+    lines = fd.readlines()
+    fd.close()
 
-    tex = open(tex_file)
     # possible figure lead-ins
     figure_head = '\\begin{figure'  # also matches figure*
     figure_tail = '\\end{figure'  # also matches figure*
@@ -377,7 +543,7 @@ def extract_captions(tex_file, sdir, image_list, main=True):
     subfloat_head = '\\subfloat'
     subfig_head = '\\subfigure'
     includegraphics_head = '\\includegraphics'
-    special_head = '\\special'
+
     epsfig_head = '\\epsfig'
     input_head = '\\input'
     # possible caption lead-ins
@@ -385,7 +551,6 @@ def extract_captions(tex_file, sdir, image_list, main=True):
     figcaption_head = '\\figcaption'
 
     label_head = '\\label'
-    ref_head = '\\ref{'
 
     rotate = 'rotate='
     angle = 'angle='
@@ -396,16 +561,14 @@ def extract_captions(tex_file, sdir, image_list, main=True):
     doc_head = '\\begin{document}'
     doc_tail = '\\end{document}'
 
-    images_and_captions_and_labels = []
+    extracted_image_data = []
     cur_image = ''
     caption = ''
-    label = []
-
-    lines = tex.readlines()
-    tex.close()
+    labels = []
+    active_label = ""
 
     # cut out shit before the doc head
-    if main:
+    if primary:
         for line_index in range(len(lines)):
             if lines[line_index].find(doc_head) < 0:
                 lines[line_index] = ''
@@ -414,7 +577,7 @@ def extract_captions(tex_file, sdir, image_list, main=True):
 
     # are we using commas in filenames here?
     commas_okay = False
-    for dirpath, dummy0, filenames in \
+    for dummy1, dummy2, filenames in \
             os.walk(os.path.split(os.path.split(tex_file)[0])[0]):
         for filename in filenames:
             if filename.find(',') > -1:
@@ -439,9 +602,9 @@ def extract_captions(tex_file, sdir, image_list, main=True):
         if line == '':
             continue
         if line.find(doc_tail) > -1:
-           return images_and_captions_and_labels
+            return extracted_image_data
 
-        '''
+        """
         FIGURE -
         structure of a figure:
         \begin{figure}
@@ -449,7 +612,7 @@ def extract_captions(tex_file, sdir, image_list, main=True):
         \includegraphics[someoptions]{FILENAME}
         \caption{CAPTION}  %caption and includegraphics may be switched!
         \end{figure}
-        '''
+        """
 
         index = line.find(figure_head)
         if index > -1:
@@ -457,33 +620,32 @@ def extract_captions(tex_file, sdir, image_list, main=True):
             # some punks don't like to put things in the figure tag.  so we
             # just want to see if there is anything that is sitting outside
             # of it when we find it
-            cur_image, caption, label, images_and_captions_and_labels =\
-                    put_it_together(cur_image, caption, label,\
-                                    images_and_captions_and_labels,\
-                                    line_index, lines, tex_file)
+            cur_image, caption, extracted_image_data = \
+                    put_it_together(cur_image, caption, active_label, extracted_image_data, \
+                                    line_index, lines)
 
         # here, you jerks, just make it so that it's fecking impossible to
         # figure out your damn inclusion types
 
-        index = max([line.find(eps_tail), line.find(ps_tail),\
+        index = max([line.find(eps_tail), line.find(ps_tail), \
                      line.find(epsfig_head)])
         if index > -1:
             if line.find(eps_tail) > -1 or line.find(ps_tail) > -1:
                 ext = True
             else:
                 ext = False
-            filenames = intelligently_find_filenames(line, ext=ext,
-                                                     commas_okay=commas_okay)
+            filenames = intelligently_find_filenames(line, ext = ext,
+                                                     commas_okay = commas_okay)
 
             # try to look ahead!  sometimes there are better matches after
             if line_index < len(lines) - 1:
                 filenames.extend(\
                           intelligently_find_filenames(lines[line_index + 1],
-                                                      commas_okay=commas_okay))
+                                                      commas_okay = commas_okay))
             if line_index < len(lines) - 2:
                 filenames.extend(\
                           intelligently_find_filenames(lines[line_index + 2],
-                                                      commas_okay=commas_okay))
+                                                      commas_okay = commas_okay))
 
             for filename in filenames:
                 filename = str(filename)
@@ -497,19 +659,21 @@ def extract_captions(tex_file, sdir, image_list, main=True):
                 else:
                     cur_image = ['', [cur_image, filename]]
 
-        '''
+        """
         Rotate and angle
-        '''
+        """
         index = max(line.find(rotate), line.find(angle))
         if index > -1:
             # which is the image associated to it?
             filenames = intelligently_find_filenames(line,
-                                                     commas_okay=commas_okay)
+                                                     commas_okay = commas_okay)
             # try the line after and the line before
-            filenames.extend(intelligently_find_filenames(lines[line_index+1],
-                                                      commas_okay=commas_okay))
-            filenames.extend(intelligently_find_filenames(lines[line_index-1],
-                                                      commas_okay=commas_okay))
+            if line_index + 1 < len(lines):
+                filenames.extend(intelligently_find_filenames(lines[line_index + 1],
+                                                      commas_okay = commas_okay))
+            if line_index > 1:
+                filenames.extend(intelligently_find_filenames(lines[line_index - 1],
+                                                      commas_okay = commas_okay))
 
             already_tried = []
             for filename in filenames:
@@ -518,17 +682,17 @@ def extract_captions(tex_file, sdir, image_list, main=True):
                         break
                     already_tried.append(filename)
 
-        '''
+        """
         INCLUDEGRAPHICS -
         structure of includegraphics:
         \includegraphics[someoptions]{FILENAME}
-        '''
+        """
         index = line.find(includegraphics_head)
         if index > -1:
             open_curly, open_curly_line, close_curly, dummy = \
                     find_open_and_close_braces(line_index, index, '{', lines)
 
-            filename = lines[open_curly_line][open_curly+1:close_curly]
+            filename = lines[open_curly_line][open_curly + 1:close_curly]
 
             if cur_image == '':
                 cur_image = filename
@@ -540,74 +704,52 @@ def extract_captions(tex_file, sdir, image_list, main=True):
             else:
                 cur_image = ['', [cur_image, filename]]
 
-        '''
+        """
         {\input{FILENAME}}
         \caption{CAPTION}
 
         This input is ambiguous, since input is also used for things like
         inclusion of data from other LaTeX files directly.
-        '''
+        """
         index = line.find(input_head)
         if index > -1:
-            #write_message('found input tag')
-            new_tex_names = intelligently_find_filenames(line, TeX=True,
-                                                        commas_okay=commas_okay)
+            new_tex_names = intelligently_find_filenames(line, TeX = True, \
+                                                         commas_okay = commas_okay)
 
             for new_tex_name in new_tex_names:
                 if new_tex_name != 'ERROR':
-                    #write_message('input TeX: ' + new_tex_name)
                     new_tex_file = get_tex_location(new_tex_name, tex_file)
-                    if new_tex_file != None:
-                        images_and_captions_and_labels.extend(extract_captions(\
-                                                      new_tex_file, sdir,\
+                    if new_tex_file != None and primary: #to kill recursion
+                        extracted_image_data.extend(extract_captions(\
+                                                      new_tex_file, sdir, \
                                                       image_list,
-                                                      main=False))
+                                                      primary = False))
 
-        '''PICTURE'''
+        """PICTURE"""
 
         index = line.find(picture_head)
         if index > -1:
             # structure of a picture:
             # \begin{picture}
             # ....not worrying about this now
-            write_message('found picture tag')
+            #write_message('found picture tag')
+            #FIXME
+            pass
 
-        '''DISPLAYMATH'''
+
+
+        """DISPLAYMATH"""
 
         index = line.find(displaymath_head)
         if index > -1:
             # structure of a displaymath:
             # \begin{displaymath}
             # ....not worrying about this now
-            write_message('found displaymath tag')
+            #write_message('found displaymath tag')
+            #FIXME
+            pass
 
-        '''
-        LABELS -
-        structure of a label:
-        \label{somelabelnamewhichprobablyincludesacolon}
-
-        Labels are used to tag images and will later be used in ref tags
-        to reference them.  This is interesting because in effect the refs
-        to a plot are additional caption for it.
-
-        Notes: labels can be used for many more things than just plots.
-        We'll have to experiment with how to best associate a label with an
-        image.. if it's in the caption, it's easy.  If it's in a figure, it's
-        still okay... but the images that aren't in figure tags are numerous.
-        '''
-
-        index = line.find(label_head)
-        if index > -1:
-            if in_figure_tag:
-                # well then this clearly belongs to the current image
-                open_curly, open_curly_line, close_curly, dummy = \
-                    find_open_and_close_braces(line_index, index, '{', lines)
-                cur_label = lines[open_curly_line][open_curly+1:close_curly]
-                cur_label = cur_label.strip()
-                label.append(cur_label)
-                # write_message('found label ' + cur_label)
-
-        '''
+        """
         CAPTIONS -
         structure of a caption:
         \caption[someoptions]{CAPTION}
@@ -615,7 +757,7 @@ def extract_captions(tex_file, sdir, image_list, main=True):
         \caption{CAPTION}
         or
         \caption{{options}{CAPTION}}
-        '''
+        """
 
         index = max([line.find(caption_head), line.find(figcaption_head)])
         if index > -1:
@@ -637,13 +779,13 @@ def extract_captions(tex_file, sdir, image_list, main=True):
             elif caption != cur_caption:
                 caption = ['', [caption, cur_caption]]
 
-        '''
+        """
         SUBFLOATS -
         structure of a subfloat (inside of a figure tag):
         \subfloat[CAPTION]{options{FILENAME}}
 
         also associated with the overall caption of the enclosing figure
-        '''
+        """
 
         index = line.find(subfloat_head)
         if index > -1:
@@ -665,18 +807,18 @@ def extract_captions(tex_file, sdir, image_list, main=True):
             open_curly, open_curly_line, close_curly, dummy = \
                     find_open_and_close_braces(close_square_line, \
                     close_square, '{', lines)
-            sub_image = lines[open_curly_line][open_curly+1:close_curly]
+            sub_image = lines[open_curly_line][open_curly + 1:close_curly]
 
             cur_image[SUB_CAPTION_OR_IMAGE].append(sub_image)
 
-        '''
+        """
         SUBFIGURES -
         structure of a subfigure (inside a figure tag):
         \subfigure[CAPTION]{
         \includegraphics[options]{FILENAME}}
 
         also associated with the overall caption of the enclosing figure
-        '''
+        """
 
         index = line.find(subfig_head)
         if index > -1:
@@ -704,70 +846,87 @@ def extract_captions(tex_file, sdir, image_list, main=True):
                 line_index = line_index + 1
                 line = lines[line_index]
                 index = line.find(includegraphics_head)
-
             if line_index == len(lines):
+                # didn't find the image name on line
                 line_index = index_cpy
-                write_message('didn\'t find the image name on line ' +\
-                                   line_index)
 
-            else:
-                open_curly, open_curly_line, close_curly, dummy = \
-                        find_open_and_close_braces(line_index, \
-                        index, '{', lines)
-                sub_image = lines[open_curly_line][open_curly+1:close_curly]
+            open_curly, open_curly_line, close_curly, dummy = \
+                    find_open_and_close_braces(line_index, \
+                    index, '{', lines)
+            sub_image = lines[open_curly_line][open_curly + 1:close_curly]
 
-                cur_image[SUB_CAPTION_OR_IMAGE].append(sub_image)
+            cur_image[SUB_CAPTION_OR_IMAGE].append(sub_image)
 
-        '''
+        """
+        LABELS -
+        structure of a label:
+        \label{somelabelnamewhichprobablyincludesacolon}
+
+        Labels are used to tag images and will later be used in ref tags
+        to reference them.  This is interesting because in effect the refs
+        to a plot are additional caption for it.
+
+        Notes: labels can be used for many more things than just plots.
+        We'll have to experiment with how to best associate a label with an
+        image.. if it's in the caption, it's easy.  If it's in a figure, it's
+        still okay... but the images that aren't in figure tags are numerous.
+        """
+        index = line.find(label_head)
+        if index > -1 and in_figure_tag:
+            open_curly, open_curly_line, close_curly, dummy = \
+                    find_open_and_close_braces(line_index, \
+                    index, '{', lines)
+            label = lines[open_curly_line][open_curly + 1:close_curly]
+            if label not in labels:
+                active_label = label
+            labels.append(label)
+
+        """
         FIGURE
 
         important: we put the check for the end of the figure at the end
         of the loop in case some pathological person puts everything in one
         line
-        '''
+        """
 
         index = max([line.find(figure_tail), line.find(doc_tail)])
         if index > -1:
             in_figure_tag = 0
 
-            cur_image, caption, label, images_and_captions_and_labels =\
-                    put_it_together(cur_image, caption, label,\
-                                    images_and_captions_and_labels,\
-                                    line_index, lines, tex_file)
+            cur_image, caption, extracted_image_data = \
+                    put_it_together(cur_image, caption, active_label, extracted_image_data, \
+                                    line_index, lines)
 
-        '''
+        """
         END DOCUMENT
 
         we shouldn't look at anything after the end document tag is found
-        '''
+        """
 
         index = line.find(doc_tail)
         if index > -1:
             break
 
-    return images_and_captions_and_labels
+    return extracted_image_data
 
-def put_it_together(cur_image, caption, label, images_and_captions_and_labels,
-                    line_index, lines, tex_file):
-    '''
-    Takes the current image(s) and caption(s) and label(s) and assembles them
-    into something useful in the images_and_captions_and_labels list.
+def put_it_together(cur_image, caption, context, extracted_image_data, line_index, \
+                    lines):
+    """
+    Takes the current image(s) and caption(s) and assembles them into
+    something useful in the extracted_image_data list.
 
     @param: cur_image (string || list): the image currently being dealt with, or
         the list of images, in the case of subimages
     @param: caption (string || list): the caption or captions currently in scope
-    @param: label (list): the labels associated to this image/these images
-    @param: images_and_captions_and_labels ([(string, string, list),
-        (string, string, list), ...]): a list of tuples of images matched to
-        captions and labels from this document.
+    @param: extracted_image_data ([(string, string), (string, string), ...]):
+        a list of tuples of images matched to captions from this document.
     @param: line_index (int): the index where we are in the lines (for
         searchback and searchforward purposes)
     @param: lines ([string, string, ...]): the lines in the TeX
-    @oaram: tex_file (string): the name of the TeX file we're dealing with
 
-    @return: (cur_image, caption, images_and_captions_labels): the same
-        arguments it was sent, processed appropriately
-    '''
+    @return: (cur_image, caption, extracted_image_data): the same arguments it
+        was sent, processed appropriately
+    """
 
     if type(cur_image) == list:
         if cur_image[MAIN_CAPTION_OR_IMAGE] == 'ERROR':
@@ -782,11 +941,12 @@ def put_it_together(cur_image, caption, label, images_and_captions_and_labels,
 
             if cur_image[MAIN_CAPTION_OR_IMAGE] != '' and\
                     caption[MAIN_CAPTION_OR_IMAGE] != '':
-                images_and_captions_and_labels.append(
+                extracted_image_data.append(
                     (cur_image[MAIN_CAPTION_OR_IMAGE],
-                     caption[MAIN_CAPTION_OR_IMAGE], label))
+                     caption[MAIN_CAPTION_OR_IMAGE],
+                     context))
             if type(cur_image[MAIN_CAPTION_OR_IMAGE]) == list:
-                write_message('why is the main image a list?')
+                # why is the main image a list?
                 # it's a good idea to attach the main caption to other
                 # things, but the main image can only be used once
                 cur_image[MAIN_CAPTION_OR_IMAGE] = ''
@@ -796,67 +956,66 @@ def put_it_together(cur_image, caption, label, images_and_captions_and_labels,
                     for index in \
                             range(len(cur_image[SUB_CAPTION_OR_IMAGE])):
                         if index < len(caption[SUB_CAPTION_OR_IMAGE]):
-                            long_caption =\
-                                caption[MAIN_CAPTION_OR_IMAGE] +' : '+\
+                            long_caption = \
+                                caption[MAIN_CAPTION_OR_IMAGE] + ' : ' + \
                                 caption[SUB_CAPTION_OR_IMAGE][index]
                         else:
-                            long_caption =\
-                                caption[MAIN_CAPTION_OR_IMAGE] +' : '+\
-                                'caption not extracted'
-                        images_and_captions_and_labels.append(
+                            long_caption = \
+                                caption[MAIN_CAPTION_OR_IMAGE] + ' : ' + \
+                                'Caption not extracted'
+                        extracted_image_data.append(
                             (cur_image[SUB_CAPTION_OR_IMAGE][index],
-                             long_caption, label))
+                             long_caption, context))
 
                 else:
-                    long_caption = caption[MAIN_CAPTION_OR_IMAGE] +\
+                    long_caption = caption[MAIN_CAPTION_OR_IMAGE] + \
                         ' : ' + caption[SUB_CAPTION_OR_IMAGE]
                     for sub_image in cur_image[SUB_CAPTION_OR_IMAGE]:
-                        images_and_captions_and_labels.append(
-                            (sub_image, long_caption, label))
+                        extracted_image_data.append(
+                            (sub_image, long_caption, context))
 
             else:
                 if type(caption[SUB_CAPTION_OR_IMAGE]) == list:
                     long_caption = caption[MAIN_CAPTION_OR_IMAGE]
                     for sub_cap in caption[SUB_CAPTION_OR_IMAGE]:
                         long_caption = long_caption + ' : ' + sub_cap
-                    images_and_captions_and_labels.append(
-                       (cur_image[SUB_CAPTION_OR_IMAGE], long_caption, label))
+                    extracted_image_data.append(
+                       (cur_image[SUB_CAPTION_OR_IMAGE], long_caption, context))
                 else:
                     #wtf are they lists for?
-                    images_and_captions_and_labels.append(
+                    extracted_image_data.append(
                         (cur_image[SUB_CAPTION_OR_IMAGE],
-                         caption[SUB_CAPTION_OR_IMAGE], label))
+                         caption[SUB_CAPTION_OR_IMAGE], context))
 
         elif type(cur_image) == list:
             if cur_image[MAIN_CAPTION_OR_IMAGE] != '':
-                images_and_captions_and_labels.append(
-                    (cur_image[MAIN_CAPTION_OR_IMAGE], caption, label))
+                extracted_image_data.append(
+                    (cur_image[MAIN_CAPTION_OR_IMAGE], caption, context))
             if type(cur_image[SUB_CAPTION_OR_IMAGE]) == list:
                 for image in cur_image[SUB_CAPTION_OR_IMAGE]:
-                   images_and_captions_and_labels.append((image, caption,
-                                                          label))
+                    extracted_image_data.append((image, caption, context))
             else:
-                images_and_captions_and_labels.append(
-                    (cur_image[SUB_CAPTION_OR_IMAGE], caption, label))
+                extracted_image_data.append(
+                    (cur_image[SUB_CAPTION_OR_IMAGE], caption, context))
 
         elif type(caption) == list:
             if caption[MAIN_CAPTION_OR_IMAGE] != '':
-                images_and_captions_and_labels.append(
-                    (cur_image, caption[MAIN_CAPTION_OR_IMAGE], label))
+                extracted_image_data.append(
+                    (cur_image, caption[MAIN_CAPTION_OR_IMAGE], context))
             if type(caption[SUB_CAPTION_OR_IMAGE]) == list:
-                write_message('multiple caps for one image: ')
+                # multiple caps for one image:
                 long_caption = caption[MAIN_CAPTION_OR_IMAGE]
                 for subcap in caption[SUB_CAPTION_OR_IMAGE]:
-                    long_caption = long_caption + ' : ' + subcap
-                write_message(long_caption)
-                images_and_captions_and_labels.append((cur_image, long_caption,
-                                                       label))
+                    if long_caption != '':
+                        long_caption += ' : '
+                    long_caption += subcap
+                extracted_image_data.append((cur_image, long_caption, context))
             else:
-                images_and_captions_and_labels.append(
-                    (cur_image, caption[SUB_CAPTION_OR_IMAGE], label))
+                extracted_image_data.append(
+                    (cur_image, caption[SUB_CAPTION_OR_IMAGE]. context))
 
         else:
-            images_and_captions_and_labels.append((cur_image, caption, label))
+            extracted_image_data.append((cur_image, caption, context))
 
     elif cur_image != '' and caption == '':
         # we may have missed the caption somewhere.
@@ -882,15 +1041,12 @@ def put_it_together(cur_image, caption, label, images_and_captions_and_labels,
                     close_curly_line, close_curly, lines)
 
                 if type(cur_image) == list:
-                    images_and_captions_and_labels.append(
-                            (cur_image[MAIN_CAPTION_OR_IMAGE], caption, label))
-
+                    extracted_image_data.append(
+                            (cur_image[MAIN_CAPTION_OR_IMAGE], caption, context))
                     for sub_img in cur_image[SUB_CAPTION_OR_IMAGE]:
-                        images_and_captions_and_labels.append((sub_img, caption,
-                                                           label))
+                        extracted_image_data.append((sub_img, caption, context))
                 else:
-                    images_and_captions_and_labels.append((cur_image, caption,
-                                                       label))
+                    extracted_image_data.append((cur_image, caption, context))
                     break
 
         if caption == '':
@@ -913,27 +1069,24 @@ def put_it_together(cur_image, caption, label, images_and_captions_and_labels,
                               cap_begin, close_curly_line, close_curly, lines)
 
                     if type(cur_image) == list:
-                        images_and_captions_and_labels.append(
-                            (cur_image[MAIN_CAPTION_OR_IMAGE], caption, label))
+                        extracted_image_data.append(
+                            (cur_image[MAIN_CAPTION_OR_IMAGE], caption, context))
                         for sub_img in cur_image[SUB_CAPTION_OR_IMAGE]:
-                            images_and_captions_and_labels.append(
-                                                (sub_img, caption, label))
+                            extracted_image_data.append((sub_img, caption, context))
                     else:
-                        images_and_captions_and_labels.append((cur_image,
-                                                           caption, label))
+                        extracted_image_data.append((cur_image, caption, context))
                     break
 
         if caption == '':
             if type(cur_image) == list:
-                images_and_captions_and_labels.append(
-                    (cur_image[MAIN_CAPTION_OR_IMAGE], 'No caption found',\
-                     label))
+                extracted_image_data.append(
+                    (cur_image[MAIN_CAPTION_OR_IMAGE], 'No caption found', context))
                 for sub_img in cur_image[SUB_CAPTION_OR_IMAGE]:
-                    images_and_captions_and_labels.append((sub_img,
-                                                           'No caption', label))
+                    extracted_image_data.append((sub_img, 'No caption', context))
             else:
-                images_and_captions_and_labels.append(
-                   (cur_image, 'No caption found', label))
+                extracted_image_data.append(
+	               (cur_image, 'No caption found', context))
+
 
     elif caption != '' and cur_image == '':
         if type(caption) == list:
@@ -942,38 +1095,37 @@ def put_it_together(cur_image, caption, label, images_and_captions_and_labels,
                 long_caption = long_caption + ': ' + subcap
         else:
             long_caption = caption
+        extracted_image_data.append(('', 'noimg' + long_caption, context))
 
-        images_and_captions_and_labels.append(('', long_caption, label))
 
     # if we're leaving the figure, no sense keeping the data
     cur_image = ''
     caption = ''
-    label = []
 
-    return (cur_image, caption, label, images_and_captions_and_labels)
+    return (cur_image, caption, extracted_image_data)
 
-def intelligently_find_filenames(line, TeX=False, ext=False, commas_okay=False):
-    '''
+def intelligently_find_filenames(line, TeX = False, ext = False, commas_okay = False):
+    """
     Find the filename in the line.  We don't support all filenames!  Just eps
     and ps for now.
 
     @param: line (string): the line we want to get a filename out of
 
     @return: filename ([string, ...]): what is probably the name of the file(s)
-    '''
+    """
 
     files_included = ['ERROR']
 
     if commas_okay:
-        valid_for_filename = '\\s*[A-Za-z0-9\\-\\=\\+/\\\\ _\\.,%#]+'
+        valid_for_filename = '\\s*[A-Za-z0-9\\-\\=\\+/\\\\_\\.,%#]+'
     else:
-        valid_for_filename = '\\s*[A-Za-z0-9\\-\\=\\+/\\\\ _\\.%#]+'
+        valid_for_filename = '\\s*[A-Za-z0-9\\-\\=\\+/\\\\_\\.%#]+'
 
     if ext:
-        valid_for_filename = valid_for_filename + '.e*ps[texfi2]*'
+        valid_for_filename = valid_for_filename + '\.e*ps[texfi2]*'
 
     if TeX:
-        valid_for_filename = valid_for_filename + '[.latex]*'
+        valid_for_filename = valid_for_filename + '[\.latex]*'
 
     file_inclusion = re.findall('=' + valid_for_filename + '[ ,]', line)
 
@@ -982,18 +1134,19 @@ def intelligently_find_filenames(line, TeX=False, ext=False, commas_okay=False):
         for file_included in file_inclusion:
             files_included.append(file_included[1:-1])
 
-    file_inclusion = re.findall('([ps]*file=\\s*|figure=\\s*)' +\
+    file_inclusion = re.findall('(?:[ps]*file=|figure=)' + \
                                 valid_for_filename + '[,\\]} ]*', line)
 
     if len(file_inclusion) > 0:
         # still has the =
         for file_included in file_inclusion:
             part_before_equals = file_included.split('=')[0]
-            file_included = file_included[len(part_before_equals):].strip()
+            if len(part_before_equals) != file_included:
+                file_included = file_included[len(part_before_equals) + 1:].strip()
             if not file_included in files_included:
                 files_included.append(file_included)
 
-    file_inclusion = re.findall('["\'{\\[]'+ valid_for_filename + '[}\\],"\']',\
+    file_inclusion = re.findall('["\'{\\[]' + valid_for_filename + '[}\\],"\']', \
                 line)
 
     if len(file_inclusion) > 0:
@@ -1030,8 +1183,7 @@ def intelligently_find_filenames(line, TeX=False, ext=False, commas_okay=False):
 
     if files_included != ['ERROR']:
         files_included = files_included[1:] # cut off the dummy
-    #    write_message(line)
-    #    write_message('can\'t match this for some reason')
+
     for file_included in files_included:
         if file_included == '':
             files_included.remove(file_included)
@@ -1046,21 +1198,8 @@ def intelligently_find_filenames(line, TeX=False, ext=False, commas_okay=False):
 
     return files_included
 
-def clean_up(image_list):
-    '''
-    Removes all the intermediate stuff.
-
-    @param: image_list ([string, string, ...]): the images to remove
-
-    NOTE: when running this for later upload, it's not a good idea to
-        remove the converted images!
-    '''
-    return # FIXME do not delete image files before upload
-    for image_file in image_list:
-        run_shell_command('rm ' + image_file)
-
 def upload_to_site(marcxml, yes_i_know):
-    '''
+    """
     makes the appropriate calls to bibupload to get the MARCXML record onto
     the site.
 
@@ -1071,13 +1210,13 @@ def upload_to_site(marcxml, yes_i_know):
     @output: a new record on the invenio site
 
     @return: None
-    '''
+    """
     if not yes_i_know:
-        wait_for_user(wrap_text_in_a_box('You are going to upload new ' +\
+        wait_for_user(wrap_text_in_a_box('You are going to upload new ' + \
                                          'plots to the server.'))
     task_low_level_submission('bibupload', 'admin', '-a', marcxml)
 
-help_string = '''
+help_string = """
     name: plotextractor
     usage:
             python plotextractor.py -d tar/dir -s scratch/dir
@@ -1086,8 +1225,8 @@ help_string = '''
             python plotextractor.py --recid=recids
 
     example:
-            python extract_plots.py -d /some/path/with/tarballs
-            python extract_plots.py -i input.txt --no-sdir --extract-text
+            python plotextractor.py -d /some/path/with/tarballs
+            python plotextractor.py -i input.txt --no-sdir --extract-text
             python plotextractor.py --arXiv=hep-ex/0101001
             python plotextractor.py --recid=13-20,29
 
@@ -1121,13 +1260,26 @@ help_string = '''
             force the script to overwrite it.  otherwise it will only run on
             things that haven't been run on yet (for use with tardir).
 
+        -c, --clean
+            if you wish to do delete all non-essential files that were extracted.
+
         -u, --call-bibupload, --yes-i-know
             if you want to upload the plots, ask to call bibupload.  appending
             the --yes-i-know flag bypasses bibupload's prompt to upload
 
+        -l, --refno-url
+            Specify an URL to the invenio-instance to query for refno.
+            Defaults to CFG_SITE_URL.
+
+        -k, --skip-refno
+            allows you to skip any refno check
+
         -r, --recid=
             if you want to process the tarball of one recid, use this tag.  it
             will also accept ranges (i.e. --recid=13-20)
+
+        -a, --arXiv=
+            if you want to process the tarball of one arXiv id, use this tag.
 
         -t, --tarball=
             for processing one tarball.
@@ -1136,10 +1288,13 @@ help_string = '''
             if you want to squash all MARC into a single MARC file (for easier
             and faster bibuploading)
 
+        -h, --help
+            Print this help and exit.
+
     description: extracts plots from a tarfile from arXiv and generates
         MARCXML that links figures and their captions.  converts all
         images to PNG format.
-'''
+"""
 
 def usage():
     write_message(help_string)

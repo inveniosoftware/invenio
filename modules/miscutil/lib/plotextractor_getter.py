@@ -17,18 +17,18 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import urllib, time, os, getopt, sys, re
-from invenio.config import CFG_TMPDIR, CFG_PLOTEXTRACTOR_ARXIV_BASE
+import urllib, time, os, sys, re
+from invenio.config import CFG_TMPDIR
+from invenio.plotextractor_config import CFG_PLOTEXTRACTOR_ARXIV_BASE, \
+                                         CFG_PLOTEXTRACTOR_ARXIV_E_PRINT, \
+                                         CFG_PLOTEXTRACTOR_ARXIV_PDF, \
+                                         CFG_PLOTEXTRACTOR_DESY_BASE, \
+                                         CFG_PLOTEXTRACTOR_DESY_PIECE
 from invenio.search_engine import get_record
+from invenio.bibrecord import record_get_field_instances, \
+                              field_get_subfield_values
 from invenio.shellutils import run_shell_command
-from invenio.plotextractor_output_utils import write_message, write_messages
-
-ARXIV_BASE = 'http://arxiv.org/' # home!
-E_PRINT = 'e-print/' # where the tarballs sit
-PDF = 'pdf/' # where the pdfs sit
-
-DESY_BASE = 'http://www-library.desy.de/preparch/desy/'
-DESY_PIECE = '/desy'
+from invenio.plotextractor_output_utils import write_message
 
 PDF_EXTENSION = '.pdf'
 
@@ -54,7 +54,7 @@ FIX_FOR_YEAR_END = 88
 current_yearmonth = int(('%02d%02d' % (time.localtime().tm_year, \
         time.localtime().tm_mon))[2:])
 
-'''
+"""
 each of the areas of hep began in a different year and month.
 
 beginning in 0704, i.e. April 2007, arXiv moved its URLS from
@@ -64,7 +64,7 @@ ARXIV_BASE + E_PRINT + <<number.with.dot>>
 
 the papers for a given month are numbered between yymm.0001 and yymm.9999
 after the URL move, and before that they are between yymm001 and yymm999
-'''
+"""
 
 help_param = 'help'
 dir_param = 'dir'
@@ -77,7 +77,7 @@ params = [help_param, dir_param + '=', from_param + '=', from_index_param + '=',
           ref_file_param + '=', single_param + '=']
 
 def harvest(to_dir, from_date, from_index):
-    '''
+    """
         Calls upon arXiv using URLS as described above in order to grab
         all the tarballs from HEP areas.
 
@@ -90,17 +90,15 @@ def harvest(to_dir, from_date, from_index):
 
         @output: TONS OF .tar.gz FILES FROM ARXIV
         @return: (none)
-    '''
+    """
 
     global current_yearmonth
 
     if from_date > current_yearmonth and from_date < ARBITRARY_FROM_DATE:
-        # wtf?
-        print 'please choose a from date that is not in the future!'
+        write_message('Please choose a from date that is not in the future!')
         sys.exit(1)
     if from_date % 100 > 12:
-        # also wtf?
-        print 'please choose a from date in the form YYMM'
+        write_message('Please choose a from date in the form YYMM')
         sys.exit(1)
 
     if from_date >= ARBITRARY_FROM_DATE or from_date < URL_MOVE:
@@ -150,7 +148,7 @@ def harvest(to_dir, from_date, from_index):
 
 
 def make_single_directory(to_dir, dirname):
-    '''
+    """
         Makes a subdirectory for the arXiv record we are working with and
         returns its exact location.
 
@@ -160,20 +158,20 @@ def make_single_directory(to_dir, dirname):
 
         @output: a new directory called dirname located in to_dir
         @return: the absolute path to the new directory
-    '''
+    """
     new_dir = os.path.join(to_dir, dirname)
 
     if not os.path.isdir(new_dir):
         try:
             os.mkdir(new_dir)
         except OSError:
-            print 'failed to make new dir...'
+            write_message('Failed to make new dir...')
             return to_dir
 
     return new_dir
 
 def make_useful_directories(yearmonthindex, to_dir):
-    '''
+    """
         Builds up the hierarchical filestructure for saving these things
         in a useful way.
 
@@ -182,7 +180,7 @@ def make_useful_directories(yearmonthindex, to_dir):
 
         @return month_dir (string): the new directory we are going to put
             stuff in
-    '''
+    """
     year = yearmonthindex / 100
     if year >= (ARBITRARY_FROM_DATE / 100):
         year = '19%02d' % year
@@ -201,25 +199,6 @@ def make_useful_directories(yearmonthindex, to_dir):
 
     return month_dir
 
-def make_single_directory(to_dir, dirname):
-    '''
-        Makes a subdirectory for the arXiv record we are working with and
-        returns its exact location.
-
-        @param: to_dir (string): the name of the directory we want to make it
-            in
-        @param: dirname (string): the name of the directory we want to create
-
-        @output: a new directory called dirname located in to_dir
-        @return: the absolute path to the new directory
-    '''
-    new_dir = os.path.join(to_dir, dirname)
-
-    if not os.path.isdir(new_dir):
-        os.mkdir(new_dir)
-
-    return new_dir
-
 def get_list_of_all_matching_files(basedir, filetypes):
     """
     This function uses the os module in order tocrawl
@@ -236,13 +215,11 @@ def get_list_of_all_matching_files(basedir, filetypes):
     """
 
     file_paths = []
-    file_cmd = 'file '
 
     for dirpath, dummy0, filenames in os.walk(basedir):
         for filename in filenames:
             full_path = os.path.join(dirpath, filename)
-            cmd = file_cmd + full_path
-            dummy1, cmd_out, dummy2 = run_shell_command(cmd)
+            dummy1, cmd_out, dummy2 = run_shell_command('file %s', (full_path,))
             for filetype in filetypes:
                 if cmd_out.find(filetype) > -1:
                     file_paths.append(full_path)
@@ -250,7 +227,7 @@ def get_list_of_all_matching_files(basedir, filetypes):
     return file_paths
 
 def tarballs_by_recids(recids, sdir):
-    '''
+    """
     Take a string representing one recid or several and get the associated
     tarballs for those ids.
 
@@ -258,7 +235,7 @@ def tarballs_by_recids(recids, sdir):
     @param: sdir (string): where the tarballs should live
 
     @return: tarballs ([string, string, ...]): locations of tarballs
-    '''
+    """
     list_of_ids = []
 
     if ',' in recids:
@@ -283,31 +260,29 @@ def tarballs_by_recids(recids, sdir):
 
     for recid in list_of_ids:
         rec = get_record(recid)
-        for afieldinstance in record_get_field_instances(rec, tag='035'):
-            if 'CERNKEY' == field_get_subfield_values(afieldinstance, '9')[0]:
-                arXiv_id = field_get_subfield_values(afieldinstance, 'z')[0]
-                arXiv_ids.append('arXiv:' + arXiv_id)
+        for afieldinstance in record_get_field_instances(rec, tag = '037'):
+            if 'arXiv' == field_get_subfield_values(afieldinstance, '9')[0]:
+                arXiv_id = field_get_subfield_values(afieldinstance, 'a')[0]
+                arXiv_ids.append(arXiv_id)
 
     return tarballs_by_arXiv_id(arXiv_ids, sdir)
 
 def tarballs_by_arXiv_id(arXiv_ids, sdir):
-    '''
-    Takes an arXiv id or a list of arXiv ids and downloads their tarballs
+    """
+    Takes an list of arXiv ids and downloads their tarballs
     and returns a list of the tarballs' locations.
 
-    @param: arXiv_ids (string || [string, string, ...]): the arXiv ids you
+    @param: arXiv_ids ([string, string, ...]): the arXiv ids you
         would like to have tarballs for
     @param: sdir (string): the place to download these tarballs to
 
     @return: tarballs ([string, ...]): a list of the tarballs downloaded
-    '''
+    """
     tarballs = []
 
-    if type(arXiv_ids) != list:
-        arXiv_ids = [arXiv_ids]
-
     for arXiv_id in arXiv_ids:
-        arXiv_id = 'arXiv:' + arXiv_id
+        if 'arXiv' not in arXiv_id:
+            arXiv_id = 'arXiv:' + arXiv_id
         tarball, dummy_pdf = harvest_single(arXiv_id, sdir)
         if tarball != None:
             tarballs.append(tarball)
@@ -315,13 +290,13 @@ def tarballs_by_arXiv_id(arXiv_ids, sdir):
     return tarballs
 
 def parse_and_download(infile, sdir):
-    '''
+    """
     Read the write_messageation in the input file and download the corresponding
     tarballs from arxiv.
 
     @param: infile (string): the name of the file to parse
     @param: sdir (string): where to put the downloaded tarballs
-    '''
+    """
 
     tarfiles = []
 
@@ -345,14 +320,18 @@ def parse_and_download(infile, sdir):
                 filename = os.path.join(tardir, filename)
                 urllib.urlretrieve(url, filename)
                 tarfiles.append(filename)
+                write_message('Downloaded to ' + filename)
+                time.sleep(7) # be nice!
             except:
                 write_message(filename + ' may already exist')
                 write_message(sys.exc_info()[0])
+        elif line.startswith('arXiv'):
+            tarfiles.extend(tarballs_by_arXiv_id([line.strip()], sdir))
 
     return tarfiles
 
 def harvest_single(single, to_dir):
-    '''
+    """
     if we only want to harvest one id (arXiv or DESY), we can use this.
 
     @param: single (string): an id from arXiv or DESY
@@ -362,34 +341,43 @@ def harvest_single(single, to_dir):
 
     @return: (tarball, pdf): the location of the source tarball and PDF, None
             if not found
-    '''
+    """
 
-    if single.find('arXiv') > -1 and CFG_PLOTEXTRACTOR_ARXIV_BASE == '':
+    if single.find('arXiv') > -1 and \
+           CFG_PLOTEXTRACTOR_ARXIV_BASE == 'http://arxiv.org/':
         # good!
-        idno = re.findall('(([a-zA-Z\\-]+/\\d+)|(\\d+\\.\\d+))', single)[0]
-        idno = id.split('/')
+        id_str = re.findall('[a-zA-Z\\-]+/\\d+|\\d+\\.\\d+', single)[0]
+        idno = id_str.split('/')
         if len(idno) > 0:
             idno = idno[-1]
         yymm = int(idno[:4])
         yymm_dir = make_useful_directories(yymm, to_dir)
-        individual_dir = make_single_directory(yymm_dir, id)
-        url_for_file = ARXIV_BASE + E_PRINT + id
-        url_for_pdf = ARXIV_BASE + PDF + id
-        individual_file = id.replace('/', '_')
-        print 'download ' + url_for_file + ' to ' +\
-                os.path.join(individual_dir, individual_file)
-        download(url_for_file, individual_file, individual_dir)
-        download(url_for_pdf, individual_file + '.pdf', individual_dir)
-        return (individual_file, individual_file + '.pdf')
+        individual_dir = make_single_directory(yymm_dir, 'arXiv:' + id_str)
+        url_for_file = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_E_PRINT + \
+                       id_str
+        url_for_pdf = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_PDF + \
+                      id_str
+        individual_file = 'arXiv:' + id_str.replace('/', '_')
+        abs_path = os.path.join(individual_dir, individual_file)
+        tarball = abs_path
+        pdf = abs_path + '.pdf'
+        write_message('download ' + url_for_file + ' to ' + abs_path)
+        if not download(url_for_file, individual_file, individual_dir):
+            write_message('download of tarball failed')
+            tarball = None
+        if not download(url_for_pdf, individual_file + '.pdf', individual_dir):
+            write_message('download of pdf failed')
+            pdf = None
+        return (tarball, pdf)
 
     elif single.find('arXiv') > -1 and CFG_PLOTEXTRACTOR_ARXIV_BASE != '':
         # hmm... is it a filesystem?
         if CFG_PLOTEXTRACTOR_ARXIV_BASE.startswith('/'):
             if not os.path.exists(CFG_PLOTEXTRACTOR_ARXIV_BASE):
-                print 'PROBLEM WITH CFG_PLOTEXTRACTOR_ARXIV_BASE: we cannot ' +\
-                        'find this folder!'
+                write_message('PROBLEM WITH CFG_PLOTEXTRACTOR_ARXIV_BASE: we cannot ' + \
+                        'find this folder!')
                 return (None, None)
-            for root, files, folders in os.walk(CFG_PLOTEXTRACTOR_ARXIV_BASE):
+            for root, files, dummy in os.walk(CFG_PLOTEXTRACTOR_ARXIV_BASE):
                 for file_name in files:
                     id_no = single.replace('arXiv', '')
                     if file_name.find(id_no) > -1 or\
@@ -411,14 +399,14 @@ def harvest_single(single, to_dir):
 
         # well, I don't know what to do with it
         else:
-            print 'unsure how to handle CFG_PLOTEXTRACTOR_ARXIV_BASE. ' +\
-                  'please fix the harvest_single function in ' +\
-                  'miscutil/lib/plotextractor_getter.py'
+            write_message('unsure how to handle CFG_PLOTEXTRACTOR_ARXIV_BASE. ' + \
+                  'please fix the harvest_single function in ' + \
+                  'miscutil/lib/plotextractor_getter.py')
             return (None, None)
 
     elif single.find('DESY') > -1:
         # also okay!
-        idno = re.findall('\\d{2,4}-\\d{3}')[0]
+        idno = re.findall('\\d{2,4}-\\d{3}', single)[0]
         year, number = idno.split('-')
         if len(year) < 4:
             if int(year) > 92:
@@ -428,18 +416,19 @@ def harvest_single(single, to_dir):
         year_dir = make_single_directory(to_dir, year)
         desy_dir = make_single_directory(year_dir, 'DESY')
         individual_dir = make_single_directory(desy_dir, number)
-        id = year[2:] + '-' + number + '.pdf'
-        url_for_file = DESY_BASE + year + DESY_PIECE + id
-        individual_file = id
-        print 'download ' + url_for_file + ' to ' +\
-                os.path.join(individual_dir, individual_file)
+        id_no = year[2:] + '-' + number + '.pdf'
+        url_for_file = CFG_PLOTEXTRACTOR_DESY_BASE + year + \
+                       CFG_PLOTEXTRACTOR_DESY_PIECE + id_no
+        individual_file = id_no
+        write_message('download ' + url_for_file + ' to ' + \
+                os.path.join(individual_dir, individual_file))
         download(url_for_file, individual_file, individual_dir)
         return (None, individual_file)
-
+    write_message('END')
     return (None, None)
 
 def src_pdf_from_marc(marc_file):
-    '''
+    """
     Given a marc file, this function attempts to determine where to find
     a pdf for that record
 
@@ -447,48 +436,44 @@ def src_pdf_from_marc(marc_file):
 
     @return: pdfloc (string): the location of the downloaded PDF source file,
         None if no pdf was downloaded
-    '''
+    """
 
     if not os.path.exists(marc_file):
         return None
 
     marc_file = open(marc_file)
-    marc_text = marc_file.readlines()
+    marc_text = marc_file.read()
     marc_file.close()
 
-    arXiv_match = '(([a-zA-Z\\-]+/\\d{7})|(\\d{4}\\.\\d{3}))'
-    CERN_match = 'CERN-[A-Z]-\\d{4}-\\d{3}' # we can't get pdfs from CERN..
+    arXiv_match = '(([a-zA-Z\\-]+/\\d{7})|(\\d{4}\\.\\d{4}))'
     DESY_match = 'DESY-\\d{2,4}-\\d{3}'
 
     pdf_loc = None
     to_dir = os.path.join(CFG_TMPDIR, 'plotdata')
 
-    for line in marc_text:
-        possible_match = re.findall(arXiv_match, line)
-        if len(possible_match) > 0:
-            # it's listed on arXiv, hooray!
-            arXiv_id = possible_match[0]
-            dummy1, pdf_loc = harvest_single(arXiv_id, to_dir)
-            break
+    possible_match = re.search(arXiv_match, marc_text)
+    if possible_match != None:
+        # it's listed on arXiv, hooray!
+        arXiv_id = possible_match.group(0)
+        dummy1, pdf_loc = harvest_single(arXiv_id, to_dir)
 
-        possible_match = re.findall(DESY_match, line)
-        if len(possible_match) > 0:
-            # it's listed on DESY, hooray!
-            desy_id = possible_match[0]
-            dummy1, pdf_loc = harvest_single(desy_id, to_dir)
-            break
+    possible_match = re.search(DESY_match, marc_text)
+    if possible_match != None:
+        # it's listed on DESY, hooray!
+        desy_id = possible_match.group(0)
+        dummy1, pdf_loc = harvest_single(desy_id, to_dir)
 
     return pdf_loc
 
 
 def harvest_from_file(filename, to_dir):
-    '''
+    """
     Harvest from the file Tibor made.
     Format of a single entry:
         oai:arXiv.org:area/YYMMIII
             or
         oai:arXiv.org:YYMM.IIII
-    '''
+    """
 
     ok_format = '^oai:arXiv.org:(([a-zA-Z\\-]+/\\d+)|(\\d+\\.\\d+))$'
 
@@ -496,15 +481,15 @@ def harvest_from_file(filename, to_dir):
         names_file = open(filename)
         for arXiv_name in names_file.readlines():
             if re.match(ok_format, arXiv_name) == None:
-                print 'error on ' + arXiv_name + '. continuing.'
+                write_message('error on ' + arXiv_name + '. continuing.')
                 continue
             harvest_single(arXiv_name, to_dir)
 
     except IOError:
-        print 'Something is wrong with the file!'
+        write_message('Something is wrong with the file!')
 
 def old_URL_harvest(from_date, to_date, to_dir, area):
-    '''
+    """
         Grab all the PDFs and tarballs off arXiv between from_date and to_date,
         where from_date and to_date are in YYMM form, and put them in their own
         separate folders inside of to_dir.  Folder hierarchy will be
@@ -521,7 +506,7 @@ def old_URL_harvest(from_date, to_date, to_dir, area):
 
         @output: PDFs and tarballs from arXiv in a hierarchy rooted at to_dir
         @return: None
-    '''
+    """
 
     yearmonthindex = from_date
 
@@ -533,20 +518,21 @@ def old_URL_harvest(from_date, to_date, to_dir, area):
             # for whatever reason, we can't count on these things to
             # start at 1 (in HEP_PH from 9403 to CENTURY_END only).
             # they start at frickin 202.
-            if area == HEP_PH and yearmonthindex < ARBITRARY_FROM_INDEX:
-                paperindex = paperindex + 201
+            #if area == HEP_PH and yearmonthindex < ARBITRARY_FROM_INDEX:
+            #   paperindex = paperindex + 201
             # of note: before the URL change happened in 0704, it was
             # also the case that the paper numbers only had 3 digits
             next_to_harvest = '%04d%03d' % (yearmonthindex, paperindex)
             arXiv_id = area[AREA_STRING_INDEX] + next_to_harvest
             individual_dir = make_single_directory(sub_dir, arXiv_id)
 
-            full_url = ARXIV_BASE + E_PRINT + area[URL] + next_to_harvest
+            full_url = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_E_PRINT + \
+                       area[URL] + next_to_harvest
             if not download(full_url, \
                 area[AREA_STRING_INDEX] + next_to_harvest, individual_dir):
                 break
-            full_pdf_url = ARXIV_BASE + PDF + area[URL] +\
-                 next_to_harvest
+            full_pdf_url = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_PDF + \
+                           area[URL] + next_to_harvest
             download(full_pdf_url, \
                 area[AREA_STRING_INDEX] + next_to_harvest + PDF_EXTENSION, \
                 individual_dir)
@@ -557,7 +543,7 @@ def old_URL_harvest(from_date, to_date, to_dir, area):
         yearmonthindex = yearmonthindex + 1
 
 def new_URL_harvest(from_date, from_index, to_dir):
-    '''
+    """
         Grab all the PDFs and tarballs off arXiv between from_date and to_date,
         where from_date and to_date are in YYMM form, and put them in their own
         separate folders inside of to_dir.  Folder hierarchy will be
@@ -572,7 +558,7 @@ def new_URL_harvest(from_date, from_index, to_dir):
 
         @output: PDFs and tarballs from arXiv in a hierarchy rooted at to_dir
         @return: None
-    '''
+    """
 
     global current_yearmonth
     yearmonthindex = from_date
@@ -594,12 +580,14 @@ def new_URL_harvest(from_date, from_index, to_dir):
             arXiv_id = ARXIV_HEADER + next_to_harvest
             individual_dir = make_single_directory(sub_dir, arXiv_id)
 
-            full_url = ARXIV_BASE + E_PRINT + next_to_harvest
-            if not download(full_url, ARXIV_HEADER + next_to_harvest,\
+            full_url = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_E_PRINT + \
+                       next_to_harvest
+            if not download(full_url, ARXIV_HEADER + next_to_harvest, \
                 individual_dir):
                 break
 
-            full_pdf_url = ARXIV_BASE + PDF + next_to_harvest
+            full_pdf_url = CFG_PLOTEXTRACTOR_ARXIV_BASE + CFG_PLOTEXTRACTOR_ARXIV_PDF + \
+                           next_to_harvest
             download(full_pdf_url, \
                 ARXIV_HEADER + next_to_harvest + PDF_EXTENSION, \
                 individual_dir)
@@ -610,7 +598,7 @@ def new_URL_harvest(from_date, from_index, to_dir):
         yearmonthindex = yearmonthindex + 1
 
 def download(url, filename, to_dir):
-    '''
+    """
         Actually does the call and download given a URL and desired output
         filename.
 
@@ -621,48 +609,17 @@ def download(url, filename, to_dir):
         @output: a file in to_dir
 
         @return: True on success, False on failure
-    '''
+    """
     new_file = os.path.join(to_dir, filename)
-
-    # let's see if this file is actually available to INSPIRE:
-    if not record_exists(filename):
-        # we return true because we don't want to skip things
-        # for no reason that may come after this file
-        return True
 
     try:
         urllib.urlretrieve(url, new_file)
-        print 'down-a-loaded to ' + new_file
+        write_message('Downloaded to ' + new_file)
         time.sleep(7) # be nice to arXiv!
         return True
     except IOError:
         # this could be a permissions error, but it probably means that
         # there's nothing left in that section YYMM
-        print 'nothing at ' + new_file
+        write_message('Nothing at ' + new_file)
         return False
 
-def record_exists(filename):
-    '''
-    Returns true iff there is a record in the database for the given
-    tarball name (the name must conform to the name scheme in this file).
-
-    @param: filename (string): arXiv:<refno>
-
-    @return: exists (bool): true iff there is a record for the refno.
-    '''
-
-    if filename.startswith(ARXIV_HEADER):
-        filename = filename.split(':')[1]
-        if len(filename.split('_')) > 1:
-            arXiv_record = filename.replace('_', '/')
-        else:
-            arXiv_record = filename
-
-        result = perform_request_search(p=arXiv_record, f='reportnumber')
-
-        if len(result) == 0:
-            return False
-
-        return True
-
-    return False

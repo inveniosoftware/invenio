@@ -20,12 +20,12 @@
 import os
 import re
 
-from invenio.shellutils import run_shell_command
+from invenio.shellutils import run_shell_command, run_process_with_timeout, Timeout
 from invenio.plotextractor_output_utils import get_converted_image_name, \
-                                               write_message, write_messages
+                                               write_message
 
-def untar(tarball, sdir):
-    '''
+def untar(original_tarball, sdir):
+    """
     Here we decide if our file is actually a tarball (sometimes the
     'tarballs' gotten from arXiv aren't actually tarballs.  If they
     'contain' only the TeX file, then they are just that file.), then
@@ -38,23 +38,21 @@ def untar(tarball, sdir):
     @return: (image_list, tex_file) (([string, string, ...], string)):
         list of images in the tarball and the name of the TeX file in the
         tarball.
-    '''
+    """
 
-    tarball = check_for_gzip(tarball, sdir)
-    dummy1, cmd_out, cmd_err = run_shell_command('file ' + tarball)
-
+    tarball = check_for_gzip(original_tarball)
+    dummy1, cmd_out, cmd_err = run_shell_command('file %s', (tarball,))
     tarball_output = 'tar archive'
     if re.search(tarball_output, cmd_out) == None:
-        run_shell_command('rm ' + tarball)
-        return ([], None)
-
-    cmd = 'tar xvf ' + tarball + ' -C ' + sdir
-    dummy1, cmd_out, cmd_err = run_shell_command(cmd)
+        run_shell_command('rm %s', (tarball,))
+        return ([], [], None)
+    dummy1, cmd_out, cmd_err = run_process_with_timeout('tar xvf %s -C %s' %
+                                                        (tarball, sdir), shell = True)
 
     if cmd_err != '':
-        return ([], None)
-
-    run_shell_command('rm ' + tarball)
+        return ([], [], None)
+    if original_tarball != tarball:
+        run_shell_command('rm %s', (tarball,))
     cmd_out = cmd_out.split('\n')
 
     tex_output_contains = 'TeX'
@@ -64,17 +62,22 @@ def untar(tarball, sdir):
     eps_output_contains = '- type eps'
     ps_output_contains = 'Postscript'
 
+    file_list = []
     image_list = []
     might_be_tex = []
 
     for extracted_file in cmd_out:
         if extracted_file == '':
             break
-
+        if extracted_file.startswith('./'):
+            extracted_file = extracted_file[2:]
         # ensure we are actually looking at the right file
         extracted_file = os.path.join(sdir, extracted_file)
 
-        dummy1, cmd_out, dummy2 = run_shell_command('file ' + extracted_file)
+        # Add to full list of extracted files
+        file_list.append(extracted_file)
+
+        dummy1, cmd_out, dummy2 = run_shell_command('file %s', (extracted_file,))
 
         # is it TeX?
         if cmd_out.find(tex_output_contains) > -1:
@@ -96,62 +99,58 @@ def untar(tarball, sdir):
             if extracted_file.split('.')[-1] == tex_file_extension:
                 # we might have tex source!
                 might_be_tex.append(extracted_file)
-            else:
-                if extracted_file.split('.')[-1] in ['eps', 'png',\
-                    'ps', 'jpg']:
-                    # we might have an image!
-                    image_list.append(extracted_file)
-                #else:
-                    # we don't care about it
-                    #run_shell_command('rm ' + extracted_file)
+            elif extracted_file.split('.')[-1] in ['eps', 'png', \
+                    'ps', 'jpg', 'pdf']:
+                # we might have an image!
+                image_list.append(extracted_file)
 
     if might_be_tex == []:
         # well, that's tragic
-        write_message('could not find TeX file in tar archive')
-        return ([], [])
+        # could not find TeX file in tar archive
+        return ([], [], [])
 
-    return (image_list, might_be_tex)
+    return (file_list, image_list, might_be_tex)
 
-def check_for_gzip(tfile, sdir):
-    '''
+def check_for_gzip(tfile):
+    """
     Was that tarball also gzipped?  Let's find out!
 
     @param: file (string): the name of the object (so we can gunzip, if
         that's necessary)
-    @param: sdir (string): the directory to gunzip the file to if necessary
 
     @output: a gunzipped file in the directory of choice, if that's necessary
 
     @return new_file (string): The name of the file after gunzipping or the
         original name of the file if that wasn't necessary
-    '''
+    """
 
     gzip_contains = 'gzip compressed data'
-    gunzip = 'gunzip -c '
-
-    dummy1, cmd_out, dummy2 = run_shell_command('file ' + tfile)
+    dummy1, cmd_out, dummy2 = run_shell_command('file %s', (tfile,))
 
     if cmd_out.find(gzip_contains) > -1:
         # we have a gzip!
         # so gzip is retarded and won't accept any file that doesn't end
         # with .gz.  sad.
-        cmd = 'cp ' + tfile + ' ' + tfile + '.tar.gz'
-        run_shell_command(cmd)
+        run_shell_command('cp %s %s' % (tfile, tfile + '.tar.gz'))
         new_dest = os.path.join(os.path.split(tfile)[0], 'tmp.tar')
-        run_shell_command('touch ' + new_dest)
-        cmd = gunzip + tfile + '.tar.gz'
-        dummy1, cmd_out, cmd_err = run_shell_command(cmd)
+        run_shell_command('touch %s' % (new_dest,))
+        dummy1, cmd_out, cmd_err = run_shell_command('gunzip -c %s' % \
+                                                            (tfile + '.tar.gz',))
+        if cmd_err != '':
+            write_message('Error while gunzipping ' + tfile)
+            return tfile
+
         tarfile = open(new_dest, 'w')
         tarfile.write(cmd_out)
         tarfile.close()
-        cmd = 'rm ' + tfile + '.tar.gz'
-        run_shell_command(cmd)
+
+        run_shell_command('rm %s', (tfile + '.tar.gz',))
         return new_dest
 
     return tfile
 
 def convert_images(image_list):
-    '''
+    """
     Here we figure out the types of the images that were extracted from
     the tarball and determine how to convert them into PNG.
 
@@ -160,14 +159,9 @@ def convert_images(image_list):
 
     @return: image_list ([str, str, ...]): The list of image files when all
         have been converted to PNG format.
-    '''
-
-    png_output_contains = 'PNG image data'
-    ps_output_contains = 'Postscript'
-    eps_output_contains = 'PostScript'
-
+    """
+    png_output_contains = 'PNG image'
     ret_list = []
-
     for image_file in image_list:
         if os.path.isdir(image_file):
             continue
@@ -178,7 +172,7 @@ def convert_images(image_list):
         # conversions; (2) the arguments should be passed properly so
         # that they are escaped.
 
-        dummy1, cmd_out, dummy2 = run_shell_command('file ' + image_file)
+        dummy1, cmd_out, dummy2 = run_shell_command('file %s', (image_file,))
         if cmd_out.find(png_output_contains) > -1:
             ret_list.append(image_file)
         else:
@@ -187,14 +181,34 @@ def convert_images(image_list):
             # for sure it can do EPS->PNG and JPG->PNG and PS->PNG
             # and PSTEX->PNG
             converted_image_file = get_converted_image_name(image_file)
-
-            convert_cmd = 'convert '
-
-            dummy1, cmd_out, cmd_err = run_shell_command(convert_cmd +\
-                    image_file + ' ' + converted_image_file)
-            if cmd_err == '':
-                ret_list.append(converted_image_file)
-            else:
-                write_message('convert failed on ' + image_file)
+            try:
+                dummy1, cmd_out, cmd_err = run_process_with_timeout('convert %s %s'\
+                                                   % (image_file, \
+                                                      converted_image_file), shell = True)
+                if cmd_err == '':
+                    ret_list.append(converted_image_file)
+                else:
+                    write_message('convert failed on ' + image_file)
+            except Timeout:
+                write_message('convert timed out on ' + image_file)
 
     return ret_list
+
+def extract_text(tarball):
+    """
+    We check to see if there's a file called tarball.pdf, and, if there is,
+    we run pdftotext on it.  Simple as that.
+
+    @param: tarball (string): the raw name of the tarball
+
+    @return: None
+    """
+    try:
+        os.stat(tarball + '.pdf')
+        dummy1, dummy2, cmd_err = run_process_with_timeout('pdftotext %s %s' % \
+                                     (tarball + '.pdf ', tarball + '.txt'), shell = True)
+        if cmd_err != '':
+            return - 1
+        write_message('generated ' + tarball + '.txt from ' + tarball + '.pdf')
+    except:
+        write_message('no text from ' + tarball + '.pdf')

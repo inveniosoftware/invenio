@@ -55,7 +55,8 @@ pylib_DATA = __init__.py \
              plotextractor_converter.py \
              plotextractor_getter.py \
              plotextractor_output_utils.py \
-             plotextractor_tests.py
+             plotextractor_tests.py \
+             plotextractor_config.py
 
 noinst_DATA = testimport.py \
               kwalitee.py \
