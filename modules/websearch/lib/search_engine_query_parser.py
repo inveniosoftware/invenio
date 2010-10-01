@@ -196,17 +196,20 @@ class SearchQueryParenthesisedParser(object):
 
             Adds space around special punctuation, then splits on whitespace.
             """
-            #for char in ['(',')', '+', '-', '|']:
+            s = ' '+s
+            s = s.replace('->', '####DATE###RANGE##OP#') # XXX: Save '->'
+            s = re.sub('(?P<outside>[a-zA-Z0-9_,]+)\((?P<inside>[a-zA-Z0-9_,]*)\)',
+                       '#####\g<outside>####PAREN###\g<inside>##PAREN#', s) # XXX: Save U(1) and SL(2,Z)
             for char in self.specials:
-                s = s.replace('->', '####DATE###RANGE##OP#') # XXX: Save '->'
-                s = re.sub('(?P<outside>[a-zA-Z0-9_,]+)\((?P<inside>[a-zA-Z0-9_,]*)\)',
-                           '#####\g<outside>####PAREN###\g<inside>##PAREN#', s) # XXX: Save U(1) and SL(2,Z)
-
-                s = s.replace(char, ' '+char+' ')
-
-                s = re.sub('#####(?P<outside>[a-zA-Z0-9_,]+)####PAREN###(?P<inside>[a-zA-Z0-9_,]*)##PAREN#',
-                           '\g<outside>(\g<inside>)', s) # XXX: Restore U(1) and SL(2,Z)
-                s = s.replace('####DATE###RANGE##OP#', '->') # XXX: Restore '->'
+                if char == '-':
+                    s = s.replace(' -', ' '+char+' ')
+                    s = s.replace(')-', ') '+char+' ')
+                    s = s.replace('-(', ' '+char+' (')
+                else:
+                    s = s.replace(char, ' '+char+' ')
+            s = re.sub('#####(?P<outside>[a-zA-Z0-9_,]+)####PAREN###(?P<inside>[a-zA-Z0-9_,]*)##PAREN#',
+                       '\g<outside>(\g<inside>)', s) # XXX: Restore U(1) and SL(2,Z)
+            s = s.replace('####DATE###RANGE##OP#', '->') # XXX: Restore '->'
             return s.split()
 
         querytokens = []
@@ -687,7 +690,7 @@ class SpiresToInvenioSyntaxConverter:
             if None == day:
                 day = match.group('day2')
 
-            # if day is missing, look for everything in geven year and month
+            # if day is missing, look for everything in given year and month
             if None == day:
                 return QUOTES + year + '-' + month + '-*' + QUOTES
 

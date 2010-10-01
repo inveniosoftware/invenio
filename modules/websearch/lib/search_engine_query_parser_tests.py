@@ -25,7 +25,7 @@ import unittest
 from invenio import search_engine_query_parser
 
 from invenio.testutils import make_test_suite, run_test_suite
-from invenio.search_engine import create_basic_search_units
+from invenio.search_engine import create_basic_search_units, perform_request_search
 
 
 class TestSearchQueryParenthesisedParser(unittest.TestCase):
@@ -211,10 +211,20 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(self.parser.parse_query('foo oR bar'),
                          ['+', 'foo', '|', 'bar'])
 
+    def test_space_before_last_paren(self):
+        """SearchQueryParenthesisedParser - Test (ellis )"""
+        self.assertEqual(self.parser.parse_query('(ellis )'),
+                         ['+', 'ellis'])
+
     def test_sqpp_nested_U1_or_SL2(self):
         """SearchQueryParenthesisedParser - Test (U(1) or SL(2,Z))"""
         self.assertEqual(self.parser.parse_query('(U(1) or SL(2,Z))'),
                          ['+', 'u(1)', '|', 'sl(2,z)'])
+
+    def test_sqpp_distributed_ands_equivalent(self):
+        """SearchQueryParenthesisedParser - ellis and (kaluza-klein or r-parity) == ellis and (r-parity or kaluza-klein)"""
+        self.assertEqual(sorted(perform_request_search(p='ellis and (kaluza-klein or r-parity)')),
+                         sorted(perform_request_search(p='ellis and (r-parity or kaluza-klein)')))
 
 
 class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
@@ -248,14 +258,11 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
             '',
             None)
 
-
-
         assert result_obtained == result_wanted, \
                                   """SPIRES parsed as %s instead of %s""" % \
                                   (repr(result_obtained), repr(result_wanted))
         return
 
-        #test operator searching
     def test_operators(self):
         """SPIRES search syntax - find a ellis and t shapes"""
         invenio_search = "author:ellis and title:shapes"
@@ -316,7 +323,6 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         spi_search = "find a klebanov, ig.r."
         self._compare_searches(inv_search, spi_search)
 
-
     def test_author_full_first(self):
         """SPIRES search syntax - find a ellis, john"""
         invenio_search = 'author:"ellis, john*" or exactauthor:"ellis, j" or exactauthor:"ellis, jo" or exactauthor:"ellis, joh"'
@@ -338,7 +344,6 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
     def test_irn_processing(self):
         """SPIRES search syntax - find irn 1360337 == find irn SPIRES-1360337"""
         # Added for trac-130
-        from invenio.search_engine import perform_request_search
         with_spires = "fin irn SPIRES-1360337"
         with_result = perform_request_search(p=with_spires)
         without_spires = "fin irn 1360337"
@@ -356,7 +361,6 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
     def test_fin_to_find_trans(self):
         """SPIRES search syntax - fin a ellis, j == find a ellis, j"""
-        from invenio.search_engine import perform_request_search
         fin_search = "fin a ellis, j"
         fin_result = perform_request_search(p=fin_search)
         find_search = "find a ellis, j"
@@ -428,4 +432,3 @@ TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser,
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
     #run_test_suite(make_test_suite(TestSearchQueryParenthesisedParser))
-
