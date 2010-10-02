@@ -190,10 +190,12 @@ def main():
  -d, --del                 delete words for selected records
  -S, --stat                show statistics for a method
 
- -R, --recalculate         recalculate weigth data, used by word frequency
+ -R, --recalculate         recalculate weight data, used by word frequency
                            and citation methods, should be used if ca 1%
-                           of the document has been changed since last
-                           time -R was used
+                           of the documents have been changed since last
+                           time -R was used.  NOTE: This will replace the
+                           entire set of weights, regardless of date/id
+                           selection.
 
  -E, --extcites=NUM        print the top entries of the external cites table.
                            These are entries that should be entered in
