@@ -61,11 +61,9 @@ from invenio.bibcirculation import perform_new_request, \
                                    perform_get_holdings_information, \
                                    perform_borrower_loans, \
                                    perform_loanshistoricaloverview, \
-                                   display_ill_form, \
                                    ill_register_request, \
                                    ill_request_with_recid, \
                                    ill_register_request_with_recid
-import datetime
 import time
 
 
@@ -248,6 +246,40 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
             'additional_comments': (str, None), 'only_edition': (str, 'No'),'ln': (str, "en")})
 
+        title = argd['title']
+        authors = argd['authors']
+        place = argd['place']
+        publisher = argd['publisher']
+        year = argd['year']
+        edition = argd['edition']
+        isbn = argd['isbn']
+        budget_code = argd['budget_code']
+        period_of_interest_from = argd['period_of_interest_from']
+        period_of_interest_to = argd['period_of_interest_to']
+        additional_comments = argd['additional_comments']
+        only_edition = argd['only_edition']
+        #key = argd['key']
+        string = argd['string']
+        borrower_id = argd['borrower_id']
+        ln = argd['ln']
+
+        if borrower_id == 'None':
+            borrower_id = None
+        else:
+            borrower_id = borrower_id.strip()
+
+        title = title.strip()
+        authors = authors.strip()
+        place = place.strip()
+        publisher = publisher.strip()
+        year = year.strip()
+        edition =  edition.strip()
+        isbn = isbn.strip()
+        budget_code = budget_code.strip()
+        period_of_interest_from = period_of_interest_from.strip()
+        period_of_interest_to = period_of_interest_to.strip()
+        string = string.strip()
+
         # Check if user is logged
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -261,9 +293,9 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                     'referer' : "%s/ill/book_request_step2%s" % (
                         CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})), norobot=True)
+                    "ln" : ln}, {})), norobot=True)
 
-        _ = gettext_set_language(argd['ln'])
+        _ = gettext_set_language(ln)
 
         user_info = collect_user_info(req)
         if not user_info['precached_useloans']:
@@ -274,15 +306,15 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         if borrower_id != ():
             borrower_id = borrower_id[0][0]
 
-            book_info = (argd['title'], argd['authors'], argd['place'], argd['publisher'],
-                         argd['year'], argd['edition'], argd['isbn'])
+            book_info = (title, authors, place, publisher,
+                         year, edition, isbn)
             user_info = db.get_borrower_data_by_id(borrower_id)
 
-            request_details = (argd['budget_code'], argd['period_of_interest_from'],
-                               argd['period_of_interest_to'], argd['additional_comments'],
-                               argd['only_edition'])
+            request_details = (budget_code, period_of_interest_from,
+                               period_of_interest_to, additional_comments,
+                               only_edition)
             body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(
-                                        book_info, user_info, request_details, False, argd['ln'])
+                                        book_info, user_info, request_details, False, ln)
 
         else:
             body = "wrong user id"
@@ -292,7 +324,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
                     uid         = uid,
                     lastupdated = __lastupdated__,
                     req         = req,
-                    language    = argd['ln'],
+                    language    = ln,
                     navmenuid   = "ill")
 
     def book_request_step3(self, req, form):
@@ -328,8 +360,8 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         ln = argd['ln']
 
         book_info = (title, authors, place, publisher, year, edition, isbn)
-        request_details = (budget_code, period_of_interest_from, period_of_interest_to,
-                            library_notes, only_edition)
+        #request_details = (budget_code, period_of_interest_from, period_of_interest_to,
+        #                    library_notes, only_edition)
 
         # Check if user is logged
         uid = getUid(req)
@@ -363,7 +395,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         ### budget_code ###
         db.ill_register_request_on_desk(borrower_id, book_info, period_of_interest_from,
                                     period_of_interest_to, 'new',
-                                    str(ill_request_notes), only_edition, 'book')
+                                    str(ill_request_notes), only_edition, 'book', budget_code)
 
         infos=[]
         infos.append('Interlibrary loan request done.')
@@ -434,10 +466,11 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 
         argd = wash_urlargd(form, {'periodical_title': (str, None), 'article_title': (str, None),
             'author': (str, None), 'report_number': (str, None), 'volume': (str, None),
-            'issue': (str, None), 'page': (str, None), 'year': (str, None), 'budget_code': (str, None),
-            'issn': (str, None), 'period_of_interest_from': (str, None),
-            'period_of_interest_to': (str, None), 'additional_comments': (str, None),
-            'key': (str, None), 'string': (str, None), 'ln': (str, "en")})
+            'issue': (str, None), 'page': (str, None), 'year': (str, None),
+            'budget_code': (str, None), 'issn': (str, None),
+            'period_of_interest_from': (str, None), 'period_of_interest_to': (str, None),
+            'additional_comments': (str, None), 'key': (str, None), 'string': (str, None),
+            'ln': (str, "en")})
 
         # Check if user is logged
         uid = getUid(req)
@@ -476,9 +509,9 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
 
             ### budget_code ###
             db.ill_register_request_on_desk(borrower_id, item_info,
-                                            argd['period_of_interest_from'],
-                                            argd['period_of_interest_to'], 'new',
-                                            str(ill_request_notes), 'No', 'article')
+                                    argd['period_of_interest_from'],
+                                    argd['period_of_interest_to'], 'new',
+                                    str(ill_request_notes), 'No', 'article', argd['budget_code'])
 
             infos=[]
             infos.append('Interlibrary loan request done.')
@@ -776,11 +809,17 @@ class WebInterfaceHoldingsPages(WebInterfaceDirectory):
 
         uid = getUid(req)
 
+        period_from = argd['period_from']
+        period_to = argd['period_to']
+        period_from = period_from.strip()
+        period_to = period_to.strip()
+        barcode = argd['barcode']
+
         body = perform_new_request_send(recid=self.recid,
                                         uid=uid,
                                         period_from=argd['period_from'],
                                         period_to=argd['period_to'],
-                                        barcode=argd['barcode'])
+                                        barcode=barcode)
 
         ln = CFG_SITE_LANG
         _ = gettext_set_language(ln)

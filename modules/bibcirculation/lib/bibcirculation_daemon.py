@@ -33,8 +33,8 @@ from invenio.bibtask import task_init, task_sleep_now_if_required, \
 from invenio.mailutils import send_email
 import invenio.bibcirculation_dblayer as db
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_TEMPLATES, \
-     CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, CFG_BIBCIRCULATION_LOANS_EMAIL
-from invenio.search_engine import get_fieldvalues
+                                          CFG_BIBCIRCULATION_LOANS_EMAIL
+
 from invenio.bibcirculation_utils import generate_email_body, book_title_from_MARC
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):

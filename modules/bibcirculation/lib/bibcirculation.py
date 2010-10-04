@@ -97,7 +97,7 @@ def perform_borrower_loans(uid, barcode, borrower_id,
         queue = db.get_queue_request(recid)
 
         if len(queue) != 0 and queue[0][0] != borrower_id:
-                infos.append("It is not possible to renew your loan for " \
+            infos.append("It is not possible to renew your loan for " \
                          "<strong>" + book_title_from_MARC(recid) + "</strong>. Another user " \
                          "is waiting for this book.")
         else:
@@ -238,14 +238,18 @@ def perform_new_request_send(uid, recid, period_from, period_to, barcode, ln=CFG
         status = 'waiting'
 
     user = collect_user_info(uid)
-    borrower = search_user('email',user['email'])
+    if CFG_CERN_SITE:
+        borrower = search_user('ccid',user['external_hidden_personid'])
+    else:
+        borrower = search_user('email',user['email'])
+
     if borrower != ():
         borrower = borrower[0]
         borrower_id = borrower[0]
         borrower_details = db.get_borrower_details(borrower_id)
-        (_id, ccid, name, email, phone, address, mailbox) = borrower_details
+        (_id, ccid, name, email, _phone, address, mailbox) = borrower_details
 
-        (title, year, author, isbn, publisher) = book_information_from_MARC(int(recid))
+        (title, year, author, isbn, publisher) = book_information_from_MARC(recid)
 
         req_id = db.new_hold_request(borrower_id, recid, barcode,
                                 period_from, period_to, status)
@@ -583,8 +587,8 @@ def display_ill_form(ln=CFG_SITE_LANG):
     return body
 
 def ill_register_request(uid, title, authors, place, publisher, year, edition,
-                         isbn, period_of_interest_from, period_of_interest_to,
-                         additional_comments, conditions, only_edition, request_type, ln=CFG_SITE_LANG):
+                isbn, period_of_interest_from, period_of_interest_to,
+                additional_comments, conditions, only_edition, request_type, ln=CFG_SITE_LANG):
     """
     Register new ILL request. Create new record (collection: ILL Books)
 

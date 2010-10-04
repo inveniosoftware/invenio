@@ -24,7 +24,6 @@ __revision__ = "$Id$"
 import invenio.bibcirculation_dblayer as db
 from invenio.search_engine import get_fieldvalues, get_field_tags
 from invenio.bibtask import task_low_level_submission
-from invenio.urlutils import create_html_link
 from invenio.textutils import encode_for_xml
 from invenio.config import CFG_SITE_URL, CFG_TMPDIR
 

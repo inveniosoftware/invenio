@@ -3514,12 +3514,13 @@ CREATE TABLE IF NOT EXISTS crcILLREQUEST (
   return_date datetime NOT NULL default '0000-00-00 00:00:00',
   status varchar(20) NOT NULL default '',
   cost varchar(30) NOT NULL default '',
+  budget_code varchar(60) NOT NULL default '',
   item_info text,
   request_type text,
   borrower_comments text,
   only_this_edition varchar(10) NOT NULL default '',
   library_notes text,
-  PRIMARY KEY  (id),
+  PRIMARY KEY (id),
   KEY id_crcborrower (id_crcBORROWER),
   KEY id_crclibrary (id_crcLIBRARY)
 ) TYPE=MyISAM;
@@ -3537,7 +3538,7 @@ CREATE TABLE IF NOT EXISTS crcITEM (
   creation_date datetime NOT NULL default '0000-00-00 00:00:00',
   modification_date datetime NOT NULL default '0000-00-00 00:00:00',
   number_of_requests int(3) unsigned NOT NULL default '0',
-  PRIMARY KEY  (barcode),
+  PRIMARY KEY (barcode),
   KEY id_bibrec (id_bibrec),
   KEY id_crclibrary (id_crcLIBRARY)
 ) TYPE=MyISAM;
@@ -3550,7 +3551,7 @@ CREATE TABLE IF NOT EXISTS crcLIBRARY (
   phone varchar(30) NOT NULL default '',
   type varchar(30) default NULL,
   notes text,
-  PRIMARY KEY  (id)
+  PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS crcLOAN (
@@ -3567,7 +3568,7 @@ CREATE TABLE IF NOT EXISTS crcLOAN (
   status varchar(20) NOT NULL default '',
   type varchar(20) NOT NULL default '',
   notes text,
-  PRIMARY KEY  (id),
+  PRIMARY KEY (id),
   KEY id_crcborrower (id_crcBORROWER),
   KEY id_bibrec (id_bibrec),
   KEY barcode (barcode)
@@ -3583,7 +3584,7 @@ CREATE TABLE IF NOT EXISTS crcLOANREQUEST (
   status varchar(20) NOT NULL default '',
   notes text,
   request_date datetime NOT NULL default '0000-00-00 00:00:00',
-  PRIMARY KEY  (id),
+  PRIMARY KEY (id),
   KEY id_crcborrower (id_crcBORROWER),
   KEY id_bibrec (id_bibrec),
   KEY barcode (barcode)
@@ -3598,7 +3599,7 @@ CREATE TABLE IF NOT EXISTS crcPURCHASE (
   price varchar(20) NOT NULL default '0',
   status varchar(20) NOT NULL default '',
   notes text,
-  PRIMARY KEY  (id),
+  PRIMARY KEY (id),
   KEY id_bibrec (id_bibrec),
   KEY id_crcVENDOR (id_crcVENDOR)
 ) TYPE=MyISAM;
@@ -3610,7 +3611,7 @@ CREATE TABLE IF NOT EXISTS crcVENDOR (
   email varchar(255) NOT NULL default '',
   phone varchar(30) NOT NULL default '',
   notes text,
-  PRIMARY KEY  (id)
+  PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
 -- BibExport tables:
@@ -3623,7 +3624,7 @@ CREATE TABLE IF NOT EXISTS expJOB (
   deleted mediumint(12) NOT NULL default '0',
   lastrun datetime NOT NULL default '0000-00-00 00:00:00',
   output_directory text,
-  PRIMARY KEY  (id),
+  PRIMARY KEY (id),
   UNIQUE KEY jobname (jobname)
 ) TYPE=MyISAM;
 
@@ -3634,13 +3635,13 @@ CREATE TABLE IF NOT EXISTS expQUERY (
   output_fields text NOT NULL,
   notes text,
   deleted mediumint(12) NOT NULL default '0',
-  PRIMARY KEY  (id)
+  PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expJOB_expQUERY (
   id_expJOB int(15) NOT NULL,
   id_expQUERY int(15) NOT NULL,
-  PRIMARY KEY  (id_expJOB,id_expQUERY),
+  PRIMARY KEY (id_expJOB,id_expQUERY),
   KEY id_expJOB (id_expJOB),
   KEY id_expQUERY (id_expQUERY)
 ) TYPE=MyISAM;
@@ -3651,7 +3652,7 @@ CREATE TABLE IF NOT EXISTS expQUERYRESULT (
   result text NOT NULL,
   status mediumint(12) NOT NULL default '0',
   status_message text NOT NULL,
-  PRIMARY KEY  (id)
+  PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expJOBRESULT (
@@ -3660,13 +3661,13 @@ CREATE TABLE IF NOT EXISTS expJOBRESULT (
   execution_time datetime NOT NULL default '0000-00-00 00:00:00',
   status mediumint(12) NOT NULL default '0',
   status_message text NOT NULL,
-  PRIMARY KEY  (id)
+  PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS expJOBRESULT_expQUERYRESULT (
   id_expJOBRESULT int(15) NOT NULL,
   id_expQUERYRESULT int(15) NOT NULL,
-  PRIMARY KEY  (id_expJOBRESULT, id_expQUERYRESULT),
+  PRIMARY KEY (id_expJOBRESULT, id_expQUERYRESULT),
   KEY id_expJOBRESULT (id_expJOBRESULT),
   KEY id_expQUERYRESULT (id_expQUERYRESULT)
 ) TYPE=MyISAM;
@@ -3674,7 +3675,7 @@ CREATE TABLE IF NOT EXISTS expJOBRESULT_expQUERYRESULT (
 CREATE TABLE IF NOT EXISTS user_expJOB (
   id_user int(15) NOT NULL,
   id_expJOB int(15) NOT NULL,
-  PRIMARY KEY  (id_user, id_expJOB),
+  PRIMARY KEY (id_user, id_expJOB),
   KEY id_user (id_user),
   KEY id_expJOB (id_expJOB)
 ) TYPE=MyISAM;

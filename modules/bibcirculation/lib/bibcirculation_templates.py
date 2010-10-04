@@ -25,8 +25,6 @@ import datetime
 import time
 import cgi
 
-import simplejson as json
-
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, \
      CFG_CERN_SITE, CFG_SITE_SECURE_URL
@@ -196,12 +194,11 @@ class Template:
         # verify if all copies are missing
         elif all_copies_are_missing(recid):
 
-            #ill_link = """<a href='%s/record/%s/holdings/ill_request_with_recid'>ILL services</a>""" % (CFG_SITE_URL, recid)
             ill_link = """<a href='%s/ill/book_request_step1'>ILL services</a>""" % CFG_SITE_URL
 
             out = """<div align="center"
                      <div class="bibcircinfoboxmsg">
-                      All the copies of <strong>%s</strong> are missing.You can request a copy using <strong>%s</strong>.
+                    All the copies of <strong>%s</strong> are missing.You can request a copy using <strong>%s</strong>.
                       </div>""" % (book_title_from_MARC(recid), ill_link)
 
             return out
@@ -988,11 +985,22 @@ class Template:
                     .tablesorterPager({container: $("#pager"), positionFixed: false});
             });
             </script>
+            <script type="text/javascript">
+                function confirmation(rqid) {
+                  var answer = confirm("Delete this request?")
+                  if (answer){
+                    window.location = "%s/admin2/bibcirculation/get_pending_requests?request_id="+rqid;
+                    }
+                  else{
+                    alert("Request not deleted.")
+                    }
+                 }
+            </script>
 
             <br />
 
             <div class="bibcircbottom">
-            """
+            """ % (CFG_SITE_URL)
 
         if len(result) == 0:
             out += """
@@ -1044,7 +1052,8 @@ class Template:
                               _("Request date"),
                               _("Actions"))
 
-            for (request_id, recid, name, borrower_id, library, location, date_from, date_to, request_date) in result:
+            for (request_id, recid, name, borrower_id, library, location,
+                 date_from, date_to, request_date) in result:
 
                 title_link = create_html_link(CFG_SITE_URL +
                                           '/admin2/bibcirculation/get_item_details',
@@ -1057,17 +1066,6 @@ class Template:
                                              (name))
 
                 out += """
-                <script type="text/javascript">
-                function confirmation() {
-                  var answer = confirm("Delete this request?")
-                  if (answer){
-                    window.location = "%s/admin2/bibcirculation/get_pending_requests?request_id=%s";
-                    }
-                  else{
-                    alert("Request not deleted.")
-                    }
-                 }
-                </script>
                 <tr>
                  <td width='150'>%s</td>
                  <td width='250'>%s</td>
@@ -1079,7 +1077,7 @@ class Template:
                  <td algin='center'>
                  <input type="button" value='%s' style="background: url(/img/dialog-cancel.png)
                  no-repeat; width: 75px; text-align: right;"
-                 onClick="confirmation()"
+                 onClick="confirmation(%s)"
                  onmouseover="this.className='bibcircbuttonover'" onmouseout="this.className='bibcircbutton'"
                  class="bibcircbutton">
 
@@ -1090,9 +1088,7 @@ class Template:
                  value='%s' class="bibcircbutton">
                  </td>
                 </tr>
-                """ % (CFG_SITE_URL,
-                       request_id,
-                       borrower_link,
+                """ % (borrower_link,
                        title_link,
                        library,
                        location,
@@ -1100,6 +1096,7 @@ class Template:
                        date_to,
                        request_date,
                        _("Delete"),
+                       request_id,
                        CFG_SITE_URL,
                        request_id,
                        recid,
@@ -1529,7 +1526,7 @@ class Template:
 
                """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)), _("There are %s requests on the book that has been returned." % len(result)))
 
-        (_book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (_book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -1762,7 +1759,10 @@ class Template:
                  </td>
                </tr>
                <tr align="center">
-                 <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
+                 <td>
+                    <input type="text" size="45" name="string"
+                           style='border: 1px solid #cfcfcf'>
+                 </td>
                </tr>
              </table>
         <br />
@@ -1822,8 +1822,10 @@ class Template:
             </td>
           </tr>
           <tr align="center">
-          <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
-                             </tr>
+            <td>
+                <input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'>
+            </td>
+          </tr>
         </table>
         <br />
         <table class="bibcirctable">
@@ -2022,15 +2024,16 @@ class Template:
                     </td>
                     </tr>
                     <tr>
-                    <td align="center">
-                    <input type="text" size="40" id="string" name="string"  value='%s' style='border: 1px solid #cfcfcf'>
-                    </td>
+                        <td align="center">
+                            <input type="text" size="40" id="string" name="string"
+                                   value='%s' style='border: 1px solid #cfcfcf'>
+                        </td>
                     </tr>
                     <tr>
-                    <td align="center">
-                    <br>
-                    <input type="submit" value="Search" class="formbutton">
-                    </td>
+                        <td align="center">
+                            <br>
+                            <input type="submit" value="Search" class="formbutton">
+                        </td>
                     </tr>
 
                    </table>
@@ -2424,7 +2427,7 @@ class Template:
         """
 
         (borrower_id, ccid, name, email, phone, address, mailbox) = borrower_info
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         _ = gettext_set_language(ln)
 
@@ -2790,7 +2793,8 @@ class Template:
 
         out += _MENU_
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author,
+                     book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             try:
@@ -3267,30 +3271,32 @@ class Template:
                                           {'recid': recid, 'ln': ln},
                                           (book_title_from_MARC(recid)))
 
-            out += """ <tr>
-                       <td>%s</td>
-                       <td>%s</td>
-                       <td>%s</td>
-                       <td>%s</td>
-                       <td>%s</td>
-                       <td>%s</td>
-                       <td>%s</td>
-                       <td>%s</td>
-                       <td>%s</td>
-                       </tr>
-                 """ % (title_link, barcode,
-                        library_name, location,
-                        loaned_on, due_date,
-                        returned_on, nb_renew,
-                        nb_overdueletters)
+                out += """ <tr>
+                           <td>%s</td>
+                           <td>%s</td>
+                           <td>%s</td>
+                           <td>%s</td>
+                           <td>%s</td>
+                           <td>%s</td>
+                           <td>%s</td>
+                           <td>%s</td>
+                           <td>%s</td>
+                           </tr>
+                     """ % (title_link, barcode,
+                            library_name, location,
+                            loaned_on, due_date,
+                            returned_on, nb_renew,
+                            nb_overdueletters)
 
         out += """
-           </table>
-           <br />
-           <table class="bibcirctable">
+            </table>
+            <br />
+            <table class="bibcirctable">
                 <tr>
-                     <td><input type=button value='%s'
-                          onClick="history.go(-1)" class="formbutton"></td>
+                    <td>
+                        <input type=button value='%s'
+                               onClick="history.go(-1)" class="formbutton">
+                    </td>
                 </tr>
            </table>
            <br />
@@ -3601,7 +3607,7 @@ class Template:
         return out
 
     def tmpl_merge_libraries_step1(self, library_details, library_items,
-                                         result, f, p, ln=CFG_SITE_LANG):
+                                         result, p, ln=CFG_SITE_LANG):
 
         _ = gettext_set_language(ln)
 
@@ -3922,6 +3928,10 @@ class Template:
                             </table>
                             <table class="tablesorter" border="0"
                                    cellpadding="0" cellspacing="1">
+                                <tr>
+                                    <th width="100">%s</th>
+                                    <td>%s</td>
+                                </tr>
                                 <tr>
                                     <th width="100">%s</th>
                                     <td>%s</td>
@@ -5240,7 +5250,7 @@ class Template:
         _ = gettext_set_language(ln)
 
 
-        (book_title, _book_year, _book_author, book_isbn, _book_editor) =  book_information_from_MARC(int(recid))
+        (book_title, _book_year, _book_author, book_isbn, _book_editor) =  book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover  = get_book_cover(book_isbn)
@@ -5263,7 +5273,8 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan" method="get" >
+            <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan"
+                  method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
             <input type=hidden name=request_id value=%s>
@@ -5328,7 +5339,9 @@ class Template:
             <th>%s</th>
           </tr>
           <tr>
-            <td><input type="text" size="66" name="barcode" style='border: 1px solid #cfcfcf'></td>
+            <td>
+                <input type="text" size="66" name="barcode" style='border: 1px solid #cfcfcf'>
+            </td>
           </tr>
         </table>
 
@@ -5607,61 +5620,71 @@ class Template:
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="%s" name="author">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="%s" name="author">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="%s" name="ean">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="%s" name="ean">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="%s" name="isbn">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="%s" name="isbn">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" size=45 style='border: 1px solid #cfcfcf' value="%s" name="publisher">
+                       <input type="text" size=45 style='border: 1px solid #cfcfcf'
+                              value="%s" name="publisher">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" size=45 style='border: 1px solid #cfcfcf' value="%s" name="pub_date">
+                       <input type="text" size=45 style='border: 1px solid #cfcfcf'
+                              value="%s" name="pub_date">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="" name="pub_place">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="" name="pub_place">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="%s" name="edition">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="%s" name="edition">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="%s" name="nb_pages">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="%s" name="nb_pages">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="%s" name="sub_library">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="%s" name="sub_library">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="" name="location">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="" name="location">
                      </td>
                      </tr>
                      <tr>
@@ -5675,19 +5698,22 @@ class Template:
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="" name="barcode">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="" name="barcode">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="" name="collection">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="" name="collection">
                      </td>
                      </tr>
                      <tr>
                      <td width="110">%s</td>
                      <td class="bibcirccontent">
-                       <input type="text" style='border: 1px solid #cfcfcf' size=45 value="" name="description">
+                       <input type="text" style='border: 1px solid #cfcfcf'
+                              size=45 value="" name="description">
                      </td>
                      </tr>
            </table>
@@ -7011,7 +7037,7 @@ class Template:
         out += _MENU_
 
         (book_title, book_year, book_author,
-                     book_isbn, book_editor) = book_information_from_MARC(int(recid))
+                     book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -7273,7 +7299,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        (barcode, library, library_name, location, collection,
+        (barcode, library, _library_name, location, collection,
          description, loan_period, status, expected_arrival_date, recid) = tup_infos
 
         out = """ """
@@ -7354,7 +7380,7 @@ class Template:
 
         return out
 
-    def tmpl_add_new_copy_step5(self, recid, ln=CFG_SITE_LANG):
+    def tmpl_add_new_copy_step5(self, infos, recid, ln=CFG_SITE_LANG):
         """
         @param recid: identify the record. Primary key of bibrec.
         @type recid: int
@@ -7371,7 +7397,9 @@ class Template:
 
         out += _MENU_
 
-        out += """
+        if infos == []:
+
+            out += """
             <div class="bibcircbottom">
               <br />
               <br />
@@ -7382,12 +7410,13 @@ class Template:
                 </table>
                 <br />
                 <table class="bibcirctable">
-                <tr>
-                  <td>
-                       <input type=button value='%s'
-                       onClick= onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'" class="formbutton">
-                  </td>
-                 </tr>
+                    <tr>
+                        <td>
+                            <input type=button value='%s'
+                            onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
+                            class="formbutton">
+                        </td>
+                    </tr>
                 </table>
                 <br />
                 <br />
@@ -7395,6 +7424,29 @@ class Template:
                 """ % (_("A %s has been added." % (item_link)),
                        _("Back to home"),
                        CFG_SITE_URL)
+
+        else:
+            out += """<br /> """
+            out += self.tmpl_infobox(infos, ln)
+            out += """
+            <div class="bibcircbottom">
+                <br />
+                <br />
+
+                <table class="bibcirctable">
+                    <tr>
+                        <td>
+                            <input type=button value='%s'
+                            onClick="location.href='%s/admin2/bibcirculation/get_item_details?ln=%s&recid=%s'"
+                            class="formbutton">
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <br />
+                </div>
+                """ % (_("Back to the record"),
+                       CFG_SITE_URL, ln, recid)
 
         return out
 
@@ -7525,7 +7577,7 @@ class Template:
         """
         out += _MENU_
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -7673,7 +7725,7 @@ class Template:
 
         out = _MENU_
 
-        (title, year, author, isbn, editor) = book_information_from_MARC(int(recid))
+        (title, year, author, isbn, editor) = book_information_from_MARC(recid)
 
         barcode = result[0]
         expected_arrival_date = db.get_expected_arrival_date(barcode)
@@ -8478,7 +8530,8 @@ class Template:
 
         out += _MENU_
 
-        (recid, barcode, loaned_on, due_date, loan_status, loan_period, item_status) = loan_details
+        (recid, barcode, loaned_on, due_date, loan_status,
+                                    loan_period, _item_status) = loan_details
         number_of_requests = db.get_number_requests_per_copy(barcode)
         if number_of_requests > 0:
             request_status = 'Yes'
@@ -9197,7 +9250,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -9339,7 +9392,8 @@ class Template:
                     </tr>
                     <tr>
                     <td align="center">
-                    <input type="text" size="40" id="string" name="string"  value='%s' style='border: 1px solid #cfcfcf'>
+                    <input type="text" size="40" id="string" name="string"
+                           value='%s' style='border: 1px solid #cfcfcf'>
                     </td>
                     </tr>
                     <tr>
@@ -9418,7 +9472,7 @@ class Template:
         @param ln: language of the page
         """
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -9666,7 +9720,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -9834,7 +9888,10 @@ class Template:
 
             """ % (CFG_SITE_URL, barcode)
 
-            for (borrower_id, ccid, name, email, phone, address, mailbox) in result:
+            for brw in result:
+                borrower_id = brw[0]
+                name = brw[2]
+                #(borrower_id, ccid, name, email, phone, address, mailbox)
                 out += """
                        <option value ="%s">%s
 
@@ -9883,7 +9940,7 @@ class Template:
         """
 
         (book_title, book_year, book_author, book_isbn,
-         book_editor) = book_information_from_MARC(int(recid))
+         book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -10089,7 +10146,7 @@ class Template:
         """
         out += _MENU_
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -10305,7 +10362,7 @@ class Template:
          order_date, expected_date, library_id, notes) = order_info
 
         (book_title, book_year, book_author,
-         book_isbn, book_editor) = book_information_from_MARC(int(recid))
+         book_isbn, book_editor) = book_information_from_MARC(recid)
 
         vendor_name = db.get_vendor_name(vendor_id)
         library_name = db.get_library_name(library_id)
@@ -10708,7 +10765,7 @@ class Template:
     #    """
     #    _ = gettext_set_language(ln)
     #
-    #    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+    #    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
     #
     #    if book_isbn:
     #        book_cover = get_book_cover(book_isbn)
@@ -10924,7 +10981,7 @@ class Template:
     #
     #    out += _MENU_
     #
-    #    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+    #    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
     #
     #    out += """
     #       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -11122,7 +11179,7 @@ class Template:
          notes, only_edition) = request_info
 
         (book_title, book_year, book_author,
-         book_isbn, book_editor) = book_information_from_MARC(int(recid))
+         book_isbn, book_editor) = book_information_from_MARC(recid)
 
         (borrower_id, ccid, name, email, phone, address, mailbox) = user_info
 
@@ -11316,7 +11373,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         today = datetime.date.today()
         within_six_months = (datetime.date.today() + datetime.timedelta(days=182)).strftime('%Y-%m-%d')
@@ -13632,11 +13689,13 @@ class Template:
         """
         out += _MENU_
 
-        (purchase_id, recid, vendor, order_date, expected_date, price, status, notes) = order_details
+        (purchase_id, recid, vendor, order_date, expected_date,
+                                           price, status, notes) = order_details
 
         purchase_notes = eval(notes)
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author,
+                      book_isbn, book_editor) = book_information_from_MARC(recid)
 
         (value, currency) = price.split()
 
@@ -13895,7 +13954,7 @@ class Template:
 
         vendor_name = db.get_vendor_name(vendor_id)
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
@@ -14941,7 +15000,14 @@ class Template:
                     <td class="bibcirctableheader">%s</td>
                   </tr>
                 </table>
+            """ % (_("Item details"))
+
+        if borrower_id not in (None,''):
+            out+="""
                 <input type=hidden name=borrower_id value=%s>
+            """ % (borrower_id)
+
+        out+= """
                 <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
                     <tr>
                         <th width="100">%s</th>
@@ -14990,8 +15056,7 @@ class Template:
 
            <br />
 
-           """  % (_("Item details"), borrower_id,
-                   _("Book title"),
+           """  % (_("Book title"),
                    _("Author(s)"),
                    _("Place"),
                    _("Publisher"),
@@ -15356,7 +15421,11 @@ class Template:
                         </td>
                     </tr>
                     </table>
-                    <input type=hidden name=request_details value='%s,%s,%s,%s,%s'>
+                    <input type=hidden name=budget_code value="%s">
+                    <input type=hidden name=period_of_interest_from value="%s">
+                    <input type=hidden name=period_of_interest_to value="%s">
+                    <input type=hidden name=additional_comments value="%s">
+                    <input type=hidden name=only_edition value="%s">
                     </form>
                     """ % (_("Select user"), budget_code,
                                             period_of_interest_from,
@@ -15544,7 +15613,8 @@ class Template:
                                   <input type=hidden name=borrower_id value="%s">
                                 </tr>
                             </table>
-                            <table class="tablesorter" width="200" border="0" cellpadding="0" cellspacing="1">
+                            <table class="tablesorter" width="200" border="0"
+                                    cellpadding="0" cellspacing="1">
                                 <tr>
                                  <th width="100">%s</th>
                                  <td>%s</td>
@@ -15581,142 +15651,6 @@ class Template:
                              _("Phone"), phone,
                              _("Address"), address,
                              _("Mailbox"), mailbox)
-
-
-        #out += """
-        #<style type="text/css"> @import url("/img/tablesorter.css"); </style>
-        #<div class=bibcircbottom align="center">
-        # <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step4" method="get" >
-        # <br />
-        #    <table class="bibcirctable">
-        #        <tr>
-        #            <td width="500" valign='top'>
-        #                <table>
-        #                  <tr align="center">
-        #                    <td class="bibcirctableheader">%s</td>
-        #                    <input type=hidden name=book_info value="%s">
-        #                  </tr>
-        #                </table>
-        #                <table class="tablesorterborrower" width:100%% border="0" cellpadding="0" cellspacing="1">
-        #                    <tr width:100%%>
-        #                      <th>%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="300">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="300">%s</th>
-        #                      <td width="300">%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                </table>
-        #    """ %(CFG_SITE_URL,
-        #                     _("Item details"), book_info,
-        #                     _("Name"), title,
-        #                     _("Author(s)"), authors,
-        #                     _("Place"), place,
-        #                     _("Year"), year,
-        #                     _("Publisher"), publisher,
-        #                     _("Edition"), edition,
-        #                     _("ISBN"), isbn,)
-        #out += """
-        #                <table>
-        #                    <tr align="center">
-        #                        <td class="bibcirctableheader">%s</td>
-        #                            <input type=hidden name=request_details value="%s">
-        #                    </tr>
-        #                </table>
-        #                <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                    <tr>
-        #                      <th width="100">%s</th>
-        #                      <td>%s</td>
-        #                    </tr>
-        #                </table>
-        #            </td>
-        #            <td width="200" align='center' valign='top'>
-        #               <table>
-        #                 <tr>
-        #                   <td>
-        #
-        #                   </td>
-        #                 </tr>
-        #               </table>
-        #             </td>
-        #            <td valign='top' align='center'>
-        #
-        #                    <table>
-        #                        <tr align="center">
-        #                          <td class="bibcirctableheader">%s</td>
-        #                          <input type=hidden name=user_info value="%s">
-        #                        </tr>
-        #                    </table>
-        #                    <table class="tablesorterborrower" border="0" cellpadding="0" cellspacing="1">
-        #                        <tr>
-        #                         <th width="100">%s</th>
-        #                         <td>%s</td>
-        #                        </tr>
-        #                        <tr>
-        #                         <th width="100">%s</th>
-        #                         <td>%s</td>
-        #                        </tr>
-        #                        <tr>
-        #                         <th width="100">%s</th>
-        #                         <td>%s</td>
-        #                        </tr>
-        #                        <tr>
-        #                         <th width="100">%s</th>
-        #                         <td>%s</td>
-        #                        </tr>
-        #                        <tr>
-        #                         <th width="100">%s</th>
-        #                         <td>%s</td>
-        #                        </tr>
-        #                    </table>
-        #
-        #            </td>
-        #        </tr>
-        #    </table>
-        #              """ % (
-        #                     _("ILL request details"), request_details,
-        #                     _("Period of interest - From"), period_of_interest_from,
-        #                     _("Period of interest - To"), period_of_interest_to,
-        #                     _("Additional comments"), additional_comments,
-        #                     _("Only this edition"), only_edition,
-        #                     _("Borrower details"), user_info,
-        #                     _("Name"), name,
-        #                     _("Email"), email,
-        #                     _("Phone"), phone,
-        #                     _("Address"), address,
-        #                     _("Mailbox"), mailbox)
 
         out += """<br />
                   <table class="bibcirctable">
@@ -16182,7 +16116,15 @@ class Template:
         <br />
         <input type=hidden name=start value="0">
         <input type=hidden name=end value="10">
-        <input type=hidden name=borrower_id value=%s>
+        """ % (CFG_SITE_URL, _("Check if the book already exists on CDS Invenio,"\
+                               + " before to send your ILL request."))
+
+        if borrower_id is not None:
+            out += """
+            <input type=hidden name=borrower_id value=%s>
+            """ % (borrower_id)
+
+        out += """
         <table class="bibcirctable">
           <tr align="center">
             <td class="bibcirctableheader">Search item by
@@ -16215,9 +16157,7 @@ class Template:
         </div>
         </form>
 
-        """ % (CFG_SITE_URL, _("Check if the book already exists on CDS Invenio,"\
-                               + " before to send your ILL request."), borrower_id,
-               _("Back"), _("Search"))
+        """ %(_("Back"), _("Search"))
 
         return out
 
@@ -16239,8 +16179,11 @@ class Template:
             <br />
             <div class="bibcircinfoboxmsg">%s</div>
             <br />
-            <input type=hidden name=borrower_id value=%s>
-            """ % (_("0 items found."), borrower_id)
+            """ % (_("0 items found."))
+            if borrower_id is not None:
+                out+= """
+                    <input type=hidden name=borrower_id value=%s>
+                """ % (borrower_id)
 
         else:
             out += """
@@ -16248,7 +16191,14 @@ class Template:
         <div class="bibcircbottom">
         <form name="search_form" action="%s/admin2/bibcirculation/register_ill_request_with_no_recid_step1" method="get" >
         <br />
+        """ % (CFG_SITE_URL)
+
+            if borrower_id is not None and borrower_id is not '':
+                out+= """
         <input type=hidden name=borrower_id value=%s>
+        """ % (borrower_id)
+
+            out+= """
         <table class="bibcirctable">
           <tr align="center">
             <td>
@@ -16267,7 +16217,7 @@ class Template:
             </tr>
           </thead>
           <tbody>
-        """ % (CFG_SITE_URL, borrower_id, len(result), _("Title"),
+        """ % (len(result), _("Title"),
                _("Author"), _("Publisher"),
                _("No. Copies"))
 
@@ -17387,7 +17337,7 @@ class Template:
 
         out = _MENU_
 
-        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
+        (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
         if book_isbn:
             book_cover = get_book_cover(book_isbn)
