@@ -822,3 +822,9 @@ def generate_email_body(template, loan_id):
 def create_item_details_url(recid, ln):
     url = '/admin2/bibcirculation/get_item_details?ln=%s&recid=%s' % (ln, str(recid))
     return CFG_SITE_URL+url
+
+def tag_all_requests_as_done(barcode, user_id):
+    recid = db.get_recid(barcode)
+    list_of_barcodes = db.get_barcodes(recid)
+    for bc in list_of_barcodes:
+        db.tag_requests_as_done(bc, user_id)

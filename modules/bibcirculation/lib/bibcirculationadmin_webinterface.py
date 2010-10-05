@@ -1676,7 +1676,8 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
         ln = argd['ln']
 
-        user_info = user_info.split(',')
+        if user_info is not None:
+            user_info = user_info.split(',')
 
         return bal.register_ill_request_with_no_recid_step3(req, title, authors, place,
                                                             publisher, year, edition, isbn,
@@ -1886,7 +1887,7 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'periodical_title': (str, ''), 'article_title': (str, ''),
                 'author': (str, ''), 'report_number': (str, ''), 'volume': (str, ''),
                 'issue': (str, ''), 'page': (str, ''), 'year': (str, ''), 'issn': (str, ''),
-                'user_info': (str, 'new_cpoy'), 'request_details': (str, '()'),
+                'user_info': (str, None), 'request_details': (str, '()'),
                 'ln': (str, "en")})
 
         periodical_title = argd['periodical_title']
@@ -1904,7 +1905,8 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
 
         request_details = request_details.split(',')
 
-        user_info = user_info.split(',')
+        if user_info is not None:
+            user_info = user_info.split(',')
 
         return bal.register_ill_article_request_step3(req, periodical_title, article_title,
                                         author, report_number, volume, issue, page, year, issn,

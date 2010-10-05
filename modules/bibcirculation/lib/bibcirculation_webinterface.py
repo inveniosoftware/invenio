@@ -29,8 +29,8 @@ from invenio.config import CFG_SITE_LANG, \
                            CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
-                           CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
-
+                           CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+                           CFG_CERN_SITE
 
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, \
                             collect_user_info
@@ -48,7 +48,7 @@ from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 import invenio.template
-webstyle_templates = invenio.template.load('webstyle')
+webstyle_templates  = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
 
 # bibcirculation imports
@@ -259,14 +259,14 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         additional_comments = argd['additional_comments']
         only_edition = argd['only_edition']
         #key = argd['key']
-        string = argd['string']
-        borrower_id = argd['borrower_id']
+        #string = argd['string']
+        #borrower_id = argd['borrower_id']
         ln = argd['ln']
 
-        if borrower_id == 'None':
-            borrower_id = None
-        else:
-            borrower_id = borrower_id.strip()
+        #if borrower_id == 'None':
+        #    borrower_id = None
+        #else:
+        #    borrower_id = borrower_id.strip()
 
         title = title.strip()
         authors = authors.strip()
@@ -278,7 +278,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
         budget_code = budget_code.strip()
         period_of_interest_from = period_of_interest_from.strip()
         period_of_interest_to = period_of_interest_to.strip()
-        string = string.strip()
+        #string = string.strip()
 
         # Check if user is logged
         uid = getUid(req)
@@ -302,7 +302,11 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../", \
                                        text = _("You are not authorized to use ill."))
 
-        borrower_id = search_user('email',user_info['email'])
+        if CFG_CERN_SITE:
+            borrower_id = search_user('ccid',user_info['external_hidden_personid'])
+        else:
+            borrower_id = search_user('email',user_info['email'])
+
         if borrower_id != ():
             borrower_id = borrower_id[0][0]
 

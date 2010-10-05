@@ -39,7 +39,8 @@ from invenio.mailutils import send_email
 from invenio.bibcirculation_utils import book_title_from_MARC, \
      book_information_from_MARC, \
      make_copy_available, \
-     create_ill_record, search_user
+     create_ill_record, search_user, \
+     tag_all_requests_as_done
      #book_information_from_MARC
 from invenio.bibcirculation_cern_ldap import get_user_info_from_ldap
 from invenio.bibcirculation_config import CFG_BIBCIRCULATION_LIBRARIAN_EMAIL, \
@@ -103,7 +104,7 @@ def perform_borrower_loans(uid, barcode, borrower_id,
         else:
             loan_id = db.get_current_loan_id(barcode)
             db.renew_loan(loan_id, new_due_date)
-            db.tag_requests_as_done(barcode, borrower_id)
+            tag_all_requests_as_done(barcode, borrower_id)
             #db.update_due_date(loan_id, new_due_date)
             infos.append("Your loan has been renewed with sucess.")
 
@@ -130,7 +131,7 @@ def perform_borrower_loans(uid, barcode, borrower_id,
             else:
                 loan_id = db.get_current_loan_id(bc)
                 db.renew_loan(loan_id, new_due_date)
-                db.tag_requests_as_done(barcode, borrower_id)
+                tag_all_requests_as_done(barcode, borrower_id)
                 #db.update_due_date_borrower(borrower_id, new_due_date)
 
         if infos == []:

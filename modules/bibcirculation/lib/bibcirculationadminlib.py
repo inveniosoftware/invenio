@@ -48,7 +48,8 @@ from invenio.bibcirculation_utils import book_title_from_MARC, \
       create_ill_record, \
       generate_email_body, \
       book_information_from_MARC, \
-      search_user
+      search_user, \
+      tag_all_requests_as_done
       #get_list_of_ILL_requests, \
       #create_item_details_url
 
@@ -140,10 +141,10 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
         body = bibcirculation_templates.tmpl_item_search_result(result=result, ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return page(title="Item search result",
                 uid=id_user,
@@ -170,10 +171,10 @@ def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
         infos.append(empty_barcode)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     body = bibcirculation_templates.tmpl_borrower_search(infos=infos, redirect=redirect, ln=ln)
 
@@ -215,10 +216,10 @@ def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG)
         result = search_user(column, string)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     if len(result) == 1:
         if redirect == 'no':
@@ -227,7 +228,9 @@ def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG)
             return create_new_request_step1(req, result[0][0])
             #return create_new_request_step1(req, borrower_id, p, f, search, ln)
     else:
-        body = bibcirculation_templates.tmpl_borrower_search_result(result=result, redirect=redirect, ln=ln)
+        body = bibcirculation_templates.tmpl_borrower_search_result(result=result,
+                                                                    redirect=redirect,
+                                                                    ln=ln)
 
         return page(title="Borrower search result",
                     uid=id_user,
@@ -242,10 +245,10 @@ def item_search(req, infos=[], ln=CFG_SITE_LANG):
     Display a form where is possible to searh for an item.
     """
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -772,7 +775,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
         db.new_loan(user_id, recid, barcode, loaned_on, due_date[i],
                     'on loan', 'normal', note_format)
 
-        db.tag_requests_as_done(barcode, user_id)
+        tag_all_requests_as_done(barcode, user_id)
         db.update_item_status('on loan', barcode)
 
     return redirect_to_url(req, '%s/admin2/bibcirculation/all_loans?msg=ok' % CFG_SITE_URL)
@@ -902,7 +905,7 @@ def register_new_loan(req, barcode, borrower_id,
 
         db.new_loan(borrower_id, recid, barcode,
                     loaned_on, due_date, 'on loan', 'normal', note_format)
-        db.tag_requests_as_done(barcode, borrower_id)
+        tag_all_requests_as_done(barcode, borrower_id)
 
         #requested_barcode = db.get_requested_barcode(request_id)
 
@@ -1076,7 +1079,8 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
 
     force_renew_link = create_html_link(CFG_SITE_URL +
                         '/admin2/bibcirculation/get_borrower_loans_details',
-                        {'barcode': barcode, 'borrower_id': borrower_id, 'loan_id': loan_id, 'force': 'true'},
+                        {'barcode': barcode, 'borrower_id': borrower_id,
+                         'loan_id': loan_id, 'force': 'true'},
                         ("Yes"))
 
     no_renew_link = create_html_link(CFG_SITE_URL +
@@ -1110,9 +1114,10 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
             new_due_date = renew_loan_for_X_days(barcode)
 
             force_renewall_link = create_html_link(CFG_SITE_URL +
-                                                   '/admin2/bibcirculation/get_borrower_loans_details',
-                                                   {'barcode': barcode, 'borrower_id': borrower_id, 'loan_id': loan_id, 'force': 'true'},
-                                                   ("Yes"))
+                                        '/admin2/bibcirculation/get_borrower_loans_details',
+                                        {'barcode': barcode, 'borrower_id': borrower_id,
+                                         'loan_id': loan_id, 'force': 'true'},
+                                            ("Yes"))
 
             if len(queue) != 0:
                 infos.append("Another user is waiting for this book <strong>"+ book_title_from_MARC(recid) +"</strong>. " \
@@ -1184,7 +1189,8 @@ def get_item_loans_details(req, recid, barcode, loan_id, force, ln=CFG_SITE_LANG
 
         force_renew_link = create_html_link(CFG_SITE_URL +
                         '/admin2/bibcirculation/get_item_loans_details',
-                        {'barcode': barcode, 'loan_id': loan_id, 'force': 'true', 'recid': recid},
+                        {'barcode': barcode, 'loan_id': loan_id, 'force': 'true',
+                         'recid': recid},
                         ("Yes"))
 
         no_renew_link = create_html_link(CFG_SITE_URL +
@@ -1289,7 +1295,9 @@ def get_item_req_historical_overview(req, recid, ln=CFG_SITE_LANG):
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    body = bibcirculation_templates.tmpl_get_item_req_historical_overview(req_hist_overview = req_hist_overview, ln=ln)
+    body = bibcirculation_templates.tmpl_get_item_req_historical_overview(
+                                                            req_hist_overview=req_hist_overview,
+                                                            ln=ln)
 
     return page(title="Requests - historical overview",
                 uid=id_user,
@@ -1319,8 +1327,9 @@ def get_item_loans_historical_overview(req, recid, ln=CFG_SITE_LANG):
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    body = bibcirculation_templates.tmpl_get_item_loans_historical_overview(loans_hist_overview = loans_hist_overview,
-                                                                        ln=ln)
+    body = bibcirculation_templates.tmpl_get_item_loans_historical_overview(
+                                                        loans_hist_overview=loans_hist_overview,
+                                                        ln=ln)
 
     return page(title="Loans - historical overview",
                 uid=id_user,
@@ -1708,10 +1717,10 @@ def all_loans(req, msg=None, ln=CFG_SITE_LANG):
     result = db.get_all_loans(20)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     body = bibcirculation_templates.tmpl_all_loans(result=result, infos=infos, ln=ln)
 
@@ -1771,10 +1780,10 @@ def all_expired_loans(req, ln=CFG_SITE_LANG):
     infos = []
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     body = bibcirculation_templates.tmpl_all_expired_loans(result=result, infos=infos, ln=ln)
 
@@ -1901,10 +1910,10 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
     borrower_notes = db.get_borrower_notes(borrower_id)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     body = bibcirculation_templates.tmpl_borrower_notes(borrower_notes=borrower_notes,
                                                         borrower_id=borrower_id,
@@ -1949,10 +1958,10 @@ def get_loans_notes(req, loan_id, delete_key,
     loans_notes = db.get_loan_notes(loan_id)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     referer = req.headers_in.get('referer')
 
@@ -3081,10 +3090,10 @@ def search_library_step2(req, column, string, ln=CFG_SITE_LANG):
 
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return page(title="Search library",
                 uid=id_user,
@@ -3123,10 +3132,10 @@ def get_library_notes(req, library_id, delete_key,
     lib_notes = db.get_library_notes(library_id)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     body = bibcirculation_templates.tmpl_library_notes(library_notes=lib_notes,
                                                        library_id=library_id,
@@ -3330,7 +3339,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
         due_date = renew_loan_for_X_days(barcode)
         db.new_loan(borrower_id, has_recid, barcode,
                     loaned_on, due_date, 'on loan', 'normal', notes_format)
-        db.tag_requests_as_done(barcode, borrower_id)
+        tag_all_requests_as_done(barcode, borrower_id)
         db.update_item_status('on loan', barcode)
         result = db.get_all_loans(20)
         title = "Current loans"
@@ -3445,10 +3454,10 @@ def create_new_request_step2(req, recid, borrower_id, ln=CFG_SITE_LANG):
 
     user_info = db.get_borrower_details(borrower_id)
 
-    body = bibcirculation_templates.tmpl_create_new_request_step2(user_info = user_info,
-                                                                  holdings_information = holdings_information,
-                                                                  recid=recid,
-                                                                  ln=ln)
+    body = bibcirculation_templates.tmpl_create_new_request_step2(user_info=user_info,
+                                                    holdings_information=holdings_information,
+                                                    recid=recid,
+                                                    ln=ln)
 
     return page(title="New request",
                 uid=id_user,
@@ -4055,7 +4064,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
                     loaned_on, due_date, 'on loan',
                     'normal', notes_format)
 
-        db.tag_requests_as_done(barcode, is_borrower)
+        tag_all_requests_as_done(barcode, is_borrower)
         db.update_item_status('on loan', barcode)
 
         title = "New loan"
@@ -4070,7 +4079,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
         db.new_loan(is_borrower, recid, barcode,
                     loaned_on, due_date, 'on loan',
                     'normal', notes_format)
-        db.tag_requests_as_done(barcode, is_borrower)
+        tag_all_requests_as_done(barcode, is_borrower)
         db.update_item_status('on loan', barcode)
 
         title = "New loan"
@@ -4079,10 +4088,10 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
                                                                ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return page(title=title,
                 uid=id_user,
@@ -4545,10 +4554,10 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status, ln=CF
                               '</a>' % (CFG_SITE_URL,)
 
     body = bibcirculation_templates.tmpl_ill_request_details_step1(ill_request_id=ill_request_id,
-                                                                   ill_request_details=ill_request_details,
-                                                                   libraries=libraries,
-                                                                   ill_request_borrower_details=ill_request_borrower_details,
-                                                                   ln=ln)
+                                    ill_request_details=ill_request_details,
+                                    libraries=libraries,
+                                    ill_request_borrower_details=ill_request_borrower_details,
+                                    ln=ln)
 
     return page(title="ILL request details",
                 uid=id_user,
@@ -5084,7 +5093,9 @@ def register_ill_request_with_no_recid_step1(req, borrower_id, ln=CFG_SITE_LANG)
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos, borrower_id=borrower_id, admin=True, ln=ln)
+    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step1(infos=infos,
+                                                                    borrower_id=borrower_id,
+                                                                    admin=True, ln=ln)
 
     return page(title="Register ILL request",
                 uid=id_user,
@@ -5182,7 +5193,7 @@ def register_ill_request_with_no_recid_step3(req, title, authors, place,
                                                 period_of_interest_from,
                                                 period_of_interest_to,
                                                 additional_comments,
-                                                only_edition, ln):
+                                                only_edition, ln=CFG_SITE_LANG):
 
     """
     """
@@ -5203,19 +5214,27 @@ def register_ill_request_with_no_recid_step3(req, title, authors, place,
 
     book_info = (title, authors, place, publisher, year, edition, isbn)
 
-    body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(
-                                                            book_info=book_info,
-                                                            user_info=user_info,
-                                                            request_details=request_details,
-                                                            admin=True,
-                                                            ln=ln)
+    if user_info is None:
+        return register_ill_request_with_no_recid_step2(req, title, authors, place,
+                            publisher, year, edition, isbn, budget_code, period_of_interest_from,
+                            period_of_interest_to, additional_comments,
+                            only_edition, 'name', None, None, ln)
 
-    return page(title="Register ILL request",
-                uid=id_user,
-                req=req,
-                body=body,
-                navtrail=navtrail_previous_links,
-                lastupdated=__lastupdated__)
+    else:
+
+        body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(
+                                                                book_info=book_info,
+                                                                user_info=user_info,
+                                                                request_details=request_details,
+                                                                admin=True,
+                                                                ln=ln)
+
+        return page(title="Register ILL request",
+                    uid=id_user,
+                    req=req,
+                    body=body,
+                    navtrail=navtrail_previous_links,
+                    lastupdated=__lastupdated__)
 
 def register_ill_request_with_no_recid_step4(req, book_info, borrower_id, request_details, ln):
 
@@ -5439,7 +5458,9 @@ def register_ill_book_request_result(req, borrower_id, p, f,  ln=CFG_SITE_LANG):
     infos = []
     if p == '':
         infos.append('Empty string. Please, try again.')
-        body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos, borrower_id=borrower_id,  ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos,
+                                                                       borrower_id=borrower_id,
+                                                                       ln=ln)
     else:
         if f == 'barcode':
             p = p.strip('\'" \t')
@@ -5447,21 +5468,29 @@ def register_ill_book_request_result(req, borrower_id, p, f,  ln=CFG_SITE_LANG):
 
             if has_recid is None:
                 infos.append('The barcode <strong>%s</strong> does not exist on BibCirculation database.' % p)
-                body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos, borrower_id=borrower_id, ln=ln)
+                body = bibcirculation_templates.tmpl_register_ill_book_request(infos=infos,
+                                                                        borrower_id=borrower_id,
+                                                                        ln=ln)
             else:
-                body = bibcirculation_templates.tmpl_register_ill_book_request_result(result=has_recid, borrower_id=borrower_id, ln=ln)
+                body = bibcirculation_templates.tmpl_register_ill_book_request_result(
+                                                                    result=has_recid,
+                                                                    borrower_id=borrower_id,
+                                                                    ln=ln)
         else:
             result = perform_request_search(cc="Books", sc="1", p=p, f=f)
             if len(result) == 0:
                 return register_ill_request_with_no_recid_step1(req, borrower_id, ln)
             else:
-                body = bibcirculation_templates.tmpl_register_ill_book_request_result(result=result, borrower_id=borrower_id, ln=ln)
+                body = bibcirculation_templates.tmpl_register_ill_book_request_result(
+                                                                        result=result,
+                                                                        borrower_id=borrower_id,
+                                                                        ln=ln)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return page(title="Register ILL Book request",
                 uid=id_user,
@@ -5480,16 +5509,17 @@ def register_ill_book_request_from_borrower_page(req, borrower_id, ln=CFG_SITE_L
         return mustloginpage(req, auth_message)
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     infos = []
 
-    body = bibcirculation_templates.tmpl_register_ill_book_request_from_borrower_page(infos=infos,
-                                                                                      borrower_id=borrower_id,
-                                                                                      ln=ln)
+    body = bibcirculation_templates.tmpl_register_ill_book_request_from_borrower_page(
+                                                                        infos=infos,
+                                                                        borrower_id=borrower_id,
+                                                                        ln=ln)
 
     return page(title="Register ILL Book request",
                 uid=id_user,
@@ -5499,7 +5529,8 @@ def register_ill_book_request_from_borrower_page(req, borrower_id, ln=CFG_SITE_L
                 lastupdated=__lastupdated__)
 
 ### not used ###
-def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, ln=CFG_SITE_LANG):
+def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f,
+                                                             ln=CFG_SITE_LANG):
     """
     Search an item and return a list with all the possible results. To retrieve
     the information desired, we use the method 'perform_request_search' (from
@@ -5526,11 +5557,13 @@ def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, 
 
         if has_recid is None:
             infos.append('The barcode <strong>%s</strong> does not exist on BibCirculation database.' % p)
-            body = bibcirculation_templates.tmpl_register_ill_book_request_from_borrower_page(infos=infos, ln=ln)
+            body = bibcirculation_templates.tmpl_register_ill_book_request_from_borrower_page(
+                                                                            infos=infos, ln=ln)
         else:
-            body = bibcirculation_templates.tmpl_register_ill_book_request_from_borrower_page_result(result=has_recid,
-                                                                                                   borrower_id=borrower_id,
-                                                                                                     ln=ln)
+            body = bibcirculation_templates.tmpl_register_ill_book_request_from_borrower_page_result(
+                result=has_recid,
+                borrower_id=borrower_id,
+                ln=ln)
             #return get_item_details(req, has_recid, ln=ln)
     else:
         result = perform_request_search(cc="Books", sc="1", p=p, f=f)
@@ -5538,13 +5571,13 @@ def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f, 
             return register_ill_request_from_borrower_page_step1(req, borrower_id, ln)
         else:
             body = bibcirculation_templates.tmpl_register_ill_book_request_from_borrower_page_result(result=result,
-                                                                                                     borrower_id=borrower_id,
-                                                                                                     ln=ln)
+                                                          borrower_id=borrower_id,
+                                                          ln=ln)
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return page(title="Register ILL Book request",
                 uid=id_user,
@@ -5566,9 +5599,10 @@ def register_ill_request_from_borrower_page_step1(req, borrower_id, ln=CFG_SITE_
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
-    body = bibcirculation_templates.tmpl_register_ill_request_from_borrower_page_step1(infos=infos,
-                                                                                       borrower_id=borrower_id,
-                                                                                       ln=ln)
+    body = bibcirculation_templates.tmpl_register_ill_request_from_borrower_page_step1(
+                                                                        infos=infos,
+                                                                        borrower_id=borrower_id,
+                                                                        ln=ln)
 
     return page(title="Register ILL request",
                 uid=id_user,
@@ -5594,35 +5628,38 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id, title, autho
         infos.append("The given 'period_of_interest_from' <strong>%s</strong>" \
                      " is not a valid date or date format" % period_of_interest_from)
 
-        body = bibcirculation_templates.tmpl_register_ill_request_from_borrower_page_step1(infos=infos,
-                                                                                           borrower_id=borrower_id,
-                                                                                           ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_request_from_borrower_page_step1(
+                                                                        infos=infos,
+                                                                        borrower_id=borrower_id,
+                                                                        ln=ln)
 
     elif validate_date_format(period_of_interest_to) is False:
         infos.append("The given 'period_of_interest_to' <strong>%s</strong>" \
                      " is not a valid date or date format" % period_of_interest_to)
 
-        body = bibcirculation_templates.tmpl_register_ill_request_from_borrower_page_step1(infos=infos,
-                                                                                           borrower_id=borrower_id,
-                                                                                           ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_request_from_borrower_page_step1(
+                                                                        infos=infos,
+                                                                        borrower_id=borrower_id,
+                                                                        ln=ln)
     else:
         book_info = (title, authors, place, publisher, year, edition, isbn)
         user_info = db.get_borrower_details(borrower_id)
         request_details = (period_of_interest_from, period_of_interest_to,
                            additional_comments, only_edition)
 
-        body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(book_info=book_info,
-                                                                                  user_info=user_info,
-                                                                                  request_details=request_details,
-                                                                                  admin=True,
-                                                                                  ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_request_with_no_recid_step3(
+                                                                book_info=book_info,
+                                                                user_info=user_info,
+                                                                request_details=request_details,
+                                                                admin=True,
+                                                                ln=ln)
 
 
     navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return page(title="Register ILL request",
                 uid=id_user,
@@ -5676,19 +5713,20 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         request_details = (period_of_interest_from, period_of_interest_to, budget_code,
                            additional_comments)
 
-        body = bibcirculation_templates.tmpl_register_ill_article_request_step2(article_info=article_info,
-                                                                                request_details=request_details,
-                                                                                result=None,
-                                                                                key=key,
-                                                                                string=string,
-                                                                                infos=infos,
-                                                                                ln=ln)
+        body = bibcirculation_templates.tmpl_register_ill_article_request_step2(
+                                                                article_info=article_info,
+                                                                request_details=request_details,
+                                                                result=None,
+                                                                key=key,
+                                                                string=string,
+                                                                infos=infos,
+                                                                ln=ln)
 
         navtrail_previous_links = '<a class="navtrail" ' \
-                              'href="%s/help/admin">Admin Area' \
-                              '</a> &gt; <a class="navtrail" ' \
-                              'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
-                              '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
+                    'href="%s/help/admin">Admin Area' \
+                    '</a> &gt; <a class="navtrail" ' \
+                    'href="%s/admin2/bibcirculation/loan_on_desk_step1">Circulation Management' \
+                    '</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
         return page(title="Register ILL request",
                     uid=id_user,
@@ -5754,7 +5792,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
 
 def register_ill_article_request_step3(req, periodical_title, title, authors,
                                        report_number, volume, issue, page_number, year, issn,
-                                       user_info, request_details, ln):
+                                       user_info, request_details, ln=CFG_SITE_LANG):
 
     """
     """
@@ -5767,7 +5805,7 @@ def register_ill_article_request_step3(req, periodical_title, title, authors,
     volume = volume + ', '+ issue + ', '+ page_number
     info = (title, authors, "", "", year, "", issn)
 
-    create_ill_record(info)
+    #create_ill_record(info)
 
     item_info = {'periodical_title': periodical_title, 'title': title, 'authors': authors,
                  'place': "", 'publisher': "", 'year' : year,  'edition': "", 'issn' : issn,
@@ -5779,17 +5817,24 @@ def register_ill_article_request_step3(req, periodical_title, title, authors,
 
     only_edition = ""
 
-    (borrower_id, _ccid, _name, _email, _phone, _address, _mailbox) = user_info
+    if user_info is None:
+        return register_ill_article_request_step2(req, periodical_title, title, authors,
+                                       report_number, volume, issue, page_number, year,
+                                       budget_code, issn, period_of_interest_from,
+                                       period_of_interest_to,
+                                       library_notes, 'name', None, ln)
+    else:
+        (borrower_id, _ccid, _name, _email, _phone, _address, _mailbox) = user_info
 
-    ill_request_notes = {}
-    if library_notes:
-        ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
+        ill_request_notes = {}
+        if library_notes:
+            ill_request_notes[time.strftime("%Y-%m-%d %H:%M:%S")] = str(library_notes)
 
-    db.ill_register_request_on_desk(borrower_id, item_info, period_of_interest_from,
-                                    period_of_interest_to, 'new', str(ill_request_notes),
-                                    only_edition, 'article', budget_code)
+        db.ill_register_request_on_desk(borrower_id, item_info, period_of_interest_from,
+                                        period_of_interest_to, 'new', str(ill_request_notes),
+                                        only_edition, 'article', budget_code)
 
-    return list_ill_request(req, 'new', ln)
+        return list_ill_request(req, 'new', ln)
 
 def ill_search(req, ln=CFG_SITE_LANG):
     """
@@ -5955,8 +6000,6 @@ def delete_copy_step2(req, barcode, ln):
         infos.append(message)
         title="Item search"
         body = bibcirculation_templates.tmpl_item_search(infos=infos, ln=ln)
-
-
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \

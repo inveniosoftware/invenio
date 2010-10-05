@@ -2168,7 +2168,7 @@ def ill_register_request_on_desk(borrower_id, item_info, period_of_interest_from
 
     run_sql("""insert into crcILLREQUEST(id_crcBORROWER, period_of_interest_from,
                                     period_of_interest_to, status, item_info,
-                                    only_this_edition, library_notes, request_type, budget_code )
+                                    only_this_edition, library_notes, request_type, budget_code)
                            values (%s, %s, %s, %s, %s, %s, %s, %s, %s)""",
             (borrower_id, period_of_interest_from, period_of_interest_to, status,
              str(item_info), only_edition, notes, request_type, budget_code))
