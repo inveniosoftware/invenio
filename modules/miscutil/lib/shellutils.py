@@ -146,7 +146,7 @@ def run_shell_command(cmd, args=None, filename_out=None, filename_err=None):
     # return results:
     return cmd_exit_code, cmd_out, cmd_err
 
-def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, cwd=None, timeout=CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT):
+def run_process_with_timeout(args, filename_in=None, filename_out=None, filename_err=None, cwd=None, timeout=CFG_MISCUTIL_DEFAULT_PROCESS_TIMEOUT, shell=False):
     """
     Run a process capturing its output and killing it after a given timeout.
 
@@ -165,10 +165,12 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
         the process. If None, the process standard error will still be
         captured and returned.
     @type filename_err: string
-    @param timeout: the number of seconds after which the process is killed.
-    @type timeout: int
     @param cwd: the current working directory where to execute the process.
     @type cwd: string
+    @param timeout: the number of seconds after which the process is killed.
+    @type timeout: int
+    @param shell: specifies if this command should be called through the shell
+    @type shell: boolean
     @return: a tuple containing with the exit status, the captured output and
         the captured error.
     @rtype: tuple
@@ -221,7 +223,7 @@ def run_process_with_timeout(args, filename_in=None, filename_out=None, filename
         stderr = open(filename_err, 'w')
     else:
         stderr = None
-    the_process = Process(args, stdin=stdin, cwd=cwd)
+    the_process = Process(args, shell=shell, stdin=stdin, cwd=cwd)
     try:
         return with_timeout(timeout, call_the_process, the_process, stdout, stderr)
     except Timeout:
