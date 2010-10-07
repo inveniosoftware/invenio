@@ -1771,6 +1771,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
+        # FIXME: workaround for not having phrase index yet
+        if bsu_f == 'fulltext' and bsu_m != 'w' and of.startswith('h'):
+            print_warning(req, _("No phrase index available for fulltext yet, looking for word combination..."))
         #check that the user is allowed to search with this tag
         #if he/she tries it
         if bsu_f and len(bsu_f) > 1 and bsu_f[0].isdigit() and bsu_f[1].isdigit():
@@ -1976,6 +1979,9 @@ def search_unit(p, f=None, m=None):
         # we are doing search by the citation count
         set = search_unit_citedby(p)
     elif m == 'a' or m == 'r':
+        # FIXME: workaround for not having phrase index yet
+        if f == 'fulltext':
+            return search_pattern(None, p, f, 'w')
         # we are doing either phrase search or regexp search
         index_id = get_index_id_from_field(f)
         if index_id != 0:
@@ -2380,6 +2386,9 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     if p.startswith('%') and p.endswith('%'):
         p = p[1:-1] # fix for partial phrase
     index_id = get_index_id_from_field(f)
+    # FIXME: workaround for not having phrase index yet
+    if f == 'fulltext':
+        t = 'w'
     # special indexes:
     if f == 'refersto':
         return _("There are no records referring to %s.") % cgi.escape(p)
