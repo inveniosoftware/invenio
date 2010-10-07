@@ -727,7 +727,7 @@ class Template:
 
         today = datetime.date.today()
         out = """
-        <form name="request_form" action="%s/record/%s/holdings/send" method="get" >
+        <form name="request_form" action="%s/record/%s/holdings/send" method="post" >
         <div class="bibcirctableheader" align="center">%s</div>
         <br />
              <table class="bibcirctable_contents">
@@ -832,7 +832,7 @@ class Template:
         <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
-        <form name="request_form" action="%s/record/%s/holdings/send" method="get" >
+        <form name="request_form" action="%s/record/%s/holdings/send" method="post" >
         <br />
         <div align=center>
           <table class="bibcirctable_contents" align=center>
@@ -2229,7 +2229,8 @@ class Template:
             }while(datepicker != null);
             }
             </script>
-            <form name="step3_form" action="%s/admin2/bibcirculation/loan_on_desk_step4" method="get" >
+            <form name="step3_form" action="%s/admin2/bibcirculation/loan_on_desk_step4"
+                  method="post" >
               <br />
               <br />
               <input type=hidden name="list_of_barcodes" value="%s">
@@ -2538,7 +2539,7 @@ class Template:
         borrower_id = int(borrower_id[:-1])
 
         out += """
-        <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan" method="get" >
+        <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan" method="post" >
              <div class="bibcircbottom">
              <input type=hidden name=borrower_id value=%s>
              <br />
@@ -5274,7 +5275,7 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <form name="return_form" action="%s/admin2/bibcirculation/register_new_loan"
-                  method="get" >
+                  method="post" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
             <input type=hidden name=request_id value=%s>
@@ -5871,7 +5872,7 @@ class Template:
 
         out += """
             <div class="bibcircbottom">
-            <form name="add_new_borrower_step2_form" action="%s/admin2/bibcirculation/add_new_borrower_step3" method="get" >
+            <form name="add_new_borrower_step2_form" action="%s/admin2/bibcirculation/add_new_borrower_step3" method="post" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -8705,7 +8706,7 @@ class Template:
             id_string= _("CCID")
 
         out += """
-            <form name="create_new_loan_form1" action="%s/admin2/bibcirculation/create_new_loan_step2" method="get" >
+            <form name="create_new_loan_form1" action="%s/admin2/bibcirculation/create_new_loan_step2" method="post" >
             <div class="bibcircbottom">
             <input type=hidden name=borrower_id value=%s>
             <br />
@@ -9114,7 +9115,8 @@ class Template:
         <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
         <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
 
-        <form name="request_form" action="%s/admin2/bibcirculation/create_new_request_step4" method="get" >
+        <form name="request_form" action="%s/admin2/bibcirculation/create_new_request_step4"
+              method="post" >
         <div class="bibcircbottom">
         <br />
         <br />
@@ -9490,7 +9492,8 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom">
-            <form name="step2_form" action="%s/admin2/bibcirculation/place_new_request_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/place_new_request_step3"
+                  method="post" >
             <input type=hidden name=barcode value='%s'>
             <input type=hidden name=recid value='%s'>
             <input type=hidden name=user_info value="%s,%s,%s,%s,%s,%s,%s">
@@ -9958,7 +9961,8 @@ class Template:
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom">
-            <form name="step2_form" action="%s/admin2/bibcirculation/place_new_loan_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/place_new_loan_step3"
+                  method="post" >
             <input type=hidden name=barcode value='%s'>
             <input type=hidden name=recid value='%s'>
             <input type=hidden name=email value='%s'>
@@ -11198,7 +11202,8 @@ class Template:
         <div class=bibcircbottom align="center">
         <br />
         <br />
-         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_step3" method="get" >
+         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_request_step3"
+               method="post" >
                  <table>
                    <tr align="center">
                      <td class="bibcirctableheader">%s</td>
@@ -11381,7 +11386,7 @@ class Template:
         out += """
            <div align="center">
            <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="update_item_info_step4_form" action="%s/record/%s/holdings/ill_register_request_with_recid" method="get" >
+           <form name="update_item_info_step4_form" action="%s/record/%s/holdings/ill_register_request_with_recid" method="post" >
                 <table class="bibcirctable">
                   <tr align="center">
                     <td><h1 class="headline">%s</h1></td>
@@ -11562,7 +11567,7 @@ class Template:
     #    out += """
     #       <div align="center">
     #       <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-    #       <form name="display_ill_form" action="%s/ill/register_request" method="get">
+    #       <form name="display_ill_form" action="%s/ill/register_request" method="post">
     #            <table class="bibcirctable">
     #              <tr align="center">
     #                <td class="bibcirctableheader" width="10">%s</td>
@@ -15489,7 +15494,7 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-        <form name="step3_form1" action="%s" method="get" >
+        <form name="step3_form1" action="%s" method="post" >
         <br />
                 <table class="bibcirctable">
                   <tr>
@@ -16785,8 +16790,10 @@ class Template:
 
         if admin:
             form_url = CFG_SITE_URL+'/admin2/bibcirculation/register_ill_article_request_step2'
+            method = 'get'
         else:
             form_url = CFG_SITE_URL+'/ill/article_request_step2'
+            method = 'post'
 
         out = self.tmpl_infobox(infos, ln)
         if admin:
@@ -16799,7 +16806,11 @@ class Template:
           <br />
           <br />
           <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-           <form name="display_ill_form" action="%s" method="get">
+          """
+        out += """
+           <form name="display_ill_form" action="%s" method="%s">
+                """ % (form_url, method)
+        out += """
              <table class="bibcirctable">
                   <tr align="center">
                     <td class="bibcirctableheader" width="10">%s</td>
@@ -16871,8 +16882,7 @@ class Template:
 
            <br />
 
-           """  % (form_url,
-                   _("Article details"),
+           """  % (_("Article details"),
                    _("Periodical title"),
                    _("Article title"),
                    _("Author(s)"),
@@ -16888,8 +16898,10 @@ class Template:
         #conditions_link = """<a href="http://library.web.cern.ch/library/Library/ill_faq.html" target="_blank">conditions</a>"""
 
         out += """
-            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/ui.datepicker.min.js"></script>
 
              <table class="bibcirctable">
                 <tr align="center">
@@ -16902,49 +16914,59 @@ class Template:
                 <td>
                         <script type="text/javascript">
                             $(function(){
-                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                            $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                         showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                         buttonImageOnly: true});
                             });
                         </script>
-                        <input type="text" size="12" id="date_picker1" name="period_of_interest_from" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="text" size="12" id="date_picker1"
+                               name="period_of_interest_from" value="%s"
+                               style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
                 <tr>
-                <th width="150">%s</th>
-                <td>
+                    <th width="150">%s</th>
+                    <td>
                         <script type="text/javascript">
                             $(function(){
-                            $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                            $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
                             });
                         </script>
-                        <input type="text" size="12" id="date_picker2" name="period_of_interest_to" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="text" size="12" id="date_picker2"
+                               name="period_of_interest_to" value="%s"
+                               style='border: 1px solid #cfcfcf'>
                     </td>
                 </tr>
                 <tr>
                    <th valign="top" width="150">%s</th>
-                   <td><textarea name='additional_comments' rows="6" cols="30"
-                   style='border: 1px solid #cfcfcf'></textarea></td>
+                    <td>
+                        <textarea name='additional_comments' rows="6" cols="30"
+                                  style='border: 1px solid #cfcfcf'></textarea>
+                        </td>
                 </tr>
               </table>
               <br />
               <table class="bibcirctable">
                 <tr align="center">
-                  <td>
-                       <input type=button value=%s
-                        onClick="history.go(-1)" class="formbutton">
-
-                       <input type="submit"
-                       value=%s class="formbutton">
-
-                  </td>
-                 </tr>
-             </table>
-             </form>
-             <br />
-             <br />
-             </div>
+                    <td>
+                        <input type=button value=%s
+                               onClick="history.go(-1)" class="formbutton">
+                        <input type="submit"
+                               value=%s class="formbutton">
+                    </td>
+                </tr>
+              </table>
+              </form>
+              <br />
+              <br />
+              </div>
              """ % (CFG_SITE_URL,CFG_SITE_URL,_("ILL request details"),
-                    _("Period of interest - From"), CFG_SITE_URL, datetime.date.today().strftime('%Y-%m-%d'),
-                    _("Period of interest - To"), CFG_SITE_URL, (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
+                    _("Period of interest - From"), CFG_SITE_URL,
+                    datetime.date.today().strftime('%Y-%m-%d'),
+                    _("Period of interest - To"), CFG_SITE_URL,
+                    (datetime.date.today() + datetime.timedelta(days=365)).strftime('%Y-%m-%d'),
                     _("Additional comments"),
                     _("Back"), _("Continue"))
 
@@ -16988,7 +17010,9 @@ class Template:
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
         <div class="bibcircbottom">
-         <form name="step1_form1" action="%s/admin2/bibcirculation/register_ill_article_request_step2" method="get" >
+         <form name="step1_form1"
+               action="%s/admin2/bibcirculation/register_ill_article_request_step2"
+               method="get" >
         <br />
           <table class="bibcirctable">
                   <tr>
@@ -17166,7 +17190,7 @@ class Template:
         if result:
             out += """
             <br />
-            <form name="step1_form2" action="%s/admin2/bibcirculation/register_ill_article_request_step3" method="get" >
+            <form name="step1_form2" action="%s/admin2/bibcirculation/register_ill_article_request_step3" method="post" >
             <input type=hidden name=periodical_title value="%s">
             <input type=hidden name=article_title value="%s">
             <input type=hidden name=author value="%s">
