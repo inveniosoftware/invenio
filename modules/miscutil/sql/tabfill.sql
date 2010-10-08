@@ -53,6 +53,7 @@ INSERT INTO field VALUES (23,'date created','datecreated');
 INSERT INTO field VALUES (24,'date modified','datemodified');
 INSERT INTO field VALUES (25,'refers to','refersto');
 INSERT INTO field VALUES (26,'cited by','citedby');
+INSERT INTO field VALUES (27,'caption','caption');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
@@ -189,6 +190,7 @@ INSERT INTO field_tag VALUES (21,133,100);
 INSERT INTO field_tag VALUES (21,134,90);
 INSERT INTO field_tag VALUES (22,1,100);
 INSERT INTO field_tag VALUES (22,2,90);
+INSERT INTO field_tag VALUES (27,135,100);
 
 INSERT INTO format VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -345,6 +347,7 @@ INSERT INTO tag VALUES (131,'journal','909C4%');
 INSERT INTO tag VALUES (132,'collaboration','710__g');
 INSERT INTO tag VALUES (133,'first author affiliation','100__u');
 INSERT INTO tag VALUES (134,'additional author affiliation','700__u');
+INSERT INTO tag VALUES (135,'caption','8564_y');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '');
@@ -360,6 +363,7 @@ INSERT INTO idxINDEX VALUES (11,'journal','This index contains words/phrases fro
 INSERT INTO idxINDEX VALUES (12,'collaboration','This index contains words/phrases from collaboration name fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (13,'affiliation','This index contains words/phrases from institutional affiliation fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (14,'exactauthor','This index contains exact words/phrases from author fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (15,'caption','This index contains exact words/phrases from figure captions.','0000-00-00 00:00:00', '');
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
@@ -375,6 +379,7 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (11,19);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (12,20);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (13,21);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (14,22);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (15,27);
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');
