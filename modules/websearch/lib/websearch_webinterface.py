@@ -401,7 +401,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge']
+                'keywords', 'multiedit', 'merge', 'plots']
 
     #_exports.extend(output_formats)
 
@@ -410,15 +410,15 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.tab = tab
         self.format = format
 
-        self.export = self
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.usage = self
         self.references = self
-        self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.keywords = self
+        self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
+        self.plots = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
@@ -478,7 +478,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations', 'holdings', 'edit',
-                'keywords', 'multiedit', 'merge']
+                'keywords', 'multiedit', 'merge', 'plots']
 
     #_exports.extend(output_formats)
 
@@ -495,6 +495,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.keywords = self
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
+        self.plots = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
         self.merge = WebInterfaceMergePages(self.recid)
@@ -843,7 +844,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
                                'references', 'citations', 'holdings', 'edit',
-                               'keywords', 'multiedit', 'merge']:
+                               'keywords', 'multiedit', 'merge', 'plots']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

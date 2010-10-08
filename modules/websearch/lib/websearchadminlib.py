@@ -3377,7 +3377,8 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 5},
             'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 6},
             'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 7},
-            'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 8},
+            'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 8},
+            'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 9},
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
@@ -3425,6 +3426,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         ## collection-by-collection basis.
 
         # Disable fulltext if no file found
+        # FIXME: check non-Plot type
         if not CFG_INSPIRE_SITE:
             brd =  BibRecDocs(recID)
             if len(brd.list_bibdocs()) == 0:
@@ -3434,6 +3436,12 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         collection = run_sql("""select name from collection where id=%s""", (colID, ))
         if collection[0][0] != 'Books':
             tabs['holdings']['enabled'] = False
+
+        # Disable plots if no file found
+        # FIXME: check Plot type
+        brd =  BibRecDocs(recID)
+        if len(brd.list_bibdocs()) == 0:
+            tabs['plots']['enabled'] = False
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']

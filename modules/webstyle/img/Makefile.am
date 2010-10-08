@@ -228,6 +228,10 @@ img_DATA = add-small.png \
            wsignout.gif \
 	   compare.png
 
-EXTRA_DIST = $(img_DATA)
+tmpdir=$(localstatedir)/tmp
+
+tmp_DATA = plotextractor_dummy.png
+
+EXTRA_DIST = $(img_DATA) $(tmp_DATA)
 
 CLEANFILES = *~ *.tmp

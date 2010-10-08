@@ -92,6 +92,13 @@ def format(bfo, style, separator='; ', show_icons='no', focus_on_main_file='no')
         main_urls_keys = sort_alphanumerically(main_urls.keys())
         for descr in main_urls_keys:
             urls = main_urls[descr]
+            if re.match(r'^\d+\s', descr) and urls[0][2] == 'png':
+                # FIXME: we have probably hit a Plot (as link
+                # description looks like '0001 This is Caption'), so
+                # do not take it.  This test is not ideal, we should
+                # rather study doc type, and base ourselves on
+                # Main/Additional/Plot etc.
+                continue
             out += "<strong>%s:</strong> " % descr
             url_list = []
             ## FIXME: This is so ugly!

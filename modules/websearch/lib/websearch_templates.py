@@ -3196,15 +3196,20 @@ class Template:
         # sixthly, fulltext link:
         urls_z = get_fieldvalues(recID, "8564_z")
         urls_u = get_fieldvalues(recID, "8564_u")
-        for idx in range(0, len(urls_u)):
-            link_text = "URL"
-            try:
-                if urls_z[idx]:
-                    link_text = urls_z[idx]
-            except IndexError:
-                pass
-            out += """<p style="margin-left: 15%%; width: 70%%">
-            <small><strong>%s:</strong> <a href="%s">%s</a></small></p>""" % (link_text, urls_u[idx], urls_u[idx])
+        # we separate the fulltext links and image links
+        for url_u in urls_u:
+            if url_u.endswith('.png'):
+                continue
+            else:
+                link_text = "URL"
+                try:
+                    if urls_z[idx]:
+                        link_text = urls_z[idx]
+                except IndexError:
+                    pass
+                out += """<p style="margin-left: 15%%; width: 70%%">
+                <small><strong>%s:</strong> <a href="%s">%s</a></small></p>""" % (link_text, urls_u[idx], urls_u[idx])
+
         # print some white space at the end:
         out += "<br /><br />"
         return out
@@ -3275,6 +3280,14 @@ class Template:
         # fifthly, fulltext link:
         urls_z = get_fieldvalues(recID, "8564_z")
         urls_u = get_fieldvalues(recID, "8564_u")
+        # get rid of images
+        images = []
+        non_image_urls_u = []
+        for url_u in urls_u:
+            if url_u.endswith('.png'):
+                images.append(url_u)
+            else:
+                non_image_urls_u.append(url_u)
 
         ## unAPI identifier
         out = '<abbr class="unapi-id" title="%s"></abbr>\n' % recID
@@ -3284,9 +3297,10 @@ class Template:
                  dates = dates,
                  rns = rns,
                  abstracts = abstracts,
-                 urls_u = urls_u,
+                 urls_u = non_image_urls_u,
                  urls_z = urls_z,
                  ln=ln)
+
         return out
 
     def tmpl_print_record_brief_links(self, ln, recID, sf='', so='d', sp='', rm=''):
@@ -3596,6 +3610,68 @@ class Template:
         out += content
 
         return out
+
+    def tmpl_record_plots(self, recID, ln):
+        """
+          Displays little tables containing the images and captions contained in the specified document.
+
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+        """
+        from invenio.search_engine import get_record
+        from invenio.bibrecord import field_get_subfield_values
+        from invenio.bibrecord import record_get_field_instances
+        _ = gettext_set_language(ln)
+
+        out = ''
+
+        rec = get_record(recID)
+        flds = record_get_field_instances(rec, '856', '4')
+
+        images = []
+
+        for fld in flds:
+            image = field_get_subfield_values(fld, 'u')
+            caption = field_get_subfield_values(fld, 'y')
+
+            if type(image) == list and len(image) > 0:
+                image = image[0]
+            else:
+                continue
+            if type(caption) == list and len(caption) > 0:
+                caption = caption[0]
+            else:
+                continue
+
+            if not image.endswith('.png'):
+                # huh?
+                continue
+
+            if len(caption) >= 5:
+                images.append((int(caption[:5]), image, caption[5:]))
+            else:
+                # we don't have any idea of the order... just put it on
+                images.append(99999, image, caption)
+
+        images = sorted(images, key=lambda x: x[0])
+
+        for (index, image, caption) in images:
+            # let's put everything in nice little subtables with the image
+            # next to the caption
+            out = out + '<table width="95%" style="display: inline;">' +\
+                 '<tr><td width="66%"><a name="' + str(index) + '" ' +\
+                 'href="' + image + '">' +\
+                 '<img src="' + image + '" width="95%"/></a></td>' +\
+                 '<td width="33%">' + caption + '</td></tr>' +\
+                 '</table>'
+
+        out = out + '<br /><br />'
+
+        return out
+
 
     def tmpl_detailed_record_statistics(self, recID, ln,
                                         downloadsimilarity,

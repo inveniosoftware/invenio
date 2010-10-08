@@ -3568,6 +3568,17 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
 
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                             tabs, ln))
+                    elif tab == 'plots':
+                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                                                                                   tabs,
+                                                                                   ln))
+                        content = websearch_templates.tmpl_record_plots(
+                                                        recID=recIDs[irec],
+                                                        ln=ln)
+                        req.write(content)
+                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                                                                                      tabs,
+                                                                                      ln))
                     else:
                         # Metadata tab
                         req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
@@ -3863,6 +3874,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                 out += "        <subject>%s</subject>\n" % encode_for_xml(f)
 
             for f in get_fieldvalues(recID, "8564_u"):
+                if f.split('.') == 'png':
+                    continue
                 out += "        <identifier>%s</identifier>\n" % encode_for_xml(f)
 
             for f in get_fieldvalues(recID, "520__a"):

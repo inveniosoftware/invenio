@@ -130,6 +130,9 @@ def format(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes'
         out += '<small class="detailedRecordActions">%s:</small>%s' % (external_link, separator)
         url_list = []
         for url, descr in others_urls:
+            # we don't need to show the plot links here, and all are pngs.
+            if url.find('.png') > -1:
+                continue
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
         out += '<small>' + separator.join(url_list) + '</small>'
     if out.endswith('<br />'):
