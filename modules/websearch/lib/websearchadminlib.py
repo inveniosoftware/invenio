@@ -3437,10 +3437,9 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         if collection[0][0] != 'Books':
             tabs['holdings']['enabled'] = False
 
-        # Disable plots if no file found
-        # FIXME: check Plot type
+        # Disable Plots tab if no docfile of doctype Plot found
         brd =  BibRecDocs(recID)
-        if len(brd.list_bibdocs()) == 0:
+        if len(brd.list_bibdocs('Plot')) == 0:
             tabs['plots']['enabled'] = False
 
     tabs[''] = tabs['metadata']
