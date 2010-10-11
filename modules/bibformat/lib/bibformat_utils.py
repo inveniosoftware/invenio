@@ -33,7 +33,8 @@ import zlib
 from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_WEBSEARCH_FULLTEXT_SNIPPETS, \
-     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS
+     CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS, \
+     CFG_INSPIRE_SITE
 from invenio.dbquery import run_sql
 from invenio.urlutils import string_to_numeric_char_reference
 from invenio.textutils import encode_for_xml
@@ -553,7 +554,6 @@ def latex_to_html(text):
 def get_pdf_snippets(recID, patterns,
                      nb_words_around=CFG_WEBSEARCH_FULLTEXT_SNIPPETS_WORDS,
                      max_snippets=CFG_WEBSEARCH_FULLTEXT_SNIPPETS):
-
     """
     Extract text snippets around 'patterns' from the newest PDF file of 'recID'
     The search is case-insensitive.
@@ -569,6 +569,8 @@ def get_pdf_snippets(recID, patterns,
         if bd.get_text():
             text_path = bd.get_text_path()
             text_path_courtesy = bd.get_status()
+            if not text_path_courtesy and CFG_INSPIRE_SITE:
+                text_path_courtesy = bd.get_type()
             break # stop at the first good PDF textable file
 
     if text_path:
