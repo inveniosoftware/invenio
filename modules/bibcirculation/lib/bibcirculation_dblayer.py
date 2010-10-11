@@ -2261,6 +2261,20 @@ def get_ill_request_details(ill_request_id):
     else:
         return None
 
+def get_ill_request_type(ill_request_id):
+
+    """
+    """
+
+    res = run_sql("""SELECT request_type
+                       FROM crcILLREQUEST
+                      WHERE id=%s""", (ill_request_id, ))
+
+    if res:
+        return res[0][0]
+    else:
+        return None
+
 #def get_ill_borrower_request(ill_request_id)
 def get_ill_request_borrower_details(ill_request_id):
     """
@@ -2649,6 +2663,14 @@ def update_ill_request_notes(ill_request_id, library_notes):
     run_sql("""UPDATE crcILLREQUEST
                   SET library_notes=%s
                 WHERE id=%s""", (str(library_notes), ill_request_id))
+
+def update_ill_request_item_info(ill_request_id, item_info):
+    """
+    """
+
+    run_sql("""UPDATE crcILLREQUEST
+                  SET item_info=%s
+                WHERE id=%s""", (str(item_info), ill_request_id))
 
 def get_ill_borrower(ill_request_id):
     """

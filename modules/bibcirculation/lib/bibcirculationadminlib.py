@@ -4570,7 +4570,8 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status, ln=CF
 
 def ill_request_details_step2(req, delete_key, ill_request_id, new_status, library_id,
                               request_date, expected_date, arrival_date, due_date, return_date,
-                              cost, currency, barcode, library_notes, ln=CFG_SITE_LANG):
+                              cost, currency, barcode, library_notes,
+                              book_info, article_info, ln=CFG_SITE_LANG):
     """
     """
     #id_user = getUid(req)
@@ -4613,6 +4614,13 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status, libra
     db.update_ill_request(ill_request_id, library_id, request_date, expected_date,
                           arrival_date, due_date, return_date, new_status, cost_format, barcode,
                           str(library_previous_notes))
+
+    request_type = db.get_ill_request_type(ill_request_id)
+    if request_type == 'book':
+        item_info = book_info
+    else:
+        item_info = article_info
+    db.update_ill_request_item_info(ill_request_id, item_info)
 
     return list_ill_request(req,new_status,ln)
 

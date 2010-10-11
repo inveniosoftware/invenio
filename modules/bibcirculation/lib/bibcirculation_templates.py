@@ -11851,8 +11851,10 @@ class Template:
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <script type="text/javascript" language='JavaScript' src="%s/js/jquery.min.js"></script>
-            <script type="text/javascript" language='JavaScript' src="%s/js/ui.datepicker.min.js"></script>
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/jquery.min.js"></script>
+            <script type="text/javascript" language='JavaScript'
+                    src="%s/js/ui.datepicker.min.js"></script>
             """% (CFG_SITE_URL, CFG_SITE_URL)
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
@@ -11878,19 +11880,22 @@ class Template:
         item_info = eval(item_info)
 
         today = datetime.date.today()
-        within_a_week  = (datetime.date.today() + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
-        within_a_month = (datetime.date.today() + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
+        within_a_week  = (datetime.date.today()
+                          + datetime.timedelta(days=7)).strftime('%Y-%m-%d')
+        within_a_month = (datetime.date.today()
+                          + datetime.timedelta(days=30)).strftime('%Y-%m-%d')
 
 
         notes=''
         for key in key_array:
             delete_note = create_html_link(CFG_SITE_URL +
-                                           '/admin2/bibcirculation/ill_request_details_step1',
-                                           {'delete_key': key, 'ill_request_id': ill_request_id, 'ln': ln},
-                                           (_("[delete]")))
+                                '/admin2/bibcirculation/ill_request_details_step1',
+                                {'delete_key': key, 'ill_request_id': ill_request_id, 'ln': ln},
+                                (_("[delete]")))
 
             notes += """<tr class="bibcirccontent">
-                            <td class="bibcircnotes" width="160" valign="top" align="center"><b>%s</b></td>
+                            <td class="bibcircnotes" width="160" valign="top"
+                                align="center"><b>%s</b></td>
                             <td width="400"><i>%s</i></td>
                             <td width="65" align="center">%s</td>
                         </tr>
@@ -11903,7 +11908,8 @@ class Template:
             library_name = '-'
 
         try:
-            (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(item_info['recid']))
+            (book_title, book_year, book_author,
+             book_isbn, book_editor) = book_information_from_MARC(int(item_info['recid']))
 
             if book_isbn:
                 book_cover = get_book_cover(book_isbn)
@@ -11911,7 +11917,8 @@ class Template:
                 book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
             out += """
-            <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
+            <form name="ill_req_form"
+                  action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=ill_request_id value=%s>
                 <br />
@@ -11946,7 +11953,9 @@ class Template:
                      </tr>
                     </table>
                    </td>
-                   <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                   <td class="bibcirccontent">
+                       <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                   </td>
                  </tr>
               </table>
               <br />
@@ -11974,7 +11983,8 @@ class Template:
             if str(request_type) == 'book':
                 out += """
                 <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-                <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
+                <form name="ill_req_form"
+                      action="%s/admin2/bibcirculation/ill_request_details_step2" method="get">
                    <div class="bibcircbottom">
                    <input type=hidden name=ill_request_id value=%s>
                     <br />
@@ -11989,64 +11999,81 @@ class Template:
                         <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='title' rows="2"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='authors' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
-                             </tr>
-                         <tr>
-                            <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='place' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='publisher' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='year' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='edition' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                          <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='isbn' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                         </table>
                       </td>
-                        <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                        <td class="bibcirccontent">
+                            <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                        </td>
                       </tr>
                   </table>
                   <br />
-
-                  """  % (CFG_SITE_URL,
-                          ill_request_id,
+                  """  % (CFG_SITE_URL, ill_request_id,
                           _("Item details"),
-                          _("Title"),
-                          item_info['title'],
-                          _("Author(s)"),
-                          item_info['authors'],
-                          _("Place"),
-                          item_info['place'],
-                          _("Publisher"),
-                          item_info['publisher'],
-                          _("Year"),
-                          item_info['year'],
-                          _("Edition"),
-                          item_info['edition'],
-                          _("ISBN"),
-                          item_info['isbn'],
+                          _("Title"),     item_info['title'],
+                          _("Author(s)"), item_info['authors'],
+                          _("Place"),     item_info['place'],
+                          _("Publisher"), item_info['publisher'],
+                          _("Year"),      item_info['year'],
+                          _("Edition"),   item_info['edition'],
+                          _("ISBN"),      item_info['isbn'],
                           str(book_cover))
 
             # for articles
             elif str(request_type) == 'article':
 
+                (volume, issue, page) = item_info['volume'].split(',')
+
                 out += """
                 <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-                <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
+                <form name="ill_req_form"
+                      action="%s/admin2/bibcirculation/ill_request_details_step2" method="get" >
                    <div class="bibcircbottom">
                    <input type=hidden name=ill_request_id value=%s>
                     <br />
@@ -12061,65 +12088,99 @@ class Template:
                         <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='periodical_title' rows="2"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='title' rows="2"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
-                             </tr>
-                         <tr>
-                            <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='authors' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='volume' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='issue' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='page' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>%s</td>
+                            <td>
+                                <textarea name='issn' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='place' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='publisher' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                         </tr>
+                         <tr>
+                            <th width="100">%s</th>
+                            <td>
+                                <textarea name='year' rows="1"
+                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
                          </tr>
                         </table>
                       </td>
-                        <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                      <td class="bibcirccontent">
+                        <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                      </td>
                       </tr>
                   </table>
                   <br />
-
                   """  % (CFG_SITE_URL,
                           ill_request_id,
                           _("Item details"),
-                          _("Periodical Title"),
-                          item_info['periodical_title'],
-                          _("Article Title"),
-                          item_info['title'],
-                          _("Author(s)"),
-                          item_info['authors'],
-                          _("Volume, Issue, Page"),
-                          item_info['volume'],
-                          _("ISSN"),
-                          item_info['issn'],
-                          _("Place"),
-                          item_info['place'],
-                          _("Publisher"),
-                          item_info['publisher'],
-                          _("Year"),
-                          item_info['year'],
+                          _("Periodical Title"),item_info['periodical_title'],
+                          _("Article Title"),   item_info['title'],
+                          _("Author(s)"),       item_info['authors'],
+                          _("Volume"),          volume,
+                          _("Issue"),           issue,
+                          _("Page"),            page,
+                          _("ISSN"),            item_info['issn'],
+                          _("Place"),           item_info['place'],
+                          _("Publisher"),       item_info['publisher'],
+                          _("Year"),            item_info['year'],
                           str(book_cover))
+
             else:
-                out+= """aqui falta algo, no?"""
+                out += """aqui falta algo, no?"""
 
         out += """
         <table class="bibcirctable">
@@ -12187,17 +12248,18 @@ class Template:
                                 <input type=hidden name=new_status value="new">
                               <th width="100">%s</th>
                               <td>
-                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
+                                <select style='border: 1px solid #cfcfcf'
+                                onchange="location = this.options[this.selectedIndex].value;">
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
                                     New
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
                                     Requested
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
                                     On loan
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
                                     Returned
                                   </option>
                                 </select>
@@ -12210,8 +12272,11 @@ class Template:
                             <tr>
                               <th width="100" valign="top">%s</th>
                               <td>
-                                <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
-                                                                    ill_request_id, ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
+                                <table class="bibcircnotes">
+                        """ % (_("Status"), ill_request_id, ill_request_id, ill_request_id,
+                           ill_request_id, _("ILL request ID"), ill_request_id,
+                           _("Previous notes"))
+
             if request_type == 'article':
                 out += """
                       <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
@@ -12219,14 +12284,15 @@ class Template:
                             <input type=hidden name=new_status value="new">
                           <th width="100">%s</th>
                           <td>
-                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
+                            <select style='border: 1px solid #cfcfcf'
+                                 onchange="location = this.options[this.selectedIndex].value;">
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
                                 New
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
                                 Requested
                               </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
                                 Received
                               </option>
                             </select>
@@ -12239,8 +12305,9 @@ class Template:
                         <tr>
                           <th width="100" valign="top">%s</th>
                           <td>
-                            <table class="bibcircnotes"> """ % (_("Status"), ill_request_id, ill_request_id,
-                                                                ill_request_id, _("ILL request ID"), ill_request_id, _("Previous notes"))
+                            <table class="bibcircnotes"> """ % (_("Status"), ill_request_id,
+                                        ill_request_id, ill_request_id,
+                                        _("ILL request ID"), ill_request_id, _("Previous notes"))
 
 
             out += notes
@@ -12251,7 +12318,11 @@ class Template:
                         </tr>
                         <tr>
                           <th valign="top" width="100">%s</th>
-                          <td><textarea name='library_notes' rows="6" cols="74" style='border: 1px solid #cfcfcf'></textarea></td>
+                          <td>
+                            <textarea name='library_notes' rows="6" cols="74"
+                                      style='border: 1px solid #cfcfcf'>
+                            </textarea>
+                          </td>
                         </tr>
                       </table>
                     </td>
@@ -12270,17 +12341,18 @@ class Template:
                             <input type=hidden name=new_status value="requested">
                               <th width="150">%s</th>
                               <td class="bibcirccontent">
-                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
+                                <select style='border: 1px solid #cfcfcf'
+                                onchange="location = this.options[this.selectedIndex].value;">
+                    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
                                     New
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
+    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
                                     Requested
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
+                <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
                                     On loan
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
+                <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
                                     Returned
                                   </option>
                                 </select>
@@ -12296,8 +12368,9 @@ class Template:
                                 <select name="library_id"  style='border: 1px solid #cfcfcf'>
 
                             """ % (_("Status"), ill_request_id, ill_request_id,
-                                   ill_request_id, ill_request_id, _("ILL request ID"), ill_request_id,
-                                   _("Library/Supplier"))
+                                    ill_request_id, ill_request_id, _("ILL request ID"),
+                                    ill_request_id, _("Library/Supplier"))
+
             if request_type == 'article':
                 out += """
                           <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
@@ -12305,14 +12378,15 @@ class Template:
                             <input type=hidden name=new_status value="requested">
                               <th width="150">%s</th>
                               <td class="bibcirccontent">
-                                <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
+                                <select style='border: 1px solid #cfcfcf'
+                                onchange="location = this.options[this.selectedIndex].value;">
+    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
                                     New
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
+    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
                                     Requested
                                   </option>
-                                  <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
+    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
                                     Received
                                   </option>
                                 </select>
@@ -12344,10 +12418,13 @@ class Template:
 
                         <script type="text/javascript">
                              $(function(){
-                                 $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                                 $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                   showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                   buttonImageOnly: true});
                              });
                         </script>
-                        <input type="text" size="10" id="date_picker1" name="request_date" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="text" size="10" id="date_picker1"
+                               name="request_date" value="%s" style='border: 1px solid #cfcfcf'>
 
                       </td>
                     </tr>
@@ -12842,7 +12919,8 @@ class Template:
         return out
 
 
-    def tmpl_ill_request_details_step2(self, ill_req_details, request_info, ill_status, ill_request_borrower_details, ln=CFG_SITE_LANG):
+    def tmpl_ill_request_details_step2(self, ill_req_details, request_info, ill_status,
+                                             ill_request_borrower_details, ln=CFG_SITE_LANG):
         """
         @param ill_req_details: informations about a given ILL request
         @type ill_req_details: tuple
@@ -12861,13 +12939,14 @@ class Template:
 
         out = _MENU_
 
-        (_borrower_id, borrower_name, borrower_email, borrower_mailbox,
-         period_from, period_to, book_info, borrower_comments, only_this_edition) = ill_request_borrower_details
+        (_borrower_id, borrower_name, borrower_email, borrower_mailbox, period_from, period_to,
+         book_info, borrower_comments, only_this_edition) = ill_request_borrower_details
 
         book_info = eval(book_info)
 
         try:
-            (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(book_info['recid']))
+            (book_title, book_year, book_author,
+             book_isbn, book_editor) = book_information_from_MARC(int(book_info['recid']))
 
             if book_isbn:
                 book_cover = get_book_cover(book_isbn)
@@ -12876,7 +12955,8 @@ class Template:
 
             out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
+            <form name="ill_req_form"
+                  action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=request_info value="%s">
                 <br />
@@ -12911,7 +12991,8 @@ class Template:
                      </tr>
                      </table>
                      </td>
-                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
+                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf'
+                         src="%s" alt="Book Cover"/></td>
                      </tr>
               </table>
               <br />
@@ -12940,7 +13021,8 @@ class Template:
 
             out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="ill_req_form" action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
+            <form name="ill_req_form"
+                  action="%s/admin2/bibcirculation/ill_request_details_step3" method="get" >
             <div class="bibcircbottom">
             <input type=hidden name=request_info value="%s">
                 <br />

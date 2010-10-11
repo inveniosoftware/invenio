@@ -1311,7 +1311,13 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
             'new_status': (str, None), 'library_id': (str, None), 'request_date': (str, None),
             'expected_date': (str, None), 'arrival_date': (str, None), 'due_date': (str, None),
             'return_date': (str, None), 'cost': (str, None), 'currency': (str, None),
-            'barcode': (str, None), 'library_notes': (str, None), 'ln': (str, "en")})
+            'barcode': (str, None), 'library_notes': (str, None),
+            'title': (str, None), 'authors': (str, None), 'place': (str, None),
+            'publisher': (str, None), 'year': (str, None), 'edition': (str, None),
+            'isbn': (str, None),
+            'periodical_title': (str,None), 'volume': (str,''), 'issue': (str,''),
+            'page': (str,''), 'issn': (str,None),
+            'ln': (str, "en")})
 
         delete_key = argd['delete_key']
         ill_request_id = argd['ill_request_id']
@@ -1326,8 +1332,25 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         currency = argd['currency']
         barcode = argd['barcode']
         library_notes = argd['library_notes']
+
+        title = argd['title']
+        authors = argd['authors']
+        place = argd['place']
+        publisher = argd['publisher']
+        year = argd['year']
+        edition = argd['edition']
+        isbn = argd['isbn']
+
+        periodical_title = argd['periodical_title']
+        volume = argd['volume']
+        issue = argd['issue']
+        page = argd['page']
+        issn = argd['issn']
+
         ln = argd['ln']
 
+        if library_notes is not None:
+            library_notes = library_notes.strip()
         if delete_key is not None:
             delete_key = delete_key.strip()
         if ill_request_id is not None:
@@ -1353,10 +1376,49 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         if barcode is not None:
             barcode = barcode.strip()
 
+        if title is not None:
+            title = title.strip()
+        if authors is not None:
+            authors = authors.strip()
+        if place is not None:
+            place = place.strip()
+        if publisher is not None:
+            publisher = publisher.strip()
+        if year is not None:
+            year = year.strip()
+        if edition is not None:
+            edition =  edition.strip()
+        if isbn is not None:
+            isbn = isbn.strip()
+
+
+        if periodical_title is not None:
+            periodical_title = periodical_title.strip()
+        if volume is not None:
+            volume = volume.strip()
+        if issue is not None:
+            issue = issue.strip()
+        if page is not None:
+            page = page.strip()
+        if issn is not None:
+            issn = issn.strip()
+
+        #article_info = {'periodical_title': periodical_title, 'article_title:': title,
+                   #     'authors': author, report_number,
+                #    volume, issue, pages, year, issn}
+        volume = volume + ','+ issue + ','+ page
+        article_info = {'periodical_title': periodical_title, 'title': title, 'authors': authors,
+            'place': place, 'publisher': publisher, 'year' : year,  'edition': "", 'issn' : issn,
+            'volume': volume }
+
+        book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
+                     'year': year, 'edition': edition, 'isbn': isbn}
+        #article_details = ()
+
         return bal.ill_request_details_step2(req, delete_key, ill_request_id, new_status,
                                         library_id, request_date, expected_date, arrival_date,
                                         due_date, return_date, cost, currency, barcode,
-                                        library_notes, ln)
+                                        library_notes, book_info, article_info, ln)
 
 
     #def ill_request_details_step3(self, req, form):

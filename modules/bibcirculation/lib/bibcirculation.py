@@ -547,7 +547,8 @@ def ill_register_request_with_recid(recid, uid, period_of_interest_from,
         else:
             message = bibcirculation_templates.tmpl_message_request_send_fail_other()
 
-        return bibcirculation_templates.tmpl_ill_register_request_with_recid(message=message, ln=ln)
+        return bibcirculation_templates.tmpl_ill_register_request_with_recid(message=message,
+                                                                             ln=ln)
 
     if not conditions:
         infos = []
