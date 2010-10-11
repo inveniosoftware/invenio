@@ -482,6 +482,34 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
             inv_search = 'year:1960-06-12->9999'
             self._compare_searches(inv_search, spi_search)
 
+    def test_spires_syntax_detected_f(self):
+        """SPIRES search syntax - test detection f t p"""
+        # trac #261
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = converter.is_applicable("f t p")
+        self.assertEqual(spi_search, True)
+
+    def test_spires_syntax_detected_fin(self):
+        """SPIRES search syntax - test detection fin t p"""
+        # trac #261
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = converter.is_applicable("fin t p")
+        self.assertEqual(spi_search, True)
+
+    def test_spires_syntax_detected_find(self):
+        """SPIRES search syntax - test detection find t p"""
+        # trac #261
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        spi_search = converter.is_applicable("find t p")
+        self.assertEqual(spi_search, True)
+
+    def test_spires_syntax_detected_invenio(self):
+        """SPIRES search syntax - test detection Not SPIRES"""
+        # trac #261
+        converter = search_engine_query_parser.SpiresToInvenioSyntaxConverter()
+        inv_search = converter.is_applicable("t:p a:c")
+        self.assertEqual(inv_search, False)
+
 
 TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser,
                              TestSpiresToInvenioSyntaxConverter)

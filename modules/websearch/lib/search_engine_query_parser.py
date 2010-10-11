@@ -547,7 +547,7 @@ class SpiresToInvenioSyntaxConverter:
         self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))\s*(?P<content>.+)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
-        self._re_find_or_fin_at_start = re.compile('^find? .*$')
+        self._re_spires_find_keyword = re.compile('^(?P<find>f|fin|find)\s+(?P<query>.*)$', re.IGNORECASE)
 
         # patterns for subbing out spaces within quotes temporarily
         self._re_pattern_single_quotes = re.compile("'(.*?)'")
@@ -556,20 +556,27 @@ class SpiresToInvenioSyntaxConverter:
         self._re_pattern_space = re.compile("__SPACE__")
         self._re_pattern_IRN_search = re.compile(r'970__a:(?P<irn>\d+)')
 
+    def is_applicable(self, query):
+        """Is this converter applicable to this query?
+
+        Returns True IFF the query starts with SPIRES' 'find' keyword or some
+        acceptable variation thereof."""
+        if self._re_spires_find_keyword.match(query.lower()):
+            return True
+        else:
+            return False
+
     def convert_query(self, query):
-        """Converts the query from SPIRES syntax to Invenio syntax
+        """Convert SPIRES syntax queries to Invenio syntax.
 
-        Queries are assumed SPIRES queries only if they start with FIND or FIN"""
-
-        # allow users to use "f" only...
-        query = re.sub('^[fF] ', 'find ', query)
+        Do nothing to queries not in SPIRES syntax."""
 
         # SPIRES syntax allows searches with 'find' or 'fin'.
-        if self._re_find_or_fin_at_start.match(query.lower()):
+        if self.is_applicable(query):
 
             # Everywhere else make the assumption that all and only queries
             # starting with 'find' are SPIRES queries.  Turn fin into find.
-            query = re.sub('^[fF][iI][nN] ', 'find ', query)
+            query = self._re_spires_find_keyword.sub(lambda m: 'find '+m.group('query'), query)
 
             # these calls are before keywords replacement becuase when keywords
             # are replaced, date keyword is replaced by specific field search

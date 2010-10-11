@@ -102,7 +102,7 @@ from invenio.webuser import getUid, collect_user_info
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
-InvenioWebSearchMismatchedParensError, SpiresToInvenioSyntaxConverter
+    SpiresToInvenioSyntaxConverter
 
 from invenio import webinterface_handler_config as apache
 
@@ -1904,10 +1904,13 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
        For more details on the parameters see 'search_pattern'
     """
     _ = gettext_set_language(ln)
+    spires_syntax_converter = SpiresToInvenioSyntaxConverter()
+    spires_syntax_query = False
 
     # if the pattern uses SPIRES search syntax, convert it to Invenio syntax
-    spires_syntax_converter = SpiresToInvenioSyntaxConverter()
-    p = spires_syntax_converter.convert_query(p)
+    if spires_syntax_converter.is_applicable(p):
+        spires_syntax_query = True
+        p = spires_syntax_converter.convert_query(p)
 
     # sanity check: do not call parenthesised parser for search terms
     # like U(1):
@@ -1932,6 +1935,15 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         for index in xrange(0, len(parsing_result)-1, 2 ):
             current_operator = parsing_result[index]
             current_pattern = parsing_result[index+1]
+
+            if CFG_INSPIRE_SITE and spires_syntax_query:
+                # setting ap=0 to turn off approximate matching for 0 results.
+                # Doesn't work well in combinations.
+                # FIXME: The right fix involves collecting statuses for each
+                #        hitset, then showing a nearest terms box exactly once,
+                #        outside this loop.
+                ap = 0
+                display_nearest_terms_box=False
 
             # obtain a hitset for the current pattern
             current_hitset = search_pattern(req, current_pattern, f, m, ap, of, verbose, ln, display_nearest_terms_box=display_nearest_terms_box)
@@ -3044,8 +3056,6 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb
        If middle_only is set to 1, it will only print the middle box information (beg/netx/prev/end/etc) links.
        This is suitable for displaying navigation links at the bottom of the search results page."""
 
-    out = ""
-
     # sanity check:
     if jrec < 1:
         jrec = 1
@@ -3154,7 +3164,7 @@ def print_hosted_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_N
              cpu_time = cpu_time,
            )
 
-def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=CFG_SITE_LANG, ec=[], hosted_colls_potential_results_p=False):
+def print_results_overview(colls, results_final_nb_total, results_final_nb, cpu_time, ln=CFG_SITE_LANG, ec=[], hosted_colls_potential_results_p=False):
     """Prints results overview box with links to particular collections below."""
 
     out = ""
@@ -4842,7 +4852,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             elif of.startswith("h"):
                 if of not in ['hcs']:
                     # added the hosted_colls_potential_results_p parameter to help print out the overview more accurately
-                    req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec, hosted_colls_potential_results_p=hosted_colls_potential_results_p))
+                    req.write(print_results_overview(colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec, hosted_colls_potential_results_p=hosted_colls_potential_results_p))
                     selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
             # print number of hits found for XML outputs:
             if of.startswith("x"):
