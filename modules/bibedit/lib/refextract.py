@@ -318,10 +318,6 @@ def compress_subfields(out,subfield_code):
               <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
               <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
            </datafield>
-
-        - group together the contents of misc elements which belong to the same datafield element
-        - correctly manage mulitple references inside a single citation line (using multiple 'o'
-            tags to denote mulitple references)
            """
     in_lines = out.split('\n')
     ## hold the subfield compressed version of the xml, line by line
@@ -3587,7 +3583,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 report_num = processed_line[tag_match_end:idx_closing_tag]
                 ## now trim this matched institutional report-number and its tags from the start of the line:
                 processed_line = processed_line[idx_closing_tag+len(CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM):]
-
+                    
                 identified_citation_element =   {   'type'       : "REPORTNUMBER",
                                                     'misc_txt'   : "%s" % cur_misc_txt,
                                                     'report_num' : "%s" % report_num,
@@ -3595,9 +3591,18 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 count_reportnum += 1
                 cur_misc_txt = u""
 
+<<<<<<< HEAD
+                identified_citation_element =   {   'type'       : "REPORTNUMBER",
+                                                    'misc_txt'   : "%s" % cur_misc_txt,
+                                                    'report_num' : "%s" % report_num,
+                                                }
+                count_reportnum += 1
+                cur_misc_txt = u""
+
+=======
+>>>>>>> Identifies Authors in citations. Splits references based on the
 
         elif tag_type == "URL":
-
             ## This tag is an identified URL:
 
             ## From the "identified_urls" list, get this URL and its
@@ -4027,7 +4032,6 @@ def remove_reference_line_marker(line):
     else:
         marker_val = u" "
     return (marker_val, line)
-
 def create_marc_xml_reference_section(ref_sect,
                                       preprint_repnum_search_kb,
                                       preprint_repnum_standardised_categs,
@@ -4100,7 +4104,7 @@ def create_marc_xml_reference_section(ref_sect,
         ## Strip the 'marker' (e.g. [1]) from this reference line:
         (line_marker, working_line1) = \
                       remove_reference_line_marker(ref_line)
- 
+    
 
         ## Find DOI sections in citation
         (working_line1, identified_dois) = identify_and_tag_doi(working_line1)
