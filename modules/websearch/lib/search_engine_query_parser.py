@@ -325,7 +325,7 @@ class SpiresToInvenioSyntaxConverter:
 
     # Constants defining fields
     _DATE_ADDED_FIELD = 'datecreated:'
-    _DATE_UPDATED_FIELD = 'dateupdated:'
+    _DATE_UPDATED_FIELD = 'datemodified:'
     _DATE_FIELD = 'year:'
 
     _A_TAG = 'author:'
