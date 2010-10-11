@@ -444,12 +444,21 @@ class SpiresToInvenioSyntaxConverter:
         'ti' : 'title:',
         'title' : 'title:',
         'with-language' : 'title:',
+        # fulltext
+        'fulltext' : 'fulltext:',
+        'ft' : 'fulltext:',
         # topic
         'topic' : '695__a:',
         'tp' : '695__a:',
         'hep-topic' : '695__a:',
         'desy-keyword' : '695__a:',
         'dk' : '695__a:',
+
+        # second-order operators
+        'refersto' : 'refersto:',
+        'refs': 'refersto:',
+        'citedby' : 'citedby:',
+
         # replace all the keywords without match with empty string
         # this will remove the noise from the unknown keywrds in the search
         # and will in all fields for the words following the keywords
@@ -533,11 +542,13 @@ class SpiresToInvenioSyntaxConverter:
         # are searched) and the operator preceding the term. In case that the
         # names of the groups defined in the expression are changed, the
         # chagned should be reflected in the code that use it.
-        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:)(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:|fulltext:)(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # regular expression matching date after pattern
-        #self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<year>[0-9-]{4,10})\b', re.IGNORECASE)
         self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
+
+        ## match second-order operators
+        #self._re_second_order = re.compile(r'\b(?P<combine_operator>find|and not|and|or|not)\s+(?P<second_order>refersto:|citedby:|)\s+(?P<search_term>.+?)\s+(?P<search_content>.+)', re.IGNORECASE)
 
         # regular expression matching date after pattern
         self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
@@ -721,8 +732,8 @@ class SpiresToInvenioSyntaxConverter:
         author: ellis or title:THESE THREE WORDS it is expanded to
         author:ellis or (title: THESE and title:THREE...)
 
-        Not all the search terms are expanded this way, but only title: and
-        keyword: - see _re_search_term_pattern_match for details.
+        Not all the search terms are expanded this way, but only title:,
+        keyword:, and fulltext: - see _re_search_term_pattern_match for details.
         """
 
         def create_replacements(term, content):

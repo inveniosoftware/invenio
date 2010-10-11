@@ -409,6 +409,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = "title:bob and title:sam"
         self._compare_searches(inv_search, spi_search)
 
+    def test_syntax_converter_expand_fulltext(self):
+        """SPIRES search syntax - fulltext support"""
+        spi_search = "find ft The holographic RG is based on"
+        inv_search = "fulltext:The and fulltext:holographic and fulltext:RG and fulltext:is and fulltext:based and fulltext:on"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_syntax_converter_expand_fulltext_within_larger(self):
+        """SPIRES search syntax - fulltext subsearch support"""
+        spi_search = "find au taylor and ft The holographic RG is based on and t brane"
+        inv_search = "author:taylor fulltext:The and fulltext:holographic and fulltext:RG and fulltext:is and fulltext:based and fulltext:on title:brane"
+        self._compare_searches(inv_search, spi_search)
+
     def test_syntax_converter_expand_search_patterns_conjoined(self):
         """SPIRES search syntax - simplest distribution"""
         spi_search = "find t bob and sam"
