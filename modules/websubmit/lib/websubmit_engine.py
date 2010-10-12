@@ -442,6 +442,7 @@ def interface(req,
         'uid_email' : uid_email,
         'form' : form,
         'act' : act,
+        'action' : act, ## for backward compatibility
         'req' : req,
         'user_info' : user_info,
         'InvenioWebSubmitFunctionError' : InvenioWebSubmitFunctionError,
@@ -1505,6 +1506,7 @@ def print_function_calls(req, doctype, action, step, form, start_time,
     the_globals = {
         'doctype' : doctype,
         'action' : action,
+        'act' : action, ## for backward compatibility
         'step' : step,
         'access' : access,
         'ln' : ln,

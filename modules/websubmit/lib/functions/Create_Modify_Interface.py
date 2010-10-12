@@ -136,6 +136,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     the_globals = {
         'doctype' : doctype,
         'action' : action,
+        'act' : action, ## for backward compatibility
         'step' : step,
         'access' : access,
         'ln' : ln,
