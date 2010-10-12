@@ -1076,7 +1076,7 @@ def get_borrower_request_details_order_by_to(borrower_id):
     return res
 
 def new_loan(borrower_id, recid, barcode,
-             loaned_on, due_date, status, loan_type, notes):
+             due_date, status, loan_type, notes):
     """
     Create a new loan.
 
@@ -1103,9 +1103,9 @@ def new_loan(borrower_id, recid, barcode,
     res = run_sql(""" insert into crcLOAN (id_crcBORROWER, id_bibrec,
                                            barcode, loaned_on, due_date,
                                            status, type, notes)
-                      values(%s, %s, %s, %s, %s, %s ,%s, %s)
-                  """, (borrower_id, recid, barcode, loaned_on,
-                        due_date, status, loan_type, str(notes)))
+                      values(%s, %s, %s, NOW(), %s, %s ,%s, %s)
+                  """, (borrower_id, recid, barcode, due_date,
+                        status, loan_type, str(notes)))
 
     res = run_sql(""" UPDATE crcITEM
                          SET status=%s
@@ -1146,25 +1146,24 @@ def get_all_loans(limit):
     Get all loans.
     """
 
-    res = run_sql(
-    """
-    SELECT bor.id,
-           bor.name,
-           it.id_bibrec,
-           l.barcode,
-           DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
-           DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
-           l.number_of_renewals,
-           l.overdue_letter_number,
-           DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
-           l.notes,
-           l.id
-    FROM crcLOAN l, crcBORROWER bor, crcITEM it
-    WHERE l.id_crcBORROWER = bor.id
-          and l.barcode = it.barcode
-          and l.status = 'on loan'
-    ORDER BY 5 DESC
-    LIMIT 0,%s
+    res = run_sql("""
+        SELECT bor.id,
+               bor.name,
+               it.id_bibrec,
+               l.barcode,
+               DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d %%T'),
+               DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
+               l.number_of_renewals,
+               l.overdue_letter_number,
+               DATE_FORMAT(l.overdue_letter_date,'%%Y-%%m-%%d'),
+               l.notes,
+               l.id
+          FROM crcLOAN l, crcBORROWER bor, crcITEM it
+         WHERE l.id_crcBORROWER = bor.id
+           AND l.barcode = it.barcode
+           AND l.status = 'on loan'
+      ORDER BY 5 DESC
+         LIMIT 0,%s
     """, (limit,))
 
     return res
@@ -2275,7 +2274,6 @@ def get_ill_request_type(ill_request_id):
     else:
         return None
 
-#def get_ill_borrower_request(ill_request_id)
 def get_ill_request_borrower_details(ill_request_id):
     """
     """

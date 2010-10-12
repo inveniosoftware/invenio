@@ -447,7 +447,7 @@ def update_next_loan_request_status(req, check_id, barcode, ln=CFG_SITE_LANG):
 
     db.update_loan_request_status(check_id,'done')
     db.update_request_barcode(barcode, check_id)
-    db.new_loan(borrower_id, recid, barcode, loaned_on, due_date, 'on loan', 'normal','')
+    db.new_loan(borrower_id, recid, barcode, due_date, 'on loan', 'normal','')
 
     db.update_item_status('on loan', barcode)
 
@@ -772,7 +772,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
             note_format[time.strftime("%Y-%m-%d %H:%M:%S")] = str(note)
         barcode = list_of_barcodes[i]
         recid = db.get_recid(barcode)
-        db.new_loan(user_id, recid, barcode, loaned_on, due_date[i],
+        db.new_loan(user_id, recid, barcode, due_date[i],
                     'on loan', 'normal', note_format)
 
         tag_all_requests_as_done(barcode, user_id)
@@ -904,7 +904,7 @@ def register_new_loan(req, barcode, borrower_id,
             note_format = ''
 
         db.new_loan(borrower_id, recid, barcode,
-                    loaned_on, due_date, 'on loan', 'normal', note_format)
+                    due_date, 'on loan', 'normal', note_format)
         tag_all_requests_as_done(barcode, borrower_id)
 
         #requested_barcode = db.get_requested_barcode(request_id)
@@ -3338,7 +3338,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
         loaned_on = datetime.date.today()
         due_date = renew_loan_for_X_days(barcode)
         db.new_loan(borrower_id, has_recid, barcode,
-                    loaned_on, due_date, 'on loan', 'normal', notes_format)
+                    due_date, 'on loan', 'normal', notes_format)
         tag_all_requests_as_done(barcode, borrower_id)
         db.update_item_status('on loan', barcode)
         result = db.get_all_loans(20)
@@ -4061,7 +4061,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
 
     elif is_borrower != 0:
         db.new_loan(is_borrower, recid, barcode,
-                    loaned_on, due_date, 'on loan',
+                    due_date, 'on loan',
                     'normal', notes_format)
 
         tag_all_requests_as_done(barcode, is_borrower)
@@ -4077,7 +4077,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
         is_borrower = db.is_borrower(email)
 
         db.new_loan(is_borrower, recid, barcode,
-                    loaned_on, due_date, 'on loan',
+                    due_date, 'on loan',
                     'normal', notes_format)
         tag_all_requests_as_done(barcode, is_borrower)
         db.update_item_status('on loan', barcode)
@@ -4603,7 +4603,7 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status, libra
     #if new_status == 'on loan':
     #    borrower_id = db.get_ill_borrower(ill_request_id)
     #    loaned_on = datetime.date.today()
-        #db.new_loan(borrower_id, '0', barcode, loaned_on, due_date, 'on loan', 'ill','')
+        #db.new_loan(borrower_id, '0', barcode, due_date, 'on loan', 'ill','')
         # ???
 
     if new_status == 'returned':
@@ -5810,14 +5810,13 @@ def register_ill_article_request_step3(req, periodical_title, title, authors,
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    volume = volume + ', '+ issue + ', '+ page_number
     info = (title, authors, "", "", year, "", issn)
 
     #create_ill_record(info)
 
     item_info = {'periodical_title': periodical_title, 'title': title, 'authors': authors,
                  'place': "", 'publisher': "", 'year' : year,  'edition': "", 'issn' : issn,
-                 'volume': volume }
+                 'volume': volume, 'issue': issue, 'page': page_number }
 
 
     (period_of_interest_from, period_of_interest_to, budget_code,

@@ -11995,7 +11995,7 @@ class Template:
                     </table>
                     <table class="bibcirctable">
                      <tr valign='top'>
-                       <td width="400">
+                       <td width="800">
                         <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                          <tr>
                             <th width="100">%s</th>
@@ -12068,7 +12068,12 @@ class Template:
             # for articles
             elif str(request_type) == 'article':
 
-                (volume, issue, page) = item_info['volume'].split(',')
+                try:
+                    (volume, issue, page) = item_info['volume'].split(',')
+                except:
+                    volume = item_info['volume']
+                    issue = ''
+                    page = ''
 
                 out += """
                 <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -12084,7 +12089,7 @@ class Template:
                     </table>
                     <table class="bibcirctable">
                      <tr valign='top'>
-                       <td width="400">
+                       <td width="800">
                         <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                          <tr>
                             <th width="100">%s</th>
@@ -12170,9 +12175,9 @@ class Template:
                           _("Periodical Title"),item_info['periodical_title'],
                           _("Article Title"),   item_info['title'],
                           _("Author(s)"),       item_info['authors'],
-                          _("Volume"),          volume,
-                          _("Issue"),           issue,
-                          _("Page"),            page,
+                          _("Volume"),          item_info['volume'],
+                          _("Issue"),           item_info['issue'],
+                          _("Page"),            item_info['page'],
                           _("ISSN"),            item_info['issn'],
                           _("Place"),           item_info['place'],
                           _("Publisher"),       item_info['publisher'],

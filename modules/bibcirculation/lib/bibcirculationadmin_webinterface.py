@@ -1406,10 +1406,10 @@ class WebInterfaceBibCirculationAdminPages(WebInterfaceDirectory):
         #article_info = {'periodical_title': periodical_title, 'article_title:': title,
                    #     'authors': author, report_number,
                 #    volume, issue, pages, year, issn}
-        volume = volume + ','+ issue + ','+ page
+
         article_info = {'periodical_title': periodical_title, 'title': title, 'authors': authors,
             'place': place, 'publisher': publisher, 'year' : year,  'edition': "", 'issn' : issn,
-            'volume': volume }
+            'volume': volume, 'issue': issue, 'page': page }
 
         book_info = {'title': title, 'authors': authors, 'place': place, 'publisher': publisher,
                      'year': year, 'edition': edition, 'isbn': isbn}
