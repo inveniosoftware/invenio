@@ -547,9 +547,6 @@ class SpiresToInvenioSyntaxConverter:
         # regular expression matching date after pattern
         self._re_date_after_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(after|>)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
-        ## match second-order operators
-        #self._re_second_order = re.compile(r'\b(?P<combine_operator>find|and not|and|or|not)\s+(?P<second_order>refersto:|citedby:|)\s+(?P<search_term>.+?)\s+(?P<search_content>.+)', re.IGNORECASE)
-
         # regular expression matching date after pattern
         self._re_date_before_match = re.compile(r'\b(?P<searchop>d|date|dupd|dadd|da|date-added|du|date-updated)\b\s*(before|<)\s*(?P<search_content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
@@ -676,11 +673,14 @@ class SpiresToInvenioSyntaxConverter:
                         if re.match('[0-9]{1,4}$', datestamp):
                             isodates.append(datestamp)
                         else:
-                            dtobj = dateutil.parser.parse(datestamp, default=DEFAULT)
-                            if dtobj.day == 1:
-                                isodates.append("%d-%02d" % (dtobj.year, dtobj.month))
-                            else:
-                                isodates.append("%d-%02d-%02d" % (dtobj.year, dtobj.month, dtobj.day))
+                            try:
+                                dtobj = dateutil.parser.parse(datestamp, default=DEFAULT)
+                                if dtobj.day == 1:
+                                    isodates.append("%d-%02d" % (dtobj.year, dtobj.month))
+                                else:
+                                    isodates.append("%d-%02d-%02d" % (dtobj.year, dtobj.month, dtobj.day))
+                            except ValueError:
+                                isodates.append(datestamp)
 
                 daterange = '->'.join(isodates)
                 #if re.search('[^\s]+-[^>][^\s]*', daterange):
@@ -847,9 +847,10 @@ class SpiresToInvenioSyntaxConverter:
                     search_pattern += ' or ' + self._EA_TAG + "\"%s, %s %s\"" % (author_surname, author_name[0:i], author_middle_name)
             return search_pattern
 
-        # ellis, jacqueline ---> "ellis, jacqueline" or "ellis, j.*" or "ellis, j" or "ellis, ja.*" or "ellis, ja" or "ellis, jacqueline *"
+        # ellis, jacqueline ---> "ellis, jacqueline" or "ellis, j.*" or "ellis, j" or "ellis, ja.*" or "ellis, ja" or "ellis, jacqueline *, ellis, j *"
         # in case we don't use SPIRES data, the ending dot is ommited.
         search_pattern = self._A_TAG + '"' + author_surname + ', ' + author_name + '*"'
+        search_pattern += " or " + self._EA_TAG + "\"%s, %s *\"" % (author_surname, author_name[0])
         if NAME_IS_NOT_INITIAL:
             for i in range(1,len(author_name)):
                 search_pattern += ' or ' + self._EA_TAG + "\"%s, %s\"" % (author_surname, author_name[0:i])
