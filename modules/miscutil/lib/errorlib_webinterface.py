@@ -96,7 +96,7 @@ class WebInterfaceErrorPages(WebInterfaceDirectory):
             <p>%(back)s
             """ % \
                 {'title' : _("The error report has been sent."),
-                 'message' : _("Many thanks for helping us make CDS Invenio better."),
+                 'message' : _("Many thanks for helping us to improve the service."),
                  'back' : argd['referer']!="NA" and "<a href=\"%s\">back</a>" % (argd['referer'],) or \
                           _("Use the back button of your browser to return to the previous page.")
                 }
