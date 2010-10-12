@@ -45,6 +45,9 @@ class InvenioWebSearchMismatchedParensError(Exception):
     def __init__(self, message):
         """Initialization."""
         self.message = message
+    def __str__(self):
+        """String representation."""
+        return repr(self.message)
 
 
 class SearchQueryParenthesisedParser(object):
