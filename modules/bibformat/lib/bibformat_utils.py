@@ -579,7 +579,6 @@ def get_pdf_snippets(recID, patterns,
             # no hit, so check stemmed versions:
             from invenio.bibindex_engine_stemmer import stem
             stemmed_patterns = [stem(p, 'en') for p in patterns]
-            print stemmed_patterns
             out = get_text_snippets(text_path, stemmed_patterns, nb_words_around, max_snippets)
         if out:
             out_courtesy = ""
