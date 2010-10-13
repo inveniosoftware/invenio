@@ -15,23 +15,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
+"""OAI Harvest Configuration."""
 
-pylib_DATA = oai_repository_server.py \
-             oai_repository_tests.py \
-             oai_repository_webinterface.py \
-             oai_repository_regression_tests.py \
-             oai_harvest_getter.py \
-	     oai_harvest_dblayer.py \
-             bibharvest_templates.py \
-             oai_harvest_admin.py \
-             oai_harvest_admin_regression_tests.py \
-             oai_repository_admin.py \
-             oai_repository_admin_regression_tests.py \
-             oai_harvest_daemon.py \
-             oai_repository_updater.py \
-             oai_harvest_config.py
+__revision__ = "$Id$"
 
-EXTRA_DIST = $(pylib_DATA)
-
-CLEANFILES = *~ *.tmp *.pyc
+## CFG_OAI_POSSIBLE_POSTMODES -- list of possible modes available for
+## OAI harvest post-processing
+CFG_OAI_POSSIBLE_POSTMODES = [\
+         ["h", "harvest only (h)"], \
+         ["h-c", "harvest and convert (h-c)"], \
+         ["h-u", "harvest and upload (h-u)"], \
+         ["h-c-u", "harvest, convert and upload (h-c-u)"], \
+         ["h-c-f-u", "harvest, convert, filter, upload (h-c-f-u)"], \
+         ["h-c-e-u", "harvest, convert, extract, upload (h-c-e-u)"], \
+         ["h-c-e-f-u", "harvest, convert, extract, filter, upload (h-c-e-f-u)"]]

@@ -36,6 +36,7 @@ from invenio.config import \
      CFG_ETCDIR, \
      CFG_BINDIR, \
      CFG_LOGDIR
+from invenio.oai_harvest_config import CFG_OAI_POSSIBLE_POSTMODES
 from invenio.bibrankadminlib import \
      write_outcome, \
      addadminbox, \
@@ -69,12 +70,6 @@ freqs = [[0, "never"],
          [24, "daily"],
          [168, "weekly"],
          [720, "monthly"] ]
-
-posts = [["h", "harvest only (h)"],
-         ["h-c", "harvest and convert (h-c)"],
-         ["h-u", "harvest and upload (h-u)"],
-         ["h-c-u", "harvest, convert and upload (h-c-u)"],
-         ["h-c-f-u", "harvest, convert, filter, upload (h-c-f-u)"]]
 
 dates = [[0, "from beginning"],
          [1, "from today"]]
@@ -232,11 +227,23 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
                                                           name='oai_src_sets',
                                                           value=' '.join(oai_src_sets))
 
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
-    text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
-    text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config, suffix="<small>Eg: </small><code>oaidc2marcxml.xsl</code>, <code>oaimarc2marcxml.xsl</code><br/>")
-    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, \
+                title = "Metadata prefix", name = "oai_src_prefix", value = oai_src_prefix)
+    text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, \
+                title = "Frequency", name = "oai_src_frequency", \
+                valuenil = "- select frequency -" , values = freqs, \
+                lastval = oai_src_frequency)
+    text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, \
+                title = "Postprocess", name = "oai_src_post", \
+                valuenil = "- select mode -" , values = CFG_OAI_POSSIBLE_POSTMODES, \
+                lastval = oai_src_post)
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, \
+                title = "BibConvert configuration file (if needed by postprocess)", \
+                name = "oai_src_config", value = oai_src_config, \
+                suffix="<small>Eg: </small><code>oaidc2marcxml.xsl</code>, <code>oaimarc2marcxml.xsl</code><br/>")
+    text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, \
+                title = "BibFilter program (if needed by postprocess)", \
+                name = "oai_src_bibfilter", value = oai_src_bibfilter)
     text += bibharvest_templates.tmpl_print_brs(ln, 2)
 
     output += createhiddenform(action="editsource#1",
@@ -362,11 +369,24 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
                                                               name='oai_src_sets',
                                                               value=' '.join(oai_src_sets))
 
-        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Frequency", name = "oai_src_frequency", valuenil = "- select frequency -" , values = freqs, lastval = oai_src_frequency)
-        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Starting date", name = "oai_src_lastrun", valuenil = "- select a date -" , values = dates, lastval = oai_src_lastrun)
-        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, title = "Postprocess", name = "oai_src_post", valuenil = "- select mode -" , values = posts, lastval = oai_src_post)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibConvert configuration file (if needed by postprocess)", name = "oai_src_config", value = oai_src_config)
-        text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, title = "BibFilter program (if needed by postprocess)", name = "oai_src_bibfilter", value = oai_src_bibfilter)
+        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, \
+                        title = "Frequency", name = "oai_src_frequency", \
+                        valuenil = "- select frequency -" , values = freqs, \
+                        lastval = oai_src_frequency)
+        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, \
+                        title = "Starting date", name = "oai_src_lastrun", \
+                        valuenil = "- select a date -" , values = dates, \
+                        lastval = oai_src_lastrun)
+        text += bibharvest_templates.tmpl_admin_w200_select(ln = ln, \
+                        title = "Postprocess", name = "oai_src_post", \
+                        valuenil = "- select mode -" , values = CFG_OAI_POSSIBLE_POSTMODES, \
+                        lastval = oai_src_post)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, \
+                        title = "BibConvert configuration file (if needed by postprocess)", \
+                        name = "oai_src_config", value = oai_src_config)
+        text += bibharvest_templates.tmpl_admin_w200_text(ln = ln, \
+                        title = "BibFilter program (if needed by postprocess)", \
+                        name = "oai_src_bibfilter", value = oai_src_bibfilter)
         text += bibharvest_templates.tmpl_print_brs(ln, 2)
 
 
