@@ -20,12 +20,14 @@
 """Regression tests for BibKnowledge."""
 
 import unittest
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
+from os import remove
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
 from invenio.bibknowledge import kb_exists, get_kba_values, \
      get_kbr_keys, get_kbd_values_for_bibedit, get_kbs_info, add_kb,\
      delete_kb, add_kb_mapping, remove_kb_mapping, get_kb_name, kb_mapping_exists, \
      get_kbt_items_for_bibedit
 from invenio.testutils import make_test_suite, run_test_suite, test_web_page_content
+
 
 class BibknowledgeTests(unittest.TestCase):
     """Test functions for bibknowledge."""
@@ -96,7 +98,7 @@ class BibknowledgeTests(unittest.TestCase):
         import mechanize
         response = mechanize.urlopen("http://cdsware.cern.ch/download/invenio-demo-site-files/HEP.rdf")
         content = response.read()
-        f = open("HEP.rdf","w")
+        f = open(CFG_TMPDIR+"/HEP.rdf","w")
         f.write(content)
         f.close()
         #upload it to the right destination, but log in first
@@ -116,12 +118,18 @@ class BibknowledgeTests(unittest.TestCase):
         browser.open(CFG_SITE_URL+"/kb?kb="+str(new_kb_id))
         browser.select_form(name="upload")
         browser.form["kb"] = str(new_kb_id) #force the id
-        browser.form.add_file(open("HEP.rdf"), content_type='text/plain', filename="HEP.rdf", name="file")
+        browser.form.add_file(open(CFG_TMPDIR+"/HEP.rdf"), content_type='text/plain', filename="HEP.rdf", name="file")
         browser.submit()
         #check that we can get an item from the kb
         items = get_kbt_items_for_bibedit(new_kb_name, "prefLabel", "Altarelli")
         #item should contain 1 string: 'Altarelli-Parisi equation'
         self.assertEqual(1, len(items))
+        #delete the temp file
+        remove(CFG_TMPDIR+"/HEP.rdf")
+        #delete the test odf the DB
+        delete_kb(new_kb_name)
+        still_there = kb_exists(new_kb_name)
+        self.assertEqual(False, still_there)
 
 TEST_SUITE = make_test_suite(BibknowledgeTests)
 
