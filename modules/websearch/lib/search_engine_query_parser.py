@@ -62,6 +62,8 @@ class SearchQueryParenthesisedParser(object):
     def __init__(self, substitution_dict = {'and': '+', 'or': '|', 'not': '-'}):
         self.substitution_dict = substitution_dict
         self.specials = set(['(', ')', '+', '|', '-', '+ -'])
+        self.__tl_idx = 0
+        self.__tl_len = 0
 
     # I think my names are both concise and clear
     # pylint: disable=C0103
@@ -97,8 +99,12 @@ class SearchQueryParenthesisedParser(object):
         parse_query() is a wrapper for self.tokenize() and self.parse().
         """
         toklist = self.tokenize(query)
+        depth, balanced, d0_p = self.nesting_depth_and_balance(toklist)
+        if not balanced:
+            raise SyntaxError("Mismatched parentheses in "+str(toklist))
         toklist, var_subs = self.substitute_variables(toklist)
-        toklist = self.tokenize(self.logically_reduce(toklist))
+        if depth > 1:
+            toklist = self.tokenize(self.logically_reduce(toklist))
         return self.parse(toklist, var_subs)
 
     def substitute_variables(self, toklist):
@@ -161,6 +167,27 @@ class SearchQueryParenthesisedParser(object):
                     new_toklist.append(token)
         return filter_front_ands(new_toklist), var_subs
 
+    def nesting_depth_and_balance(self, token_list):
+        """Checks that parentheses are balanced and counts how deep they nest"""
+        depth = 0
+        maxdepth = 0
+        depth0_pairs = 0
+        good_depth = True
+        for i in range(len(token_list)):
+            token = token_list[i]
+            if token == '(':
+                if depth == 0:
+                    depth0_pairs += 1
+                depth += 1
+                if depth > maxdepth:
+                    maxdepth += 1
+            elif token == ')':
+                depth -= 1
+            if depth == -1:        # can only happen with unmatched )
+                good_depth = False # so force depth check to fail
+                depth = 0          # but keep maxdepth in good range
+        return maxdepth, depth == 0 and good_depth, depth0_pairs
+
     def logically_reduce(self, token_list):
         """Return token_list in conjunctive normal form as a string.
 
@@ -169,16 +196,18 @@ class SearchQueryParenthesisedParser(object):
         the not in -(p | q) will be fully distributed (as -p + -q).
         """
 
+        maxdepth, balanced, d0_p = self.nesting_depth_and_balance(token_list)
         s = ' '.join(token_list)
         s = self._invenio_to_python_logical(s)
-        try:
-            s = str(to_cnf(to_cnf(s))) # XXX: sometimes NaryExpr doesn't
-                                       # fully flatten Expr; but it always
-                                       # does in 2 passes
-        except SyntaxError:
-            #raise InvenioWebSearchMismatchedParensError("Mismatched parentheses")
-            raise SyntaxError(str(s)+" couldn't be converted to a logic expression.")
-        if s[0] == '(' and s[-1] == ')':# s comes back with extra parens
+        last_maxdepth = 0
+        while maxdepth != last_maxdepth:             # XXX: sometimes NaryExpr doesn't
+            try:                                     # fully flatten Expr; but it usually
+                s = str(to_cnf(s))                   # does in 2 passes FIXME: diagnose
+            except SyntaxError:
+                raise SyntaxError(str(s)+" couldn't be converted to a logic expression.")
+            last_maxdepth = maxdepth
+            maxdepth, balanced, d0_p = self.nesting_depth_and_balance(self.tokenize(s))
+        if d0_p == 1 and s[0] == '(' and s[-1] == ')': # s can come back with extra parens
             s = s[1:-1]
         s = self._python_logical_to_invenio(s)
         return s
@@ -285,40 +314,52 @@ class SearchQueryParenthesisedParser(object):
         ###
 
         op_symbols = self.substitution_dict.values()
-        parsed_values = ['+']
+        self.__tl_idx = 0
+        self.__tl_len = len(token_list)
 
-        i = 0
-        while i < len(token_list):
-            token = token_list[i]
-            if parsed_values[-1] not in op_symbols:
-                parsed_values.append('+')
-            if token == '(':
-                # Warning: Here be recursion
-                try:
-                    clause_end = token_list.index(')', i)
-                except ValueError:
-                    raise InvenioWebSearchMismatchedParensError("Mismatched '(' in "+str(token_list))
-                clause = token_list[i+1:clause_end]
-                clause = self.parse(clause, variable_substitution_dict)
-                parsed_values.append(' '.join(clause))
-                i = clause_end+1
-                continue
-            elif token == ')':
-                # Since we strip ) from recursive calls in clause above, all
-                # ) appearing now are necessarily errors.
-                raise InvenioWebSearchMismatchedParensError("Mismatched ')' in "+str(token_list))
-            elif token in op_symbols:
-                parsed_values[-1] = token
+        def inner_parse(token_list, open_parens=False):
+
+            if open_parens:
+                parsed_values = []
             else:
-                if variable_substitution_dict != None and token in variable_substitution_dict:
-                    token = variable_substitution_dict[token]
-                parsed_values.append(token)
-            i += 1
+                parsed_values = ['+']
 
-        # If we have an extra start symbol, remove the default one
-        if parsed_values[1] in op_symbols:
-            parsed_values = parsed_values[1:]
-        return parsed_values
+            i = 0
+            while i < len(token_list):
+                token = token_list[i]
+                if i > 0 and parsed_values[-1] not in op_symbols:
+                    parsed_values.append('+')
+                if token == '(':
+                    offset = self.__tl_len - len(token_list)
+                    inner_value = inner_parse(token_list[i+1:], True)
+                    inner_value = ' '.join(inner_value)
+                    parsed_values.append(inner_value)
+                    self.__tl_idx += 1
+                    i = self.__tl_idx - offset
+                elif token == ')':
+                    if parsed_values[-1] in op_symbols:
+                        parsed_values = parsed_values[:-1]
+                    if parsed_values[0] == '+' and parsed_values[1] in op_symbols:
+                        parsed_values = parsed_values[1:]
+                    return parsed_values
+                elif token in op_symbols:
+                    if len(parsed_values) > 0:
+                        parsed_values[-1] = token
+                    else:
+                        parsed_values = [token]
+                else:
+                    if variable_substitution_dict != None and token in variable_substitution_dict:
+                        token = variable_substitution_dict[token]
+                    parsed_values.append(token)
+                i += 1
+                self.__tl_idx += 1
+
+            # If we have an extra start symbol, remove the default one
+            if parsed_values[1] in op_symbols:
+                parsed_values = parsed_values[1:]
+            return parsed_values
+
+        return inner_parse(token_list, False)
 
 
 class SpiresToInvenioSyntaxConverter:
