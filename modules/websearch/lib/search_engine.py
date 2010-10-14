@@ -2636,7 +2636,7 @@ def get_nearest_terms_in_bibrec(p, f, n_below, n_above):
         col = 'modification_date'
     res_above = run_sql("""SELECT DATE_FORMAT(%s,'%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s')
                              FROM bibrec WHERE %s < %%s
-                            ORDER BY %s ASC LIMIT %%s""" % (col, col, col),
+                            ORDER BY %s DESC LIMIT %%s""" % (col, col, col),
                         (p, n_above))
     res_below = run_sql("""SELECT DATE_FORMAT(%s,'%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s')
                              FROM bibrec WHERE %s > %%s
@@ -2647,7 +2647,9 @@ def get_nearest_terms_in_bibrec(p, f, n_below, n_above):
         out.add(row[0])
     for row in res_below:
         out.add(row[0])
-    return list(out)
+    out_list = list(out)
+    out_list.sort()
+    return list(out_list)
 
 def get_nbhits_in_bibrec(term, f):
     """Return number of hits in bibrec table.  term is usually a date,
