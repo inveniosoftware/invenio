@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.90\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
-"PO-Revision-Date: 2010-09-12 22:38+0200\n"
+"PO-Revision-Date: 2010-10-12 23:12+0200\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -4404,24 +4404,22 @@ msgid "Here are all reported comments sorted by the most reported"
 msgstr "Aquests són tots els comentaris denunciats, ordenats de més a menys"
 
 #: modules/webcomment/lib/webcomment_templates.py:1769
-#, fuzzy, python-format
+#, python-format
 msgid "Here are all reviews for record %i, sorted by the most reported"
-msgstr "Aquestes són totes les ressenyes denunciades, ordenades de més a menys"
+msgstr "Ressenyes del registre %i, ordenades de més a menys denúncies"
 
 #: modules/webcomment/lib/webcomment_templates.py:1770
-#, fuzzy
 msgid "Show comments"
 msgstr "Visualitza els comentaris"
 
 #: modules/webcomment/lib/webcomment_templates.py:1772
-#, fuzzy, python-format
+#, python-format
 msgid "Here are all comments for record %i, sorted by the most reported"
-msgstr "Aquests són tots els comentaris denunciats, ordenats de més a menys"
+msgstr "Comentaris al registre %i, ordenats de més a menys denúncies"
 
 #: modules/webcomment/lib/webcomment_templates.py:1773
-#, fuzzy
 msgid "Show reviews"
-msgstr "crítiques"
+msgstr "Visualitza les ressenyes"
 
 #: modules/webcomment/lib/webcomment_templates.py:1798
 #: modules/webcomment/lib/webcomment_templates.py:1822
@@ -4434,9 +4432,8 @@ msgid "successfully deleted"
 msgstr "suprimit correctament"
 
 #: modules/webcomment/lib/webcomment_templates.py:1822
-#, fuzzy
 msgid "successfully undeleted"
-msgstr "suprimit correctament"
+msgstr "recuperat correctament"
 
 #: modules/webcomment/lib/webcomment_templates.py:1848
 msgid "successfully suppressed abuse report"
@@ -4447,16 +4444,20 @@ msgid "Not yet reviewed"
 msgstr "Sense cap ressenya"
 
 #: modules/webcomment/lib/webcomment_templates.py:1933
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The following review was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
-msgstr "S'ha enviat aquesta ressenya a %(CFG_SITE_NAME)s:"
+msgstr ""
+"S'ha enviat aquesta ressenya a %(CFG_SITE_NAME)s per "
+"%(user_nickname)s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1934
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "The following comment was sent to %(CFG_SITE_NAME)s by %(user_nickname)s:"
-msgstr "S'ha enviat aquest comentari a %(CFG_SITE_NAME)s:"
+msgstr ""
+"S'ha enviat aquest comentari a %(CFG_SITE_NAME)s per "
+"%(user_nickname)s:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1961
 msgid "This is an automatic message, please don't reply to it."
@@ -4521,19 +4522,16 @@ msgid "Internal Error"
 msgstr "Error intern"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
-#, fuzzy
 msgid "Delete/Undelete Reviews"
-msgstr "Suprimeix les ressenyes seleccionades"
+msgstr "Suprimeix/recupera ressenyes"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
-#, fuzzy
 msgid "Delete/Undelete Comments"
-msgstr "Suprimeix els comentaris seleccionats"
+msgstr "Suprimeix/recupera comentaris"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
-#, fuzzy
 msgid " or Suppress abuse reports"
-msgstr "Elimina les denúncies d'abús"
+msgstr " o elimina les denúncies d'abús"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:244
 msgid "View all reported users"
@@ -4548,9 +4546,8 @@ msgid "Suppress abuse reports"
 msgstr "Elimina les denúncies d'abús"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:297
-#, fuzzy
 msgid "Undelete comments"
-msgstr "suprimeix comentaris"
+msgstr "Recupera comentaris suprimits"
 
 #: modules/webmessage/lib/webmessage.py:127
 msgid "The message could not be deleted."
@@ -4768,9 +4765,8 @@ msgstr "Teniu %(x_nb_new)s missates nous d'un total de %(x_nb_total)s"
 #: modules/webmessage/lib/webmessage_webinterface.py:309
 #: modules/webmessage/lib/webmessage_webinterface.py:356
 #: modules/webmessage/lib/webmessage_webinterface.py:403
-#, fuzzy
 msgid "You are not authorized to use messages."
-msgstr "No esteu autoritzats a veure aquesta àrea."
+msgstr "No esteu autoritzats a utilitzar missatges."
 
 #: modules/webmessage/lib/webmessage_webinterface.py:409
 msgid "Read a message"
@@ -4800,14 +4796,12 @@ msgstr "qualsevol any"
 
 #: modules/websearch/lib/search_engine.py:904
 #: modules/websearch/lib/search_engine.py:923
-#, fuzzy
 msgid "any public collection"
-msgstr "totes les col·leccions"
+msgstr "qualsevol col·lecció pública"
 
 #: modules/websearch/lib/search_engine.py:908
-#, fuzzy
 msgid "remove this collection"
-msgstr "esborrar aquest usuari"
+msgstr "esborrar aquesta col·lecció"
 
 #: modules/websearch/lib/search_engine.py:919
 msgid "add another collection"
@@ -4857,19 +4851,14 @@ msgstr ""
 "cerca..."
 
 #: modules/websearch/lib/search_engine.py:2221
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
-"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"No s'ha trobat cap coincidència dins la col·lecció %(x_collection)s. Altres "
-"col·leccions públiques han donat%(x_url_open)s%(x_nb_hits)d resultats%"
-"(x_url_close)s.\n"
-"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"No s'ha trobat cap coincidència dins la col·lecció\n"
-" %(x_collection)s. Altres col·leccions públiques han donat %(x_url_open)s%"
-"(x_nb_hits)d resultats%(x_url_close)s."
+"No s'ha trobat cap coincidència a la col·leció "
+"%(x_collection)s. Les altres col·leccions públicas donen "
+"%(x_url_open)s%(x_nb_hits)d resultats%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:2230
 msgid ""
@@ -4880,14 +4869,14 @@ msgstr ""
 "documents no públics, escolliu primer la col·lecció restringida."
 
 #: modules/websearch/lib/search_engine.py:2344
-#, fuzzy, python-format
+#, python-format
 msgid "No word index is available for %s."
-msgstr "No hi ha cap índex de paraules disponible per a"
+msgstr "No hi ha cap índex de paraules disponible per a %s."
 
 #: modules/websearch/lib/search_engine.py:2355
-#, fuzzy, python-format
+#, python-format
 msgid "No phrase index is available for %s."
-msgstr "No hi ha cap índex de frases disponible per a"
+msgstr "No hi ha cap índex de frases disponible per a %s."
 
 #: modules/websearch/lib/search_engine.py:2397
 #, python-format
@@ -4960,9 +4949,8 @@ msgid "Citations"
 msgstr "Cites"
 
 #: modules/websearch/lib/websearchadminlib.py:3374
-#, fuzzy
 msgid "Keywords"
-msgstr "paraula clau"
+msgstr "Paraules clau"
 
 #: modules/websearch/lib/websearchadminlib.py:3375
 msgid "Discussion"
@@ -4973,9 +4961,8 @@ msgid "Usage statistics"
 msgstr "Estadístiques d'ús"
 
 #: modules/websearch/lib/websearchadminlib.py:3378
-#, fuzzy
 msgid "Holdings"
-msgstr "identificació"
+msgstr "Disponibilitat"
 
 #: modules/websearch/lib/websearch_templates.py:472
 #, python-format
@@ -5083,13 +5070,12 @@ msgid "Search also:"
 msgstr "Cerqueu també:"
 
 #: modules/websearch/lib/websearch_templates.py:1440
-#, fuzzy
 msgid ""
 "This collection is restricted.  If you are authorized to access it, please "
 "click on the Search button."
 msgstr ""
-"Aquesta col·lecció és restringida.  Si creieu que hi teniu accés, "
-"identifiqueu-vos."
+"Aquesta col·lecció és restringida.  Si hi teniu accés, feu clic al "
+"botó de Cerca."
 
 #: modules/websearch/lib/websearch_templates.py:1455
 msgid ""
@@ -5223,23 +5209,22 @@ msgstr ""
 "trobats en %(x_nb_seconds)s segons."
 
 #: modules/websearch/lib/websearch_templates.py:2960
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_fmt_open)sResults overview%(x_fmt_close)s"
-msgstr "Aquest document ha estat %(x_fmt_open)saprovat%(x_fmt_close)s."
+msgstr "%(x_fmt_open)sResultats globals%(x_fmt_close)s"
 
 #: modules/websearch/lib/websearch_templates.py:2968
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least %(x_nb_records)"
 "s records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)sResultats globals:%(x_fmt_close)s %(x_nb_records)s registres "
-"trobats en %(x_nb_seconds)s segons."
+"%(x_fmt_open)sResultats globals:%(x_fmt_close)s Al menys "
+"%(x_nb_records)s registres trobats en %(x_nb_seconds)s segons."
 
 #: modules/websearch/lib/websearch_templates.py:3045
-#, fuzzy
 msgid "No results found..."
-msgstr "No s'han trobat resultats."
+msgstr "No s'han trobat resultats..."
 
 #: modules/websearch/lib/websearch_templates.py:3078
 msgid ""
@@ -5253,29 +5238,26 @@ msgid "See also: similar author names"
 msgstr "Vegeu també: autors amb noms similars"
 
 #: modules/websearch/lib/websearch_templates.py:3341
-#, fuzzy
 msgid "Cited by 1 record"
-msgstr "Citat por %i registres"
+msgstr "Citat per 1 registre"
 
 #: modules/websearch/lib/websearch_templates.py:3351
-#, fuzzy, python-format
+#, python-format
 msgid "%i comments"
-msgstr "comentaris"
+msgstr "%i comentaris"
 
 #: modules/websearch/lib/websearch_templates.py:3352
-#, fuzzy
 msgid "1 comment"
-msgstr "comentari"
+msgstr "1 comentari"
 
 #: modules/websearch/lib/websearch_templates.py:3362
-#, fuzzy, python-format
+#, python-format
 msgid "%i reviews"
-msgstr "crítiques"
+msgstr "%i ressenyes"
 
 #: modules/websearch/lib/websearch_templates.py:3363
-#, fuzzy
 msgid "1 review"
-msgstr "ressenya"
+msgstr "1 ressenya"
 
 #: modules/websearch/lib/websearch_templates.py:3507
 #: modules/websearch/lib/websearch_webinterface.py:975
@@ -5306,10 +5288,9 @@ msgstr ""
 "electrònic o subscribiu-vos al %(x_url2_open)scanal RSS%(x_url2_close)s."
 
 #: modules/websearch/lib/websearch_templates.py:3555
-#, fuzzy, python-format
+#, python-format
 msgid "Subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
-msgstr ""
-"Si ho desitgeu podeu %(x_url_open)sidentificar-vos aquí%(x_url_close)s."
+msgstr "Subscriviu-vos al %(x_url2_open)scanal RSS%(x_url2_close)s."
 
 #: modules/websearch/lib/websearch_templates.py:3564
 msgid "Interested in being notified about new results for this query?"
@@ -5469,12 +5450,11 @@ msgstr ""
 "identifiqueu-vos."
 
 #: modules/websession/lib/webaccount.py:362
-#, fuzzy
 msgid ""
 "This file is restricted.  If you think you have right to access it, please "
 "authenticate yourself."
 msgstr ""
-"Aquesta col·lecció és restringida.  Si creieu que hi teniu accés, "
+"Aquest document és restringit.  Si creieu que hi teniu accés, "
 "identifiqueu-vos."
 
 #: modules/websession/lib/websession_templates.py:92
@@ -5547,13 +5527,8 @@ msgid "Old password"
 msgstr "Contrasenya antiga"
 
 #: modules/websession/lib/websession_templates.py:211
-#, fuzzy
 msgid "New password"
-msgstr ""
-"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"Nova contrasenya\n"
-"#-#-#-#-#  ca.po (CDS-Invenio 0.99.1)  #-#-#-#-#\n"
-"Contrasenya nova"
+msgstr "Contrasenya nova"
 
 #: modules/websession/lib/websession_templates.py:212
 #: modules/websession/lib/websession_templates.py:1034
@@ -5596,9 +5571,8 @@ msgstr ""
 "(x_url_open)ssistema de comptes del CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:252
-#, fuzzy
 msgid "Edit cataloging interface settings"
-msgstr "Edita els paràmetres de llengua"
+msgstr "Edita els paràmetres de catalogació"
 
 # Confirmar que no hagi de ser l'email!
 #: modules/websession/lib/websession_templates.py:253
@@ -5834,15 +5808,15 @@ msgid "Your Approvals"
 msgstr "Les vostres aprovacions"
 
 #: modules/websession/lib/websession_templates.py:638
-#, fuzzy, python-format
+#, python-format
 msgid "You can consult the list of %(x_url_open)syour tickets%(x_url_close)s."
 msgstr ""
-"Podeu consultar la llista dels %(x_url_open)svostres grups%(x_url_close)s."
+"Podeu consultar la llista de les %(x_url_open)svostres "
+"tasques%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:641
-#, fuzzy
 msgid "Your Tickets"
-msgstr "Els vostres cistells"
+msgstr "Les vostres tasques"
 
 #: modules/websession/lib/websession_templates.py:643
 #: modules/websession/lib/websession_webinterface.py:624
@@ -5953,11 +5927,9 @@ msgstr ""
 "(x_url_close)s en un compte intern."
 
 #: modules/websession/lib/websession_templates.py:847
-#, fuzzy, python-format
+#, python-format
 msgid "If you don't own an account yet, please contact %s."
-msgstr ""
-"Si encara no teniu un compte, podeu %(x_url_open)sdonar-vos d'alta%"
-"(x_url_close)s en un compte intern."
+msgstr "Si encara no teniu un compte, poseu-vos en contacte amb %s."
 
 #: modules/websession/lib/websession_templates.py:870
 msgid "Login method:"
@@ -6077,9 +6049,8 @@ msgid "You are enabled to the following roles: %(x_role)s."
 msgstr "Teniu activats els següents rols: %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:1098
-#, fuzzy
 msgid "Configure BibKnowledge"
-msgstr "Configurar de BibIndex"
+msgstr "Configurar BibKnowledge"
 
 #: modules/websession/lib/websession_templates.py:1118
 msgid "Here are some interesting web admin links for you:"
@@ -6109,59 +6080,48 @@ msgid "Personalize"
 msgstr "Personalitza"
 
 #: modules/websession/lib/websession_templates.py:1243
-#, fuzzy
 msgid "Your account"
 msgstr "El vostre compte"
 
 #: modules/websession/lib/websession_templates.py:1249
-#, fuzzy
 msgid "Your alerts"
 msgstr "Les vostres alertes"
 
 #: modules/websession/lib/websession_templates.py:1255
-#, fuzzy
 msgid "Your approvals"
 msgstr "Les vostres aprovacions"
 
 #: modules/websession/lib/websession_templates.py:1261
-#, fuzzy
 msgid "Your baskets"
 msgstr "Els vostres cistells"
 
 #: modules/websession/lib/websession_templates.py:1267
-#, fuzzy
 msgid "Your groups"
 msgstr "Els vostres grups"
 
 #: modules/websession/lib/websession_templates.py:1273
-#, fuzzy
 msgid "Your loans"
 msgstr "Els vostres préstecs"
 
 #: modules/websession/lib/websession_templates.py:1279
-#, fuzzy
 msgid "Your messages"
 msgstr "Els vostres missatges"
 
 #: modules/websession/lib/websession_templates.py:1285
-#, fuzzy
 msgid "Your submissions"
 msgstr "Els vostres lliuraments"
 
 #: modules/websession/lib/websession_templates.py:1291
-#, fuzzy
 msgid "Your searches"
 msgstr "Les vostres cerques"
 
 #: modules/websession/lib/websession_templates.py:1344
-#, fuzzy
 msgid "Administration"
-msgstr "administració"
+msgstr "Administració"
 
 #: modules/websession/lib/websession_templates.py:1360
-#, fuzzy
 msgid "Statistics"
-msgstr "estadístiques"
+msgstr "Estadístiques"
 
 #: modules/websession/lib/websession_templates.py:1487
 msgid "You are an administrator of the following groups:"
@@ -6518,9 +6478,8 @@ msgid "You can approve or reject this account request at"
 msgstr "Podeu aprovar o rebutjar aquest compte a"
 
 #: modules/websession/lib/webuser.py:914 modules/websession/lib/webuser.py:915
-#, fuzzy
 msgid "Run File Manager"
-msgstr "Unificar registres"
+msgstr "Executar el gestor de fitxers"
 
 #: modules/websession/lib/websession_webinterface.py:83
 msgid "Mail Cookie Service"
@@ -6586,16 +6545,14 @@ msgid "Reset password"
 msgstr "Reiniciar la contrassenya"
 
 #: modules/websession/lib/websession_webinterface.py:157
-#, fuzzy
 msgid "This request for resetting a password has already been used."
-msgstr ""
-"Aquesta petició per reiniciar la contrasenya no és vàlida o ha expirat."
+msgstr "Aquesta petició per reiniciar la contrasenya ja s'ha usat."
 
 #: modules/websession/lib/websession_webinterface.py:160
-#, fuzzy
 msgid "This request for resetting a password is not valid or is expired."
 msgstr ""
-"Aquesta petició per reiniciar la contrasenya no és vàlida o ha expirat."
+"Aquesta petició per reiniciar una contrasenya no és vàlida o ha "
+"expirat."
 
 #: modules/websession/lib/websession_webinterface.py:165
 msgid "This request for resetting the password is not valid or is expired."
@@ -6635,16 +6592,14 @@ msgid "Show account"
 msgstr "Mostrar el compte"
 
 #: modules/websession/lib/websession_webinterface.py:338
-#, fuzzy
 msgid "Unable to change login method."
-msgstr "El mètode d'identificació canviat a l'intern."
+msgstr "No ha estat possible canviar el mètode d'identificació."
 
 #: modules/websession/lib/websession_webinterface.py:346
 msgid "Switched to internal login method."
 msgstr "El mètode d'identificació canviat a l'intern."
 
 #: modules/websession/lib/websession_webinterface.py:347
-#, fuzzy
 msgid ""
 "Please note that if this is the first time that you are using this account "
 "with the internal login method then the system has set for you a randomly "
@@ -6798,16 +6753,13 @@ msgstr "Anterior contrassenya incorrecta."
 msgid "User settings saved correctly."
 msgstr "S'han guardat correctament els paràmetres d'usuario."
 
-# Fallida?  Impossible editar...
 #: modules/websession/lib/websession_webinterface.py:486
-#, fuzzy
 msgid "Editing bibcatalog authorization failed"
-msgstr "L'edició dels paràmetres ha fallat"
+msgstr "Ha fallat l'edició de l'autorització de bibcatalog"
 
 #: modules/websession/lib/websession_webinterface.py:487
-#, fuzzy
 msgid "Empty username or password"
-msgstr "Poseu la contrasenya nova"
+msgstr "La identificació o la contrasenya estan buits"
 
 #: modules/websession/lib/websession_webinterface.py:496
 msgid "Unable to update settings."
@@ -6945,9 +6897,8 @@ msgstr ""
 "possible."
 
 #: modules/websession/lib/websession_webinterface.py:906
-#, fuzzy
 msgid "Your tickets"
-msgstr "Els vostres cistells"
+msgstr "Les vostres tasques"
 
 #: modules/websession/lib/websession_webinterface.py:941
 #: modules/websession/lib/websession_webinterface.py:985
@@ -6955,9 +6906,8 @@ msgstr "Els vostres cistells"
 #: modules/websession/lib/websession_webinterface.py:1108
 #: modules/websession/lib/websession_webinterface.py:1166
 #: modules/websession/lib/websession_webinterface.py:1238
-#, fuzzy
 msgid "You are not authorized to use groups."
-msgstr "No esteu autoritzats a veure aquesta àrea."
+msgstr "No esteu autoritzats a usar grups."
 
 #: modules/websession/lib/websession_webinterface.py:1070
 msgid "Join New Group"
@@ -7034,9 +6984,8 @@ msgid "Client"
 msgstr "Client"
 
 #: modules/webstyle/lib/webstyle_templates.py:671
-#, fuzzy
 msgid "Please send an error report to the administrator."
-msgstr "Si us plau envieu l'informe d'error a l'Administrador."
+msgstr "Si us plau envieu l'informe d'error a l'administrador."
 
 #: modules/webstyle/lib/webstyle_templates.py:672
 msgid "Send error report"
@@ -7056,16 +7005,12 @@ msgstr ""
 "(x_date_modification)s"
 
 #: modules/webstyle/lib/webstyle_templates.py:903
-#, fuzzy
 msgid "The server encountered an error while dealing with your request."
-msgstr ""
-"El sistema ha trobat un error recuperant la llista dels fitxers d'aquest "
-"document."
+msgstr "El sistema ha trobat un error mentre gestionava la vostra petició."
 
 #: modules/webstyle/lib/webstyle_templates.py:904
-#, fuzzy
 msgid "The system administrators have been alerted."
-msgstr "El registre ha estat suprimit."
+msgstr "Els administradors del sistema han estat avisats."
 
 #: modules/webstyle/lib/webstyle_templates.py:905
 #, python-format
@@ -7130,15 +7075,13 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:368
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:443
-#, fuzzy
 msgid "Choose a file"
-msgstr "Escolliu un tema"
+msgstr "Escolliu el fitxer"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:376
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:459
-#, fuzzy
 msgid "Access"
-msgstr "menys"
+msgstr "Accés"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:536
 #, python-format
@@ -7173,9 +7116,11 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:583
 #: modules/websubmit/lib/websubmit_managedocfiles.py:594
 #: modules/websubmit/lib/websubmit_managedocfiles.py:704
-#, fuzzy, python-format
+#, python-format
 msgid "A file named %s already exists. Please choose another name."
-msgstr "L'àlies sol·licitat %s ja existeix a la base de dades."
+msgstr ""
+"Ja existeix un fitxer amb el nom %s.  Escolliu-ne un altre, si us "
+"plau."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:605
 #, python-format
@@ -7199,9 +7144,8 @@ msgid "Choose how you want to restrict access to this file."
 msgstr "Escolliu com voleu restringir l'accés a aquest fitxer"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:817
-#, fuzzy
 msgid "Add new file"
-msgstr "Afegeix una nova regla"
+msgstr "Afegeix una altre fitxer"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:842
 msgid "You can decide to hide or not previous version(s) of this file."
@@ -7225,9 +7169,8 @@ msgstr ""
 "esborrats"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:845
-#, fuzzy
 msgid "Keep previous versions"
-msgstr "versions anteriors"
+msgstr "Guardar les versions anteriors"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:847
 msgid "Upload"
@@ -7235,7 +7178,6 @@ msgstr "Penjar"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:859
 #: modules/websubmit/lib/websubmit_webinterface.py:464
-#, fuzzy
 msgid "Apply changes"
 msgstr "Desar els canvis"
 
@@ -7267,23 +7209,21 @@ msgstr ""
 "(mailto_link)s."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:874
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Having a problem adding or revising a file? Send the new/revised version to %"
 "(mailto_link)s."
 msgstr ""
-"Teniu problemes revisant un fitxer? Envieu la versió revisada a %"
-"(mailto_link)s."
+"Teniu problemes per afegir o revisar un fitxer? Envieu la versió nova "
+"o revisada a %(mailto_link)s."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:989
-#, fuzzy
 msgid "revise"
-msgstr "ressenya"
+msgstr "revisar"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:1033
-#, fuzzy
 msgid "add format"
-msgstr "afegir comentaris"
+msgstr "afegir format"
 
 #: modules/websubmit/lib/functions/Shared_Functions.py:203
 msgid ""
@@ -7323,9 +7263,8 @@ msgstr "Heu d'identificar-vos per a executar aquesta acció."
 
 #: modules/websubmit/lib/websubmit_engine.py:186
 #: modules/websubmit/lib/websubmit_engine.py:798
-#, fuzzy
 msgid "Not enough information to go ahead with the submission."
-msgstr "No hi ha prou informació per a recuperar el document"
+msgstr "No hi ha prou informació per a continuar amb el lliurament."
 
 #: modules/websubmit/lib/websubmit_engine.py:192
 #: modules/websubmit/lib/websubmit_engine.py:273
@@ -7336,21 +7275,19 @@ msgstr "No hi ha prou informació per a recuperar el document"
 #: modules/websubmit/lib/websubmit_engine.py:850
 #: modules/websubmit/lib/websubmit_engine.py:908
 #: modules/websubmit/lib/websubmit_engine.py:949
-#, fuzzy
 msgid "Invalid parameters"
-msgstr "Paràmetre no vàlid"
+msgstr "Paràmetres no vàlids"
 
 #: modules/websubmit/lib/websubmit_engine.py:198
 #: modules/websubmit/lib/websubmit_engine.py:804
-#, fuzzy
 msgid "Invalid doctype and act parameters"
-msgstr "Paràmetre no vàlid"
+msgstr "Paràmetres per a doctype i act no vàlids"
 
 #: modules/websubmit/lib/websubmit_engine.py:229
 #: modules/websubmit/lib/websubmit_engine.py:839
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to find the submission directory for the action: %s"
-msgstr "No es pot trobar el directori de lliuraments."
+msgstr "No es pot trobar el directori de lliuraments per a l'acció: %s"
 
 #: modules/websubmit/lib/websubmit_engine.py:238
 #: modules/websubmit/lib/websubmit_engine.py:989
@@ -7369,17 +7306,19 @@ msgstr "No ha estat possible determinar el número de pàgines del lliurament."
 
 #: modules/websubmit/lib/websubmit_engine.py:293
 #: modules/websubmit/lib/websubmit_engine.py:858
-#, fuzzy
 msgid ""
 "Unable to create a directory for this submission. The administrator has been "
 "alerted."
-msgstr "No es pot crear el directori per a aquest lliurament."
+msgstr ""
+"No es pot crear el directori per a aquest lliurament. L'administrador "
+"ha estat avisat."
 
 #: modules/websubmit/lib/websubmit_engine.py:402
 #: modules/websubmit/lib/websubmit_engine.py:956
-#, fuzzy
 msgid "Cannot create submission directory. The administrator has been alerted."
-msgstr "No es pot crear el directori de lliuraments"
+msgstr ""
+"No es pot crear el directori de lliuraments. L'administrador ha estat "
+"avisat."
 
 #: modules/websubmit/lib/websubmit_engine.py:421
 #: modules/websubmit/lib/websubmit_engine.py:975
@@ -7406,9 +7345,9 @@ msgstr ""
 "fitxer PDF)."
 
 #: modules/websubmit/lib/websubmit_engine.py:1361
-#, fuzzy, python-format
+#, python-format
 msgid "Unable to find document type: %s"
-msgstr "Impossible de determinar el tipus de document."
+msgstr "Impossible de trobar el tipus de document: %s"
 
 #: modules/websubmit/lib/websubmit_engine.py:1640
 msgid "The chosen action is not supported by the document type."
@@ -7790,9 +7729,8 @@ msgid "Click here"
 msgstr "Feu clic aquí"
 
 #: modules/websubmit/lib/websubmit_templates.py:2357
-#, fuzzy
 msgid "Approval note:"
-msgstr "Aprova"
+msgstr "Nota d'aprovació:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2362
 #, python-format
@@ -8047,21 +7985,18 @@ msgstr "Usuari"
 msgid "Select:"
 msgstr "Seleccioneu:"
 
-# Està bé el plural?
+# Aprovar o aprovat?
 #: modules/websubmit/lib/websubmit_templates.py:3083
-#, fuzzy
 msgid "approve"
-msgstr "aprovats"
+msgstr "aprovar"
 
 #: modules/websubmit/lib/websubmit_templates.py:3084
-#, fuzzy
 msgid "reject"
-msgstr "rebutjats"
+msgstr "rebutjar"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:113
-#, fuzzy
 msgid "Requested record does not seem to have been integrated."
-msgstr "El registre que sol·liciteu no existeix."
+msgstr "El registre que sol·liciteu no sembla estar integrat."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:139
 msgid ""
@@ -8086,9 +8021,8 @@ msgid ""
 msgstr "Aquest fitxer està amagat i no teniu permís per acceder-hi."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:222
-#, fuzzy
 msgid "Requested file does not seem to exist."
-msgstr "El registre que sol·liciteu no existeix."
+msgstr "El fitxer que sol·liciteu no existeix."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:256
 msgid "Access to Fulltext"
@@ -8107,9 +8041,8 @@ msgid "An error has happened in trying to retrieving the requested file."
 msgstr "Hi ha hagut un error a l'intentar recuperar el fitxer sol·licitat."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:367
-#, fuzzy
 msgid "Manage Document Files"
-msgstr "Gestiona les plantilles dels formats"
+msgstr "Gestionar els fitxers dels documents"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:385
 #, fuzzy, python-format
