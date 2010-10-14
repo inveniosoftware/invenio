@@ -89,13 +89,14 @@ class TestSelectiveHarvesting(unittest.TestCase):
                                                                  untildate=sample_datestamp.split('T')[0]))
 
         # At later date (year after) we should not find our id again
-        later_datestamp = sample_datestamp
-        later_datestamp = sample_datestamp[0:3] + str(int(sample_datestamp[3]) + 1) + sample_datestamp[4:]
+        sample_datestamp_year = int(sample_datestamp[0:4])
+        sample_datestamp_rest = sample_datestamp[4:]
+        later_datestamp = str(sample_datestamp_year + 1) + sample_datestamp_rest
         self.assert_(sample_id not in oai_repository.oaigetsysnolist(fromdate=later_datestamp))
 
         # At earlier date (year before) we should not find our id again
         earlier_datestamp = sample_datestamp
-        earlier_datestamp = sample_datestamp[0:3] + str(int(sample_datestamp[3]) - 1) + sample_datestamp[4:]
+        earlier_datestamp = str(sample_datestamp_year - 1) + sample_datestamp_rest
         self.assert_(sample_id not in oai_repository.oaigetsysnolist(untildate=earlier_datestamp))
 
         # From earliest date to latest date must include all oai records
