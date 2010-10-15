@@ -133,30 +133,26 @@ def get_subfield_content(line,code):
     content = content.split('</subfield>')[0]
     return content
 
-def change_otag_format(out):
+def compress_m_subfields(out):
     #
-    ## Mark "o" tag lines so can delete and move o tags
-    ## This version (using find) slightly faster than compiled expressions..
+    ## For each datafield, compress multiple 'm' subfields into a single one
     #
     """ change xml format from (e.g.):
            <datafield tag="999" ind1="C" ind2="5">
-                <subfield code="o">1.</subfield>
+              <subfield code="o">1.</subfield>
+              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,</subfield>
+              <subfield code="s">Rev. Mod. Phys. 76 (2004) 643</subfield>
+              <subfield code="m">and this is some more misc text</subfield>
            </datafield>
            <datafield tag="999" ind1="C" ind2="5">
-                <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,</subfield>
-                <subfield code="s">Rev. Mod. Phys. 76 (2004) 643</subfield>
-           </datafield>
-           <datafield tag="999" ind1="C" ind2="5">
-                <subfield code="o">2.</subfield>
-           </datafield>
-           <datafield tag="999" ind1="C" ind2="5">
-                <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
-                <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
+              <subfield code="o">2.</subfield>
+              <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
+              <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
            </datafield>
         to:
            <datafield tag="999" ind1="C" ind2="5">
               <subfield code="o">1.</subfield>
-              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,</subfield>
+              <subfield code="m">J. Dukelsky, S. Pittel and G. Sierra,and this is some more misc text</subfield>
               <subfield code="s">Rev. Mod. Phys. 76 (2004) 643</subfield>
            </datafield>
            <datafield tag="999" ind1="C" ind2="5">
@@ -164,116 +160,41 @@ def change_otag_format(out):
               <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
               <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
            </datafield>
-
-        - group together the contents of misc elements which belong to the same datafield element
-        - correctly manage mulitple references inside a single citation line (using multiple 'o'
-            tags to denote mulitple references)
            """
-
-    tag_lines=[]
     in_lines = out.split('\n')
-
-    marker_found = False
-
-    ## Set the elements in the 'tag_line' list based on the tag contents of
-    ## Each line in the xml string.
-    for line in in_lines:
-        if line.find('<subfield code="o">') != -1:
-            tag_lines.append('o')
-            marker_found = True
-        elif line.find('<datafield tag="999" ind1="C" ind2="5">') != -1:
-            tag_lines.append('5')
-        ## 'y' is used to mark the end of a datafield element
-        elif line.find('</datafield>') <> -1:
-            tag_lines.append('y')
-        ## 'm' (misc) fields are treated differently from other subfields.
-        ## Their contents will be concatenated later on into a single 'm' subfield.
-        ## During processing, there exists the possibility for mulitple 'm' subfields
-        ## To be generated.
-        elif line.find('<subfield code="m"') != -1:
-            tag_lines.append('m')
-        ## All other subfields and elements (url's, record tags, doi's ... etc)
-        else:
-            tag_lines.append('z')
-
+    ## hold the 'm' compressed version of the xml, line by line
     new_rec_lines=[]
-    lc = 0
-    ## Used to denote the starting datafield tag in the file
-    open_5_line = True
-
     ## Used to indicate when an m tag has already been reached inside a particular datafield
-    first_m = True
-    ## Hold the line number of the first 'm' subfield encountered for a particular datafield
     position_m = 0
-
-    ## Holds the ending datafield tag when found
-    end_tag = ""
-
     ## Where the concatenated misc text is held before appended at the end
     misc_text = ""
     ## Components of the misc subfield elements
     misc_subfield_start = "      <subfield code=\"m\">"
     subfield_end = "</subfield>"
 
-    ## Once again, for each line in the xml string..
-    ## Run adjacently to the list of tags in tag_lines
-    ## Output fixed xml (collect together a single citation's
-    ## items into datafield elements)
-    for xline in in_lines:
-        xline = xline.rstrip()
-
-        ## Save ending datafield tag
-        if tag_lines[lc] == 'y':
-            end_tag = xline
-
-        ## Checks to see if the line is the FIRST <datafield> opening tag
-        ## (FIRST in the entire xml string)
-        if tag_lines[lc] == '5' and open_5_line:
-            new_rec_lines.append(xline)
-            ## All other <datafield> tags are second to this
-            open_5_line = False
-
-        ## ALWAYS append <subfield> (not misc) and <record> lines,
-        elif tag_lines[lc] == 'z' or tag_lines[lc] == 'o':
-            new_rec_lines.append(xline)
-
-        ## If a misc tag is found, add the contents of the element to the total misc content.
-        elif tag_lines[lc] == 'm':
-            if first_m:
+    for i, line in enumerate(in_lines):
+        if line.find('</datafield>') != -1:
+            if misc_text != "":
+                ## Insert the concatenated misc contents back where it was first encountered
+                ## (dont RIGHTstrip semi-colons, as these may be needed for &amp; or &lt;)
+                new_rec_lines.insert(position_m, misc_subfield_start+misc_text.strip(" ,.").lstrip(" ,.;")+subfield_end)
+                misc_text = ""
+            position_m = 0
+            new_rec_lines.append(line)
+        ## concatenate misc contents for this single datafield
+        elif line.find('<subfield code="m">') != -1:
+            if position_m == 0:
                 ## Save the position of this found 'm' subfield
                 ## for later insertion into the same place
-                position_m = len(new_rec_lines)
-                first_m = False
-            misc_text += get_subfield_content(xline,'m')
-
-        ## Encountering a datafield tag of some sort: (not the first starting tag or any ending tag)
+                position_m = i
+            new_m_text = get_subfield_content(line,'m')
+            if (len(misc_text) > 0) and (len(new_m_text)) > 0:
+                ## If there is no space between the m text.. make a space
+                if (misc_text[-1]+new_m_text[0]).find(" ") == -1:
+                    new_m_text = " "+new_m_text
+            misc_text += new_m_text
         else:
-            ## Look-ahead is needed to try and observe a marker tag
-            if len(tag_lines) >= lc:
-                ## Try to append the closing </datafield> tag at the end of a <datafield> element.
-                ## The end of a full citation is marked by the next datafield element which
-                ## Holds an 'o' subfield tag as its first subfield element.
-                if tag_lines[lc] == '5' and tag_lines[lc + 1] == 'o':
-                    if misc_text <> "":
-                        ## Insert the misc subfield element where it was first encountered
-                        new_rec_lines.insert(position_m, misc_subfield_start+misc_text+subfield_end)
-                        ## Reset misc check variables
-                        first_m = True
-                        misc_text = ""
-                    ## End the datafield element, and start a new one.
-                    new_rec_lines.append(end_tag)
-                    new_rec_lines.append(xline)
-                ## Else, if there is not a starting datafield tag before the current
-                ## Datafield ending tag, append the current end tag by itself
-                ## (reached end of file)
-                elif tag_lines[lc] == 'y' and tag_lines[lc + 1] <> '5':
-                    if misc_text <> "":
-                        ## Add the misc subfield element to the final xml file
-                        new_rec_lines.insert(position_m, misc_subfield_start+misc_text+subfield_end)
-                        first_m = True
-                        misc_text = ""
-                    new_rec_lines.append(end_tag)
-        lc+=1
+            new_rec_lines.append(line)
 
     ## Create the readable file from the list of lines.
     new_out = ''
@@ -283,58 +204,45 @@ def change_otag_format(out):
             new_out += rec + '\n'
     return new_out
 
-def squeeze_m(reference_lines):
-    """remove solitary "m" tags that are too short or too long
-       min and max lengths derived by inspection of actual data """
+def restrict_m_subfields(reference_lines):
+    """Remove complete datafields which hold ONLY a single 'm' subfield,
+       AND where the misc content is too short or too long to be of use.
+       Min and max lengths derived by inspection of actual data. """
     min_length = 12
     max_length = 1024
     m_tag=re.compile('\<subfield code=\"m\"\>(.*?)\<\/subfield\>')
-    end_tag=re.compile('<\/datafield\>')
     filter_list = []
-    m_squeezed = 0
+    m_restricted = 0
     for i in range(len(reference_lines)): ## set up initial filter
         filter_list.append(1)
     for i in range(len(reference_lines)):
         if m_tag.search(reference_lines[i]):
-            if end_tag.search(reference_lines[i + 1]):  ## If this is true then its a solitary "m" tag
-                mlength= len(m_tag.search(reference_lines[i]).group(1))
-                if mlength < min_length or mlength > max_length:
-                    filter_list[i-1] = filter_list[i] = filter_list[i+1] = 0
-                    m_squeezed += 1
+            if (i - 2) >= 0 and (i + 1) < len(reference_lines):
+                if reference_lines[i + 1].find('</datafield>') != -1 and \
+                    reference_lines[i - 1].find('<subfield code="o">') != -1 and \
+                    reference_lines[i - 2].find('<datafield') != -1:
+                    ## If both of these are true then its a solitary "m" tag
+                    mlength= len(m_tag.search(reference_lines[i]).group(1))
+                    if mlength < min_length or mlength > max_length:
+                        filter_list[i-2] = filter_list[i-1] = filter_list[i] = filter_list[i+1] = 0
+                        m_restricted += 1
     new_reference_lines = []
     for i in range(len(reference_lines)):
         if filter_list[i]:
             new_reference_lines.append(reference_lines[i])
-    return m_squeezed,new_reference_lines
-
-def squeeze_o(reference_lines):
-    """ remove consecutive "o" tags - which are already present but are made
-        worse by squeezing out m tags """
-    o_tag=re.compile('\<subfield code=\"o\"\>(.*?)\<\/subfield\>')
-    o_squeezed = 0
-    filter_list = []
-    for i in range(len(reference_lines)):
-        filter_list.append(1)
-    for i in range(len(reference_lines)):
-        if o_tag.search(reference_lines[i]):
-            if i+3 < len(reference_lines):
-                if  o_tag.search(reference_lines[i+3]): ## if this is true then its 2 "o" tags in a row
-                    filter_list[i-1] = filter_list[i] = filter_list[i+1] = 0
-                    o_squeezed += 1
-    new_reference_lines = []
-    for i in range(len(reference_lines)):
-        if filter_list[i]:
-            new_reference_lines.append(reference_lines[i])
-    return o_squeezed,new_reference_lines
+    return m_restricted,new_reference_lines
 
 def filter_processed_references(out):
+    #print "XML LINES in filter_processed_references:"
+    #print out
+
     """ apply filters to reference lines found - to remove junk"""
     reference_lines = out.split('\n')
+
     ## Remove too long and too short m tags
-    (m_squeezed,ref_lines) = squeeze_m(reference_lines)
-    ## Now look for consecutive o tags (with no other tag)
-    (o_squeezed,ref_lines) = squeeze_o(ref_lines)
-    if m_squeezed + o_squeezed:
+    (m_restricted,ref_lines) = restrict_m_subfields(reference_lines)
+
+    if m_restricted:
         a_tag=re.compile('\<subfield code=\"a\"\>(.*?)\<\/subfield\>')
         for i in range(len(ref_lines)):
             ## Checks to see that the datafield has the attribute ind2="6",
@@ -349,7 +257,7 @@ def filter_processed_references(out):
                         words1 = data.split()
                         words2 = words1[-1].split('-')
                         old_m = int(words2[-1])
-                        words2[-1] = str(old_m - m_squeezed)
+                        words2[-1] = str(old_m - m_restricted)
                         data1 = '-'.join(words2)
                         words1[-1] = data1
                         new_data = ' '.join(words1)
@@ -365,6 +273,7 @@ def filter_processed_references(out):
     if cli_opts['verbosity'] >= 1 and len(reference_lines) != len_filtered:
         sys.stdout.write("-----Filter results: unfilter references line length is %d and filtered length is %d\n" \
               %  (len(reference_lines),len_filtered))
+
     return new_out
 
 def get_url_repair_patterns():
@@ -882,7 +791,8 @@ re_tagged_citation = re.compile(r"""
           |REPORTNUMBER          ## or a REPORTNUMBER tag
           |SER                   ## or a SER tag
           |URL                   ## or a URL tag
-          |DOI)                  ## or a DOI tag
+          |DOI                   ## or a DOI tag
+          |AUTH(stnd|etal))       ## or an AUTH tag
           (\s\/)?                ## optional /
           \>                     ## closing of tag (>)
           """, \
@@ -1146,6 +1056,84 @@ re_doi = (re.compile("""
     """, re.VERBOSE))
 
 
+# SURNAME FIRST NAME, auth, massive problems with this
+##       ((([A-Z]\w\s)\w+[\-\’'\`]?\w*)|([A-Z]\w+[\-\’'\`]?\w*)(\s+))
+##        ([A-Z])
+
+def make_auth_regex_str(author=None):
+
+    if not author:
+## Pattern used to locate a GROUP of author names in a reference
+## The format of an author can take many forms:
+## J. Bloggs, W. H. Smith, D. De Samuel, G.L. Bayetian, C. Hayward et al.,
+## (the use of 'et. al' is a giveaway that the preceeding
+## text was indeed an author name)
+## This will also match authors which seem to be labeled as editors (with the phrase 'ed.')
+## In which case, the author will be thrown away later on.
+        author = """
+    (
+        ([A-Z]((\.\s?)|(\.?\s+))){1,9}                              ## The first initials (one to nine)(with a dot or a space)
+       ((([A-Z]\w\s)\w+[\-\’'\`]?\w*)|([A-Z]\w+[\-\’'\`]?\w*))      ## The surname, which must start with an upper case lttr (hyphen allowed)
+       (([,\.]\s*)|([,\.]?\s+))                                     ## A comma or dot, Then the space between authors
+    )
+        """
+
+    return r"""
+     (^|\s+)                                                        ## Must be the start of the line, or a space
+
+     (?P<badand>                                                    ## An AND found here likely indicates a missed author before this text.
+        (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                               ## Thus, triggers weaker author searching, within the previous misc text
+     )?
+
+     (?P<es>                                                        ## Look for 'ed' before the author
+      (((ed|edited|editor)((\.\s?)|(\.?\s)))                        ## 'ed. '     | 'ed '      | 'ed.'
+      |((ed|edited)((\.\s?)|(\.?\s))by(\s|([:,]\s)))                ## 'ed. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
+      |(\(\s?(ed|edited|editor)((\.\s?)|(\.?\s))?\)))               ## '( ed. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
+     )?
+
+     %s+
+     (
+      (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                                 ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
+      %s
+     )?
+
+    (?P<ee>                                                         ## Look for 'ed' after the author...
+     (((ed|edited|editor)((\.?\s)|(\.\s?)))                         ## 'ed.'   | 'ed. '   | 'ed '
+     |(\((ed|edited|editor)((\.\s)|(\.))?\)))                       ## '(ed.)' | '(ed. )' | '(ed)'
+    )?
+
+    (?P<et>
+        \s?[Ee][Tt](((,|\.)\s*)|((,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?   ## Possibly: Et al., or Et al. or Et al,
+    )?
+
+    """ % (author,author)
+
+
+re_auth = (re.compile(make_auth_regex_str(),re.VERBOSE|re.UNICODE))
+
+## Given an Auth hit, some misc text, and then another Auth hit straight after,
+## (OR a bad_and was found)
+## check the entire misc text to see if is 'looks' like an author group, which didn't match
+## as a normal author. In which case, append it to the single author group.
+## PLEASE use this pattern only against space stripped text.
+## IF a bad_and was found (from above).. do re.search using this pattern
+## ELIF an auth-misc-auth combo was hit, do re.match using this pattern
+
+weaker_author = """
+    (([A-Z]((\.\s?)|(\.?\s+))){1,9}             ## look closely for initials, and less closely at the last name.
+     [^\s]*\s?[^\s]*?(\s|$))
+    """
+
+## End of line MUST match, since the next string is definitely a portion of an author group (append '$')
+re_auth_near_miss = (re.compile(make_auth_regex_str(weaker_author),re.VERBOSE|re.UNICODE))
+
+
+
+# AND is before last author
+# et. al. is at the end always
+# et. al. before J. /// means J is a journal
+
+
 ## a list of patterns used to try to repair broken URLs within reference lines:
 re_list_url_repair_patterns = get_url_repair_patterns()
 
@@ -1158,6 +1146,7 @@ def get_recids_and_filepaths(args):
     """from a list of arguments in the form "recid:filepath"
        (["1:filepath", "2:filepath", [...]])
        split each string into 2 parts: the record ID and the filepath.
+       @param args: a list of strings
        @param args: a list of strings
        @return: a list of tuples: [(recid, filepath)]
     """
@@ -1761,6 +1750,7 @@ def identify_preprint_report_numbers(line,
             (matched-reportnum-lengths, matched-reportnum-replacements,
              working-line)
     """
+
     def _by_len(a, b):
         """Comparison function used to sort a list by the length of the
            strings in each element of the list.
@@ -1796,7 +1786,7 @@ def identify_preprint_report_numbers(line,
             numeration_match = numeration_match.replace("-/", "/")
             numeration_match = numeration_match.replace("-/-", "/")
             ## replace the found preprint report number in the
-            ## string with underscores:
+            ## string with underscores (this will replace chars in the lower-cased line):
             line = line[0:repnum_match.start(1)] \
                    + "_"*len(repnum_match.group(1)) + line[repnum_match.end(1):]
             ## record the information about the matched preprint report number:
@@ -1807,7 +1797,6 @@ def identify_preprint_report_numbers(line,
             repnum_matches_repl_str[repnum_match.start(1)] = \
                                     preprint_repnum_standardised_categs[categ] \
                                     + numeration_match
-
     ## return recorded information about matched report numbers, along with
     ## the newly changed working line:
     return (repnum_matches_matchlen, repnum_matches_repl_str, line)
@@ -1995,6 +1984,83 @@ def identify_and_tag_doi(line):
         doi_strings.append(doi_phrase)
 
     return (line, doi_strings)
+
+def identify_and_tag_authors(line):
+    """Given a reference, look for a GROUP of author names,
+       leave a tag in place, and return a list of authors GROUPS found in the line.
+    """
+
+    output_line = line
+    tmp_line = line
+    ## Firstly, go through and change JUST THE TITLES to underscores
+    ## so that title tag content won't be tagged as authors
+    title_start = tmp_line.find("<cds.TITLE>")
+    while title_start != -1:
+        title_end = tmp_line.find("</cds.TITLE>") + len("</cds.TITLE>")
+        ## Replace title tags, and the title itself with underscores (this line is used to find authors)
+        line = line[:title_start]+"_"*(title_end - title_start)+line[title_end:]
+        ## Place underscores in the wake of the search
+        tmp_line = "_"*len(tmp_line[:title_end]) + tmp_line[title_end:]
+        title_start = tmp_line.find("<cds.TITLE>")
+
+    ## Find as many author groups (collections of author names) as possible from the 'title-hidden' line
+    matched_authors = re_auth.finditer(line)
+    ## If there is at least one matched author group
+    if matched_authors:
+        matched_positions = []
+        preceeding_text_string = line
+        preceeding_text_start = 0
+        for auth_no, match in enumerate(matched_authors):
+            ## Has the group with name 'et' (for 'et al') been found in the pattern?
+            ## Has the group with name 'es' (for ed. before the author) been found in the pattern?
+            ## Has the group with name 'ee' (for ed. after the author) been found in the pattern?
+            matched_positions.append({  'start'       : match.start(),
+                                        'end'         : match.end(),
+                                        'etal'        : match.group('et'),
+                                        'ed_start'    : match.group('es'),
+                                        'ed_end'      : match.group('ee'),
+                                        'bad_and'     : match.group('badand'),
+                                        'text_before' : preceeding_text_string[preceeding_text_start:match.start()],
+                                        'auth_no'     : auth_no })
+            ## Save the end of the match, from where to snip the misc text found before an author match
+            preceeding_text_start = match.end()
+
+        ## Work backwards to avoid index problems when adding AUTH tags
+        matched_positions.reverse()
+        for m in matched_positions:
+            dump_in_misc = False
+            start = m['start']
+            end = m['end']
+
+            if m['bad_and']:
+                ## Search the misc text using a weaker pattern before this author hit
+                weaker_match = re_auth_near_miss.search(m['text_before'])
+                if weaker_match and not (weaker_match.group('es') or weaker_match.group('ee')):
+                    ## Change the start of the author group to include this new author group
+                    start = start - (len(m['text_before']) - weaker_match.start())
+                ## Still no match, do not add tags for this author match.. dump it into misc
+                else:
+                    dump_in_misc = True
+
+            ## Ideally, id like to have it search the misc text when auth-misc-auth occurs
+            #elif m['
+
+            ## ONLY wrap author data with tags IF there is no evidence that it is an
+            ## ed. author. (i.e. The author is not referred to as an editor)
+            ## Does this author group string have 'et al.'?
+            if m['etal'] and not(m['ed_start'] or m['ed_end'] or dump_in_misc):
+                ## Et al. is present! This is HIGHLY likely to be an author group
+                ## Insert the etal tag...
+                output_line = output_line[:start] + "<cds.AUTHetal>" \
+                    + re.sub('\sans\s',' and ',output_line[start:end].strip(".,:;- []"), re.IGNORECASE) \
+                    + "</cds.AUTHetal>" + output_line[end:]
+            elif not(m['ed_start'] or m['ed_end'] or dump_in_misc):
+                ## Insert the std (standard) tag
+                output_line = output_line[:start] + "<cds.AUTHstnd>" \
+                    + re.sub('\sans\s',' and ',output_line[start:end].strip(".,:;- []"), re.IGNORECASE) \
+                    + "</cds.AUTHstnd>" + output_line[end:]
+
+    return output_line
 
 
 def identify_periodical_titles(line,
@@ -2197,6 +2263,8 @@ def account_for_stripped_whitespace(spaces_keys,
     return (true_replacement_index, extras)
 
 
+
+
 def create_marc_xml_reference_line(line_marker,
                                    working_line,
                                    found_title_len,
@@ -2325,8 +2393,11 @@ def create_marc_xml_reference_line(line_marker,
                                            extras=extras)
                 tagged_line += rebuilt_chunk
 
+
+
         ## add the remainder of the original working-line into the rebuilt line:
         tagged_line += working_line[startpos:]
+
         ## use the recently marked-up title information to identify any
         ## numeration that escaped the last pass:
         tagged_line = _re_identify_numeration(tagged_line)
@@ -2334,6 +2405,10 @@ def create_marc_xml_reference_line(line_marker,
         ## series information into the title tags:
         tagged_line = move_tagged_series_into_tagged_title(tagged_line)
         tagged_line = wash_line(tagged_line)
+
+    ## Before moving onto creating the XML string... try to find any authors in the line
+    ## Found authors are immediately placed into tags (after Titles and Repnum's have been found)
+    tagged_line = identify_and_tag_authors(tagged_line)
 
     ## Now, from the tagged line, create a MARC XML string,
     ## marking up any recognised citations:
@@ -2349,358 +2424,7 @@ def create_marc_xml_reference_line(line_marker,
                                                       identified_urls)
     return (xml_line, count_misc, count_title, count_reportnum, count_url, count_doi)
 
-def markup_title_as_marcxml(title, volume, year, page, misc_text=""):
-    """Given a title, its numeration and some optional miscellaneous text,
-       return a string containing the MARC XML version of this information.
-       E.g. for the miscellaneous text "S. D. Hsu and M. Schwetz ", the
-       title "Nucl. Phys., B", the volume "572", the year "2000" and the
-       page number "211" return the following MARC XML string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="m">S. D. Hsu and M. Schwetz </subfield>
-           <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
-        </datafield>
-       In the event that the miscellaneous text string is zero-length, there
-       will be no $m subfield present in the returned XML.
-       @param title: (string) - the cited title.
-       @param volume: (string) - the volume of the cited title.
-       @param year: (string) - the year of the cited title.
-       @param page: (string) - the page of the cited title.
-       @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the cited title and its
-        miscellaneous text.
-    """
-    ## First, determine whether there is need of a misc subfield:
-    if len(misc_text) > 0:
-        ## create a misc subfield to be included in the MARC XML:
-        xml_misc_subfield = """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : encode_for_xml(misc_text),
-                  }
-    else:
-        ## the misc subfield is not needed
-        xml_misc_subfield = ""
-    ## Build the datafield for the report number segment of the reference line:
-    xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
-      <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>
-   </datafield>
-"""               % { 'df-tag-ref'          : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                      'df-ind1-ref'         : CFG_REFEXTRACT_IND1_REFERENCE,
-                      'df-ind2-ref'         : CFG_REFEXTRACT_IND2_REFERENCE,
-                      'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                      'misc-subfield'       : xml_misc_subfield,
-                      'title'               : encode_for_xml(title),
-                      'volume'              : encode_for_xml(volume),
-                      'year'                : encode_for_xml(year),
-                      'page'                : encode_for_xml(page),
-                    }
-    return xml_line
 
-def markup_title_followedby_reportnum_as_marcxml(title, volume, year, page,
-                                                 report_number, misc_text=""):
-    """Given a title (and its numeration), a report number, and some optional
-       miscellaneous text, return a string containing the MARC XML version of
-       this information. E.g. for the miscellaneous text
-       "S. D. Hsu and M. Schwetz ", the report number "hep-th/1111111", the
-       title "Nucl. Phys., B", the volume "572", the year "2000", and the
-       page number "211", return the following MARC XML string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="m">S. D. Hsu and M. Schwetz </subfield>
-           <subfield code="r">hep-th/1111111</subfield>
-           <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
-        </datafield>
-       In the event that the miscellaneous text string is zero-length, there
-       will be no $m subfield present in the returned XML.
-       @param title: (string) - the cited title.
-       @param volume: (string) - the volume of the cited title.
-       @param year: (string) - the year of the cited title.
-       @param page: (string) - the page of the cited title.
-       @param report_number: (string) - the institutional report number to
-        be marked up.
-       @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the cited title and
-        its miscellaneous text.
-    """
-    ## First, determine whether there is need of a misc subfield:
-    if len(misc_text) > 0:
-        ## create a misc subfield to be included in the MARC XML:
-        xml_misc_subfield = """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : encode_for_xml(misc_text),
-                  }
-    else:
-        ## the misc subfield is not needed
-        xml_misc_subfield = ""
-    ## Build the datafield for the report number segment of the reference line:
-    ## but first perhaps change the reportnumber for arxiv
-    if report_number.lower().find('arxiv') == 0:
-        report_number = massage_arxiv_reportnumber(report_number)
-    ## Build the datafield for the report number segment of the reference line:
-    xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
-      <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>
-      <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>
-   </datafield>
-"""          % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                 'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                 'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                 'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                 'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
-                 'misc-subfield'          : xml_misc_subfield,
-                 'title'                  : encode_for_xml(title),
-                 'volume'                 : encode_for_xml(volume),
-                 'year'                   : encode_for_xml(year),
-                 'page'                   : encode_for_xml(page),
-                 'report-number'          : encode_for_xml(report_number),
-               }
-    return xml_line
-
-def markup_reportnum_followedby_title_as_marcxml(title, volume, year, page,
-                                                 report_number, misc_text=""):
-    """Given a title (and its numeration), a report number, and some optional
-       miscellaneous text, return a string containing the MARC XML version of
-       this information. E.g. for the miscellaneous text
-       "S. D. Hsu and M. Schwetz ", the title "Nucl. Phys., B", the volume
-       "572", the year "2000", the page number "211", and the report number
-       "hep-th/1111111", return the following MARC XML string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="m">S. D. Hsu and M. Schwetz </subfield>
-           <subfield code="r">hep-th/1111111</subfield>
-           <subfield code="s">Nucl. Phys., B 572 (2000) 211</subfield>
-        </datafield>
-       In the event that the miscellaneous text string is zero-length, there
-       will be no $m subfield present in the returned XML.
-       @param title: (string) - the cited title.
-       @param volume: (string) - the volume of the cited title.
-       @param year: (string) - the year of the cited title.
-       @param page: (string) - the page of the cited title.
-       @param report_number: (string) - the institutional report number to
-        be marked up.
-       @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the cited title and its
-        miscellaneous text.
-    """
-    ## First, determine whether there is need of a misc subfield:
-    if len(misc_text) > 0:
-        ## Create a misc subfield to be included in the MARC XML:
-        xml_misc_subfield = """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : encode_for_xml(misc_text),
-                  }
-    else:
-        ## The misc subfield is not needed
-        xml_misc_subfield = ""
-    ## Build the datafield for the report number segment of the reference line:
-    xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
-      <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>
-      <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>
-   </datafield>
-"""          % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                 'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                 'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                 'sf-code-ref-title'      : CFG_REFEXTRACT_SUBFIELD_TITLE,
-                 'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
-                 'misc-subfield'          : xml_misc_subfield,
-                 'title'                  : encode_for_xml(title),
-                 'volume'                 : encode_for_xml(volume),
-                 'year'                   : encode_for_xml(year),
-                 'page'                   : encode_for_xml(page),
-                 'report-number'          : encode_for_xml(report_number),
-               }
-    return xml_line
-
-def markup_reportnum_as_marcxml(report_number, misc_text=""):
-    """Given a report number and some optional miscellaneous text, return a
-       string containing the MARC XML version of this information. E.g. for
-       the miscellaneous text "Example, AN " and the institutional report-
-       number "hep-th/1111111", return the following MARC XML string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="m">Example, AN </subfield>
-           <subfield code="r">hep-th/1111111</subfield>
-        </datafield>
-       In the event that the miscellaneous text string is zero-length, there
-       will be no $m subfield present in the returned XML.
-       @param report_number: (string) - the institutional report number to be
-        marked up.
-       @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the report number and its
-        miscellaneous text.
-    """
-    ## First, determine whether there is need of a misc subfield:
-    if len(misc_text) > 0:
-        ## create a misc subfield to be included in the MARC XML:
-        xml_misc_subfield = """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : encode_for_xml(misc_text),
-                  }
-    else:
-        ## the misc subfield is not needed
-        xml_misc_subfield = ""
-    ## Build the datafield for the report number segment of the reference line:
-    ## but first perhaps change the reportnumber for arxiv
-    if report_number.lower().find('arxiv') == 0:
-        report_number = massage_arxiv_reportnumber(report_number)
-    xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
-      <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>
-   </datafield>
-"""          % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                 'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                 'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                 'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
-                 'misc-subfield'          : xml_misc_subfield,
-                 'report-number'          : encode_for_xml(report_number),
-               }
-    return xml_line
-
-
-def markup_url_or_doi_as_marcxml(doi_string, url_string, url_description, misc_text=""):
-    """Given a DOI string and some misc text.. OR a URL, a URL description, and some optional miscellaneous text,
-       return a string containing the MARC XML version of this information.
-       E.g. for the miscellaneous text "Example, AN ", the URL
-       "http://cdsweb.cern.ch/", and the URL description
-       "CERN Document Server", return the following MARC XML string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="m">Example, AN </subfield>
-           <subfield code="u">http://cdsweb.cern.ch/</subfield>
-           <subfield code="z">CERN Document Server</subfield>
-        </datafield>
-
-        For a given a DOI
-       return a string containing the MARC XML version of this information.
-       E.g. for the DOI 'doi:10.1001/chr223'
-       return the following MARC XML string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="a">10.1001/chr223</subfield>
-        </datafield>
-
-        The choice of markup information is denoted by calling this method with
-        the appropriate blank strings for either the doi_string or both
-        pieces of url information.
-
-       In the event that the miscellaneous text string is zero-length, there
-       will be no $m subfield present in the returned XML.
-        @param doi_string: (string) - the DOI to be marked up.
-       @param url_string: (string) - the URL to be marked up.
-       @param url_description: (string) - the description of the URL to be
-        marked up.
-       @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the URL or the DOI, its description,
-        and its miscellaneous text.
-    """
-    ## First, determine whether there is need of a misc subfield:
-    if len(misc_text) > 0:
-        ## create a misc subfield to be included in the MARC XML:
-        xml_misc_subfield = """
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
-                % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                    'misc-val'               : encode_for_xml(misc_text),
-                  }
-    else:
-        ## the misc subfield is not needed
-        xml_misc_subfield = ""
-
-    ## If a DOI is provided
-    if doi_string <> "":
-        ## Build the datafield for the DOI segment of the reference line:
-        xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
-      <subfield code="%(sf-code-ref-misc)s">%(doi-val)s</subfield>
-   </datafield>
-"""        % { 'df-tag-ref'            : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                   'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
-                   'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
-                   'misc-subfield'         : xml_misc_subfield,
-                   'sf-code-ref-misc'      : CFG_REFEXTRACT_SUBFIELD_DOI,
-                   'doi-val'               : encode_for_xml(doi_string)
-                 }
-
-    ## Else, if a url is provided
-    else:
-        ## If the url string is the same as its set description, ignore inputting it as a separate subfield
-        if url_string == url_description:
-            ## Build the datafield for the URL segment of the reference line:
-            xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
-      <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>
-   </datafield>
-"""            % { 'df-tag-ref'            : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                           'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
-                           'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
-                           'misc-subfield'         : xml_misc_subfield,
-                           'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
-                           'url'                   : encode_for_xml(url_string)
-                         }
-        ## Else, in the case that the url string and the description differ in some way, include them both
-        else:
-            ## Build the datafield for the URL segment of the reference line:
-            xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
-      <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>
-      <subfield code="%(sf-code-ref-url-descr)s">%(url-descr)s</subfield>
-   </datafield>
-"""            % { 'df-tag-ref'            : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                           'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
-                           'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
-                           'misc-subfield'         : xml_misc_subfield,
-                           'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
-                           'sf-code-ref-url-descr' : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
-                           'url'                   : encode_for_xml(url_string),
-                           'url-descr'             : encode_for_xml(url_description)
-                         }
-
-    return xml_line
-
-def markup_refline_marker_as_marcxml(marker_text):
-    """Given a reference line marker, return a string containing the MARC XML
-       version of the marker. E.g. for the line marker "[1]", return the
-       following MARC XML string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="o">[1]</subfield>
-        </datafield>
-       @param marker_text: (string) the reference line marker to be marked up
-        as MARC XML
-       @return: (string) MARC XML representation of the marker line.
-    """
-    xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
-      <subfield code="%(sf-code-ref-marker)s">%(marker-val)s</subfield>
-   </datafield>
-""" % { 'df-tag-ref'         : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-        'df-ind1-ref'        : CFG_REFEXTRACT_IND1_REFERENCE,
-        'df-ind2-ref'        : CFG_REFEXTRACT_IND2_REFERENCE,
-        'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
-        'marker-val'         : encode_for_xml(marker_text),
-      }
-    return xml_line
-
-def markup_misc_as_marcxml(misc_text):
-    """Given some miscellaneous text, return a string containing the MARC XML
-       version of the string. E.g. for the misc_text string "testing", return
-       the following xml string:
-        <datafield tag="999" ind1="C" ind2="5">
-           <subfield code="m">testing</subfield>
-        </datafield>
-       @param misc_text: (string) the miscellaneous text to be marked up as
-        MARC XML
-       @return: (string) MARC XML representation of the miscellaneous text.
-    """
-    xml_line = \
-"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
-      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>
-   </datafield>
-"""           % { 'df-tag-ref'             : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                  'df-ind1-ref'            : CFG_REFEXTRACT_IND1_REFERENCE,
-                  'df-ind2-ref'            : CFG_REFEXTRACT_IND2_REFERENCE,
-                  'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
-                  'misc-val'               : encode_for_xml(misc_text),
-                }
-    return xml_line
 
 def convert_unusable_tag_to_misc(line,
                                  misc_text,
@@ -2708,10 +2432,9 @@ def convert_unusable_tag_to_misc(line,
                                  tag_match_end,
                                  closing_tag):
     """Function to remove an unwanted, tagged, citation item from a reference
-       line. Everything prior to the opening tag, as well as the tagged item
-       itself, is put into the miscellaneous text variable; the data up to the
-       closing tag is then trimmed from the beginning of the working line. For
-       example, the following working line:
+       line. The tagged item itself is put into the miscellaneous text variable;
+       the data up to the closing tag is then trimmed from the beginning of the
+       working line. For example, the following working line:
          Example, AN. Testing software; <cds.YR>(2001)</cds.YR>, CERN, Geneva.
        ...would be trimmed down to:
          , CERN, Geneva.
@@ -2730,7 +2453,7 @@ def convert_unusable_tag_to_misc(line,
         (e.g. </cds.YR>).
        @return: (tuple) - containing misc_text (string) and line (string)
     """
-    misc_text += line[0:tag_match_start]
+
     ## extract the tagged information:
     idx_closing_tag = line.find(closing_tag, tag_match_end)
     ## Sanity check - did we find a closing tag?
@@ -2745,62 +2468,343 @@ def convert_unusable_tag_to_misc(line,
         line = line[idx_closing_tag+len(closing_tag):]
     return (misc_text, line)
 
+
+
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+def append_datafield_element(line_marker):
+    """ Finish the current datafield element and start a new one, with a new
+        marker subfield.
+        @param line_marker: (string) The line marker which will be the sole
+        content of the newly created marker subfield. This will always be the
+        first subfield to be created for a new datafield element.
+        @return new_datafield: (string) The string holding the relevant
+        datafield and subfield tags.
+    """
+    new_datafield = """
+   </datafield>
+   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
+      <subfield code="%(sf-code-ref-marker)s">%(marker-val)s</subfield>""" \
+    % {      'df-tag-ref'         : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+             'df-ind1-ref'        : CFG_REFEXTRACT_IND1_REFERENCE,
+             'df-ind2-ref'        : CFG_REFEXTRACT_IND2_REFERENCE,
+             'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
+             'marker-val'         : encode_for_xml(line_marker)
+    }
+
+    return new_datafield
+
+def start_datafield_element(line_marker):
+    """ Start a brand new datafield element with a marker subfield.
+        @param line_marker: (string) The line marker which will be the sole
+        content of the newly created marker subfield. This will always be the
+        first subfield to be created for a new datafield element.
+        @return new_datafield: (string) The string holding the relevant
+        datafield and subfield tags.
+    """
+    new_datafield = """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">
+      <subfield code="%(sf-code-ref-marker)s">%(marker-val)s</subfield>""" \
+    % {      'df-tag-ref'         : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+             'df-ind1-ref'        : CFG_REFEXTRACT_IND1_REFERENCE,
+             'df-ind2-ref'        : CFG_REFEXTRACT_IND2_REFERENCE,
+             'sf-code-ref-marker' : CFG_REFEXTRACT_SUBFIELD_MARKER,
+             'marker-val'         : encode_for_xml(line_marker)
+    }
+
+    return new_datafield
+
+
+def apply_semi_colon_heuristics(misc_txt,past_elements,elements_processed,total_elements):
+    """ Given some misc text, see if there are any semi-colons which may indiciate that
+        a reference line is in fact two separate citations.
+        @param misc_txt: (string) The misc_txt to look for semi-colons within.
+        @param past_elements: (list) The list of single upper-case chars which
+            represent an element of a reference which has been processed.
+        @param elements_processed: (integer) The number of elements which have been
+            *looked at* for this entire reference line, regardless of splits
+        @param citation_elements: (integer) The total number of elements which
+            have been identified in the *entire* reference line
+        @return: (string) Dipicting where the semi-colon was found in relation to the
+            rest of the misc_txt. False if a semi-colon was not found, or one was found
+            relating to an escaped piece of text.
+    """
+    ## If there has already been meaningful information found in the reference
+    ## and there are still elements to be processed beyond the element relating to
+    ## this misc_txt
+    if (("T" in past_elements) or ("R" in past_elements)) and \
+        (elements_processed < (total_elements)):
+
+        if ((len(misc_txt) > 4)) and \
+                ((misc_txt[-5:] == '&amp;') or (misc_txt[-4:] == '&lt;')):
+            ## This is a semi-colon which does not indicate a new citation
+            return False
+        else:
+            ## If a semi-colon is at the end, make sure to append preceeding misc_txt to
+            ## the current datafield element
+            if misc_txt.strip(" .,")[-1] == ";":
+                return "after"
+            ## Else, make sure to append the misc_txt to the *newly created datafield element*
+            elif misc_txt.strip(" .,")[0] == ";":
+                return "before"
+
+    return False
+
+
+def build_formatted_xml_citation(citation_elements,line_marker):
+    """ Create the MARC-XML string of the found reference information which was taken
+        from a tagged reference line.
+        @param citation_elements: (list) an ordered list of dictionary elements,
+        with each element corresponding to a found piece of information from a reference line.
+        @param line_marker: (string) The line marker for this single reference line (e.g. [19])
+        @return xml_line: (string) The MARC-XML representation of the list of reference elements
+    """
+    ## Begin the datafield element
+    xml_line = start_datafield_element(line_marker)
+
+    ## This will hold the ordering of tags which have been appended to the xml line
+    ## This list will be used to control the desisions involving the creation of new citation lines
+    ## (in the event of a new set of authors being recognised, or strange title ordering...)
+    past_elements = []
+    elements_processed = 0
+    #print "Element type ordering: "
+    for element in citation_elements:
+        #print "   "+element['type']
+
+        ## Before going onto checking 'what' the next element is, handle misc text and semi-colons
+        ## Multiple misc text subfields will be compressed later
+        ## This will also be the only part of the code that deals with MISC tag_typed elements
+        if len(element['misc_txt'].strip(" .,")) > 0:
+            ## If misc text is ultimately just a semi-colon, don't add it as a new subfield
+            ## But still use it to dictate whether a new citation is created
+            if element['misc_txt'].strip(" .,") == ";":
+                misc_txt = False
+            else:
+                misc_txt = element['misc_txt']
+
+            ## Now.. if the MISC text is simply a single semi-colon,
+            ## AND at least a title or a report number has also been identified..
+            ## Mark up as a new citation
+            ## (this is done before the 'author choice' is made, as it's more reliable)
+            ## (an author choice will not create a new citation if a correct semi-colon is found)
+            ## It is important to note that Author tagging helps the accurate detection
+            ## a dual citation when looking for semi-colons (by reducing the length of misc text)
+            split_on_semi_colon = apply_semi_colon_heuristics(element['misc_txt'],\
+                                                                past_elements,\
+                                                                elements_processed,\
+                                                                len(citation_elements))
+
+            if split_on_semi_colon == "after":
+                if misc_txt:
+                    ## Append the misc subfield, before any of semi-colons (if any),
+                    ## only if there is are other elements to be processed after this current element
+                    xml_line += """
+      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
+                            % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
+                                'misc-val'               : encode_for_xml(misc_txt),
+                              }
+                ## THEN set as a new citation line
+                ## %%%%% Set as NEW citation line %%%%%
+                xml_line += append_datafield_element(line_marker)
+                past_elements = []
+
+            elif split_on_semi_colon == "before":
+                ## FIRST
+                ## %%%%% Set as NEW citation line %%%%%
+                xml_line += append_datafield_element(line_marker)
+                past_elements = []
+                if misc_txt:
+                    ## THEN append the misc text found AFTER the semi-colon (if any)
+                    ## Append the misc subfield, before any of semi-colons
+                    xml_line += """
+      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
+                            % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
+                                'misc-val'               : encode_for_xml(misc_txt),
+                              }
+            elif misc_txt:
+                ## Just append the misc subfield anyway
+                ## In the case of:
+                ## no semi-colon branch, or this is the last element to be processed, and it is not just a semi-colon
+                xml_line += """
+      <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
+                        % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
+                            'misc-val'               : encode_for_xml(misc_txt),
+                          }
+
+        ## Now handle the type dependent actions
+        ## If a TITLE was found...
+        if element['type'] == "TITLE":
+            ## If a report number has been marked up, and there's misc text before this title and the last tag
+            if "R" in past_elements and (len(element['misc_txt'].lower().replace("arxiv", "").strip(".,:;- []")) > 0):
+                ## %%%%% Set as NEW citation line %%%%%
+                xml_line += append_datafield_element(line_marker)
+                past_elements = []
+            elif "T" in past_elements:
+                ## %%%%% Set as NEW citation line %%%%%
+                xml_line += append_datafield_element(line_marker)
+                past_elements = []
+            ## ADD to current datafield
+            xml_line += """
+      <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
+                  % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                      'title'               : encode_for_xml(element['title']),
+                      'volume'              : encode_for_xml(element['volume']),
+                      'year'                : encode_for_xml(element['year']),
+                      'page'                : encode_for_xml(element['page']),
+                    }
+
+            ## Now, see if there are any IBID's after this title:
+            if len(element['IBIDs']) > 0:
+                ## At least one IBID is present, these are to be outputted each into their own datafield
+                for IBID in element['IBIDs']:
+                    ## %%%%% Set as NEW citation line %%%%%
+                    xml_line += append_datafield_element(line_marker)
+                    xml_line += """
+      <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>""" \
+                          % { 'sf-code-ref-title'   : CFG_REFEXTRACT_SUBFIELD_TITLE,
+                              'title'               : encode_for_xml(IBID['title']),
+                              'volume'              : encode_for_xml(IBID['volume']),
+                              'year'                : encode_for_xml(IBID['year']),
+                              'page'                : encode_for_xml(IBID['page']),
+                            }
+                ## Add a Title element to the past elements list, since we last found an IBID
+                past_elements = []
+                #print
+                #print "xml line with IBIDS at the end (please check formatting): %s" % xml_line
+                #print "I HAVE EXITED ON A LEAST ONE IBID, AS REQUESTED"
+                #sys.exit(0)
+
+            past_elements.append("T")
+
+        elif element['type'] == "REPORTNUMBER":
+            report_number = element['report_num']
+            ## If a report number has been marked up, and there's misc text before this title and the last tag
+            if "T" in past_elements and (len(element['misc_txt'].lower().replace("arxiv", "").strip(".,:;- []")) > 0):
+                ## %%%%% Set as NEW citation line %%%%%
+                xml_line += append_datafield_element(line_marker)
+                past_elements = []
+            elif "R" in past_elements:
+                ## %%%%% Set as NEW citation line %%%%%
+                xml_line += append_datafield_element(line_marker)
+                past_elements = []
+            if report_number.lower().find('arxiv') == 0:
+                report_number = massage_arxiv_reportnumber(report_number)
+            ## ADD to current datafield
+            xml_line += """
+      <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>""" \
+                % {'sf-code-ref-report-num' : CFG_REFEXTRACT_SUBFIELD_REPORT_NUM,
+                   'report-number'          : encode_for_xml(report_number)
+                }
+            past_elements.append("R")
+
+        elif element['type'] == "URL":
+            if element['url_string'] == element['url_desc']:
+                ## Build the datafield for the URL segment of the reference line:
+                xml_line += """
+      <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>""" \
+                    % {    'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
+                           'url'                   : encode_for_xml(element['url_string'])
+                      }
+            ## Else, in the case that the url string and the description differ in some way, include them both
+            else:
+                ## Build the datafield for the URL segment of the reference line:
+                xml_line = """
+      <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>
+      <subfield code="%(sf-code-ref-url-desc)s">%(url-desc)s</subfield>""" \
+                    % {  'sf-code-ref-url'          : CFG_REFEXTRACT_SUBFIELD_URL,
+                            'sf-code-ref-url-desc'  : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
+                            'url'                   : encode_for_xml(element['url_string']),
+                            'url-desc'              : encode_for_xml(element['url_desc'])
+                         }
+            past_elements.append("U")
+
+        elif element['type'] == "DOI":
+            xml_line += """
+      <subfield code="%(sf-code-ref-doi)s">%(doi-val)s</subfield>""" \
+                % {     'sf-code-ref-doi'       : CFG_REFEXTRACT_SUBFIELD_DOI,
+                        'doi-val'               : encode_for_xml(element['doi_string'])
+                 }
+            past_elements.append("D")
+
+        elif element['type'] == "AUTH":
+            # This is where the magic happens
+            if "A" in past_elements:
+                ## Stronger confirmation that this is an author group
+                if element['auth_type'] == 'etal' or element['auth_type'] == 'stnd':
+                    ## %%%%% Set as NEW citation line %%%%%
+                    xml_line += append_datafield_element(line_marker)
+                    past_elements = []
+                ## Create a new subfield type to hold this author group
+            xml_line += """
+      <subfield code="h">%(authors)s</subfield>""" \
+                % {     'authors'               : encode_for_xml(element['auth_txt'])
+                 }
+            ## Append the "A" symbol only
+            past_elements.append("A")
+
+        ## The number of elements processed
+        elements_processed+=1
+
+    ## Close the ending datafield element
+    xml_line += """
+   </datafield>\n"""
+
+    #print "RETURNED XML LINE: %s" % xml_line
+
+    return xml_line
+
+
+
 def convert_processed_reference_line_to_marc_xml(line_marker,
                                                  line,
                                                  identified_dois,
                                                  identified_urls):
-    """Given a processed reference line, convert it to MARC XML.
-       @param line_marker: (string) - the marker for the reference
-        line (e.g. [1]).
-       @param line: (string) - the processed reference line, in which
-        the recognised citations have been tagged.
-       @identified_urls: (list) - contains 2-cell tuples, each of which
-        represents an idenitfied URL and its description string.
-        The list takes the order in which the URLs were identified in the line
-        (i.e. first-found, second-found, etc).
-       @identified_dois: (string) - contains the single doi for this citation
-       @return: (tuple) -
-          + xml_line (string) - the reference line with all of its
-            identified citations marked up into the various subfields.
-          + count_misc (integer) - number of sections of miscellaneous
-             found in the line
-          + count_title (integer) - number of title-citations found in
-            the line
-          + count_reportnum (integer) - number of report numbers found
-            in the line
-          + count_url (integer) - number of URLs found in the line
+
+    """ Given a single tagged reference line, convert it to its MARC-XML representation.
+        Try to find all tags and extract their contents and their types into corresponding
+        dictionary elements. Append each dictionary tag representation onto a list, which
+        is given to 'build_formatted_xml_citation()' where the correct xml output will be generated.
+        @param line_marker: (string) The line marker for this single reference line (e.g. [19])
+        @param line: (string) The tagged reference line.
+        @param identified_dois: (list) a list of dois which were found in this line. The ordering of
+        dois corresponds to the ordering of tags in the line, reading from left to right.
+        @param identified_urls: (list) a list of urls which were found in this line. The ordering of
+        urls corresponds to the ordering of tags in the line, reading from left to right.
+        @return xml_line: (string) the MARC-XML representation of the tagged reference line
+        @return count_*: (integer) the number of * (pieces of info) found in the reference line.
     """
 
-    count_misc = count_title = count_reportnum = count_url = count_doi = 0
+    count_misc = count_title = count_reportnum = count_url = count_doi = count_auth_group = 0
     xml_line = ""
-    previously_cited_item = None
     processed_line = line
+    cur_misc_txt = u""
 
-    ## Now display the marker in marked-up XML:
-    xml_line += markup_refline_marker_as_marcxml(line_marker)
-
-    ## 2. Loop through remaining identified segments in line and tag them
-    ## into MARC XML segments:
-    cur_misc_txt = u""  ## a marker to hold gathered miscellaneous text before
-                        ## a citation
     tag_match = re_tagged_citation.search(processed_line)
+
+    # contains a list of dictionary entries of previously cited items
+    citation_elements = []
+    # the last tag element found when working from left-to-right across the line
+    identified_citation_element = None
+
+    #print "tagged line from where information will be extracted \n %s" % processed_line
+
     while tag_match is not None:
-        ## found a tag - process it:
+        ## While there are tags inside this reference line...
         tag_match_start = tag_match.start()
         tag_match_end   = tag_match.end()
         tag_type        = tag_match.group(1)
-
+        #print "adding to cur_misc_txt: %s" % processed_line[0:tag_match_start]
+        cur_misc_txt += processed_line[0:tag_match_start]
         if tag_type == "TITLE":
             ## This tag is an identified journal TITLE. It should be followed
             ## by VOLUME, YEAR and PAGE tags.
-            cur_misc_txt += processed_line[0:tag_match_start]
+
             ## extract the title from the line:
             idx_closing_tag = processed_line.find(CFG_REFEXTRACT_MARKER_CLOSING_TITLE, tag_match_end)
-            ## Sanity check - did we find a closing TITLE tag?
+
             if idx_closing_tag == -1:
-                ## no closing </cds.TITLE> tag found - strip the opening tag
-                ## and move past it
+                ## no closing </cds.TITLE> tag found - get rid of the solitary tag
                 processed_line = processed_line[tag_match_end:]
+                identified_citation_element = None
             else:
                 ## Closing tag was found:
                 ## The title text to be used in the marked-up citation:
@@ -2821,220 +2825,54 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                     ## Skip past the matched numeration in the working line:
                     processed_line = processed_line[numeration_match.end():]
 
-                    if previously_cited_item is None:
-                        ## There is no previously cited item - this should be added as the previously
-                        ## cited item:
-                        previously_cited_item = { 'type'       : "TITLE",
-                                                  'misc_txt'   : cur_misc_txt,
-                                                  'title'      : title_text,
-                                                  'volume'     : reference_volume,
-                                                  'year'       : reference_year,
-                                                  'page'       : reference_page,
-                                                }
-                        ## Now empty the miscellaneous text and title components:
-                        cur_misc_txt = ""
-                        title_text = ""
-                        reference_volume = ""
-                        reference_year = ""
-                        reference_page = ""
-                    elif (previously_cited_item is not None) and \
-                         (previously_cited_item['type'] == "REPORTNUMBER") and \
-                         (len(cur_misc_txt.lower().replace("arxiv", "").strip(".,:;- []")) == 0):
-                        ## This TITLE belongs with the REPORT NUMBER before it - add them both into
-                        ## the same datafield tag (REPORT NUMBER first, TITLE second):
-                        prev_report_num = previously_cited_item['report_num']
-                        prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += \
-                          markup_title_followedby_reportnum_as_marcxml(title_text,
-                                                                       reference_volume,
-                                                                       reference_year,
-                                                                       reference_page,
-                                                                       prev_report_num,
-                                                                       prev_misc_txt)
-                        ## Increment the stats counters:
-                        count_title += 1
-                        count_reportnum += 1
+                    identified_citation_element =   {   'type'       : "TITLE",
+                                                        'misc_txt'   : cur_misc_txt,
+                                                        'title'      : title_text,
+                                                        'volume'     : reference_volume,
+                                                        'year'       : reference_year,
+                                                        'page'       : reference_page,
+                                                        'IBIDs'      : []
+                                                    }
+                    count_title += 1
+                    cur_misc_txt = u""
 
-                        ## reset the various variables:
-                        previously_cited_item = None
-                        cur_misc_txt = ""
-                        title_text = ""
-                        reference_volume = ""
-                        reference_year = ""
-                        reference_page = ""
-                    else:
-
-			## Here, it's likely that the cur_misc_text holds some other preceeding data
-
-                        ## either the previously cited item is NOT a REPORT NUMBER, or this cited TITLE
-                        ## is preceeded by miscellaneous text. In either case, the two cited objects are
-                        ## not the same and do not belong together in the same datafield.
-                        if previously_cited_item['type'] == "REPORTNUMBER":
-                            ## previously cited item was a REPORT NUMBER.
-                            ## Add previously cited REPORT NUMBER to XML string:
-                            prev_report_num = previously_cited_item['report_num']
-                            prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                            xml_line += \
-                                    markup_reportnum_as_marcxml(prev_report_num,
-                                                                prev_misc_txt)
-                            ## Increment the stats counters:
-                            count_reportnum += 1
-                        elif previously_cited_item['type'] == "TITLE":
-                            ## previously cited item was a TITLE.
-                            ## Add previously cited TITLE to XML string:
-                            prev_title    = previously_cited_item['title']
-                            prev_volume   = previously_cited_item['volume']
-                            prev_year     = previously_cited_item['year']
-                            prev_page     = previously_cited_item['page']
-                            prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                            xml_line += markup_title_as_marcxml(prev_title, prev_volume,
-                                                                            prev_year, prev_page, prev_misc_txt)
-
-
-
-                            ## Increment the stats counters:
-                            count_title += 1
-
-                        ## [was above in the elif statement]
-                        ## (changed) NOW, append a second 'o' marker to counter this second title... (to signify a new citation???)
-                        xml_line += markup_refline_marker_as_marcxml(line_marker)
-
-
-                        ## Now add the current cited item into the previously cited item marker
-                        previously_cited_item = { 'type'       : "TITLE",
-                                                  'misc_txt'   : cur_misc_txt,
-                                                  'title'      : title_text,
-                                                  'volume'     : reference_volume,
-                                                  'year'       : reference_year,
-                                                  'page'       : reference_page,
-                                                }
-                        ## empty miscellaneous text
-                        cur_misc_txt = u""
-                        title_text = ""
-                        reference_volume = ""
-                        reference_year = ""
-                        reference_page = ""
-
-                    ## The first title citation was successfully marked up.
-                    ## Now look for any numeration patterns that lead on from
-                    ## it. We're looking for IBIDs here, that didn't
-                    ## have the word IBID. E.g. the following line:
-                    ## R. M. Cavalcanti and C. A. A. de Carvalho,
-                    ## <cds.TITLE>J. Phys. A</cds.TITLE> : <cds.VOL>31</cds.VOL>
-                    ## <cds.YR>(1998)</cds.YR> <cds.PG>2391</cds.PG>;
-                    ## : <cds.VOL>32</cds.VOL> <cds.YR>(1999)</cds.YR>
-                    ## <cds.PG>6119</cds.PG>.   title_text_for_ibid
+                    # Now try to find IBID's after this title
                     numeration_match = re_numeration_no_ibid_txt.match(processed_line)
                     while numeration_match is not None:
+
                         reference_volume = numeration_match.group(3)
                         reference_year   = numeration_match.group(4)
                         reference_page   = numeration_match.group(5)
                         ## Skip past the matched numeration in the working line:
                         processed_line = processed_line[numeration_match.end():]
 
-                        ## If the previously cited item is not None, it must
-                        ##  be a title since we just recognised one.
-                        if previously_cited_item is None:
-                            ## no previously cited item. The previous title
-                            ## must have been linked up with a report-number.
-                            ## Make this item into the "previously-cited-
-                            ## item":
-                            previously_cited_item = \
-                                    { 'type'       : "TITLE",
-                                      'misc_txt'   : "",
-                                      'title'      : title_text_for_ibid,
-                                      'volume'     : reference_volume,
-                                      'year'       : reference_year,
-                                      'page'       : reference_page,
-                                    }
-                            ## Now empty the miscellaneous text and title
-                            ## components:
-                            cur_misc_txt = ""
-                            title_text = ""
-                            reference_volume = ""
-                            reference_year = ""
-                            reference_page = ""
-                        elif previously_cited_item['type'] == "TITLE":
-                            ## logically, the previous citation was a title
-                            ## Add previously cited TITLE to XML string:
-                            prev_title    = previously_cited_item['title']
-                            prev_volume   = previously_cited_item['volume']
-                            prev_year     = previously_cited_item['year']
-                            prev_page     = previously_cited_item['page']
-                            prev_misc_txt = previously_cited_item['misc_txt'].\
-                                            lstrip(".;, ").rstrip()
-                            xml_line += markup_title_as_marcxml(prev_title, \
-                                                                prev_volume, \
-                                                                prev_year, \
-                                                                prev_page, \
-                                                                prev_misc_txt)
-                            ## Increment the stats counters:
-                            count_title += 1
-                            ## Now add the current cited item into the previously cited item marker
-                            previously_cited_item = { 'type'       : "TITLE",
-                                                      'misc_txt'   : "",
-                                                      'title'      : title_text_for_ibid,
-                                                      'volume'     : reference_volume,
-                                                      'year'       : reference_year,
-                                                      'page'       : reference_page,
-                                                    }
-                            ## empty miscellaneous text & title components:
-                            cur_misc_txt = u""
-                            title_text = ""
-                            reference_volume = ""
-                            reference_year = ""
-                            reference_page = ""
-                        elif previously_cited_item['type'] == "REPORTNUMBER":
-                            ## previously cited item was a REPORT NUMBER.
-                            ## ****NOTE: This should NEVER happen when we have
-                            ## just matched a TITLE.****
+                        ## Takes the just found title text
+                        identified_citation_element['IBIDs'].append(
+                                                { 'type'       : "TITLE",
+                                                  'misc_txt'   : "",
+                                                  'title'      : title_text_for_ibid,
+                                                  'volume'     : reference_volume,
+                                                  'year'       : reference_year,
+                                                  'page'       : reference_page,
+                                                })
+                        ## Increment the stats counters:
+                        count_title += 1
 
-                            ## Add previously cited REPORT NUMBER to XML string:
-                            prev_report_num = previously_cited_item['report_num']
-                            prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                            xml_line += \
-                                    markup_reportnum_as_marcxml(prev_report_num,
-                                                                prev_misc_txt)
-                            ## Increment the stats counters:
-                            count_reportnum += 1
-                            ## Now add the current cited item into the previously cited item marker
-                            previously_cited_item = { 'type'       : "TITLE",
-                                                      'misc_txt'   : "",
-                                                      'title'      : title_text_for_ibid,
-                                                      'volume'     : reference_volume,
-                                                      'year'       : reference_year,
-                                                      'page'       : reference_page,
-                                                    }
-                            ## empty miscellaneous text & title components:
-                            cur_misc_txt = u""
-                            title_text = ""
-                            reference_volume = ""
-                            reference_year = ""
-                            reference_page = ""
-                        else:
-                            ## previously_cited_item is something unexpected
-                            ## refextract doesn't know how to continue from
-                            ## here. Launch an exception so that the stack
-                            ## trace can be analysed by the user:
-                            raise Exception("Unknown Citation Object " \
-                                            "Identified when Marking-Up " \
-                                            "Reference Line. Unable to " \
-                                            "Continue.")
-
-                        ## Look again for another following IBID numeration
-                        ## match (without the word "IBID"):
-                        numeration_match = re_numeration_no_ibid_txt.match(\
-                            processed_line)
-                    title_text_for_ibid = ""
+                        title_text = ""
+                        reference_volume = ""
+                        reference_year = ""
+                        reference_page = ""
+                        numeration_match = re_numeration_no_ibid_txt.match(processed_line)
 
                 else:
-                    ## No numeration was recognised after the title. Add the title into misc and carry on:
+                    ## No numeration was recognised after the title. Add the title into a MISC item instead:
                     cur_misc_txt += "%s" % title_text
+                    identified_citation_element = None
+
 
         elif tag_type == "REPORTNUMBER":
             ## This tag is an identified institutional report number:
-            ## Account for the miscellaneous text before the citation:
-            cur_misc_txt += processed_line[0:tag_match_start]
+
             ## extract the institutional report-number from the line:
             idx_closing_tag = processed_line.find(CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM, tag_match_end)
             ## Sanity check - did we find a closing report-number tag?
@@ -3042,97 +2880,28 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 ## no closing </cds.REPORTNUMBER> tag found - strip the opening tag and move past this
                 ## recognised reportnumber as it is unreliable:
                 processed_line = processed_line[tag_match_end:]
+                identified_citation_element = None
             else:
                 ## closing tag was found
                 report_num = processed_line[tag_match_end:idx_closing_tag]
                 ## now trim this matched institutional report-number and its tags from the start of the line:
                 processed_line = processed_line[idx_closing_tag+len(CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM):]
 
-                ## Now, if there was a previous TITLE citation and this REPORT NUMBER citation one has no
-                ## miscellaneous text after punctuation has been stripped, the two refer to the same object,
-                ## so group them under the same datafield:
-                if previously_cited_item is None:
-                    ## There is no previously cited item - this should be added as the previously
-                    ## cited item:
-                    previously_cited_item = { 'type'       : "REPORTNUMBER",
-                                              'misc_txt'   : "%s" % cur_misc_txt,
-                                              'report_num' : "%s" % report_num,
-                                            }
-                    ## empty miscellaneous text
-                    cur_misc_txt = u""
-                    report_num = u""
-                elif (previously_cited_item is not None) and \
-                     (previously_cited_item['type'] == "TITLE") and \
-                     (len(cur_misc_txt.lower().replace("arxiv", "").strip(".,:;- []")) == 0):
-                    ## This REPORT NUMBER belongs with the title before it - add them both into
-                    ## the same datafield tag (TITLE first, REPORT NUMBER second):
-                    prev_title    = previously_cited_item['title']
-                    prev_volume   = previously_cited_item['volume']
-                    prev_year     = previously_cited_item['year']
-                    prev_page     = previously_cited_item['page']
-                    prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                    xml_line += \
-                     markup_title_followedby_reportnum_as_marcxml(prev_title,
-                                                                  prev_volume,
-                                                                  prev_year,
-                                                                  prev_page,
-                                                                  report_num,
-                                                                  prev_misc_txt)
-                    ## Increment the stats counters:
-                    count_title += 1
-                    count_reportnum += 1
+                identified_citation_element =   {   'type'       : "REPORTNUMBER",
+                                                    'misc_txt'   : "%s" % cur_misc_txt,
+                                                    'report_num' : "%s" % report_num,
+                                                }
+                count_reportnum += 1
+                cur_misc_txt = u""
 
-                    ## Reset variables:
-                    previously_cited_item = None
-                    cur_misc_txt = u""
-                else:
-                    ## either the previously cited item is NOT a TITLE, or this cited REPORT NUMBER
-                    ## is preceeded by miscellaneous text. In either case, the two cited objects are
-                    ## not the same and do not belong together in the same datafield.
-                    if previously_cited_item['type'] == "REPORTNUMBER":
-                        ## previously cited item was a REPORT NUMBER.
-                        ## Add previously cited REPORT NUMBER to XML string:
-                        prev_report_num = previously_cited_item['report_num']
-                        prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += markup_reportnum_as_marcxml(prev_report_num,
-                                                                prev_misc_txt)
-                        ## Increment the stats counters:
-                        count_reportnum += 1
-                    elif previously_cited_item['type'] == "TITLE":
-                        ## previously cited item was a TITLE.
-                        ## Add previously cited TITLE to XML string:
-                        prev_title    = previously_cited_item['title']
-                        prev_volume   = previously_cited_item['volume']
-                        prev_year     = previously_cited_item['year']
-                        prev_page     = previously_cited_item['page']
-                        prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                        xml_line += markup_title_as_marcxml(prev_title, prev_volume,
-                                                                        prev_year, prev_page, prev_misc_txt)
-                        ## Increment the stats counters:
-                        count_title += 1
-
-                    ## changed / added (to signify a new citation...?)
-                    xml_line += markup_refline_marker_as_marcxml(line_marker)
-
-                    ## Now add the current cited item into the previously cited item marker
-                    previously_cited_item = { 'type'       : "REPORTNUMBER",
-                                              'misc_txt'   : "%s" % cur_misc_txt,
-                                              'report_num' : "%s" % report_num,
-                                            }
-                    ## empty miscellaneous text
-                    cur_misc_txt = u""
-                    report_num = u""
 
         elif tag_type == "URL":
-
             ## This tag is an identified URL:
-            ## Account for the miscellaneous text before the URL:
-            cur_misc_txt += processed_line[0:tag_match_start]
 
             ## From the "identified_urls" list, get this URL and its
             ## description string:
             url_string = identified_urls[0][0]
-            url_descr  = identified_urls[0][1]
+            url_desc  = identified_urls[0][1]
 
             ## Now move past this "<cds.URL />"tag in the line:
             processed_line = processed_line[tag_match_end:]
@@ -3141,61 +2910,17 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             ## of identified URLs:
             identified_urls[0:1] = []
 
-            ## Build the MARC XML representation of this identified URL:
-            if previously_cited_item is not None:
-                ## There was a previously cited item. We must convert it to XML before we can
-                ## convert this URL to XML:
-                if previously_cited_item['type'] == "REPORTNUMBER":
-                    ## previously cited item was a REPORT NUMBER.
-                    ## Add previously cited REPORT NUMBER to XML string:
-                    prev_report_num = previously_cited_item['report_num']
-                    prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                    xml_line += markup_reportnum_as_marcxml(prev_report_num,
-                                                            prev_misc_txt)
-                    ## Increment the stats counters:
-                    count_reportnum += 1
-                elif previously_cited_item['type'] == "TITLE":
-                    ## previously cited item was a TITLE.
-                    ## Add previously cited TITLE to XML string:
-                    prev_title    = previously_cited_item['title']
-                    prev_volume   = previously_cited_item['volume']
-                    prev_year     = previously_cited_item['year']
-                    prev_page     = previously_cited_item['page']
-                    prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                    xml_line += markup_title_as_marcxml(prev_title, prev_volume,
-                                                                    prev_year, prev_page, prev_misc_txt)
-                    ## Increment the stats counters:
-                    count_title += 1
-                ## Empty the previously-cited item place-holder:
-
-
-
-
-                #previously_cited_item = None # CREATE A URL ENTRY IN THE DICTIONARY???
-            ## Now convert this URL to MARC XML
-            cur_misc_txt = cur_misc_txt.lstrip(".;, ").rstrip()
-
-            xml_line += markup_url_or_doi_as_marcxml("", \
-                                              url_string, \
-                                              url_descr, \
-                                              cur_misc_txt)
-
             ## Save the current misc text
-            previously_cited_item = {'type'      :     "URL",
-                                    'misc_txt'   :     "",
-                                    'url_string' :     "%s" % url_string,
-                                    'url_descr'  :     "%s" % url_descr
-                                   }
-
-            ## Increment the stats counters:
+            identified_citation_element =   {   'type'      :     "URL",
+                                                'misc_txt'   :     "%s" % cur_misc_txt,
+                                                'url_string' :     "%s" % url_string,
+                                                'url_desc'  :     "%s" % url_desc
+                                            }
             count_url += 1
             cur_misc_txt = u""
 
         elif tag_type == "DOI":
-
             ## This tag is an identified DOI:
-            ## Account for the miscellaneous text before the DOI:
-            cur_misc_txt += processed_line[0:tag_match_start]
 
             ## From the "identified_dois" list, get this DOI and its
             ## description string:
@@ -3207,48 +2932,51 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             # Remove DOI from the list of DOI strings
             identified_dois[0:1] = []
 
-            ## Build the MARC XML representation of this identified URL:
-            if previously_cited_item is not None:
-                ## There was a previously cited item. We must convert it to XML before we can
-                ## convert this URL to XML:
-                if previously_cited_item['type'] == "REPORTNUMBER":
-                    ## previously cited item was a REPORT NUMBER.
-                    ## Add previously cited REPORT NUMBER to XML string:
-                    prev_report_num = previously_cited_item['report_num']
-                    prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                    xml_line += markup_reportnum_as_marcxml(prev_report_num,
-                                                            prev_misc_txt)
-                    ## Increment the stats counters:
-                    count_reportnum += 1
-                elif previously_cited_item['type'] == "TITLE":
-                    ## previously cited item was a TITLE.
-                    ## Add previously cited TITLE to XML string:
-                    prev_title    = previously_cited_item['title']
-                    prev_volume   = previously_cited_item['volume']
-                    prev_year     = previously_cited_item['year']
-                    prev_page     = previously_cited_item['page']
-                    prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-                    xml_line += markup_title_as_marcxml(prev_title, prev_volume,
-                                                                    prev_year, prev_page, prev_misc_txt)
-                    ## Increment the stats counters:
-                    count_title += 1
-
-            ## Now convert this DOI to MARC XML
-            cur_misc_txt = cur_misc_txt.lstrip(".;, ").rstrip()
-            xml_line += markup_url_or_doi_as_marcxml(doi_string, \
-                                              "", "", \
-                                              cur_misc_txt)
-
             #SAVE the current misc text
-            previously_cited_item = {'type'       : "DOI",
-                                     'misc_txt'   : "",
-                                     'doi_string' : "%s" % doi_string
-                                   }
+            identified_citation_element =   {      'type'       : "DOI",
+                                                    'misc_txt'   : "%s" % cur_misc_txt,
+                                                    'doi_string' : "%s" % doi_string
+                                            }
 
             ## Increment the stats counters:
             count_doi += 1
             cur_misc_txt = u""
 
+        elif tag_type.find("AUTH") <> -1:
+            ## This tag is an identified Author:
+
+            auth_type = ""
+            ## extract the title from the line:
+            if tag_type.find("stnd") <> -1:
+                auth_type = "stnd"
+                idx_closing_tag_nearest = processed_line.find("</cds.AUTHstnd>", tag_match_end)
+            else:
+                auth_type = "etal"
+                idx_closing_tag_nearest = processed_line.find("</cds.AUTHetal>", tag_match_end)
+
+            if idx_closing_tag_nearest == -1:
+                ## no closing </cds.AUTH****> tag found - strip the opening tag
+                ## and move past it
+                processed_line = processed_line[tag_match_end:]
+                identified_citation_element = None
+            else:
+                auth_txt = processed_line[tag_match_end:idx_closing_tag_nearest]
+                ## Now move past the ending tag in the line:
+                ## FIXME add the string to a CONF variable
+                processed_line = processed_line[idx_closing_tag_nearest+len("</cds.AUTHxxxx>"):]
+                #SAVE the current misc text
+                identified_citation_element =   {   'type'       : "AUTH",
+                                                    'misc_txt'   : "%s" % cur_misc_txt,
+                                                    'auth_txt'   : "%s" % auth_txt,
+                                                    'auth_type'  : "%s" % auth_type
+                                                }
+                ## Increment the stats counters:
+                count_auth_group += 1
+                cur_misc_txt = u""
+
+## These following tags may be found separately;
+## They are usually found when a "TITLE" tag is hit (ONLY immediately afterwards, however)
+## Sitting by themselves means they do not have an associated TITLE tag, and should be MISC
 
         elif tag_type == "SER":
             ## This tag is a SERIES tag; Since it was not preceeded by a TITLE
@@ -3258,6 +2986,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                                            cur_misc_txt, \
                                            tag_match_start,tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_SERIES)
+            identified_citation_element = None
 
         elif tag_type == "VOL":
             ## This tag is a VOLUME tag; Since it was not preceeded by a TITLE
@@ -3266,6 +2995,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
               convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
                                            tag_match_start,tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_VOLUME)
+            identified_citation_element = None
 
         elif tag_type == "YR":
             ## This tag is a YEAR tag; Since it's not preceeded by TITLE and
@@ -3275,6 +3005,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
               convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
                                            tag_match_start,tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_YEAR)
+            identified_citation_element = None
 
         elif tag_type == "PG":
             ## This tag is a PAGE tag; Since it's not preceeded by TITLE,
@@ -3284,68 +3015,46 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
               convert_unusable_tag_to_misc(processed_line, cur_misc_txt, \
                                            tag_match_start,tag_match_end, \
                                            CFG_REFEXTRACT_MARKER_CLOSING_PAGE)
+            identified_citation_element = None
 
-        else:
+        if identified_citation_element <> None:
+            ## Append the found tagged data and current misc text
+            citation_elements.append(identified_citation_element)
+            identified_citation_element = None
 
-            #if previously_cited_item is not None:
-            #    cur_misc_txt += previously_cited_item['misc_txt']
-
-            ## Unknown tag - discard as miscellaneous text:
-            cur_misc_txt += processed_line[0:tag_match.end()]
-            processed_line = processed_line[tag_match.end():]
 
         ## Look for the next tag in the processed line:
         tag_match = re_tagged_citation.search(processed_line)
 
-    ## If a previously cited item remains, convert it into MARC XML:
-    if previously_cited_item is not None:
-        if previously_cited_item['type'] == "REPORTNUMBER":
-            ## previously cited item was a REPORT NUMBER.
-            ## Add previously cited REPORT NUMBER to XML string:
-            prev_report_num = previously_cited_item['report_num']
-            prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-            xml_line += markup_reportnum_as_marcxml(prev_report_num,
-                                                    prev_misc_txt)
-            ## Increment the stats counters:
-            count_reportnum += 1
-        elif previously_cited_item['type'] == "TITLE":
-            ## previously cited item was a TITLE.
-            ## Add previously cited TITLE to XML string:
-            prev_title    = previously_cited_item['title']
-            prev_volume   = previously_cited_item['volume']
-            prev_year     = previously_cited_item['year']
-            prev_page     = previously_cited_item['page']
-            prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-            xml_line += markup_title_as_marcxml(prev_title, prev_volume,
-                                                            prev_year, prev_page, prev_misc_txt)
-            ## Increment the stats counters:
-            count_title += 1
-
-        elif previously_cited_item['type'] == "DOI" or previously_cited_item['type'] == "URL":
-            ## get the saved misc content... append later on
-            cur_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
-
-
-        ## free up previously_cited_item:
-        previously_cited_item = None
 
     ## place any remaining miscellaneous text into the
     ## appropriate MARC XML fields:
     cur_misc_txt += processed_line
 
+    ## This MISC element will hold the entire citation in the event
+    ## that no tags were found.
     if len(cur_misc_txt.strip(" .;,")) > 0:
-        ## The remaining misc text is not just a full-stop
-        ## or semi-colon. Add it as a new datafield element.
-        ## changed (add the marker to denote a new datafield element)
-        xml_line += markup_refline_marker_as_marcxml(line_marker)
-        ## Add the misc text
-        xml_line += markup_misc_as_marcxml(cur_misc_txt)
-
         ## Increment the stats counters:
         count_misc += 1
+        identified_citation_element =   {   'type'  : "MISC",
+                                            'misc_txt'   : "%s" % cur_misc_txt,
+                                        }
+        citation_elements.append(identified_citation_element)
+
+    ## Now, run the method which will take as input:
+    ## 1. A list of dictionaries, where each dictionary is a piece
+    ## of citation information corresponding to a tag in the citation.
+    ## 2. The line marker for this entire citation line (mulitple citation
+    ## 'finds' inside a single citation will use the same marker value)
+    ## The resulting xml line will be a properly marked up form of the
+    ## citation. It will take into account authors to try and split up
+    ## references which should be read as two SEPARATE ones.
+    xml_line = build_formatted_xml_citation(citation_elements,line_marker)
 
     ## return the reference-line as MARC XML:
+
     return (xml_line, count_misc, count_title, count_reportnum, count_url, count_doi)
+
 
 def move_tagged_series_into_tagged_title(line):
     """Moves a marked-up series item into a marked-up title.
@@ -3629,7 +3338,6 @@ def remove_reference_line_marker(line):
     else:
         marker_val = u" "
     return (marker_val, line)
-
 def create_marc_xml_reference_section(ref_sect,
                                       preprint_repnum_search_kb,
                                       preprint_repnum_standardised_categs,
@@ -5671,7 +5379,7 @@ def main():
                                      % (str(len(reflines)), str(extract_error)))
 
             ## 3. Standardise the reference lines:
-#            reflines = test_get_reference_lines()
+            #reflines = test_get_reference_lines()
             (processed_references, count_misc, \
              count_title, count_reportnum, \
              count_url, count_doi, record_titles_count) = \
@@ -5722,6 +5430,7 @@ def main():
         elif  count_reportnum + count_title  > 0 and how_found_start > 2:
             if cli_opts['verbosity'] >= 1:
                 sys.stdout.write("-----Found journals/reports with how_found_start=  %d\n" % (how_found_start))
+
         ## Display the processed reference lines:
         out = display_xml_record(extract_error, \
                                  count_reportnum, \
@@ -5731,12 +5440,13 @@ def main():
                                  count_misc, \
                                  recid, \
                                  processed_references)
+
         ## Filter the processed reference lines to remove junk
-        out = filter_processed_references(out)  ## Be sure to call this BEFORE change_otag_format
+        out = filter_processed_references(out)  ## Be sure to call this BEFORE compress_m_subfields
                                                 ## since filter_processed_references expects the
                                                 ## original xml format.
         ## Change o_tag format
-        out = change_otag_format(out)
+        out = compress_m_subfields(out)
         if cli_opts['verbosity'] >= 1:
             lines = out.split('\n')
             sys.stdout.write("-----display_xml_record gave: %s significant " \
@@ -5828,7 +5538,6 @@ def test_get_reference_lines():
                 """[33] J. Brown and J. York, Phys. Rev. D47 (1993) 1407.""",
                 """[34] D. Freedman, S. Mathur, A. Matsuis and L. Rastelli, Nucl. Phys. B546 (1999) 96; hep-th/9804058. More text, followed by an IBID A 546 (1999) 96""",
                 """[35] D. Freedman, S. Mathur, A. Matsuis and L. Rastelli, Nucl. Phys. B546 (1999) 96; hep-th/9804058. More text, followed by an IBID A""",
-                """[36] whatever http://cdsware.cern.ch/""",
                 """[37] some misc  lkjslkdjlksjflksj [hep-th/9804058] lkjlkjlkjlkj [hep-th/0001567], hep-th/1212321, some more misc, Nucl. Phys. B546 (1999) 96""",
                 """[38] R. Emparan, C. Johnson and R.... Myers, Phys. Rev. D60 (1999) 104001; this is :: .... misc! hep-th/9903238. and some ...,.,.,.,::: more hep-ph/9912000""",
                 """[10] A. Ceresole, G. Dall Agata and R. D Auria, JHEP 11(1999) 009, [hep-th/9907216].""",
@@ -5841,7 +5550,9 @@ def test_get_reference_lines():
                 """[21] E. Schrodinger, Sitzungsber. Preuss. Akad. Wiss. Phys. Math. Kl. 24, 418(1930); ibid, 3, 1(1931); K. Huang, Am. J. Phys. 20, 479(1952); H. Jehle, Phys, Rev. D3, 306(1971); G. A. Perkins, Found. Phys. 6, 237(1976); J. A. Lock, Am. J. Phys. 47, 797(1979); A. O. Barut et al, Phys. Rev. D23, 2454(1981); ibid, D24, 3333(1981); ibid, D31, 1386(1985); Phys. Rev. Lett. 52, 2009(1984).""",
                 """[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).""",
                 """[40] O.O. Vaneeva, R.O. Popovych and C. Sophocleous, Enhanced Group Analysis and Exact Solutions of Vari-able Coefficient Semilinear Diffusion Equations with a Power Source, Acta Appl. Math., doi:10.1007/s10440-008-9280-9, 46 p., arXiv:0708.3457.""",
-                """[41] M. I. Trofimov and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.""",
+                """[41] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.""",
+                """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic, Phys. Rev. Lett. 44, 912, (1980).
+                """,
                ]
     return reflines
 
