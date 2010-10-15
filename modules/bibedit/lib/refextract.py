@@ -233,8 +233,6 @@ def restrict_m_subfields(reference_lines):
     return m_restricted,new_reference_lines
 
 def filter_processed_references(out):
-    #print "XML LINES in filter_processed_references:"
-    #print out
 
     """ apply filters to reference lines found - to remove junk"""
     reference_lines = out.split('\n')
@@ -690,13 +688,14 @@ def get_bad_char_replacements():
         ## \030 : cedilla
         u'\u0327c' : u'\u00E7',
         u'\u0327C' : u'\u00C7',
-        ## \02DC : tilde
+        ## \02DC : tilde (s with a tilde turns to just 's')
         u'\u02DCn' : u'\u00F1',
         u'\u02DCN' : u'\u00D1',
         u'\u02DCo' : u'\u00F5',
         u'\u02DCO' : u'\u00D5',
         u'\u02DCa' : u'\u00E3',
         u'\u02DCA' : u'\u00C3',
+        u'\u02DCs' : u'\u0073',
     }
     return replacements
 
@@ -759,8 +758,9 @@ re_html_tagged_url = \
 
 ## Numeration recognition pattern - used to identify numeration
 ## associated with a title when marking the title up into MARC XML:
+## UPDATED: volume numbers can be two numbers with a hyphen in between!
 re_recognised_numeration_for_title = \
-     re.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+)\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', re.UNICODE)
+     re.compile(r'^(\s*\.?,?\s*:?\s\<cds\.VOL\>(\d+|(?:\d+\-\d+))\<\/cds\.VOL> \<cds\.YR\>\(([1-2]\d\d\d)\)\<\/cds\.YR\> \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)', re.UNICODE)
 
 ## Another numeration pattern. This one is designed to match marked-up
 ## numeration that is essentially an IBID, but without the word "IBID". E.g.:
@@ -769,10 +769,10 @@ re_recognised_numeration_for_title = \
 ## <cds.YR>(1999)</cds.YR> <cds.PG>6119</cds.PG>.
 re_numeration_no_ibid_txt = \
           re.compile(r"""
-          ^((\s*;\s*|\s+and\s+):?\s                   ## Leading ; : or " and :"
-          \<cds\.VOL\>(\d+)\<\/cds\.VOL>\s            ## Volume
-          \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s   ## year
-          \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)     ## page
+          ^((\s*;\s*|\s+and\s+):?\s                                 ## Leading ; : or " and :"
+          \<cds\.VOL\>(\d+|(?:\d+\-\d+))\<\/cds\.VOL>\s             ## Volume
+          \<cds\.YR\>\(([12]\d{3})\)\<\/cds\.YR\>\s                 ## year
+          \<cds\.PG\>([RL]?\d+[c]?)\<\/cds\.PG\>)                   ## page
           """, re.UNICODE|re.VERBOSE)
 
 re_title_followed_by_series_markup_tags = \
@@ -823,7 +823,7 @@ re_correct_numeration_2nd_try_ptn1 = (re.compile(r"""
   \(?([12]\d{3})([A-Za-z]?)\)?,?\s*        ## Year
   (<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>)   ## Recognised, tagged title
   ,?\s*
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)      ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+|(?:\d+\-\d+))      ## The volume (optional "vol"/"no")
   (,\s*|\s+)
   [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
   ([RL]?\d+[c]?)                           ## 1st part of pagenum(optional R/L)
@@ -840,7 +840,7 @@ re_correct_numeration_2nd_try_ptn2 = (re.compile(r"""
   \(?([12]\d{3})([A-Za-z]?)\)?,?\s*        ## Year
   (<cds\.TITLE>(\.|[^<])*<\/cds\.TITLE>)   ## Recognised, tagged title
   ,?\s*
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+)      ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(\d+|(?:\d+\-\d+))      ## The volume (optional "vol"/"no")
   \s?([A-H])\s?                            ## Series
   [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
   ([RL]?\d+[c]?)                           ## 1st part of pagenum(optional R/L)
@@ -873,7 +873,7 @@ _sre_non_compiled_pattern_nucphysb_subtitle = \
 
 ## Pattern 0 (was pattern 3): <x, vol, page, year>
 re_numeration_vol_nucphys_page_yr = (re.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?   ## The volume (optional "vol"/"no")
   [,:\s]\s?
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -894,7 +894,7 @@ re_numeration_nucphys_vol_page_yr = (re.compile(r"""
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?
-  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?       ## The volume (optional "vol"/"no")
+  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?       ## The volume (optional "vol"/"no")
   [,:\s]\s?
   [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
   ([RL]?\d+[c]?)                           ## 1st part of pagenum(optional R/L)
@@ -911,7 +911,7 @@ re_numeration_nucphys_vol_page_yr = (re.compile(r"""
 ## Pattern 1: <x, vol, year, page>
 ## <v, [FS]?, y, p>
 re_numeration_vol_nucphys_yr_page = (re.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?   ## The volume (optional "vol"/"no")
   [,:\s]?\s?
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -933,7 +933,7 @@ re_numeration_nucphys_vol_yr_page = (re.compile(r"""
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?
-  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?       ## The volume (optional "vol"/"no")
+  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?       ## The volume (optional "vol"/"no")
   [,:\s]?\s?
   \((1\d\d\d|20\d\d)\),?\s?                ## Year
   [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
@@ -951,7 +951,7 @@ re_numeration_nucphys_vol_yr_page = (re.compile(r"""
 ## Pattern 2: <vol, serie, year, page>
 ## <v, s, [FS]?, y, p>
 re_numeration_vol_series_nucphys_yr_page = (re.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?   ## The volume (optional "vol"/"no")
   ([A-H])\s?                               ## The series
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -969,7 +969,7 @@ re_numeration_vol_series_nucphys_yr_page = (re.compile(r"""
                                       '<cds.PG>\\g<5></cds.PG> '))
 ## <v, [FS]?, s, y, p
 re_numeration_vol_nucphys_series_yr_page = (re.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?   ## The volume (optional "vol"/"no")
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?([A-H])\s?                   ## The series
@@ -991,7 +991,7 @@ re_numeration_vol_nucphys_series_yr_page = (re.compile(r"""
 ## Pattern 4: <vol, serie, page, year>
 ## <v, s, [FS]?, p, y>
 re_numeration_vol_series_nucphys_page_yr = (re.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?   ## The volume (optional "vol"/"no")
   ([A-H])[,:\s]\s?                         ## The series
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
@@ -1010,7 +1010,7 @@ re_numeration_vol_series_nucphys_page_yr = (re.compile(r"""
 
 ## <v, [FS]?, s, p, y>
 re_numeration_vol_nucphys_series_page_yr = (re.compile(r"""
-  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+)\s?   ## The volume (optional "vol"/"no")
+  (\b[Vv]o?l?\.?|\b[Nn]o\.?)?\s?(?<!(?:\/|\d))(\d+|(?:\d+\-\d+))\s?   ## The volume (optional "vol"/"no")
   """ + \
   _sre_non_compiled_pattern_nucphysb_subtitle + \
   r"""[,;:\s]?([A-H])[,:\s]\s?             ## The series
@@ -1029,9 +1029,9 @@ re_numeration_vol_nucphys_series_page_yr = (re.compile(r"""
 
 ## Pattern 5: <year, vol, page>
 re_numeration_yr_vol_page = (re.compile(r"""
-  (\b|\()(1\d\d\d|20\d\d)\)?(,\s?|\s)      ## The year (optional brackets)
-  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+)[,:\s]\s? ## The Volume (optional 'vol.' word
-  [pP]?[p]?\.?\s?                          ## Starting page num: optional Pp.
+  (\b|\()(1\d\d\d|20\d\d)\)?(,\s?|\s)                       ## The year (optional brackets)
+  ([Vv]o?l?\.?|[Nn]o\.?)?\s?(\d+|(?:\d+\-\d+))[,:\s]\s?     ## The Volume (optional 'vol.' word
+  [pP]?[p]?\.?\s?                                           ## Starting page num: optional Pp.
   ([RL]?\d+[c]?)                           ## 1st part of pagenum(optional R/L)
   (?:\-|\255)?                             ## optional separatr between pagenums
   [RL]?\d{0,6}[c]?                         ## optional 2nd component of pagenum
@@ -1056,57 +1056,76 @@ re_doi = (re.compile("""
     """, re.VERBOSE))
 
 
-# SURNAME FIRST NAME, auth, massive problems with this
-##       ((([A-Z]\w\s)\w+[\-\’'\`]?\w*)|([A-Z]\w+[\-\’'\`]?\w*)(\s+))
-##        ([A-Z])
+## SURNAME FIRST NAME, auth, massive problems with this
+## ((([A-Z]\w\s)\w+[\-\’'\`]?\w*)|([A-Z]\w+[\-\’'\`]?\w*)(\s+))
+##  ([A-Z])
 
-def make_auth_regex_str(author=None):
+def make_auth_regex_str(author=None,first_author=None):
 
     if not author:
-## Pattern used to locate a GROUP of author names in a reference
-## The format of an author can take many forms:
-## J. Bloggs, W. H. Smith, D. De Samuel, G.L. Bayetian, C. Hayward et al.,
-## (the use of 'et. al' is a giveaway that the preceeding
-## text was indeed an author name)
-## This will also match authors which seem to be labeled as editors (with the phrase 'ed.')
-## In which case, the author will be thrown away later on.
-        author = """
+        ## Standard author, with a max of 9 initials, and a surname.
+        ## The Initials MUST be uppercase, and have at least a dot or space between them.
+        author = u"""
     (
-        ([A-Z]((\.\s?)|(\.?\s+))){1,9}                              ## The first initials (one to nine)(with a dot or a space)
-       ((([A-Z]\w\s)\w+[\-\’'\`]?\w*)|([A-Z]\w+[\-\’'\`]?\w*))      ## The surname, which must start with an upper case lttr (hyphen allowed)
-       (([,\.]\s*)|([,\.]?\s+))                                     ## A comma or dot, Then the space between authors
+
+       ([A-Z]((\’\s?)|(\.\s?)|(\.?\s+)|(\.?\s?\-))){1,9}        ## The single initials (x1-9)(with a dot, space or hyphen separating them)
+       ([A-Za-z]\w{1,2}\s)?[A-Z]\w+[\-’'\`]?\w*                 ## The surname, which must start with an upper case lttr (single hyphen allowed)
+                                                                ## ...and possbily a separate prefix consisting on 2-3 characters
+       (([,\.]\s*)|([,\.]?\s+))                                 ## A comma, dot or space between authors
     )
         """
 
-    return r"""
-     (^|\s+)                                                        ## Must be the start of the line, or a space
+    if not first_author:
+        ## The starting author, found before a standard author, MUST NOT start with an 'A' without a fullstop,
+        ## since this could relate to a title. (e.g. 'A software method ...')
+        ## Subsequently found authors are fine to start with 'A ...'
+        first_author = u"""
+    (
 
-     (?P<badand>                                                    ## An AND found here likely indicates a missed author before this text.
-        (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                               ## Thus, triggers weaker author searching, within the previous misc text
-     )?
+      (([B-Z]((\.\s?)|(\.?\s+)|(\.?\s?\-)))|(A\.\s?))           ## The first initial (with a dot, space or hyphen separating them) if A, must end with '.'
+       ([A-Z]((\’\s?)|(\.\s?)|(\.?\s+)|(\.?\s?\-))){0,8}        ## The single initials (x0-8) (with a dot, space or hyphen separating them)
+       ([A-Za-z]\w{1,2}\s)?[A-Z]\w+[\-’'\`]?\w*                 ## The surname, which must start with an upper case lttr (hyphen allowed)
+                                                                ## ...and possbily a separate prefix consisting on 2-3 characters
+       (([,\.]\s*)|([,\.]?\s+))                                 ## A comma, dot or space between authors
+    )
+        """
+    ## Pattern used to locate a GROUP of author names in a reference
+    ## The format of an author can take many forms:
+    ## J. Bloggs, W.-H. Smith, D. De Samuel, G.L. Bayetian, C. Hayward et al.,
+    ## (the use of 'et. al' is a giveaway that the preceeding
+    ## text was indeed an author name)
+    ## This will also match authors which seem to be labeled as editors (with the phrase 'ed.')
+    ## In which case, the author will be thrown away later on.
+
+    return r"""
+     (^|\s+|\()                                                     ## Must be the start of the line, or a space (or an opening bracket in very few cases)
 
      (?P<es>                                                        ## Look for 'ed' before the author
-      (((ed|edited|editor)((\.\s?)|(\.?\s)))                        ## 'ed. '     | 'ed '      | 'ed.'
-      |((ed|edited)((\.\s?)|(\.?\s))by(\s|([:,]\s)))                ## 'ed. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
-      |(\(\s?(ed|edited|editor)((\.\s?)|(\.?\s))?\)))               ## '( ed. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
+      (((eds?|edited|editors?)((\.\s?)|(\.?\s)))                    ## 'eds?. '     | 'ed '      | 'ed.'
+      |((eds?|edited|editions?)((\.\s?)|(\.?\s))by(\s|([:,]\s)))    ## 'eds?. by, ' | 'ed. by: ' | 'ed by '  | 'ed. by '| 'ed by: '
+      |(\(\s?(eds?|edited|editors?)((\.\s?)|(\.?\s))?\)))           ## '( eds?. )'  | '(ed.)'    | '(ed )'   | '( ed )' | '(ed)'
      )?
-
-     %s+
+                                                                    ## Do not place comments to the side of 'format strings' !!!
+     %s
+     (%s)*
      (
       (([Aa][Nn]([Dd]|[Ss])|\&)\s+)                                 ## Maybe 'and' or 'ans' (mistake) or '&' tied with another name
       %s
      )?
 
-    (?P<ee>                                                         ## Look for 'ed' after the author...
-     (((ed|edited|editor)((\.?\s)|(\.\s?)))                         ## 'ed.'   | 'ed. '   | 'ed '
-     |(\((ed|edited|editor)((\.\s)|(\.))?\)))                       ## '(ed.)' | '(ed. )' | '(ed)'
-    )?
-
     (?P<et>
-        \s?[Ee][Tt](((,|\.)\s*)|((,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?   ## Possibly: Et al., or Et al. or Et al,
+        [Ee][Tt](((,|\.)\s*)|((,|\.)?\s+))[Aa][Ll][,\.]?[,\.]?\s*   ## Possibly: Et al., or Et al. or Et al,
     )?
 
-    """ % (author,author)
+
+    (?P<ee>                                                         ## Look for 'ed' after the author group...
+     (((eds?|edited|editors?)((\.?\s)|(\.\s?)))                     ## 'eds?.'   | 'ed. '   | 'ed '
+     |(\((eds?|edited|editors?)((\.\s)|(\.))?\)))                   ## '(eds?.)' | '(ed. )' | '(ed)'
+    )?
+
+    \)?                                                             ## Possible closing bracket
+
+    """ % (first_author,author,author)
 
 
 re_auth = (re.compile(make_auth_regex_str(),re.VERBOSE|re.UNICODE))
@@ -1119,15 +1138,23 @@ re_auth = (re.compile(make_auth_regex_str(),re.VERBOSE|re.UNICODE))
 ## IF a bad_and was found (from above).. do re.search using this pattern
 ## ELIF an auth-misc-auth combo was hit, do re.match using this pattern
 
+
 weaker_author = """
-    (([A-Z]((\.\s?)|(\.?\s+))){1,9}             ## look closely for initials, and less closely at the last name.
+     (([A-Z]((\.\s?)|(\.?\s+)|(\-))){1,9}             ## look closely for initials, and less closely at the last name.
      [^\s]*\s?[^\s]*?(\s|$))
     """
 
 ## End of line MUST match, since the next string is definitely a portion of an author group (append '$')
-re_auth_near_miss = (re.compile(make_auth_regex_str(weaker_author),re.VERBOSE|re.UNICODE))
+re_auth_near_miss = (re.compile(make_auth_regex_str(weaker_author,weaker_author),re.VERBOSE|re.UNICODE))
 
+## Finding an et. al, before author names indicates a bad match!!!
+## I.e. could be a title match... ignore it
+bad_etal_before_auth_matches = (' et al.,',' et. al.,',' et. al.',' et.al.,',' et al.',' et al')
 
+## The different forms of arXiv notation
+re_arxiv_notation = re.compile("""
+    (arxiv)|(e[\-\s]?print:?\s*arxiv)
+    """, re.VERBOSE)
 
 # AND is before last author
 # et. al. is at the end always
@@ -1436,18 +1463,18 @@ def build_reportnum_knowledge_base(fpath):
                                                           classification[0])] =\
                                                           classification[1]
 
-    preprint_reference_search_regexp_patterns  = {}  ## a dictionary of paterns
+    preprint_reference_search_regexp_patterns  = {}  ## a dictionary of patterns
                                                      ## used to recognise
                                                      ## categories of preprints
                                                      ## as used by various
                                                      ## institutes
     standardised_preprint_reference_categories = {}  ## dictionary of
                                                      ## standardised category
-                                                     ## stringsfor preprint cats
-    current_institute_preprint_classifications = []  ## listof tuples containing
+                                                     ## strings for preprint cats
+    current_institute_preprint_classifications = []  ## list of tuples containing
                                                      ## preprint categories in
                                                      ## their raw & standardised
-                                                     ## forms,as read from KB
+                                                     ## forms, as read from KB
     current_institute_numerations = []               ## list of preprint
                                                      ## numeration patterns, as
                                                      ## read from the KB
@@ -1682,7 +1709,7 @@ def build_titles_knowledge_base(fpath):
     return (kb, standardised_titles, seek_phrases)
 
 def standardize_and_markup_numeration_of_citations_in_line(line):
-    """Given a reference line, attepmt to locate instances of citation
+    """Given a reference line, attempt to locate instances of citation
        'numeration' in the line.
        Upon finding some numeration, re-arrange it into a standard
        order, and mark it up with tags.
@@ -1728,7 +1755,7 @@ def identify_preprint_report_numbers(line,
        line.
        Report numbers will be identified, their information (location
        in line, length in line, and standardised replacement version)
-       will be record, and they will be replaced in the working-line
+       will be recorded, and they will be replaced in the working-line
        by underscores.
        @param line: (string) - the working reference line.
        @param preprint_repnum_search_kb: (dictionary) - contains the
@@ -1953,7 +1980,7 @@ def identify_and_tag_URLs(line):
     ## return the line containing the tagged URLs:
     return (line, identified_urls)
 
-def identify_and_tag_doi(line):
+def identify_and_tag_DOI(line):
     """takes a single citation line and attempts to locate any DOI references.
        DOI references are recognised in both http (url) format and also the
        standard DOI notation (DOI: ...)
@@ -2019,7 +2046,6 @@ def identify_and_tag_authors(line):
                                         'etal'        : match.group('et'),
                                         'ed_start'    : match.group('es'),
                                         'ed_end'      : match.group('ee'),
-                                        'bad_and'     : match.group('badand'),
                                         'text_before' : preceeding_text_string[preceeding_text_start:match.start()],
                                         'auth_no'     : auth_no })
             ## Save the end of the match, from where to snip the misc text found before an author match
@@ -2032,8 +2058,19 @@ def identify_and_tag_authors(line):
             start = m['start']
             end = m['end']
 
-            if m['bad_and']:
-                ## Search the misc text using a weaker pattern before this author hit
+            ## Check the text before the current match to see if it has a bad 'et al'
+            lower_text_before = m['text_before'].strip().lower()
+            for e in bad_etal_before_auth_matches:
+                if lower_text_before.endswith(e):
+                    ## If so, this author match is likely to be a bad match on a title
+                    dump_in_misc = True
+                    break
+
+            ## An AND found here likely indicates a missed author before this text
+            ## Thus, triggers weaker author searching, within the previous misc text
+            ## (Check the text before the current match to see if it has a bad 'and')
+            if not dump_in_misc and (lower_text_before.endswith(' and') or lower_text_before.endswith(' ans')):
+                ## Search using a weaker author pattern to try and find the missed author(s)
                 weaker_match = re_auth_near_miss.search(m['text_before'])
                 if weaker_match and not (weaker_match.group('es') or weaker_match.group('ee')):
                     ## Change the start of the author group to include this new author group
@@ -2574,9 +2611,12 @@ def build_formatted_xml_citation(citation_elements,line_marker):
         ## Multiple misc text subfields will be compressed later
         ## This will also be the only part of the code that deals with MISC tag_typed elements
         if len(element['misc_txt'].strip(" .,")) > 0:
+            lower_stripped_misc = element['misc_txt'].lower().strip(".,:;- []")
             ## If misc text is ultimately just a semi-colon, don't add it as a new subfield
             ## But still use it to dictate whether a new citation is created
-            if element['misc_txt'].strip(" .,") == ";":
+            if ((element['misc_txt'].strip(" .,") == ";") or \
+                ((len(re.sub(re_arxiv_notation,"",lower_stripped_misc)) == 0) and \
+                 (element['type'] == 'REPORTNUMBER'))):
                 misc_txt = False
             else:
                 misc_txt = element['misc_txt']
@@ -2634,7 +2674,8 @@ def build_formatted_xml_citation(citation_elements,line_marker):
         ## If a TITLE was found...
         if element['type'] == "TITLE":
             ## If a report number has been marked up, and there's misc text before this title and the last tag
-            if "R" in past_elements and (len(element['misc_txt'].lower().replace("arxiv", "").strip(".,:;- []")) > 0):
+            if "R" in past_elements and \
+                (len(re.sub(re_arxiv_notation,"",(element['misc_txt'].lower().strip(".,:;- []")))) > 0):
                 ## %%%%% Set as NEW citation line %%%%%
                 xml_line += append_datafield_element(line_marker)
                 past_elements = []
@@ -2668,17 +2709,14 @@ def build_formatted_xml_citation(citation_elements,line_marker):
                             }
                 ## Add a Title element to the past elements list, since we last found an IBID
                 past_elements = []
-                #print
-                #print "xml line with IBIDS at the end (please check formatting): %s" % xml_line
-                #print "I HAVE EXITED ON A LEAST ONE IBID, AS REQUESTED"
-                #sys.exit(0)
 
             past_elements.append("T")
 
         elif element['type'] == "REPORTNUMBER":
             report_number = element['report_num']
             ## If a report number has been marked up, and there's misc text before this title and the last tag
-            if "T" in past_elements and (len(element['misc_txt'].lower().replace("arxiv", "").strip(".,:;- []")) > 0):
+            if "T" in past_elements and \
+                (len(re.sub(re_arxiv_notation,"",(element['misc_txt'].lower().strip(".,:;- []")))) > 0):
                 ## %%%%% Set as NEW citation line %%%%%
                 xml_line += append_datafield_element(line_marker)
                 past_elements = []
@@ -2747,8 +2785,6 @@ def build_formatted_xml_citation(citation_elements,line_marker):
     ## Close the ending datafield element
     xml_line += """
    </datafield>\n"""
-
-    #print "RETURNED XML LINE: %s" % xml_line
 
     return xml_line
 
@@ -3338,6 +3374,7 @@ def remove_reference_line_marker(line):
     else:
         marker_val = u" "
     return (marker_val, line)
+
 def create_marc_xml_reference_section(ref_sect,
                                       preprint_repnum_search_kb,
                                       preprint_repnum_standardised_categs,
@@ -3411,7 +3448,7 @@ def create_marc_xml_reference_section(ref_sect,
 
 
         ## Find DOI sections in citation
-        (working_line1, identified_dois) = identify_and_tag_doi(working_line1)
+        (working_line1, identified_dois) = identify_and_tag_DOI(working_line1)
 
 
         ## Identify and replace URLs in the line:
@@ -5551,7 +5588,7 @@ def test_get_reference_lines():
                 """[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).""",
                 """[40] O.O. Vaneeva, R.O. Popovych and C. Sophocleous, Enhanced Group Analysis and Exact Solutions of Vari-able Coefficient Semilinear Diffusion Equations with a Power Source, Acta Appl. Math., doi:10.1007/s10440-008-9280-9, 46 p., arXiv:0708.3457.""",
                 """[41] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.""",
-                """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic, Phys. Rev. Lett. 44, 912, (1980).
+                """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic’, Phys. Rev. Lett. 44, 912, (1980).
                 """,
                ]
     return reflines
