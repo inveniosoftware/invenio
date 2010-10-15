@@ -43,6 +43,7 @@ CFG_REFEXTRACT_IND1_REFERENCE            = "C"   ## ref field ind1
 CFG_REFEXTRACT_IND2_REFERENCE            = "5"   ## ref field ind2
 CFG_REFEXTRACT_SUBFIELD_MARKER           = "o"   ## ref marker subfield
 CFG_REFEXTRACT_SUBFIELD_MISC             = "m"   ## ref misc subfield
+CFG_REFEXTRACT_SUBFIELD_DOI              = "a"   ## ref DOI subfield (NEW)
 CFG_REFEXTRACT_SUBFIELD_REPORT_NUM       = "r"   ## ref reportnum subfield
 CFG_REFEXTRACT_SUBFIELD_TITLE            = "s"   ## ref title subfield
 CFG_REFEXTRACT_SUBFIELD_URL              = "u"   ## ref url subfield

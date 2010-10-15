@@ -42,6 +42,7 @@ try:
                   CFG_REFEXTRACT_SUBFIELD_REPORT_NUM, \
                   CFG_REFEXTRACT_SUBFIELD_TITLE, \
                   CFG_REFEXTRACT_SUBFIELD_URL, \
+                  CFG_REFEXTRACT_SUBFIELD_DOI, \
                   CFG_REFEXTRACT_SUBFIELD_URL_DESCR, \
                   CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS, \
                   CFG_REFEXTRACT_IND1_EXTRACTION_STATS, \
@@ -118,16 +119,24 @@ def massage_arxiv_reportnumber(report_number):
         return report_number
     words = report_number.split('-')
     if len(words) == 3:  ## case of arXiv-yymm-nnnn  (vn)
-        words.pop(0) # discard leading arXiv
+        words.pop(0) ## discard leading arXiv
         report_number = 'arXiv:' + '.'.join(words).lower()
     elif len(words) == 2: ## case of arXivyymm-nnnn  (vn)
         report_number = 'arXiv:' + words[0][5:] + '.' + words[1].lower()
     return report_number
 
+def get_subfield_content(line,code):
+    """ Given a line (subfield element) and a xml code attribute for a subfield element,
+        return the contents of the subfield element.
+    """
+    content = line.split('<subfield code="'+code+'">')[1]
+    content = content.split('</subfield>')[0]
+    return content
+
 def change_otag_format(out):
     #
-    # Mark "o" tag lines so can delete and move o tags
-    # This version (using find) slightly faster than compiled expressions..
+    ## Mark "o" tag lines so can delete and move o tags
+    ## This version (using find) slightly faster than compiled expressions..
     #
     """ change xml format from (e.g.):
            <datafield tag="999" ind1="C" ind2="5">
@@ -155,36 +164,118 @@ def change_otag_format(out):
               <subfield code="m">J. von Delft and D.C. Ralph,</subfield>
               <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
            </datafield>
+
+        - group together the contents of misc elements which belong to the same datafield element
+        - correctly manage mulitple references inside a single citation line (using multiple 'o'
+            tags to denote mulitple references)
            """
 
     tag_lines=[]
     in_lines = out.split('\n')
+
+    marker_found = False
+
+    ## Set the elements in the 'tag_line' list based on the tag contents of
+    ## Each line in the xml string.
     for line in in_lines:
         if line.find('<subfield code="o">') != -1:
             tag_lines.append('o')
-        elif line.find('<subfield code="m">') != -1 or line.find('<subfield code="r">') != -1 or \
-             line.find('<subfield code="s">') != -1 or line.find('<subfield code="z">') != -1 or \
-             line.find('<subfield code="u">') != -1:
-            tag_lines.append('t')
+            marker_found = True
         elif line.find('<datafield tag="999" ind1="C" ind2="5">') != -1:
             tag_lines.append('5')
+        ## 'y' is used to mark the end of a datafield element
+        elif line.find('</datafield>') <> -1:
+            tag_lines.append('y')
+        ## 'm' (misc) fields are treated differently from other subfields.
+        ## Their contents will be concatenated later on into a single 'm' subfield.
+        ## During processing, there exists the possibility for mulitple 'm' subfields
+        ## To be generated.
+        elif line.find('<subfield code="m"') != -1:
+            tag_lines.append('m')
+        ## All other subfields and elements (url's, record tags, doi's ... etc)
         else:
-            tag_lines.append('a')
-    o_tag = ''
+            tag_lines.append('z')
+
     new_rec_lines=[]
-    lc = -1
-    for lane in in_lines:
-        line = lane.rstrip()
-        lc += 1
-        if tag_lines[lc] == 'o': # save o tag (but do not write line to buffer)
-            o_tag=line
-        elif lc > 2 and tag_lines[lc - 2] == '5' and tag_lines[lc - 1] == 'o' and tag_lines[lc] == 'a':
-            new_rec_lines.pop()  # remove previous '5' line and current 'a' line also not written
-        elif lc > 2 and tag_lines[lc -1] == '5' and tag_lines[lc] == 't':
-            new_rec_lines.append(o_tag) # add o_tag here
-            new_rec_lines.append(line)
+    lc = 0
+    ## Used to denote the starting datafield tag in the file
+    open_5_line = True
+
+    ## Used to indicate when an m tag has already been reached inside a particular datafield
+    first_m = True
+    ## Hold the line number of the first 'm' subfield encountered for a particular datafield
+    position_m = 0
+
+    ## Holds the ending datafield tag when found
+    end_tag = ""
+
+    ## Where the concatenated misc text is held before appended at the end
+    misc_text = ""
+    ## Components of the misc subfield elements
+    misc_subfield_start = "      <subfield code=\"m\">"
+    subfield_end = "</subfield>"
+
+    ## Once again, for each line in the xml string..
+    ## Run adjacently to the list of tags in tag_lines
+    ## Output fixed xml (collect together a single citation's
+    ## items into datafield elements)
+    for xline in in_lines:
+        xline = xline.rstrip()
+
+        ## Save ending datafield tag
+        if tag_lines[lc] == 'y':
+            end_tag = xline
+
+        ## Checks to see if the line is the FIRST <datafield> opening tag
+        ## (FIRST in the entire xml string)
+        if tag_lines[lc] == '5' and open_5_line:
+            new_rec_lines.append(xline)
+            ## All other <datafield> tags are second to this
+            open_5_line = False
+
+        ## ALWAYS append <subfield> (not misc) and <record> lines,
+        elif tag_lines[lc] == 'z' or tag_lines[lc] == 'o':
+            new_rec_lines.append(xline)
+
+        ## If a misc tag is found, add the contents of the element to the total misc content.
+        elif tag_lines[lc] == 'm':
+            if first_m:
+                ## Save the position of this found 'm' subfield
+                ## for later insertion into the same place
+                position_m = len(new_rec_lines)
+                first_m = False
+            misc_text += get_subfield_content(xline,'m')
+
+        ## Encountering a datafield tag of some sort: (not the first starting tag or any ending tag)
         else:
-            new_rec_lines.append(line)
+            ## Look-ahead is needed to try and observe a marker tag
+            if len(tag_lines) >= lc:
+                ## Try to append the closing </datafield> tag at the end of a <datafield> element.
+                ## The end of a full citation is marked by the next datafield element which
+                ## Holds an 'o' subfield tag as its first subfield element.
+                if tag_lines[lc] == '5' and tag_lines[lc + 1] == 'o':
+                    if misc_text <> "":
+                        ## Insert the misc subfield element where it was first encountered
+                        new_rec_lines.insert(position_m, misc_subfield_start+misc_text+subfield_end)
+                        ## Reset misc check variables
+                        first_m = True
+                        misc_text = ""
+                    ## End the datafield element, and start a new one.
+                    new_rec_lines.append(end_tag)
+                    new_rec_lines.append(xline)
+                ## Else, if there is not a starting datafield tag before the current
+                ## Datafield ending tag, append the current end tag by itself
+                ## (reached end of file)
+                elif tag_lines[lc] == 'y' and tag_lines[lc + 1] <> '5':
+                    if misc_text <> "":
+                        ## Add the misc subfield element to the final xml file
+                        new_rec_lines.insert(position_m, misc_subfield_start+misc_text+subfield_end)
+                        first_m = True
+                        misc_text = ""
+                    new_rec_lines.append(end_tag)
+        lc+=1
+
+    ## Create the readable file from the list of lines.
     new_out = ''
     for rec in new_rec_lines:
         rec = rec.rstrip()
@@ -193,71 +284,77 @@ def change_otag_format(out):
     return new_out
 
 def squeeze_m(reference_lines):
-    """squeeze out solitary "m" tags that are too short or too long
+    """remove solitary "m" tags that are too short or too long
        min and max lengths derived by inspection of actual data """
     min_length = 12
     max_length = 1024
     m_tag=re.compile('\<subfield code=\"m\"\>(.*?)\<\/subfield\>')
     end_tag=re.compile('<\/datafield\>')
-    filter = []
+    filter_list = []
     m_squeezed = 0
     for i in range(len(reference_lines)): ## set up initial filter
-        filter.append(1)
+        filter_list.append(1)
     for i in range(len(reference_lines)):
         if m_tag.search(reference_lines[i]):
             if end_tag.search(reference_lines[i + 1]):  ## If this is true then its a solitary "m" tag
                 mlength= len(m_tag.search(reference_lines[i]).group(1))
                 if mlength < min_length or mlength > max_length:
-                    filter[i-1] = filter[i] = filter[i+1] = 0
+                    filter_list[i-1] = filter_list[i] = filter_list[i+1] = 0
                     m_squeezed += 1
     new_reference_lines = []
     for i in range(len(reference_lines)):
-        if filter[i]:
+        if filter_list[i]:
             new_reference_lines.append(reference_lines[i])
     return m_squeezed,new_reference_lines
 
 def squeeze_o(reference_lines):
-    """ squeeze out consecutive o tags - which are already present but are made
+    """ remove consecutive "o" tags - which are already present but are made
         worse by squeezing out m tags """
     o_tag=re.compile('\<subfield code=\"o\"\>(.*?)\<\/subfield\>')
     o_squeezed = 0
-    filter = []
+    filter_list = []
     for i in range(len(reference_lines)):
-        filter.append(1)
+        filter_list.append(1)
     for i in range(len(reference_lines)):
         if o_tag.search(reference_lines[i]):
             if i+3 < len(reference_lines):
                 if  o_tag.search(reference_lines[i+3]): ## if this is true then its 2 "o" tags in a row
-                    filter[i-1] = filter[i] = filter[i+1] = 0
+                    filter_list[i-1] = filter_list[i] = filter_list[i+1] = 0
                     o_squeezed += 1
     new_reference_lines = []
     for i in range(len(reference_lines)):
-        if filter[i]:
+        if filter_list[i]:
             new_reference_lines.append(reference_lines[i])
     return o_squeezed,new_reference_lines
 
 def filter_processed_references(out):
     """ apply filters to reference lines found - to remove junk"""
     reference_lines = out.split('\n')
-    ## remove too long and too short m tags
+    ## Remove too long and too short m tags
     (m_squeezed,ref_lines) = squeeze_m(reference_lines)
     ## Now look for consecutive o tags (with no other tag)
     (o_squeezed,ref_lines) = squeeze_o(ref_lines)
     if m_squeezed + o_squeezed:
         a_tag=re.compile('\<subfield code=\"a\"\>(.*?)\<\/subfield\>')
         for i in range(len(ref_lines)):
-            # <subfield code="a">CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
-            if a_tag.search(ref_lines[i]):  ## remake the "a" tag for new numbe of "m" tags
-                data = a_tag.search(ref_lines[i]).group(1)
-                words1 = data.split()
-                words2 = words1[-1].split('-')
-                old_m = int(words2[-1])
-                words2[-1] = str(old_m - m_squeezed)
-                data1 = '-'.join(words2)
-                words1[-1] = data1
-                new_data = ' '.join(words1)
-                ref_lines[i] = '      <subfield code="a">' + new_data + '</subfield>'
-                break
+            ## Checks to see that the datafield has the attribute ind2="6",
+            ## Before looking to see if the subfield code attribute is 'a'
+            if ref_lines[i].find('<datafield tag="999" ind1="C" ind2="6">') <> -1 and (len(ref_lines)-1) > i:
+                ## For each line in this datafield element, try to find the subfield whose code attribute is 'a'
+                while ref_lines[i].find('</datafield>') <> -1 and (len(ref_lines)-1) > i:
+                    i+=1
+                    ## <subfield code="a">CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
+                    if a_tag.search(ref_lines[i]):  ## remake the "a" tag for new numbe of "m" tags
+                        data = a_tag.search(ref_lines[i]).group(1)
+                        words1 = data.split()
+                        words2 = words1[-1].split('-')
+                        old_m = int(words2[-1])
+                        words2[-1] = str(old_m - m_squeezed)
+                        data1 = '-'.join(words2)
+                        words1[-1] = data1
+                        new_data = ' '.join(words1)
+                        ref_lines[i] = '      <subfield code="a">' + new_data + '</subfield>'
+                        break
     new_out = ''
     len_filtered = 0
     for rec in ref_lines:
@@ -784,7 +881,8 @@ re_tagged_citation = re.compile(r"""
           |PG                    ## or a PG tag
           |REPORTNUMBER          ## or a REPORTNUMBER tag
           |SER                   ## or a SER tag
-          |URL)                  ## or a URL tag
+          |URL                   ## or a URL tag
+          |DOI)                  ## or a DOI tag
           (\s\/)?                ## optional /
           \>                     ## closing of tag (>)
           """, \
@@ -1034,14 +1132,25 @@ re_numeration_yr_vol_page = (re.compile(r"""
                                       '<cds.YR>(\\g<2>)</cds.YR> ' \
                                       '<cds.PG>\\g<6></cds.PG> '))
 
+
+## Pattern used to locate references of a doi inside a citation
+## This pattern matches both url (http) and 'doi:' or 'DOI' formats
+re_doi = (re.compile("""
+    ((\(?[Dd][Oo][Ii](\s)*\)?:?(\s)*)       #'doi:' or 'doi' or '(doi)' (upper or lower case)
+    |(https?:\/\/dx\.doi\.org\/))?          #or 'http://dx.doi.org/'    (neither has to be present)
+    (10\.                                   #10.                        (mandatory for DOI's)
+    \d{4}                                   #[0-9] x4
+    \/                                      #/
+    [\w\-_;\(\)\/\.]+                       #any character
+    [\w\-_;\(\)\/])                         #any character excluding a full stop
+    """, re.VERBOSE))
+
+
 ## a list of patterns used to try to repair broken URLs within reference lines:
 re_list_url_repair_patterns = get_url_repair_patterns()
 
 ## a dictionary of undesirable characters and their replacements:
 undesirable_char_replacements = get_bad_char_replacements()
-
-
-
 
 ## General initiation tasks:
 
@@ -1052,6 +1161,7 @@ def get_recids_and_filepaths(args):
        @param args: a list of strings
        @return: a list of tuples: [(recid, filepath)]
     """
+
     jobs = []
     for x in args:
         items = x.split(":")
@@ -1854,6 +1964,39 @@ def identify_and_tag_URLs(line):
     ## return the line containing the tagged URLs:
     return (line, identified_urls)
 
+def identify_and_tag_doi(line):
+    """takes a single citation line and attempts to locate any DOI references.
+       DOI references are recognised in both http (url) format and also the
+       standard DOI notation (DOI: ...)
+       @param line: (string) the reference line in which to search for DOI's.
+       @return: the tagged line and a list of DOI strings (if any)
+    """
+    ## Used to hold the DOI strings in the citation line
+    doi_strings = []
+
+    ## Run the DOI pattern on the line, returning the re.match objects
+    matched_doi = re_doi.finditer(line)
+    ## For each match found in the line
+    for match in matched_doi:
+        ## Store the start and end position
+        start = match.start()
+        end = match.end()
+        ## Get the actual DOI string (remove the url part of the doi string)
+        doi_phrase = match.group(6)
+
+        ## Either overwrite the doi phrase with a tag, or leave the phrase in
+        if match.group(1) and match.group(1).find("http") <> -1:
+            ## Leave the link in the citation so that the url method can find it
+            line = line[0:end]+"<cds.DOI />"+line[end:]
+        else:
+            ## Take out the entire matched doi
+            line = line[0:start]+"<cds.DOI />"+line[end:]
+        ## Add the single DOI string to the list of DOI strings
+        doi_strings.append(doi_phrase)
+
+    return (line, doi_strings)
+
+
 def identify_periodical_titles(line,
                                periodical_title_search_kb,
                                periodical_title_search_keys):
@@ -2060,6 +2203,7 @@ def create_marc_xml_reference_line(line_marker,
                                    found_title_matchtext,
                                    pprint_repnum_len,
                                    pprint_repnum_matchtext,
+                                   identified_dois,
                                    identified_urls,
                                    removed_spaces,
                                    standardised_titles):
@@ -2091,6 +2235,7 @@ def create_marc_xml_reference_line(line_marker,
        @param pprint_repnum_matchtext: (dictionary) - The matched text for each
         matched institutional report number. Keyed by the index within the line
         of each match.
+       @param identified_dois (list) - The list of dois inside the citation
        @identified_urls: (list) - contains 2-cell tuples, each of which
         represents an idenitfied URL and its description string.
         The list takes the order in which the URLs were identified in the line
@@ -2196,11 +2341,13 @@ def create_marc_xml_reference_line(line_marker,
      count_misc, \
      count_title, \
      count_reportnum, \
-     count_url) = \
+     count_url, \
+     count_doi) = \
          convert_processed_reference_line_to_marc_xml(line_marker, \
-                                                      tagged_line, \
+                                                      tagged_line.replace('\n',''), \
+                                                      identified_dois, \
                                                       identified_urls)
-    return (xml_line, count_misc, count_title, count_reportnum, count_url)
+    return (xml_line, count_misc, count_title, count_reportnum, count_url, count_doi)
 
 def markup_title_as_marcxml(title, volume, year, page, misc_text=""):
     """Given a title, its numeration and some optional miscellaneous text,
@@ -2337,14 +2484,14 @@ def markup_reportnum_followedby_title_as_marcxml(title, volume, year, page,
     """
     ## First, determine whether there is need of a misc subfield:
     if len(misc_text) > 0:
-        ## create a misc subfield to be included in the MARC XML:
+        ## Create a misc subfield to be included in the MARC XML:
         xml_misc_subfield = """
       <subfield code="%(sf-code-ref-misc)s">%(misc-val)s</subfield>""" \
                 % { 'sf-code-ref-misc'       : CFG_REFEXTRACT_SUBFIELD_MISC,
                     'misc-val'               : encode_for_xml(misc_text),
                   }
     else:
-        ## the misc subfield is not needed
+        ## The misc subfield is not needed
         xml_misc_subfield = ""
     ## Build the datafield for the report number segment of the reference line:
     xml_line = \
@@ -2411,8 +2558,9 @@ def markup_reportnum_as_marcxml(report_number, misc_text=""):
                }
     return xml_line
 
-def markup_url_as_marcxml(url_string, url_description, misc_text=""):
-    """Given a URL, a URL description, and some optional miscellaneous text,
+
+def markup_url_or_doi_as_marcxml(doi_string, url_string, url_description, misc_text=""):
+    """Given a DOI string and some misc text.. OR a URL, a URL description, and some optional miscellaneous text,
        return a string containing the MARC XML version of this information.
        E.g. for the miscellaneous text "Example, AN ", the URL
        "http://cdsweb.cern.ch/", and the URL description
@@ -2422,13 +2570,27 @@ def markup_url_as_marcxml(url_string, url_description, misc_text=""):
            <subfield code="u">http://cdsweb.cern.ch/</subfield>
            <subfield code="z">CERN Document Server</subfield>
         </datafield>
+
+        For a given a DOI
+       return a string containing the MARC XML version of this information.
+       E.g. for the DOI 'doi:10.1001/chr223'
+       return the following MARC XML string:
+        <datafield tag="999" ind1="C" ind2="5">
+           <subfield code="a">10.1001/chr223</subfield>
+        </datafield>
+
+        The choice of markup information is denoted by calling this method with
+        the appropriate blank strings for either the doi_string or both
+        pieces of url information.
+
        In the event that the miscellaneous text string is zero-length, there
        will be no $m subfield present in the returned XML.
+        @param doi_string: (string) - the DOI to be marked up.
        @param url_string: (string) - the URL to be marked up.
        @param url_description: (string) - the description of the URL to be
         marked up.
        @param misc_text: (string) - the miscellaneous text to be marked up.
-       @return: (string) MARC XML representation of the URL, its description,
+       @return: (string) MARC XML representation of the URL or the DOI, its description,
         and its miscellaneous text.
     """
     ## First, determine whether there is need of a misc subfield:
@@ -2442,21 +2604,56 @@ def markup_url_as_marcxml(url_string, url_description, misc_text=""):
     else:
         ## the misc subfield is not needed
         xml_misc_subfield = ""
-    ## Build the datafield for the URL segment of the reference line:
-    xml_line = \
+
+    ## If a DOI is provided
+    if doi_string <> "":
+        ## Build the datafield for the DOI segment of the reference line:
+        xml_line = \
+"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
+      <subfield code="%(sf-code-ref-misc)s">%(doi-val)s</subfield>
+   </datafield>
+"""        % { 'df-tag-ref'            : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+                   'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
+                   'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
+                   'misc-subfield'         : xml_misc_subfield,
+                   'sf-code-ref-misc'      : CFG_REFEXTRACT_SUBFIELD_DOI,
+                   'doi-val'               : encode_for_xml(doi_string)
+                 }
+
+    ## Else, if a url is provided
+    else:
+        ## If the url string is the same as its set description, ignore inputting it as a separate subfield
+        if url_string == url_description:
+            ## Build the datafield for the URL segment of the reference line:
+            xml_line = \
+"""   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
+      <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>
+   </datafield>
+"""            % { 'df-tag-ref'            : CFG_REFEXTRACT_TAG_ID_REFERENCE,
+                           'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
+                           'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
+                           'misc-subfield'         : xml_misc_subfield,
+                           'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
+                           'url'                   : encode_for_xml(url_string)
+                         }
+        ## Else, in the case that the url string and the description differ in some way, include them both
+        else:
+            ## Build the datafield for the URL segment of the reference line:
+            xml_line = \
 """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
       <subfield code="%(sf-code-ref-url)s">%(url)s</subfield>
       <subfield code="%(sf-code-ref-url-descr)s">%(url-descr)s</subfield>
    </datafield>
 """            % { 'df-tag-ref'            : CFG_REFEXTRACT_TAG_ID_REFERENCE,
-                   'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
-                   'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
-                   'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
-                   'sf-code-ref-url-descr' : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
-                   'misc-subfield'         : xml_misc_subfield,
-                   'url'                   : encode_for_xml(url_string),
-                   'url-descr'             : encode_for_xml(url_description),
-                 }
+                           'df-ind1-ref'           : CFG_REFEXTRACT_IND1_REFERENCE,
+                           'df-ind2-ref'           : CFG_REFEXTRACT_IND2_REFERENCE,
+                           'misc-subfield'         : xml_misc_subfield,
+                           'sf-code-ref-url'       : CFG_REFEXTRACT_SUBFIELD_URL,
+                           'sf-code-ref-url-descr' : CFG_REFEXTRACT_SUBFIELD_URL_DESCR,
+                           'url'                   : encode_for_xml(url_string),
+                           'url-descr'             : encode_for_xml(url_description)
+                         }
+
     return xml_line
 
 def markup_refline_marker_as_marcxml(marker_text):
@@ -2550,6 +2747,7 @@ def convert_unusable_tag_to_misc(line,
 
 def convert_processed_reference_line_to_marc_xml(line_marker,
                                                  line,
+                                                 identified_dois,
                                                  identified_urls):
     """Given a processed reference line, convert it to MARC XML.
        @param line_marker: (string) - the marker for the reference
@@ -2560,6 +2758,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
         represents an idenitfied URL and its description string.
         The list takes the order in which the URLs were identified in the line
         (i.e. first-found, second-found, etc).
+       @identified_dois: (string) - contains the single doi for this citation
        @return: (tuple) -
           + xml_line (string) - the reference line with all of its
             identified citations marked up into the various subfields.
@@ -2571,7 +2770,8 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
             in the line
           + count_url (integer) - number of URLs found in the line
     """
-    count_misc = count_title = count_reportnum = count_url = 0
+
+    count_misc = count_title = count_reportnum = count_url = count_doi = 0
     xml_line = ""
     previously_cited_item = None
     processed_line = line
@@ -2663,6 +2863,9 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                         reference_year = ""
                         reference_page = ""
                     else:
+
+			## Here, it's likely that the cur_misc_text holds some other preceeding data
+
                         ## either the previously cited item is NOT a REPORT NUMBER, or this cited TITLE
                         ## is preceeded by miscellaneous text. In either case, the two cited objects are
                         ## not the same and do not belong together in the same datafield.
@@ -2686,8 +2889,16 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                             prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
                             xml_line += markup_title_as_marcxml(prev_title, prev_volume,
                                                                             prev_year, prev_page, prev_misc_txt)
+
+
+
                             ## Increment the stats counters:
                             count_title += 1
+
+                        ## [was above in the elif statement]
+                        ## (changed) NOW, append a second 'o' marker to counter this second title... (to signify a new citation???)
+                        xml_line += markup_refline_marker_as_marcxml(line_marker)
+
 
                         ## Now add the current cited item into the previously cited item marker
                         previously_cited_item = { 'type'       : "TITLE",
@@ -2899,6 +3110,10 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                                                                         prev_year, prev_page, prev_misc_txt)
                         ## Increment the stats counters:
                         count_title += 1
+
+                    ## changed / added (to signify a new citation...?)
+                    xml_line += markup_refline_marker_as_marcxml(line_marker)
+
                     ## Now add the current cited item into the previously cited item marker
                     previously_cited_item = { 'type'       : "REPORTNUMBER",
                                               'misc_txt'   : "%s" % cur_misc_txt,
@@ -2909,6 +3124,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                     report_num = u""
 
         elif tag_type == "URL":
+
             ## This tag is an identified URL:
             ## Account for the miscellaneous text before the URL:
             cur_misc_txt += processed_line[0:tag_match_start]
@@ -2951,15 +3167,88 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                     ## Increment the stats counters:
                     count_title += 1
                 ## Empty the previously-cited item place-holder:
-                previously_cited_item = None
+
+
+
+
+                #previously_cited_item = None # CREATE A URL ENTRY IN THE DICTIONARY???
             ## Now convert this URL to MARC XML
             cur_misc_txt = cur_misc_txt.lstrip(".;, ").rstrip()
-            xml_line += markup_url_as_marcxml(url_string, \
+
+            xml_line += markup_url_or_doi_as_marcxml("", \
+                                              url_string, \
                                               url_descr, \
                                               cur_misc_txt)
+
+            ## Save the current misc text
+            previously_cited_item = {'type'      :     "URL",
+                                    'misc_txt'   :     "",
+                                    'url_string' :     "%s" % url_string,
+                                    'url_descr'  :     "%s" % url_descr
+                                   }
+
             ## Increment the stats counters:
             count_url += 1
             cur_misc_txt = u""
+
+        elif tag_type == "DOI":
+
+            ## This tag is an identified DOI:
+            ## Account for the miscellaneous text before the DOI:
+            cur_misc_txt += processed_line[0:tag_match_start]
+
+            ## From the "identified_dois" list, get this DOI and its
+            ## description string:
+            doi_string = identified_dois[0]
+
+            ## Now move past this "<cds.CDS />"tag in the line:
+            processed_line = processed_line[tag_match_end:]
+
+            # Remove DOI from the list of DOI strings
+            identified_dois[0:1] = []
+
+            ## Build the MARC XML representation of this identified URL:
+            if previously_cited_item is not None:
+                ## There was a previously cited item. We must convert it to XML before we can
+                ## convert this URL to XML:
+                if previously_cited_item['type'] == "REPORTNUMBER":
+                    ## previously cited item was a REPORT NUMBER.
+                    ## Add previously cited REPORT NUMBER to XML string:
+                    prev_report_num = previously_cited_item['report_num']
+                    prev_misc_txt   = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
+                    xml_line += markup_reportnum_as_marcxml(prev_report_num,
+                                                            prev_misc_txt)
+                    ## Increment the stats counters:
+                    count_reportnum += 1
+                elif previously_cited_item['type'] == "TITLE":
+                    ## previously cited item was a TITLE.
+                    ## Add previously cited TITLE to XML string:
+                    prev_title    = previously_cited_item['title']
+                    prev_volume   = previously_cited_item['volume']
+                    prev_year     = previously_cited_item['year']
+                    prev_page     = previously_cited_item['page']
+                    prev_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
+                    xml_line += markup_title_as_marcxml(prev_title, prev_volume,
+                                                                    prev_year, prev_page, prev_misc_txt)
+                    ## Increment the stats counters:
+                    count_title += 1
+
+            ## Now convert this DOI to MARC XML
+            cur_misc_txt = cur_misc_txt.lstrip(".;, ").rstrip()
+            xml_line += markup_url_or_doi_as_marcxml(doi_string, \
+                                              "", "", \
+                                              cur_misc_txt)
+
+            #SAVE the current misc text
+            previously_cited_item = {'type'       : "DOI",
+                                     'misc_txt'   : "",
+                                     'doi_string' : "%s" % doi_string
+                                   }
+
+            ## Increment the stats counters:
+            count_doi += 1
+            cur_misc_txt = u""
+
 
         elif tag_type == "SER":
             ## This tag is a SERIES tag; Since it was not preceeded by a TITLE
@@ -2997,6 +3286,10 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                                            CFG_REFEXTRACT_MARKER_CLOSING_PAGE)
 
         else:
+
+            #if previously_cited_item is not None:
+            #    cur_misc_txt += previously_cited_item['misc_txt']
+
             ## Unknown tag - discard as miscellaneous text:
             cur_misc_txt += processed_line[0:tag_match.end()]
             processed_line = processed_line[tag_match.end():]
@@ -3027,21 +3320,32 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                                                             prev_year, prev_page, prev_misc_txt)
             ## Increment the stats counters:
             count_title += 1
+
+        elif previously_cited_item['type'] == "DOI" or previously_cited_item['type'] == "URL":
+            ## get the saved misc content... append later on
+            cur_misc_txt = previously_cited_item['misc_txt'].lstrip(".;, ").rstrip()
+
+
         ## free up previously_cited_item:
         previously_cited_item = None
 
     ## place any remaining miscellaneous text into the
     ## appropriate MARC XML fields:
     cur_misc_txt += processed_line
+
     if len(cur_misc_txt.strip(" .;,")) > 0:
         ## The remaining misc text is not just a full-stop
-        ## or semi-colon. Add it:
+        ## or semi-colon. Add it as a new datafield element.
+        ## changed (add the marker to denote a new datafield element)
+        xml_line += markup_refline_marker_as_marcxml(line_marker)
+        ## Add the misc text
         xml_line += markup_misc_as_marcxml(cur_misc_txt)
+
         ## Increment the stats counters:
         count_misc += 1
 
     ## return the reference-line as MARC XML:
-    return (xml_line, count_misc, count_title, count_reportnum, count_url)
+    return (xml_line, count_misc, count_title, count_reportnum, count_url, count_doi)
 
 def move_tagged_series_into_tagged_title(line):
     """Moves a marked-up series item into a marked-up title.
@@ -3367,7 +3671,7 @@ def create_marc_xml_reference_section(ref_sect,
     ## a list to contain the processed reference lines:
     xml_ref_sectn = []
     ## counters for extraction stats:
-    count_misc = count_title = count_reportnum = count_url = 0
+    count_misc = count_title = count_reportnum = count_url = count_doi = 0
 
     ## A dictionary to contain the total count of each 'bad title' found
     ## in the entire reference section:
@@ -3397,6 +3701,11 @@ def create_marc_xml_reference_section(ref_sect,
         (line_marker, working_line1) = \
                       remove_reference_line_marker(ref_line)
 
+
+        ## Find DOI sections in citation
+        (working_line1, identified_dois) = identify_and_tag_doi(working_line1)
+
+
         ## Identify and replace URLs in the line:
         (working_line1, identified_urls) = identify_and_tag_URLs(working_line1)
 
@@ -3406,7 +3715,7 @@ def create_marc_xml_reference_section(ref_sect,
 
         ## Identify and standardise numeration in the line:
         working_line1 = \
-         standardize_and_markup_numeration_of_citations_in_line(working_line1)
+        standardize_and_markup_numeration_of_citations_in_line(working_line1)
 
         ## Now that numeration has been marked-up, check for and remove any
         ## ocurrences of " bf ":
@@ -3465,7 +3774,7 @@ def create_marc_xml_reference_section(ref_sect,
         ## At the same time, get stats of citations found in the reference line
         ## (titles, urls, etc):
         (xml_line, this_count_misc, this_count_title, \
-         this_count_reportnum, this_count_url) = \
+         this_count_reportnum, this_count_url, this_count_doi) = \
            create_marc_xml_reference_line(line_marker=line_marker,
                                           working_line=working_line1,
                                           found_title_len=found_title_len,
@@ -3475,6 +3784,7 @@ def create_marc_xml_reference_section(ref_sect,
                                             found_pprint_repnum_matchlens,
                                           pprint_repnum_matchtext=\
                                             found_pprint_repnum_replstr,
+                                            identified_dois=identified_dois,
                                           identified_urls=identified_urls,
                                           removed_spaces=removed_spaces,
                                           standardised_titles=\
@@ -3483,14 +3793,15 @@ def create_marc_xml_reference_section(ref_sect,
         count_title     += this_count_title
         count_reportnum += this_count_reportnum
         count_url       += this_count_url
+        count_doi       += this_count_doi
 
         ## Append the rebuilt line details to the list of
         ## MARC XML reference lines:
         xml_ref_sectn.append(xml_line)
 
-    ## Return thereturn  list of processed reference lines:
+    ## Return the list of processed reference lines:
     return (xml_ref_sectn, count_misc, count_title, \
-            count_reportnum, count_url, record_titles_count)
+            count_reportnum, count_url, count_doi, record_titles_count)
 
 
 ## Tasks related to extraction of reference section from full-text:
@@ -4293,7 +4604,10 @@ def find_reference_section_no_title_via_numbers(docbody):
             mark_match = \
                 perform_regex_match_upon_line_with_pattern_list(docbody[x], \
                                                                 marker_patterns)
-            if mark_match is not None and int(mark_match.group('num')) == 1:
+
+            if mark_match is None:
+                break
+            elif mark_match is not None and int(mark_match.group('num')) == 1:
                 ## Get marker recognition pattern:
                 mk_ptn = mark_match.re.pattern
 
@@ -4515,7 +4829,6 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
         Else the orginal 'rebuilt' lines.
     """
     fixed = []
-    unsafe = 0
     try:
         m = p_refmarker.match(rebuilt_lines[0])
         last_marknum = int(m.group("marknum"))
@@ -4538,7 +4851,7 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
     ## the previous line by looking in the current line for another marker
     ## that has the numeric value of previous-marker + 1. If found, that marker
     ## will be taken as the true marker for the line and the leader of the line
-    ## (up to the point of this marker) will be appended to the revious line.
+    ## (up to the point of this marker) will be appended to the previous line.
     ## E.g.:
     ## [1] Smith, J blah blah
     ## [2] Brown, N blah blah see reference
@@ -4602,8 +4915,10 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         if m_test_nxt_mark_not_eol is not None:
                             ## move this section back to its real line:
 
-                            ## get the segment of this line to be moved to the
-                            ## previous line (append a newline to it too):
+                            ## get the segment of line (before the marker,
+                            ## which holds a marker that isn't supposed to
+                            ## be next) to be moved back to the previous line
+                            ## where it belongs, (append a newline to it too):
                             movesect = \
                                current_line[0:m_test_nxt_mark_not_eol.start()] \
                                + "\n"
@@ -4612,13 +4927,14 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                             ## (without its newline at the end):
                             previous_line = fixed[len(fixed) - 1].rstrip("\n")
 
-                            ## Now append the section to be moved to the
-                            ## previous line variable. Check the last character
+                            ## Now append the section which is to be moved to the
+                            ## previous line. Check the last character
                             ## of the previous line. If it's a space, then just
                             ## directly append this new section. Else, append a
                             ## space then this new section.
+                            if previous_line[len(previous_line)-1] not in (u' ',u'-'):
+                                movesect = ' ' + movesect
                             previous_line += movesect
-
                             fixed[len(fixed) - 1] = previous_line
 
                             ## Now append the remainder of the current line to
@@ -4641,8 +4957,11 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                             ## If it's a space, then just directly append this
                             ## new section. Else, append a space then this new
                             ## section.
+                            if previous_line[len(previous_line)-1] not in (u' ',u'-'):
+                                movesect = ' ' + movesect
                             previous_line += movesect
                             fixed[len(fixed) - 1] = previous_line
+                            ## Should be blank?
                             current_line = current_line[m_next_mark.end():]
 
                     else:
@@ -4655,11 +4974,11 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                         ## Check the last character of the previous line. If
                         ## it's a space, then just directly append this new
                         ## section. Else, append a space then this new section.
+                        if previous_line[len(previous_line)-1] not in (u' ',u'-'):
+                            movesect = ' ' + movesect
                         previous_line += movesect
                         fixed[len(fixed) - 1] = previous_line
                         current_line = current_line[m_next_mark.end():]
-
-
 
                     ## Get next match:
                     m_next_mark = p_refmarker.search(current_line)
@@ -4674,6 +4993,8 @@ def correct_rebuilt_lines(rebuilt_lines, p_refmarker):
                     ## Check the last character of the previous line. If it's a
                     ## space, then just directly append this new section. Else,
                     ## append a space then this new section.
+                    if previous_line[len(previous_line)-1] not in (u' ',u'-'):
+                        movesect = ' ' + movesect
                     previous_line += movesect
                     fixed[len(fixed) - 1] = previous_line
 
@@ -4737,19 +5058,17 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
             ref_line_marker_ptn = unicode(r'^A$^A$$')
     p_ref_line_marker = re.compile(ref_line_marker_ptn, re.I|re.UNICODE)
 
+    ## Work backwards, starting from the last 'broken' reference line
+    ## Append each fixed reference line to rebuilt_references
     for x in xrange(len_ref_sectn - 1, -1, -1):
         current_string = ref_sectn[x].strip()
+        ## Try to find the marker for the reference line
         m_ref_line_marker = p_ref_line_marker.match(current_string)
         if m_ref_line_marker is not None:
-            ## Ref line start marker
-            if current_string == '':
-                ## Blank line to separate refs. Append the current
-                ## working line to the refs list
-                working_line = working_line.rstrip()
-                working_line = wash_and_repair_reference_line(working_line)
-                rebuilt_references.append(working_line)
-                working_line = u''
-            else:
+            ## Reference line marker found! : Append this reference to the
+            ## list of fixed references and reset the working_line to 'blank'
+            if current_string <> '':
+                ## If it's not a blank line to separate refs .
                 if current_string[len(current_string) - 1] in (u'-', u' '):
                     ## space or hyphenated word at the end of the
                     ## line - don't add in a space
@@ -4758,10 +5077,11 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
                     ## no space or hyphenated word at the end of this
                     ## line - add in a space
                     working_line = current_string + u' ' + working_line
-                working_line = working_line.rstrip()
-                working_line = wash_and_repair_reference_line(working_line)
-                rebuilt_references.append(working_line)
-                working_line = u''
+            ## Append current working line to the refs list
+            working_line = working_line.rstrip()
+            working_line = wash_and_repair_reference_line(working_line)
+            rebuilt_references.append(working_line)
+            working_line = u''
         else:
             if current_string != u'':
                 ## Continuation of line
@@ -4782,9 +5102,16 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
 
     ## a list of reference lines has been built backwards - reverse it:
     rebuilt_references.reverse()
-
+    ## Make sure mulitple markers within references are correctly
+    ## in place (compare current marker num with current marker num +1)
     rebuilt_references = correct_rebuilt_lines(rebuilt_references, \
                                                p_ref_line_marker)
+
+    ## For each properly formated reference line, try to identify cases
+    ## where there is more than one citation in a single line. This is
+    ## done by looking for semi-colons, which could be used to
+    ## separate references
+
     return rebuilt_references
 
 def get_reference_lines(docbody,
@@ -4821,13 +5148,16 @@ def get_reference_lines(docbody,
         ## Title on same line as 1st ref- take title out!
         title_start = docbody[start_idx].find(ref_sect_title)
         if title_start != -1:
+            ## Set the first line with no title
             docbody[start_idx] = docbody[start_idx][title_start + \
                                                     len(ref_sect_title):]
     elif ref_sect_title is not None:
-        ## Pass title line
+        ## Set the start of the reference section to be after the title line
         start_idx += 1
 
     ## now rebuild reference lines:
+    ## (Go through each raw reference line, and format them into a set
+    ## of properly ordered lines based on markers)
     if type(ref_sect_end_line) is int:
         ref_lines = \
            rebuild_reference_lines(docbody[start_idx:ref_sect_end_line+1], \
@@ -4880,6 +5210,7 @@ def extract_references_from_fulltext(fulltext):
             sys.stdout.write("-----extract_references_from_fulltext: " \
                              "ref_sect_start is None\n")
     else:
+        ## If a reference section was found, however weak
         ref_sect_end = \
            find_end_of_reference_section(fulltext, \
                                          ref_sect_start["start_line"], \
@@ -4893,7 +5224,7 @@ def extract_references_from_fulltext(fulltext):
                 sys.stdout.write("-----extract_references_from_fulltext: " \
                                  "no end to refs!\n")
         else:
-            ## Extract
+            ## If the end of the reference section was found.. start extraction
             refs = get_reference_lines(fulltext, \
                                        ref_sect_start["start_line"], \
                                        ref_sect_end, \
@@ -5154,7 +5485,7 @@ def get_cli_options():
     return (cli_opts, myargs)
 
 def display_xml_record(status_code, count_reportnum,
-                       count_title, count_url, count_misc, recid, xml_lines):
+                       count_title, count_url, count_doi, count_misc, recid, xml_lines):
     """Given a series of MARC XML-ized reference lines and a record-id, write a
        MARC XML record to the stdout stream. Include in the record some stats
        for the extraction job.
@@ -5209,7 +5540,7 @@ def display_xml_record(status_code, count_reportnum,
 
     ## add the 999C6 status subfields:
     out += u"""   <datafield tag="%(df-tag-ref-stats)s" ind1="%(df-ind1-ref-stats)s" ind2="%(df-ind2-ref-stats)s">
-      <subfield code="%(sf-code-ref-stats)s">%(version)s-%(timestamp)s-%(status)s-%(reportnum)s-%(title)s-%(url)s-%(misc)s</subfield>
+      <subfield code="%(sf-code-ref-stats)s">%(version)s-%(timestamp)s-%(status)s-%(reportnum)s-%(title)s-%(url)s-%(doi)s-%(misc)s</subfield>
    </datafield>\n""" \
         % { 'df-tag-ref-stats'  : CFG_REFEXTRACT_TAG_ID_EXTRACTION_STATS,
             'df-ind1-ref-stats' : CFG_REFEXTRACT_IND1_EXTRACTION_STATS,
@@ -5221,6 +5552,7 @@ def display_xml_record(status_code, count_reportnum,
             'reportnum'         : count_reportnum,
             'title'             : count_title,
             'url'               : count_url,
+            'doi'               : count_doi,
             'misc'              : count_misc,
           }
 
@@ -5275,14 +5607,14 @@ def main():
      standardised_preprint_reportnum_categs) = \
                build_reportnum_knowledge_base(CFG_REFEXTRACT_KB_REPORT_NUMBERS)
 
-    done_coltags = 0 ## flag to signal that the XML collection
-                     ## tags have been output
+    done_coltags = 0 ## flag to signal that the starting XML collection
+                     ## tags have been output to either an xml file or stdout
 
     for curitem in extract_jobs:
         how_found_start = -1  ## flag to indicate how the reference start section was found (or not)
         extract_error = 0  ## extraction was OK unless determined otherwise
         ## reset the stats counters:
-        count_misc = count_title = count_reportnum = count_url = 0
+        count_misc = count_title = count_reportnum = count_url = count_doi = 0
         recid = curitem[0]
         if cli_opts['verbosity'] >= 1:
             sys.stdout.write("--- processing RecID: %s pdffile: %s; %s\n" \
@@ -5290,6 +5622,7 @@ def main():
 
         if not done_coltags:
             ## Output opening XML collection tags:
+            ## Initialise ouput xml file if the relevant cli flag/arg exists
             if cli_opts['xmlfile']:
                 try:
                     ofilehdl = open(cli_opts['xmlfile'], 'w')
@@ -5302,6 +5635,7 @@ def main():
                     sys.stdout.write("***%s\n\n" % cli_opts['xmlfile'])
                     raise IOError("Cannot open %s to write!" \
                                   % cli_opts['xmlfile'])
+            ## else, write the xml lines to the stdout
             else:
                 sys.stdout.write("%s\n" \
                           % CFG_REFEXTRACT_XML_VERSION.encode("utf-8"))
@@ -5340,7 +5674,7 @@ def main():
 #            reflines = test_get_reference_lines()
             (processed_references, count_misc, \
              count_title, count_reportnum, \
-             count_url, record_titles_count) = \
+             count_url, count_doi, record_titles_count) = \
               create_marc_xml_reference_section(reflines,
                                                 preprint_repnum_search_kb=\
                                                   preprint_reportnum_sre,
@@ -5393,6 +5727,7 @@ def main():
                                  count_reportnum, \
                                  count_title, \
                                  count_url, \
+                                 count_doi, \
                                  count_misc, \
                                  recid, \
                                  processed_references)
@@ -5455,6 +5790,8 @@ def test_get_reference_lines():
        @return: (list) of strings - the test reference lines. Each
         string in the list is a reference line that should be processed.
     """
+    ## new addition: include two references containing a standard DOI and a DOI embedded in an http link (last two references)
+
     reflines = ["""[1] <a href="http://cdsweb.cern.ch/">CERN Document Server</a> J. Maldacena, Adv. Theor. Math. Phys. 2 (1998) 231; hep-th/9711200. http://cdsweb.cern.ch/ then http://www.itp.ucsb.edu/online/susyc99/discussion/. ; L. Susskind, J. Math. Phys. 36 (1995) 6377; hep-th/9409089. hello world a<a href="http://uk.yahoo.com/">Yahoo!</a>. Fin.""",
                 """[1] J. Maldacena, Adv. Theor. Math. Phys. 2 (1998) 231; hep-th/9711200. http://cdsweb.cern.ch/""",
                 """[2] S. Gubser, I. Klebanov and A. Polyakov, Phys. Lett. B428 (1998) 105; hep-th/9802109. http://cdsweb.cern.ch/search.py?AGE=hello-world&ln=en""",
@@ -5503,6 +5840,8 @@ def test_get_reference_lines():
                 """[2] H. J. Bhabha, Rev. Mod. Phys. 17, 200(1945); ibid, 21, 451(1949); S. Weinberg, Phys. Rev. 133, B1318(1964); ibid, 134, 882(1964); D. L. Pursey, Ann. Phys(N. Y)32, 157(1965); W. K. Tung, Phys, Rev. Lett. 16, 763(1966); Phys. Rev. 156, 1385(1967); W. J. Hurley, Phys. Rev. Lett. 29, 1475(1972).""",
                 """[21] E. Schrodinger, Sitzungsber. Preuss. Akad. Wiss. Phys. Math. Kl. 24, 418(1930); ibid, 3, 1(1931); K. Huang, Am. J. Phys. 20, 479(1952); H. Jehle, Phys, Rev. D3, 306(1971); G. A. Perkins, Found. Phys. 6, 237(1976); J. A. Lock, Am. J. Phys. 47, 797(1979); A. O. Barut et al, Phys. Rev. D23, 2454(1981); ibid, D24, 3333(1981); ibid, D31, 1386(1985); Phys. Rev. Lett. 52, 2009(1984).""",
                 """[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).""",
+                """[40] O.O. Vaneeva, R.O. Popovych and C. Sophocleous, Enhanced Group Analysis and Exact Solutions of Vari-able Coefficient Semilinear Diffusion Equations with a Power Source, Acta Appl. Math., doi:10.1007/s10440-008-9280-9, 46 p., arXiv:0708.3457.""",
+                """[41] M. I. Trofimov and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.""",
                ]
     return reflines
 
