@@ -852,14 +852,14 @@ def get_bad_char_replacements():
         ## \030 : cedilla
         u'\u0327c' : u'\u00E7',
         u'\u0327C' : u'\u00C7',
-        ## \02DC : tilde (s with a tilde turns to just 's')
+        ## \02DC : tilde
         u'\u02DCn' : u'\u00F1',
         u'\u02DCN' : u'\u00D1',
         u'\u02DCo' : u'\u00F5',
         u'\u02DCO' : u'\u00D5',
         u'\u02DCa' : u'\u00E3',
         u'\u02DCA' : u'\u00C3',
-        u'\u02DCs' : u'_', ## no valid 's with tilde' character
+        u'\u02DCs' : u'\u0303s', ## Combining tilde with 's'
     }
     return replacements
 
@@ -3390,6 +3390,7 @@ def build_formatted_xml_citation(citation_elements,line_marker):
     xml_line += """
    </datafield>\n"""
 
+
     return xml_line
 
 
@@ -3428,6 +3429,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
     citation_elements = []
     # the last tag element found when working from left-to-right across the line
     identified_citation_element = None
+
 
     while tag_match is not None:
         ## While there are tags inside this reference line...
@@ -6556,7 +6558,11 @@ def test_get_reference_lines():
                 """[1] P. A. M. Dirac, Proc. R. Soc. London, Ser. A155, 447(1936); ibid, D24, 3333(1981).""",
                 """[40] O.O. Vaneeva, R.O. Popovych and C. Sophocleous, Enhanced Group Analysis and Exact Solutions of Vari-able Coefficient Semilinear Diffusion Equations with a Power Source, Acta Appl. Math., doi:10.1007/s10440-008-9280-9, 46 p., arXiv:0708.3457.""",
                 """[41] M. I. Trofimov, N. De Filippis and E. A. Smolenskii. Application of the electronegativity indices of organic molecules to tasks of chemical informatics. Russ. Chem. Bull., 54:2235-2246, 2005. http://dx.doi.org/10.1007/s11172-006-0105-6.""",
-                """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic’, Phys. Rev. Lett. 44, 912, (1980).
+                """[42] M. Gell-Mann, P. Ramon ans R. Slansky, in Supergravity, P. van Niewenhuizen and D. Freedman (North-Holland 1979); T. Yanagida, in Proceedings of the Workshop on the Unified Thoery and the Baryon Number in teh Universe, ed. O. Sawaga and A. Sugamoto (Tsukuba 1979); R.N. Mohapatra and G. Senjanovic, Phys. Rev. Lett. 44, 912, (1980).
+                """,
+                """[43] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); Hayward and Yellow et al., Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990);
+                """,
+                """[44] M. I. _________________________________________ Molinero, and J. C. Oller, Performance test of the CMS link alignment system
                 """,
                 """[43] L.S. Durkin and P. Langacker, Phys. Lett B166, 436 (1986); Amaldi et al., Phys. Rev. D36, 1385 (1987); Hayward and Yellow et al., eds. Phys. Lett B245, 669 (1990); Nucl. Phys. B342, 15 (1990);
                 """,
