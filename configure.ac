@@ -22,8 +22,10 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.1, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.99.1)
+AC_INIT([cds-invenio],
+        m4_esyscmd([./git-version-gen .tarball-version]),
+        [cds.support@cern.ch])
+AM_INIT_AUTOMAKE([tar-ustar])
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -401,7 +403,6 @@ if test -z "$GNUPLOT"; then
 fi
 
 ## Substitute variables:
-AC_SUBST(VERSION)
 AC_SUBST(MYSQL)
 AC_SUBST(PHP)
 AC_SUBST(PYTHON)

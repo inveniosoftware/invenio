@@ -30,6 +30,13 @@ JSMFV = 1.3
 JSMATH = jsMath-$(JSMV).zip
 JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
 
+# git-version-get stuff:
+BUILT_SOURCES = $(top_srcdir)/.version
+$(top_srcdir)/.version:
+	echo $(VERSION) > $@-t && mv $@-t $@
+dist-hook:
+	echo $(VERSION) > $(distdir)/.tarball-version
+
 all:
 	@echo "****************************************************"
 	@echo "** CDS Invenio has been successfully built.       **"
