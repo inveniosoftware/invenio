@@ -35,7 +35,7 @@ from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
     DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
-from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
+from invenio.dbquery import run_sql, ProgrammingError
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
 from invenio.intbitset import intbitset
@@ -1080,15 +1080,15 @@ def acc_get_action_details(id_action=0):
 
 def acc_get_all_actions():
     """returns all entries in accACTION."""
-    return run_sql_cached("""SELECT id, name, description
-        FROM accACTION ORDER BY name""", affected_tables=['accACTION'])
+    return run_sql("""SELECT id, name, description
+        FROM accACTION ORDER BY name""")
 
 def acc_get_action_roles(id_action):
     """Returns all the roles connected with an action."""
-    return run_sql_cached("""SELECT DISTINCT(r.id), r.name, r.description
+    return run_sql("""SELECT DISTINCT(r.id), r.name, r.description
         FROM accROLE_accACTION_accARGUMENT raa, accROLE r
         WHERE (raa.id_accROLE = r.id AND raa.id_accACTION = %s) OR r.name = %s
-        ORDER BY r.name """, (id_action, SUPERADMINROLE), affected_tables=['accROLE_accACTION_accARGUMENT', 'accROLE'])
+        ORDER BY r.name """, (id_action, SUPERADMINROLE))
 
 
 # ROLE RELATED
@@ -1137,23 +1137,23 @@ def acc_get_role_details(id_role=0):
 def acc_get_all_roles():
     """get all entries in accROLE."""
 
-    return run_sql_cached("""SELECT id, name, description,
+    return run_sql("""SELECT id, name, description,
         firerole_def_ser, firerole_def_src
-        FROM accROLE ORDER BY name""", affected_tables=['accROLE'])
+        FROM accROLE ORDER BY name""")
 
 
 def acc_get_role_actions(id_role):
     """get all actions connected to a role. """
     if acc_get_role_name(id_role) == SUPERADMINROLE:
-        return run_sql_cached("""SELECT id, name, description
+        return run_sql("""SELECT id, name, description
             FROM accACTION
-            ORDER BY name """, affected_tables=['accACTION'])
+            ORDER BY name """)
     else:
-        return run_sql_cached("""SELECT DISTINCT(a.id), a.name, a.description
+        return run_sql("""SELECT DISTINCT(a.id), a.name, a.description
             FROM accROLE_accACTION_accARGUMENT raa, accACTION a
             WHERE raa.id_accROLE = %s and
                 raa.id_accACTION = a.id
-            ORDER BY a.name""", (id_role, ), affected_tables=['accACTION', 'accROLE_accACTION_accARGUMENT'])
+            ORDER BY a.name""", (id_role, ))
 
 
 def acc_get_role_users(id_role):
@@ -1463,11 +1463,11 @@ def acc_find_possible_actions(id_role, id_action):
     """
 
     # query to find all entries for user and action
-    res1 = run_sql_cached(""" SELECT raa.argumentlistid, ar.keyword, ar.value
+    res1 = run_sql(""" SELECT raa.argumentlistid, ar.keyword, ar.value
         FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT ar
         WHERE raa.id_accROLE = %s and
         raa.id_accACTION = %s and
-        raa.id_accARGUMENT = ar.id """, (id_role, id_action), affected_tables=['accROLE_accACTION_accARGUMENT', 'accARGUMENT'])
+        raa.id_accARGUMENT = ar.id """, (id_role, id_action))
 
     # find needed keywords, create header
     keywords = acc_get_action_keywords(id_action=id_action)
@@ -1475,9 +1475,9 @@ def acc_find_possible_actions(id_role, id_action):
 
     if not keywords:
         # action without arguments
-        if run_sql_cached("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
+        if run_sql("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
             WHERE id_accROLE = %s AND id_accACTION = %s AND id_accARGUMENT = 0
-            AND argumentlistid = 0""", (id_role, id_action), affected_tables=['accROLE_accACTION_accARGUMENT']):
+            AND argumentlistid = 0""", (id_role, id_action)):
             return [['#', 'argument keyword'],
                     ['0', 'action without arguments']]
 

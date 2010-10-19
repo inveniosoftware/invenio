@@ -97,7 +97,7 @@ from invenio.bibrank_citation_searcher import get_cited_by_count, calculate_cite
     get_refersto_hitset, get_citedby_hitset
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
-from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time
+from invenio.dbquery import run_sql, get_table_update_time
 from invenio.webuser import getUid, collect_user_info
 from invenio.webpage import pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
@@ -481,8 +481,7 @@ def get_alphabetically_ordered_collection_list(level=0, ln=CFG_SITE_LANG):
        (collection name, printable collection name).
        Suitable for create_search_box()."""
     out = []
-    res = run_sql_cached("SELECT id,name FROM collection ORDER BY name ASC",
-                         affected_tables=['collection',])
+    res = run_sql("SELECT id,name FROM collection ORDER BY name ASC")
     for c_id, c_name in res:
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
@@ -1028,13 +1027,11 @@ def get_searchwithin_fields(ln='en', colID=None):
     """Retrieves the fields name used in the 'search within' selection box for the collection ID colID."""
     res = None
     if colID:
-        res = run_sql_cached("""SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
+        res = run_sql("""SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='sew' AND cff.id_collection=%s AND cff.id_field=f.id
-                              ORDER BY cff.score DESC, f.name ASC""", (colID,),
-                             affected_tables=['field', 'collection_field_fieldvalue'])
+                              ORDER BY cff.score DESC, f.name ASC""", (colID,))
     if not res:
-        res = run_sql_cached("SELECT code,name FROM field ORDER BY name ASC",
-                             affected_tables=['field',])
+        res = run_sql("SELECT code,name FROM field ORDER BY name ASC")
     fields = [{
                 'value' : '',
                 'text' : get_field_i18nname("any field", ln, False)
@@ -1051,22 +1048,19 @@ def get_sortby_fields(ln='en', colID=None):
     _ = gettext_set_language(ln)
     res = None
     if colID:
-        res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+        res = run_sql("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='soo' AND cff.id_collection=%s AND cff.id_field=f.id
-                              ORDER BY cff.score DESC, f.name ASC""", (colID,),
-                             affected_tables=['field', 'collection_field_fieldvalue'])
+                              ORDER BY cff.score DESC, f.name ASC""", (colID,))
     if not res:
         # no sort fields defined for this colID, try to take Home collection:
-        res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+        res = run_sql("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='soo' AND cff.id_collection=%s AND cff.id_field=f.id
-                                 ORDER BY cff.score DESC, f.name ASC""", (1,),
-                             affected_tables=['field', 'collection_field_fieldvalue'])
+                                 ORDER BY cff.score DESC, f.name ASC""", (1,))
     if not res:
         # no sort fields defined for the Home collection, take all sort fields defined wherever they are:
-        res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+        res = run_sql("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='soo' AND cff.id_field=f.id
-                                 ORDER BY cff.score DESC, f.name ASC""",
-                             affected_tables=['field', 'collection_field_fieldvalue'])
+                                 ORDER BY cff.score DESC, f.name ASC""",)
     fields = [{
                 'value' : '',
                 'text' : _("latest first")
@@ -2235,7 +2229,7 @@ def search_unit_by_times_cited(p):
     allrecs = []
     if p == 0 or p == "0" or \
        p.startswith("0->") or p.endswith("->0"):
-        allrecs = HitSet(run_sql_cached("SELECT id FROM bibrec", affected_tables=['bibrec']))
+        allrecs = HitSet(run_sql("SELECT id FROM bibrec"))
     return get_records_with_num_cites(numstr, allrecs)
 
 def search_unit_refersto(query):
@@ -2804,8 +2798,7 @@ def get_tag_name(tag_value, prolog="", epilog=""):
        Return empty string in case of failure.
        Example: input='100__%', output=first author'."""
     out = ""
-    res = run_sql_cached("SELECT name FROM tag WHERE value=%s", (tag_value,),
-                         affected_tables=['tag',])
+    res = run_sql("SELECT name FROM tag WHERE value=%s", (tag_value,))
     if res:
         out = prolog + res[0][0] + epilog
     return out
@@ -2814,8 +2807,7 @@ def get_fieldcodes():
     """Returns a list of field codes that may have been passed as 'search options' in URL.
        Example: output=['subject','division']."""
     out = []
-    res = run_sql_cached("SELECT DISTINCT(code) FROM field",
-                         affected_tables=['field',])
+    res = run_sql("SELECT DISTINCT(code) FROM field")
     for row in res:
         out.append(row[0])
     return out
@@ -2823,8 +2815,7 @@ def get_fieldcodes():
 def get_field_name(code):
     """Return the corresponding field_name given the field code.
     e.g. reportnumber -> report number."""
-    res = run_sql_cached("SELECT name FROM field WHERE code=%s", (code, ),
-                         affected_tables=['field',])
+    res = run_sql("SELECT name FROM field WHERE code=%s", (code, ))
     if res:
         return res[0][0]
     else:

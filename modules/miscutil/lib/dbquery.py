@@ -20,7 +20,6 @@ CDS Invenio utilities to run SQL queries.
 
 The main API functions are:
     - run_sql()
-    - run_sql_cached()
     - run_sql_many()
 but see the others as well.
 """
@@ -40,7 +39,7 @@ import re
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
-    CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES, CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
+    CFG_MISCUTIL_SQL_USE_SQLALCHEMY, \
     CFG_MISCUTIL_SQL_RUN_SQL_MANY_LIMIT
 
 if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
@@ -70,11 +69,6 @@ CFG_DATABASE_USER = 'cdsinvenio'
 CFG_DATABASE_PASS = 'my123p$ss'
 
 _DB_CONN = {}
-
-try:
-    _db_cache
-except NameError:
-    _db_cache = {}
 
 def _db_login(relogin = 0):
     """Login to the database."""
@@ -123,70 +117,6 @@ def _db_logout():
         del _DB_CONN[get_ident()]
     except KeyError:
         pass
-
-def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=['bibrec']):
-    """
-    Run the SQL query and cache the SQL command for later reuse.
-
-    @param param: tuple of string params to insert in the query
-    (see notes below)
-
-    @param n: number of tuples in result (0 for unbounded)
-
-    @param with_desc: if true, will return a
-    DB API 7-tuple describing columns in query
-
-    @param affected_tables: is a list of tablenames of affected tables,
-    used to decide whether we should update the cache or whether we
-    can return cached result, depending on the last modification time
-    for corresponding tables.  If empty, and if the cached result is
-    present in the cache, always return the cached result without
-    recomputing it.  (This is useful to speed up queries that operate
-    on objects that virtually never change, e.g. list of defined
-    logical fields, that remain usually constant in between Apache
-    restarts.  Note that this would be a dangerous default for any
-    query.)
-
-    @return: the result as provided by run_sql()
-
-    Note that it is pointless and even wrong to use this function with
-    SQL commands different from SELECT.
-    """
-
-    ## FIXME: The code below, checking table update times, was found
-    ## to be slow in user storm situations.  So let us rather run SQL
-    ## statement live; it seems faster to let MySQL use its own cache
-    ## than to constantly verify table update time.  Later, a proper
-    ## time-driven data cacher might be introduced here.  Or, better
-    ## yet, we can plug dedicated data cachers to every place that
-    ## called run_sql_cached.
-    return run_sql(sql, param, n, with_desc)
-
-    global _db_cache
-
-    if CFG_ACCESS_CONTROL_LEVEL_SITE == 3:
-        # do not connect to the database as the site is closed for maintenance:
-        return []
-
-    key = repr((sql, param, n, with_desc))
-
-    # Garbage collecting needed?
-    if len(_db_cache) >= CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES:
-        _db_cache = {}
-
-    # Query already in the cache?
-    if not _db_cache.has_key(key) or \
-           (affected_tables and _db_cache[key][1] <= max([get_table_update_time(table) for table in affected_tables])):
-        # Let's update the cache
-        result = run_sql(sql, param, n, with_desc)
-        _db_cache[key] = (result, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-        ### log_sql_query_cached(key, result, False) ### UNCOMMENT ONLY IF you REALLY want to log all queries
-
-    else:
-        result = _db_cache[key][0]
-        ### log_sql_query_cached(key, result, True) ### UNCOMMENT ONLY IF you REALLY want to log all queries
-
-    return result
 
 def run_sql(sql, param=None, n=0, with_desc=0):
     """Run SQL on the server with PARAM and return result.
@@ -301,28 +231,6 @@ def blob_to_string(ablob):
             return ablob.tostring()
     else:
         return ablob
-
-def log_sql_query_cached(key, result, hit_p):
-    """Log SQL query cached into prefix/var/log/dbquery.log log file.  In order
-    to enable logging of all SQL queries, please uncomment two lines
-    in run_sql_cached() above. Useful for fine-level debugging only!
-    """
-    from invenio.config import CFG_LOGDIR
-    from invenio.dateutils import convert_datestruct_to_datetext
-    from invenio.textutils import indent_text
-    log_path = CFG_LOGDIR + '/dbquery.log'
-    date_of_log = convert_datestruct_to_datetext(time.localtime())
-    message = date_of_log + '-->\n'
-    message += indent_text('Key:\n' + indent_text(str(key), 2, wrap=True), 2)
-    message += indent_text('Result:\n' + indent_text(str(result) + (hit_p and ' HIT' or ' MISS'), 2, wrap=True), 2)
-    message += 'Cached queries: %i\n\n' % len(_db_cache)
-    try:
-        log_file = open(log_path, 'a+')
-        log_file.writelines(message)
-        log_file.close()
-    except:
-        pass
-
 
 def log_sql_query(sql, param=None):
     """Log SQL query into prefix/var/log/dbquery.log log file.  In order

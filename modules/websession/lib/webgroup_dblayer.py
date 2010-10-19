@@ -25,7 +25,7 @@ from time import localtime
 from zlib import decompress
 
 from invenio.config import CFG_SITE_LANG
-from invenio.dbquery import run_sql, run_sql_cached, OperationalError
+from invenio.dbquery import run_sql, OperationalError
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -48,7 +48,7 @@ def get_groups_by_user_status(uid, user_status, login_method='INTERNAL'):
                      g.login_method = %s
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql_cached(query, (uid, user_status, login_method), affected_tables=['usergroup', 'user_usergroup'])
+    res = run_sql(query, (uid, user_status, login_method))
     return res
 
 def get_groups_by_login_method(uid, login_method):
@@ -69,7 +69,7 @@ def get_groups_by_login_method(uid, login_method):
 
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql_cached(query, (uid, login_method), affected_tables=['usergroup', 'user_usergroup'])
+    res = run_sql(query, (uid, login_method))
     return res
 
 def get_groups_with_description(uid):
@@ -87,7 +87,7 @@ def get_groups_with_description(uid):
                      ug.id_usergroup=g.id
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql_cached(query, (uid, ), affected_tables=['usergroup', 'user_usergroup'])
+    res = run_sql(query, (uid, ))
     return res
 
 
@@ -109,7 +109,7 @@ def get_external_groups(uid):
 
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql_cached(query, (uid, ), affected_tables=['usergroup', 'user_usergroup'])
+    res = run_sql(query, (uid, ))
     return res
 
 def get_groups(uid):
@@ -119,7 +119,7 @@ def get_groups(uid):
                WHERE ug.id_user=%s AND
                      ug.id_usergroup=g.id
             """
-    res = run_sql_cached(query, (uid, ), affected_tables=['usergroup', 'user_usergroup'])
+    res = run_sql(query, (uid, ))
     res = list(res)
     return res
 

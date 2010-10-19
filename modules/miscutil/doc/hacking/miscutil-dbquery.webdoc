@@ -23,8 +23,7 @@
 
 <p>dbquery module handles automatically connection (and reconnection)
 to the database and provides the <code>run_sql()</code> function to
-perform SQL queries and <code>run_sql_cached()</code> for rarely
-changing SELECT queries.  It also exports DB exceptions for the client
+perform SQL queries.  It also exports DB exceptions for the client
 code to use (see below).
 </p>
 
@@ -124,47 +123,6 @@ solution is to force MySQL to convert date to a textual format:</p>
     SELECT DATE&#95;FORMAT(date&#95;field,'%%Y-%%m-%%d %%H:%%i:%%s') FROM table
 </pre>
 <p>This conversion will return a datetext format as described in <a href="miscutil-dateutils">dateutils library</a><code>(YEAR-MONTH-DAY HOUR:MINUTE:SECOND)</code>.</p>
-
-<h3><code>run_sql_cached()</code> API</h3>
-
-<p> If you execute a certain SELECT query often, you can
-use <code>run_sql_cached()</code> that will cache its result in memory
-and return it faster next time.  The function signature and usage is
-similar to the one known from <code>run_sql()</code>:
-
-<blockquote>
-<pre>
-def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=['bibrec']):
-    """
-    Run the SQL query and cache the SQL command for later reuse.
-
-    @param param: tuple of string params to insert in the query
-    (see notes below)
-
-    @param n: number of tuples in result (0 for unbounded)
-
-    @param with_desc: if true, will return a
-    DB API 7-tuple describing columns in query
-
-    @param affected_tables is a list of tablenames of affected tables,
-    used to decide whether we should update the cache or whether we
-    can return cached result, depending on the last modification time
-    for corresponding tables.  If empty, and if the cached result is
-    present in the cache, always return the cached result without
-    recomputing it.  (This is useful to speed up queries that operate
-    on objects that virtually never change, e.g. list of defined
-    logical fields, that remain usually constant in between Apache
-    restarts.  Note that this would be a dangerous default for any
-    query.)
-
-    @return the result as provided by run_sql()
-
-    Note that it is pointless and even wrong to use this function with
-    SQL commands different from SELECT.
-    """
-</pre>
-</blockquote>
-</p>
 
 <h3>Logging SQL Queries</h3>
 
