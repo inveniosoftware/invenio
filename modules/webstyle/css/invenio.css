@@ -2818,6 +2818,10 @@ div.bibcircbottom {
     color: #f16f10;
 }
 
+.clear {
+   clear: both;
+}
+
 .bibcircok {
     color: #060;
 }

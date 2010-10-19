@@ -94,7 +94,7 @@ def index(req, ln=CFG_SITE_LANG):
     return page(title="BibCirculation Admin",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -149,7 +149,7 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
     return page(title="Item search result",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -186,7 +186,7 @@ def borrower_search(req, empty_barcode, redirect='no', ln=CFG_SITE_LANG):
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -235,7 +235,7 @@ def borrower_search_result(req, column, string, redirect='no', ln=CFG_SITE_LANG)
         return page(title="Borrower search result",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -262,7 +262,7 @@ def item_search(req, infos=[], ln=CFG_SITE_LANG):
     return page(title="Item search",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -360,7 +360,7 @@ def borrower_notification(req, borrower_id, borrower_email, template, message,
     return page(title="Borrower Notification",
                  uid=id_user,
                  req=req,
-                 body=body,
+                 body=body, language=ln,
                  navtrail=navtrail_previous_links,
                  lastupdated=__lastupdated__)
 
@@ -414,7 +414,7 @@ def get_next_waiting_loan_request(req, recid, barcode, check_id,
     return page(title="Next requests",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -463,7 +463,7 @@ def update_next_loan_request_status(req, check_id, barcode, ln=CFG_SITE_LANG):
     return page(title="New Loan",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -491,7 +491,7 @@ def loan_return(req, ln=CFG_SITE_LANG):
     return page(title="Loan return",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -531,7 +531,7 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
         return page(title="Loan on desk",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -562,6 +562,7 @@ def loan_on_desk_step1(req, key, string, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
+                language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -594,7 +595,7 @@ def loan_on_desk_step2(req, user_id, ln=CFG_SITE_LANG):
     return page(title="Circulation management",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -622,8 +623,6 @@ def loan_on_desk_step3(req, user_id, list_of_barcodes, ln=CFG_SITE_LANG):
 
     infos = []
     list_of_books = []
-
-
     #user_info = [ccid, name, email, phone, address, mailbox]
 
     for value in list_of_barcodes:
@@ -645,6 +644,20 @@ def loan_on_desk_step3(req, user_id, list_of_barcodes, ln=CFG_SITE_LANG):
             (library_id, location) = db.get_lib_location(value)
             tup = (recid, value, library_id, location)
             list_of_books.append(tup)
+            book_details = db.get_item_info(value)
+            item_status = book_details[7]
+
+            if item_status != 'on shelf':
+                infos.append('<strong>WARNING:</strong> Note that item '\
+                             '<strong>[%s]</strong> status ' \
+                             'is <strong>%s</strong>.' % (value, item_status))
+
+            if CFG_CERN_SITE:
+                if library_id != 6:
+                    library_name = db.get_library_name(library_id)
+                    infos.append("<strong>WARNING:</strong> Note that item "\
+                             "<strong>[%s]</strong> location is "\
+                             "'<strong>%s</strong>'." % (value, library_name))
 
             if len(queue) != 0  and  queue[0][0] != user_id:
                 infos.append("Another user is waiting for the book:<strong> " \
@@ -663,10 +676,20 @@ def loan_on_desk_step3(req, user_id, list_of_barcodes, ln=CFG_SITE_LANG):
                                                                 infos=infos,
                                                                 ln=ln)
 
-    return page(title="Circulation management",
+    if infos == []:
+        # shortcut to simplify loan process
+        due_dates = []
+        for bc in list_of_barcodes:
+            due_dates.append(renew_loan_for_X_days(bc))
+
+        return loan_on_desk_step4(req, list_of_barcodes, user_id,
+                       due_dates, None, ln)
+
+    else:
+        return page(title="Circulation management",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -721,7 +744,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
             on_loan.append(barcode)
 
     if len(on_loan) != 0:
-        infos.append("The item(s) with barcode(s) <strong>%s</strong> is(are) already on loan." % on_loan)
+        infos.append("The items with barcode <strong>%s</strong> are already on loan." % on_loan)
 
         body = bibcirculation_templates.tmpl_loan_on_desk_step1(result=None,
                                                                 key='',
@@ -732,7 +755,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
         return page(title="Loan on desk",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -758,7 +781,7 @@ def loan_on_desk_step4(req, list_of_barcodes, user_id,
             return page(title="Circulation management",
                         uid=id_user,
                         req=req,
-                        body=body,
+                        body=body, language=ln,
                         navtrail=navtrail_previous_links,
                         lastupdated=__lastupdated__)
 
@@ -813,7 +836,7 @@ def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
     return page(title="Loan on desk confirm",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -932,7 +955,7 @@ def register_new_loan(req, barcode, borrower_id,
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -985,6 +1008,7 @@ def loan_return_confirm(req, barcode, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
+                language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1036,7 +1060,7 @@ def get_borrower_details(req, borrower_id, ln=CFG_SITE_LANG):
         return page(title="Borrower details",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1143,7 +1167,7 @@ def get_borrower_loans_details(req, recid, barcode, borrower_id,
     return page(title="Loans details - %s" % (db.get_borrower_name(borrower_id)),
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1221,7 +1245,7 @@ def get_item_loans_details(req, recid, barcode, loan_id, force, ln=CFG_SITE_LANG
     return page(title="Loans details - %s" % (book_title_from_MARC(int(recid))),
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1271,7 +1295,7 @@ def get_item_details(req, recid, ln=CFG_SITE_LANG):
     return page(title="Item details",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1302,7 +1326,7 @@ def get_item_req_historical_overview(req, recid, ln=CFG_SITE_LANG):
     return page(title="Requests - historical overview",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1334,7 +1358,7 @@ def get_item_loans_historical_overview(req, recid, ln=CFG_SITE_LANG):
     return page(title="Loans - historical overview",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1366,7 +1390,7 @@ def bor_loans_historical_overview(req, borrower_id, ln=CFG_SITE_LANG):
     return page(title="Loans - historical overview",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1400,7 +1424,7 @@ def bor_requests_historical_overview(req, borrower_id, ln=CFG_SITE_LANG):
     return page(title="Requests - historical overview",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1434,7 +1458,7 @@ def get_library_details(req, library_id, ln=CFG_SITE_LANG):
     return page(title="Library details",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1472,7 +1496,7 @@ def merge_libraries_step1(req, library_id, f=None, p=None, ln=CFG_SITE_LANG):
     return page(title="Merge libraries",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1503,7 +1527,7 @@ def merge_libraries_step2(req, library_from, library_to, ln=CFG_SITE_LANG):
     return page(title="Merge libraries",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1561,7 +1585,7 @@ def get_borrower_requests_details(req, borrower_id, request_id, ln=CFG_SITE_LANG
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1607,7 +1631,7 @@ def get_pending_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
     return page(title="Items on shelf with holds",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1653,7 +1677,7 @@ def get_waiting_requests(req, request_id, print_data, ln=CFG_SITE_LANG):
     return page(title="Items on loan with holds",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1687,7 +1711,7 @@ def all_requests(req, request_id, ln=CFG_SITE_LANG):
     return page(title="List of hold requests",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1727,7 +1751,7 @@ def all_loans(req, msg=None, ln=CFG_SITE_LANG):
     return page(title="Current loans",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1754,7 +1778,7 @@ def all_loans_test(req, ln=CFG_SITE_LANG):
     return page(title="TEST loans",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1790,7 +1814,7 @@ def all_expired_loans(req, ln=CFG_SITE_LANG):
     return page(title='Overdue loans',
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1831,7 +1855,7 @@ def get_item_requests_details(req, recid, request_id, ln=CFG_SITE_LANG):
     return page(title="Hold requests - %s" % (book_title_from_MARC(recid)),
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1873,7 +1897,7 @@ def associate_barcode(req, request_id, recid, borrower_id, ln=CFG_SITE_LANG):
     return page(title="Associate barcode",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1922,7 +1946,7 @@ def get_borrower_notes(req, borrower_id, delete_key, library_notes, ln=CFG_SITE_
     return page(title="Borrower notes",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1972,7 +1996,7 @@ def get_loans_notes(req, loan_id, delete_key,
     return page(title="Loan notes",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -1994,7 +2018,7 @@ def add_new_borrower_step1(req, ln=CFG_SITE_LANG):
     return page(title="Add new borrower - I",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2038,7 +2062,7 @@ def add_new_borrower_step2(req, name, email, phone, address, mailbox,
     return page(title="Add new borrower - II",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2066,7 +2090,7 @@ def add_new_borrower_step3(req, tup_infos, ln=CFG_SITE_LANG):
     return page(title="Add new borrower - III",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2090,7 +2114,7 @@ def update_borrower_info_step1(req, ln=CFG_SITE_LANG):
     return page(title="Update borrower information - I",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2121,7 +2145,7 @@ def update_borrower_info_step2(req, column, string, ln=CFG_SITE_LANG):
     return page(title="Update borrower information - II",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2150,7 +2174,7 @@ def update_borrower_info_step3(req, borrower_id, ln=CFG_SITE_LANG):
     return page(title="Update borrower information - III",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2179,7 +2203,7 @@ def update_borrower_info_step4(req, borrower_id, name, email, phone, address, ma
     return page(title="Update borrower information - IV",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2208,7 +2232,7 @@ def update_borrower_info_step5(req, borrower_id, name, email, phone, address, ma
     return page(title="Update borrower information - V",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2255,7 +2279,7 @@ def get_item_loans_notes(req, loan_id, add_notes, new_note, ln=CFG_SITE_LANG):
     return page(title="Loan notes",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2392,7 +2416,7 @@ def new_item(req, isbn, ln=CFG_SITE_LANG):
     return page(title="New Item",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2416,7 +2440,7 @@ def add_new_library_step1(req, ln=CFG_SITE_LANG):
     return page(title="Add new library",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2444,7 +2468,7 @@ def add_new_library_step2(req, name, email, phone, address,
     return page(title="Add new library",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2470,7 +2494,7 @@ def add_new_library_step3(req, name, email, phone, address,
     return page(title="Add new library",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2495,7 +2519,7 @@ def update_library_info_step1(req, ln=CFG_SITE_LANG):
     return page(title="Update library information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2532,7 +2556,7 @@ def update_library_info_step2(req, column, string, ln=CFG_SITE_LANG):
     return page(title="Update library information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2562,7 +2586,7 @@ def update_library_info_step3(req, library_id, ln=CFG_SITE_LANG):
     return page(title="Update library information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2588,7 +2612,7 @@ def update_library_info_step4(req, name, email, phone, address, lib_type,
     return page(title="Update library information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2616,7 +2640,7 @@ def update_library_info_step5(req, name, email, phone, address, lib_type,
     return page(title="Update library information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2638,7 +2662,7 @@ def new_book_step1(req,ln):
     return page(title="Order New Book",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2660,7 +2684,7 @@ def new_book_step2(req,ln):
     return page(title="Order New Book",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2683,7 +2707,7 @@ def add_new_copy_step1(req, ln=CFG_SITE_LANG):
     return page(title="Associate copy to item",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2708,7 +2732,7 @@ def add_new_copy_step2(req, p, f, ln=CFG_SITE_LANG):
     return page(title="Add new copy - II",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2738,7 +2762,7 @@ def add_new_copy_step3(req, recid, ln=CFG_SITE_LANG):
     return page(title="Add new copy - III",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2790,7 +2814,7 @@ def add_new_copy_step4(req, barcode, library, location, collection, description,
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2820,7 +2844,7 @@ def add_new_copy_step5(req, barcode, library, location, collection, description,
     return page(title="Add new copy - V",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2843,7 +2867,7 @@ def update_item_info_step1(req, ln=CFG_SITE_LANG):
     return page(title="Update item information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2869,7 +2893,7 @@ def update_item_info_step2(req, p, f, ln=CFG_SITE_LANG):
     return page(title="Update item information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2897,6 +2921,7 @@ def update_item_info_step3(req, recid, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
+                language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -2917,6 +2942,12 @@ def update_item_info_step4(req, barcode, ln=CFG_SITE_LANG):
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
 
+    if recid == None:
+        _ = gettext_set_language(ln)
+        infos = []
+        infos.append(_("Barcode <strong>[%s]</strong> not found" % barcode))
+        return item_search(req, infos, ln)
+
 
     body = bibcirculation_templates.tmpl_update_item_info_step4(recid=recid,
                                                                 result=result,
@@ -2927,8 +2958,10 @@ def update_item_info_step4(req, barcode, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 body=body,
+                language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
+
 
 def update_item_info_step5(req, barcode, old_barcode, library, location, collection, description,
                            loan_period, status, expected_arrival_date, recid, ln=CFG_SITE_LANG):
@@ -2955,7 +2988,7 @@ def update_item_info_step5(req, barcode, old_barcode, library, location, collect
     return page(title="Update item information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3000,9 +3033,13 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
                          modified</strong> because it is already in use."
                             % (old_barcode))
         else:
-            db.update_barcode(old_barcode, barcode)
-            infos.append("Item <strong>[%s]</strong> updated to <strong>[%s]</strong> with \
+            if db.update_barcode(old_barcode, barcode):
+                infos.append("Item <strong>[%s]</strong> updated to <strong>[%s]</strong> with \
                      success." % (old_barcode, barcode))
+            else:
+                infos.append("Item <strong>[%s]</strong> updated, but the <strong>barcode was \
+                             not modified</strong> because it was not found (!?)."
+                            % (old_barcode))
     else:
         infos.append("Item <strong>[%s]</strong> updated with success." % old_barcode)
 
@@ -3025,7 +3062,7 @@ def update_item_info_step6(req, tup_infos, ln=CFG_SITE_LANG):
     return page(title="Update copy information - VI",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3051,7 +3088,7 @@ def search_library_step1(req, ln=CFG_SITE_LANG):
     return page(title="Search library",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3098,7 +3135,7 @@ def search_library_step2(req, column, string, ln=CFG_SITE_LANG):
     return page(title="Search library",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3143,7 +3180,7 @@ def get_library_notes(req, library_id, delete_key,
     return page(title="Library notes",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3176,7 +3213,7 @@ def change_due_date_step1(req, barcode, borrower_id, ln=CFG_SITE_LANG):
     return page(title="Change due date",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -3212,7 +3249,7 @@ def change_due_date_step2(req, new_due_date, loan_id, borrower_id, ln=CFG_SITE_L
     return page(title="Change due date",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3253,7 +3290,7 @@ def claim_book_return(req, borrower_id, recid, loan_id,
     return page(title="Claim return",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3285,7 +3322,7 @@ def create_new_loan_step1(req, borrower_id, ln=CFG_SITE_LANG):
     return page(title="New loan",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3356,7 +3393,7 @@ def create_new_loan_step2(req, borrower_id, barcode, notes, ln=CFG_SITE_LANG):
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3426,7 +3463,7 @@ def create_new_request_step1(req, borrower_id, p="", f="", search=None, ln=CFG_S
     return page(title="New request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3462,7 +3499,7 @@ def create_new_request_step2(req, recid, borrower_id, ln=CFG_SITE_LANG):
     return page(title="New request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3503,7 +3540,7 @@ def create_new_request_step3(req, borrower_id, barcode, recid, ln=CFG_SITE_LANG)
     return page(title="New request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -3554,7 +3591,7 @@ def create_new_request_step4(req, period_from, period_to, barcode,
     return page(title="New request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3597,7 +3634,7 @@ def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
         return page(title="New request",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -3699,7 +3736,7 @@ def place_new_request_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
     return page(title="New request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3742,7 +3779,7 @@ def place_new_request_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
     return page(title="New request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -3789,7 +3826,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
         return page(title="New request",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -3874,7 +3911,7 @@ def place_new_request_step3(req, barcode, recid, user_info,
     return page(title="New request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3928,7 +3965,7 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
         return page(title="New loan",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -3958,7 +3995,7 @@ def place_new_loan_step1(req, barcode, recid, key, string, ln=CFG_SITE_LANG):
     return page(title="New loan",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -3995,7 +4032,7 @@ def place_new_loan_step2(req, barcode, recid, user_info, ln=CFG_SITE_LANG):
     return page(title="New loan",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4096,7 +4133,7 @@ def place_new_loan_step3(req, barcode, recid, ccid, name, email, phone,
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4128,7 +4165,7 @@ def order_new_copy_step1(req, recid, ln):
                 req=req,
                 metaheaderadd = """<link rel="stylesheet" href="%s/img/jquery-ui.css"
                                          type="text/css" >""" % CFG_SITE_URL,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4156,7 +4193,7 @@ def order_new_copy_step2 (req, recid, barcode, vendor_id, cost, currency,
     return page(title="Order new copy",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4195,7 +4232,7 @@ def order_new_copy_step3(req, order_info, ln):
     #return page(title="Order new copy",
     #            uid=id_user,
     #            req=req,
-    #            body=body,
+    #            body=body, language=ln,
     #            navtrail=navtrail_previous_links,
     #            lastupdated=__lastupdated__)
 
@@ -4223,7 +4260,7 @@ def list_ordered_books(req, ln):
     return page(title="List of ordered books",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4270,7 +4307,7 @@ def get_purchase_notes(req, purchase_id, delete_key, library_notes, ln=CFG_SITE_
     return page(title="Purchase notes",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4321,7 +4358,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
         return page(title="Register ILL request",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -4402,7 +4439,7 @@ def register_ill_request_step0(req, recid, key, string, ln=CFG_SITE_LANG):
     return page(title="Register ILL request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4429,7 +4466,7 @@ def register_ill_request_step1(req, recid, user_info, ln=CFG_SITE_LANG):
     return page(title="Register ILL request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4458,7 +4495,7 @@ def register_ill_request_step2(req, recid, user_info, period_of_interest_from,
     return page(title="Register ILL request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4496,7 +4533,7 @@ def register_ill_request_step3(req, borrower_id, request_info, ln=CFG_SITE_LANG)
     return page(title="Register ILL request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4522,7 +4559,7 @@ def list_ill_request(req, status, ln=CFG_SITE_LANG):
     return page(title="List of ILL requests",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4563,7 +4600,7 @@ def ill_request_details_step1(req, delete_key, ill_request_id, new_status, ln=CF
                 uid=id_user,
                 req=req,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4628,7 +4665,7 @@ def ill_request_details_step2(req, delete_key, ill_request_id, new_status, libra
     #return page(title="ILL request details",
     #            uid=id_user,
     #            req=req,
-    #            body=body,
+    #            body=body, language=ln,
     #            navtrail=navtrail_previous_links,
     #            lastupdated=__lastupdated__)
 
@@ -4662,7 +4699,7 @@ def ordered_books_details_step1(req, purchase_id, delete_key, ln=CFG_SITE_LANG):
                 uid=id_user,
                 req=req,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4694,7 +4731,7 @@ def ordered_books_details_step2(req, purchase_id, recid, vendor_id,
     return page(title="Ordered book details",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4729,7 +4766,7 @@ def ordered_books_details_step3(req, purchase_id, recid, vendor_id,
     return page(title="Ordered book details",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4751,7 +4788,7 @@ def add_new_vendor_step1(req, ln=CFG_SITE_LANG):
     return page(title="Add new vendor",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4778,7 +4815,7 @@ def add_new_vendor_step2(req, name, email, phone, address,
     return page(title="Add new vendor",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4803,7 +4840,7 @@ def add_new_vendor_step3(req, name, email, phone, address,
     return page(title="Add new vendor",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4829,7 +4866,7 @@ def update_vendor_info_step1(req, ln=CFG_SITE_LANG):
     return page(title="Update vendor information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4867,7 +4904,7 @@ def update_vendor_info_step2(req, column, string, ln=CFG_SITE_LANG):
     return page(title="Update vendor information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4895,7 +4932,7 @@ def update_vendor_info_step3(req, vendor_id, ln=CFG_SITE_LANG):
     return page(title="Update vendor information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4921,7 +4958,7 @@ def update_vendor_info_step4(req, name, email, phone, address,
     return page(title="Update vendor information",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4946,7 +4983,7 @@ def update_vendor_info_step5(req, name, email, phone, address,
     return page(title="Update library information - V",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -4971,7 +5008,7 @@ def search_vendor_step1(req, ln=CFG_SITE_LANG):
     return page(title="Search vendor",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5013,7 +5050,7 @@ def search_vendor_step2(req, column, string, ln=CFG_SITE_LANG):
     return page(title="Search vendor",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5044,7 +5081,7 @@ def get_vendor_details(req, vendor_id, ln=CFG_SITE_LANG):
     return page(title="Vendor details",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5083,7 +5120,7 @@ def get_vendor_notes(req, vendor_id, add_notes, new_note, ln=CFG_SITE_LANG):
     return page(title="Vendor notes",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5109,7 +5146,7 @@ def register_ill_request_with_no_recid_step1(req, borrower_id, ln=CFG_SITE_LANG)
                 uid=id_user,
                 req=req,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5190,7 +5227,7 @@ def register_ill_request_with_no_recid_step2(req, title, authors, place,
     return page(title="Register ILL request",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -5240,7 +5277,7 @@ def register_ill_request_with_no_recid_step3(req, title, authors, place,
         return page(title="Register ILL request",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -5314,7 +5351,7 @@ def get_borrower_ill_details(req, borrower_id, ln=CFG_SITE_LANG):
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5341,7 +5378,7 @@ def bor_ill_historical_overview(req, borrower_id, ln):
     return page(title=title,
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5379,7 +5416,7 @@ def get_ill_library_notes(req, ill_id, delete_key, library_notes, ln=CFG_SITE_LA
     return page(title="ILL notes",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5411,7 +5448,7 @@ def get_expired_loans_with_requests(req, request_id, ln=CFG_SITE_LANG):
     return page(title="Overdue loans with holds",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5439,7 +5476,7 @@ def register_ill_book_request(req, borrower_id, ln=CFG_SITE_LANG):
     return page(title="Register ILL Book request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5503,7 +5540,7 @@ def register_ill_book_request_result(req, borrower_id, p, f,  ln=CFG_SITE_LANG):
     return page(title="Register ILL Book request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5532,7 +5569,7 @@ def register_ill_book_request_from_borrower_page(req, borrower_id, ln=CFG_SITE_L
     return page(title="Register ILL Book request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5590,7 +5627,7 @@ def register_ill_book_request_from_borrower_page_result(req, borrower_id, p, f,
     return page(title="Register ILL Book request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5615,7 +5652,7 @@ def register_ill_request_from_borrower_page_step1(req, borrower_id, ln=CFG_SITE_
     return page(title="Register ILL request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5672,7 +5709,7 @@ def register_ill_request_from_borrower_page_step2(req, borrower_id, title, autho
     return page(title="Register ILL request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5697,7 +5734,7 @@ def register_ill_article_request_step1(req, ln=CFG_SITE_LANG):
     return page(title="Register ILL Article request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />"%(CFG_SITE_URL),
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -5739,7 +5776,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
         return page(title="Register ILL request",
                     uid=id_user,
                     req=req,
-                    body=body,
+                    body=body, language=ln,
                     navtrail=navtrail_previous_links,
                     lastupdated=__lastupdated__)
 
@@ -5794,7 +5831,7 @@ def register_ill_article_request_step2(req, periodical_title, article_title, aut
     return invenio.webpage.page(title="Register ILL request",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5864,7 +5901,7 @@ def ill_search(req, ln=CFG_SITE_LANG):
     return page(title="ILL search",
                 uid=id_user,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 metaheaderadd = "<link rel=\"stylesheet\" href=\"%s/img/jquery-ui.css\" type=\"text/css\" />" % CFG_SITE_URL,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
@@ -5910,7 +5947,7 @@ def ill_search_result(req, p, f, date_from, date_to, ln):
 
     return page(title="List of ILL requests",
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -5962,7 +5999,7 @@ def delete_copy_step1(req, barcode, ln):
 
     return page(title=title,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -6013,6 +6050,6 @@ def delete_copy_step2(req, barcode, ln):
                               '</a>' % (CFG_SITE_URL,)
     return page(title=title,
                 req=req,
-                body=body,
+                body=body, language=ln,
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)

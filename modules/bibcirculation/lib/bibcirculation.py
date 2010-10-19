@@ -267,37 +267,40 @@ def perform_new_request_send(uid, recid, period_from, period_to, barcode, ln=CFG
             library = ''
             request_date = ''
 
-        link_to_holdings_details = create_html_link(CFG_SITE_URL +
-                                    '/record/%s/holdings'%str(recid),
-                                    {'ln': ln},
-                                    (CFG_SITE_URL +
-                                    '/record/%s/holdings'%str(recid)))
+        link_to_holdings_details = CFG_SITE_URL + '/record/%s/holdings' % str(recid)
+
+        link_to_item_request_details = CFG_SITE_URL + '/admin2/bibcirculation/get_item_requests_details?recid=%s' % str(recid)
 
         subject = 'New request'
-        message = load_template('notification')
+        message_template = load_template('notification')
 
-        message = message % (name, ccid, email, address, mailbox, title,
-                             author, publisher, year, isbn, location, library,
-                             link_to_holdings_details, request_date)
+        message_for_user = message_template % (name, ccid, email, address, mailbox, title,
+                                               author, publisher, year, isbn, location, library,
+                                               link_to_holdings_details, request_date)
+
+        message_for_librarian = message_template % (name, ccid, email, address, mailbox, title,
+                                               author, publisher, year, isbn, location, library,
+                                               link_to_item_request_details, request_date)
 
         send_email(fromaddr = CFG_BIBCIRCULATION_LIBRARIAN_EMAIL,
-                toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
-                subject  = subject,
-                content  = message,
-                header   = '',
-                footer   = '',
-                attempt_times=1,
-                attempt_sleeptime=10
-                )
+                   toaddr   = CFG_BIBCIRCULATION_LOANS_EMAIL,
+                   subject  = subject,
+                   content  = message_for_librarian,
+                   header   = '',
+                   footer   = '',
+                   attempt_times=1,
+                   attempt_sleeptime=10
+                  )
+
         send_email(fromaddr = CFG_BIBCIRCULATION_LOANS_EMAIL,
-                toaddr   = email,
-                subject  = subject,
-                content  = message,
-                header   = '',
-                footer   = '',
-                attempt_times=1,
-                attempt_sleeptime=10
-                )
+                   toaddr   = email,
+                   subject  = subject,
+                   content  = message_for_user,
+                   header   = '',
+                   footer   = '',
+                   attempt_times=1,
+                   attempt_sleeptime=10
+                  )
 
         if CFG_CERN_SITE:
             message = bibcirculation_templates.tmpl_message_request_send_ok_cern()

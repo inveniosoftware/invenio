@@ -41,7 +41,13 @@ from invenio.bibcirculation_utils import get_book_cover, \
       all_copies_are_missing, \
       has_copies
 
-_MENU_ = """
+
+
+def load_menu(ln=CFG_SITE_LANG):
+
+    _ = gettext_set_language(ln)
+
+    _MENU_ = """
 
       <div>
       <map name="Navigation_Bar" id="cdlnav">
@@ -49,93 +55,127 @@ _MENU_ = """
       <!-- <h2><a name="localNavLinks">Main navigation links:</a></h2> -->
       <ul>
       <!-- <li>
-       <a href="%(url)s/admin2/bibcirculation">Home</a>
+       <a href="%(url)s/admin2/bibcirculation">%(Home)s</a>
       </li> -->
 
     <li>
-        <a href="%(url)s/admin2/bibcirculation/loan_on_desk_step1">Loan</a>
+        <a href="%(url)s/admin2/bibcirculation/loan_on_desk_step1">%(Loan)s</a>
     </li>
 
     <li>
-        <a href="%(url)s/admin2/bibcirculation/loan_return">Return</a>
+        <a href="%(url)s/admin2/bibcirculation/loan_return">%(Return)s</a>
     </li>
 
     <li>
-        <a href="%(url)s/admin2/bibcirculation/borrower_search?redirect='yes'">Request</a>
+        <a href="%(url)s/admin2/bibcirculation/borrower_search?redirect='yes'">%(Request)s</a>
     </li>
 
     <li>
-        <a href="%(url)s/admin2/bibcirculation/borrower_search">Borrowers</a>
+        <a href="%(url)s/admin2/bibcirculation/borrower_search">%(Borrowers)s</a>
     </li>
 
     <li>
-        <a href="%(url)s/admin2/bibcirculation/item_search">Items</a>
+        <a href="%(url)s/admin2/bibcirculation/item_search">%(Items)s</a>
     </li>
+    """ % {'url': CFG_SITE_URL, 'Home': _("Home"), 'Loan': _("Loan"), 'Return': _("Return"),
+           'Request': _("Request"), 'Borrowers': _("Borrowers"), 'Items': _("Items") }
 
+    _MENU_ += """
 
-    <li class="hassubmenu"> <a href="#">Lists</a>
+    <li class="hassubmenu"> <a href="#">%(Lists)s</a>
         <ul class="submenu">
-            <li><a href="%(url)s/admin2/bibcirculation/all_loans">Last loans</a></li>
-            <li><a href="%(url)s/admin2/bibcirculation/all_expired_loans">Overdue loans</a></li>
-            <li><a href="%(url)s/admin2/bibcirculation/get_pending_requests">Items on shelf with holds</a></li>
-            <li><a href="%(url)s/admin2/bibcirculation/get_waiting_requests">Items on loan with holds</a></li>
-            <li><a href="%(url)s/admin2/bibcirculation/get_expired_loans_with_requests">Overdue loans with holds</a></li>
-            <li><a href="%(url)s/admin2/bibcirculation/ordered_books">Ordered books</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/all_loans">%(Last_loans)s</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/all_expired_loans">%(Overdue_loans)s</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/get_pending_requests">%(Items_on_shelf_with_holds)s</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/get_waiting_requests">%(Items_on_loan_with_holds)s</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/get_expired_loans_with_requests">%(Overdue_loans_with_holds)s</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/ordered_books">%(Ordered_books)s</a></li>
         </ul>
     </li>
 
-    <li class="hassubmenu"> <a href="#">Others</a>
+    <li class="hassubmenu"> <a href="#">%(Others)s</a>
         <ul class="submenu">
-            <li> <a href="#">Libraries</a>
+            <li> <a href="#">%(Libraries)s</a>
                 <ul class="subsubmenu">
-                    <li><a href="%(url)s/admin2/bibcirculation/search_library_step1">Search...</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/add_new_library_step1">Add new library</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/update_library_info_step1">Update info</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/search_library_step1">%(Search)s...</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/add_new_library_step1">%(Add_new_library)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/update_library_info_step1">%(Update_info)s</a></li>
                 </ul>
             </li>
-            <li> <a href="#">Acquisitions</a>
+            <li> <a href="#">%(Acquisitions)s</a>
                 <ul class="subsubmenu">
-                    <li><a href="%(url)s/admin2/bibcirculation/ordered_books">List of ordered books</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/new_book_step1">Order new book</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/ordered_books">%(List_of_ordered_books)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/new_book_step1">%(Order_new_book)s</a></li>
                 </ul>
             </li>
-            <li> <a href="#">Vendors</a>
+            <li> <a href="#">%(Vendors)s</a>
                 <ul class="subsubmenu">
-                    <li><a href="%(url)s/admin2/bibcirculation/search_vendor_step1">Search...</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/add_new_vendor_step1">Add new vendor</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/update_vendor_info_step1">Update info</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/search_vendor_step1">%(Search)s...</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/add_new_vendor_step1">%(Add_new_vendor)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/update_vendor_info_step1">%(Update_info)s</a></li>
                 </ul>
             </li>
         </ul>
     </li>
+    """ % {'url': CFG_SITE_URL, 'Lists': _("Lists"), 'Last_loans': _("Last loans"),
+           'Overdue_loans': _("Overdue loans"),
+           'Items_on_shelf_with_holds': _("Items on shelf with holds"),
+            'Items_on_loan_with_holds': _("Items on loan with holds"),
+            'Overdue_loans_with_holds': _("Overdue loans with holds"),
+            'Ordered_books': _("Ordered books"), 'Others': _("Others"),
+            'Libraries': _("Libraries"), 'Search': _("Search"),
+            'Add_new_library': _("Add new library"), 'Update_info': _("Update info"),
+            'Acquisitions': _("Acquisitions"),
+            'List_of_ordered_books': _("List of ordered books"),
+            'Order_new_book': _("Order new book"),
+            'Vendors': _("Vendors"),
+            'Add_new_vendor': _("Add new vendor"),
+            'Update_info': _("Update info")
+            }
 
-    <li class="hassubmenu"> <a href="#">ILL</a>
+    _MENU_ += """
+
+    <li class="hassubmenu"> <a href="#">%(ILL)s<!--Inter Library Loan--></a>
         <ul class="submenu">
-            <li><a href="%(url)s/admin2/bibcirculation/register_ill_book_request">Register Book request</a></li>
-            <li><a href="%(url)s/admin2/bibcirculation/register_ill_article_request_step1">Register Article request</a></li>
-            <li><a href="%(url)s/admin2/bibcirculation/ill_search">Search...</a></li>
-            <li><a href="#">Lists</a>
+            <li><a href="%(url)s/admin2/bibcirculation/register_ill_book_request">%(Register_Book_request)s</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/register_ill_article_request_step1">%(Register_Article)s request</a></li>
+            <li><a href="%(url)s/admin2/bibcirculation/ill_search">%(Search)s...</a></li>
+            <li><a href="#">%(Lists)s</a>
                 <ul class="subsubmenu">
-                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=new">New</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=requested">Requested</a></li>
-                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=on loan">On loan</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=new">%(New)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=requested">%(Requested)s</a></li>
+                    <li><a href="%(url)s/admin2/bibcirculation/list_ill_request?status=on loan">%(On_loan)s</a></li>
                 </ul>
             </li>
         </ul>
     </li>
 
     <li class="hassubmenu">
-         <a href="#">Help</a>
+         <a href="#">%(Help)s</a>
         <ul class="submenu">
-          <li><a href="%(url)s/help/admin/bibcirculation-admin-guide" target="_blank">Admin guide</a></li>
-             <!-- <li><a href="%(url)s/admin2/bibcirculation/help_contactsupport">Contact Support</a></li> -->
+          <li><a href="%(url)s/help/admin/bibcirculation-admin-guide" target="_blank">%(Admin_guide)s</a></li>
+             <!-- <li><a href="%(url)s/admin2/bibcirculation/help_contactsupport">%(Contact_Support)s</a></li> -->
         </ul>
     </li>
+    </ul>
     <div class="clear"></div>
+    </div>
     </map>
     </div>
+    """ % {'url': CFG_SITE_URL, 'ILL': _("ILL"),
+           'Register_Book_request': _("Register Book request"),
+           'Register_Article': _("Register Article"),
+           'Search': _("Search"),
+           'Lists': _("Lists"),
+           'New': _("New"),
+           'Requested': _("Requested"),
+           'On_loan': _("On loan"),
+           'Help': _("Help"),
+           'Admin_guide': _("Admin guide"),
+           'Contact_Support': _("Contact Support")
+           }
 
-        """ % {'url': CFG_SITE_URL}
+    return _MENU_
 
 
 class Template:
@@ -360,7 +400,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -938,7 +978,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -967,7 +1007,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
@@ -1153,7 +1193,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
@@ -1339,7 +1379,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
 
         if len(result) == 0:
@@ -1452,7 +1492,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <form name="return_form" action="%s/admin2/bibcirculation/loan_return_confirm" method="get">
@@ -1464,7 +1504,11 @@ class Template:
           <tr align="center">
             <td class="bibcirctableheader">
             %s
-            <input type="text" size=45 id="barcode" name="barcode" style='border: 1px solid #cfcfcf'>
+            <input type="text" size=45 id="barcode" name="barcode"
+                   style='border: 1px solid #cfcfcf'>
+            <script language="javascript" type="text/javascript">
+                document.getElementById("barcode").focus();
+            </script>
             </td>
 
           </tr>
@@ -1503,7 +1547,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         borrower_link = create_html_link(CFG_SITE_URL +
                                          '/admin2/bibcirculation/get_borrower_details',
@@ -1515,16 +1559,33 @@ class Template:
                                       {'recid': recid, 'ln': ln},
                                       (book_title_from_MARC(recid)))
 
+        if len(result) == 0:
+            out += """
+            <script type="text/javascript" language='JavaScript' src="%(url)s/js/jquery.min.js">
+
+            </script>
+            <script type="text/javascript">
+                $(window).keydown(function(event){
+                    window.location.href="%(url)s/admin2/bibcirculation/loan_return";
+                });
+            </script>
+            """  % {'url': CFG_SITE_URL}
+
         out += """
-           <form name="return_form" action="%s/admin2/bibcirculation/get_next_waiting_loan_request" method="get" >
+           <form name="return_form"
+                 action="%s/admin2/bibcirculation/get_next_waiting_loan_request" method="get" >
              <div class="bibcircbottom">
              <br />
              <div class="infoboxsuccess">%s</div>
+            """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode\
+        <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid),
+                                                                barcode)))
+        if len(result) > 0:
+            out+= """
              <br />
              <div class="infoboxmsg">%s</div>
              <br />
-
-               """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)), _("There are %s requests on the book that has been returned." % len(result)))
+        """ % (_("There are %s requests on the book that has been returned." % len(result)))
 
         (_book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
@@ -1677,7 +1738,7 @@ class Template:
         else:
             out += """
               </table>
-              <div class="bibcircinfoboxmsg">%s</div>""" % (_("There are no requests waiting on the item <strong>%s</strong>." % book_title_from_MARC(recid)))
+              <div class="infoboxmsg">%s</div>""" % (_("There are no requests waiting on the item <strong>%s</strong>." % book_title_from_MARC(recid)))
 
             out += """
             <br />
@@ -1702,7 +1763,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -1741,7 +1802,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -1760,8 +1821,11 @@ class Template:
                </tr>
                <tr align="center">
                  <td>
-                    <input type="text" size="45" name="string"
+                    <input type="text" size="45" name="string" id="string"
                            style='border: 1px solid #cfcfcf'>
+                    <script language="javascript" type="text/javascript">
+                                document.getElementById("string").focus();
+                            </script>
                  </td>
                </tr>
              </table>
@@ -1800,7 +1864,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -1823,7 +1887,10 @@ class Template:
           </tr>
           <tr align="center">
             <td>
-                <input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'>
+                <input type="text" size="50" name="p" id="p" style='border: 1px solid #cfcfcf'>
+                <script language="javascript" type="text/javascript">
+                    document.getElementById("p").focus();
+                </script>
             </td>
           </tr>
         </table>
@@ -1860,7 +1927,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         try:
             number_of_results = len(result)
@@ -1952,16 +2019,16 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
-        <form name="step1_form1" action="%s/admin2/bibcirculation/loan_on_desk_step1" method="get" >
+        <form name="step1_form1" action="%s/admin2/bibcirculation/loan_on_desk_step1"
+              method="get" >
         <br />
         <br />
         <br />
           <table class="bibcirctable" align="center">
-
             """  % (CFG_SITE_URL)
 
         if CFG_CERN_SITE == 1:
@@ -2027,6 +2094,9 @@ class Template:
                         <td align="center">
                             <input type="text" size="40" id="string" name="string"
                                    value='%s' style='border: 1px solid #cfcfcf'>
+                            <script language="javascript" type="text/javascript">
+                                document.getElementById("string").focus();
+                            </script>
                         </td>
                     </tr>
                     <tr>
@@ -2100,12 +2170,13 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
-            <form name="step2_form" action="%s/admin2/bibcirculation/loan_on_desk_step3" method="get" >
+            <form name="step2_form" action="%s/admin2/bibcirculation/loan_on_desk_step3"
+                  method="get" >
               <br />
               <br />
               <table class="bibcirctable">
@@ -2150,7 +2221,13 @@ class Template:
                     <td class="bibcirctableheader" width="77">%s</td>
                   </tr>
                   <tr>
-                    <td><textarea rows="5" cols="43" name="barcode" style='border: 1px solid #cfcfcf'></textarea></td>
+                    <td>
+                        <textarea rows="5" cols="43" name="barcode" id="barcode"
+                                  style='border: 1px solid #cfcfcf'></textarea>
+                        <script language="javascript" type="text/javascript">
+                            document.getElementById("barcode").focus();
+                        </script>
+                    </td>
                   </tr>
                 </table>
                 <br />
@@ -2207,7 +2284,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -2369,7 +2446,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out +="""<div class="bibcircbottom">
                  <br />
@@ -2400,7 +2477,7 @@ class Template:
 
         out = """
               """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -2440,7 +2517,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <br />
@@ -2532,7 +2609,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         borrower_email = borrower.split(' [')[0]
         borrower_id = borrower.split(' [')[1]
@@ -2599,7 +2676,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <form name="all_requests_form" action="%s/admin2/bibcirculation/all_requests" method="get" >
@@ -2688,7 +2765,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -2792,7 +2869,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         (book_title, book_year, book_author,
                      book_isbn, book_editor) = book_information_from_MARC(recid)
@@ -3120,7 +3197,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(req_hist_overview) == 0:
             out += """
@@ -3208,7 +3285,7 @@ class Template:
 
         out = """   """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(loans_hist_overview) == 0:
             out += """
@@ -3322,7 +3399,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(req_hist_overview) == 0:
             out += """
@@ -3420,7 +3497,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """<div class="bibcircbottom">
                   <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -3508,7 +3585,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -3614,7 +3691,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -3791,7 +3868,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -4021,7 +4098,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         (borrower_id, ccid, name, email, phone, address, mailbox) = borrower
 
@@ -4271,7 +4348,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -4377,7 +4454,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(borrower_loans) == 0:
             out += """
@@ -4534,7 +4611,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
@@ -4714,7 +4791,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/js/tablesorter/themes/blue/style.css"); </style>
@@ -4896,7 +4973,7 @@ class Template:
 
         out  = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -4998,7 +5075,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <br />
@@ -5112,7 +5189,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -5134,14 +5211,16 @@ class Template:
             });
             </script>
             <br />
-            <form name="borrower_form" action="%s/admin2/bibcirculation/get_item_loans_details" method="get" >
+            <form name="borrower_form"
+                  action="%s/admin2/bibcirculation/get_item_loans_details" method="get" >
             <input type=hidden name=recid value=%s>
             """ % (CFG_SITE_URL,
                    recid)
 
             out += """
              <br />
-             <table id="table_loans" class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+             <table id="table_loans" class="tablesorter" border="0"
+                                     cellpadding="0" cellspacing="1">
                <thead>
                     <tr>
                        <th>%s</th>
@@ -5207,7 +5286,7 @@ class Template:
                       <OPTION VALUE="get_item_loans_details?barcode=%s&loan_id=%s&recid=%s">Renew
                       <OPTION VALUE="loan_return_confirm?barcode=%s">Return
                       <OPTION VALUE="change_due_date_step1?barcode=%s">Change due date
-                      <OPTION VALUE="claim_book_return?recid=%s&template=claim_return">Send recall
+                      <OPTION VALUE="claim_book_return?recid=%s&loan_id=%s&template=claim_return">Send recall
                     </SELECT>
                  </td>
              </tr>
@@ -5217,7 +5296,8 @@ class Template:
                    nb_renewall, nb_overdue,
                    date_overdue, status, check_notes,
                    barcode, loan_id, recid,
-                   barcode, barcode, recid,
+                   barcode, barcode,
+                   recid, loan_id,
                    loan_id)
 
         out += """
@@ -5261,7 +5341,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         (borrower_id, ccid, name, email, phone, address, mailbox) = borrower
 
@@ -5400,7 +5480,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out +="""
             <div class="bibcircbottom">
@@ -5495,7 +5575,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out +="""
             <div class="bibcircbottom">
@@ -5586,7 +5666,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if book_info:
             out += """
@@ -5795,7 +5875,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -5868,7 +5948,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -5948,7 +6028,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -5987,7 +6067,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -6037,7 +6117,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -6105,7 +6185,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -6187,7 +6267,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -6253,7 +6333,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -6288,7 +6368,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -6306,7 +6386,11 @@ class Template:
                 <tr>
                     <th width="70">%s</th>
                     <td>
-                      <input type="text" style='border: 1px solid #cfcfcf' size=50 name="name">
+                      <input type="text" style='border: 1px solid #cfcfcf'
+                             size=50 name="name" id='name'>
+                      <script language="javascript" type="text/javascript">
+                            document.getElementById("name").focus();
+                      </script>
                     </td>
                 </tr>
                 <tr>
@@ -6373,7 +6457,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -6445,7 +6529,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -6485,7 +6569,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -6501,7 +6585,13 @@ class Template:
                      </td>
                   </tr>
                   <tr align="center">
-                        <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
+                    <td>
+                        <input type="text" size="45" name="string" id='string'
+                               style='border: 1px solid #cfcfcf'>
+                        <script language="javascript" type="text/javascript">
+                            document.getElementById("string").focus();
+                        </script>
+                    </td>
                   </tr>
              </table>
         <br />
@@ -6538,7 +6628,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -6599,7 +6689,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -6700,7 +6790,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -6774,7 +6864,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -6808,7 +6898,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         out += """
         <br />
@@ -6827,7 +6917,11 @@ class Template:
                     <tr>
                         <th width="100">%s</th>
                         <td>
-                          <input type="text" size="45" name="title" style='border: 1px solid #cfcfcf'>
+                          <input type="text" size="45" name="title" id='title'
+                                 style='border: 1px solid #cfcfcf'>
+                            <script language="javascript" type="text/javascript">
+                                document.getElementById("title").focus();
+                            </script>
                         </td>
                     </tr>
                     <tr>
@@ -6915,7 +7009,7 @@ class Template:
         @param ln: language of the page
         """
 
-        out = _MENU_
+        out = load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -6974,7 +7068,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -7035,7 +7129,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         (book_title, book_year, book_author,
                      book_isbn, book_editor) = book_information_from_MARC(recid)
@@ -7305,7 +7399,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -7396,7 +7490,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if infos == []:
 
@@ -7438,7 +7532,7 @@ class Template:
                     <tr>
                         <td>
                             <input type=button value='%s'
-                            onClick="location.href='%s/admin2/bibcirculation/get_item_details?ln=%s&recid=%s'"
+            onClick="location.href='%s/admin2/bibcirculation/get_item_details?ln=%s&recid=%s'"
                             class="formbutton">
                         </td>
                     </tr>
@@ -7451,18 +7545,19 @@ class Template:
 
         return out
 
-    def tmpl_update_item_info_step1(self):
+    def tmpl_update_item_info_step1(self, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
-        <form name="update_item_info_step1_form" action="%s/admin2/bibcirculation/update_item_info_step2" method="get" >
+        <form name="update_item_info_step1_form"
+              action="%s/admin2/bibcirculation/update_item_info_step2" method="get" >
         <br />
         <br />
         <br />
@@ -7478,7 +7573,9 @@ class Template:
                     <br /><br />
                   </td>
                 <tr align="center">
-                  <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
+                  <td>
+                    <input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'>
+                  </td>
                 </tr>
         </table>
         <br />
@@ -7514,7 +7611,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -7576,7 +7673,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
@@ -7586,7 +7683,8 @@ class Template:
             book_cover = "%s/img/book_cover_placeholder.gif" % (CFG_SITE_URL)
 
         out += """
-           <form name="update_item_info_step3_form" action="%s/admin2/bibcirculation/update_item_info_step4" method="get" >
+           <form name="update_item_info_step3_form"
+                 action="%s/admin2/bibcirculation/update_item_info_step4" method="get" >
            <div class="bibcircbottom">
                 <br />
                      <table class="bibcirctable">
@@ -7620,9 +7718,11 @@ class Template:
                      </tr>
                      </table>
                      </td>
-                     <td class="bibcirccontent"><img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/></td>
-                     </tr>
-              </table>
+                     <td class="bibcirccontent">
+                        <img style='border: 1px solid #cfcfcf' src="%s" alt="Book Cover"/>
+                     </td>
+                 </tr>
+                </table>
 
            <br />
 
@@ -7681,7 +7781,8 @@ class Template:
                      <td class="bibcirccontent" align="center">%s</td>
                      <td class="bibcirccontent" align="center">%s</td>
                      <td class="bibcirccontent" align="center">
-                     <input type=button onClick="location.href='%s/admin2/bibcirculation/update_item_info_step4?barcode=%s'"
+                     <input type=button
+            onClick="location.href='%s/admin2/bibcirculation/update_item_info_step4?barcode=%s'"
                      value=%s class="formbutton">
                      </td>
                      <td class="bibcirccontent" width="350"></td>
@@ -7724,7 +7825,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         (title, year, author, isbn, editor) = book_information_from_MARC(recid)
 
@@ -7807,7 +7908,7 @@ class Template:
                  <td>
                     <input type="text" style='border: 1px solid #cfcfcf'
                            size=35 name="barcode" value="%s">
-                    <input type=hidden name=old_barcode value=%s>
+                    <input type=hidden name=old_barcode value="%s">
                  </td>
                </tr>
                <tr>
@@ -8157,19 +8258,20 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
             <div class="bibcircbottom">
-            <form name="update_item_info_step5_form" action="%s/admin2/bibcirculation/update_item_info_step6" method="get" >
+            <form name="update_item_info_step5_form"
+                  action="%s/admin2/bibcirculation/update_item_info_step6" method="get" >
               <br />
               <br />
               <table class="bibcirctable">
                 <tr>
-                     <td class="bibcirctableheader">%s</td>
+                    <td class="bibcirctableheader">%s</td>
                 </tr>
-             </table>
+              </table>
               <table class="tablesortersmall" border="0" cellpadding="0" cellspacing="1">
                 <tr>
                     <th width="100">%s</th> <td>%s</td>
@@ -8182,57 +8284,60 @@ class Template:
                 </tr>
                 <tr>
                     <th width="100">%s</th> <td>%s</td>
-                 </tr>
-                 <tr>
+                </tr>
+                <tr>
                     <th width="100">%s</th> <td>%s</td>
-                 </tr>
-                 <tr>
+                </tr>
+                <tr>
                     <th width="100">%s</th> <td>%s</td>
-                 </tr>
-                 <tr>
+                </tr>
+                <tr>
                     <th width="100">%s</th> <td>%s</td>
-                 </tr>
-                 <tr>
+                </tr>
+                <tr>
                     <th width="100">%s</th> <td>%s</td>
-                 </tr>
-                </table>
-                <br />
-                <table class="bibcirctable">
+                </tr>
+              </table>
+              <br />
+              <table class="bibcirctable">
                 <tr>
                   <td>
-                       <input type=button value=%s
-                         onClick="history.go(-1)" class="formbutton">
-                       <input type="submit"
-                        value=%s class="formbutton">
-                       <input type=hidden name=barcode value="%s">
-                       <input type=hidden name=old_barcode value="%s">
-                       <input type=hidden name=library_id value="%s">
-                       <input type=hidden name=location value="%s">
-                       <input type=hidden name=collection value="%s">
-                       <input type=hidden name=description value="%s">
-                       <input type=hidden name=loan_period value="%s">
-                       <input type=hidden name=status value="%s">
-                       <input type=hidden name=expected_arrival_date value="%s">
-                       <input type=hidden name=recid value="%s">
+                     <input type=button value=%s
+                       onClick="history.go(-1)" class="formbutton">
+                     <input type="submit"
+                      value=%s class="formbutton">
+                     <input type=hidden name=barcode value="%s">
+                     <input type=hidden name=old_barcode value="%s">
+                     <input type=hidden name=library_id value="%s">
+                     <input type=hidden name=location value="%s">
+                     <input type=hidden name=collection value="%s">
+                     <input type=hidden name=description value="%s">
+                     <input type=hidden name=loan_period value="%s">
+                     <input type=hidden name=status value="%s">
+                     <input type=hidden name=expected_arrival_date value="%s">
+                     <input type=hidden name=recid value="%s">
                   </td>
-                 </tr>
-                </table>
-                <br />
-                <br />
-                </form>
-                </div>
+                </tr>
+              </table>
+              <br />
+              <br />
+            </form>
+            </div>
                 """ % (CFG_SITE_URL, _("New copy information"),
-                       _("Barcode"), tup_infos[0],
-                       _("Library"), tup_infos[3],
-                       _("Location"), tup_infos[4],
-                       _("Collection"), tup_infos[5],
-                       _("Description"), tup_infos[6],
-                       _("Loan period"), tup_infos[7],
-                       _("Status"), tup_infos[8],
-                       _("Expected arrival date"), tup_infos[9],
+                       _("Barcode"), cgi.escape(tup_infos[0],True),
+                       _("Library"), cgi.escape(tup_infos[3],True),
+                       _("Location"), cgi.escape(tup_infos[4],True),
+                       _("Collection"), cgi.escape(tup_infos[5],True),
+                       _("Description"), cgi.escape(tup_infos[6],True),
+                       _("Loan period"), cgi.escape(tup_infos[7],True),
+                       _("Status"), cgi.escape(tup_infos[8],True),
+                       _("Expected arrival date"), cgi.escape(tup_infos[9],True),
                        _("Back"), _("Confirm"),
-                       tup_infos[0], tup_infos[1], tup_infos[2], tup_infos[4], tup_infos[5],
-                       tup_infos[6], tup_infos[7], tup_infos[8], tup_infos[9], tup_infos[10])
+                        cgi.escape(tup_infos[0],True), cgi.escape(tup_infos[1],True),
+                                         tup_infos[2], cgi.escape(tup_infos[4],True),
+                        cgi.escape(tup_infos[5],True), cgi.escape(tup_infos[6],True),
+                        cgi.escape(tup_infos[7],True), cgi.escape(tup_infos[8],True),
+                        cgi.escape(tup_infos[9],True), tup_infos[10])
 
         return out
 
@@ -8245,7 +8350,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -8261,7 +8366,8 @@ class Template:
                 <tr>
                   <td>
                        <input type=button value='%s'
-                        onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'" class="formbutton">
+                        onClick="location.href='%s/admin2/bibcirculation/loan_on_desk_step1'"
+                        class="formbutton">
                   </td>
                  </tr>
                 </table>
@@ -8287,7 +8393,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -8303,7 +8409,13 @@ class Template:
              </td>
            </tr>
            <tr align="center">
-             <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
+             <td>
+                <input type="text" size="45" name="string" id="string"
+                       style='border: 1px solid #cfcfcf'>
+                <script language="javascript" type="text/javascript">
+                    document.getElementById("string").focus();
+                </script>
+             </td>
            </tr>
           </table>
           <br />
@@ -8343,7 +8455,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -8428,7 +8540,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out +="""
             <div class="bibcircbottom">
@@ -8529,7 +8641,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         (recid, barcode, loaned_on, due_date, loan_status,
                                     loan_period, _item_status) = loan_details
@@ -8647,7 +8759,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -8695,7 +8807,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         (borrower_id, ccid, name, email, phone, address, mailbox) = borrower
 
@@ -8828,7 +8940,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         (borrower_id, ccid, name, email, phone, address, mailbox) = borrower
 
@@ -9036,7 +9148,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
                  <div class="bibcircbottom">
@@ -9108,7 +9220,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
 
@@ -9199,7 +9311,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -9261,7 +9373,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -9487,7 +9599,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -9674,7 +9786,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -9732,7 +9844,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -9956,7 +10068,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -10148,7 +10260,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 
@@ -10380,7 +10492,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -10520,7 +10632,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -10560,7 +10672,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -10670,7 +10782,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out +="""
             <div class="bibcircbottom">
@@ -10778,7 +10890,7 @@ class Template:
     #
     #    out = self.tmpl_infobox(infos, ln)
     #
-    #    out += _MENU_
+    #    out += load_menu(ln)
     #
     #    out += """
     #    <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -10983,7 +11095,7 @@ class Template:
     #
     #    out = """  """
     #
-    #    out += _MENU_
+    #    out += load_menu(ln)
     #
     #    (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
     #
@@ -11195,7 +11307,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -11336,7 +11448,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -11734,7 +11846,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -11845,9 +11957,12 @@ class Template:
         @type ill_request_borrower_details: tuple
         """
 
+        book_statuses    = ['new', 'requested', 'on loan', 'returned', 'cancelled']
+        article_statuses = ['new', 'requested',     'received',        'cancelled']
+
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -12093,72 +12208,69 @@ class Template:
                         <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                          <tr>
                             <th width="100">%s</th>
-                            <td>
+                            <td colspan="5">
                                 <textarea name='periodical_title' rows="2"
                                     style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>
+                            <td colspan="5">
                                 <textarea name='title' rows="2"
                                     style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>
+                            <td colspan="5">
                                 <textarea name='authors' rows="1"
                                     style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
                          </tr>
+
                          <tr>
                             <th width="100">%s</th>
                             <td>
                                 <textarea name='volume' rows="1"
-                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                                          style='width:91%%;
+                                          border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
-                         </tr>
-                         <tr>
-                            <th width="100">%s</th>
+                            <th width="50" align='right'>%s</th>
                             <td>
                                 <textarea name='issue' rows="1"
-                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                                          style='width:91%%;
+                                          border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
-                         </tr>
-                         <tr>
-                            <th width="100">%s</th>
+                            <th width="50" align='right'>%s</th>
                             <td>
                                 <textarea name='page' rows="1"
-                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                                          style='width:91%%;
+                                          border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
                          </tr>
+
                          <tr>
                             <th width="100">%s</th>
+                            <td colspan="3">
+                                <textarea name='place' rows="1"
+                                    style='width:96%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                            </td>
+                            <th width="50" align='right'>%s</th>
                             <td>
                                 <textarea name='issn' rows="1"
-                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                                    style='width:91%%; border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
                          </tr>
                          <tr>
                             <th width="100">%s</th>
-                            <td>
-                                <textarea name='place' rows="1"
-                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
-                            </td>
-                         </tr>
-                         <tr>
-                            <th width="100">%s</th>
-                            <td>
+                            <td colspan="3">
                                 <textarea name='publisher' rows="1"
-                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                                    style='width:96%%; border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
-                         </tr>
-                         <tr>
-                            <th width="100">%s</th>
+                            <th width="50" align='right'>%s</th>
                             <td>
                                 <textarea name='year' rows="1"
-                                    style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                                    style='width:91%%; border: 1px solid #cfcfcf;'>%s</textarea>
                             </td>
                          </tr>
                         </table>
@@ -12178,11 +12290,28 @@ class Template:
                           _("Volume"),          item_info['volume'],
                           _("Issue"),           item_info['issue'],
                           _("Page"),            item_info['page'],
-                          _("ISSN"),            item_info['issn'],
                           _("Place"),           item_info['place'],
+                          _("ISSN"),            item_info['issn'],
                           _("Publisher"),       item_info['publisher'],
                           _("Year"),            item_info['year'],
                           str(book_cover))
+
+                         #<!---
+                         #<tr>
+                         #   <th width="100">%s</th>
+                         #   <td>
+                         #       <textarea name='issue' rows="1"
+                         #           style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                         #   </td>
+                         #</tr>
+                         #<tr>
+                         #   <th width="100">%s</th>
+                         #   <td>
+                         #       <textarea name='page' rows="1"
+                         #           style='width:98%%; border: 1px solid #cfcfcf;'>%s</textarea>
+                         #   </td>
+                         #</tr>
+                         #--->
 
             else:
                 out += """aqui falta algo, no?"""
@@ -12244,32 +12373,45 @@ class Template:
                     _("ILL request details"))
 
 
-#### NEW ####
-        if ill_status == 'new' or ill_status == None or ill_status == '':
-            if request_type == 'book':
-                out += """
-                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
+        out += """
+                        <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
                             <tr>
-                                <input type=hidden name=new_status value="new">
+                                <input type=hidden name=new_status value="%s">
                               <th width="100">%s</th>
                               <td>
                                 <select style='border: 1px solid #cfcfcf'
                                 onchange="location = this.options[this.selectedIndex].value;">
-            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
-                                    New
-                                  </option>
-            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
-                                    Requested
-                                  </option>
-            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
-                                    On loan
-                                  </option>
-            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
-                                    Returned
-                                  </option>
+        """ % ( ill_status, _("Status"))
+
+        if request_type == 'book':
+            statuses = book_statuses
+        else:
+            statuses = article_statuses
+
+        for status in statuses:
+            if status == ill_status:
+                out += """
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=%s" selected>
+                    %s
+                    </option>
+            """ % (ill_request_id, status, status)
+            else:
+                out += """
+            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=%s">
+                    %s
+                    </option>
+            """ % (ill_request_id, status, status)
+
+        out += """
                                 </select>
                               </td>
                             </tr>
+            """
+
+#### NEW ####
+        if ill_status == 'new' or ill_status == None or ill_status == '':
+
+            out += """
                             <tr>
                               <th width="150">%s</th>
                               <td>%s</td>
@@ -12278,42 +12420,7 @@ class Template:
                               <th width="100" valign="top">%s</th>
                               <td>
                                 <table class="bibcircnotes">
-                        """ % (_("Status"), ill_request_id, ill_request_id, ill_request_id,
-                           ill_request_id, _("ILL request ID"), ill_request_id,
-                           _("Previous notes"))
-
-            if request_type == 'article':
-                out += """
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                            <input type=hidden name=new_status value="new">
-                          <th width="100">%s</th>
-                          <td>
-                            <select style='border: 1px solid #cfcfcf'
-                                 onchange="location = this.options[this.selectedIndex].value;">
-            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new" selected>
-                                New
-                              </option>
-            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
-                                Requested
-                              </option>
-            <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
-                                Received
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
-                        <tr>
-                          <th width="150">%s</th>
-                          <td>%s</td>
-                        </tr>
-                        <tr>
-                          <th width="100" valign="top">%s</th>
-                          <td>
-                            <table class="bibcircnotes"> """ % (_("Status"), ill_request_id,
-                                        ill_request_id, ill_request_id,
-                                        _("ILL request ID"), ill_request_id, _("Previous notes"))
-
+                        """  % (_("ILL request ID"), ill_request_id, _("Previous notes"))
 
             out += notes
 
@@ -12339,79 +12446,25 @@ class Template:
 ############# REQUESTED ##############
         elif ill_status == 'requested':
 
-            if request_type == 'book':
-                out += """
-                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                            <tr>
-                            <input type=hidden name=new_status value="requested">
-                              <th width="150">%s</th>
-                              <td class="bibcirccontent">
-                                <select style='border: 1px solid #cfcfcf'
-                                onchange="location = this.options[this.selectedIndex].value;">
-                    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
-                                    New
-                                  </option>
-    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
-                                    Requested
-                                  </option>
-                <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
-                                    On loan
-                                  </option>
-                <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
-                                    Returned
-                                  </option>
-                                </select>
-                              </td>
-                            </tr>
+            out += """
                             <tr>
                               <th width="150">%s</th>
                               <td class="bibcirccontent">%s</td>
                             </tr>
+                        """ %(_("ILL request ID"), ill_request_id)
+
+            out += """
                             <tr>
                               <th width="150">%s</th>
                               <td class="bibcirccontent">
                                 <select name="library_id"  style='border: 1px solid #cfcfcf'>
+            """ % (_("Library/Supplier"))
 
-                            """ % (_("Status"), ill_request_id, ill_request_id,
-                                    ill_request_id, ill_request_id, _("ILL request ID"),
-                                    ill_request_id, _("Library/Supplier"))
-
-            if request_type == 'article':
-                out += """
-                          <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                            <tr>
-                            <input type=hidden name=new_status value="requested">
-                              <th width="150">%s</th>
-                              <td class="bibcirccontent">
-                                <select style='border: 1px solid #cfcfcf'
-                                onchange="location = this.options[this.selectedIndex].value;">
-    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
-                                    New
-                                  </option>
-    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested" selected>
-                                    Requested
-                                  </option>
-    <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received">
-                                    Received
-                                  </option>
-                                </select>
-                              </td>
-                            </tr>
-                            <tr>
-                              <th width="150">%s</th>
-                              <td class="bibcirccontent">%s</td>
-                            </tr>
-                            <tr>
-                              <th width="150">%s</th>
-                              <td class="bibcirccontent">
-                                <select name="library_id"  style='border: 1px solid #cfcfcf'>
-
-                            """ % (_("Status"), ill_request_id, ill_request_id,
-                                   ill_request_id, _("ILL request ID"), ill_request_id,
-                                   _("Library/Supplier"))
-
-            for(library_id, name) in libraries:
-                out += """<option value ="%s">%s</option>""" % (library_id, name)
+            for(lib_id, name) in libraries:
+                if lib_id == library_id:
+                    out += """       <option value="%s" selected>%s</option>""" % (lib_id, name)
+                else:
+                    out += """       <option value="%s">%s</option>""" % (lib_id, name)
 
             out += """
                          </select>
@@ -12439,17 +12492,21 @@ class Template:
 
                         <script type="text/javascript">
                              $(function() {
-                                 $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                                 $("#date_picker2").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
                              });
                         </script>
-                        <input type="text" size="10" id="date_picker2" name="expected_date" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="text" size="10" id="date_picker2"
+                               name="expected_date" value="%s" style='border: 1px solid #cfcfcf'>
 
                       </td>
                     </tr>
                     <tr>
                       <th width="100">%s</th>
                       <td class="bibcirccontent">
-                        <input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
+                        <input type="text" size="12" name="cost"
+                               value="%s" style='border: 1px solid #cfcfcf'>
                         <select name="currency"  style='border: 1px solid #cfcfcf'>
 
                         """ % (_("Request date"),
@@ -12483,14 +12540,16 @@ class Template:
                     </tr>
                     <tr>
                       <th width="100">%s</th>
-                      <td class="bibcirccontent"><input type="text" size="12" name="barcode" value="%s" style='border: 1px solid #cfcfcf'>
+                      <td class="bibcirccontent"><input type="text" size="12" name="barcode"
+                          value="%s" style='border: 1px solid #cfcfcf'>
                       </td>
                     </tr>
                     <tr>
                           <th width="100" valign="top">%s</th>
                           <td>
-                            <table class="bibcircnotes"> """  %(_("Barcode"), barcode or 'No barcode asociated',
-                                                                _("Previous notes"))
+                            <table class="bibcircnotes">
+                    """  %(_("Barcode"), barcode or 'No barcode asociated',
+                           _("Previous notes"))
 
             out += notes
 
@@ -12500,7 +12559,10 @@ class Template:
                         </tr>
                     <tr>
                        <th valign="top" width="150">%s</th>
-                       <td><textarea name='library_notes' rows="6" cols="74" style='border: 1px solid #cfcfcf'></textarea></td>
+                          <td>
+                            <textarea name='library_notes' rows="6" cols="74"
+                                      style='border: 1px solid #cfcfcf'></textarea>
+                          </td>
                      </tr>
                    </table>
                  </td>
@@ -12513,27 +12575,6 @@ class Template:
         elif ill_status == 'on loan':
 
             out += """
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                        <input type=hidden name=new_status value="on loan">
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">
-                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
-                                New
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
-                                Requested
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan" selected>
-                                On loan
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned">
-                                Returned
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
                         <tr>
                           <th width="100">%s</th>
                           <td class="bibcirccontent">%s</td>
@@ -12550,12 +12591,8 @@ class Template:
                           <th width="100">%s</th>
                           <td class="bibcirccontent">%s</td>
                         </tr>
-
-                    """ % (_("Status"), ill_request_id, ill_request_id,
-                            ill_request_id, ill_request_id, _("ILL request ID"), ill_request_id,
-                            _("Library"), library_name,
-                            _("Request date"), request_date, _("Expected date"),
-                            expected_date)
+                    """ % (_("ILL request ID"), ill_request_id, _("Library"), library_name,
+                           _("Request date"), request_date, _("Expected date"), expected_date)
 
             if str(arrival_date)=='0000-00-00':
                 date1=today
@@ -12594,9 +12631,10 @@ class Template:
                         <input type="text" size="10" id="date_picker2" name="due_date" value="%s" style='border: 1px solid #cfcfcf'>
                         <input type="hidden" name="request_date" value="%s">
                         <input type="hidden" name="expected_date" value="%s">
+                        <input type="hidden" name="library_id" value="%s">
                       </td>
                     </tr>
-                """ % (_("Arrival date"), CFG_SITE_URL, date1, _("Due date"), CFG_SITE_URL, date2, request_date, expected_date)
+                """ % (_("Arrival date"), CFG_SITE_URL, date1, _("Due date"), CFG_SITE_URL, date2, request_date, expected_date, library_id)
 
             out += """
                         <tr>
@@ -12657,30 +12695,12 @@ class Template:
 
 
 ##### RETURNED ##############
-        elif ill_status == 'returned':
+        elif ill_status == 'returned' or ill_status == 'cancelled':
+            date1 = return_date
+            if ill_status == 'returned' and str(return_date)=='0000-00-00':
+                date1 = today
 
             out += """
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                        <input type=hidden name=new_status value="returned">
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">
-                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
-                                New
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
-                                Requested
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=on loan">
-                                On loan
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=returned" selected>
-                                Returned
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
                         <tr>
                           <th width="100">%s</th>
                           <td class="bibcirccontent">%s</td>
@@ -12710,28 +12730,32 @@ class Template:
                           <td class="bibcirccontent">
                             <script type="text/javascript">
                                 $(function() {
-                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
                                 });
                             </script>
-                            <input type="text" size="10" id="date_picker1" name="return_date" value="%s" style='border: 1px solid #cfcfcf'>
-                            <input type="hidden" name="request_date" value="%s">
+                            <input type="text" size="10" id="date_picker1" name="return_date"
+                                   value="%s" style='border: 1px solid #cfcfcf'>
+                            <input type="hidden" name="request_date"  value="%s">
                             <input type="hidden" name="expected_date" value="%s">
-                            <input type="hidden" name="arrival_date" value="%s">
-                            <input type="hidden" name="due_date" value="%s">
+                            <input type="hidden" name="arrival_date"  value="%s">
+                            <input type="hidden" name="due_date"      value="%s">
+                            <input type="hidden" name="library_id"    value="%s">
                           </td>
                         </tr>
                         <tr>
                           <th width="100">%s</th>
-                          <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
+                          <td class="bibcirccontent">
+                            <input type="text" size="12" name="cost"
+                                   value="%s" style='border: 1px solid #cfcfcf'>
                             <select name="currency"  style='border: 1px solid #cfcfcf'>
 
-                            """  % ( _("Status"), ill_request_id,ill_request_id,ill_request_id,ill_request_id, _("ILL request ID"), ill_request_id,
-                                    _("Library"), library_name,
-                                    _("Request date"), request_date, _("Expected date"), expected_date,
-                                    _("Arrival date"), arrival_date, _("Due date"), due_date,
-                                    _("Return date"), CFG_SITE_URL, return_date,
-                                    request_date, expected_date,arrival_date,due_date,
-                                    _("Cost"), value)
+                """  % (_("ILL request ID"), ill_request_id, _("Library"),
+                        library_name, _("Request date"), request_date, _("Expected date"),
+                        expected_date, _("Arrival date"), arrival_date, _("Due date"),
+                        due_date, _("Return date"), CFG_SITE_URL, date1, request_date,
+                        expected_date, arrival_date, due_date, library_id, _("Cost"), value)
 
 
             if currency == 'EUR':
@@ -12763,7 +12787,8 @@ class Template:
                         <tr>
                           <th width="100" valign="top">%s</th>
                           <td>
-                            <table class="bibcircnotes"> """ % (_("Barcode"), barcode, _("Previous notes"))
+                            <table class="bibcircnotes">
+                    """ % (_("Barcode"), barcode, _("Previous notes"))
 
             out += notes
 
@@ -12788,25 +12813,8 @@ class Template:
                 date1=today
             else:
                 date1=arrival_date
+
             out += """
-                      <table class="tablesorter" border="0" cellpadding="0" cellspacing="1">
-                        <tr>
-                        <input type=hidden name=new_status value="received">
-                          <th width="100">%s</th>
-                          <td class="bibcirccontent">
-                            <select style='border: 1px solid #cfcfcf' onchange="location = this.options[this.selectedIndex].value;">
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=new">
-                                New
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=requested">
-                                Requested
-                              </option>
-                              <option value ="ill_request_details_step1?ill_request_id=%s&new_status=received" selected>
-                                Received
-                              </option>
-                            </select>
-                          </td>
-                        </tr>
                         <tr>
                           <th width="100">%s</th>
                           <td class="bibcirccontent">%s</td>
@@ -12828,25 +12836,27 @@ class Template:
                           <td class="bibcirccontent">
                             <script type="text/javascript">
                                 $(function() {
-                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd', showOn: 'button', buttonImage: "%s/img/calendar.gif", buttonImageOnly: true});
+                                    $("#date_picker1").datepicker({dateFormat: 'yy-mm-dd',
+                                        showOn: 'button', buttonImage: "%s/img/calendar.gif",
+                                        buttonImageOnly: true});
                                 });
                             </script>
-                            <input type="text" size="10" id="date_picker1" name="arrival_date" value="%s" style='border: 1px solid #cfcfcf'>
+                            <input type="text" size="10" id="date_picker1"
+                               name="arrival_date" value="%s" style='border: 1px solid #cfcfcf'>
                             <input type="hidden" name="request_date" value="%s">
                             <input type="hidden" name="expected_date" value="%s">
+                            <input type="hidden" name="library_id" value="%s">
                           </td>
                         </tr>
                         <tr>
                           <th width="100">%s</th>
-                          <td class="bibcirccontent"><input type="text" size="12" name="cost" value="%s" style='border: 1px solid #cfcfcf'>
+                          <td class="bibcirccontent"><input type="text" size="12"
+                              name="cost" value="%s" style='border: 1px solid #cfcfcf'>
                             <select name="currency"  style='border: 1px solid #cfcfcf'>
-
-                            """  % ( _("Status"), ill_request_id,ill_request_id,ill_request_id, _("ILL request ID"), ill_request_id,
-                                    _("Library"), library_name,
-                                    _("Request date"), request_date, _("Expected date"), expected_date,
-                                    _("Arrival date"), CFG_SITE_URL, date1,
-                                    request_date, expected_date,
-                                    _("Cost"), value)
+                    """ % (_("ILL request ID"), ill_request_id, _("Library"), library_name,
+                           _("Request date"), request_date, _("Expected date"), expected_date,
+                           _("Arrival date"), CFG_SITE_URL, date1, request_date, expected_date,
+                           library_id, _("Cost"), value)
 
 
             if currency == 'EUR':
@@ -12878,7 +12888,8 @@ class Template:
                         <tr>
                           <th width="100" valign="top">%s</th>
                           <td>
-                            <table class="bibcircnotes"> """ % (_("Barcode"), barcode, _("Previous notes"))
+                            <table class="bibcircnotes">
+                """ % (_("Barcode"), barcode, _("Previous notes"))
 
             out += notes
 
@@ -12896,8 +12907,8 @@ class Template:
                  </table>
 
                       """ % (_("Library notes"))
-###### END STATUSES ######
 
+###### END STATUSES ######
 
         out += """
 
@@ -12920,7 +12931,6 @@ class Template:
              <br />
                """ % (_("Back"), _("Continue"))
 
-
         return out
 
 
@@ -12942,7 +12952,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         (_borrower_id, borrower_name, borrower_email, borrower_mailbox, period_from, period_to,
          book_info, borrower_comments, only_this_edition) = ill_request_borrower_details
@@ -13738,7 +13748,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -13779,7 +13789,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         (purchase_id, recid, vendor, order_date, expected_date,
                                            price, status, notes) = order_details
@@ -14057,7 +14067,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -14222,7 +14232,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -14260,7 +14270,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14339,7 +14349,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14408,7 +14418,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -14449,7 +14459,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -14504,7 +14514,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14573,7 +14583,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14652,7 +14662,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14720,7 +14730,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
             <div class="bibcircbottom">
@@ -14761,7 +14771,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom">
@@ -14777,7 +14787,13 @@ class Template:
              </td>
            </tr>
            <tr align="center">
-             <td><input type="text" size="45" name="string" style='border: 1px solid #cfcfcf'></td>
+             <td>
+                <input type="text" size="45" name="string" id='string'
+                       style='border: 1px solid #cfcfcf'>
+                <script language="javascript" type="text/javascript">
+                    document.getElementById("string").focus();
+                </script>
+             </td>
            </tr>
           </table>
           <br />
@@ -14817,7 +14833,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -14883,7 +14899,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class="bibcircbottom" align="center">
@@ -14978,7 +14994,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out +="""
             <div class="bibcircbottom">
@@ -15071,7 +15087,7 @@ class Template:
         out = self.tmpl_infobox(infos, ln)
 
         if admin:
-            out += _MENU_
+            out += load_menu(ln)
 
             out += """
             <br />
@@ -15284,7 +15300,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         #if isbn:
         #    book_cover = get_book_cover(isbn)
@@ -15576,7 +15592,7 @@ class Template:
 
         out = ""
         if admin:
-            out += _MENU_
+            out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -15778,7 +15794,7 @@ class Template:
 
         out = """
         """
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -15922,7 +15938,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out +="""
             <div class="bibcircbottom">
@@ -16011,7 +16027,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -16196,7 +16212,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class=bibcircbottom align="center">
@@ -16229,7 +16245,12 @@ class Template:
             </td>
           </tr>
           <tr align="center">
-            <td><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
+            <td>
+                <input type="text" size="50" name="p" id='p' style='border: 1px solid #cfcfcf'>
+                <script language="javascript" type="text/javascript">
+                    document.getElementById("p").focus();
+                </script>
+            </td>
           </tr>
         </table>
         <br />
@@ -16263,7 +16284,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -16369,7 +16390,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <div class=bibcircbottom align="center">
@@ -16438,7 +16459,7 @@ class Template:
 
         out = """  """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         if len(result) == 0:
             out += """
@@ -16528,7 +16549,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
 
         out += """
@@ -16728,7 +16749,7 @@ class Template:
 
         out = """ """
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -16884,7 +16905,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
         if admin:
-            out += _MENU_
+            out += load_menu(ln)
 
         out += """
         <br />
@@ -16907,7 +16928,12 @@ class Template:
                     <tr>
                         <th width="100">%s</th>
                         <td>
-                          <input type="text" size="45" name="periodical_title" style='border: 1px solid #cfcfcf'>
+                          <input type="text" size="45" name="periodical_title"
+                                 id='periodical_title'
+                                 style='border: 1px solid #cfcfcf'>
+                          <script language="javascript" type="text/javascript">
+                            document.getElementById("periodical_title").focus();
+                          </script>
                         </td>
                      </tr>
                      <tr>
@@ -17092,7 +17118,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
         out += """
         <style type="text/css"> @import url("/img/tablesorter.css"); </style>
@@ -17347,7 +17373,7 @@ class Template:
 
         out = self.tmpl_infobox(infos, ln)
 
-        out += _MENU_
+        out += load_menu(ln)
 
 #<input type=hidden name=start value="0">
 #<input type=hidden name=end value="10">
@@ -17374,7 +17400,13 @@ class Template:
         <br />
         <table class="bibcirctable">
             <tr align="center" width=10>
-                <td width=10><input type="text" size="50" name="p" style='border: 1px solid #cfcfcf'></td>
+                <td width=10>
+                    <input type="text" size="50" name="p" id='p'
+                           style='border: 1px solid #cfcfcf'>
+                    <script language="javascript" type="text/javascript">
+                        document.getElementById("p").focus();
+                    </script>
+                </td>
             </tr>
         </table>
         """ % (CFG_SITE_URL,CFG_SITE_URL,CFG_SITE_URL,CFG_SITE_URL)
@@ -17446,7 +17478,7 @@ class Template:
 
         #out = self.tmpl_infobox(infos, ln)
 
-        out = _MENU_
+        out = load_menu(ln)
 
         (book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(recid)
 

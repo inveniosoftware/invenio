@@ -509,7 +509,7 @@ class WebInterfaceILLPages(WebInterfaceDirectory):
             item_info = {'periodical_title': argd['periodical_title'],
                 'title': argd['article_title'], 'authors': argd['author'], 'place': "",
                 'publisher': "", 'year' : argd['year'], 'edition': "", 'issn' : argd['issn'],
-                'volume': argd['volume'] }
+                'volume': argd['volume'], 'page': argd['page'], 'issue': argd['issue'] }
 
             ### budget_code ###
             db.ill_register_request_on_desk(borrower_id, item_info,

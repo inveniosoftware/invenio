@@ -2992,10 +2992,10 @@ def update_loan_recid(barcode, new_recid):
 
 def update_barcode(old_barcode, barcode):
 
-    run_sql("""UPDATE crcITEM
-                  SET barcode=%s
-                WHERE barcode=%s
-                """, (barcode, old_barcode))
+    r = run_sql("""UPDATE crcITEM
+                      SET barcode=%s
+                    WHERE barcode=%s
+                    """, (barcode, old_barcode))
 
     run_sql("""UPDATE crcLOAN
                   SET barcode=%s
@@ -3006,6 +3006,8 @@ def update_barcode(old_barcode, barcode):
                   SET barcode=%s
                 WHERE barcode=%s
                 """, (barcode, old_barcode))
+
+    return r > 0
 
 def tag_requests_as_done(barcode, user_id):
     res = run_sql("""UPDATE crcLOANREQUEST
