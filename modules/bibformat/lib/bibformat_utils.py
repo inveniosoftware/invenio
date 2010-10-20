@@ -654,7 +654,6 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
         cmdargs.append(p)
     (dummy1, output, dummy2) = run_shell_command(cmd, cmdargs)
 
-    #print cmd, cmdargs, output
     result = []
     big_snippets = output.split("--")
 
@@ -668,11 +667,13 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
 
     # combine snippets
     out = ""
+    count = 0
     for snippet in result:
-        if snippet:
+        if snippet and count < max_snippets:
             if out:
                 out += "<br>"
             out += "..." + snippet + "..."
+            count += 1
     return out
 
 def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary = True):
@@ -706,8 +707,6 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary =
         # to make sure that at least one pattern is included
         while nb_words_around * 2 + 1 > max_words:
             nb_words_around -= 1
-        if nb_words_around == 0:
-            break
 
         #can be first or a following pattern in this snippet
         if matches_any(words[i]):
