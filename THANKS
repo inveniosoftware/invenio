@@ -150,8 +150,7 @@ was written by Thomas Bellman <bellman@lysator.liu.se>.  The asyncproc.py
 version included with CDS Invenio was downloaded from
 <http://www.lysator.liu.se/~bellman/download/asyncproc.py> on 2009-07-13.
 
-The git-version-gen script was taken from gnulib 20100704+stable-1 and
-slightly adapted to fit Invenio needs; see the note in that file.
+The git-version-gen script was taken from gnulib 20100704+stable-1.
 <http://www.gnu.org/software/gnulib/>
 
 - end of file -

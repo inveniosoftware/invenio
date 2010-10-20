@@ -1,14 +1,9 @@
 #!/bin/sh
 # Print a version string.
-scriptversion=2010-10-19.18; # UTC
+scriptversion=2010-10-20.23; # UTC
 
-## Note by Tibor Simko 2010-10-19: This file is taken from
-## `git-version-gen' coming with gnulib 20100704+stable-1 and was
-## slightly adapted to fit Invenio needs.  (Notably, to use `git
-## describe --tags', for we cannot use gnulib's original version as of
-## yet due to the presence of non-signed git tags from cvs-to-git
-## migration.  We shall be able to return to gnulib's version shortly
-## once we add new signed tags for forthcoming releases.
+## Note by Tibor Simko 2010-10-21: This is `git-version-gen' script
+## taken verbatim from gnulib 20100704+stable-1.
 
 # Copyright (C) 2007-2010 Free Software Foundation, Inc.
 #
@@ -107,8 +102,8 @@ if test -n "$v"
 then
     : # use $v
 elif test -d .git \
-    && v=`git describe --tags --abbrev=4 --match='v*' HEAD 2>/dev/null \
-	  || git describe --tags --abbrev=4 HEAD 2>/dev/null` \
+    && v=`git describe --abbrev=4 --match='v*' HEAD 2>/dev/null \
+	  || git describe --abbrev=4 HEAD 2>/dev/null` \
     && v=`printf '%s\n' "$v" | sed "$tag_sed_script"` \
     && case $v in
 	 v[0-9]*) ;;
