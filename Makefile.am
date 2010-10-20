@@ -20,7 +20,8 @@ confignice_SCRIPTS=config.nice
 
 SUBDIRS = po config modules
 
-EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in
+EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
+             config.rpath
 
 # current jsMath version and packages
 JSMV = 3.6b
@@ -32,12 +33,12 @@ JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
 FCKV = 2.6.6
 FCKEDITOR = FCKeditor_$(FCKV).zip
 
-all:
-	@echo "****************************************************"
-	@echo "** CDS Invenio has been successfully built.       **"
-	@echo "**                                                **"
-	@echo "** You may proceed to 'make install' now.         **"
-	@echo "****************************************************"
+# git-version-get stuff:
+BUILT_SOURCES = $(top_srcdir)/.version
+$(top_srcdir)/.version:
+	echo $(VERSION) > $@-t && mv $@-t $@
+dist-hook:
+	echo $(VERSION) > $(distdir)/.tarball-version
 
 check-custom-templates:
 	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
