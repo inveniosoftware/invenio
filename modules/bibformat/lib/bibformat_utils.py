@@ -613,7 +613,8 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
     The snippets are meant to look like in the results of the popular search
     engine: using " ... " between snippets.
     For empty patterns it returns ""
-    The idea is to first produce big snippets with grep and narrow them
+    The idea is to first produce big snippets with grep and then narrow them
+    using the cut_out_snippet function.
     @param right_boundary: match the right word boundary
     TODO: - distinguish the beginning of sentences and try to make the snippets
           start there
@@ -637,7 +638,7 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
                     escaped_keywords.append(w1.replace(')', ''))
             else:
                 escaped_keywords.append(w)
-    # the max number of words that can still be added to the snippet
+    # the max number of words that the snippets can have for this record
     words_left = max_snippets * (nb_words_around * 2 + 1)
     # Assuming that there will be at least one word per line we can produce the
     # big snippets like this
@@ -659,13 +660,11 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
 
     # cut the snippets to match the nb_words_around parameter precisely:
     for s in big_snippets:
-        small_snippet = cut_out_snippet(s, escaped_keywords, nb_words_around, \
-        words_left, right_boundary)
-        #count words
-        words_left -= len(small_snippet.split())
-        #if words_left <= 0:
-            #print "Error: snippet too long"
-        result.append(small_snippet)
+        if words_left > 0:
+            (small_snippets, words_left) = cut_out_snippet(s, escaped_keywords, \
+             nb_words_around, words_left, right_boundary)
+            #count words
+            result += small_snippets
 
     # combine snippets
     out = ""
@@ -677,8 +676,9 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
     return out
 
 def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary = True):
-    # the snippet can include many occurances of the patterns if they are not
-    # further appart than 2 * nb_words_around
+    # Cut out one ore more snippets, limits to max_words param.
+    # The snippet can include many occurances of the patterns if they are not
+    # further appart than 2 * nb_words_around.
 
     def matches_any(w1):
         if compiled_pattern.search(' ' + w1 + ' '):
@@ -693,19 +693,23 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary =
         pattern = '(\\b|\\s)(' + '|'.join(patterns) + ')'
     compiled_pattern = re.compile(pattern, re.IGNORECASE | re.UNICODE)
 
-    # make the nb_words_around smaller if required by max_words
-    # to make sure that at least one pattern is included
-    while nb_words_around * 2 + 1 > max_words:
-        nb_words_around -= 1
-    if nb_words_around < 1:
-        return ""
-
+    snippets = []
     snippet = ""
     words = text.split()
 
     last_written_word = -1
     i = 0
-    while i < len(words):
+    while i < len(words) and max_words > 3:
+
+        # For the last snippet for this record:
+        # make the nb_words_around smaller if required by max_words
+        # to make sure that at least one pattern is included
+        while nb_words_around * 2 + 1 > max_words:
+            nb_words_around -= 1
+        if nb_words_around == 0:
+            break
+
+        #can be first or a following pattern in this snippet
         if matches_any(words[i]):
             # add part before first or following occurance of a word
             j = max(last_written_word + 1, i - nb_words_around)
@@ -728,17 +732,11 @@ def cut_out_snippet(text, patterns, nb_words_around, max_words, right_boundary =
             i += j
         else:
             i += 1
+        # if the snippet is ready (i.e. we didn't just find a new match)
+        if snippet != "" and i < len(words) and not matches_any(words[i]):
+            max_words -= len(snippet.split())
+            snippets.append(highlight_matches(snippet, compiled_pattern))
+            snippet = ""
 
-    snippet = highlight_matches(snippet, compiled_pattern)
-    # apply max_words param if needed
-    snippet_words = snippet.split()
-    length = len(snippet_words)
-    if (length > max_words):
-        j = 0
-        shorter_snippet = ""
-        while j < max_words:
-            shorter_snippet += " " + snippet_words[j]
-            j += 1
-        return shorter_snippet
-    else:
-        return snippet
+    return (snippets, max_words)
+
