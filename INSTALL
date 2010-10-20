@@ -1,11 +1,11 @@
-CDS Invenio v0.99.1 INSTALL
-===========================
+CDS Invenio INSTALLATION
+========================
 
 About
 =====
 
 This document specifies how to build, customize, and install CDS
-Invenio v0.99.1 for the first time.  See RELEASE-NOTES if you are
+Invenio v0.99.2 for the first time.  See RELEASE-NOTES if you are
 upgrading from a previous CDS Invenio release.
 
 Contents
@@ -217,13 +217,13 @@ Contents
 ----------------
 
       $ cd $HOME/src/
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz.sig
-      $ md5sum -v -c cds-invenio-0.99.1.tar.gz.md5
-      $ gpg --verify cds-invenio-0.99.1.tar.gz.sig cds-invenio-0.99.1.tar.gz
-      $ tar xvfz cds-invenio-0.99.1.tar.gz
-      $ cd cds-invenio-0.99.1
+      $ wget http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz
+      $ wget http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.md5
+      $ wget http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.sig
+      $ md5sum -v -c cds-invenio-0.99.2.tar.gz.md5
+      $ gpg --verify cds-invenio-0.99.2.tar.gz.sig cds-invenio-0.99.2.tar.gz
+      $ tar xvfz cds-invenio-0.99.2.tar.gz
+      $ cd cds-invenio-0.99.2
       $ ./configure
       $ make
       $ make install
@@ -266,20 +266,20 @@ Contents
           sources.  (The built files will be installed into different
           "target" directories later.)
 
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz.sig
+      $ wget http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz
+      $ wget http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.md5
+      $ wget http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.sig
 
           Fetch CDS Invenio source tarball from the CDS Software
           Consortium distribution server, together with MD5 checksum
           and GnuPG cryptographic signature files useful for verifying
           the integrity of the tarball.
 
-      $ md5sum -v -c cds-invenio-0.99.1.tar.gz.md5
+      $ md5sum -v -c cds-invenio-0.99.2.tar.gz.md5
 
           Verify MD5 checksum.
 
-      $ gpg --verify cds-invenio-0.99.1.tar.gz.sig cds-invenio-0.99.1.tar.gz
+      $ gpg --verify cds-invenio-0.99.2.tar.gz.sig cds-invenio-0.99.2.tar.gz
 
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
@@ -291,11 +291,11 @@ Contents
           warning that may follow after the signature has been
           successfully verified.
 
-      $ tar xvfz cds-invenio-0.99.1.tar.gz
+      $ tar xvfz cds-invenio-0.99.2.tar.gz
 
           Untar the distribution tarball.
 
-      $ cd cds-invenio-0.99.1
+      $ cd cds-invenio-0.99.2
 
           Go to the source directory.
 
@@ -670,4 +670,4 @@ Good luck, and thanks for choosing CDS Invenio.
 
        - CDS Development Group
          <cds.support@cern.ch>
-         <http://cdsware.cern.ch/>
+         <http://invenio-software.org/>

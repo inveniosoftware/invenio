@@ -1,5 +1,5 @@
-CDS Invenio v0.99.1 AUTHORS
-===========================
+CDS Invenio AUTHORS
+===================
 
 CDS Invenio is developed at, and maintained by, the CERN Document
 Server Software Consortium, jointly by CERN (European Organization for
@@ -15,7 +15,7 @@ The CERN development group currently consists of:
      Head Developer.  General system architecture, release management.
      WebSearch, BibIndex, BibSched, WebStat, WebStyle, WebSession,
      WebHelp, and more.
-  
+
  - Jerome Caffaro <jerome.caffaro@cern.ch>
      BibFormat, redesign and rewrite in Python.  BibConvert
      XML-oriented mode.  OAI harvester improvements.  Improvements to
@@ -28,33 +28,12 @@ The CERN development group currently consists of:
      extension for the indexer.  Improvents to the task scheduler and
      session hander, etc.
 
- - Martin Vesely <martin.vesely@cern.ch>
-     BibHarvest, OAI daemon and admin interface. BibConvert
-     text-oriented mode. BibMatch.
-
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.
 
- - Tony Osborne <tony.osborne@cern.ch>
-     Improvements to the reference extractor.
-
  - Marko Niinimaki <manzikki@gmail.com>
-     Contributions to the BibRank citation module and WebSearch 
+     Contributions to the BibRank citation module and WebSearch
      summary output formats.
-
- - Radoslav Ivanov <radoslav.ivanov@cern.ch>
-     Contributions to the WebBasket module test suite.  Support for
-     parentheses and SPIRES search syntax in WebSearch.
-
- - Joaquim Silvestre <joaquim.rodrigues.silvestre@cern.ch>
-     Forthcoming BibCirculation module to handle physical item copies.
-
- - Lars Christian Raae <lars.christian.raae@cern.ch>
-     Record locking, per-collection curating authentication, reverting
-     older record versions, for the BibEdit.
-
- - Ruben Pollan <ruben.pollan@cern.ch>
-     Contributions to the WebStat module.
 
  - Piotr Praczyk <piotr.praczyk@gmail.com>
      OAI harvesting from arXiv.  Test harvesting interface, for
@@ -74,6 +53,30 @@ The SLAC development group currently consists of:
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
+
+ - Benoit Thiell  <benoit.thiell@cern.ch>
+     Improvements to BibClassify.
+
+ - Martin Vesely <martin.vesely@cern.ch>
+     BibHarvest, OAI daemon and admin interface. BibConvert
+     text-oriented mode. BibMatch.
+
+ - Tony Osborne <tony.osborne@cern.ch>
+     Improvements to the reference extractor.
+
+ - Radoslav Ivanov <radoslav.ivanov@cern.ch>
+     Contributions to the WebBasket module test suite.  Support for
+     parentheses and SPIRES search syntax in WebSearch.
+
+ - Joaquim Silvestre <joaquim.rodrigues.silvestre@cern.ch>
+     Forthcoming BibCirculation module to handle physical item copies.
+
+ - Lars Christian Raae <lars.christian.raae@cern.ch>
+     Record locking, per-collection curating authentication, reverting
+     older record versions, for the BibEdit.
+
+ - Ruben Pollan <ruben.pollan@cern.ch>
+     Contributions to the WebStat module.
 
  - Nicholas Robinson <nicholas.robinson@cern.ch>
      WebSubmit.  Reference extraction for the BibEdit module.
@@ -95,11 +98,11 @@ project.  In an approximate decreasing chronological order:
      Original implementation of the fulltext file transfer mode for
      BibUpload.
 
- - Axel Voitier <axel.voitier@gmail.com> 
+ - Axel Voitier <axel.voitier@gmail.com>
      Complex approval and refereeing subsystem, for WebSubmit.
 
  - Alberto Pepe <alberto.pepe@cern.ch>
-     BibClassify, BibHarvest Admin. 
+     BibClassify, BibHarvest Admin.
 
  - Nikolay Dyankov <ndyankov@gmail.com>
      XML-based BFX formatting engine, for BibFormat.
@@ -116,7 +119,7 @@ project.  In an approximate decreasing chronological order:
      numerous patches for many modules.
 
  - Krzysztof Jedrzejek <krzysztof.jedrzejek@gmail.com>
-     Improvements to ElmSubmit.  
+     Improvements to ElmSubmit.
 
  - Yohann Paris <paris.yohann@gmail.com>
      BibEdit Admin.
@@ -131,7 +134,7 @@ project.  In an approximate decreasing chronological order:
      System librarian, MARC21 expertise.
 
  - Tiberiu Dondera <tiberiu.dondera@pronet-consulting.com>
-     Patches for the WebSubmit engine and the admin interface. 
+     Patches for the WebSubmit engine and the admin interface.
      Templatizing codebase.
 
  - Anna Afshar <anna.afshar@novell.com>
@@ -141,7 +144,7 @@ project.  In an approximate decreasing chronological order:
      Ranking engine, the BibRank module.  Stemming and stopwords for
      the BibIndex module.  Site access policies and external
      authentication methods, for the WebAccess module and its clients.
-     Administration interfaces to WebSearch, BibIndex, BibRank, and 
+     Administration interfaces to WebSearch, BibIndex, BibRank, and
      additions to WebAccess.
 
  - Hector Sanchez <hector.sanchez.sanmartin@gmail.com>
@@ -149,7 +152,7 @@ project.  In an approximate decreasing chronological order:
      management, for the WebSession module.
 
  - Richard Owen <ro@tes.la>
-     Electronic mail submission system, the ElmSubmit module. 
+     Electronic mail submission system, the ElmSubmit module.
 
  - Alexandra Silva <xana@correio.ci.uminho.pt>
      Rewriting and enhancing BibRecord XML MARC and record handling
@@ -159,7 +162,7 @@ project.  In an approximate decreasing chronological order:
      Automatic text classification and keyword indexing. (upcoming)
 
  - Mikael Vik <mikael.vik@cern.ch>
-     Role-based access control engine and its admin interface, 
+     Role-based access control engine and its admin interface,
      the WebAccess module.  Guest user sessions garbage collector,
      for the WebSession module.
 
@@ -176,7 +179,7 @@ project.  In an approximate decreasing chronological order:
  - Franck Grenier <franckgrenier@wanadoo.fr>
      Parts of web design and graphics, for the WebStyle module.
 
- - Eduardo Margallo 
+ - Eduardo Margallo
      Enhancements to the indexing engine, for the BibWords module.
      Initial implementation of the task scheduler, for the BibSched
      module.

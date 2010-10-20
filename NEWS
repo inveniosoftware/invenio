@@ -1,10 +1,39 @@
-CDS Invenio v0.99.1 NEWS
-========================
+CDS Invenio NEWS
+================
 
 Here is a short summary of the most notable changes in CDS Invenio
 releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
+
+CDS Invenio v0.99.2 -- released 2010-10-20
+------------------------------------------
+
+ *) stricter checking of access to restricted records: in order to
+    view a restricted record, users are now required to have
+    authorizations to access all restricted collections the given
+    record may belong to (WebSearch)
+
+ *) strict checking of user query history when setting up email
+    notification alert, preventing URL mangling attempts (WebAlert)
+
+ *) fixed possible Unix signal conflicts for tasks performing I/O
+    operations or running external processes, relevant notably to
+    full-text indexing of remote files (BibSched)
+
+ *) fixed full-text indexing and improved handling of files of
+    `unexpected' extensions (BibIndex, WebSubmit)
+
+ *) streaming of files of `unknown' MIME type now defaults to
+    application/octet-stream (WebSubmit)
+
+ *) fixed addition of new MARC fields in the record editor (BibEdit)
+
+ *) fixed issues in full-text file attachment via MARC (BibUpload)
+
+ *) fixed authaction CLI client (WebAccess)
+
+ *) ... plus other minor fixes and improvements
 
 CDS Invenio v0.99.1 -- released 2008-07-10
 ------------------------------------------
@@ -504,7 +533,7 @@ CDS Invenio v0.92.0 -- released 2006-12-22
     now recommended
 
  *) full compatibility with FreeBSD and Mac OS X
- 
+
 CDS Invenio v0.90.1 -- released 2006-07-23
 ------------------------------------------
 
@@ -557,9 +586,9 @@ CDS Invenio v0.90.0 -- released 2006-06-30
  *) new basket sharing among user groups (WebBasket)
 
  *) new open peer reviewing and commenting on documents (WebComment)
- 
+
  *) new user and group web messaging system (WebMessage)
-       
+
  *) new ontology-based document classification system (BibClassify)
 
  *) new WebSubmit Admin (WebSubmit)
@@ -570,7 +599,7 @@ CDS Invenio v0.90.0 -- released 2006-06-30
 
  *) new OAI repository administration tool (BibHarvest)
 
- *) new OAI periodical harvesting tool (BibHarvest) 
+ *) new OAI periodical harvesting tool (BibHarvest)
 
  *) new web layout templating system (WebStyle)
 
@@ -610,15 +639,15 @@ CDSware v0.7.1 -- released 2005-05-04
  *) automatic linking to Google Print in the ``Haven't found what you
     were looking for...'' page box (WebSearch)
 
- *) BibFormat Admin Guide cleaned, thanks to Ferran Jorba   
+ *) BibFormat Admin Guide cleaned, thanks to Ferran Jorba
 
  *) new Catalan translation, thanks to Ferran Jorba
 
  *) updated Greek and Portuguese translations, thanks to Theodoros
     Theodoropoulos and FlÃ¡vio C. Coelho
 
- *) updated Spanish translation 
- 
+ *) updated Spanish translation
+
 CDSware v0.7.0 -- released 2005-04-06
 -------------------------------------
 
@@ -668,11 +697,11 @@ CDSware v0.7.0 -- released 2005-04-06
 
 CDSware v0.5.0 -- released 2004-12-17
 -------------------------------------
-  
+
  *) new rank engine, featuring word similarity rank method and the
     journal impact factor rank demo (BibRank)
 
- *) search engine includes ranking option (WebSearch) 
+ *) search engine includes ranking option (WebSearch)
 
  *) record similarity search based on word frequency (WebSearch,
     BibRank)
@@ -912,13 +941,13 @@ CDSware v0.1.1 (DEVELOPMENT) -- released 2003-12-19
 
  *) more internationalization of the search engine messages (WebSearch)
 
- *) new language: Norwegian (bokmÃ¥l) 
+ *) new language: Norwegian (bokmÃ¥l)
 
  *) simple example for converting BibTeX into XML MARC (BibConvert)
 
  *) new optional --with-python configuration option
 
- *) Python module detection during configure 
+ *) Python module detection during configure
 
  *) bugfixes: os.tempnam() warning, login page referer, and others
 
@@ -927,7 +956,7 @@ CDSware v0.1.0 (DEVELOPMENT) -- released 2003-12-04
 
  *) development branch release
 
- *) search engine redesign to yield five times more search performance 
+ *) search engine redesign to yield five times more search performance
     for larger sites (WebSearch, BibWords)
 
  *) fulltext indexation of PDF, PostScript, MS Word, MS PowerPoint and

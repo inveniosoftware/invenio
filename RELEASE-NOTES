@@ -1,131 +1,49 @@
 --------------------------------------------------------------------
-CDS Invenio v0.99.1 is released
-July 10, 2008
-http://cdsware.cern.ch/invenio/news.html
+CDS Invenio v0.99.2 is released
+October 20, 2010
+http://invenio-software.org/
 --------------------------------------------------------------------
 
-CDS Invenio v0.99.1 was released on July 10, 2008.
+CDS Invenio v0.99.2 was released on October 20, 2010.
+
+This is a bugfix release only.  It is recommended to all CDS Invenio
+sites using v0.99.1 or previous releases.
 
 What's new:
 -----------
 
- *) search engine syntax now supports parentheses (WebSearch)
+ *) stricter checking of access to restricted records: in order to
+    view a restricted record, users are now required to have
+    authorizations to access all restricted collections the given
+    record may belong to (WebSearch)
 
- *) search engine syntax now supports SPIRES query language
-    (WebSearch)
+ *) strict checking of user query history when setting up email
+    notification alert, preventing URL mangling attempts (WebAlert)
 
- *) strict respect for per-collection sort options on the search
-    results pages (WebSearch)
+ *) fixed possible Unix signal conflicts for tasks performing I/O
+    operations or running external processes, relevant notably to
+    full-text indexing of remote files (BibSched)
 
- *) improved parsing of search query with respect to non-existing
-    field terms (WebSearch)
+ *) fixed full-text indexing and improved handling of files of
+    `unexpected' extensions (BibIndex, WebSubmit)
 
- *) fixed "any collection" switch on the search results page
-    (WebSearch)
+ *) streaming of files of `unknown' MIME type now defaults to
+    application/octet-stream (WebSubmit)
 
- *) added possibility for progressive display of detailed record page
-    tabs (WebSearch)
+ *) fixed addition of new MARC fields in the record editor (BibEdit)
 
- *) added support for multi-page RSS output (WebSearch)
+ *) fixed issues in full-text file attachment via MARC (BibUpload)
 
- *) new search engine summarizer module with the cite summary output
-    format (WebSearch, BibRank)
+ *) fixed authaction CLI client (WebAccess)
 
- *) "cited by" links are now generated only when needed (WebSearch)
-
- *) new experimental comprehensive author page (WebSearch)
-
- *) stemming for many indexes is now enabled by default (BibIndex)
-
- *) new intelligent journal index (BibIndex)
-
- *) new logging of missing citations (BibRank)
-
- *) citation indexer and searcher improvements and caching (BibRank)
-
- *) new low-level task submission facility (BibSched)
-
- *) new options in bibsched task monitor: view task options, log and
-    error files; prune task to a history table; extended status
-    reporting; failed tasks now need acknowledgement in order to
-    restart the queue (BibSched)
-
- *) safer handling of task sleeping and waking up (BibSched)
-
- *) new experimental support for task priorities and concurrent task
-    execution (BibSched)
-
- *) improved user-configured browser language matching (MiscUtil)
-
- *) new default behaviour not differentiating between guest users;
-    this removes a need to keep sessions/uids for guests and robots
-    (WebSession)
-
- *) optimized sessions and collecting external user information (WebSession)
-
- *) improved logging conflicts for external vs internal users
-    (WebAccess)
-
- *) improved Single Sign-On session preservation (WebAccess)
-
- *) new 'become user' debugging facility for admins (WebAccess)
-
- *) new bibdocfile CLI tool to manipulate full-text files archive
-    (WebSubmit)
-
- *) optimized redirection of old URLs (WebSubmit)
-
- *) new icon creation tool in the submission input chain (WebSubmit)
-
- *) improved full-text file migration tool (WebSubmit)
-
- *) improved stamping of full-text files (WebSubmit)
-
- *) new approval-related end-submission functions (WebSubmit)
-
- *) comments and descriptions of full-text files are now kept also in
-    bibdoc tables, not only in MARC; they are synchronized during
-    bibupload (WebSubmit, BibUpload)
-
- *) fixed navigation in public baskets (WebBasket)
-
- *) added detailed record page link to basket records (WebBasket)
-
- *) new removal of HTML markup in alert notification emails (WebAlert)
-
- *) improved OAI harvester logging and handling (BibHarvest)
-
- *) improved error checking (BibConvert)
-
- *) improvements to the record editing tool: subfield order change,
-    repetitive subfields; improved record locking features;
-    configurable per-collection curators (BibEdit)
-
- *) fully refactored WebJournal module (WebJournal)
-
- *) new RefWorks output format, thanks to Theodoros Theodoropoulos
-    (BibFormat)
-
- *) fixed keyword detection tool's output; deactivated taxonomy
-    compilation (BibClassify)
-
- *) new /stats URL for administrators (WebStat)
-
- *) better filtering of unused translations (WebStyle)
-
- *) updated French, Italian, Norwegian and Swedish translations;
-    updated Japanese translation (thanks to Makiko Matsumoto and Takao
-    Ishigaki); updated Greek translation (thanks to Theodoros
-    Theodoropoulos); new Hungarian translation (thanks to Eva Papp)
-
- *) ... plus many other minor bug fixes and improvements
+ *) ... plus other minor fixes and improvements
 
 Download:
 ---------
 
-  <http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz>
-  <http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz.md5>
-  <http://cdsware.cern.ch/download/cds-invenio-0.99.1.tar.gz.sig>
+  <http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz>
+  <http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.md5>
+  <http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -135,46 +53,25 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from CDS Invenio v0.99.0, then:
+If you are upgrading from CDS Invenio v0.99.1, then:
 
  - please stop your bibsched queue and your Apache server
 
- - clean your session and user tables of guests:
-
-     $ echo "TRUNCATE session" | /opt/cds-invenio/bin/dbexec
-     $ echo "DELETE FROM user WHERE email=''" | \
-       /opt/cds-invenio/bin/dbexec
-
  - install the update:
 
-     $ cd cds-invenio-0.99.1
+     $ cd cds-invenio-0.99.2
      $ cp -a /opt/cds-invenio/etc /opt/cds-invenio/etc.OLD
      $ sh /opt/cds-invenio/etc/build/config.nice
      $ make install
      $ /opt/cds-invenio/bin/inveniocfg --update-all
-     $ make update-v0.99.0-tables
-     $ make check-custom-templates
-     $ diff -r /opt/cds-invenio/etc /opt/cds-invenio/etc.OLD
-   
- - study the differences in the 'etc' folder and copy or merge your
-   past customizations (namely, files like HB.bfo)  
+     $ cp -a /opt/cds-invenio/etc.OLD /opt/cds-invenio/etc
 
- - restart your Apache server and your bibsched queue 
+ - restart your Apache server and your bibsched queue
 
  - you are done
 
 If you are upgrading from previous CDS Invenio releases (e.g. from
 v0.92.1), then please see a dedicated Invenio Upgrade wiki page at
 <https://twiki.cern.ch/twiki/bin/view/CDS/InvenioUpgrade>.
-
-Further notes and issues:
--------------------------
-
- *) Some modules of this release (e.g. mail submission system) are
-    still experimental and not yet activated.  You may have a peek at
-    what is planned, but please do not rely on them.
-
- *) The admin-level functionality of several modules is not fully
-    developed or documented yet.
 
 - end of file -
