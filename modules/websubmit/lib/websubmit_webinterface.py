@@ -200,7 +200,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     warn += print_warning(_("This file is restricted: ") + auth_message)
                                     break
 
-                            if display_hidden or not docfile.hidden_p():
+                            if not docfile.hidden_p():
                                 if not readonly:
                                     ip = str(req.remote_ip)
                                     res = doc.register_download(ip, version, format, uid)
@@ -212,7 +212,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                                     return warningMsg(_("An error has happened in trying to stream the request file."), req, CFG_SITE_NAME, ln)
                             else:
                                 req.status = apache.HTTP_UNAUTHORIZED
-                                warn = print_warning(_("The requested file is hidden and you don't have the proper rights to access it."))
+                                warn = print_warning(_("The requested file is hidden and can not be accessed."))
 
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
