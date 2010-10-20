@@ -16,12 +16,13 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.1\n"
+"Project-Id-Version: CDS-Invenio 0.99.2\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-07-10 12:19+0200\n"
+"POT-Creation-Date: 2010-10-20 20:36+0200\n"
 "PO-Revision-Date: 2008-03-27 02:25+0200\n"
 "Last-Translator: Nikolay Dyankov <ndyankov@gmail.com>\n"
 "Language-Team: BG <cds.support@cern.ch>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,7 +36,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:661
 #: modules/websearch/doc/search-guide.webdoc:764
 #: modules/websearch/doc/search-guide.webdoc:799
-#: modules/websearch/lib/search_engine.py:948
+#: modules/websearch/lib/search_engine.py:987
 #: modules/websearch/lib/websearch_templates.py:1078
 msgid "AND NOT"
 msgstr "AND NOT"
@@ -72,7 +73,7 @@ msgstr "Администриране"
 #: modules/websearch/doc/search-guide.webdoc:555
 #: modules/websearch/doc/search-guide.webdoc:692
 #: modules/websearch/doc/search-guide.webdoc:830
-#: modules/websearch/lib/search_engine.py:3715
+#: modules/websearch/lib/search_engine.py:3754
 #: modules/websearch/lib/websearch_templates.py:718
 #: modules/websearch/lib/websearch_templates.py:797
 #: modules/websearch/lib/websearch_templates.py:920
@@ -141,7 +142,7 @@ msgstr "пълен текст"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:970
+#: modules/websearch/lib/search_engine.py:1009
 #: modules/websearch/lib/websearch_templates.py:1034
 msgid "Regular expression:"
 msgstr "Регулярен израз:"
@@ -158,7 +159,7 @@ msgstr "Регулярен израз:"
 #: modules/websearch/doc/search-guide.webdoc:736
 #: modules/websearch/doc/search-guide.webdoc:772
 #: modules/websearch/doc/search-guide.webdoc:807
-#: modules/websearch/lib/search_engine.py:966
+#: modules/websearch/lib/search_engine.py:1005
 #: modules/websearch/lib/websearch_templates.py:1026
 msgid "All of the words:"
 msgstr "Всички думи от:"
@@ -230,7 +231,7 @@ msgstr "тема"
 #: modules/websearch/doc/search-guide.webdoc:739
 #: modules/websearch/doc/search-guide.webdoc:775
 #: modules/websearch/doc/search-guide.webdoc:810
-#: modules/websearch/lib/search_engine.py:969
+#: modules/websearch/lib/search_engine.py:1008
 #: modules/websearch/lib/websearch_templates.py:1032
 msgid "Partial phrase:"
 msgstr "Частична фраза:"
@@ -504,7 +505,7 @@ msgstr "експеримент"
 #: modules/websearch/doc/search-guide.webdoc:737
 #: modules/websearch/doc/search-guide.webdoc:773
 #: modules/websearch/doc/search-guide.webdoc:808
-#: modules/websearch/lib/search_engine.py:967
+#: modules/websearch/lib/search_engine.py:1006
 #: modules/websearch/lib/websearch_templates.py:1028
 msgid "Any of the words:"
 msgstr "Коя да е от думите:"
@@ -1029,7 +1030,7 @@ msgstr "Ръководство за администриране на WebSearch"
 #: modules/websearch/doc/search-guide.webdoc:738
 #: modules/websearch/doc/search-guide.webdoc:774
 #: modules/websearch/doc/search-guide.webdoc:809
-#: modules/websearch/lib/search_engine.py:968
+#: modules/websearch/lib/search_engine.py:1007
 #: modules/websearch/lib/websearch_templates.py:1030
 msgid "Exact phrase:"
 msgstr "Точна фраза:"
@@ -1047,8 +1048,8 @@ msgstr "Ръководство за публикуване"
 #: modules/websearch/doc/search-guide.webdoc:660
 #: modules/websearch/doc/search-guide.webdoc:763
 #: modules/websearch/doc/search-guide.webdoc:798
-#: modules/websearch/lib/search_engine.py:792
-#: modules/websearch/lib/search_engine.py:947
+#: modules/websearch/lib/search_engine.py:831
+#: modules/websearch/lib/search_engine.py:986
 #: modules/websearch/lib/websearch_templates.py:1077
 #: modules/websearch/lib/websearch_webcoll.py:532
 msgid "OR"
@@ -1062,7 +1063,7 @@ msgstr "OR"
 #: modules/websearch/doc/search-guide.webdoc:659
 #: modules/websearch/doc/search-guide.webdoc:762
 #: modules/websearch/doc/search-guide.webdoc:797
-#: modules/websearch/lib/search_engine.py:946
+#: modules/websearch/lib/search_engine.py:985
 #: modules/websearch/lib/websearch_templates.py:1076
 msgid "AND"
 msgstr "AND"
@@ -2169,7 +2170,7 @@ msgid "Apr"
 msgstr "Апр"
 
 #: modules/miscutil/lib/dateutils.py:192 modules/miscutil/lib/dateutils.py:206
-#: modules/websearch/lib/search_engine.py:724
+#: modules/websearch/lib/search_engine.py:763
 #: modules/websearch/lib/websearch_templates.py:1116
 msgid "May"
 msgstr "Май"
@@ -2203,67 +2204,67 @@ msgid "Dec"
 msgstr "Дек"
 
 #: modules/miscutil/lib/dateutils.py:202
-#: modules/websearch/lib/search_engine.py:723
+#: modules/websearch/lib/search_engine.py:762
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "January"
 msgstr "Януари"
 
 #: modules/miscutil/lib/dateutils.py:203
-#: modules/websearch/lib/search_engine.py:723
+#: modules/websearch/lib/search_engine.py:762
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "February"
 msgstr "Февруари"
 
 #: modules/miscutil/lib/dateutils.py:204
-#: modules/websearch/lib/search_engine.py:723
+#: modules/websearch/lib/search_engine.py:762
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "March"
 msgstr "Март"
 
 #: modules/miscutil/lib/dateutils.py:205
-#: modules/websearch/lib/search_engine.py:723
+#: modules/websearch/lib/search_engine.py:762
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "April"
 msgstr "Април"
 
 #: modules/miscutil/lib/dateutils.py:207
-#: modules/websearch/lib/search_engine.py:724
+#: modules/websearch/lib/search_engine.py:763
 #: modules/websearch/lib/websearch_templates.py:1116
 msgid "June"
 msgstr "Юни"
 
 #: modules/miscutil/lib/dateutils.py:208
-#: modules/websearch/lib/search_engine.py:724
+#: modules/websearch/lib/search_engine.py:763
 #: modules/websearch/lib/websearch_templates.py:1116
 msgid "July"
 msgstr "Юли"
 
 #: modules/miscutil/lib/dateutils.py:209
-#: modules/websearch/lib/search_engine.py:724
+#: modules/websearch/lib/search_engine.py:763
 #: modules/websearch/lib/websearch_templates.py:1116
 msgid "August"
 msgstr "Август"
 
 #: modules/miscutil/lib/dateutils.py:210
-#: modules/websearch/lib/search_engine.py:725
+#: modules/websearch/lib/search_engine.py:764
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "September"
 msgstr "Септември"
 
 #: modules/miscutil/lib/dateutils.py:211
-#: modules/websearch/lib/search_engine.py:725
+#: modules/websearch/lib/search_engine.py:764
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "October"
 msgstr "Октомври"
 
 #: modules/miscutil/lib/dateutils.py:212
-#: modules/websearch/lib/search_engine.py:725
+#: modules/websearch/lib/search_engine.py:764
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "November"
 msgstr "Ноември"
 
 #: modules/miscutil/lib/dateutils.py:213
-#: modules/websearch/lib/search_engine.py:725
+#: modules/websearch/lib/search_engine.py:764
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "December"
 msgstr "Декември"
@@ -2468,7 +2469,7 @@ msgstr "Подобни записи"
 msgid "Cited by"
 msgstr "Цитиран от"
 
-#: modules/webalert/lib/webalert.py:56
+#: modules/webalert/lib/webalert.py:54
 #, python-format
 msgid "You already have an alert named %s."
 msgstr "Вече имате известие с име %s."
@@ -2478,37 +2479,43 @@ msgstr "Вече имате известие с име %s."
 msgid "unknown"
 msgstr "неизвестен"
 
-#: modules/webalert/lib/webalert.py:174
+#: modules/webalert/lib/webalert.py:163 modules/webalert/lib/webalert.py:217
+#: modules/webalert/lib/webalert.py:303 modules/webalert/lib/webalert.py:341
+#, fuzzy
+msgid "You do not have rights for this operation."
+msgstr "Нямате достатъчно права за достъп до съдържанието на кошницата."
+
+#: modules/webalert/lib/webalert.py:198
 msgid "You already have an alert defined for the specified query and basket."
 msgstr "Вече имате дефинирано известие за споменатите заявка и кошница."
 
-#: modules/webalert/lib/webalert.py:193 modules/webalert/lib/webalert.py:308
+#: modules/webalert/lib/webalert.py:221 modules/webalert/lib/webalert.py:345
 msgid "The alert name cannot be empty."
 msgstr "Името на известието не може да бъде празно."
 
-#: modules/webalert/lib/webalert.py:198
+#: modules/webalert/lib/webalert.py:226
 msgid "You are not the owner of this basket."
 msgstr "Вие не сте собственика на тази кошница."
 
-#: modules/webalert/lib/webalert.py:209
+#: modules/webalert/lib/webalert.py:237
 #, python-format
 msgid "The alert %s has been added to your profile."
 msgstr "Известието %s е добавено към вашия профил."
 
-#: modules/webalert/lib/webalert.py:339
+#: modules/webalert/lib/webalert.py:376
 #, python-format
 msgid "The alert %s has been successfully updated."
 msgstr "Известието %s е успешно обновено."
 
-#: modules/webalert/lib/webalert.py:391
+#: modules/webalert/lib/webalert.py:428
 #, python-format
 msgid ""
 "You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
 "is available with a possibility to (a) view search results and (b) subscribe "
 "to an automatic email alerting service for these queries."
 msgstr ""
-"Направили сте %(x_nb)s заявки. Наличен е %(x_url_open)sподробен списък%"
-"(x_url_close)s с възможност за (а) разглеждане на резултатите от търсене и "
+"Направили сте %(x_nb)s заявки. Наличен е %(x_url_open)sподробен списък"
+"%(x_url_close)s с възможност за (а) разглеждане на резултатите от търсене и "
 "(б) абониране за известяване по e-mail за тези заявки."
 
 #: modules/webalert/lib/webalert_templates.py:74
@@ -2629,12 +2636,12 @@ msgstr "ИЗЧИСТВАНЕ"
 #: modules/webalert/lib/webalert_templates.py:300
 #, python-format
 msgid ""
-"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
-"(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
+"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
+"%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Задаване на ново известяване от %(x_url1_open)sвашите търсения%(x_url1_close)"
-"s, %(x_url2_open)sпопулярните търсения%(x_url2_close)s или от входящата "
-"форма."
+"Задаване на ново известяване от %(x_url1_open)sвашите търсения"
+"%(x_url1_close)s, %(x_url2_open)sпопулярните търсения%(x_url2_close)s или от "
+"входящата форма."
 
 #: modules/webalert/lib/webalert_templates.py:320
 msgid "Search checking frequency"
@@ -2691,8 +2698,8 @@ msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
 msgstr ""
-"Все още не сте извършили търсене. Моля, първо отидете на  %(x_url_open)"
-"sстраницата за търсене%(x_url_close)s."
+"Все още не сте извършили търсене. Моля, първо отидете на  "
+"%(x_url_open)sстраницата за търсене%(x_url_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:429
 #, python-format
@@ -2732,12 +2739,17 @@ msgid "Your Searches"
 msgstr "Вашите търсения"
 
 #: modules/webalert/lib/webalert_webinterface.py:88
-#: modules/webalert/lib/webalert_webinterface.py:139
-#: modules/webalert/lib/webalert_webinterface.py:191
-#: modules/webalert/lib/webalert_webinterface.py:228
-#: modules/webalert/lib/webalert_webinterface.py:276
-#: modules/webalert/lib/webalert_webinterface.py:324
-#: modules/webalert/lib/webalert_webinterface.py:365
+#: modules/webalert/lib/webalert_webinterface.py:135
+#: modules/webalert/lib/webalert_webinterface.py:156
+#: modules/webalert/lib/webalert_webinterface.py:204
+#: modules/webalert/lib/webalert_webinterface.py:225
+#: modules/webalert/lib/webalert_webinterface.py:262
+#: modules/webalert/lib/webalert_webinterface.py:308
+#: modules/webalert/lib/webalert_webinterface.py:323
+#: modules/webalert/lib/webalert_webinterface.py:370
+#: modules/webalert/lib/webalert_webinterface.py:385
+#: modules/webalert/lib/webalert_webinterface.py:429
+#: modules/webalert/lib/webalert_webinterface.py:445
 #: modules/webbasket/lib/webbasket_webinterface.py:92
 #: modules/webbasket/lib/webbasket_webinterface.py:152
 #: modules/webbasket/lib/webbasket_webinterface.py:211
@@ -2750,20 +2762,20 @@ msgstr "Вашите търсения"
 #: modules/webmessage/lib/webmessage_templates.py:467
 #: modules/websession/lib/websession_templates.py:570
 #: modules/websession/lib/websession_templates.py:2075
-#: modules/websession/lib/websession_webinterface.py:210
-#: modules/websession/lib/websession_webinterface.py:227
-#: modules/websession/lib/websession_webinterface.py:263
-#: modules/websession/lib/websession_webinterface.py:450
-#: modules/websession/lib/websession_webinterface.py:473
-#: modules/websession/lib/websession_webinterface.py:501
-#: modules/websession/lib/websession_webinterface.py:517
-#: modules/websession/lib/websession_webinterface.py:569
-#: modules/websession/lib/websession_webinterface.py:592
-#: modules/websession/lib/websession_webinterface.py:618
-#: modules/websession/lib/websession_webinterface.py:674
-#: modules/websession/lib/websession_webinterface.py:709
-#: modules/websession/lib/websession_webinterface.py:740
-#: modules/websession/lib/websession_webinterface.py:811
+#: modules/websession/lib/websession_webinterface.py:217
+#: modules/websession/lib/websession_webinterface.py:234
+#: modules/websession/lib/websession_webinterface.py:270
+#: modules/websession/lib/websession_webinterface.py:457
+#: modules/websession/lib/websession_webinterface.py:480
+#: modules/websession/lib/websession_webinterface.py:508
+#: modules/websession/lib/websession_webinterface.py:524
+#: modules/websession/lib/websession_webinterface.py:576
+#: modules/websession/lib/websession_webinterface.py:599
+#: modules/websession/lib/websession_webinterface.py:625
+#: modules/websession/lib/websession_webinterface.py:681
+#: modules/websession/lib/websession_webinterface.py:716
+#: modules/websession/lib/websession_webinterface.py:747
+#: modules/websession/lib/websession_webinterface.py:818
 #: modules/websubmit/web/publiline.py:132
 #: modules/websubmit/web/publiline.py:153
 #: modules/websubmit/web/yourapprovals.py:97
@@ -2777,62 +2789,85 @@ msgid "%s Personalize, Display searches"
 msgstr ""
 
 #: modules/webalert/lib/webalert_webinterface.py:91
-#: modules/webalert/lib/webalert_webinterface.py:142
-#: modules/webalert/lib/webalert_webinterface.py:194
-#: modules/webalert/lib/webalert_webinterface.py:231
-#: modules/webalert/lib/webalert_webinterface.py:279
-#: modules/webalert/lib/webalert_webinterface.py:327
-#: modules/webalert/lib/webalert_webinterface.py:368
-#: modules/websession/lib/websession_webinterface.py:213
-#: modules/websession/lib/websession_webinterface.py:230
-#: modules/websession/lib/websession_webinterface.py:265
-#: modules/websession/lib/websession_webinterface.py:452
-#: modules/websession/lib/websession_webinterface.py:475
-#: modules/websession/lib/websession_webinterface.py:504
-#: modules/websession/lib/websession_webinterface.py:520
-#: modules/websession/lib/websession_webinterface.py:538
-#: modules/websession/lib/websession_webinterface.py:548
-#: modules/websession/lib/websession_webinterface.py:571
-#: modules/websession/lib/websession_webinterface.py:594
-#: modules/websession/lib/websession_webinterface.py:620
+#: modules/webalert/lib/webalert_webinterface.py:138
+#: modules/webalert/lib/webalert_webinterface.py:159
+#: modules/webalert/lib/webalert_webinterface.py:207
+#: modules/webalert/lib/webalert_webinterface.py:228
+#: modules/webalert/lib/webalert_webinterface.py:265
+#: modules/webalert/lib/webalert_webinterface.py:311
+#: modules/webalert/lib/webalert_webinterface.py:326
+#: modules/webalert/lib/webalert_webinterface.py:373
+#: modules/webalert/lib/webalert_webinterface.py:388
+#: modules/webalert/lib/webalert_webinterface.py:432
+#: modules/webalert/lib/webalert_webinterface.py:448
+#: modules/websession/lib/websession_webinterface.py:220
+#: modules/websession/lib/websession_webinterface.py:237
+#: modules/websession/lib/websession_webinterface.py:272
+#: modules/websession/lib/websession_webinterface.py:459
+#: modules/websession/lib/websession_webinterface.py:482
+#: modules/websession/lib/websession_webinterface.py:511
+#: modules/websession/lib/websession_webinterface.py:527
+#: modules/websession/lib/websession_webinterface.py:545
+#: modules/websession/lib/websession_webinterface.py:555
+#: modules/websession/lib/websession_webinterface.py:578
+#: modules/websession/lib/websession_webinterface.py:601
+#: modules/websession/lib/websession_webinterface.py:627
 #, python-format
 msgid "%s, personalize"
 msgstr "%s, персонализиране"
 
-#: modules/webalert/lib/webalert_webinterface.py:134
-msgid "Set a new alert"
-msgstr "Задаване на ново известие"
+#: modules/webalert/lib/webalert_webinterface.py:130
+#: modules/webalert/lib/webalert_webinterface.py:199
+#: modules/webalert/lib/webalert_webinterface.py:303
+#: modules/webalert/lib/webalert_webinterface.py:365
+#: modules/webalert/lib/webalert_webinterface.py:424
+#: modules/webstyle/lib/webstyle_templates.py:525
+#: modules/webstyle/lib/webstyle_templates.py:562
+#: modules/webstyle/lib/webstyle_templates.py:564
+#: modules/websubmit/lib/websubmit_engine.py:1534
+#: modules/websubmit/lib/websubmit_webinterface.py:502
+msgid "Error"
+msgstr "Грешка"
 
-#: modules/webalert/lib/webalert_webinterface.py:141
+#: modules/webalert/lib/webalert_webinterface.py:137
+#: modules/webalert/lib/webalert_webinterface.py:158
+#: modules/webalert/lib/webalert_webinterface.py:206
+#: modules/webalert/lib/webalert_webinterface.py:310
+#: modules/webalert/lib/webalert_webinterface.py:372
+#: modules/webalert/lib/webalert_webinterface.py:431
 #, python-format
 msgid "%s Personalize, Set a new alert"
 msgstr ""
 
-#: modules/webalert/lib/webalert_webinterface.py:186
+#: modules/webalert/lib/webalert_webinterface.py:151
+msgid "Set a new alert"
+msgstr "Задаване на ново известие"
+
+#: modules/webalert/lib/webalert_webinterface.py:220
 msgid "Modify alert settings"
 msgstr "Промяна на настройките за известието"
 
-#: modules/webalert/lib/webalert_webinterface.py:193
+#: modules/webalert/lib/webalert_webinterface.py:227
 #, python-format
 msgid "%s Personalize, Modify alert settings"
 msgstr ""
 
-#: modules/webalert/lib/webalert_webinterface.py:223
+#: modules/webalert/lib/webalert_webinterface.py:257
 #: modules/websession/lib/websession_templates.py:449
 msgid "Your Alerts"
 msgstr "Вашите известия"
 
-#: modules/webalert/lib/webalert_webinterface.py:230
-#: modules/webalert/lib/webalert_webinterface.py:278
-#: modules/webalert/lib/webalert_webinterface.py:326
-#: modules/webalert/lib/webalert_webinterface.py:367
+#: modules/webalert/lib/webalert_webinterface.py:264
+#: modules/webalert/lib/webalert_webinterface.py:325
+#: modules/webalert/lib/webalert_webinterface.py:387
+#: modules/webalert/lib/webalert_webinterface.py:447
 #, python-format
 msgid "%s Personalize, Display alerts"
 msgstr ""
 
-#: modules/webalert/lib/webalert_webinterface.py:271
-#: modules/webalert/lib/webalert_webinterface.py:319
-#: modules/webalert/lib/webalert_webinterface.py:359
+#: modules/webalert/lib/webalert_webinterface.py:318
+#: modules/webalert/lib/webalert_webinterface.py:380
+#: modules/webalert/lib/webalert_webinterface.py:440
 msgid "Display alerts"
 msgstr "Показване на известията"
 
@@ -2858,8 +2893,8 @@ msgstr "Чужди кошници"
 #: modules/webbasket/lib/webbasket.py:852
 #, python-format
 msgid ""
-"You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
-"s group baskets and %(x_nb_public)s other users public baskets."
+"You have %(x_nb_perso)s personal baskets and are subscribed to "
+"%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
 msgstr ""
 "Вие имате %(x_nb_perso)s лични кошници и сте абониран за %(x_nb_group)s "
 "групови кошници и %(x_nb_public)s кошници на други потребители."
@@ -2881,11 +2916,11 @@ msgstr "Кошницата е празна"
 #: modules/webbasket/lib/webbasket_templates.py:254
 #, python-format
 msgid ""
-"This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
-"(x_url_close)s to it"
+"This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
+"%(x_url_close)s to it"
 msgstr ""
-"Тази кошница принадлежи на %(x_name)s. Можете свободно да се  %(x_url_open)"
-"sабонирате%(x_url_close)s за нея"
+"Тази кошница принадлежи на %(x_name)s. Можете свободно да се  "
+"%(x_url_open)sабонирате%(x_url_close)s за нея"
 
 #: modules/webbasket/lib/webbasket_templates.py:281
 #: modules/webbasket/lib/webbasket_webinterface.py:777
@@ -3297,11 +3332,11 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Ако желаете, може да  %(x_url_open)sвлезете или да се регистрирате тук%"
-"(x_url_close)s."
+"Ако желаете, може да  %(x_url_open)sвлезете или да се регистрирате тук"
+"%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1485
-#: modules/websession/lib/websession_webinterface.py:252
+#: modules/websession/lib/websession_webinterface.py:259
 msgid "This functionality is forbidden to guest users."
 msgstr "Тази функционалност е забранена за гости."
 
@@ -3504,11 +3539,11 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:843
 #, python-format
 msgid ""
-"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
-"(x_nickname)s will be displayed as the author of this comment."
+"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
+"%(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
-"Забележка: не сте %(x_url_open)sзадали своя прякор%(x_url_close)s. %"
-"(x_nickname)s ще бъде показан като автор на този коментар."
+"Забележка: не сте %(x_url_open)sзадали своя прякор%(x_url_close)s. "
+"%(x_nickname)s ще бъде показан като автор на този коментар."
 
 #: modules/webcomment/lib/webcomment_templates.py:806
 #: modules/webcomment/lib/webcomment_templates.py:899
@@ -3762,12 +3797,12 @@ msgid ""
 "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
-"Преди да добавите коментар, първо трябва да %(x_url_open)sвлезете%"
-"(x_url_close)s first"
+"Преди да добавите коментар, първо трябва да %(x_url_open)sвлезете"
+"%(x_url_close)s first"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:266
-#: modules/websession/lib/websession_webinterface.py:672
-#: modules/websession/lib/websession_webinterface.py:707
+#: modules/websession/lib/websession_webinterface.py:679
+#: modules/websession/lib/websession_webinterface.py:714
 msgid "Login"
 msgstr "Вход"
 
@@ -3788,7 +3823,7 @@ msgstr "Администриране на WebComment"
 #: modules/websearch/lib/websearch_webinterface.py:738
 #: modules/websearch/lib/websearch_webinterface.py:822
 #: modules/websearch/web/admin/websearchadmin.py:1070
-#: modules/websession/lib/websession_webinterface.py:805
+#: modules/websession/lib/websession_webinterface.py:812
 #: modules/webstyle/lib/webstyle_templates.py:527
 #: modules/webjournal/web/admin/webjournaladmin.py:374
 msgid "Internal Error"
@@ -4017,70 +4052,70 @@ msgstr "Имате %(x_nb_new)s нови съобщения от общо %(x_nb
 msgid "Read a message"
 msgstr "Прочитане на съобщение"
 
-#: modules/websearch/lib/search_engine.py:601
-#: modules/websearch/lib/search_engine.py:631
-#: modules/websearch/lib/search_engine.py:3737
-#: modules/websearch/lib/search_engine.py:3787
-#: modules/websearch/lib/search_engine.py:3832
+#: modules/websearch/lib/search_engine.py:640
+#: modules/websearch/lib/search_engine.py:670
+#: modules/websearch/lib/search_engine.py:3776
+#: modules/websearch/lib/search_engine.py:3826
+#: modules/websearch/lib/search_engine.py:3871
 msgid "Search Results"
 msgstr "Резултати от търсенето"
 
-#: modules/websearch/lib/search_engine.py:716
+#: modules/websearch/lib/search_engine.py:755
 #: modules/websearch/lib/websearch_templates.py:1100
 msgid "any day"
 msgstr "всички дни"
 
-#: modules/websearch/lib/search_engine.py:722
+#: modules/websearch/lib/search_engine.py:761
 #: modules/websearch/lib/websearch_templates.py:1112
 msgid "any month"
 msgstr "всички месеци"
 
-#: modules/websearch/lib/search_engine.py:730
+#: modules/websearch/lib/search_engine.py:769
 #: modules/websearch/lib/websearch_templates.py:1126
 msgid "any year"
 msgstr "всички години"
 
-#: modules/websearch/lib/search_engine.py:771
-#: modules/websearch/lib/search_engine.py:786
+#: modules/websearch/lib/search_engine.py:810
+#: modules/websearch/lib/search_engine.py:825
 msgid "any collection"
 msgstr "всички колекции"
 
-#: modules/websearch/lib/search_engine.py:782
+#: modules/websearch/lib/search_engine.py:821
 msgid "add another collection"
 msgstr "добавяне на още една колекция"
 
-#: modules/websearch/lib/search_engine.py:792
+#: modules/websearch/lib/search_engine.py:831
 #: modules/websearch/lib/websearch_webcoll.py:532
 msgid "rank by"
 msgstr "класиране по"
 
-#: modules/websearch/lib/search_engine.py:812
+#: modules/websearch/lib/search_engine.py:851
 msgid "HTML brief"
 msgstr "кратък HTML"
 
-#: modules/websearch/lib/search_engine.py:925
+#: modules/websearch/lib/search_engine.py:964
 #: modules/websearch/lib/websearch_webcoll.py:502
 msgid "latest first"
 msgstr "първо най-новите"
 
-#: modules/websearch/lib/search_engine.py:1545
+#: modules/websearch/lib/search_engine.py:1584
 msgid "No values found."
 msgstr "Не бяха намерени стойности."
 
-#: modules/websearch/lib/search_engine.py:1677
+#: modules/websearch/lib/search_engine.py:1716
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
-"Не беше намерено точно съвпадение за %(x_query1)s, вместо това използваме %"
-"(x_query2)s..."
+"Не беше намерено точно съвпадение за %(x_query1)s, вместо това използваме "
+"%(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1806
+#: modules/websearch/lib/search_engine.py:1845
 msgid ""
 "Nested or mismatched parentheses detected. Ignoring all parentheses in the "
 "query..."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2029
+#: modules/websearch/lib/search_engine.py:2068
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -4089,7 +4124,7 @@ msgstr ""
 "Не беше намерено съвпадение в колекцията %(x_collection)s. Други публични "
 "колекции дадоха %(x_url_open)s%(x_nb_hits)d поапдения%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2038
+#: modules/websearch/lib/search_engine.py:2077
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -4097,15 +4132,15 @@ msgstr ""
 "Вашата заявка не съвпадна с нито една обща колекция. Ако търсите частен "
 "документ, моля, първо изберете желаната ограничена колекция."
 
-#: modules/websearch/lib/search_engine.py:2151
+#: modules/websearch/lib/search_engine.py:2190
 msgid "No words index available for"
 msgstr "Индексът за думата не е наличен за"
 
-#: modules/websearch/lib/search_engine.py:2155
+#: modules/websearch/lib/search_engine.py:2194
 msgid "No phrase index available for"
 msgstr "Индексът за фразата не е наличен за"
 
-#: modules/websearch/lib/search_engine.py:2187
+#: modules/websearch/lib/search_engine.py:2226
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -4114,7 +4149,7 @@ msgstr ""
 "Търсенето на %(x_term)s в индекса %(x_index)s не съвпадна с нито един запис. "
 "Най-близките до него попадения в коя да е колекция са:"
 
-#: modules/websearch/lib/search_engine.py:2191
+#: modules/websearch/lib/search_engine.py:2230
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -4122,7 +4157,7 @@ msgstr ""
 "Търсенето на %s не съвпадна с нито един запис. Най-близките попадения във "
 "всички колекции са:"
 
-#: modules/websearch/lib/search_engine.py:2655
+#: modules/websearch/lib/search_engine.py:2694
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -4131,7 +4166,7 @@ msgstr ""
 "Съжаляваме, сортирането е позволено само на множества от най-много %d "
 "записа. Използване на ред по подразбиране."
 
-#: modules/websearch/lib/search_engine.py:2679
+#: modules/websearch/lib/search_engine.py:2718
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -4140,30 +4175,30 @@ msgstr ""
 "Съжаляваме, %s не е валидна опция за сортиране. Използване на сортиране по "
 "заглавие."
 
-#: modules/websearch/lib/search_engine.py:2983
+#: modules/websearch/lib/search_engine.py:3022
 msgid "Use different search terms."
 msgstr "Използвайте други думи за търсене."
 
-#: modules/websearch/lib/search_engine.py:3051
-#: modules/websearch/lib/search_engine.py:3216
-#: modules/websearch/lib/search_engine.py:3239
-#: modules/websearch/lib/search_engine.py:3247
+#: modules/websearch/lib/search_engine.py:3090
 #: modules/websearch/lib/search_engine.py:3255
-#: modules/websearch/lib/search_engine.py:3301
+#: modules/websearch/lib/search_engine.py:3278
+#: modules/websearch/lib/search_engine.py:3286
+#: modules/websearch/lib/search_engine.py:3294
+#: modules/websearch/lib/search_engine.py:3340
 msgid "The record has been deleted."
 msgstr "Записът е изтрит."
 
-#: modules/websearch/lib/search_engine.py:3711
+#: modules/websearch/lib/search_engine.py:3750
 msgid "Requested record does not seem to exist."
 msgstr "Желаният запис не съществува."
 
-#: modules/websearch/lib/search_engine.py:3945
+#: modules/websearch/lib/search_engine.py:3984
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Няма съвпадения, удовлетворяващи зададените от вас критерии за време, "
 "премахване на това условие..."
 
-#: modules/websearch/lib/search_engine.py:3969
+#: modules/websearch/lib/search_engine.py:4008
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Няма съвпадения, удовлетворящи зададените от вас граници за търсене, "
@@ -4396,8 +4431,8 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)sПреглед на резултатите:%(x_fmt_close)s Намерени са %"
-"(x_nb_records)s записа за %(x_nb_seconds)s секунди."
+"%(x_fmt_open)sПреглед на резултатите:%(x_fmt_close)s Намерени са "
+"%(x_nb_records)s записа за %(x_nb_seconds)s секунди."
 
 #: modules/websearch/lib/websearch_templates.py:2637
 msgid ""
@@ -4579,8 +4614,8 @@ msgstr "кратко"
 #: modules/websession/lib/webaccount.py:115
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
-"s as a regular user."
+"You are logged in as guest. You may want to %(x_url_open)slogin"
+"%(x_url_close)s as a regular user."
 msgstr ""
 "Вие сте влязъл като гост. Може да %(x_url_open)sвлезете%(x_url_close)s като "
 "редовен потребител."
@@ -4588,8 +4623,8 @@ msgstr ""
 #: modules/websession/lib/webaccount.py:119
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
-"(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
+"%(x_url_close)s first"
 msgstr ""
 "Потребителите %(x_fmt_open)sвлезли като гост%(x_fmt_close)s трябва първо да "
 "се %(x_url_open)sрегистрират%(x_url_close)s"
@@ -4613,11 +4648,11 @@ msgstr "Настройки на външна сметка"
 #: modules/websession/lib/websession_templates.py:99
 #, python-format
 msgid ""
-"You can consult the list of your external groups directly in the %"
-"(x_url_open)sgroups page%(x_url_close)s."
+"You can consult the list of your external groups directly in the "
+"%(x_url_open)sgroups page%(x_url_close)s."
 msgstr ""
-"Може да направите справка за списъка на външните ви групи директно от %"
-"(x_url_open)sстраницата за групи%(x_url_close)s."
+"Може да направите справка за списъка на външните ви групи директно от "
+"%(x_url_open)sстраницата за групи%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:103
 msgid "External user groups"
@@ -4720,8 +4755,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:235
 #, python-format
 msgid ""
-"You can change or reset your CERN account password by means of the %"
-"(x_url_open)sCERN account system%(x_url_close)s."
+"You can change or reset your CERN account password by means of the "
+"%(x_url_open)sCERN account system%(x_url_close)s."
 msgstr ""
 "Можете да смените или установите наново вашата парола за сметка в CERN с "
 "помощта на %(x_url_open)sсистемата за регистрация на CERN%(x_url_close)s."
@@ -4827,7 +4862,7 @@ msgstr ""
 "което ще се извършва периодично и ще ви уведомява за резултатите по e-mail."
 
 #: modules/websession/lib/websession_templates.py:427
-#: modules/websession/lib/websession_webinterface.py:260
+#: modules/websession/lib/websession_webinterface.py:267
 msgid "Your Settings"
 msgstr "Вашите настройки"
 
@@ -4883,12 +4918,12 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:508
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
-"(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
-"s."
+"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
+"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
+"%(x_url2_close)s."
 msgstr ""
-"Вие сте влязъл като %(x_user)s. Може да  а) %(x_url1_open)sизлезете%"
-"(x_url1_close)s; б) редактирате  %(x_url2_open)sнастройките%(x_url2_close)s "
+"Вие сте влязъл като %(x_user)s. Може да  а) %(x_url1_open)sизлезете"
+"%(x_url1_close)s; б) редактирате  %(x_url2_open)sнастройките%(x_url2_close)s "
 "на вашата сметка."
 
 #: modules/websession/lib/websession_templates.py:573
@@ -4901,12 +4936,12 @@ msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
 "administering or are a member of."
 msgstr ""
-"Може да направите справка със списъка на %(x_url_open)sгрупите%(x_url_close)"
-"s, които администрирате, или на които сте член."
+"Може да направите справка със списъка на %(x_url_open)sгрупите"
+"%(x_url_close)s, които администрирате, или на които сте член."
 
 #: modules/websession/lib/websession_templates.py:578
 #: modules/websession/lib/websession_templates.py:2073
-#: modules/websession/lib/websession_webinterface.py:849
+#: modules/websession/lib/websession_webinterface.py:856
 msgid "Your Groups"
 msgstr "Вашите групи"
 
@@ -4916,8 +4951,8 @@ msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
 msgstr ""
-"Може да направите справка със списъка на %(x_url_open)sвашите публикации%"
-"(x_url_close)s и да проверите техния статус."
+"Може да направите справка със списъка на %(x_url_open)sвашите публикации"
+"%(x_url_close)s и да проверите техния статус."
 
 #: modules/websession/lib/websession_templates.py:582
 #: modules/websubmit/web/yoursubmissions.py:172
@@ -4930,8 +4965,8 @@ msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
 "the documents you approved or refereed."
 msgstr ""
-"Може да направите справка със списъка на %(x_url_open)sдокументите%"
-"(x_url_close)s, които сте одобрили или рецензирали."
+"Може да направите справка със списъка на %(x_url_open)sдокументите"
+"%(x_url_close)s, които сте одобрили или рецензирали."
 
 #: modules/websession/lib/websession_templates.py:586
 #: modules/websubmit/web/yourapprovals.py:94
@@ -4939,7 +4974,7 @@ msgid "Your Approvals"
 msgstr "Вашите одобрения"
 
 #: modules/websession/lib/websession_templates.py:587
-#: modules/websession/lib/websession_webinterface.py:567
+#: modules/websession/lib/websession_webinterface.py:574
 msgid "Your Administrative Activities"
 msgstr "Вашите действия за администриране"
 
@@ -5021,14 +5056,14 @@ msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
 "CERN lightweight account%(x_url_close)s."
 msgstr ""
-"Ако все още не притежавате сметка в CERN, можете да регистрирате %"
-"(x_url_open)sолекотена такава%(x_url_close)s."
+"Ако все още не притежавате сметка в CERN, можете да регистрирате "
+"%(x_url_open)sолекотена такава%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:783
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
-"s an internal account."
+"If you don't own an account yet, please %(x_url_open)sregister"
+"%(x_url_close)s an internal account."
 msgstr ""
 "Ако все още нямате сметка, моля %(x_url_open)sрегистрирайте%(x_url_close)s "
 "вътрешна такава."
@@ -5062,13 +5097,13 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:840
 #: modules/websession/lib/websession_templates.py:1082
 #: modules/websession/lib/websession_webinterface.py:105
-#: modules/websession/lib/websession_webinterface.py:192
-#: modules/websession/lib/websession_webinterface.py:708
+#: modules/websession/lib/websession_webinterface.py:199
+#: modules/websession/lib/websession_webinterface.py:715
 msgid "login"
 msgstr "вход"
 
 #: modules/websession/lib/websession_templates.py:845
-#: modules/websession/lib/websession_webinterface.py:471
+#: modules/websession/lib/websession_webinterface.py:478
 msgid "Lost your password?"
 msgstr "Забравена парола?"
 
@@ -5114,7 +5149,7 @@ msgid "Retype Password"
 msgstr "Въведете повторно паролата"
 
 #: modules/websession/lib/websession_templates.py:977
-#: modules/websession/lib/websession_webinterface.py:810
+#: modules/websession/lib/websession_webinterface.py:817
 msgid "register"
 msgstr "регистриране"
 
@@ -5160,8 +5195,8 @@ msgstr "Ето няколко интересни връзки за админи�
 #: modules/websession/lib/websession_templates.py:1042
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
-"(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
+"%(x_url_close)s."
 msgstr ""
 "За повече администраторски действия, вижте пълната %(x_url_open)sзона за "
 "администриране%(x_url_close)s."
@@ -5244,7 +5279,7 @@ msgstr "Редактиране на членовете на %s"
 #: modules/websession/lib/websession_templates.py:1314
 #: modules/websession/lib/websession_templates.py:1454
 #: modules/websession/lib/websession_templates.py:1456
-#: modules/websession/lib/websession_webinterface.py:904
+#: modules/websession/lib/websession_webinterface.py:911
 msgid "Create new group"
 msgstr "Създаване на нова група"
 
@@ -5362,11 +5397,11 @@ msgstr "Покана на нови членове"
 #: modules/websession/lib/websession_templates.py:1823
 #, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %"
-"(x_url_open)sweb message%(x_url_close)s system."
+"If you want to invite new members to join your group, please use the "
+"%(x_url_open)sweb message%(x_url_close)s system."
 msgstr ""
-"Ако искате да поканите нови членове към групата, моля използвайте %"
-"(x_url_open)sсистемата за съобщения%(x_url_close)s."
+"Ако искате да поканите нови членове към групата, моля използвайте "
+"%(x_url_open)sсистемата за съобщения%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1827
 #, python-format
@@ -5440,8 +5475,8 @@ msgstr "Молбата ви за присъединяване към група 
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr ""
-"Може да направите справка със списъка на %(x_url_open)sвашите групи%"
-"(x_url_close)s."
+"Може да направите справка със списъка на %(x_url_open)sвашите групи"
+"%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:2145
 #, python-format
@@ -5456,8 +5491,9 @@ msgstr "Групата %s е изтрита от нейния администр
 #: modules/websession/lib/websession_templates.py:2164
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
-"s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
+"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
+"(%(x_nb_admin)i)."
 msgstr ""
 "Можете да направите справка със списъка на %(x_url_open)s%(x_nb_total)i "
 "групите%(x_url_close)s, за които сте абониран (%(x_nb_member)i) или "
@@ -5534,8 +5570,8 @@ msgstr ""
 #, python-format
 msgid "You can now go to %(x_url_open)syour account page%(x_url_close)s."
 msgstr ""
-"Сега може да влезете в %(x_url_open)sстраницата на вашата сметка%"
-"(x_url_close)s."
+"Сега може да влезете в %(x_url_open)sстраницата на вашата сметка"
+"%(x_url_close)s."
 
 #: modules/websession/lib/websession_webinterface.py:125
 #: modules/websession/lib/websession_webinterface.py:134
@@ -5555,47 +5591,55 @@ msgstr ""
 msgid "This request for an authorization is not valid or is expired."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:158
+#: modules/websession/lib/websession_webinterface.py:155
 msgid "Reset password"
 msgstr "Установяване на нова парола"
 
-#: modules/websession/lib/websession_webinterface.py:162
+#: modules/websession/lib/websession_webinterface.py:161
+msgid "This request for resetting a password has already been used."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:164
+msgid "This request for resetting a password is not valid or is expired."
+msgstr ""
+
+#: modules/websession/lib/websession_webinterface.py:169
 msgid "This request for resetting the password is not valid or is expired."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:175
+#: modules/websession/lib/websession_webinterface.py:182
 msgid "The two provided passwords aren't equal."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:190
+#: modules/websession/lib/websession_webinterface.py:197
 msgid "The password was successfully set! You can now proceed with the login."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:264
+#: modules/websession/lib/websession_webinterface.py:271
 #, python-format
 msgid "%s Personalize, Your Settings"
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:304
-#: modules/websession/lib/websession_webinterface.py:372
-#: modules/websession/lib/websession_webinterface.py:427
-#: modules/websession/lib/websession_webinterface.py:438
+#: modules/websession/lib/websession_webinterface.py:311
+#: modules/websession/lib/websession_webinterface.py:379
+#: modules/websession/lib/websession_webinterface.py:434
+#: modules/websession/lib/websession_webinterface.py:445
 msgid "Settings edited"
 msgstr "Настройките са редактирани"
 
-#: modules/websession/lib/websession_webinterface.py:306
-#: modules/websession/lib/websession_webinterface.py:371
-#: modules/websession/lib/websession_webinterface.py:407
-#: modules/websession/lib/websession_webinterface.py:429
-#: modules/websession/lib/websession_webinterface.py:440
+#: modules/websession/lib/websession_webinterface.py:313
+#: modules/websession/lib/websession_webinterface.py:378
+#: modules/websession/lib/websession_webinterface.py:414
+#: modules/websession/lib/websession_webinterface.py:436
+#: modules/websession/lib/websession_webinterface.py:447
 msgid "Show account"
 msgstr "Показване на сметка"
 
-#: modules/websession/lib/websession_webinterface.py:316
+#: modules/websession/lib/websession_webinterface.py:323
 msgid "Switched to internal login method."
 msgstr "Методът за влизане е променен на вътрешен."
 
-#: modules/websession/lib/websession_webinterface.py:317
+#: modules/websession/lib/websession_webinterface.py:324
 msgid ""
 "Please note that if this is the first time that you are using this account "
 "with the internal login method then the system has set for you a randomly "
@@ -5603,129 +5647,129 @@ msgid ""
 "reset request link sent to you via email:"
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:325
+#: modules/websession/lib/websession_webinterface.py:332
 msgid "Send Password"
 msgstr "Изпращане на парола"
 
-#: modules/websession/lib/websession_webinterface.py:335
+#: modules/websession/lib/websession_webinterface.py:342
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:339
+#: modules/websession/lib/websession_webinterface.py:346
 #, python-format
 msgid ""
 "Unable to switch to external login method %s, because your email address is "
 "unknown to the external login system."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:343
+#: modules/websession/lib/websession_webinterface.py:350
 msgid "Login method successfully selected."
 msgstr "Методът за влизане е успешно избран."
 
-#: modules/websession/lib/websession_webinterface.py:345
+#: modules/websession/lib/websession_webinterface.py:352
 #, python-format
 msgid ""
 "The external login method %s does not support email address based logins.  "
 "Please contact the site administrators."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:369
+#: modules/websession/lib/websession_webinterface.py:376
 msgid "Settings successfully edited."
 msgstr "Настройките бяха успешно редактирани."
 
-#: modules/websession/lib/websession_webinterface.py:374
-#: modules/websession/lib/websession_webinterface.py:780
+#: modules/websession/lib/websession_webinterface.py:381
+#: modules/websession/lib/websession_webinterface.py:787
 #, python-format
 msgid "Desired nickname %s is invalid."
 msgstr "Желаният псевдоним %s не е валиден."
 
-#: modules/websession/lib/websession_webinterface.py:375
-#: modules/websession/lib/websession_webinterface.py:381
-#: modules/websession/lib/websession_webinterface.py:394
-#: modules/websession/lib/websession_webinterface.py:411
-#: modules/websession/lib/websession_webinterface.py:417
-#: modules/websession/lib/websession_webinterface.py:771
-#: modules/websession/lib/websession_webinterface.py:776
-#: modules/websession/lib/websession_webinterface.py:781
-#: modules/websession/lib/websession_webinterface.py:792
+#: modules/websession/lib/websession_webinterface.py:382
+#: modules/websession/lib/websession_webinterface.py:388
+#: modules/websession/lib/websession_webinterface.py:401
+#: modules/websession/lib/websession_webinterface.py:418
+#: modules/websession/lib/websession_webinterface.py:424
+#: modules/websession/lib/websession_webinterface.py:778
+#: modules/websession/lib/websession_webinterface.py:783
+#: modules/websession/lib/websession_webinterface.py:788
+#: modules/websession/lib/websession_webinterface.py:799
 msgid "Please try again."
 msgstr "Моля, опитайте отново."
 
-#: modules/websession/lib/websession_webinterface.py:377
-#: modules/websession/lib/websession_webinterface.py:383
+#: modules/websession/lib/websession_webinterface.py:384
 #: modules/websession/lib/websession_webinterface.py:390
-#: modules/websession/lib/websession_webinterface.py:396
-#: modules/websession/lib/websession_webinterface.py:413
-#: modules/websession/lib/websession_webinterface.py:419
-#: modules/websession/lib/websession_webinterface.py:445
+#: modules/websession/lib/websession_webinterface.py:397
+#: modules/websession/lib/websession_webinterface.py:403
+#: modules/websession/lib/websession_webinterface.py:420
+#: modules/websession/lib/websession_webinterface.py:426
+#: modules/websession/lib/websession_webinterface.py:452
 msgid "Edit settings"
 msgstr "Редактиране на настройките"
 
-#: modules/websession/lib/websession_webinterface.py:378
-#: modules/websession/lib/websession_webinterface.py:384
+#: modules/websession/lib/websession_webinterface.py:385
 #: modules/websession/lib/websession_webinterface.py:391
-#: modules/websession/lib/websession_webinterface.py:397
-#: modules/websession/lib/websession_webinterface.py:446
+#: modules/websession/lib/websession_webinterface.py:398
+#: modules/websession/lib/websession_webinterface.py:404
+#: modules/websession/lib/websession_webinterface.py:453
 msgid "Editing settings failed"
 msgstr "Грешка при промяна на настройките"
 
-#: modules/websession/lib/websession_webinterface.py:380
-#: modules/websession/lib/websession_webinterface.py:775
+#: modules/websession/lib/websession_webinterface.py:387
+#: modules/websession/lib/websession_webinterface.py:782
 #, python-format
 msgid "Supplied email address %s is invalid."
 msgstr "Посоченият e-mail адрес %s е невалиден."
 
-#: modules/websession/lib/websession_webinterface.py:386
-#: modules/websession/lib/websession_webinterface.py:785
+#: modules/websession/lib/websession_webinterface.py:393
+#: modules/websession/lib/websession_webinterface.py:792
 #, python-format
 msgid "Supplied email address %s already exists in the database."
 msgstr "Посоченият e-mail %s вече съществува в базата данни."
 
-#: modules/websession/lib/websession_webinterface.py:388
-#: modules/websession/lib/websession_webinterface.py:787
+#: modules/websession/lib/websession_webinterface.py:395
+#: modules/websession/lib/websession_webinterface.py:794
 msgid "Or please try again."
 msgstr "Или опитайте отново."
 
-#: modules/websession/lib/websession_webinterface.py:393
+#: modules/websession/lib/websession_webinterface.py:400
 #, python-format
 msgid "Desired nickname %s is already in use."
 msgstr "Желаният псевдоним %s вече съществува."
 
-#: modules/websession/lib/websession_webinterface.py:405
+#: modules/websession/lib/websession_webinterface.py:412
 msgid "Password successfully edited."
 msgstr "Паролата е успешно редактирана."
 
-#: modules/websession/lib/websession_webinterface.py:408
+#: modules/websession/lib/websession_webinterface.py:415
 msgid "Password edited"
 msgstr "Паролата е променена"
 
-#: modules/websession/lib/websession_webinterface.py:410
-#: modules/websession/lib/websession_webinterface.py:770
+#: modules/websession/lib/websession_webinterface.py:417
+#: modules/websession/lib/websession_webinterface.py:777
 msgid "Both passwords must match."
 msgstr "Двете пароли трябва да съвпадат."
 
-#: modules/websession/lib/websession_webinterface.py:414
-#: modules/websession/lib/websession_webinterface.py:420
+#: modules/websession/lib/websession_webinterface.py:421
+#: modules/websession/lib/websession_webinterface.py:427
 msgid "Editing password failed"
 msgstr "Промяната на паролата е неуспешно"
 
-#: modules/websession/lib/websession_webinterface.py:416
+#: modules/websession/lib/websession_webinterface.py:423
 msgid "Wrong old password inserted."
 msgstr "Грешно въведена стара парола."
 
-#: modules/websession/lib/websession_webinterface.py:430
-#: modules/websession/lib/websession_webinterface.py:441
+#: modules/websession/lib/websession_webinterface.py:437
+#: modules/websession/lib/websession_webinterface.py:448
 msgid "User settings saved correctly."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:443
+#: modules/websession/lib/websession_webinterface.py:450
 msgid "Unable to update settings."
 msgstr "Невъзможност за актуализиране на настройките."
 
-#: modules/websession/lib/websession_webinterface.py:500
+#: modules/websession/lib/websession_webinterface.py:507
 msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
@@ -5733,15 +5777,15 @@ msgstr ""
 "Връзката за установяване на нова парола не може да бъде изпратена, тъй като "
 "вие използвате външна система за удостоверяване."
 
-#: modules/websession/lib/websession_webinterface.py:516
+#: modules/websession/lib/websession_webinterface.py:523
 msgid "The entered email address does not exist in the database."
 msgstr "Въведеният e-mail не съществува в базата от данни."
 
-#: modules/websession/lib/websession_webinterface.py:530
+#: modules/websession/lib/websession_webinterface.py:537
 msgid "Password reset request for"
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:534
+#: modules/websession/lib/websession_webinterface.py:541
 msgid ""
 "The entered email address is incorrect, please check that it is written "
 "correctly (e.g. johndoe@example.com)."
@@ -5749,53 +5793,53 @@ msgstr ""
 "Въведеният e-mail е невалиден, моля проверете дали той е написан правилно "
 "(пр. johndoe@example.com)."
 
-#: modules/websession/lib/websession_webinterface.py:535
+#: modules/websession/lib/websession_webinterface.py:542
 msgid "Incorrect email address"
 msgstr "Невалиден e-mail адрес"
 
-#: modules/websession/lib/websession_webinterface.py:545
+#: modules/websession/lib/websession_webinterface.py:552
 msgid "Reset password link sent"
 msgstr "Връзката за установяване на нова парола е изпратена"
 
-#: modules/websession/lib/websession_webinterface.py:590
+#: modules/websession/lib/websession_webinterface.py:597
 msgid "Delete Account"
 msgstr "Изтриване на сметка"
 
-#: modules/websession/lib/websession_webinterface.py:616
+#: modules/websession/lib/websession_webinterface.py:623
 msgid "Logout"
 msgstr "Изход"
 
-#: modules/websession/lib/websession_webinterface.py:738
+#: modules/websession/lib/websession_webinterface.py:745
 msgid "Register"
 msgstr "Регистриране"
 
-#: modules/websession/lib/websession_webinterface.py:741
-#: modules/websession/lib/websession_webinterface.py:812
+#: modules/websession/lib/websession_webinterface.py:748
+#: modules/websession/lib/websession_webinterface.py:819
 #, python-format
 msgid "%s  Personalize, Main page"
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:757
+#: modules/websession/lib/websession_webinterface.py:764
 msgid "Your account has been successfully created."
 msgstr "Вашата сметка е успешно създадена."
 
-#: modules/websession/lib/websession_webinterface.py:758
+#: modules/websession/lib/websession_webinterface.py:765
 msgid "Account created"
 msgstr "Сметката е създадена"
 
-#: modules/websession/lib/websession_webinterface.py:760
+#: modules/websession/lib/websession_webinterface.py:767
 msgid ""
 "In order to confirm its validity, an email message containing an account "
 "activation key has been sent to the given email address."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:761
+#: modules/websession/lib/websession_webinterface.py:768
 msgid ""
 "Please follow instructions presented there in order to complete the account "
 "registration process."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:763
+#: modules/websession/lib/websession_webinterface.py:770
 msgid ""
 "A second email will be sent when the account has been activated and can be "
 "used."
@@ -5803,59 +5847,59 @@ msgstr ""
 "Втори e-mail ще бъде изпратен, когато сметката е активирана и може да бъде "
 "използвана."
 
-#: modules/websession/lib/websession_webinterface.py:766
+#: modules/websession/lib/websession_webinterface.py:773
 #, python-format
 msgid "You can now access your %(x_url_open)saccount%(x_url_close)s."
 msgstr "Сега може да влезете във вашата %(x_url_open)sсметка%(x_url_close)s."
 
-#: modules/websession/lib/websession_webinterface.py:773
-#: modules/websession/lib/websession_webinterface.py:778
-#: modules/websession/lib/websession_webinterface.py:783
-#: modules/websession/lib/websession_webinterface.py:789
-#: modules/websession/lib/websession_webinterface.py:794
-#: modules/websession/lib/websession_webinterface.py:798
-#: modules/websession/lib/websession_webinterface.py:802
-#: modules/websession/lib/websession_webinterface.py:807
+#: modules/websession/lib/websession_webinterface.py:780
+#: modules/websession/lib/websession_webinterface.py:785
+#: modules/websession/lib/websession_webinterface.py:790
+#: modules/websession/lib/websession_webinterface.py:796
+#: modules/websession/lib/websession_webinterface.py:801
+#: modules/websession/lib/websession_webinterface.py:805
+#: modules/websession/lib/websession_webinterface.py:809
+#: modules/websession/lib/websession_webinterface.py:814
 msgid "Registration failure"
 msgstr "Грешка при регистрация"
 
-#: modules/websession/lib/websession_webinterface.py:791
+#: modules/websession/lib/websession_webinterface.py:798
 #, python-format
 msgid "Desired nickname %s already exists in the database."
 msgstr "Желаният псевдоним %s вече съществува в базата от данни."
 
-#: modules/websession/lib/websession_webinterface.py:796
+#: modules/websession/lib/websession_webinterface.py:803
 msgid "Users cannot register themselves, only admin can register them."
 msgstr ""
 "Потребителите не могат да се регистрират сами, само администратор може да ги "
 "регистрира."
 
-#: modules/websession/lib/websession_webinterface.py:800
+#: modules/websession/lib/websession_webinterface.py:807
 msgid ""
 "The site is having troubles in sending you an email for confirming your "
 "email address."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:800
+#: modules/websession/lib/websession_webinterface.py:807
 #: modules/websubmit/lib/websubmit_webinterface.py:125
 msgid ""
 "The error has been logged and will be taken in consideration as soon as "
 "possible."
 msgstr ""
 
-#: modules/websession/lib/websession_webinterface.py:965
+#: modules/websession/lib/websession_webinterface.py:972
 msgid "Join New Group"
 msgstr "Присъединяване към нова група"
 
-#: modules/websession/lib/websession_webinterface.py:1014
+#: modules/websession/lib/websession_webinterface.py:1021
 msgid "Leave Group"
 msgstr "Напускане на група"
 
-#: modules/websession/lib/websession_webinterface.py:1081
+#: modules/websession/lib/websession_webinterface.py:1088
 msgid "Edit Group"
 msgstr "Редактиране на група"
 
-#: modules/websession/lib/websession_webinterface.py:1150
+#: modules/websession/lib/websession_webinterface.py:1157
 msgid "Edit group members"
 msgstr "Редактиране на членове на група"
 
@@ -5890,14 +5934,6 @@ msgstr "Поддръжка от"
 #: modules/webstyle/lib/webstyle_templates.py:500
 msgid "This site is also available in the following languages:"
 msgstr "Този сайт е достъпен на следните езици:"
-
-#: modules/webstyle/lib/webstyle_templates.py:525
-#: modules/webstyle/lib/webstyle_templates.py:562
-#: modules/webstyle/lib/webstyle_templates.py:564
-#: modules/websubmit/lib/websubmit_engine.py:1534
-#: modules/websubmit/lib/websubmit_webinterface.py:502
-msgid "Error"
-msgstr "Грешка"
 
 #: modules/webstyle/lib/webstyle_templates.py:529
 msgid "Browser"
@@ -5937,8 +5973,8 @@ msgstr "Моля свържете се с %s като цитирате след�
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr ""
-"Записът е създаден на %(x_date_creation)s, последна промяна на %"
-"(x_date_modification)s"
+"Записът е създаден на %(x_date_creation)s, последна промяна на "
+"%(x_date_modification)s"
 
 #: modules/webstyle/lib/webdoc.py:548
 #, python-format
@@ -5990,11 +6026,11 @@ msgstr "Съжаляваме, страницата %s не съществува.
 #: modules/webstyle/lib/webdoc_webinterface.py:192
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)"
-"s."
+"You may want to look at the %(x_url_open)s%(x_category)s pages"
+"%(x_url_close)s."
 msgstr ""
-"Може да погледнете в %(x_url_open)sстраниците за %(x_category)s%(x_url_close)"
-"s."
+"Може да погледнете в %(x_url_open)sстраниците за %(x_category)s"
+"%(x_url_close)s."
 
 #: modules/websubmit/lib/websubmit_engine.py:186
 #: modules/websubmit/lib/websubmit_engine.py:712
@@ -6185,11 +6221,11 @@ msgstr "Публикация номер"
 #: modules/websubmit/lib/websubmit_templates.py:1027
 #, python-format
 msgid ""
-"Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
-"(x_step)s"
+"Here is the %(x_action)s function list for %(x_doctype)s documents at level "
+"%(x_step)s"
 msgstr ""
-"Това е списъка с %(x_action)s функции за %(x_doctype)s документи на ниво %"
-"(x_step)s"
+"Това е списъка с %(x_action)s функции за %(x_doctype)s документи на ниво "
+"%(x_step)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1032
 msgid "Function"
