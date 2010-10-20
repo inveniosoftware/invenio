@@ -403,6 +403,7 @@ if test -z "$GNUPLOT"; then
 fi
 
 ## Substitute variables:
+AC_SUBST(VERSION)
 AC_SUBST(MYSQL)
 AC_SUBST(PHP)
 AC_SUBST(PYTHON)

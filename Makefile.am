@@ -1,5 +1,3 @@
-## $Id$
-
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -22,7 +20,8 @@ confignice_SCRIPTS=config.nice
 
 SUBDIRS = po config modules
 
-EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in
+EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
+             config.rpath
 
 # current jsMath version and packages
 JSMV = v3.5
@@ -36,13 +35,6 @@ $(top_srcdir)/.version:
 	echo $(VERSION) > $@-t && mv $@-t $@
 dist-hook:
 	echo $(VERSION) > $(distdir)/.tarball-version
-
-all:
-	@echo "****************************************************"
-	@echo "** CDS Invenio has been successfully built.       **"
-	@echo "**                                                **"
-	@echo "** You may proceed to 'make install' now.         **"
-	@echo "****************************************************"
 
 check-custom-templates:
 	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
