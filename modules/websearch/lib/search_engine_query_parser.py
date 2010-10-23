@@ -99,7 +99,7 @@ class SearchQueryParenthesisedParser(object):
         parse_query() is a wrapper for self.tokenize() and self.parse().
         """
         toklist = self.tokenize(query)
-        depth, balanced, d0_p = self.nesting_depth_and_balance(toklist)
+        depth, balanced, dummy_d0_p = self.nesting_depth_and_balance(toklist)
         if not balanced:
             raise SyntaxError("Mismatched parentheses in "+str(toklist))
         toklist, var_subs = self.substitute_variables(toklist)
@@ -196,7 +196,7 @@ class SearchQueryParenthesisedParser(object):
         the not in -(p | q) will be fully distributed (as -p + -q).
         """
 
-        maxdepth, balanced, d0_p = self.nesting_depth_and_balance(token_list)
+        maxdepth, dummy_balanced, d0_p = self.nesting_depth_and_balance(token_list)
         s = ' '.join(token_list)
         s = self._invenio_to_python_logical(s)
         last_maxdepth = 0
@@ -206,7 +206,7 @@ class SearchQueryParenthesisedParser(object):
             except SyntaxError:
                 raise SyntaxError(str(s)+" couldn't be converted to a logic expression.")
             last_maxdepth = maxdepth
-            maxdepth, balanced, d0_p = self.nesting_depth_and_balance(self.tokenize(s))
+            maxdepth, dummy_balanced, d0_p = self.nesting_depth_and_balance(self.tokenize(s))
         if d0_p == 1 and s[0] == '(' and s[-1] == ')': # s can come back with extra parens
             s = s[1:-1]
         s = self._python_logical_to_invenio(s)
@@ -596,7 +596,8 @@ class SpiresToInvenioSyntaxConverter:
 
         # regular expression that matches date searches which have been
         # keyword-substituted
-        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))\s*(?P<content>.+)(?= and not | and | or | not |$)', re.IGNORECASE)
+        #self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))\s*(?P<content>.+)(?= and not | and | or | not |$)', re.IGNORECASE)
+        self._re_keysubbed_date_expr = re.compile(r'\b(?P<term>(' + self._DATE_ADDED_FIELD + ')|(' + self._DATE_UPDATED_FIELD + ')|(' + self._DATE_FIELD + '))(?P<content>.+?)(?= and not | and | or | not |$)', re.IGNORECASE)
 
         # for finding (and changing) a variety of different SPIRES search keywords
         self._re_spires_find_keyword = re.compile('^(?P<find>f|fin|find)\s+(?P<query>.*)$', re.IGNORECASE)
@@ -727,8 +728,6 @@ class SpiresToInvenioSyntaxConverter:
                                 isodates.append(datestamp)
 
                 daterange = '->'.join(isodates)
-                #if re.search('[^\s]+-[^>][^\s]*', daterange):
-                #    daterange = '"' + daterange + '"'
                 result += match.group('term') + daterange
                 position = match.end()
             result += query[position : ]

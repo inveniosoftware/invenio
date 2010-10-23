@@ -528,6 +528,18 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         inv_search = 'year:1976-04'
         self._compare_searches(inv_search, spi_search)
 
+    def test_date_by_yr_mo_day_wholemonth_and_suffix(self):
+        """SPIRES search syntax - searching by date 1976-04-01 and t dog"""
+        spi_search = "find date 1976-04-01 and t dog"
+        inv_search = 'year:1976-04 and title:dog'
+        self._compare_searches(inv_search, spi_search)
+
+    def test_date_by_yr_mo_day_and_suffix(self):
+        """SPIRES search syntax - searching by date 1976-04-05 and t dog"""
+        spi_search = "find date 1976-04-05 and t dog"
+        inv_search = 'year:1976-04-05 and title:dog'
+        self._compare_searches(inv_search, spi_search)
+
     def test_date_by_eq_yr_mo(self):
         """SPIRES search syntax - searching by date 1976-04"""
         spi_search = "find date 1976-04"
