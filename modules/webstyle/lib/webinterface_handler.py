@@ -192,7 +192,10 @@ class WebInterfaceDirectory(object):
         # resolving, otherwise call the method as it is our final
         # renderer. We even pass it the parsed form arguments.
         if path:
-            return obj._traverse(req, path)
+            if hasattr(obj, '_traverse'):
+                return obj._traverse(req, path)
+            else:
+                raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
 
         form = util.FieldStorage(req, keep_blank_values=True)
         try:
