@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibUpload Admin Guide -->
@@ -38,12 +38,12 @@
 <a name="1"></a><h2>1. Overview</h2>
 
 <p>BibUpload enables you to upload bibliographic data in MARCXML
-format into CDS Invenio bibliographic database.  It is also used
-internally by other CDS Invenio modules as the sole entrance of
+format into Invenio bibliographic database.  It is also used
+internally by other Invenio modules as the sole entrance of
 metadata into the bibliographic databases.</p>
 
 <p>Note that before uploading a MARCXML file, you may want to run
-provided <code>/opt/cds-invenio/bin/xmlmarclint</code> on it in order
+provided <code>/opt/invenio/bin/xmlmarclint</code> on it in order
 to verify its correctness.</p>
 
 <a name="2"></a><h2>2. Configuring BibUpload</h2>
@@ -71,7 +71,7 @@ record twice, for example.
 <a name="3.1"></a><h3>3.1 Inserting new records</h3>
 
 <p>Consider that you have an MARCXML file containing new records that
-is to be uploaded into the CDS Invenio.  (For example, it might have
+is to be uploaded into the Invenio.  (For example, it might have
 been produced by <a href="bibconvert-admin">BibConvert</a>.)  To finish
 the upload, you would call the BibUpload script in the insert mode as
 follows:
@@ -257,7 +257,7 @@ write two FFT tags, both containing the same $x subfield.</p>
 
 <p>The bibupload process, when it encounters FFT tags, will
 automatically populate fulltext storage space
-(<code>/opt/cds-invenio/var/data/files</code>) and metadata record
+(<code>/opt/invenio/var/data/files</code>) and metadata record
 associated tables (<code>bibrec_bibdoc</code>, <code>bibdoc</code>) as
 appropriate.  It will also enrich the 856 tags (URL tags) of the MARC
 metadata of the record in question with references to the latest
@@ -375,17 +375,17 @@ The allowed user agents can also be defined using the <tt>CFG_BATCHUPLOADER_WEB_
 <a name="4.3"></a><h3>4.2 Daemon mode</h3>
 
 <p>The batchuploader daemon mode is intended to be a bibsched task for document or metadata upload. The parent directory where the daemon will look for folders <tt>metadata</tt> and <tt>documents</tt> must be specified in the invenio configuration file.</p>
-<p>An example of how directories should be arranged, considering that invenio was installed in folder <tt>/opt/cds-invenio</tt> would be:
+<p>An example of how directories should be arranged, considering that invenio was installed in folder <tt>/opt/invenio</tt> would be:
 <pre>
-     /opt/cds-invenio/var/batchupload
-            /opt/cds-invenio/var/batchupload/documents
-                    /opt/cds-invenio/var/batchupload/documents/append
-                    /opt/cds-invenio/var/batchupload/documents/revise
-            /opt/cds-invenio/var/batchupload/metadata
-                    /opt/cds-invenio/var/batchupload/metadata/append
-                    /opt/cds-invenio/var/batchupload/metadata/correct
-                    /opt/cds-invenio/var/batchupload/metadata/insert
-                    /opt/cds-invenio/var/batchupload/metadata/replace
+     /opt/invenio/var/batchupload
+            /opt/invenio/var/batchupload/documents
+                    /opt/invenio/var/batchupload/documents/append
+                    /opt/invenio/var/batchupload/documents/revise
+            /opt/invenio/var/batchupload/metadata
+                    /opt/invenio/var/batchupload/metadata/append
+                    /opt/invenio/var/batchupload/metadata/correct
+                    /opt/invenio/var/batchupload/metadata/insert
+                    /opt/invenio/var/batchupload/metadata/replace
 </pre>
 </p>
 <p>When running the batchuploader daemon there are two possible execution modes:

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: cds.support@cern.ch\n"
+"Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
@@ -2403,7 +2403,7 @@ msgid "The error report has been sent."
 msgstr ""
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-msgid "Many thanks for helping us make CDS Invenio better."
+msgid "Many thanks for helping us make Invenio better."
 msgstr ""
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
@@ -6166,20 +6166,20 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2438
 msgid ""
-"Warning : The password set for MySQL is the same as the default CDS-Invenio "
+"Warning : The password set for MySQL is the same as the default Invenio "
 "password. For security purposes, you might want to change the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2444
 msgid ""
-"Warning : The password set for the CDS Invenio database is the same as the "
-"default CDS-Invenio password. For security purposes, you might want to "
+"Warning : The password set for the Invenio database is the same as the "
+"default Invenio password. For security purposes, you might want to "
 "change the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2450
 msgid ""
-"Warning : The password set for the CDS-Invenio admin user is currently "
+"Warning : The password set for the Invenio admin user is currently "
 "empty. For security purposes, it is strongly recommended that you add a "
 "password."
 msgstr ""
@@ -6192,7 +6192,7 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2462
-msgid "A newer version of CDS-Invenio is available for download. Please visit "
+msgid "A newer version of Invenio is available for download. Please visit "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2469
@@ -6752,7 +6752,7 @@ msgid "Hacking Pages"
 msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:157
-msgid "Hacking CDS Invenio"
+msgid "Hacking Invenio"
 msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:159
@@ -9147,7 +9147,7 @@ msgid "There are no requests waiting on the item <strong>%s</strong>."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1743
-msgid "Welcome to CDS Invenio BibCirculation Admin"
+msgid "Welcome to Invenio BibCirculation Admin"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1807
@@ -10227,7 +10227,7 @@ msgid "Add notes"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
-msgid "Book does not exists on CDS Invenio."
+msgid "Book does not exists on Invenio."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
@@ -10279,7 +10279,7 @@ msgid "Printable format"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15484
-msgid "Check if the book already exists on CDS Invenio,"
+msgid "Check if the book already exists on Invenio,"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15508
@@ -10293,12 +10293,12 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15642
 msgid ""
-"Check if the book already exists on CDS Invenio, before to send your ILL "
+"Check if the book already exists on Invenio, before to send your ILL "
 "request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15819
-msgid "Book does not exists on CDS Invenio. Please fill the following form."
+msgid "Book does not exists on Invenio. Please fill the following form."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16174

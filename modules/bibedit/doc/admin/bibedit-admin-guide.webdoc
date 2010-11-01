@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibEdit Admin Guide -->
@@ -45,7 +45,7 @@ delete fields in a record.</p>
 <p>If you want to change several records at once, please use the batch
 command-line techniques describe below.</p>
 
-<p>Please note that 8564 tags pointing to fulltext files managed by CDS Invenio
+<p>Please note that 8564 tags pointing to fulltext files managed by Invenio
 can't be manipulated via BibEdit. In order to modify them please use the
 <a href="bibupload-admin-guide#3.5">FFT tags through BibUpload</a> or the
 bibdocfile command line tool.</p>
@@ -199,7 +199,7 @@ external world, or the OAI harvestors might have harvested it already,
 etc.  We usually prefer only to *mark* records as deleted, so that our
 record IDs are ensured to stay permanent.</p>
 
-<p>Thus said, the canonical way to delete the record #1234 in CDS Invenio
+<p>Thus said, the canonical way to delete the record #1234 in Invenio
 v0.1.x development branch is to download its XML MARC:
 
        <pre>
@@ -264,7 +264,7 @@ be able to access it.
 <p>P.S. Note that the ``bibXXx'' tables will keep having entries for the
      deleted records.  These entries are to be cleaned from time to
      time by the BibEdit garbage collector.  This GC isn't part of
-     CDS Invenio yet; moreover in the future we plan to abolish all the
+     Invenio yet; moreover in the future we plan to abolish all the
      bibXXx tables, so that this won't be necessary anymore.</p>
 
 
@@ -275,14 +275,14 @@ be able to access it.
        scratch again, you can launch:
 
      <pre>
-       $ /opt/cds-invenio/bin/dbexec &lt; /opt/cds-invenio/src/cds-invenio-0.90/modules/miscutil/sql/tabbibclean.sql
-       $ rm -rf /opt/cds-invenio/var/data/files/*
-       $ /opt/cds-invenio/bin/webcoll
-       $ /opt/cds-invenio/bin/bibindex --reindex
+       $ /opt/invenio/bin/dbexec &lt; /opt/invenio/src/invenio-0.90/modules/miscutil/sql/tabbibclean.sql
+       $ rm -rf /opt/invenio/var/data/files/*
+       $ /opt/invenio/bin/webcoll
+       $ /opt/invenio/bin/bibindex --reindex
      </pre>
 
      Note that you may also want to delete the fulltext files and the
-     submission counters in <code>/opt/cds-invenio/var/data</code>
+     submission counters in <code>/opt/invenio/var/data</code>
      subdirectories, if you use WebSubmit.
     </p>
 
@@ -296,7 +296,7 @@ utility.
 <p>To list previous revisions of record ID 1:
 
      <pre>
-     $ /opt/cds-invenio/bin/bibedit --list-revisions 1
+     $ /opt/invenio/bin/bibedit --list-revisions 1
      1.20080319193118
      1.20080318172536
      1.20080311020315
@@ -306,7 +306,7 @@ utility.
 revision date 2008-03-18 17:25:36):
 
      <pre>
-     $/opt/cds-invenio/bin/bibedit --get-revision 1.20080318172536 | head -5
+     $/opt/invenio/bin/bibedit --get-revision 1.20080318172536 | head -5
      &lt;record>
        &lt;controlfield tag="001">1&lt;/controlfield>
        &lt;datafield tag="037" ind1=" " ind2=" ">
@@ -318,7 +318,7 @@ revision date 2008-03-18 17:25:36):
 <p>To compare the differences between the two last revisions:
 
      <pre>
-     $ /opt/cds-invenio/bin/bibedit --diff-revisions 1.20080318172536 1.20080319193118
+     $ /opt/invenio/bin/bibedit --diff-revisions 1.20080318172536 1.20080319193118
      --- 1.20080318172536
      +++ 1.20080319193118
      @@ -4,7 +4,7 @@

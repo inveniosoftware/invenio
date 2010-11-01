@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
@@ -2435,31 +2435,31 @@ Best regards.
         #Try and connect to the mysql database with the default invenio password
         if "warning_mysql_password_equal_to_invenio_password" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The password set for MySQL is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")
+            message += _("Warning : The password set for MySQL is the same as the default Invenio password. For security purposes, you might want to change the password.")
             message += "</font></p>"
 
         #Try and connect to the invenio database with the default invenio password
         if "warning_invenio_password_equal_to_default" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The password set for the CDS Invenio database is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")
+            message += _("Warning : The password set for the Invenio database is the same as the default Invenio password. For security purposes, you might want to change the password.")
             message += "</font></p>"
 
         #Check if the admin password is empty
         if "warning_empty_admin_password" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The password set for the CDS-Invenio admin user is currently empty. For security purposes, it is strongly recommended that you add a password.")
+            message += _("Warning : The password set for the Invenio admin user is currently empty. For security purposes, it is strongly recommended that you add a password.")
             message += "</font></p>"
 
         #Check if the admin email has been changed from the default
         if "warning_site_support_email_equal_to_default" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The email address set for support email is currently set to cds.support@cern.ch . It is recommended that you change this to change this to your own address.")
+            message += _("Warning : The email address set for support email is currently set to info@invenio-software.org. It is recommended that you change this to change this to your own address.")
             message += "</font></p>"
 
         #Check for a new release
         if "note_new_release_available" in warning_list:
             message += "<p><font color=red>"
-            message += _("A newer version of CDS-Invenio is available for download. Please visit ")
+            message += _("A newer version of Invenio is available for download. Please visit ")
             message += "<a href=\"http://cdsware.cern.ch/invenio/download.html\">cdsware</a>"
             message += "</font></p>"
 

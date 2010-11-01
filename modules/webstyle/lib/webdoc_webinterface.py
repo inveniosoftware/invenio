@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
@@ -154,7 +154,7 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
                      'help': '<a class="navtrail" href="%s/help/%s">%s</a>' % \
                      (CFG_SITE_URL, ln_link, _("Help Central")),
                      'hacking': '<a class="navtrail" href="%s/help/hacking%s">%s</a>' % \
-                     (CFG_SITE_URL, ln_link, _("Hacking CDS Invenio"))}
+                     (CFG_SITE_URL, ln_link, _("Hacking Invenio"))}
         body = '''<div style="float:right;clear:none;font-size:small;color:#666;width:auto;margin-right:30px;padding:5px" class="mini-panel"><strong>''' + \
                _("Latest modifications:") + '</strong>' + \
                get_webdoc_topics(sort_by='date', sc=0, limit=5,

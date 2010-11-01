@@ -1,22 +1,22 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Test Suite Strategy -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
@@ -39,7 +39,7 @@
 <a name="1"></a><h2>1. General considerations</h2>
 
 <p>This documents presents guidelines for unit testing and regression
-testing homogenisation throughout all CDS Invenio modules.
+testing homogenisation throughout all Invenio modules.
 
 <p>Testing is an important coding activity.  Most authors believe that
 writing test cases should take between 10% and 30% of the project
@@ -136,7 +136,7 @@ named identically as the lib file it tests, but with the suffix
 An example for testing search engine query parameter washing function:
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
+$ cat /opt/invenio/lib/python/invenio/search_engine_tests.py
 [...]
 import search_engine
 import unittest
@@ -166,7 +166,7 @@ the tests available in this file:
 
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
+$ cat /opt/invenio/lib/python/invenio/search_engine_tests.py
 [...]
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,
@@ -186,7 +186,7 @@ If you are interested in running tests only on a certain file (say
 
 <blockquote>
 <pre>
-$ python /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
+$ python /opt/invenio/lib/python/invenio/search_engine_tests.py
 </pre>
 </blockquote>
 </p>
@@ -198,11 +198,11 @@ files in the source distribution.
 
 <a name="2.3"></a><h3>2.3 Running unit tests</h3>
 
-<p>CDS Invenio test suite can be run at any time via:
+<p>Invenio test suite can be run at any time via:
 
 <blockquote>
 <pre>
-$ /opt/cds-invenio/bin/inveniocfg --run-unit-tests
+$ /opt/invenio/bin/inveniocfg --run-unit-tests
 </pre>
 </blockquote>
 
@@ -214,7 +214,7 @@ Invenio.
 
 <blockquote>
 <pre>
-CDS Invenio v0.3.2.20040519 test suite results:
+Invenio v0.3.2.20040519 test suite results:
 ===========================================
 search engine washing of query patterns ... ok
 search engine washing of URL arguments ... ok
@@ -232,7 +232,7 @@ In case of problems you will see failures like:
 
 <blockquote>
 <pre>
-CDS Invenio v0.3.2.20040519 test suite results:
+Invenio v0.3.2.20040519 test suite results:
 ===========================================
 search engine washing of query patterns ... FAIL
 search engine washing of URL arguments ... ok
@@ -243,7 +243,7 @@ bibindex engine list union ... ok
 FAIL: search engine washing of query patterns
 ----------------------------------------------------------------------
 Traceback (most recent call last):
-  File "/opt/cds-invenio/lib/python/invenio/search_engine_tests.py", line 25, in test_wash_pattern
+  File "/opt/invenio/lib/python/invenio/search_engine_tests.py", line 25, in test_wash_pattern
     self.assertEqual("ell*", search_engine.wash_pattern('ell*'))
   File "/usr/lib/python2.3/unittest.py", line 302, in failUnlessEqual
     raise self.failureException, \
@@ -258,7 +258,7 @@ FAILED (failures=1)
 </p>
 
 <p>The test suite compliance should be checked before each CVS commit.
-(And, obviously, double-checked before each CDS Invenio release.)
+(And, obviously, double-checked before each Invenio release.)
 </p>
 
 <a name="3"></a><h2>3. Regression testing</h2>
@@ -326,7 +326,7 @@ of the following helper function:
 
 <blockquote>
 <pre>
-$ cat /opt/cds-invenio/lib/python/invenio/testutils.py
+$ cat /opt/invenio/lib/python/invenio/testutils.py
 [...]
 def test_web_page_content(url, username="guest", expected_text="</html>"):
     """Test whether web page URL as seen by user USERNAME contains
@@ -412,7 +412,7 @@ test suite.</p>
 
 <blockquote>
 <pre>
-$ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
+$ /opt/invenio/bin/inveniocfg --run-regression-tests
 </pre>
 </blockquote>
 
@@ -439,7 +439,7 @@ abort the process:
 
 <blockquote>
 <pre>
-$ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
+$ /opt/invenio/bin/inveniocfg --run-regression-tests
 **********************************************************************
 **                                                                  **
 **  ***  I M P O R T A N T   W A R N I N G  ***                     **
@@ -486,7 +486,7 @@ and can generally more easily test various complex multi-page
 scenarios.  It is the latter type of acceptance tests that we are
 concerned with here.</p>
 
-<p>CDS Invenio currently uses the
+<p>Invenio currently uses the
 <a href="http://www.mozilla.com/en-US/firefox/">Firefox</a> browser
 with the <a href="http://selenium-ide.openqa.org/">Selenium IDE</a>
 extension to automatize its real-browser web tests.</p>
@@ -523,7 +523,7 @@ directory following e.g. <code>websearch/web</code> example.
 
 <blockquote>
 <pre>
-$ /opt/cds-invenio/bin/inveniocfg --run-web-tests
+$ /opt/invenio/bin/inveniocfg --run-web-tests
 </pre>
 </blockquote>
 
@@ -538,8 +538,8 @@ you can install a local Invenio site as usual, and then do:</p>
 
 <blockquote>
 <pre>
-$ sudo -u apache perl -pi -e 's,localhost,foo.site.com,g' /opt/cds-invenio/lib/webtest/invenio/test*html
-$ /opt/cds-invenio/bin/inveniocfg --run-web-tests --yes-i-know
+$ sudo -u apache perl -pi -e 's,localhost,foo.site.com,g' /opt/invenio/lib/webtest/invenio/test*html
+$ /opt/invenio/bin/inveniocfg --run-web-tests --yes-i-know
 </pre>
 </blockquote>
 

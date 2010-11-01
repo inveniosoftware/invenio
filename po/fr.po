@@ -1,27 +1,28 @@
-# # This file is part of CDS Invenio.
+# # This file is part of Invenio.
 # # Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 # #
-# # CDS Invenio is free software; you can redistribute it and/or
+# # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
 # # published by the Free Software Foundation; either version 2 of the
 # # License, or (at your option) any later version.
 # #
-# # CDS Invenio is distributed in the hope that it will be useful, but
+# # Invenio is distributed in the hope that it will be useful, but
 # # WITHOUT ANY WARRANTY; without even the implied warranty of
 # # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # # General Public License for more details.
 # #
 # # You should have received a copy of the GNU General Public License
-# # along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.90\n"
-"Report-Msgid-Bugs-To: cds.support@cern.ch\n"
+"Project-Id-Version: Invenio 0.99.90\n"
+"Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
 "PO-Revision-Date: 2010-05-18 09:52+0200\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
-"Language-Team: FR <cds.support@cern.ch>\n"
+"Language-Team: FR <info@invenio-software.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2054,10 +2055,13 @@ msgstr "sont obligatoires"
 #: modules/bibupload/lib/batchuploader_templates.py:191
 #, python-format
 msgid ""
-"Your file has been succesfully queued. You can check your %(x_url1_open)"
-"supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%"
-"(x_url2_close)s"
-msgstr "Votre fichier a été transmis dans la file d'exécution avec succès. Vous pouvez consulter %(x_url1_open)svotre historique d'envois%(x_url1_close)s ou %(x_url2_open)ssoumettre un nouveau fichier%(x_url2_close)s."
+"Your file has been succesfully queued. You can check your "
+"%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
+"another file%(x_url2_close)s"
+msgstr ""
+"Votre fichier a été transmis dans la file d'exécution avec succès. Vous "
+"pouvez consulter %(x_url1_open)svotre historique d'envois%(x_url1_close)s ou "
+"%(x_url2_open)ssoumettre un nouveau fichier%(x_url2_close)s."
 
 #: modules/bibupload/lib/batchuploader_templates.py:205
 msgid "No metadata files have been uploaded yet."
@@ -2122,7 +2126,8 @@ msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:373
 msgid "The following files have been succesfully queued:"
-msgstr "Les fichiers suivants ont été placés dans la file d'attente avec succès:"
+msgstr ""
+"Les fichiers suivants ont été placés dans la file d'attente avec succès:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:378
 msgid "The following errors have ocurred:"
@@ -2416,8 +2421,8 @@ msgid "The error report has been sent."
 msgstr "Le rapport d'erreur a été envoyé."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-msgid "Many thanks for helping us make CDS Invenio better."
-msgstr "Merci beaucoup de nous aider à améliorer CDS Invenio."
+msgid "Many thanks for helping us make Invenio better."
+msgstr "Merci beaucoup de nous aider à améliorer Invenio."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
@@ -2822,12 +2827,12 @@ msgstr "EFFACER"
 #: modules/webalert/lib/webalert_templates.py:300
 #, python-format
 msgid ""
-"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
-"(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
+"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
+"%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Créer une nouvelle alerte depuis %(x_url1_open)svos recherches%(x_url1_close)"
-"s, les %(x_url2_open)srecherches populaires%(x_url2_close)s, ou le "
-"formulaire."
+"Créer une nouvelle alerte depuis %(x_url1_open)svos recherches"
+"%(x_url1_close)s, les %(x_url2_open)srecherches populaires%(x_url2_close)s, "
+"ou le formulaire."
 
 #: modules/webalert/lib/webalert_templates.py:318
 #: modules/webcomment/lib/webcomment_templates.py:220
@@ -2900,8 +2905,8 @@ msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
 msgstr ""
-"Vous n'avez pas encore effectué de recherche. Vous pouvez aller sur %"
-"(x_url_open)sl'interface de recherche%(x_url_close)s."
+"Vous n'avez pas encore effectué de recherche. Vous pouvez aller sur "
+"%(x_url_open)sl'interface de recherche%(x_url_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:446
 #, python-format
@@ -3146,11 +3151,11 @@ msgstr "Paniers publics"
 #: modules/webbasket/lib/webbasket.py:2173
 #, python-format
 msgid ""
-"You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
-"s group baskets and %(x_nb_public)s other users public baskets."
+"You have %(x_nb_perso)s personal baskets and are subscribed to "
+"%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
 msgstr ""
-"Vous possédez %(x_nb_perso)s paniers personnels et êtes abonnés à %"
-"(x_nb_group)s paniers de groupes et à %(x_nb_public)s paniers publics."
+"Vous possédez %(x_nb_perso)s paniers personnels et êtes abonnés à "
+"%(x_nb_group)s paniers de groupes et à %(x_nb_public)s paniers publics."
 
 #: modules/webbasket/lib/webbasket_templates.py:83
 #, fuzzy
@@ -4133,11 +4138,11 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1081
 #, python-format
 msgid ""
-"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
-"(x_nickname)s will be displayed as the author of this comment."
+"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
+"%(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
-"Note: Vous n'avez pas %(x_url_open)sdéfini de pseudonyme%(x_url_close)s. %"
-"(x_nickname)s sera affiché en temps qu'auteur de ce commentaire."
+"Note: Vous n'avez pas %(x_url_open)sdéfini de pseudonyme%(x_url_close)s. "
+"%(x_nickname)s sera affiché en temps qu'auteur de ce commentaire."
 
 #: modules/webcomment/lib/webcomment_templates.py:1023
 msgid "Send me an email when a new comment is posted"
@@ -4883,8 +4888,8 @@ msgstr "Pas de résultat"
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
-"Aucun résultat précis pour %(x_query1)s n'a été trouvé, remplacement par %"
-"(x_query2)s..."
+"Aucun résultat précis pour %(x_query1)s n'a été trouvé, remplacement par "
+"%(x_query2)s..."
 
 #: modules/websearch/lib/search_engine.py:1817
 #: modules/websearch/lib/search_engine.py:1826
@@ -4909,8 +4914,8 @@ msgid ""
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
 "Aucun résultat n'a été trouvé dans la collection %(x_collection)s. Les "
-"autres collections publiques ont donné %(x_url_open)s%(x_nb_hits)d résultats%"
-"(x_url_close)s."
+"autres collections publiques ont donné %(x_url_open)s%(x_nb_hits)d résultats"
+"%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:2230
 msgid ""
@@ -5259,8 +5264,8 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)sVue d'ensemble sur les résultats:%(x_fmt_close)s Trouvé %"
-"(x_nb_records)s notices en %(x_nb_seconds)s secondes."
+"%(x_fmt_open)sVue d'ensemble sur les résultats:%(x_fmt_close)s Trouvé "
+"%(x_nb_records)s notices en %(x_nb_seconds)s secondes."
 
 #: modules/websearch/lib/websearch_templates.py:2960
 #, fuzzy, python-format
@@ -5270,11 +5275,11 @@ msgstr "Ce document a été %(x_fmt_open)sapprouvé%(x_fmt_close)s."
 #: modules/websearch/lib/websearch_templates.py:2968
 #, fuzzy, python-format
 msgid ""
-"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least %(x_nb_records)"
-"s records in %(x_nb_seconds)s seconds."
+"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least "
+"%(x_nb_records)s records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)sVue d'ensemble sur les résultats:%(x_fmt_close)s Trouvé %"
-"(x_nb_records)s notices en %(x_nb_seconds)s secondes."
+"%(x_fmt_open)sVue d'ensemble sur les résultats:%(x_fmt_close)s Trouvé "
+"%(x_nb_records)s notices en %(x_nb_seconds)s secondes."
 
 #: modules/websearch/lib/websearch_templates.py:3045
 #, fuzzy
@@ -5350,8 +5355,8 @@ msgstr ""
 #, fuzzy, python-format
 msgid "Subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
-"Si vous le souhaitez, vous pouvez vous %(x_url_open)sidentifier%(x_url_close)"
-"s."
+"Si vous le souhaitez, vous pouvez vous %(x_url_open)sidentifier"
+"%(x_url_close)s."
 
 #: modules/websearch/lib/websearch_templates.py:3564
 msgid "Interested in being notified about new results for this query?"
@@ -5486,20 +5491,20 @@ msgstr "condensé"
 #: modules/websession/lib/webaccount.py:114
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
-"s as a regular user."
+"You are logged in as guest. You may want to %(x_url_open)slogin"
+"%(x_url_close)s as a regular user."
 msgstr ""
-"Vous êtes identifié comme invité. Vous pouvez vous %(x_url_open)sidentifier%"
-"(x_url_close)s en tant qu'utilisateur."
+"Vous êtes identifié comme invité. Vous pouvez vous %(x_url_open)sidentifier"
+"%(x_url_close)s en tant qu'utilisateur."
 
 #: modules/websession/lib/webaccount.py:118
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
-"(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
+"%(x_url_close)s first"
 msgstr ""
-"Les %(x_fmt_open)sinvités%(x_fmt_close)s doivent d'abord %(x_url_open)"
-"s'enregistrer%(x_url_close)s."
+"Les %(x_fmt_open)sinvités%(x_fmt_close)s doivent d'abord "
+"%(x_url_open)s'enregistrer%(x_url_close)s."
 
 #: modules/websession/lib/webaccount.py:123
 msgid "No queries found"
@@ -5527,8 +5532,8 @@ msgstr "Paramètres de compte externe"
 #: modules/websession/lib/websession_templates.py:94
 #, python-format
 msgid ""
-"You can consult the list of your external groups directly in the %"
-"(x_url_open)sgroups page%(x_url_close)s."
+"You can consult the list of your external groups directly in the "
+"%(x_url_open)sgroups page%(x_url_close)s."
 msgstr ""
 "Vous pouvez consulter la liste de vos groupes externes directement sur\n"
 "la %(x_url_open)spage des groupes%(x_url_close)s."
@@ -5629,8 +5634,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:228
 #, python-format
 msgid ""
-"You can change or reset your CERN account password by means of the %"
-"(x_url_open)sCERN account system%(x_url_close)s."
+"You can change or reset your CERN account password by means of the "
+"%(x_url_open)sCERN account system%(x_url_close)s."
 msgstr ""
 "Vous pouvez changer ou réinitialiser votre mot de passe CERN\n"
 "directement sur la %(x_url_open)spage de gestion des comptes\n"
@@ -5725,9 +5730,9 @@ msgid ""
 "then you can recover your password through the %(x_url_open)sCERN "
 "authentication system%(x_url_close)s."
 msgstr ""
-"Si votre compte utilise le %(x_fmt_open)ssystème d'identification du CERN%"
-"(x_fmt_close)s, vous pouvez retrouver votre mot de passe sur la %(x_url_open)"
-"spage de gestion des comptes CERN%(x_url_close)s."
+"Si votre compte utilise le %(x_fmt_open)ssystème d'identification du CERN"
+"%(x_fmt_close)s, vous pouvez retrouver votre mot de passe sur la "
+"%(x_url_open)spage de gestion des comptes CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:410
 msgid ""
@@ -5820,9 +5825,9 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:532
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
-"(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
-"s."
+"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
+"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
+"%(x_url2_close)s."
 msgstr ""
 "Vous êtes enregistré comme %(x_user)s. Vous pouvez a) %(x_url1_open)svous "
 "déconnecter%(x_url1_close)s; b) modifier vos %(x_url2_open)spréférences de "
@@ -5853,8 +5858,8 @@ msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
 msgstr ""
-"Vous pouvez consulter la liste de %(x_url_open)svos soumissions%(x_url_close)"
-"s et vous informer sur leur statut."
+"Vous pouvez consulter la liste de %(x_url_open)svos soumissions"
+"%(x_url_close)s et vous informer sur leur statut."
 
 #: modules/websession/lib/websession_templates.py:628
 #: modules/websubmit/web/yoursubmissions.py:170
@@ -5867,8 +5872,8 @@ msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
 "the documents you approved or refereed."
 msgstr ""
-"Vous pouvez consulter la liste de %(x_url_open)svos approbations%"
-"(x_url_close)s contenant les références des documents que vous avez "
+"Vous pouvez consulter la liste de %(x_url_open)svos approbations"
+"%(x_url_close)s contenant les références des documents que vous avez "
 "approuvés ou relus."
 
 #: modules/websession/lib/websession_templates.py:634
@@ -5932,8 +5937,8 @@ msgid ""
 "for the email address \"%(x_email)s\"."
 msgstr ""
 "Quelqu'un (vous-même?) provenant de %(x_ip_address)s a demandé "
-"l'enregistrement d'un nouveau compte %(x_sitename)s pour l'adresse \"%"
-"(x_email)s\"."
+"l'enregistrement d'un nouveau compte %(x_sitename)s pour l'adresse "
+"\"%(x_email)s\"."
 
 #: modules/websession/lib/websession_templates.py:737
 msgid "If you want to complete this account registration, please go to:"
@@ -5960,15 +5965,15 @@ msgid ""
 "                %(x_url_open)slogout from SSO%(x_url_close)s, too."
 msgstr ""
 "Vous êtes par contre toujours reconnu par le %(x_fmt_open)ssystème "
-"centralisé SSO%(x_fmt_close)s. Vous pouvez également vous %(x_url_open)"
-"sdéconnecter de SSO%(x_url_close)s."
+"centralisé SSO%(x_fmt_close)s. Vous pouvez également vous "
+"%(x_url_open)sdéconnecter de SSO%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:801
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
 msgstr ""
-"Si vous le souhaitez, vous pouvez vous %(x_url_open)sidentifier%(x_url_close)"
-"s."
+"Si vous le souhaitez, vous pouvez vous %(x_url_open)sidentifier"
+"%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:832
 msgid "If you already have an account, please login using the form below."
@@ -5982,24 +5987,24 @@ msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
 "CERN lightweight account%(x_url_close)s."
 msgstr ""
-"Si vous ne possédez pas encore de compte CERN, vous pouvez %(x_url_open)"
-"scréer un compte CERN \"lightweight\"%(x_url_close)s."
+"Si vous ne possédez pas encore de compte CERN, vous pouvez "
+"%(x_url_open)scréer un compte CERN \"lightweight\"%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:839
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
-"s an internal account."
+"If you don't own an account yet, please %(x_url_open)sregister"
+"%(x_url_close)s an internal account."
 msgstr ""
-"Si vous ne possédez pas encore de compte, vous pouvez vous %(x_url_open)"
-"senregistrer%(x_url_close)s pour créer un compte interne."
+"Si vous ne possédez pas encore de compte, vous pouvez vous "
+"%(x_url_open)senregistrer%(x_url_close)s pour créer un compte interne."
 
 #: modules/websession/lib/websession_templates.py:847
 #, fuzzy, python-format
 msgid "If you don't own an account yet, please contact %s."
 msgstr ""
-"Si vous ne possédez pas encore de compte, vous pouvez vous %(x_url_open)"
-"senregistrer%(x_url_close)s pour créer un compte interne."
+"Si vous ne possédez pas encore de compte, vous pouvez vous "
+"%(x_url_open)senregistrer%(x_url_close)s pour créer un compte interne."
 
 #: modules/websession/lib/websession_templates.py:870
 msgid "Login method:"
@@ -6108,8 +6113,8 @@ msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
-"Vous n'êtes pas identifé. Vous devez d'abord vous %(x_url_open)sidentifier%"
-"(x_url_close)s."
+"Vous n'êtes pas identifé. Vous devez d'abord vous %(x_url_open)sidentifier"
+"%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1076
 msgid "You are not authorized to access administrative functions."
@@ -6132,8 +6137,8 @@ msgstr "Voici quelques liens administratifs intéressants pour vous:"
 #: modules/websession/lib/websession_templates.py:1120
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
-"(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
+"%(x_url_close)s."
 msgstr ""
 "Pour plus d'activités administratives, affichez la %(x_url_open)szone "
 "d'administration%(x_url_close)s."
@@ -6369,12 +6374,12 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2076
 #, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %"
-"(x_url_open)sweb message%(x_url_close)s system."
+"If you want to invite new members to join your group, please use the "
+"%(x_url_open)sweb message%(x_url_close)s system."
 msgstr ""
 "Si vous souhaitez inviter de nouveaux membres à rejoindre votre groupe, "
-"veuillez utiliser le %(x_url_open)ssystème de messagerie interne%"
-"(x_url_close)s."
+"veuillez utiliser le %(x_url_open)ssystème de messagerie interne"
+"%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:2080
 #, python-format
@@ -6463,31 +6468,31 @@ msgstr "Le groupe %s a été supprimé par son administrateur."
 #: modules/websession/lib/websession_templates.py:2419
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
-"s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
+"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
+"(%(x_nb_admin)i)."
 msgstr ""
-"Vous pouvez consulter la liste des %(x_url_open)s%(x_nb_total)i groupes%"
-"(x_url_close)s dont vous êtes membre (%(x_nb_member)i) ou administrateur(%"
-"(x_nb_admin)i)."
+"Vous pouvez consulter la liste des %(x_url_open)s%(x_nb_total)i groupes"
+"%(x_url_close)s dont vous êtes membre (%(x_nb_member)i) ou administrateur"
+"(%(x_nb_admin)i)."
 
 #: modules/websession/lib/websession_templates.py:2438
 msgid ""
-"Warning : The password set for MySQL is the same as the default CDS-Invenio "
+"Warning : The password set for MySQL is the same as the default Invenio "
 "password. For security purposes, you might want to change the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2444
 msgid ""
-"Warning : The password set for the CDS Invenio database is the same as the "
-"default CDS-Invenio password. For security purposes, you might want to "
-"change the password."
+"Warning : The password set for the Invenio database is the same as the "
+"default Invenio password. For security purposes, you might want to change "
+"the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2450
 msgid ""
-"Warning : The password set for the CDS-Invenio admin user is currently "
-"empty. For security purposes, it is strongly recommended that you add a "
-"password."
+"Warning : The password set for the Invenio admin user is currently empty. "
+"For security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2456
@@ -6498,7 +6503,7 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2462
-msgid "A newer version of CDS-Invenio is available for download. Please visit "
+msgid "A newer version of Invenio is available for download. Please visit "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2469
@@ -6725,8 +6730,8 @@ msgstr "Préférences modifiées."
 #: modules/websession/lib/websession_webinterface.py:395
 #, python-format
 msgid ""
-"Note that if you have changed your email address, you will have to %"
-"(x_url_open)sreset your password%(x_url_close)s anew."
+"Note that if you have changed your email address, you will have to "
+"%(x_url_open)sreset your password%(x_url_close)s anew."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:403
@@ -7108,8 +7113,8 @@ msgid "Hacking Pages"
 msgstr "Pages développeurs"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:157
-msgid "Hacking CDS Invenio"
-msgstr "Bidouiller CDS Invenio"
+msgid "Hacking Invenio"
+msgstr "Bidouiller Invenio"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:159
 msgid "Latest modifications:"
@@ -7137,8 +7142,8 @@ msgstr "Désolé, la page %s n'existe pas."
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)"
-"s."
+"You may want to look at the %(x_url_open)s%(x_category)s pages"
+"%(x_url_close)s."
 msgstr ""
 "Vous pouvez consulter %(x_url_open)sles page %(x_category)s%(x_url_close)s."
 
@@ -7253,15 +7258,15 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:871
 #, python-format
 msgid ""
-"Having a problem revising a file? Send the revised version to %(mailto_link)"
-"s."
+"Having a problem revising a file? Send the revised version to "
+"%(mailto_link)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:874
 #, python-format
 msgid ""
-"Having a problem adding or revising a file? Send the new/revised version to %"
-"(mailto_link)s."
+"Having a problem adding or revising a file? Send the new/revised version to "
+"%(mailto_link)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:989
@@ -7530,8 +7535,8 @@ msgstr "N° de soumission"
 #: modules/websubmit/lib/websubmit_templates.py:1070
 #, python-format
 msgid ""
-"Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
-"(x_step)s"
+"Here is the %(x_action)s function list for %(x_doctype)s documents at level "
+"%(x_step)s"
 msgstr ""
 "Liste des fonctions %(x_action)s pour les documents de type %(x_doctype)s au "
 "niveau %(x_step)s"
@@ -7778,8 +7783,8 @@ msgstr "Approuver"
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
-"Ce document est toujours %(x_fmt_open)sen attente d'approbation%(x_fmt_close)"
-"s."
+"Ce document est toujours %(x_fmt_open)sen attente d'approbation"
+"%(x_fmt_close)s."
 
 #: modules/websubmit/lib/websubmit_templates.py:2365
 #: modules/websubmit/lib/websubmit_templates.py:2385
@@ -9664,7 +9669,7 @@ msgid "There are no requests waiting on the item <strong>%s</strong>."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1743
-msgid "Welcome to CDS Invenio BibCirculation Admin"
+msgid "Welcome to Invenio BibCirculation Admin"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1807
@@ -10824,7 +10829,7 @@ msgid "Add notes"
 msgstr "Ajouter aux utilisateurs"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
-msgid "Book does not exists on CDS Invenio."
+msgid "Book does not exists on Invenio."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
@@ -10879,7 +10884,7 @@ msgid "Printable format"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15484
-msgid "Check if the book already exists on CDS Invenio,"
+msgid "Check if the book already exists on Invenio,"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15508
@@ -10894,12 +10899,11 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15642
 msgid ""
-"Check if the book already exists on CDS Invenio, before to send your ILL "
-"request."
+"Check if the book already exists on Invenio, before to send your ILL request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15819
-msgid "Book does not exists on CDS Invenio. Please fill the following form."
+msgid "Book does not exists on Invenio. Please fill the following form."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16174
@@ -11437,11 +11441,11 @@ msgstr "Supprimer la base de connaissances"
 #~ msgstr "mis à jour le"
 
 #~ msgid ""
-#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
-#~ "(x_url_close)s to it"
+#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
+#~ "%(x_url_close)s to it"
 #~ msgstr ""
-#~ "Ce panier appartient à %(x_name)s. Vous pouvez librement vous y %"
-#~ "(x_url_open)sabonner%(x_url_close)s"
+#~ "Ce panier appartient à %(x_name)s. Vous pouvez librement vous y "
+#~ "%(x_url_open)sabonner%(x_url_close)s"
 
 #~ msgid "records"
 #~ msgstr "notices"
@@ -11523,8 +11527,8 @@ msgstr "Supprimer la base de connaissances"
 #~ msgid ""
 #~ "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
 #~ msgstr ""
-#~ "Voulez-vous vraiment charger la révision %(revdate)s de la notice #%"
-#~ "(recid)s?"
+#~ "Voulez-vous vraiment charger la révision %(revdate)s de la notice #"
+#~ "%(recid)s?"
 
 #~ msgid ""
 #~ "The current version will be replaced with a copy of revision %(revdate)s"
@@ -11937,5 +11941,5 @@ msgstr "Supprimer la base de connaissances"
 #~ "of the current session. If you wish you can %slogin or register here%s."
 #~ msgstr ""
 #~ "Vous êtes actuellement enregistré en tant qu'invité. Vos %s disparaîtront "
-#~ "à la fin de la session. Si vous le souhaitez, vous pouvez vous %"
-#~ "sidentifier ou vous enregister%s."
+#~ "à la fin de la session. Si vous le souhaitez, vous pouvez vous "
+#~ "%sidentifier ou vous enregister%s."

@@ -1,27 +1,28 @@
-# # This file is part of CDS Invenio.
+# # This file is part of Invenio.
 # # Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 # #
-# # CDS Invenio is free software; you can redistribute it and/or
+# # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
 # # published by the Free Software Foundation; either version 2 of the
 # # License, or (at your option) any later version.
 # #
-# # CDS Invenio is distributed in the hope that it will be useful, but
+# # Invenio is distributed in the hope that it will be useful, but
 # # WITHOUT ANY WARRANTY; without even the implied warranty of
 # # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # # General Public License for more details.
 # #
 # # You should have received a copy of the GNU General Public License
-# # along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.90\n"
-"Report-Msgid-Bugs-To: cds.support@cern.ch\n"
+"Project-Id-Version: Invenio 0.99.90\n"
+"Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
 "PO-Revision-Date: 2008-02-29 15:37+0100\n"
 "Last-Translator: Kam-ming Ku <kmku@hkusua.hku.hk>\n"
-"Language-Team: ZH_CN <cds.support@cern.ch>\n"
+"Language-Team: ZH_CN <info@invenio-software.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2082,9 +2083,9 @@ msgstr "必须的"
 #: modules/bibupload/lib/batchuploader_templates.py:191
 #, fuzzy, python-format
 msgid ""
-"Your file has been succesfully queued. You can check your %(x_url1_open)"
-"supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%"
-"(x_url2_close)s"
+"Your file has been succesfully queued. You can check your "
+"%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
+"another file%(x_url2_close)s"
 msgstr ""
 "您是用%(x_user)s身分登录，你可以 a)%(x_url1_open)s登出%(x_url1_close)s； b) "
 "修改您的%(x_url2_open)s户囗设定%(x_url2_close)s。"
@@ -2455,8 +2456,8 @@ msgid "The error report has been sent."
 msgstr "错误报告已被发送。"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-msgid "Many thanks for helping us make CDS Invenio better."
-msgstr "多谢协助我们把 CDS Invenio 做得更好。"
+msgid "Many thanks for helping us make Invenio better."
+msgstr "多谢协助我们把 Invenio 做得更好。"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
@@ -2864,11 +2865,11 @@ msgstr "清除资料"
 #: modules/webalert/lib/webalert_templates.py:300
 #, fuzzy, python-format
 msgid ""
-"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
-"(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
+"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
+"%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
-"从%(x_url1_open)s您的检索%(x_url1_close)s、 %(x_url2_open)s热门检索%"
-"(x_url2_close)s或表格中建设新的警报。"
+"从%(x_url1_open)s您的检索%(x_url1_close)s、 %(x_url2_open)s热门检"
+"索%(x_url2_close)s或表格中建设新的警报。"
 
 #: modules/webalert/lib/webalert_templates.py:318
 #: modules/webcomment/lib/webcomment_templates.py:220
@@ -3188,11 +3189,11 @@ msgstr "共享收藏篮"
 #: modules/webbasket/lib/webbasket.py:2173
 #, python-format
 msgid ""
-"You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
-"s group baskets and %(x_nb_public)s other users public baskets."
+"You have %(x_nb_perso)s personal baskets and are subscribed to "
+"%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
 msgstr ""
-"您有 %(x_nb_perso)s 个个人收藏篮、订阅 %(x_nb_group)s 组别收藏篮和%"
-"(x_nb_public)s 其他用户的共享收藏篮。"
+"您有 %(x_nb_perso)s 个个人收藏篮、订阅 %(x_nb_group)s 组别收藏篮"
+"和%(x_nb_public)s 其他用户的共享收藏篮。"
 
 #: modules/webbasket/lib/webbasket_templates.py:83
 #, fuzzy
@@ -4165,8 +4166,8 @@ msgstr "注意：您的诨号 - %s - 将会成显示为文件的作者名称。"
 #: modules/webcomment/lib/webcomment_templates.py:1081
 #, python-format
 msgid ""
-"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
-"(x_nickname)s will be displayed as the author of this comment."
+"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
+"%(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
 "注意：您并未%(x_url_open)s定义您的诨号%(x_url_close)s。%(x_nickname)s 是会成"
 "显示为文件的作者名称。"
@@ -4929,8 +4930,8 @@ msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
 "%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
 msgstr ""
-"在专辑 %(x_collection)s 里没有匹配任何记录；但在其他的专辑里找到%(x_url_open)"
-"s%(x_nb_hits)d 笔记录%(x_url_close)s。"
+"在专辑 %(x_collection)s 里没有匹配任何记录；但在其他的专辑里找"
+"到%(x_url_open)s%(x_nb_hits)d 笔记录%(x_url_close)s。"
 
 #: modules/websearch/lib/search_engine.py:2230
 msgid ""
@@ -5268,8 +5269,8 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)s查询结果:%(x_fmt_close)s 找到 %(x_nb_records)s 记录，需时 in %"
-"(x_nb_seconds)s 秒。"
+"%(x_fmt_open)s查询结果:%(x_fmt_close)s 找到 %(x_nb_records)s 记录，需时 in "
+"%(x_nb_seconds)s 秒。"
 
 #: modules/websearch/lib/websearch_templates.py:2960
 #, fuzzy, python-format
@@ -5279,11 +5280,11 @@ msgstr "这文件已被%(x_fmt_open)s批核%(x_fmt_close)s。"
 #: modules/websearch/lib/websearch_templates.py:2968
 #, fuzzy, python-format
 msgid ""
-"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least %(x_nb_records)"
-"s records in %(x_nb_seconds)s seconds."
+"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least "
+"%(x_nb_records)s records in %(x_nb_seconds)s seconds."
 msgstr ""
-"%(x_fmt_open)s查询结果:%(x_fmt_close)s 找到 %(x_nb_records)s 记录，需时 in %"
-"(x_nb_seconds)s 秒。"
+"%(x_fmt_open)s查询结果:%(x_fmt_close)s 找到 %(x_nb_records)s 记录，需时 in "
+"%(x_nb_seconds)s 秒。"
 
 #: modules/websearch/lib/websearch_templates.py:3045
 #, fuzzy
@@ -5494,15 +5495,15 @@ msgstr "摘要"
 #: modules/websession/lib/webaccount.py:114
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
-"s as a regular user."
+"You are logged in as guest. You may want to %(x_url_open)slogin"
+"%(x_url_close)s as a regular user."
 msgstr "您的身分是游客。您需要先%(x_url_open)s登入%(x_url_close)s。"
 
 #: modules/websession/lib/webaccount.py:118
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
-"(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
+"%(x_url_close)s first"
 msgstr ""
 "%(x_fmt_open)s游客%(x_fmt_close)s 需要先%(x_url_open)s注册%(x_url_close)s。"
 
@@ -5529,8 +5530,8 @@ msgstr "外部帐号设定"
 #: modules/websession/lib/websession_templates.py:94
 #, python-format
 msgid ""
-"You can consult the list of your external groups directly in the %"
-"(x_url_open)sgroups page%(x_url_close)s."
+"You can consult the list of your external groups directly in the "
+"%(x_url_open)sgroups page%(x_url_close)s."
 msgstr "您可直接在%(x_url_open)s这里%(x_url_close)s咨询您的外部组别名单。"
 
 #: modules/websession/lib/websession_templates.py:98
@@ -5619,8 +5620,8 @@ msgstr "您可以%(x_url_open)s登入或%(x_url_close)s注册。"
 #: modules/websession/lib/websession_templates.py:228
 #, fuzzy, python-format
 msgid ""
-"You can change or reset your CERN account password by means of the %"
-"(x_url_open)sCERN account system%(x_url_close)s."
+"You can change or reset your CERN account password by means of the "
+"%(x_url_open)sCERN account system%(x_url_close)s."
 msgstr "您可以使用您的%(x_url_open)s帐号%(x_url_close)s。"
 
 #: modules/websession/lib/websession_templates.py:252
@@ -5782,9 +5783,9 @@ msgstr "您是用游客登录, 因此您的警报将不会保存在这系统中�
 #: modules/websession/lib/websession_templates.py:532
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
-"(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
-"s."
+"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
+"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
+"%(x_url2_close)s."
 msgstr ""
 "您是用%(x_user)s身分登录，你可以 a)%(x_url1_open)s登出%(x_url1_close)s； b) "
 "修改您的%(x_url2_open)s户囗设定%(x_url2_close)s。"
@@ -5928,8 +5929,8 @@ msgstr "如果您没有帐号, 请先%(x_url_open)s注册%(x_url_close)s."
 #: modules/websession/lib/websession_templates.py:839
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
-"s an internal account."
+"If you don't own an account yet, please %(x_url_open)sregister"
+"%(x_url_close)s an internal account."
 msgstr "如果您没有帐号, 请先%(x_url_open)s注册%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:847
@@ -6017,8 +6018,8 @@ msgid ""
 "automatic alert search that will look for new preprints and will notify you "
 "daily of new arrivals by email."
 msgstr ""
-"请不要使用您自己沿用的密码。您的电邮不会被透露到第三方，它只会使用以辨认您的%"
-"s服务。"
+"请不要使用您自己沿用的密码。您的电邮不会被透露到第三方，它只会使用以辨认您"
+"的%s服务。"
 
 #: modules/websession/lib/websession_templates.py:1044
 #, python-format
@@ -6055,8 +6056,8 @@ msgstr "以下是一些有用的连结："
 #: modules/websession/lib/websession_templates.py:1120
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
-"(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
+"%(x_url_close)s."
 msgstr "请到%(x_url_open)s管理区%(x_url_close)s以便使用更多管理功能。"
 
 #: modules/websession/lib/websession_templates.py:1173
@@ -6290,8 +6291,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2076
 #, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %"
-"(x_url_open)sweb message%(x_url_close)s system."
+"If you want to invite new members to join your group, please use the "
+"%(x_url_open)sweb message%(x_url_close)s system."
 msgstr "请使用%(x_url_open)s讯息%(x_url_close)s来邀请成员加入组别。"
 
 #: modules/websession/lib/websession_templates.py:2080
@@ -6378,30 +6379,30 @@ msgstr "组别 %s 已被管理员删除。"
 #: modules/websession/lib/websession_templates.py:2419
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
-"s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
+"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
+"(%(x_nb_admin)i)."
 msgstr ""
-"您可直接在%(x_url_open)s这里%(x_url_close)s咨询您的%(x_nb_total)i组别给(%"
-"(x_nb_member)i) or 管理 (%(x_nb_admin)i)名单。"
+"您可直接在%(x_url_open)s这里%(x_url_close)s咨询您的%(x_nb_total)i组别给"
+"(%(x_nb_member)i) or 管理 (%(x_nb_admin)i)名单。"
 
 #: modules/websession/lib/websession_templates.py:2438
 msgid ""
-"Warning : The password set for MySQL is the same as the default CDS-Invenio "
+"Warning : The password set for MySQL is the same as the default Invenio "
 "password. For security purposes, you might want to change the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2444
 msgid ""
-"Warning : The password set for the CDS Invenio database is the same as the "
-"default CDS-Invenio password. For security purposes, you might want to "
-"change the password."
+"Warning : The password set for the Invenio database is the same as the "
+"default Invenio password. For security purposes, you might want to change "
+"the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2450
 msgid ""
-"Warning : The password set for the CDS-Invenio admin user is currently "
-"empty. For security purposes, it is strongly recommended that you add a "
-"password."
+"Warning : The password set for the Invenio admin user is currently empty. "
+"For security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2456
@@ -6412,7 +6413,7 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2462
-msgid "A newer version of CDS-Invenio is available for download. Please visit "
+msgid "A newer version of Invenio is available for download. Please visit "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2469
@@ -6622,8 +6623,8 @@ msgstr "设定已被修改。"
 #: modules/websession/lib/websession_webinterface.py:395
 #, python-format
 msgid ""
-"Note that if you have changed your email address, you will have to %"
-"(x_url_open)sreset your password%(x_url_close)s anew."
+"Note that if you have changed your email address, you will have to "
+"%(x_url_open)sreset your password%(x_url_close)s anew."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:403
@@ -6989,7 +6990,7 @@ msgid "Hacking Pages"
 msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:157
-msgid "Hacking CDS Invenio"
+msgid "Hacking Invenio"
 msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:159
@@ -7020,8 +7021,8 @@ msgstr "对不起，记录 %s 并不存在。"
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, fuzzy, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)"
-"s."
+"You may want to look at the %(x_url_open)s%(x_category)s pages"
+"%(x_url_close)s."
 msgstr "您可以使用您的%(x_url_open)s帐号%(x_url_close)s。"
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:368
@@ -7135,15 +7136,15 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:871
 #, python-format
 msgid ""
-"Having a problem revising a file? Send the revised version to %(mailto_link)"
-"s."
+"Having a problem revising a file? Send the revised version to "
+"%(mailto_link)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:874
 #, python-format
 msgid ""
-"Having a problem adding or revising a file? Send the new/revised version to %"
-"(mailto_link)s."
+"Having a problem adding or revising a file? Send the new/revised version to "
+"%(mailto_link)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:989
@@ -7405,8 +7406,8 @@ msgstr "提交号码"
 #: modules/websubmit/lib/websubmit_templates.py:1070
 #, python-format
 msgid ""
-"Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
-"(x_step)s"
+"Here is the %(x_action)s function list for %(x_doctype)s documents at level "
+"%(x_step)s"
 msgstr "这是 %(x_action)s 功能名单  %(x_doctype)s 文件 在 级别 %(x_step)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1075
@@ -9551,7 +9552,7 @@ msgid "There are no requests waiting on the item <strong>%s</strong>."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1743
-msgid "Welcome to CDS Invenio BibCirculation Admin"
+msgid "Welcome to Invenio BibCirculation Admin"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1807
@@ -10710,7 +10711,7 @@ msgid "Add notes"
 msgstr "加入至用户"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
-msgid "Book does not exists on CDS Invenio."
+msgid "Book does not exists on Invenio."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
@@ -10765,7 +10766,7 @@ msgid "Printable format"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15484
-msgid "Check if the book already exists on CDS Invenio,"
+msgid "Check if the book already exists on Invenio,"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15508
@@ -10780,12 +10781,11 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15642
 msgid ""
-"Check if the book already exists on CDS Invenio, before to send your ILL "
-"request."
+"Check if the book already exists on Invenio, before to send your ILL request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15819
-msgid "Book does not exists on CDS Invenio. Please fill the following form."
+msgid "Book does not exists on Invenio. Please fill the following form."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16174
@@ -11321,8 +11321,8 @@ msgstr "删除知识库"
 #~ msgstr "更新"
 
 #~ msgid ""
-#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
-#~ "(x_url_close)s to it"
+#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
+#~ "%(x_url_close)s to it"
 #~ msgstr "您可以%(x_url_open)s订阅%(x_url_close)s这属于%(x_name)s的收藏篮。"
 
 #~ msgid "records"

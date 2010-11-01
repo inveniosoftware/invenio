@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """This is the main body of refextract. It is used to extract references from
@@ -60,7 +60,7 @@ try:
                   CFG_REFEXTRACT_XML_RECORD_OPEN, \
                   CFG_REFEXTRACT_XML_RECORD_CLOSE
 except ImportError:
-    CFG_REFEXTRACT_VERSION = "CDS Invenio/%s refextract/%s" % ('standalone', 'standalone')
+    CFG_REFEXTRACT_VERSION = "Invenio/%s refextract/%s" % ('standalone', 'standalone')
     CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/etc/refextract-journal-titles.kb" % '..'
     CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/etc/refextract-report-numbers.kb" % '..'
     CFG_REFEXTRACT_CTRL_FIELD_RECID          = "001" ## control-field recid
@@ -249,7 +249,7 @@ def filter_processed_references(out):
                 ## For each line in this datafield element, try to find the subfield whose code attribute is 'a'
                 while ref_lines[i].find('</datafield>') <> -1 and (len(ref_lines)-1) > i:
                     i+=1
-                    ## <subfield code="a">CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
+                    ## <subfield code="a">Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
                     if a_tag.search(ref_lines[i]):  ## remake the "a" tag for new numbe of "m" tags
                         data = a_tag.search(ref_lines[i]).group(1)
                         words1 = data.split()
@@ -5244,7 +5244,7 @@ def display_xml_record(status_code, count_reportnum,
            [...]
            <datafield tag="999" ind1="C" ind2="6">
               <subfield code="a">
-        CDS Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
+        Invenio/X.XX.X refextract/X.XX.X-timestamp-err-repnum-title-URL-misc
               </subfield>
            </datafield>
         </record>

@@ -1,12 +1,12 @@
 --------------------------------------------------------------------
-CDS Invenio v0.99.2 is released
+Invenio v0.99.2 is released
 October 20, 2010
 http://invenio-software.org/
 --------------------------------------------------------------------
 
-CDS Invenio v0.99.2 was released on October 20, 2010.
+Invenio v0.99.2 was released on October 20, 2010.
 
-This is a bugfix release only.  It is recommended to all CDS Invenio
+This is a bugfix release only.  It is recommended to all Invenio
 sites using v0.99.1 or previous releases.
 
 What's new:
@@ -41,9 +41,9 @@ What's new:
 Download:
 ---------
 
-  <http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz>
-  <http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.md5>
-  <http://invenio-software.org/download/cds-invenio-0.99.2.tar.gz.sig>
+  <http://invenio-software.org/download/invenio-0.99.2.tar.gz>
+  <http://invenio-software.org/download/invenio-0.99.2.tar.gz.md5>
+  <http://invenio-software.org/download/invenio-0.99.2.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -53,24 +53,24 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from CDS Invenio v0.99.1, then:
+If you are upgrading from Invenio v0.99.1, then:
 
  - please stop your bibsched queue and your Apache server
 
  - install the update:
 
-     $ cd cds-invenio-0.99.2
-     $ cp -a /opt/cds-invenio/etc /opt/cds-invenio/etc.OLD
-     $ sh /opt/cds-invenio/etc/build/config.nice
+     $ cd invenio-0.99.2
+     $ cp -a /opt/invenio/etc /opt/invenio/etc.OLD
+     $ sh /opt/invenio/etc/build/config.nice
      $ make install
-     $ /opt/cds-invenio/bin/inveniocfg --update-all
-     $ cp -a /opt/cds-invenio/etc.OLD /opt/cds-invenio/etc
+     $ /opt/invenio/bin/inveniocfg --update-all
+     $ cp -a /opt/invenio/etc.OLD /opt/invenio/etc
 
  - restart your Apache server and your bibsched queue
 
  - you are done
 
-If you are upgrading from previous CDS Invenio releases (e.g. from
+If you are upgrading from previous Invenio releases (e.g. from
 v0.92.1), then please see a dedicated Invenio Upgrade wiki page at
 <https://twiki.cern.ch/twiki/bin/view/CDS/InvenioUpgrade>.
 

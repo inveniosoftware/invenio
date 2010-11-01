@@ -1,37 +1,37 @@
-CDS Invenio v0.99.1 UNINSTALL
-=============================
+Invenio UNINSTALL
+=================
 
 About
 =====
 
-This document specifies how to uninstall the CDS Invenio.  Please see
+This document specifies how to uninstall the Invenio.  Please see
 INSTALL and RELEASE-NOTES files if you are looking for information on
 how to install or upgrade the system.
 
 Contents
 ========
 
-1. Quick instructions for the impatient CDS Invenio admin
-2. Detailed instructions for the patient CDS Invenio admin
+1. Quick instructions for the impatient Invenio admin
+2. Detailed instructions for the patient Invenio admin
 
-1. Quick instructions for the impatient CDS Invenio admin
+1. Quick instructions for the impatient Invenio admin
 ==================================================
 
-      $ cd /usr/local/src/cds-invenio-0.90
+      $ cd /usr/local/src/invenio-0.90
       $ make uninstall     ## NOTE: This has not been tested yet!!
       $ cd ..
-      $ rm -rf cds-invenio-0.90.tar.gz cds-invenio-0.90
+      $ rm -rf invenio-0.90.tar.gz invenio-0.90
       $ mysql -h sqlserver.domain.com -u root -p mysql
-          mysql> DROP DATABASE cdsinvenio;
-          mysql> REVOKE ALL PRIVILEGES ON cdsinvenio.* FROM cdsinvenio@webserver.domain.com;
+          mysql> DROP DATABASE invenio;
+          mysql> REVOKE ALL PRIVILEGES ON invenio.* FROM invenio@webserver.domain.com;
 
-2. Detailed instructions for the patient CDS Invenio admin
+2. Detailed instructions for the patient Invenio admin
 ===================================================
 
-      $ cd /usr/local/src/cds-invenio-0.90
- 
+      $ cd /usr/local/src/invenio-0.90
+
           Change to the directory where you have configured and built
-          the CDS Invenio.
+          the Invenio.
 
       $ make uninstall     ## NOTE: This has not been tested yet!!
 
@@ -44,25 +44,25 @@ Contents
           @prefix@.
 
       $ cd ..
-  
+
           Go to the parent directory.
 
-      $ rm -rf cds-invenio-0.90.tar.gz cds-invenio-0.90      
+      $ rm -rf invenio-0.90.tar.gz invenio-0.90
 
-          Wipe out the downloaded tarball and all the CDS Invenio sources.
+          Wipe out the downloaded tarball and all the Invenio sources.
 
       $ mysql -h sqlserver.domain.com -u root -p mysql
-          mysql> DROP DATABASE cdsinvenio;
-          mysql> REVOKE ALL PRIVILEGES ON cdsinvenio.* FROM cdsinvenio@webserver.domain.com;
+          mysql> DROP DATABASE invenio;
+          mysql> REVOKE ALL PRIVILEGES ON invenio.* FROM invenio@webserver.domain.com;
 
           Ask your MySQL administrator to execute the above commands
-          to drop CDS Invenio databases and to revoke access rights
-          from the CDS Invenio user.
+          to drop Invenio databases and to revoke access rights
+          from the Invenio user.
 
-Thanks for testing CDS Invenio.  We would be glad to hear from you
-about your CDS Invenio experience.  Please tell us what you think to
+Thanks for testing Invenio.  We would be glad to hear from you
+about your Invenio experience.  Please tell us what you think to
 help us to improve the system.  Thanks!
-  
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cdsware.cern.ch/>
+
+       - Invenio Development Group
+         <info@invenio-software.org>
+         <http://invenio-software.org/>

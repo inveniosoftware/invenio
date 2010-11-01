@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: _(WebSearch Admin Guide)_ -->
@@ -84,7 +84,7 @@ subsequently described in the rest of this guide.
 
 <a name="2"></a><h2>2. Edit Collection Tree</h2>
 
-<p>Metadata corpus in CDS Invenio is organized into collections.  The
+<p>Metadata corpus in Invenio is organized into collections.  The
 collections are organized in a tree.  The collection tree is what the
 end-users see when they start to navigate at <a
 href="<CFG_SITE_URL>"><CFG_SITE_NAME></a>.  The collection tree is similar to what
@@ -92,7 +92,7 @@ other sites call Web Directories that organize Web into topical
 categories, such as <a href="http://www.google.com/dirhp">Google
 Directory</a>.
 
-<p>Note that CDS Invenio permits every collection in the tree to have
+<p>Note that Invenio permits every collection in the tree to have
 either "regular" or "virtual" sons.  In other words, every node in the
 collection tree may see either regular or virtual branches growing out
 of it.  This permits to create a tree with very complex, multi-level,
@@ -295,14 +295,14 @@ its contents will be empty.
 
 <a name="3.2"></a><h3>3.2 Modify access restrictions</h3>
 
-<p>Until <em>CDS Invenio-0.92.1</em> there was the possibility to directly
+<p>Until <em>Invenio-0.92.1</em> there was the possibility to directly
 restrict a collection by specifying an Apache group. Users who had an
 Apache user and password belonging to the given group would have been able
 to access the restricted collection.</p>
 
 <p>Collection restriction managament is now integrated with the wider
 <a href="webaccess-admin-guide">Role Based Access Control</a>
-facility of CDS Invenio.</p>
+facility of Invenio.</p>
 
 <p>In order to restrict access to a collection you just have to create
 at least an authorization for the action <code>viewrestrcoll</code>
@@ -322,7 +322,7 @@ to whatever is your need.</p>
 <a name="3.3"></a><h3>3.3 Modify translations</h3>
 
 <p>You may define translations of collection names into the languages
-of your CDS Invenio installation.  Moreover, a collection name may be
+of your Invenio installation.  Moreover, a collection name may be
 different in different contexts (e.g. long name, short name, etc), so
 that prior to modifying translations you will be asked to select which
 name type you want to change.
@@ -486,7 +486,7 @@ additional source of information external to your repository: in a
 <i>book</i> collection you might want for example to provide a link to
 <i>Amazon</i> items corresponding to the user's query. Futhermore, for
 some external services only, you can set the collection to display the
-results directly in CDS Invenio search results page.
+results directly in Invenio search results page.
 
 <p>The following settings are available:
 <dl>
@@ -495,7 +495,7 @@ results directly in CDS Invenio search results page.
 <dt>See also</dt>
 <dd>A link to the external collection listing the items corresponding to user's query is displayed (only once a query has been performed).</dd>
 <dt>External search</dt>
-<dd>User can ask to perform a search in parallel on your repository and on the external collection. Results are shown in the CDS Invenio search results page. Not available for all external collections.<dd>
+<dd>User can ask to perform a search in parallel on your repository and on the external collection. Results are shown in the Invenio search results page. Not available for all external collections.<dd>
 <dt>External search checked</dt>
 <dd>Same as above, but the external collection is searched by default. Not available for all external collections.</dd>
 <dl>

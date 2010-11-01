@@ -1,22 +1,22 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Directory Organization -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <pre>
@@ -24,28 +24,28 @@ Please find some notes below on how the source (as well as the target)
 directory structure is organized, where the sources get installed to,
 and how the visible URLs are organized.
 
-1. CDS Invenio will generally install into the directory taken from
+1. Invenio will generally install into the directory taken from
    --with-prefix configuration variables.  These are discussed in points
    2 and 3 below, respectively.
 
-2. The first directory (--with-prefix) specifies general CDS Invenio
+2. The first directory (--with-prefix) specifies general Invenio
    install directory, where we'll put CLI binaries, Python and PHP
    libraries, manpages, log and cache directories for the running
    installation, and any other dirs as needed.  They will all live
    under one common hood.
 
-   For example, configure --with-prefix=/opt/cds-invenio,
+   For example, configure --with-prefix=/opt/invenio,
    and you'll obtain the following principal directories:
 
-      /opt/cds-invenio/
-      /opt/cds-invenio/bin
-      /opt/cds-invenio/lib
-      /opt/cds-invenio/lib/php
-      /opt/cds-invenio/lib/python
-      /opt/cds-invenio/lib/wml
-      /opt/cds-invenio/var
-      /opt/cds-invenio/var/cache
-      /opt/cds-invenio/var/log
+      /opt/invenio/
+      /opt/invenio/bin
+      /opt/invenio/lib
+      /opt/invenio/lib/php
+      /opt/invenio/lib/python
+      /opt/invenio/lib/wml
+      /opt/invenio/var
+      /opt/invenio/var/cache
+      /opt/invenio/var/log
 
    with the obvious meaning:
 
@@ -103,8 +103,8 @@ and how the visible URLs are organized.
 4. Let's now return a bit more closely to the role Python and PHP
    library directories outside of the Apache tree:
 
-      /opt/cds-invenio/lib/php
-      /opt/cds-invenio/lib/python
+      /opt/invenio/lib/php
+      /opt/invenio/lib/python
 
    Here we put not only (a) libraries that may be reused across CDS
    Invenio modules, but also (b) all the "core" functionality of CDS
@@ -113,11 +113,11 @@ and how the visible URLs are organized.
    web scripts and documents, and under "bindir" in case of CLI
    executables.
 
-   As for (a), for example in the PHP CDS Invenio library you'll find
+   As for (a), for example in the PHP Invenio library you'll find
    currently the common PHP error handling code that is shared between
-   BibFormat and WebSubmit; in the Python CDS Invenio library (in fact,
-   CDS Invenio Pythonic 'module', but we are reserving the word 'module'
-   to denote 'CDS Invenio module' in this text) you'll find config.py
+   BibFormat and WebSubmit; in the Python Invenio library (in fact,
+   Invenio Pythonic 'module', but we are reserving the word 'module'
+   to denote 'Invenio module' in this text) you'll find config.py
    containing WML-supplied site parameters, dbquery.py containing DB
    persistent query module, or webpage.py with templates and functions
    to produce mod_python web pages with common look and feel.  These
@@ -136,7 +136,7 @@ and how the visible URLs are organized.
 
    To recap:
 
-      - For each CDS Invenio module, I'm differentiating between
+      - For each Invenio module, I'm differentiating between
         "callable" and "core" parts.  The former go into
         prefix/var/www or BINDIR, the latter into LIBDIR.
 
@@ -145,9 +145,9 @@ and how the visible URLs are organized.
           - the implementation of the "callable" functions
 
           - non-callable internal "core" or "library" code parts, as
-            stated above.  Not shared across CDS Invenio modules.
+            stated above.  Not shared across Invenio modules.
 
-          - utility code meant for reuse across CDS Invenio modules, such
+          - utility code meant for reuse across Invenio modules, such
             as dbquery.py
 
           - Pythonic config files out of user-supplied WML (non-MySQL)
@@ -155,7 +155,7 @@ and how the visible URLs are organized.
             e.g. search_engine_config.py)
 
 5. The same strategy is reflected in the organization of source
-   directories inside CDS Invenio CVS.  Each CDS Invenio module lives in a
+   directories inside Invenio CVS.  Each Invenio module lives in a
    separate directory located under "modules" directory of the
    sources.  Further on, each module contains usually several
    subdirectories that reflect the above-mentioned packaging choice.
@@ -187,7 +187,7 @@ and how the visible URLs are organized.
               admin- level is separated similarly as in the "doc"
               directory (see above).
 
-   The structure is respected throughout all the CDS Invenio modules, a
+   The structure is respected throughout all the Invenio modules, a
    notable exception being the MiscUtil module that contains subdirs
    like "sql" (for the table creating/dropping SQL commands, etc) or
    "demo" (for creation of Atlantis Institute of Science, our demo

@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable=C0301
@@ -28,8 +28,8 @@ from invenio.config import CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT, \
 
 # if we want to define a parser for an external collection directly using the following dictionary
 # we have to import them here instead of the searcher
-from invenio.websearch_external_collections_parser import CDSInvenioHTMLExternalCollectionResultsParser
-from invenio.websearch_external_collections_parser import CDSInvenioXMLExternalCollectionResultsParser
+from invenio.websearch_external_collections_parser import InvenioHTMLExternalCollectionResultsParser
+from invenio.websearch_external_collections_parser import InvenioXMLExternalCollectionResultsParser
 
 
 CFG_EXTERNAL_COLLECTION_TIMEOUT = CFG_WEBSEARCH_EXTERNAL_COLLECTION_SEARCH_TIMEOUT
@@ -88,12 +88,12 @@ CFG_EXTERNAL_COLLECTIONS = {
     'SLAC Library Catalog':
         {'engine': 'SPIRESBooks'},
     'Atlantis Institute Books':
-        {'engine': 'CDSInvenio',
+        {'engine': 'Invenio',
          'base_url': 'http://invenio-demo.cern.ch/',
          'parser_params':
             {'host': 'invenio-demo.cern.ch',
              'path': '',
-             'parser': CDSInvenioHTMLExternalCollectionResultsParser,
+             'parser': InvenioHTMLExternalCollectionResultsParser,
              'fetch_format': 'hb',
              'num_results_regex_str': r'<strong>([0-9,]+?)</strong> records found',
              'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
@@ -102,12 +102,12 @@ CFG_EXTERNAL_COLLECTIONS = {
          'record_url': 'http://invenio-demo.cern.ch/record/',
          'selected_by_default': False},
     'Atlantis Institute Articles':
-        {'engine': 'CDSInvenio',
+        {'engine': 'Invenio',
          'base_url': 'http://invenio-demo.cern.ch/',
          'parser_params':
             {'host': 'invenio-demo.cern.ch',
              'path': '',
-             'parser': CDSInvenioXMLExternalCollectionResultsParser,
+             'parser': InvenioXMLExternalCollectionResultsParser,
              'fetch_format': 'xm',
              'num_results_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
              'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
@@ -116,12 +116,12 @@ CFG_EXTERNAL_COLLECTIONS = {
          'record_url': 'http://invenio-demo.cern.ch/record/',
          'selected_by_default': True},
     'CDS DEV':
-        {'engine': 'CDSInvenio',
+        {'engine': 'Invenio',
          'base_url': 'http://cdsdev.cern.ch/',
          'parser_params':
             {'host': 'cdsdev.cern.ch',
              'path': '',
-             'parser': CDSInvenioXMLExternalCollectionResultsParser,
+             'parser': InvenioXMLExternalCollectionResultsParser,
              'fetch_format': 'xm',
              'num_results_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',
              'nbrecs_regex_str': r'<!-- Search-Engine-Total-Number-Of-Results: ([0-9,]+?) -->',

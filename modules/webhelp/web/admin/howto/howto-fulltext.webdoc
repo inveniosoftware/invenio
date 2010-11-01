@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: HOWTO Manage Fulltext Files -->
@@ -21,7 +21,7 @@
 
 <h2>How to manage your fulltext files through BibDocFile</h2>
 <protect><pre>
-Usage: /opt/cds-invenio/bin/bibdocfile [options]
+Usage: /opt/invenio/bin/bibdocfile [options]
 
 Options:
   --version             show program's version number and exit
@@ -173,7 +173,7 @@ Examples:
 
 <h2>How to convert your fulltext files among different formats</h2>
 <protect><pre>
-Usage: python /opt/cds-invenio/lib/python/invenio/websubmit_file_converter.py [options]
+Usage: python /opt/invenio/lib/python/invenio/websubmit_file_converter.py [options]
 
 Options:
   -h, --help            show this help message and exit
@@ -200,12 +200,12 @@ Options:
                         en, it, fr...)
 
   Examples:
-    python /opt/cds-invenio/lib/python/invenio/websubmit_file_converter.py \
+    python /opt/invenio/lib/python/invenio/websubmit_file_converter.py \
               --convert=foo.docx -f pdf
     ## The previous command will generate a PDF/A out of a Microsoft Office
     ## Word document
 
-    python /opt/cds-invenio/lib/python/invenio/websubmit_file_converter.py \
+    python /opt/invenio/lib/python/invenio/websubmit_file_converter.py \
               --special-pdf2hocr2pdf=scanned-foo.pdf --output=ocred-foo.pdf
     ## The previous command will generate a new PDF with a text stream
     ## extracted via an OCR engine.
@@ -214,12 +214,12 @@ Options:
 <p>This module is used internally by Invenio to convert from one format to
 another</p>
 <p>It can also be invoked manually by a system administrator to obtain the
-same level of conversion quality offered by CDS Invenio.</p>
+same level of conversion quality offered by Invenio.</p>
 
 <h2>How to create icons</h2>
 <protect><pre>
 Usage:
-  python /opt/cds-invenio/lib/python/invenio/websubmit_icon_creator.py \
+  python /opt/invenio/lib/python/invenio/websubmit_icon_creator.py \
                            [options] input-file.jpg
 
   websubmit_icon_creator.py is used to create an icon for an image.
@@ -256,13 +256,13 @@ Usage:
                                    file, but will be prefixed by "icon-";
 
   Examples:
-    python /opt/cds-invenio/lib/python/invenio/websubmit_icon_creator.py \
+    python /opt/invenio/lib/python/invenio/websubmit_icon_creator.py \
               --icon-scale=200 \
               --icon-name=test-icon \
               --icon-file-format=jpg \
               test-image.jpg
 
-    python /opt/cds-invenio/lib/python/invenio/websubmit_icon_creator.py \
+    python /opt/invenio/lib/python/invenio/websubmit_icon_creator.py \
               --icon-scale=200 \
               --icon-name=test-icon2 \
               --icon-file-format=gif \
@@ -274,7 +274,7 @@ Usage:
 <h2>How to stamp PDFs</h2>
 <protect><pre>
 Usage:
-  python /opt/cds-invenio/lib/python/invenio/websubmit_file_stamper.py \
+  python /opt/invenio/lib/python/invenio/websubmit_file_stamper.py \
                            [options] input-file.pdf
 
   websubmit_file_stamper.py  is used to add a "stamp" to a PDF file.
@@ -319,7 +319,7 @@ Usage:
                              file, but will be prefixed by "stamped-";
 
   Example:
-    python /opt/cds-invenio/lib/python/invenio/websubmit_file_stamper.py \
+    python /opt/invenio/lib/python/invenio/websubmit_file_stamper.py \
               --latex-template=demo-stamp-left.tex \
               --latex-template-var='REPORTNUMBER=TEST-THESIS-2008-019' \
               --latex-template-var='DATE=27/02/2008' \

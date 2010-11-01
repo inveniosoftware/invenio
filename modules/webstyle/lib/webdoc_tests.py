@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """WebDoc module unit tests."""
@@ -96,7 +96,7 @@ class WebDocPartsTest(unittest.TestCase):
 
             result = transform('''
             <!-- WebDoc-Page-Title: _(Help Central)_  -->
-            <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a> -->
+            <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a> -->
             <!-- WebDoc-Page-Revision: $Id: help-central.webdoc,v 1.5 2008/05/26 12:52:41 jerome Exp $ -->
             <!-- WebDoc-Page-Description: A description -->''',
                                languages=[CFG_SITE_LANG])
@@ -108,7 +108,7 @@ class WebDocPartsTest(unittest.TestCase):
             self.assertEqual(result[0][3], None)
 
             # Navtrail
-            self.assertEqual(result[0][4], '<a class="navtrail" href="%s/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a>' % CFG_SITE_URL)
+            self.assertEqual(result[0][4], '<a class="navtrail" href="%s/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a>' % CFG_SITE_URL)
 
             # Revision. Keep date & time only
             self.assertEqual(result[0][5], '2008-05-26 12:52:41')

@@ -1,7 +1,7 @@
-CDS Invenio v0.99.1 THANKS
-==========================
+Invenio THANKS
+==============
 
-Several people outside the CDS Invenio Development Team
+Several people outside the Invenio Development Team
 contributed to the project:
 
   - Thierry Thomas <thierry@FreeBSD.org>
@@ -141,13 +141,13 @@ Initiative.
 
 The PEP8 conformance checking script (pep8.py) was written by Johann
 C. Rocholl <johann@browsershots.org>.  The pep8.py version included
-with CDS Invenio was downloaded from
+with Invenio was downloaded from
 <http://svn.browsershots.org/trunk/devtools/pep8/pep8.py> on
 2009-06-14.
 
 The asyncproc module to manage asynchronous processes with timeout support
 was written by Thomas Bellman <bellman@lysator.liu.se>.  The asyncproc.py
-version included with CDS Invenio was downloaded from
+version included with Invenio was downloaded from
 <http://www.lysator.liu.se/~bellman/download/asyncproc.py> on 2009-07-13.
 
 The git-version-gen script was taken from gnulib 20100704+stable-1.

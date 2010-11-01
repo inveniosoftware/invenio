@@ -1,4 +1,4 @@
-/*Define here the config of the FCKEditor used in CDS Invenio.
+/*Define here the config of the FCKEditor used in Invenio.
 
   Users/admin:
   Since the editor is used in various contexts that require different

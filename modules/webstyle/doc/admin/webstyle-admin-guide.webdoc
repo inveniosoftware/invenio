@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebStyle Admin Guide -->
@@ -83,7 +83,7 @@ page header and footer.</p>
 
 <h4><a name="overview_page_layout_stat">1.2.1 Layout of HTML Static Pages</a></h4>
 
-<p>Static HTML pages are all located in the /opt/cds-invenio/lib/webdoc/
+<p>Static HTML pages are all located in the /opt/invenio/lib/webdoc/
 installation directory. These files are organized in 3 directories:</p>
 <ul>
 <li><b>help:</b> Help pages available to users of your website</li>
@@ -127,12 +127,12 @@ your needs: <b>they</b> will adapt themselves to your needs.</p>
 <p>Any modification should be immediatly visible when looking at the
 pages from the web: the pages are built "dynamically" and then cached.
 If you want to force the cache of the pages, use the WebDoc CLI
-(type <code>/opt/cds-invenio/bin/webdoc --help</code> to learn more about it).</p>
+(type <code>/opt/invenio/bin/webdoc --help</code> to learn more about it).</p>
 
 <h4><a name="overview_page_layout_dyn">1.2.2 Layout of Python Dynamic Pages</a></h4>
 
 <p>The dynamic Python-powered pages can be customized by making use of
-CDS Invenio templating system that uses a notion of a template skin.
+Invenio templating system that uses a notion of a template skin.
 How this works?</p>
 
 <p>When you edit <code>invenio-local.conf</code> during installation
@@ -143,7 +143,7 @@ provided default ones by editing
 <code>CFG_WEBSTYLE_TEMPLATE_SKIN</code> variable.  Let us say you
 put <code>ithaca</code> there in order to use your
 own <code>ithaca</code> style.  Now, when you start Apache, then
-instead of CDS Invenio's usual template files such
+instead of Invenio's usual template files such
 as <code>webbasket_templates.py</code> the system will look for file
 named <code>webbasket_templates_ithaca.py</code> and will load the
 template functions from there instead, provided that they exist.
@@ -233,7 +233,7 @@ End of the side comment.)
     thanks to the full Python power.</li>
 
 <li>If you feel like doing so, you can modify all
-    the <code>tmpl_foo()</code> functions across all CDS Invenio
+    the <code>tmpl_foo()</code> functions across all Invenio
     modules in a way that will completely change the presentation of
     elements including their content, position and order on the
     screen.</li>
@@ -247,7 +247,7 @@ End of the side comment.)
     generate which region on the web page, you can switch on
     the <tt>CFG_WEBSTYLE_INSPECT_TEMPLATES</tt> configuration variable
     in your <tt>invenio-local.conf</tt> file and rerun <code>sudo -u
-    apache /opt/cds-invenio/bin/inveniocfg
+    apache /opt/invenio/bin/inveniocfg
     --update-config-py</code>. Then, after optionally running
     <code>bibreformat -a</code> and <code>webcoll -f</code> (if you
     want to debug search pages) and after having restarted your Apache
@@ -260,10 +260,10 @@ End of the side comment.)
     snippet in the output.</li>
 
 <li>We expect to provide possibly more than one skin with the default
-    distribution, so if you have modified CDS Invenio look and feel in
+    distribution, so if you have modified Invenio look and feel in
     an interesting way, please consider donating us your templates.</li>
 
-<li>When upgrading from one CDS Invenio release to another, you may
+<li>When upgrading from one Invenio release to another, you may
     find out that the default templates have changed in a way that
     requires changes to your templates (such as an addition of
     parameters to cover the new functionality).  This is inevitable in
@@ -288,8 +288,8 @@ End of the side comment.)
     You can also run this tool any time after the new default
     templates have been installed, in order to ensure that
     modifications you have done to your templates are valid. To do so
-    move to your CDS Invenio installation directory, and run: <br/>
-    <code>$ python /opt/cds-invenio/lib/python/invenio/template.py
+    move to your Invenio installation directory, and run: <br/>
+    <code>$ python /opt/invenio/lib/python/invenio/template.py
     --check-custom-templates</code>
 </li>
 

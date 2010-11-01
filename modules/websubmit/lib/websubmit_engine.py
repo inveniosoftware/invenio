@@ -1,21 +1,21 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""WebSubmit: the mechanism for the submission of new records into CDS Invenio
+"""WebSubmit: the mechanism for the submission of new records into Invenio
    via a Web interface.
 """
 
@@ -117,7 +117,7 @@ def interface(req,
         the index function of websubmit_webinterface. It contains a
         "mod_python.util.FieldStorage" instance, that contains the form-fields
         found on the previous submission page.
-       @param c: (string), defaulted to CFG_SITE_NAME. The name of the CDS Invenio
+       @param c: (string), defaulted to CFG_SITE_NAME. The name of the Invenio
         installation.
        @param ln: (string), defaulted to CFG_SITE_LANG. The language in which to
         display the pages.
@@ -135,7 +135,7 @@ def interface(req,
        @param access: (string) - the "access" number for the submission
         (e.g. 1174062451_7010). This number is also used as the name for the
         current working submission directory.
-       @param mainmenu: (string) - contains the URL (minus the CDS Invenio
+       @param mainmenu: (string) - contains the URL (minus the Invenio
         home stem) for the submission's home-page. (E.g. If this submission
         is "PICT", the "mainmenu" file would contain "/submit?doctype=PICT".
        @param fromdir: (integer)
@@ -737,7 +737,7 @@ def endaction(req,
         the index function of websubmit_webinterface. It contains a
         "mod_python.util.FieldStorage" instance, that contains the form-fields
         found on the previous submission page.
-       @param c: (string), defaulted to CFG_SITE_NAME. The name of the CDS Invenio
+       @param c: (string), defaulted to CFG_SITE_NAME. The name of the Invenio
         installation.
        @param ln: (string), defaulted to CFG_SITE_LANG. The language in which to
         display the pages.
@@ -755,7 +755,7 @@ def endaction(req,
        @param access: (string) - the "access" number for the submission
         (e.g. 1174062451_7010). This number is also used as the name for the
         current working submission directory.
-       @param mainmenu: (string) - contains the URL (minus the CDS Invenio
+       @param mainmenu: (string) - contains the URL (minus the Invenio
         home stem) for the submission's home-page. (E.g. If this submission
         is "PICT", the "mainmenu" file would contain "/submit?doctype=PICT".
        @param fromdir:
@@ -1136,7 +1136,7 @@ def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
        connected to a submission-collection in WebSubmit.
        @param req: (apache request object)
        @param c: (string) - defaults to CFG_SITE_NAME
-       @param ln: (string) - The CDS Invenio interface language of choice.
+       @param ln: (string) - The Invenio interface language of choice.
         Defaults to CFG_SITE_LANG (the default language of the installation).
        @return: (string) - the Web page to be displayed.
     """

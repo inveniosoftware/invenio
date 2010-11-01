@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibRank Admin Guide -->
@@ -95,12 +95,12 @@ Which collections the rank method should be visible in.
 </blockquote>
 
 <a name="ar"></a><h3>3.2 Add rank method</h3>
-<p>When pressing the link in the upper right corner from the main interface, you will see the interface for adding a new rank method. The two available options that needs to be decided upon, are the bibrank code and the template to use, both values can be changed later. The bibrank code is used by the bibrank daemon to run the method, and should be fairly short without spaces. Which template you are using, decides how the ranking will be done, and must before used, be changed to suit your CDS Invenio configuration. When confirming to add a new rank method, it will be added to the list of possible rank methods, and a configuration file will be created if the httpd user has proper rights to the 'invenio/etc/bibrank' directory. If not, the file has to manually be created with the name 'bibrankcode.cfg' where bibrankcode is the same as given in the interface.</p>
+<p>When pressing the link in the upper right corner from the main interface, you will see the interface for adding a new rank method. The two available options that needs to be decided upon, are the bibrank code and the template to use, both values can be changed later. The bibrank code is used by the bibrank daemon to run the method, and should be fairly short without spaces. Which template you are using, decides how the ranking will be done, and must before used, be changed to suit your Invenio configuration. When confirming to add a new rank method, it will be added to the list of possible rank methods, and a configuration file will be created if the httpd user has proper rights to the 'invenio/etc/bibrank' directory. If not, the file has to manually be created with the name 'bibrankcode.cfg' where bibrankcode is the same as given in the interface.</p>
 
 <a name="sd"></a><h3>3.3 Show details of rank method</h3>
 <p>This interface gives you an overview of the current status of the rank method, and gives direct access to the various interfaces for changing the configuration.
 In the overview section, you see the bibrank code, for use with the bibrank daemon, and the date for the last run of the rank method.
-In the statistics section you see how many records have been added to the rank method and other statistic data. In the collection part, the collections which the rank method is visible to is shown. The translations part shows the various translations in the languages available in CDS Invenio. On the bottom the configuration file is shown, if accessible.</p>
+In the statistics section you see how many records have been added to the rank method and other statistic data. In the collection part, the collections which the rank method is visible to is shown. The translations part shows the various translations in the languages available in Invenio. On the bottom the configuration file is shown, if accessible.</p>
 
 <a name="mr"></a><h3>3.4 Modify rank method</h3>
 <p>This interface gives access to modify the bibrank code given when creating the rank method and the configuration file of the rank method, if the file can be accessed. If not, it may not exist, or the httpd user doesn't have enough rights to read the file. On the bottom of the interface, it is possible to choose a template, see it, and copy it over the old rank method configuration if wanted. Remember that the values present in the template is an example, and must be changed where necessary. See this documentation for information about this, and the 'BibRank Internals' link below for additional information.</p>
@@ -109,13 +109,13 @@ In the statistics section you see how many records have been added to the rank m
 <p>If it is necessary to delete a rank method, some precautions must be taken since the configuration of the method will be lost. When deleting a rank method, the configuration file will also be deleted ('invenio/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the file can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.</p>
 
 <a name="mt"></a><h3>3.6 Modify translations</h3>
-<p>If you want to use internalisation of the rank method names, you have to add them using the 'Modify translations' interface. Below a list of all the languages used in the CDS Invenio installation will be shown with the possibility to add the translation for each language.</p>
+<p>If you want to use internalisation of the rank method names, you have to add them using the 'Modify translations' interface. Below a list of all the languages used in the Invenio installation will be shown with the possibility to add the translation for each language.</p>
 
 <a name="mc"></a><h3>3.7 Modify visibility toward collections</h3>
-<p>If a rank method should be visible to the users of the CDS Invenio search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper list box does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower list box. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.</p>
+<p>If a rank method should be visible to the users of the Invenio search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper list box does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower list box. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.</p>
 
 <a name="bd"></a><h2>4. BibRank Daemon</h2>
-<p>The bibrank daemon read the necessary metadata from the CDS Invenio database and combines the read metadata
+<p>The bibrank daemon read the necessary metadata from the Invenio database and combines the read metadata
 in different ways to create the ranking data necessary at searchtime to fast be able to rank the results.</p>
 <a name="cli1"></a><h3>4.1 Command Line Interface</h3>
 <blockquote>
@@ -181,7 +181,7 @@ J. High Energy Phys.---8.664
 
 <h4>Step 3 - Modify the configuration file</h4>
 <p>The configuration files for the different rank methods has different option, so verify that you are using the correct
-configuration file and rank method. A template for each rank method exists as examples, but may not work on all configurations of CDS Invenio.
+configuration file and rank method. A template for each rank method exists as examples, but may not work on all configurations of Invenio.
 For a description of each rank method and the configuration necessary, check section 6 below.</p>
 
 <h4>Step 4 - Add the ranking method as a scheduled task</h4>
@@ -456,7 +456,7 @@ relevance_number_output_epilogue = )
 
 <a name="bt"></a><h2>6. bibrankgkb Tool</h2>
 <p>For some ranking methods, like the single_tag_rank method, a knowledge base file (kb) with the needed data in the correct format is necessary. This file can be created using the bibrankgkb tool which can read the data either from
-the CDS Invenio database, from several web pages using regular expressions, or from another file. In case one source
+the Invenio database, from several web pages using regular expressions, or from another file. In case one source
 has another naming convention, bibrank can convert between them using a convert file.</p>
 <a name="cli2"></a><h3>6.1 Command Line Interface</h3>
 
@@ -481,7 +481,7 @@ Usage: bibrankgkb %s [options]
 <a name="ubt"></a><h3>6.2 Using bibrankgkb</h3>
 
 <h4>Step 1 - Find sources</h4>
-<p>Since some of the data used for ranking purposes is not freely available, it cannot be bundled with CDS Invenio. To get hold of the necessary data,
+<p>Since some of the data used for ranking purposes is not freely available, it cannot be bundled with Invenio. To get hold of the necessary data,
 you may find it useful to ask your library if they have a copy of the data that can be used (like the Journal Impact Factors from the Science Citation Index), or use google to search the web for any public source.</p>
 <h4>Step 2 - Create configuration file</h4>
 <p>The default configuration file is shown below.</p>
@@ -534,14 +534,14 @@ create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
 
 <p>When you have found a source for the data, created the configuration file, it may be necessary to
 create an conversion file, but this depends on the conversions used in the available data versus
-the conversion used in your CDS Invenio installation.</p>
+the conversion used in your Invenio installation.</p>
 <p>The available data may look like this:</p>
 <blockquote>
 <pre>
 COLLOID SURFACE A---1.98
 </pre>
 </blockquote>
-<p>But in CDS Invenio you are using:</p>
+<p>But in Invenio you are using:</p>
 <blockquote>
 <pre>
 Colloids Surf., A---1.98

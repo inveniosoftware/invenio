@@ -1,12 +1,12 @@
-CDS Invenio TODO
-================
+Invenio TODO
+============
 
-As of March 2006 the TODO list is now handled by CERN Savannah:
+Invenio TODO list is handled by Trac at
 
-   https://savannah.cern.ch/projects/cdsware/
+   <http://invenio-software.org/>
 
 Please use this resource from now on.
 
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cdsware.cern.ch/>
+       - Invenio Development Team
+         <info@invenio-software.org>
+         <http://invenio-software.org/>

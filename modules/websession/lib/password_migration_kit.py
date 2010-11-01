@@ -2,21 +2,21 @@
 ##
 ## Every db-related function of module webmessage
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """ Migration from local clear password [v0.92.1] to local encrypted
@@ -36,7 +36,7 @@ from invenio.textutils import wrap_text_in_a_box
 import sys
 
 def migrate_passwords():
-    print wrap_text_in_a_box(title="Password migration kit (for CDS Invenio prior to v0.92.1)", style='conclusion')
+    print wrap_text_in_a_box(title="Password migration kit (for Invenio prior to v0.92.1)", style='conclusion')
     print "Checking your installation..."
     if __check_update_possibility():
         print "Tables are OK."
@@ -89,7 +89,7 @@ def __check_update_possibility():
     res = run_sql("SHOW COLUMNS FROM user LIKE 'password'");
     if res:
         return res[0][1] not in ('tinyblob', 'blob')
-    print "User table is broken or CDS Invenio Database is not functional."
+    print "User table is broken or Invenio Database is not functional."
 
 def __count_current_passwords():
     query = "SELECT count(*) FROM user"
@@ -177,10 +177,10 @@ def __restoring_from_backup():
     return True
 
 def __print_error(restore_backup=False):
-    print wrap_text_in_a_box("The kit encountered errors in migrating passwords. Please contact The CDS Invenio developers in order to get support providing all the printed messages.")
+    print wrap_text_in_a_box("The kit encountered errors in migrating passwords. Please contact The Invenio developers in order to get support providing all the printed messages.")
     if restore_backup:
         if __restoring_from_backup():
-            print wrap_text_in_a_box("Passwords were restored from the backup, but you still need to migrate them in order to use this version of CDS Invenio.")
+            print wrap_text_in_a_box("Passwords were restored from the backup, but you still need to migrate them in order to use this version of Invenio.")
         else:
             print wrap_text_in_a_box("The kit was't unable to restore passwords from the backup")
     sys.exit(1)

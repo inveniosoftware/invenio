@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
@@ -176,7 +176,7 @@ def superuser_account_warnings():
     #Try and connect to the invenio database with the default invenio password
     try:
         conn = MySQLdb.connect (host = CFG_DATABASE_HOST,
-                                user = "cdsinvenio",
+                                user = "invenio",
                                 passwd = "my123p$ss",
                                 db = CFG_DATABASE_NAME)
         conn.close ()
@@ -192,12 +192,12 @@ def superuser_account_warnings():
         warning_array.append("warning_empty_admin_password")
 
     #Check if the admin email has been changed from the default
-    if (CFG_SITE_ADMIN_EMAIL == "cds.support@cern.ch" or CFG_SITE_SUPPORT_EMAIL == "cds.support@cern.ch") and CFG_CERN_SITE == 0:
+    if (CFG_SITE_ADMIN_EMAIL == "info@invenio-software.org" or CFG_SITE_SUPPORT_EMAIL == "info@invenio-software.org") and CFG_CERN_SITE == 0:
         warning_array.append("warning_site_support_email_equal_to_default")
 
-    #Check for a new release of CDS Invenio
+    #Check for a new release of Invenio
     try:
-        find = re.compile('CDS Invenio v[0-9]+.[0-9]+.[0-9]+ is released')
+        find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+ is released')
 
         webFile = urllib.urlopen("http://cdsware.cern.ch/download/RELEASE-NOTES")
 

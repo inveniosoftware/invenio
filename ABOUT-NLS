@@ -1,10 +1,10 @@
-CDS Invenio v0.99.1 NATIVE LANGUAGE SUPPORT
-===========================================
+Invenio NATIVE LANGUAGE SUPPORT
+===============================
 
 About
 =====
 
-This document describes the Native Language Support (NLS) in CDS Invenio.
+This document describes the Native Language Support (NLS) in Invenio.
 
 Contents
 ========
@@ -18,7 +18,7 @@ B. Integrating translation contributions
 1. Native Language Support information for administrators
 =========================================================
 
-CDS Invenio is currently available in the following languages:
+Invenio is currently available in the following languages:
 
    af = Afrikaans
    bg = Bulgarian
@@ -47,14 +47,14 @@ CDS Invenio is currently available in the following languages:
    zh_CN = Chinese (China)
    zh_TW = Chinese (Taiwan)
 
-If you are installing CDS Invenio and you want to enable/disable some
+If you are installing Invenio and you want to enable/disable some
 languages, please just follow the standard installation procedure as
 described in the INSTALL file.  The default language of the
 installation as well as the list of all user-seen languages can be
 selected in the general invenio.conf file, see variables CFG_SITE_LANG
 and CFG_SITE_LANGS.
 
-(Please note that some runtime CDS Invenio daemons -- such as webcoll,
+(Please note that some runtime Invenio daemons -- such as webcoll,
 responsible for updating the collection cache, running every hour or
 so -- may work twice as long when twice as many user-seen languages
 are selected, because it creates collection cache page elements for
@@ -65,7 +65,7 @@ setup, you may want to try to limit the list of selected languages.)
 2. Native Language Support information for translators
 ======================================================
 
-If you want to contibute a translation to CDS Invenio, then please follow
+If you want to contibute a translation to Invenio, then please follow
 the procedure below:
 
   - Please check out the existence of po/LL.po file for your language,
@@ -73,7 +73,7 @@ the procedure below:
     Greek).  If such a file exists, then this language is already
     supported, in which case you may want to review the existing
     translation (see below).  If the file does not exist yet, then you
-    can create an empty one by copying the cds-invenio.pot template file
+    can create an empty one by copying the invenio.pot template file
     into LL.po that you can review as described in the next item.
     (Please note that you would have to translate some dynamic
     elements that are currently not located in the PO file, see the
@@ -92,7 +92,7 @@ the procedure below:
     make sure it does not contain formatting errors.  (E.g. in the
     Emacs PO mode, press `V' to validate the file.)
 
-  - If you have access to a test installation of CDS Invenio, you may want
+  - If you have access to a test installation of Invenio, you may want
     to see your modified PO file in action:
 
        $ cd po
@@ -120,8 +120,8 @@ the procedure below:
     ``make''.  End of note to developers.)
 
   - Please contribute your translation by emailing the file to
-    <cds.support@cern.ch>.  You help is greatly appreciated and will
-    be properly credited in the THANKS file.
+    <info@invenio-software.org>.  You help is greatly appreciated and
+    will be properly credited in the THANKS file.
 
 See also the GNU gettext manual, especially the chapters 5, 6 and 11.
 <http://www.gnu.org/software/gettext/manual/html_chapter/gettext_toc.html>
@@ -129,7 +129,7 @@ See also the GNU gettext manual, especially the chapters 5, 6 and 11.
 3. Native Language Support information for programmers
 ======================================================
 
-CDS Invenio uses standard GNU gettext I18N and L12N philosophy.
+Invenio uses standard GNU gettext I18N and L12N philosophy.
 
 In Python programs, all output strings should be made translatable via
 the _() convention:
@@ -246,7 +246,7 @@ translator sends over the following translations by email:
    - demo right-hand-side portalbox, from democfgdata.sql:
 
         ABOUT THIS SITE
-        Welcome to the demo site of the CDS Invenio, a free document server
+        Welcome to the demo site of the Invenio, a free document server
         software coming from CERN. Please feel free to explore all the
         features of this demo site to the full.
         SEE ALSO
@@ -259,25 +259,25 @@ be to translate some short static HTML pages such as:
 
    - modules/webhelp/web/help-central.webdoc
 
-Thanks for helping us to internationalize CDS Invenio.
+Thanks for helping us to internationalize Invenio.
 
 Appendix B. Integrating translation contributions
 =================================================
 
 This appendix contains some tips on integrating translated phrases
-that were prepared for different CDS Invenio releases.  It is mostly
-of interest to CDS Invenio developers or the release manager.
+that were prepared for different Invenio releases.  It is mostly
+of interest to Invenio developers or the release manager.
 
 Imagine that we have a working translation file sk.po and that we have
 received a contribution co-CONTRIB.po that was prepared for previous
-CDS Invenio release, so that the messages do not fully correspond.
+Invenio release, so that the messages do not fully correspond.
 Moreover, another person might have had worked with the sk.po file in
 the meantime.  The goal is to integrate the contributions.
 
 Firstly, check whether the contributed file sk-CONTRIB.po was indeed
 prepared for different software release version:
 
-   $ msgcmp --use-fuzzy --use-untranslated sk-CONTRIB.po cds-invenio.pot
+   $ msgcmp --use-fuzzy --use-untranslated sk-CONTRIB.po invenio.pot
 
 If yes, then join its translations with the ones in the latest sk.po
 file:
@@ -286,10 +286,10 @@ file:
 
 and update the message references:
 
-   $ msgmerge sk-TMP.po cds-invenio.pot > sk-NEW.po
+   $ msgmerge sk-TMP.po invenio.pot > sk-NEW.po
 
 This will give the new file sk-NEW.po that should now be msgcmp'rable
-to cds-invenio.pot.
+to invenio.pot.
 
 Lastly, we will have to go manually through sk-NEW.po in order to
 resolve potential translation conflicts (marked via ``#-#-#-#-#''

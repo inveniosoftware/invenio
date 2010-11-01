@@ -1,41 +1,41 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Common Concepts -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <pre>
 The description of concepts you will encounter here and there in the
-CDS Invenio.  Our interpretation may differ from the practice found in
+Invenio.  Our interpretation may differ from the practice found in
 other products, so please read this carefully.
 
 1. sysno - (ALEPH|old) system number
 
    Stands for (ALEPH|old) system number only.  Which means that, for
-   outside-CERN CDS Invenio installations, stands for an 'old system
+   outside-CERN Invenio installations, stands for an 'old system
    number' whatever it is, if they want to publicise it instead of our
-   internal auto-incremented CDS Invenio record identifiers.
+   internal auto-incremented Invenio record identifiers.
 
-2. recID - CDS Invenio record identifier
+2. recID - Invenio record identifier
 
    Each record has got an auto-incremented ID in the "bibrec" table
    (formerly called "bibitem").  This is the basic "record identifier"
-   concept in CDS Invenio.
+   concept in Invenio.
 
 3. docID - eventual fulltext document identifier
 

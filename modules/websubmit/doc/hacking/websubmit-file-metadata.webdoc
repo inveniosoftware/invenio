@@ -1,24 +1,24 @@
 ## -*- mode: html; coding: utf-8; -*-
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
 <!-- WebDoc-Page-Title: Websubmit_file_metadata APIs and Plugin Development-->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking -->
 
 <h2>Contents</h2>
@@ -44,7 +44,7 @@
 
 <p>The websubmit_file_metadata library enables extraction and update of file metadata.<br/>
 It can be called from Python sources or run from the command line.<br/>
-The library can be extended to support various formats thanks to plugins (which must be dropped in <code>/opt/cds-invenio/lib/python/invenio/websubmit_file_metadata_plugins/</code> directory).</p>
+The library can be extended to support various formats thanks to plugins (which must be dropped in <code>/opt/invenio/lib/python/invenio/websubmit_file_metadata_plugins/</code> directory).</p>
 
 <h2><a name="apis">1. APIs</a></h2>
 
@@ -113,7 +113,7 @@ library with additional file formats.</p>
 
 <h3><a name="specifications">2.1 Specifications</a></h3>
 <p>Your plugin name must start with "<code>wsm_</code>" and end with "<code>.py</code>". For eg. <code>wsm_myplugin.py</code>.<br/>
-Once ready, it must be dropped into <code>/opt/cds-invenio/lib/python/invenio/websubmit_file_metadata_plugins/</code> directory.<br/>
+Once ready, it must be dropped into <code>/opt/invenio/lib/python/invenio/websubmit_file_metadata_plugins/</code> directory.<br/>
 Your plugin can define the following interface:
 </p>
 <ul>

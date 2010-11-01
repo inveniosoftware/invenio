@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
@@ -288,7 +288,7 @@ def register_customevent(id, *arguments):
     as created by create_customevent().
 
     This function constitutes the "function hook" that should be
-    called throughout CDS Invenio where one wants to register a
+    called throughout Invenio where one wants to register a
     custom event! Refer to the help section on the admin web page.
 
     @param id: Human-readable id of the event to be registered
@@ -908,7 +908,7 @@ def _get_timespans(dt=None):
 
 def _get_formats(with_dump=False):
     """
-    Helper function to retrieve a CDS Invenio friendly list of all possible
+    Helper function to retrieve a Invenio friendly list of all possible
     output types (displaying and exporting) from the central repository as
     stored in the variable self.types at the top of this module.
 
@@ -973,9 +973,9 @@ def _get_export_closure(typename):
 
 def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
     """
-    Uses the CDS Invenio cache, i.e. the tempdir, to see if there's a recent
+    Uses the Invenio cache, i.e. the tempdir, to see if there's a recent
     cached version of the sought-after file in there. If not, use the closure to
-    compute a new, and return that instead. Relies on CDS Invenio configuration
+    compute a new, and return that instead. Relies on Invenio configuration
     parameter WEBSTAT_CACHE_INTERVAL.
 
     @param filename: The name of the file that might be cached

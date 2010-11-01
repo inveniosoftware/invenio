@@ -1,21 +1,21 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<!-- WebDoc-Page-Title: HOWTO Run Your CDS Invenio Installation -->
+<!-- WebDoc-Page-Title: HOWTO Run Your Invenio Installation -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">Admin Area</a> &gt; <a class="navtrail" href="howto">Admin HOWTOs</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
@@ -45,7 +45,7 @@ runtime.  You can consider BibSched to be a kind of cron daemon for
 bibliographic tasks.
 </p>
 
-<p>This means that after having installed CDS Invenio you will want to
+<p>This means that after having installed Invenio you will want to
 have the BibSched daemon running permanently.  To launch BibSched
 daemon, do:
 
@@ -119,11 +119,11 @@ $ bibsched
 delete the tasks that were wrongly submitted, to run some of the tasks
 manually, etc.  Note also that the BibSched daemon writes its log and
 error files about its own operation, as well as on the operation of
-its tasks, to the <code>/opt/cds-invenio/var/log</code> directory.</p>
+its tasks, to the <code>/opt/invenio/var/log</code> directory.</p>
 
 <h2>Running alert engine</h2>
 
-<p>CDS Invenio users may set up an automatic notification email alerts
+<p>Invenio users may set up an automatic notification email alerts
 so that they are automatically alerted about documents of their
 interest by email, either daily, weekly, or monthly.  It is the job of
 the alert engine to do this.  The alert engine has to be run every
@@ -145,7 +145,7 @@ $ crontab -l
 &#35; invenio: periodically restart Apache:
 59 23 * * * /usr/sbin/apachectl restart
 &#35; invenio: run alert engine:
-30 14 * * * /usr/bin/sudo -u apache /opt/cds-invenio/bin/alertengine
+30 14 * * * /usr/bin/sudo -u apache /opt/invenio/bin/alertengine
 </pre>
 </blockquote>
 </p>
@@ -181,7 +181,7 @@ the database, temporary files, and the like.</p>
 <p>If you choose to differentiate between guest users
 (see <code>CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS</code>
 in <code>invenio.conf</code>), then guest users can create a lot of
-entries in CDS Invenio tables that are related to their web sessions,
+entries in Invenio tables that are related to their web sessions,
 their search history, personal baskets, etc.  This data has to be
 garbage-collected periodically.  You can run this, say every Sunday
 between 01:00 and 05:00, via:
@@ -194,8 +194,8 @@ $ inveniogc -s 7d -L 'Sunday 01:00-05:00'
 </p>
 
 <p>Different temporary log and err files are created
-in <code>/opt/cds-invenio/var/log</code>
-and <code>/opt/cds-invenio/var/tmp</code> directory that is good to
+in <code>/opt/invenio/var/log</code>
+and <code>/opt/invenio/var/tmp</code> directory that is good to
 clean up from time to time.  The previous command could be used to
 clean those files, too, via:
 
@@ -231,7 +231,7 @@ $ dbdump -s 20h -L '22:00-06:00' -o /opt2/mysql-backups -n 10
 </blockquote>
 
 <p>This will create files named
-like <code>cdsinvenio-dbdump-2009-03-10_22:10:28.sql</code> in this
+like <code>invenio-dbdump-2009-03-10_22:10:28.sql</code> in this
 folder.</p>
 
 <p>Note that you may use Invenio-independent MySQL backuping tools
@@ -251,7 +251,7 @@ Invenio instance later, you can use:</p>
 <blockquote>
 <pre>
 $ bibsched stop
-$ cat /opt2/mysql-backups/cdsinvenio-dbdump-2009-03-10_22\:10\:28.sql | dbexec
+$ cat /opt2/mysql-backups/invenio-dbdump-2009-03-10_22\:10\:28.sql | dbexec
 $ bibsched start
 </pre>
 </blockquote>

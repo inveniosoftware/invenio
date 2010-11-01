@@ -1,24 +1,24 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibFormat API -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibformat-internals">BibFormat Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="bibformat-internals">BibFormat Internals</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <protect>
@@ -558,7 +558,7 @@ files. If you have not modified the "Formats" or modified only a
 little bit the "Behaviours", then the transition will be painless and
 automatic. Otherwise you will have to manually rewrite some of the
 formats. This should however not be a big problem. Firstly because the
-CDS Invenio installation will provide both versions of BibFormat for
+Invenio installation will provide both versions of BibFormat for
 some time. Secondly because both BibFormat versions can run side by
 side, so that you can migrate your formats while your server still
 works with the old formats.  Thirdly because we provide a migration
@@ -645,10 +645,10 @@ expression must be understandable by Python)
 
 Some other considerations on the management of output formats:
 - Format outputs must be placed inside directory
-  /etc/bibformat/outputs/ of your CDS Invenio installation.
+  /etc/bibformat/outputs/ of your Invenio installation.
 - Note that as long as you have not provided a name to an output
   THROUGH the web interface, it will not be available as a choice
-  for your users in some parts of CDS Invenio.
+  for your users in some parts of Invenio.
 - You should remove output formats THROUGH the web interface.
 - The format extension of output format is .bfo
 
@@ -693,7 +693,7 @@ You should also provide these tags in all of your templates:
 
 Another feature of the templates is the support for multi-languages
 outputs. You can include &lt;lang> tags, which contain tags labeled with
-the names of the languages supported in CDS Invenio. For example, one
+the names of the languages supported in Invenio. For example, one
 might write:
 
   &lt;lang>&lt;en>A record:&lt;/en>&lt;fr>Une notice:&lt;/fr>&lt;/lang>
@@ -715,7 +715,7 @@ Some other considerations on the use of elements inside templates:
   and quotes different from the kind that delimit parameters (you can
   for example have &lt;BFE_Title default='&lt;a href="#">No Title&lt;/a>'/> )
  -Format templates must be placed inside the directory
-  /etc/bibformat/templates/ of your CDS Invenio installation
+  /etc/bibformat/templates/ of your Invenio installation
  -The format extension of a template is .bft
 
 Trick: you can use the &lt;BFE_FIELD tag="245__a" /> to print the value
@@ -742,7 +742,7 @@ carefully such that it is not too long, but self explanatory (you can
 prefix the filename with BFE or not, but the element will always be called
 with prefix &lt;BFE_ inside templates).  Then you just need to drop the
 file in the /lib/python/invenio/bibformat_elements/ directory
-of your CDS Invenio installation. Inside your file you have to define a
+of your Invenio installation. Inside your file you have to define a
 function named "format", which takes at least a "bfo" parameter (bfo
 for BibFormat Object). The function must return a string:
 

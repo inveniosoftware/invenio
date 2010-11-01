@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebJournal Admin Guide -->
@@ -56,7 +56,7 @@
 <h2><a name="introduction">1. Introduction</a></h2>
 
 <p>This guides shows how you can set up a new journal managed by the
-WebJournal module of CDS Invenio. You should first read the
+WebJournal module of Invenio. You should first read the
 <a href="webjournal-editor-guide">WebJournal Editor Guide</a> to get
 an overview of the main concepts of this module
 </p>
@@ -72,9 +72,9 @@ journal. Click &quot;Save&quot;.</p>
 <p><a name="journalConfigurationWritePermission"><strong>Note that by
 default your Apache user should not be able to save the
 configuration</strong></a> since it should not have rights to write
-to <code>/opt/cds-invenio/etc/webjournal/</code>. To save the settings
+to <code>/opt/invenio/etc/webjournal/</code>. To save the settings
 you might want to manually save your configuration
-to <code>/opt/cds-invenio/etc/webjournal/<strong>yourJournalName</strong>/<strong>yourJournalName</strong>-config.xml</code> or give write permission to <code>/opt/cds-invenio/etc/webjournal/</code></p>
+to <code>/opt/invenio/etc/webjournal/<strong>yourJournalName</strong>/<strong>yourJournalName</strong>-config.xml</code> or give write permission to <code>/opt/invenio/etc/webjournal/</code></p>
 
 <p>Usually adding a journal also requires to set up a dedicated
 submission, give some access using WebAccess, and can optionally lead
@@ -121,7 +121,7 @@ nodes:</p>
     <ul>
       <li>record
         <ul>
-          <li><strong>rule*</strong>: defines the categories of the journal, and the query matching articles of this category. Format: <code>categoryName, query</code>. The journal categories are not necessary mapped to CDS Invenio collections (but they can be, for consistency)</li>
+          <li><strong>rule*</strong>: defines the categories of the journal, and the query matching articles of this category. Format: <code>categoryName, query</code>. The journal categories are not necessary mapped to Invenio collections (but they can be, for consistency)</li>
         </ul>
       </li>
     </ul>
@@ -199,7 +199,7 @@ are:</p>
   &lt;html&gt;</code>, <code>&lt;header&gt;</code>, <code>&lt;body&gt;</code>,
   etc.</li>
   <li>Format templates are saved
-  to <code>/opt/cds-invenio/etc/bibformat/format_templates/webjournal/</code>.</li>
+  to <code>/opt/invenio/etc/bibformat/format_templates/webjournal/</code>.</li>
   <li>In general, format elements (<em>in Python</em>) cannot rely on
   the <code>bfo</code> parameter passed to their <code>format(bfo,
   ...)</code> function to access the articles metadata: format
@@ -269,7 +269,7 @@ index page: we are not displaying a specific article.</p>
 <p><strong>Note</strong> the difference between <code>bfo.lang</code>
 and the &quot;<code>ln</code>&quot; value returned
 by <code>parse_url_string(..)</code>: the former represents the
-user-chosen language on your CDS Invenio installation, while the
+user-chosen language on your Invenio installation, while the
 latter is the more appropriate language to display the journal, based
 on the languages defined in your journal configuration
 file. Propagate <code>bfo.lang</code> through links, but display your
@@ -300,7 +300,7 @@ readers do not have access to these records before the issue they
 belong to is released. Indeed, even though the articles can be hidden
 from the journal interface (depending on the value of the
 configuration variable <strong>hide_unreleased_issues</strong>), they
-are still accessible from the standard CDS Invenio interface (the CDS
+are still accessible from the standard Invenio interface (the CDS
 Invenio search/browse interface is independent from the WebJournal
 Module, as the WebJournal interface is independent from the CDS
 Invenio search/browse interface)
@@ -377,21 +377,21 @@ WebJournal makes heavy use of caches in order to optimize the serving
 speed. Journal editors can regenerate the journal cache, but it does
 not apply to old issues, or cache that has been generated by some
 widgets. To clean the cache, remove the files
-in <nobr><code>/opt/cds-invenio/var/cache/webjournal/</code><b>yourjournal</b></nobr>.
+in <nobr><code>/opt/invenio/var/cache/webjournal/</code><b>yourjournal</b></nobr>.
 Cached files starts with <code>issue_year</code>, followed by
 the <code>category</code> so that it is easy to remove the caches for
 a specific issue/section. Examples:
 </p>
 <pre>
-  $ rm /opt/cds-invenio/var/cache/webjournal/AtlantisTimes/07_2009_*
-  $ rm /opt/cds-invenio/var/cache/webjournal/AtlantisTimes/07_2009_index_News*
+  $ rm /opt/invenio/var/cache/webjournal/AtlantisTimes/07_2009_*
+  $ rm /opt/invenio/var/cache/webjournal/AtlantisTimes/07_2009_index_News*
 </pre>
 
 
 <p>You might want to remove some other specific files created by some
 widgets, for example:</p>
 <pre>
-  $ rm /opt/cds-invenio/var/cache/webjournal/AtlantisTimes/weather.html
+  $ rm /opt/invenio/var/cache/webjournal/AtlantisTimes/weather.html
 </pre>
 
 <h3><a name="issueReleases">8.2 Manage Issue Releases</a></h3>

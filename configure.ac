@@ -1,34 +1,34 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-## This is CDS Invenio main configure.ac file.  If you change this
+## This is Invenio main configure.ac file.  If you change this
 ## file, then please run "autoreconf" to regenerate the "configure"
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT([cds-invenio],
+AC_INIT([invenio],
         m4_esyscmd([./git-version-gen .tarball-version]),
-        [cds.support@cern.ch])
+        [info@invenio-software.org])
 AM_INIT_AUTOMAKE([tar-ustar])
 
-## By default we shall install into /opt/cds-invenio.  (Do not use
+## By default we shall install into /opt/invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
 ## the localstatedir hack below.)
-test "${prefix}" = NONE && prefix=/opt/cds-invenio
+test "${prefix}" = NONE && prefix=/opt/invenio
 
 ## Remove eventual trailing slashes from the prefix value:
 test "${prefix%/}" != "" && prefix=${prefix%/}
@@ -113,7 +113,7 @@ if test -z "$GZIP"; then
    AC_MSG_WARN([
    Gzip was not found in your PATH.  It is used in
    the WebSubmit module to compress the data submitted in an archive.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Gzip is available from
    <http://www.gzip.org/>.])
@@ -126,7 +126,7 @@ if test -z "$GUNZIP"; then
    Gunzip was not found in your PATH.  It is used in
    the WebSubmit module to correctly deal with submitted compressed
    files.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Gunzip is available from
    <http://www.gzip.org/>.])
@@ -138,7 +138,7 @@ if test -z "$TAR"; then
    AC_MSG_WARN([
    Tar was not found in your PATH.  It is used in
    the WebSubmit module to pack the submitted data into an archive.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Tar is available from
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
@@ -172,7 +172,7 @@ if test -z "$PS2PDF"; then
    AC_MSG_WARN([
    ps2pdf was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted PostScripts into PDF.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  ps2pdf is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
@@ -184,7 +184,7 @@ if test -z "$PDFLATEX"; then
    AC_MSG_WARN([
    pdflatex was not found in your PATH.  It is used in
    the WebSubmit module to stamp PDF files.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.])
 fi
@@ -196,7 +196,7 @@ if test -z "$TIFF2PDF"; then
    AC_MSG_WARN([
    tiff2pdf was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted TIFF file into PDF.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  tiff2pdf is available from
    <http://www.remotesensing.org/libtiff/>.])
@@ -208,7 +208,7 @@ if test -z "$GS"; then
    AC_MSG_WARN([
    gs was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted PostScripts into PDF.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  gs is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
@@ -221,7 +221,7 @@ if test -z "$PDFTOTEXT"; then
    pdftotext was not found in your PATH.  It is used for the fulltext indexation
    of PDF files.
    You can continue without it but you may miss fulltext searching capability
-   of CDS Invenio.  We recomend you to install it first and to rerun the configure
+   of Invenio.  We recomend you to install it first and to rerun the configure
    script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
    ])
 fi
@@ -232,7 +232,7 @@ if test -z "$PDFINFO"; then
    AC_MSG_WARN([
    pdfinfo was not found in your PATH.  It is used for gathering information on
    PDF files.
-   You can continue without it but you may miss this feature of CDS Invenio.
+   You can continue without it but you may miss this feature of Invenio.
    We recomend you to install it first and to rerun the configure
    script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
    ])
@@ -243,7 +243,7 @@ AC_PATH_PROG(PDFTK, pdftk)
 if test -z "$PDFTK"; then
    AC_MSG_WARN([
    pdftk was not found in your PATH.  It is used for the fulltext file stamping.
-   You can continue without it but you may miss this feature of CDS Invenio.
+   You can continue without it but you may miss this feature of Invenio.
    We recomend you to install it first and to rerun the configure
    script.  pdftk is available from <http://www.accesspdf.com/pdftk/>.
    ])
@@ -255,7 +255,7 @@ if test -z "$PDF2PS"; then
    AC_MSG_WARN([
    pdf2ps was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted PDFs into PostScript.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  pdf2ps is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
@@ -267,7 +267,7 @@ if test -z "$PDFTOPS"; then
    AC_MSG_WARN([
    pdftops was not found in your PATH.  It is used in
    the WebSubmit module to convert submitted PDFs into PostScript.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  pdftops is available from
    <http://poppler.freedesktop.org/>.])
@@ -279,7 +279,7 @@ if test -z "$PDFOPT"; then
    AC_MSG_WARN([
    pdfopt was not found in your PATH.  It is used in
    the WebSubmit module to linearized submitted PDFs.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  pdfopt is available from
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
@@ -291,7 +291,7 @@ if test -z "$PDFTOPPM"; then
    AC_MSG_WARN([
    pdftoppm was not found in your PATH.  It is used in
    the WebSubmit module to extract images from PDFs for OCR.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  pdftoppm is available from
    <http://poppler.freedesktop.org/>.])
@@ -304,7 +304,7 @@ if test -z "$PAMFILE"; then
    pamfile was not found in your PATH.  It is used in
    the WebSubmit module to retrieve the size of images extracted from PDFs
    for OCR.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  pamfile is available as part of the netpbm utilities
    from:
@@ -318,7 +318,7 @@ if test -z "$OCROSCRIPT"; then
    If you plan to run OCR on your PDFs, then please install
    ocroscript now.  Otherwise you can safely continue.  You have also an
    option to install ocroscript later and edit invenio-local.conf to let
-   CDS Invenio know the path to ocroscript.
+   Invenio know the path to ocroscript.
    ocroscript is available as part of OCROpus from
    <http://code.google.com/p/ocropus/>.
    NOTE: Since OCROpus is being actively developed and its api is continuosly
@@ -333,7 +333,7 @@ if test -z "$PSTOTEXT"; then
    of PDF and PostScript files.
    Please install pstotext.  Otherwise you can safely continue.  You have also an
    option to install pstotext later and edit invenio-local.conf to let
-   CDS Invenio know the path to pstotext.
+   Invenio know the path to pstotext.
    pstotext is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
@@ -346,7 +346,7 @@ if test -z "$PSTOASCII"; then
    of PostScript files.
    Please install ps2ascii.  Otherwise you can safely continue.  You have also an
    option to install ps2ascii later and edit invenio-local.conf to let
-   CDS Invenio know the path to ps2ascii.
+   Invenio know the path to ps2ascii.
    ps2ascii is available from <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.
    ])
 fi
@@ -359,7 +359,7 @@ if test -z "$ANY2DJVU"; then
    the WebSubmit module to convert documents to DJVU.
    Please install any2djvu.  Otherwise you can safely continue.  You have also an
    option to install any2djvu later and edit invenio-local.conf to let
-   CDS Invenio know the path to any2djvu.
+   Invenio know the path to any2djvu.
    any2djvu is available from
    <http://djvu.sourceforge.net/>.])
 fi
@@ -372,7 +372,7 @@ if test -z "$DJVUPS"; then
    the WebSubmit module to convert documents from DJVU.
    Please install djvups.  Otherwise you can safely continue.  You have also an
    option to install djvups later and edit invenio-local.conf to let
-   CDS Invenio know the path to djvups.
+   Invenio know the path to djvups.
    djvups is available from
    <http://djvu.sourceforge.net/>.])
 fi
@@ -383,7 +383,7 @@ if test -z "$DJVUTXT"; then
    AC_MSG_WARN([
    djvutxt was not found in your PATH.  It is used in
    the WebSubmit module to extract text from DJVU documents.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  djvutxt is available from
    <http://djvu.sourceforge.net/>.])
@@ -395,7 +395,7 @@ if test -z "$FILE"; then
    AC_MSG_WARN([
    File was not found in your PATH.  It is used in
    the WebSubmit module to check the validity of the submitted files.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  File is available from
    <ftp://ftp.astron.com/pub/file/>.])
@@ -407,7 +407,7 @@ if test -z "$CONVERT"; then
    AC_MSG_WARN([
    Convert was not found in your PATH.  It is used in
    the WebSubmit module to create an icon from a submitted picture.
-   You can continue without it but you will miss some CDS Invenio
+   You can continue without it but you will miss some Invenio
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Convert is available from
    <http://www.imagemagick.org/>.])
@@ -423,7 +423,7 @@ else
    if test -z "$CLISP"; then
       AC_MSG_WARN([
       GNU CLISP was not found in your PATH.  It is used by the WebStat
-      module to produce statistics about CDS Invenio usage.  (Alternatively,
+      module to produce statistics about Invenio usage.  (Alternatively,
       SBCL or CMUCL can be used instead of CLISP.)
       You can continue without it but you will miss this feature.  We
       recommend you to install it first (if you don't have neither CMUCL
@@ -446,7 +446,7 @@ else
    if test -z "$CMUCL"; then
       AC_MSG_WARN([
       CMUCL was not found in your PATH.  It is used by the WebStat
-      module to produce statistics about CDS Invenio usage.  (Alternatively,
+      module to produce statistics about Invenio usage.  (Alternatively,
       CLISP or SBCL can be used instead of CMUCL.)
       You can continue without it but you will miss this feature.  We
       recommend you to install it first (if you don't have neither CLISP
@@ -465,7 +465,7 @@ else
    if test -z "$SBCL"; then
       AC_MSG_WARN([
       SBCL was not found in your PATH.  It is used by the WebStat
-      module to produce statistics about CDS Invenio usage.  (Alternatively,
+      module to produce statistics about Invenio usage.  (Alternatively,
       CLISP or CMUCL can be used instead of SBCL.)
       You can continue without it but you will miss this feature.  We
       recommend you to install it first (if you don't have neither CLISP
@@ -798,21 +798,21 @@ AC_OUTPUT
 
 ## Write help:
 AC_MSG_RESULT([****************************************************************************])
-AC_MSG_RESULT([** Your CDS Invenio installation is now ready for building.               **])
+AC_MSG_RESULT([** Your Invenio installation is now ready for building.                   **])
 AC_MSG_RESULT([** You have entered the following parameters:                             **])
-AC_MSG_RESULT([**   - CDS Invenio main install directory: ${prefix}])
+AC_MSG_RESULT([**   - Invenio main install directory: ${prefix}])
 AC_MSG_RESULT([**   - Python executable: $PYTHON])
 AC_MSG_RESULT([**   - MySQL client executable: $MYSQL])
 AC_MSG_RESULT([**   - CLISP executable: $CLISP])
 AC_MSG_RESULT([**   - CMUCL executable: $CMUCL])
 AC_MSG_RESULT([**   - SBCL executable: $SBCL])
 AC_MSG_RESULT([** Here are the steps to continue the building process:                   **])
-AC_MSG_RESULT([**   1) Type 'make' to build your CDS Invenio system.                     **])
-AC_MSG_RESULT([**   2) Type 'make install' to install your CDS Invenio system.           **])
+AC_MSG_RESULT([**   1) Type 'make' to build your Invenio system.                         **])
+AC_MSG_RESULT([**   2) Type 'make install' to install your Invenio system.               **])
 AC_MSG_RESULT([** After that you can start customizing your installation as documented   **])
 AC_MSG_RESULT([** in the INSTALL file (i.e. edit invenio.conf, run inveniocfg, etc).     **])
-AC_MSG_RESULT([** Good luck, and thanks for choosing CDS Invenio.                        **])
-AC_MSG_RESULT([**              -- CDS Development Group <cds.support@cern.ch>            **])
+AC_MSG_RESULT([** Good luck, and thanks for choosing Invenio.                            **])
+AC_MSG_RESULT([**              -- Invenio Development Team <info@invenio-software.org>   **])
 AC_MSG_RESULT([****************************************************************************])
 
 ## end of file

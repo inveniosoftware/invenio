@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 """
 WebJournal exceptions classes
@@ -194,7 +194,7 @@ class InvenioWebJournalNoJournalOnServerError(Exception):
         String representation.
         """
         return 'Apparently there are no journals configured on this \
-        installation of CDS Invenio. You can try to use the sample Invenio \
+        installation of Invenio. You can try to use the sample Invenio \
         Atlantis Journal for testing.'
 
     def user_box(self):
@@ -354,10 +354,10 @@ class InvenioWebJournalNoPopupRecordError(Exception):
         return webjournal_templates.tmpl_webjournal_error_box(self.ln,
                     _('No popup record'),
                     _('We could not deduce the popup article you requested'),
-                    'You called a popup window on CDS Invenio without \
+                    'You called a popup window on Invenio without \
                       specifying a record in which you are interested or the \
                       record was badly formed. Does this link come \
-                      from a CDS Invenio Journal? If so, please contact \
+                      from a Invenio Journal? If so, please contact \
                       support.')
 
 class InvenioWebJournalReleaseUpdateError(Exception):

@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Unit tests for the access_control_firerole library."""
@@ -53,12 +53,12 @@ class AccessControlFireRoleTest(unittest.TestCase):
     def test_compile_role_definition_literal_field(self):
         """firerole - compiling literal field role definitions"""
         self.failUnless(serialize(compile_role_definition(
-            "allow email 'cds.support@cern.ch'")))
+            "allow email 'info@invenio-software.org'")))
 
     def test_compile_role_definition_not(self):
         """firerole - compiling not role definitions"""
         self.failUnless(serialize(compile_role_definition(
-            "allow not email 'cds.support@cern.ch'")))
+            "allow not email 'info@invenio-software.org'")))
 
     def test_compile_role_definition_group_field(self):
         """firerole - compiling group field role definitions"""
@@ -73,7 +73,7 @@ class AccessControlFireRoleTest(unittest.TestCase):
     def test_compile_role_definition_literal_list(self):
         """firerole - compiling literal list role definitions"""
         self.failUnless(serialize(compile_role_definition(
-            "allow email 'cds.support@cern.ch', 'foo.bar@cern.ch'")))
+            "allow email 'info@invenio-software.org', 'foo.bar@cern.ch'")))
 
     def test_compile_role_definition_more_rows(self):
         """firerole - compiling more rows role definitions"""
@@ -102,7 +102,7 @@ class AccessControlFireRoleTest(unittest.TestCase):
     def test_firerole_literal_email(self):
         """firerole - firerole core testing literal email matching"""
         self.failUnless(acc_firerole_check_user(self.user_info,
-            compile_role_definition("allow email 'cds.support@cern.ch',"
+            compile_role_definition("allow email 'info@invenio-software.org',"
                 "'foo.bar@cern.ch'\ndeny any")))
 
     def test_firerole_regexp_email(self):

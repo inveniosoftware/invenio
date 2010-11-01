@@ -1,22 +1,22 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Code kwalitee checking tools for CDS Invenio Python code.
+Code kwalitee checking tools for Invenio Python code.
 
 Q: What is kwalitee?
 A: <http://qa.perl.org/phalanx/kwalitee.html>
@@ -40,7 +40,7 @@ Check options::
    --check-pep8             check PEP8 compliance
 
 Examples::
-   $ python kwalitee.py --stats ~/private/src/cds-invenio/
+   $ python kwalitee.py --stats ~/private/src/invenio/
    $ python kwalitee.py --stats ../../websearch/lib/*.py
    $ python kwalitee.py --check-some ../../websearch/lib/
    $ python kwalitee.py --check-all ../../websearch/lib/search_engine.py
@@ -293,7 +293,7 @@ def calculate_module_kwalitee(modulesdir, modulename):
 
 
 def get_invenio_modulenames(dirname="."):
-    """Return the list of all CDS Invenio source modules
+    """Return the list of all Invenio source modules
        (directories).
     """
     modulenames = os.listdir(dirname)
@@ -318,7 +318,7 @@ def shorten_module_name(modulename, maxlen=13):
 
 
 def generate_kwalitee_stats_for_all_modules(modulesdir):
-    """Run kwalitee estimation for each CDS Invenio module and print
+    """Run kwalitee estimation for each Invenio module and print
        the results on stdout.
     """
     # init kwalitee measurement structure:
@@ -337,15 +337,15 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                          'nb_msg_error': 0,
                          'nb_msg_fatal': 0,
                          }
-    # detect CDS Invenio modules:
+    # detect Invenio modules:
     modulenames = get_invenio_modulenames(modulesdir)
     if "websearch" not in modulenames:
-        print "Cannot find CDS Invenio modules in %s." % modulesdir
+        print "Cannot find Invenio modules in %s." % modulesdir
         print_usage()
         sys.exit(1)
     # print header
     print "="*112
-    print "CDS Invenio Python Code Kwalitee Check %73s" % \
+    print "Invenio Python Code Kwalitee Check %73s" % \
           time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     print "="*112
     print ""
@@ -775,7 +775,7 @@ def cmd_stats(filenames):
         if os.path.isdir(modulesdir):
             generate_kwalitee_stats_for_all_modules(modulesdir)
         else:
-            print "ERROR: %s does not seem to be CDS Invenio top source " \
+            print "ERROR: %s does not seem to be Invenio top source " \
                   "directory." % filenames[0]
             print_usage()
             sys.exit(0)
@@ -837,7 +837,7 @@ def main():
 
 def test():
     """Test stuff."""
-    print get_pylint_results("/opt/cds-invenio/lib/python/"
+    print get_pylint_results("/opt/invenio/lib/python/"
                              "invenio/bibrecord.py")
 
 

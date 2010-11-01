@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title:BibFormat Admin Guide -->
@@ -155,7 +155,7 @@ a typical workflow:</p>
     <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-url_bar.png" alt="http://cdsweb.cern.ch/search?recid=946417&amp;ln=en&amp;of=hd"/>
     </td>
 
-    <td width="50%">When CDS Invenio has to display a record, it
+    <td width="50%">When Invenio has to display a record, it
       asks BibFormat to format the record with the given output format
       and language. For example here the requested output format is
       <span class="outputFormatBox">hd</span>, which is a short code
@@ -338,7 +338,7 @@ of formatting has to be done, but not how it has to be done.</p>
     <p>To add a new output format, go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Add New Output Format" button at the bottom of the page. The format has been created. You can then specify the attributes of the output format. See <a href="#attrsOutputFormat">Edit the Attributes of an Output Format</a> to learn more about it.<p>
     <strong>For developers and adventurers only:</strong>
     <p>Alternatively you can directly add a new output format file into the
-  /etc/bibformat/outputs/ directory of your CDS Invenio installation, if you have
+  /etc/bibformat/outputs/ directory of your Invenio installation, if you have
   access to the server's files. Use the format extension .bfo for your file.</p>
   <p>You should also check that user <code>www-data</code> has read/write access to the file,
   if you want to be able to modify the rules through the web interface.</p>
@@ -346,7 +346,7 @@ of formatting has to be done, but not how it has to be done.</p>
 <h3><a name="removeOutputFormat">2.2 Remove an Output Format</a></h3>
 <p>To remove an output format, go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page and click on the "Delete" button facing the output format you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
 <strong>For developers and adventurers only:</strong>
-<p>You can directly remove an output format from the /etc/bibformat/outputs/ directory of your CDS Invenio installation.
+<p>You can directly remove an output format from the /etc/bibformat/outputs/ directory of your Invenio installation.
 However you must make sure that it is removed from the tables <code>format</code> and <code>formatname</code> in the database, so that other modules know that it is not longer available.</p>
 
 <h3><a name="rulesOutputFormat">2.3 Edit the Rules of an Output Format</a></h3>
@@ -417,7 +417,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <p>An output format has the following attributes:
     <ul>
     <li><code>code</code>: a short identifier that is used to identify the output format. It must be unique and contain a maximum of 6 letters. Note that the <b>code is not case sensitive</b> ("HB" is equal to "hb").</li>
-    <li><code>content type</code>: this is the content type of the format, specified in Mime. For example if you were to produce an Excel output, you could use <code>application/ms-excel</code> as content type. If a content type is specified, CDS Invenio will not print the usual header and footerfor the page, but will trigger a download in the client's browser when viewing the page (Unless the browser handles this content type).</li>
+    <li><code>content type</code>: this is the content type of the format, specified in Mime. For example if you were to produce an Excel output, you could use <code>application/ms-excel</code> as content type. If a content type is specified, Invenio will not print the usual header and footerfor the page, but will trigger a download in the client's browser when viewing the page (Unless the browser handles this content type).</li>
     <li><code>name</code>: a generic name to display in the interface for this output format.</li>
     <li>(*) <code>name</code>: internationalized names for the output format, used for displaying localized name in the search interface.</li>
     <li><code>description</code>: an optional description for the output format.</li>
@@ -473,7 +473,7 @@ However you must make sure that it is removed from the tables <code>format</code
  See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about editing the attributes.<p>
     <strong>For developers and adventurers only:</strong>
     <p>Alternatively you can directly add a new format template file into the
-  /etc/bibformat/format_templates/ directory of your CDS Invenio installation, if you have
+  /etc/bibformat/format_templates/ directory of your Invenio installation, if you have
   access to the server's files. Use the format extension .bft for your file.</p>
   <p>You should also check that user <code>www-data</code> has read/write access to the file,
   if you want to be able to modify the code and the attributes of the template through the web interface.</p>
@@ -481,7 +481,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <h3><a name="removeFormatTemplate">3.2 Remove a Format Template</a></h3>
     <p>To remove a format template, go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the "Delete" button facing the format template you want to delete. If you cannot click on the button (the button is not enabled), this means that you do not have sufficent priviledge to do so (Format is protected. Contact the administrator of the system).</p>
 <strong>For developers and adventurers only:</strong>
-<p>You can directly remove the format template from the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.</p>
+<p>You can directly remove the format template from the /etc/bibformat/format_templates/ directory of your Invenio installation.</p>
     <h3><a name="codeFormatTemplate">3.3 Edit the Code of a Format Template</a></h3>
     <p>You can change the formatting of records by modifying the code of a template.
     <p>To edit the code of a format template
@@ -504,7 +504,7 @@ However you must make sure that it is removed from the tables <code>format</code
   <strong>For developers and adventurers only:</strong>
   <p>
   You can edit the code of a template using exactly the same syntax as in the web interface. The code of the template
-  is in the template file located in the /etc/bibformat/format_templates/ directory of your CDS Invenio installation. You just
+  is in the template file located in the /etc/bibformat/format_templates/ directory of your Invenio installation. You just
   have to take care of the attributes of the template, which are saved in the same file as the code. See <a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a> to learn more about it.
   </p>
 
@@ -545,7 +545,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <p>You can fill in the "Search Pattern" field to preview a specific record. The search pattern uses exactly the same
     syntax as the one used in the web interface. The only difference with the regular search engine is that only the first matching record is shown.</p>
      <strong>For developers and adventurers only:</strong>
-     <p>If you do not want to use the web interface to edit the templates but still would like to get previews, you can open the preview frame of any format in a new window/tab. In this mode you get a preview of the template (if it is placed in the /etc/bibformat/format_templates/ directory of your CDS Invenio installation). The parameters of the preview are specified in the url: <ul>
+     <p>If you do not want to use the web interface to edit the templates but still would like to get previews, you can open the preview frame of any format in a new window/tab. In this mode you get a preview of the template (if it is placed in the /etc/bibformat/format_templates/ directory of your Invenio installation). The parameters of the preview are specified in the url: <ul>
      <li><code>bft</code>: the filename of the format template to preview</li>
      <li><code>ln</code>: the language to use for the preview</li>
      <li><code>pattern_for_preview</code>: the search pattern to use for the preview</li>
@@ -555,7 +555,7 @@ However you must make sure that it is removed from the tables <code>format</code
     with tags corresponding to the two letters of the language. For example if we want to localize "title", write <code>&lt;en&gt;Title&lt;/en&gt;</code>. Repeat this for each language in which you want to make "title" available: <code>&lt;en&gt;Title&lt;/en&gt;&lt;fr&gt;Titre&lt;/fr&gt;&lt;de&gt;Titel&lt;/de&gt;</code>.
     Finally enclose everything with <code>&lt;lang&gt; &lt;/lang&gt;</code> tags: <code>&lt;lang&gt;&lt;en&gt;Title&lt;/en&gt;&lt;fr&gt;Titre&lt;/fr&gt;&lt;de&gt;Titel&lt;/de&gt;&lt;/lang&gt;</code></p>
 <p>For each &lt;lang&gt; group only the text in the user's language is displayed. If user's language is not
-available in the &lt;lang&gt; group, your default CDS Invenio language is used.</p>
+available in the &lt;lang&gt; group, your default Invenio language is used.</p>
 
  <h4><a name="escapeFormatTemplate">3.8 Escaping special HTML/XML characters</a></h4>
 
@@ -604,7 +604,7 @@ are not returned by the format elements.</p>
     <p>If the name you have chosen already exists for another template, you name will be suffixed with an integer so that the name is unique.</p>
     <p>You should also be aware that if you change the name of a format template, all output formats that were linking to this template will be changed to match the new name.</p>
      <strong>For developers and adventurers only:</strong>
-     <p>You can change the attributes of a template by editing its file in the /etc/bibformat/format_templates/ directory of your CDS Invenio installation.  The attributes must be enclosed with tags <code>&lt;name&gt; &lt;/name&gt;</code> and <code>&lt;description&gt; &lt;/description&gt;</code> and should ideally be placed at the beginning of the file.</p>
+     <p>You can change the attributes of a template by editing its file in the /etc/bibformat/format_templates/ directory of your Invenio installation.  The attributes must be enclosed with tags <code>&lt;name&gt; &lt;/name&gt;</code> and <code>&lt;description&gt; &lt;/description&gt;</code> and should ideally be placed at the beginning of the file.</p>
      <p>Also note that the admin web interface tries to keep the name of the template in sync with the filename of the template. If the name is changed through the web interface, the filename of the template is changed, and all output formats that use this template are updated. You have to do update output formats manually if you change the filename of the template without the web interface.</p>
 
     <h3><a name="dependenciesFormatTemplate">3.10 Check the Dependencies of a Format Template</a></h3>
@@ -657,10 +657,10 @@ are not returned by the format elements.</p>
  <p>Format elements are typically written in Python (there is an exception to that point which is dicussed in <a href="#addFormatElement">Add a Format Element</a>). This brings great flexibily and power to the formatting process. This however restricts the creation of format elements to developers.</p>
 
     <h3><a name="addFormatElement">4.1 Add a Format Element</a></h3>
-    <p>The most typical way of adding a format element is to drop a <code>.py</code> file in the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation. See <a href="#codeFormatElement">Edit the Code of a Format Element</a> to learn how to implement an element.</p>
+    <p>The most typical way of adding a format element is to drop a <code>.py</code> file in the lib/python/invenio/bibformat_elements directory of your Invenio installation. See <a href="#codeFormatElement">Edit the Code of a Format Element</a> to learn how to implement an element.</p>
     <p>The most simple way to add a format element is to add a en entry in the "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module. When BibFormat cannot find the Python format element corresponding to a given name, it looks into this table for the name and prints the value of the field declared for this name. This lightweight way of doing is straightforward but does not allow complex handling of the data (it limits to printing the value of the field, or the values of the fields if multiple fields are declared under the same label).</p>
     <h3><a name="removeFormatElement">4.2 Remove a Format Element</a></h3>
-    <p>To remove a Python format element simply remove the corresponding file from the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation.</p>
+    <p>To remove a Python format element simply remove the corresponding file from the lib/python/invenio/bibformat_elements directory of your Invenio installation.</p>
     <p>To remove a format element declared in the "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module simply remove the entry from the table.</p>
     <h3><a name="codeFormatElement">4.3 Edit the Code of a Format Element</a></h3>
     <p>This section only applies to Python format elements. Basic format elements declared in "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" have non configurable behaviour.</p>
@@ -750,7 +750,7 @@ about the possibilities offered by the <code>bfo</code>, read the <a href="<CFG_
 <h3><a name="internationalizationFormatElement">4.5 Internationalization (i18n)</a></h3>
 
     <p>You can follow the standard internationalization procedure in
-    use accross CDS Invenio sources. For example the following code
+    use accross Invenio sources. For example the following code
     will get you the translation for "Welcome" (assuming "Welcome" has
     been translated):
 <pre>
@@ -922,7 +922,7 @@ it will process all the records that have been modified since the last
 run of BibReformat, as well as all newly inputted records. This is
 suitable for running BibReformat in a periodical daemon mode via
 BibSched. See our <a href="<CFG_SITE_URL>/help/admin/howto-run">HOWTO Run
-Your CDS Invenio Installation</a> guide for more information.</p>
+Your Invenio Installation</a> guide for more information.</p>
 
 <h2><a name="Appendix">6. Appendix</a></h2>
 <h3><a name="marcNotation">6.1 MARC Notation in Formats</a></h3>
@@ -1060,7 +1060,7 @@ default: Default_HTML_brief.bft<br/>
 <h4>Migrating <i>formats</i> to <i>format templates</i> and <i>format elements</i></h4>
 <p>The migration of formats is the most difficult part of the migration. You will need to separate the presentation code (HTML) from the business code (iterations, tests and calls to the database). Here are some tips on how you can do this:</p>
 <ul>
-<li>If you want to save the time of unescaping all HTML characters and understanding how the layout should look like, just go with your web browser to a formatted version of the format in your CDS Invenio installation, and copy the source of the web page. Identify the parts of the HTML code which are specific to the current record, and replace them with a call to the corresponding format element.</li>
+<li>If you want to save the time of unescaping all HTML characters and understanding how the layout should look like, just go with your web browser to a formatted version of the format in your Invenio installation, and copy the source of the web page. Identify the parts of the HTML code which are specific to the current record, and replace them with a call to the corresponding format element.</li>
 <li>If you have made small modifications to the old default provided formats, we suggest that you use the new provided ones and modify them according to your needs.</li>
 </ul>
 <h4>Migrating <i>UDFs</i> and <i>Link rules</i></h4>
@@ -1082,7 +1082,7 @@ a way to extend one particular editor, Dreamweaver.</p>
 edit a Dreamweaver configuration file named <code>Tags.xml</code> located inside /Configuration/ThirdPartyTags directory
 of your Dreamweaver installation folder. At the end of this file, copy-paste the following lines:
   <pre>
-  &lt;!-- BibFormat (CDS Invenio) --&gt;
+  &lt;!-- BibFormat (Invenio) --&gt;
   &lt;tagspec tag_name="BIBFORMAT" start_string="&lt;BFE_" end_string="/&gt;" parse_attributes="false" detect_in_attribute="true" icon="bibformat.gif" icon_width="25" icon_height="16"&gt;&lt;/tagspec &gt;
   &lt;tagspec tag_name="BIBFORMAT" start_string="&lt;bfe_" end_string="/&gt;" parse_attributes="false" detect_in_attribute="true" icon="bibformat.gif" icon_width="25" icon_height="16"&gt;&lt;/tagspec &gt;
   </pre>
@@ -1129,10 +1129,10 @@ possible (or at least not trivial) to guess that the call to <code>field(str(5+4
 is equal to a call to <code>field("980__a")</code>. You should then not completely rely on this indication.</p>
 
 <h4>How are displayed deleted record?</h4>
-<p>By default, CDS Invenio displays a standard "The record has been deleted." message for all
+<p>By default, Invenio displays a standard "The record has been deleted." message for all
 output formats with a 'text/html' content type. Your output format, format templates and format elements
 are bypassed by the engine.
-However, for more advanced output formats, CDS Invenio
+However, for more advanced output formats, Invenio
 goes through the regular formatting process and let your formats do the job. This allows you to customize how a record should be displayed once it has been deleted.</p>
 
 <h4>Why are some format elements omitted in the "Knowledge Base Dependencies" page?</h4>

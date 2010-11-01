@@ -1,22 +1,22 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable=C0103
-"""CDS Invenio BibMerge Administrator Interface."""
+"""Invenio BibMerge Administrator Interface."""
 
 __revision__ = "$Id$"
 
@@ -70,7 +70,7 @@ class WebInterfaceMergePages(WebInterfaceDirectory):
         ajax_request, recid1, recid2 = False, None, None
         if form.has_key('jsondata'):
             json_data = json.loads(str(form['jsondata']))
-            # Deunicode all strings (CDS Invenio doesn't have unicode
+            # Deunicode all strings (Invenio doesn't have unicode
             # support).
             json_data = json_unicode_to_utf8(json_data)
             ajax_request = True

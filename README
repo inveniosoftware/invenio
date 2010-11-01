@@ -1,13 +1,13 @@
-CDS Invenio v0.99.1 README
-==========================
+Invenio README
+==============
 
-CDS Invenio enables you to run your own electronic preprint server,
+Invenio enables you to run your own electronic preprint server,
 your own online library catalogue or a digital document system on the
 web.  It complies with the Open Archive Initiative metadata harvesting
 protocol and uses MARC21 as its underlying bibliographic standard.
 
-CDS Invenio is developed at, and maintained by, the CERN Document
-Server Software Consortium.  At CERN, CDS Invenio installation manages
+Invenio is developed at, and maintained by, the CERN Document
+Server Software Consortium.  At CERN, Invenio installation manages
 over 600 collections of data, consisting of over 800,000 bibliographic
 records, including 400,000 fulltext documents, covering preprints,
 articles, books, journals, photographs, videos, and more.  Please
@@ -47,22 +47,22 @@ We aim at user friendliness and speed.  Among the features are:
     . Open peer commentin and reviewing of repository documents and in
       group-shared baskets
 
-The CDS Invenio is free software licenced under terms of GNU General
+The Invenio is free software licenced under terms of GNU General
 Public Licence (GPL).  It is provided on an "as is" basis.  However,
-please note that a support contract can be arranged with the CDS
-Development Group in which we, the developers, can help you to
-install, configure, and maintain the system (featuring email and
-telnet support throughout the year), including development of new
-local features should such a need arise.  If you are interested in
-concluding a support contract with us, please contact the CDS
-Development Group at <cds.support@cern.ch>.
+please note that a support contract can be arranged with the Invenio
+Development Team in which we, the developers, can help you to install,
+configure, and maintain the system (featuring email and telnet support
+throughout the year), including development of new local features
+should such a need arise.  If you are interested in concluding a
+support contract with us, please contact the Invenio Development Team
+at <info@invenio-software.org>.
 
-CDS Invenio runs on Unix-like systems and requires MySQL database
+Invenio runs on Unix-like systems and requires MySQL database
 server and Apache/Python web application server.  Please consult the
 INSTALL file for more information.
 
-Good luck, and thanks for choosing CDS Invenio.
+Good luck, and thanks for choosing Invenio.
 
-       - CDS Development Group
-         <cds.support@cern.ch>
-         <http://cdsware.cern.ch/>
+       - Invenio Development Team
+         <info@invenio-software.org>
+         <http://invenio-software.org/>

@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: _(Admin Area)_ -->
@@ -20,11 +20,11 @@
 
 <p>Welcome to the Admin Area of the <CFG_SITE_NAME>.  You'll find here
 pointers to the available runtime admin-level interfaces and
-admin-level guides on how to configure and run the CDS Invenio
+admin-level guides on how to configure and run the Invenio
 system.</p>
 
 
-<p>CDS Invenio comes as a suite of several more or less independent
+<p>Invenio comes as a suite of several more or less independent
 modules.  You'll find brief descriptions for each admin module below.
 (More background information on each module may be read in the <a
 href="<CFG_SITE_URL>/help/hacking/modules-overview">modules overview</a> article.)
@@ -42,14 +42,14 @@ presented below.
 
 <h3>Data acquisition related modules</h3>
 
-<p>The metadata input into a running CDS Invenio system can be done in two
+<p>The metadata input into a running Invenio system can be done in two
 ways: <em>(i) admin-oriented batch mode</em>,
 i.e. <strong>OAI Harvest</strong> to get data from OAI repositories,
 <strong>BibConvert</strong> to convert any input data into XML MARC,
-and <strong>BibUpload</strong> to upload XML MARC files into CDS Invenio;
+and <strong>BibUpload</strong> to upload XML MARC files into Invenio;
 and <em>(ii) author-oriented interactive mode</em>,
 i.e. <strong>WebSubmit</strong> to submit documents via Web.  Once the
-data are uploaded in CDS Invenio, you may want to modify them via
+data are uploaded in Invenio, you may want to modify them via
 <strong>BibEdit</strong> to edit the metadata.
 </p>
 
@@ -71,7 +71,7 @@ data are uploaded in CDS Invenio, you may want to modify them via
   Enables you to configure OAI metadata harvestor for eventual
   periodical batch upload of data.  For example, you can define from
   where to harvest, with what periodicity, how to transform data
-  before uploading them into CDS Invenio, etc. See also
+  before uploading them into Invenio, etc. See also
    <a href="<CFG_SITE_URL>/admin/bibharvest/oairepositoryadmin.py">OAI Repository Admin</a>
    to expose your data to other harvesters.
 </td>
@@ -219,7 +219,7 @@ data are uploaded in CDS Invenio, you may want to modify them via
 
 <h3>Data provision related modules</h3>
 
-<p>The metadata output from a running CDS Invenio system to the end-user
+<p>The metadata output from a running Invenio system to the end-user
 is covered by several modules: <strong>BibIndex</strong> to index the
 metadata, <strong>BibRank</strong> to eventually rank them,
 <strong>BibFormat</strong> to format them for the output,
@@ -368,7 +368,7 @@ engine.
 </td>
 
 <td> Enables you to configure and run an online journal hosted on your
- CDS Invenio server, using the same tools and concepts at those you
+ Invenio server, using the same tools and concepts at those you
  use to manage bibliographic data.  </td>
 
 <td>
@@ -383,7 +383,7 @@ engine.
 
 <h3>Personalization related modules</h3>
 
-<p>CDS Invenio interface can be personalized to suit different needs
+<p>Invenio interface can be personalized to suit different needs
 of different end-users.  This functionality is covered by several
 modules: <strong>WebSession</strong> to identify users and their
 personal configurations, <strong>WebBasket</strong> to provide
@@ -486,8 +486,8 @@ set up personal email notification alerts.
 <p>Modules that provide the necessary glue for those presented above
 are: <strong>BibSched</strong> to manage and schedule bibliographic
 tasks, <strong>WebAccess</strong> to define role-based access control
-system to all CDS Invenio services, and <strong>WebStyle</strong> to
-define a common look and feel of CDS Invenio web pages.
+system to all Invenio services, and <strong>WebStyle</strong> to
+define a common look and feel of Invenio web pages.
 </p>
 
 <table border="1">
@@ -520,7 +520,7 @@ define a common look and feel of CDS Invenio web pages.
   <strong>WebAccess Admin</strong>
 </td>
 <td>
-    Enables you to define who has got access or admin rights on various CDS Invenio modules.
+    Enables you to define who has got access or admin rights on various Invenio modules.
     For example, you can define that John is the bibliographic
     data manager, that Jim can modify the search interface pages, that
     Jill is the submission approval editor, etc.
@@ -545,7 +545,7 @@ define a common look and feel of CDS Invenio web pages.
   <strong>WebStyle Admin</strong>
 </td>
 <td>
-  Enables you to customize default CDS Invenio page style and the CSS style sheet.
+  Enables you to customize default Invenio page style and the CSS style sheet.
 </td>
 <td>
   <small class="note">not available, but see the guide for the command-line way</small>

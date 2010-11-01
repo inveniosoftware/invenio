@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
@@ -442,7 +442,7 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CF
     ##     'authors'          : [],  ## List   - the item's authors
     ##   }
     if item_details is not None:
-        ## Details of the item were found in the CDS Invenio repository
+        ## Details of the item were found in the Invenio repository
         authors = ", ".join(item_details['authors'])
         newrn = item_details['report-number']
         title = item_details['title']
@@ -662,7 +662,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
     ##     'authors'          : [],  ## List   - the item's authors
     ##   }
     if item_details is not None:
-        ## Details of the item were found in the CDS Invenio repository
+        ## Details of the item were found in the Invenio repository
         authors = ", ".join(item_details['authors'])
         newrn = item_details['report-number']
         title = item_details['title']
@@ -1225,7 +1225,7 @@ def get_pending_item_details(doctype, reportnumber):
     """Given a doctype and reference number, try to retrieve an item's details.
        The first place to search for them should be the WebSubmit pending
        directory. If nothing is retrieved from there, and attempt is made
-       to retrieve them from the CDS Invenio repository itself.
+       to retrieve them from the Invenio repository itself.
        @param doctype: (string) - the doctype of the item for which brief
         details are to be retrieved.
        @param reportnumber: (string) - the report number of the item
@@ -1426,7 +1426,7 @@ def get_brief_doc_details_from_repository(reportnumber):
         + recid (why?)
         + report-number (why?)
         + email
-       This function searches in the CDS Invenio repository, based on
+       This function searches in the Invenio repository, based on
        "reportnumber" for a record and then pulls the interesting fields
        from it.
        @param reportnumber: (string) - the report number of the item for
@@ -1727,7 +1727,7 @@ def sendMailToGroup(doctype,categ,RN,group_id,authors):
     group_member_ids = run_sql("SELECT id_user FROM user_usergroup WHERE id_usergroup = '%s'" % (group_id))
     for member_id in group_member_ids:
         member_email = run_sql("SELECT email FROM user WHERE id = '%s'" % (member_id))
-        if not member_email[0][0] == "cds.support@cern.ch":
+        if not member_email[0][0] == "info@invenio-software.org":
             send_email(FROMADDR, member_email[0][0],"Request for comment on document %s" % (RN),message)
     return ""
 

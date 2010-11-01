@@ -1,24 +1,24 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebJournal Table Structure -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webjournal-internals">WebJournal Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="webjournal-internals">WebJournal Internals</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <pre>
@@ -65,16 +65,16 @@ It is quite safe to delete, edit and add entries manually in these
 tables. If a journal editor released an issue by mistake, you can
 delete the corresponding issue from the table. Eg:
 
-$ echo "SELECT id FROM jrnJOURNAL WHERE name='AtlantisTimes'" | /opt/cds-invenio/bin/dbexec
+$ echo "SELECT id FROM jrnJOURNAL WHERE name='AtlantisTimes'" | /opt/invenio/bin/dbexec
   ----
  | id |
   ----
  | 1  |
   ----
 
-$ echo "DELETE FROM jrnISSUE WHERE id_jrnJOURNAL=1 and issue_number='07/2009'" | /opt/cds-invenio/bin/dbexec
+$ echo "DELETE FROM jrnISSUE WHERE id_jrnJOURNAL=1 and issue_number='07/2009'" | /opt/invenio/bin/dbexec
 
-Note however that articles remain visible on the main CDS Invenio
+Note however that articles remain visible on the main Invenio
 interface, in your journal collection.
 
 
@@ -82,7 +82,7 @@ If a journal editor grouped two issues by mistake, you can change the
 'issue_display' column value to be the same as the 'issue_number'
 column. Eg:
 
-$ echo "SELECT issue_number, issue_display FROM jrnISSUE WHERE id_jrnJOURNAL=1" | /opt/cds-invenio/bin/dbexec
+$ echo "SELECT issue_number, issue_display FROM jrnISSUE WHERE id_jrnJOURNAL=1" | /opt/invenio/bin/dbexec
 
   -----------------------------
  | issue_number  issue_display |
@@ -91,8 +91,8 @@ $ echo "SELECT issue_number, issue_display FROM jrnISSUE WHERE id_jrnJOURNAL=1" 
  | 06/2009       06-07/2009    |
   -----------------------------
 
-$ echo "UPDATE jrnISSUE set issue_display='07/2009' WHERE id_jrnJOURNAL=1 AND issue_number='07/2009'" | /opt/cds-invenio/bin/dbexec
-$ echo "UPDATE jrnISSUE set issue_display='06/2009' WHERE id_jrnJOURNAL=1 AND issue_number='06/2009'" | /opt/cds-invenio/bin/dbexec
+$ echo "UPDATE jrnISSUE set issue_display='07/2009' WHERE id_jrnJOURNAL=1 AND issue_number='07/2009'" | /opt/invenio/bin/dbexec
+$ echo "UPDATE jrnISSUE set issue_display='06/2009' WHERE id_jrnJOURNAL=1 AND issue_number='06/2009'" | /opt/invenio/bin/dbexec
 
 You can leave the '07/2009' if it has no release date. You should
 remove it if it has a release date while the issue should not have

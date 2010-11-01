@@ -1,24 +1,24 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebDoc Syntax -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <style type="text/css">
@@ -45,7 +45,7 @@ table.list {
 -->
 </style>
 
-<p>WebDoc files are used for the documentation of CDS Invenio. WebDoc syntax is based on HTML, plus some additional markup that provides the necessary features to generate basic "dynamic" pages.</p>
+<p>WebDoc files are used for the documentation of Invenio. WebDoc syntax is based on HTML, plus some additional markup that provides the necessary features to generate basic "dynamic" pages.</p>
 
 <h2>Contents</h2>
 
@@ -146,7 +146,7 @@ translated. Eg:</p>
 	<tr class="blue"><td><code>&lt;CFG_SITE_ADMIN_EMAIL></code></td><td>Admin email address</td><td><CFG_SITE_ADMIN_EMAIL></td></tr>
 	<tr><td><code>&lt;CFG_SITE_URL></code></td><td>Base URL of the website</td><td><CFG_SITE_URL></td></tr>
 	<tr class="blue"><td><code>&lt;CFG_SITE_SECURE_URL></code></td><td>Secured base URL of the website</td><td><CFG_SITE_SECURE_URL></td></tr>
-	<tr><td><code>&lt;CFG_VERSION></code></td><td>Version of CDS Invenio</td><td><CFG_VERSION></td></tr>
+	<tr><td><code>&lt;CFG_VERSION></code></td><td>Version of Invenio</td><td><CFG_VERSION></td></tr>
 </table>
 
 <p>Variables are read-only and you can only use the one provided in this table.</p>
@@ -167,7 +167,7 @@ header and footer:</p>
 <table class="list">
 	<tr><th>directive</th><th>description</th></tr>
 	<tr><td><code>&lt;!-- WebDoc-Page-Title: &#95;(My Title)&#95; --></td><td>Title of the page. It will be embedded in <code>&lt;h1></code> tag at the beginning of the page, as well as in the <code>&lt;title></code> tag of the header. Also used in the breadcrumb of the page ("navtrail")</td></tr>
-	<tr class="blue"><td><code>&lt;!-- WebDoc-Page-Navtrail: &lt;a class="navtrail" href="&lt;CFG_SITE_URL>/help/hacking">Hacking CDS Invenio&lt;/a> &amp;gt; &lt;a class="navtrail" href="webstyle-internals">WebStyle Internals&lt;/a> --></code></td><td>Specified the breadcrumb of the page.</td></tr>
+	<tr class="blue"><td><code>&lt;!-- WebDoc-Page-Navtrail: &lt;a class="navtrail" href="&lt;CFG_SITE_URL>/help/hacking">Hacking Invenio&lt;/a> &amp;gt; &lt;a class="navtrail" href="webstyle-internals">WebStyle Internals&lt;/a> --></code></td><td>Specified the breadcrumb of the page.</td></tr>
 	<tr><td><code>&lt;!-- WebDoc-Page-Keywords: some keywords --></code></td><td>Keywords that will appear in the <code>&lt;meta name="keyword"/></code> tag of the page.</td></tr>
 	<tr class="blue"><td><code>&lt;!-- WebDoc-Page-Description: a page description --></code></td><td>A description that will appear in the <code>&lt;meta name="description"/></code> tag of the page.</td></tr>
 	<tr><td><code>&lt;!-- WebDoc-Page-Revision: $Id$ --></code></td><td>The version of the file (typically for CVS keyword expansion).</td></tr>

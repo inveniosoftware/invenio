@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # logicutils.py was originally distributed as part of the aima-python project, at
 # http://code.google.com/p/aima-python/
-# At the time it was integrated into CDS Invenio (2010 May 20), aima-python
+# At the time it was integrated into Invenio (2010 May 20), aima-python
 # had a notice on its website declaring the code to be under the "MIT license"
 # and linking to http://www.opensource.org/licenses/mit-license.php by way of
 # explanation.

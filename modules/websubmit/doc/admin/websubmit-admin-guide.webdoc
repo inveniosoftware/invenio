@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: _(WebSubmit Admin Guide)_ -->
@@ -173,7 +173,7 @@ as "<code>Create_Modify_Interface</code>" function).</p>
 <label for="figure3">Figure 3</label>
 </div>
 <div class="helpnote">A set of WebSubmit functions comes installed by
-default in CDS Invenio, to provide all the necessary functionalities
+default in Invenio, to provide all the necessary functionalities
 to create your own workflow. The behaviour of these functions can be
 customized through their parameters. Advanced users can also create
 their own functions in Python (see further below in this guide). The
@@ -283,7 +283,7 @@ particularly important to understand when designing a submission.</p>
 on disk in order to store all the collected values. This working
 directory is usually called the "<code>curdir</code>". It is located
 in a subdirectory
-of <code>/opt/cds-invenio/var/data/submit/storage/</code><small><em>{action
+of <code>/opt/invenio/var/data/submit/storage/</code><small><em>{action
 directory}</em></small><code>/</code><small><em>{submission
 code}</em></small><code>/</code><small><em>{submission access
 number}</em></small> where <small><em>{submission code}</em></small>
@@ -325,7 +325,7 @@ eg. <code>comboDEMOART</code> contains the chosen category on page
 
 <p>The path to the <code>curdir</code> can sometimes be slightly
 different, depending on the chosen action. For eg. the SRV action will
-use <code>/opt/cds-invenio/var/data/submit/storage/revise/</code><small><em>{submission
+use <code>/opt/invenio/var/data/submit/storage/revise/</code><small><em>{submission
 code}</em></small><code>/</code><small><em>{submission access
 number}</em></small> where <small><em>{submission
 code}</em></small></p>
@@ -347,7 +347,7 @@ use of the "<code>Move_to_Done</code>" function will create a zipped
 archive of this directory (+ rename it using the report number of the
 record, found in file <code>curdir/RN</code>), and will move it to a
 different
-directory, <code>/opt/cds-invenio/var/data/submit/storage/done/running/</code>.
+directory, <code>/opt/invenio/var/data/submit/storage/done/running/</code>.
 </p>
 
 <a name="2"></a><h2>2. Configure Submissions: a Tutorial</h2>
@@ -896,7 +896,7 @@ an existing function to your submission.</p>
 <p>A WebSubmit function corresponds to a Python file, which must be
 named after the function name (eg "<code>My_Function</code>" =&gt;
 "<code>My_Function.py</code>") and placed into
-the <code>/opt/cds-invenio/lib/python/invenio/websubmit_functions/</code>
+the <code>/opt/invenio/lib/python/invenio/websubmit_functions/</code>
 directory. The file must also contain a Python function with the same
 "<code>My_Function</code>" name. This function interface must be
 the following one:
@@ -979,7 +979,7 @@ on the page as needed.
 <p>At this step your users will be able to upload a file to the server
 during the submission process. Indeed if you have a look at the
 corresponding submission directory in
-<code>/opt/cds-invenio/var/data/submit/storage/</code> you will see the uploaded
+<code>/opt/invenio/var/data/submit/storage/</code> you will see the uploaded
 file in the <code>/files/DEMO_FILE/</code> directory, plus a standard <code>DEMO_FILE</code>
 file containing the path to the uploaded file. However the file is not
 attached to the uploaded record: you must add a corresponding entry in
@@ -995,7 +995,7 @@ rules. From your submission page, click on "view functions" of the
 action you want to edit, then "view parameters" of the
 <code>Make_Record</code>/<code>Make_Modify_Record</code> function. The "create/modifyTemplate"
 and "sourceTemplate" are the names of the BibConvert templates you can
-find in the <code>/opt/cds-invenio/etc/bibconvert/config/</code> directory
+find in the <code>/opt/invenio/etc/bibconvert/config/</code> directory
 (Depending on the authorization on disk, you might even be able to
 edit the files from the web interface). Read more about BibConvert in
 the <a href="<CFG_SITE_URL>/help/admin/bibconvert-admin-guide">BibConvert admin guide</a>.
@@ -1025,7 +1025,7 @@ would for any other WebSubmit element. Open the source BibConvert
 template (which is also given as parameter to
 the <code>Make_Record</code>/<code>Make_Modify_Record</code>
 functions, and can be found in
-the <code>/opt/cds-invenio/etc/bibconvert/config/</code> directory),
+the <code>/opt/invenio/etc/bibconvert/config/</code> directory),
 and add for example:</p>
 <pre>
 DEMO_FILE---<:DEMO_FILE:>
@@ -1531,7 +1531,7 @@ submitted values, you will certainly use the submission directory.</p>
 and can act as a backup when something goes wrong during a submission.</p>
 
 <p>An example of submission directory could be found at this
-path <code>/opt/cds-invenio/var/data/submit/storage/running/DEMOART/1245135338_62620</code>,
+path <code>/opt/invenio/var/data/submit/storage/running/DEMOART/1245135338_62620</code>,
 where DEMOART is your submission code,
 and <code>1245135338_62620</code> is the submission session ID, as
 found at the bottom of each WebSubmit web page during the submission
@@ -1547,7 +1547,7 @@ submission directory again!) (Function <code>Make_Record</code>),
 upload of the MARCXML (Function <code>Insert_Record</code>)
 and <code>Move_To_Done</code>. This last function moves the submission
 directory to a new place. It could be for
-e.g.: <code>/opt/cds-invenio/var/data/submit/storage/done/DEMOART/DEMO-ARTICLE-2010-001.tar.gz</code>,
+e.g.: <code>/opt/invenio/var/data/submit/storage/done/DEMOART/DEMO-ARTICLE-2010-001.tar.gz</code>,
 supposedly that the report number of the submitted record
 is <code>ARTICLE-2010-001</code>. Some other functions will move the
 submission directory to other places, and some functions will even let
@@ -1743,13 +1743,13 @@ you configure where to move it.</p>
 
                 &nbsp;<span class="guideheader">T</span>he relation
                 between a search collection and a submission document
-                type may be prone to certain confusion for CDS Invenio
+                type may be prone to certain confusion for Invenio
                 administrators. This comes from the fact that there is
                 no one-to-one direct mapping between them, as is usual
                 elsewhere.  The relation is more flexible than that.<br/><br/>
 
 		&nbsp;<span class="guideheader">A</span> search
-		collection in CDS Invenio is defined through a search
+		collection in Invenio is defined through a search
 		query. For example, "all records where field F
 		contains the value V belong to collection C". Several
 		assertions can be deduced from this definition:<br/>
@@ -2030,10 +2030,10 @@ you configure where to move it.</p>
                 <li><b>dir</b>: This is the name of the directory in which the submission data will be stored temporarily. If
                 the dir value is "running" as for the "Submit New Record" action (SBI), then the submission data for a
                 Text Document (document acronym "TEXT") will be stored in the
-                /opt/cds-invenio/var/data/submit/storage/running/TEXT/9089760_90540 directory (where 9089760_90540 is what we call
+                /opt/invenio/var/data/submit/storage/running/TEXT/9089760_90540 directory (where 9089760_90540 is what we call
                 the submission number. It is a string automatically generated at the beginning of each submission). Once
                 finished, the submission data will be moved to the
-                /opt/cds-invenio/var/data/submit/storage/done/running/TEXT/ directory by the "Move_to_Done" function.
+                /opt/invenio/var/data/submit/storage/done/running/TEXT/ directory by the "Move_to_Done" function.
                 <li><b>statustext</b>: text displayed in the status bar of the browser when the user moves his mouse upon
                  the action button.
             </ul>
@@ -2413,7 +2413,7 @@ you configure where to move it.</p>
             &nbsp;<span class="guideheader">T</span>he treatment is organised in a succession of functions, each of
             which has its own input and output.<br/><br/>
             &nbsp;<span class="guideheader">T</span>he functions themselves are stored in separate files (one per
-            function) in the /opt/cds-invenio/lib/python/invenio/websubmit_functions directory. A file containing a function MUST
+            function) in the /opt/invenio/lib/python/invenio/websubmit_functions directory. A file containing a function MUST
             be named after the function name itself. For example, a function called "Move_to_Done" MUST be stored in a
             file called Move_to_Done.py. The case is important here.<br/><br/>
             &nbsp;<span class="guideheader">F</span>or a description of what should be inside the file, have a look to
@@ -2451,9 +2451,9 @@ you configure where to move it.</p>
             &nbsp;<span class="guideheader">Y</span>ou will then reach a page where you can add parameters to your
             new function.<br/><br/>
             &nbsp;<span class="guideheader">D</span>on't forget to add the function file inside the
-            /opt/cds-invenio/lib/python/invenio/websubmit_functions directory and to name the file after the function. Functions must
+            /opt/invenio/lib/python/invenio/websubmit_functions directory and to name the file after the function. Functions must
             be written in Python. Here is an example implementation of a function:<br/><br/>
-            /opt/cds-invenio/lib/python/invenio/websubmit_functions/Get_Report_Number.py:</small>
+            /opt/invenio/lib/python/invenio/websubmit_functions/Get_Report_Number.py:</small>
             <table border=0 width=75% bgcolor="eeeeff"><tr><td><small><pre><br/>
 def Get_Report_Number (parameters,curdir,form):
     global rn
@@ -2550,7 +2550,7 @@ def Get_Report_Number (parameters,curdir,form):
         <h3>Description:</h3>
         <blockquote>
             &nbsp;<span class="guideheader">T</span>his page lists and explains all the functions used in the demo
-            provided with the CDS Invenio package. This list is not exhaustive since you can add any new function you need.<br/>
+            provided with the Invenio package. This list is not exhaustive since you can add any new function you need.<br/>
             &nbsp;<span class="guideheader">C</span>lick on one function name to get its description.<br/>
             &nbsp;<span class="guideheader">P</span>lease note in this page when we refer to [param] this means the
             value of the parameter 'param' for a given document type.<br/><br/>
@@ -3065,7 +3065,7 @@ def Get_Report_Number (parameters,curdir,form):
         <tr>
             <td colspan="2">
                 <small>
-                This function moves the existing submission directory to the /opt/cds-invenio/var/data/submit/storage/done directory. If the
+                This function moves the existing submission directory to the /opt/invenio/var/data/submit/storage/done directory. If the
                 Then it tars and gzips the directory.
                 </small>
             </td>
@@ -3087,7 +3087,7 @@ def Get_Report_Number (parameters,curdir,form):
         <tr>
             <td colspan="2">
                 <small>
-                This function moves the existing submission directory to the /opt/cds-invenio/var/data/submit/storage/pending directory. It is
+                This function moves the existing submission directory to the /opt/invenio/var/data/submit/storage/pending directory. It is
                 used to store temporarily this data until it is approved or...
                 </small>
             </td>
@@ -3722,24 +3722,24 @@ def Get_Report_Number (parameters,curdir,form):
     <i>&nbsp;<span class="guideheader">Q</span>2. Where are all the files stored in this system?
     </i>
     <blockquote>
-        <li>the counter files are here: /opt/cds-invenio/var/data/submit/counters. There are used by the
+        <li>the counter files are here: /opt/invenio/var/data/submit/counters. There are used by the
         <a href="#Report_Number_Generation">Report_Number_Generation</a>
         function.
-        <li>all running and completed submissions are stored here: /opt/cds-invenio/var/data/submit/storage.
-        <li>all the document files attached to records are stored here: /opt/cds-invenio/var/data/files.
-        <li>all python functions used by webSubmit are stored here: /opt/cds-invenio/lib/python/invenio/websubmit_functions
+        <li>all running and completed submissions are stored here: /opt/invenio/var/data/submit/storage.
+        <li>all the document files attached to records are stored here: /opt/invenio/var/data/files.
+        <li>all python functions used by webSubmit are stored here: /opt/invenio/lib/python/invenio/websubmit_functions
     </blockquote>
     <a name="Q3"></a>
     <i>&nbsp;<span class="guideheader">Q</span>3. How is the documents archive organised?
     </i>
     <blockquote>
-        First of all, the documents files attached to records are stored here: /opt/cds-invenio/var/data/files. <br/><br/>
+        First of all, the documents files attached to records are stored here: /opt/invenio/var/data/files. <br/><br/>
         The <a href="#Upload_Files">Upload_Files</a> webSubmit function is used
         to link a document with a record.<br/><br/>
         All documents get an id from the system and are stored in the "bibdoc" table in the database. The link between a
         document and a record is stored using the "bibdoc_bibrec" table.<br/><br/>
         The document id is used to determine where the files are stored. For example the files of document #14 will be
-        stored here: /opt/cds-invenio/var/data/files/g0/14<br/><br/>
+        stored here: /opt/invenio/var/data/files/g0/14<br/><br/>
         The subdirectory g0 is used to split the documents accross the filesystem.  The CFG_FILE_DIR_SIZE variable from
         invenio.conf determines how many documents will be stored under one subdirectory.<br/><br/>
         Several files may be stored under the same document directory: they are the different formats and versions of the

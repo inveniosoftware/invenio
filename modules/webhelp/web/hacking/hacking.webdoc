@@ -1,25 +1,25 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<!-- WebDoc-Page-Title: Hacking CDS Invenio -->
+<!-- WebDoc-Page-Title: Hacking Invenio -->
 <!-- WebDoc-Page-Navbar-Name: hacking-test-suite -->
 <!-- WebDoc-Page-Navbar-Select: hacking -->
 
-Welcome to the CDS Invenio Developers' corner.  Before diving into the
+Welcome to the Invenio Developers' corner.  Before diving into the
 source, make sure you don't miss our <a
 href="<CFG_SITE_URL>/help/">user-level</a> and <a
 href="<CFG_SITE_URL>/help/admin/">admin-level</a> documentation as well.  And now, back to the source, and happy hacking!
@@ -36,14 +36,14 @@ href="<CFG_SITE_URL>/help/admin/">admin-level</a> documentation as well.  And no
 <dd>A policy we try to follow, for good or bad.</dd>
 
 <dt><a href="release-numbering">Release Numbering</a></dt>
-<dd>Presenting the version numbering scheme adopted for CDS Invenio stable and development releases.</dd>
+<dd>Presenting the version numbering scheme adopted for Invenio stable and development releases.</dd>
 
 <dt><a href="directory-organization">Directory Organization</a></dt>
 <dd>How the source and target directories are organized, where the
 sources get installed to, what is the visible URL policy, etc.</dd>
 
 <dt><a href="modules-overview">Modules Overview</a></dt>
-<dd>Presenting a summary of various CDS Invenio modules and their relationships.</dd>
+<dd>Presenting a summary of various Invenio modules and their relationships.</dd>
 
 <dt><a href="test-suite">Test Suite</a></dt>
 <dd>Describes our unit and regression test suites.</dd>

@@ -1,23 +1,23 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
 Test the suitability of Python core and the availability of various
-Python modules for running CDS Invenio.  Warn the user if there are
+Python modules for running Invenio.  Warn the user if there are
 eventual troubles.  Exit status: 0 if okay, 1 if not okay.  Useful for
 running from configure.ac.
 """
@@ -72,7 +72,8 @@ if sys.version > cfg_max_python_version:
     ** Perhaps you have downloaded and are installing an **
     ** old Invenio version?  Please look for more recent **
     ** Invenio version or please contact the development **
-    ** team at <cds.support@cern.ch> about this problem. **
+    ** team at <info@invenio-software.org> about this    **
+    ** problem.                                          **
     **                                                   **
     ** Installation aborted.                             **
     *******************************************************
@@ -131,12 +132,12 @@ except ImportError, msg:
     ** IMPORT WARNING %s
     *****************************************************
     ** Note that Psyco is not really required but we   **
-    ** recommend it for faster CDS Invenio operation   **
+    ** recommend it for faster Invenio operation   **
     ** if you are running in 32-bit operating system.  **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -154,9 +155,9 @@ except ImportError, msg:
     ** to work with the automatic classification of    **
     ** documents based on RDF-based taxonomies.        **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -172,9 +173,9 @@ except ImportError, msg:
     ** Note that PyRXP is not really required but      **
     ** we recommend it for fast XML MARC parsing.      **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -191,9 +192,9 @@ except ImportError, msg:
     ** we recommend it for user-friendly date          **
     ** parsing.                                        **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -210,9 +211,9 @@ except ImportError, msg:
     ** we recommend it for XML metadata conversions    **
     ** and for fast XML parsing.                       **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -228,9 +229,9 @@ except ImportError, msg:
     ** Note that libxslt is not really required but    **
     ** we recommend it for XML metadata conversions.   **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -248,9 +249,9 @@ except ImportError, msg:
     ** and citation history graphs on Detailed record  **
     ** pages.                                          **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -269,9 +270,9 @@ except ImportError, msg:
     ** but we recommend it in order to have detailed   **
     ** content information about fulltext files.       **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg
@@ -284,9 +285,9 @@ except StandardError:
     ** the one supported by Invenio. Please refer to   **
     ** the INSTALL file for more details.              **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """
@@ -302,9 +303,9 @@ except ImportError, msg:
     ** required, but we recommend it you want to       **
     ** enrich PDF with OCR information.                **
     **                                                 **
-    ** You can safely continue installing CDS Invenio  **
+    ** You can safely continue installing Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
-    ** even after your CDS Invenio installation is put **
+    ** even after your Invenio installation is put **
     ** into production.)                               **
     *****************************************************
     """ % msg

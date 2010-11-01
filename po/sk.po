@@ -1,27 +1,28 @@
-# # This file is part of CDS Invenio.
+# # This file is part of Invenio.
 # # Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 # #
-# # CDS Invenio is free software; you can redistribute it and/or
+# # Invenio is free software; you can redistribute it and/or
 # # modify it under the terms of the GNU General Public License as
 # # published by the Free Software Foundation; either version 2 of the
 # # License, or (at your option) any later version.
 # #
-# # CDS Invenio is distributed in the hope that it will be useful, but
+# # Invenio is distributed in the hope that it will be useful, but
 # # WITHOUT ANY WARRANTY; without even the implied warranty of
 # # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # # General Public License for more details.
 # #
 # # You should have received a copy of the GNU General Public License
-# # along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+# # along with Invenio; if not, write to the Free Software Foundation, Inc.,
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.90\n"
-"Report-Msgid-Bugs-To: cds.support@cern.ch\n"
+"Project-Id-Version: Invenio 0.99.90\n"
+"Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-05-16 23:00+0200\n"
 "PO-Revision-Date: 2008-02-29 14:29+0100\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
-"Language-Team: SK <cds.support@cern.ch>\n"
+"Language-Team: SK <info@invenio-software.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -2100,13 +2101,13 @@ msgstr "nutné"
 #: modules/bibupload/lib/batchuploader_templates.py:191
 #, fuzzy, python-format
 msgid ""
-"Your file has been succesfully queued. You can check your %(x_url1_open)"
-"supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%"
-"(x_url2_close)s"
+"Your file has been succesfully queued. You can check your "
+"%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
+"another file%(x_url2_close)s"
 msgstr ""
-"Ste prihlásený ako %(x_user)s.  Môžete a) %(x_url1_open)ssa odhlásiť%"
-"(x_url1_close)s; b) editovať %(x_url2_open)sparametre Vášho konta%"
-"(x_url2_close)s."
+"Ste prihlásený ako %(x_user)s.  Môžete a) %(x_url1_open)ssa odhlásiť"
+"%(x_url1_close)s; b) editovať %(x_url2_open)sparametre Vášho konta"
+"%(x_url2_close)s."
 
 #: modules/bibupload/lib/batchuploader_templates.py:205
 #, fuzzy
@@ -2473,8 +2474,8 @@ msgid "The error report has been sent."
 msgstr "Správa o chybe bola zaslaná."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-msgid "Many thanks for helping us make CDS Invenio better."
-msgstr "Ďakujeme že nám pomáhate robiť CDS Invenio lepším."
+msgid "Many thanks for helping us make Invenio better."
+msgstr "Ďakujeme že nám pomáhate robiť Invenio lepším."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
@@ -2887,11 +2888,11 @@ msgstr "VYČISTIŤ DÁTA"
 #: modules/webalert/lib/webalert_templates.py:300
 #, fuzzy, python-format
 msgid ""
-"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
-"(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
+"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the "
+"%(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
 msgstr ""
-"Nastaviť nové avízo %(x_url1_open)sVašich hľadaní%(x_url1_close)s, z %"
-"(x_url2_open)spopulárnych hľadaní%(x_url2_close)s, alebo zo vstupného "
+"Nastaviť nové avízo %(x_url1_open)sVašich hľadaní%(x_url1_close)s, z "
+"%(x_url2_open)spopulárnych hľadaní%(x_url2_close)s, alebo zo vstupného "
 "formulára."
 
 #: modules/webalert/lib/webalert_templates.py:318
@@ -2965,8 +2966,8 @@ msgid ""
 "You have not executed any search yet. Please go to the %(x_url_open)ssearch "
 "interface%(x_url_close)s first."
 msgstr ""
-"Ešte ste nevykonali žiadne hľadanie. Prosím najprv choďte do %(x_url_open)"
-"shľadacieho rozhrania%(x_url_close)s."
+"Ešte ste nevykonali žiadne hľadanie. Prosím najprv choďte do "
+"%(x_url_open)shľadacieho rozhrania%(x_url_close)s."
 
 #: modules/webalert/lib/webalert_templates.py:446
 #, python-format
@@ -3216,11 +3217,12 @@ msgstr "Verejné košíky"
 #: modules/webbasket/lib/webbasket.py:2173
 #, python-format
 msgid ""
-"You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
-"s group baskets and %(x_nb_public)s other users public baskets."
+"You have %(x_nb_perso)s personal baskets and are subscribed to "
+"%(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
 msgstr ""
-"Máte %(x_nb_perso)s osobných košíkov a ste prihlásení k odberu %(x_nb_group)"
-"s košíkov grúp a %(x_nb_public)s verejných košíkov iných užívateľov."
+"Máte %(x_nb_perso)s osobných košíkov a ste prihlásení k odberu "
+"%(x_nb_group)s košíkov grúp a %(x_nb_public)s verejných košíkov iných "
+"užívateľov."
 
 #: modules/webbasket/lib/webbasket_templates.py:83
 #, fuzzy
@@ -3648,8 +3650,8 @@ msgstr ""
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
-"Ak si prajete, môžete sa %(x_url_open)sprihlásiť alebo zaregistrovať tu%"
-"(x_url_close)s."
+"Ak si prajete, môžete sa %(x_url_open)sprihlásiť alebo zaregistrovať tu"
+"%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1763
 #: modules/websession/lib/websession_webinterface.py:260
@@ -4202,11 +4204,11 @@ msgstr "Poznámka: Vaša prezývka, %s, bude zobrazená ako autor tohto komentá
 #: modules/webcomment/lib/webcomment_templates.py:1081
 #, python-format
 msgid ""
-"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
-"(x_nickname)s will be displayed as the author of this comment."
+"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. "
+"%(x_nickname)s will be displayed as the author of this comment."
 msgstr ""
-"Poznámka: Ešte ste si %(x_url_open)snezvolili prezývku%(x_url_close)s. %"
-"(x_nickname)s bude zobrazené ako autor tohto komentára."
+"Poznámka: Ešte ste si %(x_url_open)snezvolili prezývku%(x_url_close)s. "
+"%(x_nickname)s bude zobrazené ako autor tohto komentára."
 
 #: modules/webcomment/lib/webcomment_templates.py:1023
 msgid "Send me an email when a new comment is posted"
@@ -4950,8 +4952,8 @@ msgstr "Žiadne hodnoty nenájdené."
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
-"Žiaden presný výsledok pre %(x_query1)s nebol nájdený, skúsme použiť %"
-"(x_query2)s namiesto neho..."
+"Žiaden presný výsledok pre %(x_query1)s nebol nájdený, skúsme použiť "
+"%(x_query2)s namiesto neho..."
 
 #: modules/websearch/lib/search_engine.py:1817
 #: modules/websearch/lib/search_engine.py:1826
@@ -5341,8 +5343,8 @@ msgstr "Tento dokument bol %(x_fmt_open)sschváený%(x_fmt_close)s."
 #: modules/websearch/lib/websearch_templates.py:2968
 #, fuzzy, python-format
 msgid ""
-"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least %(x_nb_records)"
-"s records in %(x_nb_seconds)s seconds."
+"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found at least "
+"%(x_nb_records)s records in %(x_nb_seconds)s seconds."
 msgstr ""
 "%(x_fmt_open)sPrehľad výsledkov:%(x_fmt_close)s Nájdených %(x_nb_records)s "
 "záznamov za %(x_nb_seconds)s sekúnd."
@@ -5558,20 +5560,20 @@ msgstr "stručný"
 #: modules/websession/lib/webaccount.py:114
 #, python-format
 msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
-"s as a regular user."
+"You are logged in as guest. You may want to %(x_url_open)slogin"
+"%(x_url_close)s as a regular user."
 msgstr ""
-"Ste prihlásený ako anonymný hosť.  Môžete sa %(x_url_open)sprihlásiť%"
-"(x_url_close)s ako riadny užívateľ."
+"Ste prihlásený ako anonymný hosť.  Môžete sa %(x_url_open)sprihlásiť"
+"%(x_url_close)s ako riadny užívateľ."
 
 #: modules/websession/lib/webaccount.py:118
 #, python-format
 msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
-"(x_url_close)s first"
+"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister"
+"%(x_url_close)s first"
 msgstr ""
-"%(x_fmt_open)sAnonymní hostia%(x_fmt_close)s sa musia najprv %(x_url_open)"
-"szaregistrovať%(x_url_close)s"
+"%(x_fmt_open)sAnonymní hostia%(x_fmt_close)s sa musia najprv "
+"%(x_url_open)szaregistrovať%(x_url_close)s"
 
 #: modules/websession/lib/webaccount.py:123
 msgid "No queries found"
@@ -5597,8 +5599,8 @@ msgstr "Všeobecné parametre"
 #: modules/websession/lib/websession_templates.py:94
 #, fuzzy, python-format
 msgid ""
-"You can consult the list of your external groups directly in the %"
-"(x_url_open)sgroups page%(x_url_close)s."
+"You can consult the list of your external groups directly in the "
+"%(x_url_open)sgroups page%(x_url_close)s."
 msgstr "Môžete si prezrieť zoznam %(x_url_open)sVašich grúp%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:98
@@ -5693,14 +5695,14 @@ msgid ""
 "If you are using a lightweight CERN account you can\n"
 "                %(x_url_open)sreset the password%(x_url_close)s."
 msgstr ""
-"Ak si prajete, môžete sa %(x_url_open)sprihlásiť alebo zaregistrovať tu%"
-"(x_url_close)s."
+"Ak si prajete, môžete sa %(x_url_open)sprihlásiť alebo zaregistrovať tu"
+"%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:228
 #, fuzzy, python-format
 msgid ""
-"You can change or reset your CERN account password by means of the %"
-"(x_url_open)sCERN account system%(x_url_close)s."
+"You can change or reset your CERN account password by means of the "
+"%(x_url_open)sCERN account system%(x_url_close)s."
 msgstr "Teraz môžete pristúpiť k Vášmu %(x_url_open)skontu%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:252
@@ -5777,9 +5779,9 @@ msgid ""
 "account%(x_fmt_close)s, then please enter your email address in the "
 "following form in order to have a password reset link emailed to you."
 msgstr ""
-"Ak ste stratili heslo k internému kontu CDS Invenio, tak prosíme vyplňte "
-"Vašu adresu elektronickej pošty do formulára nižšie. Vaše heslo Vám bude "
-"obratom zaslané elektronickou poštou."
+"Ak ste stratili heslo k internému kontu Invenio, tak prosíme vyplňte Vašu "
+"adresu elektronickej pošty do formulára nižšie. Vaše heslo Vám bude obratom "
+"zaslané elektronickou poštou."
 
 #: modules/websession/lib/websession_templates.py:402
 #: modules/websession/lib/websession_templates.py:1030
@@ -5888,13 +5890,13 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:532
 #, python-format
 msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
-"(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
-"s."
+"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout"
+"%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings"
+"%(x_url2_close)s."
 msgstr ""
-"Ste prihlásený ako %(x_user)s.  Môžete a) %(x_url1_open)ssa odhlásiť%"
-"(x_url1_close)s; b) editovať %(x_url2_open)sparametre Vášho konta%"
-"(x_url2_close)s."
+"Ste prihlásený ako %(x_user)s.  Môžete a) %(x_url1_open)ssa odhlásiť"
+"%(x_url1_close)s; b) editovať %(x_url2_open)sparametre Vášho konta"
+"%(x_url2_close)s."
 
 #: modules/websession/lib/websession_templates.py:613
 msgid "Your Alert Searches"
@@ -6043,8 +6045,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:839
 #, python-format
 msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
-"s an internal account."
+"If you don't own an account yet, please %(x_url_open)sregister"
+"%(x_url_close)s an internal account."
 msgstr ""
 "Ak ešte konto nemáte, prosím %(x_url_open)szaregistrujte%(x_url_close)s "
 "interné konto."
@@ -6157,8 +6159,8 @@ msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr ""
-"Zdáte sa byť užívateľom-hosťom.  Musíte sa vopred %(x_url_open)sprihlásiť%"
-"(x_url_close)s."
+"Zdáte sa byť užívateľom-hosťom.  Musíte sa vopred %(x_url_open)sprihlásiť"
+"%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1076
 msgid "You are not authorized to access administrative functions."
@@ -6181,8 +6183,8 @@ msgstr "Tu sú nejaké zaujímavé administratívne linky pre Vás:"
 #: modules/websession/lib/websession_templates.py:1120
 #, python-format
 msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
-"(x_url_close)s."
+"For more admin-level activities, see the complete %(x_url_open)sAdmin Area"
+"%(x_url_close)s."
 msgstr ""
 "Pre viac administratívnych aktivít, pozrite kompletný %(x_url_open)sAreál "
 "Adminstrátora%(x_url_close)s."
@@ -6420,8 +6422,8 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2076
 #, python-format
 msgid ""
-"If you want to invite new members to join your group, please use the %"
-"(x_url_open)sweb message%(x_url_close)s system."
+"If you want to invite new members to join your group, please use the "
+"%(x_url_open)sweb message%(x_url_close)s system."
 msgstr ""
 "Ak chcete pozvať nových členov aby sa pripojili k Vašej grupe, prosím "
 "použite systém %(x_url_open)sweb správ%(x_url_close)s."
@@ -6512,31 +6514,31 @@ msgstr "Grupa %s bola zrušená jej administrátorom."
 #: modules/websession/lib/websession_templates.py:2419
 #, python-format
 msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
-"s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
+"You can consult the list of %(x_url_open)s%(x_nb_total)i groups"
+"%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering "
+"(%(x_nb_admin)i)."
 msgstr ""
-"Môžete si prezrieť zoznam %(x_url_open)s%(x_nb_total)i Vašich grúp%"
-"(x_url_close)s ktorých ste členom (%(x_nb_member)i) alebo ktoré spravujete (%"
-"(x_nb_admin)i)."
+"Môžete si prezrieť zoznam %(x_url_open)s%(x_nb_total)i Vašich grúp"
+"%(x_url_close)s ktorých ste členom (%(x_nb_member)i) alebo ktoré spravujete "
+"(%(x_nb_admin)i)."
 
 #: modules/websession/lib/websession_templates.py:2438
 msgid ""
-"Warning : The password set for MySQL is the same as the default CDS-Invenio "
+"Warning : The password set for MySQL is the same as the default Invenio "
 "password. For security purposes, you might want to change the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2444
 msgid ""
-"Warning : The password set for the CDS Invenio database is the same as the "
-"default CDS-Invenio password. For security purposes, you might want to "
-"change the password."
+"Warning : The password set for the Invenio database is the same as the "
+"default Invenio password. For security purposes, you might want to change "
+"the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2450
 msgid ""
-"Warning : The password set for the CDS-Invenio admin user is currently "
-"empty. For security purposes, it is strongly recommended that you add a "
-"password."
+"Warning : The password set for the Invenio admin user is currently empty. "
+"For security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2456
@@ -6547,7 +6549,7 @@ msgid ""
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2462
-msgid "A newer version of CDS-Invenio is available for download. Please visit "
+msgid "A newer version of Invenio is available for download. Please visit "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2469
@@ -6757,8 +6759,8 @@ msgstr "Parametre úspešne upravené."
 #: modules/websession/lib/websession_webinterface.py:395
 #, python-format
 msgid ""
-"Note that if you have changed your email address, you will have to %"
-"(x_url_open)sreset your password%(x_url_close)s anew."
+"Note that if you have changed your email address, you will have to "
+"%(x_url_open)sreset your password%(x_url_close)s anew."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:403
@@ -7133,7 +7135,7 @@ msgid "Hacking Pages"
 msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:157
-msgid "Hacking CDS Invenio"
+msgid "Hacking Invenio"
 msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:159
@@ -7164,8 +7166,8 @@ msgstr "Ľutujem, záznam %s sa nezdá že by existoval."
 #: modules/webstyle/lib/webdoc_webinterface.py:190
 #, fuzzy, python-format
 msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)"
-"s."
+"You may want to look at the %(x_url_open)s%(x_category)s pages"
+"%(x_url_close)s."
 msgstr "Teraz môžete pristúpiť k Vášmu %(x_url_open)skontu%(x_url_close)s."
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:368
@@ -7279,15 +7281,15 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_managedocfiles.py:871
 #, python-format
 msgid ""
-"Having a problem revising a file? Send the revised version to %(mailto_link)"
-"s."
+"Having a problem revising a file? Send the revised version to "
+"%(mailto_link)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:874
 #, python-format
 msgid ""
-"Having a problem adding or revising a file? Send the new/revised version to %"
-"(mailto_link)s."
+"Having a problem adding or revising a file? Send the new/revised version to "
+"%(mailto_link)s."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_managedocfiles.py:989
@@ -7554,11 +7556,11 @@ msgstr "Číslo pridania"
 #: modules/websubmit/lib/websubmit_templates.py:1070
 #, python-format
 msgid ""
-"Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
-"(x_step)s"
+"Here is the %(x_action)s function list for %(x_doctype)s documents at level "
+"%(x_step)s"
 msgstr ""
-"Tu je %(x_action)s zoznam funkcií pre %(x_doctype)s dokumenty na úrovni %"
-"(x_step)s"
+"Tu je %(x_action)s zoznam funkcií pre %(x_doctype)s dokumenty na úrovni "
+"%(x_step)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1075
 msgid "Function"
@@ -9708,7 +9710,7 @@ msgid "There are no requests waiting on the item <strong>%s</strong>."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1743
-msgid "Welcome to CDS Invenio BibCirculation Admin"
+msgid "Welcome to Invenio BibCirculation Admin"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1807
@@ -10866,7 +10868,7 @@ msgid "Add notes"
 msgstr "Pridaj k užívateľom"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
-msgid "Book does not exists on CDS Invenio."
+msgid "Book does not exists on Invenio."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14340
@@ -10921,7 +10923,7 @@ msgid "Printable format"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15484
-msgid "Check if the book already exists on CDS Invenio,"
+msgid "Check if the book already exists on Invenio,"
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15508
@@ -10936,12 +10938,11 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15642
 msgid ""
-"Check if the book already exists on CDS Invenio, before to send your ILL "
-"request."
+"Check if the book already exists on Invenio, before to send your ILL request."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15819
-msgid "Book does not exists on CDS Invenio. Please fill the following form."
+msgid "Book does not exists on Invenio. Please fill the following form."
 msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16174
@@ -11477,8 +11478,8 @@ msgstr "Zruš košík"
 #~ msgstr "aktualizované"
 
 #~ msgid ""
-#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
-#~ "(x_url_close)s to it"
+#~ "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe"
+#~ "%(x_url_close)s to it"
 #~ msgstr ""
 #~ "Tento košík patrí %(x_name)s. Môžete sa voľne %(x_url_open)sprihlásiť k "
 #~ "odberu%(x_url_close)s"
@@ -11794,8 +11795,8 @@ msgstr "Zruš košík"
 #~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
 #~ "s."
 #~ msgstr ""
-#~ "Teraz sa môžete vrátiť ku %(x_url_open)sBibEdit rozhraniu administrátora%"
-#~ "(x_url_close)s."
+#~ "Teraz sa môžete vrátiť ku %(x_url_open)sBibEdit rozhraniu administrátora"
+#~ "%(x_url_close)s."
 
 #, fuzzy
 #~ msgid "Article Error"

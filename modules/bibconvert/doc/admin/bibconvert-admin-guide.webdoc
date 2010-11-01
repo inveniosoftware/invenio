@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibConvert Admin Guide -->
@@ -42,7 +42,7 @@
 
 <p>BibConvert utility enables you to convert metadata records from
 various metadata formats into another metadata format supported by the
-CDS Invenio local database. It is designed to process XML harvested
+Invenio local database. It is designed to process XML harvested
 metadata records, converting them into MARC21 before they are uploaded
 into the database. However, BibConvert is flexible enough to deal also
 with other structured metadata according to your needs, and offers a
@@ -83,14 +83,14 @@ want to install) an XSLT processor on your machine.
 <h4>Using XSLT</h4>
 You can use standard XSL stylesheets to transform your source data. Have a look
 at the provided samples in <code>etc/bibconvert/config</code> directory
-of your CDS Invenio installation.<br/>
+of your Invenio installation.<br/>
 <h4>Using BFX</h4>
 BFX (BibFormat for XML) uses a syntax similar to XSLT. Roughly they only
 differ in the name of the tags.<br/>
 More documentation about it is to be added soon (FIXME).<br/>
 Have a look
 at the provided samples in <code>etc/bibconvert/config</code> directory
-of your CDS Invenio installation to learn more about it.
+of your Invenio installation to learn more about it.
 <a name="B.2"></a><h3>2. Running BibConvert</h3>
 BibConvert in XML-oriented mode has only 1 parameter: <code>-c</code>.
 It is used to specify which transformation stylesheet to apply to the piped XML.
@@ -101,7 +101,7 @@ $ bibconvert -coaidc2marcxml.xsl < sample.xml > /tmp/record.xml
 </blockquote>
 
 If the stylesheet you want to use is installed in the <code>etc/bibconvert/config</code>
-directory of your CDS Invenio installation, then you can just refer to it by its filename.
+directory of your Invenio installation, then you can just refer to it by its filename.
 Otherwise use the full path to the file.
 
 <a name="C"></a><h2>C Plain Text-Oriented Mode</h2>
@@ -172,7 +172,7 @@ Guide</a> section below.
 <p>For a fully functional demo, consider the following sample input data:
 
 <blockquote>
-<a href="<CFG_SITE_URL>/admin/bibconvert/sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into CDS Invenio
+<a href="<CFG_SITE_URL>/admin/bibconvert/sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into Invenio
 <br /><a href="<CFG_SITE_URL>/admin/bibconvert/sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
 </blockquote>
 

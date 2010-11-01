@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """Unit tests for the textutils library."""
@@ -307,36 +307,33 @@ foobar                                  \n"""
 
     def test_real_longtext_wrap_text_in_a_box(self):
         """textutils - wrap_text_in_a_box long text."""
-        text = """CDS Invenio (formerly CDSware), the integrated digital library system, is a suite of applications which provides the framework and tools for building and managing an autonomous digital library server. The software is readily available to anyone, as it is free software, licensed under the GNU General Public Licence (GPL). The technology offered by the software covers all aspects of digital library management. It complies with the Open Archives Initiative metadata harvesting protocol (OAI-PMH) and uses MARC 21 as its underlying bibliographic standard. Its flexibility and performance make it a comprehensive solution for the management of document repositories of moderate to large size.
+        text = """Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-CDS Invenio is developed by, maintained by, and used at, the CERN Document Server. At CERN, CDS Invenio manages over 500 collections of data, consisting of over 800,000 bibliographic records, covering preprints, articles, books, journals, photographs, and more. Besides CERN, CDS Invenio is currently installed and in use by over a dozen scientific institutions worldwide (see the Demo page for details)
-
-If you would like to try it out yourself, please feel free to download our latest version. If you have any questions about the product or our support service, do not hesitate to check out CDS Invenio mailing list archives or to contact us."""
+At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus asperiores repellat."""
 
         result = """
 ************************************************************************
-** CDS Invenio (formerly CDSware), the integrated digital library     **
-** system, is a suite of applications which provides the framework    **
-** and tools for building and managing an autonomous digital library  **
-** server. The software is readily available to anyone, as it is free **
-** software, licensed under the GNU General Public Licence (GPL). The **
-** technology offered by the software covers all aspects of digital   **
-** library management. It complies with the Open Archives Initiative  **
-** metadata harvesting protocol (OAI-PMH) and uses MARC 21 as its     **
-** underlying bibliographic standard. Its flexibility and performance **
-** make it a comprehensive solution for the management of document    **
-** repositories of moderate to large size.                            **
-** CDS Invenio is developed by, maintained by, and used at, the CERN  **
-** Document Server. At CERN, CDS Invenio manages over 500 collections **
-** of data, consisting of over 800,000 bibliographic records,         **
-** covering preprints, articles, books, journals, photographs, and    **
-** more. Besides CERN, CDS Invenio is currently installed and in use  **
-** by over a dozen scientific institutions worldwide (see the Demo    **
-** page for details)                                                  **
-** If you would like to try it out yourself, please feel free to      **
-** download our latest version. If you have any questions about the   **
-** product or our support service, do not hesitate to check out CDS   **
-** Invenio mailing list archives or to contact us.                    **
+** Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do   **
+** eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut     **
+** enim ad minim veniam, quis nostrud exercitation ullamco laboris    **
+** nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in  **
+** reprehenderit in voluptate velit esse cillum dolore eu fugiat      **
+** nulla pariatur. Excepteur sint occaecat cupidatat non proident,    **
+** sunt in culpa qui officia deserunt mollit anim id est laborum.     **
+** At vero eos et accusamus et iusto odio dignissimos ducimus qui     **
+** blanditiis praesentium voluptatum deleniti atque corrupti quos     **
+** dolores et quas molestias excepturi sint occaecati cupiditate non  **
+** provident, similique sunt in culpa qui officia deserunt mollitia   **
+** animi, id est laborum et dolorum fuga. Et harum quidem rerum       **
+** facilis est et expedita distinctio. Nam libero tempore, cum soluta **
+** nobis est eligendi optio cumque nihil impedit quo minus id quod    **
+** maxime placeat facere possimus, omnis voluptas assumenda est,      **
+** omnis dolor repellendus. Temporibus autem quibusdam et aut         **
+** officiis debitis aut rerum necessitatibus saepe eveniet ut et      **
+** voluptates repudiandae sint et molestiae non recusandae. Itaque    **
+** earum rerum hic tenetur a sapiente delectus, ut aut reiciendis     **
+** voluptatibus maiores alias consequatur aut perferendis doloribus   **
+** asperiores repellat.                                               **
 ************************************************************************
 """
         self.assertEqual(wrap_text_in_a_box(text), result)

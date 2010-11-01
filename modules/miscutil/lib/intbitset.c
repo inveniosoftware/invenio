@@ -416,7 +416,7 @@ static int __Pyx_InitStrings(__Pyx_StringTabEntry *t); /*proto*/
 
 /* Type declarations */
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":741
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":741
  *         return self.extract_finite_list()
  * 
  * cdef class intbitset_iterator:             # <<<<<<<<<<<<<<
@@ -431,7 +431,7 @@ struct __pyx_obj_3lib_9intbitset_intbitset_iterator {
   int sanity_checks;
 };
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":94
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":94
  * __maxelem__ = maxelem
  * 
  * cdef class intbitset:             # <<<<<<<<<<<<<<
@@ -802,7 +802,7 @@ static char __pyx_k_77[] = "It's impossible to retrieve a list of an infinite se
 static PyObject *__pyx_kp_78;
 static char __pyx_k_78[] = "intbitset corrupted: allocated: %s, size: %s";
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":135
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":135
  *     cdef bint sanity_checks
  * 
  *     def __cinit__(self, rhs=0, int preallocate=-1, int trailing_bits=0, bint sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):             # <<<<<<<<<<<<<<
@@ -934,7 +934,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   __pyx_v_tmp = Py_None; __Pyx_INCREF(Py_None);
   __pyx_v_tmp_tuple = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":162
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":162
  *         cdef int remelem
  *         cdef bint tuple_of_tuples
  *         self.sanity_checks = sanity_checks             # <<<<<<<<<<<<<<
@@ -943,7 +943,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks = __pyx_v_sanity_checks;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":163
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":163
  *         cdef bint tuple_of_tuples
  *         self.sanity_checks = sanity_checks
  *         msg = "Error"             # <<<<<<<<<<<<<<
@@ -954,7 +954,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   __Pyx_DECREF(__pyx_v_msg);
   __pyx_v_msg = __pyx_kp_8;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":164
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":164
  *         self.sanity_checks = sanity_checks
  *         msg = "Error"
  *         self.bitset = NULL             # <<<<<<<<<<<<<<
@@ -963,7 +963,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset = NULL;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":165
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":165
  *         msg = "Error"
  *         self.bitset = NULL
  *         if no_allocate:             # <<<<<<<<<<<<<<
@@ -973,7 +973,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   __pyx_t_1 = __pyx_v_no_allocate;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":166
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":166
  *         self.bitset = NULL
  *         if no_allocate:
  *             self.bitset = intBitSetCreateNoAllocate()             # <<<<<<<<<<<<<<
@@ -982,7 +982,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
  */
     ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset = intBitSetCreateNoAllocate();
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":167
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":167
  *         if no_allocate:
  *             self.bitset = intBitSetCreateNoAllocate()
  *             return             # <<<<<<<<<<<<<<
@@ -995,7 +995,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   }
   __pyx_L6:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":168
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":168
  *             self.bitset = intBitSetCreateNoAllocate()
  *             return
  *         if type(rhs) in (int, long):             # <<<<<<<<<<<<<<
@@ -1027,7 +1027,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_4) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":169
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":169
  *             return
  *         if type(rhs) in (int, long):
  *             if rhs < 0:             # <<<<<<<<<<<<<<
@@ -1040,7 +1040,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_4) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":170
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":170
  *         if type(rhs) in (int, long):
  *             if rhs < 0:
  *                 raise ValueError("rhs can't be negative")             # <<<<<<<<<<<<<<
@@ -1062,7 +1062,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
     }
     __pyx_L8:;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":171
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":171
  *             if rhs < 0:
  *                 raise ValueError("rhs can't be negative")
  *             self.bitset = intBitSetCreate(rhs, trailing_bits)             # <<<<<<<<<<<<<<
@@ -1074,7 +1074,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
     goto __pyx_L7;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":172
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":172
  *                 raise ValueError("rhs can't be negative")
  *             self.bitset = intBitSetCreate(rhs, trailing_bits)
  *         elif type(rhs) is intbitset:             # <<<<<<<<<<<<<<
@@ -1093,7 +1093,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
   if (__pyx_t_4) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":173
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":173
  *             self.bitset = intBitSetCreate(rhs, trailing_bits)
  *         elif type(rhs) is intbitset:
  *             self.bitset = intBitSetClone((<intbitset>rhs).bitset)             # <<<<<<<<<<<<<<
@@ -1104,7 +1104,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
     goto __pyx_L7;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":174
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":174
  *         elif type(rhs) is intbitset:
  *             self.bitset = intBitSetClone((<intbitset>rhs).bitset)
  *         elif type(rhs) in (str, array):             # <<<<<<<<<<<<<<
@@ -1139,7 +1139,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   if (__pyx_t_4) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":175
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":175
  *             self.bitset = intBitSetClone((<intbitset>rhs).bitset)
  *         elif type(rhs) in (str, array):
  *             try:             # <<<<<<<<<<<<<<
@@ -1154,7 +1154,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
       __Pyx_XGOTREF(__pyx_save_exc_tb);
       /*try:*/ {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":176
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":176
  *         elif type(rhs) in (str, array):
  *             try:
  *                 if type(rhs) is array:             # <<<<<<<<<<<<<<
@@ -1176,7 +1176,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __Pyx_DECREF(__pyx_1); __pyx_1 = 0;
         if (__pyx_t_4) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":177
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":177
  *             try:
  *                 if type(rhs) is array:
  *                     rhs = rhs.tostring()             # <<<<<<<<<<<<<<
@@ -1195,7 +1195,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         }
         __pyx_L17:;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":178
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":178
  *                 if type(rhs) is array:
  *                     rhs = rhs.tostring()
  *                 tmp = zlib.decompress(rhs)             # <<<<<<<<<<<<<<
@@ -1220,7 +1220,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __pyx_v_tmp = __pyx_t_7;
         __pyx_t_7 = 0;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":179
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":179
  *                     rhs = rhs.tostring()
  *                 tmp = zlib.decompress(rhs)
  *                 if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:             # <<<<<<<<<<<<<<
@@ -1230,7 +1230,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __pyx_t_4 = (PyObject_AsReadBuffer(__pyx_v_tmp, (&__pyx_v_buf), (&__pyx_v_size)) < 0);
         if (__pyx_t_4) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":180
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":180
  *                 tmp = zlib.decompress(rhs)
  *                 if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
  *                     raise Exception("Buffer error!!!")             # <<<<<<<<<<<<<<
@@ -1252,7 +1252,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         }
         __pyx_L18:;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":181
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":181
  *                 if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
  *                     raise Exception("Buffer error!!!")
  *                 self.bitset = intBitSetCreateFromBuffer(buf, size)             # <<<<<<<<<<<<<<
@@ -1271,7 +1271,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":182
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":182
  *                     raise Exception("Buffer error!!!")
  *                 self.bitset = intBitSetCreateFromBuffer(buf, size)
  *             except Exception, msg:             # <<<<<<<<<<<<<<
@@ -1289,7 +1289,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __Pyx_DECREF(__pyx_v_msg);
         __pyx_v_msg = __pyx_3;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":183
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":183
  *                 self.bitset = intBitSetCreateFromBuffer(buf, size)
  *             except Exception, msg:
  *                 raise ValueError("rhs is corrupted: %s" % msg)             # <<<<<<<<<<<<<<
@@ -1329,7 +1329,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
     goto __pyx_L7;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":184
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":184
  *             except Exception, msg:
  *                 raise ValueError("rhs is corrupted: %s" % msg)
  *         elif hasattr(rhs, '__iter__'):             # <<<<<<<<<<<<<<
@@ -1339,7 +1339,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   __pyx_t_4 = PyObject_HasAttr(__pyx_v_rhs, __pyx_kp_12); if (unlikely(__pyx_t_4 == -1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 184; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   if (__pyx_t_4) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":185
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":185
  *                 raise ValueError("rhs is corrupted: %s" % msg)
  *         elif hasattr(rhs, '__iter__'):
  *             tuple_of_tuples = rhs and type(rhs[0]) is tuple             # <<<<<<<<<<<<<<
@@ -1372,7 +1372,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     __pyx_v_tuple_of_tuples = __pyx_t_4;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":186
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":186
  *         elif hasattr(rhs, '__iter__'):
  *             tuple_of_tuples = rhs and type(rhs[0]) is tuple
  *             try:             # <<<<<<<<<<<<<<
@@ -1387,7 +1387,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
       __Pyx_XGOTREF(__pyx_save_exc_tb);
       /*try:*/ {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":187
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":187
  *             tuple_of_tuples = rhs and type(rhs[0]) is tuple
  *             try:
  *                 if preallocate < 0:             # <<<<<<<<<<<<<<
@@ -1397,7 +1397,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __pyx_t_4 = (__pyx_v_preallocate < 0);
         if (__pyx_t_4) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":188
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":188
  *             try:
  *                 if preallocate < 0:
  *                     if rhs and type(rhs[0]) is int:             # <<<<<<<<<<<<<<
@@ -1424,7 +1424,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
           }
           if (__pyx_t_6) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":189
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":189
  *                 if preallocate < 0:
  *                     if rhs and type(rhs[0]) is int:
  *                         preallocate = max(rhs)             # <<<<<<<<<<<<<<
@@ -1446,7 +1446,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
           }
           /*else*/ {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":191
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":191
  *                         preallocate = max(rhs)
  *                     else:
  *                         preallocate = 0             # <<<<<<<<<<<<<<
@@ -1460,7 +1460,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         }
         __pyx_L29:;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":192
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":192
  *                     else:
  *                         preallocate = 0
  *                 if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -1470,7 +1470,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __pyx_t_6 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
         if (__pyx_t_6) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":193
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":193
  *                         preallocate = 0
  *                 if self.sanity_checks:
  *                     if not (0 <= preallocate < maxelem):             # <<<<<<<<<<<<<<
@@ -1484,7 +1484,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
           __pyx_t_4 = (!__pyx_t_6);
           if (__pyx_t_4) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":194
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":194
  *                 if self.sanity_checks:
  *                     if not (0 <= preallocate < maxelem):
  *                         raise OverflowError("Can't integers bigger than %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -1514,7 +1514,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         }
         __pyx_L31:;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":195
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":195
  *                     if not (0 <= preallocate < maxelem):
  *                         raise OverflowError("Can't integers bigger than %s" % maxelem)
  *                 self.bitset = intBitSetCreate(preallocate, trailing_bits)             # <<<<<<<<<<<<<<
@@ -1523,7 +1523,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
  */
         ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset = intBitSetCreate(__pyx_v_preallocate, __pyx_v_trailing_bits);
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":196
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":196
  *                         raise OverflowError("Can't integers bigger than %s" % maxelem)
  *                 self.bitset = intBitSetCreate(preallocate, trailing_bits)
  *                 if trailing_bits:             # <<<<<<<<<<<<<<
@@ -1533,7 +1533,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __pyx_t_1 = __pyx_v_trailing_bits;
         if (__pyx_t_1) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":197
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":197
  *                 self.bitset = intBitSetCreate(preallocate, trailing_bits)
  *                 if trailing_bits:
  *                     last = 0             # <<<<<<<<<<<<<<
@@ -1542,7 +1542,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
  */
           __pyx_v_last = 0;
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":198
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":198
  *                 if trailing_bits:
  *                     last = 0
  *                     if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -1552,7 +1552,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
           __pyx_t_4 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
           if (__pyx_t_4) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":199
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":199
  *                     last = 0
  *                     if self.sanity_checks:
  *                         if tuple_of_tuples:             # <<<<<<<<<<<<<<
@@ -1562,7 +1562,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             __pyx_t_4 = __pyx_v_tuple_of_tuples;
             if (__pyx_t_4) {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":200
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":200
  *                     if self.sanity_checks:
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:             # <<<<<<<<<<<<<<
@@ -1594,7 +1594,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_v_tmp_tuple = __pyx_t_3;
                 __pyx_t_3 = 0;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":201
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":201
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]             # <<<<<<<<<<<<<<
@@ -1607,7 +1607,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_4); __pyx_4 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":202
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":202
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]
  *                                 if elem < 0:             # <<<<<<<<<<<<<<
@@ -1617,7 +1617,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem < 0);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":203
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":203
  *                                 elem = tmp_tuple[0]
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -1638,7 +1638,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   goto __pyx_L38;
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":204
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":204
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -1648,7 +1648,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem > maxelem);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":205
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":205
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -1675,7 +1675,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 }
                 __pyx_L38:;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":206
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":206
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)
  *                                 for remelem from last <= remelem < elem:             # <<<<<<<<<<<<<<
@@ -1685,7 +1685,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_1 = __pyx_v_elem;
                 for (__pyx_v_remelem = __pyx_v_last; __pyx_v_remelem < __pyx_t_1; __pyx_v_remelem++) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":207
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":207
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)             # <<<<<<<<<<<<<<
@@ -1695,7 +1695,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   intBitSetDelElem(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_remelem);
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":208
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":208
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)
  *                                 last = elem + 1             # <<<<<<<<<<<<<<
@@ -1709,7 +1709,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             }
             /*else*/ {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":210
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":210
  *                                 last = elem + 1
  *                         else:
  *                             for elem in rhs:             # <<<<<<<<<<<<<<
@@ -1741,7 +1741,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":211
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":211
  *                         else:
  *                             for elem in rhs:
  *                                 if elem < 0:             # <<<<<<<<<<<<<<
@@ -1751,7 +1751,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem < 0);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":212
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":212
  *                             for elem in rhs:
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -1772,7 +1772,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   goto __pyx_L43;
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":213
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":213
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -1782,7 +1782,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem > maxelem);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":214
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":214
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -1809,7 +1809,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 }
                 __pyx_L43:;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":215
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":215
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)
  *                                 for remelem from last <= remelem < elem:             # <<<<<<<<<<<<<<
@@ -1819,7 +1819,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_1 = __pyx_v_elem;
                 for (__pyx_v_remelem = __pyx_v_last; __pyx_v_remelem < __pyx_t_1; __pyx_v_remelem++) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":216
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":216
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)             # <<<<<<<<<<<<<<
@@ -1829,7 +1829,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   intBitSetDelElem(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_remelem);
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":217
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":217
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)
  *                                 last = elem + 1             # <<<<<<<<<<<<<<
@@ -1845,7 +1845,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
           }
           /*else*/ {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":219
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":219
  *                                 last = elem + 1
  *                     else:
  *                         if tuple_of_tuples:             # <<<<<<<<<<<<<<
@@ -1855,7 +1855,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             __pyx_t_4 = __pyx_v_tuple_of_tuples;
             if (__pyx_t_4) {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":220
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":220
  *                     else:
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:             # <<<<<<<<<<<<<<
@@ -1887,7 +1887,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_v_tmp_tuple = __pyx_t_3;
                 __pyx_t_3 = 0;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":221
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":221
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]             # <<<<<<<<<<<<<<
@@ -1900,7 +1900,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_1); __pyx_1 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":222
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":222
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]
  *                                 for remelem from last <= remelem < elem:             # <<<<<<<<<<<<<<
@@ -1910,7 +1910,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_1 = __pyx_v_elem;
                 for (__pyx_v_remelem = __pyx_v_last; __pyx_v_remelem < __pyx_t_1; __pyx_v_remelem++) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":223
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":223
  *                                 elem = tmp_tuple[0]
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)             # <<<<<<<<<<<<<<
@@ -1920,7 +1920,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   intBitSetDelElem(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_remelem);
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":224
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":224
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)
  *                                 last = elem + 1             # <<<<<<<<<<<<<<
@@ -1934,7 +1934,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             }
             /*else*/ {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":226
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":226
  *                                 last = elem + 1
  *                         else:
  *                             for elem in rhs:             # <<<<<<<<<<<<<<
@@ -1966,7 +1966,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":227
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":227
  *                         else:
  *                             for elem in rhs:
  *                                 for remelem from last <= remelem < elem:             # <<<<<<<<<<<<<<
@@ -1976,7 +1976,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_1 = __pyx_v_elem;
                 for (__pyx_v_remelem = __pyx_v_last; __pyx_v_remelem < __pyx_t_1; __pyx_v_remelem++) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":228
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":228
  *                             for elem in rhs:
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)             # <<<<<<<<<<<<<<
@@ -1986,7 +1986,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   intBitSetDelElem(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_remelem);
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":229
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":229
  *                                 for remelem from last <= remelem < elem:
  *                                     intBitSetDelElem(self.bitset, remelem)
  *                                 last = elem + 1             # <<<<<<<<<<<<<<
@@ -2004,7 +2004,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         }
         /*else*/ {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":232
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":232
  * 
  *                 else:
  *                     if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -2014,7 +2014,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
           __pyx_t_4 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
           if (__pyx_t_4) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":233
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":233
  *                 else:
  *                     if self.sanity_checks:
  *                         if tuple_of_tuples:             # <<<<<<<<<<<<<<
@@ -2024,7 +2024,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             __pyx_t_4 = __pyx_v_tuple_of_tuples;
             if (__pyx_t_4) {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":234
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":234
  *                     if self.sanity_checks:
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:             # <<<<<<<<<<<<<<
@@ -2056,7 +2056,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_v_tmp_tuple = __pyx_t_3;
                 __pyx_t_3 = 0;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":235
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":235
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]             # <<<<<<<<<<<<<<
@@ -2069,7 +2069,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_3); __pyx_3 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":236
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":236
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]
  *                                 if elem < 0:             # <<<<<<<<<<<<<<
@@ -2079,7 +2079,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem < 0);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":237
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":237
  *                                 elem = tmp_tuple[0]
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -2100,7 +2100,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   goto __pyx_L59;
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":238
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":238
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -2110,7 +2110,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem > maxelem);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":239
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":239
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -2137,7 +2137,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 }
                 __pyx_L59:;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":240
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":240
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)
  *                                 intBitSetAddElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -2151,7 +2151,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             }
             /*else*/ {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":242
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":242
  *                                 intBitSetAddElem(self.bitset, elem)
  *                         else:
  *                             for elem in rhs:             # <<<<<<<<<<<<<<
@@ -2183,7 +2183,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":243
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":243
  *                         else:
  *                             for elem in rhs:
  *                                 if elem < 0:             # <<<<<<<<<<<<<<
@@ -2193,7 +2193,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem < 0);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":244
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":244
  *                             for elem in rhs:
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -2214,7 +2214,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                   goto __pyx_L62;
                 }
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":245
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":245
  *                                 if elem < 0:
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -2224,7 +2224,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_t_4 = (__pyx_v_elem > maxelem);
                 if (__pyx_t_4) {
 
-                  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":246
+                  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":246
  *                                     raise ValueError("Negative numbers, not allowed")
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -2251,7 +2251,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 }
                 __pyx_L62:;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":247
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":247
  *                                 elif elem > maxelem:
  *                                     raise OverflowError("Elements must be <= %s" % maxelem)
  *                                 intBitSetAddElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -2267,7 +2267,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
           }
           /*else*/ {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":249
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":249
  *                                 intBitSetAddElem(self.bitset, elem)
  *                     else:
  *                         if tuple_of_tuples:             # <<<<<<<<<<<<<<
@@ -2277,7 +2277,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             __pyx_t_4 = __pyx_v_tuple_of_tuples;
             if (__pyx_t_4) {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":250
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":250
  *                     else:
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:             # <<<<<<<<<<<<<<
@@ -2309,7 +2309,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __pyx_v_tmp_tuple = __pyx_t_3;
                 __pyx_t_3 = 0;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":251
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":251
  *                         if tuple_of_tuples:
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]             # <<<<<<<<<<<<<<
@@ -2322,7 +2322,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_4); __pyx_4 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":252
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":252
  *                             for tmp_tuple in rhs:
  *                                 elem = tmp_tuple[0]
  *                                 intBitSetAddElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -2336,7 +2336,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
             }
             /*else*/ {
 
-              /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":254
+              /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":254
  *                                 intBitSetAddElem(self.bitset, elem)
  *                         else:
  *                             for elem in rhs:             # <<<<<<<<<<<<<<
@@ -2368,7 +2368,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
                 __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
                 __pyx_v_elem = __pyx_t_1;
 
-                /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":255
+                /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":255
  *                         else:
  *                             for elem in rhs:
  *                                 intBitSetAddElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -2397,7 +2397,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
       __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
       __Pyx_XDECREF(__pyx_t_7); __pyx_t_7 = 0;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":256
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":256
  *                             for elem in rhs:
  *                                 intBitSetAddElem(self.bitset, elem)
  *             except Exception, msg:             # <<<<<<<<<<<<<<
@@ -2415,7 +2415,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
         __Pyx_DECREF(__pyx_v_msg);
         __pyx_v_msg = __pyx_3;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":257
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":257
  *                                 intBitSetAddElem(self.bitset, elem)
  *             except Exception, msg:
  *                 raise ValueError("retrieving integers from rhs is impossible: %s" % msg)             # <<<<<<<<<<<<<<
@@ -2456,7 +2456,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   }
   /*else*/ {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":259
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":259
  *                 raise ValueError("retrieving integers from rhs is impossible: %s" % msg)
  *         else:
  *             raise TypeError("rhs is of unknown type %s" % type(rhs))             # <<<<<<<<<<<<<<
@@ -2508,7 +2508,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cinit__(PyObject *__pyx_v_self,
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":261
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":261
  *             raise TypeError("rhs is of unknown type %s" % type(rhs))
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -2521,7 +2521,7 @@ static void __pyx_pf_3lib_9intbitset_9intbitset___dealloc__(PyObject *__pyx_v_se
   int __pyx_t_1;
   __Pyx_SetupRefcountContext("__dealloc__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":262
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":262
  * 
  *     def __dealloc__(self):
  *         if self.bitset:             # <<<<<<<<<<<<<<
@@ -2531,7 +2531,7 @@ static void __pyx_pf_3lib_9intbitset_9intbitset___dealloc__(PyObject *__pyx_v_se
   __pyx_t_1 = (((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset != 0);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":263
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":263
  *     def __dealloc__(self):
  *         if self.bitset:
  *             intBitSetDestroy(self.bitset)             # <<<<<<<<<<<<<<
@@ -2546,7 +2546,7 @@ static void __pyx_pf_3lib_9intbitset_9intbitset___dealloc__(PyObject *__pyx_v_se
   __Pyx_FinishRefcountContext();
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":265
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":265
  *             intBitSetDestroy(self.bitset)
  * 
  *     def __contains__(self, int elem):             # <<<<<<<<<<<<<<
@@ -2571,7 +2571,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___contains__(PyObject *__pyx_v_se
   return -1;
   __pyx_L4_argument_unpacking_done:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":266
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":266
  * 
  *     def __contains__(self, int elem):
  *         if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -2581,7 +2581,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___contains__(PyObject *__pyx_v_se
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":267
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":267
  *     def __contains__(self, int elem):
  *         if self.sanity_checks:
  *             if elem < 0:             # <<<<<<<<<<<<<<
@@ -2591,7 +2591,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___contains__(PyObject *__pyx_v_se
     __pyx_t_1 = (__pyx_v_elem < 0);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":268
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":268
  *         if self.sanity_checks:
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -2612,7 +2612,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___contains__(PyObject *__pyx_v_se
       goto __pyx_L6;
     }
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":269
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":269
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -2622,7 +2622,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___contains__(PyObject *__pyx_v_se
     __pyx_t_1 = (__pyx_v_elem > maxelem);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":270
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":270
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -2652,7 +2652,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___contains__(PyObject *__pyx_v_se
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":271
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":271
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)
  *         return intBitSetIsInElem(self.bitset, elem) != 0             # <<<<<<<<<<<<<<
@@ -2674,7 +2674,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___contains__(PyObject *__pyx_v_se
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":273
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":273
  *         return intBitSetIsInElem(self.bitset, elem) != 0
  * 
  *     def __cmp__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -2690,7 +2690,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cmp__(PyObject *__pyx_v_self, P
   __Pyx_SetupRefcountContext("__cmp__");
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 273; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":274
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":274
  * 
  *     def __cmp__(self, intbitset rhs not None):
  *         raise TypeError("cannot compare intbitset using cmp()")             # <<<<<<<<<<<<<<
@@ -2721,7 +2721,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___cmp__(PyObject *__pyx_v_self, P
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":276
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":276
  *         raise TypeError("cannot compare intbitset using cmp()")
  * 
  *     def __richcmp__(self, intbitset rhs not None, int op):             # <<<<<<<<<<<<<<
@@ -2739,7 +2739,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   __Pyx_SetupRefcountContext("__richcmp__");
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 276; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":278
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":278
  *     def __richcmp__(self, intbitset rhs not None, int op):
  *         cdef short unsigned int tmp
  *         tmp = intBitSetCmp((<intbitset>self).bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -2748,7 +2748,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
  */
   __pyx_v_tmp = intBitSetCmp(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":279
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":279
  *         cdef short unsigned int tmp
  *         tmp = intBitSetCmp((<intbitset>self).bitset, rhs.bitset)
  *         if op == 0: # <             # <<<<<<<<<<<<<<
@@ -2758,7 +2758,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   __pyx_t_1 = (__pyx_v_op == 0);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":280
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":280
  *         tmp = intBitSetCmp((<intbitset>self).bitset, rhs.bitset)
  *         if op == 0: # <
  *             return tmp == 1             # <<<<<<<<<<<<<<
@@ -2775,7 +2775,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":281
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":281
  *         if op == 0: # <
  *             return tmp == 1
  *         if op == 1: # <=             # <<<<<<<<<<<<<<
@@ -2785,7 +2785,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   __pyx_t_1 = (__pyx_v_op == 1);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":282
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":282
  *             return tmp == 1
  *         if op == 1: # <=
  *             return tmp <= 1             # <<<<<<<<<<<<<<
@@ -2802,7 +2802,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   }
   __pyx_L6:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":283
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":283
  *         if op == 1: # <=
  *             return tmp <= 1
  *         if op == 2: # ==             # <<<<<<<<<<<<<<
@@ -2812,7 +2812,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   __pyx_t_1 = (__pyx_v_op == 2);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":284
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":284
  *             return tmp <= 1
  *         if op == 2: # ==
  *             return tmp == 0             # <<<<<<<<<<<<<<
@@ -2829,7 +2829,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   }
   __pyx_L7:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":285
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":285
  *         if op == 2: # ==
  *             return tmp == 0
  *         if op == 3: # !=             # <<<<<<<<<<<<<<
@@ -2839,7 +2839,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   __pyx_t_1 = (__pyx_v_op == 3);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":286
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":286
  *             return tmp == 0
  *         if op == 3: # !=
  *             return tmp > 0             # <<<<<<<<<<<<<<
@@ -2856,7 +2856,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   }
   __pyx_L8:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":287
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":287
  *         if op == 3: # !=
  *             return tmp > 0
  *         if op == 4: # >             # <<<<<<<<<<<<<<
@@ -2866,7 +2866,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   __pyx_t_1 = (__pyx_v_op == 4);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":288
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":288
  *             return tmp > 0
  *         if op == 4: # >
  *             return tmp == 2             # <<<<<<<<<<<<<<
@@ -2883,7 +2883,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   }
   __pyx_L9:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":289
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":289
  *         if op == 4: # >
  *             return tmp == 2
  *         if op == 5: # >=             # <<<<<<<<<<<<<<
@@ -2893,7 +2893,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   __pyx_t_1 = (__pyx_v_op == 5);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":290
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":290
  *             return tmp == 2
  *         if op == 5: # >=
  *             return tmp in (0, 2)             # <<<<<<<<<<<<<<
@@ -2928,7 +2928,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___richcmp__(PyObject *__pyx
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":292
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":292
  *             return tmp in (0, 2)
  * 
  *     def __len__(self):             # <<<<<<<<<<<<<<
@@ -2941,7 +2941,7 @@ static Py_ssize_t __pyx_pf_3lib_9intbitset_9intbitset___len__(PyObject *__pyx_v_
   Py_ssize_t __pyx_r;
   __Pyx_SetupRefcountContext("__len__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":293
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":293
  * 
  *     def __len__(self):
  *         return intBitSetGetTot(self.bitset)             # <<<<<<<<<<<<<<
@@ -2957,7 +2957,7 @@ static Py_ssize_t __pyx_pf_3lib_9intbitset_9intbitset___len__(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":295
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":295
  *         return intBitSetGetTot(self.bitset)
  * 
  *     def __hash__(self):             # <<<<<<<<<<<<<<
@@ -2972,7 +2972,7 @@ static long __pyx_pf_3lib_9intbitset_9intbitset___hash__(PyObject *__pyx_v_self)
   long __pyx_t_2;
   __Pyx_SetupRefcountContext("__hash__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":296
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":296
  * 
  *     def __hash__(self):
  *         return hash(PyString_FromStringAndSize(<char *>self.bitset.bitset, wordbytesize * (intBitSetGetTot(self.bitset) / wordbitsize + 1)))             # <<<<<<<<<<<<<<
@@ -2997,7 +2997,7 @@ static long __pyx_pf_3lib_9intbitset_9intbitset___hash__(PyObject *__pyx_v_self)
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":298
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":298
  *         return hash(PyString_FromStringAndSize(<char *>self.bitset.bitset, wordbytesize * (intBitSetGetTot(self.bitset) / wordbitsize + 1)))
  * 
  *     def __nonzero__(self):             # <<<<<<<<<<<<<<
@@ -3010,7 +3010,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___nonzero__(PyObject *__pyx_v_sel
   int __pyx_r;
   __Pyx_SetupRefcountContext("__nonzero__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":299
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":299
  * 
  *     def __nonzero__(self):
  *         return not intBitSetEmpty(self.bitset)             # <<<<<<<<<<<<<<
@@ -3026,7 +3026,7 @@ static int __pyx_pf_3lib_9intbitset_9intbitset___nonzero__(PyObject *__pyx_v_sel
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":301
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":301
  *         return not intBitSetEmpty(self.bitset)
  * 
  *     def __iadd__(self, rhs):             # <<<<<<<<<<<<<<
@@ -3046,7 +3046,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
   PyObject *__pyx_t_6 = NULL;
   __Pyx_SetupRefcountContext("__iadd__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":303
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":303
  *     def __iadd__(self, rhs):
  *         cdef int elem
  *         if isinstance(rhs, (int, long)):             # <<<<<<<<<<<<<<
@@ -3065,7 +3065,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
   __Pyx_DECREF(((PyObject *)__pyx_t_1)); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":304
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":304
  *         cdef int elem
  *         if isinstance(rhs, (int, long)):
  *             if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -3075,7 +3075,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
     __pyx_t_2 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
     if (__pyx_t_2) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":305
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":305
  *         if isinstance(rhs, (int, long)):
  *             if self.sanity_checks:
  *                 if rhs < 0:             # <<<<<<<<<<<<<<
@@ -3088,7 +3088,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (__pyx_t_2) {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":306
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":306
  *             if self.sanity_checks:
  *                 if rhs < 0:
  *                     raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -3109,7 +3109,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         goto __pyx_L7;
       }
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":307
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":307
  *                 if rhs < 0:
  *                     raise ValueError("Negative numbers, not allowed")
  *                 elif rhs > maxelem:             # <<<<<<<<<<<<<<
@@ -3125,7 +3125,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (__pyx_t_2) {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":308
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":308
  *                     raise ValueError("Negative numbers, not allowed")
  *                 elif rhs > maxelem:
  *                     raise OverflowError("rhs must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -3155,7 +3155,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
     }
     __pyx_L6:;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":309
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":309
  *                 elif rhs > maxelem:
  *                     raise OverflowError("rhs must be <= %s" % maxelem)
  *             intBitSetAddElem(self.bitset, rhs)             # <<<<<<<<<<<<<<
@@ -3167,7 +3167,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
     goto __pyx_L5;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":310
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":310
  *                     raise OverflowError("rhs must be <= %s" % maxelem)
  *             intBitSetAddElem(self.bitset, rhs)
  *         elif isinstance(rhs, intbitset):             # <<<<<<<<<<<<<<
@@ -3177,7 +3177,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
   __pyx_t_2 = PyObject_TypeCheck(__pyx_v_rhs, ((PyTypeObject *)((PyObject*)__pyx_ptype_3lib_9intbitset_intbitset))); 
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":311
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":311
  *             intBitSetAddElem(self.bitset, rhs)
  *         elif isinstance(rhs, intbitset):
  *             intBitSetIUnion(self.bitset, (<intbitset> rhs).bitset)             # <<<<<<<<<<<<<<
@@ -3189,7 +3189,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
   }
   /*else*/ {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":313
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":313
  *             intBitSetIUnion(self.bitset, (<intbitset> rhs).bitset)
  *         else:
  *             if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -3199,7 +3199,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
     __pyx_t_2 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
     if (__pyx_t_2) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":314
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":314
  *         else:
  *             if self.sanity_checks:
  *                 for elem in rhs:             # <<<<<<<<<<<<<<
@@ -3231,7 +3231,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_elem = __pyx_t_4;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":315
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":315
  *             if self.sanity_checks:
  *                 for elem in rhs:
  *                     if elem < 0:             # <<<<<<<<<<<<<<
@@ -3241,7 +3241,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         __pyx_t_2 = (__pyx_v_elem < 0);
         if (__pyx_t_2) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":316
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":316
  *                 for elem in rhs:
  *                     if elem < 0:
  *                         raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -3262,7 +3262,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
           goto __pyx_L11;
         }
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":317
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":317
  *                     if elem < 0:
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -3272,7 +3272,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         __pyx_t_2 = (__pyx_v_elem > maxelem);
         if (__pyx_t_2) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":318
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":318
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif elem > maxelem:
  *                         raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -3299,7 +3299,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         }
         __pyx_L11:;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":319
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":319
  *                     elif elem > maxelem:
  *                         raise OverflowError("Elements must be <= %s" % maxelem)
  *                     intBitSetAddElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -3313,7 +3313,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
     }
     /*else*/ {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":321
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":321
  *                     intBitSetAddElem(self.bitset, elem)
  *             else:
  *                 for elem in rhs:             # <<<<<<<<<<<<<<
@@ -3345,7 +3345,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_elem = __pyx_t_4;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":322
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":322
  *             else:
  *                 for elem in rhs:
  *                     if elem < 0:             # <<<<<<<<<<<<<<
@@ -3355,7 +3355,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         __pyx_t_2 = (__pyx_v_elem < 0);
         if (__pyx_t_2) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":323
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":323
  *                 for elem in rhs:
  *                     if elem < 0:
  *                         raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -3376,7 +3376,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
           goto __pyx_L14;
         }
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":324
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":324
  *                     if elem < 0:
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -3386,7 +3386,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         __pyx_t_2 = (__pyx_v_elem > maxelem);
         if (__pyx_t_2) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":325
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":325
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif elem > maxelem:
  *                         raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -3413,7 +3413,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
         }
         __pyx_L14:;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":326
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":326
  *                     elif elem > maxelem:
  *                         raise OverflowError("Elements must be <= %s" % maxelem)
  *                     intBitSetAddElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -3428,7 +3428,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":327
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":327
  *                         raise OverflowError("Elements must be <= %s" % maxelem)
  *                     intBitSetAddElem(self.bitset, elem)
  *         return self             # <<<<<<<<<<<<<<
@@ -3454,7 +3454,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iadd__(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":329
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":329
  *         return self
  * 
  *     def __isub__(self, rhs):             # <<<<<<<<<<<<<<
@@ -3474,7 +3474,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
   PyObject *__pyx_t_6 = NULL;
   __Pyx_SetupRefcountContext("__isub__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":331
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":331
  *     def __isub__(self, rhs):
  *         cdef int elem
  *         if isinstance(rhs, (int, long)):             # <<<<<<<<<<<<<<
@@ -3493,7 +3493,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
   __Pyx_DECREF(((PyObject *)__pyx_t_1)); __pyx_t_1 = 0;
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":332
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":332
  *         cdef int elem
  *         if isinstance(rhs, (int, long)):
  *             if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -3503,7 +3503,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
     __pyx_t_2 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
     if (__pyx_t_2) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":333
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":333
  *         if isinstance(rhs, (int, long)):
  *             if self.sanity_checks:
  *                 if rhs < 0:             # <<<<<<<<<<<<<<
@@ -3516,7 +3516,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (__pyx_t_2) {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":334
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":334
  *             if self.sanity_checks:
  *                 if rhs < 0:
  *                     raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -3537,7 +3537,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
         goto __pyx_L7;
       }
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":335
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":335
  *                 if rhs < 0:
  *                     raise ValueError("Negative numbers, not allowed")
  *                 elif rhs > maxelem:             # <<<<<<<<<<<<<<
@@ -3553,7 +3553,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
       __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
       if (__pyx_t_2) {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":336
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":336
  *                     raise ValueError("Negative numbers, not allowed")
  *                 elif rhs > maxelem:
  *                     raise OverflowError("rhs must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -3583,7 +3583,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
     }
     __pyx_L6:;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":337
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":337
  *                 elif rhs > maxelem:
  *                     raise OverflowError("rhs must be <= %s" % maxelem)
  *             intBitSetDelElem(self.bitset, rhs)             # <<<<<<<<<<<<<<
@@ -3595,7 +3595,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
     goto __pyx_L5;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":338
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":338
  *                     raise OverflowError("rhs must be <= %s" % maxelem)
  *             intBitSetDelElem(self.bitset, rhs)
  *         elif isinstance(rhs, intbitset):             # <<<<<<<<<<<<<<
@@ -3605,7 +3605,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
   __pyx_t_2 = PyObject_TypeCheck(__pyx_v_rhs, ((PyTypeObject *)((PyObject*)__pyx_ptype_3lib_9intbitset_intbitset))); 
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":339
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":339
  *             intBitSetDelElem(self.bitset, rhs)
  *         elif isinstance(rhs, intbitset):
  *             intBitSetISub(self.bitset, (<intbitset> rhs).bitset)             # <<<<<<<<<<<<<<
@@ -3617,7 +3617,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
   }
   /*else*/ {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":341
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":341
  *             intBitSetISub(self.bitset, (<intbitset> rhs).bitset)
  *         else:
  *             if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -3627,7 +3627,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
     __pyx_t_2 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
     if (__pyx_t_2) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":342
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":342
  *         else:
  *             if self.sanity_checks:
  *                 for elem in rhs:             # <<<<<<<<<<<<<<
@@ -3659,7 +3659,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_elem = __pyx_t_4;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":343
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":343
  *             if self.sanity_checks:
  *                 for elem in rhs:
  *                     if elem < 0:             # <<<<<<<<<<<<<<
@@ -3669,7 +3669,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
         __pyx_t_2 = (__pyx_v_elem < 0);
         if (__pyx_t_2) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":344
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":344
  *                 for elem in rhs:
  *                     if elem < 0:
  *                         raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -3690,7 +3690,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
           goto __pyx_L11;
         }
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":345
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":345
  *                     if elem < 0:
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -3700,7 +3700,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
         __pyx_t_2 = (__pyx_v_elem > maxelem);
         if (__pyx_t_2) {
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":346
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":346
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif elem > maxelem:
  *                         raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -3727,7 +3727,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
         }
         __pyx_L11:;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":347
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":347
  *                     elif elem > maxelem:
  *                         raise OverflowError("Elements must be <= %s" % maxelem)
  *                     intBitSetDelElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -3741,7 +3741,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
     }
     /*else*/ {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":349
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":349
  *                     intBitSetDelElem(self.bitset, elem)
  *             else:
  *                 for elem in rhs:             # <<<<<<<<<<<<<<
@@ -3773,7 +3773,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
         __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
         __pyx_v_elem = __pyx_t_4;
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":350
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":350
  *             else:
  *                 for elem in rhs:
  *                     intBitSetDelElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -3788,7 +3788,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":351
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":351
  *                 for elem in rhs:
  *                     intBitSetDelElem(self.bitset, elem)
  *         return self             # <<<<<<<<<<<<<<
@@ -3814,7 +3814,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___isub__(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":353
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":353
  *         return self
  * 
  *     def __deepcopy__(self, memo):             # <<<<<<<<<<<<<<
@@ -3829,7 +3829,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___deepcopy__(PyObject *__py
   PyObject *__pyx_t_2 = NULL;
   __Pyx_SetupRefcountContext("__deepcopy__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":354
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":354
  * 
  *     def __deepcopy__(self, memo):
  *         return intbitset(self)             # <<<<<<<<<<<<<<
@@ -3862,7 +3862,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___deepcopy__(PyObject *__py
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":356
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":356
  *         return intbitset(self)
  * 
  *     def __del__(self, int elem):             # <<<<<<<<<<<<<<
@@ -3887,7 +3887,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___del__(PyObject *__pyx_v_s
   return NULL;
   __pyx_L4_argument_unpacking_done:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":357
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":357
  * 
  *     def __del__(self, int elem):
  *         if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -3897,7 +3897,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___del__(PyObject *__pyx_v_s
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":358
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":358
  *     def __del__(self, int elem):
  *         if self.sanity_checks:
  *             if elem < 0:             # <<<<<<<<<<<<<<
@@ -3907,7 +3907,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___del__(PyObject *__pyx_v_s
     __pyx_t_1 = (__pyx_v_elem < 0);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":359
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":359
  *         if self.sanity_checks:
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -3928,7 +3928,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___del__(PyObject *__pyx_v_s
       goto __pyx_L6;
     }
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":360
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":360
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -3938,7 +3938,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___del__(PyObject *__pyx_v_s
     __pyx_t_1 = (__pyx_v_elem > maxelem);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":361
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":361
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -3968,7 +3968,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___del__(PyObject *__pyx_v_s
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":362
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":362
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)
  *         intBitSetDelElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -3990,7 +3990,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___del__(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":364
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":364
  *         intBitSetDelElem(self.bitset, elem)
  * 
  *     def __and__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -4008,7 +4008,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___and__(PyObject *__pyx_v_s
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 364; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":365
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":365
  * 
  *     def __and__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)             # <<<<<<<<<<<<<<
@@ -4025,7 +4025,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___and__(PyObject *__pyx_v_s
   __pyx_v_ret = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":366
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":366
  *     def __and__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetIntersection((<intbitset> self).bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -4034,7 +4034,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___and__(PyObject *__pyx_v_s
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_ret)->bitset = intBitSetIntersection(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":367
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":367
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetIntersection((<intbitset> self).bitset, rhs.bitset)
  *         return ret             # <<<<<<<<<<<<<<
@@ -4060,7 +4060,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___and__(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":369
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":369
  *         return ret
  * 
  *     def __or__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -4078,7 +4078,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___or__(PyObject *__pyx_v_se
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 369; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":370
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":370
  * 
  *     def __or__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)             # <<<<<<<<<<<<<<
@@ -4095,7 +4095,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___or__(PyObject *__pyx_v_se
   __pyx_v_ret = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":371
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":371
  *     def __or__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetUnion((<intbitset> self).bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -4104,7 +4104,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___or__(PyObject *__pyx_v_se
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_ret)->bitset = intBitSetUnion(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":372
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":372
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetUnion((<intbitset> self).bitset, rhs.bitset)
  *         return ret             # <<<<<<<<<<<<<<
@@ -4130,7 +4130,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___or__(PyObject *__pyx_v_se
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":374
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":374
  *         return ret
  * 
  *     def __xor__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -4148,7 +4148,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___xor__(PyObject *__pyx_v_s
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 374; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":375
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":375
  * 
  *     def __xor__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)             # <<<<<<<<<<<<<<
@@ -4165,7 +4165,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___xor__(PyObject *__pyx_v_s
   __pyx_v_ret = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":376
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":376
  *     def __xor__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetXor((<intbitset> self).bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -4174,7 +4174,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___xor__(PyObject *__pyx_v_s
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_ret)->bitset = intBitSetXor(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":377
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":377
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetXor((<intbitset> self).bitset, rhs.bitset)
  *         return ret             # <<<<<<<<<<<<<<
@@ -4200,7 +4200,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___xor__(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":379
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":379
  *         return ret
  * 
  *     def __sub__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -4218,7 +4218,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___sub__(PyObject *__pyx_v_s
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 379; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":380
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":380
  * 
  *     def __sub__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)             # <<<<<<<<<<<<<<
@@ -4235,7 +4235,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___sub__(PyObject *__pyx_v_s
   __pyx_v_ret = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":381
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":381
  *     def __sub__(self, intbitset rhs not None):
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetSub((<intbitset> self).bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -4244,7 +4244,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___sub__(PyObject *__pyx_v_s
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_ret)->bitset = intBitSetSub(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":382
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":382
  *         ret = intbitset(no_allocate=1)
  *         (<intbitset>ret).bitset = intBitSetSub((<intbitset> self).bitset, rhs.bitset)
  *         return ret             # <<<<<<<<<<<<<<
@@ -4270,7 +4270,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___sub__(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":384
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":384
  *         return ret
  * 
  *     def __iand__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -4284,7 +4284,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iand__(PyObject *__pyx_v_
   __Pyx_SetupRefcountContext("__iand__");
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 384; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":385
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":385
  * 
  *     def __iand__(self, intbitset rhs not None):
  *         intBitSetIIntersection(self.bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -4293,7 +4293,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iand__(PyObject *__pyx_v_
  */
   intBitSetIIntersection(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":386
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":386
  *     def __iand__(self, intbitset rhs not None):
  *         intBitSetIIntersection(self.bitset, rhs.bitset)
  *         return self             # <<<<<<<<<<<<<<
@@ -4316,7 +4316,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iand__(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":388
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":388
  *         return self
  * 
  *     def __ior__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -4330,7 +4330,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___ior__(PyObject *__pyx_v_s
   __Pyx_SetupRefcountContext("__ior__");
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 388; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":389
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":389
  * 
  *     def __ior__(self, intbitset rhs not None):
  *         intBitSetIUnion(self.bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -4339,7 +4339,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___ior__(PyObject *__pyx_v_s
  */
   intBitSetIUnion(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":390
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":390
  *     def __ior__(self, intbitset rhs not None):
  *         intBitSetIUnion(self.bitset, rhs.bitset)
  *         return self             # <<<<<<<<<<<<<<
@@ -4362,7 +4362,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___ior__(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":392
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":392
  *         return self
  * 
  *     def __ixor__(self, intbitset rhs not None):             # <<<<<<<<<<<<<<
@@ -4376,7 +4376,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___ixor__(PyObject *__pyx_v_
   __Pyx_SetupRefcountContext("__ixor__");
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_rhs), __pyx_ptype_3lib_9intbitset_intbitset, 0, "rhs", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 392; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":393
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":393
  * 
  *     def __ixor__(self, intbitset rhs not None):
  *         intBitSetIXor(self.bitset, rhs.bitset)             # <<<<<<<<<<<<<<
@@ -4385,7 +4385,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___ixor__(PyObject *__pyx_v_
  */
   intBitSetIXor(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_rhs)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":394
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":394
  *     def __ixor__(self, intbitset rhs not None):
  *         intBitSetIXor(self.bitset, rhs.bitset)
  *         return self             # <<<<<<<<<<<<<<
@@ -4408,7 +4408,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___ixor__(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":396
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":396
  *         return self
  * 
  *     def __repr__(self):             # <<<<<<<<<<<<<<
@@ -4431,7 +4431,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
   __Pyx_SetupRefcountContext("__repr__");
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":399
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":399
  *         cdef int last
  *         cdef int maxelem
  *         if self.bitset.trailing_bits:             # <<<<<<<<<<<<<<
@@ -4441,7 +4441,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset->trailing_bits;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":400
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":400
  *         cdef int maxelem
  *         if self.bitset.trailing_bits:
  *             maxelem = (intBitSetGetSize(self.bitset)) * wordbitsize             # <<<<<<<<<<<<<<
@@ -4450,7 +4450,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
  */
     __pyx_v_maxelem = (intBitSetGetSize(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset) * wordbitsize);
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":401
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":401
  *         if self.bitset.trailing_bits:
  *             maxelem = (intBitSetGetSize(self.bitset)) * wordbitsize
  *             ret = "intbitset(["             # <<<<<<<<<<<<<<
@@ -4461,7 +4461,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     __Pyx_DECREF(__pyx_v_ret);
     __pyx_v_ret = __pyx_kp_39;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":402
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":402
  *             maxelem = (intBitSetGetSize(self.bitset)) * wordbitsize
  *             ret = "intbitset(["
  *             last = -1             # <<<<<<<<<<<<<<
@@ -4470,7 +4470,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
  */
     __pyx_v_last = -1;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":403
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":403
  *             ret = "intbitset(["
  *             last = -1
  *             while last < maxelem:             # <<<<<<<<<<<<<<
@@ -4481,7 +4481,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
       __pyx_t_2 = (__pyx_v_last < __pyx_v_maxelem);
       if (!__pyx_t_2) break;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":404
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":404
  *             last = -1
  *             while last < maxelem:
  *                 last = intBitSetGetNext(self.bitset, last)             # <<<<<<<<<<<<<<
@@ -4490,7 +4490,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
  */
       __pyx_v_last = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_last);
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":405
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":405
  *             while last < maxelem:
  *                 last = intBitSetGetNext(self.bitset, last)
  *                 ret = ret + '%i, ' % last             # <<<<<<<<<<<<<<
@@ -4510,7 +4510,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
       __pyx_t_3 = 0;
     }
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":406
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":406
  *                 last = intBitSetGetNext(self.bitset, last)
  *                 ret = ret + '%i, ' % last
  *             if ret.endswith(", "):             # <<<<<<<<<<<<<<
@@ -4532,7 +4532,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     __Pyx_DECREF(__pyx_t_5); __pyx_t_5 = 0;
     if (__pyx_t_2) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":407
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":407
  *                 ret = ret + '%i, ' % last
  *             if ret.endswith(", "):
  *                 ret = ret[:-2]             # <<<<<<<<<<<<<<
@@ -4548,7 +4548,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     }
     __pyx_L8:;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":408
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":408
  *             if ret.endswith(", "):
  *                 ret = ret[:-2]
  *             ret = ret + '], trailing_bits=True)'             # <<<<<<<<<<<<<<
@@ -4561,7 +4561,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     __pyx_v_ret = __pyx_t_5;
     __pyx_t_5 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":409
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":409
  *                 ret = ret[:-2]
  *             ret = ret + '], trailing_bits=True)'
  *             return ret             # <<<<<<<<<<<<<<
@@ -4576,7 +4576,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
   }
   /*else*/ {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":411
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":411
  *             return ret
  *         else:
  *             ret = "intbitset(["             # <<<<<<<<<<<<<<
@@ -4587,7 +4587,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     __Pyx_DECREF(__pyx_v_ret);
     __pyx_v_ret = __pyx_kp_43;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":412
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":412
  *         else:
  *             ret = "intbitset(["
  *             last = -1             # <<<<<<<<<<<<<<
@@ -4596,7 +4596,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
  */
     __pyx_v_last = -1;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":413
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":413
  *             ret = "intbitset(["
  *             last = -1
  *             while last >= -1:             # <<<<<<<<<<<<<<
@@ -4607,7 +4607,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
       __pyx_t_2 = (__pyx_v_last >= -1);
       if (!__pyx_t_2) break;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":414
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":414
  *             last = -1
  *             while last >= -1:
  *                 last = intBitSetGetNext(self.bitset, last)             # <<<<<<<<<<<<<<
@@ -4616,7 +4616,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
  */
       __pyx_v_last = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_last);
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":415
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":415
  *             while last >= -1:
  *                 last = intBitSetGetNext(self.bitset, last)
  *                 ret = ret + '%i, ' % last             # <<<<<<<<<<<<<<
@@ -4636,7 +4636,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
       __pyx_t_5 = 0;
     }
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":416
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":416
  *                 last = intBitSetGetNext(self.bitset, last)
  *                 ret = ret + '%i, ' % last
  *             ret = ret[:-4] # -len('-2, ')             # <<<<<<<<<<<<<<
@@ -4649,7 +4649,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     __pyx_v_ret = __pyx_1;
     __pyx_1 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":417
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":417
  *                 ret = ret + '%i, ' % last
  *             ret = ret[:-4] # -len('-2, ')
  *             if ret.endswith(', '):             # <<<<<<<<<<<<<<
@@ -4671,7 +4671,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
     if (__pyx_t_2) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":418
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":418
  *             ret = ret[:-4] # -len('-2, ')
  *             if ret.endswith(', '):
  *                 ret = ret[:-2]             # <<<<<<<<<<<<<<
@@ -4687,7 +4687,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     }
     __pyx_L11:;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":419
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":419
  *             if ret.endswith(', '):
  *                 ret = ret[:-2]
  *             ret = ret + '])'             # <<<<<<<<<<<<<<
@@ -4700,7 +4700,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
     __pyx_v_ret = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":420
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":420
  *                 ret = ret[:-2]
  *             ret = ret + '])'
  *             return ret             # <<<<<<<<<<<<<<
@@ -4730,7 +4730,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___repr__(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":422
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":422
  *             return ret
  * 
  *     def __str__(self):             # <<<<<<<<<<<<<<
@@ -4759,7 +4759,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
   __pyx_v_n = Py_None; __Pyx_INCREF(Py_None);
   __pyx_v_end_list = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":424
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":424
  *     def __str__(self):
  *         cdef int tot
  *         tot = intBitSetGetTot(self.bitset)             # <<<<<<<<<<<<<<
@@ -4768,7 +4768,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
  */
   __pyx_v_tot = intBitSetGetTot(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":425
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":425
  *         cdef int tot
  *         tot = intBitSetGetTot(self.bitset)
  *         if tot < 0:             # <<<<<<<<<<<<<<
@@ -4778,7 +4778,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
   __pyx_t_1 = (__pyx_v_tot < 0);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":426
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":426
  *         tot = intBitSetGetTot(self.bitset)
  *         if tot < 0:
  *             begin_list = self.to_sorted_list(0, 10)             # <<<<<<<<<<<<<<
@@ -4803,7 +4803,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __pyx_v_begin_list = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":427
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":427
  *         if tot < 0:
  *             begin_list = self.to_sorted_list(0, 10)
  *             ret = "intbitset(["             # <<<<<<<<<<<<<<
@@ -4814,7 +4814,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __Pyx_DECREF(__pyx_v_ret);
     __pyx_v_ret = __pyx_kp_47;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":428
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":428
  *             begin_list = self.to_sorted_list(0, 10)
  *             ret = "intbitset(["
  *             for n in begin_list:             # <<<<<<<<<<<<<<
@@ -4846,7 +4846,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
       __pyx_v_n = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":429
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":429
  *             ret = "intbitset(["
  *             for n in begin_list:
  *                 ret = ret + '%i, ' % n             # <<<<<<<<<<<<<<
@@ -4864,7 +4864,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":430
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":430
  *             for n in begin_list:
  *                 ret = ret + '%i, ' % n
  *             ret = ret + "...])"             # <<<<<<<<<<<<<<
@@ -4877,7 +4877,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __pyx_v_ret = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":431
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":431
  *                 ret = ret + '%i, ' % n
  *             ret = ret + "...])"
  *             return ret             # <<<<<<<<<<<<<<
@@ -4891,7 +4891,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     goto __pyx_L5;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":432
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":432
  *             ret = ret + "...])"
  *             return ret
  *         elif tot > 10:             # <<<<<<<<<<<<<<
@@ -4901,7 +4901,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
   __pyx_t_1 = (__pyx_v_tot > 10);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":433
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":433
  *             return ret
  *         elif tot > 10:
  *             begin_list = self.to_sorted_list(0, 5)             # <<<<<<<<<<<<<<
@@ -4926,7 +4926,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __pyx_v_begin_list = __pyx_t_3;
     __pyx_t_3 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":434
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":434
  *         elif tot > 10:
  *             begin_list = self.to_sorted_list(0, 5)
  *             end_list = self.to_sorted_list(tot - 5, tot)             # <<<<<<<<<<<<<<
@@ -4955,7 +4955,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __pyx_v_end_list = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":435
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":435
  *             begin_list = self.to_sorted_list(0, 5)
  *             end_list = self.to_sorted_list(tot - 5, tot)
  *             ret = "intbitset(["             # <<<<<<<<<<<<<<
@@ -4966,7 +4966,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __Pyx_DECREF(__pyx_v_ret);
     __pyx_v_ret = __pyx_kp_50;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":436
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":436
  *             end_list = self.to_sorted_list(tot - 5, tot)
  *             ret = "intbitset(["
  *             for n in begin_list:             # <<<<<<<<<<<<<<
@@ -4998,7 +4998,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
       __pyx_v_n = __pyx_t_6;
       __pyx_t_6 = 0;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":437
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":437
  *             ret = "intbitset(["
  *             for n in begin_list:
  *                 ret = ret + '%i, ' % n             # <<<<<<<<<<<<<<
@@ -5016,7 +5016,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":438
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":438
  *             for n in begin_list:
  *                 ret = ret + '%i, ' % n
  *             ret = ret + "..., "             # <<<<<<<<<<<<<<
@@ -5029,7 +5029,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __pyx_v_ret = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":439
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":439
  *                 ret = ret + '%i, ' % n
  *             ret = ret + "..., "
  *             for n in end_list:             # <<<<<<<<<<<<<<
@@ -5061,7 +5061,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
       __pyx_v_n = __pyx_t_3;
       __pyx_t_3 = 0;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":440
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":440
  *             ret = ret + "..., "
  *             for n in end_list:
  *                 ret = ret + '%i, ' % n             # <<<<<<<<<<<<<<
@@ -5079,7 +5079,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     }
     __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":441
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":441
  *             for n in end_list:
  *                 ret = ret + '%i, ' % n
  *             ret = ret[:-2]             # <<<<<<<<<<<<<<
@@ -5092,7 +5092,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __pyx_v_ret = __pyx_1;
     __pyx_1 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":442
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":442
  *                 ret = ret + '%i, ' % n
  *             ret = ret[:-2]
  *             ret = ret + '])'             # <<<<<<<<<<<<<<
@@ -5105,7 +5105,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
     __pyx_v_ret = __pyx_t_4;
     __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":443
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":443
  *             ret = ret[:-2]
  *             ret = ret + '])'
  *             return ret             # <<<<<<<<<<<<<<
@@ -5120,7 +5120,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
   }
   /*else*/ {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":445
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":445
  *             return ret
  *         else:
  *             return self.__repr__()             # <<<<<<<<<<<<<<
@@ -5159,7 +5159,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___str__(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":472
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":472
  * 
  *     # Iterator interface
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -5175,7 +5175,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iter__(PyObject *__pyx_v_
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("__iter__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":473
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":473
  *     # Iterator interface
  *     def __iter__(self):
  *         if self.bitset.trailing_bits:             # <<<<<<<<<<<<<<
@@ -5185,7 +5185,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iter__(PyObject *__pyx_v_
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset->trailing_bits;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":474
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":474
  *     def __iter__(self):
  *         if self.bitset.trailing_bits:
  *             raise OverflowError("It's impossible to iterate over an infinite set.")             # <<<<<<<<<<<<<<
@@ -5207,7 +5207,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iter__(PyObject *__pyx_v_
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":475
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":475
  *         if self.bitset.trailing_bits:
  *             raise OverflowError("It's impossible to iterate over an infinite set.")
  *         return intbitset_iterator(self)             # <<<<<<<<<<<<<<
@@ -5240,7 +5240,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset___iter__(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":478
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":478
  * 
  *     # Customized interface
  *     def add(self, int elem):             # <<<<<<<<<<<<<<
@@ -5266,7 +5266,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_add(PyObject *__pyx_v_self,
   return NULL;
   __pyx_L4_argument_unpacking_done:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":481
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":481
  *         """Add an element to a set.
  *         This has no effect if the element is already present."""
  *         if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -5276,7 +5276,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_add(PyObject *__pyx_v_self,
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":482
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":482
  *         This has no effect if the element is already present."""
  *         if self.sanity_checks:
  *             if elem < 0:             # <<<<<<<<<<<<<<
@@ -5286,7 +5286,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_add(PyObject *__pyx_v_self,
     __pyx_t_1 = (__pyx_v_elem < 0);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":483
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":483
  *         if self.sanity_checks:
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -5307,7 +5307,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_add(PyObject *__pyx_v_self,
       goto __pyx_L6;
     }
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":484
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":484
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -5317,7 +5317,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_add(PyObject *__pyx_v_self,
     __pyx_t_1 = (__pyx_v_elem > maxelem);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":485
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":485
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -5347,7 +5347,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_add(PyObject *__pyx_v_self,
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":486
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":486
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)
  *         intBitSetAddElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -5369,7 +5369,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_add(PyObject *__pyx_v_self,
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":488
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":488
  *         intBitSetAddElem(self.bitset, elem)
  * 
  *     def clear(self):             # <<<<<<<<<<<<<<
@@ -5382,7 +5382,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_clear(PyObject *__pyx_v_sel
   PyObject *__pyx_r = NULL;
   __Pyx_SetupRefcountContext("clear");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":489
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":489
  * 
  *     def clear(self):
  *         intBitSetReset(self.bitset)             # <<<<<<<<<<<<<<
@@ -5397,7 +5397,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_clear(PyObject *__pyx_v_sel
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":491
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":491
  *         intBitSetReset(self.bitset)
  * 
  *     def difference(intbitset self, rhs):             # <<<<<<<<<<<<<<
@@ -5414,7 +5414,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_difference(PyObject *__pyx_
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("difference");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":495
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":495
  *         (i.e. all elements that are in this intbitset but not the other.)
  *         """
  *         return self.__sub__(rhs)             # <<<<<<<<<<<<<<
@@ -5451,7 +5451,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_difference(PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":497
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":497
  *         return self.__sub__(rhs)
  * 
  *     def difference_update(self, rhs):             # <<<<<<<<<<<<<<
@@ -5468,7 +5468,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_difference_update(PyObject 
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("difference_update");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":499
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":499
  *     def difference_update(self, rhs):
  *         """Remove all elements of another set from this set."""
  *         self.__isub__(rhs)             # <<<<<<<<<<<<<<
@@ -5502,7 +5502,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_difference_update(PyObject 
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":501
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":501
  *         self.__isub__(rhs)
  * 
  *     def discard(self, int elem):             # <<<<<<<<<<<<<<
@@ -5528,7 +5528,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_discard(PyObject *__pyx_v_s
   return NULL;
   __pyx_L4_argument_unpacking_done:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":504
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":504
  *         """Remove an element from a intbitset if it is a member.
  *         If the element is not a member, do nothing."""
  *         if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -5538,7 +5538,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_discard(PyObject *__pyx_v_s
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":505
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":505
  *         If the element is not a member, do nothing."""
  *         if self.sanity_checks:
  *             if elem < 0:             # <<<<<<<<<<<<<<
@@ -5548,7 +5548,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_discard(PyObject *__pyx_v_s
     __pyx_t_1 = (__pyx_v_elem < 0);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":506
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":506
  *         if self.sanity_checks:
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -5569,7 +5569,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_discard(PyObject *__pyx_v_s
       goto __pyx_L6;
     }
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":507
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":507
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -5579,7 +5579,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_discard(PyObject *__pyx_v_s
     __pyx_t_1 = (__pyx_v_elem > maxelem);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":508
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":508
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -5609,7 +5609,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_discard(PyObject *__pyx_v_s
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":509
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":509
  *             elif elem > maxelem:
  *                 raise OverflowError("Element must be <= %s" % maxelem)
  *         intBitSetDelElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -5631,7 +5631,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_discard(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":511
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":511
  *         intBitSetDelElem(self.bitset, elem)
  * 
  *     def intersection(self, rhs):             # <<<<<<<<<<<<<<
@@ -5648,7 +5648,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_intersection(PyObject *__py
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("intersection");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":515
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":515
  *         (i.e. all elements that are in both intbitsets.)
  *         """
  *         return self.__and__(rhs)             # <<<<<<<<<<<<<<
@@ -5685,7 +5685,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_intersection(PyObject *__py
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":517
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":517
  *         return self.__and__(rhs)
  * 
  *     def intersection_update(self, rhs):             # <<<<<<<<<<<<<<
@@ -5702,7 +5702,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_intersection_update(PyObjec
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("intersection_update");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":519
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":519
  *     def intersection_update(self, rhs):
  *         """Update a intbitset with the intersection of itself and another."""
  *         self.__iand__(rhs)             # <<<<<<<<<<<<<<
@@ -5736,7 +5736,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_intersection_update(PyObjec
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":521
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":521
  *         self.__iand__(rhs)
  * 
  *     def union(self, rhs):             # <<<<<<<<<<<<<<
@@ -5753,7 +5753,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_union(PyObject *__pyx_v_sel
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("union");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":525
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":525
  *         (i.e. all elements that are in either intbitsets.)
  *         """
  *         return self.__or__(rhs)             # <<<<<<<<<<<<<<
@@ -5790,7 +5790,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_union(PyObject *__pyx_v_sel
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":527
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":527
  *         return self.__or__(rhs)
  * 
  *     def union_update(self, rhs):             # <<<<<<<<<<<<<<
@@ -5807,7 +5807,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_union_update(PyObject *__py
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("union_update");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":529
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":529
  *     def union_update(self, rhs):
  *         """Update a intbitset with the union of itself and another."""
  *         self.__ior__(rhs)             # <<<<<<<<<<<<<<
@@ -5841,7 +5841,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_union_update(PyObject *__py
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":531
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":531
  *         self.__ior__(rhs)
  * 
  *     def issubset(self, rhs):             # <<<<<<<<<<<<<<
@@ -5858,7 +5858,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_issubset(PyObject *__pyx_v_
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("issubset");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":533
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":533
  *     def issubset(self, rhs):
  *         """Report whether another set contains this set."""
  *         return self.__le__(rhs)             # <<<<<<<<<<<<<<
@@ -5895,7 +5895,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_issubset(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":535
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":535
  *         return self.__le__(rhs)
  * 
  *     def issuperset(self, rhs):             # <<<<<<<<<<<<<<
@@ -5912,7 +5912,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_issuperset(PyObject *__pyx_
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("issuperset");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":537
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":537
  *     def issuperset(self, rhs):
  *         """Report whether this set contains another set."""
  *         return self.__ge__(rhs)             # <<<<<<<<<<<<<<
@@ -5949,7 +5949,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_issuperset(PyObject *__pyx_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":539
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":539
  *         return self.__ge__(rhs)
  * 
  *     def symmetric_difference(self, rhs):             # <<<<<<<<<<<<<<
@@ -5966,7 +5966,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_symmetric_difference(PyObje
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("symmetric_difference");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":543
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":543
  *         (i.e. all elements that are in exactly one of the sets.)
  *         """
  *         return self.__xor__(rhs)             # <<<<<<<<<<<<<<
@@ -6003,7 +6003,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_symmetric_difference(PyObje
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":545
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":545
  *         return self.__xor__(rhs)
  * 
  *     def symmetric_difference_update(self, rhs):             # <<<<<<<<<<<<<<
@@ -6020,7 +6020,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_symmetric_difference_update
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("symmetric_difference_update");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":548
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":548
  *         """Update an intbitset with the symmetric difference of itself and another.
  *         """
  *         self.__ixor__(rhs)             # <<<<<<<<<<<<<<
@@ -6054,7 +6054,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_symmetric_difference_update
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":551
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":551
  * 
  *     # Dumping & Loading
  *     def fastdump(self):             # <<<<<<<<<<<<<<
@@ -6075,7 +6075,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastdump(PyObject *__pyx_v_
   __Pyx_SetupRefcountContext("fastdump");
   __pyx_v_tmp = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":555
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":555
  *         somewhere."""
  *         cdef Py_ssize_t size
  *         size = intBitSetGetSize((<intbitset> self).bitset)             # <<<<<<<<<<<<<<
@@ -6084,7 +6084,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastdump(PyObject *__pyx_v_
  */
   __pyx_v_size = intBitSetGetSize(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":556
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":556
  *         cdef Py_ssize_t size
  *         size = intBitSetGetSize((<intbitset> self).bitset)
  *         tmp = PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize)             # <<<<<<<<<<<<<<
@@ -6097,7 +6097,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastdump(PyObject *__pyx_v_
   __pyx_v_tmp = __pyx_t_1;
   __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":557
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":557
  *         size = intBitSetGetSize((<intbitset> self).bitset)
  *         tmp = PyString_FromStringAndSize(<char *>self.bitset.bitset, ( size + 1) * wordbytesize)
  *         return zlib.compress(tmp)             # <<<<<<<<<<<<<<
@@ -6139,7 +6139,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastdump(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":559
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":559
  *         return zlib.compress(tmp)
  * 
  *     def fastload(self, strdump):             # <<<<<<<<<<<<<<
@@ -6165,7 +6165,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
   __Pyx_INCREF(__pyx_v_strdump);
   __pyx_v_tmp = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":565
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":565
  *         cdef Py_ssize_t size
  *         cdef void *buf
  *         buf = NULL             # <<<<<<<<<<<<<<
@@ -6174,7 +6174,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
  */
   __pyx_v_buf = NULL;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":566
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":566
  *         cdef void *buf
  *         buf = NULL
  *         size = 0             # <<<<<<<<<<<<<<
@@ -6183,7 +6183,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
  */
   __pyx_v_size = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":567
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":567
  *         buf = NULL
  *         size = 0
  *         try:             # <<<<<<<<<<<<<<
@@ -6198,7 +6198,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
     __Pyx_XGOTREF(__pyx_save_exc_tb);
     /*try:*/ {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":568
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":568
  *         size = 0
  *         try:
  *             if type(strdump) is array:             # <<<<<<<<<<<<<<
@@ -6220,7 +6220,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
       __Pyx_DECREF(__pyx_1); __pyx_1 = 0;
       if (__pyx_t_3) {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":569
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":569
  *         try:
  *             if type(strdump) is array:
  *                 strdump = strdump.tostring()             # <<<<<<<<<<<<<<
@@ -6239,7 +6239,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
       }
       __pyx_L13:;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":571
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":571
  *                 strdump = strdump.tostring()
  *             # tmp needed to not be garbage collected
  *             tmp = zlib.decompress(strdump)             # <<<<<<<<<<<<<<
@@ -6264,7 +6264,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
       __pyx_v_tmp = __pyx_t_4;
       __pyx_t_4 = 0;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":572
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":572
  *             # tmp needed to not be garbage collected
  *             tmp = zlib.decompress(strdump)
  *             if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:             # <<<<<<<<<<<<<<
@@ -6274,7 +6274,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
       __pyx_t_3 = (PyObject_AsReadBuffer(__pyx_v_tmp, (&__pyx_v_buf), (&__pyx_v_size)) < 0);
       if (__pyx_t_3) {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":573
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":573
  *             tmp = zlib.decompress(strdump)
  *             if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
  *                 raise Exception()             # <<<<<<<<<<<<<<
@@ -6290,7 +6290,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
       }
       __pyx_L14:;
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":574
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":574
  *             if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
  *                 raise Exception()
  *             intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)             # <<<<<<<<<<<<<<
@@ -6309,7 +6309,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
     __Pyx_XDECREF(__pyx_t_2); __pyx_t_2 = 0;
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":575
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":575
  *                 raise Exception()
  *             intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
  *         except:             # <<<<<<<<<<<<<<
@@ -6323,7 +6323,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
       __Pyx_GOTREF(__pyx_t_2);
       __Pyx_GOTREF(__pyx_t_1);
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":576
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":576
  *             intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
  *         except:
  *             raise ValueError("strdump is corrupted")             # <<<<<<<<<<<<<<
@@ -6359,7 +6359,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
     __pyx_L12_try_end:;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":577
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":577
  *         except:
  *             raise ValueError("strdump is corrupted")
  *         return self             # <<<<<<<<<<<<<<
@@ -6390,7 +6390,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_fastload(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":579
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":579
  *         return self
  * 
  *     def copy(self):             # <<<<<<<<<<<<<<
@@ -6406,7 +6406,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_copy(PyObject *__pyx_v_self
   PyObject *__pyx_t_2 = NULL;
   __Pyx_SetupRefcountContext("copy");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":581
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":581
  *     def copy(self):
  *         """Return a shallow copy of a set."""
  *         return intbitset(self)             # <<<<<<<<<<<<<<
@@ -6439,7 +6439,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_copy(PyObject *__pyx_v_self
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":583
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":583
  *         return intbitset(self)
  * 
  *     def pop(self):             # <<<<<<<<<<<<<<
@@ -6457,7 +6457,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_pop(PyObject *__pyx_v_self,
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("pop");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":586
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":586
  *         """Remove and return an arbitrary set element."""
  *         cdef int ret
  *         ret = intBitSetGetNext(self.bitset, -1)             # <<<<<<<<<<<<<<
@@ -6466,7 +6466,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_pop(PyObject *__pyx_v_self,
  */
   __pyx_v_ret = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, -1);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":587
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":587
  *         cdef int ret
  *         ret = intBitSetGetNext(self.bitset, -1)
  *         if ret < 0:             # <<<<<<<<<<<<<<
@@ -6476,7 +6476,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_pop(PyObject *__pyx_v_self,
   __pyx_t_1 = (__pyx_v_ret < 0);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":588
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":588
  *         ret = intBitSetGetNext(self.bitset, -1)
  *         if ret < 0:
  *             raise KeyError("pop from an empty intbitset")             # <<<<<<<<<<<<<<
@@ -6498,7 +6498,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_pop(PyObject *__pyx_v_self,
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":589
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":589
  *         if ret < 0:
  *             raise KeyError("pop from an empty intbitset")
  *         intBitSetDelElem(self.bitset, ret)             # <<<<<<<<<<<<<<
@@ -6507,7 +6507,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_pop(PyObject *__pyx_v_self,
  */
   intBitSetDelElem(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_ret);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":590
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":590
  *             raise KeyError("pop from an empty intbitset")
  *         intBitSetDelElem(self.bitset, ret)
  *         return ret             # <<<<<<<<<<<<<<
@@ -6534,7 +6534,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_pop(PyObject *__pyx_v_self,
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":592
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":592
  *         return ret
  * 
  *     def remove(self, int elem):             # <<<<<<<<<<<<<<
@@ -6560,7 +6560,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
   return NULL;
   __pyx_L4_argument_unpacking_done:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":596
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":596
  *         If the element is not a member, raise a KeyError.
  *         """
  *         if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -6570,7 +6570,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":597
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":597
  *         """
  *         if self.sanity_checks:
  *             if elem < 0:             # <<<<<<<<<<<<<<
@@ -6580,7 +6580,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
     __pyx_t_1 = (__pyx_v_elem < 0);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":598
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":598
  *         if self.sanity_checks:
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -6601,7 +6601,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
       goto __pyx_L6;
     }
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":599
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":599
  *             if elem < 0:
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:             # <<<<<<<<<<<<<<
@@ -6611,7 +6611,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
     __pyx_t_1 = (__pyx_v_elem > maxelem);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":600
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":600
  *                 raise ValueError("Negative numbers, not allowed")
  *             elif elem > maxelem:
  *                 raise OverflowError("Elements must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -6641,7 +6641,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":601
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":601
  *             elif elem > maxelem:
  *                 raise OverflowError("Elements must be <= %s" % maxelem)
  *         if intBitSetIsInElem(self.bitset, elem):             # <<<<<<<<<<<<<<
@@ -6651,7 +6651,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
   __pyx_t_1 = intBitSetIsInElem(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_elem);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":602
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":602
  *                 raise OverflowError("Elements must be <= %s" % maxelem)
  *         if intBitSetIsInElem(self.bitset, elem):
  *             intBitSetDelElem(self.bitset, elem)             # <<<<<<<<<<<<<<
@@ -6663,7 +6663,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
   }
   /*else*/ {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":604
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":604
  *             intBitSetDelElem(self.bitset, elem)
  *         else:
  *             raise KeyError(elem)             # <<<<<<<<<<<<<<
@@ -6699,7 +6699,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_remove(PyObject *__pyx_v_se
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":606
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":606
  *             raise KeyError(elem)
  * 
  *     def strbits(self):             # <<<<<<<<<<<<<<
@@ -6723,7 +6723,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
   __Pyx_SetupRefcountContext("strbits");
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":612
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":612
  *         cdef int i
  *         cdef int last
  *         if (<intbitset> self).bitset.trailing_bits:             # <<<<<<<<<<<<<<
@@ -6733,7 +6733,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset->trailing_bits;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":613
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":613
  *         cdef int last
  *         if (<intbitset> self).bitset.trailing_bits:
  *             raise OverflowError("It's impossible to print an infinite set.")             # <<<<<<<<<<<<<<
@@ -6755,7 +6755,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":614
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":614
  *         if (<intbitset> self).bitset.trailing_bits:
  *             raise OverflowError("It's impossible to print an infinite set.")
  *         last = 0             # <<<<<<<<<<<<<<
@@ -6764,7 +6764,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
  */
   __pyx_v_last = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":615
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":615
  *             raise OverflowError("It's impossible to print an infinite set.")
  *         last = 0
  *         ret = ''             # <<<<<<<<<<<<<<
@@ -6775,7 +6775,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
   __Pyx_DECREF(__pyx_v_ret);
   __pyx_v_ret = __pyx_kp_65;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":616
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":616
  *         last = 0
  *         ret = ''
  *         for i in self:             # <<<<<<<<<<<<<<
@@ -6807,7 +6807,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
     __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
     __pyx_v_i = __pyx_t_5;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":617
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":617
  *         ret = ''
  *         for i in self:
  *             ret = ret + '0'*(i-last)+'1'             # <<<<<<<<<<<<<<
@@ -6829,7 +6829,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
     __pyx_v_ret = __pyx_t_6;
     __pyx_t_6 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":618
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":618
  *         for i in self:
  *             ret = ret + '0'*(i-last)+'1'
  *             last = i+1             # <<<<<<<<<<<<<<
@@ -6840,7 +6840,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
   }
   __Pyx_DECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":619
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":619
  *             ret = ret + '0'*(i-last)+'1'
  *             last = i+1
  *         return ret             # <<<<<<<<<<<<<<
@@ -6867,7 +6867,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_strbits(PyObject *__pyx_v_s
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":621
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":621
  *         return ret
  * 
  *     def update_with_signs(self, rhs):             # <<<<<<<<<<<<<<
@@ -6895,7 +6895,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
   __Pyx_SetupRefcountContext("update_with_signs");
   __pyx_v_sign = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":625
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":625
  *         whose value are less than 0 and add every integer whose value is 0 or more"""
  *         cdef int value
  *         try:             # <<<<<<<<<<<<<<
@@ -6910,7 +6910,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
     __Pyx_XGOTREF(__pyx_save_exc_tb);
     /*try:*/ {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":626
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":626
  *         cdef int value
  *         try:
  *             if self.sanity_checks:             # <<<<<<<<<<<<<<
@@ -6920,7 +6920,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
       __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->sanity_checks;
       if (__pyx_t_1) {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":627
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":627
  *         try:
  *             if self.sanity_checks:
  *                 for value, sign in rhs.iteritems():             # <<<<<<<<<<<<<<
@@ -6983,7 +6983,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
             __pyx_2 = 0;
           }
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":628
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":628
  *             if self.sanity_checks:
  *                 for value, sign in rhs.iteritems():
  *                     if value < 0:             # <<<<<<<<<<<<<<
@@ -6993,7 +6993,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
           __pyx_t_1 = (__pyx_v_value < 0);
           if (__pyx_t_1) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":629
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":629
  *                 for value, sign in rhs.iteritems():
  *                     if value < 0:
  *                         raise ValueError("Negative numbers, not allowed")             # <<<<<<<<<<<<<<
@@ -7014,7 +7014,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
             goto __pyx_L16;
           }
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":630
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":630
  *                     if value < 0:
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif value > maxelem:             # <<<<<<<<<<<<<<
@@ -7024,7 +7024,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
           __pyx_t_1 = (__pyx_v_value > maxelem);
           if (__pyx_t_1) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":631
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":631
  *                         raise ValueError("Negative numbers, not allowed")
  *                     elif value > maxelem:
  *                         raise OverflowError("Elements must <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -7051,7 +7051,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
           }
           __pyx_L16:;
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":632
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":632
  *                     elif value > maxelem:
  *                         raise OverflowError("Elements must <= %s" % maxelem)
  *                     if sign < 0:             # <<<<<<<<<<<<<<
@@ -7064,7 +7064,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           if (__pyx_t_1) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":633
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":633
  *                         raise OverflowError("Elements must <= %s" % maxelem)
  *                     if sign < 0:
  *                         intBitSetDelElem(self.bitset, value)             # <<<<<<<<<<<<<<
@@ -7076,7 +7076,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
           }
           /*else*/ {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":635
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":635
  *                         intBitSetDelElem(self.bitset, value)
  *                     else:
  *                         intBitSetAddElem(self.bitset, value)             # <<<<<<<<<<<<<<
@@ -7092,7 +7092,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
       }
       /*else*/ {
 
-        /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":637
+        /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":637
  *                         intBitSetAddElem(self.bitset, value)
  *             else:
  *                 for value, sign in rhs.iteritems():             # <<<<<<<<<<<<<<
@@ -7155,7 +7155,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
             __pyx_2 = 0;
           }
 
-          /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":638
+          /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":638
  *             else:
  *                 for value, sign in rhs.iteritems():
  *                     if sign < 0:             # <<<<<<<<<<<<<<
@@ -7168,7 +7168,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
           __Pyx_DECREF(__pyx_t_4); __pyx_t_4 = 0;
           if (__pyx_t_1) {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":639
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":639
  *                 for value, sign in rhs.iteritems():
  *                     if sign < 0:
  *                         intBitSetDelElem(self.bitset, value)             # <<<<<<<<<<<<<<
@@ -7180,7 +7180,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
           }
           /*else*/ {
 
-            /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":641
+            /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":641
  *                         intBitSetDelElem(self.bitset, value)
  *                     else:
  *                         intBitSetAddElem(self.bitset, value)             # <<<<<<<<<<<<<<
@@ -7206,7 +7206,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
     __Pyx_XDECREF(__pyx_t_4); __pyx_t_4 = 0;
     __Pyx_XDECREF(__pyx_t_3); __pyx_t_3 = 0;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":642
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":642
  *                     else:
  *                         intBitSetAddElem(self.bitset, value)
  *         except AttributeError:             # <<<<<<<<<<<<<<
@@ -7221,7 +7221,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
       __Pyx_GOTREF(__pyx_t_4);
       __Pyx_GOTREF(__pyx_t_6);
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":643
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":643
  *                         intBitSetAddElem(self.bitset, value)
  *         except AttributeError:
  *             raise TypeError("rhs should be a valid dictionary with integers keys and integer values")             # <<<<<<<<<<<<<<
@@ -7276,7 +7276,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_update_with_signs(PyObject 
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":645
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":645
  *             raise TypeError("rhs should be a valid dictionary with integers keys and integer values")
  * 
  *     def get_size(self):             # <<<<<<<<<<<<<<
@@ -7290,7 +7290,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_size(PyObject *__pyx_v_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_SetupRefcountContext("get_size");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":646
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":646
  * 
  *     def get_size(self):
  *         return intBitSetGetSize(self.bitset)             # <<<<<<<<<<<<<<
@@ -7316,7 +7316,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_size(PyObject *__pyx_v_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":648
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":648
  *         return intBitSetGetSize(self.bitset)
  * 
  *     def get_allocated(self):             # <<<<<<<<<<<<<<
@@ -7330,7 +7330,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_allocated(PyObject *__p
   PyObject *__pyx_t_1 = NULL;
   __Pyx_SetupRefcountContext("get_allocated");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":649
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":649
  * 
  *     def get_allocated(self):
  *         return intBitSetGetAllocated(self.bitset)             # <<<<<<<<<<<<<<
@@ -7356,7 +7356,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_allocated(PyObject *__p
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":651
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":651
  *         return intBitSetGetAllocated(self.bitset)
  * 
  *     def get_sorted_element(self, int index):             # <<<<<<<<<<<<<<
@@ -7387,7 +7387,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   return NULL;
   __pyx_L4_argument_unpacking_done:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":657
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":657
  *         cdef int last
  *         cdef int i
  *         l = intBitSetGetTot(self.bitset)             # <<<<<<<<<<<<<<
@@ -7396,7 +7396,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
  */
   __pyx_v_l = intBitSetGetTot(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":658
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":658
  *         cdef int i
  *         l = intBitSetGetTot(self.bitset)
  *         if index < 0:             # <<<<<<<<<<<<<<
@@ -7406,7 +7406,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   __pyx_t_1 = (__pyx_v_index < 0);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":659
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":659
  *         l = intBitSetGetTot(self.bitset)
  *         if index < 0:
  *             if self.bitset.trailing_bits:             # <<<<<<<<<<<<<<
@@ -7416,7 +7416,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
     __pyx_t_2 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset->trailing_bits;
     if (__pyx_t_2) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":660
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":660
  *         if index < 0:
  *             if self.bitset.trailing_bits:
  *                 raise OverflowError("It's impossible to retrieve a negative item from an infinite set.")             # <<<<<<<<<<<<<<
@@ -7438,7 +7438,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
     }
     __pyx_L6:;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":661
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":661
  *             if self.bitset.trailing_bits:
  *                 raise OverflowError("It's impossible to retrieve a negative item from an infinite set.")
  *             index = index + l             # <<<<<<<<<<<<<<
@@ -7449,7 +7449,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
     goto __pyx_L5;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":662
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":662
  *                 raise OverflowError("It's impossible to retrieve a negative item from an infinite set.")
  *             index = index + l
  *         elif index > maxelem:             # <<<<<<<<<<<<<<
@@ -7459,7 +7459,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   __pyx_t_1 = (__pyx_v_index > maxelem);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":663
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":663
  *             index = index + l
  *         elif index > maxelem:
  *             raise OverflowError("Index must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -7486,7 +7486,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":664
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":664
  *         elif index > maxelem:
  *             raise OverflowError("Index must be <= %s" % maxelem)
  *         if 0 <= index < l:             # <<<<<<<<<<<<<<
@@ -7499,7 +7499,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   }
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":665
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":665
  *             raise OverflowError("Index must be <= %s" % maxelem)
  *         if 0 <= index < l:
  *             last = intBitSetGetNext(self.bitset, -1)             # <<<<<<<<<<<<<<
@@ -7508,7 +7508,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
  */
     __pyx_v_last = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, -1);
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":666
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":666
  *         if 0 <= index < l:
  *             last = intBitSetGetNext(self.bitset, -1)
  *             for i from 0 <= i < index:             # <<<<<<<<<<<<<<
@@ -7518,7 +7518,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
     __pyx_t_5 = __pyx_v_index;
     for (__pyx_v_i = 0; __pyx_v_i < __pyx_t_5; __pyx_v_i++) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":667
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":667
  *             last = intBitSetGetNext(self.bitset, -1)
  *             for i from 0 <= i < index:
  *                 last = intBitSetGetNext(self.bitset, last)             # <<<<<<<<<<<<<<
@@ -7531,7 +7531,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   }
   /*else*/ {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":669
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":669
  *                 last = intBitSetGetNext(self.bitset, last)
  *         else:
  *             raise IndexError("intbitset index out of range")             # <<<<<<<<<<<<<<
@@ -7552,7 +7552,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   }
   __pyx_L7:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":670
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":670
  *         else:
  *             raise IndexError("intbitset index out of range")
  *         return last             # <<<<<<<<<<<<<<
@@ -7579,7 +7579,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_sorted_element(PyObject
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":672
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":672
  *         return last
  * 
  *     def to_sorted_list(self, int i, int j):             # <<<<<<<<<<<<<<
@@ -7645,7 +7645,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_L4_argument_unpacking_done:;
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":678
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":678
  *         cdef int last
  *         cdef int cnt
  *         if self.bitset.trailing_bits and (i < 0 or j < 0):             # <<<<<<<<<<<<<<
@@ -7664,7 +7664,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":679
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":679
  *         cdef int cnt
  *         if self.bitset.trailing_bits and (i < 0 or j < 0):
  *             raise OverflowError("It's impossible to retrieve a sublist using negative indices from an infinite set.")             # <<<<<<<<<<<<<<
@@ -7685,7 +7685,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
     goto __pyx_L6;
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":680
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":680
  *         if self.bitset.trailing_bits and (i < 0 or j < 0):
  *             raise OverflowError("It's impossible to retrieve a sublist using negative indices from an infinite set.")
  *         elif (i > maxelem or j > maxelem):             # <<<<<<<<<<<<<<
@@ -7699,7 +7699,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":681
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":681
  *             raise OverflowError("It's impossible to retrieve a sublist using negative indices from an infinite set.")
  *         elif (i > maxelem or j > maxelem):
  *             raise OverflowError("Indexes must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -7726,7 +7726,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   __pyx_L6:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":682
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":682
  *         elif (i > maxelem or j > maxelem):
  *             raise OverflowError("Indexes must be <= %s" % maxelem)
  *         l = intBitSetGetTot(self.bitset)             # <<<<<<<<<<<<<<
@@ -7735,7 +7735,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
  */
   __pyx_v_l = intBitSetGetTot(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":683
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":683
  *             raise OverflowError("Indexes must be <= %s" % maxelem)
  *         l = intBitSetGetTot(self.bitset)
  *         if i == 0 and j == -1:             # <<<<<<<<<<<<<<
@@ -7749,7 +7749,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":684
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":684
  *         l = intBitSetGetTot(self.bitset)
  *         if i == 0 and j == -1:
  *             return intbitset(self)             # <<<<<<<<<<<<<<
@@ -7772,7 +7772,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   __pyx_L7:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":685
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":685
  *         if i == 0 and j == -1:
  *             return intbitset(self)
  *         ret = intbitset()             # <<<<<<<<<<<<<<
@@ -7785,7 +7785,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_v_ret = __pyx_t_4;
   __pyx_t_4 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":686
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":686
  *             return intbitset(self)
  *         ret = intbitset()
  *         if i < 0:             # <<<<<<<<<<<<<<
@@ -7795,7 +7795,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_t_2 = (__pyx_v_i < 0);
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":687
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":687
  *         ret = intbitset()
  *         if i < 0:
  *             i = i + l             # <<<<<<<<<<<<<<
@@ -7807,7 +7807,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   __pyx_L8:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":688
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":688
  *         if i < 0:
  *             i = i + l
  *         if j < 0:             # <<<<<<<<<<<<<<
@@ -7817,7 +7817,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_t_2 = (__pyx_v_j < 0);
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":689
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":689
  *             i = i + l
  *         if j < 0:
  *             j = j + l             # <<<<<<<<<<<<<<
@@ -7829,7 +7829,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   __pyx_L9:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":690
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":690
  *         if j < 0:
  *             j = j + l
  *         if i >= l:             # <<<<<<<<<<<<<<
@@ -7839,7 +7839,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_t_2 = (__pyx_v_i >= __pyx_v_l);
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":691
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":691
  *             j = j + l
  *         if i >= l:
  *             i = l             # <<<<<<<<<<<<<<
@@ -7851,7 +7851,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   __pyx_L10:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":692
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":692
  *         if i >= l:
  *             i = l
  *         if j >= l:             # <<<<<<<<<<<<<<
@@ -7861,7 +7861,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_t_2 = (__pyx_v_j >= __pyx_v_l);
   if (__pyx_t_2) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":693
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":693
  *             i = l
  *         if j >= l:
  *             j = l             # <<<<<<<<<<<<<<
@@ -7873,7 +7873,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   }
   __pyx_L11:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":694
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":694
  *         if j >= l:
  *             j = l
  *         last = -1             # <<<<<<<<<<<<<<
@@ -7882,7 +7882,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
  */
   __pyx_v_last = -1;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":695
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":695
  *             j = l
  *         last = -1
  *         for cnt from 0 <= cnt < i:             # <<<<<<<<<<<<<<
@@ -7892,7 +7892,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_t_5 = __pyx_v_i;
   for (__pyx_v_cnt = 0; __pyx_v_cnt < __pyx_t_5; __pyx_v_cnt++) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":696
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":696
  *         last = -1
  *         for cnt from 0 <= cnt < i:
  *             last = intBitSetGetNext(self.bitset, last)             # <<<<<<<<<<<<<<
@@ -7902,7 +7902,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
     __pyx_v_last = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_last);
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":697
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":697
  *         for cnt from 0 <= cnt < i:
  *             last = intBitSetGetNext(self.bitset, last)
  *         for cnt from i <= cnt < j:             # <<<<<<<<<<<<<<
@@ -7912,7 +7912,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   __pyx_t_5 = __pyx_v_j;
   for (__pyx_v_cnt = __pyx_v_i; __pyx_v_cnt < __pyx_t_5; __pyx_v_cnt++) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":698
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":698
  *             last = intBitSetGetNext(self.bitset, last)
  *         for cnt from i <= cnt < j:
  *             last = intBitSetGetNext(self.bitset, last)             # <<<<<<<<<<<<<<
@@ -7921,7 +7921,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
  */
     __pyx_v_last = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_last);
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":699
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":699
  *         for cnt from i <= cnt < j:
  *             last = intBitSetGetNext(self.bitset, last)
  *             intBitSetAddElem((<intbitset> ret).bitset, last)             # <<<<<<<<<<<<<<
@@ -7931,7 +7931,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
     intBitSetAddElem(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_ret)->bitset, __pyx_v_last);
   }
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":700
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":700
  *             last = intBitSetGetNext(self.bitset, last)
  *             intBitSetAddElem((<intbitset> ret).bitset, last)
  *         return ret             # <<<<<<<<<<<<<<
@@ -7957,7 +7957,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_to_sorted_list(PyObject *__
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":702
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":702
  *         return ret
  * 
  *     def is_infinite(self):             # <<<<<<<<<<<<<<
@@ -7972,7 +7972,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_is_infinite(PyObject *__pyx
   PyObject *__pyx_t_1 = NULL;
   __Pyx_SetupRefcountContext("is_infinite");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":705
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":705
  *         """Return True if the intbitset is infinite. (i.e. trailing_bits=True
  *         was used in the constructor.)"""
  *         return self.bitset.trailing_bits != 0             # <<<<<<<<<<<<<<
@@ -7998,7 +7998,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_is_infinite(PyObject *__pyx
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":707
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":707
  *         return self.bitset.trailing_bits != 0
  * 
  *     def extract_finite_list(self, int up_to=-1):             # <<<<<<<<<<<<<<
@@ -8061,7 +8061,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
   __pyx_L4_argument_unpacking_done:;
   __pyx_v_ret = Py_None; __Pyx_INCREF(Py_None);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":715
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":715
  *         cdef int true_up_to
  *         cdef int last
  *         if self.sanity_checks and up_to > maxelem:             # <<<<<<<<<<<<<<
@@ -8075,7 +8075,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
   }
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":716
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":716
  *         cdef int last
  *         if self.sanity_checks and up_to > maxelem:
  *             raise OverflowError("up_to must be <= %s" % maxelem)             # <<<<<<<<<<<<<<
@@ -8102,7 +8102,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
   }
   __pyx_L6:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":717
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":717
  *         if self.sanity_checks and up_to > maxelem:
  *             raise OverflowError("up_to must be <= %s" % maxelem)
  *         ret = []             # <<<<<<<<<<<<<<
@@ -8115,7 +8115,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
   __pyx_v_ret = ((PyObject *)__pyx_t_3);
   __pyx_t_3 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":718
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":718
  *             raise OverflowError("up_to must be <= %s" % maxelem)
  *         ret = []
  *         true_up_to = max(up_to, (intBitSetGetSize(self.bitset)) * wordbitsize)             # <<<<<<<<<<<<<<
@@ -8141,7 +8141,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
   __Pyx_DECREF(__pyx_t_2); __pyx_t_2 = 0;
   __pyx_v_true_up_to = __pyx_t_5;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":719
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":719
  *         ret = []
  *         true_up_to = max(up_to, (intBitSetGetSize(self.bitset)) * wordbitsize)
  *         last = -1             # <<<<<<<<<<<<<<
@@ -8150,7 +8150,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
  */
   __pyx_v_last = -1;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":720
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":720
  *         true_up_to = max(up_to, (intBitSetGetSize(self.bitset)) * wordbitsize)
  *         last = -1
  *         while last < true_up_to:             # <<<<<<<<<<<<<<
@@ -8161,7 +8161,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
     __pyx_t_1 = (__pyx_v_last < __pyx_v_true_up_to);
     if (!__pyx_t_1) break;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":721
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":721
  *         last = -1
  *         while last < true_up_to:
  *             last = intBitSetGetNext(self.bitset, last)             # <<<<<<<<<<<<<<
@@ -8170,7 +8170,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
  */
     __pyx_v_last = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset, __pyx_v_last);
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":722
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":722
  *         while last < true_up_to:
  *             last = intBitSetGetNext(self.bitset, last)
  *             if last == -2:             # <<<<<<<<<<<<<<
@@ -8180,7 +8180,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
     __pyx_t_1 = (__pyx_v_last == -2);
     if (__pyx_t_1) {
 
-      /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":723
+      /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":723
  *             last = intBitSetGetNext(self.bitset, last)
  *             if last == -2:
  *                 break             # <<<<<<<<<<<<<<
@@ -8192,7 +8192,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
     }
     __pyx_L9:;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":724
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":724
  *             if last == -2:
  *                 break
  *             ret.append(last)             # <<<<<<<<<<<<<<
@@ -8208,7 +8208,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
   }
   __pyx_L8_break:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":725
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":725
  *                 break
  *             ret.append(last)
  *         return ret             # <<<<<<<<<<<<<<
@@ -8235,7 +8235,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_extract_finite_list(PyObjec
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":727
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":727
  *         return ret
  * 
  *     def get_wordbitsize(self):             # <<<<<<<<<<<<<<
@@ -8249,7 +8249,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_wordbitsize(PyObject *_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_SetupRefcountContext("get_wordbitsize");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":728
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":728
  * 
  *     def get_wordbitsize(self):
  *         return wordbitsize             # <<<<<<<<<<<<<<
@@ -8275,7 +8275,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_wordbitsize(PyObject *_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":730
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":730
  *         return wordbitsize
  * 
  *     def get_wordbytsize(self):             # <<<<<<<<<<<<<<
@@ -8289,7 +8289,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_wordbytsize(PyObject *_
   PyObject *__pyx_t_1 = NULL;
   __Pyx_SetupRefcountContext("get_wordbytsize");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":731
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":731
  * 
  *     def get_wordbytsize(self):
  *         return wordbytesize             # <<<<<<<<<<<<<<
@@ -8315,7 +8315,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_get_wordbytsize(PyObject *_
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":733
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":733
  *         return wordbytesize
  * 
  *     def tolist(self):             # <<<<<<<<<<<<<<
@@ -8332,7 +8332,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_tolist(PyObject *__pyx_v_se
   PyObject *__pyx_t_3 = NULL;
   __Pyx_SetupRefcountContext("tolist");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":737
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":737
  *         intbitset.
  *         """
  *         if self.bitset.trailing_bits:             # <<<<<<<<<<<<<<
@@ -8342,7 +8342,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_tolist(PyObject *__pyx_v_se
   __pyx_t_1 = ((struct __pyx_obj_3lib_9intbitset_intbitset *)__pyx_v_self)->bitset->trailing_bits;
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":738
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":738
  *         """
  *         if self.bitset.trailing_bits:
  *             raise OverflowError("It's impossible to retrieve a list of an infinite set")             # <<<<<<<<<<<<<<
@@ -8364,7 +8364,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_tolist(PyObject *__pyx_v_se
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":739
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":739
  *         if self.bitset.trailing_bits:
  *             raise OverflowError("It's impossible to retrieve a list of an infinite set")
  *         return self.extract_finite_list()             # <<<<<<<<<<<<<<
@@ -8394,7 +8394,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_9intbitset_tolist(PyObject *__pyx_v_se
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":746
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":746
  *     cdef bint sanity_checks
  * 
  *     def __cinit__(self, intbitset bitset not None):             # <<<<<<<<<<<<<<
@@ -8442,7 +8442,7 @@ static int __pyx_pf_3lib_9intbitset_18intbitset_iterator___cinit__(PyObject *__p
   __pyx_L4_argument_unpacking_done:;
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_bitset), __pyx_ptype_3lib_9intbitset_intbitset, 0, "bitset", 0))) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 746; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":747
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":747
  * 
  *     def __cinit__(self, intbitset bitset not None):
  *         self.last = -1             # <<<<<<<<<<<<<<
@@ -8451,7 +8451,7 @@ static int __pyx_pf_3lib_9intbitset_18intbitset_iterator___cinit__(PyObject *__p
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->last = -1;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":750
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":750
  *         ## A copy should be performed, in case the original bitset disappears
  *         ## as in "for x in intbitset([1,2,3])"!
  *         self.bitset = intBitSetClone(bitset.bitset)             # <<<<<<<<<<<<<<
@@ -8460,7 +8460,7 @@ static int __pyx_pf_3lib_9intbitset_18intbitset_iterator___cinit__(PyObject *__p
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->bitset = intBitSetClone(__pyx_v_bitset->bitset);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":751
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":751
  *         ## as in "for x in intbitset([1,2,3])"!
  *         self.bitset = intBitSetClone(bitset.bitset)
  *         self.sanity_checks = CFG_INTBITSET_ENABLE_SANITY_CHECKS             # <<<<<<<<<<<<<<
@@ -8484,7 +8484,7 @@ static int __pyx_pf_3lib_9intbitset_18intbitset_iterator___cinit__(PyObject *__p
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":753
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":753
  *         self.sanity_checks = CFG_INTBITSET_ENABLE_SANITY_CHECKS
  * 
  *     def __dealloc__(self):             # <<<<<<<<<<<<<<
@@ -8497,7 +8497,7 @@ static void __pyx_pf_3lib_9intbitset_18intbitset_iterator___dealloc__(PyObject *
   int __pyx_t_1;
   __Pyx_SetupRefcountContext("__dealloc__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":754
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":754
  * 
  *     def __dealloc__(self):
  *         if self.bitset:             # <<<<<<<<<<<<<<
@@ -8507,7 +8507,7 @@ static void __pyx_pf_3lib_9intbitset_18intbitset_iterator___dealloc__(PyObject *
   __pyx_t_1 = (((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->bitset != 0);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":755
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":755
  *     def __dealloc__(self):
  *         if self.bitset:
  *             intBitSetDestroy(self.bitset)             # <<<<<<<<<<<<<<
@@ -8522,7 +8522,7 @@ static void __pyx_pf_3lib_9intbitset_18intbitset_iterator___dealloc__(PyObject *
   __Pyx_FinishRefcountContext();
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":757
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":757
  *             intBitSetDestroy(self.bitset)
  * 
  *     def __next__(self):             # <<<<<<<<<<<<<<
@@ -8539,7 +8539,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   PyObject *__pyx_t_4 = NULL;
   __Pyx_SetupRefcountContext("__next__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":758
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":758
  * 
  *     def __next__(self):
  *         if self.last == -2:             # <<<<<<<<<<<<<<
@@ -8549,7 +8549,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   __pyx_t_1 = (((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->last == -2);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":759
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":759
  *     def __next__(self):
  *         if self.last == -2:
  *             raise StopIteration()             # <<<<<<<<<<<<<<
@@ -8565,7 +8565,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   }
   __pyx_L5:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":760
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":760
  *         if self.last == -2:
  *             raise StopIteration()
  *         self.last = intBitSetGetNext(self.bitset, self.last)             # <<<<<<<<<<<<<<
@@ -8574,7 +8574,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
  */
   ((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->last = intBitSetGetNext(((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->bitset, ((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->last);
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":761
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":761
  *             raise StopIteration()
  *         self.last = intBitSetGetNext(self.bitset, self.last)
  *         if self.sanity_checks and (self.bitset.allocated < self.bitset.size):             # <<<<<<<<<<<<<<
@@ -8588,7 +8588,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   }
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":762
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":762
  *         self.last = intBitSetGetNext(self.bitset, self.last)
  *         if self.sanity_checks and (self.bitset.allocated < self.bitset.size):
  *             raise MemoryError("intbitset corrupted: allocated: %s, size: %s" % (self.bitset.allocated, self.bitset.size))             # <<<<<<<<<<<<<<
@@ -8625,7 +8625,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   }
   __pyx_L6:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":763
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":763
  *         if self.sanity_checks and (self.bitset.allocated < self.bitset.size):
  *             raise MemoryError("intbitset corrupted: allocated: %s, size: %s" % (self.bitset.allocated, self.bitset.size))
  *         if self.last < 0:             # <<<<<<<<<<<<<<
@@ -8635,7 +8635,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   __pyx_t_1 = (((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->last < 0);
   if (__pyx_t_1) {
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":764
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":764
  *             raise MemoryError("intbitset corrupted: allocated: %s, size: %s" % (self.bitset.allocated, self.bitset.size))
  *         if self.last < 0:
  *             self.last = -2             # <<<<<<<<<<<<<<
@@ -8644,7 +8644,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
  */
     ((struct __pyx_obj_3lib_9intbitset_intbitset_iterator *)__pyx_v_self)->last = -2;
 
-    /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":765
+    /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":765
  *         if self.last < 0:
  *             self.last = -2
  *             raise StopIteration()             # <<<<<<<<<<<<<<
@@ -8660,7 +8660,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   }
   __pyx_L7:;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":766
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":766
  *             self.last = -2
  *             raise StopIteration()
  *         return self.last             # <<<<<<<<<<<<<<
@@ -8688,7 +8688,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___next__(PyObject
   return __pyx_r;
 }
 
-/* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":768
+/* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":768
  *         return self.last
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<
@@ -8700,7 +8700,7 @@ static PyObject *__pyx_pf_3lib_9intbitset_18intbitset_iterator___iter__(PyObject
   PyObject *__pyx_r = NULL;
   __Pyx_SetupRefcountContext("__iter__");
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":769
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":769
  * 
  *     def __iter__(self):
  *         return self             # <<<<<<<<<<<<<<
@@ -9389,7 +9389,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   /*--- Function import code ---*/
   /*--- Execution code ---*/
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":18
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":18
  * ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  * 
  * __revision__ = "$Id$"             # <<<<<<<<<<<<<<
@@ -9398,7 +9398,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
  */
   if (PyObject_SetAttr(__pyx_m, __pyx_kp___revision__, __pyx_kp_3) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 18; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":19
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":19
  * 
  * __revision__ = "$Id$"
  * __apilevel__ = 1.03             # <<<<<<<<<<<<<<
@@ -9410,7 +9410,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   if (PyObject_SetAttr(__pyx_m, __pyx_kp___apilevel__, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 19; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":42
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":42
  * """
  * 
  * import zlib             # <<<<<<<<<<<<<<
@@ -9422,7 +9422,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   if (PyObject_SetAttr(__pyx_m, __pyx_kp_zlib, __pyx_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 42; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_1); __pyx_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":43
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":43
  * 
  * import zlib
  * from array import array             # <<<<<<<<<<<<<<
@@ -9443,7 +9443,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   __Pyx_DECREF(__pyx_2); __pyx_2 = 0;
   __Pyx_DECREF(__pyx_1); __pyx_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":44
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":44
  * import zlib
  * from array import array
  * from invenio.config import CFG_INTBITSET_ENABLE_SANITY_CHECKS             # <<<<<<<<<<<<<<
@@ -9464,7 +9464,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   __Pyx_DECREF(__pyx_2); __pyx_2 = 0;
   __Pyx_DECREF(__pyx_1); __pyx_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":46
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":46
  * from invenio.config import CFG_INTBITSET_ENABLE_SANITY_CHECKS
  * 
  * __all__ = ['intbitset']             # <<<<<<<<<<<<<<
@@ -9479,7 +9479,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   if (PyObject_SetAttr(__pyx_m, __pyx_kp___all__, ((PyObject *)__pyx_t_1)) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 46; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(((PyObject *)__pyx_t_1)); __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":92
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":92
  *     unsigned char intBitSetCmp(IntBitSet *x, IntBitSet *y)
  * 
  * __maxelem__ = maxelem             # <<<<<<<<<<<<<<
@@ -9491,7 +9491,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   if (PyObject_SetAttr(__pyx_m, __pyx_kp___maxelem__, __pyx_t_1) < 0) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 92; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
   __Pyx_DECREF(__pyx_t_1); __pyx_t_1 = 0;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":135
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":135
  *     cdef bint sanity_checks
  * 
  *     def __cinit__(self, rhs=0, int preallocate=-1, int trailing_bits=0, bint sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):             # <<<<<<<<<<<<<<
@@ -9504,7 +9504,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
   __Pyx_DECREF(__pyx_1); __pyx_1 = 0;
   __pyx_k_7 = __pyx_t_2;
 
-  /* "/mnt/disk1/build/cds-invenio/modules/miscutil/lib/intbitset.pyx":768
+  /* "/mnt/disk1/build/invenio/modules/miscutil/lib/intbitset.pyx":768
  *         return self.last
  * 
  *     def __iter__(self):             # <<<<<<<<<<<<<<

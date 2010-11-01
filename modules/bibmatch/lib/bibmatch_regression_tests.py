@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002-2010 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 # pylint: disable=E1102
@@ -738,7 +738,7 @@ class BibMatchTest(unittest.TestCase):
     <subfield code="m">G. Koutsoumbas, S. Musiri, E. Papantonopoulos and G. Siopsis, in preparation.</subfield>
   </datafield>
   <datafield tag="999" ind1="C" ind2="6">
-    <subfield code="a">CDS Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181414732-0-36-41-0-2</subfield>
+    <subfield code="a">Invenio/0.92.0.20070116 refextract/0.92.0.20070116-1181414732-0-36-41-0-2</subfield>
   </datafield>
 </record>
 

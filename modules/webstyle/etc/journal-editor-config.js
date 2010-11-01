@@ -1,4 +1,4 @@
-/*Define here the config of the FCKEditor used in CDS Invenio for
+/*Define here the config of the FCKEditor used in Invenio for
   journal articles submission.
 
   Users/admin:

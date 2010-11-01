@@ -1,20 +1,20 @@
 ## -*- mode: html; coding: utf-8; -*-
 
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibIndex Admin Guide -->
@@ -193,7 +193,7 @@ to shape are commands like: (assuming the problem is with the index ID
 <blockquote>
 <pre>
   $ echo "DELETE FROM idxWORD01R WHERE type='TEMPORARY' or type='FUTURE';" | \
-    /opt/cds-invenio/bin/dbexec
+    /opt/invenio/bin/dbexec
 </pre>
 </blockquote>
 
@@ -219,7 +219,7 @@ browsable while the indexes are being rebuilt. The steps to perform are:</p>
 <pre>
   $ bibindex --reindex -f50000 -wcollection # reindex the collection index (fast)
   $ echo "UPDATE collection SET reclist=NULL;" | \
-    /opt/cds-invenio/bin/dbexec # clean collection cache
+    /opt/invenio/bin/dbexec # clean collection cache
   $ webcoll -f # recreate the collection cache
   $ bibsched # run the two above-submitted tasks
   $ sudo apachectl restart
@@ -242,11 +242,11 @@ browsable while the indexes are being rebuilt. The steps to perform are:</p>
 <blockquote>
 <pre>
   $ bibsched # wait for all active tasks to finish, and put the queue into manual mode
-  $ cd cds-invenio-0.92.1 # source dir
+  $ cd invenio-0.92.1 # source dir
   $ grep rnkWORD ./modules/miscutil/sql/tabbibclean.sql | \
-    /opt/cds-invenio/bin/dbexec # truncate rank indexes
+    /opt/invenio/bin/dbexec # truncate rank indexes
   $ echo "UPDATE rnkMETHOD SET last_updated='0000-00-00 00:00:00';" | \
-    /opt/cds-invenio/bin/dbexec # rewind the last ranking time
+    /opt/invenio/bin/dbexec # rewind the last ranking time
 </pre>
 </blockquote></p>
 
@@ -257,17 +257,17 @@ truncate them too:
 <blockquote>
 <pre>
 &nbsp; # find out which custom ranking indexes were added:
-&nbsp; $ echo "SELECT id FROM rnkMETHOD" | /opt/cds-invenio/bin/dbexec
+&nbsp; $ echo "SELECT id FROM rnkMETHOD" | /opt/invenio/bin/dbexec
 &nbsp; id
 &nbsp; 66
 &nbsp; 67
 &nbsp; [...]
 &nbsp;
 &nbsp; # for every ranking index id, truncate corresponding ranking tables:
-&nbsp; $ echo "TRUNCATE rnkWORD66F" | /opt/cds-invenio/bin/dbexec
-&nbsp; $ echo "TRUNCATE rnkWORD66R" | /opt/cds-invenio/bin/dbexec
-&nbsp; $ echo "TRUNCATE rnkWORD67F" | /opt/cds-invenio/bin/dbexec
-&nbsp; $ echo "TRUNCATE rnkWORD67R" | /opt/cds-invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE rnkWORD66F" | /opt/invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE rnkWORD66R" | /opt/invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE rnkWORD67F" | /opt/invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE rnkWORD67R" | /opt/invenio/bin/dbexec
 </pre>
 </blockquote></p>
 
@@ -283,7 +283,7 @@ truncate them too:
 
 and we are done.</p>
 
-<p>In the future CDS Invenio should ideally run indexing into
+<p>In the future Invenio should ideally run indexing into
 invisible tables that would be switched against the production ones
 once the indexing process is successfully over.  For the time being,
 if reindexing takes several hours in your installation (e.g. if you

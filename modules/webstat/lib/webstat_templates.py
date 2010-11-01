@@ -1,18 +1,18 @@
-## This file is part of CDS Invenio.
+## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
-## CDS Invenio is free software; you can redistribute it and/or
+## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
 ## published by the Free Software Foundation; either version 2 of the
 ## License, or (at your option) any later version.
 ##
-## CDS Invenio is distributed in the hope that it will be useful, but
+## Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
@@ -30,7 +30,7 @@ class Template:
         """
         Generates a welcome page for the Webstat module.
         """
-        return """<p>On these pages, you can review measurements of CDS Invenio usage
+        return """<p>On these pages, you can review measurements of Invenio usage
                      and performance. Output is available in several formats, and its
                      raw data can be exported for offline processing. Further on, a general
                      overview is presented below under the label Current System Health.</p>"""
@@ -77,7 +77,7 @@ class Template:
         Generates a list of available custom statistics.
         """
         out = """<h3>Custom events</h3>
-                 <p>The Webstat module supplies a mean for the administrators of CDS Invenio
+                 <p>The Webstat module supplies a mean for the administrators of Invenio
                  to define their own custom events, more abstract than the Key Statistics above.
                  A technical walk-through how to create these, is available <a href="%s/stats/customevent_help">here</a>.
                  When a custom event has been made available, it is displayed below.</p>
@@ -118,7 +118,7 @@ class Template:
                   <h3>How to create a new custom event</h3>
 
                   <ol>
-                    <li>Edit <strong>/opt/cds-invenio/etc/webstat/webstat.cfg</strong> adding
+                    <li>Edit <strong>/opt/invenio/etc/webstat/webstat.cfg</strong> adding
                     the definition of the customevent:
                     <pre>
                     [webstat_custom_event_1]

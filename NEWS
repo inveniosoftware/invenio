@@ -1,7 +1,7 @@
-CDS Invenio NEWS
-================
+Invenio NEWS
+============
 
-Here is a short summary of the most notable changes in CDS Invenio
+Here is a short summary of the most notable changes in Invenio
 releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
@@ -573,7 +573,7 @@ CDS Invenio v0.90.0 -- released 2006-06-30
 
  *) formerly known as CDSware; the application name change clarifies
     the relationship with respect to the CDS Sofware Consortium
-    producing two flagship applications (CDS Indico and CDS Invenio)
+    producing two flagship applications (CDS Indico and Invenio)
 
  *) version number increased to v0.90 in the anticipation of the
     forthcoming v1.0 release after all the major codebase changes are
