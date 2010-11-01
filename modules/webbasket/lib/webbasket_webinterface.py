@@ -172,14 +172,14 @@ class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
         if not argd['file'] is None:
             # Prepare path to file on disk. Normalize the path so that
             # ../ and other dangerous components are removed.
-            path = os.path.abspath('/opt/cds-invenio/var/data/baskets/comments/' + \
+            path = os.path.abspath(CFG_PREFIX + '/var/data/baskets/comments/' + \
                                    str(argd['bskid']) + '/'  + str(argd['recid']) + '/' + \
                                    str(argd['uid']) + '/' + argd['type'] + '/' + \
                                    argd['file'])
 
             # Check that we are really accessing attachements
             # directory, for the declared basket and record.
-            if path.startswith('/opt/cds-invenio/var/data/baskets/comments/' + \
+            if path.startswith(CFG_PREFIX + '/var/data/baskets/comments/' + \
                                str(argd['bskid']) + '/' + str(argd['recid'])) and \
                                os.path.exists(path):
                 return stream_file(req, path)

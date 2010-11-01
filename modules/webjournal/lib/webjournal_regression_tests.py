@@ -27,7 +27,8 @@ import urllib
 from invenio import webjournal_utils as wju
 from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_LANG, \
-                           CFG_SITE_SUPPORT_EMAIL
+                           CFG_SITE_SUPPORT_EMAIL, \
+			   CFG_PREFIX
 from invenio.testutils import make_test_suite, run_test_suite
 
 class ArticlesRelated(unittest.TestCase):
@@ -231,13 +232,13 @@ class JournalRelated(unittest.TestCase):
     def test_get_journal_info_path(self):
         """webjournal - returns the path to the info file of the given journal"""
         info = wju.get_journal_info_path('AtlantisTimes')
-        path = '/opt/cds-invenio/var/cache/webjournal/AtlantisTimes/info.dat'
+        path = CFG_PREFIX + '/var/cache/webjournal/AtlantisTimes/info.dat'
         self.assertEqual(info, path)
 
     def test_get_journal_article_cache_path(self):
         """webjournal - returns the path to cache file of the articles of a given issue"""
         info = wju.get_journal_article_cache_path('AtlantisTimes', '03/2009')
-        path = '/opt/cds-invenio/var/cache/webjournal/AtlantisTimes/03_2009_articles_cache.dat'
+        path = CFG_PREFIX + '/var/cache/webjournal/AtlantisTimes/03_2009_articles_cache.dat'
         self.assertEqual(info, path)
 
     def test_get_journal_id(self):

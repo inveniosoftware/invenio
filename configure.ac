@@ -178,6 +178,18 @@ if test -z "$PS2PDF"; then
    <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
 fi
 
+## Check for pdflatex:
+AC_PATH_PROG(PDFLATEX, pdflatex)
+if test -z "$PDFLATEX"; then
+   AC_MSG_WARN([
+   pdflatex was not found in your PATH.  It is used in
+   the WebSubmit module to stamp PDF files.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.])
+fi
+
+
 ## Check for tiff2pdf:
 AC_PATH_PROG(TIFF2PDF, tiff2pdf)
 if test -z "$TIFF2PDF"; then

@@ -42,6 +42,7 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_URL, \
+     CFG_PREFIX, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
      CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS
@@ -748,13 +749,13 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         if not argd['file'] is None:
             # Prepare path to file on disk. Normalize the path so that
             # ../ and other dangerous components are removed.
-            path = os.path.abspath('/opt/cds-invenio/var/data/comments/' + \
+            path = os.path.abspath(CFG_PREFIX + '/var/data/comments/' + \
                                    str(self.recid) + '/'  + str(argd['comid']) + \
                                    '/' + argd['file'])
 
             # Check that we are really accessing attachements
             # directory, for the declared record.
-            if path.startswith('/opt/cds-invenio/var/data/comments/' + \
+            if path.startswith(CFG_PREFIX + '/var/data/comments/' + \
                                str(self.recid)) and \
                    os.path.exists(path):
                 return stream_file(req, path)

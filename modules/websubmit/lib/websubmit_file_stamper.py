@@ -38,7 +38,10 @@ __revision__ = "$Id$"
 
 
 import getopt, sys, re, os, time, shutil, tempfile
-from invenio.config import CFG_PATH_PS2PDF, CFG_PATH_GFILE
+from invenio.config import \
+	CFG_PATH_PS2PDF, \
+	CFG_PATH_GFILE,\
+	CFG_PATH_PDFLATEX
 from invenio.errorlib import register_exception
 from invenio.config import CFG_TMPDIR
 from invenio.config import CFG_ETCDIR
@@ -455,12 +458,13 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     ## The name that will be givem to the PDF stamp file:
     pdf_stamp_name = "%s.pdf" % os.path.splitext(final_template)[0]
     ## Now, build the Stamp PDF from the LaTeX template:
-    cmd_latex = """cd %(workingdir)s; /usr/bin/pdflatex """ \
+    cmd_latex = """cd %(workingdir)s; %(path_pdflatex)s """ \
                 """-interaction=batchmode """ \
                 """%(template-path)s > /dev/null 2>&1""" \
                 % { 'template-path' : escape_shell_arg("%s/%s" \
                                           % (path_workingdir, final_template)),
                     'workingdir'    : path_workingdir,
+                    'path_pdflatex' : CFG_PATH_PDFLATEX,
                   }
     ## Log the latex command
     os.system("""echo %s > %s""" % (escape_shell_arg(cmd_latex), \
@@ -515,12 +519,13 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
         ## The name that will be givem to the PDF stamp file:
         pdf_stamp_name = "%s.pdf" % os.path.splitext(final_template)[0]
         ## Now, build the Stamp PDF from the LaTeX template:
-        cmd_latex = """cd %(workingdir)s; /usr/bin/pdflatex """ \
+        cmd_latex = """cd %(workingdir)s; %(path_pdflatex)s """ \
                     """-interaction=batchmode """ \
                     """%(template-path)s > /dev/null 2>&1""" \
                     % { 'template-path' : escape_shell_arg("%s/%s" \
                                           % (path_workingdir, final_template)),
                         'workingdir'    : path_workingdir,
+                        'path_pdflatex' : CFG_PATH_PDFLATEX,
                       }
         ## Log the latex command
         os.system("""echo %s > %s""" \
