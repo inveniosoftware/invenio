@@ -1,7 +1,7 @@
 ## $id: Mail_Approval_Request_to_Committee_Chair.py,v 0.01 2008/07/25 18:33:44 tibor Exp $
 
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as

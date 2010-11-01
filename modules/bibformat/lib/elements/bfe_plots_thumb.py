@@ -3,7 +3,7 @@
 ## $Id: bfe_CERN_plots.py,v 1.3 2009/03/17 10:55:15 jerome Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
