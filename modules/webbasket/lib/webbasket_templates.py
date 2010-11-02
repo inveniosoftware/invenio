@@ -1972,6 +1972,7 @@ class Template:
             #delete_basket = """<small>%s</small>""" % (_("You cannot delete this basket"),)
             edit_basket = ""
             delete_basket = ""
+            add_ext_resource = ""
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
             unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
@@ -2048,6 +2049,7 @@ class Template:
         else:
             edit_basket = ""
             delete_basket = ""
+            add_ext_resource = ""
         if selected_category==CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
             unsubscribe_url = """%s/yourbaskets/unsubscribe?bskid=%i&amp;ln=%s""" % (CFG_SITE_URL, bskid, ln)
             unsubscribe_logo = """<img src="%s/img/wb-unsubscribe.png" />""" % (CFG_SITE_URL,)
