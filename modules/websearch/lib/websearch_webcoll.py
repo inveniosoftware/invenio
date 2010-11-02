@@ -210,8 +210,13 @@ class Collection:
             res = run_sql(query, None, 1)
             if res:
                 col_ancestor = get_collection(res[0][1])
-                ancestors.append(col_ancestor)
-                id_son = res[0][0]
+                # looking for loops
+                if col_ancestor in ancestors:
+                    write_message("Loop found in collection %s" % self.name, stream=sys.stderr)
+                    raise OverflowError
+                else:
+                    ancestors.append(col_ancestor)
+                    id_son = res[0][0]
             else:
                 break
         ancestors.reverse()
@@ -246,8 +251,13 @@ class Collection:
         res = run_sql(query)
         for row in res:
             col_desc = get_collection(row[1])
-            descendants.append(col_desc)
-            descendants += col_desc.get_descendants()
+            # looking for loops
+            if col_desc in descendants:
+                write_message("Loop found in collection %s" % self.namee, stream=sys.stderr)
+                raise OverflowError
+            else:
+                descendants.append(col_desc)
+                descendants += col_desc.get_descendants()
         return descendants
 
     def write_cache_file(self, filename='', filebody=''):

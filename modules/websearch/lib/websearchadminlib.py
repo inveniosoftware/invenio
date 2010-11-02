@@ -2905,7 +2905,8 @@ def check_col(add_dad, add_son):
             res = run_sql("SELECT id_dad FROM collection_collection WHERE id_son=%s", (colID, ))
             for id in res:
                 if int(id[0]) == int(add_son):
-                    raise StandardError
+                    # raise StandardError # this was the original but it didnt work
+                    return(0)
                 else:
                     stack.append(id[0])
         return (1, "")
