@@ -69,6 +69,7 @@ from zlib import compress
 import socket
 import marshal
 import copy
+import tempfile
 
 from invenio.config import CFG_OAI_ID_FIELD, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
@@ -120,6 +121,8 @@ stat['nb_records_inserted'] = 0
 stat['nb_errors'] = 0
 stat['nb_holdingpen'] = 0
 stat['exectime'] = time.localtime()
+
+_WRITING_RIGHTS = None
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
@@ -1926,15 +1929,21 @@ def task_submit_check_options():
 def writing_rights_p():
     """Return True in case bibupload has the proper rights to write in the
     fulltext file folder."""
-    filename = os.path.join(CFG_WEBSUBMIT_FILEDIR, 'test.txt')
+    global _WRITING_RIGHTS
+    if _WRITING_RIGHTS is not None:
+        return _WRITING_RIGHTS
     try:
         if not os.path.exists(CFG_WEBSUBMIT_FILEDIR):
             os.makedirs(CFG_WEBSUBMIT_FILEDIR)
-        open(filename, 'w').write('TEST')
-        assert(open(filename).read() == 'TEST')
+        fd, filename = tempfile.mkstemp(suffix='.txt', prefix='test', dir=CFG_WEBSUBMIT_FILEDIR)
+        test = os.fdopen(fd, 'w')
+        test.write('TEST')
+        test.close()
+        if open(filename).read() != 'TEST':
+            raise IOError("Can not successfully write and readback %s" % filename)
         os.remove(filename)
     except:
-        register_exception()
+        register_exception(alert_admin=True)
         return False
     return True
 
