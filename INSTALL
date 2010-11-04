@@ -473,30 +473,41 @@ Contents
           Customize your Invenio installation.  Please read the
           'invenio.conf' file located in the same directory that
           contains the vanilla default configuration parameters of
-          your Invenio installation.  If you want to customize
-          some of these parameters, you should create a file named
+          your Invenio installation.  If you want to customize some of
+          these parameters, you should create a file named
           'invenio-local.conf' in the same directory where
-          'invenio.conf' lives and write there only the customizations
-          that you want to be different from the vanilla defaults.
+          'invenio.conf' lives and you should write there only the
+          customizations that you want to be different from the
+          vanilla defaults.
 
-          Here is a minimalist example what you would put there:
+          Here is a realistic, minimalist, yet production-ready
+          example of what you would typically put there:
 
              $ cat /opt/invenio/etc/invenio-local.conf
              [Invenio]
+             CFG_SITE_NAME = John Doe's Document Server
+             CFG_SITE_NAME_INTL_fr = Serveur des Documents de John Doe
              CFG_SITE_URL = http://your.site.com
              CFG_SITE_SECURE_URL = https://your.site.com
              CFG_SITE_ADMIN_EMAIL = john.doe@your.site.com
              CFG_SITE_SUPPORT_EMAIL = john.doe@your.site.com
+             CFG_WEBALERT_ALERT_ENGINE_EMAIL = john.doe@your.site.com
+             CFG_WEBCOMMENT_ALERT_ENGINE_EMAIL = john.doe@your.site.com
+             CFG_WEBCOMMENT_DEFAULT_MODERATOR = john.doe@your.site.com
+             CFG_DATABASE_HOST = localhost
+             CFG_DATABASE_NAME = invenio
+             CFG_DATABASE_USER = invenio
+             CFG_DATABASE_PASS = my123p$ss
 
-          You should override at least the parameters from the top of
-          invenio.conf file in order to define some very essential
-          runtime parameters such as the visible URL of your document
-          server (look for CFG_SITE_URL and CFG_SITE_SECURE_URL), the
-          database credentials (look for CFG_DATABASE_*), the name of
-          your document server (look for CFG_SITE_NAME and
-          CFG_SITE_NAME_INTL_*), or the email address of the local
-          Invenio administrator (look for CFG_SITE_SUPPORT_EMAIL and
-          CFG_SITE_ADMIN_EMAIL).
+          You should override at least the parameters mentioned above
+          in order to define some very essential runtime parameters
+          such as the name of your document server (CFG_SITE_NAME and
+          CFG_SITE_NAME_INTL_*), the visible URL of your document
+          server (CFG_SITE_URL and CFG_SITE_SECURE_URL), the email
+          address of the local Invenio administrator, comment
+          moderator, and alert engine (CFG_SITE_SUPPORT_EMAIL,
+          CFG_SITE_ADMIN_EMAIL, etc), and last but not least your
+          database credentials (CFG_DATABASE_*).
 
           The Invenio system will then read both the default
           invenio.conf file and your customized invenio-local.conf
