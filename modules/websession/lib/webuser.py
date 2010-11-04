@@ -529,7 +529,7 @@ def loginUser(req, p_un, p_pw, login_method):
             else:
                 return([], p_email, p_pw, 15)
         except InvenioWebAccessExternalAuthError:
-            register_exception(alert_admin=True)
+            register_exception(req=req, alert_admin=True)
             raise
         if p_email: # Authenthicated externally
             query_result = run_sql("SELECT id from user where email=%s", (p_email,))
@@ -542,7 +542,7 @@ def loginUser(req, p_un, p_pw, login_method):
                     except (AttributeError, NotImplementedError):
                         pass
                     except:
-                        register_exception(alert_admin=True)
+                        register_exception(req=req, alert_admin=True)
                         raise
                 res = registerUser(req, p_email, p_pw_local, p_nickname,
                         register_without_nickname=p_nickname == '',
@@ -568,7 +568,7 @@ def loginUser(req, p_un, p_pw, login_method):
             except (AttributeError, NotImplementedError):
                 pass
             except:
-                register_exception(alert_admin=True)
+                register_exception(req=req, alert_admin=True)
                 return([], p_email, p_pw, 16)
             else: # Groups synchronization
                 if groups:

@@ -71,7 +71,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     _exports = ['', 'edit', 'change', 'lost', 'display',
                 'send_email', 'youradminactivities', 'access',
                 'delete', 'logout', 'login', 'register', 'resetpassword',
-                'robotlogin']
+                'robotlogin', 'robotlogout']
 
     _force_https = True
 
@@ -683,8 +683,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     lastupdated=__lastupdated__,
                     navmenuid='youraccount')
 
+    def robotlogout(self, req, form):
+        """
+        Implement logout method for external service providers.
+        """
+        webuser.logoutUser(req)
+        redirect_to_url(req, "%s/img/pix.png" % CFG_SITE_URL)
 
     def robotlogin(self, req, form):
+        """
+        Implement authentication method for external service providers.
+        """
         from invenio.external_authentication import InvenioWebAccessExternalAuthError
         args = wash_urlargd(form, {
             'login_method': (str, None),
