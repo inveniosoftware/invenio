@@ -18,7 +18,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, var=''):
+def format_element(bfo, var=''):
     '''
     Print several client specific variables.
     @param var: the name of the desired variable. Can be one of: ln, search_pattern, uid, referer, uri, nickname, email

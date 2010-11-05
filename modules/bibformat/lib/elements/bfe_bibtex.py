@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG
 
-def format(bfo, width="50"):
+def format_element(bfo, width="50"):
     """
     Prints a full BibTeX record.
 
@@ -43,7 +43,7 @@ def format(bfo, width="50"):
 
     #Print entry type
     import invenio.bibformat_elements.bfe_collection as bfe_collection
-    collection = bfe_collection.format(bfo=bfo, kb="DBCOLLID2BIBTEX")
+    collection = bfe_collection.format_element(bfo=bfo, kb="DBCOLLID2BIBTEX")
     if collection == "":
         out += "article"
     else:
@@ -86,11 +86,11 @@ def format(bfo, width="50"):
     #Print authors
     #If author cannot be found, print a field key=recID
     import invenio.bibformat_elements.bfe_authors as bfe_authors
-    authors = bfe_authors.format(bfo=bfo,
-                                 limit="",
-                                 separator=" and ",
-                                 extension="",
-                                 print_links="no")
+    authors = bfe_authors.format_element(bfo=bfo,
+                                         limit="",
+                                         separator=" and ",
+                                         extension="",
+                                         print_links="no")
     if authors == "":
         out += format_bibtex_field("key",
                                    recID,
@@ -104,10 +104,10 @@ def format(bfo, width="50"):
 
     #Print editors
     import invenio.bibformat_elements.bfe_editors as bfe_editors
-    editors = bfe_editors.format(bfo=bfo, limit="",
-                                 separator=" and ",
-                                 extension="",
-                                 print_links="no")
+    editors = bfe_editors.format_element(bfo=bfo, limit="",
+                                         separator=" and ",
+                                         extension="",
+                                         print_links="no")
     out += format_bibtex_field("editor",
                                editors,
                                name_width,
@@ -115,7 +115,7 @@ def format(bfo, width="50"):
 
     #Print title
     import invenio.bibformat_elements.bfe_title as bfe_title
-    title = bfe_title.format(bfo=bfo, separator = ". ")
+    title = bfe_title.format_element(bfo=bfo, separator = ". ")
     out += format_bibtex_field("title",
                                title,
                                name_width,
@@ -148,7 +148,7 @@ def format(bfo, width="50"):
            or collection == "proceedings":
         publishers = []
         import invenio.bibformat_elements.bfe_publisher as bfe_publisher
-        publisher = bfe_publisher.format(bfo=bfo)
+        publisher = bfe_publisher.format_element(bfo=bfo)
         if publisher != "":
             publishers.append(publisher)
         publication_name = bfo.field("269__b")

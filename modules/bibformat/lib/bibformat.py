@@ -135,7 +135,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
         </span>""" % (recID, of)
     ############### FIXME: REMOVE WHEN MIGRATION IS DONE ###############
     if CFG_BIBFORMAT_USE_OLD_BIBFORMAT and CFG_PATH_PHP:
-        return bibformat_engine.call_old_bibformat(recID, format=of, on_the_fly=on_the_fly)
+        return bibformat_engine.call_old_bibformat(recID, of=of, on_the_fly=on_the_fly)
     ############################# END ##################################
     if not on_the_fly and \
        (ln == CFG_SITE_LANG or \

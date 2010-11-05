@@ -424,6 +424,11 @@ interface and the userID by directly getting the attribute from 'bfo':
 
     bfo.format
     """
+    ! DEPRECATED: use bfo.output_format instead
+    """
+
+    bfo.output_format
+    """
     Returns the format in which the record is being formatted
     """
 
@@ -739,14 +744,15 @@ element. A format element is written in Python. Therefore its file
 extension is ".py". The name you choose for the file is the one that
 will be used inside format template to call the element, so choose it
 carefully such that it is not too long, but self explanatory (you can
-prefix the filename with BFE or not, but the element will always be called
-with prefix &lt;BFE_ inside templates).  Then you just need to drop the
-file in the /lib/python/invenio/bibformat_elements/ directory
-of your Invenio installation. Inside your file you have to define a
-function named "format", which takes at least a "bfo" parameter (bfo
-for BibFormat Object). The function must return a string:
+prefix the filename with BFE or not, but the element will always be
+called with prefix &lt;BFE_ inside templates).  Then you just need to
+drop the file in the lib/python/invenio/bibformat_elements/ directory
+of your CDS Invenio installation. Inside your file you have to define
+a function named "format_element", which takes at least a "bfo"
+parameter (bfo for BibFormat Object). The function must return a
+string:
 
-  def format(bfo):
+  def format_element(bfo):
       out = ""
 
       return out
@@ -758,7 +764,7 @@ limit the number of characters printed. We can provide some
 documentation for the elemen in the docstring of the
 function.
 
- def format(bfo, limit="10"):
+ def format_element(bfo, limit="10"):
       """
       Prints a short title
 
@@ -773,7 +779,7 @@ Note that we put a default value of 10 in the 'limit' parameter.  To
 get some value of a field, we must request the 'bfo' object. For
 example we can get the value of field 245.a (field "title"):
 
- def format(bfo, limit="10"):
+ def format_element(bfo, limit="10"):
       """
       Prints a short title
 
@@ -827,7 +833,7 @@ Some remarks concerning format elements:
  -if no value is given as parameter in format the template, then the
   value of parameter is "" (emtpy string)
  -the docstring should contain a description, followed by
-  "@param parameter some description for parameter" for each
+  "@param parameter: some description for parameter" for each
   parameter (to give description for each parameter
   in element documentation), and @see an_element.py, another_element.py
   (to link to other elements in the documentation). Similar to JavaDoc.

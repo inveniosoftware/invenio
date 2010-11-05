@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, reference_prefix, reference_suffix):
+def format_element(bfo, reference_prefix, reference_suffix):
     """
     Prints the references of this record
 

@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-def format(bfo, kb):
+def format_element(bfo, kb):
     """
     Prints the collection identifier.
     Translate using given knowledge base.

@@ -34,7 +34,7 @@ from invenio.dateutils import \
      get_i18n_month_name, \
      get_i18n_day_name
 
-def format(bfo, display_date='yes', display_issue_number='yes',
+def format_element(bfo, display_date='yes', display_issue_number='yes',
            estimate_release_date='No', granularity='',
            group_issues_date='yes', display_month='long',
            display_week_day='long'):

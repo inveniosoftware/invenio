@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
+def format_element(bfo, note_suffix, note_prefix='Note: ', separator='; '):
     """
     Displays notes (various note fields)
 

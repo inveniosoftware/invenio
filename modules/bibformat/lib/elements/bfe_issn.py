@@ -915,7 +915,7 @@ issns = {   'aapps bull.': '0218-2203',
             'z. phys.': '0044-3328',
             'z. phys., c': '0170-9739'}
 
-def format(bfo):
+def format_element(bfo):
     """
     Returns the ISSN of the record, if known.<br/>
     Note that you HAVE to pre-generate the correspondances

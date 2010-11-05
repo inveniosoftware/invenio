@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo, kb_name="dbcollid2coll"):
+def format_element(bfo, kb_name="dbcollid2coll"):
     """
     HTML top page banner containing category, rep. number, etc
     """

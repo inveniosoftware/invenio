@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo):
+def format_element(bfo):
     """
     Prints the publisher name
 

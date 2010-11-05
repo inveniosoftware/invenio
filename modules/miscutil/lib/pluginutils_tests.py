@@ -41,7 +41,7 @@ class TestPluginContainer(unittest.TestCase):
         """pluginutils - wrapping bibformat elements"""
         def bibformat_signature(bfo, *args, **argd):
             pass
-        bibformat_elements = PluginContainer(os.path.join(CFG_BIBFORMAT_ELEMENTS_PATH, 'bfe_*.py'), plugin_signature=bibformat_signature, plugin_builder=lambda plugin_name, plugin_code: getattr(plugin_code, 'format'))
+        bibformat_elements = PluginContainer(os.path.join(CFG_BIBFORMAT_ELEMENTS_PATH, 'bfe_*.py'), plugin_signature=bibformat_signature, plugin_builder=lambda plugin_name, plugin_code: getattr(plugin_code, 'format_element'))
 
         self.failUnless(bibformat_elements['bfe_fulltext'])
         self.failUnless(callable(bibformat_elements['bfe_fulltext']))

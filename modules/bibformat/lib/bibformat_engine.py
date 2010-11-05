@@ -184,12 +184,15 @@ pattern_format_element_seealso = re.compile('''@see:\s*(?P<see>.*)''',
 ##      (?P=sep2)
 ##      ''', re.VERBOSE | re.MULTILINE)
 
-def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
+def call_old_bibformat(recID, of="HD", on_the_fly=False, verbose=0):
     """
     FIXME: REMOVE FUNCTION WHEN MIGRATION IS DONE
-    Calls BibFormat for the record RECID in the desired output format FORMAT.
+    Calls BibFormat for the record RECID in the desired output format 'of'.
 
+    @param recID: record ID to format
+    @param of: output format to be used for formatting
     @param on_the_fly: if False, try to return an already preformatted version of the record in the database
+    @param verbose: verbosity
 
     Note: this functions always try to return HTML, so when
     bibformat returns XML with embedded HTML format inside the tag
@@ -202,10 +205,10 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
     if not on_the_fly:
         # look for formatted record existence:
         query = "SELECT value, last_updated FROM bibfmt WHERE "\
-                "id_bibrec='%s' AND format='%s'" % (recID, format)
+                "id_bibrec='%s' AND format='%s'" % (recID, of)
         res = run_sql(query, None, 1)
     if res:
-        # record 'recID' is formatted in 'format', so print it
+        # record 'recID' is formatted in 'of', so print it
         if verbose == 9:
             last_updated = res[0][1]
             out += """\n<br/><span class="quicknote">
@@ -214,7 +217,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         decompress = zlib.decompress
         return "%s" % decompress(res[0][0])
     else:
-        # record 'recID' is not formatted in 'format',
+        # record 'recID' is not formatted in 'of',
         # so try to call BibFormat on the fly or use default format:
         if verbose == 9:
             out += """\n<br/><span class="quicknote">
@@ -225,7 +228,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         # Build it on-the-fly only if 'call_old_bibformat' was called
         # with format=xm and on_the_fly=True
         xm_record = record_get_xml(recID, 'xm',
-                                   on_the_fly=(on_the_fly and format == 'xm'))
+                                   on_the_fly=(on_the_fly and of == 'xm'))
 
 ##         import platform
 ##         # Some problem have been found using either popen() or os.system().
@@ -234,7 +237,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
 ##             # use os.system
         (result_code, result_path) = tempfile.mkstemp()
         command = "( %s/bibformat otype=%s )  > %s" % \
-                                     (CFG_BINDIR, format, result_path)
+                                     (CFG_BINDIR, of, result_path)
         (xm_code, xm_path) = tempfile.mkstemp()
         xm_file = open(xm_path, "w")
         xm_file.write(xm_record)
@@ -344,7 +347,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                 out += """\n<br/><span class="quicknote">
                 Using old BibFormat for record %s.
                 </span>""" % recID
-            return out + call_old_bibformat(recID, format=of, on_the_fly=True,
+            return out + call_old_bibformat(recID, of=of, on_the_fly=True,
                                             verbose=verbose)
     ############################# END ##################################
 
@@ -1034,18 +1037,23 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
                 raise Exception, errors[0][1]
             return None
 
-        # Load function 'format()' inside element
+        # Load function 'format_element()' inside element
         try:
-            function_format  = module.__dict__[module_name].format
+            function_format  = module.__dict__[module_name].format_element
             format_element['code'] = function_format
         except AttributeError, e:
-            errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION",
-                                              element_name)],
-                                            stream='error', ln=CFG_SITE_LANG)
-            if verbose == 0:
-                register_errors(errors, 'error')
-            elif verbose >= 5:
-                sys.stderr.write(errors[0][1])
+            # Try to load 'format()' function
+            try:
+                function_format  = module.__dict__[module_name].format
+                format_element['code'] = function_format
+            except AttributeError, e:
+                errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION",
+                                                  element_name)],
+                                                stream='error', ln=CFG_SITE_LANG)
+                if verbose == 0:
+                    register_errors(errors, 'error')
+                elif verbose >= 5:
+                    sys.stderr.write(errors[0][1])
 
         if errors:
             if verbose >= 7:
@@ -1699,19 +1707,17 @@ class BibFormatObject:
     # The id of the record
     recID = 0
 
-    uid = None # DEPRECATED: use bfo.user_info['uid'] instead
-
     # The information about the user, as returned by
     # 'webuser.collect_user_info(req)'
     user_info = None
 
     # The format in which the record is being formatted
-    format = ''
+    output_format = ''
 
-    req = None # DEPRECATED: use bfo.user_info instead
+    req = None # DEPRECATED: use bfo.user_info instead. Used by WebJournal.
 
     def __init__(self, recID, ln=CFG_SITE_LANG, search_pattern=None,
-                 xml_record=None, user_info=None, format=''):
+                 xml_record=None, user_info=None, output_format=''):
         """
         Creates a new bibformat object, with given record.
 
@@ -1741,7 +1747,7 @@ class BibFormatObject:
         @param search_pattern: list of string representing the request used by the user in web interface
         @param xml_record: a xml string of the record to format
         @param user_info: the information of the user who will view the formatted page
-        @param format: the format used for formatting this record
+        @param output_format: the output_format used for formatting this record
         """
 
         if xml_record is not None:
@@ -1754,7 +1760,7 @@ class BibFormatObject:
             search_pattern = []
         self.search_pattern = search_pattern
         self.recID = recID
-        self.format = format
+        self.output_format = output_format
         self.user_info = user_info
         if self.user_info is None:
             self.user_info = collect_user_info(None)

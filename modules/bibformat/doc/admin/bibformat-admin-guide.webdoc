@@ -222,7 +222,7 @@ a typical workflow:</p>
   <tr><td colspan="2"><hr/><span style="white-space: nowrap;">Step 4:</span></td></tr>
   <tr valign="top">
     <td><div class="formatElementBoxMain">
-    <code>def format(bfo, separator='; ', link='no'):<br />
+    <code>def format_element(bfo, separator='; ', link='no'):<br />
       &nbsp;&nbsp;&nbsp;&quot;&quot;&quot;<br />
       &nbsp;&nbsp;&nbsp;Prints the list of authors for the record<br /><br />
       &nbsp;&nbsp;&nbsp;@param separator a character to separate the authors<br />
@@ -242,7 +242,7 @@ a typical workflow:</p>
     elements, just call them from the templates. Each element outputs
     some text that is written in the template where it is called.<br/>
     Developers can add new elements by creating a new file, naming it
-    with the name of element, and write a Python <code>format</code>
+    with the name of element, and write a Python <code>format_element</code>
     function that takes as parameters the parameters of the elements
     plus a special one <code>bfo</code>. Regular Python code can be
     used, including import of other modules.</td>
@@ -664,10 +664,10 @@ are not returned by the format elements.</p>
     <p>To remove a format element declared in the "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module simply remove the entry from the table.</p>
     <h3><a name="codeFormatElement">4.3 Edit the Code of a Format Element</a></h3>
     <p>This section only applies to Python format elements. Basic format elements declared in "<a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" have non configurable behaviour.</p>
-    <p>A format element file is like any regular Python program. It has to implement a <code>format</code> function, which returns a <code>string</code> and takes at least <code>bfo</code> as first parameter (but can take as many others as needed).</p>
+    <p>A format element file is like any regular Python program. It has to implement a <code>format_element</code> function, which returns a <code>string</code> and takes at least <code>bfo</code> as first parameter (but can take as many others as needed).</p>
     <p>Here is for example the code of the "bfe_title.py" element:
 <pre>
-def format(bfo, separator=" "):
+def format_element(bfo, separator=" "):
     """
     Prints the title of a record.
 
@@ -703,13 +703,13 @@ Notice that the call uses (almost) the filename of your element. To find out whi
     </ol>
     This means that even if the filename of your element is "my element.py", BibFormat can resolve the call &lt;BFE_MY_ELEMENT /&gt; in a format template. This also means that you must take care no to have two format elements filenames that only differ in term of the above parameters.
         </p>
-    <p>The <code>string</code> returned by the <code>format</code> function corresponds to the value that is printed instead of the format element name in the format template.</p>
-    <p>The <code>bfo</code> object taken as parameter by <code>format</code> stands for BibFormatObject: it is an object that represents the context in which the formatting takes place. For example it allows to retrieve the value of a given field for the record that is being formatted, or the language of the user. We see the details of the BibFormatObject further below.</p>
-    <p>The <code>format</code> function of an element can take other parameters, as well as default values for these parameters. The idea is that these parameters are accessible from the format template when calling the elements, and allow to parametrize the behaviour of the format element.</p>
+    <p>The <code>string</code> returned by the <code>format_element</code> function corresponds to the value that is printed instead of the format element name in the format template.</p>
+    <p>The <code>bfo</code> object taken as parameter by <code>format_element</code> function stands for BibFormatObject: it is an object that represents the context in which the formatting takes place. For example it allows to retrieve the value of a given field for the record that is being formatted, or the language of the user. We see the details of the BibFormatObject further below.</p>
+    <p>The <code>format_element</code> function of an element can take other parameters, as well as default values for these parameters. The idea is that these parameters are accessible from the format template when calling the elements, and allow to parametrize the behaviour of the format element.</p>
     <p>It is very important to document your element: this allows to generate a documentation for the elements accessible to people writing format templates. It is the only way for them to know what your element do. The key points are:
         <ul>
-        <li>Provide a docstring for the <code>format</code> function</li>
-        <li>For each of the parameters of the <code>format</code> function (except for <code>bfo</code>), provide a description using a Java-like doc syntax in the doc string:<br/> <code>@param my_param description for my param</code> (one line per parameter)</li>
+        <li>Provide a docstring for the <code>format_element</code> function</li>
+        <li>For each of the parameters of the <code>format_element</code> function (except for <code>bfo</code>), provide a description using a Java-like doc syntax in the doc string:<br/> <code>@param my_param: description for my param</code> (one line per parameter)</li>
         <li>You can use one <code>@see</code> followed by a comma separated list of elements filenames to provide a reference to other elements of interests related to this one: <br/> <code>@see my_element1.py, my element2.py</code></li>
         </ul>
         </p>
@@ -844,9 +844,9 @@ translated_welcome =  &#95;("Welcome")
     <h3><a name="attrsFormatElement">4.7 Edit the Attributes of a Format Element</a></h3>
     <p>A format element has mainly four kinds of attributes: <ul>
     <li>Name: it corresponds to the filename of the element.</li>
-    <li>Description: the description is in the <code>docstring</code> of the <code>format</code> function (excepted lines prefixed with <code>@param</code> and <code>@see</code>).</li>
-    <li>Parameters descriptions: for each parameter of the <code>format</code> function, a line beginning with <code>@param</code> <i>parameter_name</i> and followed by the description of the parameter is present in the <code>docstring</code> of the <code>format</code> function.</li>
-    <li>Reference to other elements: one line beginning with <code>@see</code> and followed by a list of comma-separated format elements filenames in the in the <code>docstring</code> of the <code>format</code> function provides a link to related elements.</li>
+    <li>Description: the description is in the <code>docstring</code> of the <code>format_element</code> function (excepted lines prefixed with <code>@param</code> and <code>@see</code>).</li>
+    <li>Parameters descriptions: for each parameter of the <code>format_element</code> function, a line beginning with <code>@param</code> <i>parameter_name</i> and followed by the description of the parameter is present in the <code>docstring</code> of the <code>format_element</code> function.</li>
+    <li>Reference to other elements: one line beginning with <code>@see</code> and followed by a list of comma-separated format elements filenames in the in the <code>docstring</code> of the <code>format_element</code> function provides a link to related elements.</li>
     </ul>
     </p>
     <h3><a name="dependenciesFormatElement">4.8 Check the Dependencies of a Format Element</a></h3>
@@ -854,7 +854,7 @@ translated_welcome =  &#95;("Welcome")
     <p>The second method to check the dependencies of an element is through regular unix tools: for example <code>$ grep -r -i 'bfe_<i>your_element_name</i>' .</code> inside the format templates directory will tell you which templates call your element.</p>
     <h3><a name="validityFormatElement">4.9 Check the Validity of a Format Element</a></h3>
      <p>There are two ways to check the validity of an element. The simplest one is to go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">format elements documentation</a> and click on "Correctness of this element" for the element you want to check.</p>
-     <p>The second method to check the validity of an element is through regular Python methods: you can for example import the element in the interactive interpreter and feed it with test parameters. Notice that you will need to build a BibFormatObject instance to pass as <code>bfo</code> parameter to the <code>format</code> function of your element.</p>
+     <p>The second method to check the validity of an element is through regular Python methods: you can for example import the element in the interactive interpreter and feed it with test parameters. Notice that you will need to build a BibFormatObject instance to pass as <code>bfo</code> parameter to the <code>format_element</code> function of your element.</p>
     <h3><a name="browseDocFormatElement">4.10 Browse the Format Elements Documentation</a></h3>
     <p>Go to the <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py/format_elements_doc">format elements documentation</a>. There is a summary of all available format elements at the top of the page. You can click on an element to go to its detailed description in the second part of the page.</p>
     <p>Each detailed documentation shows you:

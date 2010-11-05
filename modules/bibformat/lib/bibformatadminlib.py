@@ -1396,7 +1396,10 @@ def check_format_element(name):
                     module_name = module_name[:-3]
 
                 module = __import__("invenio.bibformat_elements."+module_name)
-                function_format  = module.bibformat_elements.__dict__[module_name].format
+                try:
+                    function_format  = module.bibformat_elements.__dict__[module_name].format_element
+                except AttributeError, e:
+                    function_format  = module.bibformat_elements.__dict__[module_name].format
 
                 # Try to evaluate, with any object and pattern
                 recIDs = perform_request_search()

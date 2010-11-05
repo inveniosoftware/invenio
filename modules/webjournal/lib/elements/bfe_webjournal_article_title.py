@@ -20,7 +20,7 @@
 WebJournal Element - display article title
 """
 from invenio.webjournal_utils import parse_url_string
-def format(bfo):
+def format_element(bfo):
     """
     Display article title
     """

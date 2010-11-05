@@ -28,7 +28,7 @@ from invenio.webjournal_utils import \
      parse_url_string, \
      get_journal_submission_params
 
-def format(bfo):
+def format_element(bfo):
     """
     Display administration links for this articles when user is an
     editor of the journal

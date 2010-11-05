@@ -27,7 +27,7 @@ from invenio.messages import gettext_set_language
 from invenio.webjournal_utils import \
      parse_url_string
 
-def format(bfo, separator, display_email='yes',
+def format_element(bfo, separator, display_email='yes',
            email_obfuscation_mode=CFG_WEBSTYLE_EMAIL_ADDRESSES_OBFUSCATION_MODE):
     """
     Display article author(s)

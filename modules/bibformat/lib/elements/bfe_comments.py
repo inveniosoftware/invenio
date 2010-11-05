@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 from invenio.webcomment import get_first_comments_or_remarks
 
-def format(bfo, nbReviews='all', nbComments='all'):
+def format_element(bfo, nbReviews='all', nbComments='all'):
     """
     Prints comments posted for the record.
 

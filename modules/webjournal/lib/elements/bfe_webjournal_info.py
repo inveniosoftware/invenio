@@ -27,7 +27,7 @@ from invenio.webjournal_utils import \
      get_journal_css_url, \
      get_journal_name_intl
 
-def format(bfo, var=''):
+def format_element(bfo, var=''):
     """
     Print several journal specific variables.
     @param var: the name of the desired variable. Can be one of: WEBJOURNAL_CSS_URL, WEBJOURNAL_NAME, WEBJOURNAL_NAME_INTL, WEBJOURNAL_CURRENT_ISSUE_NUMBER, WEBJOURNAL_ISSUE_NUMBER, WEBJOURNAL_URL

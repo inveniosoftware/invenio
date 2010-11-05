@@ -29,7 +29,7 @@ from invenio.webjournal_utils import \
      get_journal_articles,\
      get_journal_categories
 
-def format(bfo, new_articles_first='yes',
+def format_element(bfo, new_articles_first='yes',
            subject_to_css_class_kb="WebJournalSubject2CSSClass",
            display_all_category_articles='no'):
     """

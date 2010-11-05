@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, style, separator='; '):
+def format_element(bfo, style, separator='; '):
     """
     This is the default format for formatting full-text URLs.
     @param separator: the separator between urls.

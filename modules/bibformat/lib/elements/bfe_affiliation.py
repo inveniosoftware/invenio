@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo):
+def format_element(bfo):
     """
     HTML Affiliation display
     """

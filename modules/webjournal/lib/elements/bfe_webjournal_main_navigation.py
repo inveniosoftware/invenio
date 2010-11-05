@@ -27,7 +27,7 @@ from invenio.webjournal_utils import \
 from invenio.urlutils import create_html_link
 from invenio.messages import gettext_set_language
 
-def format(bfo, category_prefix, category_suffix, separator=" | ",
+def format_element(bfo, category_prefix, category_suffix, separator=" | ",
            display_all_categories='no'):
     """
     Creates the main navigation menu of the journal

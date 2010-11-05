@@ -21,7 +21,7 @@ to unknown element
 """
 __revision__ = "$Id$"
 
-def format(bfo, param1, param2, param3, param4="a default value"):
+def format_element(bfo, param1, param2, param3, param4="a default value"):
 
     #No docstring on purpose
 

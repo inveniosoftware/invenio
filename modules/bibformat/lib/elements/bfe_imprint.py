@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import time
 
-def format(bfo, place_label, publisher_label, date_label,
+def format_element(bfo, place_label, publisher_label, date_label,
            separator=', ', date_format=""):
     """
     Print imprint (Order: Name of publisher, place of publication and date of publication).

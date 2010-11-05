@@ -26,7 +26,7 @@ from invenio.webjournal_utils import \
      parse_url_string, \
      get_featured_records
 
-def format(bfo):
+def format_element(bfo):
     """
     List the 'featured' records
     """

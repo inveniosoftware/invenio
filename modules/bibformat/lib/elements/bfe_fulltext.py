@@ -38,7 +38,7 @@ cern_arxiv_categories = ["astro-ph", "chao-dyn", "cond-mat", "gr-qc",
                          "atom-ph", "cmp-lg", "dg-ga", "funct-an", "mtrl-th",
                          "plasm-ph", "q-alg", "supr-con"]
 
-def format(bfo, style, separator='; ', show_icons='no', focus_on_main_file='no'):
+def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='no'):
     """
     This is the default format for formatting fulltext links.
 

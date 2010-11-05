@@ -48,7 +48,7 @@ re_image_pattern = re.compile(r'<img\s*(class=["\']imageScale["\'])*?\s*src="(?P
 
 yahoo_weather_rss_base_url = 'http://weather.yahooapis.com/forecastrss?p=%(location)s&u=%(degree_unit)s'
 
-def format(bfo, location='SZXX0008', degree_unit='c' ,
+def format_element(bfo, location='SZXX0008', degree_unit='c' ,
            display_weather_icon='false', weather_icon_only='false'):
     """
     Display the latest weather forecast from Yahoo Weather

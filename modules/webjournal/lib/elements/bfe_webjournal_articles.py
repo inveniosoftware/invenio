@@ -33,7 +33,7 @@ from invenio.webjournal_utils import \
      issue_is_later_than, \
      get_current_issue
 
-def format(bfo, new_articles_first='yes',
+def format_element(bfo, new_articles_first='yes',
            subject_to_css_class_kb="WebJournalSubject2CSSClass",
            display_all_category_articles='no', display_category_title='no'):
     """

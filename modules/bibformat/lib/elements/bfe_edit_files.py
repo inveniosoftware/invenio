@@ -25,7 +25,7 @@ from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL
 from invenio.access_control_engine import acc_authorize_action
 
-def format(bfo, style):
+def format_element(bfo, style):
     """
     Prints a link to simple file management interface (BibDocFile), if
     authorization is granted.

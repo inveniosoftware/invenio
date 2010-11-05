@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 from invenio.config import CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
                            CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG
 
-def format(bfo):
+def format_element(bfo):
     """
     Prints the record id.
     """

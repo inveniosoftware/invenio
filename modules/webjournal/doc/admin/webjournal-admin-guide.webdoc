@@ -216,11 +216,11 @@ format a single article/record: they are used as a generic way to
 provide dynamic content to your journal, such as the main navigation
 menu containing the categories defined for your journal, or a
 dynamically updated weather forecast section. As a consequence you
-should not use the <code>bfo</code> object the
-element <code>format(bfo, ...)</code> function to access the articles
-metadata, as it does not correspond to a record (see exceptions
-further below). You can however use it to access knowledge bases and
-user information.</p>
+should not use the <code>bfo</code> object of
+the <code>format_element(bfo, ...)</code> function to access the
+articles metadata, as it does not correspond to a record (see
+exceptions further below). You can however use it to access knowledge
+bases and user information.</p>
 
 <p>In order to access the context of the page, you should use
 the <code>parse_url_string(bfo.user_uri['uri'])</code> function, which
@@ -255,7 +255,7 @@ returns a dictionary with the keys and values:</p>
 <pre style="border:1px dashed #888;background-color:#EEE">
 from invenio.webjournal_utils import parse_url_string
 
-def format(bfo):
+def format_element(bfo):
     args = parse_url_string(bfo.user_info['uri'])
     journal_name = args['journal_name']
     category = args['category']

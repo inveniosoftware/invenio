@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
+def format_element(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
     """
     Prints the list of editors of a record.
 

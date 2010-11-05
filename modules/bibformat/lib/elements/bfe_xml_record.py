@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, type='xml', encodeForXML='yes'):
+def format_element(bfo, type='xml', encodeForXML='yes'):
     """
     Prints the complete current record as XML.
 

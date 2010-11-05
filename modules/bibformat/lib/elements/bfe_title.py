@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo, separator=" ", highlight='no'):
+def format_element(bfo, separator=" ", highlight='no'):
     """
     Prints the titles of a record.
 

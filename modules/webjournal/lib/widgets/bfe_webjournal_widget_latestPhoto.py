@@ -23,7 +23,7 @@ from invenio.bibformat_engine import BibFormatObject
 from invenio.search_engine import perform_request_search
 from invenio.config import CFG_CERN_SITE, CFG_SITE_URL
 
-def format(bfo, collections, max_photos="3", separator="<br/>"):
+def format_element(bfo, collections, max_photos="3", separator="<br/>"):
     """
     Display the latest pictures from the given collection(s)
 

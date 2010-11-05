@@ -29,7 +29,7 @@ from invenio.config import CFG_CERN_SITE
 from invenio.webjournal_utils import parse_url_string
 from invenio.bibformat_elements import bfe_fulltext
 
-def format(bfo, separator='<br/>'):
+def format_element(bfo, separator='<br/>'):
     """
     Display article body
 
@@ -86,7 +86,7 @@ def format(bfo, separator='<br/>'):
             # CERN-only: old CERN Bulletin articles
             return __backward_compatible_HTML(article[0]) + \
                    (bfo.field('980__a').startswith('BULLETINSTAFF') and \
-                    ('<br/><br/>' + bfe_fulltext.format(bfo, style="", show_icons='yes')) \
+                    ('<br/><br/>' + bfe_fulltext.format_element(bfo, style="", show_icons='yes')) \
                     or '')
         else:
             return ''

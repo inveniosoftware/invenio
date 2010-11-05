@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo):
+def format_element(bfo):
     """
     Prints html image and link to photo resources.
     """

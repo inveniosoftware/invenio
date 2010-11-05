@@ -18,7 +18,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo):
+def format_element(bfo):
     """
     Date of the entry of the record in the database
 

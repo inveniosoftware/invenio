@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import time
 
-def format(bfo, date_format='%d %B %Y'):
+def format_element(bfo, date_format='%d %B %Y'):
     """
     Prints the imprint publication date. If <code>format</code> is specified,
     Parameter <code>date_format</code> allows to specify the string representation of the output.

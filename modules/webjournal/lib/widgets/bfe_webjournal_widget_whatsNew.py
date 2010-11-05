@@ -39,7 +39,7 @@ from invenio.webjournal_utils import \
      get_current_issue
 from invenio.messages import gettext_set_language
 
-def format(bfo, latest_issue_only='yes', newest_articles_only='yes',
+def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
            link_category_headers='yes', display_categories='', hide_when_only_new_records="no"):
     """
     Display the index to the newest articles (of the latest issue, or of the displayed issue)

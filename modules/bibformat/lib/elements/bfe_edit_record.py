@@ -26,7 +26,7 @@ from invenio.config import CFG_SITE_URL
 from invenio.access_control_engine import acc_authorize_action
 from invenio.search_engine import guess_primary_collection_of_a_record
 
-def format(bfo, style):
+def format_element(bfo, style):
     """
     Prints a link to BibEdit, if authorization is granted
 

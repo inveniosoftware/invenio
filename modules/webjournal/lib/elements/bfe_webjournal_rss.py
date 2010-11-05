@@ -31,7 +31,7 @@ from invenio.urlutils import create_html_link
 from invenio.dbquery import run_sql
 from urllib import quote
 
-def format(bfo, categories, label="Subscribe by RSS",
+def format_element(bfo, categories, label="Subscribe by RSS",
            rss_icon_url="/img/rss.png", cc='', css_class="rssLink"):
     """
     Display RSS links to journal articles, in one or several

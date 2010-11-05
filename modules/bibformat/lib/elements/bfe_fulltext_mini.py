@@ -25,7 +25,7 @@ from invenio.messages import gettext_set_language
 from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from cgi import escape
 
-def format(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes'):
+def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_file='yes'):
     """
     This is the format for formatting fulltext links in the mini panel.
     @param separator: the separator between urls.

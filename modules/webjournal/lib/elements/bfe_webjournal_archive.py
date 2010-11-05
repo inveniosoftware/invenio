@@ -30,7 +30,7 @@ from invenio.webjournal_utils import \
      compare_issues, \
      get_journal_nb_issues_per_year
 
-def format(bfo, lowest_issue):
+def format_element(bfo, lowest_issue):
     """
     Prints a form that redirects to specified journal issue
 

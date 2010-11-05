@@ -20,7 +20,7 @@ __revision__ = "$Id$"
 
 from invenio.search_engine import get_creation_date
 
-def format(bfo, format='%Y-%m-%d'):
+def format_element(bfo, format='%Y-%m-%d'):
     '''
     Get the record creation date.
     @param format: The date format in MySQL syntax

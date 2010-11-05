@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import re
 
-def format(bfo):
+def format_element(bfo):
     """
     Prints the publication year.
     @see: pagination.py, publisher.py, reprints.py, imprint.py, place.py

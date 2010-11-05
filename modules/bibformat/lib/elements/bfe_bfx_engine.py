@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 from cStringIO import StringIO
 from invenio.bibformat_bfx_engine import format_with_bfx
 
-def format(bfo, template='DC'):
+def format_element(bfo, template='DC'):
     """
     An entry point to the BibFormat BFX engine, when used as an element.
     Formats the record according to a template.

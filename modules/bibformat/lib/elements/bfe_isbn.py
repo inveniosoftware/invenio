@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-def format(bfo, separator=", "):
+def format_element(bfo, separator=", "):
     """
     Returns the ISBN of the record.
     """

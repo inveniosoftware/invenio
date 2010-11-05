@@ -52,7 +52,7 @@ from invenio.webjournal_utils import \
 from invenio.urlutils import create_html_link
 from invenio.bibdocfile import decompose_file
 
-def format(bfo, number_of_featured_articles="1",
+def format_element(bfo, number_of_featured_articles="1",
            number_of_articles_with_image="3", new_articles_first='yes',
            image_px_width="300", small_image_px_width="200",
            subject_to_css_class_kb="WebJournalSubject2CSSClass",

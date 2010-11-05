@@ -25,7 +25,7 @@ import cgi
 from urllib import quote
 from invenio.config import CFG_SITE_URL
 
-def format(bfo, separator="; ", print_link="yes"):
+def format_element(bfo, separator="; ", print_link="yes"):
     """
     Prints a list of addresses linked to this report
 

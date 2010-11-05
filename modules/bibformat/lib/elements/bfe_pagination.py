@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo):
+def format_element(bfo):
     """
     Prints the record pagination
     @see: date.py, publisher.py, reprints.py, imprint.py, place.py

@@ -24,7 +24,7 @@ import cgi
 from urllib import quote
 from invenio.config import CFG_SITE_URL
 
-def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
+def format_element(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     """
     Display keywords of the record.
 

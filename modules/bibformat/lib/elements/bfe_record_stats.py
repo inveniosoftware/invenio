@@ -20,7 +20,7 @@ __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
 
-def format(bfo, display='day_distinct_ip_nb_views'):
+def format_element(bfo, display='day_distinct_ip_nb_views'):
     '''
     Prints record statistics
 

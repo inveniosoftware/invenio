@@ -3407,7 +3407,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
 
         # Disable references if no references found
         #bfo = BibFormatObject(recID)
-        #if bfe_references.format(bfo, '', '') == '':
+        #if bfe_references.format_element(bfo, '', '') == '':
         #    tabs['references']['enabled'] = False
 
         ## FIXME: the above was commented out because bfe_references

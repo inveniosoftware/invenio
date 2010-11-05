@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, limit, separator=' ; ',
+def format_element(bfo, limit, separator=' ; ',
            extension='[...]',
            print_links="yes",
            print_affiliations='no',

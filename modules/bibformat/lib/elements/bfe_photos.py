@@ -23,7 +23,7 @@ import cgi
 from invenio.bibdocfile import BibRecDocs
 from invenio.urlutils import create_html_link
 
-def format(bfo, separator=" ", style='', img_style='', text_style='font-size:small', print_links='yes', max_photos='',
+def format_element(bfo, separator=" ", style='', img_style='', text_style='font-size:small', print_links='yes', max_photos='',
            show_comment='yes', img_max_width='250px', display_all_version_links='yes'):
     """
     Lists the photos of a record. Display the icon version, linked to

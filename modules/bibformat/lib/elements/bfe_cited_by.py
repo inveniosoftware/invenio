@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-def format(bfo, separator='; '):
+def format_element(bfo, separator='; '):
     """
     Prints a list of records citing this record
 

@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo):
+def format_element(bfo):
     """
     Prints the imprint publication place as HTML
     @see: date.py, publisher.py, reprints.py, imprint.py, pagination.py

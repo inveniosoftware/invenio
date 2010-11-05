@@ -18,7 +18,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, separator):
+def format_element(bfo, separator):
     """
     Prints the reprinted editions of a record
 

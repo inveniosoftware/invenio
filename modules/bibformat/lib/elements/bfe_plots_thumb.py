@@ -25,7 +25,8 @@ __revision__ = "$Id: bfe_CERN_plots.py,v 1.3 2009/03/17 10:55:15 jerome Exp $"
 from invenio.bibdocfile import BibRecDocs
 from invenio.urlutils import create_html_link
 from invenio.config import CFG_SITE_URL
-def format(bfo):
+
+def format_element(bfo):
     """
     Display image of the thumbnail plot if we are in selected plots collections
     """

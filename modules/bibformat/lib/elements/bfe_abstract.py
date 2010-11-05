@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 #import cgi
 from invenio import bibformat_utils
 
-def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
+def format_element(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
            extension_en="[...] ",extension_fr="[...] ", contextual="no",
            highlight='no', print_lang='en,fr', escape="3",
            separator_en="<br/>", separator_fr="<br/>", latex_to_html='no'):
@@ -33,8 +33,8 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
 
     Printed languages can be chosen with the 'print_lang' parameter.
 
-    @param prefix_en a prefix for english abstract (printed only if english abstract exists)
-    @param prefix_fr a prefix for french abstract (printed only if french abstract exists)
+    @param prefix_en: a prefix for english abstract (printed only if english abstract exists)
+    @param prefix_fr: a prefix for french abstract (printed only if french abstract exists)
     @param limit: the maximum number of sentences of the abstract to display (for each language)
     @param max_chars: the maximum number of chars of the abstract to display (for each language)
     @param extension_en: a text printed after english abstracts longer than parameter 'limit'

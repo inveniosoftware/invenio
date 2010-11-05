@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 from urllib import quote
 import cgi
 
-def format(bfo):
+def format_element(bfo):
     """
     Displays inline publication information with html link to ejournal
     (when available).

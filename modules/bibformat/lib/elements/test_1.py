@@ -21,7 +21,7 @@ to unknown element
 """
 __revision__ = "$Id$"
 
-def format(bfo, param1, param2='default value'):
+def format_element(bfo, param1, param2='default value'):
     """
     Prints test
 

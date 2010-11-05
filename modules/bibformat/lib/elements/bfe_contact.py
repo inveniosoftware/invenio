@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, separator='; ', link="yes"):
+def format_element(bfo, separator='; ', link="yes"):
     """
     Prints contact information for the record
 
