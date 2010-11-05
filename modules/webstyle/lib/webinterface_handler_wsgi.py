@@ -21,6 +21,7 @@
 import sys
 import os
 import cgi
+import inspect
 from fnmatch import fnmatch
 
 from wsgiref.validate import validator
@@ -437,6 +438,8 @@ def is_mp_legacy_publisher_path(path):
         if component.endswith('.py'):
             possible_module = os.path.abspath(CFG_WEBDIR + os.path.sep + os.path.sep.join(path[:index + 1]))
             possible_handler = '/'.join(path[index + 1:]).strip()
+            if possible_handler.startswith('_'):
+                return None, None
             if not possible_handler:
                 possible_handler = 'index'
             if os.path.exists(possible_module) and possible_module.startswith(CFG_WEBDIR):
@@ -453,6 +456,11 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
     exec(the_module, module_globals)
     if possible_handler in module_globals and callable(module_globals[possible_handler]):
         from invenio.webinterface_handler import _check_result
+        ## req is the required first parameter of any handler
+        expected_args = list(inspect.getargspec(module_globals[possible_handler])[0])
+        if not expected_args or 'req' != expected_args[0]:
+            ## req was not the first argument. Too bad!
+            raise SERVER_RETURN, HTTP_NOT_FOUND
         ## the req.form must be casted to dict because of Python 2.4 and earlier
         ## otherwise any object exposing the mapping interface can be
         ## used with the magic **
@@ -470,7 +478,6 @@ def mp_legacy_publisher(req, possible_module, possible_handler):
             return _check_result(req, module_globals[possible_handler](req, **form))
         except TypeError, err:
             if ("%s() got an unexpected keyword argument" % possible_handler) in str(err) or ('%s() takes at least' % possible_handler) in str(err):
-                import inspect
                 inspected_args = inspect.getargspec(module_globals[possible_handler])
                 expected_args = list(inspected_args[0])
                 expected_defaults = list(inspected_args[3])
