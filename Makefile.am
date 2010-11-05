@@ -155,18 +155,19 @@ install-jquery-plugins: install-jquery-plugins
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.slider.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
-	wget http://github.com/malsup/form/raw/master/jquery.form.js && \
+	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	wget http://tablesorter.com/jquery.tablesorter.zip && \
-	wget http://www.uploadify.com/_files/jquery.uploadify-v2.1.0.zip && \
+	wget http://www.uploadify.com/wp-content/uploads/Uploadify-v2.1.3.zip -O uploadify.zip && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
-	unzip -u jquery.uploadify-v2.1.0.zip -d uploadify && \
+	unzip -u uploadify.zip && \
+	mv -T jquery.uploadify-v2.1.3 uploadify && \
 	mv uploadify/swfobject.js ./ && \
 	mv uploadify/cancel.png uploadify/uploadify.css uploadify/uploadify.allglyphs.swf uploadify/uploadify.fla uploadify/uploadify.swf ../img/ && \
-	mv uploadify/jquery.uploadify.v2.1.0.min.js ./jquery.uploadify.min.js && \
-	rm jquery.uploadify-v2.1.0.zip && rm -r uploadify && \
+	mv uploadify/jquery.uploadify.v2.1.3.min.js ./jquery.uploadify.min.js && \
+	rm uploadify.zip && rm -r uploadify && \
 	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
 	rm jquery.autogrow-1.2.2.zip && \
 	wget -O json2.js.tmp http://json.org/json2.js && \
