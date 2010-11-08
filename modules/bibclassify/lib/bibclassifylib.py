@@ -146,7 +146,10 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
             os.remove(compiled_ontology_db_file)
     if not(os.access(dictfile,os.F_OK) and os.access(compiled_ontology_db_file,os.F_OK) and os.path.getmtime(compiled_ontology_db_file) > os.path.getmtime(dictfile)):
         # changed graph type, recommended by devel team
-        store = rdflib.ConjunctiveGraph()
+        if rdflib.__version__ >= '2.3.2':
+            store = rdflib.ConjunctiveGraph()
+        else:
+            store = rdflib.Graph()
         store.parse(dictfile)
         compiled_ontology_db = shelve.open(compiled_ontology_db_file)
         compiled_ontology_db['graph'] = store
