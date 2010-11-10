@@ -2902,7 +2902,7 @@ div.subtitle {
 	position:relative;
 }
 .menu .hassubmenu a {
-        display: inline-block; /* Necessary on IE */
+        /*display: inline-block; /* Necessary on IE */
 	padding-right:12px;
 	background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;
 }
