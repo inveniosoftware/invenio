@@ -47,7 +47,8 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_MISCUTIL_SMTP_HOST, \
      CFG_MISCUTIL_SMTP_PORT, \
-     CFG_VERSION
+     CFG_VERSION, \
+     CFG_DEVEL_SITE
 
 from invenio.messages import wash_language, gettext_set_language
 from invenio.textutils import guess_minimum_encoding
@@ -109,6 +110,15 @@ def send_email(fromaddr,
     if copy_to_admin:
         if CFG_SITE_ADMIN_EMAIL not in toaddr:
             toaddr.append(CFG_SITE_ADMIN_EMAIL)
+    if CFG_DEVEL_SITE: #if we are on a development site, we don't want to send external e-mails
+        content = """
+--------------------------------------------------------------
+This message would have been sent to the following recipients:
+%s
+--------------------------------------------------------------
+%s""" %(toaddr, content)
+        toaddr = CFG_SITE_ADMIN_EMAIL
+        usebcc = False
     body = forge_email(fromaddr, toaddr, subject, content, html_content,
                        html_images, usebcc, header, footer, html_header,
                        html_footer, ln, charset)
