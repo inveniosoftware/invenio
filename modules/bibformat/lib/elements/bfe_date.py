@@ -35,7 +35,7 @@ def format_element(bfo, date_format='%d %B %Y'):
     @param date_format date format
     """
     date = bfo.field('260__c')
-    if format != '':
+    if date_format != '':
         try:
             date_time = time.strptime(date, "%Y-%m-%d")
             return time.strftime(date_format, date_time)
