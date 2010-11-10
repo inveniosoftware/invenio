@@ -59,7 +59,7 @@ CFG_EXTERNAL_AUTH_HIDDEN_GROUPS_RE = (
     )
 
 # Prefix name for Shibboleth variables
-CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME = 'HTTP_ADFS_'
+CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME = 'ADFS_'
 # Name of the variable containing groups
 CFG_EXTERNAL_AUTH_SSO_GROUP_VARIABLE = CFG_EXTERNAL_AUTH_SSO_PREFIX_NAME+'GROUP'
 # Name of the variable containing login name
