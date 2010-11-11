@@ -1020,6 +1020,8 @@ II. Example - connecting role and user</a>
 
         or
 
+        <strong>ALLOW/DENY FROM/UNTIL <em>"YYYY-MM-DD"</em></strong>
+
         <strong>ALLOW/DENY [NOT] <em>field</em> {<em>one or more values</em>}</strong>
 
     The rows are parsed from top to bottom. If a row matches the user than the
@@ -1031,7 +1033,17 @@ II. Example - connecting role and user</a>
     Note, in place of ANY you can use the word ALL. The semantic is the same. The
     system support both to let the user comply with the English grammar.
 
-    The second type of rule is interpreted as follows: given a dictionary
+    The second type of rule is interpreted as follows: given a date in the
+    form <em>"YYYY-MM-DD"</em> (double-)quoted), the rule is matched if, when using <strong>FROM</strong>,
+    the current date is either identical or <em>'bigger'</em> than the given date, or if,
+    when using <strong>UNTIL</strong>, the current date is either identical or <em>'smaller'</em> than the
+    given date. If the rule starts with <strong>ALLOW</strong> and is matched
+    then the next row is evaluated. If it is not matched, then the whole FireRole
+    will evaluate into a DENY ALL. If the rule starts with <strong>DENY</strong> and
+    is matched then the whole FireRole while evaluate as a DENY ALL. If it is
+    not matched then the next row is evaluated.
+
+    The third type of rule is interpreted as follows: given a dictionary
     of keys:values describing a user (we will cover this below), the rule
     considers the value associated with the key named in field, and checks
     if it corresponds to at least one of the values in the "one or more values" list.
@@ -1043,7 +1055,10 @@ II. Example - connecting role and user</a>
     rule matches the rule is skipped, otherwise if all the value of the rules
     don't match the whole rule matches.
 
-    A <strong>DENY ALL</strong> rule is implicitly added at the end of every definition.
+    A <strong>DENY ALL</strong> rule is implicitly added at the end of every definition. Note that
+    this imply that, if you are using e.g. a temporal rule (FROM/UNTIL), you
+    should explicitly add an additional row with value <strong>ALLOW ANY</strong>,
+    if you actually want to allow users in the specified timeframe.
 
     Any field is valid, but only rules concerning fields which currently
     exist in the user describing dictionary are checked. All the rules

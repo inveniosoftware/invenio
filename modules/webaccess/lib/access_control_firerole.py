@@ -29,6 +29,7 @@ import re
 import cPickle
 from zlib import compress, decompress
 import sys
+import time
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -83,30 +84,40 @@ def compile_role_definition(firerole_def_src):
                         field = alias_item[0]
                         break
                 if field.startswith('precached_'):
-                    raise InvenioWebAccessFireroleError, "Error while compiling rule %s (line %s): %s is a reserved key and can not be used in FireRole rules!" % (row, line, field)
+                    raise InvenioWebAccessFireroleError("Error while compiling rule %s (line %s): %s is a reserved key and can not be used in FireRole rules!" % (row, line, field))
                 expressions = g.group('expression')+g.group('more_expressions')
                 expressions_list = []
                 for expr in _expressions_re.finditer(expressions):
                     expr = expr.group()
-                    if expr[0] == '/':
+                    if field in ('from', 'until'):
+                        try:
+                            expressions_list.append((False, time.mktime(time.strptime(expr[1:-1], '%Y-%m-%d'))))
+                        except Exception, msg:
+                            raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): %s is not a valid date with format YYYY-MM-DD because %s!" % (row, line, expr, msg))
+                    elif expr[0] == '/':
                         try:
                             expressions_list.append((True, re.compile(expr[1:-1], re.I)))
                         except Exception, msg:
-                            raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): %s is not a valid re because %s!" % (row, line, expr, msg)
+                            raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): %s is not a valid re because %s!" % (row, line, expr, msg))
                     else:
                         if field == 'remote_ip' and '/' in expr[1:-1]:
                             try:
                                 expressions_list.append((False, _ip_matcher_builder(expr[1:-1])))
                             except Exception, msg:
-                                raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): %s is not a valid ip group because %s!" % (row, line, expr, msg)
+                                raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): %s is not a valid ip group because %s!" % (row, line, expr, msg))
                         else:
                             expressions_list.append((False, expr[1:-1]))
                 expressions_list = tuple(expressions_list)
-                if field in ('apache_group', 'apache_user'):
+                if field in ('from', 'until'):
+                    if len(expressions_list) != 1:
+                        raise InvenioWebAccessFireroleError("Error when compiling rule %s (line %s): exactly one date is expected when using 'from' or 'until', but %s were found" % (row, line, len(expressions_list)))
+                    if not_p:
+                        raise InvenioWebAccessFireroleError("Error when compiling rule %s (line %s): 'not' is not allowed when using 'from' or 'until'" % (row, line))
+                elif field in ('apache_group', 'apache_user'):
                     suggest_apache_p = True
                 ret.append((allow_p, not_p, field, expressions_list))
             else:
-                raise InvenioWebAccessFireroleError, "Syntax error while compiling rule %s (line %s): not a valid rule!" % (row, line)
+                raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): not a valid rule!" % (row, line))
     return (default_allow_p, suggest_apache_p, tuple(ret))
 
 
@@ -205,10 +216,12 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
     try:
         default_allow_p, suggest_apache_p, rules = firerole_def_obj
         for (allow_p, not_p, field, expressions_list) in rules: # for every rule
-            group_p = field in ['group', 'apache_group'] # Is it related to group?
+            group_p = field in ('group', 'apache_group') # Is it related to group?
             ip_p = field == 'remote_ip' # Is it related to Ips?
-            next_rule_p = False # Silly flag to break 2 for cycle
-            if not user_info.has_key(field):
+            until_p = field == 'until' # Is it related to dates?
+            from_p = field == 'from' # Idem.
+            next_expr_p = False # Silly flag to break 2 for cycles
+            if not user_info.has_key(field) and not from_p and not until_p:
                 continue
             for reg_p, expr in expressions_list: # For every element in the rule
                 if group_p: # Special case: groups
@@ -216,39 +229,59 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
                         for group in user_info[field]: # iterate over every group
                             if expr.match(group): # if it matches
                                 if not_p: # if must not match
-                                    next_rule_p = True # let's skip to next rule
+                                    next_expr_p = True # let's skip to next expr
                                     break
                                 else: # Ok!
                                     return allow_p
-                        if next_rule_p:
+                        if next_expr_p:
                             break # I said: let's skip to next rule ;-)
                     elif expr.lower() in [group.lower() for group in user_info[field]]: # Simple expression then just check for expr in groups
                         if not_p: # If expr is in groups then if must not match
-                            break # let's skip to next rule
+                            break # let's skip to next expr
                         else: # Ok!
                             return allow_p
                 elif reg_p: # Not a group, then easier. If it's a regexp
                     if expr.match(user_info[field]): # if it matches
                         if not_p: # If must not match
-                            break # Let's skip to next rule
+                            break # Let's skip to next expr
                         else:
                             return allow_p # Ok!
                 elif ip_p and type(expr) == type(()): # If it's just a simple expression but an IP!
                     if _ipmatch(user_info['remote_ip'], expr): # Then if Ip matches
                         if not_p: # If must not match
-                            break # let's skip to next rule
+                            break # let's skip to next expr
                         else:
                             return allow_p # ok!
+                elif until_p:
+                    if time.time() <= expr:
+                        if allow_p:
+                            break
+                        else:
+                            return False
+                    elif allow_p:
+                        return False
+                    else:
+                        break
+                elif from_p:
+                    if time.time() >= expr:
+                        if allow_p:
+                            break
+                        else:
+                            return False
+                    elif allow_p:
+                        return False
+                    else:
+                        break
                 elif expr.lower() == user_info[field].lower(): # Finally the easiest one!!
                     if not_p: # ...
                         break
                     else: # ...
                         return allow_p # ...
-            if not_p and not next_rule_p: # Nothing has matched and we got not
+            if not_p and not next_expr_p: # Nothing has matched and we got not
                 return allow_p # Then the whole rule matched!
     except Exception, msg:
         raise InvenioWebAccessFireroleError, msg
-    return default_allow_p # By default we allow ;-) it'an OpenSource project
+    return default_allow_p # By default we allow ;-) it'an OpenAccess project
 
 def serialize(firerole_def_obj):
     """ Serialize and compress a definition."""

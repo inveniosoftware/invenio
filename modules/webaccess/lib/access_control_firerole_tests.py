@@ -87,6 +87,17 @@ class AccessControlFireRoleTest(unittest.TestCase):
             "allow email /.*@cern.ch/\nallow groups 'patata' "
             "# a comment\ndeny remote_ip '127.0.0.0/24'\ndeny any")))
 
+    def test_compile_role_definition_with_date(self):
+        """firerole - compiling date based role definitions"""
+        self.failUnless(serialize(compile_role_definition(
+            "allow from '2010-11-11'")))
+        self.failUnless(serialize(compile_role_definition(
+            "allow until '2010-11-11'")))
+        self.assertRaises(InvenioWebAccessFireroleError,
+            compile_role_definition, "allow from '2010-11-11','2010-11-23'")
+        self.assertRaises(InvenioWebAccessFireroleError,
+            compile_role_definition, "allow from '2010-11'")
+
     def test_compile_role_definition_wrong(self):
         """firerole - compiling wrong role definitions"""
         self.assertRaises(InvenioWebAccessFireroleError,
@@ -125,6 +136,24 @@ class AccessControlFireRoleTest(unittest.TestCase):
         """firerole - firerole core testing non existant group matching"""
         self.failIf(acc_firerole_check_user(self.user_info,
             compile_role_definition("allow groups 'patat'\ndeny any")))
+
+    def test_firerole_with_future_date(self):
+        """firerole - firerole core testing with future date"""
+        import time
+        future_date = time.strftime('%Y-%m-%d', time.gmtime(time.time() + 24 * 3600 * 2))
+        self.failUnless(acc_firerole_check_user(self.user_info,
+            compile_role_definition("allow until '%s'\nallow any" % future_date)))
+        self.failIf(acc_firerole_check_user(self.user_info,
+            compile_role_definition("allow from '%s'\nallow any" % future_date)))
+
+    def test_firerole_with_past_date(self):
+        """firerole - firerole core testing with past date"""
+        import time
+        past_date = time.strftime('%Y-%m-%d', time.gmtime(time.time() - 24 * 3600 * 2))
+        self.failIf(acc_firerole_check_user(self.user_info,
+            compile_role_definition("allow until '%s'\nallow any" % past_date)))
+        self.failUnless(acc_firerole_check_user(self.user_info,
+            compile_role_definition("allow from '%s'\nallow any" % past_date)))
 
     def test_firerole_empty(self):
         """firerole - firerole core testing empty matching"""
