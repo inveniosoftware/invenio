@@ -21,15 +21,18 @@
 
 __revision__ = ""
 
-def format_element(bfo, limit, separator=" ", extension=" etc."):
+import cgi
+from invenio.urlutils import create_html_link
+
+def format_element(bfo, limit, separator=" ", extension=" etc.", link='yes'):
     """
     Prints the report numbers of the record (037__a and 088__a)
 
     @param separator: the separator between report numbers.
     @param limit: the max number of report numbers to print
     @param extension: a prefix printed when limit param is reached
+    @param link: if 'yes', display report number with corresponding link when possible
     """
-
     numbers = bfo.fields("037__a")
     numbers.extend(bfo.fields("088__a"))
 
@@ -38,4 +41,26 @@ def format_element(bfo, limit, separator=" ", extension=" etc."):
         if limit_as_int <= len(numbers):
             return separator.join(numbers[:limit_as_int]) + extension
 
-    return separator.join(numbers)
+    return separator.join([build_report_number_link(report_number, \
+                                                    link == 'yes') \
+                           for report_number in numbers])
+
+def build_report_number_link(report_number, link_p=True):
+    """
+    Build HTML link out of given report number when it make sense (or
+    is possible) and/or escape report number.
+    @param report_number: the report number to consider
+    @param link_p: if True, build link, otherwise just escape
+    """
+    if link_p and report_number.lower().startswith('arxiv:'):
+        return create_html_link('http://arxiv.org/abs/' + report_number,
+                                urlargd={}, link_label=report_number)
+    else:
+        return cgi.escape(report_number)
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0

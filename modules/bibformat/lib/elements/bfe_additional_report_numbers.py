@@ -21,17 +21,29 @@
 
 __revision__ = "$Id$"
 
-def format_element(bfo, limit, separator=" "):
+from invenio.bibformat_elements.bfe_report_numbers import \
+     build_report_number_link
+
+def format_element(bfo, limit, separator=" ", link='yes'):
     """
     Prints the additional report numbers of the record
 
     @param separator: the separator between report numbers.
     @param limit: the max number of report numbers to display
+    @param link: if 'yes', display report number with corresponding link when possible
     """
-
     numbers = bfo.fields("088__a")
 
     if limit.isdigit() and int(limit) <= len(numbers):
         numbers = numbers[:int(limit)]
 
-    return separator.join(numbers)
+    return separator.join([build_report_number_link(report_number,
+                                                    link == 'yes') \
+                           for report_number in numbers])
+
+def escape_values(bfo):
+    """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
+    """
+    return 0
