@@ -78,6 +78,16 @@ class TestParserUtilityFunctions(unittest.TestCase):
                           'author:"richter, burton*" | exactauthor:"richter, b *" | exactauthor:"richter, b" | exactauthor:"richter, bu" | exactauthor:"richter, bur" | exactauthor:"richter, burt" | exactauthor:"richter, burto"',
                           '+', 'title:quark'])
 
+    def test_stisc_not_vs_and_not1(self):
+        """Parse stack parses "find a ellis, j and not a enqvist" == "find a ellis, j not a enqvist" """
+        self.assertEqual(self.parser.parse_query(self.converter.convert_query('find a ellis, j and not a enqvist')),
+                         self.parser.parse_query(self.converter.convert_query('find a ellis, j not a enqvist')))
+
+    def test_stisc_not_vs_and_not2(self):
+        """Parse stack parses "find a mangano, m and not a ellis, j" == "find a mangano, m not a ellis, j" """
+        self.assertEqual(self.parser.parse_query(self.converter.convert_query('find a mangano, m and not a ellis, j')),
+                         self.parser.parse_query(self.converter.convert_query('find a mangano, m not a ellis, j')))
+
 
 class TestSearchQueryParenthesisedParser(unittest.TestCase):
     """Test parenthesis parsing."""

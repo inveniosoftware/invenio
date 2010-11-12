@@ -1670,6 +1670,16 @@ class WebSearchReferstoCitedbyTest(unittest.TestCase):
                                                expected_text='[95]'))
 
 
+class WebSearchSPIRESSyntaxTest(unittest.TestCase):
+    """Test of SPIRES syntax issues"""
+
+    def test_and_not_parens(self):
+        'websearch - find a ellis, j and not a enqvist'
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL +'/search?p=find+a+ellis%2C+j+and+not+a+enqvist&of=id&ap=0',
+                                               expected_text='[9, 12, 14, 47]'))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1702,7 +1712,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchAddToBasketTest,
                              WebSearchAlertTeaserTest,
                              WebSearchSpanQueryTest,
-                             WebSearchReferstoCitedbyTest)
+                             WebSearchReferstoCitedbyTest,
+                             WebSearchSPIRESSyntaxTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)

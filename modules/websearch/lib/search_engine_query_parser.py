@@ -143,7 +143,7 @@ class SearchQueryParenthesisedParser(object):
             token = token.lower()
             if token in self.substitution_dict:
                 if token == 'not' and new_toklist[-1] == '+':
-                    new_toklist[-1] = '+ -'
+                    new_toklist[-1] = '-'
                 else:
                     new_toklist.append(self.substitution_dict[token])
             elif token == '(':
@@ -162,7 +162,7 @@ class SearchQueryParenthesisedParser(object):
                 new_toklist.append(label)
             else:
                 if token == '-' and new_toklist[-1] == '+':
-                    new_toklist[-1] = '+ -'
+                    new_toklist[-1] = '-'
                 else:
                     new_toklist.append(token)
         return filter_front_ands(new_toklist), var_subs
