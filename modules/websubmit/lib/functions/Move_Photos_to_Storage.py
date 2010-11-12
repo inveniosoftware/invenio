@@ -376,7 +376,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/jquery.uploadify.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/swfobject.js"></script>
-    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.core.min.js"></script>
+    <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.core.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.sortable.min.js"></script>
     <script type="text/javascript" src="%(CFG_SITE_URL)s/js/ui.slider.min.js"></script>
     <link rel="stylesheet" href="%(CFG_SITE_URL)s/img/uploadify.css" type="text/css" />
@@ -512,7 +512,7 @@ def create_photos_manager_interface(sysno, session_id, uid,
 
     <div style="margin: 0 auto;">
     <img src="%(CFG_SITE_URL)s/img/loading.gif" style="visibility: hidden" id="loading"/>
-    <input type="file" size="40" id="uploadFile" name="CMSPH_FILE" style="margin: 0 auto;%(upload_display)s"/>
+    <input type="file" size="40" id="uploadFile" name="PHOTO_FILE" style="margin: 0 auto;%(upload_display)s"/>
     </div>
 
     <!--<a href="javascript:$('#uploadFile').fileUploadStart();">Upload Files</a> -->
