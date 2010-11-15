@@ -2642,7 +2642,7 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
                     else: allkeys = 0
                 except KeyError: allkeys = 0
                 output += ' /> <br />\n'
-            output = output[:-5] + ' <input class="adminbutton" type="submit" value="create authorization -->" />\n'
+            output = output[:-8] + ' <input class="adminbutton" type="submit" value="create authorization -->" />\n'
             output += '</form>\n'
 
             # ask for confirmation
