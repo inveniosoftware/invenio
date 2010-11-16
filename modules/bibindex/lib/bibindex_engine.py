@@ -272,7 +272,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             write_message("... %s is an internal document" % url_direct_or_indirect, verbose=2)
             bibdoc = bibdocfile_url_to_bibdoc(url_direct_or_indirect)
             perform_ocr = bool(re_perform_ocr.match(bibdoc.get_docname()))
-            write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''))
+            write_message("... will extract words from %s (docid: %s) %s" % (bibdoc.get_docname(), bibdoc.get_id(), perform_ocr and 'with OCR' or ''), verbose=2)
             if not bibdoc.has_text(require_up_to_date=True):
                 bibdoc.extract_text(perform_ocr=perform_ocr)
             return get_words_from_phrase(bibdoc.get_text(), stemming_language)
@@ -287,7 +287,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 urls = get_fulltext_urls_from_html_page(url_direct_or_indirect)
             else:
                 urls = [url_direct_or_indirect]
-            write_message("... will extract words from %s" % ', '.join(urls))
+            write_message("... will extract words from %s" % ', '.join(urls), verbose=2)
             words = {}
             for url in urls:
                 format = guess_format_from_url(url)
