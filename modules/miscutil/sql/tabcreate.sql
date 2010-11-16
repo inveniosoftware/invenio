@@ -3756,5 +3756,25 @@ CREATE TABLE IF NOT EXISTS swrCLIENTDATA (
   PRIMARY KEY (id)
 ) TYPE=MyISAM;
 
+-- tables for exception management
+
+-- This table is used to log exceptions
+-- to discover the full details of an exception either check the email
+-- that are sent to CFG_SITE_ADMIN_EMAIL or look into invenio.err
+CREATE TABLE IF NOT EXISTS hstEXCEPTION (
+  id int(15) unsigned NOT NULL auto_increment,
+  name varchar(50) NOT NULL, -- name of the exception
+  filename varchar(255) NULL, -- file where the exception was raised
+  line int(9) NULL, -- line at which the exception was raised
+  last_seen datetime NOT NULL default '0000-00-00 00:00:00', -- last time this exception has been seen
+  last_notified datetime NOT NULL default '0000-00-00 00:00:00', -- last time this exception has been notified
+  counter int(15) NOT NULL default 0, -- internal counter to decide when to notify this exception
+  total int(15) NOT NULL default 0, -- total number of times this exception has been seen
+  PRIMARY KEY (id),
+  KEY (last_seen),
+  KEY (last_notified),
+  KEY (total),
+  UNIQUE KEY (name(50), filename(255), line)
+) TYPE=MyISAM;
 
 -- end of file

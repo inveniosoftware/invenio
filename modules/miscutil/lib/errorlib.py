@@ -25,6 +25,7 @@ import traceback
 import os
 import sys
 import time
+import datetime
 import re
 from cStringIO import StringIO
 
@@ -32,11 +33,13 @@ from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, \
     CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, \
     CFG_CERN_SITE, CFG_SITE_EMERGENCY_PHONE_NUMBERS, \
-    CFG_SITE_ADMIN_EMAIL_EXCEPTIONS
+    CFG_SITE_ADMIN_EMAIL_EXCEPTIONS, \
+    CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
 from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.dbquery import run_sql
 
 ## Regular expression to match possible password related variable that should
 ## be disclosed in frame analysis.
@@ -265,6 +268,52 @@ def get_pretty_traceback(req=None, exc_info=None, force_stack=True):
     else:
         return ""
 
+def _is_pow_of_2(n):
+    """
+    Return True if n is a power of 2
+    """
+    while n > 1:
+        if n % 2:
+            return False
+        n = n / 2
+    return True
+
+def exception_should_be_notified(name, filename, line):
+    """
+    Return True if the exception should be notified to the admin.
+    This actually depends on several considerations, e.g. wethever
+    it has passed some since the last time this exception has been notified.
+    """
+    try:
+        exc_log = run_sql("SELECT id,last_notified,counter,total FROM hstEXCEPTION WHERE name=%s AND filename=%s AND line=%s", (name, filename, line))
+        if exc_log:
+            exc_id, last_notified, counter, total = exc_log[0]
+            delta = datetime.datetime.now() - last_notified
+            counter += 1
+            total += 1
+            if (delta.seconds + delta.days * 86400) >= CFG_ERRORLIB_RESET_EXCEPTION_NOTIFICATION_COUNTER_AFTER:
+                run_sql("UPDATE hstEXCEPTION SET last_seen=NOW(), last_notified=NOW(), counter=1, total=%s WHERE id=%s", (total, exc_id))
+                return True
+            else:
+                run_sql("UPDATE hstEXCEPTION SET last_seen=NOW(), counter=%s, total=%s WHERE id=%s", (counter, total, exc_id))
+                return _is_pow_of_2(counter)
+        else:
+            run_sql("INSERT INTO hstEXCEPTION(name, filename, line, last_seen, last_notified, counter, total) VALUES(%s, %s, %s, NOW(), NOW(), 1, 1)", (name, filename, line))
+            return True
+    except:
+        raise
+        return True
+
+def get_pretty_notification_info(name, filename, line):
+    """
+    Return a sentence describing when this exception was already seen.
+    """
+    exc_log = run_sql("SELECT last_notified,last_seen,total FROM hstEXCEPTION WHERE name=%s AND filename=%s AND line=%s", (name, filename, line))
+    if exc_log:
+        last_notified, last_seen, total = exc_log[0]
+        return "This exception has already been seen %s times\n    last time it was seen: %s\n    last time it was notified: %s\n" % (total, last_seen.strftime("%Y-%m-%d %H:%M:%S"), last_notified.strftime("%Y-%m-%d %H:%M:%S"))
+    else:
+        return "It is the first time this exception has been seen.\n"
 
 def register_exception(force_stack=False,
                        stream='error',
@@ -308,6 +357,7 @@ def register_exception(force_stack=False,
     try:
         ## Let's extract exception information
         exc_info = sys.exc_info()
+        exc_name = exc_info[0].__name__
         output = get_pretty_traceback(
             req=req, exc_info=exc_info, force_stack=force_stack)
         if output:
@@ -350,16 +400,18 @@ def register_exception(force_stack=False,
                 written_to_log = True
             except:
                 written_to_log = False
+            filename, line_no, function_name = _get_filename_and_line(exc_info)
 
-            if CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or \
-                (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or \
-                not written_to_log:
+            ## let's log the exception and see whether we should report it.
+            if exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
+                (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or
+                not written_to_log):
                 ## If requested or if it's impossible to write in the log
                 from invenio.mailutils import send_email
                 if not subject:
-                    filename, line_no, function_name = _get_filename_and_line(exc_info)
                     subject = 'Exception (%s:%s:%s)' % (filename, line_no, function_name)
                 subject = '%s at %s' % (subject, CFG_SITE_URL)
+                email_text = "\n%s\n%s" % (get_pretty_notification_info(exc_name, filename, line_no), email_text)
                 if not written_to_log:
                         email_text += """\
 Note that this email was sent to you because it has been impossible to log
