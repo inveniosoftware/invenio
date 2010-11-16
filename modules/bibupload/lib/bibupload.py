@@ -753,16 +753,28 @@ def synchronize_8564(rec_id, record, record_had_FFT):
     for field in tags8564s:
         to_be_removed = False
         for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
-            if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)) or \
-                value.startswith('%s/record/%s/files/' % (CFG_SITE_SECURE_URL, rec_id)):
-                if not record_had_FFT and bibdocfile_url_p(value):
+            try:
+                ## Let's see if it is a bibdocfile URL.
+                found_recid, dummy, dummy = decompose_bibdocfile_url(value)
+                if int(found_recid) == int(rec_id):
+                    to_be_removed = True
+            except:
+                try:
+                    ## Let's see if it is an old bibdocfile URL
+                    found_recid = decompose_bibdocfile_old_url(value)
+                    if int(found_recid) == int(rec_id):
+                        to_be_removed = True
+                except:
+                    pass
+            if to_be_removed:
+                if not record_had_FFT:
                     ## If the submission didn't have FFTs, i.e. could be
                     ## not FFTs aware, and it specify 8564s pointing to local
                     ## owned files, then we should import comment and
                     ## description from the 8564s tags.
                     ## Anything else will be discarded.
                     merge_marc_into_bibdocfile(field)
-                to_be_removed = True
+                break
         if not to_be_removed:
             filtered_tags8564s.append(field)
 
