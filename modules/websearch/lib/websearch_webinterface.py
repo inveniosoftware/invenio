@@ -70,6 +70,7 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_SECURE_URL, \
+     CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
@@ -312,14 +313,14 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         if verbose == 9:
             req.write("<br/>affiliations: "+str(time1-time2)+"<br/>")
 
-
-        #find out how many times these records have been downloaded
-        recsloads = {}
-        recsloads = get_download_weight_total(recsloads, pubs)
-        #sum up
         totaldownloads = 0
-        for k in recsloads.keys():
-            totaldownloads = totaldownloads + recsloads[k]
+        if CFG_BIBRANK_SHOW_DOWNLOAD_STATS:
+            #find out how many times these records have been downloaded
+            recsloads = {}
+            recsloads = get_download_weight_total(recsloads, pubs)
+            #sum up
+            for k in recsloads.keys():
+                totaldownloads = totaldownloads + recsloads[k]
 
         #get cited by..
         citedbylist = get_cited_by_list(pubs)

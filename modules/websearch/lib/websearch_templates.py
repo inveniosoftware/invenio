@@ -3924,8 +3924,8 @@ class Template:
                                      {}, "All papers ("+str(len(pubs))+")",)
         line1 = "<strong>" + _("Papers:") + "</strong>"
         line2 = searchstr
-        if num_downloads:
-            line2 + " ("+_("downloaded")+" "
+        if CFG_BIBRANK_SHOW_DOWNLOAD_STATS and num_downloads:
+            line2 += " ("+_("downloaded")+" "
             line2 += str(num_downloads)+" "+_("times")+")"
         if CFG_INSPIRE_SITE:
             CFG_COLLS = ['Book',
