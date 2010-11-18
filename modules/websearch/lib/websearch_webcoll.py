@@ -726,9 +726,9 @@ class Collection:
             #     (note: explicitly remove DELETED records)
             if CFG_CERN_SITE:
                 reclist = search_pattern(None, self.dbquery + \
-                                         ' -collection:"DELETED" -collection:"DUMMY"')
+                                         ' -980__:"DELETED" -980__:"DUMMY"')
             else:
-                reclist = search_pattern(None, self.dbquery + ' -collection:"DELETED"')
+                reclist = search_pattern(None, self.dbquery + ' -980__:"DELETED"')
             reclist_with_nonpublic_subcolls = copy.deepcopy(reclist)
         # store the results:
         self.nbrecs = len(reclist_with_nonpublic_subcolls)
