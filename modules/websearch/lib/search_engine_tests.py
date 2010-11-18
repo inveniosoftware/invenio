@@ -27,6 +27,20 @@ import unittest
 from invenio import search_engine
 from invenio.testutils import make_test_suite, run_test_suite
 
+
+class TestMiscUtilityFunctions(unittest.TestCase):
+    """Test whatever non-data-specific utility functions are essential."""
+
+    def test_ziplist2x2(self):
+        """search engine - ziplist 2 x 2"""
+        self.assertEqual(search_engine.ziplist([1, 2], [3, 4]), [[1, 3], [2, 4]])
+
+    def test_ziplist3x3(self):
+        """search engine - ziplist 3 x 3"""
+        self.assertEqual(search_engine.ziplist([1, 2, 3], ['a', 'b', 'c'], [9, 8, 7]),
+                         [[1, 'a', 9], [2, 'b', 8], [3, 'c', 7]])
+
+
 class TestWashQueryParameters(unittest.TestCase):
     """Test for washing of search query parameters."""
 
@@ -226,9 +240,12 @@ class TestQueryParser(unittest.TestCase):
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w']])
 
+
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,
-                             TestQueryParser)
+                             TestQueryParser,
+                             TestMiscUtilityFunctions)
+
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

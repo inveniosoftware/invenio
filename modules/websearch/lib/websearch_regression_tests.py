@@ -1453,6 +1453,23 @@ class WebSearchSummarizerTest(unittest.TestCase):
                                                expected_link_target=CFG_SITE_URL+"/search?p=ellis%20AND%20cited%3A1-%3E9&rm=citation",
                                                expected_link_label='1'))
 
+    def test_ellis_not_quark_citation_summary_advanced(self):
+        """websearch - ellis and not quark, citation summary format advanced"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&as=1&m1=a&p1=ellis&f1=author&op1=n&m2=a&p2=quark&f2=&op2=a&m3=a&p3=&f3=&action_search=Search&sf=&so=a&rm=&rg=10&sc=1&of=hcs',
+                                               expected_text="Less known papers (1-9)",
+                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9&rm=citation',
+                                               expected_link_label='1'))
+
+    def test_ellis_not_quark_citation_summary_regular(self):
+        """websearch - ellis and not quark, citation summary format advanced"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=author%3Aellis+and+not+quark&f=&action_search=Search&sf=&so=d&rm=&rg=10&sc=0&of=hcs',
+                                               expected_text="Less known papers (1-9)",
+                                               expected_link_target=CFG_SITE_URL+'/search?p=author%3Aellis%20and%20not%20quark%20AND%20cited%3A1-%3E9&rm=citation',
+                                               expected_link_label='1'))
+
+
 class WebSearchRecordCollectionGuessTest(unittest.TestCase):
     """Primary collection guessing tests."""
 

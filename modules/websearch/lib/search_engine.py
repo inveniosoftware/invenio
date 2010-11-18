@@ -207,6 +207,24 @@ try:
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
 
+
+def ziplist(*lists):
+    """Just like zip(), but returns lists of lists instead of lists of tuples
+
+    Example:
+    zip([f1, f2, f3], [p1, p2, p3], [op1, op2, '']) =>
+       [(f1, p1, op1), (f2, p2, op2), (f3, p3, '')]
+    ziplist([f1, f2, f3], [p1, p2, p3], [op1, op2, '']) =>
+       [[f1, p1, op1], [f2, p2, op2], [f3, p3, '']]
+
+    FIXME: This is handy to have, and should live somewhere else, like
+    miscutil.really_useful_functions or something.
+    """
+    def l(*items):
+        return list(items)
+    return map(l, *lists)
+
+
 def get_permitted_restricted_collections(user_info):
     """Return a list of collection that are restricted but for which the user
     is authorized."""
@@ -3029,12 +3047,12 @@ def get_modification_date(recID, fmt="%Y-%m-%d"):
         out = res[0][0]
     return out
 
-def print_warning(req, msg, type='', prologue='<br />', epilogue='<br />'):
+def print_warning(req, msg, msg_type='', prologue='<br />', epilogue='<br />'):
     "Prints warning message and flushes output."
     if req and msg:
         req.write(websearch_templates.tmpl_print_warning(
                    msg = msg,
-                   type = type,
+                   type = msg_type,
                    prologue = prologue,
                    epilogue = epilogue,
                  ))
@@ -4856,7 +4874,24 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
             if of in ['hcs']:
                 # feed the current search to be summarized:
                 from invenio.search_engine_summarizer import summarize_records
-                summarize_records(results_final_for_all_selected_colls, 'hcs', ln, p, f, req)
+                search_p = p
+                search_f = f
+                if not p and (aas == 1 or p1 or p2 or p3):
+                    op_d = {'n': ' and not ', 'a': ' and ', 'o': ' or ', '': ''}
+                    triples = ziplist([f1, f2, f3], [p1, p2, p3], [op1, op2, ''])
+                    triples_len = len(triples)
+                    for i in range(triples_len):
+                        fi, pi, oi = triples[i]                       # e.g.:
+                        if i < triples_len-1 and not triples[i+1][1]: # if p2 empty
+                            triples[i+1][0] = ''                      #   f2 must be too
+                            oi = ''                                   #   and o1
+                        if ' ' in pi:
+                            pi = '"'+pi+'"'
+                        if fi:
+                            fi = fi + ':'
+                        search_p += fi + pi + op_d[oi]
+                    search_f = ''
+                summarize_records(results_final_for_all_selected_colls, 'hcs', ln, search_p, search_f, req)
             else:
                 if len(colls_to_search)>1:
                     cpu_time = -1 # we do not want to have search time printed on each collection
@@ -4926,7 +4961,6 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=CF
                         # TODO: check if verbose messages still work when dealing with (re)calculations of timeouts
                         (hosted_colls_timeouts_results, hosted_colls_timeouts_timeouts) = do_calculate_hosted_collections_results(req, ln, None, verbose, None, hosted_colls_timeouts, CFG_HOSTED_COLLECTION_TIMEOUT_POST_SEARCH)
                         if hosted_colls_timeouts_results:
-                            hosted_colls_timeouts_true_results = []
                             for result in hosted_colls_timeouts_results:
                                 if result[1] == None or result[1] == False:
                                     ## these are the searches the returned no or zero results
@@ -5079,7 +5113,7 @@ def perform_request_log(req, date=""):
         i = 0
         for line in lines:
             try:
-                datetime, aas, p, f, c, nbhits = string.split(line,"#")
+                datetime, dummy_aas, p, f, c, nbhits = string.split(line,"#")
                 i += 1
                 req.write("<tr><td align=\"right\">#%d</td><td>%s:%s:%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>" \
                           % (i, datetime[8:10], datetime[10:12], datetime[12:], p, f, c, nbhits))
