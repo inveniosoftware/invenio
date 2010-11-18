@@ -2739,22 +2739,17 @@ class BibDocFile:
         return calculate_md5(self.fullpath) == self.checksum
 
     def stream(self, req):
-        """Stream the file."""
-        if self.status:
-            (auth_code, auth_message) = acc_authorize_action(req, 'viewrestrdoc', status=self.status)
+        """Stream the file.  Note that no restriction check is being
+        done here, since restrictions have been checked previously
+        inside websubmit_webinterface.py."""
+        if os.path.exists(self.fullpath):
+            if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
+                raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
+            stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
+            raise apache.SERVER_RETURN, apache.DONE
         else:
-            auth_code = 0
-        if auth_code == 0:
-            if os.path.exists(self.fullpath):
-                if random.random() < CFG_BIBDOCFILE_MD5_CHECK_PROBABILITY and calculate_md5(self.fullpath) != self.checksum:
-                    raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-                stream_file(req, self.fullpath, "%s%s" % (self.name, self.superformat), self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
-                raise apache.SERVER_RETURN, apache.DONE
-            else:
-                req.status = apache.HTTP_NOT_FOUND
-                raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
-        else:
-            raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
+            req.status = apache.HTTP_NOT_FOUND
+            raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
 
 _RE_STATUS_PARSER = re.compile(r'^(?P<type>email|group|egroup|role|firerole|status):\s*(?P<value>.*)$', re.M)
 def check_bibdoc_authorization(user_info, status):
