@@ -86,9 +86,24 @@ class TestGetWordsFromDateTag(unittest.TestCase):
           bibindex_engine.get_words_from_date_tag("dd mon yyyy"))
 
 
+class TestGetAuthorFamilyNameWords(unittest.TestCase):
+    """Test for getting family name words from author names."""
+
+    def test_authornames_john_doe(self):
+        """bibindex engine - get author family name words for John Doe"""
+        self.assertEqual(['doe',],
+          bibindex_engine.get_author_family_name_words_from_phrase('John Doe'))
+
+    def test_authornames_doe_john(self):
+        """bibindex engine - get author family name words for Doe, John"""
+        self.assertEqual(['doe',],
+          bibindex_engine.get_author_family_name_words_from_phrase('Doe, John'))
+
+
 TEST_SUITE = make_test_suite(TestListSetOperations,
                              TestWashIndexTerm,
-                             TestGetWordsFromDateTag)
+                             TestGetWordsFromDateTag,
+                             TestGetAuthorFamilyNameWords)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

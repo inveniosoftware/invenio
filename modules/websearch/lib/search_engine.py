@@ -1993,10 +1993,10 @@ def search_unit(p, f=None, m=None):
         # we are doing search by the citation count
         set = search_unit_citedby(p)
     elif m == 'a' or m == 'r':
-        # FIXME: workaround for not having phrase index yet
-        if f == 'fulltext':
-            return search_pattern(None, p, f, 'w')
         # we are doing either phrase search or regexp search
+        if f == 'fulltext':
+            # FIXME: workaround for not having phrase index yet
+            return search_pattern(None, p, f, 'w')
         index_id = get_index_id_from_field(f)
         if index_id != 0:
             set = search_unit_in_idxphrases(p, f, m)

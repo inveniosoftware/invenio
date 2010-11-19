@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-## BibIndxes bibliographic data, reference and fulltext indexing utility.
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
@@ -36,6 +35,7 @@ from invenio.config import \
      CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
+     CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES, \
      CFG_CERN_SITE, CFG_INSPIRE_SITE, \
      CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES, \
      CFG_BIBINDEX_SPLASH_PAGES
@@ -322,7 +322,6 @@ def get_nothing_from_phrase(phrase, stemming_language=None):
     8564_u)."""
     return []
 
-
 def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Atomically swap reindexed temporary table with the original one.
     Delete the now-old one."""
@@ -527,6 +526,22 @@ def get_exact_authors_from_phrase(phrase, stemming_language=None):
     """
     author_tokenizer = BibIndexExactNameTokenizer()
     return author_tokenizer.tokenize(phrase)
+
+def get_author_family_name_words_from_phrase(phrase, stemming_language=None):
+    """
+    Return list of words from author family names, not his/her first
+    names.  The phrase is assumed to be the full author name.  This is
+    useful for CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES.
+    """
+    d_family_names = {}
+    for name in get_fuzzy_authors_from_phrase(phrase, stemming_language):
+        if ',' in name:
+            d_family_names[name.split(',', 1)[0]] = 1
+    d_family_names_words = {}
+    for family_name in d_family_names.keys():
+        for word in get_words_from_phrase(family_name, stemming_language):
+            d_family_names_words[word] = 1
+    return d_family_names_words.keys()
 
 def apply_stemming_and_stopwords_and_length_check(word, stemming_language):
     """Return WORD after applying stemming and stopword and length checks.
@@ -1428,9 +1443,11 @@ def task_run_core():
         for index_id, index_name, index_tags in wordTables:
             if index_name == 'year' and CFG_INSPIRE_SITE:
                 fnc_get_words_from_phrase = get_words_from_date_tag
+            elif index_name == 'author' and \
+                     CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
+                fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
             else:
                 fnc_get_words_from_phrase = get_words_from_phrase
-
             wordTable = WordTable(index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxWORD%02dF',
@@ -1441,10 +1458,15 @@ def task_run_core():
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
+            if index_name == 'author' and \
+                   CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
+                fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
+            else:
+                fnc_get_pairs_from_phrase = get_pairs_from_phrase
             wordTable = WordTable(index_id=index_id,
                                   fields_to_index=index_tags,
                                   table_name_pattern='idxPAIR%02dF',
-                                  default_get_words_fnc=get_pairs_from_phrase,
+                                  default_get_words_fnc=fnc_get_pairs_from_phrase,
                                   tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
                                   wash_index_terms=100)
             _last_word_table = wordTable
@@ -1479,6 +1501,9 @@ def task_run_core():
             init_temporary_reindex_tables(index_id, reindex_prefix)
         if index_name == 'year' and CFG_INSPIRE_SITE:
             fnc_get_words_from_phrase = get_words_from_date_tag
+        elif index_name == 'author' and \
+                 CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
+            fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
         else:
             fnc_get_words_from_phrase = get_words_from_phrase
         wordTable = WordTable(index_id=index_id,
@@ -1545,10 +1570,15 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
 
         # Let's work on pairs now
+        if index_name == 'author' and \
+               CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
+            fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
+        else:
+            fnc_get_pairs_from_phrase = get_pairs_from_phrase
         wordTable = WordTable(index_id=index_id,
                               fields_to_index=index_tags,
                               table_name_pattern=reindex_prefix + 'idxPAIR%02dF',
-                              default_get_words_fnc=get_pairs_from_phrase,
+                              default_get_words_fnc=fnc_get_pairs_from_phrase,
                               tag_to_words_fnc_map={'8564_u': get_nothing_from_phrase},
                               wash_index_terms=100)
         _last_word_table = wordTable
