@@ -163,7 +163,7 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
                  'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': []}
         output = self.get_index_tokens(tagged_data)
-        anticipated = ['R Starr', 'Ringo Starr', 'Starr', 'Starr, R', 'Starr, Ringo']
+        anticipated = ['R Starr', 'Ringo Starr', 'Starr, R', 'Starr, Ringo']
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_simple_reverse(self):
@@ -174,7 +174,7 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
                  'lastnames': ['Starr'], 'nonlastnames': ['Ringo'], 'titles': []}
         output = self.get_index_tokens(tagged_data)
-        anticipated = ['R Starr', 'Ringo Starr', 'Starr', 'Starr, R', 'Starr, Ringo']
+        anticipated = ['R Starr', 'Ringo Starr', 'Starr, R', 'Starr, Ringo']
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_twoname_forward(self):
@@ -187,7 +187,7 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         output = self.get_index_tokens(tagged_data)
         anticipated = ['E Peskin', 'Edward Peskin', 'M E Peskin', 'M Edward Peskin', 'M Peskin',
                        'Michael E Peskin', 'Michael Edward Peskin', 'Michael Peskin',
-                       'Peskin', 'Peskin, E', 'Peskin, Edward', 'Peskin, M',
+                       'Peskin, E', 'Peskin, Edward', 'Peskin, M',
                        'Peskin, M E', 'Peskin, M Edward', 'Peskin, Michael',
                        'Peskin, Michael E', 'Peskin, Michael Edward']
         self.assertEqual(output, anticipated)
@@ -200,8 +200,7 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
                  'lastnames': ['Alvarez', 'Gaume'], 'nonlastnames': ['Joachim'], 'titles': []}
         output = self.get_index_tokens(tagged_data)
-        anticipated = ['Alvarez', 'Alvarez Gaume', 'Alvarez Gaume, J', 'Alvarez Gaume, Joachim',
-                       'Alvarez, J', 'Alvarez, Joachim', 'Gaume', 'Gaume, J',
+        anticipated = ['Alvarez Gaume, J', 'Alvarez Gaume, Joachim', 'Alvarez, J', 'Alvarez, Joachim', 'Gaume, J',
                        'Gaume, Joachim', 'J Alvarez', 'J Alvarez Gaume', 'J Gaume', 'Joachim Alvarez',
                        'Joachim Alvarez Gaume', 'Joachim Gaume']
         self.assertEqual(output, anticipated)
@@ -215,9 +214,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
                  'lastnames': ['Epstein'], 'nonlastnames': ['Brian'], 'titles': ['The Fifth Beatle']}
         output = self.get_index_tokens(tagged_data)
         anticipated = ['B Epstein', 'B Epstein, The Fifth Beatle', 'Brian Epstein',
-                       'Brian Epstein, The Fifth Beatle', 'Epstein', 'Epstein, B',
-                       'Epstein, B, The Fifth Beatle', 'Epstein, Brian',
-                       'Epstein, Brian, The Fifth Beatle']
+                       'Brian Epstein, The Fifth Beatle', 'Epstein, B', 'Epstein, B, The Fifth Beatle',
+                       'Epstein, Brian', 'Epstein, Brian, The Fifth Beatle']
         self.assertEqual(output, anticipated)
 
     def test_bifnt_tokenize_wildly_interesting(self):
@@ -228,8 +226,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
                  'lastnames': ['Ibanez', 'y', 'Gracia'], 'nonlastnames': ['Maria', 'Luisa'], 'titles': ['II', '(ed.)']}
         output = self.get_index_tokens(tagged_data)
-        anticipated = ['Gracia', 'Gracia, L', 'Gracia, Luisa', 'Gracia, M', 'Gracia, M L', 'Gracia, M Luisa',
-            'Gracia, Maria', 'Gracia, Maria L', 'Gracia, Maria Luisa', 'Ibanez', 'Ibanez y Gracia',
+        anticipated = ['Gracia, L', 'Gracia, Luisa', 'Gracia, M', 'Gracia, M L', 'Gracia, M Luisa',
+            'Gracia, Maria', 'Gracia, Maria L', 'Gracia, Maria Luisa',
             'Ibanez y Gracia, L', 'Ibanez y Gracia, L, II',
             'Ibanez y Gracia, Luisa', 'Ibanez y Gracia, Luisa, II',
             'Ibanez y Gracia, M', 'Ibanez y Gracia, M L', 'Ibanez y Gracia, M L, II',
@@ -262,9 +260,8 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         tagged_data = {'TOKEN_TAG_LIST': ['lastnames', 'nonlastnames', 'titles'],
                  'lastnames': ['Panofsky'], 'nonlastnames': ['W', 'K', 'H'], 'titles': []}
         output = self.get_index_tokens(tagged_data)
-        anticipated = ['H Panofsky', 'K H Panofsky', 'K Panofsky', 'Panofsky',
-                       'Panofsky, H', 'Panofsky, K', 'Panofsky, K H',
-                       'Panofsky, W', 'Panofsky, W H', 'Panofsky, W K',
+        anticipated = ['H Panofsky', 'K H Panofsky', 'K Panofsky', 'Panofsky, H', 'Panofsky, K',
+                       'Panofsky, K H', 'Panofsky, W', 'Panofsky, W H', 'Panofsky, W K',
                        'Panofsky, W K H', 'W H Panofsky',
                        'W K H Panofsky', 'W K Panofsky', 'W Panofsky']
         self.assertEqual(output, anticipated)
@@ -276,7 +273,7 @@ class TestFuzzyNameTokenizerTokens(unittest.TestCase):
         """
         teststr = "Ringo Starr"
         output = self.tokenizer.tokenize(teststr)
-        anticipated = ['R Starr', 'Ringo Starr', 'Starr', 'Starr, R', 'Starr, Ringo']
+        anticipated = ['R Starr', 'Ringo Starr', 'Starr, R', 'Starr, Ringo']
         self.assertEqual(output, anticipated)
 
 

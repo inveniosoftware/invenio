@@ -258,9 +258,6 @@ class BibIndexFuzzyNameTokenizer(BibIndexTokenizer):
                     continue
                 # XXX: remember to document that titles can only be applied to complete last names
                 expanded.extend(_fully_expanded_last_name(exp, [' '.join(last_parts)], title))
-        expanded.extend([part for part in last_parts if part not in self.lastname_stopwords])    # takes care of indexing lone last names
-        if len(last_parts) > 1:
-            expanded.append(' '.join(last_parts))     #...also, compounds
 
         return sorted(list(set(expanded)))
 
