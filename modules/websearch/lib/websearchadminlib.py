@@ -3420,18 +3420,25 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         # Disable citations if not citations found
         #if len(get_cited_by(recID)) == 0:
         #    tabs['citations']['enabled'] = False
-
         ## FIXME: the above was commented out because get_cited_by()
         ## may be too slow.  And we do not really need this anyway
         ## because we can disable tags in WebSearch Admin on a
         ## collection-by-collection basis.
 
-        # Disable Files tab if no file found
-        # FIXME: check non-Plot type
-        if not CFG_INSPIRE_SITE:
-            brd =  BibRecDocs(recID)
-            if len(brd.list_bibdocs()) == 0:
-                tabs['files']['enabled'] = False
+        # Disable Files tab if no file found except for Plots:
+        disable_files_tab_p = True
+        for abibdoc in BibRecDocs(recID).list_bibdocs():
+            abibdoc_type = abibdoc.get_type()
+            if abibdoc_type == 'Plot':
+                continue # ignore attached plots
+            else:
+                if CFG_INSPIRE_SITE and abibdoc_type != '':
+                    continue # ignore non-empty doctypes for INSPIRE
+                # okay, we found at least one non-Plot file:
+                disable_files_tab_p = False
+                break
+        if disable_files_tab_p:
+            tabs['files']['enabled'] = False
 
         #Disable holdings tab if collection != Books
         collection = run_sql("""select name from collection where id=%s""", (colID, ))
