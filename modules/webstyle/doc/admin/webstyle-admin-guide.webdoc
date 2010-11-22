@@ -333,7 +333,7 @@ displayed when <em>Information</em> tab is selected).</p>
   |nav. breadcrumb                                |
   |                                               |
   |   .--------------------------------------.    |
-  | .-|Info.|Ref.|Discussion.|Stats.|Fulltext|-.  |
+  | .-|Info.|Ref.|Discussion.|Stats.|Files |-.  |
   | | '--------------------------------------' |  |
   | |                                          |  |
   | |                  content                 |  |
@@ -377,8 +377,8 @@ The following tabs are available:
     <td>Statistics data and graph about file downloads/views</td>
     <td><a href="<CFG_SITE_URL>/record/10/usage"><CFG_SITE_URL>/record/10/usage</a></td>
   </tr>
-  <tr><td>Fulltext</td>
-    <td>Link(s) to fulltext file(s)</td>
+  <tr><td>Files</td>
+    <td>Link(s) to full-text and associated file(s)</td>
     <td><a href="<CFG_SITE_URL>/record/10/files"><CFG_SITE_URL>/record/10/files</a></td>
   </tr>
 </table>
@@ -386,7 +386,7 @@ The following tabs are available:
 <p>The mini panel is only displayed when the <em>Information</em> tab is
 selected. It is divided into the following sections:</p>
 <ul>
- <li>Files  : quick access to fulltext file(s)</li>
+ <li>Files  : quick access to full-text file(s)</li>
  <li>Review : quick access to reviewing feature</li>
  <li>Actions: quick access to several other features</li>
 </ul>
@@ -470,7 +470,7 @@ configuration:</p>
   If the returned content is empty, then the tabs will be disabled
   (visible, but cannot be clicked).</dd>
 
-<dt><strong><em>Fulltext</em> tab</strong></dt>
+<dt><strong><em>Files</em> tab</strong></dt>
   <dd>The content of this tab is defined by function <code>tmpl_filelist(..)</code>
   in <code>websubmit_templates.py</code>.</dd>
 </dl>
@@ -507,7 +507,7 @@ similarly be customized.</p>
 
 <p>Note that a tab might be greyed out (disabled) when its content is
 empty.  This is the case for the <em>References</em> tab (see <a href="#det_page_cust_cont_tabs">Customizing
-content of tabs</a> -&gt; 'References tab') and the <em>Fulltext</em> tab (if no
+content of tabs</a> -&gt; 'References tab') and the <em>Files</em> tab (if no
 file could be found for the record).<p>
 
 <p>For more advanced modifications (like changing the HTML code of the

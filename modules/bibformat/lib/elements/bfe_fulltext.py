@@ -52,7 +52,7 @@ def format_element(bfo, style, separator='; ', show_icons='no', focus_on_main_fi
     @param show_icons: if 'yes', print icons for fulltexts
     @param focus_on_main_file: if 'yes' and a doctype 'Main' is found,
     prominently display this doctype. In that case other doctypes are
-    summarized with a link to the Fulltext tab, named "Additional files"
+    summarized with a link to the Files tab, named "Additional files"
     """
     _ = gettext_set_language(bfo.lang)
 

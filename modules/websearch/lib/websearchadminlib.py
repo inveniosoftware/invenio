@@ -3377,7 +3377,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'keywords'  : {'label': _('Keywords'),         'visible': False, 'enabled': True, 'order': 4},
             'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 5},
             'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 6},
-            'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 7},
+            'files'     : {'label': _('Files'),            'visible': False, 'enabled': True, 'order': 7},
             'plots'     : {'label': _('Plots'),            'visible': False, 'enabled': True, 'order': 8},
             'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 9},
             }
@@ -3426,7 +3426,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         ## because we can disable tags in WebSearch Admin on a
         ## collection-by-collection basis.
 
-        # Disable fulltext if no file found
+        # Disable Files tab if no file found
         # FIXME: check non-Plot type
         if not CFG_INSPIRE_SITE:
             brd =  BibRecDocs(recID)

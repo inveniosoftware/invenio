@@ -849,7 +849,7 @@ URI: http://%(host)s%(page)s
          - recid *int* - the id of the displayed record
          - ln *string* - interface language code
          - format *string* - the format used to display the record
-         - files *string* - the small panel representing the fulltext
+         - files *string* - the small panel representing the attached files
          - reviews *string* - the small panel representing the reviews
          - actions *string* - the small panel representing the possible user's action
         """
