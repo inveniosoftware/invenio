@@ -36,7 +36,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_PREFIX
+     CFG_PREFIX, \
+     CFG_CERN_SITE
 from invenio import webinterface_handler_config as apache
 from invenio.dbquery import run_sql
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -1088,6 +1089,19 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
                 return page_not_authorized(req, "../submit",
                                            navmenuid='submit')
+            if CFG_CERN_SITE:
+                ## HACK BEGIN: this is a hack for CMS and ATLAS draft
+                from invenio.webuser import collect_user_info
+                user_info = collect_user_info(req)
+                if doctype == 'CMSPUB' and 'cds-admin [CERN]' not in user_info['group'] and not user_info['email'].lower() == 'cds.support@cern.ch':
+                    if 'cms-publication-committee-chair [CERN]' not in user_info['group']:
+                        return page_not_authorized(req, "../submit", text="In order to access this submission interface you need to be member of the CMS Publication Committee Chair.",
+                                        navmenuid='submit')
+                elif doctype == 'ATLPUB' and 'cds-admin [CERN]' not in user_info['group'] and not user_info['email'].lower() == 'cds.support@cern.ch':
+                    if 'atlas-gen [CERN]' not in user_info['group']:
+                        return page_not_authorized(req, "../submit", text="In order to access this submission interface you need to be member of ATLAS.",
+                                        navmenuid='submit')
+            ## HACK END
 
             if doctype=="":
                 return home(req,c,ln)
