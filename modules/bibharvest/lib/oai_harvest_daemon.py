@@ -314,6 +314,9 @@ def task_run_core():
                         (active_file + ".correct.xml",
                         get_nb_records_in_file(active_file + ".correct.xml")))
                     write_message("File %s contains %i records." % \
+                        (active_file + ".append.xml",
+                        get_nb_records_in_file(active_file + ".append.xml")))
+                    write_message("File %s contains %i records." % \
                         (active_file + ".holdingpen.xml",
                         get_nb_records_in_file(active_file + ".holdingpen.xml")))
 
@@ -341,6 +344,14 @@ def task_run_core():
                                                   len(active_files_list)))
                             res += call_bibupload(active_file + ".correct.xml", \
                                                   ["-c"], oai_src_id = repos[0][0])
+                            uploaded = True
+                        if get_nb_records_in_file(active_file + ".append.xml") > 0:
+                            task_update_progress("Uploading additions for records harvested from %s (%i/%i)" % \
+                                                 (reponame, \
+                                                  i, \
+                                                  len(active_files_list)))
+                            res += call_bibupload(active_file + ".append.xml", \
+                                                  ["-a"], oai_src_id = repos[0][0])
                             uploaded = True
                         if get_nb_records_in_file(active_file + ".holdingpen.xml") > 0:
                             task_update_progress("Uploading records harvested from %s to holding pen (%i/%i)" % \
@@ -617,13 +628,17 @@ def call_bibupload(marcxmlfile, mode = None, oai_src_id = -1):
 
 def call_bibfilter(bibfilterprogram, marcxmlfile):
     """
-    Call bibfilter program BIBFILTERPROGRAM on MARCXMLFILE that is a
-    MARCXML file usually obtained after harvest and convert steps.
+    Call bibfilter program BIBFILTERPROGRAM on MARCXMLFILE, which is usually
+    run before uploading records.
 
-    The bibfilter should produce two files called MARCXMLFILE.insert.xml
-    and MARCXMLFILE.correct.xml, the first file containing parts of
-    MARCXML to be uploaded in insert mode and the second file part of
-    MARCXML to be uploaded in correct mode.
+    The bibfilter should produce up to four files called MARCXMLFILE.insert.xml,
+    MARCXMLFILE.correct.xml, MARCXMLFILE.append.xml and MARCXMLFILE.holdingpen.xml.
+    The first file contains parts of MARCXML to be uploaded in insert mode,
+    the second file is uploaded in correct mode, third in append mode and the last file
+    contains MARCXML to be uploaded into the holding pen.
+
+    @param bibfilterprogram: path to bibfilter script to run
+    @param marcxmlfile: base-marcxmlfilename
 
     Return 0 if everything went okay, 1 otherwise.
     """
