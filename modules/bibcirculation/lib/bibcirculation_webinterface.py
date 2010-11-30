@@ -119,7 +119,8 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    navmenuid   = "yourloans")
+                    navmenuid   = "yourloans",
+                    secure_page_p=1)
 
     def loanshistoricaloverview(self, req, form):
         """
@@ -159,7 +160,8 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                     lastupdated = __lastupdated__,
                     req         = req,
                     language    = argd['ln'],
-                    navmenuid   = "yourloans")
+                    navmenuid   = "yourloans",
+                    secure_page_p=1)
 
 
 class WebInterfaceILLPages(WebInterfaceDirectory):

@@ -103,7 +103,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     language=argd['ln'],
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='youralerts')
+                    navmenuid='youralerts',
+                    secure_page_p=1)
 
     def input(self, req, form):
 

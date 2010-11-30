@@ -93,7 +93,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     language    = argd['ln'],
                     errors      = errors,
                     warnings    = warnings,
-                    navmenuid   = "yourmessages")
+                    navmenuid   = "yourmessages",
+                    secure_page_p=1)
 
     def write(self, req, form):
         """ write(): interface for message composing
@@ -154,7 +155,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     language    = argd['ln'],
                     errors      = errors,
                     warnings    = warnings,
-                    navmenuid   = "yourmessages")
+                    navmenuid   = "yourmessages",
+                    secure_page_p=1)
 
     def send(self, req, form):
         """
@@ -274,7 +276,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     language    = argd['ln'],
                     errors      = errors,
                     warnings    = warnings,
-                    navmenuid   = "yourmessages")
+                    navmenuid   = "yourmessages",
+                    secure_page_p=1)
 
     def delete(self, req, form):
         """
@@ -321,7 +324,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     language    = argd['ln'],
                     errors      = errors,
                     warnings    = warnings,
-                    navmenuid   = "yourmessages")
+                    navmenuid   = "yourmessages",
+                    secure_page_p=1)
 
     def delete_all(self, req, form):
         """
@@ -368,7 +372,8 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     language    = argd['ln'],
                     errors      = errors,
                     warnings    = warnings,
-                    navmenuid   = "yourmessages")
+                    navmenuid   = "yourmessages",
+                    secure_page_p=1)
 
     def display_msg(self, req, form):
         """
@@ -416,5 +421,6 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                     language    = argd['ln'],
                     errors      = errors,
                     warnings    = warnings,
-                    navmenuid   = "yourmessages")
+                    navmenuid   = "yourmessages",
+                    secure_page_p=1)
 

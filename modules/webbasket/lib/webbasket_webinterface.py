@@ -369,7 +369,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def search(self, req, form):
         """Search baskets interface."""
@@ -435,7 +436,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def write_note(self, req, form):
         """Write a comment (just interface for writing)"""
@@ -499,7 +501,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
-                    of          = argd['of'])
+                    of          = argd['of'],
+                    secure_page_p=1)
 
     def save_note(self, req, form):
         """Save comment on record in basket"""
@@ -571,7 +574,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def delete_note(self, req, form):
         """Delete a comment
@@ -646,7 +650,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def add(self, req, form):
         """Add records to baskets.
@@ -743,7 +748,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def delete(self, req, form):
         """Delete basket interface"""
@@ -825,7 +831,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         warnings    = warnings,
                         req         = req,
                         navmenuid   = 'yourbaskets',
-                        of          = argd['of'])
+                        of          = argd['of'],
+                        secure_page_p=1)
 
     def modify(self, req, form):
         """Modify basket content interface (reorder, suppress record, etc.)"""
@@ -917,7 +924,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
-                    of          = argd['of'])
+                    of          = argd['of'],
+                    secure_page_p=1)
 
     def edit(self, req, form):
         """Edit basket interface"""
@@ -1041,7 +1049,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
-                    of          = argd['of'])
+                    of          = argd['of'],
+                    secure_page_p=1)
 
     def edit_topic(self, req, form):
         """Edit topic interface"""
@@ -1142,7 +1151,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
-                    of          = argd['of'])
+                    of          = argd['of'],
+                    secure_page_p=1)
 
     def create_basket(self, req, form):
         """Create basket interface"""
@@ -1219,7 +1229,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         warnings    = warnings,
                         req         = req,
                         navmenuid   = 'yourbaskets',
-                        of          = argd['of'])
+                        of          = argd['of'],
+                        secure_page_p=1)
 
     def display_public(self, req, form):
         """Display a public basket"""
@@ -1285,7 +1296,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def list_public_baskets(self, req, form):
         """List of public baskets interface."""
@@ -1324,7 +1336,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def subscribe(self, req, form):
         """Subscribe to a basket pseudo-interface."""
@@ -1384,7 +1397,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def unsubscribe(self, req, form):
         """Unsubscribe from basket pseudo-interface."""
@@ -1444,7 +1458,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)
 
     def write_public_note(self, req, form):
         """Write a comment (just interface for writing)"""
@@ -1503,7 +1518,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     warnings    = warnings,
                     req         = req,
                     navmenuid   = 'yourbaskets',
-                    of          = argd['of'])
+                    of          = argd['of'],
+                    secure_page_p=1)
 
     def save_public_note(self, req, form):
         """Save comment on record in basket"""
@@ -1570,4 +1586,5 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     req         = req,
                     navmenuid   = 'yourbaskets',
                     of          = argd['of'],
-                    navtrail_append_title_p = 0)
+                    navtrail_append_title_p = 0,
+                    secure_page_p=1)

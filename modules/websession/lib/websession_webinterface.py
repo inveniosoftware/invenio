@@ -91,7 +91,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 try:
                     (role_name, expiration) = mail_cookie_check_role(args['mailcookie'], uid)
                 except InvenioWebAccessMailCookieDeletedError:
-                    return page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'])
+                    return page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'], secure_page_p=1)
                 return page(title=title,
                 body=webaccount.perform_back(
                     _("You have successfully obtained an authorization as %(x_role)s! "
@@ -104,7 +104,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 uid=webuser.getUid(req),
                 language=args['ln'],
                 lastupdated=__lastupdated__,
-                navmenuid='youraccount')
+                navmenuid='youraccount',
+                secure_page_p=1)
             elif kind == 'mail_activation':
                 try:
                     email = mail_cookie_check_mail_activation(args['mailcookie'])
@@ -120,7 +121,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         uid = webuser.update_Uid(req, email)
                         body += "<p>" + _("You can now go to %(x_url_open)syour account page%(x_url_close)s.") % {'x_url_open' : '<a href="/youraccount/display?ln=%s">' % args['ln'], 'x_url_close' : '</a>'} + "</p>"
                     return page(title=_("Email address successfully activated"),
-                    body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount')
+                    body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount', secure_page_p=1)
                 except InvenioWebAccessMailCookieDeletedError, e:
                     body = "<p>" + _("You have already confirmed the validity of your email address!") + "</p>"
                     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
@@ -129,7 +130,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     else:
                         body += "<p>" + _("You can now go to %(x_url_open)syour account page%(x_url_close)s.") % {'x_url_open' : '<a href="/youraccount/display?ln=%s">' % args['ln'], 'x_url_close' : '</a>'} + "</p>"
                     return page(title=_("Email address successfully activated"),
-                        body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount')
+                        body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount', secure_page_p=1)
                 return webuser.page_not_authorized(req, "../youraccount/access",
                     text=_("This request for confirmation of an email "
                     "address is not valid or"
@@ -155,7 +156,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         try:
             email = mail_cookie_check_pw_reset(reset_key)
         except InvenioWebAccessMailCookieDeletedError:
-            return page(title=title, req=req, body=_("This request for resetting a password has already been used."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'])
+            return page(title=title, req=req, body=_("This request for resetting a password has already been used."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'], secure_page_p=1)
         except InvenioWebAccessMailCookieError:
             return webuser.page_not_authorized(req, "../youraccount/access",
                 text=_("This request for resetting a password is not valid or"
@@ -197,7 +198,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             req=req,
             language=args['ln'],
             lastupdated=__lastupdated__,
-            navmenuid='youraccount')
+            navmenuid='youraccount', secure_page_p=1)
 
     def display(self, req, form):
         args = wash_urlargd(form, {})
@@ -793,7 +794,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                             uid=uid,
                             req=req,
-                            secure_page_p = 1,
+                            secure_page_p=1,
                             language=args['ln'],
                             lastupdated=__lastupdated__,
                             navmenuid='youraccount')
@@ -968,7 +969,8 @@ class WebInterfaceYourTicketsPages(WebInterfaceDirectory):
                     uid=uid,
                     req=req,
                     language=argd['ln'],
-                    lastupdated=__lastupdated__)
+                    lastupdated=__lastupdated__,
+                    secure_page_p=1)
 
 class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
 
@@ -1011,7 +1013,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings,
-                    navmenuid     = 'yourgroups')
+                    navmenuid     = 'yourgroups',
+                    secure_page_p = 1)
 
 
 
@@ -1073,7 +1076,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings,
-                    navmenuid     = 'yourgroups')
+                    navmenuid     = 'yourgroups',
+                    secure_page_p = 1)
 
     def join(self, req, form):
         """join(): interface for joining a new group
@@ -1136,7 +1140,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings,
-                    navmenuid     = 'yourgroups')
+                    navmenuid     = 'yourgroups',
+                    secure_page_p = 1)
 
     def leave(self, req, form):
         """leave(): interface for leaving a group
@@ -1189,7 +1194,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings,
-                    navmenuid     = 'yourgroups')
+                    navmenuid     = 'yourgroups',
+                    secure_page_p = 1)
 
     def edit(self, req, form):
         """edit(): interface for editing group
@@ -1260,7 +1266,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings,
-                    navmenuid     = 'yourgroups')
+                    navmenuid     = 'yourgroups',
+                    secure_page_p = 1)
 
 
     def members(self, req, form):
@@ -1333,7 +1340,8 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                     lastupdated   = __lastupdated__,
                     errors        = errors,
                     warnings      = warnings,
-                    navmenuid     = 'yourgroups')
+                    navmenuid     = 'yourgroups',
+                    secure_page_p = 1)
 
 
 def wash_login_method(login_method):
