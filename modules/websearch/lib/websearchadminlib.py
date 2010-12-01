@@ -3432,8 +3432,10 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             if abibdoc_type == 'Plot':
                 continue # ignore attached plots
             else:
-                if CFG_INSPIRE_SITE and abibdoc_type != '':
-                    continue # ignore non-empty doctypes for INSPIRE
+                if CFG_INSPIRE_SITE and not \
+                   abibdoc_type in ('', 'Supplementary Material'):
+                    # ignore non-empty, non-suppl doctypes for INSPIRE
+                    continue
                 # okay, we found at least one non-Plot file:
                 disable_files_tab_p = False
                 break
