@@ -3430,7 +3430,6 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
     # the last tag element found when working from left-to-right across the line
     identified_citation_element = None
 
-
     while tag_match is not None:
         ## While there are tags inside this reference line...
         tag_match_start = tag_match.start()
@@ -3926,7 +3925,8 @@ def add_tagged_title(reading_line,
     ## of the reading-line, up to the point of the matched TITLE:
     rebuilt_line = reading_line[startpos:true_replacement_index]
     ## Test to see whether a title or an "IBID" was matched:
-    if matched_title.upper().find("IBID") != -1:
+    if matched_title.upper().find("IBID") != -1 \
+        or matched_title.upper().find("IBIDEM") != -1:
         ## This is an IBID
         ## Try to replace the IBID with a title:
         if len(previous_match) > 1:
