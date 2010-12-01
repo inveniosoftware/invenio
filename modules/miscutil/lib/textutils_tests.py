@@ -26,7 +26,9 @@ import unittest
 from invenio.textutils import \
      wrap_text_in_a_box, \
      guess_minimum_encoding, \
-     wash_for_xml
+     wash_for_xml, \
+     wash_for_utf8
+
 from invenio.testutils import make_test_suite, run_test_suite
 
 class GuessMinimumEncodingTest(unittest.TestCase):
@@ -176,6 +178,56 @@ class WashForXMLTest(unittest.TestCase):
                                       xml_version='1.1'), '\x08\tsome chars')
         self.assertEqual(wash_for_xml('$b\bar{b}$', xml_version='1.1'), '$b\x08ar{b}$')
 
+class WashForUTF8Test(unittest.TestCase):
+    def test_normal_legal_string_washing(self):
+        """textutils - testing UTF-8 washing on a perfectly normal string"""
+        some_str = "This is an example string"
+        self.assertEqual(some_str, wash_for_utf8(some_str))
+
+    def test_chinese_string_washing(self):
+        """textutils - testing washing functions on chinese script"""
+        some_str = """春眠暁を覚えず
+        処処に啼鳥と聞く
+        夜来風雨の声
+        花落つること
+        知んぬ多少ぞ"""
+        self.assertEqual(some_str, wash_for_utf8(some_str))
+
+    def test_russian_characters_washing(self):
+        """textutils - washing Russian characters for UTF-8"""
+        self.assertEqual(wash_for_utf8('''
+        В тени дерев, над чистыми водами
+        Дерновый холм вы видите ль, друзья?
+        Чуть слышно там плескает в брег струя;
+        Чуть ветерок там дышит меж листами;
+        На ветвях лира и венец...
+        Увы! друзья, сей холм - могила;
+        Здесь прах певца земля сокрыла;
+        Бедный певец!'''), '''
+        В тени дерев, над чистыми водами
+        Дерновый холм вы видите ль, друзья?
+        Чуть слышно там плескает в брег струя;
+        Чуть ветерок там дышит меж листами;
+        На ветвях лира и венец...
+        Увы! друзья, сей холм - могила;
+        Здесь прах певца земля сокрыла;
+        Бедный певец!''')
+
+    def test_remove_incorrect_unicode_characters(self):
+        """textutils - washing out the incorrect characters"""
+        self.assertEqual(wash_for_utf8("Ź\206dź\204bło żół\203wia \202"), "Źdźbło żółwia ")
+
+    def test_empty_string_wash(self):
+        """textutils - washing an empty string"""
+        self.assertEqual(wash_for_utf8(""), "")
+
+    def test_only_incorrect_unicode_wash(self):
+        """textutils - washing an empty string"""
+        self.assertEqual(wash_for_utf8("\202\203\204\205"), "")
+
+    def test_raising_exception_on_incorrect(self):
+        """textutils - assuring an exception on incorrect input"""
+        self.assertRaises(UnicodeDecodeError, wash_for_utf8, "\202\203\204\205", correct=False)
 
 class WrapTextInABoxTest(unittest.TestCase):
     """Test functions related to wrap_text_in_a_box function."""
@@ -338,8 +390,9 @@ At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praese
 """
         self.assertEqual(wrap_text_in_a_box(text), result)
 
+
 TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest,
-                             WashForXMLTest)
+                             WashForXMLTest, WashForUTF8Test)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

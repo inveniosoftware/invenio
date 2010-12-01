@@ -319,6 +319,26 @@ def wash_for_xml(text, xml_version='1.0'):
     else:
         return RE_ALLOWED_XML_1_1_CHARS.sub('', unicode(text, 'utf-8')).encode('utf-8')
 
+def wash_for_utf8(text, correct=True):
+    """
+    Removes all characters incorrect from the unicode point of view
+    @param text: input string to wash
+    """
+    cont = True
+    while cont:
+        try:
+            text.decode("utf-8")
+        except UnicodeDecodeError, e:
+            if correct:
+                text = text[:e.start] + text[e.end:]
+            else:
+                raise e
+        except Exception, e:
+            raise e
+        else:
+            cont = False
+    return text
+
 def nice_size(size):
     """
     @param size: the size.

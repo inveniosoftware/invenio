@@ -87,7 +87,7 @@ from invenio.intbitset import intbitset as HitSet
 from invenio.dbquery import DatabaseError, deserialize_via_marshal
 from invenio.access_control_engine import acc_authorize_action
 from invenio.errorlib import register_exception
-from invenio.textutils import encode_for_xml
+from invenio.textutils import encode_for_xml, wash_for_utf8
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -1475,6 +1475,8 @@ def wash_pattern(p):
     p = re_pattern_today.sub(time.strftime("%Y-%m-%d", time.localtime()), p)
     # remove unnecessary whitespace:
     p = string.strip(p)
+    # remove potentially wrong UTF-8 characters:
+    p = wash_for_utf8(p)
     return p
 
 def wash_field(f):
