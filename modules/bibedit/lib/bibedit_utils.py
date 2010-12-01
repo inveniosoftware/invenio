@@ -54,6 +54,7 @@ from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions
 from invenio.search_engine import get_fieldvalues, print_record, record_exists
 from invenio.webuser import get_user_info
+from invenio.dbquery import run_sql
 
 # Precompile regexp:
 re_file_option = re.compile(r'^%s' % CFG_TMPDIR)
@@ -469,18 +470,8 @@ def _get_bibupload_task_ids():
     Ignore tasks submitted by user bibreformat.
 
     """
-    cmd = '%s%sbibsched status -t bibupload' % (CFG_BINDIR, os.sep)
-    err, out = commands.getstatusoutput(cmd)
-    if err:
-        raise StandardError, '%s: %s' % (err, out)
-    tasks = out.splitlines()[3:-1]
-    res = []
-    for task in tasks:
-        if task.find('USER="bibreformat"') == -1:
-            matchobj = re_taskid.search(task)
-            if matchobj:
-                res.append(matchobj.group(1))
-    return res
+    res = run_sql('''SELECT id FROM schTASK WHERE proc LIKE "bibupload%" AND user <> "bibreformat" AND status IN ("WAITING", "SCHEDULED", "RUNNING", "CONTINUING", "ABOUT TO STOP", "ABOUT TO SLEEP", "SLEEPING")''')
+    return [row[0] for row in res]
 
 def _get_bibupload_filenames():
     """Return paths to all files scheduled for upload."""
