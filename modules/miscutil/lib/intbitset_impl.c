@@ -61,11 +61,12 @@ IntBitSet *intBitSetCreateNoAllocate() {
 
 IntBitSet *intBitSetResetFromBuffer(IntBitSet *const bitset, const void *const buf, const Py_ssize_t bufsize) {
     bitset->allocated = bufsize/wordbytesize;
-    bitset->bitset = realloc(bitset->bitset, bufsize);
+    free(bitset->bitset);
+    bitset->bitset = malloc(bufsize);
     bitset->tot = -1;
     bitset->size = bitset->allocated - 1;
     memcpy(bitset->bitset, buf, bufsize);
-    bitset->trailing_bits = *(bitset->bitset + bitset->allocated - 1);
+    bitset->trailing_bits = *(bitset->bitset + bitset->allocated - 1) ? (word_t) ~0 : 0;
     return bitset;
 }
 
@@ -85,7 +86,7 @@ IntBitSet *intBitSetCreateFromBuffer(const void *const buf, const Py_ssize_t buf
     ret->size = ret->allocated - 1;;
     ret->tot = -1;
     memcpy(ret->bitset, buf, bufsize);
-    ret->trailing_bits = ret->bitset[ret->allocated - 1];
+    ret->trailing_bits = *(ret->bitset + ret->allocated - 1) ? (word_t) ~0 : 0;
     return ret;
 }
 

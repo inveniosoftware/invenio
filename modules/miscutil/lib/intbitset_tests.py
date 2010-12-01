@@ -23,6 +23,7 @@ __revision__ = "$Id$"
 
 import unittest
 import sys
+import zlib
 
 if sys.hexversion < 0x2040000:
     # pylint: disable=W0622
@@ -65,6 +66,12 @@ class IntBitSetTest(unittest.TestCase):
             (intbitset.__le__, set.__le__, lambda x, y: cmp(x, y) <= 0),
             (intbitset.__lt__, set.__lt__, lambda x, y: cmp(x, y) < 0),
             (intbitset.__ne__, set.__ne__, lambda x, y: cmp(x, y) != 0),
+        ]
+
+        self.corrupted_strdumps = [
+            "ciao",
+            intbitset([2, 6000000]).strbits(),
+            "djflsdkfjsdljfsldkfjsldjlfk",
         ]
 
     def _helper_sanity_test(self, intbitset1, msg=''):
@@ -401,6 +408,19 @@ class IntBitSetTest(unittest.TestCase):
             for recid in intbitset(set1):
                 tmp_set1.append(recid)
             self.assertEqual(set1, tmp_set1)
+
+    def test_set_corruption(self):
+        """intbitset - set corruption"""
+        set1 = intbitset()
+        for strdump in self.corrupted_strdumps:
+            ## These should fail because they are not compressed
+            self.assertRaises(ValueError, intbitset, strdump)
+            self.assertRaises(ValueError, set1.fastload, strdump)
+            strdump = zlib.compress(strdump)
+            ## These should fail because they are not of the good
+            ## length
+            self.assertRaises(ValueError, intbitset, strdump)
+            self.assertRaises(ValueError, set1.fastload, strdump)
 
     def test_set_consistence(self):
         """intbitset - set consistence"""

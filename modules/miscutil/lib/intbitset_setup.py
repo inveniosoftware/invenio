@@ -36,8 +36,8 @@ setup(
     bitsets between various machine architectures.
     """,
     author = 'Invenio developers (Samuele Kaplun; last updated by $Author$)',
-    author_email = 'project-cdsware-developers@cern.ch',
-    url = 'http://invenio.cern.ch/',
+    author_email = 'info@invenio-software.org',
+    url = 'http://invenio-software.org/',
     ext_modules=[
         Extension("invenio.intbitset", ["intbitset.c", "intbitset_impl.c"], extra_compile_args=['-O3']),
     ],

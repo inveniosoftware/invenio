@@ -178,6 +178,9 @@ cdef class intbitset:
                 tmp = zlib.decompress(rhs)
                 if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
                     raise Exception("Buffer error!!!")
+                if (size % wordbytesize):
+                    ## Wrong size!
+                    raise Exception()
                 self.bitset = intBitSetCreateFromBuffer(buf, size)
             except Exception, msg:
                 raise ValueError("rhs is corrupted: %s" % msg)
@@ -571,7 +574,12 @@ cdef class intbitset:
             tmp = zlib.decompress(strdump)
             if PyObject_AsReadBuffer(tmp, &buf, &size) < 0:
                 raise Exception()
-            intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
+            if (size % wordbytesize):
+                ## Wrong size!
+                raise Exception()
+            intBitSetDestroy(self.bitset)
+            self.bitset = intBitSetCreateFromBuffer(buf, size)
+            #intBitSetResetFromBuffer((<intbitset> self).bitset, buf, size)
         except:
             raise ValueError("strdump is corrupted")
         return self
