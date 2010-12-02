@@ -129,7 +129,7 @@ def convert_conf_option(option_name, option_value):
     ## 3d) special cases: comma-separated lists
     if option_name in ['CFG_SITE_LANGS',
                        'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
-                       'CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS',
+                       'CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS',
                        'CFG_BIBUPLOAD_STRONG_TAGS',
                        'CFG_BIBFORMAT_HIDDEN_TAGS',
                        'CFG_BIBSCHED_GC_TASKS_TO_REMOVE',
@@ -841,7 +841,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
         Alias /export/ %(webdir)s/export/
-        Alias /jsMath/ %(webdir)s/jsMath/
+        Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
         Alias /fckeditor/ %(webdir)s/fckeditor/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1
@@ -910,7 +910,7 @@ WSGIRestrictStdout Off
         Alias /img/ %(webdir)s/img/
         Alias /js/ %(webdir)s/js/
         Alias /export/ %(webdir)s/export/
-        Alias /jsMath/ %(webdir)s/jsMath/
+        Alias /MathJax/ %(webdir)s/MathJax/
         Alias /jsCalendar/ %(webdir)s/jsCalendar/
         Alias /fckeditor/ %(webdir)s/fckeditor/
         AliasMatch /sitemap-(.*) %(webdir)s/sitemap-$1

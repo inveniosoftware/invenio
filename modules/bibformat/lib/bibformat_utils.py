@@ -500,7 +500,7 @@ re_verbatim_env_latex = re.compile('\\\\begin\{verbatim.*?\}(?P<content>.*?)\\\\
 def latex_to_html(text):
     """
     Do some basic interpretation of LaTeX input. Gives some nice
-    results when used in combination with JSMath.
+    results when used in combination with MathJax.
     """
     # Process verbatim environment first
     def make_verbatim(match_obj):

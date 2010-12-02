@@ -48,7 +48,7 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2.1<a href="#2.1"> Viewing comments/review information</a><br />
 <strong>3. <a href="#3">Configuring WebComment</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.1<a href="#3.1"> Configuring moderator per collection</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2<a href="#3.2"> Enabling LaTeX/JSMath in comments</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.2<a href="#3.2"> Enabling LaTeX/MathJax in comments</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.3<a href="#3.3"> Configuring threading</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.4<a href="#3.4"> Configuring commenting rounds</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.5<a href="#3.5"> Configuring restrictions</a><br />
@@ -96,12 +96,12 @@ is done through WebAccess administration interface.</p>
          the steps above and write * as the collection argument. </li>
 </ul>
 
-<a name="3.2"></a><h3>3.2 Enabling LaTeX/JSMath in comments</h3>
+<a name="3.2"></a><h3>3.2 Enabling LaTeX/MathJax in comments</h3>
 
 <p>
-It is possible to enable LaTeX rendering in comments with the JSMath module. In order to do that,
+It is possible to enable LaTeX rendering in comments with the MathJax module. In order to do that,
  it is necessary to set the following directive in the invenio configuration file:
-<pre>CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS = 1</pre>
+<pre>CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS = 1</pre>
 </p>
 
 <a name="3.3"></a><h3>3.3 Configuring threading</h3>

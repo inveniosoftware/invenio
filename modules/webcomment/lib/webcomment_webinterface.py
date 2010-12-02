@@ -45,7 +45,7 @@ from invenio.config import \
      CFG_PREFIX, \
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-     CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS
+     CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -227,15 +227,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             navtrail += '</a>'
             navtrail += ' &gt; <a class="navtrail">%s</a>' % (self.discussion==1 and _("Reviews") or _("Comments"))
 
-            jsmathheader = ''
-            if CFG_WEBCOMMENT_USE_JSMATH_IN_COMMENTS:
-                jsmathheader = """ <script type='text/javascript'>
-                                    jsMath = {
-                                        Controls: {cookie: {printwarn: 0}}
-                                    };
-                                    </script>
-                                    <script src='/jsMath/easy/invenio-jsmath.js' type='text/javascript'></script>
-                               """
+            mathjaxheader = ''
+            if CFG_WEBCOMMENT_USE_MATHJAX_IN_COMMENTS:
+                mathjaxheader = """<script src='/MathJax/MathJax.js' type='text/javascript'></script>"""
             jqueryheader = '''
             <script src="%(CFG_SITE_URL)s/js/jquery.min.js" type="text/javascript" language="javascript"></script>
             <script src="%(CFG_SITE_URL)s/js/jquery.MultiFile.pack.js" type="text/javascript" language="javascript"></script>
@@ -246,7 +240,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                         navtrail=navtrail,
                         uid=uid,
                         verbose=1,
-                        metaheaderadd = jsmathheader + jqueryheader,
+                        metaheaderadd = mathjaxheader + jqueryheader,
                         req=req,
                         language=argd['ln'],
                         navmenuid='search',

@@ -76,7 +76,7 @@ from invenio.config import \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBDIR, \
-     CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
+     CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS, \
      CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
      CFG_WEBSEARCH_PERMITTED_RESTRICTED_COLLECTIONS_LEVEL, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
@@ -1059,14 +1059,9 @@ def display_collection(req, c, aas, verbose, ln):
     if rssurl_params:
         rssurl += '?' + '&amp;'.join(rssurl_params)
 
-    if 'hb' in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
+    if 'hb' in CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS:
         metaheaderadd = """
-  <script type='text/javascript'>
-    jsMath = {
-        Controls: {cookie: {printwarn: 0}}
-    };
-  </script>
-  <script src='/jsMath/easy/invenio-jsmath.js' type='text/javascript'></script>
+<script src='/MathJax/MathJax.js' type='text/javascript'></script>
 """
     else:
         metaheaderadd = ''

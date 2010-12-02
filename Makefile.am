@@ -23,11 +23,11 @@ SUBDIRS = po config modules
 EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in \
              config.rpath
 
-# current jsMath version and packages
-JSMV = 3.6b
-JSMFV = 1.3
-JSMATH = jsMath-$(JSMV).zip
-JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
+
+# current MathJax version and packages
+
+MJV = 1.0.1a
+MATHJAX = MathJax-v$(MJV).zip
 
 # current FCKeditor version
 FCKV = 2.6.6
@@ -85,35 +85,28 @@ install-data-local:
 	@echo "** You may proceed to customizing your installation now.  **"
 	@echo "************************************************************"
 
-install-jsmath-plugin:
+install-mathjax-plugin:
 	@echo "***********************************************************"
-	@echo "** Installing jsMath plugin, please wait...              **"
+	@echo "** Installing MathJax plugin, please wait...              **"
 	@echo "***********************************************************"
-	rm -rf /tmp/invenio-jsmath-plugin
-	mkdir /tmp/invenio-jsmath-plugin
-	(cd /tmp/invenio-jsmath-plugin && \
-	wget 'http://downloads.sourceforge.net/jsmath/$(JSMATH)' && \
-	wget 'http://downloads.sourceforge.net/jsmath/$(JSMATHFONTS)' && \
-	wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msam10/msam10.zip' && \
-	wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msbm10/msbm10.zip' && \
-	unzip -u -d ${prefix}/var/www $(JSMATH) && \
-	unzip -u -d ${prefix}/var/www $(JSMATHFONTS) && \
-	unzip -u -d ${prefix}/var/www/jsMath/fonts msam10.zip && \
-	unzip -u -d ${prefix}/var/www/jsMath/fonts msbm10.zip)
-	rm -fr /tmp/invenio-jsmath-plugin
-	@echo "* Installing Invenio-specific jsMath config..."
+	rm -rf /tmp/invenio-mathjax-plugin
+	mkdir /tmp/invenio-mathjax-plugin
+	(cd /tmp/invenio-mathjax-plugin && \
+	wget 'http://downloads.sourceforge.net/mathjax/$(MATHJAX)' && \
+	unzip -q -u -d ${prefix}/var/www $(MATHJAX))
+	rm -fr /tmp/invenio-mathjax-plugin
+	@echo "* Installing Invenio-specific MathJax config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
-
 	@echo "***********************************************************"
-	@echo "** The jsMath plugin was successfully installed.         **"
+	@echo "** The MathJax plugin was successfully installed.         **"
 	@echo "** Please do not forget to properly set the option       **"
-	@echo "** CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in invenio.conf. **"
+	@echo "** CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS in invenio.conf. **"
 	@echo "***********************************************************"
 
-uninstall-jsmath-plugin:
-	@rm -rvf ${prefix}/var/www/jsMath
+uninstall-mathjax-plugin:
+	@rm -rvf ${prefix}/var/www/MathJax
 	@echo "***********************************************************"
-	@echo "** The jsMath plugin was successfully uninstalled.       **"
+	@echo "** The MathJax plugin was successfully uninstalled.       **"
 	@echo "***********************************************************"
 
 install-jscalendar-plugin:

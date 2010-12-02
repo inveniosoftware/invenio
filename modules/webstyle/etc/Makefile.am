@@ -15,13 +15,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-jsmathwebdir=$(localstatedir)/www/jsMath/easy
-jsmathweb_DATA=invenio-jsmath.js
+mathjaxwebdir=$(localstatedir)/www/MathJax/config
+mathjaxweb_DATA=MathJax.js
 
 fckeditorwebdir=$(localstatedir)/www/fckeditor
 fckeditorweb_DATA=invenio-fckeditor-config.js journal-editor-config.js \
                   journal-editor-styles.xml journal-editor-templates.xml
 
-EXTRA_DIST = $(jsmathweb_DATA) $(fckeditorweb_DATA)
+EXTRA_DIST = $(mathjaxweb_DATA) $(fckeditorweb_DATA)
 
 CLEANFILES = *~ *.tmp

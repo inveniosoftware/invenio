@@ -227,7 +227,7 @@ Contents
       $ ./configure
       $ make
       $ make install
-      $ make install-jsmath-plugin     ## optional
+      $ make install-mathjax-plugin     ## optional
       $ make install-jquery-plugins    ## optional
       $ make install-fckeditor-plugin  ## optional
       $ make install-pdfa-helper-files ## optional
@@ -413,17 +413,17 @@ Contents
           hinted as to the exact command to use based on the
           parameters you have used in the configure command.
 
-      $ make install-jsmath-plugin  ## optional
+      $ make install-mathjax-plugin  ## optional
 
           This will automatically download and install in the proper
-          place jsMath, a Javascript library to render LaTeX formulas
+          place MathJax, a JavaScript library to render LaTeX formulas
           in the client browser.
 
           Note that in order to enable the rendering you will have to
-          set the variable CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in
+          set the variable CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS in
           invenio-local.conf to a suitable list of output format
           codes. For example:
-          CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS = hd,hb
+          CFG_WEBSEARCH_USE_MATHJAX_FOR_FORMATS = hd,hb
 
       $ make install-jquery-plugins  ## optional
 
