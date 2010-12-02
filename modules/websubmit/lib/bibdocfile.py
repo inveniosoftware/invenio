@@ -1057,6 +1057,10 @@ class BibRecDocs:
             types = list_types_from_array(bibdocs)
             fulltypes = []
             for mytype in types:
+                if mytype in ('Plot', 'PlotMisc'):
+                    # FIXME: quick hack to ignore plot-like doctypes
+                    # on Files tab
+                    continue
                 fulltype = {
                             'name' : mytype,
                             'content' : [],
