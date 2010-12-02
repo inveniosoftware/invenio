@@ -329,14 +329,19 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
         for set1 in self.sets + [[]]:
             self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
-        for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1), intbitset().fastload((intbitset(set1).fastdump())))
-        for set1 in self.sets + [[]]:
-            self.assertEqual(intbitset(set1, trailing_bits=True), intbitset().fastload(intbitset(set1, trailing_bits=True).fastdump()))
 
-    #def test_set_emptiness(self):
-        #"""intbitset - tests for emptiness"""
-        #map(lambda x, y: self.assertEqual(x.__nonzero__(), y, "%s is %s empty" % (x, not y and 'not' or '')), self.sets. self.emptiness)
+    def test_pickling(self):
+        """intbitset - pickling"""
+        import cPickle
+        for set1 in self.sets + [[]]:
+            self.assertEqual(intbitset(set1), cPickle.loads(cPickle.dumps(intbitset(set1), -1)))
+        for set1 in self.sets + [[]]:
+            self.assertEqual(intbitset(set1, trailing_bits=True), cPickle.loads(cPickle.dumps(intbitset(set1, trailing_bits=True), -1)))
+
+    def test_set_emptiness(self):
+        """intbitset - tests for emptiness"""
+        for set1 in self.sets + [[]]:
+            self.assertEqual(not set(set1), not intbitset(set1))
 
     def test_set_clear(self):
         """intbitset - clearing"""

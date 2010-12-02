@@ -16,7 +16,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
-__apilevel__ = 1.03
+__apilevel__ = 1.04
 
 """
 Defines an intbitset data object to hold unordered sets of unsigned
@@ -153,8 +153,8 @@ cdef class intbitset:
         * no_allocate is used internally and should never be set.
         after the biggest one added with rhs.
         """
-        cdef Py_ssize_t size
-        cdef void *buf
+        cdef Py_ssize_t size = 0
+        cdef void *buf = NULL
         cdef int elem
         cdef int i
         cdef int last
@@ -459,6 +459,12 @@ cdef class intbitset:
             #return -1
         #p[0] = <char *> (<intbitset >self).bitset
         #return (<intbitset >self).size * wordbytesize
+
+    # pickle interface
+    def __reduce__(self):
+        return _, (self.fastdump(),)
+
+    __safe_for_unpickling__ = True
 
     # Iterator interface
     def __iter__(self):
@@ -767,3 +773,11 @@ cdef class intbitset_iterator:
         return self
 
     cdef object __weakref__
+
+def _(dump):
+    ## As part of the pickle protocol, a callable that will instantiate
+    ## the class is needed.
+    ## It's called _ just to make it short and hidden :-)
+    return intbitset(dump)
+
+_.__module__ = 'invenio.intbitset'
