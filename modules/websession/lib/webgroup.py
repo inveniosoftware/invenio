@@ -788,16 +788,16 @@ def synchronize_groups_with_login_method():
     """
     from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
     for login_method, authorizer in CFG_EXTERNAL_AUTHENTICATION.items():
-        if authorizer[0]:
+        if authorizer:
             try:
-                usersgroups = authorizer[0].fetch_all_users_groups_membership()
+                usersgroups = authorizer.fetch_all_users_groups_membership()
                 synchronize_all_external_groups(usersgroups, login_method)
             except (NotImplementedError, NameError):
                 users = db.get_all_users_with_groups_with_login_method(
                     login_method)
                 for email, uid in users.items():
                     try:
-                        groups = authorizer[0].fetch_user_groups_membership(
+                        groups = authorizer.fetch_user_groups_membership(
                             email)
                         synchronize_external_groups(uid, groups, login_method)
                     except (NotImplementedError, NameError):

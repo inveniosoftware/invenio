@@ -19,9 +19,7 @@ sqldir = $(libdir)/sql/invenio
 sql_DATA = democfgdata.sql
 
 tmpdir = $(prefix)/var/tmp
-tmp_DATA = demobibdata.xml \
-           demo-site-apache-user-passwords \
-           demo-site-apache-user-groups 
+tmp_DATA = demobibdata.xml
 
 EXTRA_DIST = $(sql_DATA) $(tmp_DATA)
 

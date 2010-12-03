@@ -59,7 +59,6 @@ def compile_role_definition(firerole_def_src):
     line = 0
     ret = []
     default_allow_p = False
-    suggest_apache_p = False
     if not firerole_def_src or not firerole_def_src.strip():
         firerole_def_src = CFG_ACC_EMPTY_ROLE_DEFINITION_SRC
     for row in firerole_def_src.split('\n'):
@@ -78,7 +77,7 @@ def compile_role_definition(firerole_def_src):
                 allow_p = g.group('command').lower() == 'allow'
                 not_p = g.group('not') != None
                 field = g.group('field').lower()
-                # Renaming groups to group and apache_groups to apache_group
+                # Renaming groups to group
                 for alias_item in _aliasTable:
                     if field in alias_item:
                         field = alias_item[0]
@@ -113,12 +112,10 @@ def compile_role_definition(firerole_def_src):
                         raise InvenioWebAccessFireroleError("Error when compiling rule %s (line %s): exactly one date is expected when using 'from' or 'until', but %s were found" % (row, line, len(expressions_list)))
                     if not_p:
                         raise InvenioWebAccessFireroleError("Error when compiling rule %s (line %s): 'not' is not allowed when using 'from' or 'until'" % (row, line))
-                elif field in ('apache_group', 'apache_user'):
-                    suggest_apache_p = True
                 ret.append((allow_p, not_p, field, expressions_list))
             else:
                 raise InvenioWebAccessFireroleError("Syntax error while compiling rule %s (line %s): not a valid rule!" % (row, line))
-    return (default_allow_p, suggest_apache_p, tuple(ret))
+    return (default_allow_p, tuple(ret))
 
 
 def repair_role_definitions():
@@ -157,15 +154,6 @@ def load_role_definition(role_id):
                 return deserialize(res[0][0])
     return CFG_ACC_EMPTY_ROLE_DEFINITION_OBJ
 
-def acc_firerole_suggest_apache_p(firerole_def_obj):
-    """Return True if the given firerole definition suggest the authentication
-    through Apache."""
-    try:
-        default_allow_p, suggest_apache_p, rules = firerole_def_obj
-        return suggest_apache_p
-    except Exception, msg:
-        raise InvenioWebAccessFireroleError, msg
-
 def acc_firerole_extract_emails(firerole_def_obj):
     """
     Best effort function to extract all the possible email addresses
@@ -173,7 +161,7 @@ def acc_firerole_extract_emails(firerole_def_obj):
     """
     authorized_emails = set()
     try:
-        default_allow_p, suggest_apache_p, rules = firerole_def_obj
+        default_allow_p, rules = firerole_def_obj
         for (allow_p, not_p, field, expressions_list) in rules: # for every rule
             if not_p:
                 continue
@@ -214,9 +202,9 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
     @return: True if the user match the definition, False otherwise.
     """
     try:
-        default_allow_p, suggest_apache_p, rules = firerole_def_obj
+        default_allow_p, rules = firerole_def_obj
         for (allow_p, not_p, field, expressions_list) in rules: # for every rule
-            group_p = field in ('group', 'apache_group') # Is it related to group?
+            group_p = field == 'group' # Is it related to group?
             ip_p = field == 'remote_ip' # Is it related to Ips?
             until_p = field == 'until' # Is it related to dates?
             from_p = field == 'from' # Idem.
@@ -322,7 +310,7 @@ def _mkip (ip):
 _full = 2L ** 32 - 1
 
 
-_aliasTable = (('group', 'groups'), ('apache_group', 'apache_groups'))
+_aliasTable = (('group', 'groups'), )
 
 
 def _ip_matcher_builder(group):

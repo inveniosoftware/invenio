@@ -114,7 +114,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 return warningMsg(msg, req, CFG_SITE_NAME, ln)
 
             (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
-            if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            if auth_code and user_info['email'] == 'guest':
                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
                 target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
@@ -189,7 +189,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             if auth_code != 0:
                                 if CFG_WEBSUBMIT_ICON_SUBFORMAT_RE.match(get_subformat_from_format(format)):
                                     return stream_restricted_icon(req)
-                                if user_info['email'] == 'guest' and not user_info['apache_user']:
+                                if user_info['email'] == 'guest':
                                     cookie = mail_cookie_create_authorize_action('viewrestrdoc', {'status' : docfile.get_status()})
                                     target = '/youraccount/login' + \
                                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
@@ -348,8 +348,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         # Check authorization
         (auth_code, auth_msg) = acc_authorize_action(req,
                                                      'runbibdocfile')
-        if auth_code and user_info['email'] == 'guest' and \
-               not user_info['apache_user']:
+        if auth_code and user_info['email'] == 'guest':
             # Ask to login
             target = '/youraccount/login' + \
                      make_canonical_urlargd({'ln' : argd['ln'],
@@ -801,7 +800,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         user_info = collect_user_info(req)
         (auth_code, auth_message) = acc_authorize_action(user_info, 'attachsubmissionfile')
-        if user_info['email'] == 'guest' and not user_info['apache_user']:
+        if user_info['email'] == 'guest':
             # User is guest: must login prior to upload
             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
         elif auth_code:

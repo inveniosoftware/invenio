@@ -397,8 +397,6 @@ interface and the userID by directly getting the attribute from 'bfo':
             'referer' : '',
             'uri' : '',
             'agent' : '',
-            'apache_user' : '',
-            'apache_group' : [],
             'uid' : -1,
             'nickname' : '',
             'email' : '',

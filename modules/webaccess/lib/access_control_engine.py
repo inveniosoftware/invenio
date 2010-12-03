@@ -33,67 +33,8 @@ from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_find_possible_roles, acc_is_user_in_role, CFG_SUPERADMINROLE_ID, acc_get_role_users
 from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 from invenio.webuser import collect_user_info
-from invenio.access_control_firerole import acc_firerole_suggest_apache_p, deserialize, load_role_definition, acc_firerole_extract_emails
+from invenio.access_control_firerole import deserialize, load_role_definition, acc_firerole_extract_emails
 from invenio.urlutils import make_canonical_urlargd
-
-CFG_CALLED_FROM_APACHE = 1 #1=web,0=cli
-try:
-    import _apache
-except ImportError, e:
-    CFG_CALLED_FROM_APACHE = 0
-
-def make_list_apache_firerole(name_action, arguments):
-    """Given an action and a dictionary arguments returns a list of all the
-    roles (and their descriptions) which are authorized to perform this
-    action with these arguments, and whose FireRole definition expect
-    an Apache Password membership.
-    """
-    roles = acc_find_possible_roles(name_action, **arguments)
-
-    ret = []
-
-    for role in roles:
-        res = run_sql('SELECT name, description, firerole_def_ser FROM accROLE WHERE id=%s', (role, ))
-        if acc_firerole_suggest_apache_p(deserialize(res[0][2])):
-            ret.append((res[0][0], res[0][1]))
-    return ret
-
-def _format_list_of_apache_firerole(roles, referer):
-    """Given a list of tuples (role, description) (returned by make_list_apache_firerole), and a referer url, returns a nice string for
-    presenting urls that let the user login with Apache password through
-    Firerole.
-    This function is needed only at CERN for aiding in the migration of
-    Apache Passwords restricted collections to FireRole roles.
-    Please use it with care."""
-    out = ""
-    if roles:
-        out += "<p>1) Here is a list of administrative roles you may have " \
-        "received authorization for via an Apache password. If you are aware " \
-        "of such a password, please follow the corresponding link:"
-        out += "<table>"
-        for name, description in roles:
-            out += "<tr>"
-            out += "<td><a href='%s'>%s</a></td><td> - <em>%s</em></td>" % \
-            ('%s%s' % (CFG_SITE_SECURE_URL, make_canonical_urlargd({'realm' : name, 'referer' : referer}, {})), name, description)
-            out += "</tr>"
-        out += "</table>"
-        out += "</p>"
-    return out
-
-def make_apache_message(name_action, arguments, referer=None):
-    """Given an action name and a dictionary of arguments and a refere url
-    it returns a a nice string for presenting urls that let the user login
-    with Apache password through Firerole authorized roles.
-    This function is needed only at CERN for aiding in the migration of
-    Apache Passwords restricted collections to FireRole roles.
-    Please use it with care."""
-    if not referer:
-        referer = '%s/youraccount/youradminactivities' % CFG_SITE_SECURE_URL
-    roles = make_list_apache_firerole(name_action, arguments)
-    if roles:
-        return _format_list_of_apache_firerole(roles, referer)
-    else:
-        return ""
 
 def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **arguments):
     """
@@ -123,7 +64,8 @@ def acc_authorize_action(req, name_action, authorized_if_no_roles=False, **argum
             ## User is not authorized.
             return (20, CFG_WEBACCESS_WARNING_MSGS[20] % cgi.escape(name_action))
     ## User is not authorized
-    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (CFG_CALLED_FROM_APACHE and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info['uri'])))
+    in_a_web_request_p = bool(user_info['uri'])
+    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (in_a_web_request_p and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
 
 def acc_get_authorized_emails(name_action, **arguments):
     """
