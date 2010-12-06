@@ -391,7 +391,8 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_tag980_value)
             if auth_code != 0:
-                error_msg = _("The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_tag980_value))
+                error_msg = _("The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'") % \
+                            {'x_user': user_info['nickname'], 'x_coll': filename_tag980_value}
                 return (auth_code, error_msg)
 
     filename_rec_id_collections = _detect_collections_from_marcxml_file(recs)
@@ -403,7 +404,8 @@ def _check_client_can_submit_file(client_ip="", metafile="", req=None, webupload
         else:
             auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader', collection=filename_rec_id_collection)
             if auth_code != 0:
-                error_msg = _("The user '%s' is not authorized to modify collection '%s'" % (user_info['nickname'], filename_rec_id_collection))
+                error_msg = _("The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'") % \
+                            {'x_user': user_info['nickname'], 'x_coll': filename_rec_id_collection}
                 return (auth_code, error_msg)
     if not webupload:
         return True
