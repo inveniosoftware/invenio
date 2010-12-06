@@ -79,7 +79,7 @@ class Template:
         max_comment_round_name = comments[-1][0]
         for comment_round_name, comments_list in comments:
             comment_rows += '<div id="cmtRound%i" class="cmtRound">' % (comment_round_name)
-            comment_rows += _('%i comments for revision "%s"') % comment_round_name + "<br/>"
+            comment_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}  + "<br/>"
             for comment in comments_list:
                 if comment[c_nickname]:
                     nickname = comment[c_nickname]
@@ -230,7 +230,7 @@ class Template:
         max_comment_round_name = comments[-1][0]
         for comment_round_name, comments_list in comments:
             comment_rows += '<div id="cmtRound%i" class="cmtRound">' % (comment_round_name)
-            comment_rows += _('%i comments for revision "%s"') % comment_round_name + "<br/>"
+            comment_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name} + "<br/>"
             for comment in comments_list:
                 if comment[c_nickname]:
                     nickname = comment[c_nickname]
@@ -660,7 +660,7 @@ class Template:
                 comments_rows += 'href=\"%(siteurl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s' % link_dic
                 comments_rows += '&amp;' + '&amp;'.join(["cmtgrp=" + grp for grp in new_cmtgrp if grp != 'none']) + \
                                   '#cmtgrpLink%s' % (comment_round_name)  + '\">'
-                comments_rows += (_('%i comments for round "%s"') % (len(comments_list), comment_round_name)) + "</a><br/>"
+                comments_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name} + "</a><br/>"
             elif comment_round_name or len(comment_round_names) > 1:
                 new_cmtgrp = list(display_comment_rounds)
                 new_cmtgrp.remove(comment_round_name)
@@ -670,7 +670,7 @@ class Template:
                 comments_rows += 'href=\"%(siteurl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s' % link_dic
                 comments_rows += '&amp;' + ('&amp;'.join(["cmtgrp=" + grp for grp in new_cmtgrp if grp != 'none']) or 'cmtgrp=none' ) + \
                                 '#cmtgrpLink%s' % (comment_round_name)  + '\">'
-                comments_rows += (_('%i comments for round "%s"') % (len(comments_list), comment_round_name)) + "</a><br/>"
+                comments_rows += _('%(x_nb)i comments for round "%(x_name)s"') % {'x_nb': len(comments_list), 'x_name': comment_round_name}+ "</a><br/>"
             comments_rows += '<div id="cmtSubRound%s" class="cmtsubround" style="%s">' % (comment_round_name,
                                                                                           comment_round_style)
 
