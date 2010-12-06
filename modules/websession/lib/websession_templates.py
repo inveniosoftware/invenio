@@ -2065,14 +2065,15 @@ class Template:
                 'msg_body' : _("""\
 Hello:
 
-I think you might be interested in joining the group "%s".
-You can join by clicking here: %s.
+I think you might be interested in joining the group "%(x_name)s".
+You can join by clicking here: %(x_url)s.
 
 Best regards.
-""") % (group_name, create_html_link("%s/yourgroups/join" % CFG_SITE_URL, {
-    'grpID' : grpID,
-    'join_button' : "1",
-}, link_label=group_name, escape_urlargd=True, escape_linkattrd=True))})
+""") % {'x_name': group_name,
+        'x_url': create_html_link("%s/yourgroups/join" % CFG_SITE_URL, { 'grpID' : grpID,
+                                                                'join_button' : "1",
+                                                                },
+                         link_label=group_name, escape_urlargd=True, escape_linkattrd=True)}})
 
         link_open = '<a href="%s">' % escape_html(write_a_message_url)
         invite_text = _("If you want to invite new members to join your group, please use the %(x_url_open)sweb message%(x_url_close)s system.") % \
