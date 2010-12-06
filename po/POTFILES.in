@@ -263,3 +263,5 @@ modules/bibharvest/lib/oai_repository_admin.py
 modules/bibharvest/lib/oai_harvest_admin.py
 modules/bibknowledge/lib/bibknowledge_templates.py
 modules/bibknowledge/lib/bibknowledgeadmin.py
+modules/bibsword/lib/bibsword_webinterface.py
+modules/bibupload/lib/batchuploader_engine.py
