@@ -1559,7 +1559,8 @@ class Template:
              <div class="infoboxsuccess">%s</div>
              <br />
              <table class="bibcirctable">
-        """ % (CFG_SITE_URL, _("The item <strong>%s</strong>, with barcode <strong>%s</strong>, has been returned with success." % (book_title_from_MARC(recid), barcode)))
+        """ % (CFG_SITE_URL, _("The item %(x_title)s with barcode %(x_barcode)s has been returned with success." % \
+                             {'x_title': book_title_from_MARC(recid), 'x_barcode': barcode}))
 
         (_book_title, book_year, book_author, book_isbn, book_editor) = book_information_from_MARC(int(recid))
 
