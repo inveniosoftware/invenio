@@ -495,6 +495,7 @@ update-v0.99.2-tables:
 	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','switch_file');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','switch_file');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','paths_and_restrictions');" | ${prefix}/bin/dbexec
+	echo "INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','paths_and_doctypes');" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE cmtRECORDCOMMENT ADD round_name varchar(255) NOT NULL default ''" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE cmtRECORDCOMMENT ADD restriction varchar(50) NOT NULL default ''" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE cmtRECORDCOMMENT ADD in_reply_to_id_cmtRECORDCOMMENT int(15) unsigned NOT NULL default '0'" | ${prefix}/bin/dbexec
