@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-07 10:07+0100\n"
-"PO-Revision-Date: 2006-10-12 17:50+0200\n"
+"PO-Revision-Date: 2010-12-07 10:51+0100\n"
 "Last-Translator: Ludmila Marian <ludmila.marian@gmail.com>\n"
 "Language-Team: RO <info@invenio-software.org>\n"
 "Language: \n"
@@ -39,7 +39,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1103
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
-msgstr ""
+msgstr "ŞI NON"
 
 #: modules/webhelp/web/admin/admin.webdoc:18
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
@@ -73,7 +73,7 @@ msgstr ""
 #: modules/bibcheck/web/admin/bibcheckadmin.py:303
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:67
 msgid "Admin Area"
-msgstr ""
+msgstr "Administrare"
 
 #: modules/websearch/doc/search-guide.webdoc:427
 #: modules/websearch/doc/search-guide.webdoc:559
@@ -91,7 +91,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2230
 #: modules/websearch/lib/websearch_templates.py:2261
 msgid "Browse"
-msgstr ""
+msgstr "Răsfoieşte "
 
 #: modules/webhelp/web/help-central.webdoc:50
 #: modules/websearch/doc/search-tips.webdoc:20
@@ -102,7 +102,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2115
 #: modules/websearch/lib/websearch_templates.py:2172
 msgid "Search Tips"
-msgstr ""
+msgstr "Indicii de căutare "
 
 #: modules/websearch/doc/search-guide.webdoc:343
 #: modules/websearch/doc/search-guide.webdoc:378
@@ -118,7 +118,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:453
 msgid "abstract"
-msgstr ""
+msgstr "abstract"
 
 #: modules/websearch/doc/search-guide.webdoc:348
 #: modules/websearch/doc/search-guide.webdoc:383
@@ -151,7 +151,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1125
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
-msgstr ""
+msgstr "Expresie regulată:"
 
 #: modules/websearch/doc/search-guide.webdoc:333
 #: modules/websearch/doc/search-guide.webdoc:369
@@ -168,7 +168,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1121
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
-msgstr ""
+msgstr "Toate cuvintele:"
 
 #: modules/websearch/doc/search-guide.webdoc:351
 #: modules/websearch/doc/search-guide.webdoc:386
@@ -207,7 +207,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:831
 #: modules/miscutil/lib/inveniocfg.py:461
 msgid "year"
-msgstr ""
+msgstr "an"
 
 #: modules/websearch/doc/search-guide.webdoc:352
 #: modules/websearch/doc/search-guide.webdoc:387
@@ -223,7 +223,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:829
 #: modules/miscutil/lib/inveniocfg.py:456
 msgid "subject"
-msgstr ""
+msgstr "subiect"
 
 #: modules/websearch/doc/search-guide.webdoc:336
 #: modules/websearch/doc/search-guide.webdoc:372
@@ -256,7 +256,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:827
 #: modules/miscutil/lib/inveniocfg.py:457
 msgid "reference"
-msgstr ""
+msgstr "referinţă"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -484,7 +484,7 @@ msgstr ""
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:131
 #: modules/miscutil/lib/inveniocfg.py:452
 msgid "author"
-msgstr ""
+msgstr "autor"
 
 #: modules/webhelp/web/help-central.webdoc:98
 #: modules/websearch/doc/search-guide.webdoc:20
@@ -505,7 +505,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:824
 #: modules/miscutil/lib/inveniocfg.py:463
 msgid "experiment"
-msgstr ""
+msgstr "experiment"
 
 #: modules/websearch/doc/search-guide.webdoc:334
 #: modules/websearch/doc/search-guide.webdoc:370
@@ -538,7 +538,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:823
 #: modules/miscutil/lib/inveniocfg.py:460
 msgid "division"
-msgstr ""
+msgstr "divizie"
 
 #: modules/websearch/doc/search-tips.webdoc:39
 #: modules/websearch/doc/search-tips.webdoc:70
@@ -774,7 +774,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16592
 #: modules/bibknowledge/lib/bibknowledge_templates.py:394
 msgid "Search"
-msgstr ""
+msgstr "Caută"
 
 #: modules/webhelp/web/help-central.webdoc:133
 msgid "Citation Metrics"
@@ -1006,7 +1006,7 @@ msgstr ""
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:129
 #: modules/miscutil/lib/inveniocfg.py:450
 msgid "any field"
-msgstr ""
+msgstr "orice câmp"
 
 #: modules/webhelp/web/help-central.webdoc:20
 #: modules/webhelp/web/help-central.webdoc:25
@@ -1056,7 +1056,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:459
 msgid "collection"
-msgstr ""
+msgstr "colecţie"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:20
 msgid "WebSearch Admin Guide"
@@ -1097,7 +1097,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1162
 #: modules/websearch/lib/websearch_webcoll.py:561
 msgid "OR"
-msgstr ""
+msgstr "SAU"
 
 #: modules/websearch/doc/search-guide.webdoc:359
 #: modules/websearch/doc/search-guide.webdoc:394
@@ -1110,7 +1110,7 @@ msgstr ""
 #: modules/websearch/lib/search_engine.py:1101
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
-msgstr ""
+msgstr "ŞI"
 
 #: modules/websearch/doc/search-guide.webdoc:349
 #: modules/websearch/doc/search-guide.webdoc:384
@@ -1126,7 +1126,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:826
 #: modules/miscutil/lib/inveniocfg.py:454
 msgid "keyword"
-msgstr ""
+msgstr "cuvânt cheie"
 
 #: modules/websearch/doc/search-tips.webdoc:36
 #: modules/websearch/doc/search-tips.webdoc:67
@@ -1351,7 +1351,7 @@ msgstr ""
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:130
 #: modules/miscutil/lib/inveniocfg.py:451
 msgid "title"
-msgstr ""
+msgstr "titlu"
 
 #: modules/websearch/doc/search-tips.webdoc:72
 #: modules/websearch/doc/search-tips.webdoc:110
@@ -1378,7 +1378,7 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:429
 #: modules/bibharvest/lib/oai_harvest_admin.py:444
 msgid "or"
-msgstr ""
+msgstr "sau"
 
 #: modules/bibedit/lib/bibedit_templates.py:266
 msgid "Comparison of:"
@@ -1406,7 +1406,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:556
 #: modules/bibknowledge/lib/bibknowledge_templates.py:624
 msgid "Menu"
-msgstr ""
+msgstr "Meniu"
 
 #: modules/bibformat/lib/bibformat_templates.py:317
 #: modules/bibformat/lib/bibformat_templates.py:428
@@ -1417,7 +1417,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledge_templates.py:555
 #: modules/bibknowledge/lib/bibknowledge_templates.py:623
 msgid "Close Editor"
-msgstr ""
+msgstr "Închide editor"
 
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:429
@@ -1425,7 +1425,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:594
 #: modules/bibformat/lib/bibformat_templates.py:625
 msgid "Modify Template Attributes"
-msgstr ""
+msgstr "Modifică atributele formatului"
 
 #: modules/bibformat/lib/bibformat_templates.py:319
 #: modules/bibformat/lib/bibformat_templates.py:430
@@ -1433,7 +1433,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:595
 #: modules/bibformat/lib/bibformat_templates.py:626
 msgid "Template Editor"
-msgstr ""
+msgstr "Editor de format"
 
 #: modules/bibformat/lib/bibformat_templates.py:320
 #: modules/bibformat/lib/bibformat_templates.py:431
@@ -1444,7 +1444,7 @@ msgstr ""
 #: modules/bibformat/lib/bibformat_templates.py:1378
 #: modules/bibformat/lib/bibformat_templates.py:1482
 msgid "Check Dependencies"
-msgstr ""
+msgstr "Verifică dependenţe"
 
 #: modules/bibformat/lib/bibformat_templates.py:370
 #: modules/bibformat/lib/bibformat_templates.py:929
@@ -1516,7 +1516,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16045
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:447
 msgid "Name"
-msgstr ""
+msgstr "Nume"
 
 #: modules/bibformat/lib/bibformat_templates.py:389
 #: modules/bibformat/lib/bibformat_templates.py:930
@@ -1538,24 +1538,24 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8362
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:451
 msgid "Description"
-msgstr ""
+msgstr "Descriere"
 
 #: modules/bibformat/lib/bibformat_templates.py:390
 msgid "Update Format Attributes"
-msgstr ""
+msgstr "Actualizează atributele formatului"
 
 #: modules/bibformat/lib/bibformat_templates.py:575
 #: modules/bibformat/lib/bibformat_templates.py:591
 #: modules/bibformat/lib/bibformat_templates.py:622
 msgid "Show Documentation"
-msgstr ""
+msgstr "Arată documentaţia"
 
 #: modules/bibformat/lib/bibformat_templates.py:576
 #: modules/bibformat/lib/bibformat_templates.py:592
 #: modules/bibformat/lib/bibformat_templates.py:623
 #: modules/bibformat/lib/bibformat_templates.py:674
 msgid "Hide Documentation"
-msgstr ""
+msgstr "Ascunde documentaţia"
 
 #: modules/bibformat/lib/bibformat_templates.py:583
 #: modules/websubmit/lib/websubmit_templates.py:867
@@ -1603,12 +1603,12 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13369
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15052
 msgid "Status"
-msgstr ""
+msgstr "Status"
 
 #: modules/bibformat/lib/bibformat_templates.py:933
 #: modules/bibformat/lib/bibformat_templates.py:1057
 msgid "Last Modification Date"
-msgstr ""
+msgstr "Data ultimei modificări"
 
 #: modules/bibformat/lib/bibformat_templates.py:934
 #: modules/bibformat/lib/bibformat_templates.py:1058
@@ -1617,7 +1617,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_templates.py:89
 #: modules/websubmit/lib/websubmit_templates.py:1481
 msgid "Action"
-msgstr ""
+msgstr "Acţiune"
 
 #: modules/bibformat/lib/bibformat_templates.py:936
 #: modules/bibformat/lib/bibformat_templates.py:1060
@@ -1629,7 +1629,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:367
 #: modules/bibformat/web/admin/bibformatadmin.py:942
 msgid "Manage Output Formats"
-msgstr ""
+msgstr "Administrează formatele de iesire"
 
 #: modules/bibformat/lib/bibformat_templates.py:937
 #: modules/bibformat/lib/bibformat_templates.py:1061
@@ -1641,7 +1641,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:656
 #: modules/bibformat/web/admin/bibformatadmin.py:963
 msgid "Manage Format Templates"
-msgstr ""
+msgstr "Administrează template-urile pentru format"
 
 #: modules/bibformat/lib/bibformat_templates.py:938
 #: modules/bibformat/lib/bibformat_templates.py:1062
@@ -1651,7 +1651,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:891
 #: modules/bibformat/web/admin/bibformatadmin.py:981
 msgid "Format Elements Documentation"
-msgstr ""
+msgstr "Documentaţia elementele de format"
 
 #: modules/bibformat/lib/bibformat_templates.py:990
 #: modules/bibformat/web/admin/bibformatadmin.py:388
@@ -1671,61 +1671,61 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:721
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:723
 msgid "Delete"
-msgstr ""
+msgstr "Şterge"
 
 #: modules/bibformat/lib/bibformat_templates.py:1013
 msgid "Add New Format Template"
-msgstr ""
+msgstr "Adaugă un nou template pentru format"
 
 #: modules/bibformat/lib/bibformat_templates.py:1014
 msgid "Check Format Templates Extensively"
-msgstr ""
+msgstr "Verifică extensiv template-urile pentru format "
 
 #: modules/bibformat/lib/bibformat_templates.py:1053
 msgid "Code"
-msgstr ""
+msgstr "Cod"
 
 #: modules/bibformat/lib/bibformat_templates.py:1136
 msgid "Add New Output Format"
-msgstr ""
+msgstr "Adaugă un nou format de iesire"
 
 #: modules/bibformat/lib/bibformat_templates.py:1174
 msgid "menu"
-msgstr ""
+msgstr "meniu"
 
 #: modules/bibformat/lib/bibformat_templates.py:1175
 #: modules/bibformat/lib/bibformat_templates.py:1375
 #: modules/bibformat/lib/bibformat_templates.py:1479
 msgid "Close Output Format"
-msgstr ""
+msgstr "Închide formatul de iesire"
 
 #: modules/bibformat/lib/bibformat_templates.py:1176
 #: modules/bibformat/lib/bibformat_templates.py:1376
 #: modules/bibformat/lib/bibformat_templates.py:1480
 msgid "Rules"
-msgstr ""
+msgstr "Reguli"
 
 #: modules/bibformat/lib/bibformat_templates.py:1177
 #: modules/bibformat/lib/bibformat_templates.py:1377
 #: modules/bibformat/lib/bibformat_templates.py:1481
 msgid "Modify Output Format Attributes"
-msgstr ""
+msgstr "Modifică atributele formatului de iesire"
 
 #: modules/bibformat/lib/bibformat_templates.py:1276
 #: modules/bibformat/lib/bibformatadminlib.py:553
 msgid "Remove Rule"
-msgstr ""
+msgstr "Şterge regulă"
 
 #: modules/bibformat/lib/bibformat_templates.py:1329
 #: modules/bibformat/lib/bibformatadminlib.py:560
 msgid "Add New Rule"
-msgstr ""
+msgstr "Adaugă regulă nouă"
 
 #: modules/bibformat/lib/bibformat_templates.py:1330
 #: modules/bibformat/lib/bibformatadminlib.py:557
 #: modules/bibcheck/web/admin/bibcheckadmin.py:239
 msgid "Save Changes"
-msgstr ""
+msgstr "Salvaţi modificările"
 
 #: modules/bibformat/lib/bibformat_templates.py:1894
 msgid "No problem found with format"
@@ -1756,7 +1756,7 @@ msgstr ""
 
 #: modules/bibformat/lib/elements/bfe_authors.py:117
 msgid "Hide"
-msgstr ""
+msgstr "Ascunde"
 
 #: modules/bibformat/lib/elements/bfe_authors.py:118
 #, python-format
@@ -1823,7 +1823,7 @@ msgstr ""
 #: modules/bibformat/web/admin/bibformatadmin.py:508
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:553
 msgid "Ok"
-msgstr ""
+msgstr "OK"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:203
 #, python-format
@@ -1873,7 +1873,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3863
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:721
 msgid "Cancel"
-msgstr ""
+msgstr "Anulează"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:413
 msgid "Cannot create output format"
@@ -2018,7 +2018,7 @@ msgstr ""
 
 #: modules/bibrank/lib/bibrank_citation_grapher.py:123
 msgid "Citation history:"
-msgstr ""
+msgstr "Istoricul citaţiilor:"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:81
 msgid "Download history:"
@@ -2067,7 +2067,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_templates.py:88
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:535
 msgid "Date"
-msgstr ""
+msgstr "Dată"
 
 #: modules/bibupload/lib/batchuploader_templates.py:172
 #: modules/bibupload/lib/batchuploader_templates.py:360
@@ -2083,7 +2083,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:163
 #: modules/websession/lib/websession_templates.py:1035
 msgid "Example"
-msgstr ""
+msgstr "Exemplu"
 
 #: modules/bibupload/lib/batchuploader_templates.py:174
 #: modules/bibupload/lib/batchuploader_templates.py:362
@@ -2242,191 +2242,191 @@ msgstr ""
 #: modules/websession/lib/webuser.py:303
 #: modules/webstyle/lib/webstyle_templates.py:575
 msgid "N/A"
-msgstr ""
+msgstr "N/A"
 
 #: modules/miscutil/lib/dateutils.py:166
 msgid "Sun"
-msgstr ""
+msgstr "Du"
 
 #: modules/miscutil/lib/dateutils.py:167
 msgid "Mon"
-msgstr ""
+msgstr "Lu"
 
 #: modules/miscutil/lib/dateutils.py:168
 msgid "Tue"
-msgstr ""
+msgstr "Ma"
 
 #: modules/miscutil/lib/dateutils.py:169
 msgid "Wed"
-msgstr ""
+msgstr "Mi"
 
 #: modules/miscutil/lib/dateutils.py:170
 msgid "Thu"
-msgstr ""
+msgstr "Jo"
 
 #: modules/miscutil/lib/dateutils.py:171
 msgid "Fri"
-msgstr ""
+msgstr "Vi"
 
 #: modules/miscutil/lib/dateutils.py:172
 msgid "Sat"
-msgstr ""
+msgstr "Sâ"
 
 #: modules/miscutil/lib/dateutils.py:174
 msgid "Sunday"
-msgstr ""
+msgstr "Duminică"
 
 #: modules/miscutil/lib/dateutils.py:175
 msgid "Monday"
-msgstr ""
+msgstr "Luni"
 
 #: modules/miscutil/lib/dateutils.py:176
 msgid "Tuesday"
-msgstr ""
+msgstr "Marţi"
 
 #: modules/miscutil/lib/dateutils.py:177
 msgid "Wednesday"
-msgstr ""
+msgstr "Miercuri"
 
 #: modules/miscutil/lib/dateutils.py:178
 msgid "Thursday"
-msgstr ""
+msgstr "Joi"
 
 #: modules/miscutil/lib/dateutils.py:179
 msgid "Friday"
-msgstr ""
+msgstr "Vineri"
 
 #: modules/miscutil/lib/dateutils.py:180
 msgid "Saturday"
-msgstr ""
+msgstr "Sâmbătă"
 
 #: modules/miscutil/lib/dateutils.py:194 modules/miscutil/lib/dateutils.py:208
 #: modules/bibcirculation/lib/bibcirculation_templates.py:779
 #: modules/bibcirculation/lib/bibcirculation_templates.py:801
 msgid "Month"
-msgstr ""
+msgstr "Luna"
 
 #: modules/miscutil/lib/dateutils.py:195
 msgid "Jan"
-msgstr ""
+msgstr "ian"
 
 #: modules/miscutil/lib/dateutils.py:196
 msgid "Feb"
-msgstr ""
+msgstr "feb"
 
 #: modules/miscutil/lib/dateutils.py:197
 msgid "Mar"
-msgstr ""
+msgstr "mar"
 
 #: modules/miscutil/lib/dateutils.py:198
 msgid "Apr"
-msgstr ""
+msgstr "apr"
 
 #: modules/miscutil/lib/dateutils.py:199 modules/miscutil/lib/dateutils.py:213
 #: modules/websearch/lib/search_engine.py:875
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
-msgstr ""
+msgstr "mai"
 
 #: modules/miscutil/lib/dateutils.py:200
 msgid "Jun"
-msgstr ""
+msgstr "iun"
 
 #: modules/miscutil/lib/dateutils.py:201
 msgid "Jul"
-msgstr ""
+msgstr "iul"
 
 #: modules/miscutil/lib/dateutils.py:202
 msgid "Aug"
-msgstr ""
+msgstr "aug"
 
 #: modules/miscutil/lib/dateutils.py:203
 msgid "Sep"
-msgstr ""
+msgstr "sep"
 
 #: modules/miscutil/lib/dateutils.py:204
 msgid "Oct"
-msgstr ""
+msgstr "oct"
 
 #: modules/miscutil/lib/dateutils.py:205
 msgid "Nov"
-msgstr ""
+msgstr "nov"
 
 #: modules/miscutil/lib/dateutils.py:206
 msgid "Dec"
-msgstr ""
+msgstr "dec"
 
 #: modules/miscutil/lib/dateutils.py:209
 #: modules/websearch/lib/search_engine.py:874
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
-msgstr ""
+msgstr "Ianuarie"
 
 #: modules/miscutil/lib/dateutils.py:210
 #: modules/websearch/lib/search_engine.py:874
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
-msgstr ""
+msgstr "Februarie"
 
 #: modules/miscutil/lib/dateutils.py:211
 #: modules/websearch/lib/search_engine.py:874
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
-msgstr ""
+msgstr "Martie"
 
 #: modules/miscutil/lib/dateutils.py:212
 #: modules/websearch/lib/search_engine.py:874
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
-msgstr ""
+msgstr "Aprilie"
 
 #: modules/miscutil/lib/dateutils.py:214
 #: modules/websearch/lib/search_engine.py:875
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
-msgstr ""
+msgstr "Iunie"
 
 #: modules/miscutil/lib/dateutils.py:215
 #: modules/websearch/lib/search_engine.py:875
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
-msgstr ""
+msgstr "Iulie"
 
 #: modules/miscutil/lib/dateutils.py:216
 #: modules/websearch/lib/search_engine.py:875
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
-msgstr ""
+msgstr "August"
 
 #: modules/miscutil/lib/dateutils.py:217
 #: modules/websearch/lib/search_engine.py:876
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
-msgstr ""
+msgstr "Septembrie"
 
 #: modules/miscutil/lib/dateutils.py:218
 #: modules/websearch/lib/search_engine.py:876
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
-msgstr ""
+msgstr "Octombrie"
 
 #: modules/miscutil/lib/dateutils.py:219
 #: modules/websearch/lib/search_engine.py:876
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
-msgstr ""
+msgstr "Noiembrie"
 
 #: modules/miscutil/lib/dateutils.py:220
 #: modules/websearch/lib/search_engine.py:876
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
-msgstr ""
+msgstr "Decembrie"
 
 #: modules/miscutil/lib/dateutils.py:238
 #: modules/bibcirculation/lib/bibcirculation_templates.py:780
 #: modules/bibcirculation/lib/bibcirculation_templates.py:802
 msgid "Day"
-msgstr ""
+msgstr "Zi"
 
 #: modules/miscutil/lib/dateutils.py:289
 #: modules/bibcirculation/lib/bibcirculation_utils.py:321
@@ -2465,14 +2465,14 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16168
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16355
 msgid "Year"
-msgstr ""
+msgstr "An"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:64
 #: modules/miscutil/lib/errorlib_webinterface.py:69
 #: modules/miscutil/lib/errorlib_webinterface.py:74
 #: modules/miscutil/lib/errorlib_webinterface.py:79
 msgid "Sorry"
-msgstr ""
+msgstr "Ne pare rău"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:65
 #: modules/miscutil/lib/errorlib_webinterface.py:70
@@ -2496,11 +2496,11 @@ msgstr ""
 
 #: modules/miscutil/lib/errorlib_webinterface.py:103
 msgid "Thank you!"
-msgstr ""
+msgstr "Mulţumesc!"
 
 #: modules/miscutil/lib/inveniocfg.py:462
 msgid "journal"
-msgstr ""
+msgstr "jurnal"
 
 #: modules/miscutil/lib/inveniocfg.py:464
 msgid "record ID"
@@ -2533,11 +2533,11 @@ msgstr ""
 #: modules/miscutil/lib/mailutils.py:161 modules/miscutil/lib/mailutils.py:174
 #: modules/webcomment/lib/webcomment_templates.py:2038
 msgid "Hello:"
-msgstr ""
+msgstr "Bună ziua:"
 
 #: modules/miscutil/lib/mailutils.py:192 modules/miscutil/lib/mailutils.py:212
 msgid "Best regards"
-msgstr ""
+msgstr "Toate cele bune"
 
 #: modules/miscutil/lib/mailutils.py:194 modules/miscutil/lib/mailutils.py:214
 msgid "Need human intervention?  Contact"
@@ -2577,7 +2577,7 @@ msgstr ""
 #: modules/webaccess/lib/access_control_config.py:268
 #: modules/websession/lib/websession_templates.py:1099
 msgid "Configure BibFormat"
-msgstr ""
+msgstr "Configurare BibFormat"
 
 #: modules/webaccess/lib/access_control_config.py:269
 #: modules/websession/lib/websession_templates.py:1102
@@ -2587,37 +2587,37 @@ msgstr ""
 #: modules/webaccess/lib/access_control_config.py:270
 #: modules/websession/lib/websession_templates.py:1104
 msgid "Configure OAI Repository"
-msgstr ""
+msgstr "Configurare repertoriu OAI"
 
 #: modules/webaccess/lib/access_control_config.py:271
 #: modules/websession/lib/websession_templates.py:1106
 msgid "Configure BibIndex"
-msgstr ""
+msgstr "Configurare BibIndex"
 
 #: modules/webaccess/lib/access_control_config.py:272
 #: modules/websession/lib/websession_templates.py:1108
 msgid "Configure BibRank"
-msgstr ""
+msgstr "Configurare BibRank"
 
 #: modules/webaccess/lib/access_control_config.py:273
 #: modules/websession/lib/websession_templates.py:1110
 msgid "Configure WebAccess"
-msgstr ""
+msgstr "Configurare WebAccess"
 
 #: modules/webaccess/lib/access_control_config.py:274
 #: modules/websession/lib/websession_templates.py:1112
 msgid "Configure WebComment"
-msgstr ""
+msgstr "Configurare WebComment"
 
 #: modules/webaccess/lib/access_control_config.py:275
 #: modules/websession/lib/websession_templates.py:1116
 msgid "Configure WebSearch"
-msgstr ""
+msgstr "Configurare WebSearch"
 
 #: modules/webaccess/lib/access_control_config.py:276
 #: modules/websession/lib/websession_templates.py:1118
 msgid "Configure WebSubmit"
-msgstr ""
+msgstr "Configurare WebSubmit"
 
 #: modules/webaccess/lib/access_control_config.py:277
 #: modules/websession/lib/websession_templates.py:1114
@@ -2637,58 +2637,58 @@ msgstr ""
 #: modules/webaccess/lib/webaccessadmin_lib.py:3703
 #, python-format
 msgid "Your account on '%s' has been activated"
-msgstr ""
+msgstr "Contul dumneavoastră pe '%s' a fost activat"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3704
 #, python-format
 msgid "Your account earlier created on '%s' has been activated:"
-msgstr ""
+msgstr "Contul dumneavoastră mai devreme creat pe '%s' a fost activat:"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3706
 #: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #: modules/webaccess/lib/webaccessadmin_lib.py:3745
 msgid "Username/Email:"
-msgstr ""
+msgstr "Nume utilizator/ E-mail:"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3707
 #: modules/webaccess/lib/webaccessadmin_lib.py:3720
 msgid "Password:"
-msgstr ""
+msgstr "Parolă:"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3717
 #, python-format
 msgid "Account created on '%s'"
-msgstr ""
+msgstr "Contul a fost creat pe '%s'"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3718
 #, python-format
 msgid "An account has been created for you on '%s':"
-msgstr ""
+msgstr "Un cont a fost creat pentru dumneavoastră pe '%s':"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3730
 #, python-format
 msgid "Account rejected on '%s'"
-msgstr ""
+msgstr "Contul a fost respins pe '%s'"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3731
 #, python-format
 msgid "Your request for an account has been rejected on '%s':"
-msgstr ""
+msgstr "Cererea dumneavoastră de creare a unui cont a fost respinsă pe '%s':"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3733
 #, python-format
 msgid "Username/Email: %s"
-msgstr ""
+msgstr "Nume utilizator/E-mail: %s"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3743
 #, python-format
 msgid "Account deleted on '%s'"
-msgstr ""
+msgstr "Cont şters pe '%s'"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3744
 #, python-format
 msgid "Your account on '%s' has been deleted:"
-msgstr ""
+msgstr "Contul dumneavoastră pe '%s' a fost şters:"
 
 #: modules/webalert/lib/htmlparser.py:186
 #: modules/webbasket/lib/webbasket_templates.py:2337
@@ -2709,17 +2709,17 @@ msgstr ""
 
 #: modules/webalert/lib/htmlparser.py:188
 msgid "Cited by"
-msgstr ""
+msgstr "Citat de"
 
 #: modules/webalert/lib/webalert.py:54
 #, python-format
 msgid "You already have an alert named %s."
-msgstr ""
+msgstr "Aveţi deja o alertă numită %s."
 
 #: modules/webalert/lib/webalert.py:111
 #: modules/websearch/lib/websearch_templates.py:3913
 msgid "unknown"
-msgstr ""
+msgstr "necunoscut"
 
 #: modules/webalert/lib/webalert.py:163 modules/webalert/lib/webalert.py:217
 #: modules/webalert/lib/webalert.py:303 modules/webalert/lib/webalert.py:341
@@ -2841,19 +2841,19 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:337
 #: modules/bibharvest/lib/oai_harvest_admin.py:141
 msgid "monthly"
-msgstr ""
+msgstr "lunar"
 
 #: modules/webalert/lib/webalert_templates.py:218
 #: modules/webalert/lib/webalert_templates.py:335
 #: modules/bibharvest/lib/oai_harvest_admin.py:140
 msgid "weekly"
-msgstr ""
+msgstr "săptămânal"
 
 #: modules/webalert/lib/webalert_templates.py:219
 #: modules/webalert/lib/webalert_templates.py:332
 #: modules/bibharvest/lib/oai_harvest_admin.py:139
 msgid "daily"
-msgstr ""
+msgstr "zilnic"
 
 #: modules/webalert/lib/webalert_templates.py:220
 msgid "Send notification email?"
@@ -2862,12 +2862,12 @@ msgstr ""
 #: modules/webalert/lib/webalert_templates.py:223
 #: modules/webalert/lib/webalert_templates.py:340
 msgid "yes"
-msgstr ""
+msgstr "da"
 
 #: modules/webalert/lib/webalert_templates.py:224
 #: modules/webalert/lib/webalert_templates.py:342
 msgid "no"
-msgstr ""
+msgstr "nu"
 
 #: modules/webalert/lib/webalert_templates.py:225
 #, python-format
@@ -2903,7 +2903,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2220
 #: modules/websession/lib/websession_templates.py:2260
 msgid "No"
-msgstr ""
+msgstr "Nu"
 
 #: modules/webalert/lib/webalert_templates.py:320
 msgid "Search checking frequency"
@@ -2940,13 +2940,13 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:385
 msgid "Modify"
-msgstr ""
+msgstr "Modifică"
 
 #: modules/webalert/lib/webalert_templates.py:391
 #: modules/webjournal/lib/webjournaladminlib.py:225
 #: modules/webjournal/lib/webjournaladminlib.py:231
 msgid "Remove"
-msgstr ""
+msgstr "Elimină"
 
 #: modules/webalert/lib/webalert_templates.py:393
 #: modules/webalert/lib/webalert_templates.py:483
@@ -2979,15 +2979,15 @@ msgstr ""
 
 #: modules/webalert/lib/webalert_templates.py:462
 msgid "Question"
-msgstr ""
+msgstr "Întrebare"
 
 #: modules/webalert/lib/webalert_templates.py:466
 msgid "Last Run"
-msgstr ""
+msgstr "Ultima rulare"
 
 #: modules/webalert/lib/webalert_templates.py:484
 msgid "Set new alert"
-msgstr ""
+msgstr "Crează alertă nouă"
 
 #: modules/webalert/lib/webalert_webinterface.py:76
 #: modules/webalert/lib/webalert_webinterface.py:139
@@ -3007,7 +3007,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:456
 #: modules/websession/lib/websession_templates.py:616
 msgid "Your Searches"
-msgstr ""
+msgstr "Căutările tale"
 
 #: modules/webalert/lib/webalert_webinterface.py:98
 #: modules/webalert/lib/webalert_webinterface.py:150
@@ -3051,7 +3051,7 @@ msgstr ""
 #: modules/websubmit/web/yourapprovals.py:91
 #: modules/websubmit/web/yoursubmissions.py:163
 msgid "Your Account"
-msgstr ""
+msgstr "Contul tău"
 
 #: modules/webalert/lib/webalert_webinterface.py:100
 #, python-format
@@ -3102,7 +3102,7 @@ msgstr ""
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:269
 msgid "Error"
-msgstr ""
+msgstr "Eroare"
 
 #: modules/webalert/lib/webalert_webinterface.py:152
 #: modules/webalert/lib/webalert_webinterface.py:185
@@ -3130,7 +3130,7 @@ msgstr ""
 #: modules/webalert/lib/webalert_webinterface.py:314
 #: modules/websession/lib/websession_templates.py:473
 msgid "Your Alerts"
-msgstr ""
+msgstr "Alertele tale"
 
 #: modules/webalert/lib/webalert_webinterface.py:321
 #: modules/webalert/lib/webalert_webinterface.py:397
@@ -3293,7 +3293,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:869
 msgid "Owner"
-msgstr ""
+msgstr "Deţinător"
 
 #: modules/webbasket/lib/webbasket_templates.py:870
 msgid "Last update"
@@ -3330,26 +3330,26 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:357
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
-msgstr ""
+msgstr "%(x_name)s a scris pe %(x_date)s:"
 
 #: modules/webbasket/lib/webbasket_templates.py:1126
 msgid "Select topic"
-msgstr ""
+msgstr "Alege un subiect"
 
 #: modules/webbasket/lib/webbasket_templates.py:1142
 #: modules/webbasket/lib/webbasket_templates.py:1503
 #: modules/webbasket/lib/webbasket_templates.py:1512
 msgid "Choose topic"
-msgstr ""
+msgstr "Alege un subiect"
 
 #: modules/webbasket/lib/webbasket_templates.py:1143
 #: modules/webbasket/lib/webbasket_templates.py:1514
 msgid "or create a new one"
-msgstr ""
+msgstr "sau creează unul nou"
 
 #: modules/webbasket/lib/webbasket_templates.py:1143
 msgid "Create new topic"
-msgstr ""
+msgstr "Creează un subiect nou"
 
 #: modules/webbasket/lib/webbasket_templates.py:1144
 #: modules/webbasket/lib/webbasket_templates.py:1500
@@ -3389,7 +3389,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15520
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15682
 msgid "Title"
-msgstr ""
+msgstr "Titlu"
 
 #: modules/webbasket/lib/webbasket_templates.py:1249
 msgid "URL"
@@ -3468,22 +3468,22 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:2219
 #: modules/websession/lib/websession_templates.py:2259
 msgid "Yes"
-msgstr ""
+msgstr "Da"
 
 #: modules/webbasket/lib/webbasket_templates.py:1517
 #: modules/webbasket/lib/webbasket_templates.py:1613
 msgid "General settings"
-msgstr ""
+msgstr "Setări generale"
 
 #: modules/webbasket/lib/webbasket_templates.py:1532
 #: modules/webbasket/lib/webbasket_templates.py:1707
 #: modules/webbasket/lib/webbasket_templates.py:1734
 msgid "Add group"
-msgstr ""
+msgstr "Adaugă grup"
 
 #: modules/webbasket/lib/webbasket_templates.py:1537
 msgid "Manage group rights"
-msgstr ""
+msgstr "Administrează drepturile de grup "
 
 #: modules/webbasket/lib/webbasket_templates.py:1549
 msgid "Manage global sharing rights"
@@ -3518,7 +3518,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1654
 #: modules/webbasket/lib/webbasket_templates.py:1669
 msgid "No rights"
-msgstr ""
+msgstr "Niciun drept"
 
 #: modules/webbasket/lib/webbasket_templates.py:1656
 #: modules/webbasket/lib/webbasket_templates.py:1671
@@ -3534,15 +3534,15 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1681
 #: modules/webbasket/lib/webbasket_templates.py:1683
 msgid "and"
-msgstr ""
+msgstr "şi"
 
 #: modules/webbasket/lib/webbasket_templates.py:1658
 msgid "view comments"
-msgstr ""
+msgstr "vezi comentarii"
 
 #: modules/webbasket/lib/webbasket_templates.py:1660
 msgid "add comments"
-msgstr ""
+msgstr "adaugă comentarii"
 
 #: modules/webbasket/lib/webbasket_templates.py:1673
 msgid "view notes"
@@ -3566,11 +3566,11 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:1683
 msgid "manage sharing rights"
-msgstr ""
+msgstr "gestionează drepturile de partajare "
 
 #: modules/webbasket/lib/webbasket_templates.py:1705
 msgid "You are not a member of a group."
-msgstr ""
+msgstr "Nu sunteţi membru al unui grup."
 
 #: modules/webbasket/lib/webbasket_templates.py:1727
 msgid "Sharing basket to a new group"
@@ -3594,12 +3594,12 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1771
 #: modules/websession/lib/websession_webinterface.py:262
 msgid "This functionality is forbidden to guest users."
-msgstr ""
+msgstr "Această funcţionalitate este interzisă utilizatorilor anonimi. "
 
 #: modules/webbasket/lib/webbasket_templates.py:1825
 #: modules/webcomment/lib/webcomment_templates.py:815
 msgid "Back to search results"
-msgstr ""
+msgstr "Înapoi la rezultatele căutării"
 
 #: modules/webbasket/lib/webbasket_templates.py:1953
 #: modules/webbasket/lib/webbasket_templates.py:2986
@@ -3625,7 +3625,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1959
 #: modules/webbasket/lib/webbasket_templates.py:2990
 msgid "last update"
-msgstr ""
+msgstr "ultima actualizare"
 
 #: modules/webbasket/lib/webbasket_templates.py:1963
 #: modules/webbasket/lib/webbasket_templates.py:2042
@@ -3660,7 +3660,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2202
 msgid "Move item up"
-msgstr ""
+msgstr "Deplasează elementul în sus"
 
 #: modules/webbasket/lib/webbasket_templates.py:2206
 msgid "You cannot move this item up"
@@ -3668,7 +3668,7 @@ msgstr ""
 
 #: modules/webbasket/lib/webbasket_templates.py:2220
 msgid "Move item down"
-msgstr ""
+msgstr "Deplasează elementul în jos"
 
 #: modules/webbasket/lib/webbasket_templates.py:2224
 msgid "You cannot move this item down"
@@ -3677,11 +3677,11 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:2238
 #: modules/webbasket/lib/webbasket_templates.py:3140
 msgid "Copy item"
-msgstr ""
+msgstr "Copiază elementul "
 
 #: modules/webbasket/lib/webbasket_templates.py:2254
 msgid "Remove item"
-msgstr ""
+msgstr "Şterge elementul "
 
 #: modules/webbasket/lib/webbasket_templates.py:2329
 #: modules/webbasket/lib/webbasket_templates.py:2832
@@ -3787,7 +3787,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:363
 #: modules/webmessage/lib/webmessage_templates.py:111
 msgid "Reply"
-msgstr ""
+msgstr "Răspunde"
 
 #: modules/webbasket/lib/webbasket_templates.py:2883
 #: modules/webbasket/lib/webbasket_templates.py:3680
@@ -3802,7 +3802,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:912
 #: modules/websession/lib/websession_templates.py:1036
 msgid "Note"
-msgstr ""
+msgstr "Notă"
 
 #: modules/webbasket/lib/webbasket_templates.py:2988
 msgid ", no notes yet"
@@ -3915,22 +3915,22 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:790
 #: modules/websubmit/lib/websubmit_templates.py:2663
 msgid "Write a comment"
-msgstr ""
+msgstr "Scrie un comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:116
 #, python-format
 msgid "Showing the latest %i comments:"
-msgstr ""
+msgstr "Cele mai recente %i comentarii:"
 
 #: modules/webcomment/lib/webcomment_templates.py:132
 #: modules/webcomment/lib/webcomment_templates.py:157
 msgid "Discuss this document"
-msgstr ""
+msgstr "Discutaţi despre acest document"
 
 #: modules/webcomment/lib/webcomment_templates.py:158
 #: modules/webcomment/lib/webcomment_templates.py:800
 msgid "Start a discussion about any aspect of this document."
-msgstr ""
+msgstr "Începeţi o discuţie cu privire la orice aspect al acestui document."
 
 #: modules/webcomment/lib/webcomment_templates.py:174
 #, python-format
@@ -3940,7 +3940,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:176
 #, python-format
 msgid "Sorry, %s is not a valid ID value."
-msgstr ""
+msgstr "Ne pare rău, %s nu este o valoare validă pentru ID."
 
 #: modules/webcomment/lib/webcomment_templates.py:178
 msgid "Sorry, no record ID was provided."
@@ -3949,7 +3949,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:182
 #, python-format
 msgid "You may want to start browsing from %s"
-msgstr ""
+msgstr "Poate doriţi să începeţi de navigarea de la %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:256
 #: modules/webcomment/lib/webcomment_templates.py:714
@@ -4003,7 +4003,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:391
 #: modules/webcomment/lib/webcomment_templates.py:393
 msgid "Delete comment"
-msgstr ""
+msgstr "Şterge comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:400
 msgid "Unreport comment"
@@ -4045,7 +4045,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_webinterface.py:416
 #: modules/websubmit/lib/websubmit_templates.py:2661
 msgid "Comments"
-msgstr ""
+msgstr "Comentarii"
 
 #: modules/webcomment/lib/webcomment_templates.py:593
 #: modules/webcomment/lib/webcomment_templates.py:608
@@ -4081,7 +4081,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1575
 #: modules/websearch/lib/websearch_templates.py:569
 msgid "Record"
-msgstr ""
+msgstr "Document"
 
 #: modules/webcomment/lib/webcomment_templates.py:821
 #: modules/webcomment/lib/webcomment_templates.py:880
@@ -4091,7 +4091,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:821
 #: modules/webcomment/lib/webcomment_templates.py:880
 msgid "comment"
-msgstr ""
+msgstr "comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:822
 #: modules/webcomment/lib/webcomment_templates.py:1810
@@ -4108,7 +4108,7 @@ msgstr ""
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:401
 #: modules/websubmit/lib/functions/Create_Upload_Files_Interface.py:455
 msgid "Comment"
-msgstr ""
+msgstr "Comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:878
 msgid "Viewing"
@@ -4116,11 +4116,11 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:879
 msgid "Page:"
-msgstr ""
+msgstr "Pagină:"
 
 #: modules/webcomment/lib/webcomment_templates.py:897
 msgid "Subscribe"
-msgstr ""
+msgstr "Subscrie"
 
 #: modules/webcomment/lib/webcomment_templates.py:906
 msgid "Unsubscribe"
@@ -4180,7 +4180,7 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1140
 msgid "Add comment"
-msgstr ""
+msgstr "Adaugă comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:1182
 #, python-format
@@ -4215,11 +4215,11 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1297
 msgid "Your review was successfully added."
-msgstr ""
+msgstr "Review-ul dumneavoastră a fost adăugată cu succes."
 
 #: modules/webcomment/lib/webcomment_templates.py:1299
 msgid "Your comment was successfully added."
-msgstr ""
+msgstr "Comentariul dumneavoastră a fost adăugat cu succes."
 
 #: modules/webcomment/lib/webcomment_templates.py:1302
 msgid "Back to record"
@@ -4257,25 +4257,25 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1400
 msgid "View all users who have been reported"
-msgstr ""
+msgstr "Vedeţi toţi utilizatorii raportaţi"
 
 #: modules/webcomment/lib/webcomment_templates.py:1402
 msgid "Guide"
-msgstr ""
+msgstr "Ghid"
 
 #: modules/webcomment/lib/webcomment_templates.py:1404
 msgid "Comments and reviews are disabled"
-msgstr ""
+msgstr "Comentariile si review-urile sunt dezactivate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1424
 msgid ""
 "Please enter the ID of the comment/review so that you can view it before "
 "deciding whether to delete it or not"
-msgstr ""
+msgstr "Vă rugăm să introduceţi ID-ul comentariului/review-ului"
 
 #: modules/webcomment/lib/webcomment_templates.py:1448
 msgid "Comment ID:"
-msgstr ""
+msgstr "ID-ul comentariului:"
 
 #: modules/webcomment/lib/webcomment_templates.py:1449
 msgid "Or enter a record ID to list all the associated comments/reviews:"
@@ -4287,27 +4287,29 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1452
 msgid "View Comment"
-msgstr ""
+msgstr "Vezi comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:1473
 msgid "There have been no reports so far."
-msgstr ""
+msgstr "Nu există raportări până în prezent."
 
 #: modules/webcomment/lib/webcomment_templates.py:1477
 #, python-format
 msgid "View all %s reported comments"
-msgstr ""
+msgstr "Vedeţi toate %s comentarii raportate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1480
 #, python-format
 msgid "View all %s reported reviews"
-msgstr ""
+msgstr "Vedeţi toate %s review-uri raportate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1517
 msgid ""
 "Here is a list, sorted by total number of reports, of all users who have had "
 "a comment reported at least once."
 msgstr ""
+" Lista sortată după numărul total de raportări, conţinând toţi utilizatorii "
+"care au avut un comentariu raportat cel puţin o dată."
 
 #: modules/webcomment/lib/webcomment_templates.py:1525
 #: modules/webcomment/lib/webcomment_templates.py:1554
@@ -4349,64 +4351,64 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14844
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16046
 msgid "Email"
-msgstr ""
+msgstr "E-mail"
 
 #: modules/webcomment/lib/webcomment_templates.py:1527
 #: modules/webcomment/lib/webcomment_templates.py:1556
 msgid "User ID"
-msgstr ""
+msgstr "ID Utilizator"
 
 #: modules/webcomment/lib/webcomment_templates.py:1529
 msgid "Number positive votes"
-msgstr ""
+msgstr "Numărul voturilor pozitive"
 
 #: modules/webcomment/lib/webcomment_templates.py:1530
 msgid "Number negative votes"
-msgstr ""
+msgstr "Numărul voturilor negative"
 
 #: modules/webcomment/lib/webcomment_templates.py:1531
 msgid "Total number votes"
-msgstr ""
+msgstr "Numărul total de voturi"
 
 #: modules/webcomment/lib/webcomment_templates.py:1532
 msgid "Total number of reports"
-msgstr ""
+msgstr "Numărul total de raportări"
 
 #: modules/webcomment/lib/webcomment_templates.py:1533
 msgid "View all user's reported comments/reviews"
-msgstr ""
+msgstr "Vezi toate comentariile/review-rile raportate ale utilizatorului"
 
 #: modules/webcomment/lib/webcomment_templates.py:1566
 #, python-format
 msgid "This review has been reported %i times"
-msgstr ""
+msgstr "Acest review a fost raportat de %i ori"
 
 #: modules/webcomment/lib/webcomment_templates.py:1568
 #, python-format
 msgid "This comment has been reported %i times"
-msgstr ""
+msgstr "Acest comentariu a fost raportat de %i ori"
 
 #: modules/webcomment/lib/webcomment_templates.py:1811
 msgid "Written by"
-msgstr ""
+msgstr "Scris de"
 
 #: modules/webcomment/lib/webcomment_templates.py:1812
 msgid "General informations"
-msgstr ""
+msgstr "Informaţii generale"
 
 #: modules/webcomment/lib/webcomment_templates.py:1813
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:652
 msgid "Select"
-msgstr ""
+msgstr "Selectaţi"
 
 #: modules/webcomment/lib/webcomment_templates.py:1827
 msgid "Delete selected reviews"
-msgstr ""
+msgstr "Ştergeţi comentariile selectate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1828
 #: modules/webcomment/lib/webcomment_templates.py:1835
 msgid "Suppress selected abuse report"
-msgstr ""
+msgstr "Suprimarea rapoartelor de abuz selectate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1829
 msgid "Undelete selected reviews"
@@ -4418,24 +4420,24 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1834
 msgid "Delete selected comments"
-msgstr ""
+msgstr "Şterge comentariile selectate"
 
 #: modules/webcomment/lib/webcomment_templates.py:1843
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:494
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:557
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1526
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: modules/webcomment/lib/webcomment_templates.py:1849
 #, python-format
 msgid "Here are the reported reviews of user %s"
-msgstr ""
+msgstr "Review-urile raportate de utilizatorul %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1851
 #, python-format
 msgid "Here are the reported comments of user %s"
-msgstr ""
+msgstr "Comentariile raportate de utilizatorul %s"
 
 #: modules/webcomment/lib/webcomment_templates.py:1855
 #, python-format
@@ -4459,11 +4461,11 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1868
 msgid "Here are all reported reviews sorted by the most reported"
-msgstr ""
+msgstr "Toate review-urile raportate, sortate in funcţie de frecvenţa."
 
 #: modules/webcomment/lib/webcomment_templates.py:1870
 msgid "Here are all reported comments sorted by the most reported"
-msgstr ""
+msgstr "Toate comentariile raportate, sortate in funcţie de frecvenţa."
 
 #: modules/webcomment/lib/webcomment_templates.py:1875
 #, python-format
@@ -4487,11 +4489,11 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1928
 #: modules/webcomment/lib/webcomment_templates.py:1954
 msgid "comment ID"
-msgstr ""
+msgstr "ID comentariu"
 
 #: modules/webcomment/lib/webcomment_templates.py:1904
 msgid "successfully deleted"
-msgstr ""
+msgstr "şters cu succes"
 
 #: modules/webcomment/lib/webcomment_templates.py:1928
 msgid "successfully undeleted"
@@ -4499,11 +4501,11 @@ msgstr ""
 
 #: modules/webcomment/lib/webcomment_templates.py:1954
 msgid "successfully suppressed abuse report"
-msgstr ""
+msgstr "abuzul raportat a fost suprimat cu succes"
 
 #: modules/webcomment/lib/webcomment_templates.py:1971
 msgid "Not yet reviewed"
-msgstr ""
+msgstr "Nu a fost încă examinat"
 
 #: modules/webcomment/lib/webcomment_templates.py:2039
 #, python-format
@@ -4544,13 +4546,13 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_webinterface.py:253
 #: modules/webcomment/lib/webcomment_webinterface.py:483
 msgid "Record Not Found"
-msgstr ""
+msgstr "Documentul nu a fost găsit"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:463
 #: modules/websubmit/lib/websubmit_templates.py:2657
 #: modules/websubmit/lib/websubmit_templates.py:2658
 msgid "Add Comment"
-msgstr ""
+msgstr "Adaugă comentariu"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:725
 #: modules/webcomment/lib/webcomment_webinterface.py:759
@@ -4574,7 +4576,7 @@ msgstr ""
 #: modules/webcomment/web/admin/webcommentadmin.py:230
 #: modules/webcomment/web/admin/webcommentadmin.py:268
 msgid "WebComment Admin"
-msgstr ""
+msgstr "Administrator WebComment"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:50
 #: modules/webcomment/web/admin/webcommentadmin.py:88
@@ -4589,7 +4591,7 @@ msgstr ""
 #: modules/webjournal/web/admin/webjournaladmin.py:390
 #: modules/bibcheck/web/admin/bibcheckadmin.py:333
 msgid "Internal Error"
-msgstr ""
+msgstr "Eroare internă"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:102
 msgid "Delete/Undelete Reviews"
@@ -4605,15 +4607,15 @@ msgstr ""
 
 #: modules/webcomment/web/admin/webcommentadmin.py:244
 msgid "View all reported users"
-msgstr ""
+msgstr "Vezi toţi utilizatorii raportaţi"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:291
 msgid "Delete comments"
-msgstr ""
+msgstr "Şterge comentarii"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:294
 msgid "Suppress abuse reports"
-msgstr ""
+msgstr "Suprimarea rapoartelor de abuz"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:297
 msgid "Undelete comments"
@@ -4621,24 +4623,24 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage.py:127
 msgid "The message could not be deleted."
-msgstr ""
+msgstr "Mesajul nu a putut fi şters."
 
 #: modules/webmessage/lib/webmessage.py:129
 msgid "The message was successfully deleted."
-msgstr ""
+msgstr "Mesajul a fost şters."
 
 #: modules/webmessage/lib/webmessage.py:146
 msgid "Your mailbox has been emptied."
-msgstr ""
+msgstr "Căsuţa poştală a fost golită."
 
 #: modules/webmessage/lib/webmessage.py:347
 #, python-format
 msgid "The chosen date (%(x_year)i/%(x_month)i/%(x_day)i) is invalid."
-msgstr ""
+msgstr "Data aleasă (%(x_year)i/%(x_month)i/%(x_day)i) nu este validă."
 
 #: modules/webmessage/lib/webmessage.py:356
 msgid "Please enter a user name or a group name."
-msgstr ""
+msgstr "Vă rugăm să introduceţi un nume de utilizator sau un nume de grup."
 
 #: modules/webmessage/lib/webmessage.py:360
 #, python-format
@@ -4646,32 +4648,34 @@ msgid ""
 "Your message is too long, please edit it. Maximum size allowed is %i "
 "characters."
 msgstr ""
+"Mesajul este prea lung, vă rugăm să il editaţi. Dimensiunea maximă permisă "
+"este %i caractere."
 
 #: modules/webmessage/lib/webmessage.py:375
 #, python-format
 msgid "Group %s does not exist."
-msgstr ""
+msgstr "Grupul %s nu există."
 
 #: modules/webmessage/lib/webmessage.py:400
 #, python-format
 msgid "User %s does not exist."
-msgstr ""
+msgstr "Utilizatorul %s nu există."
 
 #: modules/webmessage/lib/webmessage.py:413
 #: modules/webmessage/lib/webmessage_webinterface.py:147
 #: modules/webmessage/lib/webmessage_webinterface.py:247
 msgid "Write a message"
-msgstr ""
+msgstr "Scrieţi un mesaj"
 
 #: modules/webmessage/lib/webmessage.py:428
 msgid ""
 "Your message could not be sent to the following recipients due to their "
 "quota:"
-msgstr ""
+msgstr "Mesajul nu a putut fi trimis la următorii destinatari:"
 
 #: modules/webmessage/lib/webmessage.py:432
 msgid "Your message has been sent."
-msgstr ""
+msgstr "Mesajul dumneavoastră a fost trimis."
 
 #: modules/webmessage/lib/webmessage.py:439
 #: modules/webmessage/lib/webmessage_templates.py:472
@@ -4680,139 +4684,139 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:366
 #: modules/websession/lib/websession_templates.py:604
 msgid "Your Messages"
-msgstr ""
+msgstr "Mesajele tale"
 
 #: modules/webmessage/lib/webmessage_templates.py:86
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4462
 msgid "Subject"
-msgstr ""
+msgstr "Subiect"
 
 #: modules/webmessage/lib/webmessage_templates.py:87
 msgid "Sender"
-msgstr ""
+msgstr "Expeditor"
 
 #: modules/webmessage/lib/webmessage_templates.py:96
 msgid "No messages"
-msgstr ""
+msgstr "Niciun mesaj"
 
 #: modules/webmessage/lib/webmessage_templates.py:100
 msgid "No subject"
-msgstr ""
+msgstr "Fara subiect"
 
 #: modules/webmessage/lib/webmessage_templates.py:146
 msgid "Write new message"
-msgstr ""
+msgstr "Scrieţi un nou mesaj"
 
 #: modules/webmessage/lib/webmessage_templates.py:147
 msgid "Delete All"
-msgstr ""
+msgstr "Şterge tot"
 
 #: modules/webmessage/lib/webmessage_templates.py:189
 msgid "Re:"
-msgstr ""
+msgstr "Re:"
 
 #: modules/webmessage/lib/webmessage_templates.py:281
 msgid "Send later?"
-msgstr ""
+msgstr "Trimite mai târziu?"
 
 #: modules/webmessage/lib/webmessage_templates.py:282
 #: modules/websubmit/lib/websubmit_templates.py:3069
 msgid "To:"
-msgstr ""
+msgstr "Către:"
 
 #: modules/webmessage/lib/webmessage_templates.py:283
 msgid "Users"
-msgstr ""
+msgstr "Utilizatori"
 
 #: modules/webmessage/lib/webmessage_templates.py:284
 msgid "Groups"
-msgstr ""
+msgstr "Grupuri"
 
 #: modules/webmessage/lib/webmessage_templates.py:285
 #: modules/webmessage/lib/webmessage_templates.py:447
 #: modules/websubmit/lib/websubmit_templates.py:3070
 msgid "Subject:"
-msgstr ""
+msgstr "Subiect:"
 
 #: modules/webmessage/lib/webmessage_templates.py:286
 #: modules/websubmit/lib/websubmit_templates.py:3071
 msgid "Message:"
-msgstr ""
+msgstr "Mesaj:"
 
 #: modules/webmessage/lib/webmessage_templates.py:287
 #: modules/websubmit/lib/websubmit_templates.py:3072
 msgid "SEND"
-msgstr ""
+msgstr "TRIMITE"
 
 #: modules/webmessage/lib/webmessage_templates.py:446
 msgid "From:"
-msgstr ""
+msgstr "De la:"
 
 #: modules/webmessage/lib/webmessage_templates.py:448
 msgid "Sent on:"
-msgstr ""
+msgstr "Trimis pe:"
 
 #: modules/webmessage/lib/webmessage_templates.py:449
 msgid "Received on:"
-msgstr ""
+msgstr "Primit pe:"
 
 #: modules/webmessage/lib/webmessage_templates.py:450
 msgid "Sent to:"
-msgstr ""
+msgstr "Trimis la:"
 
 #: modules/webmessage/lib/webmessage_templates.py:451
 msgid "Sent to groups:"
-msgstr ""
+msgstr "Trimis la grupuri:"
 
 #: modules/webmessage/lib/webmessage_templates.py:452
 msgid "REPLY"
-msgstr ""
+msgstr "RĂSPUNS"
 
 #: modules/webmessage/lib/webmessage_templates.py:453
 msgid "DELETE"
-msgstr ""
+msgstr "ŞTERGE"
 
 #: modules/webmessage/lib/webmessage_templates.py:506
 msgid "Are you sure you want to empty your whole mailbox?"
-msgstr ""
+msgstr "Sunteţi sigur(ă) că doriţi să goliţi în întregime căsuţa poştală?"
 
 #: modules/webmessage/lib/webmessage_templates.py:568
 #, python-format
 msgid "Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i"
-msgstr ""
+msgstr "Cotă depasită: %(x_nb_used)i mesaje din max. %(x_nb_total)i"
 
 #: modules/webmessage/lib/webmessage_templates.py:586
 msgid "Please select one or more:"
-msgstr ""
+msgstr "Vă rugăm să selectaţi unul sau mai multe:"
 
 #: modules/webmessage/lib/webmessage_templates.py:617
 msgid "Add to users"
-msgstr ""
+msgstr "Adaugă la utilizatori"
 
 #: modules/webmessage/lib/webmessage_templates.py:619
 msgid "Add to groups"
-msgstr ""
+msgstr "Adaugă la grupuri"
 
 #: modules/webmessage/lib/webmessage_templates.py:622
 msgid "No matching user"
-msgstr ""
+msgstr "Niciun utilizator potrivit"
 
 #: modules/webmessage/lib/webmessage_templates.py:624
 #: modules/websession/lib/websession_templates.py:1824
 msgid "No matching group"
-msgstr ""
+msgstr "Niciun grup potrivit"
 
 #: modules/webmessage/lib/webmessage_templates.py:661
 msgid "Find users or groups:"
-msgstr ""
+msgstr "Caută utilizatori sau grupuri:"
 
 #: modules/webmessage/lib/webmessage_templates.py:662
 msgid "Find a user"
-msgstr ""
+msgstr "Caută un utilizator"
 
 #: modules/webmessage/lib/webmessage_templates.py:663
 msgid "Find a group"
-msgstr ""
+msgstr "Caută un grup"
 
 #: modules/webmessage/lib/webmessage_templates.py:678
 #, python-format
@@ -4830,29 +4834,29 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_webinterface.py:414
 msgid "Read a message"
-msgstr ""
+msgstr "Citiţi un mesaj"
 
 #: modules/websearch/lib/search_engine.py:738
 #: modules/websearch/lib/search_engine.py:765
 #: modules/websearch/lib/search_engine.py:4466
 #: modules/websearch/lib/search_engine.py:4519
 msgid "Search Results"
-msgstr ""
+msgstr "Rezultatele căutării"
 
 #: modules/websearch/lib/search_engine.py:867
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
-msgstr ""
+msgstr "orice zi"
 
 #: modules/websearch/lib/search_engine.py:873
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
-msgstr ""
+msgstr "orice lună"
 
 #: modules/websearch/lib/search_engine.py:881
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
-msgstr ""
+msgstr "orice an"
 
 #: modules/websearch/lib/search_engine.py:922
 #: modules/websearch/lib/search_engine.py:941
@@ -4865,7 +4869,7 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:937
 msgid "add another collection"
-msgstr ""
+msgstr "adaugă o altă colecţie"
 
 #: modules/websearch/lib/search_engine.py:947
 #: modules/websearch/lib/websearch_webcoll.py:561
@@ -4874,7 +4878,7 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:967
 msgid "HTML brief"
-msgstr ""
+msgstr "HTML scurt"
 
 #: modules/websearch/lib/search_engine.py:1080
 #: modules/websearch/lib/websearch_webcoll.py:531
@@ -4883,7 +4887,7 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:1667
 msgid "No values found."
-msgstr ""
+msgstr "Nicio valoare nu a fost gasită."
 
 #: modules/websearch/lib/search_engine.py:1785
 msgid ""
@@ -5056,7 +5060,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:745
 msgid "less"
-msgstr ""
+msgstr "mai puţin"
 
 #: modules/websearch/lib/websearch_templates.py:746
 #: modules/websearch/lib/websearch_templates.py:1506
@@ -5064,7 +5068,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3785
 #: modules/websearch/lib/websearch_templates.py:3845
 msgid "more"
-msgstr ""
+msgstr "mai mult"
 
 #: modules/websearch/lib/websearch_templates.py:751
 #, python-format
@@ -5111,12 +5115,12 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1071
 #: modules/websearch/lib/websearch_templates.py:2254
 msgid "until:"
-msgstr ""
+msgstr "până la:"
 
 #: modules/websearch/lib/websearch_templates.py:1076
 #: modules/websearch/lib/websearch_templates.py:2296
 msgid "Sort by:"
-msgstr ""
+msgstr "Sortează după:"
 
 #: modules/websearch/lib/websearch_templates.py:1077
 #: modules/websearch/lib/websearch_templates.py:2297
@@ -5162,75 +5166,77 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:1467
 msgid "This collection does not contain any document yet."
-msgstr ""
+msgstr "Această colecţie nu conţine niciun document încă."
 
 #: modules/websearch/lib/websearch_templates.py:1521
 msgid "Latest additions:"
-msgstr ""
+msgstr "Ultimele documente adăugate:"
 
 #: modules/websearch/lib/websearch_templates.py:1624
 #: modules/websearch/lib/websearch_templates.py:3359
 #, python-format
 msgid "Cited by %i records"
-msgstr ""
+msgstr "Citat de %i documente"
 
 #: modules/websearch/lib/websearch_templates.py:1690
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr ""
+"Cuvintele asemănătoare cu %(x_word)s, aparţinând câmpului  %(x_field)s, din "
+"orice colecţie, sunt:"
 
 #: modules/websearch/lib/websearch_templates.py:1693
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
-msgstr ""
+msgstr "Cuvintele asemănătoare cu %(x_word)s, din orice colecţie, sunt:"
 
 #: modules/websearch/lib/websearch_templates.py:1785
 msgid "Hits"
-msgstr ""
+msgstr "Rezultate"
 
 #: modules/websearch/lib/websearch_templates.py:1864
 #: modules/websearch/lib/websearch_templates.py:2516
 #: modules/websearch/lib/websearch_templates.py:2706
 #: modules/bibedit/lib/bibeditmulti_templates.py:577
 msgid "next"
-msgstr ""
+msgstr "următorul"
 
 #: modules/websearch/lib/websearch_templates.py:2202
 msgid "collections"
-msgstr ""
+msgstr "colecţii"
 
 #: modules/websearch/lib/websearch_templates.py:2224
 msgid "Limit to:"
-msgstr ""
+msgstr "Limita la:"
 
 #: modules/websearch/lib/websearch_templates.py:2266
 #: modules/websearch/lib/websearch_webcoll.py:579
 msgid "results"
-msgstr ""
+msgstr "rezultate"
 
 #: modules/websearch/lib/websearch_templates.py:2302
 #: modules/websearch/lib/websearch_webcoll.py:549
 msgid "asc."
-msgstr ""
+msgstr "asc."
 
 #: modules/websearch/lib/websearch_templates.py:2305
 #: modules/websearch/lib/websearch_webcoll.py:550
 msgid "desc."
-msgstr ""
+msgstr "desc."
 
 #: modules/websearch/lib/websearch_templates.py:2311
 #: modules/websearch/lib/websearch_webcoll.py:593
 msgid "single list"
-msgstr ""
+msgstr "o singură listă"
 
 #: modules/websearch/lib/websearch_templates.py:2314
 #: modules/websearch/lib/websearch_webcoll.py:592
 msgid "split by collection"
-msgstr ""
+msgstr "divizare pe colecţii"
 
 #: modules/websearch/lib/websearch_templates.py:2352
 msgid "MARC tag"
-msgstr ""
+msgstr "tag MARC"
 
 #: modules/websearch/lib/websearch_templates.py:2467
 #: modules/websearch/lib/websearch_templates.py:2472
@@ -5240,25 +5246,25 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2992
 #, python-format
 msgid "%s records found"
-msgstr ""
+msgstr "%s documente găsite"
 
 #: modules/websearch/lib/websearch_templates.py:2499
 #: modules/websearch/lib/websearch_templates.py:2689
 #: modules/bibedit/lib/bibeditmulti_templates.py:575
 msgid "begin"
-msgstr ""
+msgstr "începe"
 
 #: modules/websearch/lib/websearch_templates.py:2504
 #: modules/websearch/lib/websearch_templates.py:2694
 #: modules/websubmit/lib/websubmit_templates.py:1233
 #: modules/bibedit/lib/bibeditmulti_templates.py:576
 msgid "previous"
-msgstr ""
+msgstr "precedent"
 
 #: modules/websearch/lib/websearch_templates.py:2523
 #: modules/websearch/lib/websearch_templates.py:2713
 msgid "end"
-msgstr ""
+msgstr "sfârşit"
 
 #: modules/websearch/lib/websearch_templates.py:2543
 #: modules/websearch/lib/websearch_templates.py:2733
@@ -5269,7 +5275,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:2746
 #, python-format
 msgid "Search took %s seconds."
-msgstr ""
+msgstr "Căutarea a durat %s secunde."
 
 #: modules/websearch/lib/websearch_templates.py:2950
 #, python-format
@@ -5277,6 +5283,8 @@ msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
 "records in %(x_nb_seconds)s seconds."
 msgstr ""
+"%(x_fmt_open)s Sumarizarea rezultatelor:%(x_fmt_close)s Au fost găsite "
+"%(x_nb_records)s documente in %(x_nb_seconds)s secunde."
 
 #: modules/websearch/lib/websearch_templates.py:2962
 #, python-format
@@ -5298,10 +5306,12 @@ msgstr ""
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
+"Căutarea booleană nu a returnat rezultate. Vă rugăm să combinaţi diferit "
+"termenii de căutare."
 
 #: modules/websearch/lib/websearch_templates.py:3112
 msgid "See also: similar author names"
-msgstr ""
+msgstr "Vedeţi de asemenea şi: nume similare de autori"
 
 #: modules/websearch/lib/websearch_templates.py:3360
 msgid "Cited by 1 record"
@@ -5329,19 +5339,19 @@ msgstr ""
 #: modules/websearch/lib/websearch_webinterface.py:963
 #, python-format
 msgid "Collection %s Not Found"
-msgstr ""
+msgstr "Colecţia %s nu a fost găsită"
 
 #: modules/websearch/lib/websearch_templates.py:3537
 #: modules/websearch/lib/websearch_webinterface.py:959
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
-msgstr ""
+msgstr "Ne pare rău, dar colecţia %s nu există."
 
 #: modules/websearch/lib/websearch_templates.py:3539
 #: modules/websearch/lib/websearch_webinterface.py:960
 #, python-format
 msgid "You may want to start browsing from %s."
-msgstr ""
+msgstr "Aţi putea să începeţi navigarea de la %s."
 
 #: modules/websearch/lib/websearch_templates.py:3566
 #, python-format
@@ -5371,17 +5381,17 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:3771
 #, python-format
 msgid "Cited by: %s records"
-msgstr ""
+msgstr "Citat de: %s documente"
 
 #: modules/websearch/lib/websearch_templates.py:3838
 #, python-format
 msgid "Co-cited with: %s records"
-msgstr ""
+msgstr "Co-citat cu: %s documente"
 
 #: modules/websearch/lib/websearch_templates.py:3880
 #, python-format
 msgid ".. of which self-citations: %s records"
-msgstr ""
+msgstr ".. din care, auto-citări: %s documente"
 
 #: modules/websearch/lib/websearch_templates.py:3925
 msgid "Papers:"
@@ -5397,7 +5407,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:3963
 msgid "Affiliations:"
-msgstr ""
+msgstr "Afilieri:"
 
 #: modules/websearch/lib/websearch_templates.py:3982
 msgid "Frequent keywords:"
@@ -5409,7 +5419,7 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4023
 msgid "Citations:"
-msgstr ""
+msgstr "Citaţii:"
 
 #: modules/websearch/lib/websearch_templates.py:4053
 msgid "Citation summary results"
@@ -5417,15 +5427,15 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_templates.py:4058
 msgid "Total number of citable papers analyzed:"
-msgstr ""
+msgstr "Numărul total de lucrări citable analizate:"
 
 #: modules/websearch/lib/websearch_templates.py:4081
 msgid "Total number of citations:"
-msgstr ""
+msgstr "Numărul total de citaţii:"
 
 #: modules/websearch/lib/websearch_templates.py:4086
 msgid "Average citations per paper:"
-msgstr ""
+msgstr "Numărul mediu de citaţii:"
 
 #: modules/websearch/lib/websearch_templates.py:4091
 msgid "Breakdown of papers by citations:"
@@ -5441,11 +5451,11 @@ msgstr ""
 
 #: modules/websearch/lib/websearch_webinterface.py:965
 msgid "Not found"
-msgstr ""
+msgstr "Nu a fost găsit"
 
 #: modules/websearch/lib/websearch_external_collections.py:143
 msgid "in"
-msgstr ""
+msgstr "în"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:51
 msgid ""
@@ -5470,21 +5480,21 @@ msgstr ""
 #: modules/websearch/lib/websearch_external_collections_templates.py:153
 #: modules/websearch/lib/websearch_external_collections_templates.py:166
 msgid "No results found."
-msgstr ""
+msgstr "Niciun rezultat nu a fost găsit."
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:149
 #, python-format
 msgid "%s results found"
-msgstr ""
+msgstr "%s rezultate găsite"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:151
 #, python-format
 msgid "%s seconds"
-msgstr ""
+msgstr "%s secunde"
 
 #: modules/websearch/lib/websearch_webcoll.py:614
 msgid "brief"
-msgstr ""
+msgstr "scurt"
 
 #: modules/websession/lib/webaccount.py:115
 #, python-format
@@ -5549,7 +5559,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:209
 #: modules/websession/lib/websession_templates.py:1033
 msgid "mandatory"
-msgstr ""
+msgstr "obligatoriu"
 
 #: modules/websession/lib/websession_templates.py:165
 msgid "Set new values"
@@ -5569,16 +5579,16 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:210
 msgid "Old password"
-msgstr ""
+msgstr "Parola veche"
 
 #: modules/websession/lib/websession_templates.py:211
 msgid "New password"
-msgstr ""
+msgstr "Parola nouă"
 
 #: modules/websession/lib/websession_templates.py:212
 #: modules/websession/lib/websession_templates.py:1034
 msgid "optional"
-msgstr ""
+msgstr "opţional"
 
 #: modules/websession/lib/websession_templates.py:214
 #: modules/websession/lib/websession_templates.py:1037
@@ -5618,13 +5628,13 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:253
 #: modules/websession/lib/websession_templates.py:897
 msgid "Username"
-msgstr ""
+msgstr "Nume utilizator"
 
 #: modules/websession/lib/websession_templates.py:254
 #: modules/websession/lib/websession_templates.py:898
 #: modules/websession/lib/websession_templates.py:1032
 msgid "Password"
-msgstr ""
+msgstr "Parolă"
 
 #: modules/websession/lib/websession_templates.py:255
 #: modules/websession/lib/websession_templates.py:281
@@ -6034,11 +6044,11 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1175
 msgid "guest"
-msgstr ""
+msgstr "vizitator"
 
 #: modules/websession/lib/websession_templates.py:1189
 msgid "logout"
-msgstr ""
+msgstr "ieşire"
 
 #: modules/websession/lib/websession_templates.py:1237
 #: modules/webstyle/lib/webstyle_templates.py:430
@@ -6092,7 +6102,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1489
 msgid "You are an administrator of the following groups:"
-msgstr ""
+msgstr "Sunteţi administrator al următoarelor grupuri:"
 
 #: modules/websession/lib/websession_templates.py:1509
 #: modules/websession/lib/websession_templates.py:1583
@@ -6100,35 +6110,35 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:3001
 #: modules/websubmit/lib/websubmit_templates.py:3007
 msgid "Group"
-msgstr ""
+msgstr "Grup"
 
 #: modules/websession/lib/websession_templates.py:1516
 msgid "You are not an administrator of any groups."
-msgstr ""
+msgstr "Nu sunteţi administratorul nici unui grup."
 
 #: modules/websession/lib/websession_templates.py:1523
 msgid "Edit group"
-msgstr ""
+msgstr "Editare grup"
 
 #: modules/websession/lib/websession_templates.py:1530
 #, python-format
 msgid "Edit %s members"
-msgstr ""
+msgstr "Editare %s membri"
 
 #: modules/websession/lib/websession_templates.py:1553
 #: modules/websession/lib/websession_templates.py:1693
 #: modules/websession/lib/websession_templates.py:1695
 #: modules/websession/lib/websession_webinterface.py:1067
 msgid "Create new group"
-msgstr ""
+msgstr "Creaţi un nou grup"
 
 #: modules/websession/lib/websession_templates.py:1567
 msgid "You are a member of the following groups:"
-msgstr ""
+msgstr "Sunteţi membru al următoarelor grupuri:"
 
 #: modules/websession/lib/websession_templates.py:1590
 msgid "You are not a member of any groups."
-msgstr ""
+msgstr "Nu sunteţi membru al nici unui grup."
 
 #: modules/websession/lib/websession_templates.py:1614
 msgid "Join new group"
@@ -6142,11 +6152,11 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:1630
 msgid "You are a member of the following external groups:"
-msgstr ""
+msgstr "Sunteţi membru al următoarelor grupuri externe:"
 
 #: modules/websession/lib/websession_templates.py:1653
 msgid "You are not a member of any external groups."
-msgstr ""
+msgstr "Nu sunteţi membru al nici unui grup extern."
 
 #: modules/websession/lib/websession_templates.py:1701
 msgid "Update group"
@@ -6155,19 +6165,19 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1703
 #, python-format
 msgid "Edit group %s"
-msgstr ""
+msgstr "Editare grup %s"
 
 #: modules/websession/lib/websession_templates.py:1705
 msgid "Delete group"
-msgstr ""
+msgstr "Ştergeţi grup"
 
 #: modules/websession/lib/websession_templates.py:1778
 msgid "Group name:"
-msgstr ""
+msgstr "Numele grupului:"
 
 #: modules/websession/lib/websession_templates.py:1780
 msgid "Group description:"
-msgstr ""
+msgstr "Descrierea grupului:"
 
 #: modules/websession/lib/websession_templates.py:1781
 msgid "Group join policy:"
@@ -6413,7 +6423,7 @@ msgstr ""
 
 #: modules/websession/lib/webuser.py:712
 msgid "   Username/Email"
-msgstr ""
+msgstr "   Nume utilizator/ E-mail"
 
 #: modules/websession/lib/webuser.py:713
 msgid "You can approve or reject this account request at"
@@ -6720,7 +6730,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:790
 #: modules/websession/lib/websession_webinterface.py:825
 msgid "Login"
-msgstr ""
+msgstr "Autentificare"
 
 #: modules/websession/lib/websession_webinterface.py:856
 msgid "Register"
@@ -6866,7 +6876,7 @@ msgstr ""
 
 #: modules/webstyle/lib/webstyle_templates.py:605
 msgid "System Error"
-msgstr ""
+msgstr "Eroare de sistem"
 
 #: modules/webstyle/lib/webstyle_templates.py:620
 msgid "Traceback"
@@ -7250,13 +7260,13 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:498
 #: modules/websubmit/lib/websubmit_templates.py:967
 msgid "SUMMARY"
-msgstr ""
+msgstr "SUMAR"
 
 #: modules/websubmit/lib/websubmit_templates.py:534
 #: modules/bibharvest/lib/oai_harvest_admin.py:844
 #: modules/bibharvest/lib/oai_harvest_admin.py:897
 msgid "Previous page"
-msgstr ""
+msgstr "Pagina anterioara"
 
 #: modules/websubmit/lib/websubmit_templates.py:540
 msgid "Submission number"
@@ -7266,7 +7276,7 @@ msgstr ""
 #: modules/bibharvest/lib/oai_harvest_admin.py:829
 #: modules/bibharvest/lib/oai_harvest_admin.py:885
 msgid "Next page"
-msgstr ""
+msgstr "Pagina următoare"
 
 #: modules/websubmit/lib/websubmit_templates.py:569
 #: modules/websubmit/lib/websubmit_templates.py:1008
@@ -7277,7 +7287,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:1009
 #: modules/websubmit/lib/websubmit_templates.py:1018
 msgid "Back to main menu"
-msgstr ""
+msgstr "Înapoi la meniul principal"
 
 #: modules/websubmit/lib/websubmit_templates.py:574
 msgid ""
@@ -7358,11 +7368,11 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1145
 msgid "record"
-msgstr ""
+msgstr "document"
 
 #: modules/websubmit/lib/websubmit_templates.py:1147
 msgid "document"
-msgstr ""
+msgstr "document"
 
 #: modules/websubmit/lib/websubmit_templates.py:1149
 #: modules/websubmit/lib/websubmit_templates.py:1245
@@ -7375,11 +7385,11 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1229
 msgid "see"
-msgstr ""
+msgstr "vezi"
 
 #: modules/websubmit/lib/websubmit_templates.py:1427
 msgid "For"
-msgstr ""
+msgstr "Pentru"
 
 #: modules/websubmit/lib/websubmit_templates.py:1428
 msgid "all types of document"
@@ -7395,11 +7405,11 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1486
 msgid "First access"
-msgstr ""
+msgstr "Primul acces"
 
 #: modules/websubmit/lib/websubmit_templates.py:1487
 msgid "Last access"
-msgstr ""
+msgstr "Ultimul acces"
 
 #: modules/websubmit/lib/websubmit_templates.py:1497
 msgid "Are you sure you want to delete this submission?"
@@ -7508,7 +7518,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:1989
 #: modules/websubmit/lib/websubmit_templates.py:2175
 msgid "Cancelled"
-msgstr ""
+msgstr "Anulat"
 
 #: modules/websubmit/lib/websubmit_templates.py:2044
 #: modules/websubmit/lib/websubmit_templates.py:2132
@@ -7542,28 +7552,28 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:2755
 #: modules/websubmit/lib/websubmit_templates.py:2939
 msgid "Title:"
-msgstr ""
+msgstr "Titlu:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2331
 #: modules/websubmit/lib/websubmit_templates.py:2452
 #: modules/websubmit/lib/websubmit_templates.py:2761
 #: modules/websubmit/lib/websubmit_templates.py:2945
 msgid "Author:"
-msgstr ""
+msgstr "Autor:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2339
 #: modules/websubmit/lib/websubmit_templates.py:2461
 #: modules/websubmit/lib/websubmit_templates.py:2769
 #: modules/websubmit/lib/websubmit_templates.py:2953
 msgid "More information:"
-msgstr ""
+msgstr "Mai multe informaţii:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2340
 #: modules/websubmit/lib/websubmit_templates.py:2462
 #: modules/websubmit/lib/websubmit_templates.py:2770
 #: modules/websubmit/lib/websubmit_templates.py:2954
 msgid "Click here"
-msgstr ""
+msgstr "Apasă aici"
 
 #: modules/websubmit/lib/websubmit_templates.py:2348
 msgid "Approval note:"
@@ -7599,7 +7609,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:2363
 #: modules/websubmit/web/publiline.py:359
 msgid "Send Again"
-msgstr ""
+msgstr "Retrimite"
 
 #: modules/websubmit/lib/websubmit_templates.py:2364
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
@@ -7626,7 +7636,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2381
 msgid "It was approved on:"
-msgstr ""
+msgstr "A fost aprobat pe:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2383
 #, python-format
@@ -7635,7 +7645,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2390
 msgid "It was rejected on:"
-msgstr ""
+msgstr "A fost respins pe:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2473
 #: modules/websubmit/lib/websubmit_templates.py:2528
@@ -7798,7 +7808,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2992
 msgid "User"
-msgstr ""
+msgstr "Utilizator"
 
 #: modules/websubmit/lib/websubmit_templates.py:3073
 #: modules/websubmit/web/publiline.py:1120
@@ -7871,7 +7881,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:402
 msgid "Edit"
-msgstr ""
+msgstr "Editează"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:403
 msgid "Edit record"
@@ -8054,18 +8064,18 @@ msgstr ""
 #: modules/webjournal/lib/webjournaladminlib.py:292
 #: modules/webjournal/lib/webjournaladminlib.py:312
 msgid "Add"
-msgstr ""
+msgstr "Adaugă"
 
 #: modules/webjournal/lib/webjournal_templates.py:416
 #: modules/webjournal/lib/webjournaladminlib.py:331
 msgid "Publish"
-msgstr ""
+msgstr "Publicare"
 
 #: modules/webjournal/lib/webjournal_templates.py:417
 #: modules/webjournal/lib/webjournaladminlib.py:292
 #: modules/webjournal/lib/webjournaladminlib.py:309
 msgid "Refresh"
-msgstr ""
+msgstr "Reîncarca"
 
 #: modules/webjournal/lib/webjournal_templates.py:480
 #: modules/webjournal/lib/webjournaladminlib.py:357
@@ -8074,7 +8084,7 @@ msgstr ""
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7053
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14148
 msgid "Update"
-msgstr ""
+msgstr "Actualizare"
 
 #: modules/webjournal/lib/webjournal_templates.py:659
 msgid "Apply"
@@ -8090,28 +8100,28 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:94
 msgid "No journal articles"
-msgstr ""
+msgstr "Niciun articol de jurnal"
 
 #: modules/webjournal/lib/webjournal_config.py:95
 #: modules/webjournal/lib/webjournal_config.py:135
 msgid "Problem with the configuration of this journal"
-msgstr ""
+msgstr "Există o problemă cu configuraţia acestui jurnal"
 
 #: modules/webjournal/lib/webjournal_config.py:134
 msgid "No journal issues"
-msgstr ""
+msgstr "Nicio ediţie de jurnal"
 
 #: modules/webjournal/lib/webjournal_config.py:172
 msgid "Journal article error"
-msgstr ""
+msgstr "Eroare cauzată de articoul de jurnal"
 
 #: modules/webjournal/lib/webjournal_config.py:173
 msgid "We could not know which article you were looking for"
-msgstr ""
+msgstr "Nu ştim ce articol cautaţi"
 
 #: modules/webjournal/lib/webjournal_config.py:206
 msgid "No journals available"
-msgstr ""
+msgstr "Niciun jurnal nu este disponibil"
 
 #: modules/webjournal/lib/webjournal_config.py:207
 msgid "We could not provide you any journals"
@@ -8129,7 +8139,7 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:234
 msgid "We couldn't guess which journal you are looking for"
-msgstr ""
+msgstr "Nu ştim ce jurnal cautaţi"
 
 #: modules/webjournal/lib/webjournal_config.py:235
 msgid ""
@@ -8177,20 +8187,20 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:388
 msgid "Update error"
-msgstr ""
+msgstr "Eroare update"
 
 #: modules/webjournal/lib/webjournal_config.py:389
 #: modules/webjournal/lib/webjournal_config.py:419
 msgid "There was an internal error"
-msgstr ""
+msgstr "Eroare internă"
 
 #: modules/webjournal/lib/webjournal_config.py:418
 msgid "Journal publishing DB error"
-msgstr ""
+msgstr "Eroare cauzată de datele de publicare ale jurnalului"
 
 #: modules/webjournal/lib/webjournal_config.py:450
 msgid "Journal issue error"
-msgstr ""
+msgstr "Eroare cauzată de ediţia jurnalului"
 
 #: modules/webjournal/lib/webjournal_config.py:451
 msgid "Issue not found"
@@ -8198,17 +8208,17 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:480
 msgid "Journal ID error"
-msgstr ""
+msgstr "Eroare cauzată de ID-ul jurnalului"
 
 #: modules/webjournal/lib/webjournal_config.py:481
 msgid "We could not find the id for this journal in the Database"
-msgstr ""
+msgstr "Id-ul aceastui jurnal nu a fost găsit în baza de date"
 
 #: modules/webjournal/lib/webjournal_config.py:512
 #: modules/webjournal/lib/webjournal_config.py:514
 #, python-format
 msgid "Category \"%(category_name)s\" not found"
-msgstr ""
+msgstr "Categoria \"%(category_name)s\" nu a fost gasită"
 
 #: modules/webjournal/lib/webjournal_config.py:516
 msgid "Sorry, this category does not exist for this journal and issue."
@@ -8220,12 +8230,12 @@ msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:77
 msgid "WebJournal Admin"
-msgstr ""
+msgstr "Admin WebJournal"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:119
 #, python-format
 msgid "Administrate %(journal_name)s"
-msgstr ""
+msgstr "Administrare %(journal_name)s"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:158
 msgid "Feature a record"
@@ -8233,7 +8243,7 @@ msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:220
 msgid "Email Alert System"
-msgstr ""
+msgstr "Sistemul (e-mail) de alertă "
 
 #: modules/webjournal/web/admin/webjournaladmin.py:273
 msgid "Issue regenerated"
@@ -8241,15 +8251,15 @@ msgstr ""
 
 #: modules/webjournal/web/admin/webjournaladmin.py:324
 msgid "Publishing Interface"
-msgstr ""
+msgstr "Interfaţa pentru publicare"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:350
 msgid "Add Journal"
-msgstr ""
+msgstr "Adaugă Jurnal"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:352
 msgid "Edit Settings"
-msgstr ""
+msgstr "Editare setări"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:43
 msgid "You have "
@@ -8695,7 +8705,7 @@ msgstr ""
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:337
 msgid "Id"
-msgstr ""
+msgstr "Id"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:339
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2184
@@ -10893,7 +10903,7 @@ msgstr ""
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:692
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:728
 msgid "Manage Knowledge Bases"
-msgstr ""
+msgstr "Gestionează bazele de cunoştinţe"
 
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:175
 #: modules/bibknowledge/lib/bibknowledgeadmin.py:220
@@ -11007,3 +11017,113 @@ msgstr ""
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
+
+#~ msgid "Add Field"
+#~ msgstr "Adaugă câmp"
+
+#~ msgid "Move up"
+#~ msgstr "Mutare în sus"
+
+#~ msgid "Move down"
+#~ msgstr "Mutare în jos"
+
+#~ msgid "older versions"
+#~ msgstr "versiuni mai vechi"
+
+#~ msgid "Configure BibHarvest"
+#~ msgstr "Configurare BibHarvest"
+
+#~ msgid "updated on"
+#~ msgstr "actualizat la data de"
+
+#~ msgid "Number of views"
+#~ msgstr "Număr de vizualizări"
+
+#~ msgid "View"
+#~ msgstr "Vezi"
+
+#~ msgid "comments"
+#~ msgstr "comentarii"
+
+#~ msgid "last comment:"
+#~ msgstr "ultimul comentariu:"
+
+#~ msgid "last"
+#~ msgstr "ultimul"
+
+#~ msgid "View comments"
+#~ msgstr "Vezi comentarii"
+
+#~ msgid "There is a total of %i comments"
+#~ msgstr "In total sunt %i comentarii"
+
+#~ msgid "by"
+#~ msgstr "de"
+
+#~ msgid "on"
+#~ msgstr "pe"
+
+#~ msgid "delete comments"
+#~ msgstr "şterge comentarii"
+
+#~ msgid "Details and comments"
+#~ msgstr "Detalii si comentarii"
+
+#~ msgid "View all reported comments"
+#~ msgstr "Vedeţi toate comentariile raportate"
+
+#~ msgid "View all reported reviews"
+#~ msgstr "Vedeţi toate review-rile raportate"
+
+#~ msgid "Delete a specific comment/review (by ID)"
+#~ msgstr "Ştergeţi un comentariu/review (dupa ID)"
+
+#~ msgid "Here is comment/review %s"
+#~ msgstr "Comentariul/review-ul %s"
+
+#~ msgid "Here is comment/review %(x_cmtID)s written by user %(x_user)s"
+#~ msgstr "Comentariul/review-ul %(x_cmtID)s scris de utilizatorul %(x_user)s"
+
+#~ msgid ""
+#~ "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)"
+#~ "s first."
+#~ msgstr ""
+#~ "Înainte de a adăuga un comentariu, trebuie sa va %(x_url_open)"
+#~ "sautentificaţi%(x_url_close)s."
+
+#~ msgid "Delete Comment"
+#~ msgstr "Şterge comentariu"
+
+#~ msgid "any collection"
+#~ msgstr "orice colecţie"
+
+#~ msgid "account"
+#~ msgstr "cont"
+
+#~ msgid "groups"
+#~ msgstr "grupuri"
+
+#~ msgid "statistics"
+#~ msgstr "statistici"
+
+#~ msgid "Internal configuration error"
+#~ msgstr "Eroare de configurare internă"
+
+#~ msgid "There is no format configured for this journals index page"
+#~ msgstr ""
+#~ "Nu există niciun format configurat pentru pagina de index a acestui jurnal"
+
+#~ msgid "There is no format configured for this journals search page"
+#~ msgstr ""
+#~ "Nu există niciun format configurat pentru pagina de cautare a acestui "
+#~ "jurnal"
+
+#~ msgid "There is no format configured for this journals popup page"
+#~ msgstr ""
+#~ "Nu există niciun format configurat pentru pagina de popup a acestui jurnal"
+
+#~ msgid "We could not find a current issue in the Database"
+#~ msgstr "Ediţia curentă nu a fost gasită in baza de date"
+
+#~ msgid "Sorry, this category does not exist for this journal."
+#~ msgstr "Ne pare rău, dar această categorie nu există pentru aceast jurnal."
