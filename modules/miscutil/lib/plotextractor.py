@@ -189,7 +189,10 @@ def main():
                        yes_i_know = yes_i_know, refno_url = refno_url, \
                        clean = clean)
     if squash:
-        write_message('generated ' + squash_path)
+        squash_fd = open(squash_path, "a")
+        squash_fd.write("</collection>\n")
+        squash_fd.close()
+        write_message("generated %s" % (squash_path,))
         if upload_plots:
             upload_to_site(squash_path, yes_i_know)
 
@@ -223,7 +226,7 @@ def process_single(tarball, sdir = CFG_TMPDIR, xtract_text = False, \
     """
     sub_dir, refno = get_defaults(tarball, sdir, refno_url)
     if not squash:
-        marc_name = os.path.join(sub_dir, refno + '.xml')
+        marc_name = os.path.join(sub_dir, '%s.xml' % (refno,))
         if (force or not os.path.exists(marc_name)):
             marc_fd = open(marc_name, 'w')
             marc_fd.write('<?xml version="1.0" encoding="UTF-8"?>\n<collection>\n')
@@ -235,10 +238,10 @@ def process_single(tarball, sdir = CFG_TMPDIR, xtract_text = False, \
     try:
         extracted_files_list, image_list, tex_files = untar(tarball, sub_dir)
     except Timeout:
-        write_message('Timeout during tarball extraction on ' + tarball)
+        write_message('Timeout during tarball extraction on %s' % (tarball,))
         return
     if tex_files == [] or tex_files == None:
-        write_message(os.path.split(tarball)[-1] + ' is not a tarball')
+        write_message('%s is not a tarball' % (os.path.split(tarball)[-1],))
         run_shell_command('rm -r %s', (sub_dir,))
         return
 
@@ -258,23 +261,25 @@ def process_single(tarball, sdir = CFG_TMPDIR, xtract_text = False, \
             # Using prev. extracted info, get contexts for each image found
             extracted_image_data.extend((extract_context(tex_file, cleaned_image_data)))
     if extracted_image_data == []:
-        write_message('No plots detected in ' + refno)
+        write_message('No plots detected in %s' % (refno,))
     else:
         if refno_url == "":
             refno = None
         create_contextfiles(extracted_image_data)
         marc_xml = create_MARC(extracted_image_data, tarball, refno)
+        if not squash:
+            marc_xml += "\n</collection>"
         if marc_name != None:
             marc_fd = open(marc_name, 'a')
-            marc_fd.write('%s\n</collection>\n' % (marc_xml,))
+            marc_fd.write('%s\n' % (marc_xml,))
             marc_fd.close()
             if not squash:
-                write_message('generated ' + marc_name)
+                write_message('generated %s' % (marc_name,))
                 if upload_plots:
                     upload_to_site(marc_name, yes_i_know)
     if clean:
         clean_up(extracted_files_list, image_list + converted_image_list)
-    write_message('work complete on ' + os.path.split(tarball)[-1])
+    write_message('work complete on %s' % (os.path.split(tarball)[-1],))
     return marc_name
 
 def clean_up(extracted_files_list, image_list):
