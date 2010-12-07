@@ -1,9 +1,10 @@
 #!/bin/sh
 # Print a version string.
-scriptversion=2010-10-20.23; # UTC
+scriptversion=2010-12-21.16; # UTC
 
-## Note by Tibor Simko 2010-10-21: This is `git-version-gen' script
-## taken verbatim from gnulib 20100704+stable-1.
+## Note by Tibor Simko: This is `git-version-gen' script taken from
+## gnulib 20100704+stable-1, with added support for vX.Y.Z-rcN style
+## of tags in Invenio.  Look for lines with the string Tibor.
 
 # Copyright (C) 2007-2010 Free Software Foundation, Inc.
 #
@@ -110,6 +111,9 @@ elif test -d .git \
 	 *) (exit 1) ;;
        esac
 then
+    # Tibor: add __MINUS__ hack to support vX.Y.Z-rcN style of tags:
+    v=`echo "$v" | sed 's/-rc/__MINUS__rc/'`
+
     # Is this a new git that lists number of commits since the last
     # tag or the previous older version that did not?
     #   Newer: v6.10-77-g0f8faeb
@@ -130,6 +134,10 @@ then
     # Change the first '-' to a '.', so version-comparing tools work properly.
     # Remove the "g" in git describe's output string, to save a byte.
     v=`echo "$v" | sed 's/-/./;s/\(.*\)-g/\1-/'`;
+
+    # Tibor: revert back from __MINUS__ hack:
+    v=`echo "$v" | sed 's/__MINUS__rc/-rc/'`
+
 else
     v=UNKNOWN
 fi

@@ -1,15 +1,13 @@
 Invenio AUTHORS
 ===============
 
-Invenio is developed at, and maintained by, the CERN Document
-Server Software Consortium, jointly by CERN (European Organization for
-Nuclear Research, Geneva, Switzerland) and EPFL (École Polytechnique
-Fédérale de Lausanne, Lausanne, Switzerland).
+Invenio is being co-developed by an international collaboration
+comprising institutes such as CERN, CfA, DESY, EPFL, FNAL, SLAC.
 
-The CERN development group currently consists of:
+The CERN development team currently consists of:
 
  - Jean-Yves Le Meur <jean-yves.le.meur@cern.ch>
-     Head of the team.  Strategic planning and lead.
+     Team leader.
 
  - Tibor Simko <tibor.simko@cern.ch>
      Head Developer.  General system architecture, release management.
@@ -20,42 +18,144 @@ The CERN development group currently consists of:
      BibFormat, redesign and rewrite in Python.  BibConvert
      XML-oriented mode.  OAI harvester improvements.  Improvements to
      BibEdit.  WebDoc tool.  WebJournal refactoring and rewrite.
+     WebComment rounds and threads.  WebSubmit asynchronous upload
+     support.  Improvements to numerous modules.
 
  - Samuele Kaplun <samuele.kaplun@cern.ch>
      Authentication and user preferences rewrite and improvements.
      Firewall-like access control RBAC system.  Fulltext file
      management rewrite and upload feature.  Intbitset Python C
      extension for the indexer.  Improvents to the task scheduler and
-     session hander, etc.
+     session hander.  Improvements to numerous modules.
+
+ - Ludmila Marian <ludmila.marian@gmail.com>
+     Citerank family of ranking methods.  Fixes to numerous modules.
 
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.
 
+ - Belinda Chan <belinda.chan@cern.ch>
+     User documentation for personal features like alerts and baskets.
+
  - Marko Niinimaki <manzikki@gmail.com>
      Contributions to the BibRank citation module and WebSearch
-     summary output formats.
+     summary output formats.  Initial implementation of BibCatalog and
+     BibKnowledge.
 
  - Piotr Praczyk <piotr.praczyk@gmail.com>
      OAI harvesting from arXiv.  Test harvesting interface, for
      BibHarvest.  Record comparison library functions, for BibRecord.
+     Numerous improvements to BibEdit, e.g. holding pen, copy/paste,
+     undo/redo.
 
-The EPFL development group currently consists of:
+ - Christopher Hayward <christopher.james.hayward@cern.ch>
+     Improvements to the reference extraction tool.
+
+ - Jaime Garcia Llopis <jaime.garcia.llopis@cern.ch>
+     Improvements to the BibCirculation module.
+
+ - Jan Aage Lavik <jan.age.lavik@cern.ch>
+     Improvements to BibMatch with remote matching capabilities,
+     improvements to plot extractor, improvements to harvesting and
+     other small fixes.
+
+ - Jan Iwaszkiewicz <jan.iwaszkiewicz@cern.ch>
+     Full-text snippet feature for full-text search.
+
+ - Jocelyne Jerdelet <jocelyne.jerdelet@cern.ch>
+     Updates to `Howto MARC' guide.
+
+ - Juan Francisco Pereira Corral <juan.francisco.pereira.corral@cern.ch>
+     Fix taxonomy regression test, for BibKnowledge.
+
+ - Roman Chyla <roman.chyla@cern.ch>
+     WSGI handler accepts UTF-8 strings.
+
+ - Samuele Carli <samuele.carli@cern.ch>
+     Fixes for basket export facility and adding external items to
+     baskets.
+
+ - Tony Ohls <tony.ohls@cern.ch>
+     Fixes for regexp treatment in BibConvert.
+
+The EPFL development team currently consists of:
 
  - Gregory Favre <gregory.favre@cern.ch>
      Rewrite of WebBasket.  WebMessage.  Improvements to WebComment.
      Other contributions and improvements.
 
-The SLAC development group currently consists of:
+The SLAC development team currently consists of:
 
- - Travis C. Brooks <travis@slac.stanford.edu>
-     Support for SPIRES search syntax.
+ - Travis Brooks <travis@slac.stanford.edu>
+     Team leader.  Support for SPIRES search syntax and other
+     improvements.
 
-Many former group members (CERN and EPFL staff and fellows, technical
+ - Joe Blaylock <jrbl@slac.stanford.edu>
+     Rewrite of SPIRES query syntax parser, support for nested
+     parenthesis for WebSearch, fuzzy author name tokenizer,
+     enrichment of author pages with h-index.
+
+ - Mike Sullivan <sul@slac.stanford.edu>
+     Improvements to author pages.
+
+The Harvard-Smithsonian Center for Astrophysics development team
+currently consists of:
+
+ - Alberto Accomazzi <aaccomazzi@cfa.harvard.edu>
+     Team leader.
+
+ - Giovanni Di Milia <gdimilia@cfa.harvard.edu>
+     Recognition of /record/sysno URLs, ADS formatting.
+
+ - Jay Luker <lbjay@reallywow.com>
+     Improvements to the emergency notification sending facility.
+
+ - Benoit Thiell <bthiell@cfa.harvard.edu>
+     Fixes for BibRecord library, detailed record links, improvements
+     to code kwalitee in numerous modules.  Improvements to
+     BibClassify.
+
+Many former team members (mostly CERN staff and fellows, technical
 students, diploma students, summer students) contributed to the
-project.  In an approximate decreasing chronological order:
+project since 2002.  In an approximately decreasing chronological
+order:
 
- - Benoit Thiell  <benoit.thiell@cern.ch>
-     Improvements to BibClassify.
+ - Mathieu Barras <mbarras@gmail.com>
+     Initial implementation of SWORD client application.
+
+ - Fabio Souto <fsoutomoure@gmail.com>
+     Initial implementation of the invenio config dumper/loader.
+
+ - Pablo Vázquez Caderno <pcaderno@cern.ch>
+     Prevent loop in collection trees, for WebSearch.
+
+ - Victor Engmark <victor.engmark@cern.ch>
+     Bash completion for inveniocfg, patche for dist-packages.
+
+ - Javier Martin <javier.martin.montull@cern.ch>
+     Moderation tools for WebComment, improvements to BibEdit, initial
+     implementation of the batch uploader.
+
+ - Nikolaos Kasioumis <nikolaos.kasioumis@cern.ch>
+     Hosted collections for WebSearch, rewrite of WebBasket UI,
+     improvements to WebAlert.
+
+ - Valkyrie Savage <vasavage@gmail.com>
+     Initial implementation of the plot extractor library.
+
+ - Miguel Martinez Pedreira <miguel.martinez.pedreira@cern.ch>
+     Tool for manipulated embedded metadata in full-text files.
+
+ - Jorge Aranda Sumarroca <jorge.aranda.sumarroca@cern.ch>
+     Support for FCKeditor-uploaded files for WebSubmit.
+
+ - Glenn Gard <glenng4@aol.com>
+     Implemented many unit, regression and web tests for WebAlert,
+     WebJournal, WebSubmit, WebComment, WebMessage, WebSession
+     modules.
+
+ - Christopher Parker <chris.parker.za@gmail.com>
+     Improvements to the submission approval workflow.
 
  - Martin Vesely <martin.vesely@cern.ch>
      BibHarvest, OAI daemon and admin interface. BibConvert
@@ -66,14 +166,21 @@ project.  In an approximate decreasing chronological order:
 
  - Radoslav Ivanov <radoslav.ivanov@cern.ch>
      Contributions to the WebBasket module test suite.  Support for
-     parentheses and SPIRES search syntax in WebSearch.
+     parentheses and SPIRES search syntax in WebSearch.  Initial
+     implementation of the multi-record editor.  Initial
+     implementation of BibExport.
 
- - Joaquim Silvestre <joaquim.rodrigues.silvestre@cern.ch>
-     Forthcoming BibCirculation module to handle physical item copies.
+ - Joaquim Rodrigues Silvestre <joaquim.rodrigues.silvestre@cern.ch>
+     Initial implementation of the BibCirculation module to handle
+     physical item copies.
+
+ - Kyriakos Liakopoulos <kyriakos.liakopoulos@cern.ch>
+     Initial implementation of BibMerge.  Improvements to BibEdit.
 
  - Lars Christian Raae <lars.christian.raae@cern.ch>
      Record locking, per-collection curating authentication, reverting
-     older record versions, for the BibEdit.
+     older record versions, for the BibEdit.  Rewrite of BibEdit in
+     Ajax.
 
  - Ruben Pollan <ruben.pollan@cern.ch>
      Contributions to the WebStat module.
@@ -91,7 +198,7 @@ project.  In an approximate decreasing chronological order:
  - Joël Vogt <joel.vogt@unifr.ch>
      Contributions to the BibClassify module.
 
- - Marcus Johannson <marcus.johansson@cern.ch>
+ - Marcus Johansson <marcus.johansson@cern.ch>
      Contributions to the WebStat module.
 
  - Jan Brice Krause <jan.brice.krause@cern.ch>
@@ -113,7 +220,7 @@ project.  In an approximate decreasing chronological order:
  - Eric Stahl <eric.stahl@utbm.fr>
      Rewrite of BibUpload in Python.
 
- - Frédéric Gobry <frederic.gobry@gmail.com>
+ - Frederic Gobry <frederic.gobry@gmail.com>
      Contributions to the templating system, the URL handler, the
      gettext infrastructure, the regression test suite infrastructure,
      numerous patches for many modules.
@@ -166,7 +273,7 @@ project.  In an approximate decreasing chronological order:
      the WebAccess module.  Guest user sessions garbage collector,
      for the WebSession module.
 
- - Eric Simon <eric.simon@unine.ch>
+ - Erik Simon <erik.simon@unine.ch>
      Alert engine, for the WebAlert module.
 
  - Roberta Faggian <roberta.faggian@cern.ch>

@@ -6,6 +6,128 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+Invenio v1.0.0-rc0 -- released 2010-12-21
+-----------------------------------------
+
+ *) CDS Invenio becomes Invenio as of this release
+
+ *) new facility of hosted collections; support for external records
+    in search collections, user alerts and baskets (WebSearch,
+    WebAlert, WebBasket)
+
+ *) support for nested parentheses in search query syntax (WebSearch)
+
+ *) new refersto/citedby search operators for second-order searches in
+    citation map (BibRank, WebSearch)
+
+ *) numerous improvements to SPIRES query syntax parser (WebSearch)
+
+ *) enhancement to search results summaries, e.g. co-author lists on
+    author pages, e.g. h-index (WebSearch)
+
+ *) new support for unAPI, Zotero, OpenSearch, AWS (WebSearch)
+
+ *) new phrase and word-pair indexes (BibIndex)
+
+ *) new fuzzy author name matching mode (BibIndex)
+
+ *) new time-dependent citation ranking family of methods (BibRank)
+
+ *) full-text search now shows context snippets (BibFormat)
+
+ *) improvements to the basket UI, basket export facility (WebBasket)
+
+ *) new support for FCKeditor in submissions and user comments,
+    possibility to attach files (WebComment, WebSubmit)
+
+ *) commenting facility enhanced with rounds and threads (WebComment)
+
+ *) new facility to moderate user comments (WebComment)
+
+ *) enhanced CLI tool for document file management bringing new
+    options such as hidden file flag (WebSubmit)
+
+ *) numerous improvements to the submission system, e.g. asynchronous
+    JavaScript upload support, derived document formats, icon
+    creation, support for automatic conversion of OpenOffice
+    documents, PDF/A, OCR (WebSubmit)
+
+ *) new full-text file metadata reader/writer tool (WebSubmit)
+
+ *) new experimental SWORD protocol client application (BibSword)
+
+ *) complete rewrite of the record editor using Ajax technology for
+    faster user operation, with new features such as field templates,
+    cloning, copy/paste, undo/redo, auto-completion, etc (BibEdit)
+
+ *) new multi-record editor to alter many records in one go (BibEdit)
+
+ *) new Ajax-based record differ and merger (BibMerge)
+
+ *) new fuzzy record matching mode, with possibility to match records
+    against remote Invenio installations (BibMatch)
+
+ *) new circulation and holdings module (BibCirculation)
+
+ *) new facility for matching provenance information when uploading
+    records (BibUpload)
+
+ *) new possibility of uploading incoming changes into holding pen
+    (BibUpload)
+
+ *) new batch uploader facility to support uploading of metadata files
+    and of full-text files either in CLI or over web (BibUpload)
+
+ *) new record exporting module supporting e.g. Sitemap and Google
+    Scholar export methods (BibExport)
+
+ *) improvements to the keyword classifier, e.g. author and core
+    keywords (BibClassify)
+
+ *) new facility for external robot-like login method (WebAccess)
+
+ *) numerous improvements to the journal creation facility, new
+    journal `Atlantis Times' demo journal (WebJournal)
+
+ *) refactored and improved OAI exporter and harvester (BibHarvest)
+
+ *) new taxonomy-based and dynamic-query knowledge base types
+    (BibKnowledge)
+
+ *) possibility to switch on/off user features such as alerts and
+    baskets based on RBAC rules (WebAccess and other modules)
+
+ *) various improvements to task scheduler, for example better
+    communication with tasks, possibility to run certain bibsched
+    tasks within given time limit, etc (BibSched)
+
+ *) new database dumper for backup purposes (MiscUtil)
+
+ *) new plotextractor library for extracting plots from compuscripts,
+    new figure caption index and the Plots tab (MiscUtil, BibIndex,
+    Webearch)
+
+ *) enhanced reference extrator, e.g. support for DOI, for author name
+    recognition (MiscUtil)
+
+ *) new register emergency feature e.g. to alert admins by SMS in case
+    the task queue stops (MiscUtil)
+
+ *) infrastructure move from mod_python to mod_wsgi, support for
+    mod_xsendfile (WebStyle and many modules)
+
+ *) infrastructure move from jsMath to MathJax (MiscUtil)
+
+ *) some notable backward-incompatible changes: removed authentication
+    methods related to Apache user and group files, changed BibFormat
+    element's API (BibFormat, many modules)
+
+ *) new translations (Afrikaans, Galician, Georgian, Romanian,
+    Kinyarwanda) plus many translation updates
+
+ *) other numerous improvements and bug fixes done in about 1600
+    commits over Invenio v0.99 series
+
 CDS Invenio v0.99.3 -- released 2010-12-13
 ------------------------------------------
 
@@ -654,7 +776,7 @@ CDSware v0.7.1 -- released 2005-05-04
  *) important bugfix for bibconvert's ``source data in a directory''
     mode, as invoked by the web submission system (BibConvert)
 
- *) minor bugfix in the search engine, thanks to FrÃ©dÃ©ric Gobry
+ *) minor bugfix in the search engine, thanks to Frederic Gobry
     (WebSearch)
 
  *) minor bugfix in the WebSearch Admin interface (WebSearch)

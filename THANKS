@@ -34,7 +34,7 @@ contributed to the project:
   - Eric Grand <eric.grand@rero.ch>
     Contributions to the French translation.
 
-  - Theodoros Theodoropoulos <theod@physics.auth.gr>
+  - Theodoropoulos Theodoros <theod@lib.auth.gr>
     Contributions to the Greek translation, Greek stopword list,
     XML RefWorks output format.
 
@@ -92,6 +92,9 @@ contributed to the project:
 
   - Nino Jejelava <nino.jejelava@gmail.com>
     Contributions to the Georgian translation.
+
+ - Cristian Bacchi <cristian.bacchi@gmail.com>
+   Improvements to the browse interface.
 
 The URL handler was inspired by the Quixote Web Framework which is
 ``Copyright (c) 2004 Corporation for National Research Initiatives;
