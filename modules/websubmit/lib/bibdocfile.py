@@ -328,7 +328,7 @@ def guess_format_from_url(url):
                 magic_cookie = _get_magic_cookies()[magic.MAGIC_MIME]
                 mimetype = magic_cookie.file(filename)
                 os.remove(filename)
-                ext = _mimes.guess_extension(content_type)
+                ext = _mimes.guess_extension(mimetype)
                 if ext:
                     return normalize_format(ext)
             except Exception:
