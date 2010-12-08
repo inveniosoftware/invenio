@@ -48,6 +48,7 @@ from invenio.config import \
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
 from invenio.mailutils import send_email
+from invenio.errorlib import register_exception
 from invenio.bibrankadminlib import addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
 from invenio.access_control_firerole import compile_role_definition, \
@@ -3827,6 +3828,7 @@ def main():
         else:
             usage(1, "You must specify at least one command")
     except StandardError, e:
+        register_exception()
         usage(e)
     return
 

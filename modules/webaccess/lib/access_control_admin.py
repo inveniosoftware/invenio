@@ -1752,8 +1752,10 @@ def acc_add_default_settings(superusers=(),
     def_auths = list(DEF_AUTHS) + list(additional_def_auths)
     for (name_role, name_action, args) in def_auths:
         # add the authorization
-        acc_add_role_action_arguments_names(name_role=name_role,
+        optional = not args and acc_get_action_is_optional(acc_get_action_id(name_action))
+        acc_add_authorization(name_role=name_role,
                                          name_action=name_action,
+                                         optional=optional,
                                          **args)
         # keep track of inserted authorizations
         insauths.append([name_role, name_action, args])
