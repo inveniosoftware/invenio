@@ -44,6 +44,23 @@ from invenio.messages import gettext_set_language
 PERMITTED_MODES = ['-i', '-r', '-c', '-a', '-ir',
                         '--insert', '--replace', '--correct', '--append']
 
+def cli_allocate_record(req):
+    req.content_type = "text/plain"
+    req.send_http_header()
+
+    # check IP and useragent:
+    if not _check_client_ip(req):
+        msg = "[ERROR] Sorry, client IP %s cannot use the service." % _get_client_ip(req)
+        _log(msg)
+        return _write(req, msg)
+    if not _check_client_useragent(req):
+        msg = "[ERROR] Sorry, this useragent cannot use the service."
+        _log(msg)
+        return _write(req, msg)
+
+    recid = run_sql("insert into bibrec (creation_date,modification_date) values(NOW(),NOW())")
+    return recid
+
 def cli_upload(req, file_content=None, mode=None):
     """ Robot interface for uploading MARC files
     """

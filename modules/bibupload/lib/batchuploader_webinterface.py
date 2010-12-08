@@ -34,7 +34,7 @@ from invenio.webpage import page
 
 from invenio.batchuploader_engine import metadata_upload, cli_upload, \
      get_user_metadata_uploads, get_user_document_uploads, document_upload, \
-     get_daemon_doc_files, get_daemon_meta_files
+     get_daemon_doc_files, get_daemon_meta_files, cli_allocate_record
 
 import re
 import calendar
@@ -110,7 +110,7 @@ def user_authorization(req, ln):
 class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
     """Defines the set of /batchuploader pages."""
 
-    _exports = ['', 'metadata', 'robotupload', 'metasubmit', 'history', 'documents', 'docsubmit', 'daemon']
+    _exports = ['', 'metadata', 'robotupload', 'metasubmit', 'history', 'documents', 'docsubmit', 'daemon', 'allocaterecord']
 
     def index(self, req, form):
         """ The function called by default
@@ -232,6 +232,12 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'file': (Field, None),
                                    'mode': (str,None)})
         cli_upload(req, argd['file'], argd['mode'])
+
+    def allocaterecord(self, req, form):
+        """
+        Interface for robots to allocate a record and obtain a record identifier
+        """
+        return cli_allocate_record(req)
 
     def metasubmit(self, req, form):
         """ Function called after submitting the metadata upload form.
