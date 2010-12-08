@@ -29,7 +29,7 @@ from invenio.testutils import make_test_suite, run_test_suite
 
 
 class TestListSetOperations(unittest.TestCase):
-    """Test list set operations."""
+    """Tests for list set operations."""
 
     def test_list_union(self):
         """bibindex engine - list union"""
@@ -39,7 +39,7 @@ class TestListSetOperations(unittest.TestCase):
 
 
 class TestWashIndexTerm(unittest.TestCase):
-    """Test for washing index terms, useful for both searching and indexing."""
+    """Tests for washing index terms, useful for both searching and indexing."""
 
     def test_wash_index_term_short(self):
         """bibindex engine - wash index term, short word"""
@@ -62,8 +62,43 @@ class TestWashIndexTerm(unittest.TestCase):
           bibindex_engine.wash_index_term("Ελληνικό αλφάβητο"))
 
 
+class TestGetWordsFromPhrase(unittest.TestCase):
+    """Tests for getting words from phrase."""
+
+    def test_easy_phrase(self):
+        """bibindex engine - getting words from `word1 word2' phrase"""
+        test_phrase = 'word1 word2'
+        l_words_expected = ['word1', 'word2']
+        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        l_words_obtained.sort()
+        self.assertEqual(l_words_obtained, l_words_expected)
+
+    def test_dashed_phrase(self):
+        """bibindex engine - getting words from `word1-word2' phrase"""
+        test_phrase = 'word1-word2'
+        l_words_expected = ['word1', 'word1-word2', 'word2']
+        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        l_words_obtained.sort()
+        self.assertEqual(l_words_obtained, l_words_expected)
+
+    def test_arXiv_good(self):
+        """bibindex engine - getting words from `arXiv:1007.5048' phrase"""
+        test_phrase = 'arXiv:1007.5048'
+        l_words_expected = ['1007', '1007.5048', '5048', 'arxiv', 'arxiv:1007.5048']
+        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        l_words_obtained.sort()
+        self.assertEqual(l_words_obtained, l_words_expected)
+
+    def test_arXiv_bad(self):
+        """bibindex engine - getting words from `arXiv:1xy7.5z48' phrase"""
+        test_phrase = 'arXiv:1xy7.5z48'
+        l_words_expected = ['1xy7', '5z48', 'arxiv', 'arxiv:1xy7.5z48']
+        l_words_obtained = bibindex_engine.get_words_from_phrase(test_phrase)
+        l_words_obtained.sort()
+        self.assertEqual(l_words_obtained, l_words_expected)
+
 class TestGetWordsFromDateTag(unittest.TestCase):
-    """Test for getting words for date-like tag."""
+    """Tests for getting words for date-like tag."""
 
     def test_dateindex_yyyy(self):
         """bibindex engine - index date-like tag, yyyy"""
@@ -87,7 +122,7 @@ class TestGetWordsFromDateTag(unittest.TestCase):
 
 
 class TestGetAuthorFamilyNameWords(unittest.TestCase):
-    """Test for getting family name words from author names."""
+    """Tests for getting family name words from author names."""
 
     def test_authornames_john_doe(self):
         """bibindex engine - get author family name words for John Doe"""
@@ -102,6 +137,7 @@ class TestGetAuthorFamilyNameWords(unittest.TestCase):
 
 TEST_SUITE = make_test_suite(TestListSetOperations,
                              TestWashIndexTerm,
+                             TestGetWordsFromPhrase,
                              TestGetWordsFromDateTag,
                              TestGetAuthorFamilyNameWords)
 

@@ -85,6 +85,7 @@ re_block_punctuation_end = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION+"+$")
 re_punctuation = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
 re_separators = re.compile(CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS)
 re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
+re_arxiv = re.compile(r'^arxiv:\d\d\d\d\.\d\d\d\d')
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
@@ -424,6 +425,11 @@ def get_words_from_phrase(phrase, stemming_language=None):
                 block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
             if block:
                 words[block] = 1
+            if re_arxiv.match(block):
+                # special case for blocks like `arXiv:1007.5048' where
+                # we would like to index the part after the colon
+                # regardless of dot or other punctuation characters:
+                words[block.split(':', 1)[1]] = 1
             # 3rd break each block into subblocks according to punctuation and add subblocks:
             for subblock in re_punctuation.split(block):
                 if stemming_language:
