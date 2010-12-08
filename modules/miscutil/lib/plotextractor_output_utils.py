@@ -201,7 +201,7 @@ def prepare_image_data(extracted_image_data, tex_file, image_list):
                         (image_loc, caption, label))
         else:
             image_locs_and_captions_and_labels.append((image, caption, label))
-    return remove_dups(image_locs_and_captions_and_labels)
+    return image_locs_and_captions_and_labels
 
 def remove_dups(extracted_image_data):
     """
@@ -221,7 +221,7 @@ def remove_dups(extracted_image_data):
     pared_image_data = []
 
     # combine relevant captions
-    for (image, caption, label) in extracted_image_data:
+    for (image, caption, label, contexts) in extracted_image_data:
         if image in img_list:
             if not caption in img_list[image]:
                 img_list[image].append(caption)
@@ -229,10 +229,10 @@ def remove_dups(extracted_image_data):
             img_list[image] = [caption]
 
     # order it (we know that the order in the original is correct)
-    for (image, caption, label) in extracted_image_data:
+    for (image, caption, label, contexts) in extracted_image_data:
         if image in img_list:
             pared_image_data.append((image, \
-                                           ' : '.join(img_list[image]), label))
+                                           ' : '.join(img_list[image]), label, contexts))
             del img_list[image]
         # else we already added it to the new list
 

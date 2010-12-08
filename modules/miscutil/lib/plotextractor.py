@@ -46,7 +46,7 @@ from invenio.plotextractor_output_utils import assemble_caption, \
                                                get_image_location, \
                                                create_contextfiles, \
                                                prepare_image_data, \
-                                               write_message
+                                               write_message, remove_dups
 from tempfile import mkstemp
 
 
@@ -256,10 +256,12 @@ def process_single(tarball, sdir = CFG_TMPDIR, xtract_text = False, \
         partly_extracted_image_data = extract_captions(tex_file, sub_dir, \
                                                 converted_image_list)
         if partly_extracted_image_data != []:
+            # Add proper filepaths and do various cleaning
             cleaned_image_data = prepare_image_data(partly_extracted_image_data, \
                                                   tex_file, converted_image_list)
             # Using prev. extracted info, get contexts for each image found
             extracted_image_data.extend((extract_context(tex_file, cleaned_image_data)))
+    extracted_image_data = remove_dups(extracted_image_data)
     if extracted_image_data == []:
         write_message('No plots detected in %s' % (refno,))
     else:
@@ -278,7 +280,7 @@ def process_single(tarball, sdir = CFG_TMPDIR, xtract_text = False, \
                 if upload_plots:
                     upload_to_site(marc_name, yes_i_know)
     if clean:
-        clean_up(extracted_files_list, image_list + converted_image_list)
+        clean_up(extracted_files_list, image_list)
     write_message('work complete on %s' % (os.path.split(tarball)[-1],))
     return marc_name
 
@@ -323,6 +325,7 @@ def get_defaults(tarball, sdir, refno_url):
             refno = os.path.basename(tarball)
             write_message('Error: can\'t find record id for %s' % (refno,))
     else:
+        refno = os.path.basename(tarball)
         write_message("Skipping ref-no check")
     return sdir, refno
 
