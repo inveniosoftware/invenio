@@ -20,12 +20,7 @@ testdir = $(libdir)/webtest/invenio
 test_DATA = test_bibedit_access_curator_coll.html \
             test_bibedit_access_curator_all.html \
             test_bibedit_access_curator_none.html \
-            test_bibedit_basic_record_locking.html \
-            test_bibeditold_access_curator_coll.html \
-            test_bibeditold_access_curator_all.html \
-            test_bibeditold_access_curator_none.html \
-            test_bibeditold_basic_record_locking.html \
-            test_bibeditold_reedit_warning.html
+            test_bibedit_basic_record_locking.html
 
 EXTRA_DIST = $(doc_DATA) $(test_DATA)
 
