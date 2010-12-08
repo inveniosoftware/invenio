@@ -137,6 +137,7 @@ re_pattern_wildcards_after_spaces = re.compile(r'(\s)[\*\%]+')
 re_pattern_single_quotes = re.compile("'(.*?)'")
 re_pattern_double_quotes = re.compile("\"(.*?)\"")
 re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
+re_pattern_spaces_after_colon = re.compile(r'(:\s+)')
 re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
 re_pattern_space = re.compile("__SPACE__")
 re_pattern_today = re.compile("\$TODAY\$")
@@ -647,6 +648,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             p = re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
             p = re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
             p = re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
+            # and remove spaces after colon:
+            p = re_pattern_spaces_after_colon.sub(lambda x: string.replace(x.group(1), ' ', ''), p)
             # wash argument:
             p = re_equal.sub(":", p)
             p = re_logical_and.sub(" ", p)

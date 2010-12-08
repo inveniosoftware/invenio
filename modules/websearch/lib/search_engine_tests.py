@@ -240,6 +240,13 @@ class TestQueryParser(unittest.TestCase):
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w']])
 
+    def test_parsing_combined_structured_query_with_spaces(self):
+        "search engine - parsing structured query with spaces"
+        self._check("title: muon author:ellis keyword:   kaon", 'abstract', None,
+                    [['+', 'muon', 'title', 'w'],
+                     ['+', 'ellis', 'author', 'w'],
+                     ['+', 'kaon', 'keyword', 'w']])
+
 
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,
