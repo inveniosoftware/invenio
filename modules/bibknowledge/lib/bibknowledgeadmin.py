@@ -19,6 +19,17 @@
 
 import MySQLdb
 import os
+import sys
+if sys.hexversion < 0x2060000:
+    try:
+        import simplejson as json
+    except ImportError:
+        # Okay, no Ajax app will be possible, but continue anyway,
+        # since this package is only recommended, not mandatory.
+        pass
+else:
+    import json
+
 from invenio import bibknowledge, bibknowledgeadminlib
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
@@ -605,6 +616,14 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
         #get the kb and print it
         mappings = bibknowledge.get_kb_mappings(kbname, searchkey, \
                                                 searchvalue, searchtype)
+        if format == 'jquery':
+            ret = []
+            for m in mappings:
+                label = m['value'] or m['key']
+                value = m['key'] or m['value']
+                ret.append({'label': label, 'value': value})
+            req.content_type = 'application/json'
+            return json.dumps(ret)
         if not mappings:
             body = "There is no knowledge base named "+kbname+" or it is empty",
             return page(title=_("No such knowledge base"),

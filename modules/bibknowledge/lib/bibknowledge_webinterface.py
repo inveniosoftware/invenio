@@ -58,6 +58,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
                                    'collection':  (str, ''), #for dynamic kbs
                                    'kbname':  (str, ''), #for exporting
                                    'format':  (str, ''), #for exporting
+                                   'term': (str, ''), #for exporting to JQuery UI
                                    'kbtype': (str, '')})
         ln = argd['ln']
         kb = argd['kb']
@@ -81,6 +82,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
         delete_mapping = argd['delete_mapping']
         kbname = argd['kbname']
         format = argd['format']
+        term = argd['term']
 
         req.argd = argd #needed by some lower level modules
 
@@ -89,7 +91,7 @@ class WebInterfaceBibKnowledgePages(WebInterfaceDirectory):
             return bibknowledgeadmin.kb_upload(req, kb=kb, ln=ln)
         #check if this is "export"
         if self.extrapath == "export":
-            return bibknowledgeadmin.kb_export(req, kbname=kbname, format=format, ln=ln)
+            return bibknowledgeadmin.kb_export(req, kbname=kbname, format=format, ln=ln, searchvalue=term)
 
         #first check if this is a specific action
         if action == "new":
