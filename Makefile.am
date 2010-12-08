@@ -163,9 +163,7 @@ install-jquery-plugins: install-jquery-plugins
 	rm uploadify.zip && rm -r uploadify && \
 	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
 	rm jquery.autogrow-1.2.2.zip && \
-	wget -O json2.js.tmp http://json.org/json2.js && \
-	grep -v 'alert.*IMPORTANT: Remove this line' json2.js.tmp > json2.js && \
-	rm json2.js.tmp && \
+	wget --no-check-certificate https://github.com/douglascrockford/JSON-js/raw/master/json2.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.datepicker.min.js && \
 	wget -O jquery.hotkeys.min.js http://js-hotkeys.googlecode.com/files/jquery.hotkeys-0.7.8-packed.js && \
 	wget http://plugins.jquery.com/files/jquery.treeview_3.zip && \
@@ -177,9 +175,9 @@ install-jquery-plugins: install-jquery-plugins
 	unzip jquery-ui-1.7.3.custom.zip development-bundle/ui/ui.core.js && \
 	mv development-bundle/ui/ui.core.js ui.core.js && \
 	rm -rf development-bundle && \
-	rm jquery-ui-1.7.3.custom.zip)
+	rm jquery-ui-1.7.3.custom.zip && \
 	mkdir -p ${prefix}/var/www/img && \
-	(cd ${prefix}/var/www/img && \
+	cd ${prefix}/var/www/img && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/base/ && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/jquery-ui.css && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/demos/images/calendar.gif && \
