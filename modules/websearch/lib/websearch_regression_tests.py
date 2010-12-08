@@ -1055,13 +1055,13 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
         """websearch - no XSS vulnerability in structured search"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
-                                               expected_text='No word index is available for <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em>.'))
+                                               expected_text='No word index is available for <em>&lt;script&gt;alert("xss");&lt;/script&gt;</em>.'))
 
     def test_xss_in_advanced_search(self):
         """websearch - no XSS vulnerability in advanced search"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?as=1&p1=ellis&f1=author&op1=a&p2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&m2=e',
-                                               expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> inside index <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
+                                               expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> inside index <em>&lt;script&gt;alert("xss");&lt;/script&gt;</em> did not match any record.'))
 
     def test_xss_in_browse(self):
         """websearch - no XSS vulnerability in browse"""
