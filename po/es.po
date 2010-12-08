@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-07 10:07+0100\n"
-"PO-Revision-Date: 2010-10-12 23:13+0200\n"
+"PO-Revision-Date: 2010-12-08 18:36+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <info@invenio-software.org>\n"
 "Language: \n"
@@ -2202,10 +2202,12 @@ msgid ""
 "Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for "
 "executing these actions periodically."
 msgstr ""
+"Consulte la %(x_url_open)spágina de ayuda del Batch Uploader "
+"daemon%(x_url_close)s para ejecutar estas acciones periódicamente."
 
 #: modules/bibupload/lib/batchuploader_templates.py:404
 msgid "Metadata folders"
-msgstr ""
+msgstr "Carpetas de metadatos"
 
 #: modules/bibupload/lib/batchuploader_templates.py:426
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2180
@@ -2220,11 +2222,11 @@ msgstr "Id"
 
 #: modules/bibupload/lib/batchuploader_templates.py:426
 msgid "Progress"
-msgstr ""
+msgstr "Progreso"
 
 #: modules/bibupload/lib/batchuploader_templates.py:428
 msgid "Last BibSched tasks:"
-msgstr ""
+msgstr "Últimas tareas en el BibSched"
 
 #: modules/bibupload/lib/batchuploader_templates.py:437
 #, fuzzy
@@ -3322,7 +3324,7 @@ msgstr "No se ha encontrado ninguno."
 #: modules/webbasket/lib/webbasket_templates.py:773
 #, python-format
 msgid "In %(x_linked_basket_name)s"
-msgstr ""
+msgstr "En %(x_linked_basket_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:868
 #: modules/webbasket/lib/webbasket_webinterface.py:1272
@@ -3469,6 +3471,8 @@ msgid ""
 "Please choose a basket: %(x_basket_selection_box)s %(x_fmt_open)s(or "
 "%(x_url_open)screate a new one%(x_url_close)s first)%(x_fmt_close)s"
 msgstr ""
+"Escoja una cesta: %(x_basket_selection_box)s %(x_fmt_open)s(o antes "
+"%(x_url_open)scree una de nueva%(x_url_close)s)%(x_fmt_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1405
 msgid "Optionally, add a note to each one of these items"
@@ -3558,7 +3562,7 @@ msgstr "Nombre del tema"
 #: modules/webbasket/lib/webbasket_templates.py:1637
 #, python-format
 msgid "Editing topic: %(x_topic_name)s"
-msgstr ""
+msgstr "Editar tema: %(x_topic_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1654
 #: modules/webbasket/lib/webbasket_templates.py:1669
@@ -3775,7 +3779,7 @@ msgstr "último comentario en"
 #: modules/webbasket/lib/webbasket_templates.py:3293
 #, python-format
 msgid "Item %(x_item_index)i of %(x_item_total)i"
-msgstr ""
+msgstr "Ítem %(x_item_index)i de %(x_item_total)i"
 
 #: modules/webbasket/lib/webbasket_templates.py:2455
 #: modules/webbasket/lib/webbasket_templates.py:2458
@@ -4065,11 +4069,11 @@ msgstr "Suprimir la denuncia al comentario"
 
 #: modules/webcomment/lib/webcomment_templates.py:411
 msgid "Attached file"
-msgstr ""
+msgstr "Fichero adjunto"
 
 #: modules/webcomment/lib/webcomment_templates.py:411
 msgid "Attached files"
-msgstr ""
+msgstr "Ficheros adjuntos"
 
 #: modules/webcomment/lib/webcomment_templates.py:465
 #, python-format
@@ -4204,6 +4208,8 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1091
 msgid "Once logged in, authorized users can also attach files."
 msgstr ""
+"Una vez identificados, los usuarios autorizados también pueden añadir "
+"ficheros."
 
 #: modules/webcomment/lib/webcomment_templates.py:1106
 #, fuzzy
@@ -4228,7 +4234,7 @@ msgstr "archivo(s)"
 #: modules/webcomment/lib/webcomment_templates.py:1110
 #, python-format
 msgid "Max %(x_nb_bytes)s per file"
-msgstr ""
+msgstr "Máximo %(x_nb_bytes)s por fichero"
 
 #: modules/webcomment/lib/webcomment_templates.py:1124
 msgid "Send me an email when a new comment is posted"
@@ -4975,17 +4981,24 @@ msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from 2006-2010."
 msgstr ""
+"Atención: la búsqueda a texto completo sólo está disponible para un "
+"subconjunto de documentos, mayoritariamente de entre 2006-2010."
 
 #: modules/websearch/lib/search_engine.py:1787
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from 2008-2010."
 msgstr ""
+"Atención: la búsqueda en los pies de imágenes sólo está disponible "
+"para un subconjunto de documentos, mayoritariamente de entre "
+"2008-2010."
 
 #: modules/websearch/lib/search_engine.py:1794
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
+"Todavía no hay índice de frases para el texto completo, buscando por "
+"combinación de palabras..."
 
 #: modules/websearch/lib/search_engine.py:1835
 #, python-format
@@ -5010,6 +5023,9 @@ msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
+"No se entiende la sintaxis de su búsqueda.  Se ignorarán todos los "
+"paréntesis de la búsqueda.  Si así no funciona, repase su búsqueda y "
+"vuelva a intentarlo."
 
 #: modules/websearch/lib/search_engine.py:2298
 #, python-format
@@ -5142,7 +5158,7 @@ msgstr "título"
 
 #: modules/websearch/lib/websearchadminlib.py:3381
 msgid "Plots"
-msgstr ""
+msgstr "Gráficos"
 
 #: modules/websearch/lib/websearchadminlib.py:3382
 msgid "Holdings"
@@ -6227,7 +6243,7 @@ msgstr "Tiene activados los seguientes roles: %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:1095
 msgid "Run BibSword Client"
-msgstr ""
+msgstr "Ejecutar el cliente BibSword"
 
 #: modules/websession/lib/websession_templates.py:1120
 msgid "Here are some interesting web admin links for you:"
@@ -8857,7 +8873,7 @@ msgstr "con"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:521
 msgid "when field equals"
-msgstr ""
+msgstr "cuando el campo es igual a"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:522
 #, fuzzy
@@ -8876,7 +8892,7 @@ msgstr "Editar"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:525
 msgid "Apply only to specific field instances"
-msgstr ""
+msgstr "Aplicar sólo a instancias específicas de campos"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:526
 msgid "value"
@@ -10784,7 +10800,7 @@ msgstr "Artículo"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11403
 msgid "Volume, Issue, Page"
-msgstr ""
+msgstr "Volumen, número, página"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11405
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16170
@@ -11077,7 +11093,7 @@ msgstr "Código de presupuesto"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16570
 msgid "the beginning"
-msgstr ""
+msgstr "el principio"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16570
 #, fuzzy
@@ -11571,36 +11587,36 @@ msgstr "Interfaz de administración de BibEdit"
 #: modules/bibsword/lib/bibsword_webinterface.py:278
 #: modules/bibsword/lib/bibsword_webinterface.py:307
 msgid "Export with BibSword : Step 2/4"
-msgstr ""
+msgstr "Exportar con BibSword: paso 2/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:212
 #: modules/bibsword/lib/bibsword_webinterface.py:223
 #: modules/bibsword/lib/bibsword_webinterface.py:268
 msgid "Export with BibSword : Step 1/4"
-msgstr ""
+msgstr "Exportar con BibSword: paso 1/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:292
 #: modules/bibsword/lib/bibsword_webinterface.py:320
 #: modules/bibsword/lib/bibsword_webinterface.py:351
 msgid "Export with BibSword : Step 3/4"
-msgstr ""
+msgstr "Exportar con BibSword: paso 3/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:335
 #: modules/bibsword/lib/bibsword_webinterface.py:366
 msgid "Export with BibSword : Step 4/4"
-msgstr ""
+msgstr "Exportar con BibSword: paso 4/4"
 
 #: modules/bibsword/lib/bibsword_webinterface.py:411
 msgid "Export with BibSword : Acknowledgement"
-msgstr ""
+msgstr "Exportar con BibSword: verificación"
 
 #: modules/bibupload/lib/batchuploader_engine.py:182
 msgid "More than one possible recID, ambiguous behaviour"
-msgstr ""
+msgstr "Más de un posible recID, comportamiento ambiguo"
 
 #: modules/bibupload/lib/batchuploader_engine.py:182
 msgid "No records match that file name"
-msgstr ""
+msgstr "Ningún registro tiene ficheros con este nombre"
 
 #: modules/bibupload/lib/batchuploader_engine.py:183
 #, fuzzy
@@ -11609,12 +11625,12 @@ msgstr "ya existe"
 
 #: modules/bibupload/lib/batchuploader_engine.py:183
 msgid "A file with the same name and format already exists"
-msgstr ""
+msgstr "Ya existe un registro com este nombre y formato"
 
 #: modules/bibupload/lib/batchuploader_engine.py:184
 #, python-format
 msgid "No rights to upload to collection '%s'"
-msgstr ""
+msgstr "No tiene permiso para subir documentos a la colección «%s»"
 
 #: modules/bibupload/lib/batchuploader_engine.py:394
 #: modules/bibupload/lib/batchuploader_engine.py:407
@@ -11622,6 +11638,8 @@ msgstr ""
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
+"El usuario «%(x_user)s» no está autorizado a modificar la colección "
+"«%(x_coll)s»"
 
 #~ msgid "Date:"
 #~ msgstr "Fecha:"
