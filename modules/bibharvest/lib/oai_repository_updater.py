@@ -473,7 +473,7 @@ def marcxml_filter_out_tags(recid, fields):
         if not field[0:5] in processed_tags_and_ind:
             # Ensure that we do not process twice the same datafields
             processed_tags_and_ind.append(field[0:5])
-            for datafield in record[field[0:3]]:
+            for datafield in record.get(field[0:3], None):
                 if datafield[1] == field[3:4] and \
                        datafield[2] == field[4:5]:
                     out += field_xml_output(datafield, field[0:3])
