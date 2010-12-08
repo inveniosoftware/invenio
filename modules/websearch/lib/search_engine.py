@@ -1481,9 +1481,11 @@ def wash_pattern(p):
 
 def wash_field(f):
     """Wash field passed by URL."""
-    # get rid of unnecessary whitespace:
     if f:
-        f = f.strip()
+        # get rid of unnecessary whitespace and make it lowercase
+        # (e.g. Author -> author) to better suit iPhone etc input
+        # mode:
+        f = f.strip().lower()
     # wash legacy 'f' field names, e.g. replace 'wau' or `au' by
     # 'author', if applicable:
     if CFG_WEBSEARCH_FIELDS_CONVERT:
