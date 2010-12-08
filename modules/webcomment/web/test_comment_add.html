@@ -24,27 +24,12 @@
 <tr>
 	<td>type</td>
 	<td>msg</td>
-	<td>This cannot go in.</td>
+	<td>This is a test comment.</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Add comment']</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Before you add your comment</td>
-	<td></td>
-</tr>
-<tr>
-        <td>open</td>
-        <td>http://localhost</td>
-        <td></td>
-</tr>
-<tr>
-        <td>clickAndWait</td>
-        <td>link=login</td>
-        <td></td>
 </tr>
 <tr>
 	<td>type</td>
@@ -62,6 +47,11 @@
 	<td></td>
 </tr>
 <tr>
+	<td>verifyTextPresent</td>
+	<td>Your comment was successfully added.</td>
+	<td></td>
+</tr>
+<tr>
 	<td>open</td>
 	<td>http://localhost/record/1</td>
 	<td></td>
@@ -73,7 +63,7 @@
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
-	<td>Your nickname, romeo, will be displayed as author of this comment</td>
+	<td>romeo wrote</td>
 	<td></td>
 </tr>
 <tr>
@@ -82,28 +72,8 @@
 	<td>This is a test comment.</td>
 </tr>
 <tr>
-	<td>clickAndWait</td>
-	<td>//input[@value='Add comment']</td>
-	<td></td>
-</tr>
-<tr>
 	<td>verifyTextPresent</td>
-	<td>Your comment was successfully added.</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Back to record</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>romeo wrote</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>This is a test comment.</td>
+	<td>Your nickname, romeo, will be displayed as author of this comment</td>
 	<td></td>
 </tr>
 <tr>

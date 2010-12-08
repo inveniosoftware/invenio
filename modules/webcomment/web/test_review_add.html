@@ -34,32 +34,17 @@
 <tr>
 	<td>type</td>
 	<td>note</td>
-	<td>This is a test review title that cannot go in</td>
+	<td>This is a test review title</td>
 </tr>
 <tr>
 	<td>type</td>
 	<td>msg</td>
-	<td>This is a test review body that cannot go in.</td>
+	<td>This is a test review body.</td>
 </tr>
 <tr>
 	<td>clickAndWait</td>
 	<td>//input[@value='Add Review']</td>
 	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>Before you add your comment</td>
-	<td></td>
-</tr>
-<tr>
-        <td>open</td>
-        <td>http://localhost</td>
-        <td></td>
-</tr>
-<tr>
-        <td>clickAndWait</td>
-        <td>link=login</td>
-        <td></td>
 </tr>
 <tr>
 	<td>type</td>
@@ -77,59 +62,24 @@
         <td></td>
 </tr>
 <tr>
-        <td>open</td>
-        <td>http://localhost/record/1</td>
-        <td></td>
+	<td>verifyTextPresent</td>
+	<td>review</td>
+	<td></td>
 </tr>
 <tr>
-        <td>clickAndWait</td>
-        <td>link=Discussion</td>
-        <td></td>
+	<td>open</td>
+	<td>http://localhost/record/1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Discussion</td>
+	<td></td>
 </tr>
 <tr>
         <td>clickAndWait</td>
         <td>link=Reviews</td>
         <td></td>
-</tr>
-<tr>
-	<td>select</td>
-	<td>score</td>
-	<td>value=4</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>note</td>
-	<td>This is a test review title</td>
-</tr>
-<tr>
-	<td>type</td>
-	<td>msg</td>
-	<td>This is a test review body.</td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>//input[@value='Add Review']</td>
-	<td></td>
-</tr>
-<tr>
-	<td>verifyTextPresent</td>
-	<td>review</td>
-	<td></td>
-</tr>
-<!-- NOTE: Cannot test easily WRT repetitive review adding, 
-     because a user can add only one review.  So not testing
-     explicitly for `success' in here.  (an `if' construct would
-     be needed, or deletion of previously submitted reviews)
--->
-<tr>
-	<td>verifyTextNotPresent</td>
-	<td>Before you add your comment</td>
-	<td></td>
-</tr>
-<tr>
-	<td>clickAndWait</td>
-	<td>link=Reviews</td>
-	<td></td>
 </tr>
 <tr>
 	<td>verifyTextPresent</td>
