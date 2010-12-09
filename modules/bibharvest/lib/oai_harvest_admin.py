@@ -208,6 +208,7 @@ def perform_request_editsource(oai_src_id=None, oai_src_name='',
 
     sets = findSets(oai_src_baseurl)
     if sets:
+        sets.sort()
         # Show available sets to users
         sets_specs = [set[0] for set in sets]
         sets_names = [set[1] for set in sets]
@@ -349,6 +350,7 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='',
 
         sets = findSets(oai_src_baseurl)
         if sets:
+            sets.sort()
             # Show available sets to users
             sets_specs = [set[0] for set in sets]
             sets_names = [set[1] for set in sets]
