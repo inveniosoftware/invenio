@@ -41,7 +41,8 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_WEBSTYLE_HTTP_USE_COMPRESSION
 
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
@@ -675,6 +676,7 @@ def oaiidentify(args, script_url):
     <earliestDatestamp>%(earliest_datestamp)s</earliestDatestamp>
     <deletedRecord>%(CFG_OAI_DELETED_POLICY)s</deletedRecord>
     <granularity>%(granularity)s</granularity>
+    %(compression)s
     %(CFG_OAI_IDENTIFY_DESCRIPTION)s\n""" % \
         {"CFG_SITE_NAME": cgi.escape(CFG_SITE_NAME),
          "CFG_SITE_URL": cgi.escape(CFG_SITE_URL),
@@ -683,6 +685,7 @@ def oaiidentify(args, script_url):
          "CFG_OAI_DELETED_POLICY": cgi.escape(CFG_OAI_DELETED_POLICY),
          "CFG_SITE_SUPPORT_EMAIL": cgi.escape(CFG_SITE_SUPPORT_EMAIL),
          "CFG_OAI_IDENTIFY_DESCRIPTION": CFG_OAI_IDENTIFY_DESCRIPTION,
+         "compression": CFG_WEBSTYLE_HTTP_USE_COMPRESSION and "<compression>deflate</compression>" or "",
          "script_url": script_url}
 
     out = oai_header(args, "Identify") + out + oai_footer("Identify")

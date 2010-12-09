@@ -788,6 +788,43 @@ def cli_cmd_create_apache_conf(conf):
         else:
             xsendfile_directive += '        #XSendFilePath %s\n' % path
     xsendfile_directive = xsendfile_directive.strip()
+
+    ## Preparation of deflate directive
+    deflate_directive_needed = int(conf.get("Invenio", 'CFG_WEBSTYLE_HTTP_USE_COMPRESSION')) != 0
+    if deflate_directive_needed:
+        deflate_directive = r"""
+        ## Configuration snippet taken from:
+        ## <http://httpd.apache.org/docs/2.2/mod/mod_deflate.html>
+        <IfModule mod_deflate.c>
+            SetOutputFilter DEFLATE
+
+            # Netscape 4.x has some problems...
+            BrowserMatch ^Mozilla/4 gzip-only-text/html
+
+            # Netscape 4.06-4.08 have some more problems
+            BrowserMatch ^Mozilla/4\.0[678] no-gzip
+
+            # MSIE masquerades as Netscape, but it is fine
+            # BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
+
+            # NOTE: Due to a bug in mod_setenvif up to Apache 2.0.48
+            # the above regex won't work. You can use the following
+            # workaround to get the desired effect:
+            BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+
+            # Don't compress images
+            SetEnvIfNoCase Request_URI \
+                \.(?:gif|jpe?g|png)$ no-gzip dont-vary
+
+            # Make sure proxies don't deliver the wrong content
+            <IfModule mod_header.c>
+                Header append Vary User-Agent env=!dont-vary
+            </IfModule>
+        </IfModule>
+        """
+    else:
+        deflate_directive = ""
+
     ## Apache vhost conf file is distro specific, so analyze needs:
     # Gentoo (and generic defaults):
     listen_directive_needed = True
@@ -868,6 +905,7 @@ WSGIRestrictStdout Off
            Order allow,deny
            Allow from all
         </Directory>
+        %(deflate_directive)s
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_URL').replace("http://", "").split('.')[0],
@@ -882,6 +920,7 @@ WSGIRestrictStdout Off
                                 'WSGISocketPrefix ' or '#WSGISocketPrefix ') + \
               conf.get('Invenio', 'CFG_PREFIX') + os.sep + 'var' + os.sep + 'run',
        'xsendfile_directive' : xsendfile_directive,
+       'deflate_directive': deflate_directive,
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
@@ -936,6 +975,7 @@ WSGIRestrictStdout Off
            Order allow,deny
            Allow from all
         </Directory>
+        %(deflate_directive)s
 </VirtualHost>
 """ % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", ""),
        'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "").split('.')[0],
@@ -956,6 +996,7 @@ WSGIRestrictStdout Off
                             '#SSLCertificateKeyFile %s' % ssl_key_path or \
                             'SSLCertificateKeyFile %s' % ssl_key_path,
        'xsendfile_directive' : xsendfile_directive,
+       'deflate_directive': deflate_directive,
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
