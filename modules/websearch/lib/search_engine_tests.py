@@ -240,13 +240,23 @@ class TestQueryParser(unittest.TestCase):
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w']])
 
-    def test_parsing_combined_structured_query_with_spaces(self):
-        "search engine - parsing structured query with spaces"
+    def test_parsing_colons_and_spaces_well_struuctured(self):
+        "search engine - parsing query with colons and spaces, well structured"
         self._check("title: muon author:ellis keyword:   kaon", 'abstract', None,
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w'],
                      ['+', 'kaon', 'keyword', 'w']])
 
+    def test_parsing_colons_and_spaces_badly_struuctured(self):
+        "search engine - parsing query with colons and spaces, badly structured"
+        self._check("foo: bar", 'abstract', None,
+                    [['+', 'bar', 'abstract', 'w'],
+                     ['+', 'foo:', 'abstract', 'w']])
+
+    def test_parsing_colons_and_spaces_for_phrase_query(self):
+        "search engine - parsing query with colons and spaces, phrase query"
+        self._check('author:  "Ellis, J"', None, None,
+                    [['+', 'Ellis, J', 'author', 'a']])
 
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,

@@ -648,8 +648,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
             p = re_pattern_single_quotes.sub(lambda x: "'"+string.replace(x.group(1), ' ', '__SPACE__')+"'", p)
             p = re_pattern_double_quotes.sub(lambda x: "\""+string.replace(x.group(1), ' ', '__SPACE__')+"\"", p)
             p = re_pattern_regexp_quotes.sub(lambda x: "/"+string.replace(x.group(1), ' ', '__SPACE__')+"/", p)
-            # and remove spaces after colon:
-            p = re_pattern_spaces_after_colon.sub(lambda x: string.replace(x.group(1), ' ', ''), p)
+            # and spaces after colon as well:
+            p = re_pattern_spaces_after_colon.sub(lambda x: string.replace(x.group(1), ' ', '__SPACE__'), p)
             # wash argument:
             p = re_equal.sub(":", p)
             p = re_logical_and.sub(" ", p)
@@ -680,6 +680,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 # wash 'fi' argument:
                 fi = wash_field(fi)
                 # wash 'pi' argument:
+                pi = pi.strip() # strip eventual spaces
                 if re_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
                     if pi[0] == '"' and pi[-1] == '"':
