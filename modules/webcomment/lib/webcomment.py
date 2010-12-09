@@ -652,7 +652,12 @@ def query_retrieve_comments_or_remarks(recID, display_order='od', display_since=
     new_limit = limit
     comments_list = []
     for row in res:
-        restriction = (ranking and row[12] or row[8])
+        if ranking:
+            # when dealing with reviews, row[12] holds restriction info:
+            restriction = row[12]
+        else:
+            # when dealing with comments, row[8] holds restriction info:
+            restriction = row[8]
         if user_info and check_user_can_view_comment(user_info, None, restriction)[0] != 0:
             # User cannot view comment. Look further
             continue
