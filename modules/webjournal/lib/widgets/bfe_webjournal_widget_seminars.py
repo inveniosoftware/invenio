@@ -118,7 +118,7 @@ def get_widget_html(bfo, indico_seminar_xml, cached_filename,
         html += "</li>"
 
     html = '<ul>' + html + '</ul>'
-    return html.encode('utf-8')
+    return html
 
 def _update_seminars(indico_seminar_xml, cached_filename):
     """
@@ -177,7 +177,7 @@ def _update_seminars(indico_seminar_xml, cached_filename):
     seminar_xml.extend(["</Indico_Seminars>", ])
     # write the created file to cache
     fptr = open("%s/%s" % (CFG_CACHEDIR, cached_filename), "w")
-    fptr.write(("\n".join(seminar_xml)).encode('utf-8'))
+    fptr.write("\n".join(seminar_xml))
     fptr.close()
 
 _ = gettext_set_language('en')

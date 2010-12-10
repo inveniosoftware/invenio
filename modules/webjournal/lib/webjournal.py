@@ -83,7 +83,6 @@ def perform_request_index(req, journal_name, issue_number, ln,
     temp_marc = '''<record>
                         <controlfield tag="001">0</controlfield>
                     </record>'''
-    temp_marc = temp_marc.decode('utf-8').encode('utf-8')
     # create a record and get HTML back from bibformat
     user_info = collect_user_info(req)
     bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc,

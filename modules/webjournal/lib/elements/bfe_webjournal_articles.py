@@ -153,8 +153,8 @@ def format_element(bfo, new_articles_first='yes',
                                    </div>
                                </div>
                            </td></tr>
-                        ''' % {'title': title.decode('utf-8'),
-                               'text': text.decode('utf-8'),
+                        ''' % {'title': title,
+                               'text': text,
                                'header_tag_size': (display_category_title.lower() == 'yes') and '3' or '2',
                                'css_classes': ' '.join(css_classes)}
         out += '</table>'

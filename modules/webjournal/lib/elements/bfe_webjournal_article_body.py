@@ -234,8 +234,6 @@ def __add_publish_buttons(title, header, uri, ln):
     """
     Prints digg, delicious, etc button
     """
-    title = title.decode('utf-8')
-    title = title.encode('utf-8')
     publish_area = '<ul class="publish">'
     publish_area += __add_email_button(title, uri, ln)
     publish_area += __add_digg_button(title, header)

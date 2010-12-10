@@ -134,7 +134,7 @@ def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
                         continue
                 try:
                     html_articles_in_category += u'<li><a href="%s">%s</a></li>' % \
-                                                 (link, title.decode('utf-8'))
+                                                 (link, title)
                 except:
                     pass
 
@@ -166,9 +166,9 @@ def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
         html_out = '<ul class="whatsNew">' + html_out + '</ul>'
 
     if args['verbose'] == 0:
-        cache_whatsNew(html_out.encode('utf-8'), journal_name, issue_number, ln)
+        cache_whatsNew(html_out, journal_name, issue_number, ln)
 
-    return html_out.encode('utf-8')
+    return html_out
 
 def _get_breaking_news(lang, journal_name):
     """
@@ -213,7 +213,7 @@ def _get_breaking_news(lang, journal_name):
     if breaking_news:
         breaking_news = '<li>%s</li>' % breaking_news
 
-    return breaking_news.decode('utf-8')
+    return breaking_news
 
 def _get_whatsNew_from_cache(journal_name, issue, ln):
     """
