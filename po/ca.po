@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-07 10:07+0100\n"
-"PO-Revision-Date: 2010-12-08 18:37+0100\n"
+"PO-Revision-Date: 2010-12-09 23:01+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Language: \n"
@@ -777,9 +777,8 @@ msgid "Search"
 msgstr "Cerca"
 
 #: modules/webhelp/web/help-central.webdoc:133
-#, fuzzy
 msgid "Citation Metrics"
-msgstr "Cites"
+msgstr "Mètrica de citacions"
 
 #: modules/websearch/doc/search-tips.webdoc:35
 #: modules/websearch/doc/search-tips.webdoc:66
@@ -2048,20 +2047,17 @@ msgid "Warning: Please, select a valid date"
 msgstr "Atenció: seleccioneu una data vàlida"
 
 #: modules/bibupload/lib/batchuploader_templates.py:167
-#, fuzzy
 msgid "Select file to upload"
-msgstr "Seleccioneu el fitxer a pujar: "
+msgstr "Seleccioneu el fitxer a pujar"
 
 #: modules/bibupload/lib/batchuploader_templates.py:168
-#, fuzzy
 msgid "File type"
-msgstr "Tipus de fitxer:"
+msgstr "Tipus de fitxer"
 
 #: modules/bibupload/lib/batchuploader_templates.py:169
 #: modules/bibupload/lib/batchuploader_templates.py:357
-#, fuzzy
 msgid "Upload mode"
-msgstr "Modus de càrrega:"
+msgstr "Modus de càrrega"
 
 #: modules/bibupload/lib/batchuploader_templates.py:170
 #: modules/bibupload/lib/batchuploader_templates.py:358
@@ -2093,12 +2089,12 @@ msgstr "Exemple"
 
 #: modules/bibupload/lib/batchuploader_templates.py:174
 #: modules/bibupload/lib/batchuploader_templates.py:362
-#, fuzzy, python-format
+#, python-format
 msgid "All fields with %(x_fmt_open)s*%(x_fmt_close)s are mandatory"
-msgstr "si %(x_fmt_open)sno%(x_fmt_close)s cal que especifiqueu un cistell"
+msgstr "Tots els camps amb %(x_fmt_open)s*%(x_fmt_close)s són obligatoris"
 
 #: modules/bibupload/lib/batchuploader_templates.py:191
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Your file has been successfully queued. You can check your "
 "%(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit "
@@ -2153,14 +2149,12 @@ msgid "Daemon monitor"
 msgstr "Seguiment de tasques"
 
 #: modules/bibupload/lib/batchuploader_templates.py:354
-#, fuzzy
 msgid "Input directory"
-msgstr "Format de visualizació:"
+msgstr "Directori d'entrada"
 
 #: modules/bibupload/lib/batchuploader_templates.py:356
-#, fuzzy
 msgid "Filename matching"
-msgstr "Fitxers del tipus:"
+msgstr "Fitxers del tipus"
 
 #: modules/bibupload/lib/batchuploader_templates.py:371
 #, python-format
@@ -2168,12 +2162,10 @@ msgid "<b>%s documents</b> have been found."
 msgstr "S'han trobat <b>%s documents</b>."
 
 #: modules/bibupload/lib/batchuploader_templates.py:373
-#, fuzzy
 msgid "The following files have been successfully queued:"
 msgstr "Fitxers que estan correctament a la cua:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:378
-#, fuzzy
 msgid "The following errors have occurred:"
 msgstr "S'han trobat els següents errors:"
 
@@ -2189,13 +2181,13 @@ msgid "All uploaded files were moved to DONE folder."
 msgstr "Tots els fitxers s'han passat al directori DONE."
 
 #: modules/bibupload/lib/batchuploader_templates.py:397
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Using %(x_fmt_open)sweb interface upload%(x_fmt_close)s, actions are "
 "executed a single time."
 msgstr ""
-"Usant la <b>interfície web de pujada de fitxers</b>, les accions només "
-"s'executen un cop."
+"Usant la %(x_fmt_open)sinterfície web de pujada de "
+"fitxers%(x_fmt_close)s, les accions només s'executen un cop."
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 #, python-format
@@ -2227,22 +2219,22 @@ msgstr "Progrés"
 
 #: modules/bibupload/lib/batchuploader_templates.py:428
 msgid "Last BibSched tasks:"
-msgstr "Darreres tasques al BibSched"
+msgstr "Darreres tasques al BibSched:"
 
 #: modules/bibupload/lib/batchuploader_templates.py:437
-#, fuzzy
 msgid "Next scheduled BibSched run:"
-msgstr "previst per:"
+msgstr "Següent tasca al BibSched:"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:98
-#, fuzzy
 msgid "Guests are not authorized to run batchuploader"
-msgstr "No esteu autoritzats a gestionar alertes."
+msgstr ""
+"Els usuaris no identificats no estan autoritzats a fer càrregues "
+"massives"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:105
-#, fuzzy, python-format
+#, python-format
 msgid "The user '%s' is not authorized to run batchuploader"
-msgstr "No esteu autoritzats a gestionar alertes."
+msgstr "L'usuari «%s» no està autoritzat a fer càrregues massives"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:216
 msgid "Document batch upload result"
@@ -2508,9 +2500,8 @@ msgid "The error report has been sent."
 msgstr "S'ha enviat l'informe d'error."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:99
-#, fuzzy
 msgid "Many thanks for helping us to improve the service."
-msgstr "Moltes gràcies per ajudar-nos a millorar Invenio."
+msgstr "Moltes gràcies per ajudar-nos a millorar el servei."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:101
 msgid "Use the back button of your browser to return to the previous page."
@@ -2590,9 +2581,8 @@ msgid "Run Record Merger"
 msgstr "Unificar registres"
 
 #: modules/webaccess/lib/access_control_config.py:266
-#, fuzzy
 msgid "Run BibSword client"
-msgstr "Executar BibCirculation"
+msgstr "Executar el client BibSword"
 
 #: modules/webaccess/lib/access_control_config.py:267
 #: modules/websession/lib/websession_templates.py:1100
@@ -3256,20 +3246,18 @@ msgstr ""
 "cistells de grup, i a %(x_nb_public)s cistells públics d'altres usuaris."
 
 #: modules/webbasket/lib/webbasket_templates.py:86
-#, fuzzy
 msgid ""
 "You have no personal or group baskets or are subscribed to any public "
 "baskets."
 msgstr ""
-"No teniu cistells personals o de grups, ni suscriptors a cistells públics"
+"No teniu cistells personals o de grups, ni esteu subscrits a cap "
+"cistell públic"
 
 #: modules/webbasket/lib/webbasket_templates.py:87
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "You may want to start by %(x_url_open)screating a new basket%(x_url_close)s."
-msgstr ""
-"Us pot interessar consultar les %(x_url_open)spàgines %(x_category)s"
-"%(x_url_close)s."
+msgstr "Podeu començar %(x_url_open)screant un cistell nou%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:111
 #: modules/webbasket/lib/webbasket_templates.py:177
@@ -3311,9 +3299,9 @@ msgstr "Sumari dels resultats"
 #: modules/webbasket/lib/webbasket_templates.py:743
 #: modules/webbasket/lib/webbasket_templates.py:759
 #: modules/webbasket/lib/webbasket_templates.py:775
-#, fuzzy, python-format
+#, python-format
 msgid "%i items found"
-msgstr "items trobats"
+msgstr "%i items trobats"
 
 #: modules/webbasket/lib/webbasket_templates.py:631
 #: modules/webbasket/lib/webbasket_templates.py:757
@@ -3360,17 +3348,19 @@ msgid "There is currently no publicly accessible basket"
 msgstr "Ara mateix no hi ha cap cistell públicament accessible"
 
 #: modules/webbasket/lib/webbasket_templates.py:976
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Displaying public baskets %(x_from)i - %(x_to)i out of "
 "%(x_total_public_basket)i public baskets in total."
-msgstr "Llista de cistells públics %s - %s d'un total de %s cistells públics."
+msgstr ""
+"Llista de cistells públics %(x_from)i - %(x_to)i d'un total de "
+"%(x_total_public_basket)i cistells públics."
 
 #: modules/webbasket/lib/webbasket_templates.py:1043
 #: modules/webbasket/lib/webbasket_templates.py:1067
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s:"
-msgstr "Ressenyat per %(x_nickname)s el %(x_date)s"
+msgstr "%(x_title)s, per %(x_name)s el %(x_date)s:"
 
 #: modules/webbasket/lib/webbasket_templates.py:1046
 #: modules/webbasket/lib/webbasket_templates.py:1070
@@ -3401,7 +3391,6 @@ msgstr "Creeu un nou tema"
 
 #: modules/webbasket/lib/webbasket_templates.py:1144
 #: modules/webbasket/lib/webbasket_templates.py:1500
-#, fuzzy
 msgid "Basket name"
 msgstr "Nom del cistell"
 
@@ -3447,29 +3436,29 @@ msgid "URL"
 msgstr "URL"
 
 #: modules/webbasket/lib/webbasket_templates.py:1279
-#, fuzzy, python-format
+#, python-format
 msgid "%i items have been successfully added to your basket"
-msgstr "els registres han estat afegits correctament al vostre cistell"
+msgstr "%i registres han estat afegits correctament al vostre cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1280
-#, fuzzy, python-format
+#, python-format
 msgid "Proceed to the %(x_url_open)sbasket%(x_url_close)s"
-msgstr "Subscriviu-vos al %(x_url2_open)scanal RSS%(x_url2_close)s."
+msgstr "Subscriviu-vos al %(x_url_open)scistell%(x_url_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1285
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)sprevious basket%(x_url_close)s"
-msgstr "Ja podeu accedir al vostre %(x_url_open)scompte%(x_url_close)s."
+msgstr " o torneu al vostre %(x_url_open)scistell anterior%(x_url_close)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1289
-#, fuzzy, python-format
+#, python-format
 msgid " or return to your %(x_url_open)ssearch%(x_url_close)s"
-msgstr "Ja podeu accedir al vostre %(x_url_open)scompte%(x_url_close)s."
+msgstr " o torneu a la vostra %(x_url_open)scerca%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1398
-#, fuzzy, python-format
+#, python-format
 msgid "Adding %i items to your baskets"
-msgstr "registres als vostres cistells"
+msgstr "%i registres afegits als vostres cistells"
 
 #: modules/webbasket/lib/webbasket_templates.py:1399
 #, python-format
@@ -5238,7 +5227,7 @@ msgstr "Afegit/modificat des de:"
 #: modules/websearch/lib/websearch_templates.py:1071
 #: modules/websearch/lib/websearch_templates.py:2254
 msgid "until:"
-msgstr "fins:"
+msgstr "fins a:"
 
 #: modules/websearch/lib/websearch_templates.py:1076
 #: modules/websearch/lib/websearch_templates.py:2296
@@ -7605,7 +7594,7 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:377
 msgid "GO"
-msgstr "ENDEVANT"
+msgstr "ENDAVANT"
 
 #: modules/websubmit/lib/websubmit_templates.py:498
 #: modules/websubmit/lib/websubmit_templates.py:967
