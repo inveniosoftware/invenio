@@ -22793,7 +22793,6 @@
     </datafield>
     <datafield tag="980" ind1=" " ind2=" ">
       <subfield code="a">ATLANTISTIMESNEWS</subfield>
-      <subfield code="t">Atlantis Times</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_virgin_forest_image.gif</subfield>
