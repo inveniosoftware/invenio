@@ -463,6 +463,7 @@ INSERT INTO sbmFORMATEXTENSION VALUES ('Compressed PostScript','.ps.gz');
 INSERT INTO sbmFORMATEXTENSION VALUES ('Tarred Tex (.tar)','.tar');
 INSERT INTO sbmFORMATEXTENSION VALUES ('Text','.txt');
 
+INSERT INTO sbmFUNDESC VALUES ('Get_Recid','record_search_pattern');
 INSERT INTO sbmFUNDESC VALUES ('Get_Report_Number','edsrn');
 INSERT INTO sbmFUNDESC VALUES ('Send_Modify_Mail','addressesMBI');
 INSERT INTO sbmFUNDESC VALUES ('Send_Modify_Mail','sourceDoc');

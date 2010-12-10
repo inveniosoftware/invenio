@@ -1479,6 +1479,7 @@ INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','sourceTemplate','DEMOPOE.tpl');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','status','ADDED');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','titleFile','DEMOPOE_TITLE');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','yeargen','AUTO');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','record_search_pattern','reportnumber:BUL-<comboDEMOJRN>-*');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','paths_and_suffixes','{\'image\':\"image\", \'file\':\"file\", \'flash\':\"flash\", \'media\':\'media\'}');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','documenttype','picture');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOJRN','rename','');
