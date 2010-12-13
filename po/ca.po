@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-07 10:07+0100\n"
-"PO-Revision-Date: 2010-12-09 23:01+0100\n"
+"PO-Revision-Date: 2010-12-12 22:35+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Language: \n"
@@ -3540,9 +3540,9 @@ msgid "Delete basket"
 msgstr "Suprimeix el cistell"
 
 #: modules/webbasket/lib/webbasket_templates.py:1578
-#, fuzzy, python-format
+#, python-format
 msgid "Editing basket %(x_basket_name)s"
-msgstr "Edició del cistell \"%s\""
+msgstr "Edició del cistell %(x_basket_name)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1587
 #: modules/webbasket/lib/webbasket_templates.py:1642
@@ -3550,7 +3550,6 @@ msgid "Save changes"
 msgstr "Desar els canvis"
 
 #: modules/webbasket/lib/webbasket_templates.py:1608
-#, fuzzy
 msgid "Topic name"
 msgstr "Nom del tema"
 
@@ -3653,24 +3652,24 @@ msgstr "Torna als resultats de la cerca"
 
 #: modules/webbasket/lib/webbasket_templates.py:1953
 #: modules/webbasket/lib/webbasket_templates.py:2986
-#, fuzzy, python-format
+#, python-format
 msgid "%i items"
-msgstr "items"
+msgstr "%i items"
 
 #: modules/webbasket/lib/webbasket_templates.py:1954
 #: modules/webbasket/lib/webbasket_templates.py:2988
-#, fuzzy, python-format
+#, python-format
 msgid "%i notes"
-msgstr "veure notes"
+msgstr "%i notes"
 
 #: modules/webbasket/lib/webbasket_templates.py:1954
 msgid "no notes yet"
 msgstr "sense notes"
 
 #: modules/webbasket/lib/webbasket_templates.py:1957
-#, fuzzy, python-format
+#, python-format
 msgid "%i subscribers"
-msgstr "subscriptors"
+msgstr "%i subscriptors"
 
 #: modules/webbasket/lib/webbasket_templates.py:1959
 #: modules/webbasket/lib/webbasket_templates.py:2990
@@ -3679,9 +3678,8 @@ msgstr "darrera actualització"
 
 #: modules/webbasket/lib/webbasket_templates.py:1963
 #: modules/webbasket/lib/webbasket_templates.py:2042
-#, fuzzy
 msgid "Add item"
-msgstr "Afegir items"
+msgstr "Afegir ítem"
 
 #: modules/webbasket/lib/webbasket_templates.py:1966
 #: modules/webbasket/lib/webbasket_templates.py:2045
@@ -3842,9 +3840,9 @@ msgstr "Respon"
 
 #: modules/webbasket/lib/webbasket_templates.py:2883
 #: modules/webbasket/lib/webbasket_templates.py:3680
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_title)s, by %(x_name)s on %(x_date)s"
-msgstr "Ressenyat per %(x_nickname)s el %(x_date)s"
+msgstr "%(x_title)s, per %(x_name)s el %(x_date)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:2885
 #: modules/webbasket/lib/webbasket_templates.py:3682
@@ -3856,9 +3854,8 @@ msgid "Note"
 msgstr "Nota"
 
 #: modules/webbasket/lib/webbasket_templates.py:2988
-#, fuzzy
 msgid ", no notes yet"
-msgstr "sense notes"
+msgstr ", sense notes"
 
 #: modules/webbasket/lib/webbasket_templates.py:2995
 #: modules/webbasket/lib/webbasket_templates.py:3048
@@ -3959,9 +3956,9 @@ msgstr "S'han comentat el %(report_number)s\"%(title)s\""
 #: modules/webcomment/lib/webcomment_templates.py:233
 #: modules/webcomment/lib/webcomment_templates.py:663
 #: modules/webcomment/lib/webcomment_templates.py:673
-#, fuzzy, python-format
+#, python-format
 msgid "%(x_nb)i comments for round \"%(x_name)s\""
-msgstr "%(x_name)s va escriure el %(x_date)s:"
+msgstr "%(x_nb)i comentaris per la volta «%(x_name)s»"
 
 #: modules/webcomment/lib/webcomment_templates.py:108
 #: modules/webcomment/lib/webcomment_templates.py:790
@@ -4211,24 +4208,21 @@ msgstr ""
 "fitxers."
 
 #: modules/webcomment/lib/webcomment_templates.py:1106
-#, fuzzy
 msgid "Optionally, attach a file to this comment"
-msgstr "Opcionalment, afegiu una nota a aquest registre"
+msgstr "Opcionalment, afegiu-hi un fitxer a aquest comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:1107
-#, fuzzy
 msgid "Optionally, attach files to this comment"
-msgstr "Opcionalment, afegiu una nota a aquest registre"
+msgstr "Opcionalment, afegiu-hi fitxers a aquest comentari"
 
 #: modules/webcomment/lib/webcomment_templates.py:1108
-#, fuzzy
 msgid "Max one file"
-msgstr "Afegeix una altre fitxer"
+msgstr "Màxim un fitxer"
 
 #: modules/webcomment/lib/webcomment_templates.py:1109
-#, fuzzy, python-format
+#, python-format
 msgid "Max %i files"
-msgstr "fitxer(s)"
+msgstr "Màxim %i fitxers"
 
 #: modules/webcomment/lib/webcomment_templates.py:1110
 #, python-format
@@ -4635,19 +4629,16 @@ msgstr "Afegeix un comentari"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:725
 #: modules/webcomment/lib/webcomment_webinterface.py:759
-#, fuzzy
 msgid "Page Not Found"
-msgstr "No s'ha trobat la pàgina %s"
+msgstr "No s'ha trobat la pàgina"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:726
-#, fuzzy
 msgid "The requested comment could not be found"
-msgstr "Aquest registre no existeix."
+msgstr "No s'ha trobat el comentari sol·licitat"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:760
-#, fuzzy
 msgid "The requested file could not be found"
-msgstr "Aquest registre no existeix."
+msgstr "No s'ha trobat el fitxer sol·licitat"
 
 #: modules/webcomment/web/admin/webcommentadmin.py:45
 #: modules/webcomment/web/admin/webcommentadmin.py:59
@@ -5043,14 +5034,14 @@ msgstr ""
 "documents no públics, escolliu primer la col·lecció restringida."
 
 #: modules/websearch/lib/search_engine.py:2424
-#, fuzzy, python-format
+#, python-format
 msgid "There are no records referring to %s."
-msgstr "Hi ha %i cistells"
+msgstr "No hi ha registres que es refereixin a %s."
 
 #: modules/websearch/lib/search_engine.py:2426
-#, fuzzy, python-format
+#, python-format
 msgid "There are no records cited by %s."
-msgstr "Hi ha %i cistells"
+msgstr "No hi ha registres citats per %s."
 
 #: modules/websearch/lib/search_engine.py:2431
 #, python-format
@@ -5147,9 +5138,8 @@ msgid "Usage statistics"
 msgstr "Estadístiques d'ús"
 
 #: modules/websearch/lib/websearchadminlib.py:3380
-#, fuzzy
 msgid "Files"
-msgstr "títol"
+msgstr "Fitxers"
 
 #: modules/websearch/lib/websearchadminlib.py:3381
 msgid "Plots"
@@ -5563,9 +5553,8 @@ msgid "Breakdown of papers by citations:"
 msgstr "Classificació d'articles per cita:"
 
 #: modules/websearch/lib/websearch_templates.py:4125
-#, fuzzy
 msgid "Additional Citation Metrics"
-msgstr "fitxers addicionals"
+msgstr "Altres mètriques de citacions"
 
 #: modules/websearch/lib/websearch_webinterface.py:573
 msgid "You are not authorized to view this area."
@@ -6467,7 +6456,7 @@ msgid "Invitation to join \"%s\" group"
 msgstr "Invitació a unir-se al grup \"%s\""
 
 #: modules/websession/lib/websession_templates.py:2065
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Hello:\n"
 "\n"
@@ -6476,10 +6465,10 @@ msgid ""
 "\n"
 "Best regards.\n"
 msgstr ""
-"Hola,\n"
+"Benvolguts,\n"
 "\n"
-"crec que podeu estar interessats en unir-vos al grup \"%s\".\n"
-"Us hi podeu unir fent clic aquí: %s.\n"
+"potser podeu estar interessats en unir-vos al grup «%(x_name)s».\n"
+"Us hi podeu unir fent clic aquí: %(x_url)s.\n"
 "\n"
 "Ben cordialment,\n"
 
@@ -6614,7 +6603,6 @@ msgstr ""
 "de seguretat, us convindria posar-ne una."
 
 #: modules/websession/lib/websession_templates.py:2459
-#, fuzzy
 msgid ""
 "Warning : The email address set for support email is currently set to "
 "info@invenio-software.org. It is recommended that you change this to change "
@@ -8207,9 +8195,8 @@ msgid "An error has happened in trying to stream the request file."
 msgstr "Hi ha hagut un error a l'intentar enviar el fitxer sol·licitat."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:216
-#, fuzzy
 msgid "The requested file is hidden and can not be accessed."
-msgstr "Aquest fitxer està amagat i no teniu permís per acceder-hi."
+msgstr "Aquest fitxer està amagat i no hi podeu accedir."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:223
 msgid "Requested file does not seem to exist."
@@ -8236,45 +8223,41 @@ msgid "Manage Document Files"
 msgstr "Gestionar els fitxers dels documents"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:385
-#, fuzzy, python-format
+#, python-format
 msgid "Your modifications to record #%i have been submitted"
-msgstr "Les vostres modificacions ja s'han lliurat"
+msgstr "Les vostres modificacions al registre #%i ja s'han lliurat"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:393
-#, fuzzy, python-format
+#, python-format
 msgid "Your modifications to record #%i have been cancelled"
-msgstr "Les vostres modificacions ja s'han lliurat"
+msgstr "Les vostres modificacions al registre #%i han estat cancel·lades"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:402
 msgid "Edit"
 msgstr "Edita"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:403
-#, fuzzy
 msgid "Edit record"
-msgstr "Editeu un altre registre"
+msgstr "Editeu el registre"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:418
 #: modules/websubmit/lib/websubmit_webinterface.py:473
-#, fuzzy
 msgid "Document File Manager"
-msgstr "Gestió de comentaris"
+msgstr "Gestió de fitxers del document"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:419
 #: modules/websubmit/lib/websubmit_webinterface.py:473
-#, fuzzy, python-format
+#, python-format
 msgid "Record #%i"
-msgstr "Registre #%s"
+msgstr "Registre #%i"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:465
-#, fuzzy
 msgid "Cancel all changes"
-msgstr "Desar els canvis"
+msgstr "Cancel·lar tots els canvis"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:937
-#, fuzzy
 msgid "Sorry, 'sub' parameter missing..."
-msgstr "No es pot enviar la petició d'error, falta el paràmetre %s."
+msgstr "Falta el paràmetre «sub»..."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:940
 msgid "Sorry. Cannot analyse parameter"
@@ -8289,19 +8272,16 @@ msgid "approve.py: cannot determine document reference"
 msgstr "approve.py: no s'ha pogut determinar la referència del document."
 
 #: modules/websubmit/web/approve.py:58
-#, fuzzy
 msgid "approve.py: cannot find document in database"
-msgstr "No es pot trobar el document %s"
+msgstr "approve.py: no s'ha trobat el document a la base de dades"
 
 #: modules/websubmit/web/approve.py:72
-#, fuzzy
 msgid "Sorry parameter missing..."
-msgstr "Falta el paràmetre docid"
+msgstr "Hi falta el paràmetre..."
 
 #: modules/websubmit/web/publiline.py:131
-#, fuzzy
 msgid "Document Approval Workflow"
-msgstr "Anar al procediment d'aprovació genèric"
+msgstr "Circuit d'aprovació de documents"
 
 #: modules/websubmit/web/publiline.py:152
 msgid "Approval and Refereeing Workflow"
@@ -8388,7 +8368,6 @@ msgid "Come back to the document"
 msgstr "Tornar al document"
 
 #: modules/websubmit/web/publiline.py:1093
-#, fuzzy
 msgid "Back to the document"
 msgstr "Tornar al document"
 
@@ -8407,9 +8386,8 @@ msgid "Wrong action for this document."
 msgstr "Acció incorrecta per a aquest document."
 
 #: modules/websubmit/web/yourapprovals.py:57
-#, fuzzy
 msgid "You are not authorized to use approval system."
-msgstr "No esteu autoritzats a veure aquesta àrea."
+msgstr "No esteu autoritzats a usar el sistema d'aprovacions"
 
 #: modules/webjournal/lib/webjournal_templates.py:49
 msgid "Available Journals"
@@ -8417,9 +8395,9 @@ msgstr "Revistes disponibles"
 
 #: modules/webjournal/lib/webjournal_templates.py:58
 #: modules/webjournal/lib/webjournal_templates.py:97
-#, fuzzy, python-format
+#, python-format
 msgid "Contact %(x_url_open)sthe administrator%(x_url_close)s"
-msgstr "Escriu als %(x_url_open)sinformàtics%(x_url_close)s"
+msgstr "Escriu als %(x_url_open)sadministradors%(x_url_close)s"
 
 #: modules/webjournal/lib/webjournal_templates.py:142
 msgid "Regeneration Error"
@@ -8470,14 +8448,12 @@ msgid "Apply"
 msgstr "Aplica"
 
 #: modules/webjournal/lib/webjournal_config.py:63
-#, fuzzy
 msgid "Page not found"
-msgstr "No s'ha trobat la pàgina %s"
+msgstr "No s'ha trobat la pàgina"
 
 #: modules/webjournal/lib/webjournal_config.py:64
-#, fuzzy
 msgid "The requested page does not exist"
-msgstr "Aquest registre no existeix."
+msgstr "La pàgina sol·licitada no existeix"
 
 #: modules/webjournal/lib/webjournal_config.py:94
 msgid "No journal articles"
@@ -8590,9 +8566,8 @@ msgid "Journal issue error"
 msgstr "Error de número de revista"
 
 #: modules/webjournal/lib/webjournal_config.py:451
-#, fuzzy
 msgid "Issue not found"
-msgstr "No s'ha trobat"
+msgstr "No s'ha trobat el número"
 
 #: modules/webjournal/lib/webjournal_config.py:480
 msgid "Journal ID error"
@@ -8611,14 +8586,12 @@ msgid "Category \"%(category_name)s\" not found"
 msgstr "No s'ha trobat la categoria «%(category_name)s»"
 
 #: modules/webjournal/lib/webjournal_config.py:516
-#, fuzzy
 msgid "Sorry, this category does not exist for this journal and issue."
-msgstr "Aquesta categoria no existeix per a aquesta revista."
+msgstr "Aquesta categoria no existeix per a aquesta revista i número."
 
 #: modules/webjournal/lib/webjournaladminlib.py:343
-#, fuzzy
 msgid "Please select an issue"
-msgstr "Seleccioneu"
+msgstr "Seleccioneu un número"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:77
 msgid "WebJournal Admin"
@@ -8654,31 +8627,27 @@ msgid "Edit Settings"
 msgstr "Edita els paràmetres"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:43
-#, fuzzy
 msgid "You have "
-msgstr "Ara heu de"
+msgstr "Teniu "
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:43
-#, fuzzy
 msgid "tickets"
-msgstr "vegades"
+msgstr "tasques"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:62
 msgid "show"
 msgstr "mostrar"
 
 #: modules/bibcatalog/lib/bibcatalog_templates.py:63
-#, fuzzy
 msgid "close"
-msgstr "Puntuació"
+msgstr "tancar"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:68
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:82
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:125
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:140
-#, fuzzy
 msgid "No information available"
-msgstr "No hi ha cap revista"
+msgstr "No hi ha informació disponible"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py:86
 msgid "No seminars today"
@@ -8697,9 +8666,8 @@ msgid "There are no new articles for the moment"
 msgstr "De moment no hi ha articles nous"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_whatsNew.py:286
-#, fuzzy
 msgid "What's new"
-msgstr "Nom del cistell"
+msgstr "És notícia"
 
 #: modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:224
 msgid "Under the CERN sky"
@@ -8719,28 +8687,29 @@ msgid "Did you know?"
 msgstr "Ho savíeu?"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:255
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Hi,\n"
 "\n"
 "Have a look at the following article:\n"
 "<%(url)s>"
-msgstr "Teniu activats els següents rols: %(x_role)s."
+msgstr ""
+"Hola,\n"
+"\n"
+"Doneu-li un cop d'ull a aquest article:\n"
+"<%(url)s>"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:262
-#, fuzzy
 msgid "Send this article"
-msgstr "Valoreu aquest article"
+msgstr "Enviar aquest article"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_rss.py:136
-#, fuzzy
 msgid "Subscribe by RSS"
-msgstr "Subscriure's"
+msgstr "Subscriure's via RSS"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:87
-#, fuzzy
 msgid "News Articles"
-msgstr "Article"
+msgstr "Notícies"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:88
 msgid "Official News"
@@ -8751,57 +8720,48 @@ msgid "Training and Development"
 msgstr "Formació i desenvolupament"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_main_navigation.py:90
-#, fuzzy
 msgid "General Information"
-msgstr "Informacions generals"
+msgstr "Informació general"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:106
 msgid "Archive"
 msgstr "Arxiu"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:133
-#, fuzzy
 msgid "Select Year:"
-msgstr "Seleccioneu:"
+msgstr "Seleccioneu l'any:"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:139
-#, fuzzy
 msgid "Select Issue:"
-msgstr "Seleccioneu:"
+msgstr "Seleccioneu el número:"
 
 #: modules/webjournal/lib/elements/bfe_webjournal_archive.py:143
-#, fuzzy
 msgid "Select Date:"
-msgstr "Seleccioneu:"
+msgstr "Seleccioneu la data:"
 
 #: modules/bibedit/lib/bibedit_webinterface.py:181
-#, fuzzy
 msgid "Comparing two record revisions"
-msgstr "Comparar revisions"
+msgstr "Comparar dues revisions del registre"
 
 #: modules/bibedit/lib/bibedit_webinterface.py:204
 msgid "Failed to create a ticket"
 msgstr "No s'ha pogut crear un ticket"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:297
-#, fuzzy
 msgid "Next Step"
-msgstr "Pàgina següent"
+msgstr "Pas següent"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:298
-#, fuzzy
 msgid "Search criteria"
-msgstr "Guia de Cerca"
+msgstr "Criteris de cerca"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:299
-#, fuzzy
 msgid "Output tags"
-msgstr "Format de visualizació:"
+msgstr "Etiquetes de visualització"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:300
-#, fuzzy
 msgid "Filter collection"
-msgstr "col·lecció"
+msgstr "Filtre de col·lecció"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:301
 msgid "1. Choose search criteria"
@@ -8817,14 +8777,12 @@ msgstr ""
 "Useu «Cerca» per a veure quins registres es filtrarien amb aquests criteris."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:304
-#, fuzzy
 msgid "Preview results"
-msgstr "resultats"
+msgstr "Previsualització dels resultats"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:505
-#, fuzzy
 msgid "2. Define changes"
-msgstr "Desar els canvis"
+msgstr "2. Definiu els canvis"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:506
 msgid ""
