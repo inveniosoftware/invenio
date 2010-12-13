@@ -1,3 +1,65 @@
+CDS Invenio v0.99.3 (released 2010-12-13)
+=========================================
+
+2010-11-25  Samuele Kaplun  <samuele.kaplun@cern.ch>
+
+	BibUpload: improve bibdocfile URL recognition
+	* URLs such as http://localhost/record/00123/foo.pdf are now
+	  correctly recognized as bibdocfile URLs, when merging FFT
+	  MARCXML snippets. (closes #352)
+
+2010-11-18  Jerome Caffaro  <jerome.caffaro@cern.ch>
+
+	WebStyle: fixed traversal of final URLs
+	* Only try to traverse URL "parts" which have the _traverse()
+	  function available. Others return HTTP_NOT_FOUND.
+	  (closes #325)
+
+2010-11-15  Samuele Kaplun  <samuele.kaplun@cern.ch>
+
+	WebAccess: fix typo in HTML admin interface
+
+2010-11-10  Samuele Kaplun  <samuele.kaplun@cern.ch>
+
+	BibSched: status showing running auto/manual mode
+	* (cherry-picked from b6fbd4b34688b6c5b7730f23550c5cad048e2ce5)
+
+2010-11-08  Tibor Simko  <tibor.simko@cern.ch>
+
+	BibClassify: compatibility with rdflib < 2.3.2
+	* Make bibclassify run with older rdflib versions too.  Based on changes
+	  done in 6796ed47bb365c2589b30ed293cbb671981e3640.
+
+	installation: add update-v0.99.1-tables
+	* Add (empty) update-v0.99.1-tables target for the last release,
+	  for completeness.
+
+2010-11-01  Jerome Caffaro  <jerome.caffaro@cern.ch>
+
+	BibHarvest: OAI harvesting bug fixes
+	* Fixed bug that would prevent harvesting of multiple repositories at
+	  once (file with harvested data being overwritten by harvesting of
+	  next repository... Thanks to Sergio Laberer for having pointed out
+	  the problem and helped solving it).
+
+	* Improved parsing of input parameter '--repository' when used with
+	  (double-)quotes.
+
+	* Fixed wrong help documentation wrt '--repository' parameter.
+
+	* Fixed bug when calling bibupload with harvested data (when harvesting
+	  multiple repositories at once, each harvested repository being
+	  bibuploaded again with the next ones; due to "mutable defaults trap"
+	  with 'mode' param of 'call_bibupload(..)' function).
+
+	* Backported from 50a211189b9fc6758f487b882d8934f5f7a25be9.
+
+2010-10-22  Jerome Caffaro  <jerome.caffaro@cern.ch>
+
+	BibFormat: formatting of not-yet-existing records
+	* Do not fail when formatting records that do not exist yet.
+	  (cherry-picked from 4f2faee5e1b10e1f9a7279612ff1bbb22bb6b00d)
+
 CDS Invenio v0.99.2 (released 2010-10-20)
 =========================================
 
@@ -181,7 +243,6 @@ CDS Invenio v0.99.2 (released 2010-10-20)
 	* Installed project-wide .gitignore, with a notable addition of *.sse2f
 	  files that are actually FASL files compiled with SSE2 support, as generated
 	  by recent versions of CMUCL.
-
 
 CDS Invenio v0.99.1 (released 2008-07-10)
 =========================================
