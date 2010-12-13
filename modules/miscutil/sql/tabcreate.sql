@@ -1997,6 +1997,21 @@ CREATE TABLE IF NOT EXISTS idxWORD15R (
   PRIMARY KEY (id_bibrec,type)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxWORD16F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(50) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxWORD16R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPAIR01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term varchar(100) default NULL,
@@ -2222,6 +2237,21 @@ CREATE TABLE IF NOT EXISTS idxPAIR15R (
   PRIMARY KEY (id_bibrec,type)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS idxPAIR16F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term varchar(100) default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  UNIQUE KEY term (term)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPAIR16R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
   term text default NULL,
@@ -2441,6 +2471,21 @@ CREATE TABLE IF NOT EXISTS idxPHRASE15F (
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE15R (
+  id_bibrec mediumint(9) unsigned NOT NULL,
+  termlist longblob,
+  type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+  PRIMARY KEY (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE16F (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  term text default NULL,
+  hitlist longblob,
+  PRIMARY KEY  (id),
+  KEY term (term(50))
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS idxPHRASE16R (
   id_bibrec mediumint(9) unsigned NOT NULL,
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',

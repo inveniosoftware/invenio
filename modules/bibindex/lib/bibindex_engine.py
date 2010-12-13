@@ -1445,7 +1445,7 @@ def task_run_core():
         for index_id, index_name, index_tags in wordTables:
             if index_name == 'year' and CFG_INSPIRE_SITE:
                 fnc_get_words_from_phrase = get_words_from_date_tag
-            elif index_name == 'author' and \
+            elif index_name in ('author', 'firstauthor') and \
                      CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
                 fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
             else:
@@ -1460,7 +1460,7 @@ def task_run_core():
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-            if index_name == 'author' and \
+            if index_name in ('author', 'firstauthor') and \
                    CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
                 fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
             else:
@@ -1475,7 +1475,7 @@ def task_run_core():
             wordTable.report_on_table_consistency()
             task_sleep_now_if_required(can_stop_too=True)
 
-            if index_name == 'author':
+            if index_name in ('author', 'firstauthor'):
                 fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
             elif index_name == 'exactauthor':
                 fnc_get_phrases_from_phrase = get_exact_authors_from_phrase
@@ -1503,7 +1503,7 @@ def task_run_core():
             init_temporary_reindex_tables(index_id, reindex_prefix)
         if index_name == 'year' and CFG_INSPIRE_SITE:
             fnc_get_words_from_phrase = get_words_from_date_tag
-        elif index_name == 'author' and \
+        elif index_name in ('author', 'firstauthor') and \
                  CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
             fnc_get_words_from_phrase = get_author_family_name_words_from_phrase
         else:
@@ -1572,7 +1572,7 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
 
         # Let's work on pairs now
-        if index_name == 'author' and \
+        if index_name in ('author', 'firstauthor') and \
                CFG_BIBINDEX_AUTHOR_WORD_INDEX_EXCLUDE_FIRST_NAMES:
             fnc_get_pairs_from_phrase = get_pairs_from_phrase # FIXME
         else:
@@ -1639,7 +1639,7 @@ def task_run_core():
         task_sleep_now_if_required(can_stop_too=True)
 
         # Let's work on phrases now
-        if index_name == 'author':
+        if index_name in ('author', 'firstauthor'):
             fnc_get_phrases_from_phrase = get_fuzzy_authors_from_phrase
         elif index_name == 'exactauthor':
             fnc_get_phrases_from_phrase = get_exact_authors_from_phrase

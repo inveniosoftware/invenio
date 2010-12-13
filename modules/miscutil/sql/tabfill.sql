@@ -52,6 +52,7 @@ INSERT INTO field VALUES (24,'date modified','datemodified');
 INSERT INTO field VALUES (25,'refers to','refersto');
 INSERT INTO field VALUES (26,'cited by','citedby');
 INSERT INTO field VALUES (27,'caption','caption');
+INSERT INTO field VALUES (28,'first author','firstauthor');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
@@ -189,6 +190,7 @@ INSERT INTO field_tag VALUES (21,134,90);
 INSERT INTO field_tag VALUES (22,1,100);
 INSERT INTO field_tag VALUES (22,2,90);
 INSERT INTO field_tag VALUES (27,135,100);
+INSERT INTO field_tag VALUES (28,1,100);
 
 INSERT INTO format VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -370,6 +372,7 @@ INSERT INTO idxINDEX VALUES (12,'collaboration','This index contains words/phras
 INSERT INTO idxINDEX VALUES (13,'affiliation','This index contains words/phrases from institutional affiliation fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (14,'exactauthor','This index contains exact words/phrases from author fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (15,'caption','This index contains exact words/phrases from figure captions.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (16,'firstauthor','This index contains fuzzy words/phrases from first author field.','0000-00-00 00:00:00', '');
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
@@ -386,6 +389,7 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (12,20);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (13,21);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (14,22);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (15,27);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (16,28);
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
 INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-11-07','','Modify Record');

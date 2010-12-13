@@ -625,7 +625,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         if f and p[0] == '"' and p[-1] == '"':
             ## B0 - does 'p' start and end by double quote, and is 'f' defined? => doing ACC search
             opfts.append(['+', p[1:-1], f, 'a'])
-        elif (f == 'author' or f == 'exactauthor') and author_name_requires_phrase_search(p):
+        elif f in ('author', 'firstauthor', 'exactauthor') and author_name_requires_phrase_search(p):
             ## B1 - do we search in author, and does 'p' contain space/comma/dot/etc?
             ## => doing washed ACC search
             opfts.append(['+', p, f, 'a'])
@@ -2124,7 +2124,7 @@ def search_unit_in_idxphrases(p, f, type):
                 query_params = (p,)
 
     # special washing for fuzzy author index:
-    if f == 'author' or f == 'exactauthor':
+    if f in ('author', 'firstauthor', 'exactauthor'):
         query_params_washed = ()
         for query_param in query_params:
             query_params_washed += (wash_author_name(query_param),)
@@ -2531,7 +2531,7 @@ def get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above):
        for the given pattern p in the given field idxPHRASE table,
        regardless of collection.
        Return list of [phrase1, phrase2, ... , phrase_n]."""
-    if CFG_INSPIRE_SITE and index_id == 3: # FIXME: workaround due to new fuzzy index
+    if CFG_INSPIRE_SITE and index_id in (3, 15): # FIXME: workaround due to new fuzzy index
         return [p,]
     idxphraseX = "idxPHRASE%02dF" % index_id
     res_above = run_sql("SELECT term FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above))
