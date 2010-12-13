@@ -12,31 +12,25 @@ sites using v0.99.1 or previous releases.
 What's new:
 -----------
 
- *) stricter checking of access to restricted records: in order to
-    view a restricted record, users are now required to have
-    authorizations to access all restricted collections the given
-    record may belong to (WebSearch)
+ *) fixed issues in the harvesting daemon when harvesting from more
+    than one OAI repository (BibHarvest)
 
- *) strict checking of user query history when setting up email
-    notification alert, preventing URL mangling attempts (WebAlert)
+ *) fixed failure in formatting engine when dealing with
+    not-yet-existing records (BibFormat)
 
- *) fixed possible Unix signal conflicts for tasks performing I/O
-    operations or running external processes, relevant notably to
-    full-text indexing of remote files (BibSched)
+ *) fixed traversal of final URL parts in the URL dispatcher
+    (WebStyle)
 
- *) fixed full-text indexing and improved handling of files of
-    `unexpected' extensions (BibIndex, WebSubmit)
+ *) improved bibdocfile URL recognition upon upload of MARC files
+    (BibUpload)
 
- *) streaming of files of `unknown' MIME type now defaults to
-    application/octet-stream (WebSubmit)
+ *) fixed bug in admin interface for adding authorizations (WebAccess)
 
- *) fixed addition of new MARC fields in the record editor (BibEdit)
+ *) keyword extractor is now compatible with rdflib releases older
+    than 2.3.2 (BibClassify)
 
- *) fixed issues in full-text file attachment via MARC (BibUpload)
-
- *) fixed authaction CLI client (WebAccess)
-
- *) ... plus other minor fixes and improvements
+ *) output of `bibsched status' now shows the queue mode status as
+    AUTOMATIC or MANUAL to help queue monitoring (BibSched)
 
 Download:
 ---------

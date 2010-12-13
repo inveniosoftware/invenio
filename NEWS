@@ -6,6 +6,29 @@ releases.  For more information about the current release, please
 consult RELEASE-NOTES.  For more information about changes, please
 consult ChangeLog.
 
+CDS Invenio v0.99.3 -- released 2010-12-13
+------------------------------------------
+
+ *) fixed issues in the harvesting daemon when harvesting from more
+    than one OAI repository (BibHarvest)
+
+ *) fixed failure in formatting engine when dealing with
+    not-yet-existing records (BibFormat)
+
+ *) fixed traversal of final URL parts in the URL dispatcher
+    (WebStyle)
+
+ *) improved bibdocfile URL recognition upon upload of MARC files
+    (BibUpload)
+
+ *) fixed bug in admin interface for adding authorizations (WebAccess)
+
+ *) keyword extractor is now compatible with rdflib releases older
+    than 2.3.2 (BibClassify)
+
+ *) output of `bibsched status' now shows the queue mode status as
+    AUTOMATIC or MANUAL to help queue monitoring (BibSched)
+
 CDS Invenio v0.99.2 -- released 2010-10-20
 ------------------------------------------
 
