@@ -2142,6 +2142,80 @@ class BibUploadPretendTest(GenericBibUploadTest):
         bibupload.bibupload(self.demo_data, opt_mode='reference', pretend=True)
         self.failUnless(self._checks_tables_fingerprints(self.before, self._get_tables_fingerprint()))
 
+class BibUploadHoldingPenTest(GenericBibUploadTest):
+    """
+    Testing the Holding Pen usage.
+    """
+    def setUp(self):
+        GenericBibUploadTest.setUp(self)
+        self.verbose = 9
+        setup_loggers()
+        task_set_task_param('verbose', self.verbose)
+        self.recid = 10
+        self.oai_id = "oai:cds.cern.ch:CERN-EP-2001-094"
+
+    def test_holding_pen_upload_with_recid(self):
+        """bibupload - holding pen upload with recid"""
+        test_to_upload = """<?xml version="1.0" encoding="UTF-8"?>
+            <collection xmlns="http://www.loc.gov/MARC21/slim">
+            <record>
+            <controlfield tag="001">%s</controlfield>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Kleefeld, F</subfield>
+            </datafield>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Newcomer, Y</subfield>
+            </datafield>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Rupp, G</subfield>
+            </datafield>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Scadron, M D</subfield>
+            </datafield>
+            </record>
+            </collection>""" % self.recid
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        bibupload.insert_record_into_holding_pen(recs[0], "")
+        res = run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid, ))
+        self.failUnless("Rupp, G" in res[0][0])
+
+    def test_holding_pen_upload_with_oai_id(self):
+        """bibupload - holding pen upload with oai_id"""
+        test_to_upload = """<?xml version="1.0" encoding="UTF-8"?>
+            <collection xmlns="http://www.loc.gov/MARC21/slim">
+            <record>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Kleefeld, F</subfield>
+            </datafield>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Newcomer, Y</subfield>
+            </datafield>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Rupp, G</subfield>
+            </datafield>
+            <datafield tag="700" ind1=" " ind2=" ">
+                <subfield code="a">Scadron, M D</subfield>
+            </datafield>
+            <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
+                <subfield code="%(extoaiidsubfieldcode)s">%(value)s</subfield>
+            </datafield>
+            </record>
+            </collection>""" % {'extoaiidtag': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
+               'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or " ",
+               'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
+                            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
+               'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'value': self.oai_id
+            }
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        bibupload.insert_record_into_holding_pen(recs[0], self.oai_id)
+        res = run_sql("SELECT changeset_xml FROM bibHOLDINGPEN WHERE id_bibrec=%s AND oai_id=%s", (self.recid, self.oai_id))
+        self.failUnless("Rupp, G" in res[0][0])
+
+    def tearDown(self):
+        GenericBibUploadTest.tearDown(self)
+        run_sql("DELETE FROM bibHOLDINGPEN WHERE id_bibrec=%s", (self.recid, ))
 
 class BibUploadFFTModeTest(GenericBibUploadTest):
     """
@@ -3459,7 +3533,8 @@ class BibUploadFFTModeTest(GenericBibUploadTest):
         self.assertEqual(expected_content_version, content_version)
 
 
-TEST_SUITE = make_test_suite(BibUploadInsertModeTest,
+TEST_SUITE = make_test_suite(BibUploadHoldingPenTest,
+                             BibUploadInsertModeTest,
                              BibUploadAppendModeTest,
                              BibUploadCorrectModeTest,
                              BibUploadDeleteModeTest,

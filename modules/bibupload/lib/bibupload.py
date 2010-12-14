@@ -441,9 +441,13 @@ def insert_record_into_holding_pen(record, oai_id, pretend=False):
     xml_record = record_xml_output(record)
     bibrec_ids = find_record_ids_by_oai_id(oai_id)  # here determining the identifier of the record
     if len(bibrec_ids) > 0:
-        bibrec_id = bibrec_ids[0]
+        bibrec_id = bibrec_ids.pop()
     else:
-        bibrec_id = 0
+        # id not found by using the oai_id, let's use a wider search based
+        # on any information we might have.
+        bibrec_id = retrieve_rec_id(record, 'holdingpen')
+        if bibrec_id is None:
+            bibrec_id = 0
 
     if not pretend:
         run_sql(query, (oai_id, xml_record, bibrec_id))

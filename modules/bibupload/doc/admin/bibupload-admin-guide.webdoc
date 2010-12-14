@@ -26,10 +26,11 @@
 <strong>2. <a href="#2">Configuring BibUpload</a></strong><br />
 <strong>3. <a href="#3">Running BibUpload</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Inserting new records</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Updating existing records</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Inserting and updating at the same time</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Updating preformatted output formats</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Uploading fulltext files</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Inserting records into the Holding Pen</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Updating existing records</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Inserting and updating at the same time</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Updating preformatted output formats</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.6. <a href="#3.6">Uploading fulltext files</a><br />
 <strong>4. <a href="#4">Batch Uploader</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.1">Web interface - Cataloguers</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1. <a href="#4.2">Web interface - Robots</a><br />
@@ -106,7 +107,27 @@ will refuse to continue.
 </pre>
 </p>
 
-<a name="3.2"></a><h3>3.2 Updating existing records</h3>
+<a name="3.2"></a><h3>3.2 Inserting records into the Holding Pen</h3>
+
+<p>A special mode of BibUpload that is thigthly connected with BibEdit is the
+<em>Holding Pen</em> mode.</p>
+
+<p>When you insert a record using the holding pen mode such as in the following
+example:
+
+<blockquote>
+<pre>
+$ bibupload -o file.xml
+</pre>
+</blockquote>
+
+the records are not actually integrated into the database, but are instead put
+into an intermediate space called holding pen, where authorized curators can
+review them, manipulate them and eventually approve them.</p>
+
+<p>The holding pen is integrated with <a href="/help/admin/bibedit-admin-guide" alt="BibEdit">BibEdit</a>.</p>
+
+<a name="3.3"></a><h3>3.3 Updating existing records</h3>
 
 <p>When you want to update existing records, with the new content from
 your input MARCXML file, then your input file should contain either
@@ -174,7 +195,7 @@ input file should contain record ID in the 001 tag and the title in
 
 <p>If you combine the <code>--pretend</code> parameter with the above updating modes you can actually test what would be executed without modifying the database or altering the system status.</p>
 
-<a name="3.3"></a><h3>3.3 Inserting and updating at the same time</h3>
+<a name="3.4"></a><h3>3.4 Inserting and updating at the same time</h3>
 
 <p>Note that the insert/update modes can be combined together.  For
 example, if you have a file that contains a mixture of new records
@@ -190,7 +211,7 @@ In this case BibUpload will try to do an update (for records having
 either 001 or 970 identifiers), or an insert (for the other ones).
 </p>
 
-<a name="3.4"></a><h3>3.4 Updating preformatted output formats</h3>
+<a name="3.5"></a><h3>3.5 Updating preformatted output formats</h3>
 
 <p>BibFormat can use this special upload mode during which metadata will
 not be updated, only the preformatted output formats for records:
@@ -204,7 +225,7 @@ This is useful for <code>bibreformat</code> daemon only; human
 administrators don't need to explicitly know about this mode.
 </p>
 
-<a name="3.5"></a><h3>3.5 Uploading fulltext files</h3>
+<a name="3.6"></a><h3>3.6 Uploading fulltext files</h3>
 
 <p>The fulltext files can be uploaded and revised via a special FFT
 ("fulltext file transfer") tag with the following
