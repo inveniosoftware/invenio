@@ -198,9 +198,9 @@ def superuser_account_warnings():
 
     #Check for a new release of Invenio
     try:
-        find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+ is released')
+        find = re.compile('Invenio v[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])? is released')
 
-        webFile = urllib.urlopen("http://cdsware.cern.ch/download/RELEASE-NOTES")
+        webFile = urllib.urlopen("http://invenio-software.org/repo/invenio/tree/RELEASE-NOTES")
 
         temp = ""
         version = ""
@@ -217,7 +217,7 @@ def superuser_account_warnings():
                 break
 
         webFile.close()
-        submatch = re.compile('[0-9]+.[0-9]+.[0-9]+')
+        submatch = re.compile('[0-9]+.[0-9]+.[0-9]+(\-rc[0-9])?')
         version1 = submatch.search(version)
         web_version = version1.group().split(".")
 

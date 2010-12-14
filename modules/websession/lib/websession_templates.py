@@ -2438,38 +2438,38 @@ Best regards.
         #Try and connect to the mysql database with the default invenio password
         if "warning_mysql_password_equal_to_invenio_password" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The password set for MySQL is the same as the default Invenio password. For security purposes, you might want to change the password.")
+            message += _("Warning: The password set for MySQL root user is the same as the default Invenio password. For security purposes, you may want to change the password.")
             message += "</font></p>"
 
         #Try and connect to the invenio database with the default invenio password
         if "warning_invenio_password_equal_to_default" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The password set for the Invenio database is the same as the default Invenio password. For security purposes, you might want to change the password.")
+            message += _("Warning: The password set for the Invenio MySQL user is the same as the shipped default. For security purposes, you may want to change the password.")
             message += "</font></p>"
 
         #Check if the admin password is empty
         if "warning_empty_admin_password" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The password set for the Invenio admin user is currently empty. For security purposes, it is strongly recommended that you add a password.")
+            message += _("Warning: The password set for the Invenio admin user is currently empty. For security purposes, it is strongly recommended that you add a password.")
             message += "</font></p>"
 
         #Check if the admin email has been changed from the default
         if "warning_site_support_email_equal_to_default" in warning_list:
             message += "<p><font color=red>"
-            message += _("Warning : The email address set for support email is currently set to info@invenio-software.org. It is recommended that you change this to change this to your own address.")
+            message += _("Warning: The email address set for support email is currently set to info@invenio-software.org. It is recommended that you change this to your own address.")
             message += "</font></p>"
 
         #Check for a new release
         if "note_new_release_available" in warning_list:
             message += "<p><font color=red>"
-            message += _("A newer version of Invenio is available for download. Please visit ")
-            message += "<a href=\"http://cdsware.cern.ch/invenio/download.html\">cdsware</a>"
+            message += _("A newer version of Invenio is available for download. You may want to visit  ")
+            message += "<a href=\"http://invenio-software.org/wiki/Installation/Download\">http://invenio-software.org/wiki/Installation/Download</a>"
             message += "</font></p>"
 
         #Error downloading release notes
         if "error_cannot_download_release_notes" in warning_list:
             message += "<p><font color=red>"
-            message += _("Cannot download release notes from http://cdsware.cern.ch/, please check your internet connection")
+            message += _("Cannot download or parse release notes from http://invenio-software.org/repo/invenio/tree/RELEASE-NOTES")
             message += "</font></p>"
 
         return message
