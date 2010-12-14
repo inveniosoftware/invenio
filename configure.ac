@@ -525,6 +525,12 @@ AC_CONFIG_FILES([config.nice  \
      config/Makefile \
      config/invenio-autotools.conf \
      modules/Makefile \
+     modules/bibauthorid/Makefile \
+     modules/bibauthorid/lib/Makefile \
+     modules/bibauthorid/lib/bibauthorid_comparison_functions/Makefile \
+     modules/bibauthorid/bin/Makefile \
+     modules/bibauthorid/web/Makefile \
+     modules/bibauthorid/bin/bibauthorid \
      modules/bibcatalog/Makefile \
      modules/bibcatalog/doc/Makefile \
      modules/bibcatalog/doc/admin/Makefile \

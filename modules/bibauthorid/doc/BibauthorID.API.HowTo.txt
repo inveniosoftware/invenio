@@ -1,0 +1,85 @@
+# -*- coding: utf-8 -*-
+##
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+##
+## Bibauthorid preparation and API usage
+##
+
+##
+## Caveats: 
+## - I'm currently working on the correct use of Unicode. The current version will
+##   skip names that are presented in Unicode.
+## - Sicne the algorithm has been developed on the Inspire database, the date
+##   recognition is not correct for the Atlantis installation. A proper fix is in progress.
+##
+
+## Getting the module code to run in the Invenio/Inspire instance
+## Assuming the Invenio/Inspire Installation is in /opt/cds-invenio
+$ tar -xvzf ./bibauthorid.tgz
+$ mkdir /opt/cds-invenio/etc/bibauthorid/
+$ cd bibauthor
+$ cp ./etc/bibauthorid/* /opt/cds-invenio/etc/bibauthorid/
+$ cp -r ./lib/python/invenio/* /opt/cds-invenio/lib/python/invenio/
+$ cd /opt/cds-invenio/lib/python/invenio/
+
+##
+## Important: if you change the final location of the scripts, make sure to
+## change the relative paths accordingly.
+##
+## Files to be touched:
+## bibauthorid_tables_utils.py @ Line 70
+## bibauthorid_general_utils.py @ Line 48
+##
+
+$ ipython 
+or
+$ python
+
+## Preparing the database and run authorid algorithm to fill it.
+## Commands to be tyoed in ipython or python
+
+In [1]: import bibauthorid_tables_utils, bibauthorid_virtualauthor_utils, bibauthorid_realauthor_utils, bibauthorid_general_functions, bibauthorid_general_utils, bibauthorid_test_functions, bibauthorid_api
+
+In [2]: bibauthorid_tables_utils.create_database_tables()
+Done. Created 9 tables. Please check. if there exist now 9 tables with the prefix 'aid_'.
+
+In [3]: bibauthorid_tables_utils.populate_authornames()
+Processing bib10x (89 entries):
+0% . 6741.0%  100%
+Processing bib70x (522 entries):
+0% . 1149.0%  100%
+
+In [3.1]:  bibauthorid_tables_utils.create_persistent_tables()
+Done. Created 3 tables. Please check. if there exist now 12 tables with the prefix 'aid_'.
+
+## perform_case("") will find and process EVERY author.
+## perform_case("Ellis") would be more selective and would just process the Ellises.
+In [4]: bibauthorid_test_functions.perform_case("")
+[Bunch of text here...
+Will run for about 160 seconds for the Atlantis instance]
+
+## API call examples
+
+In [5]: bibauthorid_api.get_affiliations_for_authorname("Ellis, J")
+Out[5]: ['CERN', 'University of Oxford']
+
+In [6]: bibauthorid_api.get_affiliations_for_authorname("Ellis, J", False)
+Out[6]: 
+[['0000-00', 'Ellis, J', 'University of Oxford'],
+ ['0000-00', 'Ellis, J', 'CERN']]

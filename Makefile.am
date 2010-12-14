@@ -143,16 +143,26 @@ install-jquery-plugins: install-jquery-plugins
 	(cd ${prefix}/var/www/js && \
 	wget http://jqueryjs.googlecode.com/files/jquery-1.3.1.min.js && \
 	mv jquery-1.3.1.min.js jquery.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/jquery-1.4.4.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.core.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.effects.highlight.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.widget.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.tabs.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.slider.min.js && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/ui/minified/ui.sortable.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.button.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.dialog.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.mouse.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.draggable.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.position.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/jquery.ui.resizable.min.js && \
 	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
 	wget http://github.com/malsup/form/raw/master/jquery.form.js --no-check-certificate && \
 	wget http://jquery-multifile-plugin.googlecode.com/svn/trunk/jquery.MultiFile.pack.js && \
 	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
 	wget http://tablesorter.com/jquery.tablesorter.zip && \
 	wget http://www.uploadify.com/wp-content/uploads/Uploadify-v2.1.3.zip -O uploadify.zip && \
+	wget http://www.datatables.net/download/build/jquery.dataTables.min.js && \
 	unzip jquery.tablesorter.zip && \
 	rm jquery.tablesorter.zip && \
 	unzip -u uploadify.zip && \
@@ -179,6 +189,9 @@ install-jquery-plugins: install-jquery-plugins
 	mkdir -p ${prefix}/var/www/img && \
 	cd ${prefix}/var/www/img && \
 	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/base/ && \
+	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/smoothness/ && \
+	wget -r -np -nH --cut-dirs=4 -A "png,css" -P jquery-ui/themes http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/ && \
+	wget --no-check-certificate -O datatables_jquery-ui.css https://github.com/DataTables/DataTables/raw/master/media/css/demo_table_jui.css && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/jquery-ui.css && \
 	wget http://jquery-ui.googlecode.com/svn/tags/1.7.3/demos/images/calendar.gif && \
 	wget -r -np -nH --cut-dirs=5 -A "png" http://jquery-ui.googlecode.com/svn/tags/1.7.3/themes/redmond/images/)
@@ -201,14 +214,17 @@ uninstall-jquery-plugins:
 	rm -f jquery.uploadify.min.js && \
 	rm -f jquery.ui.slider.min.js && \
 	rm -f jquery.ui.sortable.min.js && \
+	rm -f jquery.ui.tabs.min.js && \
 	rm -rf tablesorter && \
 	rm -f jquery.hotkeys.min.js && \
 	rm -rf jquery-treeview && \
 	rm -f jquery.ajaxPager.js && \
 	rm -f jquery.form.js && \
+	rm -f jquery.dataTables.min.js && \
 	rm -f ui.core.js) && \
 	(cd ${prefix}/var/www/img && \
-	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla)
+	rm -f cancel.png uploadify.css uploadify.swf uploadify.allglyphs.swf uploadify.fla && \
+	rm -f datatables_jquery-ui.css)
 	@echo "***********************************************************"
 	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"

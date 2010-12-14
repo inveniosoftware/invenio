@@ -1,3 +1,4 @@
+##
 ## This file is part of Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
 ##
@@ -15,18 +16,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibformat/output_formats
+pylibdir=$(libdir)/python/invenio/bibauthorid_comparison_functions
 
-etc_DATA = HB.bfo HC.bfo HD.bfo HP.bfo HX.bfo XM.bfo EXCEL.bfo \
-	   XD.bfo HS.bfo AID.bfo \
-	   XE.bfo XN.bfo XR.bfo XW.bfo \
-	   XOAIDC.bfo XO.bfo \
-	   HDREF.bfo HDFILE.bfo HDACT.bfo
+pylib_DATA = aid_cmp_affiliations.py \
+             aid_cmp_coauthorship.py \
+             aid_cmp_names.py \
+             aid_cmp_paperequality.py \
+             aid_cmp_topcites.py \
+             __init__.py
 
-tmpdir = $(prefix)/var/tmp
+EXTRA_DIST = $(pylib_DATA)
 
-tmp_DATA = TEST1.bfo TEST2.bfo TEST3.bfo
-
-EXTRA_DIST = $(etc_DATA) $(tmp_DATA)
-
-CLEANFILES = *.tmp
+CLEANFILES = *~ *.tmp *.pyc

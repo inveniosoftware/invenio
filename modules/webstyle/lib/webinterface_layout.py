@@ -41,7 +41,7 @@ class WebInterfaceDumbPages(WebInterfaceDirectory):
         try:
             from invenio.webpage import page
         except ImportError:
-            page = lambda *args: args[1]
+            page = lambda * args: args[1]
         req.status = apache.HTTP_INTERNAL_SERVER_ERROR
         msg = "<p>This functionality is facing a temporary failure.</p>"
         msg += "<p>The administrator has been informed about the problem.</p>"
@@ -187,14 +187,20 @@ try:
     from invenio.bibknowledge_webinterface import WebInterfaceBibKnowledgePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBibKnowedgePages = WebInterfaceDumbPages
+    WebInterfaceBibKnowledgePages = WebInterfaceDumbPages
 
 try:
     from invenio.batchuploader_webinterface import \
          WebInterfaceBatchUploaderPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceDocumentationPages = WebInterfaceDumbPages
+    WebInterfaceBatchUploaderPages = WebInterfaceDumbPages
+
+try:
+    from invenio.bibauthorid_webinterface import WebInterfaceBibauthoridPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceBibauthoridPages = WebInterfaceDumbPages
 
 try:
     from invenio.bibsword_webinterface import \
@@ -202,6 +208,12 @@ try:
 except:
     register_exception(alert_admin=True, subject='EMERGENCE')
     WebInterfaceDocumentationPage = WebInterfaceDumbPages
+
+try:
+    from invenio.bibauthorid_webinterface import WebInterfaceBibauthoridPages
+except:
+    register_exception(alert_admin=True, subject='EMERGENCY')
+    WebInterfaceBibauthoridPages = WebInterfaceDumbPages
 
 if CFG_DEVEL_SITE:
     try:
@@ -240,7 +252,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'exporter',
         'kb',
         'batchuploader',
-        'bibsword'
+        'bibsword',
+        'person'
         ] + test_exports
 
     def __init__(self):
@@ -269,7 +282,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     kb = WebInterfaceBibKnowledgePages()
     batchuploader = WebInterfaceBatchUploaderPages()
     bibsword = WebInterfaceSword()
-
+    person = WebInterfaceBibauthoridPages()
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
 invenio_handler = create_handler(WebInterfaceInvenio())

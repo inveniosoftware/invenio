@@ -1,0 +1,234 @@
+/*
+ This file is part of Invenio.
+ Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+
+ Invenio is free software; you can redistribute it and / or
+ modify it under the terms of the GNU General Public License as
+ published by the Free Software Foundation; either version 2 of the
+ License, or (at your option) any later version.
+
+ Invenio is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ 59 Temple Place, Suite 330, Boston, MA 02111 - 1307, USA.
+*/
+
+#aid_person {
+    font-size: 12px;
+}
+
+#aid_person img {
+    background: none repeat scroll 0% 0% transparent; 
+    border: none;
+}
+
+#aid_person hr {
+    margin: 2em auto;
+    border: 1px solid #eee;
+    width: 90%;
+}
+
+#aid_message-overlay {
+    font-family:Arial,Helvetica,sans-serif;
+    position:fixed;
+    top:0px;
+    left:0px;
+    width:100%;
+    z-index:105;
+    color:#333;
+    text-align:center;
+    font-weight:bold;
+    font-size:100%;
+    color:white;
+    padding:5px 0px 5px 0px;
+    border:1px solid #99cc33;
+        background:#c2e085;
+    vertical-align:middle;
+
+}
+
+#aid_message-overlay span {
+    color: #333;
+    text-align: center;
+    width: 95%;
+    float:left;
+}
+
+.aid_close-notify {
+    white-space: nowrap;
+    float:right;
+    margin-right:10px;
+    color:#99cc33;
+    background:#DDFF97;
+    text-decoration:none;
+    border:1px #fff solid;
+    padding-left:3px;
+    padding-right:3px
+}
+
+.aid_close-notify a {
+    color: #333;
+}
+
+#aid_moreinfo {
+    background: #E6EEEE;
+    margin: 10px;
+    padding: 10px;
+}
+
+#aid_moreinfo .record_body {
+    font-size:9pt;
+}
+
+#aid_moreinfo .titlelink {
+    font-size:9pt;
+}
+
+#aid_moreinfo .authorlink {
+    font-size:9pt;
+}
+
+#aid_moreinfo ul li {
+    margin-top: 10px;
+}
+
+#aid_result0 {
+    background: #fff;
+    margin: 5px;
+    padding: 10px;
+}
+
+#aid_result1 {
+    background: #F0F0F6;
+    margin: 5px;
+    padding: 10px;
+}
+
+#aid_moreinfolink {
+    font-size:8pt;
+    text-decoration: None;
+}
+
+#aid_message-ribbon {
+	border:solid 1px #ccc;
+	background:#ABC8E2; margin: 10px 0;
+  	padding:10px;  
+}
+
+#aid_menu {
+    border-bottom: 2px solid #3366CC;
+    clear: both;
+    height: 1.4em;
+    padding: 0 0 4px;
+    position: relative;
+    width: 100%;
+    z-index: 5;
+    line-height: 2em;
+    font-size: 14px;
+}
+
+#aid_menu ul {
+    list-style: none outside none;
+    padding: 0 0 0 4px;
+}
+
+#aid_menu li {
+    background: url("list_sep_blue.gif") no-repeat scroll left center transparent;
+    display: block;
+    float: left;
+    height: 100%;
+    margin-right: 10px;
+    text-decoration: none;
+}
+
+#aid_menu a {
+    text-decoration: None;
+    color: #333;
+}
+
+#aid_menu a:active{
+    text-decoration: None;
+    color: #333;
+}
+
+#aid_menu a:hover{
+    text-decoration: underline;
+    color: #bbb;
+}
+
+#aid_menu a:visited{
+    text-decoration: None;
+    color: #333;
+}
+
+#aid_person_names {
+    margin: 30px 10px;
+}
+
+#aid_person_names ul {
+    list-style: none outside none;
+}
+
+#aid_person_names li {
+    height: 100%;
+    margin-right: 10px;
+    text-decoration: none;
+}
+
+.aid_lowlight_text {
+    color: #CCC;
+}
+
+#aid_status_details {
+    display:inline;
+    line-height: 1.2em;
+}
+
+#aid_status_details a {
+    text-decoration: None;
+    color: #333;
+}
+
+#aid_status_details a:active{
+    text-decoration: None;
+    color: #333;
+}
+
+#aid_status_details a:hover{
+    text-decoration: underline;
+    color: #bbb;
+}
+
+#aid_status_details a:visited{
+    text-decoration: None;
+    color: #333;
+}
+
+#aid_status_details img {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+/* Hack for some UI Themes since not always are these 2 classes included */
+.css_right {
+	float: right;
+}
+
+.css_left {
+	float: left;
+}
+
+/* Hack for the dataTables jQuery UI wrapper classes */
+.dataTables_wrapper {
+    clear: both;
+    min-height: 190px;
+    position: relative;
+}
+
+.paperstable { 
+    width: 100% !Important;
+}
