@@ -212,6 +212,7 @@ class Manager:
                                            self.curses.KEY_DOWN,
                                            self.curses.KEY_PPAGE,
                                            self.curses.KEY_NPAGE,
+                                           ord("g"), ord("G"),
                                            ord("q"), ord("Q"), ord("a"),
                                            ord("A"), ord("1"), ord("2"), ord("3"),
                                            ord("p"), ord("P"), ord("o"), ord("O"),
@@ -247,6 +248,12 @@ class Manager:
             elif chr == self.curses.KEY_HOME:
                 self.first_visible_line = 0
                 self.selected_line = 2
+            elif chr == ord("g"):
+                self.selected_line = 2
+                self.repaint()
+            elif chr == ord("G"):
+                self.selected_line = len(self.rows) + 1
+                self.repaint()
             elif chr in (ord("a"), ord("A")):
                 self.change_auto_mode()
             elif chr == ord("l"):
