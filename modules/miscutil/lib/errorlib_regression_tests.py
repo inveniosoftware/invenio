@@ -79,7 +79,7 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
             password = 'this password should not be visible'
             int('foo')
         except:
-            output = get_pretty_traceback(exc_info=sys.exc_info(), force_stack=True)
+            output = get_pretty_traceback(exc_info=sys.exc_info())
         self.failIf(password in output, output)
         self.failUnless('<*****>' in output, output)
 
@@ -90,7 +90,7 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
         try:
             connect(**kwargs)
         except:
-            output = get_pretty_traceback(exc_info=sys.exc_info(), force_stack=True)
+            output = get_pretty_traceback(exc_info=sys.exc_info())
         self.failIf('123' in output, output)
         self.failUnless('<*****>' in output, output)
 
@@ -105,7 +105,7 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
             }
             int(foo)
         except:
-            output = get_pretty_traceback(exc_info=sys.exc_info(), force_stack=True)
+            output = get_pretty_traceback(exc_info=sys.exc_info())
         self.failIf('1234' in output, output)
         self.failUnless('<*****>' in output, output)
 
