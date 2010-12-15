@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 ### This program is free software; you can redistribute it and/or modify
 ### it under the terms of the GNU General Public License as published by
@@ -11,51 +12,90 @@
 ### You should have received a copy of the GNU General Public License
 ### along with this program; if not, write to the Free Software
 ### Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-### Copyright 2007-2008 Dag Wieers <dag@wieers.com>
+### Copyright 2007-2010 Dag Wieers <dag@wieers.com>
 
-import getopt
-import sys
-import os
-import time
+import getopt, sys, os, glob, time, socket, subprocess
 
-global unopath
+global convertor, oobin, oobinpath, oolibpath, ooproc
 
 ### The first thing we ought to do is find a suitable OpenOffice installation
 ### with a compatible pyuno library that we can import.
-### BEG Invenio customizations
-#extrapaths = glob.glob('/usr/lib*/openoffice*/program') + \
-             #glob.glob('/usr/lib*/ooo*/program') + \
-             #glob.glob('/opt/openoffice*/program') + \
-             #glob.glob('C:\\Program Files\\OpenOffice.org *\\program\\') + \
-             #[ '/Applications/NeoOffice.app/Contents/program', '/usr/bin' ]
-#for unopath in extrapaths:
-    #if os.path.exists(os.path.join(unopath, "pyuno.so")):
-        #filename = "pyuno.so"
-    #elif os.path.exists(os.path.join(unopath, "pyuno.dll")):
-        #filename = "pyuno.dll"
-    #else:
-        #continue
-    #sys.path.append(unopath)
-    #try:
-        #import uno, unohelper
-        #break
-    #except ImportError, e:
-        #sys.path.remove(unopath)
-        #print >>sys.stderr, e
-        #print >>sys.stderr, "WARNING: We found %s in %s, but could not import it." % (filename, unopath)
-        #continue
-#else:
-    #print >>sys.stderr, "unoconv: Cannot find the pyuno.so library in sys.path and known paths."
-    #print >>sys.stderr, "ERROR: Please locate this library and send your feedback to: <tools@lists.rpmforge.net>."
-    #sys.exit(1)
+extrapaths = glob.glob('/usr/lib*/openoffice*/program') + \
+             glob.glob('/usr/lib*/openoffice*/basis*/program') + \
+             glob.glob('/usr/lib*/ooo*/program') + \
+             glob.glob('/usr/lib*/ooo*/basis*/program') + \
+             glob.glob('/usr/local/openoffice*/program') + \
+             glob.glob('/usr/local/openoffice*/basis*/program') + \
+             glob.glob('/usr/local/ooo*/program') + \
+             glob.glob('/usr/local/ooo*/basis*/program') + \
+             glob.glob('/opt/openoffice*/program') + \
+             glob.glob('/opt/openoffice*/basis*/program') + \
+             glob.glob('/Applications/OpenOffice.org.app/Contents/program') + \
+             glob.glob('/Applications/OpenOffice.org.app/Contents/basis-link/program') + \
+             glob.glob('/Applications/NeoOffice.app/Contents/program') + \
+             glob.glob('/Applications/NeoOffice.app/Contents/basis-link/program') + \
+             glob.glob('/usr/bin') + \
+             glob.glob('/usr/local/bin') + \
+             glob.glob('/opt/bin')
 
-#### Export an environment that OpenOffice is pleased to work with
-#os.environ['LD_LIBRARY_PATH'] = '%s' % unopath
-#os.environ['PATH'] = '%s:' % unopath + os.environ['PATH']
+if 'ProgramFiles' in os.environ.keys():
+    extrapaths += glob.glob(os.environ['ProgramFiles']+'\\OpenOffice.org*\\URE\\bin') + \
+                  glob.glob(os.environ['ProgramFiles']+'\\OpenOffice.org*\\program') + \
+                  glob.glob(os.environ['ProgramFiles']+'\\OpenOffice.org*\\Basis*\\program')
 
-import uno, unohelper
-### END Invenio customizations
+if 'ProgramFiles(x86)' in os.environ.keys():
+    extrapaths += glob.glob(os.environ['ProgramFiles(x86)']+'\\OpenOffice.org*\\URE\\bin') + \
+                  glob.glob(os.environ['ProgramFiles(x86)']+'\\OpenOffice.org*\\program') + \
+                  glob.glob(os.environ['ProgramFiles(x86)']+'\\OpenOffice.org*\\Basis*\\program')
 
+binaries = ( 'soffice.bin', 'soffice', 'soffice.exe' )
+
+try:
+    import uno, unohelper
+except ImportError:
+    for oolibpath in extrapaths:
+        if os.path.exists(os.path.join(oolibpath, "pyuno.so")):
+            filename = "pyuno.so"
+        elif os.path.exists(os.path.join(oolibpath, "pyuno.pyd")):
+            filename = "pyuno.pyd"
+        else:
+            continue
+        try:
+            sys.path.append(oolibpath)
+            import uno, unohelper
+            ### Export an environment that OpenOffice is pleased to work with
+            if 'LD_LIBRARY_PATH' in os.environ:
+                os.environ['LD_LIBRARY_PATH'] = oolibpath + os.pathsep + os.environ['LD_LIBRARY_PATH']
+            else:
+                os.environ['LD_LIBRARY_PATH'] = oolibpath
+            break
+        except ImportError, e:
+            sys.path.remove(oolibpath)
+            print >>sys.stderr, e
+            print >>sys.stderr, "WARNING: Found %s in %s, but could not import it." % (filename, oolibpath)
+            continue
+    else:
+        print >>sys.stderr, "unoconv: Cannot find the pyuno library in sys.path and known paths."
+        print >>sys.stderr, "ERROR: Please locate this library and send your feedback to: <tools@lists.rpmforge.net>."
+        sys.exit(1)
+
+oobin = None
+for oobinpath in extrapaths:
+    for binary in binaries:
+        bin = os.path.join(oobinpath, binary)
+        if os.path.exists(bin):
+            sys.path.append(oobinpath)
+            oobin = bin
+            break
+    if oobin:
+        break
+else:
+    print >>sys.stderr, "unoconv: Cannot find the soffice binary in sys.path and known paths."
+    print >>sys.stderr, "ERROR: Please locate this binary and send your feedback to: <tools@lists.rpmforge.net>."
+    sys.exit(1)
+
+### Export an environment that OpenOffice is pleased to work with
+os.environ['PATH'] = oobinpath + os.pathsep + os.environ['PATH']
 
 ### Now that we have found a working pyuno library, let's import some classes
 from com.sun.star.beans import PropertyValue
@@ -68,11 +108,11 @@ from com.sun.star.uno import Exception as UnoException
 __version__ = "$Revision$"
 # $Source$
 
-VERSION = '0.3svn'
+VERSION = '0.4svn'
 
 doctypes = ('document', 'graphics', 'presentation', 'spreadsheet')
 
-oopid = None
+ooproc = None
 exitcode = 0
 
 class Fmt:
@@ -106,7 +146,7 @@ class FmtList:
     def byextension(self, extension):
         ret = []
         for fmt in self.list:
-            if '.'+fmt.extension == extension:
+            if os.extsep + fmt.extension == extension:
                 ret.append(fmt)
         return ret
 
@@ -139,154 +179,180 @@ class OutputStream( unohelper.Base, XOutputStream ):
 
 fmts = FmtList()
 
-### Document / Writer
-fmts.add('document', 'bib', 'bib', 'BibTeX', 'BibTeX_Writer')
-fmts.add('document', 'doc', 'doc', 'Microsoft Word 97/2000/XP', 'MS Word 97')
-fmts.add('document', 'doc6', 'doc', 'Microsoft Word 6.0', 'MS WinWord 6.0')
-fmts.add('document', 'doc95', 'doc', 'Microsoft Word 95', 'MS Word 95')
-fmts.add('document', 'docbook', 'xml', 'DocBook', 'DocBook File')
-fmts.add('document', 'html', 'html', 'HTML Document (OpenOffice.org Writer)', 'HTML (StarWriter)')
-fmts.add('document', 'odt', 'odt', 'Open Document Text', 'writer8')
-fmts.add('document', 'ott', 'ott', 'Open Document Text', 'writer8_template')
-fmts.add('document', 'ooxml', 'xml', 'Microsoft Office Open XML', 'MS Word 2003 XML')
-fmts.add('document', 'pdb', 'pdb', 'AportisDoc (Palm)', 'AportisDoc Palm DB')
-fmts.add('document', 'pdf', 'pdf', 'Portable Document Format', 'writer_pdf_Export')
-fmts.add('document', 'psw', 'psw', 'Pocket Word', 'PocketWord File')
-fmts.add('document', 'rtf', 'rtf', 'Rich Text Format', 'Rich Text Format')
-fmts.add('document', 'latex', 'ltx', 'LaTeX 2e', 'LaTeX_Writer')
-fmts.add('document', 'sdw', 'sdw', 'StarWriter 5.0', 'StarWriter 5.0')
-fmts.add('document', 'sdw4', 'sdw', 'StarWriter 4.0', 'StarWriter 4.0')
-fmts.add('document', 'sdw3', 'sdw', 'StarWriter 3.0', 'StarWriter 3.0')
-fmts.add('document', 'stw', 'stw', 'Open Office.org 1.0 Text Document Template', 'writer_StarOffice_XML_Writer_Template')
-fmts.add('document', 'sxw', 'sxw', 'Open Office.org 1.0 Text Document', 'StarOffice XML (Writer)')
-fmts.add('document', 'text', 'txt', 'Text Encoded', 'Text (encoded)')
-fmts.add('document', 'mediawiki', 'txt', 'Mediawiki', 'Mediawiki')
-fmts.add('document', 'txt', 'txt', 'Plain Text', 'Text')
-fmts.add('document', 'vor', 'vor', 'StarWriter 5.0 Template', 'StarWriter 5.0 Vorlage/Template')
-fmts.add('document', 'vor4', 'vor', 'StarWriter 4.0 Template', 'StarWriter 4.0 Vorlage/Template')
-fmts.add('document', 'vor3', 'vor', 'StarWriter 3.0 Template', 'StarWriter 3.0 Vorlage/Template')
-fmts.add('document', 'xhtml', 'html', 'XHTML Document', 'XHTML Writer File')
+#oFF = createUnoService( "com.sun.star.document.FilterFactory" )
+#oFilterNames = oFF.getElementNames()
+
+### TextDocument
+fmts.add('document', 'bib', 'bib', 'BibTeX', 'BibTeX_Writer') ### 22
+fmts.add('document', 'doc', 'doc', 'Microsoft Word 97/2000/XP', 'MS Word 97') ### 29
+fmts.add('document', 'doc6', 'doc', 'Microsoft Word 6.0', 'MS WinWord 6.0') ### 24
+fmts.add('document', 'doc95', 'doc', 'Microsoft Word 95', 'MS Word 95') ### 28
+fmts.add('document', 'docbook', 'xml', 'DocBook', 'DocBook File') ### 39
+fmts.add('document', 'html', 'html', 'HTML Document (OpenOffice.org Writer)', 'HTML (StarWriter)') ### 3
+fmts.add('document', 'odt', 'odt', 'ODF Text Document', 'writer8') ### 10
+fmts.add('document', 'ott', 'ott', 'Open Document Text', 'writer8_template') ### 21
+fmts.add('document', 'ooxml', 'xml', 'Microsoft Office Open XML', 'MS Word 2003 XML') ### 11
+#fmts.add('document', 'pdb', 'pdb', 'AportisDoc (Palm)', 'AportisDoc Palm DB')
+fmts.add('document', 'pdf', 'pdf', 'Portable Document Format', 'writer_pdf_Export') ### 18
+#fmts.add('document', 'psw', 'psw', 'Pocket Word', 'PocketWord File')
+fmts.add('document', 'rtf', 'rtf', 'Rich Text Format', 'Rich Text Format') ### 16
+fmts.add('document', 'latex', 'ltx', 'LaTeX 2e', 'LaTeX_Writer') ### 31
+fmts.add('document', 'sdw', 'sdw', 'StarWriter 5.0', 'StarWriter 5.0') ### 23
+fmts.add('document', 'sdw4', 'sdw', 'StarWriter 4.0', 'StarWriter 4.0') ### 2
+fmts.add('document', 'sdw3', 'sdw', 'StarWriter 3.0', 'StarWriter 3.0') ### 20
+fmts.add('document', 'stw', 'stw', 'Open Office.org 1.0 Text Document Template', 'writer_StarOffice_XML_Writer_Template') ### 9
+fmts.add('document', 'sxw', 'sxw', 'Open Office.org 1.0 Text Document', 'StarOffice XML (Writer)') ### 1
+fmts.add('document', 'text', 'txt', 'Text Encoded', 'Text (encoded)') ### 26
+fmts.add('document', 'mediawiki', 'txt', 'MediaWiki', 'MediaWiki')
+fmts.add('document', 'txt', 'txt', 'Text', 'Text') ### 34
+fmts.add('document', 'uot', 'uot', 'Unified Office Format text','UOF text') ### 27
+fmts.add('document', 'vor', 'vor', 'StarWriter 5.0 Template', 'StarWriter 5.0 Vorlage/Template') ### 6
+fmts.add('document', 'vor4', 'vor', 'StarWriter 4.0 Template', 'StarWriter 4.0 Vorlage/Template') ### 5
+fmts.add('document', 'vor3', 'vor', 'StarWriter 3.0 Template', 'StarWriter 3.0 Vorlage/Template') ### 4
+fmts.add('document', 'xhtml', 'html', 'XHTML Document', 'XHTML Writer File') ### 33
+
+### WebDocument
+fmts.add('web', 'html', 'html', 'HTML Document', 'HTML') ### 2
+fmts.add('web', 'sdw3', 'sdw', 'StarWriter 3.0 (OpenOffice.org Writer/Web)', 'StarWriter 3.0 (StarWriter/Web)') ### 3
+fmts.add('web', 'sdw4', 'sdw', 'StarWriter 4.0 (OpenOffice.org Writer/Web)', 'StarWriter 4.0 (StarWriter/Web)') ### 4
+fmts.add('web', 'sdw', 'sdw', 'StarWriter 5.0 (OpenOffice.org Writer/Web)', 'StarWriter 5.0 (StarWriter/Web)') ### 5
+fmts.add('web', 'vor4', 'vor', 'StarWriter/Web 4.0 Template', 'StarWriter/Web 4.0 Vorlage/Template') ### 6
+fmts.add('web', 'vor', 'vor', 'StarWriter/Web 5.0 Template', 'StarWriter/Web 5.0 Vorlage/Template') ### 7
+fmts.add('web', 'text', 'txt', 'Text (OpenOffice.org Writer/Web)', 'Text (StarWriter/Web)') ### 8
+fmts.add('web', 'mediawiki', 'txt', 'MediaWiki', 'MediaWiki_Web') ### 9
+fmts.add('web', 'pdf', 'pdf', 'PDF - Portable Document Format', 'writer_web_pdf_Export') ### 10
+fmts.add('web', 'html10', 'html', 'OpenOffice.org 1.0 HTML Template', 'writer_web_StarOffice_XML_Writer_Web_Template') ### 11
+fmts.add('web', 'txt', 'txt', 'OpenOffice.org Text (OpenOffice.org Writer/Web)', 'writerweb8_writer') ### 12
+fmts.add('web', 'html', 'html', 'HTML Document Template', 'writerweb8_writer_template') ### 13
+fmts.add('web', 'etext', 'txt', 'Text Encoded (OpenOffice.org Writer/Web)', 'Text (encoded) (StarWriter/Web)') ### 14
+fmts.add('web', 'text10', 'txt', 'OpenOffice.org 1.0 Text Document (OpenOffice.org Writer/Web)', 'writer_web_StarOffice_XML_Writer') ### 15
 
 ### Spreadsheet
-fmts.add('spreadsheet', 'csv', 'csv', 'Text CSV', 'Text - txt - csv (StarCalc)')
-fmts.add('spreadsheet', 'dbf', 'dbf', 'dBase', 'dBase')
-fmts.add('spreadsheet', 'dif', 'dif', 'Data Interchange Format', 'DIF')
-fmts.add('spreadsheet', 'html', 'html', 'HTML Document (OpenOffice.org Calc)', 'HTML (StarCalc)')
-fmts.add('spreadsheet', 'ods', 'ods', 'Open Document Spreadsheet', 'calc8')
-fmts.add('spreadsheet', 'ooxml', 'xml', 'Microsoft Excel 2003 XML', 'MS Excel 2003 XML')
-fmts.add('spreadsheet', 'pdf', 'pdf', 'Portable Document Format', 'calc_pdf_Export')
-fmts.add('spreadsheet', 'pts', 'pts', 'OpenDocument Spreadsheet Template', 'calc8_template')
-fmts.add('spreadsheet', 'pxl', 'pxl', 'Pocket Excel', 'Pocket Excel')
-fmts.add('spreadsheet', 'sdc', 'sdc', 'StarCalc 5.0', 'StarCalc 5.0')
-fmts.add('spreadsheet', 'sdc4', 'sdc', 'StarCalc 4.0', 'StarCalc 4.0')
-fmts.add('spreadsheet', 'sdc3', 'sdc', 'StarCalc 3.0', 'StarCalc 3.0')
-fmts.add('spreadsheet', 'slk', 'slk', 'SYLK', 'SYLK')
-fmts.add('spreadsheet', 'stc', 'stc', 'OpenOffice.org 1.0 Spreadsheet Template', 'calc_StarOffice_XML_Calc_Template')
-fmts.add('spreadsheet', 'sxc', 'sxc', 'OpenOffice.org 1.0 Spreadsheet', 'StarOffice XML (Calc)')
-fmts.add('spreadsheet', 'vor3', 'vor', 'StarCalc 3.0 Template', 'StarCalc 3.0 Vorlage/Template')
-fmts.add('spreadsheet', 'vor4', 'vor', 'StarCalc 4.0 Template', 'StarCalc 4.0 Vorlage/Template')
-fmts.add('spreadsheet', 'vor', 'vor', 'StarCalc 5.0 Template', 'StarCalc 5.0 Vorlage/Template')
-fmts.add('spreadsheet', 'xhtml', 'xhtml', 'XHTML', 'XHTML Calc File')
-fmts.add('spreadsheet', 'xls', 'xls', 'Microsoft Excel 97/2000/XP', 'MS Excel 97')
-fmts.add('spreadsheet', 'xls5', 'xls', 'Microsoft Excel 5.0', 'MS Excel 5.0/95')
-fmts.add('spreadsheet', 'xls95', 'xls', 'Microsoft Excel 95', 'MS Excel 95')
-fmts.add('spreadsheet', 'xlt', 'xlt', 'Microsoft Excel 97/2000/XP Template', 'MS Excel 97 Vorlage/Template')
-fmts.add('spreadsheet', 'xlt5', 'xlt', 'Microsoft Excel 5.0 Template', 'MS Excel 5.0/95 Vorlage/Template')
-fmts.add('spreadsheet', 'xlt95', 'xlt', 'Microsoft Excel 95 Template', 'MS Excel 95 Vorlage/Template')
+fmts.add('spreadsheet', 'csv', 'csv', 'Text CSV', 'Text - txt - csv (StarCalc)') ### 16
+fmts.add('spreadsheet', 'dbf', 'dbf', 'dBASE', 'dBase') ### 22
+fmts.add('spreadsheet', 'dif', 'dif', 'Data Interchange Format', 'DIF') ### 5
+fmts.add('spreadsheet', 'html', 'html', 'HTML Document (OpenOffice.org Calc)', 'HTML (StarCalc)') ### 7
+fmts.add('spreadsheet', 'ods', 'ods', 'ODF Spreadsheet', 'calc8') ### 15
+fmts.add('spreadsheet', 'ooxml', 'xml', 'Microsoft Excel 2003 XML', 'MS Excel 2003 XML') ### 23
+fmts.add('spreadsheet', 'ots', 'ots', 'ODF Spreadsheet Template', 'calc8_template') ### 14
+fmts.add('spreadsheet', 'pdf', 'pdf', 'Portable Document Format', 'calc_pdf_Export') ### 34
+#fmts.add('spreadsheet', 'pxl', 'pxl', 'Pocket Excel', 'Pocket Excel')
+fmts.add('spreadsheet', 'sdc', 'sdc', 'StarCalc 5.0', 'StarCalc 5.0') ### 31
+fmts.add('spreadsheet', 'sdc4', 'sdc', 'StarCalc 4.0', 'StarCalc 4.0') ### 11
+fmts.add('spreadsheet', 'sdc3', 'sdc', 'StarCalc 3.0', 'StarCalc 3.0') ### 29
+fmts.add('spreadsheet', 'slk', 'slk', 'SYLK', 'SYLK') ### 35
+fmts.add('spreadsheet', 'stc', 'stc', 'OpenOffice.org 1.0 Spreadsheet Template', 'calc_StarOffice_XML_Calc_Template') ### 2
+fmts.add('spreadsheet', 'sxc', 'sxc', 'OpenOffice.org 1.0 Spreadsheet', 'StarOffice XML (Calc)') ### 3
+fmts.add('spreadsheet', 'uos', 'uos', 'Unified Office Format spreadsheet', 'UOF spreadsheet') ### 9
+fmts.add('spreadsheet', 'vor3', 'vor', 'StarCalc 3.0 Template', 'StarCalc 3.0 Vorlage/Template') ### 18
+fmts.add('spreadsheet', 'vor4', 'vor', 'StarCalc 4.0 Template', 'StarCalc 4.0 Vorlage/Template') ### 19
+fmts.add('spreadsheet', 'vor', 'vor', 'StarCalc 5.0 Template', 'StarCalc 5.0 Vorlage/Template') ### 20
+fmts.add('spreadsheet', 'xhtml', 'xhtml', 'XHTML', 'XHTML Calc File') ### 26
+fmts.add('spreadsheet', 'xls', 'xls', 'Microsoft Excel 97/2000/XP', 'MS Excel 97') ### 12
+fmts.add('spreadsheet', 'xls5', 'xls', 'Microsoft Excel 5.0', 'MS Excel 5.0/95') ### 8
+fmts.add('spreadsheet', 'xls95', 'xls', 'Microsoft Excel 95', 'MS Excel 95') ### 10
+fmts.add('spreadsheet', 'xlt', 'xlt', 'Microsoft Excel 97/2000/XP Template', 'MS Excel 97 Vorlage/Template') ### 6
+fmts.add('spreadsheet', 'xlt5', 'xlt', 'Microsoft Excel 5.0 Template', 'MS Excel 5.0/95 Vorlage/Template') ### 28
+fmts.add('spreadsheet', 'xlt95', 'xlt', 'Microsoft Excel 95 Template', 'MS Excel 95 Vorlage/Template') ### 21
 
 ### Graphics
-fmts.add('graphics', 'bmp', 'bmp', 'Windows Bitmap', 'draw_bmp_Export')
-fmts.add('graphics', 'emf', 'emf', 'Enhanced Metafile', 'draw_emf_Export')
-fmts.add('graphics', 'eps', 'eps', 'Encapsulated PostScript', 'draw_eps_Export')
-fmts.add('graphics', 'gif', 'gif', 'Graphics Interchange Format', 'draw_gif_Export')
-fmts.add('graphics', 'html', 'html', 'HTML Document (OpenOffice.org Draw)', 'draw_html_Export')
-fmts.add('graphics', 'jpg', 'jpg', 'Joint Photographic Experts Group', 'draw_jpg_Export')
-fmts.add('graphics', 'met', 'met', 'OS/2 Metafile', 'draw_met_Export')
-fmts.add('graphics', 'odd', 'odd', 'OpenDocument Drawing', 'draw8')
-fmts.add('graphics', 'otg', 'otg', 'OpenDocument Drawing Template', 'draw8_template')
-fmts.add('graphics', 'pbm', 'pbm', 'Portable Bitmap', 'draw_pbm_Export')
-fmts.add('graphics', 'pct', 'pct', 'Mac Pict', 'draw_pct_Export')
-fmts.add('graphics', 'pdf', 'pdf', 'Portable Document Format', 'draw_pdf_Export')
-fmts.add('graphics', 'pgm', 'pgm', 'Portable Graymap', 'draw_pgm_Export')
-fmts.add('graphics', 'png', 'png', 'Portable Network Graphic', 'draw_png_Export')
-fmts.add('graphics', 'ppm', 'ppm', 'Portable Pixelmap', 'draw_ppm_Export')
-fmts.add('graphics', 'ras', 'ras', 'Sun Raster Image', 'draw_ras_Export')
-fmts.add('graphics', 'std', 'std', 'OpenOffice.org 1.0 Drawing Template', 'draw_StarOffice_XML_Draw_Template')
-fmts.add('graphics', 'svg', 'svg', 'Scalable Vector Graphics', 'draw_svg_Export')
-fmts.add('graphics', 'svm', 'svm', 'StarView Metafile', 'draw_svm_Export')
-fmts.add('graphics', 'swf', 'swf', 'Macromedia Flash (SWF)', 'draw_flash_Export')
-fmts.add('graphics', 'sxd', 'sxd', 'OpenOffice.org 1.0 Drawing', 'StarOffice XML (Draw)')
-fmts.add('graphics', 'sxd3', 'sxd', 'StarDraw 3.0', 'StarDraw 3.0')
-fmts.add('graphics', 'sxd5', 'sxd', 'StarDraw 5.0', 'StarDraw 5.0')
-fmts.add('graphics', 'tiff', 'tiff', 'Tagged Image File Format', 'draw_tif_Export')
-fmts.add('graphics', 'vor', 'vor', 'StarDraw 5.0 Template', 'StarDraw 5.0 Vorlage')
-fmts.add('graphics', 'vor3', 'vor', 'StarDraw 3.0 Template', 'StarDraw 3.0 Vorlage')
-fmts.add('graphics', 'wmf', 'wmf', 'Windows Metafile', 'draw_wmf_Export')
-fmts.add('graphics', 'xhtml', 'xhtml', 'XHTML', 'XHTML Draw File')
-fmts.add('graphics', 'xpm', 'xpm', 'X PixMap', 'draw_xpm_Export')
+fmts.add('graphics', 'bmp', 'bmp', 'Windows Bitmap', 'draw_bmp_Export') ### 21
+fmts.add('graphics', 'emf', 'emf', 'Enhanced Metafile', 'draw_emf_Export') ### 15
+fmts.add('graphics', 'eps', 'eps', 'Encapsulated PostScript', 'draw_eps_Export') ### 48
+fmts.add('graphics', 'gif', 'gif', 'Graphics Interchange Format', 'draw_gif_Export') ### 30
+fmts.add('graphics', 'html', 'html', 'HTML Document (OpenOffice.org Draw)', 'draw_html_Export') ### 37
+fmts.add('graphics', 'jpg', 'jpg', 'Joint Photographic Experts Group', 'draw_jpg_Export') ### 3
+fmts.add('graphics', 'met', 'met', 'OS/2 Metafile', 'draw_met_Export') ### 43
+fmts.add('graphics', 'odd', 'odd', 'OpenDocument Drawing', 'draw8') ### 6
+fmts.add('graphics', 'otg', 'otg', 'OpenDocument Drawing Template', 'draw8_template') ### 20
+fmts.add('graphics', 'pbm', 'pbm', 'Portable Bitmap', 'draw_pbm_Export') ### 14
+fmts.add('graphics', 'pct', 'pct', 'Mac Pict', 'draw_pct_Export') ### 41
+fmts.add('graphics', 'pdf', 'pdf', 'Portable Document Format', 'draw_pdf_Export') ### 28
+fmts.add('graphics', 'pgm', 'pgm', 'Portable Graymap', 'draw_pgm_Export') ### 11
+fmts.add('graphics', 'png', 'png', 'Portable Network Graphic', 'draw_png_Export') ### 2
+fmts.add('graphics', 'ppm', 'ppm', 'Portable Pixelmap', 'draw_ppm_Export') ### 5
+fmts.add('graphics', 'ras', 'ras', 'Sun Raster Image', 'draw_ras_Export') ## 31
+fmts.add('graphics', 'std', 'std', 'OpenOffice.org 1.0 Drawing Template', 'draw_StarOffice_XML_Draw_Template') ### 53
+fmts.add('graphics', 'svg', 'svg', 'Scalable Vector Graphics', 'draw_svg_Export') ### 50
+fmts.add('graphics', 'svm', 'svm', 'StarView Metafile', 'draw_svm_Export') ### 55
+fmts.add('graphics', 'swf', 'swf', 'Macromedia Flash (SWF)', 'draw_flash_Export') ### 23
+fmts.add('graphics', 'sxd', 'sxd', 'OpenOffice.org 1.0 Drawing', 'StarOffice XML (Draw)') ### 26
+fmts.add('graphics', 'sxd3', 'sxd', 'StarDraw 3.0', 'StarDraw 3.0') ### 40
+fmts.add('graphics', 'sxd5', 'sxd', 'StarDraw 5.0', 'StarDraw 5.0') ### 44
+fmts.add('graphics', 'tiff', 'tiff', 'Tagged Image File Format', 'draw_tif_Export') ### 13
+fmts.add('graphics', 'vor', 'vor', 'StarDraw 5.0 Template', 'StarDraw 5.0 Vorlage') ### 36
+fmts.add('graphics', 'vor3', 'vor', 'StarDraw 3.0 Template', 'StarDraw 3.0 Vorlage') ### 35
+fmts.add('graphics', 'wmf', 'wmf', 'Windows Metafile', 'draw_wmf_Export') ### 8
+fmts.add('graphics', 'xhtml', 'xhtml', 'XHTML', 'XHTML Draw File') ### 45
+fmts.add('graphics', 'xpm', 'xpm', 'X PixMap', 'draw_xpm_Export') ### 19
 
 ### Presentation
-fmts.add('presentation', 'bmp', 'bmp', 'Windows Bitmap', 'impress_bmp_Export')
-fmts.add('presentation', 'emf', 'emf', 'Enhanced Metafile', 'impress_emf_Export')
-fmts.add('presentation', 'eps', 'eps', 'Encapsulated PostScript', 'impress_eps_Export')
-fmts.add('presentation', 'gif', 'gif', 'Graphics Interchange Format', 'impress_gif_Export')
-fmts.add('presentation', 'html', 'html', 'HTML Document (OpenOffice.org Impress)', 'impress_html_Export')
-fmts.add('presentation', 'jpg', 'jpg', 'Joint Photographic Experts Group', 'impress_jpg_Export')
-fmts.add('presentation', 'met', 'met', 'OS/2 Metafile', 'impress_met_Export')
-fmts.add('presentation', 'odd', 'odd', 'OpenDocument Drawing (Impress)', 'impress8_draw')
-fmts.add('presentation', 'odg', 'odg', 'OpenOffice.org 1.0 Drawing (OpenOffice.org Impress)', 'impress_StarOffice_XML_Draw')
-fmts.add('presentation', 'odp', 'odp', 'OpenDocument Presentation', 'impress8')
-fmts.add('presentation', 'pbm', 'pbm', 'Portable Bitmap', 'impress_pbm_Export')
-fmts.add('presentation', 'pct', 'pct', 'Mac Pict', 'impress_pct_Export')
-fmts.add('presentation', 'pdf', 'pdf', 'Portable Document Format', 'impress_pdf_Export')
-fmts.add('presentation', 'pgm', 'pgm', 'Portable Graymap', 'impress_pgm_Export')
-fmts.add('presentation', 'png', 'png', 'Portable Network Graphic', 'impress_png_Export')
-fmts.add('presentation', 'pot', 'pot', 'Microsoft PowerPoint 97/2000/XP Template', 'MS PowerPoint 97 Vorlage')
-fmts.add('presentation', 'ppm', 'ppm', 'Portable Pixelmap', 'impress_ppm_Export')
-fmts.add('presentation', 'ppt', 'ppt', 'Microsoft PowerPoint 97/2000/XP', 'MS PowerPoint 97')
-fmts.add('presentation', 'pwp', 'pwp', 'PlaceWare', 'placeware_Export')
-fmts.add('presentation', 'ras', 'ras', 'Sun Raster Image', 'impress_ras_Export')
-fmts.add('presentation', 'sda', 'sda', 'StarDraw 5.0 (OpenOffice.org Impress)', 'StarDraw 5.0 (StarImpress)')
-fmts.add('presentation', 'sdd', 'sdd', 'StarImpress 5.0', 'StarImpress 5.0')
-fmts.add('presentation', 'sdd3', 'sdd', 'StarDraw 3.0 (OpenOffice.org Impress)', 'StarDraw 3.0 (StarImpress)')
-fmts.add('presentation', 'sdd4', 'sdd', 'StarImpress 4.0', 'StarImpress 4.0')
-fmts.add('presentation', 'sti', 'sti', 'OpenOffice.org 1.0 Presentation Template', 'impress_StarOffice_XML_Impress_Template')
-fmts.add('presentation', 'stp', 'stp', 'OpenDocument Presentation Template', 'impress8_template')
-fmts.add('presentation', 'svg', 'svg', 'Scalable Vector Graphics', 'impress_svg_Export')
-fmts.add('presentation', 'svm', 'svm', 'StarView Metafile', 'impress_svm_Export')
-fmts.add('presentation', 'swf', 'swf', 'Macromedia Flash (SWF)', 'impress_flash_Export')
-fmts.add('presentation', 'sxi', 'sxi', 'OpenOffice.org 1.0 Presentation', 'StarOffice XML (Impress)')
-fmts.add('presentation', 'tiff', 'tiff', 'Tagged Image File Format', 'impress_tif_Export')
-fmts.add('presentation', 'vor', 'vor', 'StarImpress 5.0 Template', 'StarImpress 5.0 Vorlage')
-fmts.add('presentation', 'vor3', 'vor', 'StarDraw 3.0 Template (OpenOffice.org Impress)', 'StarDraw 3.0 Vorlage (StarImpress)')
-fmts.add('presentation', 'vor4', 'vor', 'StarImpress 4.0 Template', 'StarImpress 4.0 Vorlage')
-fmts.add('presentation', 'vor5', 'vor', 'StarDraw 5.0 Template (OpenOffice.org Impress)', 'StarDraw 5.0 Vorlage (StarImpress)')
-fmts.add('presentation', 'wmf', 'wmf', 'Windows Metafile', 'impress_wmf_Export')
-fmts.add('presentation', 'xhtml', 'xml', 'XHTML', 'XHTML Impress File')
-fmts.add('presentation', 'xpm', 'xpm', 'X PixMap', 'impress_xpm_Export')
+fmts.add('presentation', 'bmp', 'bmp', 'Windows Bitmap', 'impress_bmp_Export') ### 15
+fmts.add('presentation', 'emf', 'emf', 'Enhanced Metafile', 'impress_emf_Export') ### 16
+fmts.add('presentation', 'eps', 'eps', 'Encapsulated PostScript', 'impress_eps_Export') ### 17
+fmts.add('presentation', 'gif', 'gif', 'Graphics Interchange Format', 'impress_gif_Export') ### 18
+fmts.add('presentation', 'html', 'html', 'HTML Document (OpenOffice.org Impress)', 'impress_html_Export') ### 43
+fmts.add('presentation', 'jpg', 'jpg', 'Joint Photographic Experts Group', 'impress_jpg_Export') ### 19
+fmts.add('presentation', 'met', 'met', 'OS/2 Metafile', 'impress_met_Export') ### 20
+fmts.add('presentation', 'odg', 'odg', 'ODF Drawing (Impress)', 'impress8_draw') ### 29
+fmts.add('presentation', 'odp', 'odp', 'ODF Presentation', 'impress8') ### 9
+fmts.add('presentation', 'otp', 'otp', 'ODF Presentation Template', 'impress8_template') ### 38
+fmts.add('presentation', 'pbm', 'pbm', 'Portable Bitmap', 'impress_pbm_Export') ### 21
+fmts.add('presentation', 'pct', 'pct', 'Mac Pict', 'impress_pct_Export') ### 22
+fmts.add('presentation', 'pdf', 'pdf', 'Portable Document Format', 'impress_pdf_Export') ### 23
+fmts.add('presentation', 'pgm', 'pgm', 'Portable Graymap', 'impress_pgm_Export') ### 24
+fmts.add('presentation', 'png', 'png', 'Portable Network Graphic', 'impress_png_Export') ### 25
+fmts.add('presentation', 'pot', 'pot', 'Microsoft PowerPoint 97/2000/XP Template', 'MS PowerPoint 97 Vorlage') ### 3
+fmts.add('presentation', 'ppm', 'ppm', 'Portable Pixelmap', 'impress_ppm_Export') ### 26
+fmts.add('presentation', 'ppt', 'ppt', 'Microsoft PowerPoint 97/2000/XP', 'MS PowerPoint 97') ### 36
+fmts.add('presentation', 'pwp', 'pwp', 'PlaceWare', 'placeware_Export') ### 30
+fmts.add('presentation', 'ras', 'ras', 'Sun Raster Image', 'impress_ras_Export') ### 27
+fmts.add('presentation', 'sda', 'sda', 'StarDraw 5.0 (OpenOffice.org Impress)', 'StarDraw 5.0 (StarImpress)') ### 8
+fmts.add('presentation', 'sdd', 'sdd', 'StarImpress 5.0', 'StarImpress 5.0') ### 6
+fmts.add('presentation', 'sdd3', 'sdd', 'StarDraw 3.0 (OpenOffice.org Impress)', 'StarDraw 3.0 (StarImpress)') ### 42
+fmts.add('presentation', 'sdd4', 'sdd', 'StarImpress 4.0', 'StarImpress 4.0') ### 37
+fmts.add('presentation', 'sxd', 'sxd', 'OpenOffice.org 1.0 Drawing (OpenOffice.org Impress)', 'impress_StarOffice_XML_Draw') ### 31
+fmts.add('presentation', 'sti', 'sti', 'OpenOffice.org 1.0 Presentation Template', 'impress_StarOffice_XML_Impress_Template') ### 5
+fmts.add('presentation', 'svg', 'svg', 'Scalable Vector Graphics', 'impress_svg_Export') ### 14
+fmts.add('presentation', 'svm', 'svm', 'StarView Metafile', 'impress_svm_Export') ### 13
+fmts.add('presentation', 'swf', 'swf', 'Macromedia Flash (SWF)', 'impress_flash_Export') ### 34
+fmts.add('presentation', 'sxi', 'sxi', 'OpenOffice.org 1.0 Presentation', 'StarOffice XML (Impress)') ### 41
+fmts.add('presentation', 'tiff', 'tiff', 'Tagged Image File Format', 'impress_tif_Export') ### 12
+fmts.add('presentation', 'uop', 'uop', 'Unified Office Format presentation', 'UOF presentation') ### 4
+fmts.add('presentation', 'vor', 'vor', 'StarImpress 5.0 Template', 'StarImpress 5.0 Vorlage') ### 40
+fmts.add('presentation', 'vor3', 'vor', 'StarDraw 3.0 Template (OpenOffice.org Impress)', 'StarDraw 3.0 Vorlage (StarImpress)') ###1
+fmts.add('presentation', 'vor4', 'vor', 'StarImpress 4.0 Template', 'StarImpress 4.0 Vorlage') ### 39
+fmts.add('presentation', 'vor5', 'vor', 'StarDraw 5.0 Template (OpenOffice.org Impress)', 'StarDraw 5.0 Vorlage (StarImpress)') ### 2
+fmts.add('presentation', 'wmf', 'wmf', 'Windows Metafile', 'impress_wmf_Export') ### 11
+fmts.add('presentation', 'xhtml', 'xml', 'XHTML', 'XHTML Impress File') ### 33
+fmts.add('presentation', 'xpm', 'xpm', 'X PixMap', 'impress_xpm_Export') ### 10
 
 class Options:
     def __init__(self, args):
-        self.stdout = False
-        self.showlist = False
-        self.listener = False
-        self.format = None
-        self.verbose = 0
-        self.timeout = 3
-        self.doctype = None
-        self.server = 'localhost'
-        self.port = '2002'
         self.connection = None
+        self.doctype = None
+        self.exportfilter = []
         self.filenames = []
+        self.format = None
+        self.importfilter = ""
+        self.listener = False
+        self.output = None
         self.pipe = None
-        self.outputpath = None
-        self.outputfile = None ### Invenio customizations
-
+        self.port = '2002'
+        self.server = 'localhost'
+        self.showlist = False
+        self.stdout = False
+        self.template = None
+        self.timeout = 6
+        self.verbose = 0
 
         ### Get options from the commandline
         try:
-            opts, args = getopt.getopt (args, 'c:d:f:hi:Llo:p:s:T:t:v',
-                ['connection=', 'doctype=', 'format=', 'help', 'listener', 'outputpath=', 'pipe=', 'port=', 'server=', 'timeout=', 'show', 'stdout', 'verbose', 'version', 'outputfile='] )
+            opts, args = getopt.getopt (args, 'c:d:e:f:hi:Llo:p:s:t:T:v',
+                ['connection=', 'doctype=', 'export', 'format=', 'help',
+                 'import', 'listener', 'output=', 'outputpath', 'pipe=',
+                 'port=', 'server=', 'timeout=', 'show', 'stdout',
+                 'template', 'verbose', 'version'] )
         except getopt.error, exc:
             print 'unoconv: %s, try unoconv -h for a list of all the options' % str(exc)
             sys.exit(255)
@@ -301,26 +367,43 @@ class Options:
                 self.connection = arg
             elif opt in ['-d', '--doctype']:
                 self.doctype = arg
+            elif opt in ['-e', '--export']:
+                l = arg.split('=')
+                if len(l) == 2:
+                    (name, value) = l
+                    if value in ('True', 'true'):
+                        self.exportfilter.append( PropertyValue( name, 0, True, 0 ) )
+                    elif value in ('False', 'false'):
+                        self.exportfilter.append( PropertyValue( name, 0, False, 0 ) )
+                    else:
+                        self.exportfilter.append( PropertyValue( name, 0, value, 0 ) )
+                else:
+                    print >>sys.stderr, 'Warning: Option %s cannot be parsed, ignoring.' % arg
             elif opt in ['-f', '--format']:
                 self.format = arg
-            elif opt in ['-i', '--pipe']:
-                self.pipe = arg
+            elif opt in ['-i', '--import']:
+                self.importfilter = arg
             elif opt in ['-l', '--listener']:
                 self.listener = True
-            elif opt in ['-o', '--outputpath']:
-                self.outputpath = arg
-            elif opt in ['--outputfile']:  ### Invenio customizations
-                self.outputfile = arg      ### Invenio customizations
+            elif opt in ['-o', '--output']:
+                self.output = arg
+            elif opt in ['--outputpath']:
+                print >>sys.stderr, 'Warning: This option is deprecated by --output.' % arg
+                self.output = arg
+            elif opt in ['--pipe']:
+                self.pipe = arg
             elif opt in ['-p', '--port']:
                 self.port = arg
             elif opt in ['-s', '--server']:
                 self.server = arg
             elif opt in ['--show']:
                 self.showlist = True
-            elif opt in ['-T', '--timeout']:
-                self.timeout = int(arg)
             elif opt in ['--stdout']:
                 self.stdout = True
+            elif opt in ['-t', '--template']:
+                self.template = arg
+            elif opt in ['-T', '--timeout']:
+                self.timeout = int(arg)
             elif opt in ['-v', '--verbose']:
                 self.verbose = self.verbose + 1
             elif opt in ['--version']:
@@ -391,14 +474,19 @@ unoconv options:
   -c, --connection=string  use a custom connection string
   -d, --doctype=type       specify document type
                              (document, graphics, presentation, spreadsheet)
+  -e, --export=name=value  set export filter options
+                             eg. -e PageRange=1-2
   -f, --format=format      specify the output format
-  -i, --pipe=name          alternative method of connection using a pipe
+  -i, --import=string      set import filter option string
+                             eg. -i utf8
   -l, --listener           start a listener to use by unoconv clients
-  -o, --outputpath=name    output directory
+  -o, --output=name        output basename, filename or directory
+      --pipe=name          alternative method of connection using a pipe
   -p, --port=port          specify the port (default: 2002)
                              to be used by client or listener
   -s, --server=server      specify the server address (default: localhost)
                              to be used by client or listener
+  -t, --template=file      import the styles from template (.ott)
   -T, --timeout=secs       timeout after secs if connections to OpenOffice fail
       --show               list the available output formats
       --stdout             write output to stdout
@@ -407,44 +495,45 @@ unoconv options:
 
 class Convertor:
     def __init__(self):
-        global exitcode, oopid
+        global exitcode, ooproc, oobin, oolibpath
         unocontext = None
 
         ### Do the OpenOffice component dance
         self.context = uno.getComponentContext()
         resolver = self.context.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", self.context)
 
-        ### Test for an existing connection (twice)
+        ### Test for an existing connection
         try:
             unocontext = resolver.resolve("uno:%s" % op.connection)
         except NoConnectException, e:
-            error(2, "Existing listener not found.\n%s" % e)
+            info(3, "Existing listener not found.\n%s" % e)
 
-            ### Test if we can use an Openoffice *binary* in our (modified) path
-            for bin in ('soffice.bin', 'soffice', ):
+            ### Start our own OpenOffice instance
+            info(3, "Launching our own listener using %s." % oobin)
+            try:
+                ooproc = subprocess.Popen([oobin, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-accept=%s" % op.connection])
+                info(2, 'OpenOffice listener successfully started. (pid=%s)' % ooproc.pid)
 
-                error(2, "Trying to launch our own listener using %s." % bin)
-                try:
-                    oopid = os.spawnvp(os.P_NOWAIT, bin, [bin, "-headless", "-nologo", "-nodefault", "-norestore", "-nofirststartwizard", "-accept=%s" % op.connection]);
-                except:
-                    error(3, "Launch of %s failed.\n%s" % (bin, e))
-                    continue
-
-                ### Try connection to it for op.timeout seconds
+                ### Try connection to it for op.timeout seconds (flakky OpenOffice)
                 timeout = 0
                 while timeout <= op.timeout:
+                    ### Is it already/still running ?
+                    if ooproc.poll() != None:
+                        info(3, "Process %s (pid=%s) is not running." % (oobin, ooproc.pid))
+                        break
                     try:
                         unocontext = resolver.resolve("uno:%s" % op.connection)
                         break
                     except NoConnectException:
                         time.sleep(0.5)
-                        timeout = timeout + 0.5
+                        timeout += 0.5
+                    except:
+                        raise
                 else:
-                    error(3, "Failed to connect to %s in %d seconds.\n%s" % (bin, op.timeout, e))
-                    continue
-                break
-            else:
-                die(250, "No proper binaries found to launch OpenOffice. Bailing out.")
+                    error("Failed to connect to %s (pid=%s) in %d seconds.\n%s" % (oobin, ooproc.pid, op.timeout, e))
+            except Exception, e:
+                raise
+                error("Launch of %s failed.\n%s" % (oobin, e))
 
         if not unocontext:
             die(251, "Unable to connect or start own listener. Aborting.")
@@ -452,6 +541,7 @@ class Convertor:
         ### And some more OpenOffice magic
         unosvcmgr = unocontext.ServiceManager
         self.desktop = unosvcmgr.createInstanceWithContext("com.sun.star.frame.Desktop", unocontext)
+        self.config = unosvcmgr.createInstanceWithContext( "com.sun.star.configuration.ConfigurationProvider", unocontext)
         self.cwd = unohelper.systemPathToFileUrl( os.getcwd() )
 
     def getformat(self, inputfn):
@@ -464,7 +554,7 @@ class Convertor:
             outputfmt = fmts.byname(op.format)
 
             if not outputfmt:
-                outputfmt = fmts.byextension('.'+op.format)
+                outputfmt = fmts.byextension(os.extsep + op.format)
 
         ### If no doctype given, check list of acceptable formats for input file ext doctype
         ### FIXME: This should go into the for-loop to match each individual input filename
@@ -496,7 +586,7 @@ class Convertor:
     def convert(self, inputfn):
         global exitcode
 
-        doc = None
+        document = None
         outputfmt = self.getformat(inputfn)
 
         if op.verbose > 0:
@@ -508,154 +598,182 @@ class Convertor:
 
         try:
             ### Load inputfile
-            inputprops = ( PropertyValue( "Hidden", 0, True, 0 ), )
+            inputprops = (
+                PropertyValue( "Hidden", 0, True, 0 ),
+                PropertyValue( "ReadOnly", 0, True, 0 ),
+                PropertyValue( "FilterOptions", 0, op.importfilter, 0 ),
+            )
 
             inputurl = unohelper.absolutize(self.cwd, unohelper.systemPathToFileUrl(inputfn))
-            doc = self.desktop.loadComponentFromURL( inputurl , "_blank", 0, inputprops )
+            document = self.desktop.loadComponentFromURL( inputurl , "_blank", 0, inputprops )
 
-            if not doc:
+            if not document:
                 raise UnoException("File could not be loaded by OpenOffice", None)
 
-#            standard = doc.getStyleFamilies().getByName('PageStyles').getByName('Standard')
-#            pageSize = Size()
-#            pageSize.Width=1480
-#            pageSize.Height=3354
-#            standard.setPropertyValue('Size', pageSize)
+            ### Import style template
+            if op.template:
+                if os.path.exists(op.template):
+                    if op.verbose > 0:
+                        print >>sys.stderr, 'Template file:', op.template
+                    templateprops = (
+                        PropertyValue( "OverwriteStyles", 0, True, 0),
+                    )
+                    templateurl = unohelper.absolutize(self.cwd, unohelper.systemPathToFileUrl(op.template))
+                    document.StyleFamilies.loadStylesFromURL(templateurl, templateprops)
+                else:
+                    print >>sys.stderr, 'unoconv: template file `%s\' does not exist.' % op.template
+                    exitcode = 1
 
-            error(1, "Selected output format: %s" % outputfmt)
-            # pylint: disable=E1103
-            # outputfmt is an instance of the class Fmt.
-            error(1, "Selected ooffice filter: %s" % outputfmt.filter)
-            error(1, "Used doctype: %s" % outputfmt.doctype)
+            info(1, "Selected output format: %s" % outputfmt)
+            info(1, "Selected ooffice filter: %s" % outputfmt.filter)
+            info(1, "Used doctype: %s" % outputfmt.doctype)
 
-####            ### Write outputfile
-####            outputprops = (
-####                    PropertyValue( "FilterName", 0, outputfmt.filter, 0),
-####                    PropertyValue( "Overwrite", 0, True, 0 ),
-#####                    PropertyValue( "Size", 0, "A3", 0 ),
-####                    PropertyValue( "OutputStream", 0, OutputStream(), 0 ),
-####                   )
+            ### Update document links
+            try:
+                document.updateLinks()
+            except AttributeError:
+                # the document doesn't implement the XLinkUpdate interface
+                pass
 
-            ### BEG Invenio customizations
+            ### Update document indexes
+            try:
+                document.refresh()
+                indexes = document.getDocumentIndexes()
+            except AttributeError:
+                # the document doesn't implement the XRefreshable and/or
+                # XDocumentIndexesSupplier interfaces
+                pass
+            else:
+                for i in range(0, indexes.getCount()):
+                    indexes.getByIndex(i).update()
+
+            ### Write outputfile
             outputprops = [
-                    PropertyValue( "FilterName" , 0, outputfmt.filter , 0 ),
-                    PropertyValue( "Overwrite" , 0, True , 0 ),
-                    PropertyValue( "OutputStream", 0, OutputStream(), 0),
-                   ]
+#                PropertyValue( "FilterData" , 0, ( PropertyValue( "SelectPdfVersion" , 0, 1 , uno.getConstantByName( "com.sun.star.beans.PropertyState.DIRECT_VALUE" ) ) ), uno.getConstantByName( "com.sun.star.beans.PropertyState.DIRECT_VALUE" ) ),
+                PropertyValue( "FilterData", 0, uno.Any("[]com.sun.star.beans.PropertyValue", tuple( op.exportfilter ), ), 0 ),
+                PropertyValue( "FilterName", 0, outputfmt.filter, 0),
+#                PropertyValue( "SelectionOnly", 0, True, 0 ),
+                PropertyValue( "OutputStream", 0, OutputStream(), 0 ),
+                PropertyValue( "Overwrite", 0, True, 0 ),
+            ]
+
             if outputfmt.filter == 'Text (encoded)':
-                ## To enable UTF-8
                 outputprops.append(PropertyValue( "FilterFlags", 0, "UTF8, LF", 0))
+            ### BEG Invenio customizations
             elif outputfmt.filter == 'writer_pdf_Export':
                 ## To enable PDF/A
                 outputprops.append(PropertyValue( "SelectPdfVersion", 0, 1, 0))
-
-            outputprops = tuple(outputprops)
             ### END Invenio customizations
 
             if not op.stdout:
                 (outputfn, ext) = os.path.splitext(inputfn)
-                ### BEG Invenio customizations
-                if op.outputfile:
-                    outputfn = op.outputfile
-                elif not op.outputpath: ### END Invenio customizations
-                    outputfn = outputfn + '.' + outputfmt.extension
+                if not op.output:
+                    outputfn = outputfn + os.extsep + outputfmt.extension
+                elif os.path.isdir(op.output):
+                    outputfn = os.path.join(op.output, os.path.basename(outputfn) + os.extsep + outputfmt.extension)
+                elif len(op.filenames) > 1:
+                    outputfn = op.output + os.extsep + outputfmt.extension
                 else:
-                    outputfn = os.path.join(op.outputpath, os.path.basename(outputfn) + '.' + outputfmt.extension)
+                    outputfn = op.output
+
                 outputurl = unohelper.absolutize( self.cwd, unohelper.systemPathToFileUrl(outputfn) )
-                doc.storeToURL(outputurl, outputprops)
-                error(1, "Output file: %s" % outputfn)
+                document.storeToURL(outputurl, tuple(outputprops) )
+                info(1, "Output file: %s" % outputfn)
             else:
-                doc.storeToURL("private:stream", outputprops)
+                document.storeToURL("private:stream", tuple(outputprops) )
 
-            # pylint: enable=E1103
-
-            doc.dispose()
-            doc.close(True)
+            document.dispose()
+            document.close(True)
 
         except SystemError, e:
-            error(0, "unoconv: SystemError during conversion: %s" % e)
-            error(0, "ERROR: The provided document cannot be converted to the desired format.")
+            error("unoconv: SystemError during conversion: %s" % e)
+            error("ERROR: The provided document cannot be converted to the desired format.")
             exitcode = 1
 
         except UnoException, e:
-            error(0, "unoconv: UnoException during conversion in %s: %s" % (repr(e.__class__), e.Message))
-            error(0, "ERROR: The provided document cannot be converted to the desired format. (code: %s)" % e.ErrCode)
+            error("unoconv: UnoException during conversion in %s: %s" % (repr(e.__class__), e.Message))
+            error("ERROR: The provided document cannot be converted to the desired format. (code: %s)" % e.ErrCode)
             exitcode = e.ErrCode
 
         except IOException, e:
-            error(0, "unoconv: IOException during conversion: %s" % e.Message)
-            error(0, "ERROR: The provided document cannot be exported to %s." % outputfmt)
+            error("unoconv: IOException during conversion: %s" % e.Message)
+            error("ERROR: The provided document cannot be exported to %s." % outputfmt)
             exitcode = 3
 
         except CannotConvertException, e:
-            error(0, "unoconv: CannotConvertException during conversion: %s" % e.Message)
+            error("unoconv: CannotConvertException during conversion: %s" % e.Message)
             exitcode = 4
 
 class Listener:
     def __init__(self):
-        error(1, "Start listener on %s:%s" % (op.server, op.port))
-        for bin in ('soffice.bin', 'soffice', ):
-            error(2, "Warning: trying to launch %s." % bin)
-            try:
-                os.execvp(bin, [bin, "-headless", "-nologo", "-nodefault", "-norestore", "-nofirststartwizard", "-accept=%s" % op.connection]);
-            except:
-                error(3, "Launch of %s failed.\n%s" % (bin, e))
-                continue
+        info(1, "Start listener on %s:%s" % (op.server, op.port))
+        try:
+            subprocess.call([oobin, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection])
+        except Exception, e:
+            error("Launch of %s failed.\n%s" % (oobin, e))
         else:
-            die(254, "Failed to start listener with connection %s" % (op.connection))
-        die(253, "Existing listener found, aborting.")
+            die(253, "Existing listener found, aborting.")
 
-def error(level, str):
+def error(str):
     "Output error message"
-    if level <= op.verbose:
-        print >>sys.stderr, str
+    print >>sys.stderr, str
 
 def info(level, str):
     "Output info message"
     if not op.stdout and level <= op.verbose:
         print >>sys.stdout, str
+    elif level <= op.verbose:
+        print >>sys.stderr, str
 
 def die(ret, str=None):
     "Print error and exit with errorcode"
-    global convertor, oopid
+    global convertor, ooproc, oobin
 
     if str:
-        error(0, 'Error: %s' % str)
+        error('Error: %s' % str)
 
     ### Did we start an instance ?
-    if oopid:
+    if ooproc and convertor:
 
         ### If there is a GUI now attached to the instance, disable listener
         if convertor.desktop.getCurrentFrame():
-            for bin in ('soffice.bin', 'soffice', ):
-                try:
-                    os.spawnvp(os.P_NOWAIT, bin, [bin, "-headless", "-nologo", "-nodefault", "-norestore", "-nofirststartwizard", "-unaccept=%s" % op.connection]);
-                    error(2, 'OpenOffice listener successfully disabled.')
-                    break
-                except Exception, e:
-                    error(3, "Launch of %s failed.\n%s" % (bin, e))
-                    continue
+            try:
+                subprocess.Popen([oobin, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-unaccept=%s" % op.connection])
+                info(2, 'OpenOffice listener successfully disabled.')
+                ooproc.wait()
+            except Exception, e:
+                error("Terminate using %s failed.\n%s" % (oobin, e))
 
         ### If there is no GUI attached to the instance, terminate instance
         else:
             try:
                 convertor.desktop.terminate()
             except DisposedException:
-                error(2, 'OpenOffice instance successfully terminated.')
+                info(2, 'OpenOffice instance unsuccessfully closed, sending TERM signal.')
+                try:
+                    ooproc.terminate()
+                except AttributeError:
+                    os.kill(ooproc.pid, 15)
+            ooproc.wait()
 
-#        error(2, 'Taking down OpenOffice with pid %s.' % oopid)
-#        os.setpgid(oopid, 0)
-#        os.killpg(os.getpgid(oopid), 15)
-#        try:
-#            os.kill(oopid, 15)
-#            error(2, 'Waiting for OpenOffice with pid %s to disappear.' % oopid)
-#            os.waitpid(oopid, os.WUNTRACED)
-#        except:
-#            error(2, 'No OpenOffice with pid %s to take down' % oopid)
+        ### OpenOffice processes may get stuck and we have to kill them
+        ### Is it still running ?
+        if ooproc.poll() == None:
+            info(1, 'OpenOffice instance still running, please investigate...')
+            ooproc.wait()
+#            info(2, 'OpenOffice instance unsuccessfully terminated, sending KILL signal.')
+#            try:
+#                ooproc.kill()
+#            except AttributeError:
+#                os.kill(ooproc.pid, 9)
+#            info(2, 'Waiting for OpenOffice with pid %s to disappear.' % ooproc.pid)
+#            ooproc.wait()
+
     sys.exit(ret)
 
 def main():
     global convertor, exitcode
+    convertor = None
 
     try:
         if op.listener:
@@ -667,19 +785,17 @@ def main():
             convertor.convert(inputfn)
 
     except NoConnectException, e:
-        error(0, "unoconv: could not find an existing connection to Open Office at %s:%s." % (op.server, op.port))
+        error("unoconv: could not find an existing connection to Open Office at %s:%s." % (op.server, op.port))
         if op.connection:
-            error(0, "Please start an OpenOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    ooffice -nologo -nodefault -accept=\"%s\"" % (op.server, op.server, op.port, op.connection))
+            info(0, "Please start an OpenOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    ooffice -nologo -nodefault -accept=\"%s\"" % (op.server, op.server, op.port, op.connection))
         else:
-            error(0, "Please start an OpenOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    ooffice -nologo -nodefault -accept=\"socket,host=%s,port=%s;urp;\"" % (op.server, op.server, op.port, op.server, op.port))
-            error(0, "Please start an ooffice instance on server '%s' by doing:\n\n    ooffice -nologo -nodefault -accept=\"socket,host=localhost,port=%s;urp;\"" % (op.server, op.port))
+            info(0, "Please start an OpenOffice instance on server '%s' by doing:\n\n    unoconv --listener --server %s --port %s\n\nor alternatively:\n\n    ooffice -nologo -nodefault -accept=\"socket,host=%s,port=%s;urp;\"" % (op.server, op.server, op.port, op.server, op.port))
+            info(0, "Please start an ooffice instance on server '%s' by doing:\n\n    ooffice -nologo -nodefault -accept=\"socket,host=localhost,port=%s;urp;\"" % (op.server, op.port))
         exitcode = 1
 #    except UnboundLocalError:
 #        die(252, "Failed to connect to remote listener.")
     except OSError:
-        error(0, "Warning: failed to launch OpenOffice. Aborting.")
-
-convertor = None
+        error("Warning: failed to launch OpenOffice. Aborting.")
 
 ### Main entrance
 if __name__ == '__main__':
