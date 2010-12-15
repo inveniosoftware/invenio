@@ -31,7 +31,7 @@ Options to finish your installation:
    --create-tables          create DB tables for Invenio
    --load-webstat-conf      load the WebStat configuration
    --drop-tables            drop DB tables of Invenio
-   --check-openoffice-dir   check for correctly set up of openoffice temporary directory
+   --check-openoffice       check for correctly set up of openoffice temporary directory
 
 Options to set up and test a demo site:
    --create-demo-site       create demo site
@@ -501,41 +501,52 @@ def cli_cmd_reset_fieldnames(conf):
 
     print ">>> I18N field names reset successfully."
 
-def cli_check_openoffice_dir(conf):
+def cli_check_openoffice(conf):
     """
     If OpenOffice.org integration is enabled, checks whether the system is
     properly configured.
     """
     from invenio.textutils import wrap_text_in_a_box
-    from invenio.websubmit_file_converter import check_openoffice_tmpdir, \
-        InvenioWebSubmitFileConverterError, CFG_OPENOFFICE_TMPDIR
+    from invenio.websubmit_file_converter import unoconv, CFG_OPENOFFICE_TMPDIR, \
+    get_file_converter_logger
     from invenio.config import CFG_OPENOFFICE_USER, \
         CFG_PATH_OPENOFFICE_PYTHON, \
         CFG_OPENOFFICE_SERVER_HOST, \
-        CFG_BIBSCHED_PROCESS_USER
+        CFG_BIBSCHED_PROCESS_USER,\
+        CFG_BINDIR, CFG_TMPDIR
+    from logging import basicConfig, DEBUG
     from invenio.bibtask import guess_apache_process_user, \
         check_running_process_user
+    from invenio.websubmit_file_converter import unoconv, convert_file
     check_running_process_user()
     print ">>> Checking if OpenOffice is correctly integrated...",
     if CFG_OPENOFFICE_SERVER_HOST:
         try:
-            check_openoffice_tmpdir()
-        except InvenioWebSubmitFileConverterError, err:
+            #basicConfig()
+            #get_file_converter_logger().setLevel(DEBUG)
+            test = os.path.join(CFG_TMPDIR, 'test.txt')
+            open(test, 'w').write('test')
+            output = unoconv(test, output_format='pdf')
+            output2 = convert_file(output, output_format='.txt')
+            if 'test' not in open(output2).read():
+                raise Exception("Coulnd't produce a valid PDF with OpenOffice")
+            os.remove(output2)
+            os.remove(output)
+            os.remove(test)
+        except Exception, err:
             print wrap_text_in_a_box("""\
 OpenOffice.org can't properly create files in the OpenOffice.org temporary
 directory %(tmpdir)s, as the user %(nobody)s (as configured in
 CFG_OPENOFFICE_USER invenio(-local).conf variable): %(err)s.
 
-
 In your /etc/sudoers file, you should authorize the %(apache)s user to run
- %(python)s as %(nobody)s user as in:
+ %(unoconv)s as %(nobody)s user as in:
 
 
-%(apache)s localhost=(%(nobody)s) NOPASSWD: %(python)s
+%(apache)s ALL=(%(nobody)s) NOPASSWD: %(unoconv)s
 
 
 You should then run the following commands:
-
 
 $ sudo mkdir -p %(tmpdir)s
 
@@ -546,7 +557,8 @@ $ sudo chmod 755 %(tmpdir)s""" % {
             'nobody' : CFG_OPENOFFICE_USER,
             'err' : err,
             'apache' : CFG_BIBSCHED_PROCESS_USER or guess_apache_process_user(),
-            'python' : CFG_PATH_OPENOFFICE_PYTHON
+            'python' : CFG_PATH_OPENOFFICE_PYTHON,
+            'unoconv' : os.path.join(CFG_BINDIR, 'inveniounoconv')
             })
             sys.exit(1)
         print "ok"
@@ -1178,8 +1190,8 @@ def main():
             elif opt == '--drop-tables':
                 cli_cmd_drop_tables(conf)
                 done = True
-            elif opt == '--check-openoffice-dir':
-                cli_check_openoffice_dir(conf)
+            elif opt == '--check-openoffice':
+                cli_check_openoffice(conf)
                 done = True
             elif opt == '--create-demo-site':
                 cli_cmd_create_demo_site(conf)

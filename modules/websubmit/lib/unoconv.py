@@ -14,8 +14,10 @@
 ### Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 ### Copyright 2007-2010 Dag Wieers <dag@wieers.com>
 
-import getopt, sys, os, glob, time, socket, subprocess
+import getopt, sys, os, glob, time, socket, subprocess, signal
+from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
 
+CFG_SOFFICE_PID = os.path.join(CFG_OPENOFFICE_TMPDIR, 'soffice.pid')
 global convertor, oobin, oobinpath, oolibpath, ooproc
 
 ### The first thing we ought to do is find a suitable OpenOffice installation
@@ -336,6 +338,7 @@ class Options:
         self.format = None
         self.importfilter = ""
         self.listener = False
+        self.kill = False
         self.output = None
         self.pipe = None
         self.port = '2002'
@@ -345,14 +348,15 @@ class Options:
         self.template = None
         self.timeout = 6
         self.verbose = 0
+        self.remove = None
 
         ### Get options from the commandline
         try:
-            opts, args = getopt.getopt (args, 'c:d:e:f:hi:Llo:p:s:t:T:v',
+            opts, args = getopt.getopt (args, 'c:d:e:f:hi:Llko:p:s:t:T:vr:',
                 ['connection=', 'doctype=', 'export', 'format=', 'help',
-                 'import', 'listener', 'output=', 'outputpath', 'pipe=',
+                 'import', 'listener', 'kill', 'output=', 'outputpath', 'pipe=',
                  'port=', 'server=', 'timeout=', 'show', 'stdout',
-                 'template', 'verbose', 'version'] )
+                 'template', 'verbose', 'version', '--remove='] )
         except getopt.error, exc:
             print 'unoconv: %s, try unoconv -h for a list of all the options' % str(exc)
             sys.exit(255)
@@ -385,6 +389,8 @@ class Options:
                 self.importfilter = arg
             elif opt in ['-l', '--listener']:
                 self.listener = True
+            elif opt in ['-k', '--kill']:
+                self.kill = True
             elif opt in ['-o', '--output']:
                 self.output = arg
             elif opt in ['--outputpath']:
@@ -406,6 +412,8 @@ class Options:
                 self.timeout = int(arg)
             elif opt in ['-v', '--verbose']:
                 self.verbose = self.verbose + 1
+            elif opt in ['-r', '--remove']:
+                self.remove = arg
             elif opt in ['--version']:
                 self.version()
                 sys.exit(255)
@@ -415,6 +423,27 @@ class Options:
             print >>sys.stderr, 'Verbosity set to level %d' % (self.verbose - 1)
 
         self.filenames = args
+
+        if self.remove:
+            os.remove(self.remove)
+            print >> sys.stderr, "%s file created by OpenOffice was successfully removed." % self.remove
+            sys.stderr.flush()
+            sys.exit(0)
+
+        if self.kill:
+            try:
+                pid = int(open(CFG_SOFFICE_PID, 'r').read())
+                os.kill(pid, signal.SIGTERM)
+                time.sleep(2)
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except:
+                    pass
+            except Exception, err:
+                    print >> sys.stderr, 'Couldn\'t kill soffice.bin: %s' % err
+                    sys.exit(1)
+            print >>sys.stderr, 'soffice.bin was hopefully killed.'
+            sys.exit(0)
 
         if not self.listener and not self.showlist and self.doctype != 'list' and not self.filenames:
             print >>sys.stderr, 'unoconv: you have to provide a filename as argument'
@@ -480,6 +509,8 @@ unoconv options:
   -i, --import=string      set import filter option string
                              eg. -i utf8
   -l, --listener           start a listener to use by unoconv clients
+  -k, --kill               kill any listener on the local machine (Invenio)
+  -r, --remove=filename    remove a file created by OpenOffice (Invenio)
   -o, --output=name        output basename, filename or directory
       --pipe=name          alternative method of connection using a pipe
   -p, --port=port          specify the port (default: 2002)
@@ -497,7 +528,6 @@ class Convertor:
     def __init__(self):
         global exitcode, ooproc, oobin, oolibpath
         unocontext = None
-
         ### Do the OpenOffice component dance
         self.context = uno.getComponentContext()
         resolver = self.context.ServiceManager.createInstanceWithContext("com.sun.star.bridge.UnoUrlResolver", self.context)
@@ -512,6 +542,8 @@ class Convertor:
             info(3, "Launching our own listener using %s." % oobin)
             try:
                 ooproc = subprocess.Popen([oobin, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-accept=%s" % op.connection])
+                open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
+
                 info(2, 'OpenOffice listener successfully started. (pid=%s)' % ooproc.pid)
 
                 ### Try connection to it for op.timeout seconds (flakky OpenOffice)
@@ -706,13 +738,14 @@ class Convertor:
 
 class Listener:
     def __init__(self):
+        from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
         info(1, "Start listener on %s:%s" % (op.server, op.port))
         try:
-            subprocess.call([oobin, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection])
+            soffice = subprocess.Popen([oobin, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nologo", "-nofirststartwizard", "-norestore", "-accept=%s" % op.connection])
+            open(CFG_SOFFICE_PID, 'w').write(str(soffice.pid))
+            soffice.wait()
         except Exception, e:
             error("Launch of %s failed.\n%s" % (oobin, e))
-        else:
-            die(253, "Existing listener found, aborting.")
 
 def error(str):
     "Output error message"
@@ -728,7 +761,7 @@ def info(level, str):
 def die(ret, str=None):
     "Print error and exit with errorcode"
     global convertor, ooproc, oobin
-
+    from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
     if str:
         error('Error: %s' % str)
 
@@ -740,6 +773,7 @@ def die(ret, str=None):
             try:
                 subprocess.Popen([oobin, "-headless", "-invisible", "-nocrashreport", "-nodefault", "-nofirststartwizard", "-nologo", "-norestore", "-unaccept=%s" % op.connection])
                 info(2, 'OpenOffice listener successfully disabled.')
+                open(CFG_SOFFICE_PID, 'w').write(str(ooproc.pid))
                 ooproc.wait()
             except Exception, e:
                 error("Terminate using %s failed.\n%s" % (oobin, e))
@@ -772,9 +806,18 @@ def die(ret, str=None):
     sys.exit(ret)
 
 def main():
-    global convertor, exitcode
+    global convertor, exitcode, op
     convertor = None
 
+    op = Options(sys.argv[1:])
+    from invenio.websubmit_file_converter import CFG_OPENOFFICE_TMPDIR
+    os.environ['HOME'] = CFG_OPENOFFICE_TMPDIR
+
+    ### BEG Invenio customizations
+    ## This is so we can kill by using gpid so that we can kill unoconv,
+    ## and the corresponding OpenOffice.
+    #os.setpgrp()
+    ### END Invenio customizations
     try:
         if op.listener:
             listener = Listener()
@@ -797,11 +840,15 @@ def main():
     except OSError:
         error("Warning: failed to launch OpenOffice. Aborting.")
 
+
+
+
 ### Main entrance
 if __name__ == '__main__':
     exitcode = 0
+    ## BEG Invenio customizations
+    ## END Invenio customizations
 
-    op = Options(sys.argv[1:])
     try:
         main()
     except KeyboardInterrupt, e:

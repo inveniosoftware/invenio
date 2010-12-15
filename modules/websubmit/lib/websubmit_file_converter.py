@@ -27,6 +27,10 @@ import shutil
 import tempfile
 import HTMLParser
 import time
+import subprocess
+import atexit
+import signal
+import threading
 
 from logging import debug, error, DEBUG, getLogger
 from htmlentitydefs import entitydefs
@@ -60,7 +64,8 @@ from invenio.config import CFG_TMPDIR, CFG_ETCDIR, CFG_PYLIBDIR, \
     CFG_OPENOFFICE_SERVER_PORT, \
     CFG_OPENOFFICE_USER, \
     CFG_PATH_CONVERT, \
-    CFG_PATH_PAMFILE
+    CFG_PATH_PAMFILE, \
+    CFG_BINDIR
 
 from invenio.websubmit_config import \
     CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM, \
@@ -432,61 +437,111 @@ def convert_file(input_file, output_file=None, output_format=None, **params):
             except InvenioWebSubmitFileConverterError, err:
                 raise InvenioWebSubmitFileConverterError("Error when converting from %s to %s: %s" % (input_file, output_ext, err))
             except Exception, err:
-                register_exception()
+                register_exception(alert_admin=True)
                 raise InvenioWebSubmitFileConverterError("Unexpected error when converting from %s to %s (%s): %s" % (input_file, output_ext, type(err), err))
             current_input = current_output
     else:
         raise InvenioWebSubmitFileConverterError("It's impossible to convert from %s to %s" % (input_ext, output_ext))
 
 
-def check_openoffice_tmpdir():
-    """Return True if OpenOffice tmpdir do exists and OpenOffice can
-    successfully create file there."""
-    if not os.path.exists(CFG_OPENOFFICE_TMPDIR):
-        raise InvenioWebSubmitFileConverterError('%s does not exists' % CFG_OPENOFFICE_TMPDIR)
-    if not os.path.isdir(CFG_OPENOFFICE_TMPDIR):
-        raise InvenioWebSubmitFileConverterError('%s is not a directory' % CFG_OPENOFFICE_TMPDIR)
-    now = str(time.time())
-    execute_command('sudo', '-u', CFG_OPENOFFICE_USER, CFG_PATH_OPENOFFICE_PYTHON, '-c', 'import os; open(os.path.join(%s, "test"), "w").write(%s)' % (repr(CFG_OPENOFFICE_TMPDIR), repr(now)))
-    try:
-        test = open(os.path.join(CFG_OPENOFFICE_TMPDIR, 'test')).read()
-        if test != now:
-            raise IOError
-    except:
-        raise InvenioWebSubmitFileConverterError("%s can't be properly written by OpenOffice.org or read by Apache" % CFG_OPENOFFICE_TMPDIR)
+try:
+    _UNOCONV_DAEMON
+except NameError:
+    _UNOCONV_DAEMON = None
 
+_UNOCONV_DAEMON_LOCK = threading.Lock()
+
+def _register_unoconv():
+    global _UNOCONV_DAEMON
+    if CFG_OPENOFFICE_SERVER_HOST != 'localhost':
+        return
+    _UNOCONV_DAEMON_LOCK.acquire()
+    try:
+        if not _UNOCONV_DAEMON:
+            _UNOCONV_DAEMON = subprocess.Popen(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-v', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '-l'])
+            time.sleep(3)
+    finally:
+        _UNOCONV_DAEMON_LOCK.release()
+
+@atexit.register
+def _unregister_unoconv():
+    global _UNOCONV_DAEMON
+    if CFG_OPENOFFICE_SERVER_HOST != 'localhost':
+        return
+    _UNOCONV_DAEMON_LOCK.acquire()
+    try:
+        if _UNOCONV_DAEMON:
+            subprocess.call(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-v', '-k'])
+            try:
+                _UNOCONV_DAEMON.stdin.close()
+            except AttributeError:
+                ## To skip: "'NoneType' object has no attribute 'close'"
+                pass
+            time.sleep(1)
+            if _UNOCONV_DAEMON.poll():
+                try:
+                    os.kill(_UNOCONV_DAEMON.pid, signal.SIGTERM)
+                except OSError:
+                    pass
+                if _UNOCONV_DAEMON.poll():
+                    try:
+                        os.kill(_UNOCONV_DAEMON.pid, signal.SIGKILL)
+                    except OSError:
+                        pass
+    finally:
+        _UNOCONV_DAEMON_LOCK.release()
 
 def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **dummy):
     """Use unconv to convert among OpenOffice understood documents."""
     from invenio.bibdocfile import normalize_format
-    try:
-        check_openoffice_tmpdir()
-    except InvenioWebSubmitFileConverterError, err:
-        register_exception(alert_admin=True, prefix='ERROR: it\'s impossible to properly execute OpenOffice.org conversions: %s' % err)
-        raise
 
+    _register_unoconv()
     input_file, output_file, dummy = prepare_io(input_file, output_file, output_format, need_working_dir=False)
     if output_format == 'txt':
         unoconv_format = 'text'
     else:
         unoconv_format = output_format
     try:
-        tmpfile = tempfile.mktemp(dir=CFG_OPENOFFICE_TMPDIR, suffix=normalize_format(output_format))
-        execute_command('sudo', '-u', CFG_OPENOFFICE_USER, CFG_PATH_OPENOFFICE_PYTHON, os.path.join(CFG_PYLIBDIR, 'invenio', 'unoconv.py'), '-v', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', CFG_OPENOFFICE_SERVER_PORT, '--outputfile', tmpfile, '-f', unoconv_format, input_file)
+        ## We copy the input file and we make it available to OpenOffice
+        ## with the user nobody
+        from invenio.bibdocfile import decompose_file
+        input_format = decompose_file(input_file, skip_version=True)[2]
+        fd, tmpinputfile = tempfile.mkstemp(dir=CFG_TMPDIR, suffix=normalize_format(input_format))
+        os.close(fd)
+        shutil.copy(input_file, tmpinputfile)
+        get_file_converter_logger().debug("Prepared input file %s" % tmpinputfile)
+        os.chmod(tmpinputfile, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+        tmpoutputfile = tempfile.mktemp(dir=CFG_OPENOFFICE_TMPDIR, suffix=normalize_format(output_format))
+        get_file_converter_logger().debug("Prepared output file %s" % tmpoutputfile)
+        try:
+            subprocess.call(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-v', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile])
+        except:
+            register_exception(alert_admin=True)
+            raise
     except InvenioWebSubmitFileConverterError:
+        ## Ok maybe OpenOffice hanged. Let's better kill it and restarted!
+        _unregister_unoconv()
+        _register_unoconv()
         time.sleep(5)
-        execute_command('sudo', '-u', CFG_OPENOFFICE_USER, CFG_PATH_OPENOFFICE_PYTHON, os.path.join(CFG_PYLIBDIR, 'invenio', 'unoconv.py'), '-v', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', CFG_OPENOFFICE_SERVER_PORT, '--outputfile', tmpfile, '-f', unoconv_format, input_file)
-
-    if not os.path.exists(tmpfile):
-        raise InvenioWebSubmitFileConverterError('No output was generated by OpenOffice')
+        try:
+            subprocess.call(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-v', '-s', CFG_OPENOFFICE_SERVER_HOST, '-p', str(CFG_OPENOFFICE_SERVER_PORT), '--output', tmpoutputfile, '-f', unoconv_format, tmpinputfile])
+        except InvenioWebSubmitFileConverterError:
+            subprocess.call(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-v', '-k'])
+            if not os.path.exists(tmpoutputfile) or not os.path.getsize(tmpoutputfile):
+                raise InvenioWebSubmitFileConverterError('No output was generated by OpenOffice')
+            else:
+                ## Sometimes OpenOffice crashes but we don't care :-)
+                ## it still have created a nice file.
+                pass
 
     output_format = normalize_format(output_format)
 
     if output_format == '.pdf' and pdfopt:
         pdf2pdfopt(tmpfile, output_file)
     else:
-        shutil.copy(tmpfile, output_file)
-    execute_command('sudo', '-u', CFG_OPENOFFICE_USER, CFG_PATH_OPENOFFICE_PYTHON, '-c', 'import os; os.remove(%s)' % repr(tmpfile))
+        shutil.copy(tmpoutputfile, output_file)
+    subprocess.call(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-v', '-r', tmpoutputfile])
+    os.remove(tmpinputfile)
     return output_file
 
 
@@ -797,15 +852,11 @@ def hocr2pdf(input_file, output_file=None, working_dir=None, font="Courier", aut
         input_file, output_file, dummy = prepare_io(input_file, output_file=output_file, need_working_dir=False)
         tmp_output_file = output_file
 
-    try:
-        create_pdf(extract_hocr(open(input_file).read()), tmp_output_file, font=font, author=author, keywords=keywords, subject=subject, title=title, image_path=working_dir, draft=draft)
-    except:
-        register_exception()
-        raise
+    create_pdf(extract_hocr(open(input_file).read()), tmp_output_file, font=font, author=author, keywords=keywords, subject=subject, title=title, image_path=working_dir, draft=draft)
 
     if pdfopt:
         output_file = pdf2pdfopt(tmp_output_file, output_file)
-        os.remove(tmp_output_file)
+        silent_remove(tmp_output_file)
         return output_file
     else:
         return tmp_output_file
@@ -823,9 +874,11 @@ def pdf2hocr2pdf(input_file, output_file=None, font="Courier", author=None, keyw
     """
     input_file, output_hocr_file, dummy = prepare_io(input_file, output_ext='.hocr', need_working_dir=False)
     output_hocr_file, working_dir = pdf2hocr(input_file, output_file=output_hocr_file, ln=ln, return_working_dir=True)
-    output_file = hocr2pdf(output_hocr_file, output_file, working_dir, font=font, author=author, keywords=keywords, subject=subject, title=title, draft=draft, pdfopt=pdfopt)
-    os.remove(output_hocr_file)
-    clean_working_dir(working_dir)
+    try:
+        output_file = hocr2pdf(output_hocr_file, output_file, working_dir, font=font, author=author, keywords=keywords, subject=subject, title=title, draft=draft, pdfopt=pdfopt)
+    finally:
+        clean_working_dir(working_dir)
+        silent_remove(output_hocr_file)
     return output_file
 
 
@@ -837,8 +890,13 @@ def pdf2text(input_file, output_file=None, perform_ocr=True, ln='en', **dummy):
     execute_command(CFG_PATH_PDFTOTEXT, '-enc', 'UTF-8', '-eol', 'unix', '-nopgbrk', input_file, output_file)
     if perform_ocr and can_perform_ocr():
         ocred_output = pdf2hocr(input_file, ln=ln, extract_only_text=True)
-        open(output_file, 'a').write(open(ocred_output).read())
-        os.remove(ocred_output)
+        try:
+            output = open(output_file, 'a')
+            for row in open(ocred_output):
+                output.write(row)
+            output.close()
+        finally:
+            silent_remove(ocred_output)
     return output_file
 
 
@@ -903,12 +961,17 @@ def djvu2ps(input_file, output_file=None, level=2, compress=True, **dummy):
     """
     if compress:
         input_file, output_file, working_dir = prepare_io(input_file, output_file, output_ext='.ps.gz')
-        execute_command(CFG_PATH_DJVUPS, input_file, os.path.join(working_dir, 'output.ps'))
-        execute_command(CFG_PATH_GZIP, '-c', os.path.join(working_dir, 'output.ps'), filename_out=output_file)
+        try:
+            execute_command(CFG_PATH_DJVUPS, input_file, os.path.join(working_dir, 'output.ps'))
+            execute_command(CFG_PATH_GZIP, '-c', os.path.join(working_dir, 'output.ps'), filename_out=output_file)
+        finally:
+            clean_working_dir(working_dir)
     else:
-        input_file, output_file, working_dir = prepare_io(input_file, output_file, output_ext='.ps')
-        execute_command(CFG_PATH_DJVUPS, '-level=%i' % level, input_file, output_file)
-    clean_working_dir(working_dir)
+        try:
+            input_file, output_file, working_dir = prepare_io(input_file, output_file, output_ext='.ps')
+            execute_command(CFG_PATH_DJVUPS, '-level=%i' % level, input_file, output_file)
+        finally:
+            clean_working_dir(working_dir)
     return output_file
 
 
@@ -918,15 +981,17 @@ def tiff2pdf(input_file, output_file=None, pdfopt=True, pdfa=True, perform_ocr=T
     """
     if pdfa or pdfopt or perform_ocr:
         input_file, output_file, working_dir = prepare_io(input_file, output_file, '.pdf')
-        partial_output = os.path.join(working_dir, 'output.pdf')
-        execute_command(CFG_PATH_TIFF2PDF, '-o', partial_output, input_file)
-        if perform_ocr:
-            pdf2hocr2pdf(partial_output, output_file, pdfopt=pdfopt, **args)
-        elif pdfa:
-            pdf2pdfa(partial_output, output_file, pdfopt=pdfopt, **args)
-        else:
-            pdfopt(partial_output, output_file)
-        clean_working_dir(working_dir)
+        try:
+            partial_output = os.path.join(working_dir, 'output.pdf')
+            execute_command(CFG_PATH_TIFF2PDF, '-o', partial_output, input_file)
+            if perform_ocr:
+                pdf2hocr2pdf(partial_output, output_file, pdfopt=pdfopt, **args)
+            elif pdfa:
+                pdf2pdfa(partial_output, output_file, pdfopt=pdfopt, **args)
+            else:
+                pdfopt(partial_output, output_file)
+        finally:
+            clean_working_dir(working_dir)
     else:
         input_file, output_file, dummy = prepare_io(input_file, output_file, '.pdf', need_working_dir=False)
         execute_command(CFG_PATH_TIFF2PDF, '-o', output_file, input_file)
@@ -938,12 +1003,14 @@ def pstotext(input_file, output_file=None, **dummy):
     Convert a .ps[.gz] into text.
     """
     input_file, output_file, working_dir = prepare_io(input_file, output_file, '.txt')
-    if input_file.endswith('.gz'):
-        new_input_file = os.path.join(working_dir, 'input.ps')
-        execute_command(CFG_PATH_GUNZIP, '-c', input_file, filename_out=new_input_file)
-        input_file = new_input_file
-    execute_command(CFG_PATH_PSTOTEXT, '-output', output_file, input_file)
-    clean_working_dir(working_dir)
+    try:
+        if input_file.endswith('.gz'):
+            new_input_file = os.path.join(working_dir, 'input.ps')
+            execute_command(CFG_PATH_GUNZIP, '-c', input_file, filename_out=new_input_file)
+            input_file = new_input_file
+        execute_command(CFG_PATH_PSTOTEXT, '-output', output_file, input_file)
+    finally:
+        clean_working_dir(working_dir)
     return output_file
 
 
@@ -1021,10 +1088,13 @@ def clean_working_dir(working_dir):
 def execute_command(*args, **argd):
     """Wrapper to run_process_with_timeout."""
     debug("Executing: %s" % (args, ))
+    args = [str(arg) for arg in args]
     res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), filename_err=argd.get('filename_err'))
+    get_file_converter_logger().debug('res: %s, stdout: %s, stderr: %s' % (res, stdout, stderr))
     if res != 0:
-        error("Error when executing %s" % (args, ))
-        raise InvenioWebSubmitFileConverterError("Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr))
+        message = "ERROR: Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr)
+        get_file_converter_logger().error(message)
+        raise InvenioWebSubmitFileConverterError(message)
     return stdout
 
 
@@ -1033,9 +1103,18 @@ def execute_command_with_stderr(*args, **argd):
     debug("Executing: %s" % (args, ))
     res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'))
     if res != 0:
-        error("Error when executing %s" % (args, ))
-        raise InvenioWebSubmitFileConverterError("Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr))
+        message = "ERROR: Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr)
+        get_file_converter_logger().error(message)
+        raise InvenioWebSubmitFileConverterError(message)
     return stdout, stderr
+
+def silent_remove(path):
+    """Remove without errors a path."""
+    if os.path.exists(path):
+        try:
+            os.remove(path)
+        except OSError:
+            pass
 
 __CONVERSION_MAP = get_conversion_map()
 
