@@ -56,9 +56,8 @@ refactor.</p>
 from <a href="http://www.python.org/peps/pep-0008.html">PEP 8</a>,
 although the existing code surely do not fulfil them here and there.
 The code indentation is done via spaces only, please do not use tabs.
-One tab counts as four spaces.  Emacs users can look into
-our <a href="<CFG_SITE_URL>/hacking/cdsware.el">cdsware.el</a> and
-our <a href="https://twiki.cern.ch/twiki/bin/view/CDS/EmacsTips">Emacs
+One tab counts as four spaces.  Emacs users can look into our
+<a href="https://twiki.cern.ch/twiki/bin/view/CDS/EmacsTips">Emacs
 Tips wiki page</a> for inspiration.</p>
 
 <p>All the Python code should be extensively documented via

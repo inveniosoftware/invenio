@@ -15,9 +15,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/hacking
-doc_DATA = cdsware.el
-
 imgdir = $(localstatedir)/www/img/hacking
 img_DATA = modules-overview-diagram.jpeg
 
@@ -32,6 +29,6 @@ webdoclib_DATA = \
 	test-suite.webdoc \
 	fckeditor.webdoc
 
-EXTRA_DIST = $(webdoclib_DATA) $(doc_DATA) $(img_DATA)
+EXTRA_DIST = $(webdoclib_DATA) $(img_DATA)
 
 CLEANFILES = *~ *.tmp
