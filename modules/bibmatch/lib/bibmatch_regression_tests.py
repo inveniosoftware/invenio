@@ -144,10 +144,10 @@ class BibMatchTest(unittest.TestCase):
       <subfield code="a">Silverstein, Eva</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0209226.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209226.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0209226.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209226.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">evas@slac.stanford.edu</subfield>

@@ -28,7 +28,7 @@ CFG_BIBFORMAT_BFX_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (CFG_ETCD
 
 CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION = "bfx"
 
-CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE = "http://cdsware.cern.ch/invenio/"
+CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE = "http://invenio-software.org/"
 
 CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS = {
 #record is a reserved keyword, don't use it

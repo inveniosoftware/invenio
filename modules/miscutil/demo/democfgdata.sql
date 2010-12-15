@@ -52,8 +52,8 @@ INSERT INTO collection VALUES (22,'Atlantis Times',NULL,NULL,NULL);
 INSERT INTO collection VALUES (23,'Atlantis Institute Books','hostedcollection:',NULL,NULL);
 INSERT INTO collection VALUES (24,'Atlantis Institute Articles','hostedcollection:',NULL,NULL);
 
-INSERT INTO clsMETHOD VALUES (1,'HEP','http://cdsware.cern.ch/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
-INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://cdsware.cern.ch/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
+INSERT INTO clsMETHOD VALUES (1,'HEP','http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf','High Energy Physics Taxonomy','0000-00-00 00:00:00');
+INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','http://invenio-software.org/download/invenio-demo-site-files/NASA-subjects.rdf','NASA Subjects','0000-00-00 00:00:00');
 
 INSERT INTO collection_clsMETHOD VALUES (2,1);
 INSERT INTO collection_clsMETHOD VALUES (12,2);
@@ -887,7 +887,7 @@ INSERT INTO oaiREPOSITORY VALUES (2,'CERN experimental papers','cern:experiment'
 INSERT INTO oaiREPOSITORY VALUES (3,'CERN theoretical papers','cern:theory','','','c=;p1=CERN;f1=reportnumber;m1=a;p2=TH;f2=division;m2=e;p3=;f3=;m3=;',NULL,'CERN','reportnumber','a','TH','division','e','','','');
 
 INSERT INTO portalbox VALUES (1,'ABOUT THIS SITE','Welcome to the demo site of the Invenio, a free document server software coming from CERN.  Please feel free to explore all the features of this demo site to the full.');
-INSERT INTO portalbox VALUES (2,'SEE ALSO','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (2,'SEE ALSO','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (3,'ABOUT ARTICLES','The Articles collection contains all the papers published in scientific journals by our staff.  The collection starts from 1998.');
 INSERT INTO portalbox VALUES (4,'SEE ALSO','<a href=\"http://arXiv.org/\">arXiv.org</a><br /><a href=\"http://cds.cern.ch/\">CDS</a><br /><a href=\"www.chemweb.com\">ChemWeb</a><br /><a href=\"http://www.ams.org/mathscinet\">MathSciNet</a>');
 INSERT INTO portalbox VALUES (5,'ABOUT PREPRINTS','The Preprints collection contains not-yet-published papers and research results obtained at the institute.  The collection starts from 2001.');
@@ -911,25 +911,25 @@ INSERT INTO portalbox VALUES (22,'ABOUT BOOKS AND REPORTS','This collection grou
 INSERT INTO portalbox VALUES (23,'ABOUT MULTIMEDIA & OUTREACH','This collection groups together all multimedia- and outreach- oriented material.');
 INSERT INTO portalbox VALUES (24,'ABOUT POETRY','This collection presents poetry excerpts, mainly to demonstrate and test the treatment of various languages.<p>Vitrum edere possum; mihi non nocet.<br />Μπορώ να φάω σπασμένα γυαλιά χωρίς να πάθω τίποτα.<br />Pòdi manjar de veire, me nafrariá pas.<br />Ég get etið gler án þess að meiða mig.<br />Ic mæg glæs eotan ond hit ne hearmiað me.<br />ᛁᚳ᛫ᛗᚨᚷ᛫ᚷᛚᚨᛋ᛫ᛖᚩᛏᚪᚾ᛫ᚩᚾᛞ᛫ᚻᛁᛏ᛫ᚾᛖ᛫ᚻᛖᚪᚱᛗᛁᚪᚧ᛫ᛗᛖ᛬<br />⠊⠀⠉⠁⠝⠀⠑⠁⠞⠀⠛⠇⠁⠎⠎⠀⠁⠝⠙⠀⠊⠞⠀⠙⠕⠑⠎⠝⠞⠀⠓⠥⠗⠞⠀⠍⠑<br />Pot să mănânc sticlă și ea nu mă rănește.<br />Meg tudom enni az üveget, nem lesz tőle bajom.<br />Môžem jesť sklo. Nezraní ma.<br /><span dir="rtl" lang="he">אני יכול לאכול זכוכית וזה לא מזיק לי.</span><br /><span dir="rtl" lang="ji">איך קען עסן גלאָז און עס טוט מיר נישט װײ.</span><br /><span dir="RTL" lang=AR>أنا قادر على أكل الزجاج و هذا لا يؤلمني.</span><br />Я могу есть стекло, оно мне не вредит.<br />მინას ვჭამ და არა მტკივა.<br />Կրնամ ապակի ուտել և ինծի անհանգիստ չըներ։<br />मैं काँच खा सकता हूँ, मुझे उस से कोई पीडा नहीं होती.<br />काचं शक्नोम्यत्तुम् । नोपहिनस्ति माम् ॥<br />ฉันกินกระจกได้ แต่มันไม่ทำให้ฉันเจ็บ<br />Tôi có thể ăn thủy tinh mà không hại gì.<br /><span lang="zh">我能吞下玻璃而不伤身体。</span><br /><span lang=ja>私はガラスを食べられます。それは私を傷つけません。</span><br /><span lang=ko>나는 유리를 먹을 수 있어요. 그래도 아프지 않아요</span><br />(<a href="http://www.columbia.edu/kermit/utf8.html">http://www.columbia.edu/kermit/utf8.html</a>)');
 INSERT INTO portalbox VALUES (25,'À PROPOS DE CE SITE','Bienvenue sur le site de démonstration de Invenio, un logiciel libre pour des serveurs des documents, venant du CERN.  Veuillez explorer les possibilités de ce site de démonstration de tous ses côtés.');
-INSERT INTO portalbox VALUES (26,'VOIR AUSSI','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (26,'VOIR AUSSI','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (27,'O TÝCHTO STRÁNKACH','Vitajte na demonštračných stránkach Invenio, voľne dostupného softwaru pre dokumentové servery, pochádzajúceho z CERNu.  Prehliadnite si možnosti našeho demonštračného serveru podla ľubovôle.');
-INSERT INTO portalbox VALUES (28,'VIĎ TIEŽ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (28,'VIĎ TIEŽ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (29,'O TĚCHTO STRÁNKÁCH','Vítejte na demonstračních stránkách Invenio, volně dostupného softwaru pro dokumentové servery, pocházejícího z CERNu.  Prohlédněte si možnosti našeho demonstračního serveru podle libosti.');
-INSERT INTO portalbox VALUES (30,'VIZ TÉŽ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (30,'VIZ TÉŽ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (31,'ÜBER DIESEN SEITEN','Willkommen Sie bei der Demo-Seite des Invenio, des Dokument Management Systems Software aus CERN. Hier können Sie den System gleich und frei ausprobieren.');
-INSERT INTO portalbox VALUES (32,'SEHEN SIE AUCH','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (32,'SEHEN SIE AUCH','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (33,'ACERCA DE ESTAS PÁGINAS','Bienvenidos a las páginas de demostración de Invenio, un software gratuito desarrollado por el CERN que permite crear un servidor de documentos. Le invitamos a explorar a fondo todas las funcionalidades ofrecidas por estas páginas de demostración.');
-INSERT INTO portalbox VALUES (34,'VEA TAMBIÉN','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (34,'VEA TAMBIÉN','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (35,'A PROPOSITO DI QUESTO SITO','Benvenuti nel sito demo di Invenio, un software libero per server di documenti sviluppato al CERN. Vi invitiamo ad esplorare a fondo tutte le caratteristiche di questo sito demo.');
-INSERT INTO portalbox VALUES (36,'VEDI ANCHE','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (36,'VEDI ANCHE','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (37,'OM DENNE SIDEN','Velkommen til demosiden for Invenio, en gratis dokumentserver fra CERN. Vennligst føl deg fri til å utforske alle mulighetene i denne demoen til det fulle.');
-INSERT INTO portalbox VALUES (38,'SE OGSÅ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (38,'SE OGSÅ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (39,'SOBRE ESTE SITE','Bem vindo ao site de demonstração do Invenio, um servidor de documentos livre desenvolvido pelo CERN. Sinta-se à vontade para explorar plenamente todos os recursos deste site demonstração.');
-INSERT INTO portalbox VALUES (40,'VEJA TAMBÉM','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (40,'VEJA TAMBÉM','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (41,'ОБ ЭТОМ САЙТЕ','Добро пожаловать на наш демонстрационный сайт Invenio. Invenio -- свободная программа для серверов документов, разработанная в CERNе.  Пожалуйста пользуйтесь свободно этим сайтом.');
-INSERT INTO portalbox VALUES (42,'СМОТРИТЕ ТАКЖЕ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (42,'СМОТРИТЕ ТАКЖЕ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (43,'OM DENNA WEBBPLATS','Välkommen till demoinstallationen av Invenio, en fri programvara för hantering av dokument, från CERN. Välkommen att undersöka alla funktioner i denna installation.');
-INSERT INTO portalbox VALUES (44,'SE ÄVEN','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (44,'SE ÄVEN','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (45,'SUBMIT PREPRINT','<a href=\"/submit?doctype=TEXT\">Submit a new preprint</a>');
 INSERT INTO portalbox VALUES (46,'SUBMIT BOOK','<a href=\"/submit?doctype=TEXT\">Submit a new book</a>');
 INSERT INTO portalbox VALUES (47,'SUBMIT THESIS','<a href=\"/submit?doctype=TEXT\">Submit a new thesis</a>');
@@ -940,36 +940,36 @@ INSERT INTO portalbox VALUES (51,'SUBMIT NEW DOCUMENT','<a href=\"/submit?doctyp
 INSERT INTO portalbox VALUES (52,'SUBMIT NEW DOCUMENT','<a href=\"/submit?doctype=TEXT\">Submit a new book</a><br /><a href=\"/submit?doctype=TEXT\">Submit a new thesis</a><br /><a href=\"/submit?doctype=TEXT\">Submit a new report</a>');
 INSERT INTO portalbox VALUES (53,'SUBMIT NEW DOCUMENT','<a href=\"/submit?doctype=DEMOPIC\">Submit a new picture</a>');
 INSERT INTO portalbox VALUES (54,'ΣΧΕΤΙΚΑ ΜΕ ΤΗΝ ΣΕΛΙΔΑ','Καλως ήλθατε στον δικτυακό τόπο του Invenio, ενός δωρεάν εξυπηρετητή για έγγραφα προερχόμενο απο το CERN. Είστε ευπρόσδεκτοι να εξερευνήσετε σε βάθος τις δυνατότητες που σας παρέχει ο δικτυακός αυτός τόπος.');
-INSERT INTO portalbox VALUES (55,'ΔΕΙΤΕ ΕΠΙΣΗΣ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (55,'ΔΕΙΤΕ ΕΠΙΣΗΣ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (56,'ПРО ЦЕЙ САЙТ','Ласкаво просимо до демонстраційного сайту Invenio, вільного програмного забезпечення, розробленого CERN. Випробуйте всі можливості цього демонстраційного сайту в повному обсязі.');
-INSERT INTO portalbox VALUES (57,'ДИВИСЬ ТАКОЖ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (57,'ДИВИСЬ ТАКОЖ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (58,'SOBRE AQUEST LLOC','Benvinguts al lloc de demo de Invenio, un servidor de documents lliure originat al CERN. Us convidem a explorar a fons totes les funcionalitats ofertes en aquestes pàgines de demostració.');
-INSERT INTO portalbox VALUES (59,'VEGEU TAMBÉ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (59,'VEGEU TAMBÉ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (60,'この場所について','Invenioデモンストレーションの場所への歓迎, CERN から来る自由な文書のサーバーソフトウェア,    このデモンストレーションの場所の特徴すべてを探検する自由の感じ');
-INSERT INTO portalbox VALUES (61,'また見なさい','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (61,'また見なさい','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (62,'O TEJ STRONIE','Witamy w wersji demo systemu Invenio, darmowego oprogramowania do obsługi serwera dokumentów, stworzonego w CERN. Zachęcamy do odkrywania wszelkich funkcjonalności oferowanych przez tę stronę.');
-INSERT INTO portalbox VALUES (63,'ZOBACZ TAKŻE','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (63,'ZOBACZ TAKŻE','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (64,'ЗА САЙТА','Добре дошли на демонстрационния сайт на Invenio, свободен софтуер за документни сървъри изработен в ЦЕРН. Чувствайте се свободни да изследвате всяка една от характеристиките на сайта.');
-INSERT INTO portalbox VALUES (65,'ВИЖ СЪЩО','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (65,'ВИЖ СЪЩО','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (66,'O OVOM SITE-u','Dobrodošli na Invenio demo site. Invenio je slobodno dostupan poslužitelj dokumenata razvijen na CERN-u. Slobodno istražite sve mogućnosti ove aplikacije.');
-INSERT INTO portalbox VALUES (67,'TAKOĐER POGLEDAJTE','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (67,'TAKOĐER POGLEDAJTE','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (68,'关于这个网站','欢迎来到Invenio 的示范网站！Invenio是一个由CERN开发的免费文件服务器软件。 要了解这网站所提供的各项特点, 请立刻行动，尽情探索。');
-INSERT INTO portalbox VALUES (69,'参见','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (69,'参见','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (70,'關於這個網站', '歡迎來到Invenio 的示範網站！Invenio是一個由CERN開發的免費文件伺服器軟體。 要瞭解這網站所提供的各項特點, 請立刻行動，盡情探索。');
-INSERT INTO portalbox VALUES (71,'參見','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (71,'參見','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (72,'IMPRESSZUM', 'Üdvözöljük a Invenio bemutatóoldalain! Ezt a szabad dokumentumkezelő szoftvert a CERN-ben fejlesztették. Fedezze fel bátran a tesztrendszer nyújtotta szolgáltatásokat!');
-INSERT INTO portalbox VALUES (73,'LÁSD MÉG','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (73,'LÁSD MÉG','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (74,'OMTRENT HIERDIE TUISTE', 'Welkom by die demo tuiste van Invenio, gratis dokument bediener sagteware wat deur CERN geskryf is. Voel vry om al die eienskappe van die demo te deursoek.');
-INSERT INTO portalbox VALUES (75,'SIEN OOK','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (75,'SIEN OOK','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (76,'ACERCA DESTE SITIO', 'Benvido ó sitio de demostración do Invenio, un software de servidor de documentos do CERN. Por favor síntete libre de explorar todas as características deste sitio de demostración.');
-INSERT INTO portalbox VALUES (77,'VEXA TAMÉN','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (77,'VEXA TAMÉN','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (78,'ABOUT ATLANTIS TIMES','The \"Atlantis Times\" collections contain the articles from the \<a href=\"/journal/atlantistimes/\">Atlantis Times</a> journal.');
 INSERT INTO portalbox VALUES (79,'DESPRE ACEST SITE', 'Bine aţi venit pe site-ul demo al Invenio, un software gratuit pentru servere de documente, creat de CERN. Nu ezitaţi să exploraţi din plin toate caracteristicile acestui site demo.');
-INSERT INTO portalbox VALUES (80,'ALTE RESURSE','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
+INSERT INTO portalbox VALUES (80,'ALTE RESURSE','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>');
 INSERT INTO portalbox VALUES (81,'IBYEREKERANYE N\'IYI WEB', 'Murakzaneza kuri web ya Invenio, iyi ni koranabuhanga y\'ubuntu ya kozwe na CERN. Bitimuntu afite uburenganzira bwo kuyigerageza no kuyikoresha.');
-INSERT INTO portalbox VALUES (82,'REBA N\'IBI','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>'); -- '
+INSERT INTO portalbox VALUES (82,'REBA N\'IBI','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>'); -- '
 INSERT INTO portalbox VALUES (83,'საიტის შესახებ', 'კეთილი იყოს თქვენი მობრძანება Invenio -ის სადემონსტრაციო საიტზე, თავისუფალი დოკუმენტების სერვერი CERN -ისაგან. გთხოვთ სრულად შეისწავლოთ სადემონსტრაციო საიტის შესაძლებლობები.');
-INSERT INTO portalbox VALUES (84,'ასევე იხილეთ','<a href=\"http://cdsware.cern.ch/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>'); -- '
+INSERT INTO portalbox VALUES (84,'ასევე იხილეთ','<a href=\"http://invenio-software.org/\">Invenio</a><br /><a href=\"http://www.cern.ch/\">CERN</a>'); -- '
 
 INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 

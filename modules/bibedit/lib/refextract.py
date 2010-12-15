@@ -745,11 +745,11 @@ re_extract_char_class = (re.compile(r' \[([^\]]+) \]', re.UNICODE), \
 
 
 ## URL recognition:
-## Stand-alone URL (e.g. http://cdsware.cern.ch/ )
+## Stand-alone URL (e.g. http://invenio-software.org/ )
 re_raw_url = \
  re.compile(r'((https?|s?ftp):\/\/([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)', \
              re.UNICODE|re.I)
-## HTML marked-up URL (e.g. <a href="http://cdsware.cern.ch/">
+## HTML marked-up URL (e.g. <a href="http://invenio-software.org/">
 ## CERN Document Server Software Consortium</a> )
 re_html_tagged_url = \
  re.compile(r'(\<a\s+href\s*=\s*([\'"])?(((https?|s?ftp):\/\/)?([\w\d\_\.\-])+(:\d{1,5})?(\/\~([\w\d\_\.\-])+)?(\/([\w\d\_\.\-])+)*(\/([\w\d\_\-]+\.\w{1,6})?)?)([\'"])?\>([^\<]+)\<\/a\>)', \
@@ -1872,8 +1872,8 @@ def identify_and_tag_URLs(line):
     """Given a reference line, identify URLs in the line, record the
        information about them, and replace them with a "<cds.URL />" tag.
        URLs are identified in 2 forms:
-        + Raw: http://cdsware.cern.ch/
-        + HTML marked-up: <a href="http://cdsware.cern.ch/">CERN Document
+        + Raw: http://invenio-software.org/
+        + HTML marked-up: <a href="http://invenio-software.org/">CERN Document
           Server Software Consortium</a>
        These URLs are considered to have 2 components: The URL itself
        (url string); and the URL description. The description is effectively
@@ -1883,17 +1883,17 @@ def identify_and_tag_URLs(line):
        In the case of a raw URL recognition, however, the URL itself will
        also be used as the URL description.
        For example, in the following reference line:
-        [1] See <a href="http://cdsware.cern.ch/">CERN Document Server
+        [1] See <a href="http://invenio-software.org/">CERN Document Server
         Software Consortium</a>.
-       ...the URL string will be "http://cdsware.cern.ch/" and the URL
+       ...the URL string will be "http://invenio-software.org/" and the URL
        description will be
        "CERN Document Server Software Consortium".
        The line returned from this function will be:
         [1] See <cds.URL />
        In the following line, however:
-        [1] See http //cdsware.cern.ch/ for more details.
-       ...the URL string will be "http://cdsware.cern.ch/" and the URL
-       description will also be "http://cdsware.cern.ch/".
+        [1] See http //invenio-software.org/ for more details.
+       ...the URL string will be "http://invenio-software.org/" and the URL
+       description will also be "http://invenio-software.org/".
        The line returned will be:
         [1] See <cds.URL /> for more details.
 
@@ -2326,8 +2326,8 @@ def create_marc_xml_reference_line(line_marker,
         stripped from it. However, any recognised numeration and/or URLs
         have been tagged with <cds.YYYY> tags.
         The working_line could, for example, look something like this:
-         [1] CDS <cds.URL description="http //cdsware.cern.ch/">
-         http //cdsware.cern.ch/</cds.URL>.
+         [1] CDS <cds.URL description="http //invenio-software.org/">
+         http //invenio-software.org/</cds.URL>.
        @param found_title_len: (dictionary) - the lengths of the title
         citations that have been recognised in the line. Keyed by the index
         within the line of each match.
@@ -4766,11 +4766,11 @@ def rebuild_reference_lines(ref_sectn, ref_line_marker_ptn):
        from PDF to text, reference lines are often broken. This is because
        pdftotext doesn't know what is a wrapped-line and what is a genuine new
        line. As a result, the following 2 reference lines:
-        [1] See http://cdsware.cern.ch/ for more details.
+        [1] See http://invenio-software.org/ for more details.
         [2] Example, AN: private communication (1996).
        ...could be broken into the following 4 lines during translation from PDF
        to plaintext:
-        [1] See http://cdsware.cern.ch/ fo
+        [1] See http://invenio-software.org/ fo
         r more details.
         [2] Example, AN: private communica
         tion (1996).
@@ -5096,11 +5096,11 @@ def write_raw_references_to_stream(recid, raw_refs, strm=None):
     """Write a lost of raw reference lines to the a given stream.
        Each reference line is preceeded by the record-id. Thus, if for example,
        the following 2 reference lines were passed to this function:
-        [1] See http://cdsware.cern.ch/ for more details.
+        [1] See http://invenio-software.org/ for more details.
         [2] Example, AN: private communication (1996).
        and the record-id was "1", the raw reference lines printed to the stream
        would be:
-        1:[1] See http://cdsware.cern.ch/ for more details.
+        1:[1] See http://invenio-software.org/ for more details.
         1:[2] Example, AN: private communication (1996).
        @param recid: (string) the record-id of the document for which raw
         references are to be written-out.

@@ -96,7 +96,7 @@ class BibknowledgeTests(unittest.TestCase):
         new_kb_name = get_kb_name(new_kb_id)
         #get the taxonomy file
         import mechanize
-        response = mechanize.urlopen("http://cdsware.cern.ch/download/invenio-demo-site-files/HEP.rdf")
+        response = mechanize.urlopen("http://invenio-software.org/download/invenio-demo-site-files/HEP.rdf")
         content = response.read()
         f = open(CFG_TMPDIR+"/HEP.rdf","w")
         f.write(content)

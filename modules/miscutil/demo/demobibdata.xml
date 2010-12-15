@@ -36,11 +36,11 @@
       <subfield code="f">neil.calder@cern.ch</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0106015_01.jpg</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0106015_01.jpg</subfield>
       <subfield code="r">restricted_picture</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0106015_01.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0106015_01.gif</subfield>
       <subfield code="f">.gif;icon</subfield>
       <subfield code="r">restricted_picture</subfield>
     </datafield>
@@ -109,8 +109,8 @@
       <subfield code="f">marie.noelle.pages.ribeiro@cern.ch</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0104007_02.jpeg</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/0104007_02.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0104007_02.jpeg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/0104007_02.gif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="o">0003601PHOPHO</subfield>
@@ -169,8 +169,8 @@
       <subfield code="a">Personalities and History of CERN</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/6902127.jpeg</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/6902127.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/6902127.jpeg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/6902127.gif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="o">0002690PHOPHO</subfield>
@@ -225,8 +225,8 @@
       <subfield code="a">Diagrams and Charts</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9906028_01.jpeg</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/9906028_01.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9906028_01.jpeg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/9906028_01.gif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="o">0001754PHOPHO</subfield>
@@ -278,8 +278,8 @@
       <subfield code="f">neil.calder@cern.ch</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9905005_01.jpeg</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/9905005_01.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9905005_01.jpeg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/9905005_01.gif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="o">0001626PHOPHO</subfield>
@@ -344,8 +344,8 @@
       <subfield code="a">Nobel laureate</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/6206002.jpg</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/6206002.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/6206002.jpg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/6206002.gif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="o">0000736PHOPHO</subfield>
@@ -429,8 +429,8 @@
       <subfield code="f">neil.calder@cern.ch</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9806033.jpeg</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/9806033.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9806033.jpeg</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/9806033.gif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="o">0000655PHOPHO</subfield>
@@ -538,26 +538,26 @@
       <subfield code="f">George Efstathiou &lt;gpe@ast.cam.ac.uk&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9812226.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9812226.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9812226.fig1.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9812226.fig1.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9812226.fig3.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9812226.fig3.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9812226.fig5.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9812226.fig5.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9812226.fig6.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9812226.fig6.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9812226.fig7.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9812226.fig7.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
@@ -1870,10 +1870,10 @@
       <subfield code="f">valerie.brunner@cern.ch</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/ep-2001-094.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/ep-2001-094.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/ep-2001-094.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/ep-2001-094.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2002</subfield>
@@ -2190,41 +2190,41 @@
       <subfield code="f">Meghan Gray &lt;meg@ast.cam.ac.uk&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.ps.gz</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig1.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig1.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig2.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig2.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig3.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig3.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig4.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig4.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig5a.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig5a.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig5b.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig5b.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig6.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig6.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0101431.fig7.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0101431.fig7.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
@@ -2364,10 +2364,10 @@
       <subfield code="f">Michelangelo MANGANO &lt;Michelangelo.Mangano@cern.ch&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0105155.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0105155.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0105155.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0105155.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2001</subfield>
@@ -5128,10 +5128,10 @@
       <subfield code="f">Deepak Jain &lt;deepak@physics.du.ac.in&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0104076.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0104076.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0104076.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0104076.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2001</subfield>
@@ -7676,10 +7676,10 @@
       <subfield code="f">Alexander Kamenshchik &lt;sasha.kamenshchik@centrovolta.it&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204045.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204045.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204045.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204045.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -7814,10 +7814,10 @@
       <subfield code="f">Maria da Conceicao Bento &lt;bento@sirius.ist.utl.pt&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204046.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204046.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204046.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204046.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2002</subfield>
@@ -7870,10 +7870,10 @@
       <subfield code="f">A. D. Alhaidari &lt;haidari@kfupm.edu.sa&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204098.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204098.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204098.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204098.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2002</subfield>
@@ -7940,10 +7940,10 @@
       <subfield code="f">M. G. Jackson &lt;markj@phys.columbia.edu&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204099.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204099.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204099.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204099.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -8170,10 +8170,10 @@
       <subfield code="f">Igor Shovkovy &lt;shovkovy@physics.umn.edu&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204132.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204132.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204132.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204132.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -8666,10 +8666,10 @@
       <subfield code="f">Mario E. Gomez &lt;mgomez@gtae3.ist.utl.pt&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204133.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204133.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204133.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204133.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -9135,10 +9135,10 @@
       <subfield code="f">"Jacinda S.M. GINGES" &lt;ginges@phys.unsw.edu.au&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204134.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204134.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204134.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204134.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -9657,10 +9657,10 @@
       <subfield code="f">Jean Orloff &lt;orloff@in2p3.fr&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204135.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204135.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204135.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204135.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2002</subfield>
@@ -9734,10 +9734,10 @@
       <subfield code="f">Shaaban Khalil &lt;shaaban.khalil@durham.ac.uk&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204136.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204136.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204136.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204136.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -10361,10 +10361,10 @@
       <subfield code="f">Emmanuel A. Paschos &lt;paschos@hal1.physik.uni-dortmund.de&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204137.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204137.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204137.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204137.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -10683,10 +10683,10 @@
       <subfield code="f">Emmanuel A. Paschos &lt;paschos@hal1.physik.uni-dortmund.de&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204138.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204138.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204138.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204138.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -10951,10 +10951,10 @@
       <subfield code="f">George Rupp &lt;george@ajax.ist.utl.pt&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204139.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204139.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204139.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204139.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -11318,10 +11318,10 @@
       <subfield code="f">Paolo Gambino &lt;paolo.gambino@cern.ch&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204140.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204140.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204140.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204140.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -12011,10 +12011,10 @@
       <subfield code="f">Robert Shrock &lt;shrock@insti.physics.sunysb.edu&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204141.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204141.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204141.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204141.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -12439,10 +12439,10 @@
       <subfield code="f">Mary K Gaillard &lt;gaillard@thsrv.lbl.gov&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204100.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204100.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204100.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204100.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -12784,10 +12784,10 @@
       <subfield code="f">Maxim Perelstein &lt;meperelstein@lbl.gov&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204142.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204142.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204142.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204142.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -13314,10 +13314,10 @@
       <subfield code="f">Pavol Domin &lt;domin@chavena.dnp.fmph.uniba.sk&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204143.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204143.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204143.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204143.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -13565,10 +13565,10 @@
       <subfield code="f">Hitoshi Nishino &lt;hnishino@csulb.edu&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204101.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204101.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204101.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204101.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -13920,10 +13920,10 @@
       <subfield code="f">Zhanying Yang &lt;yzy@phy.nwu.edu.cn&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204102.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204102.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204102.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204102.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -14202,10 +14202,10 @@
       <subfield code="f">"Philip R. page" &lt;prp@t16prp.lanl.gov&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204031.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204031.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204031.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204031.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="b">11</subfield>
@@ -14270,10 +14270,10 @@
       <subfield code="f">Ken Amos &lt;amos@physics.unimelb.edu.au&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204032.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204032.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204032.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204032.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2002</subfield>
@@ -14332,10 +14332,10 @@
       <subfield code="f">Kei Iida &lt;keiiida@postman.riken.go.jp&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204033.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204033.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204033.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204033.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -14709,10 +14709,10 @@
       <subfield code="f">Bozek &lt;bozek@sothis.ifj.edu.pl&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204034.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204034.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0204034.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0204034.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2002</subfield>
@@ -14776,10 +14776,10 @@
       <subfield code="a">Veropoulos, G</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/convert_SCAN-9605068.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/convert_SCAN-9605068.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/SCAN-9605068.tif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/SCAN-9605068.tif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="b">13</subfield>
@@ -14913,10 +14913,10 @@
       <subfield code="f">Miguel S Costa &lt;miguel@feynman.princeton.edu&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003289.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003289.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003289.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003289.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2000</subfield>
@@ -15545,10 +15545,10 @@
       <subfield code="f">Brett McInnes &lt;matmcinn@nus.edu.sg&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003291.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003291.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003291.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003291.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">2000</subfield>
@@ -15670,10 +15670,10 @@
       <subfield code="f">library@kekvax.kek.jp</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/convert_SCAN-9605071.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/convert_SCAN-9605071.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/SCAN-9605071.tif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/SCAN-9605071.tif</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="0">
       <subfield code="y">1996</subfield>
@@ -15740,10 +15740,10 @@
       <subfield code="f">spallucci@ts.infn.it</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003293.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003293.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003293.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003293.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -15949,10 +15949,10 @@
       <subfield code="f">Keizo Matsubara &lt;keizo.matsubara@teorfys.uu.se&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003294.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003294.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003294.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003294.ps.gz</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
       <subfield code="b">CER</subfield>
@@ -16065,41 +16065,41 @@
       <subfield code="f">Elcio Abdalla &lt;eabdalla@fma.if.usp.br&gt;</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.ps.gz</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig1.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig1.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig2.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig2.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig3.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig3.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig4.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig4.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig5.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig5.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig6a.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig6a.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig6b.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig6b.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0003295.fig7.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0003295.fig7.ps.gz</subfield>
       <subfield code="t">Additional</subfield>
     </datafield>
     <datafield tag="909" ind1="C" ind2="5">
@@ -16512,10 +16512,10 @@
       <subfield code="y">2002</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0210114.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0210114.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0210114.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0210114.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">klebanov@feynman.princeton.edu</subfield>
@@ -16782,10 +16782,10 @@
       <subfield code="y">2002</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0201100.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0201100.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0201100.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0201100.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">wolfgang.mueck@na.infn.it</subfield>
@@ -16940,10 +16940,10 @@
       <subfield code="y">2003</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0205061.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0205061.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0205061.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0205061.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">d.martelli@qmul.ac.uk</subfield>
@@ -17221,10 +17221,10 @@
       <subfield code="y">2002</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0207111.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0207111.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0207111.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0207111.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">ramgosk@het.brown.edu</subfield>
@@ -17514,10 +17514,10 @@
       <subfield code="a">Silverstein, Eva</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0209226.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209226.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0209226.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209226.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">evas@slac.stanford.edu</subfield>
@@ -17796,10 +17796,10 @@
       <subfield code="a">Berkooz, Micha</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0209257.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209257.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0209257.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0209257.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">berkooz@wisemail.weizmann.ac.il</subfield>
@@ -18194,10 +18194,10 @@
       <subfield code="y">2003</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0210075.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0210075.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0210075.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0210075.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">serone@he.sissa.it</subfield>
@@ -18541,10 +18541,10 @@
       <subfield code="y">2003</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0212138.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0212138.ps.gz</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0212138.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0212138.pdf</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">ssgubser@Princeton.EDU</subfield>
@@ -18643,10 +18643,10 @@
       <subfield code="y">2003</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0212181.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0212181.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0212181.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0212181.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">alberto.zaffaroni@mib.infn.it</subfield>
@@ -18913,10 +18913,10 @@
       <subfield code="y">2003</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0212314.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0212314.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0212314.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0212314.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">matsu@yukawa.kyoto-u.ac.jp</subfield>
@@ -19742,10 +19742,10 @@
       <subfield code="y">2003</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0304229.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0304229.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0304229.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0304229.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">barvin@lpi.ru</subfield>
@@ -20000,10 +20000,10 @@
       <subfield code="a">Witten, Edward</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0307041.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0307041.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0307041.ps.gz</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0307041.ps.gz</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">witten@ias.edu</subfield>
@@ -20349,7 +20349,7 @@
       <subfield code="y">2005</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0402130.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0402130.pdf</subfield>
     </datafield>
     <datafield tag="916" ind1=" " ind2=" ">
       <subfield code="s">n</subfield>
@@ -20619,7 +20619,7 @@
       <subfield code="a">Pioline, Boris</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0501145.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0501145.pdf</subfield>
     </datafield>
     <datafield tag="901" ind1=" " ind2=" ">
       <subfield code="u">LPTHE</subfield>
@@ -21054,7 +21054,7 @@
       <subfield code="y">2007</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0606038.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0606038.pdf</subfield>
     </datafield>
     <datafield tag="916" ind1=" " ind2=" ">
       <subfield code="s">n</subfield>
@@ -21495,7 +21495,7 @@
       <subfield code="y">2006</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0606096.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0606096.pdf</subfield>
     </datafield>
     <datafield tag="916" ind1=" " ind2=" ">
       <subfield code="s">n</subfield>
@@ -21851,7 +21851,7 @@
       <subfield code="p">Phys. Rev. Lett.</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0703265.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0703265.pdf</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">yunes@gravity.psu.edu&gt; Uploader Engine &lt;uploader@sundh99.cern.ch</subfield>
@@ -22044,7 +22044,7 @@
       <subfield code="y">1997</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9611103.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9611103.pdf</subfield>
     </datafield>
     <datafield tag="859" ind1=" " ind2=" ">
       <subfield code="f">vipul@viper.princeton.edu</subfield>
@@ -22147,7 +22147,7 @@
       <subfield code="a">ARTICLE</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9809057.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9809057.pdf</subfield>
     </datafield>
   </record>
   <!--added the following record to get an example of finding a reference-->
@@ -22312,10 +22312,10 @@
       <subfield code="s">Phys. Rev. D 54 (1996) 7561</subfield>
     </datafield>
     <datafield tag="FFT" ind1="" ind2="">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0002060.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0002060.pdf</subfield>
     </datafield>
     <datafield tag="FFT" ind1="" ind2="">
-        <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/0002060.ps.gz</subfield>
+        <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/0002060.ps.gz</subfield>
     </datafield>
   </record>
   <record>
@@ -22540,7 +22540,7 @@
       <subfield code="a">ARTICLE</subfield>
     </datafield>
     <datafield tag="FFT" ind1="" ind2="">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/convert_SCAN-0005061.pdf</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/convert_SCAN-0005061.pdf</subfield>
     </datafield>
   </record>
   <record>
@@ -22618,7 +22618,7 @@
       <subfield code="a">000008580CER</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-        <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/9709037.pdf</subfield>
+        <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/9709037.pdf</subfield>
     </datafield>
   </record>
   <record>
@@ -22635,7 +22635,7 @@
       <subfield code="a">A naturalist's voyage around the world</subfield>
     </datafield>
     <datafield tag="520" ind1=" " ind2=" ">
-      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">After having been twice driven back by heavy south-western gales, Her Majesty's ship Beagle" a ten-gun brig, under the command of Captain Fitz Roy, R.N., sailed from Devonport on the 27th of December, 1831. The object of the expedition was to complete the survey of Patagonia and Tierra del Fuego, commenced under Captain King in 1826 to 1830--to survey the shores of Chile, Peru, and of some islands in the Pacific--and to carry a chain of chronometrical measurements round the World.&lt;/p> &lt;div class="phwithcaption"> &lt;div class="imageScale">&lt;img alt="" src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_hms_beagle_image.gif" />&lt;/div> &lt;p>H.M.S. Beagle&lt;/p> &lt;/div> &lt;p>On the 6th of January we reached Teneriffe, but were prevented landing, by fears of our bringing the cholera: the next morning we saw the sun rise behind the rugged outline of the Grand Canary Island, and suddenly illumine the Peak of Teneriffe, whilst the lower parts were veiled in fleecy clouds. This was the first of many delightful days never to be forgotten. On the 16th of January 1832 we anchored at Porto Praya, in St. Jago, the chief island of the Cape de Verd archipelago.&lt;/p> &lt;p>The neighbourhood of Porto Praya, viewed from the sea, wears a desolate aspect. The volcanic fires of a past age, and the scorching heat of a tropical sun, have in most places rendered the soil unfit for vegetation. The country rises in successive steps of table-land, interspersed with some truncate conical hills, and the horizon is bounded by an irregular chain of more lofty mountains. The scene, as beheld through the hazy atmosphere of this climate, is one of great interest; if, indeed, a person, fresh from sea, and who has just walked, for the first time, in a grove of cocoa-nut trees, can be a judge of anything but his own happiness. The island would generally be considered as very uninteresting, but to any one accustomed only to an English landscape, the novel aspect of an utterly sterile land possesses a grandeur which more vegetation might spoil. A single green leaf can scarcely be discovered over wide tracts of the lava plains; yet flocks of goats, together with a few cows, contrive to exist. It rains very seldom, but during a short portion of the year heavy torrents fall, and immediately afterwards a light vegetation springs out of every crevice. This soon withers; and upon such naturally formed hay the animals live. It had not now rained for an entire year. When the island was discovered, the immediate neighbourhood of Porto Praya was clothed with trees,1 the reckless destruction of which has caused here, as at St. Helena, and at some of the Canary islands, almost entire sterility. The broad, flat-bottomed valleys, many of which serve during a few days only in the season as watercourses, are clothed with thickets of leafless bushes. Few living creatures inhabit these valleys. The commonest bird is a kingfisher (Dacelo Iagoensis), which tamely sits on the branches of the castor-oil plant, and thence darts on grasshoppers and lizards. It is brightly coloured, but not so beautiful as the European species: in its flight, manners, and place of habitation, which is generally in the driest valley, there is also a wide difference. One day, two of the officers and myself rode to Ribeira Grande, a village a few miles eastward of Porto Praya. Until we reached the valley of St. Martin, the country presented its usual dull brown appearance; but here, a very small rill of water produces a most refreshing margin of luxuriant vegetation. In the course of an hour we arrived at Ribeira Grande, and were surprised at the sight of a large ruined fort and cathedral. This little town, before its harbour was filled up, was the principal place in the island: it now presents a melancholy, but very picturesque appearance. Having procured a black Padre for a guide, and a Spaniard who had served in the Peninsular war as an interpreter, we visited a collection of buildings, of which an ancient church formed the principal part. It is here the governors and captain-generals of the islands have been buried. Some of the tombstones recorded dates of the sixteenth century.1 The heraldic ornaments were the only things in this retired place that reminded us of Europe. The church or chapel formed one side of a quadrangle, in the middle of which a large clump of bananas were growing. On another side was a hospital, containing about a ozen miserable-looking inmates.&lt;/p> &lt;p>We returned to the Vênda to eat our dinners. A considerable number of men, women, and children, all as black as jet, collected to watch us. Our companions were extremely merry; and everything we said or did was followed by their hearty laughter. Before leaving the town we visited the cathedral. It does not appear so rich as the smaller church, but boasts of a little organ, which sent forth singularly inharmonious cries. We presented the black priest with a few shillings, and the Spaniard, patting him on the head, said, with much candour, he thought his colour made no great difference. We then returned, as fast as the ponies would go, to Porto Praya.&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 1, By Charles Darwin)</subfield>
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">After having been twice driven back by heavy south-western gales, Her Majesty's ship Beagle" a ten-gun brig, under the command of Captain Fitz Roy, R.N., sailed from Devonport on the 27th of December, 1831. The object of the expedition was to complete the survey of Patagonia and Tierra del Fuego, commenced under Captain King in 1826 to 1830--to survey the shores of Chile, Peru, and of some islands in the Pacific--and to carry a chain of chronometrical measurements round the World.&lt;/p> &lt;div class="phwithcaption"> &lt;div class="imageScale">&lt;img alt="" src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_hms_beagle_image.gif" />&lt;/div> &lt;p>H.M.S. Beagle&lt;/p> &lt;/div> &lt;p>On the 6th of January we reached Teneriffe, but were prevented landing, by fears of our bringing the cholera: the next morning we saw the sun rise behind the rugged outline of the Grand Canary Island, and suddenly illumine the Peak of Teneriffe, whilst the lower parts were veiled in fleecy clouds. This was the first of many delightful days never to be forgotten. On the 16th of January 1832 we anchored at Porto Praya, in St. Jago, the chief island of the Cape de Verd archipelago.&lt;/p> &lt;p>The neighbourhood of Porto Praya, viewed from the sea, wears a desolate aspect. The volcanic fires of a past age, and the scorching heat of a tropical sun, have in most places rendered the soil unfit for vegetation. The country rises in successive steps of table-land, interspersed with some truncate conical hills, and the horizon is bounded by an irregular chain of more lofty mountains. The scene, as beheld through the hazy atmosphere of this climate, is one of great interest; if, indeed, a person, fresh from sea, and who has just walked, for the first time, in a grove of cocoa-nut trees, can be a judge of anything but his own happiness. The island would generally be considered as very uninteresting, but to any one accustomed only to an English landscape, the novel aspect of an utterly sterile land possesses a grandeur which more vegetation might spoil. A single green leaf can scarcely be discovered over wide tracts of the lava plains; yet flocks of goats, together with a few cows, contrive to exist. It rains very seldom, but during a short portion of the year heavy torrents fall, and immediately afterwards a light vegetation springs out of every crevice. This soon withers; and upon such naturally formed hay the animals live. It had not now rained for an entire year. When the island was discovered, the immediate neighbourhood of Porto Praya was clothed with trees,1 the reckless destruction of which has caused here, as at St. Helena, and at some of the Canary islands, almost entire sterility. The broad, flat-bottomed valleys, many of which serve during a few days only in the season as watercourses, are clothed with thickets of leafless bushes. Few living creatures inhabit these valleys. The commonest bird is a kingfisher (Dacelo Iagoensis), which tamely sits on the branches of the castor-oil plant, and thence darts on grasshoppers and lizards. It is brightly coloured, but not so beautiful as the European species: in its flight, manners, and place of habitation, which is generally in the driest valley, there is also a wide difference. One day, two of the officers and myself rode to Ribeira Grande, a village a few miles eastward of Porto Praya. Until we reached the valley of St. Martin, the country presented its usual dull brown appearance; but here, a very small rill of water produces a most refreshing margin of luxuriant vegetation. In the course of an hour we arrived at Ribeira Grande, and were surprised at the sight of a large ruined fort and cathedral. This little town, before its harbour was filled up, was the principal place in the island: it now presents a melancholy, but very picturesque appearance. Having procured a black Padre for a guide, and a Spaniard who had served in the Peninsular war as an interpreter, we visited a collection of buildings, of which an ancient church formed the principal part. It is here the governors and captain-generals of the islands have been buried. Some of the tombstones recorded dates of the sixteenth century.1 The heraldic ornaments were the only things in this retired place that reminded us of Europe. The church or chapel formed one side of a quadrangle, in the middle of which a large clump of bananas were growing. On another side was a hospital, containing about a ozen miserable-looking inmates.&lt;/p> &lt;p>We returned to the Vênda to eat our dinners. A considerable number of men, women, and children, all as black as jet, collected to watch us. Our companions were extremely merry; and everything we said or did was followed by their hearty laughter. Before leaving the town we visited the cathedral. It does not appear so rich as the smaller church, but boasts of a little organ, which sent forth singularly inharmonious cries. We presented the black priest with a few shillings, and the Spaniard, patting him on the head, said, with much candour, he thought his colour made no great difference. We then returned, as fast as the ponies would go, to Porto Praya.&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 1, By Charles Darwin)</subfield>
     </datafield>
     <datafield tag="590" ind1=" " ind2=" ">
       <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
@@ -22654,8 +22654,8 @@
       <subfield code="a">ATLANTISTIMESNEWS</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_hms_beagle_image.gif</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_hms_beagle_image.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/journal_hms_beagle_image.gif</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_hms_beagle_image.gif</subfield>
     </datafield>
   </record>
   <record>
@@ -22705,7 +22705,7 @@
       <subfield code="a">Atlantis (Timaeus)</subfield>
     </datafield>
     <datafield tag="520" ind1=" " ind2=" ">
-      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">This great island lay over against the Pillars of Heracles, in extent greater than Libya and Asia put together, and was the passage to other islands and to a great ocean of which the Mediterranean sea was only the harbour; and within the Pillars the empire of Atlantis reached in Europe to Tyrrhenia and in Libya to Egypt.&lt;/p> &lt;p>This mighty power was arrayed against Egypt and Hellas and all the countries&lt;/p> &lt;div class="phrwithcaption"> &lt;div class="imageScale">&lt;img src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif" alt="" />&lt;/div> &lt;p>Representation of Atlantis by Athanasius Kircher (1669)&lt;/p> &lt;/div> bordering on the Mediterranean. Then your city did bravely, and won renown over the whole earth. For at the peril of her own existence, and when the other Hellenes had deserted her, she repelled the invader, and of her own accord gave liberty to all the nations within the Pillars. A little while afterwards there were great earthquakes and floods, and your warrior race all sank into the earth; and the great island of Atlantis also disappeared in the sea. This is the explanation of the shallows which are found in that part of the Atlantic ocean. &lt;p> &lt;/p> (Excerpt from TIMAEUS, By Plato, translated By Jowett, Benjamin)&lt;br /></subfield>
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">This great island lay over against the Pillars of Heracles, in extent greater than Libya and Asia put together, and was the passage to other islands and to a great ocean of which the Mediterranean sea was only the harbour; and within the Pillars the empire of Atlantis reached in Europe to Tyrrhenia and in Libya to Egypt.&lt;/p> &lt;p>This mighty power was arrayed against Egypt and Hellas and all the countries&lt;/p> &lt;div class="phrwithcaption"> &lt;div class="imageScale">&lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif" alt="" />&lt;/div> &lt;p>Representation of Atlantis by Athanasius Kircher (1669)&lt;/p> &lt;/div> bordering on the Mediterranean. Then your city did bravely, and won renown over the whole earth. For at the peril of her own existence, and when the other Hellenes had deserted her, she repelled the invader, and of her own accord gave liberty to all the nations within the Pillars. A little while afterwards there were great earthquakes and floods, and your warrior race all sank into the earth; and the great island of Atlantis also disappeared in the sea. This is the explanation of the shallows which are found in that part of the Atlantic ocean. &lt;p> &lt;/p> (Excerpt from TIMAEUS, By Plato, translated By Jowett, Benjamin)&lt;br /></subfield>
     </datafield>
     <datafield tag="590" ind1=" " ind2=" ">
       <subfield code="b">&lt;!--HTML-->&lt;br /></subfield>
@@ -22729,8 +22729,8 @@
       <subfield code="a">ATLANTISTIMESNEWS</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_Athanasius_Kircher_Atlantis_image.gif</subfield>
     </datafield>
   </record>
   <record>
@@ -22747,7 +22747,7 @@
       <subfield code="a">The order Rodentia in South America</subfield>
     </datafield>
     <datafield tag="520" ind1=" " ind2=" ">
-      <subfield code="b">&lt;!--HTML-->&lt;p>The order Rodentia is here very numerous in species: of mice alone I obtained no less than eight kinds. &lt;sup>&lt;a name="note1" href="#footnote1">1&lt;/a>&lt;/sup>The largest gnawing animal in the world, the Hydrochærus capybara (the water-hog), is here also common. One which I shot at Monte Video weighed ninety-eight pounds: its length, from the end of the snout to the stump-like tail, was three feet two inches; and its girth three feet eight. These great Rodents occasionally frequent the islands in the mouth of the Plata, where the water is quite salt, but are far more abundant on the borders of fresh-water lakes and rivers. Near Maldonado three or four generally live together. In the daytime they either lie among the aquatic plants, or openly feed on the turf plain.&lt;sup>&lt;a name="note2" href="#footnote2">2&lt;/a>&lt;/sup>&lt;/p> &lt;p> &lt;div class="phlwithcaption"> &lt;div class="imageScale">&lt;img src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_water_dog_image.gif" alt="" />&lt;/div> &lt;p>Hydrochærus capybara or Water-hog&lt;/p> &lt;/div> When viewed at a distance, from their manner of walking and colour they resemble pigs: but when seated on their haunches, and attentively watching any object with one eye, they reassume the appearance of their congeners, cavies and rabbits. Both the front and side view of their head has quite a ludicrous aspect, from the great depth of their jaw. These animals, at Maldonado, were very tame; by cautiously walking, I approached within three yards of four old ones. This tameness may probably be accounted for, by the Jaguar having been banished for some years, and by the Gaucho not thinking it worth his while to hunt them. As I approached nearer and nearer they frequently made their peculiar noise, which is a low abrupt grunt, not having much actual sound, but rather arising from the sudden expulsion of air: the only noise I know at all like it, is the first hoarse bark of a large dog. Having watched the four from almost within arm's length (and they me) for several minutes, they rushed into the water at full gallop with the greatest impetuosity, and emitted at the same time their bark. After diving a short distance they came again to the surface, but only just showed the upper part of their heads. When the female is swimming in the water, and has young ones, they are said to sit on her back. These animals are easily killed in numbers; but their skins are of trifling value, and the meat is very indifferent. On the islands in the Rio Parana they are exceedingly abundant, and afford the ordinary prey to the Jaguar.&lt;/p> &lt;p>&lt;small>&lt;sup>&lt;a name="footnote1" href="#note1">1&lt;/a>&lt;/sup>. In South America I collected altogether twenty-seven species of mice, and thirteen more are known from the works of Azara and other authors. Those collected by myself have been named and described by Mr. Waterhouse at the meetings of the Zoological Society. I must be allowed to take this opportunity of returning my cordial thanks to Mr. Waterhouse, and to the other gentleman attached to that Society, for their kind and most liberal assistance on all occasions.&lt;/small>&lt;/p> &lt;p>&lt;small>&lt;sup>&lt;a name="footnote2" href="#note2">2&lt;/a>&lt;/sup>. In the stomach and duodenum of a capybara which I opened, I found a very large quantity of a thin yellowish fluid, in which scarcely a fibre could be distinguished. Mr. Owen informs me that a part of the oesophagus is so constructed that nothing much larger than a crowquill can be passed down. Certainly the broad teeth and strong jaws of this animal are well fitted to grind into pulp the aquatic plants on which it feeds.&lt;/small>&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 3, By Charles Darwin)</subfield>
+      <subfield code="b">&lt;!--HTML-->&lt;p>The order Rodentia is here very numerous in species: of mice alone I obtained no less than eight kinds. &lt;sup>&lt;a name="note1" href="#footnote1">1&lt;/a>&lt;/sup>The largest gnawing animal in the world, the Hydrochærus capybara (the water-hog), is here also common. One which I shot at Monte Video weighed ninety-eight pounds: its length, from the end of the snout to the stump-like tail, was three feet two inches; and its girth three feet eight. These great Rodents occasionally frequent the islands in the mouth of the Plata, where the water is quite salt, but are far more abundant on the borders of fresh-water lakes and rivers. Near Maldonado three or four generally live together. In the daytime they either lie among the aquatic plants, or openly feed on the turf plain.&lt;sup>&lt;a name="note2" href="#footnote2">2&lt;/a>&lt;/sup>&lt;/p> &lt;p> &lt;div class="phlwithcaption"> &lt;div class="imageScale">&lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_water_dog_image.gif" alt="" />&lt;/div> &lt;p>Hydrochærus capybara or Water-hog&lt;/p> &lt;/div> When viewed at a distance, from their manner of walking and colour they resemble pigs: but when seated on their haunches, and attentively watching any object with one eye, they reassume the appearance of their congeners, cavies and rabbits. Both the front and side view of their head has quite a ludicrous aspect, from the great depth of their jaw. These animals, at Maldonado, were very tame; by cautiously walking, I approached within three yards of four old ones. This tameness may probably be accounted for, by the Jaguar having been banished for some years, and by the Gaucho not thinking it worth his while to hunt them. As I approached nearer and nearer they frequently made their peculiar noise, which is a low abrupt grunt, not having much actual sound, but rather arising from the sudden expulsion of air: the only noise I know at all like it, is the first hoarse bark of a large dog. Having watched the four from almost within arm's length (and they me) for several minutes, they rushed into the water at full gallop with the greatest impetuosity, and emitted at the same time their bark. After diving a short distance they came again to the surface, but only just showed the upper part of their heads. When the female is swimming in the water, and has young ones, they are said to sit on her back. These animals are easily killed in numbers; but their skins are of trifling value, and the meat is very indifferent. On the islands in the Rio Parana they are exceedingly abundant, and afford the ordinary prey to the Jaguar.&lt;/p> &lt;p>&lt;small>&lt;sup>&lt;a name="footnote1" href="#note1">1&lt;/a>&lt;/sup>. In South America I collected altogether twenty-seven species of mice, and thirteen more are known from the works of Azara and other authors. Those collected by myself have been named and described by Mr. Waterhouse at the meetings of the Zoological Society. I must be allowed to take this opportunity of returning my cordial thanks to Mr. Waterhouse, and to the other gentleman attached to that Society, for their kind and most liberal assistance on all occasions.&lt;/small>&lt;/p> &lt;p>&lt;small>&lt;sup>&lt;a name="footnote2" href="#note2">2&lt;/a>&lt;/sup>. In the stomach and duodenum of a capybara which I opened, I found a very large quantity of a thin yellowish fluid, in which scarcely a fibre could be distinguished. Mr. Owen informs me that a part of the oesophagus is so constructed that nothing much larger than a crowquill can be passed down. Certainly the broad teeth and strong jaws of this animal are well fitted to grind into pulp the aquatic plants on which it feeds.&lt;/small>&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 3, By Charles Darwin)</subfield>
     </datafield>
     <datafield tag="590" ind1=" " ind2=" ">
       <subfield code="b">&lt;!--HTML-->&lt;br />test fr</subfield>
@@ -22766,8 +22766,8 @@
       <subfield code="a">ATLANTISTIMESSCIENCE</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_water_dog_image.gif</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_water_dog_image.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/journal_water_dog_image.gif</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_water_dog_image.gif</subfield>
     </datafield>
   </record>
   <record>
@@ -22784,7 +22784,7 @@
       <subfield code="a">Rio Macâe</subfield>
     </datafield>
     <datafield tag="520" ind1=" " ind2=" ">
-      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">April 14th, 1832.—Leaving Socêgo, we rode to another estate on the Rio Macâe, which was the last patch of cultivated ground in that direction. The estate was two and a half miles long, and the owner had forgotten how many broad.&lt;/p> &lt;p> &lt;div class="phlwithcaption"> &lt;div class="imageScale">&lt;img src="http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_virgin_forest_image.gif" alt="" />&lt;/div> &lt;p>Virgin Forest&lt;/p> &lt;/div> Only a very small piece had been cleared, yet almost every acre was capable of yielding all the various rich productions of a tropical land. Considering the enormous area of Brazil, the proportion of cultivated ground can scarcely be considered as anything compared to that which is left in the state of nature: at some future age, how vast a population it will support! During the second day's journey we found the road so shut up that it was necessary that a man should go ahead with a sword to cut away the creepers. The forest abounded with beautiful objects; among which the tree ferns, though not large, were, from their bright green foliage, and the elegant curvature of their fronds, most worthy of admiration. In the evening it rained very heavily, and although the thermometer stood at 65°, I felt very cold. As soon as the rain ceased, it was curious to observe the extraordinary evaporation which commenced over the whole extent of the forest. At the height of a hundred feet the hills were buried in a dense white vapour, which rose like columns of smoke from the most thickly-wooded parts, and especially from the valleys. I observed this phenomenon on several occasions: I suppose it is owing to the large surface of foliage, previously heated by the sun's rays.&lt;/p> &lt;p>While staying at this estate, I was very nearly being an eye-witness to one of those atrocious acts which can only take place in a slave country. Owing to a quarrel and a lawsuit, the owner was on the point of taking all the women and children from the male slaves, and selling them separately at the public auction at Rio. Interest, and not any feeling of compassion, prevented this act. Indeed, I do not believe the inhumanity of separating thirty families, who had lived together for many years, even occurred to the owner. Yet I will pledge myself, that in humanity and good feeling he was superior to the common run of men. It may be said there exists no limit to the blindness of interest and selfish habit. I may mention one very trifling anecdote, which at the time struck me more forcibly than any story of cruelty. I was crossing a ferry with a negro who was uncommonly stupid. In endeavouring to make him understand, I talked loud, and made signs, in doing which I passed my hand near his face. He, I suppose, thought I was in a passion, and was going to strike him; for instantly, with a frightened look and half-shut eyes, he dropped his hands. I shall never forget my feelings of surprise, disgust, and shame, at seeing a great powerful man afraid even to ward off a blow, directed, as he thought, at his face. This man had been trained to a degradation lower than the slavery of the most helpless animal.&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 2, By Charles Darwin)</subfield>
+      <subfield code="b">&lt;!--HTML-->&lt;p class="articleHeader">April 14th, 1832.—Leaving Socêgo, we rode to another estate on the Rio Macâe, which was the last patch of cultivated ground in that direction. The estate was two and a half miles long, and the owner had forgotten how many broad.&lt;/p> &lt;p> &lt;div class="phlwithcaption"> &lt;div class="imageScale">&lt;img src="http://invenio-software.org/download/invenio-demo-site-files/icon-journal_virgin_forest_image.gif" alt="" />&lt;/div> &lt;p>Virgin Forest&lt;/p> &lt;/div> Only a very small piece had been cleared, yet almost every acre was capable of yielding all the various rich productions of a tropical land. Considering the enormous area of Brazil, the proportion of cultivated ground can scarcely be considered as anything compared to that which is left in the state of nature: at some future age, how vast a population it will support! During the second day's journey we found the road so shut up that it was necessary that a man should go ahead with a sword to cut away the creepers. The forest abounded with beautiful objects; among which the tree ferns, though not large, were, from their bright green foliage, and the elegant curvature of their fronds, most worthy of admiration. In the evening it rained very heavily, and although the thermometer stood at 65°, I felt very cold. As soon as the rain ceased, it was curious to observe the extraordinary evaporation which commenced over the whole extent of the forest. At the height of a hundred feet the hills were buried in a dense white vapour, which rose like columns of smoke from the most thickly-wooded parts, and especially from the valleys. I observed this phenomenon on several occasions: I suppose it is owing to the large surface of foliage, previously heated by the sun's rays.&lt;/p> &lt;p>While staying at this estate, I was very nearly being an eye-witness to one of those atrocious acts which can only take place in a slave country. Owing to a quarrel and a lawsuit, the owner was on the point of taking all the women and children from the male slaves, and selling them separately at the public auction at Rio. Interest, and not any feeling of compassion, prevented this act. Indeed, I do not believe the inhumanity of separating thirty families, who had lived together for many years, even occurred to the owner. Yet I will pledge myself, that in humanity and good feeling he was superior to the common run of men. It may be said there exists no limit to the blindness of interest and selfish habit. I may mention one very trifling anecdote, which at the time struck me more forcibly than any story of cruelty. I was crossing a ferry with a negro who was uncommonly stupid. In endeavouring to make him understand, I talked loud, and made signs, in doing which I passed my hand near his face. He, I suppose, thought I was in a passion, and was going to strike him; for instantly, with a frightened look and half-shut eyes, he dropped his hands. I shall never forget my feelings of surprise, disgust, and shame, at seeing a great powerful man afraid even to ward off a blow, directed, as he thought, at his face. This man had been trained to a degradation lower than the slavery of the most helpless animal.&lt;/p> (Excerpt from A NATURALIST'S VOYAGE ROUND THE WORLD Chapter 2, By Charles Darwin)</subfield>
     </datafield>
     <datafield tag="773" ind1=" " ind2=" ">
       <subfield code="c">1</subfield>
@@ -22795,8 +22795,8 @@
       <subfield code="a">ATLANTISTIMESNEWS</subfield>
     </datafield>
     <datafield tag="FFT" ind1=" " ind2=" ">
-      <subfield code="a">http://cdsware.cern.ch/download/invenio-demo-site-files/journal_virgin_forest_image.gif</subfield>
-      <subfield code="x">http://cdsware.cern.ch/download/invenio-demo-site-files/icon-journal_virgin_forest_image.gif</subfield>
+      <subfield code="a">http://invenio-software.org/download/invenio-demo-site-files/journal_virgin_forest_image.gif</subfield>
+      <subfield code="x">http://invenio-software.org/download/invenio-demo-site-files/icon-journal_virgin_forest_image.gif</subfield>
     </datafield>
   </record>
   <record>

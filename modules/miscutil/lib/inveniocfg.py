@@ -765,7 +765,7 @@ def _detect_ip_address():
     """
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('cdsware.cern.ch', 0))
+        s.connect(('invenio-software.org', 0))
         return s.getsockname()[0]
     except:
         return '*'

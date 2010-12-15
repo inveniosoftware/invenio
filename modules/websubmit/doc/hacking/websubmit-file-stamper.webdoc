@@ -74,4 +74,4 @@ def stamp_file(options):
         fails for one reason or another.
     """
 </pre></protect>
-<p>See <a href="http://cdsware.cern.ch/invenio/code-browser/invenio.websubmit_file_stamper-module.html">websubmit_file_stamper API</a> for a complete API description.</p>
+<p>See <a href="http://invenio-software.org/code-browser/invenio.websubmit_file_stamper-module.html">websubmit_file_stamper API</a> for a complete API description.</p>

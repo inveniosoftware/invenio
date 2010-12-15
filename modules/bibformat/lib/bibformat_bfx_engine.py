@@ -63,7 +63,7 @@ class BFXParser:
     Customized for MARC to XML conversion through the use of a MARCTranslator.
 
     Templates are strict XML files. They are built by combining any tags with the
-    special BFX tags living in the http://cdsware.cern.ch/invenio/ namespace.
+    special BFX tags living in the http://invenio-software.org/ namespace.
     Easily extensible by tags of your own.
     Defined tags:
         - template: defines a template
@@ -1181,7 +1181,7 @@ def get_node_subelement(parent_node, name, namespace = None):
     Get the first childnode with specific name and (optional) namespace
     @param parent_node: the node to check
     @param name: the name to search
-    @param namespace: An optional namespace URI. This is usually a URL: http://cdsware.cern.ch/invenio/
+    @param namespace: An optional namespace URI. This is usually a URL: http://invenio-software.org/
     @return: the found node; None otherwise
     '''
     output = None

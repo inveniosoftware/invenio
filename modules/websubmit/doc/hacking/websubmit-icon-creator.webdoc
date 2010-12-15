@@ -79,4 +79,4 @@ def create_icon(options):
         fails for one reason or another.
     """
 </pre></protect>
-<p>See <a href="http://cdsware.cern.ch/invenio/code-browser/invenio.websubmit_icon_creator-module.html">websubmit_icon_creator API</a> for a complete API description.</p>
+<p>See <a href="http://invenio-software.org/code-browser/invenio.websubmit_icon_creator-module.html">websubmit_icon_creator API</a> for a complete API description.</p>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<bx:style xmlns:bx="http://cdsware.cern.ch/invenio/">
+<bx:style xmlns:bx="http://invenio-software.org/">
 
   <bx:format name="oaidc2marcxml" description="Convert OAIdc to XML MARC using bfx engine" content-type="text/xml">
         <collection>
@@ -66,14 +66,14 @@
 		<bx:if name='./metadata/oaidc:dc/dc:subject'>
                 <bx:then>
                     <datafield tag="650" ind1="1" ind2="7">
-                        <subfield code="a"><bx:field name="./metadata/oaidc:dc/dc:subject"/></subfield>  
+                        <subfield code="a"><bx:field name="./metadata/oaidc:dc/dc:subject"/></subfield>
                     </datafield>
                 </bx:then>
 		</bx:if>
 		<bx:if name='./metadata/oaidc:dc/dc:type'>
                 <bx:then>
 		    <datafield tag="655" ind1="7" ind2="">
-                        <subfield code="a"><bx:field name="./metadata/oaidc:dc/dc:type"/></subfield>  
+                        <subfield code="a"><bx:field name="./metadata/oaidc:dc/dc:type"/></subfield>
                     </datafield>
                 </bx:then>
 		</bx:if>
@@ -135,7 +135,7 @@
               	</record>
             </bx:loop>
         </collection>
-        
+
   </bx:format>
 
 </bx:style>

@@ -34,12 +34,12 @@ class AsyncDownloadTest(unittest.TestCase):
         """websearch_external_collections_getter - asynchronous download"""
 
         ## Test various cases for the async_download function:
-        ##   - test 1 working page: cdsware
+        ##   - test 1 working page: invenio-software.org
         ##   - test 1 unresolvable name: rjfreijoiregjreoijgoirg.fr
         ##   - test 1 bad IP: 1.2.3.4
         ## Return the list of errors.
         checks = [
-            {'url': 'http://invenio-software.org', 'content': '<title>\n      Invenio\n    </title>'},
+            {'url': 'http://invenio-software.org', 'content': 'About Invenio'},
             {'url': 'http://rjfreijoiregjreoijgoirg.fr'},
             {'url': 'http://1.2.3.4/'} ]
 
