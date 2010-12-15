@@ -417,6 +417,7 @@ def register_exception(force_stack=False,
             filename, line_no, function_name = _get_filename_and_line(exc_info)
 
             ## let's log the exception and see whether we should report it.
+            pretty_notification_info = get_pretty_notification_info(exc_name, filename, line_no)
             if exception_should_be_notified(exc_name, filename, line_no) and (CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 1 or
                 (alert_admin and CFG_SITE_ADMIN_EMAIL_EXCEPTIONS > 0) or
                 not written_to_log):
@@ -425,7 +426,7 @@ def register_exception(force_stack=False,
                 if not subject:
                     subject = 'Exception (%s:%s:%s)' % (filename, line_no, function_name)
                 subject = '%s at %s' % (subject, CFG_SITE_URL)
-                email_text = "\n%s\n%s" % (get_pretty_notification_info(exc_name, filename, line_no), email_text)
+                email_text = "\n%s\n%s" % (pretty_notification_info, email_text)
                 if not written_to_log:
                         email_text += """\
 Note that this email was sent to you because it has been impossible to log
