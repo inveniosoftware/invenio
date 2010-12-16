@@ -103,7 +103,7 @@
   <datafield tag="711" ind1=" " ind2=" ">
     <subfield code="a">Hadron Collider Physics Symposium 2007</subfield>
   </datafield>
-  <datafield tag="773" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">55-59</subfield>
     <subfield code="p">Nucl. Phys. B, Proc. Suppl.</subfield>
     <subfield code="v">177-178</subfield>

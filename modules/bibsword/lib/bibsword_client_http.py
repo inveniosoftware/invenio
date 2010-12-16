@@ -20,6 +20,8 @@ BibSWORD Client Http Queries
 '''
 
 import urllib2
+from tempfile import NamedTemporaryFile
+from invenio.config import CFG_TMPDIR
 from invenio.bibsword_config import CFG_DEFAULT_USER_AGENT
 
 class RemoteSwordServer:
@@ -37,10 +39,13 @@ class RemoteSwordServer:
             This method the constructor of the class, it initialise the
             connection using a passord. That allows users to connect with
             auto-authentication.
-            @param (self)      : reference to the current instance of the class
-            @param (realm)    : name of the realm provide by this object
-            @param (username) : name of an arxiv known user
-            @param (password) : password of the known user
+            @param self: reference to the current instance of the class
+            @param authentication_infos: dictionary with authentication infos containing
+                                         keys:
+                                            - realm: realm of the server
+                                            - hostname: hostname of the server
+                                            - username: name of an arxiv known user
+                                            - password: password of the known user
         '''
 
         #password manager with default realm to avoid looking for it
@@ -65,11 +70,9 @@ class RemoteSwordServer:
         '''
             This method sent a request to the servicedocument to know the
             collections offer by arxives.
-            @param(self)        : reference to the current instance of the class
-            @param(onbehalf)  : request on behalf of the given user
-            @param(istest)     : enable simulation request, by default=disable
-            @param(url)         : the url where the request is made
-            @return(xml file) : collection of arxiv allowed for the user
+            @param self: reference to the current instance of the class
+            @param url: the url where the request is made
+            @return: (xml file) collection of arxiv allowed for the user
         '''
 
         #format the request
@@ -90,14 +93,11 @@ class RemoteSwordServer:
         '''
             This method allow the deposit of any type of media on a given arxiv
             collection.
-            @param(self)         : reference to the current instanc off the class
-            @param(filnames)    : tuple of file info {'type', 'file'}
-            @param(mymetypes)  : list of the type of file in the same order as file
-            @param(collection) : abreviation of the collection where to deposit
-            @param(onbehalf)    : user that make the deposition
-            @param(istest)      : enable simulation deposit, by default=disabled
-            @param(url)          : url of the deposit location
-            @return(xml file)  : contains error ot the url of the temp file
+            @param self: reference to the current instanc off the class
+            @param media: dict of file info {'type', 'size', 'file'}
+            @param collection: abreviation of the collection where to deposit
+            @param onbehalf: user that make the deposition
+            @return: (xml file) contains error ot the url of the temp file
         '''
 
         #format the final deposit URL
@@ -128,8 +128,8 @@ class RemoteSwordServer:
     def metadata_submission(self, deposit_url, metadata, onbehalf):
         '''
             This method send the metadata to ArXiv, then return the answere
-            @param (metadata) : xml file to submit to ArXiv
-            @param (onbehalf) : specify the persone (and email) to informe of the
+            @param metadata: xml file to submit to ArXiv
+            @param onbehalf: specify the persone (and email) to informe of the
                                       publication
         '''
 
@@ -152,8 +152,10 @@ class RemoteSwordServer:
         try:
             response = urllib2.urlopen(result).read()
         except urllib2.HTTPError, e:
-            tmp_file = open("/tmp/error.xml", "w")
-            tmp_file.write(e.read())
+            tmpfd = NamedTemporaryFile(mode='w', suffix='.xml', prefix='bibsword_error_',
+                                       dir=CFG_TMPDIR, delete=False)
+            tmpfd.write(e.read())
+            tmpfd.close()
             return ''
         except urllib2.URLError:
             return ''
@@ -164,8 +166,8 @@ class RemoteSwordServer:
     def get_submission_status(self, status_url) :
         '''
             This method get the xml file from the given URL and return it
-            @param (status_url) : url where to get the status
-            @return : xml atom entry containing the status
+            @param status_url: url where to get the status
+            @return: xml atom entry containing the status
         '''
 
         #format the http request

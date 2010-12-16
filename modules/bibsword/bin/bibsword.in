@@ -23,7 +23,7 @@
 __revision__ = "$Id$"
 
 try:
-    from invenio.bibsword import main
+    from invenio.bibsword_client import main
 except ImportError, e:
     print "Error: %s" % e
     import sys

@@ -21,13 +21,13 @@
 BibSWORD Client Templates
 '''
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_NAME
 
 class BibSwordTemplate:
     '''
         This class contains attributes and methods that allows to display all
         information used by the BibSword web user interface. Theses informations
-        are formular, validation or error messages
+        are form, validation or error messages
     '''
 
     def __init__(self):
@@ -41,9 +41,9 @@ class BibSwordTemplate:
         '''
             This method generate the html code that displays the acknoledgement
             message after the submission of a record.
-            @param (remote_id) : id of the record given by arXiv
-            @param (links) : links to modify or consult submission
-            @return : string containing the html code
+            @param remote_id: id of the record given by arXiv
+            @param link: links to modify or consult submission
+            @return: string containing the html code
         '''
 
         html = ''
@@ -52,7 +52,7 @@ class BibSwordTemplate:
         html += '''<p>The record has been successfully pushed to arXiv ! <br />''' \
                 '''You will get an email once it will be accepted by ''' \
                 '''arXiv moderator.</p>'''
-        html += '''<p>The arXiv id of the submission is : <b>%s</b></p>''' % \
+        html += '''<p>The arXiv id of the submission is: <b>%s</b></p>''' % \
             remote_id
         html += '''<p><a href="www.arxiv.org/user">Manage your submission</a></p>'''
 
@@ -64,19 +64,18 @@ class BibSwordTemplate:
 
     def tmpl_display_admin_page(self, submissions, first_row, last_row,
                                 total_rows, is_prev, is_last, offset,
-                                error_messages=None) :
+                                error_messages=None):
         '''
             format the html code that display the submission table
-            @param (submissions) : list of all submissions and their status
-            @return : html code to be displayed
+            @param submissions: list of all submissions and their status
+            @return: html code to be displayed
         '''
 
-        if error_messages == None :
+        if error_messages == None:
             error_messages = []
 
         body = '''
-<form method="post" enctype="multipart/form-data" onsubmit="return tester();"
-    accept-charset="UTF-8">
+<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="/bibsword">
     %(error_message)s
 
     <input type="hidden" name="status" value="display_submission"/>
@@ -121,30 +120,30 @@ class BibSwordTemplate:
         %(submissions)s
     </table>
 </form>''' % {
-                 'error_message' : \
+                 'error_message': \
                     self.display_error_message_row(error_messages),
-                 'table_width'   : '100%',
-                 'first_row'     : first_row,
-                 'last_row'      : last_row,
-                 'total_rows'    : total_rows,
-                 'is_prev'       : is_prev,
-                 'is_last'       : is_last,
-                 'selected_1'    : offset[0],
-                 'selected_2'    : offset[1],
-                 'selected_3'    : offset[2],
-                 'selected_4'    : offset[3],
-                 'selected_5'    : offset[4],
-                 'submissions'   : self.fill_submission_table(submissions)
+                 'table_width'  : '100%',
+                 'first_row'    : first_row,
+                 'last_row'     : last_row,
+                 'total_rows'   : total_rows,
+                 'is_prev'      : is_prev,
+                 'is_last'      : is_last,
+                 'selected_1'   : offset[0],
+                 'selected_2'   : offset[1],
+                 'selected_3'   : offset[2],
+                 'selected_4'   : offset[3],
+                 'selected_5'   : offset[4],
+                 'submissions'  : self.fill_submission_table(submissions)
                  }
 
         return body
 
 
-    def tmpl_display_remote_server_info(self, server_info) :
+    def tmpl_display_remote_server_info(self, server_info):
         '''
             Display a table containing all server informations
-            @param (server_info) : tuple containing all server infos
-            @return : html code for the table containing infos
+            @param server_info: tuple containing all server infos
+            @return: html code for the table containing infos
         '''
 
         body =   '''<table width="%(table_width)s">\n''' \
@@ -185,16 +184,16 @@ class BibSwordTemplate:
                  '''        <td>%(url_servicedocument)s</td>\n''' \
                  '''    </tr>\n ''' \
                  '''</table>''' % {
-                    'table_width'         : '50%',
-                    'server_id'           : server_info['server_id'],
-                    'server_name'         : server_info['server_name'],
-                    'server_host'         : server_info['server_host'],
-                    'username'            : server_info['username'],
-                    'password'            : server_info['password'],
-                    'email'               : server_info['email'],
-                    'realm'               : server_info['realm'],
-                    'url_base_record'     : server_info['url_base_record'],
-                    'url_servicedocument' : server_info['url_servicedocument']
+                    'table_width'        : '50%',
+                    'server_id'          : server_info['server_id'],
+                    'server_name'        : server_info['server_name'],
+                    'server_host'        : server_info['server_host'],
+                    'username'           : server_info['username'],
+                    'password'           : server_info['password'],
+                    'email'              : server_info['email'],
+                    'realm'              : server_info['realm'],
+                    'url_base_record'    : server_info['url_base_record'],
+                    'url_servicedocument': server_info['url_servicedocument']
                  }
 
         return body
@@ -205,14 +204,13 @@ class BibSwordTemplate:
         '''
             format the html code that display a dropdown list containing the
             servers
-            @param (self) : reference to the current instance of the class
-            @param (remote_servers) : list of tuple containing server's infos
-            @return : string containing html code
+            @param self: reference to the current instance of the class
+            @param remote_servers: list of tuple containing server's infos
+            @return: string containing html code
         '''
 
         body = '''
-<form method="post" enctype="multipart/form-data" onsubmit="return tester();"
-    accept-charset="UTF-8">
+<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="/bibsword">
     <input type="hidden" name="status" value="select_server"/>
     %(error_message)s
 
@@ -225,7 +223,7 @@ class BibSwordTemplate:
         </tr>
         <tr>
             <td align="right" width="%(row_width)s">
-                <p>Enter the number of the repord to submit : </p>
+                <p>Enter the number of the report to submit: </p>
             </td>
             <td align="left" width="%(row_width)s">
                 <input type="text" name="id_record" size="20"
@@ -234,7 +232,7 @@ class BibSwordTemplate:
         </tr>
         <tr>
             <td align="right" width="%(row_width)s">
-                <p>Select a remote server : </p>
+                <p>Select a remote server: </p>
             </td>
             <td align="left" width="%(row_width)s">
                 <select name="id_remote_server" size="1">
@@ -250,12 +248,12 @@ class BibSwordTemplate:
         </tr>
     </table>
 </form>''' % {
-                 'error_message' : \
+                 'error_message': \
                     self.display_error_message_row(error_messages),
-                 'table_width'    : '100%',
-                 'row_width'      : '50%',
-                 'id_record'      : id_record,
-                 'remote_server' : \
+                 'table_width'   : '100%',
+                 'row_width'     : '50%',
+                 'id_record'     : id_record,
+                 'remote_server': \
                     self.fill_dropdown_remote_servers(remote_servers)
                  }
 
@@ -268,17 +266,15 @@ class BibSwordTemplate:
             format the html code that display the selected server, the informations
             about the selected server and a dropdown list containing the server's
             collections
-            @param (self) : reference to the current instance of the class
-            @param (selected_server) : tuple containing selected server name and id
-            @param (server_infos) : tuple containing infos about selected server
-            @param (collections) : list contianing server's collections
-            @param (remote_servers) : list of tuple containing server's infos
-            @return : string containing html code
+            @param self: reference to the current instance of the class
+            @param selected_server: tuple containing selected server name and id
+            @param server_infos: tuple containing infos about selected server
+            @param collections: list contianing server's collections
+            @return: string containing html code
         '''
 
         body = '''
-<form method="post" enctype="multipart/form-data" onsubmit="return tester();"
-    accept-charset="UTF-8">
+<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="/bibsword">
     <input type="hidden" name="status" value="select_collection"/>
     <input type="hidden" name="id_remote_server" value="%(id_server)s"/>
     <input type="hidden" name="id_record" value="%(id_record)s"/>
@@ -297,12 +293,12 @@ class BibSwordTemplate:
                 <h2>%(server_name)s</h2>
             </td>
             <td align="left">
-                SWORD version : %(server_version)s
+                SWORD version: %(server_version)s
             </td>
         </tr>
         <tr>
             <td align="left">
-                Max upload size [Kb] : %(server_maxUpload)s
+                Max upload size [Kb]: %(server_maxUpload)s
             </td>
         </tr>
         <tr>
@@ -320,7 +316,7 @@ class BibSwordTemplate:
         </td>
         </tr>
         <tr>
-            <td align="right" width="%(row_width)s">Select a collection : </td>
+            <td align="right" width="%(row_width)s">Select a collection: </td>
             <td align="left" width="%(row_width)s">
                 <select name="id_collection" size="1">
                     <option value="0">-- select a collection --</option>
@@ -336,18 +332,18 @@ class BibSwordTemplate:
     </table>
 
 </form>''' % {
-                 'table_width'      : '100%',
-                 'row_width'        : '50%',
-                 'error_message'    : \
+                 'table_width'     : '100%',
+                 'row_width'       : '50%',
+                 'error_message'   : \
                     self.display_error_message_row(error_messages),
-                 'id_server'        : selected_server['id'],
-                 'server_name'      : selected_server['name'],
-                 'server_version'   : server_infos['version'],
-                 'server_maxUpload' : server_infos['maxUploadSize'],
-                 'collection'       : \
+                 'id_server'       : selected_server['id'],
+                 'server_name'     : selected_server['name'],
+                 'server_version'  : server_infos['version'],
+                 'server_maxUpload': server_infos['maxUploadSize'],
+                 'collection'      : \
                     self.fill_dropdown_collections(collections),
-                 'id_record'        : id_record,
-                 'recid'            : recid
+                 'id_record'       : id_record,
+                 'recid'           : recid
                  }
 
         return body
@@ -362,19 +358,17 @@ class BibSwordTemplate:
             about the selected server, the selected collections, the informations
             about the collection and a dropdown list containing the server's
             primary and secondary categories
-            @param (self) : reference to the current instance of the class
-            @param (selected_server) : tuple containing selected server name and id
-            @param (server_infos) : tuple containing infos about selected server
-            @param (collections) : tuple containing selected collection
-            @param (collection_infos) : tuple containing infos about selected col
-            @param (primary_categories) : list of mandated categories for the col
-            @param (remote_servers) : list of optional categories for the col
-            @return : string containing html code
+            @param self: reference to the current instance of the class
+            @param selected_server: tuple containing selected server name and id
+            @param server_infos: tuple containing infos about selected server
+            @param selected_collection: selected collection
+            @param collection_infos: tuple containing infos about selected col
+            @param primary_categories: list of mandated categories for the col
+            @return: string containing html code
         '''
 
         body = '''
-<form method="post" enctype="multipart/form-data" onsubmit="return tester();"
-    accept-charset="UTF-8">
+<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="/bibsword">
     <input type="hidden" name="status" value="select_primary_category"/>
     <input type="hidden" name="id_remote_server" value="%(id_server)s"/>
     <input type="hidden" name="id_collection" value="%(id_collection)s"/>
@@ -395,12 +389,12 @@ class BibSwordTemplate:
                 <h2>%(server_name)s</h2>
             </td>
             <td align="left">
-                SWORD version : %(server_version)s
+                SWORD version: %(server_version)s
             </td>
         </tr>
         <tr>
             <td align="left">
-                Max upload size [Kb] : %(server_maxUpload)s
+                Max upload size [Kb]: %(server_maxUpload)s
             </td>
         </tr>
         <tr>
@@ -423,7 +417,7 @@ class BibSwordTemplate:
                 <h2>%(collection_name)s</h2>
             </td>
             <td align="left">
-                URL : %(collection_url)s
+                URL: %(collection_url)s
             </td>
         </tr>
         <tr>
@@ -449,7 +443,7 @@ class BibSwordTemplate:
         </tr>
         <tr>
             <td align="right" width="%(row_width)s">
-                <p>Select a mandated category : </p>
+                <p>Select a mandated category: </p>
             </td>
             <td align="left" width="%(row_width)s">
                 <select name="id_primary" size="1">
@@ -469,7 +463,7 @@ class BibSwordTemplate:
             </td>
         </tr>
             <td align="right" width="%(row_width)s">
-                <p>Select optional categories : </p>
+                <p>Select optional categories: </p>
             </td>
             <td align="left" width="%(row_width)s">
                 <select name="id_categories" size="10" multiple>
@@ -485,31 +479,31 @@ class BibSwordTemplate:
     </center>
 
 </form>''' % {
-                 'table_width'            : '100%',
-                 'row_width'              : '50%',
-                 'error_message'         : self.display_error_message_row(
+                 'table_width'           : '100%',
+                 'row_width'             : '50%',
+                 'error_message'        : self.display_error_message_row(
                                                  error_messages),
 
                  # hidden input
-                 'id_server'              : selected_server['id'],
-                 'id_collection'         : selected_collection['id'],
-                 'id_record'              : id_record,
-                 'recid'                    : recid,
+                 'id_server'             : selected_server['id'],
+                 'id_collection'        : selected_collection['id'],
+                 'id_record'             : id_record,
+                 'recid'                   : recid,
 
                  # variables values
-                 'server_name'            : selected_server['name'],
-                 'server_version'        : server_infos['version'],
-                 'server_maxUpload'     : server_infos['maxUploadSize'],
+                 'server_name'           : selected_server['name'],
+                 'server_version'       : server_infos['version'],
+                 'server_maxUpload'    : server_infos['maxUploadSize'],
 
-                 'collection_name'      : selected_collection['label'],
+                 'collection_name'     : selected_collection['label'],
 
-                 'collection_accept' : ''.join([
+                 'collection_accept': ''.join([
                 '''<li>%(name)s </li>''' % {
-                        'name' : accept
+                        'name': accept
                 } for accept in collection_infos['accept'] ]),
 
-                 'collection_url'        : selected_collection['url'],
-                 'primary_categories'  : self.fill_dropdown_primary(
+                 'collection_url'       : selected_collection['url'],
+                 'primary_categories' : self.fill_dropdown_primary(
                                                  primary_categories),
 
                  'secondary_categories': self.fill_dropdown_secondary(
@@ -528,8 +522,7 @@ class BibSwordTemplate:
 
 
         body = '''
-<form method="post" enctype="multipart/form-data" onsubmit="return tester();"
-    accept-charset="UTF-8">
+<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="/bibsword">
     <input type="hidden" name="status" value="check_submission"/>
     <input type="hidden" name="id_remote_server" value="%(id_server)s"/>
     <input type="hidden" name="id_collection" value="%(id_collection)s"/>
@@ -552,12 +545,12 @@ class BibSwordTemplate:
                 <h2>%(server_name)s</h2>
             </td>
             <td align="left">
-                Collection : %(collection_name)s ( %(collection_url)s )
+                Collection: %(collection_name)s ( %(collection_url)s )
             </td>
         </tr>
         <tr>
             <td align="left">
-                Primary category : %(primary_name)s ( %(primary_url)s )
+                Primary category: %(primary_name)s ( %(primary_url)s )
             </td>
         </tr>
 %(categories)s
@@ -577,12 +570,12 @@ class BibSwordTemplate:
             </td>
         </tr>
         <tr>
-            <td width="%(row_width)s">Name :</td>
+            <td width="%(row_width)s">Name:</td>
             <td><input type="text" name="author_name" size="100"
                        value="%(user_name)s"/></td>
         </tr>
         <tr>
-            <td>Email :</td>
+            <td>Email:</td>
             <td><input type="text" name="author_email" size="100"
                        value="%(user_email)s"/></td>
         </tr>
@@ -600,20 +593,20 @@ class BibSwordTemplate:
 
     <table border="1" valign="top" width="%(table_width)s">
         <tr>
-            <td align="left" colspan="3" bgcolor="#e6e6fa"><h2>Metadata</h2>   <font color="red"><b>Warning :</b> modification(s) will not be saved on Invenio</font>
+            <td align="left" colspan="3" bgcolor="#e6e6fa"><h2>Metadata</h2>   <font color="red"><b>Warning:</b> modification(s) will not be saved on the %(CFG_SITE_NAME)s</font>
             </td>
         </tr>
         <tr>
-            <td align="left" width="%(row_width)s"><p>Id* :</p></td>
+            <td align="left" width="%(row_width)s"><p>Report Number<span style="color:#f00">*</span>:</p></td>
             <td><input type="text" name="id" size="100" value="%(id)s"/></td>
         </tr>
         <tr>
-            <td align="left" width="%(row_width)s"><p>Title* :</p></td>
+            <td align="left" width="%(row_width)s"><p>Title<span style="color:#f00">*</span>:</p></td>
             <td><input type="text" name="title" size="100" value="%(title)s"/>
             </td>
         </tr>
         <tr>
-            <td align="left" width="%(row_width)s"><p>Summary* :</p></td>
+            <td align="left" width="%(row_width)s"><p>Summary<span style="color:#f00">*</span>:</p></td>
             <td>
                 <textarea name="summary" rows="4" cols="100">%(summary)s
                 </textarea>
@@ -635,6 +628,7 @@ class BibSwordTemplate:
                  'row_width'       : '25%',
                  'error_message'   : \
                     self.display_error_message_row(error_messages),
+                 'CFG_SITE_NAME': CFG_SITE_NAME,
 
                  # hidden input
                  'id_server'         : server['id'],
@@ -681,8 +675,7 @@ class BibSwordTemplate:
         '''
 
         body = '''
-<form method="post" enctype="multipart/form-data" onsubmit="return tester();"
-        accept-charset="UTF-8">
+<form method="post" enctype="multipart/form-data" accept-charset="UTF-8" action="/bibsword">
     <table border="1" valign="top" width="%(table_width)s">
         <tr>
             <td align="left" colspan="7" bgcolor="#e6e6fa">
@@ -718,8 +711,8 @@ class BibSwordTemplate:
     def display_error_message_row(self, error_messages):
         '''
             return a list of error_message in form of a bullet list
-            @param (error_messages) : list of error_messages to display
-            @return : html code that display list of errors
+            @param error_messages: list of error_messages to display
+            @return: html code that display list of errors
         '''
 
         # if no errors, return nothing
@@ -732,25 +725,25 @@ class BibSwordTemplate:
 <tr>
     <td align="left" colspan=2>
         <font color='red'>
-        <p> The following error was found in the formular : </p>
+        <p> The following error was found: </p>
         <ul>
 '''
 
-        else :
+        else:
             # display a generic header message
             body = '''
 <tr>
     <td align="left" colspan=2>
         <font color='red'>
-        <p> Following errors were found in the formular : </p>
+        <p> Following errors were found: </p>
         <ul>
 '''
 
         # insert each error lines
-        for error_message in error_messages :
+        for error_message in error_messages:
             body = body + '''
         <li>%(error)s</li>''' % {
-            'error' : error_message
+            'error': error_message
         }
 
         body = body + '''
@@ -762,32 +755,32 @@ class BibSwordTemplate:
         return body
 
 
-    def fill_submission_table(self, submissions) :
+    def fill_submission_table(self, submissions):
         '''
             This method return the body of the submission state table. each
             submissions given in parameters has one row
-            @param (submissions) : submission status list
+            @param submissions: submission status list
             @return: html table body
         '''
 
         return ''.join([
         '''  <tr>
-        <td>%(id_server)s : <a href="%(server_infos)s">
+        <td>%(id_server)s: <a href="%(server_infos)s">
             %(server_name)s</a></td>
         <td>%(user_name)s <br/> %(user_email)s</td
-        <td>%(id_bibrec)s : <a href="%(cfg_site_url)s/record/%(id_bibrec)s"
+        <td>%(id_bibrec)s: <a href="%(cfg_site_url)s/record/%(id_bibrec)s"
             target="_blank">%(no_bibrec)s</a></td>
         <td><a href="%(url_base_remote)s/%(id_remote)s" target="_blank">
             %(id_remote)s</a></td>
         <td>%(status)s</td>
-        <td><b>submission : </b> %(submission_date)s <br/>
-             <b>publication : </b> %(publication_date)s <br/>
-             <b>removal : </b> %(removal_date)s </td>
-        <td><b>media     : </b> <a href="%(media_link)s" target="_blank">
+        <td><b>submission: </b> %(submission_date)s <br/>
+             <b>publication: </b> %(publication_date)s <br/>
+             <b>removal: </b> %(removal_date)s </td>
+        <td><b>media: </b> <a href="%(media_link)s" target="_blank">
             %(media_link)s</a> <br/>
-             <b>metadata : </b> <a href="%(metadata_link)s" target="_blank">
+             <b>metadata: </b> <a href="%(metadata_link)s" target="_blank">
                 %(metadata_link)s</a> <br />
-             <b>status    : </b> <a href="%(status_link)s" target="_blank">
+             <b>status: </b> <a href="%(status_link)s" target="_blank">
                 %(status_link)s</a></td>
     </tr>''' % {
             'id_server'            : str(submission['id_server']),
@@ -814,31 +807,28 @@ class BibSwordTemplate:
     def fill_dropdown_remote_servers(self, remote_servers):
         '''
             This method fill a dropdown list of remote servers.
-            @param (collections) : list of all collections with name - url
-            @param (selected_col_url) : URL of the selected collection
-            @return (html colde) : code html to display
+            @return: html code to display
         '''
 
         return ''.join([
                 '''<option value="%(id)s">%(name)s - %(host)s</option>''' % {
-                        'id' : str(remote_server['id']),
-                        'name' : remote_server['name'],
-                        'host' : remote_server['host']
+                        'id': str(remote_server['id']),
+                        'name': remote_server['name'],
+                        'host': remote_server['host']
                 } for remote_server in remote_servers])
 
 
     def fill_dropdown_collections(self, collections):
         '''
             This method fill a dropdown list of collection.
-            @param (collections) : list of all collections with name - url
-            @param (selected_col_url) : URL of the selected collection
-            @return (html colde) : code html to display
+            @param collections: list of all collections with name - url
+            @return: html code to display
         '''
 
         return ''.join([
                 '''<option value="%(id)s">%(name)s</option>''' % {
-                        'id' : str(collection['id']),
-                        'name' : collection['label']
+                        'id': str(collection['id']),
+                        'name': collection['label']
                 } for collection in collections])
 
 
@@ -847,13 +837,13 @@ class BibSwordTemplate:
         '''
             This method fill the primary dropdown list with the data given in
             parameter
-            @param (primary) : list of 'url' 'name' tuples
-            @return (body) : html code generated to display the list
+            @param primary_categories: list of 'url' 'name' tuples
+            @return: html code generated to display the list
         '''
         return ''.join([
                 '''<option value="%(id)s">%(name)s</option>'''  % {
-                        'id' : primary_categorie['id'],
-                        'name' : primary_categorie['label']
+                        'id': primary_categorie['id'],
+                        'name': primary_categorie['label']
                 } for primary_categorie in primary_categories])
 
 
@@ -862,17 +852,17 @@ class BibSwordTemplate:
             This method fill a category list. This list is allows the multi-selection
             or items. To proced to select more than one categorie through a browser
             ctrl + clic
-            @param (categories) : list of all categories in the format name - url
-            @reutrn (html code) : the html code that display each dropdown list
+            @param categories: list of all categories in the format name - url
+            @return: the html code that display each dropdown list
         '''
 
-        if len(categories) == '' :
+        if len(categories) == '':
             return ''
 
         return ''.join([
                 '''<option value="%(id)s">%(name)s</option>''' % {
-                        'id' : category['id'],
-                        'name' : category['label']
+                        'id': category['id'],
+                        'name': category['label']
         } for category in categories])
 
 
@@ -881,19 +871,19 @@ class BibSwordTemplate:
         '''
             This method fill a table row that contains name and url of the selected
             optional categories
-            @param (self) : reference to the current instance of the class
-            @param (categories) : list of tuples containing selected categories
-            @return (body) : html code generated to display the list
+            @param self: reference to the current instance of the class
+            @param categories: list of tuples containing selected categories
+            @return: html code generated to display the list
         '''
 
-        if len(categories) == 0 :
+        if len(categories) == 0:
             return ''
 
-        else :
+        else:
             body = '<tr><td>'
 
             body = body + ''.join([
-                '''<p>Category : %(category_name)s ( %(category_url)s )</p>'''%{
+                '''<p>Category: %(category_name)s ( %(category_url)s )</p>'''%{
                     'category_name' : category['label'],
                     'category_url'  : category['url']
                 } for category in categories
@@ -910,16 +900,16 @@ class BibSwordTemplate:
 
         text = ''
 
-        if id_server == 1 :
+        if id_server == 1:
 
             media_type = self.format_media_list_by_type(medias)
 
             text = '''<h2>Please select files you would like to push to arXiv:</h2>'''
 
-            for type in media_type :
-                text += '''<h3><b>%s : </b></h3>''' % type['media_type']
+            for mtype in media_type:
+                text += '''<h3><b>%s: </b></h3>''' % mtype['media_type']
                 text += '''<blockquote>'''
-                for media in type['media_list'] :
+                for media in mtype['media_list']:
                     text += '''<input type='checkbox' name="media" value="%s" %s>%s</input><br />''' % (media['path'], media['selected'], media['name'])
                 text += "</blockquote>"
 
@@ -927,14 +917,14 @@ class BibSwordTemplate:
             text += '''<blockquote>'''
             text += '''<p>In addition, you can submit a new file (that will be added to the record as well):</p>'''
 
-            if from_websubmit == False :
+            if from_websubmit == False:
                 text += '''<input type="file" name="new_media" size="60"/>'''
         return text
 
 
-    def fill_arxiv_help_message(self) :
+    def fill_arxiv_help_message(self):
         text = '''</blockquote><h3>Help</h3>'''
-        text += '''<blockquote><p>For more help on which formats are supported by arXiv, please see :'''\
+        text += '''<blockquote><p>For more help on which formats are supported by arXiv, please see:'''\
                 '''<ul>'''\
                 '''<li><a href="http://arxiv.org/help/submit" target="_blank">'''\
                     '''arXiv submission process</a></li>'''\
@@ -948,19 +938,19 @@ class BibSwordTemplate:
         return text
 
 
-    def fill_contributors_list(self, contributors) :
+    def fill_contributors_list(self, contributors):
         '''
             This method display each contributors in the format of an editable input
             text. This allows the user to modifie it.
-            @param (contributors) : The list of all contributors of the document
-            @return (html code) : the html code that display each dropdown list
+            @param contributors: The list of all contributors of the document
+            @return: the html code that display each dropdown list
         '''
 
         output = ''
 
         is_author = True
 
-        for author in contributors :
+        for author in contributors:
 
             nb_rows = 2
 
@@ -975,7 +965,7 @@ class BibSwordTemplate:
             '''size = "100" value = "%s" id = "email"/>''' % author['email']
 
             author_affiliations = []
-            for affiliation in author['affiliation'] :
+            for affiliation in author['affiliation']:
                 affiliation_row = \
                 '''<LABEL for = "affiliation">Affiliation: </LABEL> ''' \
                 '''<input type="text" name = "contributor_affiliation" ''' \
@@ -990,16 +980,16 @@ class BibSwordTemplate:
             author_affiliations.append(affiliation_row)
             nb_rows = nb_rows + 1
 
-            if is_author :
-                output += '''<tr><td rowspan = "%s">Author : </td>''' % nb_rows
+            if is_author:
+                output += '''<tr><td rowspan = "%s">Author: </td>''' % nb_rows
                 is_author = False
-            else :
-                output += '''<tr><td rowspan = "%s">Contributor : </td>''' % \
+            else:
+                output += '''<tr><td rowspan = "%s">Contributor: </td>''' % \
                     nb_rows
             output += '''<td>%s</td></tr>''' % author_name
             if author_email != '':
                 output += '''<tr><td>%s</td></tr>''' % author_email
-            for affiliation in author_affiliations :
+            for affiliation in author_affiliations:
                 output += '''<tr><td>%s</td></tr>''' % affiliation
             output += \
                 '''<input type = "hidden" name = "contributor_affiliation" ''' \
@@ -1012,8 +1002,8 @@ class BibSwordTemplate:
         '''
             This method display each journal references in the format of an editable
             input text. This allows the user to modifie it.
-            @param (journal_refs) : The list of all journal references of the document
-            @return (html code) : the html code that display each dropdown list
+            @param journal_refs: The list of all journal references of the document
+            @return: the html code that display each dropdown list
         '''
 
         html = ''
@@ -1022,7 +1012,7 @@ class BibSwordTemplate:
 
             html += '''
             <tr>
-                <td align="left"><p>Journal references : </p></td><td>
+                <td align="left"><p>Journal references: </p></td><td>
             '''
 
             html = html + ''.join([
@@ -1030,7 +1020,7 @@ class BibSwordTemplate:
                 <p><input type="text" name="journal_refs" size="100" ''' \
                 '''value="%(journal_ref)s"/></p>
                 ''' % {
-                        'journal_ref' : journal_ref
+                        'journal_ref': journal_ref
                 } for journal_ref in journal_refs
             ])
 
@@ -1042,7 +1032,7 @@ class BibSwordTemplate:
         return html
 
 
-    def fill_report_nos_list(self, report_nos) :
+    def fill_report_nos_list(self, report_nos):
         '''
             Concatate a string containing the report number html table rows
         '''
@@ -1053,14 +1043,14 @@ class BibSwordTemplate:
 
             html = '''
             <tr>
-                <td align="left"><p>Report numbers : </p></td><td>
+                <td align="left"><p>Report numbers: </p></td><td>
             '''
 
             html = html + ''.join([
                 '''
                 <p><input type="text" name="report_nos" size="100" ''' \
                 '''value="%(report_no)s"/></p>''' % {
-                        'report_no' : report_no
+                        'report_no': report_no
                 } for report_no in report_nos
             ])
 
@@ -1085,7 +1075,7 @@ class BibSwordTemplate:
         return id_categories
 
 
-    def format_media_list_by_type(self, medias) :
+    def format_media_list_by_type(self, medias):
         '''
             This function format the media by type (Main, Uploaded, ...)
         '''
@@ -1093,23 +1083,23 @@ class BibSwordTemplate:
         #format media list by type of document
         media_type = []
 
-        for media in medias :
+        for media in medias:
 
             # if it is the first media of this type, create a new type
             is_type_in_media_type = False
-            for type in media_type :
-                if media['collection'] == type['media_type'] :
+            for type in media_type:
+                if media['collection'] == type['media_type']:
                     is_type_in_media_type = True
 
-            if is_type_in_media_type == False :
+            if is_type_in_media_type == False:
                 type = {}
                 type['media_type'] = media['collection']
                 type['media_list'] = []
                 media_type.append(type)
 
             # insert the media in the good media_type element
-            for type in media_type :
-                if type['media_type'] == media['collection'] :
+            for type in media_type:
+                if type['media_type'] == media['collection']:
                     type['media_list'].append(media)
 
         return media_type
