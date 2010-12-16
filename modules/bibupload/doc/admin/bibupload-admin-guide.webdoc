@@ -233,15 +233,16 @@ semantic:
 
 <pre>
     FFT $a  ...  location of the docfile to upload (a filesystem path or a URL)
-        $n  ...  docfile name (optional; if not set, deduced from $a)
-        $m  ...  new desired docfile name (optional; used for renaming files)
-        $t  ...  docfile type (e.g. Main, Additional)
         $d  ...  docfile description (optional)
         $f  ...  format (optional; if not set, deduced from $a)
-        $z  ...  comment (optional)
+        $m  ...  new desired docfile name (optional; used for renaming files)
+        $n  ...  docfile name (optional; if not set, deduced from $a)
+        $o  ...  flag (repeatable subfield)
         $r  ...  restriction (optional, see below)
+        $t  ...  docfile type (e.g. Main, Additional)
         $v  ...  version (used only with REVERT and DELETE-FILE, see below)
         $x  ...  url/path for an icon (optional)
+        $z  ...  comment (optional)
 </pre>
 </p>
 
@@ -392,6 +393,22 @@ will be authorized (that is exactly like setting $r to <tt>example</tt>).</li>
 </ul>
 Note, that authors (as defined in the record MARC) and superadmin are always
 authorized to access a document, no matter what is the given value of the status.
+</p>
+
+<p>Some special flags might be set via FFT and associated with the current
+document by using the $o subfield. This feature is experimental. Currently only
+two flags are actively considered:
+    <ul>
+        <li><strong>HIDDEN</strong>: used to specify that the file that is
+        currently added (via revision or append) must be hidden, i.e. must
+        not be visible to the world but only known by the system (e.g. to
+        allow for fulltext indexing). This flag is permanently associated
+        with the specific revision and format of the file being added.</li>
+        <li><strong>PERFORM_HIDE_PREVIOUS</strong>: used to specify that, although
+        the current file should be visible (unless the HIDDEN flag is also
+        specified), any other previous revision of the document should receive
+        the HIDDEN flag, and should thus be hidden to the world.</li>
+    </ul>
 </p>
 
 <p>Note that each time bibupload is called on a record, the 8564 tags

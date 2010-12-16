@@ -473,11 +473,11 @@ Examples:
     revising_options.add_option("--append", dest='append_path', help='specify the URL/path of the file that will appended to the bibdoc (implies --with-empty-recs=yes)', metavar='PATH/URL')
     revising_options.add_option("--revise", dest='revise_path', help='specify the URL/path of the file that will revise the bibdoc', metavar='PATH/URL')
     revising_options.add_option("--revert", dest='action', action='store_const', const='revert', help='reverts a document to the specified version')
-    revising_options.add_option("--delete", action='store_const', const='delete', dest='action', help='soft-delete the matched documents (applies to all revisions and formats)')
-    revising_options.add_option("--hard-delete", action='store_const', const='hard_delete', dest='action', help='hard-delete the matched documents (applies to matched revisions and formats)')
-    revising_options.add_option("--undelete", action='store_const', const='undelete', dest='action', help='undelete previosuly soft-deleted documents (applies to all revisions and formats)')
-    revising_options.add_option("--purge", action='store_const', const='purge', dest='action', help='purge (i.e. hard-delete previous versions) the matched documents')
-    revising_options.add_option("--expunge", action='store_const', const='expunge', dest='action', help='expunge (i.e. hard-delete any version and formats) the matched documents')
+    revising_options.add_option("--delete", action='store_const', const='delete', dest='action', help='soft-delete the matched documents')
+    revising_options.add_option("--hard-delete", action='store_const', const='hard-delete', dest='action', help='hard-delete the single matched document with a specific format and a specific revision (this operation is not revertible)')
+    revising_options.add_option("--undelete", action='store_const', const='undelete', dest='action', help='undelete previosuly soft-deleted documents')
+    revising_options.add_option("--purge", action='store_const', const='purge', dest='action', help='purge (i.e. hard-delete any format of any version prior to the latest version of) the matched documents')
+    revising_options.add_option("--expunge", action='store_const', const='expunge', dest='action', help='expunge (i.e. hard-delete any version and formats of) the matched documents')
     revising_options.add_option("--with-versions", dest="version", help="specifies the version(s) to be used with hard-delete, hide, revert, e.g.: 1-2,3 or all")
     revising_options.add_option("--with-format", dest="format", help='to specify a format when appending/revising/deleting/reverting a document, e.g. "pdf"', metavar='FORMAT')
     revising_options.add_option("--with-hide-previous", dest='hide_previous', action='store_true', help='when revising, hides previous versions', default=False)
@@ -1063,7 +1063,7 @@ def main():
             cli_fix_marc(options)
         elif getattr(options, 'action', None) == 'delete':
             cli_delete(options)
-        elif getattr(options, 'action', None) == 'delete-file':
+        elif getattr(options, 'action', None) == 'hard-delete':
             cli_delete_file(options)
         elif getattr(options, 'action', None) == 'fix-duplicate-docnames':
             cli_fix_duplicate_docnames(options)
@@ -1088,7 +1088,7 @@ def main():
         else:
             print >> sys.stderr, "ERROR: Action %s is not valid" % getattr(options, 'action', None)
             sys.exit(1)
-    except StandardError, e:
+    except Exception, e:
         register_exception()
         print >> sys.stderr, 'ERROR: %s' % e
         sys.exit(1)
