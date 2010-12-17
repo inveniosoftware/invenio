@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-07 10:07+0100\n"
-"PO-Revision-Date: 2010-12-12 22:35+0100\n"
+"PO-Revision-Date: 2010-12-17 05:58+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Language: \n"
@@ -8793,44 +8793,36 @@ msgstr ""
 "amb els criteris de cerca."
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:507
-#, fuzzy
 msgid "Define new field action"
-msgstr "final de l'acció"
+msgstr "Definir una nova acció pel camp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:508
-#, fuzzy
 msgid "Define new subfield action"
-msgstr "final de l'acció"
+msgstr "Definir una nova acció pel subcamp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:510
-#, fuzzy
 msgid "Select action"
-msgstr "Seleccioneu una puntuació"
+msgstr "Seleccionar una acció"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:511
-#, fuzzy
 msgid "Add field"
-msgstr "Afegeix camp"
+msgstr "Afegir un camp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:512
-#, fuzzy
 msgid "Delete field"
-msgstr "Suprimeix-los tots"
+msgstr "Suprimir un camp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:513
-#, fuzzy
 msgid "Update field"
-msgstr "qualsevol camp"
+msgstr "Actualitzar un camp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:514
-#, fuzzy
 msgid "Add subfield"
-msgstr "Afegeix subcamp"
+msgstr "Afegir un subcamp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:515
-#, fuzzy
 msgid "Delete subfield"
-msgstr "Suprimeix el cistell"
+msgstr "Suprimir un subcamp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:516
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:260
@@ -8839,14 +8831,12 @@ msgid "Save"
 msgstr "Desa"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:518
-#, fuzzy
 msgid "Replace substring"
-msgstr "Suprimeix el comentari"
+msgstr "Substituir un text"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:519
-#, fuzzy
 msgid "Replace full content"
-msgstr "Suprimeix el comentari"
+msgstr "Substituir tot el contingut"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:520
 msgid "with"
@@ -8857,19 +8847,16 @@ msgid "when field equals"
 msgstr "quan el camp és igual a"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:522
-#, fuzzy
 msgid "on subfield"
-msgstr "Afegeix subcamp"
+msgstr "en el subcamp"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:523
-#, fuzzy
 msgid "new value"
-msgstr "Guardar els nous valors"
+msgstr "nou valor"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:524
-#, fuzzy
 msgid "condition"
-msgstr "Edita"
+msgstr "condició"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:525
 msgid "Apply only to specific field instances"
@@ -8880,17 +8867,15 @@ msgid "value"
 msgstr "valor"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:555
-#, fuzzy
 msgid "Back to Results"
-msgstr "Torna als resultats de la cerca"
+msgstr "Torna als resultats"
 
 #: modules/bibedit/lib/bibeditmulti_templates.py:623
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:515
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:571
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:590
-#, fuzzy
 msgid "records found"
-msgstr "%s registres trobats"
+msgstr "registres trobats"
 
 #: modules/bibedit/lib/bibeditmulti_webinterface.py:114
 msgid "Multi-Record Editor"
@@ -8898,15 +8883,13 @@ msgstr "Editor de múltiples registres"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:116
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:132
-#, fuzzy
 msgid "Export Job Overview"
-msgstr "Sumari dels comentaris"
+msgstr "Resum de tasques d'exportació"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:117
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:189
-#, fuzzy
 msgid "New Export Job"
-msgstr "Anomena i desa"
+msgstr "Nova tasca d'exportació"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:118
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:443
@@ -8917,9 +8900,8 @@ msgstr "Exportar l'històric de tasques"
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:195
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:323
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:534
-#, fuzzy
 msgid "Run"
-msgstr "Diu"
+msgstr "Executar"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:176
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:325
@@ -8927,7 +8909,6 @@ msgid "New"
 msgstr "Nou"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:196
-#, fuzzy
 msgid "Last run"
 msgstr "Darrera execució"
 
@@ -8936,24 +8917,20 @@ msgid "Frequency"
 msgstr "Freqüència"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:257
-#, fuzzy
 msgid "Output Format"
-msgstr "Format de visualizació:"
+msgstr "Format de sortida"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:258
-#, fuzzy
 msgid "Start"
-msgstr "Div"
+msgstr "Inici"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:259
-#, fuzzy
 msgid "Output Directory"
-msgstr "Format de visualizació:"
+msgstr "Directori de sortida"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:262
-#, fuzzy
 msgid "Edit Queries"
-msgstr "Edita els paràmetres"
+msgstr "Editar les cerques"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:348
 msgid "Output Fields"
@@ -8966,75 +8943,64 @@ msgstr "Camps de sortida"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:438
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:605
-#, fuzzy
 msgid "Download"
-msgstr "descarregat"
+msgstr "Descarregar"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:439
-#, fuzzy
 msgid "View as: "
-msgstr "Visualitzar"
+msgstr "Visualitzar com:"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:533
 msgid "Job"
 msgstr "Tasca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:588
-#, fuzzy
 msgid "Total"
-msgstr "opcional"
+msgstr "Total"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:653
 msgid "All"
 msgstr "Totes"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:654
-#, fuzzy
 msgid "None"
-msgstr "Fet"
+msgstr "Cap"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:672
-#, fuzzy
 msgid "Manualy"
-msgstr "gener"
+msgstr "Manualment"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:674
-#, fuzzy
 msgid "Daily"
-msgstr "diària"
+msgstr "Diàriament"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:676
-#, fuzzy
 msgid "Weekly"
-msgstr "setmanal"
+msgstr "Setmanalment"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:678
-#, fuzzy
 msgid "Monthly"
-msgstr "mensual"
+msgstr "Mensualment"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:192
 msgid "Edit Export Job"
 msgstr "Editar la tasca d'exportació"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:239
-#, fuzzy
 msgid "Query Results"
-msgstr "Resultats de la cerca"
+msgstr "Resultats de la cerques"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:246
 msgid "Export Job Queries"
 msgstr "Exportar les cerques de la tasca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:320
-#, fuzzy
 msgid "New Query"
-msgstr "Cerca"
+msgstr "Nova cerca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:325
-#, fuzzy
 msgid "Edit Query"
-msgstr "Cerca"
+msgstr "Editar cerca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:356
 msgid "Export Job Results"
@@ -9042,24 +9008,21 @@ msgstr "Exportar els resultats de la tasca"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:389
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:423
-#, fuzzy
 msgid "Export Job Result"
-msgstr "Anomena i desa"
+msgstr "Resultat de la tasca d'exportació"
 
 #: modules/bibexport/lib/bibexport_method_fieldexporter_webinterface.py:465
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:500
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:515
 #: modules/bibexport/lib/bibexport_method_fieldexporter.py:530
-#, fuzzy
 msgid "You are not authorised to access this resource."
-msgstr "No esteu autoritzats a veure aquesta àrea."
+msgstr "No esteu autoritzats a accedir a aquest recurs."
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:296
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7910
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9420
-#, fuzzy
 msgid "Loan information"
-msgstr "Més informació:"
+msgstr "Informació de préstec"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:298
 msgid "This book is sent to you ..."
@@ -9071,14 +9034,12 @@ msgstr "S'us ha enviat aquest llibre..."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:5219
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15521
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15683
-#, fuzzy
 msgid "Author"
-msgstr "Autor:"
+msgstr "Autor"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:319
-#, fuzzy
 msgid "Editor"
-msgstr "Edita"
+msgstr "Editor"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:320
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1624
@@ -9147,9 +9108,8 @@ msgstr "Identificador"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14144
 #: modules/bibcirculation/lib/bibcirculation_templates.py:14846
 #: modules/bibcirculation/lib/bibcirculation_templates.py:16048
-#, fuzzy
 msgid "Address"
-msgstr "Adreça de correu electrònic"
+msgstr "Adreça"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:345
 #: modules/bibcirculation/lib/bibcirculation_templates.py:289
@@ -9173,9 +9133,8 @@ msgstr "Adreça de correu electrònic"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12769
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12872
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15051
-#, fuzzy
 msgid "Due date"
-msgstr "Data"
+msgstr "Tornar el"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:382
 msgid "List of pending hold requests"
@@ -9193,9 +9152,8 @@ msgstr "Llista de peticions de reserva pendents"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4550
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4678
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11055
-#, fuzzy
 msgid "Borrower"
-msgstr "Navegador"
+msgstr "Usuari"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:400
 #: modules/bibcirculation/lib/bibcirculation_templates.py:523
@@ -9273,9 +9231,8 @@ msgstr "Biblioteca"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:7565
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8362
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15302
-#, fuzzy
 msgid "Location"
-msgstr "Acció"
+msgstr "Lloc"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:403
 #: modules/bibcirculation/lib/bibcirculation_templates.py:777
