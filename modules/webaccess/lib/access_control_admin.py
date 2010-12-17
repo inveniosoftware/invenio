@@ -40,11 +40,13 @@ from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize, load_role_definition
 from invenio.intbitset import intbitset
 
-id_tmp = run_sql('SELECT id FROM accROLE WHERE name=%s', (SUPERADMINROLE, ))
-if id_tmp:
-    CFG_SUPERADMINROLE_ID = int(id_tmp[0][0])
-else:
-    CFG_SUPERADMINROLE_ID = 0
+CFG_SUPERADMINROLE_ID = 0
+try:
+    id_tmp = run_sql('SELECT id FROM accROLE WHERE name=%s', (SUPERADMINROLE, ))
+    if id_tmp:
+        CFG_SUPERADMINROLE_ID = int(id_tmp[0][0])
+except:
+    pass
 
 # ACTIONS
 
