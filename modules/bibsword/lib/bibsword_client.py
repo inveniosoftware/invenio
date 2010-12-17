@@ -847,6 +847,7 @@ def main():
                                     "collection_url=",
                                     "deposit-result=",
                                     "metadata=",
+                                    "yes-i-know"
                                     ])
 
     except getopt.GetoptError, err:
@@ -854,6 +855,10 @@ def main():
 
     if len(opts) == 0:
         usage(1, 'No options given')
+
+    if not '--yes-i-know' in sys.argv[1:]:
+        print "This is an experimental tool. It is disabled for the moment."
+        sys.exit(0)
 
     try:
         for opt in opts:
