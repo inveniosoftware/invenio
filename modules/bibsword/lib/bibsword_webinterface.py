@@ -32,12 +32,15 @@ from invenio.bibsword_client import perform_display_sub_status, \
                                     perform_display_category_list, \
                                     perform_display_metadata, \
                                     perform_submit_record, \
-                                    perform_display_server_infos
+                                    perform_display_server_infos, \
+                                    list_remote_servers
 from invenio.webpage import page
 from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websubmit_functions.Get_Recid import \
                                            get_existing_records_for_reportnumber
+from invenio.search_engine import get_fieldvalues
+from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, CFG_MARC_ADDITIONAL_REPORT_NUMBER
 
 class WebInterfaceSword(WebInterfaceDirectory):
     """ Handle /bibsword set of pages."""
@@ -58,13 +61,13 @@ class WebInterfaceSword(WebInterfaceDirectory):
 
 
         #***********************************************************************
-        #  Get values from the formular
+        #  Get values from the form
         #***********************************************************************
 
         argd = wash_urlargd(form, {
             'ln' : (str, ''),
 
-            # information of the state of the formular submission
+            # information of the state of the form submission
             'status' : (str, ''),
             'submit' : (str, ''),
             'last_row' : (str, ''),
@@ -117,7 +120,7 @@ class WebInterfaceSword(WebInterfaceDirectory):
         contributors = []
         contributor_id = 0
         affiliation_id = 0
-        for name in argd['contributor_name'] :
+        for name in argd['contributor_name']:
             contributor = {}
             contributor['name'] = name
             contributor['email'] = argd['contributor_email'][contributor_id]
@@ -125,9 +128,9 @@ class WebInterfaceSword(WebInterfaceDirectory):
             is_last_affiliation = False
             while is_last_affiliation == False and \
                   affiliation_id < len(argd['contributor_affiliation']):
-                if argd['contributor_affiliation'][affiliation_id] == 'next' :
+                if argd['contributor_affiliation'][affiliation_id] == 'next':
                     is_last_affiliation = True
-                elif argd['contributor_affiliation'][affiliation_id] != '' :
+                elif argd['contributor_affiliation'][affiliation_id] != '':
                     contributor['affiliation'].append(\
                         argd['contributor_affiliation'][affiliation_id])
                 affiliation_id += 1
@@ -157,47 +160,54 @@ class WebInterfaceSword(WebInterfaceDirectory):
         #  Display admin main page
         #***********************************************************************
 
-        if argd['status'] == '' and argd['recid'] != '' and argd['id_remote_server'] != '' :
-            title = _("Export with BibSword : Step 2/4")
-            navtrail += ''' &gt; <a class="navtrail" ''' \
-                        '''href="%(CFG_SITE_URL)s/bibsword">''' \
-                        '''SWORD Interface</a>''' % \
-                        {'CFG_SITE_URL' : CFG_SITE_URL}
-            (body, errors, warnings) = perform_display_collection_list(
+        if argd['status'] == '' and argd['recid'] != '' and argd['id_remote_server'] != '':
+            remote_servers = list_remote_servers(argd['id_remote_server'])
+            if len(remote_servers) == 0:
+                error_messages.append("No corresponding remote server could be found")
+                (body, errors, warnings) = perform_display_server_list(
+                                                          error_messages,
+                                                          argd['id_record'])
+            else:
+                title = _("Export with BibSword: Step 2/4")
+                navtrail += ''' &gt; <a class="navtrail" ''' \
+                            '''href="%(CFG_SITE_URL)s/bibsword">''' \
+                            '''SWORD Interface</a>''' % \
+                            {'CFG_SITE_URL' : CFG_SITE_URL}
+                (body, errors, warnings) = perform_display_collection_list(
                                                        argd['id_remote_server'],
                                                        argd['id_record'],
                                                        argd['recid'],
                                                        error_messages)
 
-        elif argd['status'] == '' or argd['submit'] == "Cancel" :
+        elif argd['status'] == '' or argd['submit'] == "Cancel":
             (body, errors, warnings) = perform_display_sub_status()
 
-        elif argd['status'] == 'display_submission' :
+        elif argd['status'] == 'display_submission':
 
-            if argd['submit'] == 'Refresh all' :
+            if argd['submit'] == 'Refresh all':
                 (body, errors, warnings) = \
                     perform_display_sub_status(1, argd['offset'], "refresh_all")
 
-            elif argd['submit'] == 'Select' :
+            elif argd['submit'] == 'Select':
                 first_row = 1
                 (body, errors, warnings) = \
                     perform_display_sub_status(first_row, argd['offset'])
 
-            elif argd['submit'] == 'Next' :
+            elif argd['submit'] == 'Next':
                 first_row = int(argd['last_row']) + 1
                 (body, errors, warnings) = \
                     perform_display_sub_status(first_row, argd['offset'])
 
-            elif argd['submit'] == 'Prev' :
+            elif argd['submit'] == 'Prev':
                 first_row = int(argd['first_row']) - int(argd['offset'])
                 (body, errors, warnings) = \
                     perform_display_sub_status(first_row, argd['offset'])
 
-            elif argd['submit'] == 'First' :
+            elif argd['submit'] == 'First':
                 (body, errors, warnings) = \
                     perform_display_sub_status(1, argd['offset'])
 
-            elif argd['submit'] == 'Last' :
+            elif argd['submit'] == 'Last':
                 first_row = int(argd['total_rows']) - int(argd['offset']) + 1
                 (body, errors, warnings) = \
                     perform_display_sub_status(first_row, argd['offset'])
@@ -208,8 +218,8 @@ class WebInterfaceSword(WebInterfaceDirectory):
         #***********************************************************************
 
             # when the user validated the metadata, display
-            elif argd['submit'] == 'New submission' :
-                title = _("Export with BibSword : Step 1/4")
+            elif argd['submit'] == 'New submission':
+                title = _("Export with BibSword: Step 1/4")
                 navtrail += ''' &gt; <a class="navtrail" ''' \
                             '''href="%(CFG_SITE_URL)s/bibsword">''' \
                             '''SWORD Interface</a>''' % \
@@ -219,39 +229,52 @@ class WebInterfaceSword(WebInterfaceDirectory):
                     perform_display_server_list(error_messages)
 
         # check if the user has selected a remote server
-        elif argd['status'] == 'select_server' :
-            title = _("Export with BibSword : Step 1/4")
+        elif argd['status'] == 'select_server':
+            title = _("Export with BibSword: Step 1/4")
             navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
                         '''SWORD Interface</a>''' % \
                         {'CFG_SITE_URL' : CFG_SITE_URL}
 
             # check if given id_record exist and convert it in recid
-            if argd['id_record'] == '':
-                error_messages.append("You must give a record id !")
+            if argd['recid'] != 0:
+                report_numbers = get_fieldvalues(argd['recid'], CFG_MARC_REPORT_NUMBER)
+                report_numbers.extend(get_fieldvalues(argd['recid'], CFG_MARC_ADDITIONAL_REPORT_NUMBER))
+                if report_numbers:
+                    argd['id_record'] = report_numbers[0]
 
-            else :
+            elif argd['id_record'] == '':
+                error_messages.append("You must specify a report number")
+
+            else:
                 recids = \
                     get_existing_records_for_reportnumber(argd['id_record'])
                 if len(recids) == 0:
                     error_messages.append(\
-                        "No document found with the given record id !")
+                        "No document found with the given report number")
                 elif len(recids) > 1:
                     error_messages.append(\
-                    "Many documents have been found with the given record id !")
+                    "Several documents have been found with given the report number")
                 else:
                     argd['recid'] = recids[0]
 
-            if argd['id_remote_server'] == '0' :
+            if argd['id_remote_server'] in ['0', '']:
                 error_messages.append("No remote server was selected")
 
-            if argd['id_remote_server'] == '0' or argd['recid'] == 0 :
+            if not argd['id_remote_server'] in ['0', '']:
+                # get the server's name and host
+                remote_servers = list_remote_servers(argd['id_remote_server'])
+                if len(remote_servers) == 0:
+                    error_messages.append("No corresponding remote server could be found")
+                    argd['id_remote_server'] = '0'
+
+            if argd['id_remote_server'] in ['0', ''] or argd['recid'] == 0:
                 (body, errors, warnings) = perform_display_server_list(
                                                           error_messages,
                                                           argd['id_record'])
 
-            else :
-                title = _("Export with BibSword : Step 2/4")
+            else:
+                title = _("Export with BibSword: Step 2/4")
                 (body, errors, warnings) = perform_display_collection_list(
                                                        argd['id_remote_server'],
                                                        argd['id_record'],
@@ -264,8 +287,8 @@ class WebInterfaceSword(WebInterfaceDirectory):
         #***********************************************************************
 
         # check if the user wants to change the remote server
-        elif argd['submit'] == 'Modify server' :
-            title = _("Export with BibSword : Step 1/4")
+        elif argd['submit'] == 'Modify server':
+            title = _("Export with BibSword: Step 1/4")
             navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
                         '''SWORD Interface</a>''' % \
@@ -274,13 +297,13 @@ class WebInterfaceSword(WebInterfaceDirectory):
                 perform_display_server_list(error_messages, argd['id_record'])
 
         # check if the user has selected a collection
-        elif argd['status'] == 'select_collection' :
-            title = _("Export with BibSword : Step 2/4")
+        elif argd['status'] == 'select_collection':
+            title = _("Export with BibSword: Step 2/4")
             navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
                         '''SWORD Interface</a>''' % \
-                        {'CFG_SITE_URL' : CFG_SITE_URL}
-            if argd['id_collection'] == '0' :
+                        {'CFG_SITE_URL': CFG_SITE_URL}
+            if argd['id_collection'] == '0':
                 error_messages.append("No collection was selected")
                 (body, errors, warnings) = perform_display_collection_list(
                                                        argd['id_remote_server'],
@@ -288,8 +311,8 @@ class WebInterfaceSword(WebInterfaceDirectory):
                                                        argd['recid'],
                                                        error_messages)
 
-            else :
-                title = _("Export with BibSword : Step 3/4")
+            else:
+                title = _("Export with BibSword: Step 3/4")
                 (body, errors, warnings) = perform_display_category_list(
                                                        argd['id_remote_server'],
                                                        argd['id_collection'],
@@ -303,12 +326,12 @@ class WebInterfaceSword(WebInterfaceDirectory):
         #***********************************************************************
 
         # check if the user wants to change the collection
-        elif argd['submit'] == 'Modify collection' :
-            title = _("Export with BibSword : Step 2/4")
+        elif argd['submit'] == 'Modify collection':
+            title = _("Export with BibSword: Step 2/4")
             navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
                         '''SWORD Interface</a>''' % \
-                        {'CFG_SITE_URL' : CFG_SITE_URL}
+                        {'CFG_SITE_URL': CFG_SITE_URL}
             (body, errors, warnings) = perform_display_collection_list(
                                                        argd['id_remote_server'],
                                                        argd['id_record'],
@@ -316,13 +339,13 @@ class WebInterfaceSword(WebInterfaceDirectory):
                                                        error_messages)
 
         # check if the user has selected a primary category
-        elif argd['status']  == 'select_primary_category' :
-            title = _("Export with BibSword : Step 3/4")
+        elif argd['status']  == 'select_primary_category':
+            title = _("Export with BibSword: Step 3/4")
             navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
                         '''SWORD Interface</a>''' % \
                         {'CFG_SITE_URL' : CFG_SITE_URL}
-            if argd['id_primary'] == '0' :
+            if argd['id_primary'] == '0':
                 error_messages.append("No primary category selected")
                 (body, errors, warnings) = perform_display_category_list(
                                                        argd['id_remote_server'],
@@ -331,8 +354,8 @@ class WebInterfaceSword(WebInterfaceDirectory):
                                                        argd['recid'],
                                                        error_messages)
 
-            else :
-                title = _("Export with BibSword : Step 4/4")
+            else:
+                title = _("Export with BibSword: Step 4/4")
                 (body, errors, warnings) = perform_display_metadata(user_info,
                                                   str(argd['id_remote_server']),
                                                   str(argd['id_collection']),
@@ -347,8 +370,8 @@ class WebInterfaceSword(WebInterfaceDirectory):
         #***********************************************************************
 
         # check if the user wants to change the collection
-        elif argd['submit'] == 'Modify destination' :
-            title = _("Export with BibSword : Step 3/4")
+        elif argd['submit'] == 'Modify destination':
+            title = _("Export with BibSword: Step 3/4")
             navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
                         '''SWORD Interface</a>''' % \
@@ -362,25 +385,25 @@ class WebInterfaceSword(WebInterfaceDirectory):
 
 
         # check if the metadata are complet and well-formed
-        elif argd['status']  == 'check_submission' :
-            title = _("Export with BibSword : Step 4/4")
+        elif argd['status']  == 'check_submission':
+            title = _("Export with BibSword: Step 4/4")
             navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
                         '''SWORD Interface</a>''' % \
                         {'CFG_SITE_URL' : CFG_SITE_URL}
 
-            if argd['submit'] == "Upload" :
+            if argd['submit'] == "Upload":
                 error_messages.append("Media loaded")
 
             if argd['id'] == '':
                 error_messages.append("Id is missing")
 
-            if argd['title'] == '' :
+            if argd['title'] == '':
                 error_messages.append("Title is missing")
 
-            if argd['summary'] == '' :
+            if argd['summary'] == '':
                 error_messages.append("summary is missing")
-            elif len(argd['summary']) < 25 :
+            elif len(argd['summary']) < 25:
                 error_messages.append("summary must have at least 25 character")
 
             if argd['author_name'] == '':
@@ -392,7 +415,7 @@ class WebInterfaceSword(WebInterfaceDirectory):
             if len(argd['contributors']) == 0:
                 error_messages.append("No author specified")
 
-            if len(error_messages) > 0 :
+            if len(error_messages) > 0:
 
                 (body, errors, warnings) = perform_display_metadata(user_info,
                                                   str(argd['id_remote_server']),
@@ -406,9 +429,9 @@ class WebInterfaceSword(WebInterfaceDirectory):
 
 
 
-            else :
+            else:
 
-                title = _("Export with BibSword : Acknowledgement")
+                title = _("Export with BibSword: Acknowledgement")
 
                 navtrail += ''' &gt; <a class="navtrail" ''' \
                         '''href="%(CFG_SITE_URL)s/bibsword">''' \
@@ -432,7 +455,7 @@ class WebInterfaceSword(WebInterfaceDirectory):
                     lastupdated  = __lastupdated__,
                     req          = req,
                     language     = argd['ln'],
-                    errors       = errors,
+                    #errors       = errors,
                     warnings     = warnings,
                     navmenuid    = "yourmessages")
 

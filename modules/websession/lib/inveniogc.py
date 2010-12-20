@@ -59,7 +59,10 @@ CFG_MAX_ATIME_ZIP_OAI = 7
 CFG_DELETED_BIBDOC_MAXLIFE = 365*10
 # AFter how many day to remove old cached webjournal files
 CFG_WEBJOURNAL_TTL = 7
-
+# After how many days to zip obsolete bibsword xml log files
+CFG_MAX_ATIME_ZIP_BIBSWORD = 7
+# After how many days to remove obsolete bibsword xml log files
+CFG_MAX_ATIME_RM_BIBSWORD = 28
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -113,6 +116,16 @@ def clean_logs():
     gc_exec_command('find %s -name "oai_archive*"'
         ' -atime +%s -exec rm %s -f {} \;' \
             % (CFG_TMPDIR, CFG_MAX_ATIME_RM_OAI, vstr))
+
+    write_message("- deleting/gzipping temporary old "
+            "BibSword files")
+    gc_exec_command('find %s -name "bibsword_*"'
+        ' -atime +%s -exec rm %s -f {} \;' \
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_BIBSWORD, vstr))
+    gc_exec_command('find %s -name "bibsword_*"'
+        ' -atime +%s -exec gzip %s -9 {} \;' \
+            % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_BIBSWORD, vstr))
+
     write_message("""CLEANING OF LOG FILES FINISHED""")
 
 def clean_cache():

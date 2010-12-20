@@ -21,6 +21,7 @@ BibSWORD Client Formatter
 
 import zipfile
 import os
+from tempfile import mkstemp
 from xml.dom import minidom
 from invenio.config import CFG_TMPDIR
 from invenio.bibtask import task_low_level_submission
@@ -46,6 +47,7 @@ from invenio.bibsword_config import CFG_MARC_REPORT_NUMBER, \
                                     CFG_SUBMISSION_STATUS_ONHOLD, \
                                     CFG_SUBMISSION_STATUS_REMOVED
 from invenio.bibdocfile import BibRecDocs
+from invenio.bibformat_engine import BibFormatObject
 
 #-------------------------------------------------------------------------------
 # Formating servicedocument file
@@ -56,8 +58,8 @@ def format_remote_server_infos(servicedocument):
         Get all informations about the server's options such as SWORD version,
         maxUploadSize, ... These informations are found in the servicedocument
         of the given server
-        @param (servicedocument) : xml servicedocument in a string format
-        @return (server_infomation) : tuple containing the version, the
+        @param servicedocument: xml servicedocument in a string format
+        @return: server_infomation. tuple containing the version, the
                                       maxUploadSize and the available modes
     '''
 
@@ -69,9 +71,9 @@ def format_remote_server_infos(servicedocument):
                            'error' : '' }
 
     # now the xml node are accessible by programation
-    try :
+    try:
         parsed_xml_collections = minidom.parseString(servicedocument)
-    except IOError :
+    except IOError:
         server_informations['error'] = \
             'No servicedocument found for the remote server'
         return server_informations
@@ -108,8 +110,8 @@ def format_remote_collection(servicedocument):
     '''
         The function parse the servicedocument document and return a list with
         the collections of the given file ['id', 'name', 'url']
-        @param (servicedocument) : xml file returned by the remote server.
-        @return(list)  : the list of collection found in the service document
+        @param servicedocument: xml file returned by the remote server.
+        @return: the list of collection found in the service document
     '''
 
     collections = []  # contains list of collection tuple {'id', 'url', 'label'}
@@ -152,9 +154,9 @@ def format_collection_informations(servicedocument, id_collection):
         This methode parse the given servicedocument to find the given collection
         node. Then it retrieve all information about the collection that contains
         the collection node.
-        @param (servicedocument) :  xml file returned by the remote server.
-        @parma (id_collection) : position of the collection in the sd (1 = first)
-        @return (collection_informations) : tuple containing infos
+        @param servicedocument:  xml file returned by the remote server.
+        @param id_collection: position of the collection in the sd (1 = first)
+        @return: (collection_informations) tuple containing infos
     '''
 
     # contains information tuple {[accept], 'collectionPolicy', 'mediation',
@@ -205,9 +207,9 @@ def format_primary_categories(servicedocument, collection_id=0):
         This method parse the servicedocument to retrieve the primary category
         of the given collection. If no collection is given, it takes the first
         one.
-        @param (servicedocument) : xml file returned by the remote server.
-        @param (collection_id) : id of the collection to search
-        @return : list of primary categories tuple ('id', 'url', 'label')
+        @param servicedocument: xml file returned by the remote server.
+        @param collection_id: id of the collection to search
+        @return: list of primary categories tuple ('id', 'url', 'label')
     '''
 
     categories = []  # contains list of category tuple {'id', 'url', 'label'}
@@ -255,9 +257,9 @@ def format_secondary_categories(servicedocument, collection_id=0):
         This method parse the servicedocument to retrieve the optional categories
         of the given collection. If no collection is given, it takes the first
         one.
-        @param (servicedocument) : xml file returned by the remote server.
-        @param (collection_id) : id of the collection to search
-        @return : list of optional categories tuple ('id', 'url', 'label')
+        @param servicedocument: xml file returned by the remote server.
+        @param collection_id: id of the collection to search
+        @return: list of optional categories tuple ('id', 'url', 'label')
     '''
 
     categories = []  # contains list of category tuple {'id', 'url', 'label'}
@@ -303,8 +305,8 @@ def parse_xml_servicedocument_file(servicedocument):
         This method parse a string containing a servicedocument to retrieve the
         collection node. It is used by all function that needs to work with
         collections
-        @param (servicedocument) : xml file in containing in a string
-        @return (collecion_node) : root node of all collecions
+        @param servicedocument: xml file in containing in a string
+        @return: (collecion_node) root node of all collecions
     '''
 
     # now the xml node are accessible by programation
@@ -332,13 +334,13 @@ def get_report_number_from_macrxml(marcxml):
     '''
         retrieve the record id stored in the marcxml file. The record is in the
         tag 'RECORD ID'
-        @param (marcxml) : marcxml file where to look for the record id
-        @return : the record id in a string
+        @param marcxml: marcxml file where to look for the record id
+        @return: the record id in a string
     '''
 
     #get the reportnumber tag list
     tag = CFG_MARC_REPORT_NUMBER
-    if tag == '' :
+    if tag == '':
         return ''
 
     #variable that contains the result of the parsing of the marcxml file
@@ -357,9 +359,8 @@ def get_medias_to_submit(media_paths):
     '''
         This method get a list of recod of submission. It format a list of
         media containing name, size, type and file for each media id
-        @param (recid) : id of the record where to find the medias
-        @param (media_paths) : list of path to the media to upload
-        @return : list of media tuple
+        @param media_paths: list of path to the media to upload
+        @return: list of media tuple
     '''
 
     # define the return value
@@ -368,12 +369,12 @@ def get_medias_to_submit(media_paths):
     fp = open("/tmp/test.txt", "w")
     fp.write(media_paths[0])
 
-    if len(media_paths) > 1 :
+    if len(media_paths) > 1:
         media_paths = format_file_to_zip_archiv(media_paths)
-    else :
+    else:
         media_paths = media_paths[0]
 
-    if media_paths != '' :
+    if media_paths != '':
         media['file'] = open(media_paths, "r").read()
         media['size'] = len(media['file'])
         media['name'] = media_paths.split('/')[-1].split(';')[0]
@@ -385,9 +386,7 @@ def get_medias_to_submit(media_paths):
 def get_media_from_recid(recid):
     '''
         This method get the file in the given url
-        @param(recid) : id of the file to get
-        @return (file_type) : the mime type of the file found
-        @return (data) : the file in a string variable
+        @param recid: id of the file to get
     '''
 
     medias = []
@@ -395,19 +394,19 @@ def get_media_from_recid(recid):
     bibarchiv = BibRecDocs(recid)
     bibdocs = bibarchiv.list_latest_files()
 
-    for bibdocfile in bibdocs :
+    for bibdocfile in bibdocs:
 
         bibfile = {'name': bibdocfile.get_full_name(),
-                   'file' : '',
+                   'file': '',
                    'type': 'application/%s' % \
                        bibdocfile.get_superformat().split(".")[-1],
                    'path': bibdocfile.get_full_path(),
-                   'collection' : bibdocfile.get_type(),
+                   'collection': bibdocfile.get_type(),
                    'size': bibdocfile.get_size(),
-                   'loaded' : False,
-                   'selected' : ''}
+                   'loaded': False,
+                   'selected': ''}
 
-        if bibfile['collection'] == "Main" :
+        if bibfile['collection'] == "Main":
             bibfile['selected'] = 'checked=yes'
 
         medias.append(bibfile)
@@ -415,11 +414,11 @@ def get_media_from_recid(recid):
     return medias
 
 
-def format_author_from_marcxml(marcxml) :
+def format_author_from_marcxml(marcxml):
     '''
         This method parse the marcxml file to retrieve the author of a document
-        @param (marcxml) : the xml file to parse
-        @return : tuple containing {'name', 'email' and 'affiliations'}
+        @param marcxml: the xml file to parse
+        @return: tuple containing {'name', 'email' and 'affiliations'}
     '''
 
     #get the tag id for the given field
@@ -435,13 +434,13 @@ def format_author_from_marcxml(marcxml) :
     for datafield in datafields:
 
         # retreive the main author
-        if author['name'] == '' :
+        if author['name'] == '':
             name = get_subfield_value_from_datafield(datafield, main_author)
-            if name != '' :
+            if name != '':
                 author['name'] = name
 
         affiliation = get_subfield_value_from_datafield(datafield, main_author_affiliation)
-        if affiliation != '' :
+        if affiliation != '':
             author['affiliation'].append(affiliation)
 
     return author
@@ -451,8 +450,8 @@ def format_marcxml_file(marcxml, is_file=False):
     '''
         Parse the given marcxml file to retreive the metadata needed by the
         forward of the document to ArXiv.org
-        @param (xml file): marxml file that contains metadata from Invenio
-        @return (dictionnary): couple of key value needed for the push
+        @param marcxml: marxml file that contains metadata from Invenio
+        @return: (dictionnary) couple of key value needed for the push
     '''
 
     #init the return tuple
@@ -467,7 +466,7 @@ def format_marcxml_file(marcxml, is_file=False):
 
     # check if the marcxml is not empty
     if marcxml == '':
-        marcxml_values['error'] = "Marcxml string is empty !"
+        marcxml_values['error'] = "MARCXML string is empty !"
         return marcxml_values
 
     #get the tag id and code from tag table
@@ -489,92 +488,54 @@ def format_marcxml_file(marcxml, is_file=False):
     #init tmp values
     contributor = {'name' : '', 'email' : '', 'affiliation' : []}
 
-    #variable that contains the result of the parsing of the marcxml file
-    datafields = get_list_of_marcxml_datafields(marcxml, is_file)
-    if datafields == 0:
+    try:
+        bfo = BibFormatObject(recID=None, xml_record=marcxml)
+    except:
         marcxml_values['error'] = "Unable to open marcxml file !"
         return marcxml_values
 
-    # parse all the marcxml file
-    for datafield in datafields:
+    marcxml_values = { 'id'           : bfo.field(main_report_number),
+                       'title'        : bfo.field(main_title),
+                       'summary'      : bfo.field(main_summary),
+                       'report_nos'   : bfo.fields(add_report_number),
+                       'contributors' : [],
+                       'journal_refs' : [],
+                       'comment'      : bfo.field(main_comment),
+                       'doi'          : bfo.field(doi)}
 
-        # retreive the main report number
-        if marcxml_values['id'] == '' :
-            marcxml_values['id'] = get_subfield_value_from_datafield(datafield, main_report_number)
+    authors = bfo.fields(main_author[:-1], repeatable_subfields_p=True)
+    for author in authors:
+        name = author.get(main_author[-1], [''])[0]
+        affiliation = author.get(main_author_affiliation[-1], [])
+        author = {'name': name, 'email': '', 'affiliation': affiliation}
+        marcxml_values['contributors'].append(author)
 
-        # retreive the title of the report
-        if marcxml_values['title'] == '' :
-            marcxml_values['title'] = get_subfield_value_from_datafield(datafield, main_title)
+    authors = bfo.fields(add_author[:-1], repeatable_subfields_p=True)
+    for author in authors:
+        name = author.get(add_author[-1], [''])[0]
+        affiliation = author.get(add_author_affiliation[-1], [])
+        author = {'name': name, 'email': '', 'affiliation': affiliation}
+        marcxml_values['contributors'].append(author)
 
-        # retreive the main abstract
-        if marcxml_values['summary'] == '' :
-            summary = get_subfield_value_from_datafield(datafield, main_summary)
-            if summary != '' :
-                marcxml_values['summary'] = summary
-
-        # retreive the main author
-        if len(marcxml_values['contributors']) == 0 :
-            name = get_subfield_value_from_datafield(datafield, main_author)
-            if name != '' :
-                author = {'name':name, 'email':'', 'affiliation':[]}
-                marcxml_values['contributors'].append(author)
-
-        if len(marcxml_values['contributors']) == 1 :
-            affiliation = get_subfield_value_from_datafield(datafield, main_author_affiliation)
-            if affiliation != '' :
-                marcxml_values['contributors'][0]['affiliation'].append(affiliation)
-
-        # retreive the contributors
-        if len(marcxml_values['contributors']) > 0 :
-            name = get_subfield_value_from_datafield(datafield, add_author)
-            if name != '':
-                contributor['name'] = name
-        if len(marcxml_values['contributors']) > 0 :
-            affiliation = get_subfield_value_from_datafield(datafield, add_author_affiliation)
-            if affiliation != '' :
-                contributor['affiliation'].append(affiliation)
-
-        if contributor['name'] != '':
-            marcxml_values['contributors'].append(contributor)
-            contributor = {'name' : '', 'email' : '', 'affiliation' : []}
-
-        # retreive the additional record numbers
-        report_number = get_subfield_value_from_datafield(datafield, add_report_number)
-        if report_number != '' :
-            marcxml_values['report_nos'].append(report_number)
-
-        # retreive the title of the report
-        if marcxml_values['comment'] == '' :
-            marcxml_values['comment'] = get_subfield_value_from_datafield(datafield, main_comment)
-
-        # retreive the doi of the report
-        if marcxml_values['doi'] == '' :
-            marcxml_values['doi'] = get_subfield_value_from_datafield(datafield, doi)
-
-        # retreive the journal references for the record
-        journal_title = get_subfield_value_from_datafield(datafield, journal_ref_title)
-        if journal_title != '':
-            journal_page = get_subfield_value_from_datafield(datafield, journal_ref_page)
-            journal_code = get_subfield_value_from_datafield(datafield, journal_ref_code)
-            journal_year = get_subfield_value_from_datafield(datafield, journal_ref_year)
-
-            journal = "%s : %s (%s) pp. %s" % (journal_title, journal_code, journal_year, journal_page)
-            marcxml_values['journal_refs'].append(journal)
-
-            journal_page = ''
-            journal_code = ''
-            journal_year = ''
+    journals = bfo.fields(journal_ref_title[:-1])
+    for journal in journals:
+        journal_title = journal.get(journal_ref_title[-1], '')
+        journal_page = journal.get(journal_ref_page[-1], '')
+        journal_code = journal.get(journal_ref_code[-1], '')
+        journal_year = journal.get(journal_ref_year[-1], '')
+        journal = "%s: %s (%s) pp. %s" % (journal_title, journal_code, journal_year, journal_page)
+        marcxml_values['journal_refs'].append(journal)
 
     return marcxml_values
 
 
-def get_subfield_value_from_datafield(datafield, field_tag) :
+def get_subfield_value_from_datafield(datafield, field_tag):
     '''
         This function get the datafield note from a marcxml and get the tag
         value according to the tag id and code given
-        @param(datafield) : xml node to be parsed
-        @param(searched_tag) : tuple containing id and code to find
-        return : value of the tag as a string
+        @param datafield: xml node to be parsed
+        @param field_tag: tuple containing id and code to find
+        @return: value of the tag as a string
     '''
 
     # extract the tag number
@@ -587,7 +548,7 @@ def get_subfield_value_from_datafield(datafield, field_tag) :
     if tag.value == tag_id:
         subfields = datafield.getElementsByTagName('subfield')
         for subfield in subfields:
-            if subfield.attributes['code'].value == tag_code :
+            if subfield.attributes['code'].value == tag_code:
                 return subfield.firstChild.nodeValue.encode('utf-8')
 
     return ''
@@ -597,9 +558,9 @@ def get_list_of_marcxml_datafields(marcxml, isfile=False):
     '''
         This method parse the marcxml file to retrieve the root of the datafields
         needed by all function that format marcxml nodes.
-        @param (marcxml) : file or string that contains the marcxml file
-        @param (is_file) : boolean that informs if a file or a string was given
-        @return : root of all datafileds
+        @param marcxml: file or string that contains the marcxml file
+        @param isfile: boolean that informs if a file or a string was given
+        @return: root of all datafileds
     '''
 
     #variable that contains the result of the parsing of the marcxml file
@@ -629,24 +590,22 @@ def format_file_to_zip_archiv(paths):
     '''
         This method takes a list of different type of file, zip its and group
         its into a zip archiv for sending
-        @param (paths) : list of path to file of different types
-        @return (zip archiv) : zipped file that contains all fulltext to submit
+        @param paths: list of path to file of different types
+        @return: (zip archiv) zipped file that contains all fulltext to submit
     '''
 
-    zip_file = '%s/sword_media.zip' % CFG_TMPDIR
+    (zip_fd, zip_path) = mkstemp(suffix='.zip', prefix='bibsword_media_',
+                                 dir=CFG_TMPDIR)
 
-    archiv = zipfile.ZipFile(zip_file, "w")
-
-    tmp = open("/tmp/test.txt", "w")
+    archiv = zipfile.ZipFile(zip_path, "w")
 
     for path in paths:
         if os.path.exists(path):
-            tmp.write(path)
             archiv.write(path, os.path.basename(path), zipfile.ZIP_DEFLATED)
 
     archiv.close()
 
-    return zip_file
+    return zip_path
 
 
 #-------------------------------------------------------------------------------
@@ -655,11 +614,13 @@ def format_file_to_zip_archiv(paths):
 
 def format_link_from_result(result):
     '''
-        This methode parse the xml file returned after the submission of a media
-        and retrive the URL contains in it
-        @param (result) : xml file returned by ArXiv
-        @return (links) : table of url
+        This method parses the xml file returned after the submission of a media
+        and retreive the URL contained in it
+        @param result: xml file returned by ArXiv
+        @return: (links) table of url
     '''
+    if isinstance(result, list):
+        result = result[0]
 
     # parse the xml to access each node
     parsed_result = minidom.parseString(result)
@@ -684,8 +645,8 @@ def format_update_time_from_result(result):
     '''
         parse any xml response to retreive and format the value of the 'updated'
         tag.
-        @param (result) : xml result of a deposit or a submit call to a server
-        @result : formated date content in the <updated> node
+        @param result: xml result of a deposit or a submit call to a server
+        @return: formated date content in the <updated> node
     '''
 
     # parse the xml to access each node
@@ -707,8 +668,8 @@ def format_links_from_submission(submission):
         parse the xml response of a metadata submission and retrieve all the
         informations proper to the link toward the media, the metadata and
         the status
-        @param (submission) : xml response of a submission
-        @result : tuple { 'medias', 'metadata', 'status' }
+        @param submission: xml response of a submission
+        @return: tuple { 'medias', 'metadata', 'status' }
     '''
 
     # parse the xml to access each node
@@ -722,20 +683,20 @@ def format_links_from_submission(submission):
     # getting all content nodes
     links = {'media':'', 'metadata':'', 'status':''}
 
-    for link in xml_links :
+    for link in xml_links:
 
         # declare the dictionnary that contains type and url of a link
-        if link.attributes['rel'].value == 'edit-media' :
-            if links['media'] == '' :
+        if link.attributes['rel'].value == 'edit-media':
+            if links['media'] == '':
                 links['media'] = link.attributes['href'].value.encode('utf-8')
-            else :
+            else:
                 links['media'] = links['media'] + ', ' + \
                                    link.attributes['href'].value.encode('utf-8')
 
-        if link.attributes['rel'].value == 'edit' :
+        if link.attributes['rel'].value == 'edit':
             links['metadata'] = link.attributes['href'].value.encode('utf-8')
 
-        if link.attributes['rel'].value == 'alternate' :
+        if link.attributes['rel'].value == 'alternate':
             links['status'] = link.attributes['href'].value.encode('utf-8')
 
     return links
@@ -744,8 +705,8 @@ def format_links_from_submission(submission):
 def format_id_from_submission(submission):
     '''
         Parse the submission file to retrieve the arxiv id retourned
-        @param (submission) : xml file returned after the submission
-        @return : string containing the arxiv id
+        @param submission: xml file returned after the submission
+        @return: string containing the arxiv id
     '''
 
     # parse the xml to access each node
@@ -762,7 +723,7 @@ def format_id_from_submission(submission):
 
     remote_id = 'arXiv:'
     i = 0
-    for elt in end :
+    for elt in end:
         remote_id += elt
         if i == 3:
             remote_id += '.'
@@ -779,9 +740,8 @@ def update_marcxml_with_remote_id(recid, remote_id, action="append"):
     '''
         Write a new entry in the given marc file. This entry is the remote record
         id given by the server where the submission has been done
-        @param (marcxml) : the xml file corresponding to the marc file
-        @param (remote_id) : the string containing the id to add to the marc file
-        return : boolean true if update done, false if problems
+        @param remote_id: the string containing the id to add to the marc file
+        return: boolean true if update done, false if problems
     '''
 
     field_tag = CFG_MARC_ADDITIONAL_REPORT_NUMBER
@@ -795,23 +755,24 @@ def update_marcxml_with_remote_id(recid, remote_id, action="append"):
         <subfield code="%(tagcode)s">%(remote_id)s</subfield>
     </datafield>
 </record>''' % {
-                 'recid' : recid,
-                 'tagid' : tag_id,
-                 'tagcode' : tag_code,
-                 'remote_id' : remote_id
+                 'recid': recid,
+                 'tagid': tag_id,
+                 'tagcode': tag_code,
+                 'remote_id': remote_id
              }
 
     # creation of the tmp file containing the xml node to append
-    filename = CFG_TMPDIR+'/sword_append_remote_id.xml'
-    tmp_file = open(filename, 'w')
-    tmp_file.write(node)
-    tmp_file.close()
+    (tmpfd, filename) = mkstemp(suffix='.xml', prefix='bibsword_append_remote_id_',
+                                dir=CFG_TMPDIR)
+    tmpfile = os.fdopen(tmpfd, 'w')
+    tmpfile.write(node)
+    tmpfile.close()
 
-    # insert a task in bibschedul to add the node in the marc file
-    if action == 'append' :
+    # insert a task in bibsched to add the node in the marc file
+    if action == 'append':
         result = \
             task_low_level_submission('bibupload', 'BibSword', '-a', filename)
-    elif action == 'delete' :
+    elif action == 'delete':
         result = \
             task_low_level_submission('bibupload', 'BibSword', '-d', filename)
 
@@ -819,12 +780,11 @@ def update_marcxml_with_remote_id(recid, remote_id, action="append"):
 
 
 def update_marcxml_with_info(recid, username, current_date, remote_id,
-                             action='append') :
+                             action='append'):
     '''
         This function add a field in the marc file to informat that the
         record has been submitted to a remote server
-        @param (recid) : id of the record to update
-        @parmam (submit_info) : text to set in the marc file
+        @param recid: id of the record to update
     '''
 
     # concatenation of the string to append to the marc file
@@ -834,22 +794,23 @@ def update_marcxml_with_info(recid, username, current_date, remote_id,
         <subfield code="a">%(submit_info)s</subfield>
     </datafield>
 </record>''' % {
-                 'recid' : recid,
-                 'tag' : CFG_MARC_RECORD_SUBMIT_INFO,
-                 'submit_info' : CFG_SUBMIT_ARXIV_INFO_MESSAGE % (username, current_date, remote_id)
+                 'recid': recid,
+                 'tag': CFG_MARC_RECORD_SUBMIT_INFO,
+                 'submit_info': CFG_SUBMIT_ARXIV_INFO_MESSAGE % (username, current_date, remote_id)
              }
 
     # creation of the tmp file containing the xml node to append
-    filename = CFG_TMPDIR+'/sword_append_submit_info.xml'
-    tmp_file = open(filename, 'w')
-    tmp_file.write(node)
-    tmp_file.close()
+    (tmpfd, filename) = mkstemp(suffix='.xml', prefix='bibsword_append_submit_info_',
+                                dir=CFG_TMPDIR)
+    tmpfile = os.fdopen(tmpfd, 'w')
+    tmpfile.write(node)
+    tmpfile.close()
 
     # insert a task in bibschedul to add the node in the marc file
-    if action == 'append' :
+    if action == 'append':
         result = \
             task_low_level_submission('bibupload', 'BibSword', '-a', filename)
-    elif action == 'delete' :
+    elif action == 'delete':
         result = \
             task_low_level_submission('bibupload', 'BibSword', '-d', filename)
 
@@ -860,8 +821,8 @@ def update_marcxml_with_info(recid, username, current_date, remote_id,
 def upload_fulltext(recid, path):
     '''
         This method save the uploaded file to associated record
-        @param (recid) : id of the record
-        @param (fulltext) : uploaded document to store
+        @param recid: id of the record
+        @param path: uploaded document to store
     '''
 
     # upload the file to the record
@@ -879,12 +840,12 @@ def upload_fulltext(recid, path):
 # work with the remote submission status xml file
 #-------------------------------------------------------------------------------
 
-def format_submission_status(status_xml) :
+def format_submission_status(status_xml):
     '''
         This method parse the given atom xml status string and retrieve the
         the value of the tag <status>
-        @param (status_xml) : xml atom entry
-        @return : dictionnary containing status, id and/or possible error
+        @param status_xml: xml atom entry
+        @return: dictionnary containing status, id and/or possible error
     '''
 
     result = {'status':'', 'id_submission':'', 'error':''}
@@ -894,17 +855,17 @@ def format_submission_status(status_xml) :
     status_node = deposit.getElementsByTagName('status')[0]
     if status_node.firstChild != None:
         status = status_node.firstChild.nodeValue.encode('utf-8')
-    else :
+    else:
         result['status'] = ''
         return result
 
     #status = "submitted"
-    if status == CFG_SUBMISSION_STATUS_SUBMITTED :
+    if status == CFG_SUBMISSION_STATUS_SUBMITTED:
         result['status'] = status
         return result
 
     #status = "published"
-    if status == CFG_SUBMISSION_STATUS_PUBLISHED :
+    if status == CFG_SUBMISSION_STATUS_PUBLISHED:
         result['status'] = status
         arxiv_id_node = deposit.getElementsByTagName('arxiv_id')[0]
         result['id_submission'] = \
@@ -912,12 +873,12 @@ def format_submission_status(status_xml) :
         return result
 
     #status = "onhold"
-    if status == CFG_SUBMISSION_STATUS_ONHOLD :
+    if status == CFG_SUBMISSION_STATUS_ONHOLD:
         result['status'] = status
         return result
 
     #status = "removed"
-    if status == 'unknown' :
+    if status == 'unknown':
         result['status'] = CFG_SUBMISSION_STATUS_REMOVED
         error_node = deposit.getElementsByTagName('error')[0]
         result['error'] = error_node.firstChild.nodeValue.encode('utf-8')
@@ -930,7 +891,7 @@ def format_submission_status(status_xml) :
 # Classes for the generation of XML Atom entry containing submission metadata
 #-------------------------------------------------------------------------------
 
-class BibSwordFormat :
+class BibSwordFormat:
     '''
         This class gives the methodes needed to format all mandatories xml atom
         entry nodes. It is extended by subclasses that has optional nodes add
@@ -940,13 +901,13 @@ class BibSwordFormat :
     def __init__(self):
         ''' No init necessary for this class '''
 
-    def frmt_id(self, recid) :
+    def frmt_id(self, recid):
         '''
             This methode check if there is an id for the resource. If it is the case,
             it format it returns a formated id node that may be inserted in the
             xml metadata file
-            @param (recid) : the id of the resource
-            @return (xml) : xml node correctly formated
+            @param recid: the id of the resource
+            @return: (xml) xml node correctly formated
         '''
 
         if recid != '':
@@ -954,13 +915,13 @@ class BibSwordFormat :
         return ''
 
 
-    def frmt_title(self, title) :
+    def frmt_title(self, title):
         '''
             This methode check if there is a title for the resource. If yes,
             it returns a formated title node that may be inserted in the
             xml metadata file
-            @param (title) : the title of the resource
-            @return (xml) : xml node correctly formated
+            @param title: the title of the resource
+            @return: (xml) xml node correctly formated
         '''
 
         if title != '':
@@ -968,36 +929,36 @@ class BibSwordFormat :
         return ''
 
 
-    def frmt_author(self, author_name, author_email) :
+    def frmt_author(self, author_name, author_email):
         '''
             This methode check if there is a submitter for the resource. If yes,
             it returns a formated author node that may containing the name and
             the email of the author to be inserted in the xml metadata file
-            @param (author_name) : the name of the submitter of the resource
-            @param (author_email) : the email where the remote server send answers
-            @return (xml) : xml node correctly formated
+            @param author_name: the name of the submitter of the resource
+            @param author_email: the email where the remote server send answers
+            @return: (xml) xml node correctly formated
         '''
 
         author = ''
-        if author_name != '' :
+        if author_name != '':
             author +=  '''<author>\n'''
             author += '''<name>%s</name>\n''' % author_name
-            if author_email != '' :
+            if author_email != '':
                 author += '''<email>%s</email>\n''' % author_email
             author += '''</author>\n'''
         return author
 
 
-    def frmt_summary(self, summary) :
+    def frmt_summary(self, summary):
         '''
             This methode check if there is a summary for the resource. If yes,
             it returns a formated summary node that may be inserted in the
             xml metadata file
-            @param (summary) : the summary of the resource
-            @return (xml) : xml node correctly formated
+            @param summary: the summary of the resource
+            @return: (xml) xml node correctly formated
         '''
 
-        if summary != '' :
+        if summary != '':
             return '''<summary>%s</summary>\n''' % summary
         return ''
 
@@ -1007,13 +968,13 @@ class BibSwordFormat :
             This method check if there is some categories for the resource. If it
             is the case, it returns the categorie nodes formated to be insered in
             the xml metadata file
-            @param (categories) : list of categories for one resource
-            @return (xml) : xml node(s) correctly formated
+            @param categories: list of categories for one resource
+            @return: (xml) xml node(s) correctly formated
         '''
 
         output = ''
 
-        for category in categories :
+        for category in categories:
 
             output += '''<category term="%s" scheme="%s" label="%s"/>\n''' % (category['url'], scheme, category['label'])
 
@@ -1025,13 +986,13 @@ class BibSwordFormat :
             This method check if there is some links for the resource. If it
             is the case, it returns the links nodes formated to be insered in
             the xml metadata file
-            @param (links) : list of links for the resource
-            @return (xml) : xml node(s) correctly formated
+            @param links: list of links for the resource
+            @return: (xml) xml node(s) correctly formated
         '''
 
         output = ''
 
-        if links != '' :
+        if links != '':
             output += '''<link href="%s" ''' % links['link']
             output += '''type="%s" rel="related"/>\n''' % links['type']
 
@@ -1053,10 +1014,8 @@ class ArXivFormat(BibSwordFormat):
         '''
             This method format an atom file that fits with the arxiv atom format
             used for the subission of the metadata during the push to arxiv process.
-            @param arxiv_sub (xml file): atom file returned after the submission
-            of a fulltext to arxive.
             @param metadata: tuple containing every needed information + some optional
-            @return (xml file): arxiv atom file
+            @return: (xml file) arxiv atom file
         '''
 
         #-----------------------------------------------------------------------
@@ -1068,48 +1027,48 @@ class ArXivFormat(BibSwordFormat):
         output += '''xmlns:arxiv="http://arxiv.org/schemas/atom">\n'''
 
         #id
-        if 'id' in metadata :
+        if 'id' in metadata:
             output += BibSwordFormat.frmt_id(self, metadata['id'])
 
         #title
-        if 'title' in metadata :
+        if 'title' in metadata:
             output += BibSwordFormat.frmt_title(self,
                                                              metadata['title'])
 
         #author
-        if 'author_name' in metadata and 'author_email' in metadata :
+        if 'author_name' in metadata and 'author_email' in metadata:
             output += BibSwordFormat.frmt_author(self, metadata['author_name'],
                                                        metadata['author_email'])
 
         #contributors
-        if 'contributors' in metadata :
+        if 'contributors' in metadata:
             output += '' + self.frmt_contributors(metadata['contributors'])
 
         #summary
-        if 'summary' in metadata :
+        if 'summary' in metadata:
             output += BibSwordFormat.frmt_summary(self, metadata['summary'])
 
         #categories
-        if 'categories' in metadata :
+        if 'categories' in metadata:
             output += BibSwordFormat.frmt_categories(self, metadata['categories'],
                                                 'http://arxiv.org/terms/arXiv/')
 
         #primary_category
-        if 'primary_url' in metadata and 'primary_label' in metadata :
+        if 'primary_url' in metadata and 'primary_label' in metadata:
             output += self.frmt_primary_category(metadata['primary_url'],
                                                 metadata['primary_label'],
                                                 'http://arxiv.org/terms/arXiv/')
 
         #comment
-        if 'comment' in metadata :
+        if 'comment' in metadata:
             output += self.frmt_comment(metadata['comment'])
 
         #journal references
-        if 'journal_refs' in metadata :
+        if 'journal_refs' in metadata:
             output += self.frmt_journal_ref(metadata['journal_refs'])
 
         #report numbers
-        if 'report_nos' in metadata :
+        if 'report_nos' in metadata:
             output += self.frmt_report_no(metadata['report_nos'])
 
         #doi
@@ -1117,7 +1076,7 @@ class ArXivFormat(BibSwordFormat):
             output += self.frmt_doi(metadata['doi'])
 
         #link
-        if 'links' in metadata :
+        if 'links' in metadata:
             output += BibSwordFormat.frmt_link(self, metadata['links'])
 
         output += '''</entry>'''
@@ -1129,20 +1088,20 @@ class ArXivFormat(BibSwordFormat):
         '''
             This method display each contributors in the format of an editable input
             text. This allows the user to modifie it.
-            @param (contributors) : The list of all contributors of the document
-            @return (html code) : the html code that display each dropdown list
+            @param contributors: The list of all contributors of the document
+            @return: (html code) the html code that display each dropdown list
         '''
 
         output = ''
 
-        for contributor in contributors :
+        for contributor in contributors:
             output += '''<contributor>\n'''
             output += '''<name>%s</name>\n''' % contributor['name']
-            if contributor['email'] != '' :
+            if contributor['email'] != '':
                 output += '''<email>%s</email>\n''' % \
                     contributor['email']
-            if len(contributor['affiliation']) != 0 :
-                for affiliation in contributor['affiliation'] :
+            if len(contributor['affiliation']) != 0:
+                for affiliation in contributor['affiliation']:
                     output += '''<arxiv:affiliation>%s'''\
                               '''</arxiv:affiliation>\n''' % affiliation
             output += '''</contributor>\n'''
@@ -1150,20 +1109,20 @@ class ArXivFormat(BibSwordFormat):
         return output
 
 
-    def frmt_primary_category(self, primary_url, primary_label, scheme) :
+    def frmt_primary_category(self, primary_url, primary_label, scheme):
         '''
             This method format the primary category as an element of a dropdown
             list.
-            @param (primary_url) : url of the primary category deposit
-            @param (primary_label) : name of the primary category to display
-            @parama (scheme) : url of the primary category schema
-            @return : html code containing each element to display
+            @param primary_url: url of the primary category deposit
+            @param primary_label: name of the primary category to display
+            @param scheme: url of the primary category schema
+            @return: html code containing each element to display
         '''
 
         output = ''
 
-        if primary_url != '' :
-            output += '''<arxiv:primary_category scheme="%s" label="%s" term="%s"/>\n''' % (scheme, primary_label, primary_url)
+        if primary_url != '':
+            output += '''<arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom/" scheme="%s" label="%s" term="%s"/>\n''' % (scheme, primary_label, primary_url)
 
         return output
 
@@ -1173,8 +1132,8 @@ class ArXivFormat(BibSwordFormat):
             This methode check if there is an comment given. If it is the case, it
             format it returns a formated comment node that may be inserted in the xml
             metadata file
-            @param (comment) : the string comment
-            @return (xml) : xml node correctly formated
+            @param comment: the string comment
+            @return: (xml) xml node correctly formated
         '''
 
         output = ''
@@ -1190,13 +1149,13 @@ class ArXivFormat(BibSwordFormat):
             This method check if there is some journal refs for the resource. If it
             is the case, it returns the journal_ref nodes formated to be insered in
             the xml metadata file
-            @param (categories) : list of journal_refs for one resource
-            @return (xml) : xml node(s) correctly formated
+            @param journal_refs: list of journal_refs for one resource
+            @return: (xml) xml node(s) correctly formated
         '''
 
         output = ''
 
-        for journal_ref in journal_refs :
+        for journal_ref in journal_refs:
             output += '''<arxiv:journal_ref>%s</arxiv:journal_ref>\n''' % \
                 journal_ref
 
@@ -1208,13 +1167,13 @@ class ArXivFormat(BibSwordFormat):
             This method check if there is some report numbres for the resource. If it
             is the case, it returns the report_nos nodes formated to be insered in
             the xml metadata file
-            @param (report_nos) : list of report_nos for one resource
-            @return (xml) : xml node(s) correctly formated
+            @param report_nos: list of report_nos for one resource
+            @return: (xml) xml node(s) correctly formated
         '''
 
         output = ''
 
-        for report_no in report_nos :
+        for report_no in report_nos:
             output += '''<arxiv:report_no>%s</arxiv:report_no>\n''' % \
                 report_no
 
@@ -1225,8 +1184,8 @@ class ArXivFormat(BibSwordFormat):
         '''This methode check if there is an doi given. If it is the case, it
             format it returns a formated doi node that may be inserted in the xml
             metadata file
-            @param (doi) : the string doi
-            @return (xml) : xml node correctly formated
+            @param doi: the string doi
+            @return: (xml) xml node correctly formated
         '''
 
         output = ''

@@ -30,8 +30,8 @@ def get_remote_server_auth(id_remoteserver):
     '''
         This function select the username and the password stored in the
         table swrREMOTESERVER to execute HTTP Request
-        @param (id_remoteserver) : id of the remote server to contact
-        @return (authentication_info) : dictionnary conating username - password
+        @param id_remoteserver: id of the remote server to contact
+        @return: (authentication_info) dictionnary conating username - password
     '''
 
     authentication_info = {'error':'',
@@ -65,9 +65,9 @@ def update_servicedocument(xml_servicedocument, id_remoteserver):
     '''
         This function update the servicedocument filed containing all the
         collections and categories for the given remote server
-        @param (servicedocument) : xml file
-        @param (id_remote_server) : id number of the remote server to update
-        @return (boolean) : true if update successfull, false else
+        @param xml_servicedocument: xml file
+        @param id_remoteserver: id number of the remote server to update
+        @return: (boolean) true if update successfull, false else
     '''
 
     # get the current time to keep the last update time
@@ -86,8 +86,8 @@ def update_servicedocument(xml_servicedocument, id_remoteserver):
 def select_servicedocument(id_remoteserver):
     '''
         This function retreive the servicedocument of the given remote server
-        @param (id_remoteserver) : id number of the remote server selected
-        @return (xml_file) : servicedocument xml file that contains coll and cat
+        @param id_remoteserver: id number of the remote server selected
+        @return: (xml_file) servicedocument xml file that contains coll and cat
     '''
 
     qstr = '''SELECT xml_servicedocument ''' \
@@ -105,8 +105,8 @@ def get_last_update(id_remoteserver):
     '''
         This function return the last update time of the service document. This
         is usefull to know if the service collection needs to be refreshed
-        @param (id_remoteserver) : id number of the remote server to check
-        @return (datetime) : datetime of the last update (yyyy-mm-dd hh:mm:ss)
+        @param id_remoteserver: id number of the remote server to check
+        @return: (datetime) datetime of the last update (yyyy-mm-dd hh:mm:ss)
     '''
 
     qstr = '''SELECT last_update ''' \
@@ -125,8 +125,8 @@ def get_all_remote_server(id_server):
         This function select the name of all remote service implementing the
         SWORD protocol. It returns a list of dictionnary containing three fields:
         id, name and host
-        @return (remote_server) : list of dictionnary (id - name - host) of each
-                                          remote server
+        @return: (remote_server) list of dictionnary (id - name - host) of each
+                  remote server
     '''
 
     remote_servers = []
@@ -153,8 +153,8 @@ def is_record_sent_to_server(id_server, id_record):
     '''
         check in the table swrCLIENTDATA that the current record has not already
         been sent before
-        @param (id_server) : id of the remote server where to send the record
-        @param (id_record) : id of the record to send
+        @param id_server: id of the remote server where to send the record
+        @param id_record: id of the record to send
         return : True if a value was found, false else
     '''
 
@@ -185,16 +185,16 @@ def insert_into_swr_clientdata(id_swr_remoteserver,
         This method insert a new row in the swrCLIENTDATA table. Some are given in
         parameters and some other such as the insertion time and the submission
         status are set by default
-        @param (id_swr_remoteserver) : foreign key of the sword remote server
-        @param (recid) : foreign key of the submitted record
-        @param (id_user) : foreign key of the user who did the submission
-        @param (xml_media_deposit) : xml response after the media deposit
-        @param (xml_metadata_submit) : xml response after the metadata submission
-        @param (remote_id) : record id given by the remote server in the response
-        @param (link_media) : remote url where to find the depositted medias
-        @param (link_metadata) : remote url where to find the submitted metadata
-        @param (link_status) : remote url where to check the submission status
-        @return (result) : the id of the new row inserted, 0 if the submission
+        @param id_swr_remoteserver: foreign key of the sword remote server
+        @param recid: foreign key of the submitted record
+        @param id_user: foreign key of the user who did the submission
+        @param xml_media_deposit: xml response after the media deposit
+        @param xml_metadata_submit: xml response after the metadata submission
+        @param remote_id: record id given by the remote server in the response
+        @param link_media: remote url where to find the depositted medias
+        @param link_metadata: remote url where to find the submitted metadata
+        @param link_status: remote url where to check the submission status
+        @return: (result) the id of the new row inserted, 0 if the submission
                                  didn't work
     '''
 
@@ -229,7 +229,7 @@ def count_nb_submitted_record() :
 def delete_from_swr_clientdata(id_submit):
     '''
         delete the given row from the swrCLIENTDATA table. Used by the test suit
-        @param (id_submit): id of the row to delete
+        @param id_submit: id of the row to delete
         result : boolean, true if deleted, false else
     '''
 
@@ -244,12 +244,12 @@ def select_submitted_record_infos(first_row=0, offset=10, row_id=''):
         this method return a bidimentionnal table containing all rows of the
         table swrCLIENTDATA. If sepecified, the search can be limited to a
         server, a record or a record on a server
-        @param (id_server) : if sepcified, limit the result to specified server
-        @param (id_record) : if specified, limit the result to specified record
-        @param (first_row) : give the limit where to start the selection
-        @param (offset) : give the maximal amount of rows to select
-        @param (order) : give the order to set the submission (recently first)
-        return : table of row containing each colomn of the table swrCLIENTDATA
+        @param first_row: give the limit where to start the selection
+        @param offset: give the maximal amount of rows to select
+        @return: table of row containing each colomn of the table swrCLIENTDATA
+
+        FIXME: first_row is apparently supposed to select the chosen
+               id_swrREMOTESERVER, but it is currently strangely handled...
     '''
 
     wstr = ''
@@ -299,9 +299,9 @@ def select_submitted_record_infos(first_row=0, offset=10, row_id=''):
 def update_submission_status(id_record, status, remote_id=''):
     '''
         update the submission field with the new status of the submission
-        @param (id_record) : id of the row to update
-        @param (status) : new value to set in the status field
-        @return : true if update done, else, false
+        @param id_record: id of the row to update
+        @param status: new value to set in the status field
+        @return: true if update done, else, false
     '''
 
     current_date = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -329,8 +329,8 @@ def update_submission_status(id_record, status, remote_id=''):
 def select_remote_server_infos(id_server):
     '''
         Select fields of the given remote server and return it in a tuple
-        @param (id_server) : id of the server to select
-        @return server_info : tuple containing all the available infos
+        @param id_server: id of the server to select
+        @return: (server_info) tuple containing all the available infos
     '''
 
     server_info = {'server_id' : '',
