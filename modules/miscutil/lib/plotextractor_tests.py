@@ -42,6 +42,7 @@ class GetDefaultsTest(unittest.TestCase):
         self.tarball = "/opt/cds-invenio/var/tmp/arXiv:0901.4942/arXiv:0901.4942"
 
     def test_get_defaults(self):
+        """plotextractor - get defaults"""
         sdir = None
         sdir_should_be = os.path.join(CFG_TMPDIR, self.arXiv_id + '_plots')
 
@@ -63,6 +64,7 @@ class PutItTogetherTest(unittest.TestCase):
         self.tex_file = 'unimportant'
 
     def test_with_singles(self):
+        """plotextractor - put_it_together with singles"""
         single_image = 'singleimage'
         single_caption = 'singlecaption'
         single_label = 'singlelabel'
@@ -76,6 +78,7 @@ class PutItTogetherTest(unittest.TestCase):
                                                'failed to zip captions correctly')
 
     def test_with_multiples_0(self):
+        """plotextractor - put_it_together with multiples"""
         no_main_two_subs = ['', ['img1', 'img2']]
         single_caption = 'singlecaption'
         single_label = 'singlelabel'
@@ -88,6 +91,7 @@ class PutItTogetherTest(unittest.TestCase):
                'didn\'t zip multiple images to one caption correctly')
 
     def test_with_multiples_1(self):
+        """plotextractor - put_it_together with multiples 1"""
         no_main_two_subs = ['', ['sub1', 'sub2']]
         main_and_two_sub_captions = ['main caption', ['subcap1', 'subcap2']]
         single_label = 'singlelabel'
@@ -102,6 +106,7 @@ class PutItTogetherTest(unittest.TestCase):
                 'didn\'t zip multiple images to main and subcaps correctly')
 
     def test_with_multiples_2(self):
+        """plotextractor - put_it_together with multiples 2"""
         main_and_two_sub_images = ['main', ['sub1', 'sub2']]
         main_and_two_sub_captions = ['main caption', ['subcap1', 'subcap2']]
         single_label = 'singlelabel'
@@ -117,6 +122,7 @@ class PutItTogetherTest(unittest.TestCase):
                 'didn\'t zip {main,sub}{images,captions} together properly')
 
     def test_with_multiples_3(self):
+        """plotextractor - put_it_together with multiples 3"""
         single_image = 'singleimage'
         no_main_two_subcaptions = ['', ['subcap1', 'subcap2']]
         single_label = 'singlelabel'
@@ -129,6 +135,7 @@ class PutItTogetherTest(unittest.TestCase):
                 'didn\'t zip a single image to multiple subcaps correctly')
 
     def test_extract_caption(self):
+        """plotextractor - put_it_together with extract caption"""
         self.example_lines = ['{some caption}', '[something else]', 'unrelated']
         single_image = 'singleimage'
         no_caption = ''
@@ -143,6 +150,7 @@ class PutItTogetherTest(unittest.TestCase):
 class TestFindOpenAndCloseBraces(unittest.TestCase):
 
     def test_simple_test(self):
+        """plotextractor - find_open_and_close_braces simple"""
         simple_test_lines = ['{simple}']
 
         start, start_line, end, end_line = find_open_and_close_braces(
@@ -153,6 +161,7 @@ class TestFindOpenAndCloseBraces(unittest.TestCase):
         self.assertTrue(end_line == 0, 'didn\'t identify end line')
 
     def test_braces_start_on_next_line_test(self):
+        """plotextractor - find_open_and_close_braces next line"""
         start_on_next_line_lines = ['nothing here', 'chars{morestuff', 'last}']
 
         start, start_line, end, end_line = find_open_and_close_braces(
@@ -164,6 +173,7 @@ class TestFindOpenAndCloseBraces(unittest.TestCase):
         self.assertTrue(end_line == 2, 'didn\'t identify end line')
 
     def test_confounding_braces(self):
+        """plotextractor - find_open_and_close_braces confounding"""
         confounding_braces_lines = ['{brace{bracebrace}{}', 'brace{{brace}',
                                    'brace}', '}']
 
@@ -176,6 +186,7 @@ class TestFindOpenAndCloseBraces(unittest.TestCase):
         self.assertTrue(end_line == 3, 'didn\'t identify end line')
 
     def test_square_braces(self):
+        """plotextractor - find_open_and_close_braces square braces"""
         square_brace_lines = ['[squaaaaaaare braces]']
 
         start, start_line, end, end_line = find_open_and_close_braces(
@@ -187,6 +198,7 @@ class TestFindOpenAndCloseBraces(unittest.TestCase):
         self.assertTrue(end_line == 0, 'didn\'t identify end line')
 
     def test_hanging_braces(self):
+        """plotextractor - find_open_and_close_braces hanging braces"""
         hanging_braces_lines = ['line{and stuff', 'and more stuff', 'and more']
 
         start, start_line, end, end_line = find_open_and_close_braces(
@@ -198,6 +210,7 @@ class TestFindOpenAndCloseBraces(unittest.TestCase):
         self.assertTrue(end_line == 0, 'didn\'t identify end line')
 
     def test_unacceptable_braces(self):
+        """plotextractor - find_open_and_close_braces unacceptable braces"""
         empty_lines = []
 
         start, start_line, end, end_line = find_open_and_close_braces(
@@ -211,24 +224,28 @@ class TestFindOpenAndCloseBraces(unittest.TestCase):
 class TestIntelligentlyFindFilenames(unittest.TestCase):
 
     def test_simple_test(self):
+        """plotextractor - intelligently_find_filenames simple"""
         line = 'file.eps'
 
         filenames = intelligently_find_filenames(line, ext = True)
         self.assertTrue(filenames == ['file.eps'], 'didn\'t find correct filenames')
 
     def test_ext_test(self):
+        """plotextractor - intelligently_find_filenames extension"""
         line = 'file.eps file2'
 
         filenames = intelligently_find_filenames(line, ext = True)
         self.assertTrue(filenames == ['file.eps'], 'didn\'t look for extension')
 
     def test_tex_test(self):
+        """plotextractor - intelligently_find_filenames TeX extension"""
         line = 'file.eps file2.tex'
 
         filenames = intelligently_find_filenames(line, TeX = True)
         self.assertTrue(filenames == ['file.eps', 'file2.tex'], 'not looking for TeX ext')
 
     def test_file_equals_test(self):
+        """plotextractor - intelligently_find_filenames equals"""
         line = 'file=something.eps'
 
         filenames = intelligently_find_filenames(line, ext = True)
@@ -236,6 +253,7 @@ class TestIntelligentlyFindFilenames(unittest.TestCase):
                         'didn\'t catch file=')
 
     def test_in_brackets_test(self):
+        """plotextractor - intelligently_find_filenames brackets"""
         line = '[file.eps]{anotherfile.ps}'
 
         filenames = intelligently_find_filenames(line)
@@ -243,6 +261,7 @@ class TestIntelligentlyFindFilenames(unittest.TestCase):
                 'out brackets properly')
 
     def test_lots_of_filenames(self):
+        """plotextractor - intelligently_find_filenames lots of filenames"""
         line = '[file.pstex]figure=something.eps,haha,anotherthing.ps'
 
         filenames = intelligently_find_filenames(line, ext = True)
@@ -253,6 +272,7 @@ class TestIntelligentlyFindFilenames(unittest.TestCase):
 class TestAssembleCaption(unittest.TestCase):
 
     def test_simple_test(self):
+        """plotextractor - assemble caption simple"""
         lines = ['some', 'simple ', 'caption!']
 
         caption = assemble_caption(0, 0, 2, 8, lines)
@@ -260,6 +280,7 @@ class TestAssembleCaption(unittest.TestCase):
                         'caption')
 
     def test_clean_out_label_test(self):
+        """plotextractor - assemble caption clean out label"""
         lines = ['some', '\label{aghhhh}simple ', 'caption!']
 
         caption = assemble_caption(0, 0, 2, 8, lines)
@@ -269,29 +290,33 @@ class TestAssembleCaption(unittest.TestCase):
 class TestRemoveDups(unittest.TestCase):
 
     def test_no_dups(self):
-        images_and_captions = [('img1', 'caption1', 'label1'), ('img2', 'caption2', 'label1')]
+        """plotextractor - remove_dups no dupes"""
+        images_and_captions = [('img1', 'caption1', 'label1', 'FIXME1'), ('img2', 'caption2', 'label1', 'FIXME1')]
 
         pared_images_and_captions = remove_dups(images_and_captions)
         self.assertTrue(pared_images_and_captions == images_and_captions, 'removed nondup')
 
     def test_dup_images(self):
-        images_and_captions = [('img1', 'caption1', 'label1'), ('img1', 'caption2', 'label1')]
+        """plotextractor - remove_dups images"""
+        images_and_captions = [('img1', 'caption1', 'label1', 'FIXME1'), ('img1', 'caption2', 'label1', 'FIXME1')]
 
         pared_images_and_captions = remove_dups(images_and_captions)
-        self.assertTrue(pared_images_and_captions == [('img1', 'caption1 : caption2', 'label1')], \
+        self.assertTrue(pared_images_and_captions == [('img1', 'caption1 : caption2', 'label1', 'FIXME1')], \
                 'didn\'t merge captions correctly')
 
     def test_dup_captions(self):
-        images_and_captions = [('img1', 'caption1', 'label1'), ('img1', 'caption1', 'label1'), \
-                               ('img1', 'caption2', 'label1')]
+        """plotextractor - remove_dups captions"""
+        images_and_captions = [('img1', 'caption1', 'label1', 'FIXME1'), ('img1', 'caption1', 'label1', 'FIXME1'), \
+                               ('img1', 'caption2', 'label1', 'FIXME1')]
 
         pared_images_and_captions = remove_dups(images_and_captions)
-        self.assertTrue(pared_images_and_captions == [('img1', 'caption1 : caption2', 'label1')], \
+        self.assertTrue(pared_images_and_captions == [('img1', 'caption1 : caption2', 'label1', 'FIXME1')], \
                 'didn\'t merge captions correctly')
 
 class TestGetConvertedImageName(unittest.TestCase):
 
     def test_no_change_test(self):
+        """plotextractor - get_converted_image_name no change"""
         image = '/path/to/image.png'
 
         converted_image = get_converted_image_name(image)
@@ -299,12 +324,14 @@ class TestGetConvertedImageName(unittest.TestCase):
                                        'converted')
 
     def test_dot_in_dir_name_no_ext_test(self):
+        """plotextractor - get_converted_image_name dot in dir name"""
         image = '/path.to/the/image'
 
         converted_image = get_converted_image_name(image)
         self.assertTrue(converted_image == image + '.png', 'didn\'t add extension')
 
     def test_change_extension_test(self):
+        """plotextractor - get_converted_image_name extension"""
         image = '/path/to/image.eps'
 
         converted_image = get_converted_image_name(image)
