@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
 "POT-Creation-Date: 2010-12-07 10:07+0100\n"
-"PO-Revision-Date: 2010-12-17 05:58+0100\n"
+"PO-Revision-Date: 2010-12-20 22:33+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: CA <info@invenio-software.org>\n"
 "Language: \n"
@@ -9248,9 +9248,8 @@ msgstr "Lloc"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3833
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4432
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15303
-#, fuzzy
 msgid "From"
-msgstr "De:"
+msgstr "Des de"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:404
 #: modules/bibcirculation/lib/bibcirculation_templates.py:799
@@ -9267,9 +9266,8 @@ msgstr "De:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4434
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15304
 #: modules/bibknowledge/lib/bibknowledge_templates.py:334
-#, fuzzy
 msgid "To"
-msgstr "A:"
+msgstr "Fins a"
 
 #: modules/bibcirculation/lib/bibcirculation_utils.py:405
 #: modules/bibcirculation/lib/bibcirculation_templates.py:626
@@ -9293,15 +9291,13 @@ msgstr "A:"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12869
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15048
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15305
-#, fuzzy
 msgid "Request date"
-msgstr "darrera actualització"
+msgstr "Data de petició"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:108
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:152
-#, fuzzy
 msgid "You are not authorized to use loans."
-msgstr "No esteu autoritzats a veure aquesta àrea."
+msgstr "No esteu autoritzats a fer servir el préstec."
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:157
 #: modules/bibcirculation/lib/bibcirculation_templates.py:486
@@ -9310,9 +9306,8 @@ msgstr "Històric de préstecs"
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:208
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:264
-#, fuzzy
 msgid "You are not authorized to use ill."
-msgstr "No esteu autoritzats a veure aquesta àrea."
+msgstr "No esteu autoritzats a fer servir el préstec interbibliotecari."
 
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:212
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:282
@@ -9358,9 +9353,8 @@ msgstr "Peticions de préstec interbibliotecari de llibres"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12671
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12772
 #: modules/bibcirculation/lib/bibcirculation_templates.py:12875
-#, fuzzy
 msgid "Barcode"
-msgstr "Llista"
+msgstr "Codi de barres"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:288
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2862
@@ -9381,29 +9375,25 @@ msgstr "Període de préstec"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2699
 #: modules/bibcirculation/lib/bibcirculation_templates.py:9895
 #: modules/bibcirculation/lib/bibcirculation_templates.py:11062
-#, fuzzy
 msgid "Option(s)"
-msgstr "Accions"
+msgstr "Opcion(s)"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:300
 #: modules/bibcirculation/lib/bibcirculation_templates.py:8384
-#, fuzzy
 msgid "Request"
-msgstr "Regles"
+msgstr "Petició"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:330
 msgid "See this book on BibCirculation"
 msgstr "Veure aquest llibre a BibCirculation"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:405
-#, fuzzy
 msgid "0 borrower(s) found."
-msgstr "%s registres trobats"
+msgstr "No s'ha trobat cap usuari."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:423
-#, fuzzy
 msgid "Borrower(s)"
-msgstr "Navegador"
+msgstr "Usuaris"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:459
 #: modules/bibcirculation/lib/bibcirculation_templates.py:744
@@ -9515,27 +9505,23 @@ msgstr "No teniu cap llibre en préstec."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4302
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4553
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4680
-#, fuzzy
 msgid "Loaned on"
-msgstr "actualitzat el"
+msgstr "Prestat en"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:526
 #: modules/bibcirculation/lib/bibcirculation_templates.py:628
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2866
-#, fuzzy
 msgid "Action(s)"
 msgstr "Accions"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:538
-#, fuzzy
 msgid "Renew"
-msgstr "Ressenya"
+msgstr "Renovar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:594
 #: modules/bibcirculation/lib/bibcirculation_templates.py:624
-#, fuzzy
 msgid "Your Requests"
-msgstr "Les vostres alertes"
+msgstr "Les vostres peticions"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:595
 msgid "You don't have any request (waiting or pending)."
@@ -9561,24 +9547,20 @@ msgstr "No teniu cap petició (esperant o pendent)."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13636
 #: modules/bibcirculation/lib/bibcirculation_templates.py:13944
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15261
-#, fuzzy
 msgid "Back to home"
-msgstr "Torna al registre"
+msgstr "Tornar a l'inici"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:712
-#, fuzzy
 msgid "Loaned"
-msgstr "i"
+msgstr "prestat"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:713
-#, fuzzy
 msgid "Returned"
-msgstr "Rebutjat"
+msgstr "Retornat"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:714
-#, fuzzy
 msgid "Renewalls"
-msgstr "Ressenyes"
+msgstr "Renovacions"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:776
 #: modules/bibcirculation/lib/bibcirculation_templates.py:925
@@ -9605,9 +9587,8 @@ msgstr "Confirmar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:956
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10837
-#, fuzzy
 msgid "You can see your loans "
-msgstr "Us hi podeu connectar a"
+msgstr "Podeu veure els vostres préstecs "
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:958
 #: modules/bibcirculation/lib/bibcirculation_templates.py:10839
@@ -9621,15 +9602,13 @@ msgstr "."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:990
 #: modules/bibcirculation/lib/bibcirculation_templates.py:2472
-#, fuzzy
 msgid "A new loan has been registered."
-msgstr "El vostre compte ha estat creat a"
+msgstr "S'ha enregistrat un nou préstec."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1047
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1233
-#, fuzzy
 msgid "No more requests are pending."
-msgstr "Quedent alguns documents pendents"
+msgstr "No hi ha més peticions pendents."
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1076
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15306
@@ -9643,9 +9622,8 @@ msgid "Associate barcode"
 msgstr "Associeu el codi de barres"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1262
-#, fuzzy
 msgid "Options"
-msgstr "Accions"
+msgstr "Opcions"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1395
 msgid "No hold requests waiting."
@@ -9654,26 +9632,22 @@ msgstr "No hi ha reserves pendents."
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1422
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1667
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3830
-#, fuzzy
 msgid "Request status"
-msgstr "estat actual:"
+msgstr "Estat de la petició"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1426
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1671
-#, fuzzy
 msgid "Request options"
-msgstr "Qüestió"
+msgstr "Opcions de la petició"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1454
-#, fuzzy
 msgid "Select hold request"
-msgstr "Seleccioneu un revisor"
+msgstr "Seleccioneu una petició de reserva"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1525
 #: modules/bibcirculation/lib/bibcirculation_templates.py:4506
-#, fuzzy
 msgid "Reset"
-msgstr "Rebutja"
+msgstr "Reiniciar"
 
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1562
 #, fuzzy, python-format
