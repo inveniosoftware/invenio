@@ -3584,7 +3584,7 @@ def convert_processed_reference_line_to_marc_xml(line_marker,
                 report_num = processed_line[tag_match_end:idx_closing_tag]
                 ## now trim this matched institutional report-number and its tags from the start of the line:
                 processed_line = processed_line[idx_closing_tag+len(CFG_REFEXTRACT_MARKER_CLOSING_REPORT_NUM):]
-                    
+
                 identified_citation_element =   {   'type'       : "REPORTNUMBER",
                                                     'misc_txt'   : "%s" % cur_misc_txt,
                                                     'report_num' : "%s" % report_num,
@@ -3925,8 +3925,7 @@ def add_tagged_title(reading_line,
     ## of the reading-line, up to the point of the matched TITLE:
     rebuilt_line = reading_line[startpos:true_replacement_index]
     ## Test to see whether a title or an "IBID" was matched:
-    if matched_title.upper().find("IBID") != -1 \
-        or matched_title.upper().find("IBIDEM") != -1:
+    if matched_title.upper().find("IBID") != -1:
         ## This is an IBID
         ## Try to replace the IBID with a title:
         if len(previous_match) > 1:
@@ -4107,7 +4106,7 @@ def create_marc_xml_reference_section(ref_sect,
         ## Strip the 'marker' (e.g. [1]) from this reference line:
         (line_marker, working_line1) = \
                       remove_reference_line_marker(ref_line)
-    
+
 
         ## Find DOI sections in citation
         (working_line1, identified_dois) = identify_and_tag_DOI(working_line1)
