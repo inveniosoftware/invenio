@@ -22,6 +22,7 @@ pylib_DATA = bibrecord_config.py \
              bibrecord_tests.py \
              refextract_config.py \
              refextract.py \
+             refextract_tests.py \
              xmlmarc2textmarc.py \
              textmarc2xmlmarc.py \
              bibedit_config.py \
