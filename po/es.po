@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2010-12-07 10:07+0100\n"
+"POT-Creation-Date: 2010-12-21 09:26+0100\n"
 "PO-Revision-Date: 2010-12-20 22:32+0100\n"
 "Last-Translator: Ferran Jorba <Ferran.Jorba@uab.cat>\n"
 "Language-Team: ES <info@invenio-software.org>\n"
@@ -36,7 +36,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:665
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:1103
+#: modules/websearch/lib/search_engine.py:1107
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
 msgstr "Y NO"
@@ -71,7 +71,7 @@ msgstr "Y NO"
 #: modules/bibcheck/web/admin/bibcheckadmin.py:203
 #: modules/bibcheck/web/admin/bibcheckadmin.py:263
 #: modules/bibcheck/web/admin/bibcheckadmin.py:303
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:67
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:78
 msgid "Admin Area"
 msgstr "Zona de administración"
 
@@ -79,7 +79,7 @@ msgstr "Zona de administración"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4443
+#: modules/websearch/lib/search_engine.py:4449
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -148,7 +148,7 @@ msgstr "texto completo"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/websearch/lib/search_engine.py:1125
+#: modules/websearch/lib/search_engine.py:1129
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
 msgstr "Expresión regular:"
@@ -165,7 +165,7 @@ msgstr "Expresión regular:"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:1121
+#: modules/websearch/lib/search_engine.py:1125
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
 msgstr "Todas las palabras:"
@@ -238,7 +238,7 @@ msgstr "materia"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/websearch/lib/search_engine.py:1124
+#: modules/websearch/lib/search_engine.py:1128
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "Partial phrase:"
 msgstr "Frase parcial:"
@@ -520,7 +520,7 @@ msgstr "experimento"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:777
 #: modules/websearch/doc/search-guide.webdoc:812
-#: modules/websearch/lib/search_engine.py:1122
+#: modules/websearch/lib/search_engine.py:1126
 #: modules/websearch/lib/websearch_templates.py:1113
 msgid "Any of the words:"
 msgstr "Al menos una de las palabras:"
@@ -1075,7 +1075,7 @@ msgstr "Guía de administración de WebSearch"
 #: modules/websearch/doc/search-guide.webdoc:742
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/websearch/lib/search_engine.py:1123
+#: modules/websearch/lib/search_engine.py:1127
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "Exact phrase:"
 msgstr "Frase exacta:"
@@ -1093,8 +1093,8 @@ msgstr "Ayuda para el envio"
 #: modules/websearch/doc/search-guide.webdoc:664
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:947
-#: modules/websearch/lib/search_engine.py:1102
+#: modules/websearch/lib/search_engine.py:951
+#: modules/websearch/lib/search_engine.py:1106
 #: modules/websearch/lib/websearch_templates.py:1162
 #: modules/websearch/lib/websearch_webcoll.py:561
 msgid "OR"
@@ -1108,7 +1108,7 @@ msgstr "O"
 #: modules/websearch/doc/search-guide.webdoc:663
 #: modules/websearch/doc/search-guide.webdoc:766
 #: modules/websearch/doc/search-guide.webdoc:801
-#: modules/websearch/lib/search_engine.py:1101
+#: modules/websearch/lib/search_engine.py:1105
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
 msgstr "Y"
@@ -1374,10 +1374,10 @@ msgstr "Sin texto completo"
 
 #: modules/websearch/doc/search-tips.webdoc:290
 #: modules/websubmit/lib/websubmit_templates.py:1118
-#: modules/bibharvest/lib/oai_harvest_admin.py:407
-#: modules/bibharvest/lib/oai_harvest_admin.py:415
-#: modules/bibharvest/lib/oai_harvest_admin.py:429
-#: modules/bibharvest/lib/oai_harvest_admin.py:444
+#: modules/bibharvest/lib/oai_harvest_admin.py:409
+#: modules/bibharvest/lib/oai_harvest_admin.py:417
+#: modules/bibharvest/lib/oai_harvest_admin.py:431
+#: modules/bibharvest/lib/oai_harvest_admin.py:446
 msgid "or"
 msgstr "o"
 
@@ -1669,8 +1669,8 @@ msgstr "Documentación de los elementos de los formatos"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1706
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15368
 #: modules/bibcheck/web/admin/bibcheckadmin.py:137
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:721
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:723
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:740
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:742
 msgid "Delete"
 msgstr "Suprimir"
 
@@ -1809,7 +1809,7 @@ msgstr "Texto completo"
 msgid "Manage Files of This Record"
 msgstr "Gestionar los ficheros de este registro"
 
-#: modules/bibformat/lib/elements/bfe_edit_record.py:52
+#: modules/bibformat/lib/elements/bfe_edit_record.py:51
 msgid "Edit This Record"
 msgstr "Edite este registro"
 
@@ -1822,7 +1822,7 @@ msgstr "Formato de salida restringido"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:201
 #: modules/bibformat/web/admin/bibformatadmin.py:508
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:553
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:564
 msgid "Ok"
 msgstr "De acuerdo"
 
@@ -1872,7 +1872,7 @@ msgstr "Suprimir el formato de salida"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1316
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1452
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3863
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:721
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:740
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -2128,7 +2128,7 @@ msgstr "Todavía no se ha subido ningún documento."
 
 #: modules/bibupload/lib/batchuploader_templates.py:302
 #: modules/bibupload/lib/batchuploader_webinterface.py:137
-#: modules/bibupload/lib/batchuploader_webinterface.py:295
+#: modules/bibupload/lib/batchuploader_webinterface.py:301
 msgid "Metadata batch upload"
 msgstr "Carga masiva de metadatos"
 
@@ -2139,7 +2139,7 @@ msgid "Document batch upload"
 msgstr "Carga masiva de documentos"
 
 #: modules/bibupload/lib/batchuploader_templates.py:308
-#: modules/bibupload/lib/batchuploader_webinterface.py:319
+#: modules/bibupload/lib/batchuploader_webinterface.py:325
 msgid "Upload history"
 msgstr "Histórico de envíos:"
 
@@ -2185,8 +2185,8 @@ msgid ""
 "Using %(x_fmt_open)sweb interface upload%(x_fmt_close)s, actions are "
 "executed a single time."
 msgstr ""
-"Usando la %(x_fmt_open)sinterfaz web de subir ficheros%(x_fmt_close)s, "
-"las acciones sólo se ejecutan una vez."
+"Usando la %(x_fmt_open)sinterfaz web de subir ficheros%(x_fmt_close)s, las "
+"acciones sólo se ejecutan una vez."
 
 #: modules/bibupload/lib/batchuploader_templates.py:399
 #, python-format
@@ -2194,8 +2194,8 @@ msgid ""
 "Check the %(x_url_open)sBatch Uploader daemon help page%(x_url_close)s for "
 "executing these actions periodically."
 msgstr ""
-"Consulte la %(x_url_open)spágina de ayuda del Batch Uploader "
-"daemon%(x_url_close)s para ejecutar estas acciones periódicamente."
+"Consulte la %(x_url_open)spágina de ayuda del Batch Uploader daemon"
+"%(x_url_close)s para ejecutar estas acciones periódicamente."
 
 #: modules/bibupload/lib/batchuploader_templates.py:404
 msgid "Metadata folders"
@@ -2227,8 +2227,7 @@ msgstr "Siguiente tarea en BibSched:"
 #: modules/bibupload/lib/batchuploader_webinterface.py:98
 msgid "Guests are not authorized to run batchuploader"
 msgstr ""
-"Los usuarios no identificados no están autorizados a efectuar cargas "
-"masivas"
+"Los usuarios no identificados no están autorizados a efectuar cargas masivas"
 
 #: modules/bibupload/lib/batchuploader_webinterface.py:105
 #, python-format
@@ -2239,15 +2238,15 @@ msgstr "El usuario «%s» no está autorizado a efectuar cargas masivas"
 msgid "Document batch upload result"
 msgstr "Resultado de la subida masiva"
 
-#: modules/bibupload/lib/batchuploader_webinterface.py:293
+#: modules/bibupload/lib/batchuploader_webinterface.py:299
 msgid "Upload succesful"
 msgstr "Subida correcta"
 
-#: modules/bibupload/lib/batchuploader_webinterface.py:343
+#: modules/bibupload/lib/batchuploader_webinterface.py:349
 msgid "Batch Uploader: Daemon monitor"
 msgstr "Subida masiva: seguimiento del proceso"
 
-#: modules/miscutil/lib/dateutils.py:76 modules/miscutil/lib/dateutils.py:103
+#: modules/miscutil/lib/dateutils.py:82 modules/miscutil/lib/dateutils.py:109
 #: modules/webbasket/lib/webbasket.py:181
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
@@ -2256,191 +2255,191 @@ msgstr "Subida masiva: seguimiento del proceso"
 msgid "N/A"
 msgstr "N/D"
 
-#: modules/miscutil/lib/dateutils.py:166
+#: modules/miscutil/lib/dateutils.py:172
 msgid "Sun"
 msgstr "Dom"
 
-#: modules/miscutil/lib/dateutils.py:167
+#: modules/miscutil/lib/dateutils.py:173
 msgid "Mon"
 msgstr "Lun"
 
-#: modules/miscutil/lib/dateutils.py:168
+#: modules/miscutil/lib/dateutils.py:174
 msgid "Tue"
 msgstr "Mar"
 
-#: modules/miscutil/lib/dateutils.py:169
+#: modules/miscutil/lib/dateutils.py:175
 msgid "Wed"
 msgstr "Mié"
 
-#: modules/miscutil/lib/dateutils.py:170
+#: modules/miscutil/lib/dateutils.py:176
 msgid "Thu"
 msgstr "Jue"
 
-#: modules/miscutil/lib/dateutils.py:171
+#: modules/miscutil/lib/dateutils.py:177
 msgid "Fri"
 msgstr "Vie"
 
-#: modules/miscutil/lib/dateutils.py:172
+#: modules/miscutil/lib/dateutils.py:178
 msgid "Sat"
 msgstr "Sáb"
 
-#: modules/miscutil/lib/dateutils.py:174
+#: modules/miscutil/lib/dateutils.py:180
 msgid "Sunday"
 msgstr "Domingo"
 
-#: modules/miscutil/lib/dateutils.py:175
+#: modules/miscutil/lib/dateutils.py:181
 msgid "Monday"
 msgstr "Lunes"
 
-#: modules/miscutil/lib/dateutils.py:176
+#: modules/miscutil/lib/dateutils.py:182
 msgid "Tuesday"
 msgstr "Martes"
 
-#: modules/miscutil/lib/dateutils.py:177
+#: modules/miscutil/lib/dateutils.py:183
 msgid "Wednesday"
 msgstr "Miércoles"
 
-#: modules/miscutil/lib/dateutils.py:178
+#: modules/miscutil/lib/dateutils.py:184
 msgid "Thursday"
 msgstr "Jueves"
 
-#: modules/miscutil/lib/dateutils.py:179
+#: modules/miscutil/lib/dateutils.py:185
 msgid "Friday"
 msgstr "Viernes"
 
-#: modules/miscutil/lib/dateutils.py:180
+#: modules/miscutil/lib/dateutils.py:186
 msgid "Saturday"
 msgstr "Sábado"
 
-#: modules/miscutil/lib/dateutils.py:194 modules/miscutil/lib/dateutils.py:208
+#: modules/miscutil/lib/dateutils.py:200 modules/miscutil/lib/dateutils.py:214
 #: modules/bibcirculation/lib/bibcirculation_templates.py:779
 #: modules/bibcirculation/lib/bibcirculation_templates.py:801
 msgid "Month"
 msgstr "Mes"
 
-#: modules/miscutil/lib/dateutils.py:195
+#: modules/miscutil/lib/dateutils.py:201
 msgid "Jan"
 msgstr "Ene"
 
-#: modules/miscutil/lib/dateutils.py:196
+#: modules/miscutil/lib/dateutils.py:202
 msgid "Feb"
 msgstr "Feb"
 
-#: modules/miscutil/lib/dateutils.py:197
+#: modules/miscutil/lib/dateutils.py:203
 msgid "Mar"
 msgstr "Mar"
 
-#: modules/miscutil/lib/dateutils.py:198
+#: modules/miscutil/lib/dateutils.py:204
 msgid "Apr"
 msgstr "Abr"
 
-#: modules/miscutil/lib/dateutils.py:199 modules/miscutil/lib/dateutils.py:213
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
 msgstr "May"
 
-#: modules/miscutil/lib/dateutils.py:200
+#: modules/miscutil/lib/dateutils.py:206
 msgid "Jun"
 msgstr "Jun"
 
-#: modules/miscutil/lib/dateutils.py:201
+#: modules/miscutil/lib/dateutils.py:207
 msgid "Jul"
 msgstr "Jul"
 
-#: modules/miscutil/lib/dateutils.py:202
+#: modules/miscutil/lib/dateutils.py:208
 msgid "Aug"
 msgstr "Ago"
 
-#: modules/miscutil/lib/dateutils.py:203
+#: modules/miscutil/lib/dateutils.py:209
 msgid "Sep"
 msgstr "Sep"
 
-#: modules/miscutil/lib/dateutils.py:204
+#: modules/miscutil/lib/dateutils.py:210
 msgid "Oct"
 msgstr "Oct"
 
-#: modules/miscutil/lib/dateutils.py:205
+#: modules/miscutil/lib/dateutils.py:211
 msgid "Nov"
 msgstr "Nov"
 
-#: modules/miscutil/lib/dateutils.py:206
+#: modules/miscutil/lib/dateutils.py:212
 msgid "Dec"
 msgstr "Dic"
 
-#: modules/miscutil/lib/dateutils.py:209
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:215
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
 msgstr "Enero"
 
-#: modules/miscutil/lib/dateutils.py:210
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:216
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
 msgstr "Febrero"
 
-#: modules/miscutil/lib/dateutils.py:211
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:217
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
 msgstr "Marzo"
 
-#: modules/miscutil/lib/dateutils.py:212
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:218
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
 msgstr "Abril"
 
-#: modules/miscutil/lib/dateutils.py:214
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:220
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
 msgstr "Junio"
 
-#: modules/miscutil/lib/dateutils.py:215
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:221
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
 msgstr "Julio"
 
-#: modules/miscutil/lib/dateutils.py:216
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:222
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
 msgstr "Agosto"
 
-#: modules/miscutil/lib/dateutils.py:217
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:223
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
 msgstr "Septiembre"
 
-#: modules/miscutil/lib/dateutils.py:218
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:224
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
 msgstr "Octubre"
 
-#: modules/miscutil/lib/dateutils.py:219
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:225
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
 msgstr "Noviembre"
 
-#: modules/miscutil/lib/dateutils.py:220
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:226
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
 msgstr "Diciembre"
 
-#: modules/miscutil/lib/dateutils.py:238
+#: modules/miscutil/lib/dateutils.py:244
 #: modules/bibcirculation/lib/bibcirculation_templates.py:780
 #: modules/bibcirculation/lib/bibcirculation_templates.py:802
 msgid "Day"
 msgstr "Día"
 
-#: modules/miscutil/lib/dateutils.py:289
+#: modules/miscutil/lib/dateutils.py:295
 #: modules/bibcirculation/lib/bibcirculation_utils.py:321
 #: modules/bibcirculation/lib/bibcirculation_templates.py:778
 #: modules/bibcirculation/lib/bibcirculation_templates.py:800
@@ -2647,58 +2646,58 @@ msgstr "Ejecutar BibCirculation"
 msgid "Run Batch Uploader"
 msgstr "Ejecutar el gestor de cargas masivas"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3703
+#: modules/webaccess/lib/webaccessadmin_lib.py:3704
 #, python-format
 msgid "Your account on '%s' has been activated"
 msgstr "Su cuenta en «%s» ha sido activada."
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3704
+#: modules/webaccess/lib/webaccessadmin_lib.py:3705
 #, python-format
 msgid "Your account earlier created on '%s' has been activated:"
 msgstr "Su cuenta creada previamente en «%s» ha sido activada:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3706
-#: modules/webaccess/lib/webaccessadmin_lib.py:3719
-#: modules/webaccess/lib/webaccessadmin_lib.py:3745
+#: modules/webaccess/lib/webaccessadmin_lib.py:3707
+#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3746
 msgid "Username/Email:"
 msgstr "Nombre de usuario"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3707
-#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3708
+#: modules/webaccess/lib/webaccessadmin_lib.py:3721
 msgid "Password:"
 msgstr "Contraseña"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3717
+#: modules/webaccess/lib/webaccessadmin_lib.py:3718
 #, python-format
 msgid "Account created on '%s'"
 msgstr "Cuenta creada en «%s»"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3718
+#: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #, python-format
 msgid "An account has been created for you on '%s':"
 msgstr "Se ha creado su cuenta en «%s»:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3730
+#: modules/webaccess/lib/webaccessadmin_lib.py:3731
 #, python-format
 msgid "Account rejected on '%s'"
 msgstr "Cuenta rechazada en «%s»"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3731
+#: modules/webaccess/lib/webaccessadmin_lib.py:3732
 #, python-format
 msgid "Your request for an account has been rejected on '%s':"
 msgstr "Su petición de una cuenta en «%s» ha sido rechazada:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3733
+#: modules/webaccess/lib/webaccessadmin_lib.py:3734
 #, python-format
 msgid "Username/Email: %s"
 msgstr "Nombre de usuario: %s"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3743
+#: modules/webaccess/lib/webaccessadmin_lib.py:3744
 #, python-format
 msgid "Account deleted on '%s'"
 msgstr "Cuenta en «%s» eliminada"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3744
+#: modules/webaccess/lib/webaccessadmin_lib.py:3745
 #, python-format
 msgid "Your account on '%s' has been deleted:"
 msgstr "Su cuenta en «%s» ha sido eliminada:"
@@ -3121,13 +3120,13 @@ msgstr "%s, personalizar"
 #: modules/webstyle/lib/webstyle_templates.py:579
 #: modules/webstyle/lib/webstyle_templates.py:616
 #: modules/webstyle/lib/webstyle_templates.py:618
-#: modules/websubmit/lib/websubmit_engine.py:1705
+#: modules/websubmit/lib/websubmit_engine.py:1707
 #: modules/websubmit/lib/websubmit_webinterface.py:1127
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
 #: modules/bibedit/lib/bibedit_webinterface.py:205
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:496
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:269
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:280
 msgid "Error"
 msgstr "Error"
 
@@ -3245,8 +3244,8 @@ msgid ""
 "You have no personal or group baskets or are subscribed to any public "
 "baskets."
 msgstr ""
-"No tiene cestas personales ni de grupo, ni está susbcripto a ninguna "
-"cesta pública"
+"No tiene cestas personales ni de grupo, ni está susbcripto a ninguna cesta "
+"pública"
 
 #: modules/webbasket/lib/webbasket_templates.py:87
 #, python-format
@@ -3359,7 +3358,7 @@ msgstr "%(x_title)s, por %(x_name)s el %(x_date)s:"
 
 #: modules/webbasket/lib/webbasket_templates.py:1046
 #: modules/webbasket/lib/webbasket_templates.py:1070
-#: modules/webcomment/lib/webcomment.py:1455
+#: modules/webcomment/lib/webcomment.py:1460
 #: modules/webcomment/lib/webcomment_templates.py:357
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
@@ -3932,17 +3931,17 @@ msgstr "Suprimir una cesta"
 msgid "Copy record to basket"
 msgstr "Copiar el registro a la cesta"
 
-#: modules/webcomment/lib/webcomment.py:1050
+#: modules/webcomment/lib/webcomment.py:1055
 #, python-format
 msgid "Record %i"
 msgstr "Registro %i"
 
-#: modules/webcomment/lib/webcomment.py:1061
+#: modules/webcomment/lib/webcomment.py:1066
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been reviewed"
 msgstr "Se han revisado el %(report_number)s\"%(title)s\""
 
-#: modules/webcomment/lib/webcomment.py:1065
+#: modules/webcomment/lib/webcomment.py:1070
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been commented"
 msgstr "Se han comentado el %(report_number)s\"%(title)s\""
@@ -4904,60 +4903,60 @@ msgstr "No está autorizado a utilitzar mensajes."
 msgid "Read a message"
 msgstr "Lea un mensaje"
 
-#: modules/websearch/lib/search_engine.py:738
-#: modules/websearch/lib/search_engine.py:765
-#: modules/websearch/lib/search_engine.py:4466
-#: modules/websearch/lib/search_engine.py:4519
+#: modules/websearch/lib/search_engine.py:742
+#: modules/websearch/lib/search_engine.py:769
+#: modules/websearch/lib/search_engine.py:4472
+#: modules/websearch/lib/search_engine.py:4525
 msgid "Search Results"
 msgstr "Resultados de la búsqueda"
 
-#: modules/websearch/lib/search_engine.py:867
+#: modules/websearch/lib/search_engine.py:871
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
 msgstr "cualquier día"
 
-#: modules/websearch/lib/search_engine.py:873
+#: modules/websearch/lib/search_engine.py:877
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
 msgstr "cualquier mes"
 
-#: modules/websearch/lib/search_engine.py:881
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
 msgstr "cualquier año"
 
-#: modules/websearch/lib/search_engine.py:922
-#: modules/websearch/lib/search_engine.py:941
+#: modules/websearch/lib/search_engine.py:926
+#: modules/websearch/lib/search_engine.py:945
 msgid "any public collection"
 msgstr "qualquier colección pública"
 
-#: modules/websearch/lib/search_engine.py:926
+#: modules/websearch/lib/search_engine.py:930
 msgid "remove this collection"
 msgstr "eliminar esta colección"
 
-#: modules/websearch/lib/search_engine.py:937
+#: modules/websearch/lib/search_engine.py:941
 msgid "add another collection"
 msgstr "añadir otra colección"
 
-#: modules/websearch/lib/search_engine.py:947
+#: modules/websearch/lib/search_engine.py:951
 #: modules/websearch/lib/websearch_webcoll.py:561
 msgid "rank by"
 msgstr "ordenar por"
 
-#: modules/websearch/lib/search_engine.py:967
+#: modules/websearch/lib/search_engine.py:971
 msgid "HTML brief"
 msgstr "HTML resumido"
 
-#: modules/websearch/lib/search_engine.py:1080
+#: modules/websearch/lib/search_engine.py:1084
 #: modules/websearch/lib/websearch_webcoll.py:531
 msgid "latest first"
 msgstr "el último primero"
 
-#: modules/websearch/lib/search_engine.py:1667
+#: modules/websearch/lib/search_engine.py:1673
 msgid "No values found."
 msgstr "No se han encontrado valores."
 
-#: modules/websearch/lib/search_engine.py:1785
+#: modules/websearch/lib/search_engine.py:1791
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from 2006-2010."
@@ -4965,50 +4964,49 @@ msgstr ""
 "Atención: la búsqueda a texto completo sólo está disponible para un "
 "subconjunto de documentos, mayoritariamente de entre 2006-2010."
 
-#: modules/websearch/lib/search_engine.py:1787
+#: modules/websearch/lib/search_engine.py:1793
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from 2008-2010."
 msgstr ""
-"Atención: la búsqueda en los pies de imágenes sólo está disponible "
-"para un subconjunto de documentos, mayoritariamente de entre "
-"2008-2010."
+"Atención: la búsqueda en los pies de imágenes sólo está disponible para un "
+"subconjunto de documentos, mayoritariamente de entre 2008-2010."
 
-#: modules/websearch/lib/search_engine.py:1794
+#: modules/websearch/lib/search_engine.py:1800
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 "Todavía no hay índice de frases para el texto completo, buscando por "
 "combinación de palabras..."
 
-#: modules/websearch/lib/search_engine.py:1835
+#: modules/websearch/lib/search_engine.py:1841
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "No se han encontrado coincidencias con %(x_query1)s, pero utilizando en su "
 "lugar %(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1845
-#: modules/websearch/lib/search_engine.py:1854
-#: modules/websearch/lib/search_engine.py:4438
-#: modules/websearch/lib/search_engine.py:4476
-#: modules/websearch/lib/search_engine.py:4527
+#: modules/websearch/lib/search_engine.py:1851
+#: modules/websearch/lib/search_engine.py:1860
+#: modules/websearch/lib/search_engine.py:4444
+#: modules/websearch/lib/search_engine.py:4482
+#: modules/websearch/lib/search_engine.py:4533
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
 msgid "Requested record does not seem to exist."
 msgstr "El registro solicitado no existe."
 
-#: modules/websearch/lib/search_engine.py:1976
+#: modules/websearch/lib/search_engine.py:1982
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
 "No se entiende la sintaxis de su búsqueda.  Se ignorarán todos los "
-"paréntesis de la búsqueda.  Si así no funciona, repase su búsqueda y "
-"vuelva a intentarlo."
+"paréntesis de la búsqueda.  Si así no funciona, repase su búsqueda y vuelva "
+"a intentarlo."
 
-#: modules/websearch/lib/search_engine.py:2298
+#: modules/websearch/lib/search_engine.py:2304
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5018,7 +5016,7 @@ msgstr ""
 "Las otras colecciones públicas dieron %(x_url_open)s%(x_nb_hits)d resultados"
 "%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2307
+#: modules/websearch/lib/search_engine.py:2313
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5027,27 +5025,27 @@ msgstr ""
 "documentos no públicos, por favor escoja primero la colección restringida "
 "deseada."
 
-#: modules/websearch/lib/search_engine.py:2424
+#: modules/websearch/lib/search_engine.py:2430
 #, python-format
 msgid "There are no records referring to %s."
 msgstr "No hay registros que se refieran a %s."
 
-#: modules/websearch/lib/search_engine.py:2426
+#: modules/websearch/lib/search_engine.py:2432
 #, python-format
 msgid "There are no records cited by %s."
 msgstr "No hay registros citados por a %s."
 
-#: modules/websearch/lib/search_engine.py:2431
+#: modules/websearch/lib/search_engine.py:2437
 #, python-format
 msgid "No word index is available for %s."
 msgstr "No hay índices de palabras disponible para %s."
 
-#: modules/websearch/lib/search_engine.py:2442
+#: modules/websearch/lib/search_engine.py:2448
 #, python-format
 msgid "No phrase index is available for %s."
 msgstr "No hay índices de frases disponible para %s."
 
-#: modules/websearch/lib/search_engine.py:2487
+#: modules/websearch/lib/search_engine.py:2493
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -5057,7 +5055,7 @@ msgstr ""
 "encontrado en ningún registro. Los términos aproximados en cualquier "
 "colección son:"
 
-#: modules/websearch/lib/search_engine.py:2491
+#: modules/websearch/lib/search_engine.py:2497
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -5065,7 +5063,7 @@ msgstr ""
 "El término de búsqueda %s no se ha encontrado en ningún registro. Los "
 "términos aproximados, en cualquier las colección, son:"
 
-#: modules/websearch/lib/search_engine.py:3228
+#: modules/websearch/lib/search_engine.py:3234
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -5074,35 +5072,35 @@ msgstr ""
 "Sólo se puede ordenar en conjuntos de hasta %d registros.  Ordenado por "
 "defecto (\"primero los más recientes\")."
 
-#: modules/websearch/lib/search_engine.py:3252
+#: modules/websearch/lib/search_engine.py:3258
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
 "instead."
 msgstr "No es posible ordenar por %s.  Ha quedado ordenado por título."
 
-#: modules/websearch/lib/search_engine.py:3440
-#: modules/websearch/lib/search_engine.py:3769
-#: modules/websearch/lib/search_engine.py:3947
-#: modules/websearch/lib/search_engine.py:3970
-#: modules/websearch/lib/search_engine.py:3978
-#: modules/websearch/lib/search_engine.py:3986
-#: modules/websearch/lib/search_engine.py:4032
+#: modules/websearch/lib/search_engine.py:3446
+#: modules/websearch/lib/search_engine.py:3775
+#: modules/websearch/lib/search_engine.py:3953
+#: modules/websearch/lib/search_engine.py:3976
+#: modules/websearch/lib/search_engine.py:3984
+#: modules/websearch/lib/search_engine.py:3992
+#: modules/websearch/lib/search_engine.py:4038
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "El registro se ha suprimido."
 
-#: modules/websearch/lib/search_engine.py:3668
+#: modules/websearch/lib/search_engine.py:3674
 msgid "Use different search terms."
 msgstr "Use términos de búsqueda distintos."
 
-#: modules/websearch/lib/search_engine.py:4748
+#: modules/websearch/lib/search_engine.py:4754
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "No se han encontrado resultados dentro de los límites de tiempo "
 "especificados. Descartando esta condición..."
 
-#: modules/websearch/lib/search_engine.py:4775
+#: modules/websearch/lib/search_engine.py:4781
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "No se han encontrado resultados dentro de los límites especificados, "
@@ -5998,8 +5996,8 @@ msgid "Your Administrative Activities"
 msgstr "Sus actividades administrativas"
 
 #: modules/websession/lib/websession_templates.py:670
-#: modules/bibharvest/lib/oai_harvest_admin.py:427
-#: modules/bibharvest/lib/oai_harvest_admin.py:442
+#: modules/bibharvest/lib/oai_harvest_admin.py:429
+#: modules/bibharvest/lib/oai_harvest_admin.py:444
 msgid "Try again"
 msgstr "Vuélvalo a intentar"
 
@@ -6564,52 +6562,54 @@ msgstr ""
 "(%(x_nb_admin)i)."
 
 #: modules/websession/lib/websession_templates.py:2441
+#, fuzzy
 msgid ""
-"Warning : The password set for MySQL is the same as the default Invenio "
-"password. For security purposes, you might want to change the password."
+"Warning: The password set for MySQL root user is the same as the default "
+"Invenio password. For security purposes, you may want to change the password."
 msgstr ""
 "Atención: la contraseña que ha establecido para MySQL es la misma que la de "
 "lleva Invenio.  Por motivos de seguridad, es preferible cambiarla."
 
 #: modules/websession/lib/websession_templates.py:2447
+#, fuzzy
 msgid ""
-"Warning : The password set for the Invenio database is the same as the "
-"default Invenio password. For security purposes, you might want to change "
-"the password."
+"Warning: The password set for the Invenio MySQL user is the same as the "
+"shipped default. For security purposes, you may want to change the password."
 msgstr ""
 "Atención: la contraseña que ha establecido para la base de datos Invenio es "
 "la misma que la de lleva Invenio.  Por motivos de seguridad, es preferible "
 "cambiarla."
 
 #: modules/websession/lib/websession_templates.py:2453
+#, fuzzy
 msgid ""
-"Warning : The password set for the Invenio admin user is currently empty. "
-"For security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For "
+"security purposes, it is strongly recommended that you add a password."
 msgstr ""
 "Atención: la contraseña para el usuario admin de Invenio está vacía. Por "
 "motivos de seguridad, es necesario establecer una."
 
 #: modules/websession/lib/websession_templates.py:2459
+#, fuzzy
 msgid ""
-"Warning : The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to change "
-"this to your own address."
+"Warning: The email address set for support email is currently set to "
+"info@invenio-software.org. It is recommended that you change this to your "
+"own address."
 msgstr ""
-"Atención: la dirección configurada para soporte electrónico es "
-"info@invenio-software.org. Es conveniente cambiarla a su dirección "
-"particular."
+"Atención: la dirección configurada para soporte electrónico es info@invenio-"
+"software.org. Es conveniente cambiarla a su dirección particular."
 
 #: modules/websession/lib/websession_templates.py:2465
-msgid "A newer version of Invenio is available for download. Please visit "
+#, fuzzy
+msgid ""
+"A newer version of Invenio is available for download. You may want to visit  "
 msgstr "Us podeu baixar una versió més nova de Invenio.  Visiteu "
 
 #: modules/websession/lib/websession_templates.py:2472
 msgid ""
-"Cannot download release notes from http://cdsware.cern.ch/, please check "
-"your internet connection"
+"Cannot download or parse release notes from http://invenio-software.org/repo/"
+"invenio/tree/RELEASE-NOTES"
 msgstr ""
-"No es posible bajar las notas de la versión desde http://cdsware.cern.ch/.  "
-"Compruebe su conexión a Internet."
 
 #: modules/websession/lib/webuser.py:153
 msgid "Database problem"
@@ -7094,10 +7094,10 @@ msgstr "Página principal"
 
 #: modules/webstyle/lib/webstyle_templates.py:429
 #: modules/webstyle/lib/webstyle_templates.py:498
-#: modules/websubmit/lib/websubmit_engine.py:686
-#: modules/websubmit/lib/websubmit_engine.py:1114
-#: modules/websubmit/lib/websubmit_engine.py:1160
-#: modules/websubmit/lib/websubmit_engine.py:1393
+#: modules/websubmit/lib/websubmit_engine.py:687
+#: modules/websubmit/lib/websubmit_engine.py:1115
+#: modules/websubmit/lib/websubmit_engine.py:1161
+#: modules/websubmit/lib/websubmit_engine.py:1394
 msgid "Submit"
 msgstr "Enviar"
 
@@ -7407,13 +7407,13 @@ msgstr ""
 "tardar más de lo habitual hasta que esté bien integrado y buscable.\n"
 
 #: modules/websubmit/lib/websubmit_engine.py:177
-#: modules/websubmit/lib/websubmit_engine.py:786
+#: modules/websubmit/lib/websubmit_engine.py:787
 #: modules/websubmit/web/yoursubmissions.py:61
 msgid "Sorry, you must log in to perform this action."
 msgstr "Tiene que identificarse para ejecutar esta acción."
 
 #: modules/websubmit/lib/websubmit_engine.py:184
-#: modules/websubmit/lib/websubmit_engine.py:793
+#: modules/websubmit/lib/websubmit_engine.py:794
 msgid "Not enough information to go ahead with the submission."
 msgstr "Falta información para continuar con el envío."
 
@@ -7422,41 +7422,41 @@ msgstr "Falta información para continuar con el envío."
 #: modules/websubmit/lib/websubmit_engine.py:281
 #: modules/websubmit/lib/websubmit_engine.py:353
 #: modules/websubmit/lib/websubmit_engine.py:394
-#: modules/websubmit/lib/websubmit_engine.py:807
-#: modules/websubmit/lib/websubmit_engine.py:845
-#: modules/websubmit/lib/websubmit_engine.py:903
-#: modules/websubmit/lib/websubmit_engine.py:944
+#: modules/websubmit/lib/websubmit_engine.py:808
+#: modules/websubmit/lib/websubmit_engine.py:846
+#: modules/websubmit/lib/websubmit_engine.py:904
+#: modules/websubmit/lib/websubmit_engine.py:945
 msgid "Invalid parameters"
 msgstr "Parámetros no válidos"
 
 #: modules/websubmit/lib/websubmit_engine.py:196
-#: modules/websubmit/lib/websubmit_engine.py:799
+#: modules/websubmit/lib/websubmit_engine.py:800
 msgid "Invalid doctype and act parameters"
 msgstr "Parámetros para doctype y act no válidos"
 
 #: modules/websubmit/lib/websubmit_engine.py:227
-#: modules/websubmit/lib/websubmit_engine.py:834
+#: modules/websubmit/lib/websubmit_engine.py:835
 #, python-format
 msgid "Unable to find the submission directory for the action: %s"
 msgstr "No se puede encontrar el directorio de envíos para la acción: %s"
 
 #: modules/websubmit/lib/websubmit_engine.py:236
-#: modules/websubmit/lib/websubmit_engine.py:984
+#: modules/websubmit/lib/websubmit_engine.py:985
 msgid "Unknown document type"
 msgstr "Tipo de documento desconocido"
 
 #: modules/websubmit/lib/websubmit_engine.py:242
-#: modules/websubmit/lib/websubmit_engine.py:990
+#: modules/websubmit/lib/websubmit_engine.py:991
 msgid "Unknown action"
 msgstr "Acción desconocida"
 
 #: modules/websubmit/lib/websubmit_engine.py:250
-#: modules/websubmit/lib/websubmit_engine.py:997
+#: modules/websubmit/lib/websubmit_engine.py:998
 msgid "Unable to determine the number of submission pages."
 msgstr "No ha sido posible determinar el número de páginas del envío."
 
 #: modules/websubmit/lib/websubmit_engine.py:291
-#: modules/websubmit/lib/websubmit_engine.py:853
+#: modules/websubmit/lib/websubmit_engine.py:854
 msgid ""
 "Unable to create a directory for this submission. The administrator has been "
 "alerted."
@@ -7465,25 +7465,25 @@ msgstr ""
 "administrador."
 
 #: modules/websubmit/lib/websubmit_engine.py:400
-#: modules/websubmit/lib/websubmit_engine.py:951
+#: modules/websubmit/lib/websubmit_engine.py:952
 msgid "Cannot create submission directory. The administrator has been alerted."
 msgstr ""
 "No ha sido posible crear el directorio para los envíos. Se ha avisado al "
 "administrador."
 
 #: modules/websubmit/lib/websubmit_engine.py:419
-#: modules/websubmit/lib/websubmit_engine.py:970
+#: modules/websubmit/lib/websubmit_engine.py:971
 msgid "No file uploaded?"
 msgstr "No ha subido ningún archivo?"
 
-#: modules/websubmit/lib/websubmit_engine.py:459
-#: modules/websubmit/lib/websubmit_engine.py:462
-#: modules/websubmit/lib/websubmit_engine.py:595
-#: modules/websubmit/lib/websubmit_engine.py:598
+#: modules/websubmit/lib/websubmit_engine.py:460
+#: modules/websubmit/lib/websubmit_engine.py:463
+#: modules/websubmit/lib/websubmit_engine.py:596
+#: modules/websubmit/lib/websubmit_engine.py:599
 msgid "Unknown form field found on submission page."
 msgstr "Campo desconocido en el formulario de envíos."
 
-#: modules/websubmit/lib/websubmit_engine.py:1033
+#: modules/websubmit/lib/websubmit_engine.py:1034
 msgid ""
 "A serious function-error has been encountered. Adminstrators have been "
 "alerted. <br /><em>Please not that this might be due to wrong characters "
@@ -7495,17 +7495,17 @@ msgstr ""
 "caracteres erróneos en el formulario</em> (p. ej., copiando y pegando algun "
 "texto de un archivo PDF)."
 
-#: modules/websubmit/lib/websubmit_engine.py:1356
+#: modules/websubmit/lib/websubmit_engine.py:1357
 #, python-format
 msgid "Unable to find document type: %s"
 msgstr "Imposible encontrar el tipo de documento: %s"
 
-#: modules/websubmit/lib/websubmit_engine.py:1641
+#: modules/websubmit/lib/websubmit_engine.py:1643
 msgid "The chosen action is not supported by the document type."
 msgstr ""
 "La acción que ha escogido no está soportada para este tipo de documento."
 
-#: modules/websubmit/lib/websubmit_engine.py:1718
+#: modules/websubmit/lib/websubmit_engine.py:1720
 #: modules/websubmit/lib/websubmit_webinterface.py:1143
 #: modules/websubmit/web/approve.py:81
 msgid "Warning"
@@ -7561,8 +7561,8 @@ msgid "SUMMARY"
 msgstr "RESUMEN"
 
 #: modules/websubmit/lib/websubmit_templates.py:534
-#: modules/bibharvest/lib/oai_harvest_admin.py:844
-#: modules/bibharvest/lib/oai_harvest_admin.py:897
+#: modules/bibharvest/lib/oai_harvest_admin.py:846
+#: modules/bibharvest/lib/oai_harvest_admin.py:899
 msgid "Previous page"
 msgstr "Página anterior"
 
@@ -7571,8 +7571,8 @@ msgid "Submission number"
 msgstr "Número de envío"
 
 #: modules/websubmit/lib/websubmit_templates.py:554
-#: modules/bibharvest/lib/oai_harvest_admin.py:829
-#: modules/bibharvest/lib/oai_harvest_admin.py:885
+#: modules/bibharvest/lib/oai_harvest_admin.py:831
+#: modules/bibharvest/lib/oai_harvest_admin.py:887
 msgid "Next page"
 msgstr "Página siguiente"
 
@@ -8654,7 +8654,7 @@ msgstr "Número"
 msgid "Did you know?"
 msgstr "Lo sabía?"
 
-#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:255
+#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:253
 #, python-format
 msgid ""
 "Hi,\n"
@@ -8667,7 +8667,7 @@ msgstr ""
 "échele un vistazo a este artículo:\n"
 "<%(url)s>"
 
-#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:262
+#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:260
 msgid "Send this article"
 msgstr "Enviar este artículo"
 
@@ -11128,56 +11128,56 @@ msgid "View Holding Pen"
 msgstr "Visualización"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:186
-#: modules/bibharvest/lib/oai_harvest_admin.py:545
+#: modules/bibharvest/lib/oai_harvest_admin.py:547
 msgid "No OAI source ID selected."
 msgstr "No ha seleccionado ningún identificador de servidor OAI"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:284
-#: modules/bibharvest/lib/oai_harvest_admin.py:420
-#: modules/bibharvest/lib/oai_harvest_admin.py:434
-#: modules/bibharvest/lib/oai_harvest_admin.py:449
-#: modules/bibharvest/lib/oai_harvest_admin.py:486
-#: modules/bibharvest/lib/oai_harvest_admin.py:533
+#: modules/bibharvest/lib/oai_harvest_admin.py:285
+#: modules/bibharvest/lib/oai_harvest_admin.py:422
+#: modules/bibharvest/lib/oai_harvest_admin.py:436
+#: modules/bibharvest/lib/oai_harvest_admin.py:451
+#: modules/bibharvest/lib/oai_harvest_admin.py:488
+#: modules/bibharvest/lib/oai_harvest_admin.py:535
 msgid "Go back to the OAI sources overview"
 msgstr "Volver a la lista dels servidores OAI"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:406
+#: modules/bibharvest/lib/oai_harvest_admin.py:408
 #, fuzzy
 msgid "Try again with another url"
 msgstr "Escriba ortra vez la nueva contraseña"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:413
+#: modules/bibharvest/lib/oai_harvest_admin.py:415
 msgid "Continue anyway"
 msgstr "Continuar igualmente"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:816
+#: modules/bibharvest/lib/oai_harvest_admin.py:818
 msgid "Return to the month view"
 msgstr "Volver al resumen mensual"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1090
+#: modules/bibharvest/lib/oai_harvest_admin.py:1092
 msgid "Compare with original"
 msgstr "Comparar con el original"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1096
-#: modules/bibharvest/lib/oai_harvest_admin.py:1141
+#: modules/bibharvest/lib/oai_harvest_admin.py:1098
+#: modules/bibharvest/lib/oai_harvest_admin.py:1143
 msgid "Delete from holding pen"
 msgstr "Eliminar de la lista de espera"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1114
+#: modules/bibharvest/lib/oai_harvest_admin.py:1116
 msgid "Error when retrieving the Holding Pen entry"
 msgstr "Error al recuperar la entrada en espera"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1122
+#: modules/bibharvest/lib/oai_harvest_admin.py:1124
 msgid "Error when retrieving the record"
 msgstr "Error al recuperar el registro"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1130
+#: modules/bibharvest/lib/oai_harvest_admin.py:1132
 msgid ""
 "Error when formatting the Holding Pen entry. Probably it's content is broken"
 msgstr ""
 "Error al formatear la entrada en espera.  Probablemente su contenido esté mal"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1135
+#: modules/bibharvest/lib/oai_harvest_admin.py:1137
 #, fuzzy
 msgid "Accept Holding Pen version"
 msgstr "versiones anteriores"
@@ -11364,163 +11364,175 @@ msgstr ""
 "No es posible tener dos reglas con la misma parte izquierda en la misma base "
 "de conocimento."
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:69
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:80
 #, fuzzy
 msgid "BibKnowledge Admin"
 msgstr "Administración de BibFormat"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:89
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:100
 #, fuzzy
 msgid "Knowledge Bases"
 msgstr "Base de conocimiento %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:107
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:118
 msgid "upload is a file"
 msgstr "subir este fichero"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:119
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:130
 #, fuzzy
 msgid "Cannot create upload"
 msgstr "No ha sido posible crear el formato de salida"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:133
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:144
 msgid "File uploaded"
 msgstr "Fichero subido"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:162
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:206
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:256
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:293
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:346
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:455
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:514
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:576
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:660
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:677
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:692
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:728
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:173
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:217
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:267
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:304
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:357
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:466
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:525
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:587
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:679
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:696
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:711
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:747
 msgid "Manage Knowledge Bases"
 msgstr "Gestionar las bases de conocimiento"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:175
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:220
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:306
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:360
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:468
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:533
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:704
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:186
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:231
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:317
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:371
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:479
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:544
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:723
 msgid "Unknown Knowledge Base"
 msgstr "Base de conocimiento desconocida"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:182
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:193
 #, python-format
 msgid "Knowledge Base %s"
 msgstr "Base de conocimiento %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:229
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:240
 #, python-format
 msgid "Knowledge Base %s Attributes"
 msgstr "Atributos de la base de conocimiento %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:315
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:326
 #, python-format
 msgid "Knowledge Base %s Dependencies"
 msgstr "Dependencias de la base de conocimiento %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:397
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:408
 msgid "Left side exists"
 msgstr "Ya existe la parte izquierda"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:405
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:416
 msgid "Right side exists"
 msgstr "Ya existe la parte derecha"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:578
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:589
 #, fuzzy
 msgid "Knowledge base name missing"
 msgstr "Mapeados de la base de conocimientos"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:598
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:609
 #, fuzzy
 msgid "Unknown knowledge base"
 msgstr "Base de conocimiento desconocida"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:599
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:610
 msgid "There is no knowledge base with that name."
 msgstr "No existe ninguna base de conocimiento con este nombre."
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:610
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:629
 #, fuzzy
 msgid "No such knowledge base"
 msgstr "Base de conocimiento desconocida"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:692
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:711
 msgid "Delete Knowledge Base"
 msgstr "Suprimir la base de conocimiento"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:154
+#: modules/bibsword/lib/bibsword_webinterface.py:157
 #, fuzzy
 msgid "BibSword Admin Interface"
 msgstr "Interfaz de administración de BibEdit"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:161
-#: modules/bibsword/lib/bibsword_webinterface.py:254
-#: modules/bibsword/lib/bibsword_webinterface.py:278
-#: modules/bibsword/lib/bibsword_webinterface.py:307
-msgid "Export with BibSword : Step 2/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:171
+#: modules/bibsword/lib/bibsword_webinterface.py:277
+#: modules/bibsword/lib/bibsword_webinterface.py:301
+#: modules/bibsword/lib/bibsword_webinterface.py:330
+#, fuzzy
+msgid "Export with BibSword: Step 2/4"
 msgstr "Exportar con BibSword: paso 2/4"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:212
-#: modules/bibsword/lib/bibsword_webinterface.py:223
-#: modules/bibsword/lib/bibsword_webinterface.py:268
-msgid "Export with BibSword : Step 1/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:222
+#: modules/bibsword/lib/bibsword_webinterface.py:233
+#: modules/bibsword/lib/bibsword_webinterface.py:291
+#, fuzzy
+msgid "Export with BibSword: Step 1/4"
 msgstr "Exportar con BibSword: paso 1/4"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:292
-#: modules/bibsword/lib/bibsword_webinterface.py:320
-#: modules/bibsword/lib/bibsword_webinterface.py:351
-msgid "Export with BibSword : Step 3/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:315
+#: modules/bibsword/lib/bibsword_webinterface.py:343
+#: modules/bibsword/lib/bibsword_webinterface.py:374
+#, fuzzy
+msgid "Export with BibSword: Step 3/4"
 msgstr "Exportar con BibSword: paso 3/4"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:335
-#: modules/bibsword/lib/bibsword_webinterface.py:366
-msgid "Export with BibSword : Step 4/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:358
+#: modules/bibsword/lib/bibsword_webinterface.py:389
+#, fuzzy
+msgid "Export with BibSword: Step 4/4"
 msgstr "Exportar con BibSword: paso 4/4"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:411
-msgid "Export with BibSword : Acknowledgement"
+#: modules/bibsword/lib/bibsword_webinterface.py:434
+#, fuzzy
+msgid "Export with BibSword: Acknowledgement"
 msgstr "Exportar con BibSword: verificación"
 
-#: modules/bibupload/lib/batchuploader_engine.py:182
+#: modules/bibupload/lib/batchuploader_engine.py:199
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr "Más de un posible recID, comportamiento ambiguo"
 
-#: modules/bibupload/lib/batchuploader_engine.py:182
+#: modules/bibupload/lib/batchuploader_engine.py:199
 msgid "No records match that file name"
 msgstr "Ningún registro tiene ficheros con este nombre"
 
-#: modules/bibupload/lib/batchuploader_engine.py:183
+#: modules/bibupload/lib/batchuploader_engine.py:200
 #, fuzzy
 msgid "File already exists"
 msgstr "ya existe"
 
-#: modules/bibupload/lib/batchuploader_engine.py:183
+#: modules/bibupload/lib/batchuploader_engine.py:200
 msgid "A file with the same name and format already exists"
 msgstr "Ya existe un registro com este nombre y formato"
 
-#: modules/bibupload/lib/batchuploader_engine.py:184
+#: modules/bibupload/lib/batchuploader_engine.py:201
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr "No tiene permiso para subir documentos a la colección «%s»"
 
-#: modules/bibupload/lib/batchuploader_engine.py:394
-#: modules/bibupload/lib/batchuploader_engine.py:407
+#: modules/bibupload/lib/batchuploader_engine.py:411
+#: modules/bibupload/lib/batchuploader_engine.py:424
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
 msgstr ""
 "El usuario «%(x_user)s» no está autorizado a modificar la colección "
 "«%(x_coll)s»"
+
+#~ msgid ""
+#~ "Cannot download release notes from http://cdsware.cern.ch/, please check "
+#~ "your internet connection"
+#~ msgstr ""
+#~ "No es posible bajar las notas de la versión desde http://cdsware.cern."
+#~ "ch/.  Compruebe su conexión a Internet."
 
 #~ msgid "Date:"
 #~ msgstr "Fecha:"

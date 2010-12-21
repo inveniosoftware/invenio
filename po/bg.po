@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Invenio 1.0.0-rc0\n"
 "Report-Msgid-Bugs-To: info@invenio-software.org\n"
-"POT-Creation-Date: 2010-12-07 10:07+0100\n"
+"POT-Creation-Date: 2010-12-21 09:26+0100\n"
 "PO-Revision-Date: 2008-03-27 02:25+0200\n"
 "Last-Translator: Nikolay Dyankov <ndyankov@gmail.com>\n"
 "Language-Team: BG <info@invenio-software.org>\n"
@@ -36,7 +36,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:665
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:1103
+#: modules/websearch/lib/search_engine.py:1107
 #: modules/websearch/lib/websearch_templates.py:1163
 msgid "AND NOT"
 msgstr "AND NOT"
@@ -71,7 +71,7 @@ msgstr "AND NOT"
 #: modules/bibcheck/web/admin/bibcheckadmin.py:203
 #: modules/bibcheck/web/admin/bibcheckadmin.py:263
 #: modules/bibcheck/web/admin/bibcheckadmin.py:303
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:67
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:78
 msgid "Admin Area"
 msgstr "Администриране"
 
@@ -79,7 +79,7 @@ msgstr "Администриране"
 #: modules/websearch/doc/search-guide.webdoc:559
 #: modules/websearch/doc/search-guide.webdoc:696
 #: modules/websearch/doc/search-guide.webdoc:834
-#: modules/websearch/lib/search_engine.py:4443
+#: modules/websearch/lib/search_engine.py:4449
 #: modules/websearch/lib/websearch_templates.py:804
 #: modules/websearch/lib/websearch_templates.py:882
 #: modules/websearch/lib/websearch_templates.py:1005
@@ -148,7 +148,7 @@ msgstr "пълен текст"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/websearch/lib/search_engine.py:1125
+#: modules/websearch/lib/search_engine.py:1129
 #: modules/websearch/lib/websearch_templates.py:1119
 msgid "Regular expression:"
 msgstr "Регулярен израз:"
@@ -165,7 +165,7 @@ msgstr "Регулярен израз:"
 #: modules/websearch/doc/search-guide.webdoc:740
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/websearch/lib/search_engine.py:1121
+#: modules/websearch/lib/search_engine.py:1125
 #: modules/websearch/lib/websearch_templates.py:1111
 msgid "All of the words:"
 msgstr "Всички думи от:"
@@ -237,7 +237,7 @@ msgstr "тема"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/websearch/lib/search_engine.py:1124
+#: modules/websearch/lib/search_engine.py:1128
 #: modules/websearch/lib/websearch_templates.py:1117
 msgid "Partial phrase:"
 msgstr "Частична фраза:"
@@ -519,7 +519,7 @@ msgstr "експеримент"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:777
 #: modules/websearch/doc/search-guide.webdoc:812
-#: modules/websearch/lib/search_engine.py:1122
+#: modules/websearch/lib/search_engine.py:1126
 #: modules/websearch/lib/websearch_templates.py:1113
 msgid "Any of the words:"
 msgstr "Коя да е от думите:"
@@ -1075,7 +1075,7 @@ msgstr "Ръководство за администриране на WebSearch"
 #: modules/websearch/doc/search-guide.webdoc:742
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/websearch/lib/search_engine.py:1123
+#: modules/websearch/lib/search_engine.py:1127
 #: modules/websearch/lib/websearch_templates.py:1115
 msgid "Exact phrase:"
 msgstr "Точна фраза:"
@@ -1093,8 +1093,8 @@ msgstr "Ръководство за публикуване"
 #: modules/websearch/doc/search-guide.webdoc:664
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:947
-#: modules/websearch/lib/search_engine.py:1102
+#: modules/websearch/lib/search_engine.py:951
+#: modules/websearch/lib/search_engine.py:1106
 #: modules/websearch/lib/websearch_templates.py:1162
 #: modules/websearch/lib/websearch_webcoll.py:561
 msgid "OR"
@@ -1108,7 +1108,7 @@ msgstr "OR"
 #: modules/websearch/doc/search-guide.webdoc:663
 #: modules/websearch/doc/search-guide.webdoc:766
 #: modules/websearch/doc/search-guide.webdoc:801
-#: modules/websearch/lib/search_engine.py:1101
+#: modules/websearch/lib/search_engine.py:1105
 #: modules/websearch/lib/websearch_templates.py:1161
 msgid "AND"
 msgstr "AND"
@@ -1374,10 +1374,10 @@ msgstr "Пълен текст не е наличен"
 
 #: modules/websearch/doc/search-tips.webdoc:290
 #: modules/websubmit/lib/websubmit_templates.py:1118
-#: modules/bibharvest/lib/oai_harvest_admin.py:407
-#: modules/bibharvest/lib/oai_harvest_admin.py:415
-#: modules/bibharvest/lib/oai_harvest_admin.py:429
-#: modules/bibharvest/lib/oai_harvest_admin.py:444
+#: modules/bibharvest/lib/oai_harvest_admin.py:409
+#: modules/bibharvest/lib/oai_harvest_admin.py:417
+#: modules/bibharvest/lib/oai_harvest_admin.py:431
+#: modules/bibharvest/lib/oai_harvest_admin.py:446
 msgid "or"
 msgstr "или"
 
@@ -1670,8 +1670,8 @@ msgstr "Документация на елементите"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1706
 #: modules/bibcirculation/lib/bibcirculation_templates.py:15368
 #: modules/bibcheck/web/admin/bibcheckadmin.py:137
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:721
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:723
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:740
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:742
 msgid "Delete"
 msgstr "Изтриване"
 
@@ -1811,7 +1811,7 @@ msgstr "Пълен текст"
 msgid "Manage Files of This Record"
 msgstr ""
 
-#: modules/bibformat/lib/elements/bfe_edit_record.py:52
+#: modules/bibformat/lib/elements/bfe_edit_record.py:51
 #, fuzzy
 msgid "Edit This Record"
 msgstr "Редактиране на друг запис"
@@ -1825,7 +1825,7 @@ msgstr "Ограничен изходен формат"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:201
 #: modules/bibformat/web/admin/bibformatadmin.py:508
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:553
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:564
 msgid "Ok"
 msgstr "OK"
 
@@ -1875,7 +1875,7 @@ msgstr "Изтриване на изходния формат"
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1316
 #: modules/bibcirculation/lib/bibcirculation_templates.py:1452
 #: modules/bibcirculation/lib/bibcirculation_templates.py:3863
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:721
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:740
 msgid "Cancel"
 msgstr "Отказ"
 
@@ -2149,7 +2149,7 @@ msgstr "Няма налични документни типове."
 
 #: modules/bibupload/lib/batchuploader_templates.py:302
 #: modules/bibupload/lib/batchuploader_webinterface.py:137
-#: modules/bibupload/lib/batchuploader_webinterface.py:295
+#: modules/bibupload/lib/batchuploader_webinterface.py:301
 msgid "Metadata batch upload"
 msgstr ""
 
@@ -2160,7 +2160,7 @@ msgid "Document batch upload"
 msgstr ""
 
 #: modules/bibupload/lib/batchuploader_templates.py:308
-#: modules/bibupload/lib/batchuploader_webinterface.py:319
+#: modules/bibupload/lib/batchuploader_webinterface.py:325
 #, fuzzy
 msgid "Upload history"
 msgstr "История на свалянето:"
@@ -2260,15 +2260,15 @@ msgstr "Вие не сте упълномощен да разглеждате т
 msgid "Document batch upload result"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_webinterface.py:293
+#: modules/bibupload/lib/batchuploader_webinterface.py:299
 msgid "Upload succesful"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_webinterface.py:343
+#: modules/bibupload/lib/batchuploader_webinterface.py:349
 msgid "Batch Uploader: Daemon monitor"
 msgstr ""
 
-#: modules/miscutil/lib/dateutils.py:76 modules/miscutil/lib/dateutils.py:103
+#: modules/miscutil/lib/dateutils.py:82 modules/miscutil/lib/dateutils.py:109
 #: modules/webbasket/lib/webbasket.py:181
 #: modules/webbasket/lib/webbasket.py:784
 #: modules/webbasket/lib/webbasket.py:879
@@ -2277,191 +2277,191 @@ msgstr ""
 msgid "N/A"
 msgstr "N/A"
 
-#: modules/miscutil/lib/dateutils.py:166
+#: modules/miscutil/lib/dateutils.py:172
 msgid "Sun"
 msgstr "Нд"
 
-#: modules/miscutil/lib/dateutils.py:167
+#: modules/miscutil/lib/dateutils.py:173
 msgid "Mon"
 msgstr "По"
 
-#: modules/miscutil/lib/dateutils.py:168
+#: modules/miscutil/lib/dateutils.py:174
 msgid "Tue"
 msgstr "Вт"
 
-#: modules/miscutil/lib/dateutils.py:169
+#: modules/miscutil/lib/dateutils.py:175
 msgid "Wed"
 msgstr "Ср"
 
-#: modules/miscutil/lib/dateutils.py:170
+#: modules/miscutil/lib/dateutils.py:176
 msgid "Thu"
 msgstr "Чв"
 
-#: modules/miscutil/lib/dateutils.py:171
+#: modules/miscutil/lib/dateutils.py:177
 msgid "Fri"
 msgstr "Пт"
 
-#: modules/miscutil/lib/dateutils.py:172
+#: modules/miscutil/lib/dateutils.py:178
 msgid "Sat"
 msgstr "Сб"
 
-#: modules/miscutil/lib/dateutils.py:174
+#: modules/miscutil/lib/dateutils.py:180
 msgid "Sunday"
 msgstr "Неделя"
 
-#: modules/miscutil/lib/dateutils.py:175
+#: modules/miscutil/lib/dateutils.py:181
 msgid "Monday"
 msgstr "Понеделник"
 
-#: modules/miscutil/lib/dateutils.py:176
+#: modules/miscutil/lib/dateutils.py:182
 msgid "Tuesday"
 msgstr "Вторник"
 
-#: modules/miscutil/lib/dateutils.py:177
+#: modules/miscutil/lib/dateutils.py:183
 msgid "Wednesday"
 msgstr "Сряда"
 
-#: modules/miscutil/lib/dateutils.py:178
+#: modules/miscutil/lib/dateutils.py:184
 msgid "Thursday"
 msgstr "Четвъртък"
 
-#: modules/miscutil/lib/dateutils.py:179
+#: modules/miscutil/lib/dateutils.py:185
 msgid "Friday"
 msgstr "Петък"
 
-#: modules/miscutil/lib/dateutils.py:180
+#: modules/miscutil/lib/dateutils.py:186
 msgid "Saturday"
 msgstr "Събота"
 
-#: modules/miscutil/lib/dateutils.py:194 modules/miscutil/lib/dateutils.py:208
+#: modules/miscutil/lib/dateutils.py:200 modules/miscutil/lib/dateutils.py:214
 #: modules/bibcirculation/lib/bibcirculation_templates.py:779
 #: modules/bibcirculation/lib/bibcirculation_templates.py:801
 msgid "Month"
 msgstr "месец"
 
-#: modules/miscutil/lib/dateutils.py:195
+#: modules/miscutil/lib/dateutils.py:201
 msgid "Jan"
 msgstr "Яну"
 
-#: modules/miscutil/lib/dateutils.py:196
+#: modules/miscutil/lib/dateutils.py:202
 msgid "Feb"
 msgstr "Феб"
 
-#: modules/miscutil/lib/dateutils.py:197
+#: modules/miscutil/lib/dateutils.py:203
 msgid "Mar"
 msgstr "Мар"
 
-#: modules/miscutil/lib/dateutils.py:198
+#: modules/miscutil/lib/dateutils.py:204
 msgid "Apr"
 msgstr "Апр"
 
-#: modules/miscutil/lib/dateutils.py:199 modules/miscutil/lib/dateutils.py:213
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:205 modules/miscutil/lib/dateutils.py:219
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "May"
 msgstr "Май"
 
-#: modules/miscutil/lib/dateutils.py:200
+#: modules/miscutil/lib/dateutils.py:206
 msgid "Jun"
 msgstr "Юни"
 
-#: modules/miscutil/lib/dateutils.py:201
+#: modules/miscutil/lib/dateutils.py:207
 msgid "Jul"
 msgstr "Юли"
 
-#: modules/miscutil/lib/dateutils.py:202
+#: modules/miscutil/lib/dateutils.py:208
 msgid "Aug"
 msgstr "Авг"
 
-#: modules/miscutil/lib/dateutils.py:203
+#: modules/miscutil/lib/dateutils.py:209
 msgid "Sep"
 msgstr "Сеп"
 
-#: modules/miscutil/lib/dateutils.py:204
+#: modules/miscutil/lib/dateutils.py:210
 msgid "Oct"
 msgstr "Окт"
 
-#: modules/miscutil/lib/dateutils.py:205
+#: modules/miscutil/lib/dateutils.py:211
 msgid "Nov"
 msgstr "Ное"
 
-#: modules/miscutil/lib/dateutils.py:206
+#: modules/miscutil/lib/dateutils.py:212
 msgid "Dec"
 msgstr "Дек"
 
-#: modules/miscutil/lib/dateutils.py:209
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:215
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "January"
 msgstr "Януари"
 
-#: modules/miscutil/lib/dateutils.py:210
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:216
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "February"
 msgstr "Февруари"
 
-#: modules/miscutil/lib/dateutils.py:211
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:217
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "March"
 msgstr "Март"
 
-#: modules/miscutil/lib/dateutils.py:212
-#: modules/websearch/lib/search_engine.py:874
+#: modules/miscutil/lib/dateutils.py:218
+#: modules/websearch/lib/search_engine.py:878
 #: modules/websearch/lib/websearch_templates.py:1200
 msgid "April"
 msgstr "Април"
 
-#: modules/miscutil/lib/dateutils.py:214
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:220
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "June"
 msgstr "Юни"
 
-#: modules/miscutil/lib/dateutils.py:215
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:221
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "July"
 msgstr "Юли"
 
-#: modules/miscutil/lib/dateutils.py:216
-#: modules/websearch/lib/search_engine.py:875
+#: modules/miscutil/lib/dateutils.py:222
+#: modules/websearch/lib/search_engine.py:879
 #: modules/websearch/lib/websearch_templates.py:1201
 msgid "August"
 msgstr "Август"
 
-#: modules/miscutil/lib/dateutils.py:217
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:223
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "September"
 msgstr "Септември"
 
-#: modules/miscutil/lib/dateutils.py:218
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:224
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "October"
 msgstr "Октомври"
 
-#: modules/miscutil/lib/dateutils.py:219
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:225
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "November"
 msgstr "Ноември"
 
-#: modules/miscutil/lib/dateutils.py:220
-#: modules/websearch/lib/search_engine.py:876
+#: modules/miscutil/lib/dateutils.py:226
+#: modules/websearch/lib/search_engine.py:880
 #: modules/websearch/lib/websearch_templates.py:1202
 msgid "December"
 msgstr "Декември"
 
-#: modules/miscutil/lib/dateutils.py:238
+#: modules/miscutil/lib/dateutils.py:244
 #: modules/bibcirculation/lib/bibcirculation_templates.py:780
 #: modules/bibcirculation/lib/bibcirculation_templates.py:802
 msgid "Day"
 msgstr "Ден"
 
-#: modules/miscutil/lib/dateutils.py:289
+#: modules/miscutil/lib/dateutils.py:295
 #: modules/bibcirculation/lib/bibcirculation_utils.py:321
 #: modules/bibcirculation/lib/bibcirculation_templates.py:778
 #: modules/bibcirculation/lib/bibcirculation_templates.py:800
@@ -2676,58 +2676,58 @@ msgstr "Стартиране на BibEdit"
 msgid "Run Batch Uploader"
 msgstr ""
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3703
+#: modules/webaccess/lib/webaccessadmin_lib.py:3704
 #, python-format
 msgid "Your account on '%s' has been activated"
 msgstr "Вашата сметка в '%s' е активирана."
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3704
+#: modules/webaccess/lib/webaccessadmin_lib.py:3705
 #, python-format
 msgid "Your account earlier created on '%s' has been activated:"
 msgstr "Вашата сметка създадена по-рано на '%s' е успешно активирана."
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3706
-#: modules/webaccess/lib/webaccessadmin_lib.py:3719
-#: modules/webaccess/lib/webaccessadmin_lib.py:3745
+#: modules/webaccess/lib/webaccessadmin_lib.py:3707
+#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3746
 msgid "Username/Email:"
 msgstr "Потребителско име/Email"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3707
-#: modules/webaccess/lib/webaccessadmin_lib.py:3720
+#: modules/webaccess/lib/webaccessadmin_lib.py:3708
+#: modules/webaccess/lib/webaccessadmin_lib.py:3721
 msgid "Password:"
 msgstr "Парола:"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3717
+#: modules/webaccess/lib/webaccessadmin_lib.py:3718
 #, python-format
 msgid "Account created on '%s'"
 msgstr "Сметката е създадена на '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3718
+#: modules/webaccess/lib/webaccessadmin_lib.py:3719
 #, python-format
 msgid "An account has been created for you on '%s':"
 msgstr "За вас е създадена сметка на '%s':"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3730
+#: modules/webaccess/lib/webaccessadmin_lib.py:3731
 #, python-format
 msgid "Account rejected on '%s'"
 msgstr "Сметката е отхвърлена на '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3731
+#: modules/webaccess/lib/webaccessadmin_lib.py:3732
 #, python-format
 msgid "Your request for an account has been rejected on '%s':"
 msgstr "Вашата молба за сметка е отхвърлена на '%s':"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3733
+#: modules/webaccess/lib/webaccessadmin_lib.py:3734
 #, python-format
 msgid "Username/Email: %s"
 msgstr "Потребителско име/Email: %s"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3743
+#: modules/webaccess/lib/webaccessadmin_lib.py:3744
 #, python-format
 msgid "Account deleted on '%s'"
 msgstr "Сметката е изтрита на '%s'"
 
-#: modules/webaccess/lib/webaccessadmin_lib.py:3744
+#: modules/webaccess/lib/webaccessadmin_lib.py:3745
 #, python-format
 msgid "Your account on '%s' has been deleted:"
 msgstr "Вашата сметка на %s е изтрита:"
@@ -3152,13 +3152,13 @@ msgstr "%s, персонализиране"
 #: modules/webstyle/lib/webstyle_templates.py:579
 #: modules/webstyle/lib/webstyle_templates.py:616
 #: modules/webstyle/lib/webstyle_templates.py:618
-#: modules/websubmit/lib/websubmit_engine.py:1705
+#: modules/websubmit/lib/websubmit_engine.py:1707
 #: modules/websubmit/lib/websubmit_webinterface.py:1127
 #: modules/bibcatalog/lib/bibcatalog_templates.py:37
 #: modules/bibedit/lib/bibedit_webinterface.py:205
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:496
 #: modules/bibexport/lib/bibexport_method_fieldexporter_templates.py:559
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:269
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:280
 msgid "Error"
 msgstr "Грешка"
 
@@ -3403,7 +3403,7 @@ msgstr "Прегледано от %(x_nickname)s на %(x_date)s"
 
 #: modules/webbasket/lib/webbasket_templates.py:1046
 #: modules/webbasket/lib/webbasket_templates.py:1070
-#: modules/webcomment/lib/webcomment.py:1455
+#: modules/webcomment/lib/webcomment.py:1460
 #: modules/webcomment/lib/webcomment_templates.py:357
 #, python-format
 msgid "%(x_name)s wrote on %(x_date)s:"
@@ -4003,17 +4003,17 @@ msgstr "Изтриване на кошница"
 msgid "Copy record to basket"
 msgstr "Копиране на записа в кошница"
 
-#: modules/webcomment/lib/webcomment.py:1050
+#: modules/webcomment/lib/webcomment.py:1055
 #, fuzzy, python-format
 msgid "Record %i"
 msgstr "Запис"
 
-#: modules/webcomment/lib/webcomment.py:1061
+#: modules/webcomment/lib/webcomment.py:1066
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been reviewed"
 msgstr ""
 
-#: modules/webcomment/lib/webcomment.py:1065
+#: modules/webcomment/lib/webcomment.py:1070
 #, python-format
 msgid "%(report_number)s\"%(title)s\" has been commented"
 msgstr ""
@@ -4998,103 +4998,103 @@ msgstr "Вие не сте упълномощен да разглеждате т
 msgid "Read a message"
 msgstr "Прочитане на съобщение"
 
-#: modules/websearch/lib/search_engine.py:738
-#: modules/websearch/lib/search_engine.py:765
-#: modules/websearch/lib/search_engine.py:4466
-#: modules/websearch/lib/search_engine.py:4519
+#: modules/websearch/lib/search_engine.py:742
+#: modules/websearch/lib/search_engine.py:769
+#: modules/websearch/lib/search_engine.py:4472
+#: modules/websearch/lib/search_engine.py:4525
 msgid "Search Results"
 msgstr "Резултати от търсенето"
 
-#: modules/websearch/lib/search_engine.py:867
+#: modules/websearch/lib/search_engine.py:871
 #: modules/websearch/lib/websearch_templates.py:1185
 msgid "any day"
 msgstr "всички дни"
 
-#: modules/websearch/lib/search_engine.py:873
+#: modules/websearch/lib/search_engine.py:877
 #: modules/websearch/lib/websearch_templates.py:1197
 msgid "any month"
 msgstr "всички месеци"
 
-#: modules/websearch/lib/search_engine.py:881
+#: modules/websearch/lib/search_engine.py:885
 #: modules/websearch/lib/websearch_templates.py:1211
 msgid "any year"
 msgstr "всички години"
 
-#: modules/websearch/lib/search_engine.py:922
-#: modules/websearch/lib/search_engine.py:941
+#: modules/websearch/lib/search_engine.py:926
+#: modules/websearch/lib/search_engine.py:945
 #, fuzzy
 msgid "any public collection"
 msgstr "всички колекции"
 
-#: modules/websearch/lib/search_engine.py:926
+#: modules/websearch/lib/search_engine.py:930
 #, fuzzy
 msgid "remove this collection"
 msgstr "отстранете този потребител"
 
-#: modules/websearch/lib/search_engine.py:937
+#: modules/websearch/lib/search_engine.py:941
 msgid "add another collection"
 msgstr "добавяне на още една колекция"
 
-#: modules/websearch/lib/search_engine.py:947
+#: modules/websearch/lib/search_engine.py:951
 #: modules/websearch/lib/websearch_webcoll.py:561
 msgid "rank by"
 msgstr "класиране по"
 
-#: modules/websearch/lib/search_engine.py:967
+#: modules/websearch/lib/search_engine.py:971
 msgid "HTML brief"
 msgstr "кратък HTML"
 
-#: modules/websearch/lib/search_engine.py:1080
+#: modules/websearch/lib/search_engine.py:1084
 #: modules/websearch/lib/websearch_webcoll.py:531
 msgid "latest first"
 msgstr "първо най-новите"
 
-#: modules/websearch/lib/search_engine.py:1667
+#: modules/websearch/lib/search_engine.py:1673
 msgid "No values found."
 msgstr "Не бяха намерени стойности."
 
-#: modules/websearch/lib/search_engine.py:1785
+#: modules/websearch/lib/search_engine.py:1791
 msgid ""
 "Warning: full-text search is only available for a subset of papers mostly "
 "from 2006-2010."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1787
+#: modules/websearch/lib/search_engine.py:1793
 msgid ""
 "Warning: figure caption search is only available for a subset of papers "
 "mostly from 2008-2010."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1794
+#: modules/websearch/lib/search_engine.py:1800
 msgid ""
 "No phrase index available for fulltext yet, looking for word combination..."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:1835
+#: modules/websearch/lib/search_engine.py:1841
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Не беше намерено точно съвпадение за %(x_query1)s, вместо това използваме "
 "%(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1845
-#: modules/websearch/lib/search_engine.py:1854
-#: modules/websearch/lib/search_engine.py:4438
-#: modules/websearch/lib/search_engine.py:4476
-#: modules/websearch/lib/search_engine.py:4527
+#: modules/websearch/lib/search_engine.py:1851
+#: modules/websearch/lib/search_engine.py:1860
+#: modules/websearch/lib/search_engine.py:4444
+#: modules/websearch/lib/search_engine.py:4482
+#: modules/websearch/lib/search_engine.py:4533
 #: modules/websubmit/lib/websubmit_webinterface.py:110
 #: modules/websubmit/lib/websubmit_webinterface.py:145
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:327
 msgid "Requested record does not seem to exist."
 msgstr "Желаният запис не съществува."
 
-#: modules/websearch/lib/search_engine.py:1976
+#: modules/websearch/lib/search_engine.py:1982
 msgid ""
 "Search syntax misunderstood. Ignoring all parentheses in the query. If this "
 "doesn't help, please check your search and try again."
 msgstr ""
 
-#: modules/websearch/lib/search_engine.py:2298
+#: modules/websearch/lib/search_engine.py:2304
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -5103,7 +5103,7 @@ msgstr ""
 "Не беше намерено съвпадение в колекцията %(x_collection)s. Други публични "
 "колекции дадоха %(x_url_open)s%(x_nb_hits)d поапдения%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:2307
+#: modules/websearch/lib/search_engine.py:2313
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -5111,27 +5111,27 @@ msgstr ""
 "Вашата заявка не съвпадна с нито една обща колекция. Ако търсите частен "
 "документ, моля, първо изберете желаната ограничена колекция."
 
-#: modules/websearch/lib/search_engine.py:2424
+#: modules/websearch/lib/search_engine.py:2430
 #, fuzzy, python-format
 msgid "There are no records referring to %s."
 msgstr "Има %i кошници"
 
-#: modules/websearch/lib/search_engine.py:2426
+#: modules/websearch/lib/search_engine.py:2432
 #, fuzzy, python-format
 msgid "There are no records cited by %s."
 msgstr "Има %i кошници"
 
-#: modules/websearch/lib/search_engine.py:2431
+#: modules/websearch/lib/search_engine.py:2437
 #, fuzzy, python-format
 msgid "No word index is available for %s."
 msgstr "Индексът за думата не е наличен за"
 
-#: modules/websearch/lib/search_engine.py:2442
+#: modules/websearch/lib/search_engine.py:2448
 #, fuzzy, python-format
 msgid "No phrase index is available for %s."
 msgstr "Индексът за фразата не е наличен за"
 
-#: modules/websearch/lib/search_engine.py:2487
+#: modules/websearch/lib/search_engine.py:2493
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -5140,7 +5140,7 @@ msgstr ""
 "Търсенето на %(x_term)s в индекса %(x_index)s не съвпадна с нито един запис. "
 "Най-близките до него попадения в коя да е колекция са:"
 
-#: modules/websearch/lib/search_engine.py:2491
+#: modules/websearch/lib/search_engine.py:2497
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -5148,7 +5148,7 @@ msgstr ""
 "Търсенето на %s не съвпадна с нито един запис. Най-близките попадения във "
 "всички колекции са:"
 
-#: modules/websearch/lib/search_engine.py:3228
+#: modules/websearch/lib/search_engine.py:3234
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -5157,7 +5157,7 @@ msgstr ""
 "Съжаляваме, сортирането е позволено само на множества от най-много %d "
 "записа. Използване на ред по подразбиране."
 
-#: modules/websearch/lib/search_engine.py:3252
+#: modules/websearch/lib/search_engine.py:3258
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -5166,28 +5166,28 @@ msgstr ""
 "Съжаляваме, %s не е валидна опция за сортиране. Използване на сортиране по "
 "заглавие."
 
-#: modules/websearch/lib/search_engine.py:3440
-#: modules/websearch/lib/search_engine.py:3769
-#: modules/websearch/lib/search_engine.py:3947
-#: modules/websearch/lib/search_engine.py:3970
-#: modules/websearch/lib/search_engine.py:3978
-#: modules/websearch/lib/search_engine.py:3986
-#: modules/websearch/lib/search_engine.py:4032
+#: modules/websearch/lib/search_engine.py:3446
+#: modules/websearch/lib/search_engine.py:3775
+#: modules/websearch/lib/search_engine.py:3953
+#: modules/websearch/lib/search_engine.py:3976
+#: modules/websearch/lib/search_engine.py:3984
+#: modules/websearch/lib/search_engine.py:3992
+#: modules/websearch/lib/search_engine.py:4038
 #: modules/bibcirculation/lib/bibcirculation_webinterface.py:325
 msgid "The record has been deleted."
 msgstr "Записът е изтрит."
 
-#: modules/websearch/lib/search_engine.py:3668
+#: modules/websearch/lib/search_engine.py:3674
 msgid "Use different search terms."
 msgstr "Използвайте други думи за търсене."
 
-#: modules/websearch/lib/search_engine.py:4748
+#: modules/websearch/lib/search_engine.py:4754
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Няма съвпадения, удовлетворяващи зададените от вас критерии за време, "
 "премахване на това условие..."
 
-#: modules/websearch/lib/search_engine.py:4775
+#: modules/websearch/lib/search_engine.py:4781
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Няма съвпадения, удовлетворящи зададените от вас граници за търсене, "
@@ -6096,8 +6096,8 @@ msgid "Your Administrative Activities"
 msgstr "Вашите действия за администриране"
 
 #: modules/websession/lib/websession_templates.py:670
-#: modules/bibharvest/lib/oai_harvest_admin.py:427
-#: modules/bibharvest/lib/oai_harvest_admin.py:442
+#: modules/bibharvest/lib/oai_harvest_admin.py:429
+#: modules/bibharvest/lib/oai_harvest_admin.py:444
 msgid "Try again"
 msgstr "Опитайте отново"
 
@@ -6658,38 +6658,38 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2441
 msgid ""
-"Warning : The password set for MySQL is the same as the default Invenio "
-"password. For security purposes, you might want to change the password."
+"Warning: The password set for MySQL root user is the same as the default "
+"Invenio password. For security purposes, you may want to change the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2447
 msgid ""
-"Warning : The password set for the Invenio database is the same as the "
-"default Invenio password. For security purposes, you might want to change "
-"the password."
+"Warning: The password set for the Invenio MySQL user is the same as the "
+"shipped default. For security purposes, you may want to change the password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2453
 msgid ""
-"Warning : The password set for the Invenio admin user is currently empty. "
-"For security purposes, it is strongly recommended that you add a password."
+"Warning: The password set for the Invenio admin user is currently empty. For "
+"security purposes, it is strongly recommended that you add a password."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2459
 msgid ""
-"Warning : The email address set for support email is currently set to "
-"info@invenio-software.org. It is recommended that you change this to change "
-"this to your own address."
+"Warning: The email address set for support email is currently set to "
+"info@invenio-software.org. It is recommended that you change this to your "
+"own address."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2465
-msgid "A newer version of Invenio is available for download. Please visit "
+msgid ""
+"A newer version of Invenio is available for download. You may want to visit  "
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:2472
 msgid ""
-"Cannot download release notes from http://cdsware.cern.ch/, please check "
-"your internet connection"
+"Cannot download or parse release notes from http://invenio-software.org/repo/"
+"invenio/tree/RELEASE-NOTES"
 msgstr ""
 
 #: modules/websession/lib/webuser.py:153
@@ -7158,10 +7158,10 @@ msgstr "Начало"
 
 #: modules/webstyle/lib/webstyle_templates.py:429
 #: modules/webstyle/lib/webstyle_templates.py:498
-#: modules/websubmit/lib/websubmit_engine.py:686
-#: modules/websubmit/lib/websubmit_engine.py:1114
-#: modules/websubmit/lib/websubmit_engine.py:1160
-#: modules/websubmit/lib/websubmit_engine.py:1393
+#: modules/websubmit/lib/websubmit_engine.py:687
+#: modules/websubmit/lib/websubmit_engine.py:1115
+#: modules/websubmit/lib/websubmit_engine.py:1161
+#: modules/websubmit/lib/websubmit_engine.py:1394
 msgid "Submit"
 msgstr "Изпращане"
 
@@ -7449,14 +7449,14 @@ msgid ""
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_engine.py:177
-#: modules/websubmit/lib/websubmit_engine.py:786
+#: modules/websubmit/lib/websubmit_engine.py:787
 #: modules/websubmit/web/yoursubmissions.py:61
 msgid "Sorry, you must log in to perform this action."
 msgstr ""
 "Съжаляваме, трябва да сте влязъл в системата, за да извършите това действие."
 
 #: modules/websubmit/lib/websubmit_engine.py:184
-#: modules/websubmit/lib/websubmit_engine.py:793
+#: modules/websubmit/lib/websubmit_engine.py:794
 #, fuzzy
 msgid "Not enough information to go ahead with the submission."
 msgstr "Бъдете първия, който ще оцени този документ."
@@ -7466,43 +7466,43 @@ msgstr "Бъдете първия, който ще оцени този доку�
 #: modules/websubmit/lib/websubmit_engine.py:281
 #: modules/websubmit/lib/websubmit_engine.py:353
 #: modules/websubmit/lib/websubmit_engine.py:394
-#: modules/websubmit/lib/websubmit_engine.py:807
-#: modules/websubmit/lib/websubmit_engine.py:845
-#: modules/websubmit/lib/websubmit_engine.py:903
-#: modules/websubmit/lib/websubmit_engine.py:944
+#: modules/websubmit/lib/websubmit_engine.py:808
+#: modules/websubmit/lib/websubmit_engine.py:846
+#: modules/websubmit/lib/websubmit_engine.py:904
+#: modules/websubmit/lib/websubmit_engine.py:945
 #, fuzzy
 msgid "Invalid parameters"
 msgstr "Невалиден параметър"
 
 #: modules/websubmit/lib/websubmit_engine.py:196
-#: modules/websubmit/lib/websubmit_engine.py:799
+#: modules/websubmit/lib/websubmit_engine.py:800
 #, fuzzy
 msgid "Invalid doctype and act parameters"
 msgstr "Невалиден параметър"
 
 #: modules/websubmit/lib/websubmit_engine.py:227
-#: modules/websubmit/lib/websubmit_engine.py:834
+#: modules/websubmit/lib/websubmit_engine.py:835
 #, fuzzy, python-format
 msgid "Unable to find the submission directory for the action: %s"
 msgstr "Папката за публикуване не може да бъде намерена."
 
 #: modules/websubmit/lib/websubmit_engine.py:236
-#: modules/websubmit/lib/websubmit_engine.py:984
+#: modules/websubmit/lib/websubmit_engine.py:985
 msgid "Unknown document type"
 msgstr "Непознат тип документ"
 
 #: modules/websubmit/lib/websubmit_engine.py:242
-#: modules/websubmit/lib/websubmit_engine.py:990
+#: modules/websubmit/lib/websubmit_engine.py:991
 msgid "Unknown action"
 msgstr "Непознато действие"
 
 #: modules/websubmit/lib/websubmit_engine.py:250
-#: modules/websubmit/lib/websubmit_engine.py:997
+#: modules/websubmit/lib/websubmit_engine.py:998
 msgid "Unable to determine the number of submission pages."
 msgstr "Броят на страниците в публикацията не може да бъде определен."
 
 #: modules/websubmit/lib/websubmit_engine.py:291
-#: modules/websubmit/lib/websubmit_engine.py:853
+#: modules/websubmit/lib/websubmit_engine.py:854
 #, fuzzy
 msgid ""
 "Unable to create a directory for this submission. The administrator has been "
@@ -7510,24 +7510,24 @@ msgid ""
 msgstr "Папката за тази публикация не може да бъде създадена."
 
 #: modules/websubmit/lib/websubmit_engine.py:400
-#: modules/websubmit/lib/websubmit_engine.py:951
+#: modules/websubmit/lib/websubmit_engine.py:952
 #, fuzzy
 msgid "Cannot create submission directory. The administrator has been alerted."
 msgstr "Папката за публикуване не може да бъде създадена."
 
 #: modules/websubmit/lib/websubmit_engine.py:419
-#: modules/websubmit/lib/websubmit_engine.py:970
+#: modules/websubmit/lib/websubmit_engine.py:971
 msgid "No file uploaded?"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_engine.py:459
-#: modules/websubmit/lib/websubmit_engine.py:462
-#: modules/websubmit/lib/websubmit_engine.py:595
-#: modules/websubmit/lib/websubmit_engine.py:598
+#: modules/websubmit/lib/websubmit_engine.py:460
+#: modules/websubmit/lib/websubmit_engine.py:463
+#: modules/websubmit/lib/websubmit_engine.py:596
+#: modules/websubmit/lib/websubmit_engine.py:599
 msgid "Unknown form field found on submission page."
 msgstr "Непознато поле в страницата за изпращане."
 
-#: modules/websubmit/lib/websubmit_engine.py:1033
+#: modules/websubmit/lib/websubmit_engine.py:1034
 msgid ""
 "A serious function-error has been encountered. Adminstrators have been "
 "alerted. <br /><em>Please not that this might be due to wrong characters "
@@ -7535,16 +7535,16 @@ msgid ""
 "file)."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_engine.py:1356
+#: modules/websubmit/lib/websubmit_engine.py:1357
 #, fuzzy, python-format
 msgid "Unable to find document type: %s"
 msgstr "Типът документ не може да бъде намерен."
 
-#: modules/websubmit/lib/websubmit_engine.py:1641
+#: modules/websubmit/lib/websubmit_engine.py:1643
 msgid "The chosen action is not supported by the document type."
 msgstr "Избраното от вас действие не се поддържа от типа документ."
 
-#: modules/websubmit/lib/websubmit_engine.py:1718
+#: modules/websubmit/lib/websubmit_engine.py:1720
 #: modules/websubmit/lib/websubmit_webinterface.py:1143
 #: modules/websubmit/web/approve.py:81
 msgid "Warning"
@@ -7601,8 +7601,8 @@ msgid "SUMMARY"
 msgstr "РЕЗЮМЕ"
 
 #: modules/websubmit/lib/websubmit_templates.py:534
-#: modules/bibharvest/lib/oai_harvest_admin.py:844
-#: modules/bibharvest/lib/oai_harvest_admin.py:897
+#: modules/bibharvest/lib/oai_harvest_admin.py:846
+#: modules/bibharvest/lib/oai_harvest_admin.py:899
 msgid "Previous page"
 msgstr "Предишна страница"
 
@@ -7611,8 +7611,8 @@ msgid "Submission number"
 msgstr "Номер на публикация"
 
 #: modules/websubmit/lib/websubmit_templates.py:554
-#: modules/bibharvest/lib/oai_harvest_admin.py:829
-#: modules/bibharvest/lib/oai_harvest_admin.py:885
+#: modules/bibharvest/lib/oai_harvest_admin.py:831
+#: modules/bibharvest/lib/oai_harvest_admin.py:887
 msgid "Next page"
 msgstr "Следваща страница"
 
@@ -8704,7 +8704,7 @@ msgstr ""
 msgid "Did you know?"
 msgstr ""
 
-#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:255
+#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:253
 #, fuzzy, python-format
 msgid ""
 "Hi,\n"
@@ -8713,7 +8713,7 @@ msgid ""
 "<%(url)s>"
 msgstr "Вие сте упълномощен със следните роли: %(x_role)s."
 
-#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:262
+#: modules/webjournal/lib/elements/bfe_webjournal_article_body.py:260
 #, fuzzy
 msgid "Send this article"
 msgstr "Оцени статията"
@@ -11235,55 +11235,55 @@ msgid "View Holding Pen"
 msgstr "Преглеждане"
 
 #: modules/bibharvest/lib/oai_harvest_admin.py:186
-#: modules/bibharvest/lib/oai_harvest_admin.py:545
+#: modules/bibharvest/lib/oai_harvest_admin.py:547
 msgid "No OAI source ID selected."
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:284
-#: modules/bibharvest/lib/oai_harvest_admin.py:420
-#: modules/bibharvest/lib/oai_harvest_admin.py:434
-#: modules/bibharvest/lib/oai_harvest_admin.py:449
-#: modules/bibharvest/lib/oai_harvest_admin.py:486
-#: modules/bibharvest/lib/oai_harvest_admin.py:533
+#: modules/bibharvest/lib/oai_harvest_admin.py:285
+#: modules/bibharvest/lib/oai_harvest_admin.py:422
+#: modules/bibharvest/lib/oai_harvest_admin.py:436
+#: modules/bibharvest/lib/oai_harvest_admin.py:451
+#: modules/bibharvest/lib/oai_harvest_admin.py:488
+#: modules/bibharvest/lib/oai_harvest_admin.py:535
 msgid "Go back to the OAI sources overview"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:406
+#: modules/bibharvest/lib/oai_harvest_admin.py:408
 #, fuzzy
 msgid "Try again with another url"
 msgstr "Въведете повторно новата парола"
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:413
+#: modules/bibharvest/lib/oai_harvest_admin.py:415
 msgid "Continue anyway"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:816
+#: modules/bibharvest/lib/oai_harvest_admin.py:818
 msgid "Return to the month view"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1090
+#: modules/bibharvest/lib/oai_harvest_admin.py:1092
 msgid "Compare with original"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1096
-#: modules/bibharvest/lib/oai_harvest_admin.py:1141
+#: modules/bibharvest/lib/oai_harvest_admin.py:1098
+#: modules/bibharvest/lib/oai_harvest_admin.py:1143
 msgid "Delete from holding pen"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1114
+#: modules/bibharvest/lib/oai_harvest_admin.py:1116
 msgid "Error when retrieving the Holding Pen entry"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1122
+#: modules/bibharvest/lib/oai_harvest_admin.py:1124
 msgid "Error when retrieving the record"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1130
+#: modules/bibharvest/lib/oai_harvest_admin.py:1132
 msgid ""
 "Error when formatting the Holding Pen entry. Probably it's content is broken"
 msgstr ""
 
-#: modules/bibharvest/lib/oai_harvest_admin.py:1135
+#: modules/bibharvest/lib/oai_harvest_admin.py:1137
 #, fuzzy
 msgid "Accept Holding Pen version"
 msgstr "стари версии"
@@ -11453,156 +11453,156 @@ msgid ""
 "knowledge base."
 msgstr ""
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:69
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:80
 #, fuzzy
 msgid "BibKnowledge Admin"
 msgstr "Администриране на BibFormat"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:89
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:100
 #, fuzzy
 msgid "Knowledge Bases"
 msgstr "База от знания %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:107
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:118
 msgid "upload is a file"
 msgstr ""
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:119
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:130
 #, fuzzy
 msgid "Cannot create upload"
 msgstr "Управление на форматите"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:133
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:144
 msgid "File uploaded"
 msgstr ""
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:162
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:206
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:256
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:293
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:346
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:455
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:514
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:576
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:660
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:677
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:692
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:728
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:173
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:217
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:267
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:304
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:357
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:466
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:525
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:587
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:679
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:696
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:711
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:747
 msgid "Manage Knowledge Bases"
 msgstr "Управление на базите от знания"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:175
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:220
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:306
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:360
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:468
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:533
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:704
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:186
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:231
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:317
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:371
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:479
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:544
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:723
 msgid "Unknown Knowledge Base"
 msgstr "Непозната база от знания %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:182
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:193
 #, python-format
 msgid "Knowledge Base %s"
 msgstr "База от знания %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:229
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:240
 #, python-format
 msgid "Knowledge Base %s Attributes"
 msgstr "Атрибути на база от знания %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:315
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:326
 #, python-format
 msgid "Knowledge Base %s Dependencies"
 msgstr "Зависимост на база от знания %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:397
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:408
 msgid "Left side exists"
 msgstr ""
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:405
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:416
 msgid "Right side exists"
 msgstr ""
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:578
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:589
 #, fuzzy
 msgid "Knowledge base name missing"
 msgstr "Бази от знания"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:598
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:609
 #, fuzzy
 msgid "Unknown knowledge base"
 msgstr "Непозната база от знания %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:599
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:610
 msgid "There is no knowledge base with that name."
 msgstr ""
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:610
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:629
 #, fuzzy
 msgid "No such knowledge base"
 msgstr "Непозната база от знания %s"
 
-#: modules/bibknowledge/lib/bibknowledgeadmin.py:692
+#: modules/bibknowledge/lib/bibknowledgeadmin.py:711
 msgid "Delete Knowledge Base"
 msgstr "Изтриване на базата от знания"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:154
+#: modules/bibsword/lib/bibsword_webinterface.py:157
 #, fuzzy
 msgid "BibSword Admin Interface"
 msgstr "Администриране на BibEdit"
 
-#: modules/bibsword/lib/bibsword_webinterface.py:161
-#: modules/bibsword/lib/bibsword_webinterface.py:254
-#: modules/bibsword/lib/bibsword_webinterface.py:278
-#: modules/bibsword/lib/bibsword_webinterface.py:307
-msgid "Export with BibSword : Step 2/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:171
+#: modules/bibsword/lib/bibsword_webinterface.py:277
+#: modules/bibsword/lib/bibsword_webinterface.py:301
+#: modules/bibsword/lib/bibsword_webinterface.py:330
+msgid "Export with BibSword: Step 2/4"
 msgstr ""
 
-#: modules/bibsword/lib/bibsword_webinterface.py:212
-#: modules/bibsword/lib/bibsword_webinterface.py:223
-#: modules/bibsword/lib/bibsword_webinterface.py:268
-msgid "Export with BibSword : Step 1/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:222
+#: modules/bibsword/lib/bibsword_webinterface.py:233
+#: modules/bibsword/lib/bibsword_webinterface.py:291
+msgid "Export with BibSword: Step 1/4"
 msgstr ""
 
-#: modules/bibsword/lib/bibsword_webinterface.py:292
-#: modules/bibsword/lib/bibsword_webinterface.py:320
-#: modules/bibsword/lib/bibsword_webinterface.py:351
-msgid "Export with BibSword : Step 3/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:315
+#: modules/bibsword/lib/bibsword_webinterface.py:343
+#: modules/bibsword/lib/bibsword_webinterface.py:374
+msgid "Export with BibSword: Step 3/4"
 msgstr ""
 
-#: modules/bibsword/lib/bibsword_webinterface.py:335
-#: modules/bibsword/lib/bibsword_webinterface.py:366
-msgid "Export with BibSword : Step 4/4"
+#: modules/bibsword/lib/bibsword_webinterface.py:358
+#: modules/bibsword/lib/bibsword_webinterface.py:389
+msgid "Export with BibSword: Step 4/4"
 msgstr ""
 
-#: modules/bibsword/lib/bibsword_webinterface.py:411
-msgid "Export with BibSword : Acknowledgement"
+#: modules/bibsword/lib/bibsword_webinterface.py:434
+msgid "Export with BibSword: Acknowledgement"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:182
+#: modules/bibupload/lib/batchuploader_engine.py:199
 msgid "More than one possible recID, ambiguous behaviour"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:182
+#: modules/bibupload/lib/batchuploader_engine.py:199
 msgid "No records match that file name"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:183
+#: modules/bibupload/lib/batchuploader_engine.py:200
 msgid "File already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:183
+#: modules/bibupload/lib/batchuploader_engine.py:200
 msgid "A file with the same name and format already exists"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:184
+#: modules/bibupload/lib/batchuploader_engine.py:201
 #, python-format
 msgid "No rights to upload to collection '%s'"
 msgstr ""
 
-#: modules/bibupload/lib/batchuploader_engine.py:394
-#: modules/bibupload/lib/batchuploader_engine.py:407
+#: modules/bibupload/lib/batchuploader_engine.py:411
+#: modules/bibupload/lib/batchuploader_engine.py:424
 #, python-format
 msgid ""
 "The user '%(x_user)s' is not authorized to modify collection '%(x_coll)s'"
