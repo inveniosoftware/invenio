@@ -47,6 +47,7 @@ from invenio.config import \
 from invenio.dbquery import run_sql, real_escape_string
 from invenio.textutils import wrap_text_in_a_box
 from invenio.errorlib import register_exception, register_emergency
+from invenio.shellutils import run_shell_command
 
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED')
 
@@ -58,7 +59,6 @@ def get_editor():
     for editor in os.environ.get('EDITOR'), '/usr/bin/vim', '/usr/bin/emacs', '/usr/bin/vi', '/usr/bin/nano':
         if editor and os.path.exists(editor):
             return editor
-
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -1217,7 +1217,10 @@ def error(msg):
     print >> sys.stderr, "error: " + msg
     sys.exit(1)
 
-def server_pid(ping_the_process=True):
+def warning(msg):
+    print >> sys.stderr, "warning: " + msg
+
+def server_pid(ping_the_process=True, check_is_really_bibsched=True):
     # The pid must be stored on the filesystem
     try:
         pid = int(open(pidfile).read())
@@ -1230,8 +1233,14 @@ def server_pid(ping_the_process=True):
         try:
             os.kill(pid, signal.SIGCONT)
         except OSError:
+            warning("pidfile %s found referring to pid %s which is not running" % (pidfile, pid))
             return None
 
+    if check_is_really_bibsched:
+        output = run_shell_command("ps p %s o args=", (str(pid),))[1]
+        if not 'bibsched' in output:
+            warning("pidfile %s found referring to pid %s which does not correspond to bibsched: cmdline is %s" % (pidfile, pid, output))
+            return None
     return pid
 
 def start(verbose = True):
@@ -1249,7 +1258,9 @@ def start(verbose = True):
         if pid2:
             error("another instance of bibsched (pid %d) is running" % pid2)
         else:
-            error("%s exist but the corresponding bibsched (pid %s) seems not be running" % (pidfile, pid))
+            warning("%s exist but the corresponding bibsched (pid %s) seems not be running" % (pidfile, pid))
+            warning("erasing %s and continuing..." % (pidfile, ))
+            os.remove(pidfile)
 
     # start the child process using the "double fork" technique
     pid = os.fork()
