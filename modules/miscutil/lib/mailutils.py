@@ -71,7 +71,7 @@ def send_email(fromaddr,
                ln=CFG_SITE_LANG,
                charset=None
                ):
-    """Send an forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
+    """Send a forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
     @param fromaddr: [string] sender
     @param toaddr: [string or list-of-strings] list of receivers (if string, then
@@ -116,7 +116,7 @@ def send_email(fromaddr,
 This message would have been sent to the following recipients:
 %s
 --------------------------------------------------------------
-%s""" %(toaddr, content)
+%s""" % (toaddr, content)
         toaddr = CFG_SITE_ADMIN_EMAIL
         usebcc = False
     body = forge_email(fromaddr, toaddr, subject, content, html_content,
@@ -286,7 +286,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         else:
             html_content_charset = charset
 
-        msg_root = MIMEMultipart('related')
+        msg_root = MIMEMultipart('alternative')
         msg_root['Subject'] = subject
         msg_root['From'] = fromaddr
         if usebcc:
@@ -296,20 +296,24 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
             msg_root['To'] = toaddr
         msg_root.preamble = 'This is a multi-part message in MIME format.'
 
-        msg_alternative = MIMEMultipart('alternative')
-        msg_root.attach(msg_alternative)
-
         msg_text = MIMEText(content, _charset=content_charset)
-        msg_alternative.attach(msg_text)
+        msg_root.attach(msg_text)
 
         msg_text = MIMEText(html_content, 'html', _charset=html_content_charset)
-        msg_alternative.attach(msg_text)
-
-        for image_id, image_path in html_images.iteritems():
-            msg_image = MIMEImage(open(image_path, 'rb').read())
-            msg_image.add_header('Content-ID', '<%s>' % image_id)
-            msg_image.add_header('Content-Disposition', 'attachment', filename=os.path.split(image_path)[1])
-            msg_root.attach(msg_image)
+        if not html_images:
+            # No image? Attach the HTML to the root
+            msg_root.attach(msg_text)
+        else:
+            # Image(s)? Attach the HTML and image(s) as children of a
+            # "related" block
+            msg_related = MIMEMultipart('related')
+            msg_related.attach(msg_text)
+            for image_id, image_path in html_images.iteritems():
+                msg_image = MIMEImage(open(image_path, 'rb').read())
+                msg_image.add_header('Content-ID', '<%s>' % image_id)
+                msg_image.add_header('Content-Disposition', 'attachment', filename=os.path.split(image_path)[1])
+                msg_related.attach(msg_image)
+            msg_root.attach(msg_related)
     else:
         msg_root = MIMEText(content, _charset=content_charset)
         msg_root['From'] = fromaddr
