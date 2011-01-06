@@ -39,7 +39,7 @@ COAUTHOR_INST_TAG = "700__u"
 VENUE_TAG = "909C4p"
 KEYWORD_TAG = "695__a"
 FKEYWORD_TAG = "6531_a"
-CFG_INSPIRE_UNWANTED_KEYWORDS_START= ['talk',
+CFG_INSPIRE_UNWANTED_KEYWORDS_START = ['talk',
                                       'conference',
                                       'conference proceedings',
                                       'numerical calculations',
@@ -208,13 +208,30 @@ class WebInterfaceUnAPIPages(WebInterfaceDirectory):
     index = __call__
 
 class WebInterfaceAuthorPages(WebInterfaceDirectory):
-    """ Handle /author/Doe%2C+John etc set of pages."""
+    """ 
+    Handle /author/Doe%2C+John page requests as well as
+    /author/<bibrec_id>:<authorname_string> (e.g. /author/15:Doe%2C+John) 
+    requests. The latter will try to find a person from the personid 
+    universe and will display the joint information from that particular 
+    author cluster.
+    
+    This interface will handle the following URLs:
+    - /author/Doe%2C+John which will show information on the exactauthor search
+    - /author/<bibrec_id>:<authorname_string> (e.g. /author/15:Doe%2C+John)
+        will try to find a person from the personid 
+        universe and will display the joint information from that particular 
+        author cluster.
+    - /author/<personid> (e.g. /author/152) will display the joint information
+        from that particular  author cluster (an entity called person).
+    """
 
     _exports = ['author']
 
-    def __init__(self, authorname=''):
+    def __init__(self, pageparam=''):
         """Constructor."""
-        self.authorname = authorname
+        self.pageparam = pageparam.replace("+", " ")
+        self.personid = -1
+        self.authorname = " "
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
@@ -223,6 +240,21 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Serve the page in the given language."""
+        is_bibauthorid = True
+
+        try:
+            from invenio.bibauthorid_webapi import search_person_ids_by_name
+            from invenio.bibauthorid_webapi import get_papers_by_person_id
+            from invenio.bibauthorid_webapi import get_person_names_from_id
+            from invenio.bibauthorid_utils import create_normalized_name
+            from invenio.bibauthorid_utils import split_name_parts
+            from invenio.bibauthorid_config import CMP_CLAIM_OTHERS_PAPERS
+            from invenio.access_control_admin import acc_find_user_role_actions
+        except (ImportError):
+            is_bibauthorid = False
+
+        from operator import itemgetter
+
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG), 'verbose': (int, 0) })
         ln = argd['ln']
         verbose = argd['verbose']
@@ -232,39 +264,114 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         req.content_type = "text/html"
         req.send_http_header()
         uid = getUid(req)
-
         page_start(req, "hb", "", "", ln, uid)
+        pubs = []
+        authors = []
+        recid = None
+        nquery = ""
+        names_dict = {}
 
-        #wants to check it in case of no results
-        self.authorname = self.authorname.replace("+"," ")
-
-        if not self.authorname:
-            return websearch_templates.tmpl_author_information(req, {}, self.authorname,
-                                                               0, {},
-                                                               {}, {}, {}, {}, ln)
         #let's see what takes time..
         time1 = time.time()
         genstart = time1
         time2 = time.time()
 
-        #search the publications by this author
-        pubs = perform_request_search(req=req, p=self.authorname, f="exactauthor")
+        #check if it is a person id:
+        try:
+            self.personid = int(self.pageparam)
+        except (ValueError, TypeError):
+            self.personid = -1
+
+        # Well, it's not a person id, maybe a bibrec:name or name:bibrec pair?
+        if self.personid < 1 and is_bibauthorid:
+            if self.pageparam.count(":"):
+                left, right = self.pageparam.split(":")
+
+                try:
+                    recid = int(left)
+                    nquery = str(right)
+                except (ValueError, TypeError):
+                    try:
+                        recid = int(right)
+                        nquery = str(left)
+                    except (ValueError, TypeError):
+                        recid = None
+                        nquery = self.pageparam
+            else:
+                nquery = self.pageparam
+
+            sorted_results = search_person_ids_by_name(nquery)
+
+            for results in sorted_results:
+                pid = results[0]
+                authorpapers = get_papers_by_person_id(pid, -1)
+                authorpapers = sorted(authorpapers, key=itemgetter(0),
+                                      reverse=True)
+
+                if (recid and
+                    not (str(recid) in [row[0] for row in authorpapers])):
+                    continue
+
+                authors.append([results[0], results[1],
+                                authorpapers[0:4]])
+
+            search_results = authors
+
+            if search_results:
+                self.personid = search_results[0][0]
+
+        if self.personid < 1 or not is_bibauthorid:
+            # Well, no person. Fall back to the exact author name search then.
+            self.authorname = self.pageparam
+
+            if not self.authorname:
+                return websearch_templates.tmpl_author_information(req, {},
+                                                            self.authorname,
+                                                            0, {}, {},
+                                                            {}, {}, {}, {}, ln)
+
+            #search the publications by this author
+            pubs = perform_request_search(req=req, p=self.authorname, f="exactauthor")
+            names_dict[self.authorname] = len(pubs)
+
+        elif is_bibauthorid:
+            #yay! Person found! find only papers not disapproved by humans
+            full_pubs = get_papers_by_person_id(self.personid, -1)
+            pubs = [int(row[0]) for row in full_pubs]
+            longest_name = ""
+
+            try:
+                self.personid = int(self.personid)
+            except (TypeError, ValueError):
+                raise ValueError("Personid must be a number!")
+
+            for aname, acount in get_person_names_from_id(self.personid):
+                names_dict[aname] = acount
+                norm_name = create_normalized_name(split_name_parts(aname))
+
+                if len(norm_name) > len(longest_name):
+                    longest_name = norm_name
+
+            self.authorname = longest_name
+
         #get most frequent authors of these pubs
         popular_author_tuples = get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))
-        authors = []
-        for (auth, frequency) in popular_author_tuples:
+        coauthors = {}
+
+        for (coauthor, frequency) in popular_author_tuples:
             if len(authors) < MAX_COLLAB_LIST:
-                authors.append(auth)
+                if coauthor not in names_dict:
+                    coauthors[coauthor] = frequency
 
         time1 = time.time()
         if verbose == 9:
-            req.write("<br/>popularized authors: "+str(time1-time2)+"<br/>")
+            req.write("<br/>popularized authors: " + str(time1 - time2) + "<br/>")
 
         #and publication venues
-        venuetuples =  get_most_popular_field_values(pubs, (VENUE_TAG))
+        venuetuples = get_most_popular_field_values(pubs, (VENUE_TAG))
         time2 = time.time()
         if verbose == 9:
-            req.write("<br/>venues: "+str(time2-time1)+"<br/>")
+            req.write("<br/>venues: " + str(time2 - time1) + "<br/>")
 
 
         #and keywords
@@ -288,30 +395,24 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             kwtuples = kwtuples_filtered
         time1 = time.time()
         if verbose == 9:
-            req.write("<br/>keywords: "+str(time1-time2)+"<br/>")
+            req.write("<br/>keywords: " + str(time1 - time2) + "<br/>")
 
-        #construct a simple list of tuples that contains keywords that appear more than once
-        #moreover, limit the length of the list to MAX_KEYWORD_LIST
+        #construct a simple list of tuples that contains keywords that appear 
+        #more than once moreover, limit the length of the list 
+        #to MAX_KEYWORD_LIST
         kwtuples = kwtuples[0:MAX_KEYWORD_LIST]
         vtuples = venuetuples[0:MAX_VENUE_LIST]
 
-
-        #remove the author in question from authors: they are associates
-        if (authors.count(self.authorname) > 0):
-            authors.remove(self.authorname)
-
-        authors = authors[0:MAX_COLLAB_LIST] #cut extra
-
         time2 = time.time()
         if verbose == 9:
-            req.write("<br/>misc: "+str(time2-time1)+"<br/>")
+            req.write("<br/>misc: " + str(time2 - time1) + "<br/>")
 
         #a dict. keys: affiliations, values: lists of publications
-        author_aff_pubs = self.get_institute_pub_dict(pubs)
+        author_aff_pubs = self.get_institute_pub_dict(pubs, names_dict.keys())
 
         time1 = time.time()
         if verbose == 9:
-            req.write("<br/>affiliations: "+str(time1-time2)+"<br/>")
+            req.write("<br/>affiliations: " + str(time1 - time2) + "<br/>")
 
         totaldownloads = 0
         if CFG_BIBRANK_SHOW_DOWNLOAD_STATS:
@@ -324,32 +425,43 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         #get cited by..
         citedbylist = get_cited_by_list(pubs)
+        admin_link = None
+
+
+        if is_bibauthorid and self.personid >= 0:
+            if [i[1] for i in acc_find_user_role_actions({'uid': uid})
+                     if i[1] == CMP_CLAIM_OTHERS_PAPERS]:
+                admin_link = self.personid
 
         time1 = time.time()
         if verbose == 9:
-            req.write("<br/>citedby: "+str(time1-time2)+"<br/>")
+            req.write("<br/>citedby: " + str(time1 - time2) + "<br/>")
 
         #finally all stuff there, call the template
         websearch_templates.tmpl_author_information(req, pubs, self.authorname,
-                                                    totaldownloads, author_aff_pubs,
-                                                    citedbylist, kwtuples, authors, vtuples, ln)
+                                                    totaldownloads,
+                                                    author_aff_pubs,
+                                                    citedbylist, kwtuples,
+                                                    coauthors, vtuples,
+                                                    names_dict, admin_link, ln)
         time1 = time.time()
         #cited-by summary
-        out = summarize_records(intbitset(pubs), 'hcs', ln, self.authorname, 'exactauthor', req)
+        out = summarize_records(intbitset(pubs), 'hcs', ln, req=req)
 
         time2 = time.time()
         if verbose == 9:
-            req.write("<br/>summarizer: "+str(time2-time1)+"<br/>")
+            req.write("<br/>summarizer: " + str(time2 - time1) + "<br/>")
 
         req.write(out)
 
-        simauthbox = create_similarly_named_authors_link_box(self.authorname)
-        req.write(simauthbox)
+#        simauthbox = create_similarly_named_authors_link_box(self.authorname)
+#        req.write(simauthbox)
         if verbose == 9:
-            req.write("<br/>all: "+str(time.time()-genstart)+"<br/>")
+            req.write("<br/>all: " + str(time.time() - genstart) + "<br/>")
         return page_end(req, 'hb', ln)
 
-    def get_institute_pub_dict(self, recids):
+
+    def get_institute_pub_dict(self, recids, names_list):
         """return a dictionary consisting of institute -> list of publications"""
         author_aff_pubs = {} #the dictionary to be built
         for recid in recids:
@@ -361,7 +473,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             mainauthor = " "
             if mainauthors:
                 mainauthor = mainauthors[0]
-            if (mainauthor == self.authorname):
+            if (mainauthor in names_list):
                 affus = get_fieldvalues(recid, AUTHOR_INST_TAG)
             else:
                 #search for coauthors..
@@ -371,15 +483,19 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                 if coauthorfield_content:
                     coauthor_field_lines = coauthorfield_content.split("\n")
                 for line in coauthor_field_lines:
-                    if line.count(self.authorname) > 0:
-                        #get affilitions .. the correct ones are $$+code
-                        code = COAUTHOR_INST_TAG[-1]
-                        myparts = line.split("$$")
-                        for part in myparts:
-                            if part and part[0] == code:
-                                myaff = part[1:]
-                                affus.append(myaff)
-                        break
+                    for name_item in names_list:
+                        breakit = False
+                        if line.count(name_item) > 0:
+                            #get affilitions .. the correct ones are $$+code
+                            code = COAUTHOR_INST_TAG[-1]
+                            myparts = line.split("$$")
+                            for part in myparts:
+                                if part and part[0] == code:
+                                    myaff = part[1:]
+                                    affus.append(myaff)
+                            breakit = True
+                        if breakit:
+                            break
 
             #if this is empty, add a dummy " " value
             if (affus == []):
@@ -461,7 +577,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
-                text = auth_msg,\
+                text=auth_msg, \
                 navmenuid='search')
 
         # mod_python does not like to return [] in case when of=id:
@@ -570,7 +686,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         if uid == -1:
             return page_not_authorized(req, "../",
-                text = _("You are not authorized to view this area."),
+                text=_("You are not authorized to view this area."),
                                        navmenuid='search')
         elif uid > 0:
             pref = get_user_preferences(uid)
@@ -631,7 +747,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                             return redirect_to_url(req, target, norobot=True)
                     elif auth_code:
                         return page_not_authorized(req, "../", \
-                            text = auth_msg,\
+                            text=auth_msg, \
                             navmenuid='search')
             else:
                 involved_collections.add(guess_primary_collection_of_a_record(argd['recid']))
@@ -648,7 +764,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
-                        text = auth_msg,\
+                        text=auth_msg, \
                         navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
@@ -688,7 +804,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
-                        text = auth_msg,\
+                        text=auth_msg, \
                         navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
@@ -944,7 +1060,7 @@ def display_collection(req, c, aas, verbose, ln):
     except Error:
         register_exception(req=req, alert_admin=True)
         return page(title=_("Internal Error"),
-                    body = create_error_box(req, verbose=verbose, ln=ln),
+                    body=create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % CFG_SITE_NAME,
                     keywords="%s, Internal Error" % CFG_SITE_NAME,
                     language=ln,
@@ -1112,7 +1228,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                     return redirect_to_url(req, target, norobot=True)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
-                        text = auth_msg,\
+                        text=auth_msg, \
                         navmenuid='search')
 
         # Create a standard filename with these parameters
@@ -1161,9 +1277,9 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                                                              jrec=(argd['jrec'] + argd['rg']))
 
             first_url = websearch_templates.build_rss_url(argd, jrec=1)
-            last_url = websearch_templates.build_rss_url(argd, jrec=nb_found-argd['rg']+1)
+            last_url = websearch_templates.build_rss_url(argd, jrec=nb_found - argd['rg'] + 1)
 
-            recIDs = recIDs[-argd['jrec']:(-argd['rg']-argd['jrec']):-1]
+            recIDs = recIDs[-argd['jrec']:(-argd['rg'] - argd['jrec']):-1]
 
             rss_prologue = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
             websearch_templates.tmpl_xml_rss_prologue(current_url=current_url,
@@ -1260,7 +1376,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             return redirect_to_url(req, target, norobot=True)
         elif auth_code:
             return page_not_authorized(req, "../", \
-                text = auth_msg,\
+                text=auth_msg, \
                 navmenuid='search')
 
         # mod_python does not like to return [] in case when of=id:

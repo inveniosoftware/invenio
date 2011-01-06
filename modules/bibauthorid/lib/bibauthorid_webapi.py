@@ -29,19 +29,38 @@ from cgi import escape
 from time import gmtime, strftime
 
 
-def export_person_ids_to_marc():
-    '''
-    Exports person id to the correspondent marc field for the search engine
-    '''
-    pass
+def get_bibrefs_from_bibrecs(bibreclist):
+    lists = []
+    for bibrec in bibreclist:
+        lists.append([bibrec, tu.get_possible_bibrecref([''], bibrec,
+                                                        always_match=True)])
+    return lists
 
 
-def get_possible_person_ids(name_string):
+def get_possible_bibrefs_from_pid_bibrec(pid, bibreclist, always_match=False):
     '''
-    Returns one or more person ids which best matches the name given
-    (More then one: we are not sure about which person)
+    Returns for each bibrec a list of bibrefs for which the surname matches.
+    @param pid: person id to gather the names strings from
+    @param bibreclist: list of bibrecs on which to search
     '''
-    pass
+    pid = _wash_integer_id(pid)
+
+    pid_names = tu.get_person_names_set([pid])
+    lists = []
+    for bibrec in bibreclist:
+        lists.append([bibrec, tu.get_possible_bibrecref([n[0] for n in pid_names], bibrec,
+                                                        always_match)])
+    return lists
+
+
+def get_pid_from_uid(uid):
+    '''
+    Return the PID associated with the uid
+    '''
+    if not isinstance(uid, tuple):
+        uid = ((uid,),)
+
+    return tu.get_personid_from_uid(uid)
 
 
 def get_user_level(uid):
@@ -170,6 +189,8 @@ def get_paper_status(person_id, bibref):
         status = db_data[0][2]
     except IndexError:
         status = -10
+
+    status = _wash_integer_id(status)
 
     return status
 
@@ -549,3 +570,43 @@ def person_bibref_is_touched(pid, bibref):
         raise ValueError("A bibref is expected!")
 
     return tu.person_bibref_is_touched(pid, bibref)
+
+
+def assign_uid_to_person(uid, pid, create_new_pid=False):
+    pid = _wash_integer_id(pid)
+    uid = _wash_integer_id(uid)
+
+    tu.assign_uid_to_person(uid, pid, create_new_pid)
+
+
+def get_review_needing_records(pid):
+    pid = _wash_integer_id(pid)
+    db_data = tu.get_person_papers_to_be_manually_reviewed(pid)
+
+    return [int(row[1]) for row in db_data if row[1]]
+
+
+def add_review_needing_record(pid, bibrec_id):
+    pid = _wash_integer_id(pid)
+    bibrec_id = _wash_integer_id(bibrec_id)
+    tu.add_person_paper_needs_manual_review(pid, bibrec_id)
+
+
+def del_review_needing_record(pid, bibrec_id):
+    pid = _wash_integer_id(pid)
+    bibrec_id = _wash_integer_id(bibrec_id)
+    tu.del_person_papers_needs_manual_review(pid, bibrec_id)
+
+
+def get_processed_external_recids(pid):
+    list_str = tu.get_processed_external_recids(pid)
+
+    return list_str.split(";")
+
+
+def set_processed_external_recids(pid, recid_list):
+    if isinstance(recid_list, list):
+        recid_list_str = ";".join(recid_list)
+
+    tu.set_processed_external_recids(pid, recid_list_str)
+

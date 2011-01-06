@@ -16,7 +16,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """Bibauthorid URL handler."""
 # pylint: disable-msg=W0105
 from operator import itemgetter
@@ -28,17 +27,20 @@ from invenio.bibauthorid_config import CMP_CHANGE_OWN_DATA
 from invenio.bibauthorid_config import CMP_CHANGE_OTHERS_DATA
 from invenio.bibauthorid_config import CMP_CLAIM_OWN_PAPERS
 from invenio.bibauthorid_config import CMP_CLAIM_OTHERS_PAPERS
+from invenio.bibauthorid_config import EXTERNAL_CLAIMED_RECORDS_KEY
 from invenio.config import CFG_SITE_LANG
 from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_SITE_NAME
+from invenio.config import CFG_SITE_SECURE_URL
 from invenio.webpage import page
 from invenio.messages import gettext_set_language, wash_language
 from invenio.template import load
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.session import get_session
 from invenio.urlutils import redirect_to_url
-from invenio.webuser import getUid, page_not_authorized
+from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.access_control_admin import acc_find_user_role_actions
+from invenio.search_engine import perform_request_search
 import invenio.bibauthorid_webapi as webapi
 
 TEMPLATE = load('bibauthorid')
@@ -54,7 +56,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         /person/batchprocess
         /person/search
     """
-    _exports = ['', 'batchprocess', 'comments', 'search', 'status']
+    _exports = ['', 'batchprocess', 'comments', 'search', 'status', 'claim', 'me', 'you']
 
 
     def __init__(self, person_id=None):
@@ -136,12 +138,13 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                                    'verbose': (int, 0)})
         ln = wash_language(argd['ln'])
         req.argd = argd #needed for perform_req_search
-        pid_ok = 0
+        pid_ok = -1
+        session = get_session(req)
 
         if self.person_id and self.person_id >= 0:
             pid_ok = self.person_id
 
-        if not self.user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+        if not self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
             return page_not_authorized(
                         req=req,
                         referer="%s/person/%s" % (CFG_SITE_URL, pid_ok),
@@ -151,23 +154,27 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                              "administrator."),
                         ln=ln)
 
-        if pid_ok < 1:
+        if pid_ok < 0:
             return self._error_page(req, ln, "Invalid Person ID.")
 
+        session["cmp_admin_last_viewed_pid"] = self.person_id
         title = "Author/Person Administration"
         metaheaderadd = self._scripts()
+        session.save()
 
         # Acquire Data        
         names = webapi.get_person_names_from_id(self.person_id)
         all_papers = webapi.get_papers_by_person_id(self.person_id)
         rejected_papers = [row for row in all_papers if row[2] < -1]
         rest_of_papers = [row for row in all_papers if row[2] >= -1]
+        review_needed = webapi.get_review_needing_records(self.person_id)
 
         # Send data to template function        
         body = TEMPLATE.tmpl_author_details(req, person_id=self.person_id,
                                             names=names,
                                             rejected_papers=rejected_papers,
-                                            rest_of_papers=rest_of_papers)
+                                            rest_of_papers=rest_of_papers,
+                                            review_needed=review_needed)
 
         # Return readily constructed page
         return page(title=title,
@@ -179,8 +186,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
 
     index = __call__
 
-
-    def _error_page(self, req, ln=CFG_SITE_LANG, message=None):
+    def _error_page(self, req, ln=CFG_SITE_LANG, message=None, intro=True):
         '''
         Create a page that contains a message explaining the error.
         
@@ -191,15 +197,18 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         @param message: message to be displayed
         @type message: string
         '''
+        body = []
+
         if not message:
             message = "No further explanation available. Sorry."
 
-        body = ["<p><strong>We're sorry. An error occurred while handling "
-                    "your request. Please find more information below: "
-                    "</strong></p>"]
-        body.append("<p>%s</p>" % message)
+        if intro:
+            body.append("<p>We're sorry. An error occurred while "
+                        "handling your request. Please find more information "
+                        "below:</p>")
+        body.append("<p><strong>%s</strong></p>" % message)
 
-        return page(title="Something went wrong",
+        return page(title="Notice",
                 body="\n".join(body),
                 description="%s - Internal Error" % CFG_SITE_NAME,
                 keywords="%s, Internal Error" % CFG_SITE_NAME,
@@ -243,6 +252,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         - mreset: mass reset assignments of a person
         - mreviewed: continue a started review process
         - mcancel: cancel whatever operation is currently running
+        - mfind_bibref: ask confirmation for which bibref to assign and assign.
         
         @param req: Apache Request Object
         @type req: Apache Request Object
@@ -262,7 +272,9 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
              'mrepeal': (str, None),
              'mreset': (str, None),
              'mcancel': (str, None),
-             'mreviewed': (str, None)})
+             'mreviewed': (str, None),
+             'mfind_bibref': (str, None),
+             'selected_bibrecs': (list, [])})
 
         ln = wash_language(argd['ln'])
         pid = None
@@ -273,13 +285,8 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                              "failed for a currently unknown reason. The "
                              "administrators have been contacted.")
 
-        if 'pid' in argd:
-            pid = argd['pid']
-        else:
-            return self._error_page(req, ln,
-                                    "Please provide a valid person id")
-
-        if not self.user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+        if (not self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS) and
+            not self.__user_is_authorized(req, CMP_CLAIM_OWN_PAPERS)):
             return page_not_authorized(
                         req=req,
                         referer="%s/person/%s" % (CFG_SITE_URL, pid),
@@ -288,6 +295,52 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                              "this is incorrect, please contact your "
                              "administrator."),
                         ln=ln)
+        if 'mcancel' in argd:
+            if argd['mcancel']:
+                redir_pid = pid
+
+                if "pid_batch_assign_papers" in session:
+                    redir_pid = session["pid_batch_assign_papers"]
+                elif "aid_mass_review_pid" in session:
+                    redir_pid = session["aid_mass_review_pid"]
+
+                self.__session_cleanup(req)
+                session['person_message_show'] = True
+                session['person_message'] = ("Successfully canceled the "
+                                     "process")
+                session.save()
+                if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                    return redirect_to_url(req, "%s/person/%s"
+                                       % (CFG_SITE_URL, pid))
+                else:
+                    return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
+                
+        if 'mfind_bibref' in argd and argd['mfind_bibref']:
+            if argd['mfind_bibref'] == 'claim' and argd['selected_bibrecs']:
+                if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                    body = TEMPLATE.tmpl_bibref_confirm_dispatcher(req, argd['selected_bibrecs'])
+                    return page(title="Review transaction",
+                            metaheaderadd=self._scripts(),
+                            body=body,
+                            req=req,
+                            language=ln)
+                else:
+                    return self.__bibref_select_page(req, ln, argd['selected_bibrecs'])
+            elif argd['mfind_bibref'] == 'confirm':
+                return self.__bibref_select_validate_confirm_page(req, ln, form)
+            elif argd['mfind_bibref'] == 'admin_claim':
+                if 'pid' in argd and argd['pid']:
+                    return self.__bibref_select_page(req, ln, argd['selected_bibrecs'], force_pid=argd['pid'])
+                else:
+                    return self.__bibref_select_page(req, ln, argd['selected_bibrecs'])
+            else:
+                return self._error_page(req, ln, self.mass_fail_message)
+
+        if 'pid' in argd:
+            pid = argd['pid']
+        else:
+            return self._error_page(req, ln,
+                                    "Please provide a valid person id")
 
         if 'selection' in argd and len(argd['selection']) > 0:
             bibrefs = argd['selection']
@@ -305,23 +358,6 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                                     "Sorry. To use this function, please "
                                     "select at least one document from the "
                                     "list to be processed.")
-
-        if 'mcancel' in argd:
-            if argd['mcancel']:
-                redir_pid = pid
-
-                if "pid_batch_assign_papers" in session:
-                    redir_pid = session["pid_batch_assign_papers"]
-                elif "aid_mass_review_pid" in session:
-                    redir_pid = session["aid_mass_review_pid"]
-
-                self.session_cleanup(req)
-                session['person_message_show'] = True
-                session['person_message'] = ("Successfully canceled the "
-                                     "process")
-                session.save()
-                return redirect_to_url(req, "%s/person/%s"
-                                       % (CFG_SITE_URL, redir_pid))
 
         if 'mconfirm' in argd:
             if argd['mconfirm']:
@@ -390,7 +426,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         else:
             return error_html
 
-        if not self.user_is_authorized(req, CMP_CHANGE_OTHERS_DATA):
+        if not self.__user_is_authorized(req, CMP_CHANGE_OTHERS_DATA):
             return json.dumps({'comments': [
                                 "We're sorry. You are not authorized to "
                                 "perform this action. If you think that "
@@ -428,6 +464,306 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                 return error_html
         else:
             return error_html
+
+
+    def claim(self, req, form):
+        '''
+        Serve the main 'claim my paper' interface.
+        Will use the user's internal account id to determine the person id to 
+        then get the relevant person information.
+        
+        @param req: Apache Request Object
+        @type req: Apache Request Object
+        @param form: Parameters sent via GET or POST request
+        @type form: dict
+        
+        @return: a full page formatted in HTML
+        @return: string
+        '''
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG),
+                                   'verbose': (int, 0)})
+        ln = wash_language(argd['ln'])
+        req.argd = argd #needed for perform_req_search
+        uid = getUid(req)
+        session = get_session(req)
+        pid = -1
+        _ = gettext_set_language(argd['ln'])
+
+        if not self.__user_is_authorized(req, CMP_CLAIM_OWN_PAPERS):
+            return page_not_authorized(
+                        req=req,
+                        referer="%s/person/claim" % (CFG_SITE_URL),
+                        text=("We're sorry. You are not authorized to "
+                              "perform this action. Please log in to start "
+                              "claiming your papers"),
+                        ln=ln)
+
+        pid_info = webapi.get_pid_from_uid(uid)
+
+        if pid_info and (not pid_info[0][0] or pid_info[0][0] < 0):
+            return self._error_page(req, ln, "We could not reliably determine "
+                                    "a bibliographic profile for you.  Please "
+                                    "use the <a href=''>search function</a> "
+                                    "and claim a paper to tell us who you are."
+                                    "  Sorry for this inconvenience!", False)
+        elif len(pid_info[0]) > 1:
+            # take care of multiple Person assignments!
+            pid = self.__handle_external_records(req, pid_info)
+            pid = webapi.assign_uid_to_person(uid, pid)
+
+            if pid < 0:
+                pid = webapi.assign_uid_to_person(uid, pid, create_new_pid=True)
+
+            session["cmp_first_time_user"] = True
+            session.save()
+        else:
+            if not pid_info[1]:
+                # take care of Person and paper assignment!
+                pid = self.__handle_external_records(req, pid_info,
+                                                     pid_info[0][0])
+                pid = webapi.assign_uid_to_person(uid, pid)
+
+                if pid < 0:
+                    pid = webapi.assign_uid_to_person(uid, pid, create_new_pid=True)
+
+                session["cmp_first_time_user"] = True
+                session.save()
+            elif pid_info[0][0]:
+                try:
+                    pid = int(pid_info[0][0])
+                except (ValueError, TypeError, IndexError):
+                    pid = -1
+                self.__handle_external_records(req, pid_info, pid)
+
+        if pid < 0:
+            return self._error_page(req, ln, "Invalid Person ID.")
+
+        title = "Claim Your Papers"
+        metaheaderadd = self._scripts()
+
+        # Acquire Data        
+        names = webapi.get_person_names_from_id(pid)
+        all_papers = webapi.get_papers_by_person_id(pid)
+        rejected_papers = [row for row in all_papers if row[2] < -1]
+        rest_of_papers = [row for row in all_papers if row[2] >= -1]
+        review_needed = webapi.get_review_needing_records(pid)
+
+        # Send data to template function        
+        body = TEMPLATE.tmpl_author_claim(req, person_id=pid,
+                                            names=names,
+                                            rejected_papers=rejected_papers,
+                                            rest_of_papers=rest_of_papers,
+                                            review_needed=review_needed)
+
+        # Return readily constructed page
+        return page(title=title,
+            metaheaderadd=metaheaderadd,
+            body=body,
+            req=req,
+            navtrail='<a class="navtrail" href="%s/youraccount/display?ln=%s">%s</a>' % (CFG_SITE_SECURE_URL, ln, _("Your Account")),
+            navmenuid='youraccount',
+            language=ln)
+
+
+    def __handle_external_records(self, req, pid_info, ppid= -1):
+        pid = -1
+        uid = getUid(req)
+        userloginfo = "%s||%s" % (uid, req.remote_ip)
+        user_info = collect_user_info(uid)
+        recids_of_ext_ids = set()
+        promising_pid = -1
+        max_matches = 0
+        processed_external_recs = []
+
+        try:
+            ppid = int(ppid)
+        except (ValueError, TypeError):
+            ppid = -1
+
+        if ppid > -1:
+            processed_external_recs = webapi.get_processed_external_recids(ppid)
+
+            for rec_item in processed_external_recs:
+                if not rec_item:
+                    processed_external_recs.remove(rec_item)
+
+        for rkey in EXTERNAL_CLAIMED_RECORDS_KEY:
+            if rkey in user_info:
+                if user_info[rkey]:
+                    for ext_rec_str in user_info[rkey].split(";"):
+                        if ext_rec_str in processed_external_recs:
+                            continue
+
+                        ids = perform_request_search(req, p=ext_rec_str)
+
+                        if ids and len(ids) == 1:
+                            recids_of_ext_ids.add(ids[0])
+                            processed_external_recs.append(ext_rec_str)
+
+        if recids_of_ext_ids:
+            if ppid < 0:
+                for cpid in pid_info[0]:
+                    try:
+                        cpid = int(cpid)
+                    except (ValueError, TypeError):
+                        continue
+
+                    pid_papers = webapi.get_papers_by_person_id(cpid)
+                    pid_recids = set([row[0] for row in pid_papers])
+                    match = pid_recids.intersection(recids_of_ext_ids)
+
+                    if len(match) == len(recids_of_ext_ids):
+                        max_matches = len(match)
+                        promising_pid = cpid
+                        break
+                    elif len(match) > max_matches:
+                        max_matches = len(match)
+                        promising_pid = cpid
+            else:
+                promising_pid = ppid
+
+            if promising_pid > -1:
+                pid = promising_pid
+#                p_names = webapi.get_person_names_from_id(pid)
+
+                for rec_id in recids_of_ext_ids:
+                    ref = webapi.get_possible_bibrefs_from_pid_bibrec(pid,
+                                                                      rec_id,
+                                                                      False)
+
+                    if ref and ref[0] and ref[0][1]:
+                        if len(ref[0][1]) == 1:
+                            refpair = "%s,%s" % (ref[0][1][0][0], rec_id)
+
+                            status = webapi.get_paper_status(pid, refpair)
+
+                            if status == 2 or status == -2:
+                                continue
+
+                            webapi.confirm_person_bibref_assignments(pid,
+                                                                 [refpair],
+                                                                 uid)
+                            webapi.log(userloginfo, pid, "confirm",
+                                            "bibref", refpair,
+                                            comment=("auto confirm from "
+                                                     "external record"))
+                        else:
+                            webapi.add_review_needing_record(pid, rec_id)
+            else:
+                pid = pid_info[0][0]
+
+            webapi.set_processed_external_recids(pid, processed_external_recs)
+
+            try:
+                pid = int(pid)
+            except (ValueError, TypeError):
+                pid = -1
+
+            return pid
+
+
+    def __bibref_select_validate_confirm_page(self, req, ln, form):
+        '''
+        Sanity checks and deploys to _mass_confirm.
+        @param form: UPDATEEEEEE list of bibrecbibref pairs which have been manually 
+        assigned. Will be crosscheckd with what have been saved in the session before 
+        generating the request of manual assignment for the user.
+        '''
+        session = get_session(req)
+
+        try:
+            pid = session['cmp_bibrecrefs_pid']
+            bibrec_refs_needs_confirm = session['cmp_bibrecrefs_needs_confirm']
+            bibrec_refs_to_confirm = session['cmp_bibrecrefs_to_confirm']
+        except KeyError:
+            return self._error_page(req, ln, "Sorry, looks like there has been a problem with"
+                                    "the session. Cannot proceed.")
+        if not self.__user_is_authorized(req, CMP_CLAIM_OWN_PAPERS):
+            return page_not_authorized(
+                        req=req,
+                        referer="%s/person/%s" % (CFG_SITE_URL, pid),
+                        text=("We're sorry. You are not authorized to "
+                             "perform this action. If you think that "
+                             "this is incorrect, please contact your "
+                             "administrator."),
+                        ln=ln)
+        mass_bibcouples = []
+
+        for b in bibrec_refs_to_confirm:
+            mass_bibcouples.append(str(b[1][0][0]) + ',' + str(b[0]))
+
+        bibreclist = []
+        for bibrec in bibrec_refs_needs_confirm:
+            rec_grp = "bibrecgroup%s" % bibrec[0]
+            if rec_grp in form:
+                bibreclist.append(form[rec_grp] + ',' + str(bibrec[0]))
+
+        for p in bibreclist:
+            rec = p.split(',')[1]
+            ref = p.split(',')[0]
+            for b in bibrec_refs_needs_confirm:
+                if rec == str(b[0]):
+                    for br in b[1]:
+                        if ref == str(br[0]):
+                            mass_bibcouples.append(p)
+
+        return self.__mass_confirm(req, pid, mass_bibcouples, ln)
+
+
+    def __bibref_select_page(self, req, ln, bibreclist, force_pid=''):
+        '''
+        Generates the page for bibrefs selection when claiming papers.
+        @param bibreclist: a list of bibrecs which are being claimed.
+        '''
+        self.__session_cleanup(req)
+        session = get_session(req)
+        uid = getUid(req)
+
+        if not self.__user_is_authorized(req, CMP_CLAIM_OWN_PAPERS):
+            return page_not_authorized(
+                        req=CFG_SITE_URL + req.unparsed_uri,
+                        referer=req,
+                        text=("We're sorry. You are not authorized to "
+                             "perform this action. If you think that "
+                             "this is incorrect, please contact your "
+                             "administrator."),
+                        ln=ln)
+        if force_pid:
+            try:
+                pid = int(force_pid)
+            except (ValueError, TypeError):
+                pid = -1
+        else:
+            pid = webapi.get_pid_from_uid(((uid,),))[0][0]
+
+        if pid < 0:
+            return self._error_page(req, ln, "Sorry, looks like no personID is associated"
+                                    " to this profile yet. Cannot proceed.")
+
+        possible_bibrec_refs = webapi.get_possible_bibrefs_from_pid_bibrec(pid, bibreclist)
+        bibrec_refs_needs_confirm = []
+        bibrec_refs_to_confirm = []
+
+        for br in possible_bibrec_refs:
+            if len(br[1]) == 1:
+                bibrec_refs_to_confirm.append(br)
+            else:
+                if len(br[1]) < 1:
+                    br[1] = webapi.get_bibrefs_from_bibrecs([br[0]])[0][1]
+                bibrec_refs_needs_confirm.append(br)
+
+        session['cmp_bibrecrefs_to_confirm'] = bibrec_refs_to_confirm
+        session['cmp_bibrecrefs_needs_confirm'] = bibrec_refs_needs_confirm
+        session['cmp_bibrecrefs_pid'] = pid
+        session.save()
+
+        body = TEMPLATE.tmpl_bibref_confirm(req, pid, bibrec_refs_needs_confirm, bibrec_refs_to_confirm)
+
+        return page(title="Review transaction",
+                metaheaderadd=self._scripts(),
+                body=body,
+                req=req,
+                language=ln)
 
 
     def __get_transaction_items(self, req, ln, pid, action, bibrefs):
@@ -523,7 +859,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         uid = getUid(req)
         userinfo = "%s||%s" % (uid, req.remote_ip)
 
-        if not self.user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+        if not self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
             return page_not_authorized(
                         req=req,
                         referer="%s/person/%s" % (CFG_SITE_URL, pid),
@@ -575,7 +911,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                 bibrefs = [row['bibref'] for row in transactions]
 
             if not bibrefs:
-                self.session_cleanup(req)
+                self.__session_cleanup(req)
                 session.load()
                 session['person_message_show'] = True
                 session['person_message'] = ("Mission to assign successful (no "
@@ -635,14 +971,15 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         uid = getUid(req)
         userinfo = "%s||%s" % (uid, req.remote_ip)
 
-        if not self.user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+        if (not self.__user_is_authorized(req, CMP_CLAIM_OWN_PAPERS) and
+            not self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS)):
             return page_not_authorized(
                         req=req,
                         referer="%s/person/%s" % (CFG_SITE_URL, pid),
                         text=("We're sorry. You are not authorized to "
                              "perform this action. If you think that "
                              "this is incorrect, please contact your "
-                             "administrator."),
+                             "administrator. [dbg: mass_confirmf]"),
                         ln=ln)
 
         transactions = self.__get_transaction_items(req, ln, pid, "mconfirm", bibrefs)
@@ -677,33 +1014,47 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
             bibrefs = [row['bibref'] for row in transactions]
 
         if not bibrefs:
-            self.session_cleanup(req)
+            self.__session_cleanup(req)
             session.load()
             session['person_message_show'] = True
             session['person_message'] = ("Mission to confirm successful (no "
                                          "records have been updated)!")
             session.save()
-            return redirect_to_url(req, "%s/person/%s"
+            if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                return redirect_to_url(req, "%s/person/%s"
                                    % (CFG_SITE_URL, pid))
+            else:
+                return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
 
         if not webapi.confirm_person_bibref_assignments(pid, bibrefs, uid):
             return self._error_page(req, ln, self.mass_fail_message)
         else:
+            needing_review = webapi.get_review_needing_records(pid)
             for bibref in bibrefs:
                 transaction_id = webapi.log(userinfo, pid, "confirm",
                                             "bibref", bibref,
                                             transactionid=transaction_id)
+                try:
+                    bibrec = int(bibref.split(',')[1])
+                except (ValueError, IndexError, TypeError):
+                    bibrec = -1
+                if bibrec in needing_review:
+                    webapi.del_review_needing_record(pid, bibrec)
+
             transaction_id = 0
 
-            self.session_cleanup(req)
+            self.__session_cleanup(req)
             session.load()
             session['person_message_show'] = True
             session['person_message'] = ("Successfully confirmed %s "
                                          "assignments."
                                          % (len(bibrefs)))
             session.save()
-            return redirect_to_url(req, "%s/person/%s"
+            if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                return redirect_to_url(req, "%s/person/%s"
                                    % (CFG_SITE_URL, pid))
+            else:
+                return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
 
 
     def __mass_repeal(self, req, pid, bibrefs, ln):
@@ -728,7 +1079,8 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         uid = getUid(req)
         userinfo = "%s||%s" % (uid, req.remote_ip)
 
-        if not self.user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+        if (not self.__user_is_authorized(req, CMP_CLAIM_OWN_PAPERS) and
+            not self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS)):
             return page_not_authorized(
                         req=req,
                         referer="%s/person/%s" % (CFG_SITE_URL, pid),
@@ -770,14 +1122,17 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
             bibrefs = [row['bibref'] for row in transactions]
 
         if not bibrefs:
-            self.session_cleanup(req)
+            self.__session_cleanup(req)
             session.load()
             session['person_message_show'] = True
             session['person_message'] = ("Mission to repeal successful (no "
                                          "records have been updated)!")
             session.save()
-            return redirect_to_url(req, "%s/person/%s"
+            if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                return redirect_to_url(req, "%s/person/%s"
                                    % (CFG_SITE_URL, pid))
+            else:
+                return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
 
         if not webapi.repeal_person_bibref_assignments(pid, bibrefs, uid):
             return self._error_page(req, ln, self.mass_fail_message)
@@ -795,15 +1150,18 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                                                 bibref,
                                          transactionid=transaction_id)
             transaction_id = 0
-            self.session_cleanup(req)
+            self.__session_cleanup(req)
             session.load()
             session['person_message_show'] = True
             session['person_message'] = ("Successfully repealed %s "
                                          "assignments."
                                          % (len(bibrefs)))
             session.save()
-            return redirect_to_url(req, "%s/person/%s"
+            if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                return redirect_to_url(req, "%s/person/%s"
                                    % (CFG_SITE_URL, pid))
+            else:
+                return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
 
 
     def __mass_reset(self, req, pid, bibrefs, ln):
@@ -828,7 +1186,8 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         uid = getUid(req)
         userinfo = "%s||%s" % (uid, req.remote_ip)
 
-        if not self.user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+        if (not self.__user_is_authorized(req, CMP_CLAIM_OWN_PAPERS) and
+            not self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS)):
             return page_not_authorized(
                         req=req,
                         referer="%s/person/%s" % (CFG_SITE_URL, pid),
@@ -869,14 +1228,17 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
             bibrefs = [row['bibref'] for row in transactions]
 
         if not bibrefs:
-            self.session_cleanup(req)
+            self.__session_cleanup(req)
             session.load()
             session['person_message_show'] = True
             session['person_message'] = ("Reset mission successful (no records"
                                          " have been updated)!")
             session.save()
-            return redirect_to_url(req, "%s/person/%s"
+            if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                return redirect_to_url(req, "%s/person/%s"
                                    % (CFG_SITE_URL, pid))
+            else:
+                return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
 
         if not webapi.reset_person_bibref_decisions(pid, bibrefs):
             return self._error_page(req, ln, self.mass_fail_message)
@@ -894,18 +1256,21 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
                                                 bibref,
                                          transactionid=transaction_id)
             transaction_id = 0
-            self.session_cleanup(req)
+            self.__session_cleanup(req)
             session.load()
             session['person_message_show'] = True
             session['person_message'] = ("Successfully reset %s "
                                          "assignments."
                                          % (len(bibrefs)))
             session.save()
-            return redirect_to_url(req, "%s/person/%s"
+            if self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+                return redirect_to_url(req, "%s/person/%s"
                                    % (CFG_SITE_URL, pid))
+            else:
+                return redirect_to_url(req, "%s/person/claim" % CFG_SITE_URL)
 
 
-    def session_cleanup(self, req):
+    def __session_cleanup(self, req):
         '''
         Cleans the session from all bibauthorid specific settings and 
         with that cancels any transaction currently in progress.
@@ -933,6 +1298,14 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
             del(session["person_message"])
         if "name_batch_assign_papers" in session:
             del(session["name_batch_assign_papers"])
+        if 'cmp_bibrecrefs_to_confirm' in session:
+            del(session['cmp_bibrecrefs_to_confirm'])
+        if 'cmp_bibrecrefs_needs_confirm' in session:
+            del(session['cmp_bibrecrefs_needs_confirm'])
+        if 'cmp_bibrecrefs_pid' in session:
+            del(session['cmp_bibrecrefs_pid'])
+        if "cmp_first_time_user" in session:
+            del(session["cmp_first_time_user"])
 
         session.save()
 
@@ -964,7 +1337,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         search_results = None
         title = "Author Search"
 
-        if not self.user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
+        if not self.__user_is_authorized(req, CMP_CLAIM_OTHERS_PAPERS):
             return page_not_authorized(
                         req=req,
                         referer="%s/person/search" % (CFG_SITE_URL),
@@ -1144,7 +1517,7 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
             return "You have to specify an action for this method."
 
 
-    def user_is_authorized(self, req, action):
+    def __user_is_authorized(self, req, action):
         '''
         Determines if a given user is authorized to perform a specified action
         
@@ -1169,6 +1542,9 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
         if not isinstance(uid, int):
             return False
 
+        if uid == 0:
+            return False
+
         allowance = [i[1] for i in acc_find_user_role_actions({'uid': uid})
                      if i[1] == action]
 
@@ -1176,3 +1552,6 @@ class WebInterfaceBibauthoridPages(WebInterfaceDirectory):
             return True
 
         return False
+
+    me = claim
+    you = claim

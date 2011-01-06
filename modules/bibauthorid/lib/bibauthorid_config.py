@@ -34,8 +34,11 @@ VERSION = '0.1.11'
 # make sure current directory is importable
 FILE_PATH = osp.dirname(osp.abspath(__file__))
 
+if FILE_PATH not in sys.path:
+    sys.path.insert(0, FILE_PATH)
+
 # Permission definitions as in actions defined in roles
-CMP_ADMIN_ROLE = "CMPadmin"
+CMP_ADMIN_ROLE = "CMPadmins"
 CMP_USER_ROLE = "CMPusers"
 CMP_VIEW_PID_UNIVERSE = 'cmp_view_pid_universe'
 CMP_CHANGE_OWN_DATA = 'cmp_change_own_data'
@@ -43,8 +46,8 @@ CMP_CHANGE_OTHERS_DATA = 'cmp_change_others_data'
 CMP_CLAIM_OWN_PAPERS = 'cmp_claim_own_papers'
 CMP_CLAIM_OTHERS_PAPERS = 'cmp_claim_others_papers'
 
-if FILE_PATH not in sys.path:
-    sys.path.insert(0, FILE_PATH)
+# User info keys for externally claimed records
+EXTERNAL_CLAIMED_RECORDS_KEY = ["external_arxivids"]
 
 # Max number of threads to parallelize sql queryes in table_utils updates
 PERSONID_SQL_MAX_THREADS = 4
@@ -58,6 +61,7 @@ PERSONID_MIN_P_FROM_NEW_RA = 0.5
 # Minimum threshold for the compatibility list of persons to an RA: if no RA 
 # is more compatible that that it will create a new person
 PERSONID_MAX_COMP_LIST_MIN_TRSH = 0.5
+PERSONID_MAX_COMP_LIST_MIN_TRSH_P_N = 0.5
 
 #Create_new_person flags thresholds
 PERSONID_CNP_FLAG_1 = 0.75

@@ -67,6 +67,20 @@ $(document).ready(function() {
                         { "sWidth": "320px" }
                 ]
     });
+    
+    $('.reviewstable').dataTable({
+                "bJQueryUI": true,
+                "sPaginationType": "full_numbers",
+                "aoColumns": [
+                        { "bSortable": false,
+                          "sWidth": "" },
+                        { "bSortable": false,
+                          "sWidth": "" },
+                        { "bSortable": false,
+                          "sWidth": "120px" }
+                ]
+    });
+
 
     // Activate Tabs
     $("#aid_tabbing").tabs();
@@ -156,7 +170,7 @@ function action_request(claimid, action) {
         success: function(result){
             if (result.editable.length > 0) {
                 if (result.editable[0] == "not_authorized") {
-                    $( "<p title=\"Not Authorized\">Sorry, you are not authorized to perform this action</p>" ).dialog({
+                    $( "<p title=\"Not Authorized\">Sorry, you are not authorized to perform this action, since this record has been assigned to another user already. Please contact the support to receive assistance</p>" ).dialog({
                         modal: true,
                         buttons: {
                             Ok: function() {
@@ -166,7 +180,7 @@ function action_request(claimid, action) {
                         }
                     });
                 } else if (result.editable[0] == "touched") {
-                    $( "<p title=\"Review\">This record has been touched before. Perform action and overwrite previous decision?</p>" ).dialog({
+                    $( "<p title=\"Transaction Review\">This record has been touched before (possibly by yourself). Perform action and overwrite previous decision?</p>" ).dialog({
                         resizable: true,
                         height:250,
                         modal: true,

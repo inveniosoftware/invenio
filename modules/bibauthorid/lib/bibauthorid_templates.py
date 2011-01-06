@@ -29,6 +29,9 @@ from invenio.config import CFG_SITE_URL
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.bibformat import format_record
 from invenio.session import get_session
+from invenio.search_engine import get_fieldvalues
+from invenio.webuser import collect_user_info
+from invenio.webuser import getUid
 #from invenio.messages import gettext_set_language, wash_language
 #from invenio.textutils import encode_for_xml
 
@@ -41,8 +44,8 @@ class Template:
         self.language = language
 #        self._ = gettext_set_language(wash_language(language))
 
-    def __records_table(self, req, form_id, person_id, bibrecids):
-        no_papers_html = ['<div style="text-align:left;"><strong>']
+    def __records_table(self, req, form_id, person_id, bibrecids, admin=False):
+        no_papers_html = ['<div style="text-align:left;margin-top:1em;"><strong>']
         no_papers_html.append('Sorry, there are currently no documents to be found in this category.')
         no_papers_html.append('</strong></div>')
 
@@ -69,8 +72,12 @@ class Template:
 
             pp_h('    <td><input type="checkbox" name="selection" '
                            'value="%s" /> </td>' % (paper[1]))
-            pp_h("    <td>%s</td>"
-                           % (format_record(paper[0], "aid", on_the_fly=True)))
+            rec_info = format_record(paper[0], "aid", on_the_fly=True)
+
+            if not admin:
+                rec_info = rec_info.replace("person/search?q=", "author/")
+
+            pp_h("    <td>%s</td>" % (rec_info))
             pp_h("    <td>%s</td>" % (paper[3]))
             paper_status = "No status information found."
 
@@ -98,7 +105,10 @@ class Template:
         pp_h('∟ With selected do: ')
         pp_h('<input type="hidden" name="pid" value="%s" />' % (person_id))
         pp_h('<input type="submit" name="mconfirm" value="Confirm" />')
-        pp_h('<input type="submit" name="massign" value="Assign to other Person" />')
+
+        if admin:
+            pp_h('<input type="submit" name="massign" value="Assign to other Person" />')
+
         pp_h('<input type="submit" name="mrepeal" value="Repeal" />')
         pp_h('<input type="submit" name="mreset" value="Forget Decision" />')
         pp_h("  </div>")
@@ -107,8 +117,64 @@ class Template:
         return "\n".join(pp_html)
 
 
-    def tmpl_author_details(self, req, person_id=0, names=[],
-                            rejected_papers=[], rest_of_papers=[]):
+    def __reviews_table(self, req, person_id, bibrecids, admin=False):
+        no_papers_html = ['<div style="text-align:left;margin-top:1em;"><strong>']
+        no_papers_html.append('Sorry, there are currently no records to be found in this category.')
+        no_papers_html.append('</strong></div>')
+
+        if not bibrecids or not person_id:
+            return "\n".join(no_papers_html)
+
+        pp_html = []
+        pp_h = pp_html.append
+        pp_h('<form id="review" action="/person/batchprocess" method="post">')
+        pp_h('<table  class="reviewstable" cellpadding="3" width="100%">')
+        pp_h("  <thead>")
+        pp_h("    <tr>")
+        pp_h('      <th>&nbsp;</th>')
+        pp_h('      <th>Paper Short Info</th>')
+        pp_h("      <th>Actions</th>")
+        pp_h("    </tr>")
+        pp_h("  </thead>")
+        pp_h("  <tbody>")
+
+        for paper in bibrecids:
+            pp_h('  <tr>')
+            pp_h('    <td><input type="checkbox" name="selected_bibrecs" '
+                       'value="%s" /> </td>' % (paper))
+            rec_info = format_record(paper[0], "aid", on_the_fly=True)
+
+            if not admin:
+                rec_info = rec_info.replace("person/search?q=", "author/")
+
+            pp_h("    <td>%s</td>" % (rec_info))
+            pp_h('    <td><a href="/person/batchprocess?selected_bibrecs=%s&mfind_bibref=claim">Review Transaction</a></td>'
+                           % (paper))
+            pp_h("  </tr>")
+
+        pp_h("  </tbody>")
+        pp_h("</table>")
+
+        pp_h('<div style="text-align:left;"> On all pages: ')
+        pp_h('<a rel="group_1" href="#select_all">Select All</a> | ')
+        pp_h('<a rel="group_1" href="#select_none">Select None</a> | ')
+        pp_h('<a rel="group_1" href="#invert_selection">Invert Selection</a>')
+        pp_h('</div>')
+
+        pp_h('<div style="vertical-align:middle;">')
+        pp_h('∟ With selected do: ')
+        pp_h('<input type="hidden" name="pid" value="%s" />' % (person_id))
+        pp_h('<input type="hidden" name="mfind_bibref" value="claim" />')
+        pp_h('<input type="submit" name="submit" value="Review selected transactions" />')
+        pp_h("  </div>")
+        pp_h('</form>')
+
+        return "\n".join(pp_html)
+
+
+    def tmpl_author_details(self, req, person_id= -1, names=[],
+                            rejected_papers=[], rest_of_papers=[],
+                            review_needed=[]):
         html = []
         h = html.append
 
@@ -116,18 +182,20 @@ class Template:
         session = get_session(req)
         session.load()
 
-        h(self.tmpl_author_menu(req))
+        h(self.tmpl_author_admin_menu(req))
 
         if session.has_key("person_message_show") and session["person_message_show"]:
-            message = "The requested action completed successfully!"
+            message = "The requested action completed without a message."
 
             if session.has_key("person_message"):
                 message = session["person_message"]
 
             h(self.tmpl_notification_box(message, "Success:"))
-            del(session["person_message_show"])
-            del(session["person_message"])
-            session.save()
+
+            if not "aid_mass_review_action" in session:
+                del(session["person_message_show"])
+                del(session["person_message"])
+                session.save()
 
         lid = int(person_id)
         next_lnk = ("<a href='%s/person/%s'>Next &gt;&gt;</a>"
@@ -157,12 +225,13 @@ class Template:
         h('  <ul>')
         h('    <li><a href="#tabRecords"><span>Records (%s)</span></a></li>' % (len(rest_of_papers)))
         h('    <li><a href="#tabNotRecords"><span>Not this person\'s records (%s)</span></a></li>' % (len(rejected_papers)))
+        h('    <li><a href="#tabReviewNeeded"><span>Records in need of review (%s)</span></a></li>' % (len(review_needed)))
         h('    <li><a href="#tabComments"><span>Comments</span></a></li>')
         h('  </ul>')
 
         h('  <div id="tabRecords">')
         h(self.__records_table(req, "massfunctions",
-                                         person_id, rest_of_papers))
+                                         person_id, rest_of_papers, True))
         h("  </div>")
 
         h('  <div id="tabNotRecords">')
@@ -170,8 +239,12 @@ class Template:
         h('<br />They will be regarded in the next run of the author '
           'disambiguation algorithm and will then disappear in this listing.')
         h(self.__records_table(req, "rmassfunctions",
-                                         person_id, rejected_papers))
+                                         person_id, rejected_papers, True))
         h("  </div>")
+
+        h('  <div id="tabReviewNeeded">')
+        h(self.__reviews_table(req, person_id, review_needed, True))
+        h('  </div>')
 
         h('  <div id="tabComments">')
         h('<p>Please note that comments are visible to all operators who have '
@@ -296,7 +369,7 @@ class Template:
             if len(results) > base_color:
                 row_color += 1
             else:
-                row_color = base_color - (base_color - index *
+                row_color = base_color - (base_color - index * 
                                           (base_color / len(results)))
 
             pid = result[0]
@@ -465,7 +538,7 @@ class Template:
         return "\n".join(html)
 
 
-    def tmpl_author_menu(self, req, role="admin"):
+    def tmpl_author_admin_menu(self, req, role="admin"):
         html = []
         h = html.append
         h('<div id="aid_menu">')
@@ -475,6 +548,92 @@ class Template:
         h('    <!--<li>You are currently logged in as %s of this interface</li>!-->' % role)
         h('  </ul>')
         h('</div>')
+
+        return "\n".join(html)
+
+
+    def tmpl_bibref_confirm_dispatcher(self, req, selected_bibrefs):
+        html = []
+        selected_bibrefs_str = ''
+        for i in selected_bibrefs:
+            selected_bibrefs_str += '&selected_bibrecs=%s' % str(i)
+        session = get_session(req)
+        h = html.append
+        h('<p>')
+        h('<strong>You are recognized as being a Person/Author manager.</strong><br/>')
+        h('Please take a decision regarding the claim in question.')
+        h('</p>')
+        h('<p>')
+        h('<a href="%s/person/batchprocess?mfind_bibref=admin_claim">Claim for yourself</a> <br/>')
+        if 'cmp_admin_last_viewed_pid' in session:
+            lvpid = session['cmp_admin_last_viewed_pid']
+            h('<a href="%s/person/batchprocess?mfind_bibref=admin_claim&pid=%s%s">'
+              'Claim for the last person you visited: %s</a> <br/>' % (CFG_SITE_URL, str(lvpid),
+                                                                     str(selected_bibrefs_str), str(lvpid)))
+        h('</p>')
+        h('<div id="aid_moreinfo">')
+        h('<p>The decision will affect the claim of the following record(s):</p>')
+        h('<ul>')
+
+        for recid in selected_bibrefs:
+            try:
+                recid = int(recid)
+            except (ValueError, TypeError):
+                continue
+
+            h("<li>%s</li>" % (format_record(recid, "aid", on_the_fly=True)))
+
+        h('</ul>')
+        h('</div>')
+        return "\n".join(html)
+
+
+    def tmpl_bibref_confirm(self, req, pid, bibrecrefs_to_confirm, bibrec_refs_to_confirm):
+        html = []
+        h = html.append
+        h('<form id="review" action="/person/batchprocess" method="post">')
+        h('<p><strong>We could not reliably determine the name of the author on the records below to '
+          'automatically perform an assignment.</strong></p>')
+        h('<p>Please select an author for the records in question.<br/>')
+        h('Boxes not selected will be ignored in the process.')
+        h('</p>')
+
+        for brc in bibrecrefs_to_confirm:
+            h('<div id="aid_moreinfo">')
+            try:
+                fv = get_fieldvalues(int(brc[0]), "245__a")[0]
+            except (ValueError, IndexError, TypeError):
+                fv = 'Error retrieving record title'
+            h("Paper title: " + fv)
+            h('<select name="bibrecgroup%s">' % (brc[0]))
+            h('<option value="" selected>-- Please select a name --</option>')
+
+            for bibref in brc[1]:
+                h('<option value="%s">%s</option>' % (bibref[0], bibref[1]))
+#                h('<input type="radio" name="bibrecgroup%s" value="%s" />%s'
+#                  % (brc[0], bibref[0], bibref[1]))
+
+            h('</select>')
+            h("</div>")
+
+        if bibrec_refs_to_confirm:
+            h('<div id="aid_moreinfo">')
+            h('The following papers have been automatically assigned:')
+            h('<ul>')
+            for p in bibrec_refs_to_confirm:
+                try:
+                    fv = get_fieldvalues(int(p[0]), "245__a")[0]
+                except (ValueError, IndexError, TypeError):
+                    fv = 'Error retrieving record title'
+                h('<li>%s <strong>with name</strong> %s</li>' % (fv, str(p[1][0][1])))
+            h('</div>')
+
+        h('<div style="text-align:center;">')
+        h('<input type="hidden" name="mfind_bibref" value="confirm">')
+        h('  <input type="submit" name="%s" value="Accept Changes" />' % 'sub')
+        h('  <input type="submit" name="mcancel" value="Cancel operation" />')
+        h("</div>")
+        h('</form>')
 
         return "\n".join(html)
 
@@ -496,21 +655,15 @@ class Template:
         h("<div>")
 
         if t_no_conflicts:
-            h(self.tmpl_notification_box("There are %s record wihout conflicts!" % len(t_no_conflicts)))
+            h(self.tmpl_notification_box("%s records show no conflicts and will be included in the action." % len(t_no_conflicts)))
 
         if t_touched:
             h("<div>")
-#            h('<div><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-info"></span>'
-#                        'The following records need your attention. <br />')
-#            h("The following records have been touched through a human before. "
-#                        "Please make sure not to accidentaly touch the wrong records.<br />")
-#            h("If you want these records <strong>NOT to be affected</strong> by the chosen action, "
-#                        "please tick the box next to the records.</div>")
-            h(self.tmpl_notification_box('The following records need your attention. <br />\n'
-                                         'The following records have been touched through a human before. '
+            h(self.tmpl_notification_box('The following %s records need your attention. <br />\n'
+                                         'The records have been touched by a human before (Possibly yourself). '
                                          'Please make sure not to accidentaly touch the wrong records.<br /> \n'
                                          'If you want to <strong>exclude</strong> any record from the chosen action, '
-                                         'please <strong>tick the box</strong> next to the record.</div>"',
+                                         'please <strong>tick the box</strong> next to the record.</div>"' % len(t_touched),
                                          "Note:", False))
             h("<table>")
 
@@ -526,17 +679,11 @@ class Template:
 
         if t_not_allowed:
             h("<div>")
-#            h('<div><span style="float: left; margin-right: 0.3em;" class="ui-icon ui-icon-alert"></span>'
-#                        'The following records cannot be updated. <br />')
-#            h("The following records have been touched through an operator before, which locked the decision for you. ")
-#            h("Please feel free to contact the support team to correct or reset the attribution for you.<br />\n"
-#                        "You may contact the support team by using the eMail "
-#                        "&lt;<a href='mailto:%s?subject=Record attribution lock'>%s</a>&gt;.</div>" % CFG_SITE_SUPPORT_EMAIL)
             h(self.tmpl_error_box('The following records cannot be updated. <br />\n'
-                                  'The following records have been touched through an operator before, which locked the decision for you.\n'
+                                  'The following records have been touched by either an operator or another user before.'
                                   'Please feel free to contact the support team to correct or reset the attribution for you.<br />\n'
                                   'You may contact the support team by using the eMail '
-                                  '&lt;<a href="mailto:%s?subject=Record attribution lock">%s</a>&gt;.</div>' % CFG_SITE_SUPPORT_EMAIL,
+                                  '&lt;<a href="mailto:%s?subject=Record attribution lock">%s</a>&gt;.</div>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
                                   "Note:", False))
             h("<ul>")
 
@@ -556,4 +703,91 @@ class Template:
         h('</form>')
 
 #        h('<p>DEBUG Session Content: <pre>%s</pre> </p>' % session)
+        return "\n".join(html)
+
+
+    def tmpl_author_claim(self, req, person_id= -1, names=[],
+                            rejected_papers=[], rest_of_papers=[],
+                            review_needed=[]):
+        html = []
+        h = html.append
+
+        h('<div id="aid_person">')
+        session = get_session(req)
+        session.load()
+        uid = getUid(req)
+        user_info = collect_user_info(uid)
+
+        if session.has_key("person_message_show") and session["person_message_show"]:
+            message = "The requested action completed without a message."
+
+            if session.has_key("person_message"):
+                message = session["person_message"]
+
+            h(self.tmpl_notification_box(message, "Success:"))
+
+            if not "aid_mass_review_action" in session:
+                del(session["person_message_show"])
+                del(session["person_message"])
+                session.save()
+
+        if "cmp_first_time_user" in session:
+            welcome_msg = ("This is the first time you are using this "
+                           "interface.<br />Please feel free to use the actions "
+                           "provided to claim credit for the records listed.  "
+                           "You might be interested in using the main search "
+                           "to find additional records not listed below.")
+
+            h(self.tmpl_notification_box(welcome_msg, "Welcome!"))
+
+        h('<div id="aid_person_names" class="ui-tabs ui-widget ui-widget-content ui-corner-all">')
+
+        if "external_familyname" in user_info:
+            if "external_firstname" in user_info:
+                uname = "%s, %s" % (user_info["external_familyname"], user_info["external_firstname"])
+            else:
+                uname = "%s" % (user_info["external_familyname"])
+
+            h('<p>Your name as stored in your user profile: %s</p>' % uname)
+
+        h('<p style="margin-left: 20px;">Name variations as found on the records listed below:</p>')
+        h("<ul>")
+        h('  <li><span class="aid_lowlight_text">Person ID: <span id="pid%s">%s</span></span></li>'
+                      % (person_id, person_id))
+
+        for name in names:
+            h("  <li>%s as appeared on %s records</li>"
+                             % (name[0], name[1]))
+
+        h("</ul>")
+
+        h("</div>")
+
+        h('<div id="aid_tabbing">')
+        h('  <ul>')
+        h('    <li><a href="#tabRecords"><span>Your Records (%s)</span></a></li>' % (len(rest_of_papers)))
+        h('    <li><a href="#tabNotRecords"><span>Not your records (%s)</span></a></li>' % (len(rejected_papers)))
+        h('    <li><a href="#tabReviewNeeded"><span>Records in need of review (%s)</span></a></li>' % (len(review_needed)))
+        h('  </ul>')
+
+        h('  <div id="tabRecords">')
+        h(self.__records_table(req, "massfunctions",
+                                         person_id, rest_of_papers))
+        h("  </div>")
+
+        h('  <div id="tabNotRecords">')
+        h('These records have been marked as not being authored by you.')
+        h('<br />They will be regarded in the next run of the author '
+          'disambiguation algorithm and will then disappear from this listing.')
+        h(self.__records_table(req, "rmassfunctions",
+                                         person_id, rejected_papers))
+        h("  </div>")
+
+        h('  <div id="tabReviewNeeded">')
+        h(self.__reviews_table(req, person_id, review_needed))
+        h('  </div>')
+
+        h("</div>")
+        h("</div>")
+
         return "\n".join(html)
