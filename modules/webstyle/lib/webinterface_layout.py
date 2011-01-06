@@ -187,21 +187,21 @@ try:
     from invenio.bibknowledge_webinterface import WebInterfaceBibKnowledgePages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceBibKnowedgePages = WebInterfaceDumbPages
+    WebInterfaceBibKnowledgePages = WebInterfaceDumbPages
 
 try:
     from invenio.batchuploader_webinterface import \
          WebInterfaceBatchUploaderPages
 except:
     register_exception(alert_admin=True, subject='EMERGENCY')
-    WebInterfaceDocumentationPages = WebInterfaceDumbPages
+    WebInterfaceBatchUploaderPages = WebInterfaceDumbPages
 
 try:
     from invenio.bibsword_webinterface import \
          WebInterfaceSword
 except:
     register_exception(alert_admin=True, subject='EMERGENCE')
-    WebInterfaceDocumentationPage = WebInterfaceDumbPages
+    WebInterfaceSword = WebInterfaceDumbPages
 
 if CFG_DEVEL_SITE:
     try:
