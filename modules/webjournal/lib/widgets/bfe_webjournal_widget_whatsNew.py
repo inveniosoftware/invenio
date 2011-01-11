@@ -104,11 +104,10 @@ def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
                 whats_new_articles[category] = {}
 
     # 2. Build the HTML
-    html_out = u''
-    html_out += _get_breaking_news(ln, journal_name)
+    html_out = _get_breaking_news(ln, journal_name)
     for category in journal_categories:
         articles_in_category = whats_new_articles[category]
-        html_articles_in_category = u""
+        html_articles_in_category = ""
         # Generate the list of articles in this category
         order_numbers = articles_in_category.keys()
         order_numbers.sort()
@@ -133,7 +132,7 @@ def format_element(bfo, latest_issue_only='yes', newest_articles_only='yes',
                     except:
                         continue
                 try:
-                    html_articles_in_category += u'<li><a href="%s">%s</a></li>' % \
+                    html_articles_in_category += '<li><a href="%s">%s</a></li>' % \
                                                  (link, title)
                 except:
                     pass
