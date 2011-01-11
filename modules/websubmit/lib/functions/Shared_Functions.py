@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_LANG
 from invenio.bibdocfile import decompose_file
 from invenio.errorlib import register_exception
-from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats
+from invenio.websubmit_file_converter import convert_file, InvenioWebSubmitFileConverterError, get_missing_formats, get_file_converter_logger
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.dbquery import run_sql
 from invenio.bibsched import server_pid
@@ -45,36 +45,42 @@ def createRelatedFormats(fullpath, overwrite=True, debug=False):
     @param overwrite: (bool) overwrite already existing formats
     Return a list of the paths to the converted files
     """
+    file_converter_logger = get_file_converter_logger()
+    old_logging_level = file_converter_logger.getEffectiveLevel()
     if debug:
-        getLogger().setLevel(DEBUG)
-    createdpaths = []
-    basedir, filename, extension = decompose_file(fullpath)
-    extension = extension.lower()
-    if debug:
-        print >> sys.stderr, "basedir: %s, filename: %s, extension: %s" % (basedir, filename, extension)
-
-    filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
-    if debug:
-        print >> sys.stderr, "filelist: %s" % filelist
-    missing_formats = get_missing_formats(filelist)
-    if debug:
-        print >> sys.stderr, "missing_formats: %s" % missing_formats
-    for path, formats in missing_formats.iteritems():
+        file_converter_logger.setLevel(DEBUG)
+    try:
+        createdpaths = []
+        basedir, filename, extension = decompose_file(fullpath)
+        extension = extension.lower()
         if debug:
-            print >> sys.stderr, "... path: %s, formats: %s" % (path, formats)
-        for aformat in formats:
+            print >> sys.stderr, "basedir: %s, filename: %s, extension: %s" % (basedir, filename, extension)
+
+        filelist = glob.glob(os.path.join(basedir, '%s*' % filename))
+        if debug:
+            print >> sys.stderr, "filelist: %s" % filelist
+        missing_formats = get_missing_formats(filelist)
+        if debug:
+            print >> sys.stderr, "missing_formats: %s" % missing_formats
+        for path, formats in missing_formats.iteritems():
             if debug:
-                print >> sys.stderr, "...... aformat: %s" % aformat
-            newpath = os.path.join(basedir, filename + aformat)
-            if debug:
-                print >> sys.stderr, "...... newpath: %s" % newpath
-            try:
-                convert_file(path, newpath)
-                createdpaths.append(newpath)
-            except InvenioWebSubmitFileConverterError, msg:
+                print >> sys.stderr, "... path: %s, formats: %s" % (path, formats)
+            for aformat in formats:
                 if debug:
-                    print >> sys.stderr, "...... Exception: %s" % msg
-                register_exception(alert_admin=True)
+                    print >> sys.stderr, "...... aformat: %s" % aformat
+                newpath = os.path.join(basedir, filename + aformat)
+                if debug:
+                    print >> sys.stderr, "...... newpath: %s" % newpath
+                try:
+                    convert_file(path, newpath)
+                    createdpaths.append(newpath)
+                except InvenioWebSubmitFileConverterError, msg:
+                    if debug:
+                        print >> sys.stderr, "...... Exception: %s" % msg
+                    register_exception(alert_admin=True)
+    finally:
+        if debug:
+            file_converter_logger.setLevel(old_logging_level)
     return createdpaths
 
 def createIcon(fullpath, iconsize):

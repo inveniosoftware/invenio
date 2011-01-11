@@ -853,4 +853,7 @@ if __name__ == '__main__':
         main()
     except KeyboardInterrupt, e:
         die(6, 'Exiting on user request')
+    except:
+        from invenio.errorlib import register_exception
+        register_exception(alert_admin=True)
     die(exitcode)

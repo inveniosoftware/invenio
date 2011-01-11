@@ -21,6 +21,7 @@ This module implement fulltext conversion between many different file formats.
 """
 
 import os
+import stat
 import re
 import sys
 import shutil
@@ -32,7 +33,7 @@ import atexit
 import signal
 import threading
 
-from logging import debug, error, DEBUG, getLogger
+from logging import DEBUG, getLogger
 from htmlentitydefs import entitydefs
 from optparse import OptionParser
 
@@ -72,8 +73,8 @@ from invenio.websubmit_config import \
     CFG_WEBSUBMIT_DESIRED_CONVERSIONS
 from invenio.errorlib import register_exception
 
-#logger = getLogger()
-#logger.setLevel(DEBUG)
+def get_file_converter_logger():
+    return getLogger("InvenioWebSubmitFileConverterLogger")
 
 CFG_TWO2THREE_LANG_CODES = {
     'en': 'eng',
@@ -105,6 +106,7 @@ def get_conversion_map():
         '.djvu': {},
         '.doc': {},
         '.docx': {},
+        '.sxw': {},
         '.htm': {},
         '.html': {},
         '.odp': {},
@@ -113,6 +115,7 @@ def get_conversion_map():
         '.pdf': {},
         '.ppt': {},
         '.pptx': {},
+        '.sxi': {},
         '.ps': {},
         '.ps.gz': {},
         '.rtf': {},
@@ -121,8 +124,11 @@ def get_conversion_map():
         '.txt': {},
         '.xls': {},
         '.xlsx': {},
+        '.sxc': {},
         '.xml': {},
         '.hocr': {},
+        '.pdf;pdfa': {},
+
     }
     if CFG_PATH_GZIP:
         ret['.ps']['.ps.gz'] = (gzip, {})
@@ -130,6 +136,7 @@ def get_conversion_map():
         ret['.ps.gz']['.ps'] = (gunzip, {})
     if CFG_PATH_ANY2DJVU:
         ret['.pdf']['.djvu'] = (any2djvu, {})
+        ret['.pdf;pdfa']['.djvu'] = (any2djvu, {})
         ret['.ps']['.djvu'] = (any2djvu, {})
         ret['.ps.gz']['.djvu'] = (any2djvu, {})
     if CFG_PATH_DJVUPS:
@@ -154,10 +161,13 @@ def get_conversion_map():
                 ret['.ps.gz']['.pdf'] = (ps2pdf, {})
     if CFG_PATH_PDFTOPS:
         ret['.pdf']['.ps'] = (pdf2ps, {'compress': False})
+        ret['.pdf;pdfa']['.ps'] = (pdf2ps, {'compress': False})
         if CFG_PATH_GZIP:
             ret['.pdf']['.ps.gz'] = (pdf2ps, {'compress': True})
+            ret['.pdf;pdfa']['.ps.gz'] = (pdf2ps, {'compress': True})
     if CFG_PATH_PDFTOTEXT:
         ret['.pdf']['.txt'] = (pdf2text, {})
+        ret['.pdf;pdfa']['.txt'] = (pdf2text, {})
     if CFG_PATH_PDFTOPPM and CFG_PATH_OCROSCRIPT and CFG_PATH_PAMFILE:
         ret['.pdf']['.hocr'] = (pdf2hocr, {})
     ret['.txt']['.txt'] = (txt2text, {})
@@ -172,42 +182,25 @@ def get_conversion_map():
         ret['.tif']['.pdf'] = (tiff2pdf, {})
     if CFG_PATH_OPENOFFICE_PYTHON and CFG_OPENOFFICE_SERVER_HOST:
         ret['.rtf']['.odt'] = (unoconv, {'output_format': 'odt'})
-        ret['.rtf']['.doc'] = (unoconv, {'output_format': 'doc'})
-        ret['.rtf']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.rtf']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.doc']['.odt'] = (unoconv, {'output_format': 'odt'})
-        ret['.doc']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.doc']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.docx']['.odt'] = (unoconv, {'output_format': 'odt'})
-        ret['.docx']['.doc'] = (unoconv, {'output_format': 'doc'})
-        ret['.docx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.docx']['.txt'] = (unoconv, {'output_format': 'text'})
+        ret['.sxw']['.odt'] = (unoconv, {'output_format': 'odt'})
         ret['.odt']['.doc'] = (unoconv, {'output_format': 'doc'})
         ret['.odt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
         ret['.odt']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.ppt']['.odp'] = (unoconv, {'output_format': 'odp'})
-        ret['.ppt']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.ppt']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.pptx']['.odp'] = (unoconv, {'output_format': 'odp'})
-        ret['.pptx']['.ppt'] = (unoconv, {'output_format': 'ppt'})
-        ret['.pptx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.pptx']['.txt'] = (unoconv, {'output_format': 'text'})
+        ret['.sxi']['.odp'] = (unoconv, {'output_format': 'odp'})
         ret['.odp']['.ppt'] = (unoconv, {'output_format': 'ppt'})
+        ret['.odp']['.pptx'] = (unoconv, {'output_format': 'pptx'})
         ret['.odp']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.odp']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.xls']['.ods'] = (unoconv, {'output_format': 'ods'})
-        ret['.xls']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.xls']['.txt'] = (unoconv, {'output_format': 'text'})
-        ret['.xls']['.csv'] = (unoconv, {'output_format': 'csv'})
-        ret['.xlsx']['.xls'] = (unoconv, {'output_format': 'xls'})
         ret['.xlsx']['.ods'] = (unoconv, {'output_format': 'ods'})
-        ret['.xlsx']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.xlsx']['.txt'] = (unoconv, {'output_format': 'text'})
-        ret['.xlsx']['.csv'] = (unoconv, {'output_format': 'csv'})
+        ret['.sxc']['.ods'] = (unoconv, {'output_format': 'ods'})
         ret['.ods']['.xls'] = (unoconv, {'output_format': 'xls'})
         ret['.ods']['.pdf;pdfa'] = (unoconv, {'output_format': 'pdf'})
-        ret['.ods']['.txt'] = (unoconv, {'output_format': 'text'})
         ret['.ods']['.csv'] = (unoconv, {'output_format': 'csv'})
+    ret['.csv']['.txt'] = (txt2text, {})
 
     ## Let's add all the existing output formats as potential input formats.
     for value in ret.values():
@@ -262,7 +255,7 @@ def get_missing_formats(filelist, desired_conversion=None):
     return ret
 
 
-def can_convert(input_format, output_format, max_intermediate_conversions=2):
+def can_convert(input_format, output_format, max_intermediate_conversions=4):
     """Return the chain of conversion to transform input_format into output_format, if any."""
     from invenio.bibdocfile import normalize_format
     if max_intermediate_conversions <= 0:
@@ -384,7 +377,7 @@ def guess_ocropus_produced_garbage(input_file, hocr_p):
             else:
                 bads += 1
     if bads > goods:
-        debug('OCROpus produced garbage')
+        get_file_converter_logger().debug('OCROpus produced garbage')
         return True
     else:
         return False
@@ -424,22 +417,26 @@ def convert_file(input_file, output_file=None, output_format=None, **params):
     input_ext = decompose_file(input_file, skip_version=True)[2]
     conversion_chain = can_convert(input_ext, output_ext)
     if conversion_chain:
+        get_file_converter_logger().debug("Conversion chain from %s to %s: %s" % (input_ext, output_ext, conversion_chain))
         current_input = input_file
-        current_output = None
         for i in xrange(len(conversion_chain)):
+            current_output = None
             if i == (len(conversion_chain) - 1):
                 current_output = output_file
             converter = conversion_chain[i][0]
             final_params = dict(conversion_chain[i][1])
             final_params.update(params)
             try:
-                return converter(current_input, current_output, **final_params)
+                get_file_converter_logger().debug("Converting from %s to %s using %s with params %s" % (current_input, current_output, converter, final_params))
+                current_output = converter(current_input, current_output, **final_params)
+                get_file_converter_logger().debug("... current_output %s" % (current_output, ))
             except InvenioWebSubmitFileConverterError, err:
                 raise InvenioWebSubmitFileConverterError("Error when converting from %s to %s: %s" % (input_file, output_ext, err))
             except Exception, err:
                 register_exception(alert_admin=True)
                 raise InvenioWebSubmitFileConverterError("Unexpected error when converting from %s to %s (%s): %s" % (input_file, output_ext, type(err), err))
             current_input = current_output
+        return current_output
     else:
         raise InvenioWebSubmitFileConverterError("It's impossible to convert from %s to %s" % (input_ext, output_ext))
 
@@ -537,7 +534,7 @@ def unoconv(input_file, output_file=None, output_format='txt', pdfopt=True, **du
     output_format = normalize_format(output_format)
 
     if output_format == '.pdf' and pdfopt:
-        pdf2pdfopt(tmpfile, output_file)
+        pdf2pdfopt(tmpoutputfile, output_file)
     else:
         shutil.copy(tmpoutputfile, output_file)
     subprocess.call(['sudo', '-u', CFG_OPENOFFICE_USER, os.path.join(CFG_BINDIR, 'inveniounoconv'), '-v', '-r', tmpoutputfile])
@@ -607,7 +604,7 @@ def pdf2pdfa(input_file, output_file=None, title=None, pdfopt=True, **dummy):
     if not title:
         title = 'No title'
 
-    debug("Extracted title is %s" % title)
+    get_file_converter_logger().debug("Extracted title is %s" % title)
 
     if os.path.exists(CFG_ICC_PATH):
         shutil.copy(CFG_ICC_PATH, working_dir)
@@ -726,7 +723,7 @@ def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, ex
     def _perform_rotate(working_dir, imagefile, angle):
         """Rotate imagefile of the corresponding angle. Creates a new file
         with rotated- as prefix."""
-        debug('Performing rotate on %s by %s degrees' % (imagefile, angle))
+        get_file_converter_logger().debug('Performing rotate on %s by %s degrees' % (imagefile, angle))
         if not angle:
             #execute_command('%s %s %s', CFG_PATH_CONVERT, os.path.join(working_dir, imagefile), os.path.join(working_dir, 'rotated-%s' % imagefile))
             shutil.copy(os.path.join(working_dir, imagefile), os.path.join(working_dir, 'rotated-%s' % imagefile))
@@ -738,22 +735,22 @@ def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, ex
         """Perform ocroscript deskew. Expect to work on rotated-imagefile.
         Creates deskewed-imagefile.
         Return True if deskewing was fine."""
-        debug('Performing deskew on %s' % imagefile)
+        get_file_converter_logger().debug('Performing deskew on %s' % imagefile)
         try:
             dummy, stderr = execute_command_with_stderr(CFG_PATH_OCROSCRIPT, os.path.join(CFG_ETCDIR, 'websubmit', 'file_converter_templates', 'deskew.lua'), os.path.join(working_dir, 'rotated-%s' % imagefile), os.path.join(working_dir, 'deskewed-%s' % imagefile))
             if stderr.strip():
-                debug('Errors found during deskewing')
+                get_file_converter_logger().debug('Errors found during deskewing')
                 return False
             else:
                 return True
         except InvenioWebSubmitFileConverterError, err:
-            debug('Deskewing error: %s' % err)
+            get_file_converter_logger().debug('Deskewing error: %s' % err)
             return False
 
     def _perform_recognize(working_dir, imagefile):
         """Perform ocroscript recognize. Expect to work on deskewed-imagefile.
         Creates recognized.out Return True if recognizing was fine."""
-        debug('Performing recognize on %s' % imagefile)
+        get_file_converter_logger().debug('Performing recognize on %s' % imagefile)
         if extract_only_text:
             output_mode = 'text'
         else:
@@ -762,16 +759,16 @@ def pdf2hocr(input_file, output_file=None, ln='en', return_working_dir=False, ex
             dummy, stderr = execute_command_with_stderr(CFG_PATH_OCROSCRIPT, 'recognize', '--tesslanguage=%s' % ln, '--output-mode=%s' % output_mode, os.path.join(working_dir, 'deskewed-%s' % imagefile), filename_out=os.path.join(working_dir, 'recognize.out'))
             if stderr.strip():
                 ## There was some output on stderr
-                debug('Errors found in recognize.err')
+                get_file_converter_logger().debug('Errors found in recognize.err')
                 return False
             return not guess_ocropus_produced_garbage(os.path.join(working_dir, 'recognize.out'), not extract_only_text)
         except InvenioWebSubmitFileConverterError, err:
-            debug('Recognizer error: %s' % err)
+            get_file_converter_logger().debug('Recognizer error: %s' % err)
             return False
 
     def _perform_dummy_recognize(working_dir, imagefile):
         """Return an empty text or an empty hocr referencing the image."""
-        debug('Performing dummy recognize on %s' % imagefile)
+        get_file_converter_logger().debug('Performing dummy recognize on %s' % imagefile)
         if extract_only_text:
             out = ''
         else:
@@ -1042,7 +1039,7 @@ def prepare_io(input_file, output_file=None, output_ext=None, need_working_dir=T
     """Clean input_file and the output_file."""
     from invenio.bibdocfile import decompose_file, normalize_format
     output_ext = normalize_format(output_ext)
-    debug('Preparing IO for input=%s, output=%s, output_ext=%s' % (input_file, output_file, output_ext))
+    get_file_converter_logger().debug('Preparing IO for input=%s, output=%s, output_ext=%s' % (input_file, output_file, output_ext))
     if output_ext is None:
         if output_file is None:
             output_ext = '.tmp'
@@ -1073,7 +1070,7 @@ def prepare_io(input_file, output_file=None, output_ext=None, need_working_dir=T
         working_dir = None
         input_file = os.path.abspath(input_file)
 
-    debug('IO prepared: input_file=%s, output_file=%s, working_dir=%s' % (input_file, output_file, working_dir))
+    get_file_converter_logger().debug('IO prepared: input_file=%s, output_file=%s, working_dir=%s' % (input_file, output_file, working_dir))
     return (input_file, output_file, working_dir)
 
 
@@ -1081,13 +1078,13 @@ def clean_working_dir(working_dir):
     """
     Remove the working_dir.
     """
-    debug('Cleaning working_dir: %s' % working_dir)
+    get_file_converter_logger().debug('Cleaning working_dir: %s' % working_dir)
     shutil.rmtree(working_dir)
 
 
 def execute_command(*args, **argd):
     """Wrapper to run_process_with_timeout."""
-    debug("Executing: %s" % (args, ))
+    get_file_converter_logger().debug("Executing: %s" % (args, ))
     args = [str(arg) for arg in args]
     res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'), filename_err=argd.get('filename_err'))
     get_file_converter_logger().debug('res: %s, stdout: %s, stderr: %s' % (res, stdout, stderr))
@@ -1100,7 +1097,7 @@ def execute_command(*args, **argd):
 
 def execute_command_with_stderr(*args, **argd):
     """Wrapper to run_process_with_timeout."""
-    debug("Executing: %s" % (args, ))
+    get_file_converter_logger().debug("Executing: %s" % (args, ))
     res, stdout, stderr = run_process_with_timeout(args, cwd=argd.get('cwd'), filename_out=argd.get('filename_out'))
     if res != 0:
         message = "ERROR: Error in running %s\n stdout:\n%s\nstderr:\n%s\n" % (args, stdout, stderr)
@@ -1140,7 +1137,9 @@ def main_cli():
     parser.add_option("-l", "--language", dest="ln", help="specify the language (used when performing OCR, e.g. en, it, fr...)", metavar="LN", default='en')
     (options, dummy) = parser.parse_args()
     if options.debug:
-        getLogger().setLevel(DEBUG)
+        from logging import basicConfig
+        basicConfig()
+        get_file_converter_logger().setLevel(DEBUG)
     if options.can_convert:
         if options.can_convert:
             input_format = normalize_format(options.can_convert)

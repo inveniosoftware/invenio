@@ -112,8 +112,7 @@ def convert_conf_option(option_name, option_value):
         option_value = 'r"[' + option_value[1:-1] + ']"'
 
     ## 3abis) special cases: real regexps
-    if option_name in ['CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES',
-                       'CFG_BIBINDEX_SPLASH_PAGES']:
+    if option_name in ['CFG_BIBINDEX_PERFORM_OCR_ON_DOCNAMES']:
         option_value = 'r"' + option_value[1:-1] + '"'
 
     ## 3b) special cases: True, False, None
@@ -127,6 +126,13 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBMATCH_FUZZY_WORDLIMITS',
                        'CFG_BIBMATCH_QUERY_TEMPLATES']:
         option_value = option_value[1:-1]
+
+    ## 3cbis) very special cases: dicts with backward compatible string
+    if option_name in ['CFG_BIBINDEX_SPLASH_PAGES']:
+        if option_value.startswith('"{') and option_value.endswith('}"'):
+            option_value = option_value[1:-1]
+        else:
+            option_value = """{%s: ".*"}""" % option_value
 
     ## 3d) special cases: comma-separated lists
     if option_name in ['CFG_SITE_LANGS',

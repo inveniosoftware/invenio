@@ -497,3 +497,29 @@ def create_html_select(options, selected=None, attrs=None, **other_attrs):
             body.append(create_html_tag("option", body=value, escape_body=True, attrs=option_attrs))
     return create_html_tag("select", body='\n'.join(body), attrs=attrs, **other_attrs)
 
+class _LinkGetter(HTMLParser):
+    """
+    Hidden class that, by deriving from HTMLParser, will intercept all
+    <a> tags and retrieve the corresponding href attribute.
+    All URLs are available in the urls attribute of the class.
+    """
+    def __init__(self):
+        HTMLParser.__init__(self)
+        self.urls = set()
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            for (name, value) in attrs:
+                if name == 'href':
+                    self.urls.add(value)
+
+def get_links_in_html_page(html):
+    """
+    @param html: the HTML text to parse
+    @type html: str
+    @return: the list of URLs that were referenced via <a> tags.
+    @rtype: set of str
+    """
+    parser = _LinkGetter()
+    parser.feed(html)
+    return parser.urls

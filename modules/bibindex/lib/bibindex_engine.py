@@ -27,6 +27,8 @@ import os
 import re
 import sys
 import time
+import urllib2
+import logging
 
 from invenio.config import \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS, \
@@ -49,7 +51,7 @@ from invenio.bibindex_engine_tokenizer import BibIndexFuzzyNameTokenizer, \
 from invenio.bibdocfile import bibdocfile_url_p, \
      bibdocfile_url_to_bibdoc, normalize_format, \
      download_url, guess_format_from_url, BibRecDocs
-from invenio.websubmit_file_converter import convert_file
+from invenio.websubmit_file_converter import convert_file, get_file_converter_logger
 from invenio.search_engine import perform_request_search, strip_accents, \
      wash_index_term, lower_index_term, get_index_stemming_language
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
@@ -61,7 +63,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
-from invenio.htmlutils import remove_html_markup
+from invenio.htmlutils import remove_html_markup, get_links_in_html_page
 from invenio.textutils import wash_for_utf8
 
 if sys.hexversion < 0x2040000:
@@ -170,30 +172,6 @@ def get_field_tags(field):
                 ORDER BY ft.score DESC"""
     res = run_sql(query, (field, ))
     return [row[0] for row in res]
-
-## Fulltext word extraction functions
-def get_fulltext_urls_from_html_page(htmlpagebody):
-
-    """Parses htmlpagebody data (the splash page content) looking for
-       url_directs referring to probable fulltexts.
-       Returns an array of (ext,url_direct) to fulltexts.
-       Note: it looks for file format extensions as defined by global
-       'CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM' structure, minus the HTML ones, because we don't
-       want to index HTML pages that the splash page might point to.
-       """
-    out = []
-    for ext in CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM:
-        expr = re.compile( r"\"(http://[\w]+\.+[\w]+[^\"'><]*\." + \
-                           ext + r")\"")
-        match =  expr.search(htmlpagebody)
-        if match and ext not in ['htm', 'html']:
-            out.append([ext, match.group(1)])
-        #else: # FIXME: workaround for getfile, should use bibdoc tables
-            #expr_getfile = re.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + "&version=.*)\"")
-            #match =  expr_getfile.search(htmlpagebody)
-            #if match and ext not in ['htm', 'html']:
-                #out.append([ext, match.group(1)])
-    return out
 
 def get_words_from_journal_tag(recID, tag):
     """
@@ -308,32 +286,54 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 write_message("... %s is external URL but indexing only local files" % url_direct_or_indirect, verbose=2)
                 return []
             write_message("... %s is an external URL" % url_direct_or_indirect, verbose=2)
-            best_formats = [normalize_format(format) for format in CFG_WEBSUBMIT_BEST_FORMATS_TO_EXTRACT_TEXT_FROM]
-            format = guess_format_from_url(url_direct_or_indirect)
-            if re.match(CFG_BIBINDEX_SPLASH_PAGES, url_direct_or_indirect):
-                urls = get_fulltext_urls_from_html_page(url_direct_or_indirect)
-            else:
-                urls = [url_direct_or_indirect]
-            write_message("... will extract words from %s" % ', '.join(urls), verbose=2)
+            urls_to_index = set()
+            for splash_re, url_re in CFG_BIBINDEX_SPLASH_PAGES.iteritems():
+                if re.match(splash_re, url_direct_or_indirect):
+                    write_message("... %s is a splash page (%s)" % (url_direct_or_indirect, splash_re), verbose=2)
+                    html = urllib2.urlopen(url_direct_or_indirect).read()
+                    urls = get_links_in_html_page(html)
+                    write_message("... found these URLs in %s splash page: %s" % (url_direct_or_indirect, ", ".join(urls)), verbose=3)
+                    for url in urls:
+                        if re.match(url_re, url):
+                            write_message("... will index %s (matched by %s)" % (url, url_re), verbose=2)
+                            urls_to_index.add(url)
+            if not urls_to_index:
+                urls_to_index.add(url_direct_or_indirect)
+            write_message("... will extract words from %s" % ', '.join(urls_to_index), verbose=2)
             words = {}
-            for url in urls:
+            for url in urls_to_index:
                 format = guess_format_from_url(url)
+                write_message("... %s format was guessed for %s" % (format, url), verbose=3)
                 tmpdoc = download_url(url, format)
-                tmptext = convert_file(tmpdoc, output_format='.txt')
-                os.remove(tmpdoc)
-                text = open(tmptext).read()
-                os.remove(tmptext)
-                if CFG_SOLR_URL:
-                    # we are relying on Solr to provide full-text indexing, so do
-                    # nothing here (FIXME: dispatch indexing to Solr)
-                    tmpwords = []
-                else:
-                    tmpwords = get_words_from_phrase(text, stemming_language)
-                words.update(dict(map(lambda x: (x, 1), tmpwords)))
+                file_converter_logger = get_file_converter_logger()
+                old_logging_level = file_converter_logger.getEffectiveLevel()
+                if task_get_task_param("verbose") > 3:
+                    file_converter_logger.setLevel(logging.DEBUG)
+                try:
+                    try:
+                        tmptext = convert_file(tmpdoc, output_format='.txt')
+                        text = open(tmptext).read()
+                        os.remove(tmptext)
+                        if CFG_SOLR_URL:
+                            # we are relying on Solr to provide full-text indexing, so do
+                            # nothing here (FIXME: dispatch indexing to Solr)
+                            tmpwords = []
+                        else:
+                            tmpwords = get_words_from_phrase(text, stemming_language)
+                        words.update(dict(map(lambda x: (x, 1), tmpwords)))
+                    except Exception, e:
+                        message = 'ERROR: it\'s impossible to correctly extract words from %s referenced by %s: %s' % (url, url_direct_or_indirect, e)
+                        register_exception(prefix=message, alert_admin=True)
+                        write_message(message, stream=sys.stderr)
+                finally:
+                    os.remove(tmpdoc)
+                    if task_get_task_param("verbose") > 3:
+                        file_converter_logger.setLevel(old_logging_level)
             return words.keys()
     except Exception, e:
-        register_exception(prefix='ERROR: it\'s impossible to correctly extract words from %s' % url_direct_or_indirect, alert_admin=True)
-        write_message("ERROR: %s" % e, stream=sys.stderr)
+        message = 'ERROR: it\'s impossible to correctly extract words from %s: %s' % (url_direct_or_indirect, e)
+        register_exception(prefix=message, alert_admin=True)
+        write_message(message, stream=sys.stderr)
         return []
 
 latex_markup_re = re.compile(r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
