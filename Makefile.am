@@ -76,7 +76,7 @@ etags:
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
 
 install-data-local:
-	for d in / /cache /log /tmp /data /run ; do	\
+	for d in / /cache /log /tmp /tmp-shared /data /run ; do	\
 		mkdir -p $(localstatedir)$$d ;		\
 	done
 	@echo "************************************************************"

@@ -40,7 +40,7 @@ from invenio import search_engine
 from invenio import bibrecord
 from invenio import bibformat
 
-from invenio.config import CFG_TMPDIR, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,\
+from invenio.config import CFG_TMPSHAREDDIR, CFG_BIBEDITMULTI_LIMIT_INSTANT_PROCESSING,\
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING,\
                            CFG_BIBEDITMULTI_LIMIT_DELAYED_PROCESSING_TIME
 from time import strftime
@@ -480,7 +480,7 @@ def _get_file_path_for_bibupload():
     """Returns file path for saving a file for bibupload """
 
     current_time = strftime("%Y%m%d%H%M%S")
-    return "%s/%s_%s%s" % (CFG_TMPDIR, "multiedit_", current_time, ".xml")
+    return "%s/%s_%s%s" % (CFG_TMPSHAREDDIR, "multiedit", current_time, ".xml")
 
 def _save_records_xml(records, file_path, upload_mode, tag_list):
     """Saves records in a file in XML format

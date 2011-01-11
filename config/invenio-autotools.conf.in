@@ -33,6 +33,7 @@ CFG_LOGDIR = @localstatedir@/log
 CFG_ETCDIR = @prefix@/etc
 CFG_LOCALEDIR = @prefix@/share/locale
 CFG_TMPDIR = @localstatedir@/tmp
+CFG_TMPSHAREDDIR = @localstatedir@/tmp-shared
 CFG_CACHEDIR = @localstatedir@/cache
 CFG_WEBDIR = @localstatedir@/www
 

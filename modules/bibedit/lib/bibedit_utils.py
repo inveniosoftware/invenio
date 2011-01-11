@@ -47,7 +47,7 @@ from invenio.bibrecord import create_record, create_records, \
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_LOCKLEVEL, \
     CFG_BIBEDIT_TIMEOUT, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
-    CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPDIR
+    CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG, CFG_TMPSHAREDDIR
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.bibedit_dblayer import get_bibupload_task_opts, \
     get_marcxml_of_record_revision, get_record_revisions
@@ -59,7 +59,7 @@ from invenio.dbquery import run_sql
 from invenio.websearchadminlib import get_detailed_page_tabs
 
 # Precompile regexp:
-re_file_option = re.compile(r'^%s' % CFG_TMPDIR)
+re_file_option = re.compile(r'^%s' % CFG_TMPSHAREDDIR)
 re_xmlfilename_suffix = re.compile('_(\d+)_\d+\.xml$')
 re_revid_split = re.compile('^(\d+)\.(\d{14})$')
 re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
@@ -443,10 +443,10 @@ def _get_file_path(recid, uid, filename=''):
 
     """
     if not filename:
-        return '%s%s%s_%s_%s' % (CFG_TMPDIR, os.sep, CFG_BIBEDIT_FILENAME,
+        return '%s%s%s_%s_%s' % (CFG_TMPSHAREDDIR, os.sep, CFG_BIBEDIT_FILENAME,
                                  recid, uid)
     else:
-        return '%s%s%s_%s_%s' % (CFG_TMPDIR, os.sep, filename, recid, uid)
+        return '%s%s%s_%s_%s' % (CFG_TMPSHAREDDIR, os.sep, filename, recid, uid)
 
 def _uids_with_active_caches(recid):
     """Return list of uids with active caches for record RECID. Active caches
@@ -456,14 +456,14 @@ def _uids_with_active_caches(recid):
     """
     re_tmpfilename = re.compile('%s_%s_(\d+)\.tmp' % (CFG_BIBEDIT_FILENAME,
                                                       recid))
-    tmpfiles = fnmatch.filter(os.listdir(CFG_TMPDIR), '%s*.tmp' %
+    tmpfiles = fnmatch.filter(os.listdir(CFG_TMPSHAREDDIR), '%s*.tmp' %
                               CFG_BIBEDIT_FILENAME)
     expire_time = int(time.time()) - CFG_BIBEDIT_TIMEOUT
     active_uids = []
     for tmpfile in tmpfiles:
         mo = re_tmpfilename.match(tmpfile)
         if mo and int(os.path.getmtime('%s%s%s' % (
-                    CFG_TMPDIR, os.sep, tmpfile))) > expire_time:
+                    CFG_TMPSHAREDDIR, os.sep, tmpfile))) > expire_time:
             active_uids.append(int(mo.group(1)))
     return active_uids
 
