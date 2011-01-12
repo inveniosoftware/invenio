@@ -295,8 +295,8 @@ class WebInterfaceBatchUploaderPages(WebInterfaceDirectory):
         else:
             uid = getUid(req)
             body = batchuploader_templates.tmpl_display_menu(argd['ln'])
-            body += batchuploader_templates.tmpl_upload_succesful(argd['ln'])
-            title = _("Upload succesful")
+            body += batchuploader_templates.tmpl_upload_successful(argd['ln'])
+            title = _("Upload successful")
             navtrail = '''<a class="navtrail" href="%s/batchuploader/metadata">%s</a>''' % \
                             (CFG_SITE_URL, _("Metadata batch upload"))
             return page(title = title,

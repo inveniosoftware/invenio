@@ -184,8 +184,8 @@ class Template:
         body_content += """</form></div>"""
         return body_content
 
-    def tmpl_upload_succesful(self, ln=CFG_SITE_LANG):
-        """ Displays message when the upload is succesful """
+    def tmpl_upload_successful(self, ln=CFG_SITE_LANG):
+        """ Displays message when the upload is successful """
         _ = gettext_set_language(ln)
         body_content = """<br/>"""
         body_content += _("Your file has been successfully queued. You can check your %(x_url1_open)supload history%(x_url1_close)s or %(x_url2_open)ssubmit another file%(x_url2_close)s") %\
