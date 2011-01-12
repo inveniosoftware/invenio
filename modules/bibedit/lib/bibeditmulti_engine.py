@@ -36,6 +36,7 @@ base class.
 
 __revision__ = "$Id"
 
+import cgi
 from invenio import search_engine
 from invenio import bibrecord
 from invenio import bibformat
@@ -354,7 +355,7 @@ def _get_formated_record(record_id, output_format, update_commands, language, ou
 
     if "hm" == output_format:
         result = "<pre>\n"
-        marc_record = _create_marc(xml_record)
+        marc_record = cgi.escape(_create_marc(xml_record))
         if "All tags" not in outputTags or not outputTags:
             for line in marc_record.split('\n')[:-1]:
                 for tag in outputTags:
