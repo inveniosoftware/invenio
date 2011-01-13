@@ -9468,7 +9468,7 @@ PyMODINIT_FUNC PyInit_intbitset(void)
 
   /* "/home/sam/build/invenio/modules/miscutil/lib/intbitset.pyx":1
  * ## This file is part of Invenio.             # <<<<<<<<<<<<<<
- * ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010 CERN.
+ * ## Copyright (C) 2007, 2008, 2009, 2010, 2011,  CERN.
  * ##
  */
   __pyx_t_1 = PyDict_New(); if (unlikely(!__pyx_t_1)) {__pyx_filename = __pyx_f[0]; __pyx_lineno = 1; __pyx_clineno = __LINE__; goto __pyx_L1_error;}
