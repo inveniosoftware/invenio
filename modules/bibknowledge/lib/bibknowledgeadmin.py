@@ -19,6 +19,7 @@
 
 import MySQLdb
 import os
+import cgi
 import sys
 if sys.hexversion < 0x2060000:
     try:
@@ -110,12 +111,19 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
         #get the form
         form = req.form
         #get the contents from the form
+        if not form.has_key('file') or not form['file'].filename:
+            return page(title=_("Cannot upload file"),
+                        body = _("You have not selected a file to upload"),
+                        language=ln,
+                        navtrail = navtrail,
+                        lastupdated=__lastupdated__,
+                        req=req)
         fileitem = form['file']
         uploaddir = CFG_WEBDIR+"/kbfiles"
 
         #create a upload directory unless already exists
         if os.path.isfile(uploaddir):
-            return page(title=_("upload is a file"),
+            return page(title=_("Cannot upload file"),
                         body = "Cannot create directory " + \
                                 uploaddir+" since it already" + \
                                 " exists and it is a file",
@@ -127,7 +135,7 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
             try:
                 os.mkdir(uploaddir)
             except:
-                return page(title=_("Cannot create upload"),
+                return page(title=_("Cannot upload file"),
                         body = "Cannot create directory "+uploaddir+ \
                                " maybe no access rights",
                         language=ln,
@@ -139,8 +147,8 @@ def kb_upload(req, kb, ln=CFG_SITE_LANG):
         #get the name and the file..
         fn = str(kb_id)+".rdf"
         open(uploaddir+"/"+fn, 'w').write(fileitem.file.read())
-        body = "File kbfiles/"+fn+" uploaded."+ \
-               " <a href='"+CFG_SITE_URL+"/kb'>Back</a>"
+        body = (_("File %s uploaded.") % ('kbfiles/' + cgi.escape(fn)))
+        body += " <a href='"+CFG_SITE_URL+"/kb'>%s</a>" % _("Back")
         return(page(title=_("File uploaded"),
                     body = body,
                     language=ln,
@@ -625,7 +633,7 @@ def kb_export(req, kbname="", format="kbr", searchkey="", searchvalue="", search
             req.content_type = 'application/json'
             return json.dumps(ret)
         if not mappings:
-            body = "There is no knowledge base named "+kbname+" or it is empty",
+            body = _("There is no knowledge base named %sor it is empty") % cgi.escape(kbname),
             return page(title=_("No such knowledge base"),
                         body=body,
                         language=ln,

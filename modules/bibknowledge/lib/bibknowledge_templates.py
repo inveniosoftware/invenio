@@ -23,6 +23,7 @@ __revision__ = ""
 
 # non Invenio imports
 import os
+import cgi
 
 # Invenio imports
 from invenio.messages import gettext_set_language
@@ -46,18 +47,19 @@ class Template:
         _ = gettext_set_language(ln)    # load the right message language
 
         #top of the page and table header
+        searchforaterm_field = '<input type="text" name="search" value="%s" />' % cgi.escape(lookup_term, 1)
+        searchforaterm = _("Limit display to knowledge bases matching %(keyword_field)s in their rules and descriptions") % \
+                         {'keyword_field': searchforaterm_field}
         out = '''
 
         <!--make a search box-->
         <table class="admin_wvar" cellspacing="0">
                  <tr><td>
                  <form action="kb">
-                 %(searchforaterm1)s
-                 <input type="text" name="search" value="%(search)s" />
-                 %(searchforaterm2)s
+                 %(searchforaterm)s
                  <input type="hidden" name="ln" value="%(ln)s" />
                  <input type="hidden" name="descriptiontoo" value="1" />
-                 <input type="submit" class="adminbutton" value="Search">
+                 <input type="submit" class="adminbutton" value="%(search_button)s">
                  </form>
                  </td></tr></table>
 
@@ -65,23 +67,26 @@ class Template:
         <table class="admin_wvar" width="95%%" cellspacing="0">
         <tr>
         <th class="adminheaderleft" >&nbsp;</th>
-        <th class="adminheaderleft" >Name</th>
-        <th class="adminheaderleft" >Description</th>
-        <th class="adminheadercenter" >Action&nbsp;
+        <th class="adminheaderleft" >%(name)s</th>
+        <th class="adminheaderleft" >%(description)s</th>
+        <th class="adminheadercenter" >%(action)s&nbsp;
           &nbsp;[<a href="%(siteurl)s/help/admin/bibknowledge-admin-guide#admin">?</a>]
         </th>
         </tr>''' % {'ln': ln,
                     'search': lookup_term,
-                    'searchforaterm1': _("Limit display to knowledge bases matching"),
-                    'searchforaterm2': _("in their rules and descriptions"),
-                    'siteurl': CFG_SITE_URL}
+                    'searchforaterm': searchforaterm,
+                    'siteurl': CFG_SITE_URL,
+                    'name': _("Name"),
+                    'description': _("Description"),
+                    'action': _("Action"),
+                    'search_button': _("Search")}
 
 
         #table content: kb names, description and actions
         if len(kbs) == 0:
             out += '''<tr>
-            <td colspan="5" class="admintd" align="center"><em>No Knowledge Base</em></td>
-            </tr>'''
+            <td colspan="5" class="admintd" align="center"><em>%s</em></td>
+            </tr>''' % _("No Knowledge Base")
         else:
             line = 0
             for kb_attributes in kbs :
@@ -91,7 +96,10 @@ class Template:
                 line += 1
                 kb_attributes['ln'] = ln
                 kb_attributes['siteurl'] = CFG_SITE_URL
-                kb_attributes['search'] = lookup_term
+                kb_attributes['search'] = cgi.escape(lookup_term, 1)
+                kb_attributes['name'] = cgi.escape(kb_attributes['name'])
+                kb_attributes['description'] = cgi.escape(kb_attributes['description'])
+                kb_attributes['delete'] = _("Delete")
                 row_content = '''<tr>
                 <td class="admintdright" style="vertical-align: middle; %(style)s">&nbsp;</td>
                 <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;">
@@ -99,7 +107,7 @@ class Template:
                 <td class="admintdleft"style="vertical-align: middle; %(style)s">%(description)s</td>
                 <td class="admintd" style="vertical-align: middle; %(style)s white-space: nowrap;">
                 <form action="kb?ln=%(ln)s" type="POST">
-                <input type="submit" class="adminbutton" value="Delete">
+                <input type="submit" class="adminbutton" value="%(delete)s">
                 <input type="hidden" id="kb" name="kb" value="%(id)s">
                 <input type="hidden" id="action" name="action" value="delete">
                 </form>
@@ -177,25 +185,26 @@ class Template:
         #check if this kb already has a file associated with it
         #it would be named CFG_WEBDIR+"/kbfiles/"+kb_id+".rdf"
         rdfname = CFG_WEBDIR+"/kbfiles/"+str(kb_id)+".rdf"
-        webname = CFG_SITE_URL+"/kb/export?kbname="+kb_name
+        webname = CFG_SITE_URL+"/kb/export?kbname="+cgi.escape(kb_name, 1)
         out = ""
         if os.path.isfile(rdfname):
             out += _("This knowledge base already has a taxonomy file.")+" "
             out += _("If you upload another file, the current version will be replaced.")
             out += "<br/>"
-            out += _("The current taxonomy can be accessed with this URL")+": "
-            out += '<a href="'+webname+'">'+webname+"</a>"
+            out += _("The current taxonomy can be accessed with this URL: %s") % \
+                   ('<a href="'+webname+'">'+webname+"</a>")
         else:
-            out += _("Please upload the RDF file for taxonomy")+" "+kb_name
+            out += _("Please upload the RDF file for taxonomy %s") % cgi.escape(kb_name)
         out += """
           <br/>
           <!-- enctype="multipart/form-data"-->
           <form method="post" action="kb/upload" name="upload" enctype="multipart/form-data">
           <input style="display:none;" name="kb", value="%(kb_id)s"/>
           <input type="file" name="file"/>
-          <input type="submit" name="submit" value="Upload"/>
+          <input type="submit" name="submit" value="%(upload)s" class="adminbutton"/>
           </form>
-          """ % { 'kb_id': kb_id }
+          """ % {'kb_id': kb_id,
+                 'upload': _("Upload")}
         return out
 
 
@@ -225,7 +234,7 @@ class Template:
         pleaseconf += _("A dynamic knowledge base is a list of values of a \
                          given field. The list is generated dynamically by \
                          searching the records using a search expression.")
-        pleaseconf += "<br>"
+        pleaseconf += "<br/>"
         pleaseconf += _("Example: Your records contain field 270__a for \
                          the name and address of the author's institute. \
                          If you set the field to '270__a' and the expression \
@@ -246,11 +255,12 @@ class Template:
                          <input type="hidden" name="action" value="dynamic_update"/>
                          <input type="hidden" name="ln" value="%(ln)s"/>
                          <input type="hidden" name="kb" value="%(kb_id)s"/>
-                         <input type="submit" name="submit" value="ok"/>
+                         <input type="submit" name="submit" value="%(save)s" class="adminbutton"/>
                          </form>''' % { 'kb_id': kb_id,
-                                        'expression': expression,
-                                        'field': field,
-                                        'collection': collection, 'ln': ln }
+                                        'expression': cgi.escape(expression, 1),
+                                        'field': cgi.escape(field, 1),
+                                        'collection': cgi.escape(collection, 1), 'ln': ln ,
+                                        'save': _("Save")}
         if field or expression:
             pleaseconf += "<p>"+_("Exporting: ")
             pleaseconf += "<a href=\""+exportstr+"\">"+exportstr+"</a><br/>"
@@ -305,7 +315,7 @@ action=attributes&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s">%(attributes)s</a>
             startati = 0
 
         #to note about exporting..
-        export = CFG_SITE_URL+"/kb/export?kbname="+kb_name
+        export = CFG_SITE_URL+"/kb/export?kbname="+cgi.escape(kb_name, 1)
 
         if kb_type == 'd':
             #it's a dynamic kb. Create a config form.
@@ -392,7 +402,7 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
         ''' % {'siteurl':CFG_SITE_URL,
                'mapfrom': mapfromstring, 'mapto': maptostring,
                'search': _("Search"), 'ln': ln, 'kb_id':kb_id,
-               'lookup_term': lookup_term,
+               'lookup_term': cgi.escape(lookup_term, 1),
                'searchforamapping': _("Search for a mapping") }
 
         #calculate if prev/next are needed
@@ -440,15 +450,15 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
         ''' % {'ln':ln,
                'kb_id':kb_id,
                'siteurl':CFG_SITE_URL,
-               'mapfrom': mapfromstring, 'mapto': maptostring,
+               'mapfrom': cgi.escape(mapfromstring, 1), 'mapto': cgi.escape(maptostring, 1),
                'prevlink': prevlink, 'nextlink': nextlink }
 
         #table content: key, value and actions
         if len(mappings) == 0:
             out += '''
             <tr>
-            <td colspan="5" class="admintd" align="center"><em>Knowledge base is empty</em></td>
-            </tr></tbody>'''
+            <td colspan="5" class="admintd" align="center"><em>%s</em></td>
+            </tr></tbody>''' % _("Knowledge base is empty")
         else:
             line = 0
             tabindex_key = 6
@@ -484,18 +494,20 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
                         <input type="text" name="mapTo" size="30" value="%(value)s" tabindex="%(tabindex_value)s">
                     </td>
                     <td class="admintd" style="%(style)s white-space: nowrap;">
-                        <input class="adminbutton" type="submit" name="save_mapping" value="Save" tabindex="%(tabindex_save_button)s"/>
-                        <input class="adminbutton" type="submit" name="delete_mapping" value="Delete"/></td>
+                        <input class="adminbutton" type="submit" name="save_mapping" value="%(save)s" tabindex="%(tabindex_save_button)s"/>
+                        <input class="adminbutton" type="submit" name="delete_mapping" value="%(delete)s"/></td>
                     </tr></table></form></td></tr>
-                    ''' % {'key': mapping['key'],
-                        'value':mapping['value'],
+                    ''' % {'key': cgi.escape(mapping['key'], 1),
+                        'value':cgi.escape(mapping['value'], 1),
                         'ln':ln,
                         'style':style,
                         'tabindex_key': tabindex_key,
                         'tabindex_value': tabindex_value,
                         'tabindex_save_button': tabindex_save_button,
                         'kb_id':kb_id,
-                        'sortby':sortby}
+                        'sortby':sortby,
+                        'save': _("Save"),
+                        'delete': _("Delete")}
 
                     out += row_content
 
@@ -587,12 +599,13 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
         </tr>
         <tr>
         <td>&nbsp;</td>
-        <td align="right"><input tabindex="6" class="adminbutton" type="submit" value="Update Base Attributes"/></td>
+        <td align="right"><input tabindex="6" class="adminbutton" type="submit" value="%(update_base_attributes)s"/></td>
         </tr>
         </table>
-        </form></td>''' % {'kb_name': kb_name,
-                           'kb_description': description,
-                           'kb_id':kb_id}
+        </form></td>''' % {'kb_name': cgi.escape(kb_name, 1),
+                           'kb_description': cgi.escape(description, 1),
+                           'kb_id':kb_id,
+                           'update_base_attributes':_("Update Base Attributes")}
 
         return out
 
@@ -634,7 +647,8 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
         <td valign="top">&nbsp;''' % {"name": kb_name}
 
         if len(format_elements) == 0:
-            out += '<p align="center"><i>This knowledge base is not used in any format elements.</i></p>'
+            out += '<p align="center"><i>%s</i></p>' % \
+                   _("This knowledge base is not used in any format elements.")
         for format_element in format_elements:
             name = format_element['name']
             out += '''<a href="format_elements_doc?ln=%(ln)s#%(anchor)s">%(name)s</a><br/>''' % {'name':"bfe_"+name.lower(),
@@ -664,12 +678,14 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
         """
         _ = gettext_set_language(ln)    # load the right message language
 
-        gen = _("Your rule")+": "+left+"->"+right+"<p>"
+        gen = _("Your rule: %s") % (' <code style="border:1px solid #999">'+cgi.escape(left)+'</code> =&gt; <code style="border:1px solid #999">'+cgi.escape(right)+"</pre><p>")
         if (leftorright=='left'):
-            gen += _("The left side of the rule ")+" ("+left+") "
+            gen += _("The left side of the rule (%s) already appears in these knowledge bases:") % \
+                   ('<code>' + cgi.escape(left) + '</code>')
         else:
-            gen += _("The right side of the rule ")+" ("+right+") "
-        gen += _("already appears in these knowledge bases")+":<br/>"
+            gen += _("The right side of the rule (%s) already appears in these knowledge bases:") % \
+                   ('<code>' + cgi.escape(right) + '</code>')
+        gen += "<br/>"
         inkbs = []
         dontdoit = False
         for d in dicts:
@@ -679,26 +695,27 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
                 #two rules with same left side in the same kb? no.
             if inkbs.count(kb)==0:
                 inkbs.append(kb)
-        kbstr = " ".join(inkbs)
-        kbstr = "<strong>"+kbstr+"</strong>"
+        kbstr = ", ".join(['<b>%s</b>' % cgi.escape(inkb) for inkb in inkbs])
         gen += kbstr
         message = _("Please select action")
         optreplace = _("Replace the selected rules with this rule")
-        optadd = _("Add this rule in the current knowledge base")+" ("+current+")"
+        optadd = _("Add this rule in the current knowledge base")+" ("+cgi.escape(current, 1)+")"
         optcancel = _("Cancel: do not add this rule")
         formreplace = '''<form action="kb?action=add_mapping&amp;ln=%(ln)s&amp;kb=%(kb_id)s&amp;forcetype=all"
                     method="post">
                     <input type="hidden" name="mapFrom" value="%(left)s"/>
                     <input type="hidden" name="mapTo" value="%(right)s"/>
-                 ''' % {  'ln':ln, 'kb_id':kbid, 'left':left, 'right':right }
+                 ''' % {  'ln':ln, 'kb_id':kbid, 'left':cgi.escape(left, 1), 'right':cgi.escape(right, 1) }
 
         #make a selectable list of kb's where to push the value..
         for d in dicts:
             kb = d['kbname']
             l = d['key']
             r = d['value']
-            value = kb+"++++"+l+"++++"+r
-            formreplace += "<input type=\"checkbox\" name=\"replacements\" value=\""+value+"\">"+kb+": "+l+"=>"+r+"</input><br/>"
+            value = cgi.escape(kb, 1)+"++++"+cgi.escape(l, 1)+"++++"+cgi.escape(r, 1)
+            formreplace += '<input type="checkbox" name="replacements" value="'+value+'" />' + \
+                           '<b>' + cgi.escape(kb) + '</b>: <code style="border:1px solid #999">' + \
+                           cgi.escape(l) + '</code> =&gt; <code style="border:1px solid #999">' + cgi.escape(r) + "</code><br/>"
 
         formreplace += ''' <input class="adminbutton"
                      type="submit" value="%(opt)s"/></form>''' % { 'opt':optreplace }
@@ -709,7 +726,7 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
                     <input class="adminbutton"
                      type="submit" value="%(opt)s"/></form>''' % { 'opt':optadd, 'ln':ln,
                                                                     'kb_id':kbid,
-                                                                    'left':left, 'right':right }
+                                                                    'left':cgi.escape(left, 1), 'right':cgi.escape(right, 1) }
         formcancel = '''<form action="kb?ln=%(ln)s&amp;kb=%(kb_id)s">
                     <input type="hidden" name="kb" value="%(kb_id)s">
                     <input  class="adminbutton"
@@ -717,5 +734,5 @@ sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
 
         if dontdoit:
             formadd = _("It is not possible to have two rules with the same left side in the same knowledge base.")+"<p>"
-        out = gen+"<P>"+message+"<P>"+formadd+formcancel+"<P><P><P>"+formreplace
+        out = gen+"<p>"+message+"<p>"+formadd+formcancel+"<p><p><p>"+formreplace
         return out
