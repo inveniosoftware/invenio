@@ -102,7 +102,8 @@ def user_authorization(req, ln):
         auth_code, auth_message = acc_authorize_action(req, 'runbatchuploader')
         if auth_code != 0:
             referer = '/batchuploader/'
-            error_msg = _("The user '%s' is not authorized to run batchuploader" % (user_info['nickname']))
+            error_msg = _("The user '%s' is not authorized to run batchuploader" % \
+                          (cgi.escape(user_info['nickname'])))
             return page_not_authorized(req=req, referer=referer,
                                        text=error_msg, navmenuid="batchuploader")
 

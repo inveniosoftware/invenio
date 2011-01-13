@@ -21,6 +21,7 @@
 
 __revision__ = "$Id$"
 
+import cgi
 from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
@@ -178,8 +179,8 @@ class Template:
         'sel3': mode == '--correct' and "selected" or "",
         'sel4': mode == '--append' and "selected" or "",
         'sel5': mode == '-ir insert-or-replace' and "selected" or "",
-        'submit_date': submit_date,
-        'submit_time': submit_time}
+        'submit_date': cgi.escape(submit_date),
+        'submit_time': cgi.escape(submit_time)}
 
         body_content += """</form></div>"""
         return body_content
@@ -327,7 +328,7 @@ class Template:
         body_content += """
         <div id="content">
         <fieldset>
-        <div><span class="mandatory_field""> * </span> %(txt1)s:&nbsp;&nbsp;<input type="text" name="docfolder" size="30">
+        <div><span class="mandatory_field""> * </span> %(txt1)s:&nbsp;&nbsp;<input type="text" name="docfolder" size="30" />
         <span class="italics">%(txt2)s: /afs/cern.ch/user/j/user/public/foo/</span></div>
         <div><span class="mandatory_field""> * </span> %(txt3)s:
         <select name="matching">
@@ -335,8 +336,8 @@ class Template:
             <option>recid</option>
         </select>
         </div>
-        <div><span class="mandatory_field""> * </span> %(txt4)s: <input type="radio" name="mode" value="append" "checked">append</input>
-                                                                <input type="radio" name="mode" value="correct">revise</input>
+        <div><span class="mandatory_field""> * </span> %(txt4)s: <input type="radio" name="mode" value="append" "checked" id="appendcheckbox"/><label for="appendcheckbox">append</label>
+                                                                <input type="radio" name="mode" value="correct" id="revisecheckbox"/><label for="revisecheckbox">revise</label>
         </div>
         <br/>
         <div>%(txt5)s&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="italics">%(txt6)s:</span>
@@ -379,7 +380,7 @@ class Template:
         body_content += "<ul>"
         for error in errors:
             if error != 'MoveError':
-                body_content += "<li><b>%s</b> : %s</li>" % (error[0], error[1])
+                body_content += "<li><b>%s</b> : %s</li>" % (cgi.escape(str(error[0])), cgi.escape(str(error[1])))
         body_content += "</ul>"
         if 'MoveError' in errors:
             body_content += "<div><i><b>" + _("Some files could not be moved to DONE folder. Please remove them manually.") + "</b></i></div><br/>"
@@ -438,8 +439,8 @@ class Template:
         actions = []
         res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='batchuploader' and runtime > now() ORDER by runtime")
         if len(res) > 0:
-            (id, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
-            actions.append([id, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
+            (tskid, proc, host, user, runtime, sleeptime, arguments, status, progress) = res[0]
+            actions.append([tskid, proc, runtime, (status !="" and status or ''), (progress !="" and progress or '')])
         else:
             actions.append(['', 'batchuploader', '', '', 'Not scheduled'])
 
