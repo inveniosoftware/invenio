@@ -77,11 +77,11 @@ def _perform_request_index(ln, search=""):
     _ = gettext_set_language(ln)
     mydir = CFG_ETCDIR+"/bibcheck"
     if not os.path.exists(mydir):
-        return _("ERROR")+" "+mydir+" "+_("does not exist")
+        return _("ERROR: %s does not exist") % mydir
     if not os.path.isdir(mydir):
-        return  _("ERROR")+" "+mydir+" "+_("is not a directory")
+        return  _("ERROR: %s is not a directory") % mydir
     if not os.access(mydir, os.W_OK):
-        return  _("ERROR")+" "+mydir+" "+_("is not writable")
+        return  _("ERROR: %s is not writable") % mydir
     myfiles = os.listdir(mydir)
     if search:
         #include only files that match
@@ -262,21 +262,20 @@ def save(req, ln, fname, code, wasnew=0):
     navtrail = '''<a class="navtrail" href="%s/help/admin">%s</a>''' % \
                (CFG_SITE_URL, _("Admin Area"))
     navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_URL
-    myout = _("File")+" " + cgi.escape(fname) + " "
     if admin_ok:
         myfile = CFG_ETCDIR+"/bibcheck/"+fname
         #check if the file exists if this was new
         if wasnew and os.path.exists(myfile):
-            msg = myout+" "+_("already exists.")
+            msg = _("File %s already exists.") % cgi.escape(fname)
         else:
             #write code into file
-            msg = myout+_("written OK.")
+            msg = _("File %s: written OK.") % cgi.escape(fname)
             try:
                 outfile = file(myfile, 'w')
                 outfile.write(code)
                 outfile.close()
             except IOError:
-                msg = myout+_("write failed.")
+                msg = _("File %s: write failed.") % cgi.escape(fname)
         #print message
         return page(title=_("Save BibCheck config file"),
                 body= msg,
@@ -302,7 +301,6 @@ def delete(req, ln, fname):
     navtrail = """<a class="navtrail" href="%s/help/admin">%s</a>""" % \
                (CFG_SITE_URL, _("Admin Area"))
     navtrail += """&gt; <a class="navtrail" href="%s/admin/bibcheck/bibcheckadmin.py/">BibCheck Admin</a> """ % CFG_SITE_URL
-    myout = _("File")+" "+fname+" "
     if admin_ok:
         msg = ""
         myfile = CFG_ETCDIR+"/bibcheck/"+fname
@@ -312,9 +310,9 @@ def delete(req, ln, fname):
         except:
             success = 0
         if success:
-            msg = myout+_("deleted")+"."
+            msg = _("File %s deleted.") % cgi.escape(fname)
         else:
-            msg = myout+_("delete failed")+"."
+            msg = _("File %s: delete failed.") % cgi.escape(fname)
         #print message
         return page(title=_("Delete BibCheck config file"),
                 body= msg,
