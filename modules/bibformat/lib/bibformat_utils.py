@@ -29,6 +29,8 @@ __revision__ = "$Id$"
 
 import re
 import zlib
+import shlex
+from subprocess import *
 
 from invenio.config import \
      CFG_OAI_ID_FIELD, \
@@ -644,15 +646,20 @@ def get_text_snippets(textfile_path, patterns, nb_words_around, max_snippets, \
     # big snippets like this
     # FIXME: the ligature replacement should be done at the textification time;
     # then the sed expression can go away here.
-    cmd = "sed \'s/ﬀ/ff/g; s/ﬁ/fi/g; s/ﬂ/fl/g; s/ﬃ/ffi/g; s/ﬄ/ffl/g\' \
-           %s | grep -i -E -A%s -B%s -m%s"
-    cmdargs = [textfile_path, str(nb_words_around), str(nb_words_around), str(max_snippets)]
+    sed_cmd = "sed \'s/ﬀ/ff/g; s/ﬁ/fi/g; s/ﬂ/fl/g; s/ﬃ/ffi/g; s/ﬄ/ffl/g\' " \
+              + textfile_path
+    grep_args = [str(nb_words_around), str(nb_words_around), str(max_snippets)]
+    grep_cmd = "grep -i -E -A%s -B%s -m%s"
     for p in escaped_keywords:
-        cmd += " -e \"(\\b|\\s)\"%s"
+        grep_cmd += " -e \"(\\b|\\s)\"%s"
         if right_boundary:
-            cmd += "\"(\\b|\\s)\""
-        cmdargs.append(p)
-    (dummy1, output, dummy2) = run_shell_command(cmd, cmdargs)
+            grep_cmd += "\"(\\b|\\s)\""
+        grep_args.append(p)
+    sed_call = shlex.split(sed_cmd)
+    grep_call = shlex.split(grep_cmd % tuple(grep_args))
+    p1 = Popen(sed_call, stdout=PIPE)
+    p2 = Popen(grep_call, stdin=p1.stdout, stdout=PIPE)
+    output = p2.communicate()[0]
 
     result = []
     big_snippets = output.split("--")
