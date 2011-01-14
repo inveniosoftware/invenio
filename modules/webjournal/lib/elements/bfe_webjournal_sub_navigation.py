@@ -2,7 +2,7 @@
 ## $Id: bfe_webjournal_CERNBulletinSubNavigation.py,v 1.13 2009/02/12 10:00:57 jerome Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011,  CERN.
+## Copyright (C) 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as

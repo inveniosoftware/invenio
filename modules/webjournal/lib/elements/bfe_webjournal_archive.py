@@ -2,7 +2,7 @@
 ## $Id: bfe_webjournal_CERN_Bulletin_Archive.py,v 1.8 2008/06/03 09:12:18 jerome Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011,  CERN.
+## Copyright (C) 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as

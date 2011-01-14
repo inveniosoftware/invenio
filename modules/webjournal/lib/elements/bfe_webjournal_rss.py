@@ -2,7 +2,7 @@
 ## $Id: bfe_webjournal_widget_whatsNew.py,v 1.24 2009/01/27 07:25:12 jerome Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011,  CERN.
+## Copyright (C) 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as

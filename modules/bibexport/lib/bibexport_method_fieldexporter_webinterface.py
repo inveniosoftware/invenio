@@ -2,7 +2,7 @@
 ## $Id: webmessage_webinterface.py,v 1.13 2008/03/12 16:48:08 tibor Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011,  CERN.
+## Copyright (C) 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as

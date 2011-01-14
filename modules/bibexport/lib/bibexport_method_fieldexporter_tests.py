@@ -3,7 +3,7 @@
 ## $Id: search_engine_tests.py,v 1.20 2008/08/11 12:49:27 kaplun Exp $
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2009, 2010, 2011,  CERN.
+## Copyright (C) 2009, 2010, 2011 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
