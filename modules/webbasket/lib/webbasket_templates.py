@@ -2332,8 +2332,6 @@ class Template:
                      'bskid': bskid,
                      'recid': recid,
                      'external_url': external_url,
-                     'cmts_label': _("notes"),
-                     'last_cmt_label': _("last note on"),
                      'detailed_record_label': _("Detailed record"),
                      'category': selected_category,
                      'topic': selected_topic,
@@ -2985,7 +2983,7 @@ class Template:
         optional_colspan = nb_items and ' colspan="3"' or ''
         records_field = '<br />' + _('%i items') % nb_items
         comments_field = user_can_view_comments and \
-                         (nb_comments and ', ' + (_('%i notes') % nb_comments) or _(', no notes yet')) \
+                         (nb_comments and ', ' + (_('%i notes') % nb_comments) or ', ' + _('no notes yet')) \
                          or ''
         last_update_field = '<br />' + _('last update') + ': ' + date_modification
 
@@ -3207,8 +3205,6 @@ class Template:
                      'bskid': bskid,
                      'recid': recid,
                      'external_url': external_url,
-                     'cmts_label': _("notes"),
-                     'last_cmt_label': _("last note on"),
                      'detailed_record_label': _("Detailed record"),
                      'copy': copy,
                      'ln': ln}
