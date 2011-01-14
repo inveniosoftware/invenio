@@ -458,7 +458,7 @@ div .boxleft_2 {
     <tr class="valueParameters">
         <td /><td /><td /><td />
         <td colspan="3">
-            <input id="textBoxValue" class="txtValue textBoxValue" type="text" value="%(text_value)s" maxlength="50"/>
+            <input id="textBoxValue" class="txtValue textBoxValue" type="text" value="%(text_value)s"/>
         </td>
     </tr>
     <tr class="newValueParameters">
