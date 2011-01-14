@@ -1012,9 +1012,9 @@ II. Example - connecting role and user</a>
 
         <strong>ALLOW/DENY ANY/ALL</strong>
 
-        or
-
         <strong>ALLOW/DENY FROM/UNTIL <em>"YYYY-MM-DD"</em></strong>
+
+        or
 
         <strong>ALLOW/DENY [NOT] <em>field</em> {<em>one or more values</em>}</strong>
 
