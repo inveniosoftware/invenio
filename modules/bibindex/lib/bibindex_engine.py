@@ -380,7 +380,8 @@ def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
 def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
     """Create reindexing temporary tables."""
     write_message("Creating new tmp index tables for id %s" % index_id)
-    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxWORD%02dF (
+    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dF""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxWORD%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term varchar(50) default NULL,
                         hitlist longblob,
@@ -388,14 +389,16 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         UNIQUE KEY term (term)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxWORD%02dR (
+    run_sql("""DROP TABLE IF EXISTS %sidxWORD%02dR""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxWORD%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL,
                         termlist longblob,
                         type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                         PRIMARY KEY (id_bibrec,type)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPAIR%02dF (
+    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dF""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPAIR%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term varchar(100) default NULL,
                         hitlist longblob,
@@ -403,14 +406,16 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         UNIQUE KEY term (term)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPAIR%02dR (
+    run_sql("""DROP TABLE IF EXISTS %sidxPAIR%02dR""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPAIR%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL,
                         termlist longblob,
                         type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                         PRIMARY KEY (id_bibrec,type)
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPHRASE%02dF (
+    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dF""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPHRASE%02dF (
                         id mediumint(9) unsigned NOT NULL auto_increment,
                         term text default NULL,
                         hitlist longblob,
@@ -418,7 +423,8 @@ def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
                         KEY term (term(50))
                         ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
 
-    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPHRASE%02dR (
+    run_sql("""DROP TABLE IF EXISTS %sidxPHRASE%02dR""" % (reindex_prefix, index_id))
+    run_sql("""CREATE TABLE %sidxPHRASE%02dR (
                         id_bibrec mediumint(9) unsigned NOT NULL default '0',
                         termlist longblob,
                         type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
