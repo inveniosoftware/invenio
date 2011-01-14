@@ -57,13 +57,14 @@ multiedit_templates = template.load('bibeditmulti')
 # base command for subfields
 class BaseSubfieldCommand:
     """Base class for commands manipulating subfields"""
-    def __init__(self, subfield, value = "", new_value = "", condition = "", condition_subfield = ""):
+    def __init__(self, subfield, value = "", new_value = "", condition = "", condition_exact_match=True, condition_subfield = ""):
         """Initialization."""
         self._subfield = subfield
         self._value = value
         self._new_value = new_value
         self._condition = condition
         self._condition_subfield = condition_subfield
+        self._condition_exact_match = condition_exact_match
 
     def process_field(self, record, tag, field_number):
         """Make changes to a record.
@@ -98,8 +99,14 @@ class BaseSubfieldCommand:
                 subfield_index = 0
                 for subfield in field[0]:
                     if self._condition != 'condition':
-                        if (self._condition_subfield == subfield[0]) and (self._condition == subfield[1]):
-                            callback(record, tag, field_number, subfield_index)
+                        if self._condition_subfield == subfield[0]:
+                            if self._condition_exact_match:
+                                if self._condition == subfield[1]:
+                                    callback(record, tag, field_number, subfield_index)
+                            else:
+                                if self._condition in subfield[1]:
+                                    callback(record, tag, field_number, subfield_index)
+
                     elif subfield[0] == self._subfield:
                         callback(record, tag, field_number, subfield_index)
                     subfield_index = subfield_index+1
